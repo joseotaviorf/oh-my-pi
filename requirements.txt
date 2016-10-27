@@ -1,0 +1,9 @@
+boto3==1.4.1
+petl==1.1.1
+python-dateutil==2.5.3
+requests==2.11.1
+enum
+pymysql
+psycopg2
+pytz
+tzlocal
