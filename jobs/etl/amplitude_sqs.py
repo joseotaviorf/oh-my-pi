@@ -54,8 +54,8 @@ def check_dates(start_date, end_date, td, kwargs):
     return start_date.strftime(AMPLITUDE_API_DATE_FORMAT), end_date.strftime(AMPLITUDE_API_DATE_FORMAT)
 
 
-def convert_date(date):
-    return date.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
+def convert_date(dt):
+    return dt.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
 
 
 if __name__ == '__main__':
@@ -66,8 +66,10 @@ if __name__ == '__main__':
     now = convert_date(datetime.utcnow())
 
     queue_name = args[1] if arg_count > 1 else None
-    start_date = convert_date(args[2]) if arg_count > 2 else now.strftime(DEFAULT_DATETIME_FORMAT)
-    end_date = convert_date(args[3]) if arg_count > 3 else now.strftime(DEFAULT_DATETIME_FORMAT)
+    start_date = convert_date(datetime.strptime(args[2], DEFAULT_DATETIME_FORMAT)) if arg_count > 2 else now.strftime(DEFAULT_DATETIME_FORMAT)
+    print start_date
+    end_date = convert_date(datetime.strptime(args[3], DEFAULT_DATETIME_FORMAT)) if arg_count > 3 else now.strftime(DEFAULT_DATETIME_FORMAT)
+    print end_date
     td = args[4] if arg_count > 4 else None
 
     execute(queue_name=queue_name, start_date=start_date, end_date=end_date, td=td)
