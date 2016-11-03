@@ -33,8 +33,3 @@ class DBFactory(object):
             return pymysql.connect(host, user, pwd, db)
 
         return None
-
-
-# ENV_BI_DW='{"host":"quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com", "user": "quintoandar", # "pwd": "ourTvH8MMkmREzoXwf2cdsARKnFGqhtY", "db": "dw", "dbtype": "redshift"}'
-# with DBFactory.get_connection(EnumDb.BI_DW) as conn:
-#     print (conn)
