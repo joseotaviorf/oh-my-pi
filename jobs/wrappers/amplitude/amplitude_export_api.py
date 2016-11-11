@@ -1,7 +1,7 @@
 import io
 import petl
 import requests
-from jobs.base.base_etl import BaseETL, log, EnumDb, EnumDbType
+from jobs.base.base_etl import BaseETL, log, EnumDb
 
 
 class AmplitudeExportApi(BaseETL):
