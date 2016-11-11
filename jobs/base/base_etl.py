@@ -9,12 +9,18 @@ import io
 import petl
 import json
 import os
+import datetime
+from decimal import Decimal
 
 
-class BaseETL:
+class BaseETL(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         pass
+
+    @staticmethod
+    def now():
+        return datetime.datetime.utcnow()
 
     @staticmethod
     def get_json_from_zipfile(f):
@@ -43,36 +49,127 @@ class BaseETL:
             )
 
     @staticmethod
+    def publish_notifications(notifications, topic_arn):
+        sns = boto3.client('sns')
+        for n in notifications:
+            sns.publish(
+                TopicArn=topic_arn,
+                Message=n
+            )
+
+    @classmethod
+    def get_message_content(cls, message):
+        body = json.loads(message.body)
+        m = json.loads(body['Message']) if body.get('Message') is not None else body
+        return m
+
+    @staticmethod
     def get_connection(db_enum):
         return DBFactory.get_connection(db_enum)
 
-    @staticmethod
-    def to_db(db_enum, data_table, table_name, append=True):
-        conn = BaseETL.get_connection(db_enum)
+    @classmethod
+    def insert_data(cls, db_enum, data_table, table_name, append=True, schema=None, commit=True, conn=None):
+        """table: list of lists like a PETL Table """
+        if not conn:
+            conn = cls.get_connection(db_enum=db_enum)
         if append:
-            petl.appenddb(data_table, conn, table_name)
+            petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
-            petl.todb(data_table, conn, table_name)
+            petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
 
     @staticmethod
-    def from_db_table(db_enum, table_name):
-        return BaseETL.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name))
+    def format_parameters_to_db(line, encode_to='utf-8'):
+        l = []
+        for item in line:
+            if isinstance(item, datetime.datetime):
+                if len(str(item)) <= 8:
+                    l.append(datetime.datetime.strftime(item, "%Y%m%d"))
+                else:
+                    l.append(datetime.datetime.strftime(item, "%Y-%m-%d %H:%M:%S"))
+            elif item is None:
+                l.append('null')
+            elif isinstance(item, Decimal):
+                l.append(float(item))
+            elif isinstance(item, unicode) or isinstance(item, str):
+                l.append(item.encode(encode_to).replace("'", "").replace(",", ""))
+            else:
+                l.append(item)
+        values = str(l).replace('[', '(').replace(']', ')').replace("'null'", "null")
+        return values
 
     @staticmethod
-    def from_db_query(db_enum, query):
-        conn = BaseETL.get_connection(db_enum)
+    def format_parameter(p):
+        return "'{0}'".format(str(p)) if p else 'null'
+
+    @classmethod
+    def execute_function(cls, db_enum, function_name, table=None, conn=None, commit=False):
+        if not conn:
+            conn = cls.get_connection(db_enum)
+
+        conn.autocommit = commit
+        if table:
+            for line in table:
+                if line != table[0]:
+                    values = cls.format_parameters_to_db(line)
+                    command = "select {0} {1}".replace("()", "").format(function_name, values)
+                    conn.cursor().execute(command)
+        else:
+            fn = function_name if (str(function_name).strip().endswith(")")) else "{0}()".format(function_name)
+            command = "select {0}".format(fn)
+            conn.cursor().execute(command)
+
+    @classmethod
+    def execute_command(cls, command, db_enum=None, conn=None, commit=False, in_iterator=False):
+        if not db_enum and not conn:
+            raise AttributeError()
+        if not conn:
+            conn = cls.get_connection(db_enum)
+        if not in_iterator:
+            conn.autocommit = commit
+        conn.cursor().execute(command)
+
+    @classmethod
+    def insert_row(cls, table, db_enum, table_name, key_name=None, conn=None, commit=True):
+        if not conn:
+            conn = cls.get_connection(db_enum)
+
+        conn.autocommit = commit
+        header = cls.format_parameters_to_db(table[0]).replace("'", "\"")
+        id_of_new_row = None
+        for line in table:
+            if line != table[0]:
+                values =  cls.format_parameters_to_db(line)
+                return_value = """returning "{}" """.format(key_name) if key_name is not None else ""
+                command = """insert into {0}{1} values {2} {3};""".format(table_name, header, values, return_value)
+                cursor = conn.cursor()
+                cursor.execute(command)
+                id_of_new_row = cursor.fetchone()[0]
+
+        return id_of_new_row
+
+    @staticmethod
+    def update_data(table, db_enum, table_name, key_name=None, conn=None, commit=True):
+        raise Exception("Not implemented")
+
+    @classmethod
+    def from_db_table(cls, db_enum, table_name):
+        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name))
+
+    @classmethod
+    def from_db_query(cls, db_enum, query):
+        conn = cls.get_connection(db_enum)
         return list(petl.fromdb(conn, query))
 
-    @staticmethod
-    def move_table(table_name, enum_db_source, enum_db_dest):
-        aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
-        aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
+    @classmethod
+    def move_table(cls, table_name, enum_db_source, enum_db_dest):
+        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         tmp_dir = '/tmp/'
         fn = '{}.csv'.format(table_name)
         tmp_fn = tmp_dir+fn
-        bucket_name =os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+        bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
 
-        dim = BaseETL.from_db_table(db_enum=enum_db_source, table_name=table_name)
+        dim = cls.from_db_table(db_enum=enum_db_source, table_name=table_name)
         petl.tocsv(dim, tmp_fn)
 
         s3 = boto3.client('s3')
@@ -80,7 +177,7 @@ class BaseETL:
 
         os.remove(tmp_fn)
 
-        con = BaseETL.get_connection(enum_db_dest)
+        con = cls.get_connection(enum_db_dest)
         sql = """COPY {} FROM '{}'
                     CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                     DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
@@ -93,7 +190,7 @@ class BaseETL:
             con.cursor().execute(sql)
         finally:
             con.close()
-            BaseETL.delete_file_s3(bucket_name, fn)
+            cls.delete_file_s3(bucket_name, fn)
 
     @staticmethod
     def delete_file_s3(bucket_name, fn):
