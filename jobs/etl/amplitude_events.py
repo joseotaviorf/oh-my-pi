@@ -48,7 +48,6 @@ class AmplitudeEventsETL(BaseETL):
                 print ('{0}\n{1}'.format(r, e))
                 # logError(message.body, e)
                 pass
-
         return messages
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=None, **kwargs):
@@ -94,12 +93,14 @@ class AmplitudeEventsETL(BaseETL):
         return start_date.strftime(AMPLITUDE_API_DATE_FORMAT), end_date.strftime(AMPLITUDE_API_DATE_FORMAT)
 
 
-def convert_date(dt):
+def convert_date(date_str):
+    dt = datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
     return dt.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
 
 
+
 if __name__ == '__main__':
-    now = convert_date(datetime.utcnow())
+    now = convert_date(datetime.utcnow().strftime(DEFAULT_DATETIME_FORMAT))
     args = sys.argv
     arg_count = len(args)
 
@@ -107,11 +108,9 @@ if __name__ == '__main__':
     a = AmplitudeEventsETL()
     if args[1] == 'source_to_sns':
         topic_arn = args[2] if arg_count > 2 else None
-        start_date = convert_date(datetime.strptime(args[3], DEFAULT_DATETIME_FORMAT)) if arg_count > 3 else now.strftime(
-            DEFAULT_DATETIME_FORMAT)
+        start_date = convert_date(args[3]) if arg_count > 3 else now
         print start_date
-        end_date = convert_date(datetime.strptime(args[4], DEFAULT_DATETIME_FORMAT)) if arg_count > 4 else now.strftime(
-            DEFAULT_DATETIME_FORMAT)
+        end_date = convert_date(args[4]) if arg_count > 4 else now
         print end_date
         td = args[5] if arg_count > 5 else None
 
