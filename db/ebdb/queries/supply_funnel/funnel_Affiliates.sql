@@ -1,6 +1,7 @@
 ﻿SELECT -- count(1)
   r.*,
 
+  affiliate_listing_value + affiliate_renting_value as CAC_Affiliate,
   TIMEDIFF(r.lead_date, r.contact_date) as contact_to_lead_diff_datetime,
   TIMESTAMPDIFF(MINUTE, r.contact_date, r.lead_date) as contact_to_lead_diff_minutes,
 
@@ -8,19 +9,19 @@
   TIMESTAMPDIFF(MINUTE, r.lead_date, r.qualified_date) as lead_to_qualified_diff_minutes,
 
   TIMEDIFF(r.opportunity_date, r.qualified_date) as qualified_to_opportunity_diff_datetime,
-  TIMESTAMPDIFF(MINUTE, r.qualified_date, r.opportunity_date) as qualified_to_opportunity_diff_minutes ,
+  TIMESTAMPDIFF(MINUTE, r.qualified_date, r.opportunity_date) as qualified_to_opportunity_diff_minutes,
 
   TIMEDIFF(r.listing_publication_date, r.opportunity_date) as opportunity_to_listing_diff_datetime,
   TIMESTAMPDIFF(MINUTE, r.opportunity_date, r.listing_publication_date) as opportunity_to_listing_diff_minutes,
 
-  TIMEDIFF(r.first_contract_date, r.listing_publication_date) as listing_to_1stcontract_diff_datetime,
-  TIMESTAMPDIFF(MINUTE, r.listing_publication_date, r.first_contract_date) as listing_to_1stcontract_diff_minutes,
+  TIMEDIFF(r.contract_date, r.listing_publication_date) as listing_to_1stcontract_diff_datetime,
+  TIMESTAMPDIFF(MINUTE, r.listing_publication_date, r.contract_date) as listing_to_1stcontract_diff_minutes,
 
   TIMEDIFF(r.listing_publication_date, r.contact_date) as contact_to_listing_diff_datetime,
   TIMESTAMPDIFF(MINUTE, r.contact_date, r.listing_publication_date) as contact_to_listing_diff_minutes,
 
-  TIMEDIFF(r.first_contract_date, r.contact_date) as contact_to_1stcontract_diff_datetime,
-  TIMESTAMPDIFF(MINUTE, r.contact_date, r.first_contract_date) as contact_to_1stcontract_diff_minutes
+  TIMEDIFF(r.contract_date, r.contact_date) as contact_to_1stcontract_diff_datetime,
+  TIMESTAMPDIFF(MINUTE, r.contact_date, r.contract_date) as contact_to_1stcontract_diff_minutes
 
 
 FROM
@@ -41,7 +42,7 @@ FROM
     coalesce(cl.dataConversao, cl.criadoEm) AS qualified_date,  
     f.dataCriacao as opportunity_date,
     ip.datePublication AS listing_publication_date,
-    cast(c.dataInicio as datetime) as first_contract_date,
+    cast(c.dataInicio as datetime) as contract_date,
   
     l.id AS lead_id,
     
@@ -53,7 +54,15 @@ FROM
     coalesce(i.usuario_id, l.proprietarioLead_id) AS owner_id,
     i.usuarioQueCadastrou_id AS rep_id,
     g.id as manager_id,
-    u.tipoAdmin AS tipoAdmin 
+    u.tipoAdmin AS tipoAdmin ,
+
+    case 
+      when l.tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0 
+    end as affiliate_listing_value,
+  
+    case 
+      when l.tipo = 'Afiliado' and cast(c.dataInicio as datetime) is not null then i.aluguel*.1 else 0 
+    end as affiliate_renting_value
 
   FROM 
     Lead l
