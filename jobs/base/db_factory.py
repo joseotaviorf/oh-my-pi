@@ -28,8 +28,13 @@ class DBFactory(object):
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
             default_port = port if port else 5439 if dbtype==EnumDbType.Redshift else 5432
-            return psycopg2.connect(host=host, user=user, password=pwd, database=db, port=default_port)
+            conn = psycopg2.connect(host=host, user=user, password=pwd, database=db, port=default_port)
+            conn.set_client_encoding('LATIN1')
+            return conn
         elif dbtype == EnumDbType.MySQL:
-            return pymysql.connect(host, user, pwd, db)
+            conn = pymysql.connect(host, user, pwd, db)
+            cur = conn.cursor()
+            cur.execute('SET SQL_MODE=ANSI_QUOTES')
+            return cur
 
         return None

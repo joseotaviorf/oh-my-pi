@@ -1,5 +1,5 @@
 from logging import info as log
-from enum_db import EnumDb
+from enum_db import EnumDb, EnumDbType
 import boto3
 from db_factory import DBFactory
 import zipfile
@@ -11,6 +11,7 @@ import json
 import os
 import datetime
 from decimal import Decimal
+import logging
 
 
 class BaseETL(object):
@@ -68,14 +69,14 @@ class BaseETL(object):
         return DBFactory.get_connection(db_enum)
 
     @classmethod
-    def insert_data(cls, db_enum, data_table, table_name, append=True, schema=None, commit=True, conn=None):
+    def to_db(cls, db_enum, data_table, table_name, append=True, schema=None, commit=True, conn=None, create=False):
         """table: list of lists like a PETL Table """
         if not conn:
             conn = cls.get_connection(db_enum=db_enum)
         if append:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
-            petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
+            petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit, create=create)
 
     @staticmethod
     def format_parameters_to_db(line, encode_to='utf-8'):
@@ -161,36 +162,57 @@ class BaseETL(object):
         return list(petl.fromdb(conn, query))
 
     @classmethod
+    def from_s3(cls, db_enum, query):
+        conn = cls.get_connection(db_enum)
+        return list(petl.fromdb(conn, query))
+
+    @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest):
+        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name)
+        filename = '{}.csv'.format(table_name)
+        bucket_name = cls.to_s3(filename, data_table)
+        cls.bulk_insert_from_s3(bucket_name, filename, enum_db_dest, table_name)
+
+        return bucket_name, filename
+
+    @classmethod
+    def bulk_insert_from_s3(cls, bucket_name, filename, enum_db_dest, table_name, append=True):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        tmp_dir = '/tmp/'
-        fn = '{}.csv'.format(table_name)
-        tmp_fn = tmp_dir+fn
-        bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
-
-        dim = cls.from_db_table(db_enum=enum_db_source, table_name=table_name)
-        petl.tocsv(dim, tmp_fn)
-
-        s3 = boto3.client('s3')
-        s3.upload_file(tmp_fn, bucket_name, fn)
-
-        os.remove(tmp_fn)
-
         con = cls.get_connection(enum_db_dest)
         sql = """COPY {} FROM '{}'
                     CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                     DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
             table_name,
-            's3://{}/{}'.format(bucket_name, fn),
+            's3://{}/{}'.format(bucket_name, filename),
             aws_access_key_id,
             aws_secret_access_key,
             ',')
         try:
+            if not append:
+                con.cursor().execute('truncate table {};'.format(table_name))
             con.cursor().execute(sql)
         finally:
             con.close()
-            cls.delete_file_s3(bucket_name, fn)
+            cls.delete_file_s3(bucket_name, filename)
+
+    @classmethod
+    def to_s3(cls, filename, data_table, encoding='ascii'):
+        tmp_dir = '/tmp/'
+        tmp_fn = tmp_dir + filename
+        try:
+            bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+            petl.tocsv(data_table, tmp_fn, encoding=encoding)
+
+            s3 = boto3.client('s3')
+            s3.upload_file(tmp_fn, bucket_name, filename)
+        except Exception as ex:
+            logging.info(ex)
+            return None
+        finally:
+            os.remove(tmp_fn)
+
+        return bucket_name
 
     @staticmethod
     def delete_file_s3(bucket_name, fn):
@@ -205,3 +227,23 @@ class BaseETL(object):
                 ]
             }
         )
+
+    @classmethod
+    def get_surrogate_key(cls, dimension_table, fact_table, dimension_key, fact_key, sk_name_column,
+                          filter_injected_rule=None, rename_dict=None, remove_fact_key=False):
+        table = petl.leftjoin(fact_table, dimension_table, lkey=fact_key, rkey=dimension_key, missing='-1')
+        if filter_injected_rule:
+            table = table.select(lambda item: filter_injected_rule(item))
+
+        cutout_columns = list(dimension_table[0])
+        cutout_columns.remove(dimension_key)
+        cutout_columns.remove(sk_name_column)
+        if remove_fact_key:
+            cutout_columns.append(fact_key)
+
+        table = table.cutout(*cutout_columns)
+
+        if rename_dict:
+            table = table.rename(rename_dict)
+
+        return table
