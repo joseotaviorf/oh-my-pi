@@ -35,6 +35,6 @@ class DBFactory(object):
             conn = pymysql.connect(host, user, pwd, db)
             cur = conn.cursor()
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
-            return cur
+            return conn
 
         return None

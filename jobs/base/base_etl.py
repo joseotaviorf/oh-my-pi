@@ -11,7 +11,6 @@ import json
 import os
 import datetime
 from decimal import Decimal
-import logging
 
 
 class BaseETL(object):
@@ -73,10 +72,13 @@ class BaseETL(object):
         """table: list of lists like a PETL Table """
         if not conn:
             conn = cls.get_connection(db_enum=db_enum)
+
+        print('Loading {} on {} - Number of rows:{}. {}'.format(table_name, db_enum, len(data_table), datetime.datetime.now()))
         if append:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
             petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit, create=create)
+        print('{} rows loaded on {}. {}'.format(len(data_table), db_enum), datetime.datetime.now())
 
     @staticmethod
     def format_parameters_to_db(line, encode_to='utf-8'):
@@ -159,7 +161,10 @@ class BaseETL(object):
     @classmethod
     def from_db_query(cls, db_enum, query):
         conn = cls.get_connection(db_enum)
-        return list(petl.fromdb(conn, query))
+        print('Starting {} on {}. {}'.format(query, db_enum, datetime.datetime.now()))
+        l = list(petl.fromdb(conn, query))
+        print('Query returned {} rows. {}'.format(len(l), datetime.datetime.now()))
+        return l
 
     @classmethod
     def from_s3(cls, db_enum, query):
@@ -207,7 +212,7 @@ class BaseETL(object):
             s3 = boto3.client('s3')
             s3.upload_file(tmp_fn, bucket_name, filename)
         except Exception as ex:
-            logging.info(ex)
+            log(ex)
             return None
         finally:
             os.remove(tmp_fn)

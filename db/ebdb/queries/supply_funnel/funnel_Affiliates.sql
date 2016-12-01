@@ -56,6 +56,8 @@ FROM
     g.id as manager_id,
     u.tipoAdmin AS tipoAdmin ,
 
+    ia.
+
     case 
       when l.tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0 
     end as affiliate_listing_value,
@@ -121,6 +123,9 @@ FROM
 --       AND (r.REV >= f.revisionImovel or f.revisionImovel is null)
 --       limit 1
 --     )
+
+  left join v_ImovelAttribution_v2 ia
+    on ia.id = i.id
 
   LEFT JOIN 
     DadosVendedor dv
