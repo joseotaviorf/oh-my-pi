@@ -3,7 +3,7 @@ import sys
 import pytz
 from pytz import timezone
 from datetime import datetime
-from jobs.wrappers.amplitude.amplitude_extract_api import AmplitudeExportApi, log
+from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -55,19 +55,21 @@ def check_dates(start_date, end_date, td, kwargs):
 
 
 def convert_date(date):
-    return date.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
+    dt = datetime.strptime(date, DEFAULT_DATETIME_FORMAT)
+    return dt.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
 
 
 if __name__ == '__main__':
     print('START')
 
     args = sys.argv
+    print(args)
     arg_count = len(args)
-    now = convert_date(datetime.utcnow())
+    now = convert_date(datetime.utcnow().strftime(DEFAULT_DATETIME_FORMAT))
 
     queue_name = args[1] if arg_count > 1 else None
-    start_date = convert_date(args[2]) if arg_count > 2 else now.strftime(DEFAULT_DATETIME_FORMAT)
-    end_date = convert_date(args[3]) if arg_count > 3 else now.strftime(DEFAULT_DATETIME_FORMAT)
+    start_date = convert_date(args[2]) if arg_count > 2 else now
+    end_date = convert_date(args[3]) if arg_count > 3 else now
     td = args[4] if arg_count > 4 else None
 
     execute(queue_name=queue_name, start_date=start_date, end_date=end_date, td=td)
