@@ -4,7 +4,7 @@ import json
 import boto3
 import pytz
 from pytz import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log, EnumDb
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 from jobs.base.base_etl import BaseETL, log, EnumDb
@@ -51,8 +51,6 @@ class AmplitudeEventsETL(BaseETL):
                             step = 'Get message content ok!'
                             table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
                             messages_to_delete.append(message)
-                            step = 'Append table to insert'
-                            print (step + ': {}'.format(batch_size))
                             if len(table_insert) > batch_size:
                                 table_insert = self._insert_messages(db_enum, table_insert, table_name)
                                 messages_to_delete = self._delete_messages(messages_to_delete)
@@ -80,7 +78,7 @@ class AmplitudeEventsETL(BaseETL):
             messages_to_delete.remove(mes)
         return messages_to_delete
 
-    def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=None, **kwargs):
+    def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
             raise Exception("Param: topic_arn can't be None!")
 
