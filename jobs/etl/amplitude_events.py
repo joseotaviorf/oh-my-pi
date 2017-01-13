@@ -31,26 +31,31 @@ class AmplitudeEventsETL(BaseETL):
         messages_to_delete = []
         end_of_messages = False
         table_insert = None
+        print ('Total ApproximateNumberOfMessages: {}'.format(queue.attributes['ApproximateNumberOfMessages']))
+        bn=0
         while not end_of_messages:
-            step = 'start'
+            bn +=1
+            step = 'Start - batch number: {}'.format(bn)
+            print(step)
             try:
                 msgs = queue.receive_messages(MaxNumberOfMessages=10)
                 if not msgs:
                     end_of_messages = True
                     if table_insert and messages_to_delete:
-                        self._insert_messages(db_enum, table_insert, table_name, messages_to_delete)
+                        self._insert_messages(db_enum, table_insert, table_name)
+                        self._delete_messages(messages_to_delete)
                 else:
                     for message in msgs:
                         try:
                             m = self.get_message_content(message)
-                            step = 'get message content ok!'
+                            step = 'Get message content ok!'
                             table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
                             messages_to_delete.append(message)
-                            step = 'append table'
+                            step = 'Append table to insert'
+                            print (step + ': {}'.format(batch_size))
                             if len(table_insert) > batch_size:
-                                table_insert, messages_to_delete = self._insert_messages(
-                                    db_enum, table_insert, table_name, messages_to_delete
-                                )
+                                table_insert = self._insert_messages(db_enum, table_insert, table_name)
+                                messages_to_delete = self._delete_messages(messages_to_delete)
                         except Exception as e:
                             if message:
                                 print ('{0}\n{1} - STEP: {2}'.format(message.body, e, step))
@@ -58,20 +63,22 @@ class AmplitudeEventsETL(BaseETL):
             except Exception as e:
                 print ('{} - STEP: {}'.format(e, step))
 
-    def _insert_messages(self, db_enum, table_insert, table_name, messages_to_delete):
+    def _insert_messages(self, db_enum, table_insert, table_name):
+        count = len(table_insert)
+        print('BULK INSERT - {} messages...'.format(count))
         self.bulk_insert(table=table_insert, table_name=table_name, db_enum=db_enum,
                          delimiter='|', encoding='LATIN-1')
         table_insert = None
-        messages_to_delete = []
-        while len(messages_to_delete) > 0:
-            mes = messages_to_delete[0]
-            try:
-                mes.delete()
-                messages_to_delete.remove(mes)
-            except:
-                pass
+        return table_insert
 
-        return table_insert, messages_to_delete
+    def _delete_messages(self, messages_to_delete):
+        count = len(messages_to_delete)
+        print('Deleting {} messages...'.format(count))
+        while count > 0:
+            mes = messages_to_delete[0]
+            mes.delete()
+            messages_to_delete.remove(mes)
+        return messages_to_delete
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=None, **kwargs):
         if not topic_arn:

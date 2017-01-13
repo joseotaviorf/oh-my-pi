@@ -1,0 +1,4 @@
+# docker ignore file
+    venv
+    .idea
+    .git
