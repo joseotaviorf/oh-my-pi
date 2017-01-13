@@ -58,6 +58,7 @@ if __name__ == '__main__':
                 'Vila Mariana',
                 'Centro'
             )
+            AND u.email is not null
         ORDER BY
             1, 2
     """)

@@ -7,4 +7,4 @@ class EnumDb():
 class EnumDbType():
     PostgreSQL = 'postgres'
     MySQL = 'mysql'
-    Redshift = 'redshift'
+    Redshift = 'postgres'

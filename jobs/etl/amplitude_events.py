@@ -18,37 +18,60 @@ class AmplitudeEventsETL(BaseETL):
     def __init__(self, *args, **kwargs):
         super(AmplitudeEventsETL, self).__init__(*args, **kwargs)
 
-    def __insert_db(self, message, db_enum, table_name):
-        table = list()
-        table.append(['dt_creation', 'message'])
-        table.append([self.now(), json.dumps(message)])
-        self.insert_data(db_enum=db_enum, data_table=table, table_name=table_name)
+    def __append(self, message, table=None):
+        if not table:
+            table = list()
+            table.append(['dt_creation', 'message'])
+        table.append([self.now(), message])
+        return table
 
-    def run_sqs_to_ods(self, sqs_queue_name, db_enum, table_name):
+    def run_sqs_to_ods(self, sqs_queue_name, db_enum, table_name, batch_size=5000):
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=sqs_queue_name)
-        messages = []
-        message = None
+        messages_to_delete = []
         end_of_messages = False
+        table_insert = None
         while not end_of_messages:
+            step = 'start'
             try:
                 msgs = queue.receive_messages(MaxNumberOfMessages=10)
                 if not msgs:
                     end_of_messages = True
+                    if table_insert and messages_to_delete:
+                        self._insert_messages(db_enum, table_insert, table_name, messages_to_delete)
                 else:
                     for message in msgs:
-                        m = self.get_message_content(message)
-                        messages.append(m)
-                        self.__insert_db(m, db_enum, table_name)
-                        message.delete()
+                        try:
+                            m = self.get_message_content(message)
+                            step = 'get message content ok!'
+                            table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
+                            messages_to_delete.append(message)
+                            step = 'append table'
+                            if len(table_insert) > batch_size:
+                                table_insert, messages_to_delete = self._insert_messages(
+                                    db_enum, table_insert, table_name, messages_to_delete
+                                )
+                        except Exception as e:
+                            if message:
+                                print ('{0}\n{1} - STEP: {2}'.format(message.body, e, step))
+
             except Exception as e:
-                r = None
-                if message:
-                    r = message.body
-                print ('{0}\n{1}'.format(r, e))
-                # logError(message.body, e)
+                print ('{} - STEP: {}'.format(e, step))
+
+    def _insert_messages(self, db_enum, table_insert, table_name, messages_to_delete):
+        self.bulk_insert(table=table_insert, table_name=table_name, db_enum=db_enum,
+                         delimiter='|', encoding='LATIN-1')
+        table_insert = None
+        messages_to_delete = []
+        while len(messages_to_delete) > 0:
+            mes = messages_to_delete[0]
+            try:
+                mes.delete()
+                messages_to_delete.remove(mes)
+            except:
                 pass
-        return messages
+
+        return table_insert, messages_to_delete
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=None, **kwargs):
         if not topic_arn:
@@ -98,7 +121,6 @@ def convert_date(date_str):
     return dt.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
 
 
-
 if __name__ == '__main__':
     now = convert_date(datetime.utcnow().strftime(DEFAULT_DATETIME_FORMAT))
     args = sys.argv
@@ -117,8 +139,14 @@ if __name__ == '__main__':
         a.run_source_to_sns(topic_arn=topic_arn, start_date=start_date, end_date=end_date, td=td)
 
     elif args[1] == 'sqs_to_ods':
-        sqs_queue_name = args[2] if arg_count > 1 else None
-        messages = a.run_sqs_to_ods(sqs_queue_name=sqs_queue_name, db_enum=EnumDb.BI_ODS, table_name='amplitude_event')
+        sqs_queue_name = args[2] if arg_count > 2 else None
+        batch_size = args[3] if arg_count > 3 else 10000
+        a.run_sqs_to_ods(
+            sqs_queue_name=sqs_queue_name,
+            db_enum=EnumDb.BI_ODS,
+            table_name='amplitude_event',
+            batch_size=batch_size
+        )
 
     print('END')
-    sys.stdout.flush()
+    # sys.stdout.flush()
