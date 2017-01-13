@@ -142,7 +142,6 @@ if __name__ == '__main__':
         end_date = convert_date(args[4]) if arg_count > 4 else now
         print end_date
         td = args[5] if arg_count > 5 else None
-
         a.run_source_to_sns(topic_arn=topic_arn, start_date=start_date, end_date=end_date, td=td)
 
     elif args[1] == 'sqs_to_ods':
@@ -156,4 +155,4 @@ if __name__ == '__main__':
         )
 
     print('END')
-    # sys.stdout.flush()
+    sys.stdout.flush()

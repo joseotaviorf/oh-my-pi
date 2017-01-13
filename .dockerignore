@@ -1,4 +1,5 @@
 # docker ignore file
+    pbi
     venv
     .idea
     .git
