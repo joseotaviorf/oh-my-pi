@@ -10,7 +10,10 @@ import petl
 import json
 import os
 import datetime
+import sys
 from decimal import Decimal
+import codecs
+import ast
 
 
 class BaseETL(object):
@@ -58,30 +61,60 @@ class BaseETL(object):
             )
 
     @classmethod
+    def json_loads_byteified(cls, json_text):
+        return cls._byteify(
+            json.loads(json_text, object_hook=cls._byteify),
+            ignore_dicts=True
+        )
+
+    @classmethod
+    def _byteify(cls, data, ignore_dicts=False):
+        # if this is a unicode string, return its string representation
+        if isinstance(data, unicode):
+            return data.encode('utf-8')
+        # if this is a list of values, return list of byteified values
+        if isinstance(data, list):
+            return [cls._byteify(item, ignore_dicts=True) for item in data]
+        # if this is a dictionary, return dictionary of byteified keys and values
+        # but only if we haven't already byteified it
+        if isinstance(data, dict) and not ignore_dicts:
+            return {
+                cls._byteify(key, ignore_dicts=True): cls._byteify(value, ignore_dicts=True)
+                for key, value in data.iteritems()
+                }
+        # if it's anything else, return it in its original form
+        return data
+
+    @classmethod
     def get_message_content(cls, message):
         body = json.loads(message.body)
-        m = json.loads(body['Message']) if body.get('Message') is not None else body
+        # m = json.loads(body[u'Message']) if body.get(u'Message') else body
+        # m = ast.literal_eval(json.dumps(body[u'Message'])) if body.get(u'Message') else body
+        # m = body[u'Message'] if body.get(u'Message') else body
+        m = cls.json_loads_byteified(body[u'Message'] if body.get(u'Message') else body)
+        m = json.dumps(m)
         return m
 
     @staticmethod
-    def get_connection(db_enum):
-        return DBFactory.get_connection(db_enum)
+    def get_connection(db_enum, encoding='LATIN1'):
+        return DBFactory.get_connection(db_enum, encoding)
 
     @classmethod
-    def to_db(cls, db_enum, data_table, table_name, append=True, schema=None, commit=True, conn=None, create=False):
+    def to_db(cls, db_enum, data_table, table_name, encoding='LATIN1', append=True, schema=None, commit=True, conn=None, create=False):
         """table: list of lists like a PETL Table """
         if not conn:
-            conn = cls.get_connection(db_enum=db_enum)
+            conn = cls.get_connection(db_enum=db_enum, encoding=encoding)
 
-        print('Loading {} on {} - Number of rows:{}. {}'.format(table_name, db_enum, len(data_table), datetime.datetime.now()))
-        if append:
+        log('Loading {} on {} - Number of rows:{}. {}'.format(table_name, db_enum, len(data_table), datetime.datetime.now()))
+        if append and not create:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
             petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit, create=create)
-        print('{} rows loaded on {}. {}'.format(len(data_table), db_enum), datetime.datetime.now())
+        log('{} rows loaded on {}. {}'.format(len(data_table)-1, db_enum, datetime.datetime.now()))
+        sys.stdout.flush()
 
     @staticmethod
-    def format_parameters_to_db(line, encode_to='utf-8'):
+    def format_parameters_to_db(line, encode_to='LATIN1'):
         l = []
         for item in line:
             if isinstance(item, datetime.datetime):
@@ -105,9 +138,9 @@ class BaseETL(object):
         return "'{0}'".format(str(p)) if p else 'null'
 
     @classmethod
-    def execute_function(cls, db_enum, function_name, table=None, conn=None, commit=False):
+    def execute_function(cls, db_enum, function_name, table=None, conn=None, encoding='LATIN1', commit=False):
         if not conn:
-            conn = cls.get_connection(db_enum)
+            conn = cls.get_connection(db_enum, encoding)
 
         conn.autocommit = commit
         if table:
@@ -122,19 +155,19 @@ class BaseETL(object):
             conn.cursor().execute(command)
 
     @classmethod
-    def execute_command(cls, command, db_enum=None, conn=None, commit=False, in_iterator=False):
+    def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False):
         if not db_enum and not conn:
             raise AttributeError()
         if not conn:
-            conn = cls.get_connection(db_enum)
+            conn = cls.get_connection(db_enum, encoding)
         if not in_iterator:
             conn.autocommit = commit
         conn.cursor().execute(command)
 
     @classmethod
-    def insert_row(cls, table, db_enum, table_name, key_name=None, conn=None, commit=True):
+    def insert_row(cls, table, db_enum, table_name, key_name=None, conn=None, encoding='LATIN1', commit=True):
         if not conn:
-            conn = cls.get_connection(db_enum)
+            conn = cls.get_connection(db_enum, encoding)
 
         conn.autocommit = commit
         header = cls.format_parameters_to_db(table[0]).replace("'", "\"")
@@ -155,36 +188,53 @@ class BaseETL(object):
         raise Exception("Not implemented")
 
     @classmethod
-    def from_db_table(cls, db_enum, table_name):
-        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name))
+    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor=None):
+        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name), encoding=encoding, server_cursor=server_cursor)
 
     @classmethod
-    def from_db_query(cls, db_enum, query):
-        conn = cls.get_connection(db_enum)
+    def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor=None):
+        conn = cls.get_connection(db_enum, encoding)
         print('Starting {} on {}. {}'.format(query, db_enum, datetime.datetime.now()))
-        l = list(petl.fromdb(conn, query))
-        print('Query returned {} rows. {}'.format(len(l), datetime.datetime.now()))
+
+        l = None
+        if server_cursor:
+            l = petl.fromdb(lambda: conn.cursor(name=server_cursor), query)
+            print('Server cursor created: {} - {}'.format(server_cursor, datetime.datetime.now()))
+        else:
+            l = list(petl.fromdb(conn, query))
+            print('Query returned {} rows. {}'.format(len(l), datetime.datetime.now()))
+
+        sys.stdout.flush()
         return l
 
     @classmethod
-    def from_s3(cls, db_enum, query):
-        conn = cls.get_connection(db_enum)
+    def get_table_count(cls, db_enum, table_name):
+        return cls.from_db_query(
+            query="select count(1) from {}".format(table_name),
+            db_enum=db_enum
+        )[1][0]
+
+    @classmethod
+    def from_s3(cls, db_enum, query, encoding='LATIN1'):
+        conn = cls.get_connection(db_enum, encoding)
         return list(petl.fromdb(conn, query))
 
     @classmethod
-    def move_table(cls, table_name, enum_db_source, enum_db_dest):
-        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name)
-        filename = '{}.csv'.format(table_name)
-        bucket_name = cls.to_s3(filename, data_table)
-        cls.bulk_insert_from_s3(bucket_name, filename, enum_db_dest, table_name)
+    def move_table(cls, table_name, enum_db_source, enum_db_dest, table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
+        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name, encoding=encoding,server_cursor=server_cursor)
+        if not table_name_dest:
+            table_name_dest = table_name
+        filename = '{}.csv'.format(table_name_dest)
+        bucket_name = cls.to_s3(filename, data_table, encoding=encoding)
+        cls.bulk_insert_from_s3(bucket_name, filename, enum_db_dest, table_name_dest, append, encoding)
 
         return bucket_name, filename
 
     @classmethod
-    def bulk_insert_from_s3(cls, bucket_name, filename, enum_db_dest, table_name, append=True):
+    def bulk_insert_from_s3(cls, bucket_name, filename, enum_db_dest, table_name, append=True, encoding='LATIN1'):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        con = cls.get_connection(enum_db_dest)
+        con = cls.get_connection(enum_db_dest, encoding)
         sql = """COPY {} FROM '{}'
                     CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                     DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
@@ -202,7 +252,26 @@ class BaseETL(object):
             cls.delete_file_s3(bucket_name, filename)
 
     @classmethod
-    def to_s3(cls, filename, data_table, encoding='ascii'):
+    def bulk_insert(cls, table, table_name, db_enum,
+                    encoding='LATIN1', append=True, commit=True, delimiter=','):
+        csv_temp = '/tmp/{}.csv'.format(table_name)
+        petl.tocsv(table=table, source=csv_temp, delimiter=delimiter, encoding=encoding)
+
+        conn = BaseETL.get_connection(db_enum=db_enum, encoding=encoding)
+        cur = conn.cursor()
+        if not append:
+            cur.execute('TRUNCATE TABLE {}'.format(table_name))
+        # with open(csv_temp) as f:
+        with codecs.open(filename=csv_temp, encoding=encoding) as f:
+            # cur.copy_from(f, table_name, delimiter)
+            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
+            cur.copy_expert(sql, f)
+
+        if commit:
+            conn.commit()
+
+    @classmethod
+    def to_s3(cls, filename, data_table, encoding='utf8'):
         tmp_dir = '/tmp/'
         tmp_fn = tmp_dir + filename
         try:
@@ -213,6 +282,7 @@ class BaseETL(object):
             s3.upload_file(tmp_fn, bucket_name, filename)
         except Exception as ex:
             log(ex)
+            sys.stdout.flush()
             return None
         finally:
             os.remove(tmp_fn)

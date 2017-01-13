@@ -23,22 +23,11 @@ if len(args) > 1:
             append=False
         )
 
-        # call facebook ads api load costs table
-
-        # call google adwords api load costs table
-
-        # call unbounce api and load costs table
-
-        # call routine to load IS workbook and load IS costs table
-
     elif args[1] == 'DW':
-        dim = BaseETL.from_db_table(
-            db_enum=EnumDb.BI_ODS,
-            table_name='list_potential_listings()')
-
-        BaseETL.to_db(
-            db_enum=EnumDb.BI_DW,
-            data_table=dim,
-            table_name='fact_supply_potential_listings',
+        BaseETL.move_table(
+            table_name='vw_fact_supply_potential_listings',
+            table_name_dest='fact_supply_potential_listings',
+            enum_db_source=EnumDb.BI_ODS,
+            enum_db_dest=EnumDb.BI_DW,
             append=False
         )

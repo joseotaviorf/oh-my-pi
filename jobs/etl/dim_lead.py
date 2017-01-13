@@ -17,13 +17,15 @@ if len(args) > 1:
         )
 
     elif args[1] == 'DW':
-        dim = BaseETL.from_db_table(
-            db_enum=EnumDb.BI_ODS,
-            table_name='list_dim_lead()')
-
-        BaseETL.to_db(
-            db_enum=EnumDb.BI_DW,
-            data_table=dim,
-            table_name='dim_lead',
+        BaseETL.move_table(
+            table_name='vw_dim_lead',
+            table_name_dest='dim_lead',
+            enum_db_source=EnumDb.BI_ODS,
+            enum_db_dest=EnumDb.BI_DW,
             append=False
+        )
+        BaseETL.execute_command(
+            'insert into dim_lead values (-1);',
+            db_enum=EnumDb.BI_DW,
+            commit=True
         )
