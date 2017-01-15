@@ -56,11 +56,14 @@ class BaseETL(object):
     @staticmethod
     def publish_notifications(notifications, topic_arn):
         sns = boto3.client('sns')
+        c = 0
         for n in notifications:
             sns.publish(
                 TopicArn=topic_arn,
                 Message=n
             )
+            c+=1
+        return c
 
     @classmethod
     def json_loads_byteified(cls, json_text):

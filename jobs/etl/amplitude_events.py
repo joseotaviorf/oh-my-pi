@@ -100,8 +100,8 @@ class AmplitudeEventsETL(BaseETL):
                 f = a.get_files_from_extract_api(start, end)
                 if f:
                     events = a.get_json_from_zipfile(f)
-                    a.publish_notifications(events, topic_arn=topic_arn)
-                    print('{} messages were published in SNS!'.format(len(events)))
+                    count = a.publish_notifications(events, topic_arn=topic_arn)
+                    print('{} messages were published in SNS!'.format(count))
                     sys.stdout.flush()
 
     @classmethod
