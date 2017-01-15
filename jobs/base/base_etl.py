@@ -34,8 +34,10 @@ class BaseETL(object):
                     buffer_gz = io.BytesIO(zfile.read(name))
                     with gzip.GzipFile(fileobj=buffer_gz, mode='rb') as gzfile:
                         file_content = gzfile.read()
-                        messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
-        return messages
+                        for x in file_content[0:-1].split('\n'):
+                            yield json.dumps(json.loads(x))
+                        #messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
+        #return messages
 
     @staticmethod
     def get_table_from_json_child(events, json_column_name, attrib_name, value):
