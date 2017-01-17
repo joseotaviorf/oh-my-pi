@@ -219,10 +219,14 @@ class BaseETL(object):
             db_enum=db_enum
         )[1][0]
 
+    # @classmethod
+    # def from_s3(cls, db_enum, query, encoding='LATIN1'):
+    #     conn = cls.get_connection(db_enum, encoding)
+    #     return list(petl.fromdb(conn, query))
+
     @classmethod
-    def from_s3(cls, db_enum, query, encoding='LATIN1'):
-        conn = cls.get_connection(db_enum, encoding)
-        return list(petl.fromdb(conn, query))
+    def drop_table(cls, db_enum, table_name, schema='public'):
+        cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
 
     @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest, table_name_dest=None, append=True, encoding='utf8', server_cursor=None):

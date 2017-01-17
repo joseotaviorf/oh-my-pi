@@ -38,6 +38,8 @@ tzlocal==1.3
 uritemplate==3.0.0
 win-inet-pton==1.0.1
 xmltodict==0.10.2
+PyDrive
+s3fs
 # Google2Pandas==0.1.0
 # numpy==1.11.3
 # pandas==0.19.1
