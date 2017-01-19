@@ -34,8 +34,10 @@ class BaseETL(object):
                     buffer_gz = io.BytesIO(zfile.read(name))
                     with gzip.GzipFile(fileobj=buffer_gz, mode='rb') as gzfile:
                         file_content = gzfile.read()
-                        messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
-        return messages
+                        for x in file_content[0:-1].split('\n'):
+                            yield json.dumps(json.loads(x))
+                        #messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
+        #return messages
 
     @staticmethod
     def get_table_from_json_child(events, json_column_name, attrib_name, value):
@@ -54,11 +56,14 @@ class BaseETL(object):
     @staticmethod
     def publish_notifications(notifications, topic_arn):
         sns = boto3.client('sns')
+        c = 0
         for n in notifications:
             sns.publish(
                 TopicArn=topic_arn,
                 Message=n
             )
+            c+=1
+        return c
 
     @classmethod
     def json_loads_byteified(cls, json_text):
@@ -214,14 +219,20 @@ class BaseETL(object):
             db_enum=db_enum
         )[1][0]
 
-    @classmethod
-    def from_s3(cls, db_enum, query, encoding='LATIN1'):
-        conn = cls.get_connection(db_enum, encoding)
-        return list(petl.fromdb(conn, query))
+    # @classmethod
+    # def from_s3(cls, db_enum, query, encoding='LATIN1'):
+    #     conn = cls.get_connection(db_enum, encoding)
+    #     return list(petl.fromdb(conn, query))
 
     @classmethod
-    def move_table(cls, table_name, enum_db_source, enum_db_dest, table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
-        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name, encoding=encoding,server_cursor=server_cursor)
+    def drop_table(cls, db_enum, table_name, schema='public'):
+        cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
+
+    @classmethod
+    def move_table(cls, table_name, enum_db_source, enum_db_dest,
+                   table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
+        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name,
+                                       encoding=encoding,server_cursor=server_cursor)
         if not table_name_dest:
             table_name_dest = table_name
         filename = '{}.csv'.format(table_name_dest)

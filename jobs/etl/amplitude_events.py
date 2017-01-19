@@ -1,10 +1,9 @@
 import os
 import sys
-import json
 import boto3
 import pytz
 from pytz import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log, EnumDb
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 from jobs.base.base_etl import BaseETL, log, EnumDb
@@ -12,6 +11,7 @@ from jobs.base.base_etl import BaseETL, log, EnumDb
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
 LOCAL_TZ = 'America/Sao_Paulo'
+
 
 class AmplitudeEventsETL(BaseETL):
 
@@ -51,8 +51,6 @@ class AmplitudeEventsETL(BaseETL):
                             step = 'Get message content ok!'
                             table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
                             messages_to_delete.append(message)
-                            step = 'Append table to insert'
-                            print (step + ': {}'.format(batch_size))
                             if len(table_insert) > batch_size:
                                 table_insert = self._insert_messages(db_enum, table_insert, table_name)
                                 messages_to_delete = self._delete_messages(messages_to_delete)
@@ -80,7 +78,7 @@ class AmplitudeEventsETL(BaseETL):
             messages_to_delete.remove(mes)
         return messages_to_delete
 
-    def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=None, **kwargs):
+    def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
             raise Exception("Param: topic_arn can't be None!")
 
@@ -102,8 +100,8 @@ class AmplitudeEventsETL(BaseETL):
                 f = a.get_files_from_extract_api(start, end)
                 if f:
                     events = a.get_json_from_zipfile(f)
-                    a.publish_notifications(events, topic_arn=topic_arn)
-                    print('{} messages were published in SNS!'.format(len(events)))
+                    count = a.publish_notifications(events, topic_arn=topic_arn)
+                    print('{} messages were published in SNS!'.format(count))
                     sys.stdout.flush()
 
     @classmethod
@@ -142,7 +140,6 @@ if __name__ == '__main__':
         end_date = convert_date(args[4]) if arg_count > 4 else now
         print end_date
         td = args[5] if arg_count > 5 else None
-
         a.run_source_to_sns(topic_arn=topic_arn, start_date=start_date, end_date=end_date, td=td)
 
     elif args[1] == 'sqs_to_ods':
@@ -155,5 +152,22 @@ if __name__ == '__main__':
             batch_size=batch_size
         )
 
+    elif args[1] == 'load_schedule_visit':
+        table_name='amplitude_event_schedule_visit'
+        # BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=table_name)
+        vw = BaseETL.from_db_table(
+            db_enum=EnumDb.BI_ODS,
+            table_name='vw_{}'.format(table_name),
+            server_cursor=table_name
+        )
+        BaseETL.bulk_insert(
+            table=vw,
+            table_name=table_name,
+            db_enum=EnumDb.BI_ODS,
+            append=False,
+            commit=True
+        )
+
+
     print('END')
-    # sys.stdout.flush()
+    sys.stdout.flush()
