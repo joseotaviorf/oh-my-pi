@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 import httplib2
-import pprint
-import StringIO
 from googleapiclient import discovery
-from googleapiclient.http import MediaFileUpload
 from oauth2client.service_account import ServiceAccountCredentials
 import json
 import os
 
 
-def createDriveService():
-    scope = ['https://www.googleapis.com/auth/analytics.readonly']
+def create_drive_service():
+    scope = ['https://www.googleapis.com/auth/drive']
     analytics_json = json.loads(os.environ['ANALYTICS_KEY_JSON'])
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(analytics_json, scopes=scope)
     return discovery.build('drive', 'v3', http=credentials.authorize(httplib2.Http()))
 
-service = createDriveService()
 
-results = service.files().list(pageSize=10, fields="nextPageToken, files(id, name)").execute()
-items = results.get('files', [])
+def get_files(service):
+    query = "mimeType != 'application/vnd.google-apps.folder'"
+    results = service.files().list(q=query).execute()
+    return results.get('files', [])
+
+
+service = create_drive_service()
+items = get_files(service)
 if not items:
     print('No files found.')
 else:

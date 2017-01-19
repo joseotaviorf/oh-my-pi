@@ -229,8 +229,10 @@ class BaseETL(object):
         cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
 
     @classmethod
-    def move_table(cls, table_name, enum_db_source, enum_db_dest, table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
-        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name, encoding=encoding,server_cursor=server_cursor)
+    def move_table(cls, table_name, enum_db_source, enum_db_dest,
+                   table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
+        data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name,
+                                       encoding=encoding,server_cursor=server_cursor)
         if not table_name_dest:
             table_name_dest = table_name
         filename = '{}.csv'.format(table_name_dest)
