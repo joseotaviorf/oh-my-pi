@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import boto3
 import pytz
 from pytz import timezone
@@ -12,6 +11,7 @@ from jobs.base.base_etl import BaseETL, log, EnumDb
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
 LOCAL_TZ = 'America/Sao_Paulo'
+
 
 class AmplitudeEventsETL(BaseETL):
 
@@ -151,6 +151,23 @@ if __name__ == '__main__':
             table_name='amplitude_event',
             batch_size=batch_size
         )
+
+    elif args[1] == 'load_schedule_visit':
+        table_name='amplitude_event_schedule_visit'
+        # BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=table_name)
+        vw = BaseETL.from_db_table(
+            db_enum=EnumDb.BI_ODS,
+            table_name='vw_{}'.format(table_name),
+            server_cursor=table_name
+        )
+        BaseETL.bulk_insert(
+            table=vw,
+            table_name=table_name,
+            db_enum=EnumDb.BI_ODS,
+            append=False,
+            commit=True
+        )
+
 
     print('END')
     sys.stdout.flush()

@@ -4,12 +4,18 @@ from jobs.base.base_etl import BaseETL, EnumDb, EnumDbType
 
 # ################ PROVISORIO #################
 descredenciados = {
+    55: datetime.datetime(2016, 10, 25).date(), # Walther Sallum Neto
+    59: datetime.datetime(2016, 12, 12).date(), # Johnny William de Almeida Santo
     95: datetime.datetime(2016, 9, 16).date(),  # Igor Pinto Alli
-    115: datetime.datetime(2016, 10, 25).date(),  # Carlos Santos Goncalves
-    117: datetime.datetime(2016, 10, 25).date(),  # Marli Martins Pedreira
+    106: datetime.datetime(2016, 10, 25).date(), # Rafael de Domenico Ribeiro de Moura
+    115: datetime.datetime(2016, 10, 25).date(), # Carlos Santos Goncalves
+    117: datetime.datetime(2016, 10, 25).date(), # Marli Martins Pedreira
     123: datetime.datetime(2016, 11, 8).date(),  # Jessika Gomes Pires Silva
     136: datetime.datetime(2016, 11, 8).date(),  # Ricardo Lima Viana
-    141: datetime.datetime(2016, 12, 8).date()}  # Regiane Santana Izidoro
+    141: datetime.datetime(2016, 12, 8).date(),  # Regiane Santana Izidoro
+    145: datetime.datetime(2016, 11, 17).date()   # Sonia Lima Rosa
+}
+
 # #############################################
 
 db = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb)

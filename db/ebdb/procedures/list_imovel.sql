@@ -128,7 +128,8 @@ select -- count(1)
   ie.MOB_VISITAS as etapa_data_mob_visitas,
   ie.MOB_VISTORIA as etapa_data_mob_vistoria,
   i.dataCriacao as data_criacao,
-  i.atualizadoEm as atualizado_em	
+  i.atualizadoEm as atualizado_em,
+  i.regiao_id
 
 from 
   Imovel i
