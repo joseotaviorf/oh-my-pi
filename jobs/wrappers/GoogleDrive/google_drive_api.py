@@ -4,6 +4,7 @@ from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 import json
 import os
+from pprint import pprint
 
 
 class GoogleDriveApi(object):
@@ -49,7 +50,7 @@ class GoogleDriveApi(object):
                 mimeType=self.convert_mime_type(mime_type)
             ).execute()
 
-    def download_file(self, file_id, path, mime_type=None):
+    def download_file_by_id(self, file_id, path, mime_type=None, file_name_destination=None):
         """
         Downloads a file from google drive
         """
@@ -60,5 +61,31 @@ class GoogleDriveApi(object):
         data = self.get_file_media(file_id, mime_type)
         file_info = self.get_file_info(file_id)
 
-        with open(os.path.join(path, file_info['name']), 'wb') as download_file:
+        name = file_name_destination if file_name_destination else file_info['name']
+        with open(os.path.join(path, name), 'wb') as download_file:
             download_file.write(data)
+
+        return name, path
+
+    def download_file(self, file_name, file_path_destination, file_name_destination=None):
+        ret_file_name = None
+        files = self.list_filenames()
+        if not files:
+            print('No files found.')
+        else:
+            print('Files:')
+            for f in files:
+                if f['name'] == file_name:
+                    pprint('{0} ({1})'.format(f['name'], f['id']))
+                    try:
+                        ret_file_name, file_path_destination = self.download_file_by_id(
+                            f['id'],
+                            file_path_destination,
+                            f['mimeType'],
+                            file_name_destination=file_name_destination
+                        )
+                    except Exception as ex:
+                        print ex
+                    continue
+
+        return ret_file_name, file_path_destination
