@@ -37,6 +37,8 @@ class DBFactory(object):
             return conn
         elif dbtype == EnumDbType.MySQL:
             conn = pymysql.connect(host, user, pwd, db)
+            conn.set_charset(encoding)
+
             cur = conn.cursor()
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
             return conn

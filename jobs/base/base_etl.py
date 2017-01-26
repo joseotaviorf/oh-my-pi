@@ -25,6 +25,19 @@ class BaseETL(object):
     def now():
         return datetime.datetime.utcnow()
 
+    @classmethod
+    def decode_table(cls, table, encoding):
+        table_r = []
+
+        for line in table:
+            line_r = []
+            for i in line:
+                if type(i) is str or type(i) is unicode:
+                    i = i.decode(encoding)
+                line_r.append(i)
+            table_r.append(line_r)
+        return table_r
+
     @staticmethod
     def get_json_from_zipfile(f):
         messages = []
@@ -197,8 +210,9 @@ class BaseETL(object):
         return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name), encoding=encoding, server_cursor=server_cursor)
 
     @classmethod
-    def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor=None):
-        conn = cls.get_connection(db_enum, encoding)
+    def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor=None, conn=None):
+        if not conn:
+            conn = cls.get_connection(db_enum, encoding)
         print('Starting {} on {}. {}'.format(query, db_enum, datetime.datetime.now()))
 
         l = None

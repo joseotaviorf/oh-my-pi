@@ -1,17 +1,19 @@
 # -*- coding: latin1 -*-
-import os
 import sys
 import petl
-import json
-from datetime import datetime, date, timedelta
 from jobs.base.base_etl import BaseETL, EnumDb
-import tempfile
 import string
 from openpyxl import load_workbook
+from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
+from pprint import pprint
 
-def get_inside_sales_workbook(fiscal_year, file_path='/tmp', name='income_statement', data_only=True):
-    # TODO: download workbook to a temp path
-    file_name='{}/{}_{}.xlsm'.format(file_path, name, fiscal_year)
+
+def dowload_income_statement_workbook(file_name, file_path_destination='/tmp'):
+    return GoogleDriveApi().download_file(file_name=file_name, file_path_destination=file_path_destination)
+
+
+def get_inside_sales_workbook(file_name, file_path='/tmp', data_only=True):
+    file_name='{}/{}'.format(file_path, file_name)
     return load_workbook(filename=file_name, data_only=data_only)
 
 
@@ -47,25 +49,38 @@ def get_values_from_income_statement_workbook(sheet, cell_search_value, referenc
 
 
 if __name__ == '__main__':
+    from datetime import datetime
+    from dateutil.relativedelta import relativedelta
     args = sys.argv
     if len(args)>1:
-        fiscal_year_start = args[1]
-        fiscal_year_end = args[2] if len(args)>2 else args[1]
+        start = args[1]
+        end = args[2] if len(args) > 2 else args[1]
 
-        append = False # truncate table - 1st time
-        for fiscal_year in range(int(fiscal_year_start), int(fiscal_year_end)+1, 1):
-            print 'Extracting Income Statement {} from Excel Worksheet...'.format(fiscal_year)
-            wb = get_inside_sales_workbook(fiscal_year)
-            sheet = wb['Income Statement']
+        date_start = datetime.strptime(start, '%Y%m')
+        date_end = datetime.strptime(end, '%Y%m')
 
-            inside_sales_table = get_inside_sales_costs_table(sheet)
-            photo_table = get_photo_costs_table(sheet)
+        append = False  # truncate table - 1st time
+        date = date_start
+        while date <= date_end:
+            print 'Extracting Income Statement {} from Excel Worksheet...'.format(date)
+            file_name, file_path_destination = dowload_income_statement_workbook(
+                file_name='Financial Reports - {}{}.xlsx'.format(date.year, date.month),
+                file_path_destination='/tmp'
+            )
+            if file_name and file_path_destination:
+                wb = get_inside_sales_workbook(file_name=file_name, file_path=file_path_destination)
+                sheet = wb['Income Statement']
 
-            income_statement = petl.cat(inside_sales_table, photo_table)
+                inside_sales_table = get_inside_sales_costs_table(sheet)
+                photo_table = get_photo_costs_table(sheet)
 
-            print 'Loading Income Statement {} on ODS...'.format(fiscal_year)
-            BaseETL.to_db(db_enum=EnumDb.BI_ODS,
-                          data_table=income_statement,
-                          table_name='income_statement',
-                          append=append)
-            append = True  # append data on the next steps
+                income_statement = petl.cat(inside_sales_table, photo_table)
+
+                print 'Loading Income Statement {} on ODS...'.format(date)
+                BaseETL.to_db(db_enum=EnumDb.BI_ODS,
+                              data_table=income_statement,
+                              table_name='income_statement',
+                              append=append)
+                print 'Income Statement {} loaded on ODS! - {}'.format(file_name, datetime.now())
+                append = True  # append data on the next steps
+            date += relativedelta(months=1)
