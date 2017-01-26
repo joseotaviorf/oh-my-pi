@@ -2,12 +2,12 @@ from jobs.base.base_etl import BaseETL, EnumDb
 
 ids = BaseETL.from_db_query(
     db_enum=EnumDb.QuintoAndar_ebdb,
-    query="select distinct id from Imovel_AUD where id >= 892770997 order by 1 desc")[1:]
+    query="select distinct id from Imovel_AUD order by 1 desc")[1:]
 
 imoveis = []
 count_ids = 0
 erros = []
-append = True
+append = False
 conn = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb)
 while ids:
     id = ids[0]
@@ -29,10 +29,10 @@ while ids:
         erros.append(id)
 
     ids.remove(id)
-    if count_ids == 1000 or len(ids) == 0:
+    if count_ids == 2000 or len(ids) == 0:
         BaseETL.bulk_insert(
             table=imoveis,
-            table_name='imovel_status_history',
+            table_name='tmp_imovel_status_history',
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
             append=append,
