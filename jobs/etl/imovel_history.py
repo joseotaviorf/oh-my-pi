@@ -39,6 +39,7 @@ while ids:
             commit=True
         )
         count_ids = 0
+        imoveis = []
         append = True
 
 conn.close()
