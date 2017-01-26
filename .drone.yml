@@ -1,0 +1,12 @@
+publish:
+  ecr:
+    when:
+      branch: master
+    access_key: $$AWS_ACCESS_KEY
+    secret_key: $$AWS_SECRET_KEY
+    region: us-east-1
+    repo: quintoandar/bi-etl-ejuice
+    storage_driver: vfs
+    tag:
+      - $$BRANCH-$$BUILD_NUMBER
+      - $$BRANCH-latest
