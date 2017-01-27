@@ -5,8 +5,8 @@ from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
 
 def get_list_descredenciados():
-    AGENT_ID_COLUMN = 10
-    DATE_COLUMN = 7
+    AGENT_ID_COLUMN = 2
+    DATE_COLUMN = 1
     agentes = BaseETL.from_db_query(
         EnumDb.QuintoAndar_ebdb,
         query=
@@ -31,7 +31,7 @@ def get_list_descredenciados():
     d = {}
     if file_name and file_path_destination:
         file_name = '{}/{}'.format(file_path_destination, file_name)
-        desc = petl.fromxlsx(file_name, 'Descredenciados')
+        desc = petl.fromxlsx(filename=file_name, sheet='Descredenciados').cut('Emails','Data do Descredenciamento')
         table_desc = petl.join(left=desc, right=agentes, lkey='Emails', rkey='email')[1:]
 
         for line in table_desc:
