@@ -16,7 +16,7 @@ ipaddress==1.0.17
 jdcal==1.3
 jmespath==0.9.0
 oauth2client==3.0.0
-openpyxl==2.4.1
+openpyxl==2.3.5
 petl==1.1.1
 psycopg2==2.6.2
 pyasn1==0.1.9
@@ -40,6 +40,7 @@ win-inet-pton==1.0.1
 xmltodict==0.10.2
 PyDrive
 s3fs
-# Google2Pandas==0.1.0
 # numpy==1.11.3
 # pandas==0.19.1
+# Google2Pandas==0.1.0
+

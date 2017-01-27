@@ -6,6 +6,7 @@ ENV PYTHONPATH $PYTHONPATH:/opt/current-app
 
 ADD . .
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 ENTRYPOINT ["python"]
