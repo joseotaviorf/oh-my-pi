@@ -17,7 +17,7 @@ while ids:
         query="select * from f_list_imovel_status_full_history ({}) where final_status_date_position;".format(id[0]),
         conn=conn
     )
-    # imovel = BaseETL.decode_table(imovel, 'utf-8')
+
     if len(imoveis) == 0:
         imoveis.extend(map(list, imovel)) # insere com header se for a primeira vez
     elif len(imovel) > 2:
@@ -29,7 +29,7 @@ while ids:
         erros.append(id)
 
     ids.remove(id)
-    if count_ids == 2000 or len(ids) == 0:
+    if count_ids == 50 or len(ids) == 0:
         BaseETL.bulk_insert(
             table=imoveis,
             table_name='imovel_status_full_history',
