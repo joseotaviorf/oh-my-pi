@@ -13,7 +13,7 @@ select
   
   l.status_time,
   l.status_date,  
-  l.actual_status as status_history,
+  coalesce(l.actual_status, i.status) as status_history,
   i.status as current_status
 
 from 
