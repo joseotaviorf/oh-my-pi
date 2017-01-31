@@ -1,9 +1,0 @@
-# AdWordsClient configurations
-# ya29.GluoAwYd5a2dGjHTB5AGQ5Hm_QzHui_8_nbqzLWHjD3fUgBpYYmWNFzuL5rjkPRZnIUQ0Vd_ER_rsguM_dmvyb28geNWM8wUsllrTEYgZ7j3efbH7Mc2OnNjAbe0
-# 116623968143-klrsmp2j9j9ht3j86akmqncuqhfktoff.apps.googleusercontent.com
-adwords:
-  developer_token: xZj7XLy_ArerEblzrDd67Q
-  client_id: 116623968143-klrsmp2j9j9ht3j86akmqncuqhfktoff.apps.googleusercontent.com
-  client_customer_id: 930-363-3340
-  client_secret: 7ak-Zdg3Q6qf0x-X4et0EMhd
-  refresh_token: 1/D3Nf-LM5tknuzqgbqTPbCj9GW6uNjxzQSP4mumjJmPo
