@@ -180,7 +180,10 @@ class BaseETL(object):
             conn = cls.get_connection(db_enum, encoding)
         if not in_iterator:
             conn.autocommit = commit
+
+        print ('Start Execute Command at: {}'.format(cls.now()))
         conn.cursor().execute(command)
+        print ('End Execute Command at: {}'.format(cls.now()))
 
     @classmethod
     def insert_row(cls, table, db_enum, table_name, key_name=None, conn=None, encoding='LATIN1', commit=True):
