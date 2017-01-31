@@ -1,4 +1,4 @@
-# -*- coding: latin1 -*-
+# -*- coding: latin-1\ -*-
 import os
 import sys
 import petl
@@ -88,9 +88,9 @@ def extract_facebook_marketing_campaigns(dt):
     return list(table)
 
 
-def extract_google_marketing_campaigns(dt, config_file="./googleads.yaml"):
+def extract_google_marketing_campaigns(dt, config_string):
     # Initialize appropriate service.
-    client = adwords.AdWordsClient.LoadFromStorage(config_file)
+    client = adwords.AdWordsClient.LoadFromString(config_string)
     report_downloader = client.GetReportDownloader(version='v201609')
 
     # Create report query.
@@ -158,7 +158,8 @@ if __name__ == '__main__':
                 append=False
             )
         if args[1] == 'google':
-            ga_table = extract_google_marketing_campaigns(date(2016, 1, 1))
+            config_key = os.environ['ADWORDS_KEY']
+            ga_table = extract_google_marketing_campaigns(date(2016, 1, 1), config_key)
             BaseETL.to_db(
                 db_enum=EnumDb.BI_ODS,
                 data_table=ga_table,
