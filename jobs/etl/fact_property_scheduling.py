@@ -26,8 +26,8 @@ if len(args) > 1:
 
     elif args[1] == 'DW':
         BaseETL.move_table(
-            table_name='vw_fact_liquidity_scheduled_properties',
-            table_name_dest='fact_liquidity_scheduled_properties',
+            table_name='vw_fact_liquidity_property_scheduling',
+            table_name_dest='fact_liquidity_property_scheduling',
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False
