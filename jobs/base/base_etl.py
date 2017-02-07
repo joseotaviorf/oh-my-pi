@@ -118,12 +118,15 @@ class BaseETL(object):
         return DBFactory.get_connection(db_enum, encoding)
 
     @classmethod
-    def to_db(cls, db_enum, data_table, table_name, encoding='LATIN1', append=True, schema=None, commit=True, conn=None, create=False):
+    def to_db(cls, db_enum, data_table, table_name,
+              encoding='LATIN1', append=True, schema=None, commit=True, conn=None, create=False):
         """table: list of lists like a PETL Table """
         if not conn:
             conn = cls.get_connection(db_enum=db_enum, encoding=encoding)
 
-        log('Loading {} on {} - Number of rows:{}. {}'.format(table_name, db_enum, len(data_table), datetime.datetime.now()))
+        log('Loading {} on {} - Number of rows:{}. {}'.format(
+            table_name, db_enum, len(data_table), datetime.datetime.now())
+        )
         if append and not create:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
@@ -209,23 +212,28 @@ class BaseETL(object):
         raise Exception("Not implemented")
 
     @classmethod
-    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor=None):
-        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name), encoding=encoding, server_cursor=server_cursor)
+    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor_postgres=None):
+        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name),
+                                 encoding=encoding, server_cursor_postgres=server_cursor_postgres)
 
     @classmethod
-    def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor=None, conn=None):
+    def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor_postgres=None, conn=None, generator=False):
         if not conn:
             conn = cls.get_connection(db_enum, encoding)
         print('Starting {} on {}. {}'.format(query, db_enum, datetime.datetime.now()))
 
         l = None
-        if server_cursor:
-            l = petl.fromdb(lambda: conn.cursor(name=server_cursor), query)
-            print('Server cursor created: {} - {}'.format(server_cursor, datetime.datetime.now()))
+        if server_cursor_postgres:
+            l = petl.fromdb(lambda: conn.cursor(name=server_cursor_postgres), query)
+            print('Server cursor created: {} - {}'.format(server_cursor_postgres, datetime.datetime.now()))
         else:
-            l = list(petl.fromdb(conn, query))
-            print('Query returned {} rows. {}'.format(len(l), datetime.datetime.now()))
-
+            ret = petl.fromdb(conn, query)
+            if not generator:
+                l = list(ret)
+                print('Query returned {} rows. {}'.format(len(l), datetime.datetime.now()))
+            else:
+                l = ret
+                print('Query returned a generator... - {}'.format(datetime.datetime.now()))
         sys.stdout.flush()
         return l
 
@@ -247,9 +255,9 @@ class BaseETL(object):
 
     @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest,
-                   table_name_dest=None, append=True, encoding='utf8', server_cursor=None):
+                   table_name_dest=None, append=True, encoding='utf8', server_cursor_postgres=None):
         data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name,
-                                       encoding=encoding,server_cursor=server_cursor)
+                                       encoding=encoding,server_cursor_postgres=server_cursor_postgres)
         if not table_name_dest:
             table_name_dest = table_name
         filename = '{}.csv'.format(table_name_dest)

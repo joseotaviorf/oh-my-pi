@@ -31,7 +31,7 @@ def get_list_descredenciados():
     d = {}
     if file_name and file_path_destination:
         file_name = '{}/{}'.format(file_path_destination, file_name)
-        desc = petl.fromxlsx(filename=file_name, sheet='Descredenciados').cut('Emails','Data do Descredenciamento')
+        desc = petl.fromxlsx(filename=file_name, sheet='Descredenciados').cut('Emails','Data do descredenciamento')
         table_desc = petl.join(left=desc, right=agentes, lkey='Emails', rkey='email')[1:]
 
         for line in table_desc:
