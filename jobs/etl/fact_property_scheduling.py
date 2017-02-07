@@ -12,13 +12,13 @@ if len(args) > 1:
 
         listODS = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
-            query="call ebdb.list_property_schedule();")
+            query="call ebdb.list_property_scheduling();")
 
         print("To ODS: {}".format(datetime.now()))
 
         BaseETL.bulk_insert(
             table=listODS,
-            table_name='property_schedule',
+            table_name='property_scheduling',
             db_enum=EnumDb.BI_ODS,
             append=False,
             commit=True

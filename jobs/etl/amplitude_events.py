@@ -158,7 +158,7 @@ if __name__ == '__main__':
         vw = BaseETL.from_db_table(
             db_enum=EnumDb.BI_ODS,
             table_name='vw_{}'.format(table_name),
-            server_cursor=table_name
+            server_cursor_postgres=table_name
         )
         BaseETL.bulk_insert(
             table=vw,
