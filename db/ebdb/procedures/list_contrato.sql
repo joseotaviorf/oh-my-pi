@@ -1,0 +1,50 @@
+﻿CREATE DEFINER = 'QuintoAndarMain'@'%'
+PROCEDURE ebdb.list_contrato()
+BEGIN
+select 
+  id,
+  emailFatura,
+  emailProprietario,
+  valorAluguel,
+  numImovel,
+  diaMesCobranca,
+  garantia,
+  tipo,
+  status,
+  dataCalculoComissaoAfiliado,
+  dataCalculoComissaoCorretor,
+  dataInicio,
+  dataAssinado,
+  dataMinutaAprovada,
+  dataEntrada,
+  dataFimContratoPrevisto,
+  dataRescisao,
+  nomeBanco,
+  paganteCondominio,
+  paganteIptu,
+  responsavelCondominio,
+  responsavelIptu,
+  seguroFianca_parcelas,
+  seguroFianca_valor,
+  seguroResidencial_parcelas,
+  seguroResidencial_valor,
+  taxaComissaoPrimeiroAluguel,
+  valorCondominio,
+  valorIptu,
+  tipoAssinatura,
+  dataContratoEletronicoEnviado,
+  statusClosing,
+  contratoAssinado,
+  googleDriveId,
+  tokenESignatureLocacao,
+  tokenESignatureAdm,
+  contratoAdministracaoAssinado,
+  contratoAutorizacaoEntradaAssinado,
+  contratoLocacaoAssinado,
+  dataTrocaTitularidade,
+  criadoEm,
+  atualizadoEm 
+from 
+  Contrato;
+
+END
