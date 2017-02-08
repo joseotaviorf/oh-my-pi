@@ -1,7 +1,7 @@
 from jobs.base.base_etl import BaseETL, EnumDb
 import sys
 from datetime import datetime
-
+import petl
 
 args = sys.argv
 
@@ -16,8 +16,8 @@ if len(args) > 1:
 
         print("To ODS: {}".format(datetime.now()))
 
-        BaseETL.bulk_insert(
-            table=listODS,
+        BaseETL.to_db(
+            data_table=listODS,
             table_name='property_scheduling',
             db_enum=EnumDb.BI_ODS,
             append=False,

@@ -2,7 +2,6 @@ from jobs.base.base_etl import BaseETL, EnumDb
 import sys
 from datetime import datetime
 
-
 args = sys.argv
 
 if len(args) > 1:

@@ -1,0 +1,37 @@
+﻿CREATE DEFINER = 'QuintoAndarMain'@'%'
+PROCEDURE ebdb.list_negociacao()
+BEGIN
+select 
+  id,
+  dataParaMudanca,
+  deadlineEm,
+  enviadaEm,
+  garantia,
+  periodo,
+  propostaAluguel,
+  respAluguel,
+  respAnimais,
+  respExplicacao,
+  respGarantias,
+  respInquilinos,
+  respItensEssenciais,
+  respItensPreferenciais,
+  respMudanca,
+  respPeriodo,
+  fase,
+  deAcordo_condominio,
+  deAcordo_iptu,
+  deAcordo_reserva,
+  deAcordo_vencimento,
+  fiador_cidade,
+  fiador_tipo,
+  fiador_vinculo,
+  status,
+  rejeicaoPendente,
+  rejeitadaEm,
+  motivoRejeicao,  
+  criadoEm,
+  atualizadoEm
+from 
+  Negociacao;
+END
