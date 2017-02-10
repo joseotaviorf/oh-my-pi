@@ -96,7 +96,7 @@ if __name__ == '__main__':
         db_enum=EnumDb.BI_ODS,
         table=table,
         table_name='agents_schedule',
-        append=False,
+        append=True,
         encoding='UTF8'
     )
 
