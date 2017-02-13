@@ -34,7 +34,7 @@ def execute(queue_name, start_date=None, end_date=None, td=None, **kwargs):
             if f:
                 events = a.get_json_from_zipfile(f)
                 a.publish_messages(events, queue_name)
-                print('{} messages published on SQS!'.format(len(events)))
+                print('{} messages published on SQS!'.format(len(list(events))))
                 sys.stdout.flush()
 
 

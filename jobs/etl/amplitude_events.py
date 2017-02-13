@@ -32,47 +32,53 @@ class AmplitudeEventsETL(BaseETL):
         end_of_messages = False
         table_insert = None
         print ('Total ApproximateNumberOfMessages: {}'.format(queue.attributes['ApproximateNumberOfMessages']))
-        bn=0
+        bn = 0
         while not end_of_messages:
-            bn +=1
+            bn += 1
             step = 'Start - batch number: {}'.format(bn)
             print(step)
-            try:
-                msgs = queue.receive_messages(MaxNumberOfMessages=10)
-                if not msgs:
-                    end_of_messages = True
-                    if table_insert and messages_to_delete:
+            msgs = queue.receive_messages(MaxNumberOfMessages=10)
+            if not msgs:
+                end_of_messages = True
+                if table_insert and messages_to_delete:
+                    self._insert_messages(db_enum, table_insert, table_name)
+                    self._delete_messages(messages_to_delete)
+            else:
+                for message in msgs:
+                    m = self.get_message_content(message)
+                    table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
+                    messages_to_delete.append(message)
+                    if len(table_insert) > batch_size:
                         self._insert_messages(db_enum, table_insert, table_name)
-                        self._delete_messages(messages_to_delete)
-                else:
-                    for message in msgs:
-                        try:
-                            m = self.get_message_content(message)
-                            step = 'Get message content ok!'
-                            table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
-                            messages_to_delete.append(message)
-                            if len(table_insert) > batch_size:
-                                table_insert = self._insert_messages(db_enum, table_insert, table_name)
-                                messages_to_delete = self._delete_messages(messages_to_delete)
-                        except Exception as e:
-                            if message:
-                                print ('{0}\n{1} - STEP: {2}'.format(message.body, e, step))
-
-            except Exception as e:
-                print ('{} - STEP: {}'.format(e, step))
+                        messages_to_delete = self._delete_messages(messages_to_delete)
+                        table_insert = None
 
     def _insert_messages(self, db_enum, table_insert, table_name):
+        table_name_raw = table_name + '_raw'
         count = len(table_insert)
         print('BULK INSERT - {} messages...'.format(count))
-        self.bulk_insert(table=table_insert, table_name=table_name, db_enum=db_enum,
-                         delimiter='|', encoding='LATIN-1')
-        table_insert = None
-        return table_insert
 
-    def _delete_messages(self, messages_to_delete):
-        count = len(messages_to_delete)
-        print('Deleting {} messages...'.format(count))
-        while count > 0:
+        self.bulk_insert(table=table_insert, table_name=table_name_raw, db_enum=db_enum,
+                         delimiter='|', encoding='LATIN-1')
+
+        self.execute_command(
+            db_enum=EnumDb.BI_ODS,
+            command='INSERT INTO {0}(dt_creation, message) SELECT dt_creation, message FROM {1}'.format(
+                table_name, table_name_raw
+            ),
+            commit=True
+        )
+
+        self.execute_command(
+            db_enum=EnumDb.BI_ODS,
+            command='TRUNCATE TABLE {0}'.format(table_name_raw),
+            commit=True
+        )
+
+    @classmethod
+    def _delete_messages(cls, messages_to_delete):
+        print('Deleting {} messages...'.format(len(messages_to_delete)))
+        while messages_to_delete:
             mes = messages_to_delete[0]
             mes.delete()
             messages_to_delete.remove(mes)
