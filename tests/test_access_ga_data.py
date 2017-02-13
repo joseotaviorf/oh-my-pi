@@ -20,7 +20,7 @@ class GAScheduleView(BaseGA):
                 "dimensions": "ga:date,ga:pagePath",
                 "filters": "ga:pagePath=~^\/lista\-de\-visitas\/agendar\?imoveis\=[0-9]+$",
                 "samplingLevel": "HIGHER_PRECISION",
-                "sort": "-ga:pageviews"
+                "sort": "ga:pagePath"
             }
         )
 
@@ -40,10 +40,32 @@ def load_data():
     result, contains_sampling_data = ga.get(start_date, end_date)
     print('{} - Sampling Data: {}'.format(ga.ga.property_name, contains_sampling_data))
 
+    imovelIds = []
+    mapImovelIdViews = {}
     for row in result[1:]:
         url = row[1]
         views = row[2]
-        print(getIdFromUrl(url) + ' - ' + views)
+        imovelIds.append(getIdFromUrl(url))
+        mapImovelIdViews[getIdFromUrl(url)] = views
+        #print(getIdFromUrl(url) + ' - ' + views)
+
+        #data = BaseETL.from_db_query(
+        #    EnumDb.QuintoAndar_ebdb,
+        #    query="select id,regiao_id,bairro from Imovel i where i.id = {};".format(getIdFromUrl(url))
+        #)
+
+    print(mapImovelIdViews)
+
+    listImovelIds = ','.join(map(str,imovelIds))
+    data = BaseETL.from_db_query(
+        EnumDb.QuintoAndar_ebdb,
+        query="select regiao_id,bairro,group_concat(distinct id separator ',') from Imovel where id in ({}) group by regiao_id,bairro;".format(listImovelIds),
+    )
+
+    for row in data[1:]:
+        print "{} - {} - {}".format(row[0],row[1],row[2])
+
+    print("======")
 
     petl.tocsv(result, os.getcwd() + '/tmp/testing.csv', encoding='utf8')
     print(os.getcwd() + "\n")
