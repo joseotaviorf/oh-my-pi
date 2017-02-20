@@ -17,15 +17,6 @@ if len(args) > 1:
         print("To ODS: {}".format(datetime.now()))
 
         table = BaseETL.decode_table(table, 'LATIN-1')
-        # BaseETL.to_db(
-        #     data_table=table,
-        #     table_name='proposal',
-        #     db_enum=EnumDb.BI_ODS,
-        #     encoding='UTF8',
-        #     append=False,
-        #     commit=True,
-        #     create=True
-        # )
 
         BaseETL.bulk_insert(
             table=table,

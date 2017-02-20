@@ -35,6 +35,7 @@ select
   vo_cr.nome as visit_created_type,
   coalesce(vo_up.isApp, FALSE) as visit_last_updated_from_app,
   coalesce(vo_up.nome, FALSE) as visit_last_updated_type,
+  fl.id as id_rental_flow,
   n.id as id_negotiation,
   n.criadoEm as dt_negotiation,
   pp.id as id_pre_proposal,
@@ -107,7 +108,13 @@ left join
 -- CONTRATO
 left join 
   Contrato c
-  on c.proposta_id = p.id
+  on c.proposta_id = p.id  
+  and c.status != 'Cancelado'
+
+where 
+  v.status != 'Canceled'
+  and a.status != 'Cancelado'
+  -- and i.id = 892795561
 ;
 
 END
