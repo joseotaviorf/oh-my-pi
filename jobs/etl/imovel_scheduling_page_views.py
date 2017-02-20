@@ -41,6 +41,13 @@ class GASlotViewInScheduleViewD0D1(BaseGA):
             }
         )
 
+def addViewsToMap(imovelId, slotNum, sumSeenSlots, views, map):
+    if sumSeenSlots >= slotNum:
+        if not imovelId in map:
+            map[imovelId] = views
+        else:
+            map[imovelId] += views
+
 def load_data():
     ga = GAScheduleView(
         'QuintoAndar',
@@ -54,9 +61,10 @@ def load_data():
         '1- Prod (Tracking GTM)'
     )
 
-    start_date = "6daysAgo"
+    dateRange = 6 # days
+    start_date = str(dateRange) + "daysAgo"
     end_date = "today"
-    start_date_query = str(date.today() - timedelta(days=6))
+    start_date_query = str(date.today() - timedelta(days=dateRange))
     end_date_query = str(date.today())
 
     # First GA query, views by page
@@ -68,17 +76,18 @@ def load_data():
     print('{} - Sampling Data: {}'.format(ga2.ga.property_name, contains_sampling_data))
 
     # Map (imovelId -> Number of views)
+    # Note: 'if row[0] != "pagePath"' is necessary because if a GA query returns more than 5000
+    # rows, it will repeat a row with the columns names
     imovelIds = []
     mapImovelIdViews = {}
     for row in result_schedule_view[1:]:
-        imovelId = str(row[0].split('=')[1])
-        views = int(row[1])
-        imovelIds.append(imovelId)
-        mapImovelIdViews[imovelId] = views
+        if row[0] != "pagePath":
+            imovelId = str(row[0].split('=')[1])
+            views = int(row[1])
+            imovelIds.append(imovelId)
+            mapImovelIdViews[imovelId] = views
 
     # Map (imovelId -> Number of views where (slots available on d0 + slots available on d1) >= 3)
-    # Note: 'if row[0] != "pagePath"' is necessary because if a GA query returns more than 5000
-    # rows, it will repeat a row with the columns names
     mapImovelIdViewsD0D1_01PlusSlots = {}
     mapImovelIdViewsD0D1_03PlusSlots = {}
     mapImovelIdViewsD0D1_05PlusSlots = {}
@@ -92,48 +101,13 @@ def load_data():
             slotNumberD1 = int(row[2])
             views = int(row[3])
 
-            if slotNumberD0 + slotNumberD1 >= 1:
-                if not imovelId in mapImovelIdViewsD0D1_01PlusSlots:
-                    mapImovelIdViewsD0D1_01PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_01PlusSlots[imovelId] += views
+            addViewsToMap(imovelId, 1, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_01PlusSlots)
+            addViewsToMap(imovelId, 3, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_03PlusSlots)
+            addViewsToMap(imovelId, 5, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_05PlusSlots)
+            addViewsToMap(imovelId, 7, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_07PlusSlots)
+            addViewsToMap(imovelId, 9, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_09PlusSlots)
+            addViewsToMap(imovelId, 11, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_11PlusSlots)
 
-            if slotNumberD0 + slotNumberD1 >= 3:
-                if not imovelId in mapImovelIdViewsD0D1_03PlusSlots:
-                    mapImovelIdViewsD0D1_03PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_03PlusSlots[imovelId] += views
-
-            if slotNumberD0 + slotNumberD1 >= 5:
-                if not imovelId in mapImovelIdViewsD0D1_05PlusSlots:
-                    mapImovelIdViewsD0D1_05PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_05PlusSlots[imovelId] += views
-
-            if slotNumberD0 + slotNumberD1 >= 7:
-                if not imovelId in mapImovelIdViewsD0D1_07PlusSlots:
-                    mapImovelIdViewsD0D1_07PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_07PlusSlots[imovelId] += views
-
-            if slotNumberD0 + slotNumberD1 >= 9:
-                if not imovelId in mapImovelIdViewsD0D1_09PlusSlots:
-                    mapImovelIdViewsD0D1_09PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_09PlusSlots[imovelId] += views
-
-            if slotNumberD0 + slotNumberD1 >= 11:
-                if not imovelId in mapImovelIdViewsD0D1_11PlusSlots:
-                    mapImovelIdViewsD0D1_11PlusSlots[imovelId] = views
-                else:
-                    mapImovelIdViewsD0D1_11PlusSlots[imovelId] += views
-
-    #SELECT r3.nome,r.nome,i.bairro,i.id
-    #FROM Imovel i
-    #LEFT JOIN Regiao r on (i.regiao_id = r.id)
-    #LEFT JOIN Regiao r2 on (r.regiaoPai_id = r2.id)
-    #LEFT JOIN Regiao r3 on (r2.regiaoPai_id = r3.id)
-    #WHERE i.id IN (%s);
 
     placeholders=','.join(['%s']*len(imovelIds))
     query="""
@@ -163,7 +137,7 @@ def load_data():
                   "Views com 1+ slots em d0 e d1","Views com 3+ slots em d0 e d1",
                   "Views com 5+ slots em d0 e d1","Views com 7+ slots em d0 e d1",
                   "Views com 9+ slots em d0 e d1","Views com 11+ slots em d0 e d1"]]
-                  
+
     for row in cursor.fetchall():
         finalData.append([start_date_query,end_date_query,
                           row[0].decode('utf-8'),
@@ -181,7 +155,14 @@ def load_data():
 
     db.close()
 
-    petl.tocsv(finalData, sys.path[0] + '/tmp/testing.csv', encoding='utf8')
+    BaseETL.bulk_insert(
+        table=finalData,
+        table_name='imovel_scheduling_page_views',
+        db_enum=EnumDb.BI_ODS,
+        encoding='UTF8',
+        append=True,
+        commit=True
+    )
 
 if __name__ == "__main__":
 
