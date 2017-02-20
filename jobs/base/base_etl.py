@@ -212,9 +212,9 @@ class BaseETL(object):
         raise Exception("Not implemented")
 
     @classmethod
-    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor_postgres=None):
+    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor_postgres=None, generator=False):
         return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name),
-                                 encoding=encoding, server_cursor_postgres=server_cursor_postgres)
+                                 encoding=encoding, server_cursor_postgres=server_cursor_postgres, generator=generator)
 
     @classmethod
     def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor_postgres=None, conn=None, generator=False):
@@ -244,10 +244,19 @@ class BaseETL(object):
             db_enum=db_enum
         )[1][0]
 
-    # @classmethod
-    # def from_s3(cls, db_enum, query, encoding='LATIN1'):
-    #     conn = cls.get_connection(db_enum, encoding)
-    #     return list(petl.fromdb(conn, query))
+    @classmethod
+    def table_exists(cls, db_enum, table_name):
+        exists = cls.from_db_query(
+            query="""
+                SELECT 1
+                FROM   information_schema.tables
+                WHERE  table_schema = 'public'
+                AND    table_name = '{}'
+                """.format(table_name),
+            db_enum=db_enum
+        )
+        return len(exists) > 1 and exists[1][0]
+
 
     @classmethod
     def drop_table(cls, db_enum, table_name, schema='public'):

@@ -58,7 +58,7 @@ class AmplitudeEventsETL(BaseETL):
         count = len(table_insert)
         print('BULK INSERT - {} messages...'.format(count))
 
-        self.bulk_insert(table=table_insert, table_name=table_name_raw, db_enum=db_enum,
+        self.bulk_insert(table=table_insert, table_name=table_name_raw, db_enum=db_enum, append=True,
                          delimiter='|', encoding='LATIN-1')
 
         self.execute_command(
