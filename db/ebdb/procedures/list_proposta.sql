@@ -1,4 +1,5 @@
-﻿CREATE DEFINER = 'QuintoAndarMain'@'%'
+﻿DROP PROCEDURE IF EXISTS ebdb.list_proposta;
+CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_proposta()
 BEGIN
 select 
@@ -19,7 +20,8 @@ select
   proprietarioAceitouContrato,
   statusDocumentacaoInq,
   statusDocumentacaoProp,
-  fazerTermoAditivo,  
+  fazerTermoAditivo, 
+  preProposta_id, 
   criadoEm,
   atualizadoEm
 from 

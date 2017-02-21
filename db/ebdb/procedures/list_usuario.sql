@@ -98,6 +98,16 @@ BEGIN
     gc.inicioContrato as dadosgerentecontas_inicio_contrato,
     ugc.nome as dadosgerentecontas_nome,
     u.active+0 as active,
+
+    u.dadosAgente_id as dados_agente_id,
+    u.dadosFotografo_id as dados_fotografo_id,
+    u.dadosVendedor_id as dados_vendedor_id,
+    u.dadosAfiliado_id as dados_afiliado_id,
+    u_c.tem_imovel,
+    u_c.tem_app_inquilino,
+    u_c.tem_contrato_ativo,
+    u_c.inquilino,
+
     u.criadoEm as criado_em, 
     u.atualizadoEm as atualizado_em
   from 
@@ -135,6 +145,63 @@ BEGIN
   left join
     Usuario ugc
     on ugc.id = gc.usuario_id
+
+
+  left join
+  (
+    select
+      U.id,
+      I.usuario_id is not null as tem_imovel,
+      D.usuario_id is not null as tem_app_inquilino,
+      C.usuario_id is not null as tem_contrato_ativo,
+      coalesce(C.usuario_id is not null, 0) as inquilino
+    
+    from
+     Usuario U
+
+    left join
+     Agendamento a
+      on a.visitante_id = U.id
+    
+    left join
+     (
+       select
+         I.usuario_id,
+         count(I.usuario_id)>0 as isProp
+       from
+         Imovel I    
+       group by
+         I.usuario_id
+     ) I
+     on U.id = I.usuario_id
+    
+    left join
+     (
+       select distinct
+         d.usuario_id
+       from
+         Device d
+       where
+         d.mobileApp = 'Inquilinos'
+     ) D
+     on U.id = D.usuario_id
+    
+    left join
+     (
+       select distinct
+         usuario_id
+       from
+         Contrato
+     ) C
+     on U.id = C.usuario_id
+    
+    group by
+      U.id,
+      I.usuario_id is not null,
+      D.usuario_id is not null,
+      C.usuario_id is not null
+  ) u_c
+  on u_c.id = u.id
 ;
 
 END
