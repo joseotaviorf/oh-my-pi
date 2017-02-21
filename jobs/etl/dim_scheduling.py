@@ -17,19 +17,10 @@ if len(args) > 1:
         print("To ODS: {}".format(datetime.now()))
 
         table = BaseETL.decode_table(table, 'LATIN-1')
-        # BaseETL.to_db(
-        #     data_table=table,
-        #     table_name='schedule',
-        #     db_enum=EnumDb.BI_ODS,
-        #     encoding='UTF8',
-        #     append=False,
-        #     commit=True,
-        #     create=True
-        # )
 
         BaseETL.bulk_insert(
             table=table,
-            table_name='scheduling',
+            table_name='booking',
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
             append=False,
@@ -38,14 +29,14 @@ if len(args) > 1:
 
     elif args[1] == 'DW':
         BaseETL.move_table(
-            table_name='vw_dim_scheduling',
-            table_name_dest='dim_scheduling',
+            table_name='vw_dim_booking',
+            table_name_dest='dim_booking',
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False
         )
         BaseETL.execute_command(
-            'insert into dim_scheduling values (-1);',
+            'insert into dim_booking values (-1);',
             db_enum=EnumDb.BI_DW,
             commit=True
         )
