@@ -27,7 +27,7 @@ if len(args) > 1:
             append=False
         )
         BaseETL.execute_command(
-            'insert into dim_user values (-1);',
+            "insert into dim_user (sk_user) values (-1);",
             db_enum=EnumDb.BI_DW,
             commit=True
         )
