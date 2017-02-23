@@ -62,6 +62,7 @@ left join
   Agendamento a
   on a.imovel_id = i.id
   and a.tipo = 'Visita'
+
 left join
   Usuario dau
   on dau.dadosAgente_id = a.agente_id
@@ -109,12 +110,7 @@ left join
 left join 
   Contrato c
   on c.proposta_id = p.id  
-  and c.status != 'Cancelado'
-
-where 
-  v.status != 'Canceled'
-  and a.status != 'Cancelado'
-  -- and i.id = 892795561
+  -- and c.status != 'Cancelado'
 ;
 
 END
