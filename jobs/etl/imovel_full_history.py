@@ -8,6 +8,12 @@ offset = 0
 offset_inc = 1000
 
 conn = BaseETL.get_connection(db_enum=EnumDb.BI_ODS, encoding='UTF8')
+BaseETL.execute_command(
+    conn=conn,
+    command="""truncate table imovel_status_full_history""",
+    commit=True
+)
+
 while offset <= count_ids:
     print('BEGINING OFFSET: {}'.format(offset))
     BaseETL.execute_command(
