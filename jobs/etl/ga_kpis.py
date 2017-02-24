@@ -9,7 +9,7 @@ class GAPageBasedKPIs(BaseGA):
 
     def __init__(self, account_name, property_name, profile_name):
         super(GAPageBasedKPIs, self).__init__(account_name, property_name, profile_name)
-        self.table_name = 'ga_page_based_kpis'
+        self.table_name = 'ga_kpis'
 
     def get(self, start_date, end_date):
         return self.execute_query(
@@ -17,7 +17,7 @@ class GAPageBasedKPIs(BaseGA):
                 "start_date": start_date,
                 "end_date": end_date,
                 "metrics": "ga:users,ga:sessions,ga:bounces,ga:bounceRate,ga:pageviews,ga:uniquePageviews,ga:exits,ga:exitRate,ga:timeOnScreen,ga:avgTimeOnPage",
-                "dimensions": "ga:date,ga:pagePath,ga:campaign,ga:sourceMedium,ga:deviceCategory",
+                "dimensions": "ga:date,ga:deviceCategory",
                 # "segment": "users::sequence::^ga:sessionCount==1",
                 "samplingLevel": "HIGHER_PRECISION",
                 "sort": "ga:date"
@@ -48,15 +48,10 @@ def load_ods():
     count = 0
     if not create_table:
         count = BaseETL.get_table_count(EnumDb.BI_ODS, ga.table_name)
-        # BaseETL.execute_command(
-        #     command="DELETE from {} where date >= '{}'".format(ga.table_name, min_date),
-        #     db_enum=EnumDb.BI_ODS,
-        #     commit=True
-        # )
 
     initial = count == 0
-    start_date = "2016-01-01" # "2016-01-01" if initial else "7daysAgo"
-    end_date = "2017-02-24" # GAPageBasedKPIs.add_date_str(start_date, 7) if initial else "today"
+    start_date = "2016-01-01" if initial else "7daysAgo"
+    end_date = GAPageBasedKPIs.add_date_str(start_date, 7) if initial else "today"
 
     while end_date:
         print("Start date: {} - End date: {}".format(start_date, end_date))
@@ -99,7 +94,7 @@ def load_ods():
 def load_dw():
     now = datetime.now()
     min_date = (datetime.today() - timedelta(days=7)).strftime('%Y%m%d')
-    fact_table = 'fact_liquidity_ga_page_kpis'
+    fact_table = 'fact_liquidity_ga_kpis'
 
     BaseETL.execute_command(
         command="DELETE from {} where sk_date >= '{}'".format(fact_table, min_date),
@@ -107,7 +102,7 @@ def load_dw():
         commit=True
     )
     BaseETL.move_table(
-        table_name='vw_fact_liquidity_ga_page_kpis',
+        table_name='vw_fact_liquidity_ga_kpis',
         table_name_dest=fact_table,
         enum_db_source=EnumDb.BI_ODS,
         enum_db_dest=EnumDb.BI_DW,
@@ -116,7 +111,7 @@ def load_dw():
         #,server_cursor='ga_page_based_kpis_cursor'
     )
     BaseETL.execute_command(
-        command="update ga_page_based_kpis set processed_date = '{}' where processed_date is null".format(now),
+        command="update ga_kpis set processed_date = '{}' where processed_date is null".format(now),
         db_enum=EnumDb.BI_ODS,
         commit=True
     )

@@ -151,10 +151,17 @@ BEGIN
   (
     select
       U.id,
-      I.usuario_id is not null as tem_imovel,
+      I.isProp as tem_imovel,
       D.usuario_id is not null as tem_app_inquilino,
       C.usuario_id is not null as tem_contrato_ativo,
-      coalesce(C.usuario_id is not null, 0) as inquilino
+      
+      (
+        U.dadosAfiliado_id is null 
+        and U.dadosFotografo_id is null 
+        and U.dadosVendedor_id is null 
+        and U.dadosAgente_id is null 
+        and not I.isProp
+      ) or  C.usuario_id is not null as inquilino
     
     from
      Usuario U
