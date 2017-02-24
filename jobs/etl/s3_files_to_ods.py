@@ -10,12 +10,15 @@ if __name__ == '__main__':
     for f in files:
         try:
             table = s3.get_tables_from_files(f[0])
-            BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=f[1], schema=schema)
+            table_name=f[1]
+            exists = BaseETL.table_exists(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
+            if exists:
+                BaseETL.truncate_table(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
             BaseETL.to_db(db_enum=EnumDb.BI_ODS,
                           data_table=table,
                           table_name=f[1],
                           schema=schema,
-                          create=True,
+                          create=not exists,
                           append=False)
         except Exception as ex:
             print(ex)

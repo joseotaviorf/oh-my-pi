@@ -245,14 +245,14 @@ class BaseETL(object):
         )[1][0]
 
     @classmethod
-    def table_exists(cls, db_enum, table_name):
+    def table_exists(cls, db_enum, table_name, schema='public'):
         exists = cls.from_db_query(
             query="""
                 SELECT 1
                 FROM   information_schema.tables
-                WHERE  table_schema = 'public'
+                WHERE  table_schema = '{}'
                 AND    table_name = '{}'
-                """.format(table_name),
+                """.format(schema, table_name),
             db_enum=db_enum
         )
         return len(exists) > 1 and exists[1][0]
@@ -261,6 +261,11 @@ class BaseETL(object):
     @classmethod
     def drop_table(cls, db_enum, table_name, schema='public'):
         cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
+
+    @classmethod
+    def truncate_table(cls, db_enum, table_name, schema='public'):
+        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
+
 
     @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest,

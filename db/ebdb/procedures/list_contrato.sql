@@ -44,6 +44,7 @@ select
   contratoLocacaoAssinado,
   dataTrocaTitularidade,
   proposta_id,
+  imovel_id,
   criadoEm,
   atualizadoEm 
 from 

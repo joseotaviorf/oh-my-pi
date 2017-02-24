@@ -109,7 +109,7 @@ left join
 -- CONTRATO
 left join 
   Contrato c
-  on c.proposta_id = p.id  
+  on c.proposta_id =  coalesce(p.id, p_n.id)
   -- and c.status != 'Cancelado'
 ;
 
