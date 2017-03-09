@@ -40,3 +40,15 @@ if len(args) > 1:
             db_enum=EnumDb.BI_DW,
             commit=True
         )
+        BaseETL.execute_command(
+            """
+            update
+                dim_booking
+            set
+                visit_follow_up = null
+            where
+                visit_follow_up = ''
+            """,
+            db_enum=EnumDb.BI_DW,
+            commit=True
+        )
