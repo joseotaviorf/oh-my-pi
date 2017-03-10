@@ -48,15 +48,15 @@ def load_ods():
     count = 0
     if not create_table:
         count = BaseETL.get_table_count(EnumDb.BI_ODS, ga.table_name)
-        # BaseETL.execute_command(
-        #     command="DELETE from {} where date >= '{}'".format(ga.table_name, min_date),
-        #     db_enum=EnumDb.BI_ODS,
-        #     commit=True
-        # )
+        BaseETL.execute_command(
+            command="DELETE from {} where date >= '{}'".format(ga.table_name, min_date),
+            db_enum=EnumDb.BI_ODS,
+            commit=True
+        )
 
     initial = count == 0
-    start_date = "2016-01-01" # "2016-01-01" if initial else "7daysAgo"
-    end_date = "2017-02-24" # GAPageBasedKPIs.add_date_str(start_date, 7) if initial else "today"
+    start_date = "2017-02-24" if initial else "7daysAgo"
+    end_date = GAPageBasedKPIs.add_date_str(start_date, 7) if initial else "today"
 
     while end_date:
         print("Start date: {} - End date: {}".format(start_date, end_date))
