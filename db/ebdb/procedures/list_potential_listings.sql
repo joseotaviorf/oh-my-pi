@@ -62,6 +62,7 @@ BEGIN
       o.lead_id AS lead_id,
       
       o.imovel_id AS property_id,
+      c.id as contract_id,
       o.aluguel as renting_value,    
       o.status as current_property_status,
       

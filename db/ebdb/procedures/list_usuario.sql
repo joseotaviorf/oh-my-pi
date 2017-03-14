@@ -108,6 +108,11 @@ BEGIN
     u_c.tem_contrato_ativo,
     u_c.inquilino,
 
+    p.first_dt_document_sent,
+    p.last_dt_document_sent,
+    i.first_dt_sent_to_insurance,
+
+
     u.criadoEm as criado_em, 
     u.atualizadoEm as atualizado_em
   from 
@@ -209,6 +214,38 @@ BEGIN
       C.usuario_id is not null
   ) u_c
   on u_c.id = u.id
+
+  left join
+  (
+    select 
+      p.proponente_id,
+      min(p.dataDocumentosEnviados) as first_dt_document_sent,
+      max(p.dataDocumentosEnviados) as last_dt_document_sent
+    from 
+      Proposta p
+    where 
+      dataDocumentosEnviados is not null
+    group by
+      p.proponente_id
+  ) p
+  on p.proponente_id = u.id
+
+  left join
+  (    
+    select 
+      proponente_id,
+      FROM_UNIXTIME(min(r.timestamp)/1000) as first_dt_sent_to_insurance
+    from 
+      Proposta_AUD p
+    left JOIN
+      UsuarioRevisionEntity r
+      on r.id = p.REV
+    where 
+      statusDocumentacaoInq = 'AnaliseCardiff'
+    group BY
+      1
+  ) i
+  on i.proponente_id = u.id
 ;
 
 END

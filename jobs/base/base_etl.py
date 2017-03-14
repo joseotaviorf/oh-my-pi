@@ -181,7 +181,7 @@ class BaseETL(object):
             raise AttributeError()
         if not conn:
             conn = cls.get_connection(db_enum, encoding)
-        if not in_iterator:
+        if not in_iterator and conn and conn.autocommit != commit:
             conn.autocommit = commit
 
         print ('Start Execute Command at: {}'.format(cls.now()))

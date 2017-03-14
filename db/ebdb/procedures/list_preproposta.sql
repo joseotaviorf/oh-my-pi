@@ -16,6 +16,7 @@ select
   status,
   proprietarioAceitouCondicoes5A,
   usuario_id,
+  imovel_id,
   criadoEm,
   atualizadoEm
 from 
