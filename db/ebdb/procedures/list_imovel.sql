@@ -186,7 +186,7 @@ left join
     Imovel_Etapas ie
     on ie.imovel_id = i.id
   group by 
-    imovel_id
+    i.id
 ) ie
   on ie.imovel_id = i.id
 

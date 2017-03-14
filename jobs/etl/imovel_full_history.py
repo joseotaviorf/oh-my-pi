@@ -27,7 +27,7 @@ while offset <= count_ids:
                 f_list_imovel_status_full_history({},{})
             where
                 all_status_date_position_flag;
-        """.format(offset, 1000),
+        """.format(offset, offset_inc),
         encoding='UTF8',
         commit=True
     )

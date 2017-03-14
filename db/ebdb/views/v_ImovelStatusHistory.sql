@@ -4,18 +4,16 @@ as
 select 
   i.*,
   a.REV,
+  a.date_status_changed,
   case when a.status = 'publicado' 
     then l.status_time
     else l.published_status_time
-  end as datePublication,
-  
-  case when a.status = 'publicado' then 1 else 0 end as published,
-  
+  end as datePublication,  
+  case when a.status = 'publicado' then 1 else 0 end as published,  
   l.status_time,
   l.status_date,  
   coalesce(l.actual_status, i.status) as status_history,
   i.status as current_status
-
 from 
   v_Imovel_AUD a
 inner JOIN
