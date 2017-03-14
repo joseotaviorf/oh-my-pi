@@ -24,7 +24,7 @@ query_extract = """
             from
               v_Imovel_AUD  a
             WHERE
-              id in (892774974, 892796245) and
+              -- id in (892774974, 892796245) and
               a.date_status_changed >= '{}'
               and a.date_status_changed < '{}'
         )
