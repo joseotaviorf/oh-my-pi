@@ -1,4 +1,5 @@
 from jobs.base.base_etl import BaseETL, EnumDb
+import sys
 
 count_ids = BaseETL.from_db_query(
     db_enum=EnumDb.BI_ODS,
@@ -7,9 +8,10 @@ count_ids = BaseETL.from_db_query(
 offset = 0
 offset_inc = 1000
 
-conn = BaseETL.get_connection(db_enum=EnumDb.BI_ODS, encoding='UTF8')
+# conn = BaseETL.get_connection()
 BaseETL.execute_command(
-    conn=conn,
+    db_enum=EnumDb.BI_ODS,
+    encoding='UTF8', #conn=conn,
     command="""truncate table imovel_status_full_history""",
     commit=True
 )
@@ -17,7 +19,7 @@ BaseETL.execute_command(
 while offset <= count_ids:
     print('BEGINING OFFSET: {}'.format(offset))
     BaseETL.execute_command(
-        conn=conn,
+        db_enum=EnumDb.BI_ODS,
         command=
         """
             insert into
@@ -32,6 +34,10 @@ while offset <= count_ids:
         commit=True
     )
     print('OFFSET: {} SUCCESSEFULLY INSERTED'.format(offset))
+    sys.stdout.flush()
     offset += offset_inc
 
-conn.close()
+print ('END')
+sys.stdout.flush()
+
+#conn.close()
