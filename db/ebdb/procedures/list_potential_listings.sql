@@ -54,8 +54,6 @@ BEGIN
         else o.qualified_date -- in all other cases we choose the qualified date
       end as qualified_date,
 
-      o.qualified_date, -- the logic is below in the select : if self service : date of planning photograher. if IS : conversaolead.dataconversao (both organic an not)
-
       case when f.dataAgendamento  <='1900-01-01' 
         then NULL -- coalesce(f.dataAgendamento, f.dataCriacao)
         ELSE f.dataAgendamento -- changed
@@ -421,7 +419,7 @@ BEGIN
       Contrato c
       on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= ip.datePublication order BY c2.id limit 1)
   
-      where o.imovel_id in (892793760)--, 892763276,892791756 )
+      -- where o.imovel_id in (892793760)--, 892763276,892791756 )
       -- year(o.ref_date)= 2016
       -- and month(o.ref_date) >= 11
       -- and  l.id = 319376
