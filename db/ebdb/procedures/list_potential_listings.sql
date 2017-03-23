@@ -46,14 +46,19 @@ BEGIN
       
       o.first_inside_sales_contact_date,
       
-      case when ia.imovelAttribution='Self-Service'
-        then f.dataCriacao 
-        else o.qualified_date
+      case 
+        when ia.imovelAttribution='Self-Service' -- Self service qualified date is set to null below because we cannot distinguish them from organic growth. here we correct the qualified date.
+          then f.dataCriacao -- best value we can get since we miss the exact date.
+        when o.qualified_date is null and o.dataConversao is not null -- correcting organic inside sales
+          then o.dataConversao --  this is needed because organic inside sales have their qualified date set to null and it needs to be corrected here
+        else o.qualified_date -- in all other cases we choose the qualified date
       end as qualified_date,
 
-      case 
-        when coalesce(f.dataInicioSessao, f.dataAgendamento, f.dataCriacao)  <='1900-01-01' then NULL 
-        ELSE coalesce(f.dataInicioSessao, f.dataAgendamento, f.dataCriacao)
+      o.qualified_date, -- the logic is below in the select : if self service : date of planning photograher. if IS : conversaolead.dataconversao (both organic an not)
+
+      case when f.dataAgendamento  <='1900-01-01' 
+        then NULL -- coalesce(f.dataAgendamento, f.dataCriacao)
+        ELSE f.dataAgendamento -- changed
       END as opportunity_date,
 
       ip.datePublication AS listing_publication_date,
@@ -152,9 +157,10 @@ BEGIN
           lfu.firstUpdateDate as first_inside_sales_contact_date,
           null as prospect_date,
 
-          CASE WHEN cl.leadConvertido_id IS NOT NULL
-            THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) -- if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
-          END as qualified_date,
+          (CASE WHEN cl.leadConvertido_id IS NOT NULL
+          THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) --if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
+          ELSE null
+          END) as qualified_date,
 
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as created_date,
           l.atualizadoEm as updated_date
@@ -191,7 +197,7 @@ BEGIN
         LEFT JOIN 
           ConversaoLead cl
           ON cl.leadConvertido_id = l.id
-          -- and cl.status = 'Concluido'
+          -- and cl.status = 'Concluido' 
           and cl.tipo = 'Lead'
       
         LEFT JOIN
@@ -222,7 +228,7 @@ BEGIN
           u.tipoAdmin,
           null as first_inside_sales_contact_date,
           dt_etapa_endereco as prospect_date,
-          null  as qualified_date,
+          null  as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm, i.dataCriacao) as created_date,
           coalesce(l.atualizadoEm, i.atualizadoEm)  as updated_date
         FROM
@@ -243,7 +249,7 @@ BEGIN
                    
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
-          
+          -- and cl.status = 'Concluido'
         left join Lead l
           on l.id = cl.leadConvertido_id
         LEFT JOIN 
@@ -289,8 +295,7 @@ BEGIN
         tipoAdmin
     ) o
   
-    LEFT JOIN 
-      v_ImovelStatusHistory ip
+    LEFT JOIN v_ImovelStatusHistory ip
       on ip.id = o.imovel_id
       and ip.published = 1
   
@@ -382,13 +387,12 @@ BEGIN
     left join JobFotografo f
       on f.id = (
       select
-        max(id)
+        max(id) -- min id
       from
         JobFotografo j
       where
         j.imovel_id = o.imovel_id
-        and (j.dataCriacao <= ip.datePublication or ip.datePublication is null)
-        and j.status != 'Cancelado'
+        and (j.dataCriacao <= ip.datePublication or ip.datePublication is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
     )
   
     LEFT JOIN 
@@ -417,7 +421,7 @@ BEGIN
       Contrato c
       on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= ip.datePublication order BY c2.id limit 1)
   
-      -- where o.imovel_id in (892784681, 892763276,892791756 )
+      where o.imovel_id in (892793760)--, 892763276,892791756 )
       -- year(o.ref_date)= 2016
       -- and month(o.ref_date) >= 11
       -- and  l.id = 319376
