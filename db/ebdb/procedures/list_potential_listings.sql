@@ -152,10 +152,9 @@ BEGIN
           lfu.firstUpdateDate as first_inside_sales_contact_date,
           null as prospect_date,
 
-          (CASE WHEN cl.leadConvertido_id IS NOT NULL
-          THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) --if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
-          ELSE null
-          END) as qualified_date,
+          CASE WHEN cl.leadConvertido_id IS NOT NULL
+            THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) -- if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
+          END as qualified_date,
 
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as created_date,
           l.atualizadoEm as updated_date
@@ -244,7 +243,7 @@ BEGIN
                    
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
-          -- and cl.status = 'Concluido'
+          
         left join Lead l
           on l.id = cl.leadConvertido_id
         LEFT JOIN 
