@@ -54,9 +54,9 @@ BEGIN
         else o.qualified_date -- in all other cases we choose the qualified date
       end as qualified_date,
 
-      case when f.dataAgendamento  <='1900-01-01' 
+      case when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01' 
         then NULL
-        ELSE f.dataAgendamento
+        ELSE coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
       END as opportunity_date,
 
       ip.datePublication AS listing_publication_date,
