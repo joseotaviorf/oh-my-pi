@@ -296,8 +296,8 @@ BEGIN
         usuario_id,
         usuarioQueCadastrou_id,
         vendedor_id,
-        tipoAdmin
-        conversao_tipo -- 
+        tipoAdmin,
+        conversao_tipo, -- 
         lead_origem --
     ) o
   
