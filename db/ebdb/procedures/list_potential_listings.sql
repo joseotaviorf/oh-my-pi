@@ -130,8 +130,8 @@ BEGIN
         usuarioQueCadastrou_id,
         vendedor_id,
         tipoAdmin,
-        o.conversao_tipo, -- 
-        o.lead_origem, -- 
+        o.conversao_tipo, 
+        o.lead_origem, 
         min(o.prospect_date) as prospect_date,
         min(o.first_inside_sales_contact_date) as first_inside_sales_contact_date,
         min(o.qualified_date) as qualified_date,   --  sera q nao serviria f.dataCriacao ??
@@ -157,8 +157,8 @@ BEGIN
           u.tipoAdmin,
           lfu.firstUpdateDate as first_inside_sales_contact_date,
           null as prospect_date,
-          cl.tipo as conversao_tipo, --
-          l.origem as lead_origem, --
+          cl.tipo as conversao_tipo, 
+          l.origem as lead_origem, 
 
           CASE WHEN cl.leadConvertido_id IS NOT NULL
             THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) -- if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
@@ -230,7 +230,7 @@ BEGIN
           u.tipoAdmin,
           null as first_inside_sales_contact_date,
           dt_etapa_endereco as prospect_date,
-          cl.tipo as conversao_tipo, --
+          cl.tipo as conversao_tipo, 
           l.origem as lead_origem ,
           null  as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm, i.dataCriacao) as created_date,
@@ -297,8 +297,8 @@ BEGIN
         usuarioQueCadastrou_id,
         vendedor_id,
         tipoAdmin,
-        conversao_tipo, -- 
-        lead_origem --
+        conversao_tipo,  
+        lead_origem 
     ) o
   
     LEFT JOIN v_ImovelStatusHistory ip
