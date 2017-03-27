@@ -79,7 +79,7 @@ BEGIN
       ia.imovelAttribution as imovel_attribution,
       o.lead_tipo as lead_tipo,
       
-      CASE -- understand why we use ia. if not needed replace ia by cl.conversaotipo
+      CASE
         WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='App' THEN 'Affiliate App'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Form' THEN 'Affiliate Form'
