@@ -84,7 +84,7 @@ BEGIN
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='App' THEN 'Affiliate App'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Form' THEN 'Affiliate Form'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Planilha' THEN 'Affiliate Spreadsheet'
-      	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem='Landing' THEN 'Landing Page Leads'
+      	WHEN o.lead_origem='Landing' THEN 'Landing Page Leads'
       	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem<>'Landing' THEN 'Marketing Leads'
        	WHEN o.conversao_tipo='InsideSales' THEN 'Organic/Duplicate/Referred Leads'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Desconhecida' THEN 'Affiliate Unknown'
@@ -96,7 +96,7 @@ BEGIN
     	CASE 
         WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
       	WHEN o.lead_tipo='Afiliado' THEN 'Affiliate Lead'
-      	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem='Landing' THEN 'Landing Page Lead'
+      	WHEN o.lead_origem='Landing' THEN 'Landing Page Lead'
       	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem<>'Landing' THEN 'Marketing Lead'
      	  WHEN o.conversao_tipo='InsideSales' THEN 'Organic/Duplicate/Referred Lead'
     	  WHEN o.conversao_tipo='Lead' THEN 'Other Lead Source'
