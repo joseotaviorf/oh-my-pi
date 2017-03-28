@@ -43,4 +43,5 @@ s3fs
 # numpy==1.11.3
 # pandas==0.19.1
 # Google2Pandas==0.1.0
+zenpy
 
