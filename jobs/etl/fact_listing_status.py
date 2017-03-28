@@ -1,8 +1,7 @@
 from jobs.base.base_etl import BaseETL, EnumDb
 
-conn = BaseETL.get_connection(db_enum=EnumDb.BI_DW, encoding='UTF8')
 BaseETL.execute_command(
-    conn=conn,
+    db_enum=EnumDb.BI_DW,
     command="""truncate table fact_listing_status""",
     commit=True
 )
