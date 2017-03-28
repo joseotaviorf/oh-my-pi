@@ -301,9 +301,13 @@ BEGIN
         lead_origem 
     ) o
   
-    LEFT JOIN v_ImovelStatusHistory ip
+    LEFT JOIN (
+      SELECT id, min(REV) as REV, datePublication
+      FROM v_ImovelStatusHistory
+      WHERE published = 1
+      group by id
+      ) ip
       on ip.id = o.imovel_id
-      and ip.published = 1
   
     left join  -- v_imovel_attribution modified to get properties without first_publication
     (
