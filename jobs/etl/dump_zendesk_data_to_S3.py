@@ -6,14 +6,12 @@ from cStringIO import StringIO
 import boto3
 from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
 
-S3_ZENDESK_BUCKET = 'bi-etl-ejuice-zendesk'
-
 
 class ZendeskDataToS3(object):
     def __init__(self, args):
         self.object_type = args[1]
         self.start_time = args[2]
-        self.end_time = args[2]
+        self.s3_bucket = args[3]
         self.s3 = boto3.client('s3')
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
@@ -46,7 +44,7 @@ class ZendeskDataToS3(object):
         target_file = '{}_{}-{}.json'.format(self.start_time, self.object_type, count)
         fake_handle = StringIO(str(data).encode('utf-8'))
 
-        self.s3.put_object(Bucket=S3_ZENDESK_BUCKET, Key=target_file, Body=fake_handle.read())
+        self.s3.put_object(Bucket=self.s3_bucket, Key=target_file, Body=fake_handle.read())
 
 
 if __name__ == '__main__':
