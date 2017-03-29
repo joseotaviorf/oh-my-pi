@@ -23,8 +23,18 @@ class ZendeskDataToS3(object):
         result = None
         if self.object_type == 'tickets':
             result = self.zendesk_api.get_tickets_data()
-        if self.object_type == 'users':
+        elif self.object_type == 'users':
             result = self.zendesk_api.get_users_data()
+        elif self.object_type == 'ticket_metrics':
+            result = self.zendesk_api.get_ticket_metrics_data()
+        elif self.object_type == 'satisfaction_ratings':
+            result = self.zendesk_api.get_satisfaction_ratings_data()
+        elif self.object_type == 'requests':
+            result = self.zendesk_api.get_requests_data()
+        elif self.object_type == 'groups':
+            result = self.zendesk_api.get_groups_data()
+        elif self.object_type == 'group_memberships':
+            result = self.zendesk_api.get_group_memberships_data()
 
         if not result:
             return
