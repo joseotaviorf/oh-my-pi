@@ -11,7 +11,7 @@ from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
 class ZendeskDataToS3(object):
     def __init__(self, args):
         self.object_type = args[1]
-        self.start_time = int(datetime.strptime(args[2], '%Y-%m-%d').strftime('%s'))
+        self.start_time = int(datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').strftime('%s'))
         self.s3_bucket = args[3]
         self.s3 = boto3.client('s3')
 
