@@ -25,9 +25,8 @@ class ZendeskAPI(object):
     def get_groups_data(self):
         return self.__get_search_data(zendesk_type='group')
 
-    # check
     def get_group_memberships_data(self):
-        return self.zenpy_client.users.group_memberships(start_time=self.start_time)
+        return self.zenpy_client.group_memberships()
 
     def get_users_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.users)
