@@ -31,8 +31,6 @@ class ZendeskDataToODS(object):
                 self.upsert_tickets(file_content['tickets'])
             elif self.object_type == 'ticket_metrics':
                 self.upsert_ticket_metrics(file_content['ticket_metrics'])
-            elif self.object_type == 'request':
-                self.upsert_ticket_metrics(file_content['requests'])
             elif self.object_type == 'user':
                 self.upsert_users(file_content['users'])
             elif self.object_type == 'group_membership':
