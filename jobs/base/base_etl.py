@@ -176,7 +176,8 @@ class BaseETL(object):
             conn.cursor().execute(command)
 
     @classmethod
-    def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False):
+    def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
+                        return_value=False):
         if not db_enum and not conn:
             raise AttributeError()
         if not conn:
@@ -185,8 +186,21 @@ class BaseETL(object):
             conn.autocommit = commit
 
         print ('Start Execute Command at: {}'.format(cls.now()))
-        conn.cursor().execute(command)
+        cursor = conn.cursor()
+        cursor.execute(command)
         print ('End Execute Command at: {}'.format(cls.now()))
+
+        if return_value:
+            return_value = None if cursor.rowcount <= 0 else cursor.fetchone()
+            return None if not return_value else return_value[0]
+
+    @staticmethod
+    def coalesce(value):
+        return 'null' if value is None else value
+
+    @staticmethod
+    def format_date(date):
+        return str(datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%SZ')) if date else 'null'
 
     @classmethod
     def insert_row(cls, table, db_enum, table_name, key_name=None, conn=None, encoding='LATIN1', commit=True):
