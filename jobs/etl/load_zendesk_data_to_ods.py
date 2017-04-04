@@ -19,7 +19,7 @@ class ZendeskDataToODS(object):
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
-        return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/'.format(self.object_type))
+        return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
 
     def save_s3_data_to_ods(self):
         files = self.__load_files_from_bucket()
