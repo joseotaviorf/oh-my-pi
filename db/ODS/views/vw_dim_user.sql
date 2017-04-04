@@ -124,7 +124,8 @@ SELECT
   u.first_dt_sent_to_insurance,
   criado_em,
   atualizado_em,
-  now() as load_timestamp
+  now() as load_timestamp,
+  aie.network
 FROM
   public.usuario u
 inner join
