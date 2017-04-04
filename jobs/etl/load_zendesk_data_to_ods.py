@@ -16,6 +16,14 @@ class ZendeskDataToODS(object):
         self.s3 = boto3.client('s3')
 
         self.db_enum = EnumDb.BI_ODS
+
+        print 'c=ZendeskDataToODS, object_type={}, start_time={}, s3_bucket={}, ods_schema={}, db_enum={}'.format(
+            self.object_type,
+            self.start_time,
+            self.s3_bucket,
+            self.ods_schema,
+            self.db_enum)
+
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
