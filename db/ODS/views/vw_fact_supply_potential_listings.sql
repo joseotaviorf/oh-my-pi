@@ -240,7 +240,7 @@ SELECT -- count(1)
   	WHEN listing_publication_date IS NOT NULL THEN NULL
   	WHEN funnel_source = 'Self-Service' THEN 'Unfinished Process'
   	WHEN l.reason IS NOT NULL THEN l.reason
-  	ELSE 'Unknown'
+  	ELSE 'Unknown' -- meaning it's an unpublished lead (from the lead flow) without a reason not to publish
   END as reason,
 
   is_first_publication,

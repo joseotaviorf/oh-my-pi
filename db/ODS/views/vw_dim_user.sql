@@ -124,7 +124,8 @@ SELECT
   u.first_dt_sent_to_insurance,
   criado_em,
   atualizado_em,
-  now() as load_timestamp
+  now() as load_timestamp,
+  aie.network
 FROM
   public.usuario u
 inner join
@@ -159,6 +160,9 @@ inner join
   left join
       contract c
       on c.proposta_id = p.id
+  left join 
+      amplitude_install_events aie
+      on u.id = aie.user_id
   group by
       u.id
 ) user_dates
