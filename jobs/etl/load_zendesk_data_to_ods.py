@@ -30,6 +30,8 @@ class ZendeskDataToODS(object):
         return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
 
     def save_s3_data_to_ods(self):
+        print 'm=save_s3_data_to_ods, init'
+        
         files = self.__load_files_from_bucket()
         for i in range(0, len(files['Contents'])):
             s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
