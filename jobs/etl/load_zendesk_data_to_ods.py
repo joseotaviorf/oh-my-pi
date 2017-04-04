@@ -211,42 +211,60 @@ class ZendeskDataToODS(object):
                                   " verified = excluded.verified ".format(self.ods_schema,
                                                                           u['id'],
                                                                           u['email'],
-                                                                          BaseETL.coalesce(u['name']).encode('utf-8'),
+                                                                          BaseETL.coalesce(None if not u['name'] else u[
+                                                                              'name'].encode('utf-8').replace("'",
+                                                                                                              "''")),
                                                                           u['active'],
-                                                                          BaseETL.coalesce(u['alias']).encode('utf-8'),
-                                                                          u['chat_only'],
-                                                                          BaseETL.format_date(u['created_at']),
-                                                                          BaseETL.coalesce(u['custom_role_id']),
-                                                                          BaseETL.coalesce(u['details']).encode(
+                                                                          BaseETL.coalesce(
+                                                                              u['alias']).encode(
                                                                               'utf-8'),
-                                                                          BaseETL.coalesce(u['external_id']),
-                                                                          BaseETL.format_date(u['last_login_at']),
-                                                                          BaseETL.coalesce(u['locale']),
-                                                                          BaseETL.coalesce(u['locale_id']),
+                                                                          u['chat_only'],
+                                                                          BaseETL.format_date(
+                                                                              u['created_at']),
+                                                                          BaseETL.coalesce(
+                                                                              u['custom_role_id']),
+                                                                          BaseETL.coalesce(
+                                                                              u['details']).encode(
+                                                                              'utf-8'),
+                                                                          BaseETL.coalesce(
+                                                                              u['external_id']),
+                                                                          BaseETL.format_date(
+                                                                              u['last_login_at']),
+                                                                          BaseETL.coalesce(
+                                                                              u['locale']),
+                                                                          BaseETL.coalesce(
+                                                                              u['locale_id']),
                                                                           u['moderator'],
                                                                           BaseETL.coalesce(u['notes']),
                                                                           u['only_private_comments'],
-                                                                          BaseETL.coalesce(u['organization_id']),
+                                                                          BaseETL.coalesce(
+                                                                              u['organization_id']),
                                                                           self.__check_existence(
-                                                                              field='default_group_id', dict_var=u),
+                                                                              field='default_group_id',
+                                                                              dict_var=u),
                                                                           BaseETL.coalesce(u['phone']),
                                                                           BaseETL.coalesce(photo_id),
                                                                           u['restricted_agent'],
                                                                           BaseETL.coalesce(u['role']),
                                                                           u['shared'],
-                                                                          BaseETL.coalesce(u['shared_agent']),
-                                                                          BaseETL.coalesce(u['signature']),
+                                                                          BaseETL.coalesce(
+                                                                              u['shared_agent']),
+                                                                          BaseETL.coalesce(
+                                                                              u['signature']),
                                                                           u['suspended'],
-                                                                          BaseETL.coalesce(u['ticket_restriction']),
-                                                                          u['time_zone'].encode('utf-8'),
+                                                                          BaseETL.coalesce(
+                                                                              u['ticket_restriction']),
+                                                                          u['time_zone'].encode(
+                                                                              'utf-8'),
                                                                           u['two_factor_auth_enabled'],
-                                                                          BaseETL.format_date(u['updated_at']),
+                                                                          BaseETL.format_date(
+                                                                              u['updated_at']),
                                                                           u['url'],
                                                                           u['verified']
                                                                           )
             self.__execute_command(command=upsert_user_command)
 
-        print 'upsert_users, end, count: {}'.format(count)
+            print 'upsert_users, end, count: {}'.format(count)
 
     def upsert_ticket_metrics(self, ticket_metrics):
         print 'upsert_ticket_metrics, init'
@@ -325,38 +343,42 @@ class ZendeskDataToODS(object):
         count = 0
         for t in tickets:
             count += 1
-            source_id = None
-            if len(t['via']['source']['to']) > 0 or len(t['via']['source']['from']) > 0 or t['via']['source']['rel']:
-                upsert_source_command = " insert into {}.source (\"to\", \"from\", rel) " \
-                                        " values ('{}','{}','{}') returning id ".format(self.ods_schema,
-                                                                                        json.dumps(t['via']['source'][
-                                                                                                       'to']).encode(
-                                                                                            'utf-8'),
-                                                                                        json.dumps(t['via']['source'][
-                                                                                                       'from']).encode(
-                                                                                            'utf-8'),
-                                                                                        'null' if not
-                                                                                        t['via']['source']['rel'] else
-                                                                                        t['via']['source']['rel'])
-                source_id = self.__execute_command(command=upsert_source_command, return_value=True)
 
-            if not source_id:
-                upsert_via_command = " insert into {}.via (channel, object_id) values ('{}','{}') " \
-                                     " on conflict (object_id) do update set channel = excluded.channel, " \
-                                     " object_id = excluded.object_id returning id ".format(
-                    self.ods_schema, t['via']['channel'], t['id'])
-            else:
-                upsert_via_command = " insert into {}.via (channel, object_id, source_id) values ('{}','{}',{}) " \
-                                     " on conflict (object_id) do update set channel = excluded.channel, " \
-                                     " object_id = excluded.object_id, source_id = excluded.source_id returning id ".format(
-                    self.ods_schema, t['via']['channel'], t['id'], source_id)
+            delete_via_command = " delete from {}.via where object_id = '{}' ".format(self.ods_schema, t['id'])
+            self.__execute_command(command=delete_via_command)
+
+            upsert_via_command = " insert into {}.via (channel, object_id) values ('{}','{}') " \
+                                 " on conflict (object_id) do update set channel = excluded.channel, " \
+                                 " object_id = excluded.object_id returning id ".format(
+                self.ods_schema, t['via']['channel'], t['id'])
 
             via_id = self.__execute_command(command=upsert_via_command, return_value=True)
 
-            if via_id and source_id:
+            if len(t['via']['source']['to']) > 0 or len(t['via']['source']['from']) > 0 or t['via']['source']['rel']:
+                delete_source_command = " delete from {}.source where via_id = {} ".format(self.ods_schema, via_id)
+                self.__execute_command(command=delete_source_command)
+
+                upsert_source_command = " insert into {}.source (\"to\", \"from\", rel, via_id) " \
+                                        " values ('{}','{}','{}', {}) returning id ".format(self.ods_schema,
+                                                                                            json.dumps(
+                                                                                                t['via']['source'][
+                                                                                                    'to']).encode(
+                                                                                                'utf-8').replace("\"",
+                                                                                                                 "\"\""),
+                                                                                            json.dumps(
+                                                                                                t['via']['source'][
+                                                                                                    'from']).encode(
+                                                                                                'utf-8').replace("\"",
+                                                                                                                 "\"\""),
+                                                                                            'null' if not
+                                                                                            t['via']['source'][
+                                                                                                'rel'] else
+                                                                                            t['via']['source']['rel'],
+                                                                                            via_id)
+                source_id = self.__execute_command(command=upsert_source_command, return_value=True)
                 self.__execute_command(
-                    command=" update {}.source set via_id = {} where id = {} ".format(self.ods_schema, via_id,
-                                                                                      source_id))
+                    command=" update {}.via set source_id = {} where id = {} ".format(self.ods_schema, source_id,
+                                                                                      via_id))
 
             if t['custom_fields']:
                 delete_custom_fields_command = " delete from {}.custom_fields where object_id = '{}' ".format(
@@ -365,15 +387,19 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_custom_fields_command)
 
                 for cf in t['custom_fields']:
+                    custom_field_value = None
+                    if isinstance(t['custom_fields'][cf], str):
+                        custom_field_value = t['custom_fields'][cf].encode('utf-8')
+                    if isinstance(t['custom_fields'][cf], bool) or isinstance(t['custom_fields'][cf], int):
+                        custom_field_value = t['custom_fields'][cf]
+
                     upsert_custom_fields_command = " insert into {}.custom_fields (id, object_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, object_id) do update set " \
                                                    "\"value\" = excluded.\"value\" ".format(self.ods_schema,
                                                                                             cf['id'],
                                                                                             t['id'],
                                                                                             BaseETL.coalesce(
-                                                                                                cf['value'].encode(
-                                                                                                    'utf-8') if cf[
-                                                                                                    'value'] else None)
+                                                                                                custom_field_value)
                                                                                             )
                     self.__execute_command(command=upsert_custom_fields_command)
 
