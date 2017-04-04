@@ -19,7 +19,7 @@ class ZendeskDataToODS(object):
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
-        return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/'.format(self.object_type))
+        return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
 
     def save_s3_data_to_ods(self):
         files = self.__load_files_from_bucket()
@@ -31,8 +31,6 @@ class ZendeskDataToODS(object):
                 self.upsert_tickets(file_content['tickets'])
             elif self.object_type == 'ticket_metrics':
                 self.upsert_ticket_metrics(file_content['ticket_metrics'])
-            elif self.object_type == 'request':
-                self.upsert_ticket_metrics(file_content['requests'])
             elif self.object_type == 'user':
                 self.upsert_users(file_content['users'])
             elif self.object_type == 'group_membership':
