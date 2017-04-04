@@ -31,7 +31,7 @@ class ZendeskDataToODS(object):
 
     def save_s3_data_to_ods(self):
         print 'm=save_s3_data_to_ods, init'
-        
+
         files = self.__load_files_from_bucket()
         for i in range(0, len(files['Contents'])):
             s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
@@ -131,18 +131,26 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_user_fields_command)
 
                 for uf in u['user_fields']:
+                    user_field_value = None
+                    if isinstance(u['user_fields'][uf], str):
+                        user_field_value = u['user_fields'][uf].encode('utf-8')
+                    if isinstance(u['user_fields'][uf], bool) or isinstance(u['user_fields'][uf], int):
+                        user_field_value = u['user_fields'][uf]
+
                     upsert_user_fields_command = " insert into {}.user_fields (user_id, description, \"value\") " \
                                                  " values ('{}','{}','{}') ".format(self.ods_schema,
                                                                                     u['id'],
                                                                                     uf.encode('utf-8'),
-                                                                                    BaseETL.coalesce(
-                                                                                        u['user_fields'][uf].encode(
-                                                                                            'utf-8') if
-                                                                                        u['user_fields'][uf] else None)
+                                                                                    BaseETL.coalesce(user_field_value)
                                                                                     )
                     self.__execute_command(command=upsert_user_fields_command)
 
             photo_id = None
+            delete_user_photo_command = " delete from {}.attachment where user_id = '{}' ".format(
+                self.ods_schema,
+                u['id'])
+            self.__execute_command(command=delete_user_photo_command)
+
             if u['photo']:
                 user_photo = u['photo']
 
@@ -150,15 +158,21 @@ class ZendeskDataToODS(object):
                 if user_photo['thumbnails'] and len(user_photo['thumbnails']) > 0:
                     thumbnail_url = user_photo['thumbnails'][0]['content_url']
 
+                file_name = None
+                if 'name' in user_photo:
+                    file_name = user_photo['name']
+                elif 'file_name' in user_photo:
+                    file_name = user_photo['file_name']
+
                 upsert_user_photo_command = " insert into {}.attachment (user_id, file_name, content_url, content_type, " \
-                                            " \"size\", inline, thumbnail_url) values ('{}','{}','{}',{},{},'{}') " \
+                                            " \"size\", inline, thumbnail_url) values ('{}','{}','{}','{}',{},{},'{}') " \
                                             " on conflict (user_id) do update set file_name = excluded.file_name, " \
                                             " content_url = excluded.content_url, content_type = excluded.content_type, " \
                                             " \"size\" = excluded.size, inline = excluded.inline, " \
-                                            " thumbnail_url = excluded.thumbnail_url ".format(
+                                            " thumbnail_url = excluded.thumbnail_url returning id ".format(
                     self.ods_schema,
                     u['id'],
-                    BaseETL.coalesce(user_photo['name']),
+                    BaseETL.coalesce(file_name),
                     BaseETL.coalesce(user_photo['content_url']),
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
@@ -175,7 +189,7 @@ class ZendeskDataToODS(object):
                                   " ticket_restriction, time_zone, two_factor_auth_enabled, updated_at, url, " \
                                   " verified) values ('{}','{}','{}',{},'{}',{},'{}'," \
                                   " {},'{}',{},'{}','{}',{},{}," \
-                                  " '{}',{},{},{},'{}',{}," \
+                                  " '{}',{},'{}',{},'{}',{}," \
                                   " {},'{}',{},{},'{}',{}," \
                                   " '{}','{}',{},'{}','{}',{}) on conflict (id) do update set " \
                                   " id = excluded.id, email = excluded.email, \"name\" = excluded.\"name\", " \
@@ -442,9 +456,9 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['url']),
                 BaseETL.coalesce(t['external_id']),
                 BaseETL.coalesce(t['type']),
-                BaseETL.coalesce(t['subject'].encode('utf-8') if t['subject'] else None),
-                BaseETL.coalesce(t['raw_subject'].encode('utf-8') if t['raw_subject'] else None),
-                BaseETL.coalesce(t['description'].encode('utf-8') if t['description'] else None),
+                BaseETL.coalesce(t['subject'].encode('utf-8').replace("'", "''") if t['subject'] else None),
+                BaseETL.coalesce(t['raw_subject'].encode('utf-8').replace("'", "''") if t['raw_subject'] else None),
+                BaseETL.coalesce(t['description'].encode('utf-8').replace("'", "''") if t['description'] else None),
                 BaseETL.coalesce(t['priority']),
                 BaseETL.coalesce(t['status']),
                 BaseETL.coalesce(t['recipient']),
@@ -472,7 +486,8 @@ class ZendeskDataToODS(object):
                     t['satisfaction_rating']['score']),
                 'null' if self.__check_existence(field='comment',
                                                  dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    t['satisfaction_rating']['comment'])
+                    t['satisfaction_rating']['comment'].encode('utf-8') if t['satisfaction_rating'][
+                        'comment'] else None)
             )
 
             self.__execute_command(command=upsert_ticket_command)
