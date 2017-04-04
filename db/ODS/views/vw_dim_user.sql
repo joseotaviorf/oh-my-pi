@@ -159,6 +159,9 @@ inner join
   left join
       contract c
       on c.proposta_id = p.id
+  left join 
+      amplitude_install_events aie
+      on u.id = aie.user_id
   group by
       u.id
 ) user_dates
