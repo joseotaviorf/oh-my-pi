@@ -257,6 +257,7 @@ SELECT -- count(1)
 
   coalesce(lead_id, -1) as sk_lead,
   coalesce(property_id, -1) as sk_property,
+  coalesce(l.contract_id, -1) as sk_contract,
   renting_value,
   l.dados_fotografo_id as sk_photographer,
   owner_id as sk_owner,

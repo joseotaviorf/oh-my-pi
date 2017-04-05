@@ -154,7 +154,7 @@ if __name__ == '__main__':
         a.run_sqs_to_ods(
             sqs_queue_name=sqs_queue_name,
             db_enum=EnumDb.BI_ODS,
-            table_name='amplitude_event',
+            table_name='amplitude.events',
             batch_size=batch_size
         )
 
