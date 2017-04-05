@@ -183,7 +183,7 @@ class ZendeskDataToODS(object):
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
                     BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(thumbnail_url)
+                    BaseETL.coalesce(thumbnail_url.encode('utf-8') if thumbnail_url else None)
                 )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
