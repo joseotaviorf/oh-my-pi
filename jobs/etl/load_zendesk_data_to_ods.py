@@ -62,6 +62,8 @@ class ZendeskDataToODS(object):
         print 'upsert_groups, init'
         count = 0
         for g in groups:
+            print 'processing group [id={}]'.format(g['id'])
+
             count += 1
             upsert_groups_command = " insert into {}.group (id, url, \"name\", deleted, created_at, updated_at) " \
                                     " values ('{}','{}','{}',{},'{}','{}') on conflict (id) do update set " \
@@ -83,6 +85,8 @@ class ZendeskDataToODS(object):
         print 'upsert_group_memberships, init'
         count = 0
         for gm in group_memberships:
+            print 'processing group_memberships [id={}]'.format(gm['id'])
+
             count += 1
             upsert_group_memberships_command = " insert into {}.group_membership (id, url, user_id, group_id, " \
                                                " \"default\", created_at, updated_at) values ('{}','{}','{}','{}'," \
@@ -109,6 +113,8 @@ class ZendeskDataToODS(object):
         print 'upsert_users, init'
         count = 0
         for u in users:
+            print 'processing user [id={}]'.format(u['id'])
+
             count += 1
             if u['tags'] and len(u['tags']) > 0:
                 delete_user_tags_command = " delete from {}.tag where object_id = '{}' ".format(self.ods_schema,
@@ -222,7 +228,7 @@ class ZendeskDataToODS(object):
                                                                                            .replace('"', '""')
                                                                                            .replace("'", "''")
                                                                                            ),
-                                                                          u['active'],
+                                                                          BaseETL.coalesce(u['active']),
                                                                           BaseETL.coalesce(
                                                                               u['alias']).encode(
                                                                               'utf-8'),
@@ -242,7 +248,7 @@ class ZendeskDataToODS(object):
                                                                               u['locale']),
                                                                           BaseETL.coalesce(
                                                                               u['locale_id']),
-                                                                          u['moderator'],
+                                                                          BaseETL.coalesce(u['moderator']),
                                                                           BaseETL.coalesce(u['notes']),
                                                                           u['only_private_comments'],
                                                                           BaseETL.coalesce(
@@ -252,23 +258,21 @@ class ZendeskDataToODS(object):
                                                                               dict_var=u),
                                                                           BaseETL.coalesce(u['phone']),
                                                                           BaseETL.coalesce(photo_id),
-                                                                          u['restricted_agent'],
+                                                                          BaseETL.coalesce(u['restricted_agent']),
                                                                           BaseETL.coalesce(u['role']),
-                                                                          u['shared'],
-                                                                          BaseETL.coalesce(
-                                                                              u['shared_agent']),
-                                                                          BaseETL.coalesce(
-                                                                              u['signature']),
-                                                                          u['suspended'],
+                                                                          BaseETL.coalesce(u['shared']),
+                                                                          BaseETL.coalesce(u['shared_agent']),
+                                                                          BaseETL.coalesce(u['signature']),
+                                                                          BaseETL.coalesce(u['suspended']),
                                                                           BaseETL.coalesce(
                                                                               u['ticket_restriction']),
                                                                           u['time_zone'].encode(
                                                                               'utf-8'),
-                                                                          u['two_factor_auth_enabled'],
-                                                                          BaseETL.format_date(
-                                                                              u['updated_at']),
-                                                                          u['url'],
-                                                                          u['verified']
+                                                                          BaseETL.coalesce(
+                                                                              u['two_factor_auth_enabled']),
+                                                                          BaseETL.format_date(u['updated_at']),
+                                                                          BaseETL.coalesce(u['url']),
+                                                                          BaseETL.coalesce(u['verified'])
                                                                           )
             self.__execute_command(command=upsert_user_command)
 
@@ -278,6 +282,7 @@ class ZendeskDataToODS(object):
         print 'upsert_ticket_metrics, init'
         count = 0
         for tm in ticket_metrics:
+            print 'processing ticket_metrics [id={}]'.format(tm['id'])
             count += 1
             upsert_ticket_metrics_command = " insert into {}.ticket_metrics (id, ticket_id, url, group_stations, " \
                                             " assignee_stations, reopens, replies, assignee_updated_at, " \
@@ -326,18 +331,12 @@ class ZendeskDataToODS(object):
                 BaseETL.format_date(tm['assigned_at']),
                 BaseETL.format_date(tm['solved_at']),
                 BaseETL.format_date(tm['latest_comment_added_at']),
-                BaseETL.coalesce(tm[
-                                     'first_resolution_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm[
-                                     'first_resolution_time_in_minutes']['business']),
-                BaseETL.coalesce(tm[
-                                     'agent_wait_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm[
-                                     'agent_wait_time_in_minutes']['business']),
-                BaseETL.coalesce(tm[
-                                     'requester_wait_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm[
-                                     'requester_wait_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['business']),
                 BaseETL.format_date(tm['created_at']),
                 BaseETL.format_date(tm['updated_at'])
             )
@@ -350,6 +349,7 @@ class ZendeskDataToODS(object):
         print 'upsert_tickets, init'
         count = 0
         for t in tickets:
+            print 'processing ticket [id={}]'.format(t['id'])
             count += 1
 
             delete_via_command = " delete from {}.via where object_id = '{}' ".format(self.ods_schema, t['id'])
@@ -371,8 +371,8 @@ class ZendeskDataToODS(object):
                                                                                             json.dumps(
                                                                                                 t['via']['source'][
                                                                                                     'to']).encode(
-                                                                                                'utf-8').replace("\"",
-                                                                                                                 "\"\""),
+                                                                                                'utf-8').replace('\"',
+                                                                                                                 '\"\"'),
                                                                                             json.dumps(
                                                                                                 t['via']['source'][
                                                                                                     'from']).encode(
