@@ -159,16 +159,16 @@ if __name__ == '__main__':
         )
 
     elif args[1] == 'load_schedule_visit':
-        table_name=''
+        table_name='booked_visit'
         # BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=table_name)
         vw = BaseETL.from_db_table(
             db_enum=EnumDb.BI_ODS,
-            table_name='vw_amplitude_event_booked_visit',
+            table_name='amplitude.vw_{}'.format(table_name),
             server_cursor_postgres=table_name
         )
         BaseETL.bulk_insert(
             table=vw,
-            table_name='amplitude.booked_visit',
+            table_name='amplitude.{}'.format(table_name),
             db_enum=EnumDb.BI_ODS,
             append=False,
             commit=True
