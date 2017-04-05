@@ -524,7 +524,7 @@ class ZendeskDataToODS(object):
                     t['satisfaction_rating']['score']),
                 'null' if self.__check_existence(field='comment',
                                                  dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    t['satisfaction_rating']['comment'].encode('utf-8') if t['satisfaction_rating'][
+                    t['satisfaction_rating']['comment'].encode('utf-8').replace("'", "''") if t['satisfaction_rating'][
                         'comment'] else None)
             )
 
