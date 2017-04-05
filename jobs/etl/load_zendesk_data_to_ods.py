@@ -7,6 +7,7 @@ import boto3
 from jobs.base.base_etl import BaseETL, EnumDb
 
 
+
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
