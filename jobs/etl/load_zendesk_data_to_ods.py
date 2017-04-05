@@ -7,6 +7,7 @@ import boto3
 from jobs.base.base_etl import BaseETL, EnumDb
 
 
+
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
@@ -178,12 +179,13 @@ class ZendeskDataToODS(object):
                                             " thumbnail_url = excluded.thumbnail_url returning id ".format(
                     self.ods_schema,
                     u['id'],
-                    BaseETL.coalesce(file_name),
-                    BaseETL.coalesce(user_photo['content_url']),
+                    BaseETL.coalesce(None if not file_name else file_name.encode('utf-8')),
+                    BaseETL.coalesce(
+                        None if not user_photo['content_url'] else user_photo['content_url'].encode('utf-8')),
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
                     BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(thumbnail_url.encode('utf-8') if thumbnail_url else None)
+                    BaseETL.coalesce(None if not thumbnail_url else thumbnail_url.encode('utf-8'))
                 )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
