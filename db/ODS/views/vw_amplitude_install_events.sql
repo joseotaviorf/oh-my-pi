@@ -1,8 +1,6 @@
-DROP PROCEDURE IF EXISTS ebdb.amplitude_install_events;
-
-CREATE DEFINER = 'QuintoAndarMain'@'%'
-PROCEDURE ebdb.amplitude_install_events()
-BEGIN
+drop view if exists vw_amplitude_install_events;
+create view vw_amplitude_install_events
+as
 
 SELECT * FROM 
 (select 
@@ -30,6 +28,4 @@ where
      message ->> 'event_type' like '%Install%'
 ) a
 
-where a.event_time = a.max_event_time
-
-END
+where a.event_time = a.max_event_time;
