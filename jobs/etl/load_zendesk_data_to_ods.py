@@ -371,13 +371,13 @@ class ZendeskDataToODS(object):
                                                                                             json.dumps(
                                                                                                 t['via']['source'][
                                                                                                     'to']).encode(
-                                                                                                'utf-8').replace('\"',
-                                                                                                                 '\"\"'),
+                                                                                                'utf-8').replace("'",
+                                                                                                                 "''"),
                                                                                             json.dumps(
                                                                                                 t['via']['source'][
                                                                                                     'from']).encode(
-                                                                                                'utf-8').replace("\"",
-                                                                                                                 "\"\""),
+                                                                                                'utf-8').replace("'",
+                                                                                                                 "''"),
                                                                                             'null' if not
                                                                                             t['via']['source'][
                                                                                                 'rel'] else
