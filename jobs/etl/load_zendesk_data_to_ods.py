@@ -132,9 +132,9 @@ class ZendeskDataToODS(object):
 
                 for uf in u['user_fields']:
                     user_field_value = None
-                    if isinstance(u['user_fields'][uf], str):
+                    if isinstance(u['user_fields'][uf], (str, unicode)):
                         user_field_value = u['user_fields'][uf].encode('utf-8')
-                    if isinstance(u['user_fields'][uf], bool) or isinstance(u['user_fields'][uf], int):
+                    if isinstance(u['user_fields'][uf], (bool, int)):
                         user_field_value = u['user_fields'][uf]
 
                     upsert_user_fields_command = " insert into {}.user_fields (user_id, description, \"value\") " \
@@ -210,10 +210,18 @@ class ZendeskDataToODS(object):
                                   " updated_at = excluded.updated_at, url = excluded.url, " \
                                   " verified = excluded.verified ".format(self.ods_schema,
                                                                           u['id'],
-                                                                          u['email'],
-                                                                          BaseETL.coalesce(None if not u['name'] else u[
-                                                                              'name'].encode('utf-8').replace("'",
-                                                                                                              "''")),
+                                                                          BaseETL.coalesce(None if not u['email']
+                                                                                           else u['email']
+                                                                                           .encode('utf-8')
+                                                                                           .replace('"', '""')
+                                                                                           .replace("'", "''")
+                                                                                           ),
+                                                                          BaseETL.coalesce(None if not u['name']
+                                                                                           else u['name']
+                                                                                           .encode('utf-8')
+                                                                                           .replace('"', '""')
+                                                                                           .replace("'", "''")
+                                                                                           ),
                                                                           u['active'],
                                                                           BaseETL.coalesce(
                                                                               u['alias']).encode(
@@ -264,7 +272,7 @@ class ZendeskDataToODS(object):
                                                                           )
             self.__execute_command(command=upsert_user_command)
 
-            print 'upsert_users, end, count: {}'.format(count)
+        print 'upsert_users, end, count: {}'.format(count)
 
     def upsert_ticket_metrics(self, ticket_metrics):
         print 'upsert_ticket_metrics, init'
@@ -388,10 +396,10 @@ class ZendeskDataToODS(object):
 
                 for cf in t['custom_fields']:
                     custom_field_value = None
-                    if isinstance(t['custom_fields'][cf], str):
-                        custom_field_value = t['custom_fields'][cf].encode('utf-8')
-                    if isinstance(t['custom_fields'][cf], bool) or isinstance(t['custom_fields'][cf], int):
-                        custom_field_value = t['custom_fields'][cf]
+                    if isinstance(cf['value'], (str, unicode)):
+                        custom_field_value = cf['value'].encode('utf-8')
+                    if isinstance(cf['value'], (bool, int, long)):
+                        custom_field_value = cf['value']
 
                     upsert_custom_fields_command = " insert into {}.custom_fields (id, object_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, object_id) do update set " \
@@ -410,15 +418,19 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_ticket_fields_command)
 
                 for f in t['fields']:
+                    field_value = None
+                    if isinstance(f['value'], (str, unicode)):
+                        field_value = f['value'].encode('utf-8')
+                    if isinstance(f['value'], (bool, int, long)):
+                        field_value = f['value']
+
                     upsert_ticket_fields_command = " insert into {}.ticket_fields (id, ticket_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, ticket_id) do update set " \
                                                    "\"value\" = excluded.\"value\" ".format(self.ods_schema,
                                                                                             f['id'],
                                                                                             t['id'],
                                                                                             BaseETL.coalesce(
-                                                                                                f['value'].encode(
-                                                                                                    'utf-8') if f[
-                                                                                                    'value'] else None)
+                                                                                                field_value)
                                                                                             )
                     self.__execute_command(command=upsert_ticket_fields_command)
 
