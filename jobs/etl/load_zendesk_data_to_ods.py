@@ -65,7 +65,7 @@ class ZendeskDataToODS(object):
     def __execute_command(self, command, return_value=False):
         command = str(command).replace("'null'", "null")
         return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
-                                       commit=True, return_value=return_value)
+                                       commit=True, return_value=return_value, show_logs=False)
 
     def __check_existence(self, field, dict_var):
         return 'null' if field not in dict_var else BaseETL.coalesce(dict_var[field])
@@ -344,9 +344,6 @@ class ZendeskDataToODS(object):
         print 'upsert_tickets, init'
         count = 0
         for t in tickets:
-            if str(t['id']) != '133776':
-                continue
-
             print 'processing ticket [id={}]'.format(t['id'])
             count += 1
 
