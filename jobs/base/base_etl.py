@@ -14,6 +14,7 @@ import boto3
 import petl
 
 from db_factory import DBFactory
+from enum_db import EnumDb, EnumDbType
 
 
 class BaseETL(object):
