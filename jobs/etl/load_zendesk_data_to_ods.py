@@ -29,6 +29,18 @@ class ZendeskDataToODS(object):
     def __load_files_from_bucket(self):
         return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
 
+    def __format_string(self, string):
+        return string.encode('utf-8').replace("'", "''").replace('"', '""') if string else None
+
+    def __convert_value(self, value):
+        if isinstance(value, (str, unicode)):
+            return self.__format_string(value)
+
+        if isinstance(value, (bool, int, long)):
+            return value
+
+        return None
+
     def save_s3_data_to_ods(self):
         print 'm=save_s3_data_to_ods, init'
 
@@ -179,12 +191,11 @@ class ZendeskDataToODS(object):
                     self.ods_schema,
                     u['id'],
                     BaseETL.coalesce(None if not file_name else file_name.encode('utf-8')),
-                    BaseETL.coalesce(
-                        None if not user_photo['content_url'] else user_photo['content_url'].encode('utf-8')),
+                    BaseETL.coalesce(self.__format_string(user_photo['content_url'])),
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
                     BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(None if not thumbnail_url else thumbnail_url.encode('utf-8'))
+                    BaseETL.coalesce(self.__format_string(thumbnail_url.encode('utf-8')))
                 )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
@@ -217,51 +228,31 @@ class ZendeskDataToODS(object):
                                   " updated_at = excluded.updated_at, url = excluded.url, " \
                                   " verified = excluded.verified ".format(self.ods_schema,
                                                                           u['id'],
-                                                                          BaseETL.coalesce(None if not u['email']
-                                                                                           else u['email']
-                                                                                           .encode('utf-8')
-                                                                                           .replace('"', '""')
-                                                                                           .replace("'", "''")
-                                                                                           ),
-                                                                          BaseETL.coalesce(None if not u['name']
-                                                                                           else u['name']
-                                                                                           .encode('utf-8')
-                                                                                           .replace('"', '""')
-                                                                                           .replace("'", "''")
-                                                                                           ),
+                                                                          BaseETL.coalesce(
+                                                                              self.__format_string(u['email'])),
+                                                                          BaseETL.coalesce(
+                                                                              self.__format_string(u['name'])),
                                                                           BaseETL.coalesce(u['active']),
                                                                           BaseETL.coalesce(
-                                                                              u['alias']).encode(
-                                                                              'utf-8'),
+                                                                              self.__format_string(u['alias'])),
                                                                           u['chat_only'],
-                                                                          BaseETL.format_date(
-                                                                              u['created_at']),
+                                                                          BaseETL.format_date(u['created_at']),
+                                                                          BaseETL.coalesce(u['custom_role_id']),
                                                                           BaseETL.coalesce(
-                                                                              u['custom_role_id']),
-                                                                          BaseETL.coalesce(
-                                                                              u['details']).encode(
-                                                                              'utf-8'),
-                                                                          BaseETL.coalesce(
-                                                                              u['external_id']),
-                                                                          BaseETL.format_date(
-                                                                              u['last_login_at']),
-                                                                          BaseETL.coalesce(
-                                                                              u['locale']),
-                                                                          BaseETL.coalesce(
-                                                                              u['locale_id']),
+                                                                              self.__format_string(u['details'])),
+                                                                          BaseETL.coalesce(u['external_id']),
+                                                                          BaseETL.format_date(u['last_login_at']),
+                                                                          BaseETL.coalesce(u['locale']),
+                                                                          BaseETL.coalesce(u['locale_id']),
                                                                           BaseETL.coalesce(u['moderator']),
                                                                           BaseETL.coalesce(u['notes']),
                                                                           u['only_private_comments'],
-                                                                          BaseETL.coalesce(
-                                                                              u['organization_id']),
+                                                                          BaseETL.coalesce(u['organization_id']),
                                                                           self.__check_existence(
                                                                               field='default_group_id',
                                                                               dict_var=u),
                                                                           BaseETL.coalesce(
-                                                                              None if not u['phone'] else u[
-                                                                                  'phone'].encode('utf-8')
-                                                                                  .replace("'", "")
-                                                                                  .replace('"', '')),
+                                                                              self.__format_string(u['phone'])),
                                                                           BaseETL.coalesce(photo_id),
                                                                           BaseETL.coalesce(u['restricted_agent']),
                                                                           BaseETL.coalesce(u['role']),
@@ -269,10 +260,9 @@ class ZendeskDataToODS(object):
                                                                           BaseETL.coalesce(u['shared_agent']),
                                                                           BaseETL.coalesce(u['signature']),
                                                                           BaseETL.coalesce(u['suspended']),
+                                                                          BaseETL.coalesce(u['ticket_restriction']),
                                                                           BaseETL.coalesce(
-                                                                              u['ticket_restriction']),
-                                                                          u['time_zone'].encode(
-                                                                              'utf-8'),
+                                                                              self.__format_string(u['time_zone'])),
                                                                           BaseETL.coalesce(
                                                                               u['two_factor_auth_enabled']),
                                                                           BaseETL.format_date(u['updated_at']),
@@ -354,6 +344,9 @@ class ZendeskDataToODS(object):
         print 'upsert_tickets, init'
         count = 0
         for t in tickets:
+            if str(t['id']) != '133776':
+                continue
+
             print 'processing ticket [id={}]'.format(t['id'])
             count += 1
 
@@ -373,20 +366,21 @@ class ZendeskDataToODS(object):
 
                 upsert_source_command = " insert into {}.source (\"to\", \"from\", rel, via_id) " \
                                         " values ('{}','{}','{}', {}) returning id ".format(self.ods_schema,
-                                                                                            json.dumps(
+                                                                                            BaseETL.coalesce(
+                                                                                                self.__format_string(
+                                                                                                    json.dumps(
+                                                                                                        t['via'][
+                                                                                                            'source'][
+                                                                                                            'to']))),
+                                                                                            BaseETL.coalesce(
+                                                                                                self.__format_string(
+                                                                                                    json.dumps(
+                                                                                                        t['via'][
+                                                                                                            'source'][
+                                                                                                            'from']))),
+                                                                                            BaseETL.coalesce(
                                                                                                 t['via']['source'][
-                                                                                                    'to']).encode(
-                                                                                                'utf-8').replace("'",
-                                                                                                                 "''"),
-                                                                                            json.dumps(
-                                                                                                t['via']['source'][
-                                                                                                    'from']).encode(
-                                                                                                'utf-8').replace("'",
-                                                                                                                 "''"),
-                                                                                            'null' if not
-                                                                                            t['via']['source'][
-                                                                                                'rel'] else
-                                                                                            t['via']['source']['rel'],
+                                                                                                    'rel']),
                                                                                             via_id)
                 source_id = self.__execute_command(command=upsert_source_command, return_value=True)
                 self.__execute_command(
@@ -400,12 +394,7 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_custom_fields_command)
 
                 for cf in t['custom_fields']:
-                    custom_field_value = None
-                    if isinstance(cf['value'], (str, unicode)):
-                        custom_field_value = cf['value'].encode('utf-8')
-                    if isinstance(cf['value'], (bool, int, long)):
-                        custom_field_value = cf['value']
-
+                    custom_field_value = self.__convert_value(cf['value'])
                     upsert_custom_fields_command = " insert into {}.custom_fields (id, object_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, object_id) do update set " \
                                                    "\"value\" = excluded.\"value\" ".format(self.ods_schema,
@@ -423,11 +412,7 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_ticket_fields_command)
 
                 for f in t['fields']:
-                    field_value = None
-                    if isinstance(f['value'], (str, unicode)):
-                        field_value = f['value'].encode('utf-8')
-                    if isinstance(f['value'], (bool, int, long)):
-                        field_value = f['value']
+                    field_value = self.__convert_value(f['value'])
 
                     upsert_ticket_fields_command = " insert into {}.ticket_fields (id, ticket_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, ticket_id) do update set " \
@@ -499,9 +484,9 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['url']),
                 BaseETL.coalesce(t['external_id']),
                 BaseETL.coalesce(t['type']),
-                BaseETL.coalesce(t['subject'].encode('utf-8').replace("'", "''") if t['subject'] else None),
-                BaseETL.coalesce(t['raw_subject'].encode('utf-8').replace("'", "''") if t['raw_subject'] else None),
-                BaseETL.coalesce(t['description'].encode('utf-8').replace("'", "''") if t['description'] else None),
+                BaseETL.coalesce(self.__format_string(t['subject'])),
+                BaseETL.coalesce(self.__format_string(t['raw_subject'])),
+                BaseETL.coalesce(self.__format_string(t['description'])),
                 BaseETL.coalesce(t['priority']),
                 BaseETL.coalesce(t['status']),
                 BaseETL.coalesce(t['recipient']),
@@ -529,8 +514,7 @@ class ZendeskDataToODS(object):
                     t['satisfaction_rating']['score']),
                 'null' if self.__check_existence(field='comment',
                                                  dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    t['satisfaction_rating']['comment'].encode('utf-8').replace("'", "''") if t['satisfaction_rating'][
-                        'comment'] else None)
+                    self.__format_string(t['satisfaction_rating']['comment']))
             )
 
             self.__execute_command(command=upsert_ticket_command)
