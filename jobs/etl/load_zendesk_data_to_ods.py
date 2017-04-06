@@ -4,7 +4,8 @@ import sys
 from datetime import datetime
 
 import boto3
-from jobs.base.base_etl import BaseETL, EnumDb
+from jobs.base.base_etl import BaseETL
+from jobs.base.enum_db import EnumDb
 
 
 class ZendeskDataToODS(object):
@@ -30,7 +31,7 @@ class ZendeskDataToODS(object):
         return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
 
     def __format_string(self, string):
-        return string.encode('utf-8').replace("'", "''").replace('"', '""') if string else None
+        return string.encode('utf-8').replace('"', '""').replace("'", "''") if string else None
 
     def __convert_value(self, value):
         if isinstance(value, (str, unicode)):
@@ -63,7 +64,7 @@ class ZendeskDataToODS(object):
                 return
 
     def __execute_command(self, command, return_value=False):
-        command = str(command).replace("'null'", "null")
+        command = str(command).replace("'null'", "null").replace('\n', '')
         return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
                                        commit=True, return_value=return_value, show_logs=False)
 
