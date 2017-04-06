@@ -7,7 +7,6 @@ import boto3
 from jobs.base.base_etl import BaseETL, EnumDb
 
 
-
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
@@ -114,6 +113,9 @@ class ZendeskDataToODS(object):
         print 'upsert_users, init'
         count = 0
         for u in users:
+            if str(u['id']) != '17863440328':
+                continue
+
             print 'processing user [id={}]'.format(u['id'])
 
             count += 1
@@ -258,7 +260,11 @@ class ZendeskDataToODS(object):
                                                                           self.__check_existence(
                                                                               field='default_group_id',
                                                                               dict_var=u),
-                                                                          BaseETL.coalesce(u['phone']),
+                                                                          BaseETL.coalesce(
+                                                                              None if not u['phone']
+                                                                              else u['phone'].encode('utf-8')
+                                                                                  .replace("'", "")
+                                                                                  .replace('"', '')),
                                                                           BaseETL.coalesce(photo_id),
                                                                           BaseETL.coalesce(u['restricted_agent']),
                                                                           BaseETL.coalesce(u['role']),
