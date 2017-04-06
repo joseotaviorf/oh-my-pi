@@ -3,12 +3,11 @@
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
 CREATE VIEW vw_fact_supply_potential_listings as
-
 with first_pub as
 (
   SELECT
-    min(l.listing_publication_date) over w_prop_id as first_publication_date,
-    (listing_publication_date = min(l.listing_publication_date) over w_prop_id) as is_first_publication,
+    p.first_publication as first_publication_date,
+    (listing_publication_date = first_publication) as is_first_publication,
     l.*,
     le.reason
   FROM
@@ -16,6 +15,9 @@ with first_pub as
   left join
   	public.lead le
     on le.id = l.lead_id
+  left join
+    vw_dim_property p
+    on p.id = l.property_id
 --  where	l.property_id = 892776892
   WINDOW
   	w_prop_id as (partition by l.property_id)
@@ -445,6 +447,7 @@ left join
     group by ad.day
   ) g
   on cast(g.day as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+
 ;
 
 /*
