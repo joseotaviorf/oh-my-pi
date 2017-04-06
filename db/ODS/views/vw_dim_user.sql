@@ -167,7 +167,7 @@ inner join
 on user_dates.id = u.id
 left join 
   vw_amplitude_install_events aie
-on u.id = aie.user_id
+on u.id = aie.user_id::integer
 ;
 
 -- select data_nascimento from vw_dim_user
