@@ -1,23 +1,23 @@
-from logging import info as log
-from enum_db import EnumDb, EnumDbType
-import boto3
-from db_factory import DBFactory
-import zipfile
+import codecs
+import datetime
 import gzip
-import re
 import io
-import petl
 import json
 import os
-import datetime
+import re
 import sys
+import zipfile
 from decimal import Decimal
-import codecs
-import ast
+from logging import info as log
+
+import boto3
+import petl
+
+from db_factory import DBFactory
+from enum_db import EnumDb, EnumDbType
 
 
 class BaseETL(object):
-
     def __init__(self, *args, **kwargs):
         pass
 
@@ -49,8 +49,8 @@ class BaseETL(object):
                         file_content = gzfile.read()
                         for x in file_content[0:-1].split('\n'):
                             yield json.dumps(json.loads(x))
-                        #messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
-        #return messages
+                            # messages += [json.dumps(json.loads(x)) for x in file_content[0:-1].split('\n')]
+                            # return messages
 
     @staticmethod
     def get_table_from_json_child(events, json_column_name, attrib_name, value):
@@ -75,7 +75,7 @@ class BaseETL(object):
                 TopicArn=topic_arn,
                 Message=n
             )
-            c+=1
+            c += 1
         return c
 
     @classmethod
@@ -99,7 +99,7 @@ class BaseETL(object):
             return {
                 cls._byteify(key, ignore_dicts=True): cls._byteify(value, ignore_dicts=True)
                 for key, value in data.iteritems()
-                }
+            }
         # if it's anything else, return it in its original form
         return data
 
@@ -131,7 +131,7 @@ class BaseETL(object):
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
             petl.todb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit, create=create)
-        log('{} rows loaded on {}. {}'.format(len(data_table)-1, db_enum, datetime.datetime.now()))
+        log('{} rows loaded on {}. {}'.format(len(data_table) - 1, db_enum, datetime.datetime.now()))
         sys.stdout.flush()
 
     @staticmethod
@@ -177,7 +177,7 @@ class BaseETL(object):
 
     @classmethod
     def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
-                        return_value=False):
+                        return_value=False, show_logs=True):
         if not db_enum and not conn:
             raise AttributeError()
         if not conn:
@@ -185,10 +185,13 @@ class BaseETL(object):
         if not in_iterator and conn and conn.autocommit != commit:
             conn.autocommit = commit
 
-        print ('Start Execute Command at: {}'.format(cls.now()))
+        if show_logs:
+            print ('Start Execute Command at: {}'.format(cls.now()))
         cursor = conn.cursor()
         cursor.execute(command)
-        print ('End Execute Command at: {}'.format(cls.now()))
+
+        if show_logs:
+            print ('End Execute Command at: {}'.format(cls.now()))
 
         if return_value:
             return_value = None if cursor.rowcount <= 0 else cursor.fetchone()
@@ -212,7 +215,7 @@ class BaseETL(object):
         id_of_new_row = None
         for line in table:
             if line != table[0]:
-                values =  cls.format_parameters_to_db(line)
+                values = cls.format_parameters_to_db(line)
                 return_value = """returning "{}" """.format(key_name) if key_name is not None else ""
                 command = """insert into {0}{1} values {2} {3};""".format(table_name, header, values, return_value)
                 cursor = conn.cursor()
@@ -271,21 +274,21 @@ class BaseETL(object):
         )
         return len(exists) > 1 and exists[1][0]
 
-
     @classmethod
     def drop_table(cls, db_enum, table_name, schema='public'):
-        cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
+        cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
+                            commit=True)
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
-        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum, commit=True)
-
+        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
+                            commit=True)
 
     @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest,
                    table_name_dest=None, append=True, encoding='utf8', server_cursor_postgres=None):
         data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name,
-                                       encoding=encoding,server_cursor_postgres=server_cursor_postgres)
+                                       encoding=encoding, server_cursor_postgres=server_cursor_postgres)
         if not table_name_dest:
             table_name_dest = table_name
         filename = '{}.csv'.format(table_name_dest)

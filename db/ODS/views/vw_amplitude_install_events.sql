@@ -23,7 +23,7 @@ SELECT * FROM
      message ->> 'event_type' as event_type
 
 from
-     amplitude_event amp
+     amplitude.events amp
 where
      message ->> 'event_type' like '%Install%'
 ) a
