@@ -484,7 +484,11 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['type']),
                 BaseETL.coalesce(self.__format_string(t['subject'])),
                 BaseETL.coalesce(self.__format_string(t['raw_subject'])),
-                BaseETL.coalesce(self.__format_string(t['description'])),
+                BaseETL.coalesce(None if not t['description'] else
+                                 self.__format_string(
+                                     str(t['description'].encode('utf-8')).decode('utf-8').replace(u'\u0000', u'')
+                                 )
+                                 ),
                 BaseETL.coalesce(t['priority']),
                 BaseETL.coalesce(t['status']),
                 BaseETL.coalesce(t['recipient']),
@@ -507,12 +511,10 @@ class ZendeskDataToODS(object):
                 str(self.__check_existence(field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
                 str(self.__check_existence(field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']',
                                                                                                                  '}'),
-                'null' if self.__check_existence(field='score',
-                                                 dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    t['satisfaction_rating']['score']),
-                'null' if self.__check_existence(field='comment',
-                                                 dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    self.__format_string(t['satisfaction_rating']['comment']))
+                'null' if self.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null' \
+                    else BaseETL.coalesce(t['satisfaction_rating']['score']),
+                'null' if self.__check_existence(field='comment', dict_var=t['satisfaction_rating']) == 'null' \
+                    else BaseETL.coalesce(self.__format_string(t['satisfaction_rating']['comment']))
             )
 
             self.__execute_command(command=upsert_ticket_command)
