@@ -125,7 +125,7 @@ SELECT
   criado_em,
   atualizado_em,
   now() as load_timestamp,
-  aie.network
+  an.network
 FROM
   public.usuario u
 inner join
@@ -166,8 +166,8 @@ inner join
 ) user_dates
 on user_dates.id = u.id
 left join 
-  vw_amplitude_install_events aie
-on u.id = aie.user_id
+  app_network an
+on u.id = an.user_id
 ;
 
 -- select data_nascimento from vw_dim_user
