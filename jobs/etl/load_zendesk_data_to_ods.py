@@ -287,11 +287,16 @@ class ZendeskDataToODS(object):
                                             " first_resolution_time_in_minutes_calendar, first_resolution_time_in_minutes_business, " \
                                             " agent_wait_time_in_minutes_calendar, agent_wait_time_in_minutes_business, " \
                                             " requester_wait_time_in_minutes_calendar, requester_wait_time_in_minutes_business, " \
-                                            " created_at, updated_at) " \
+                                            " on_hold_time_in_minutes_calendar, on_hold_time_in_minutes_business, " \
+                                            " full_resolution_time_in_minutes_calendar, full_resolution_time_in_minutes_business, " \
+                                            " reply_time_in_minutes_calendar, reply_time_in_minutes_business, created_at, updated_at) " \
                                             " values ('{}','{}','{}',{}, " \
                                             " {},{},{},'{}', " \
                                             " '{}','{}','{}', " \
                                             " '{}','{}','{}', " \
+                                            " {},{}, " \
+                                            " {},{}, " \
+                                            " {},{}, " \
                                             " {},{}, " \
                                             " {},{}, " \
                                             " {},{}, " \
@@ -311,6 +316,12 @@ class ZendeskDataToODS(object):
                                             " agent_wait_time_in_minutes_business = excluded.agent_wait_time_in_minutes_business, " \
                                             " requester_wait_time_in_minutes_calendar = excluded.requester_wait_time_in_minutes_calendar, " \
                                             " requester_wait_time_in_minutes_business = excluded.requester_wait_time_in_minutes_business, " \
+                                            " on_hold_time_in_minutes_calendar = excluded.on_hold_time_in_minutes_calendar, " \
+                                            " on_hold_time_in_minutes_business = excluded.on_hold_time_in_minutes_business, " \
+                                            " full_resolution_time_in_minutes_calendar = excluded.full_resolution_time_in_minutes_calendar, " \
+                                            " full_resolution_time_in_minutes_business = excluded.full_resolution_time_in_minutes_business, " \
+                                            " reply_time_in_minutes_calendar = excluded.reply_time_in_minutes_calendar, " \
+                                            " reply_time_in_minutes_business = excluded.reply_time_in_minutes_business, " \
                                             " created_at = excluded.created_at, updated_at = excluded.updated_at".format(
                 self.ods_schema,
                 tm['id'],
@@ -333,6 +344,12 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(tm['agent_wait_time_in_minutes']['business']),
                 BaseETL.coalesce(tm['requester_wait_time_in_minutes']['calendar']),
                 BaseETL.coalesce(tm['requester_wait_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['on_hold_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['on_hold_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['reply_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['reply_time_in_minutes']['business']),
                 BaseETL.format_date(tm['created_at']),
                 BaseETL.format_date(tm['updated_at'])
             )
