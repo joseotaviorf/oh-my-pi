@@ -1,4 +1,4 @@
-﻿drop view if exists vw_dim_user;
+drop view if exists vw_dim_user;
 create view vw_dim_user
 as
 SELECT
