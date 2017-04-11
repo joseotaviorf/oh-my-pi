@@ -63,7 +63,8 @@ select  -- count(1)
   da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
   l.region_id,
   l.atualizadoEm	as atualizado_em,
-  l.criadoEm	as criado_em
+  l.criadoEm	as criado_em,
+  coalesce(ua.network, l.utmSource) as network -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
 from 
   Lead l
 left join
@@ -92,5 +93,8 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
+left join
+  Usuario ua
+  on da.usuario_id=ua.id
 ;
 END
