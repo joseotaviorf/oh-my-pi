@@ -2,11 +2,13 @@ import os
 import sys
 import boto3
 import pytz
+import json
 from pytz import timezone
 from datetime import datetime, timedelta
 from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log, EnumDb
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 from jobs.base.base_etl import BaseETL, log, EnumDb
+from StringIO import StringIO
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -25,8 +27,21 @@ class AmplitudeEventsETL(BaseETL):
         table.append([self.now(), message])
         return table
 
+    @staticmethod
+    def save_to_s3(s3, bucket_name, data, encoding='utf-8'):
+        if type(data) is str:
+            data = json.loads(data)
+
+        event_time = datetime.strptime(data['event_time'], '%Y-%m-%d %H:%M:%S.%f')
+
+        target_file = '{}/{}/{}/{}.json'.format(str(event_time.date()), data['app'], data['event_type'], data['uuid'])
+        fake_handle = StringIO(str(json.dumps(data)).encode(encoding))
+        s3.Bucket(bucket_name).put_object(Body=fake_handle, Key=target_file)
+
     def run_sqs_to_ods(self, sqs_queue_name, db_enum, table_name, batch_size=5000):
         sqs = boto3.resource('sqs')
+        s3 = boto3.resource('s3')
+        s3_bucket = 'amplitude-events'
         queue = sqs.get_queue_by_name(QueueName=sqs_queue_name)
         messages_to_delete = []
         end_of_messages = False
@@ -46,6 +61,7 @@ class AmplitudeEventsETL(BaseETL):
             else:
                 for message in msgs:
                     m = self.get_message_content(message)
+                    self.save_to_s3(s3, s3_bucket, m)
                     table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
                     messages_to_delete.append(message)
                     if len(table_insert) > batch_size:
