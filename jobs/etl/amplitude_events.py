@@ -44,8 +44,8 @@ class AmplitudeEventsETL(BaseETL):
 
     def run_sqs_to_ods(self, sqs_queue_name, db_enum, table_name, batch_size=5000):
         sqs = boto3.resource('sqs')
-        s3 = boto3.resource('s3')
-        s3_bucket = 'amplitude-events'
+        # s3 = boto3.resource('s3')
+        # s3_bucket = 'amplitude-events'
         queue = sqs.get_queue_by_name(QueueName=sqs_queue_name)
         messages_to_delete = []
         end_of_messages = False
@@ -65,7 +65,7 @@ class AmplitudeEventsETL(BaseETL):
             else:
                 for message in msgs:
                     m = self.get_message_content(message)
-                    self.save_to_s3(s3, s3_bucket, m)
+                    # self.save_to_s3(s3, s3_bucket, m)
                     table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
                     messages_to_delete.append(message)
                     if len(table_insert) > batch_size:
