@@ -258,7 +258,7 @@ SELECT -- count(1)
   coalesce(to_char(contract_date,'YYYYMMDD')::integer, -1) as sk_contract_date,
 
   coalesce(lead_id, -1) as sk_lead,
-  coalesce(property_id, -1) as sk_property,
+  coalesce(property_id || '_1', '-1') as sk_property,
   coalesce(l.contract_id, -1) as sk_contract,
   renting_value,
   l.dados_fotografo_id as sk_photographer,
