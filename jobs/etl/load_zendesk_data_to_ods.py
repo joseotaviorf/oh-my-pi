@@ -196,7 +196,7 @@ class ZendeskDataToODS(object):
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
                     BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(self.__format_string(thumbnail_url.encode('utf-8')))
+                    BaseETL.coalesce(self.__format_string(thumbnail_url))
                 )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
@@ -287,11 +287,16 @@ class ZendeskDataToODS(object):
                                             " first_resolution_time_in_minutes_calendar, first_resolution_time_in_minutes_business, " \
                                             " agent_wait_time_in_minutes_calendar, agent_wait_time_in_minutes_business, " \
                                             " requester_wait_time_in_minutes_calendar, requester_wait_time_in_minutes_business, " \
-                                            " created_at, updated_at) " \
+                                            " on_hold_time_in_minutes_calendar, on_hold_time_in_minutes_business, " \
+                                            " full_resolution_time_in_minutes_calendar, full_resolution_time_in_minutes_business, " \
+                                            " reply_time_in_minutes_calendar, reply_time_in_minutes_business, created_at, updated_at) " \
                                             " values ('{}','{}','{}',{}, " \
                                             " {},{},{},'{}', " \
                                             " '{}','{}','{}', " \
                                             " '{}','{}','{}', " \
+                                            " {},{}, " \
+                                            " {},{}, " \
+                                            " {},{}, " \
                                             " {},{}, " \
                                             " {},{}, " \
                                             " {},{}, " \
@@ -311,6 +316,12 @@ class ZendeskDataToODS(object):
                                             " agent_wait_time_in_minutes_business = excluded.agent_wait_time_in_minutes_business, " \
                                             " requester_wait_time_in_minutes_calendar = excluded.requester_wait_time_in_minutes_calendar, " \
                                             " requester_wait_time_in_minutes_business = excluded.requester_wait_time_in_minutes_business, " \
+                                            " on_hold_time_in_minutes_calendar = excluded.on_hold_time_in_minutes_calendar, " \
+                                            " on_hold_time_in_minutes_business = excluded.on_hold_time_in_minutes_business, " \
+                                            " full_resolution_time_in_minutes_calendar = excluded.full_resolution_time_in_minutes_calendar, " \
+                                            " full_resolution_time_in_minutes_business = excluded.full_resolution_time_in_minutes_business, " \
+                                            " reply_time_in_minutes_calendar = excluded.reply_time_in_minutes_calendar, " \
+                                            " reply_time_in_minutes_business = excluded.reply_time_in_minutes_business, " \
                                             " created_at = excluded.created_at, updated_at = excluded.updated_at".format(
                 self.ods_schema,
                 tm['id'],
@@ -333,6 +344,12 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(tm['agent_wait_time_in_minutes']['business']),
                 BaseETL.coalesce(tm['requester_wait_time_in_minutes']['calendar']),
                 BaseETL.coalesce(tm['requester_wait_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['on_hold_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['on_hold_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['business']),
+                BaseETL.coalesce(tm['reply_time_in_minutes']['calendar']),
+                BaseETL.coalesce(tm['reply_time_in_minutes']['business']),
                 BaseETL.format_date(tm['created_at']),
                 BaseETL.format_date(tm['updated_at'])
             )
@@ -484,7 +501,11 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['type']),
                 BaseETL.coalesce(self.__format_string(t['subject'])),
                 BaseETL.coalesce(self.__format_string(t['raw_subject'])),
-                BaseETL.coalesce(self.__format_string(t['description'])),
+                BaseETL.coalesce(None if not t['description'] else
+                                 self.__format_string(
+                                     str(t['description'].encode('utf-8')).decode('utf-8').replace(u'\u0000', u'')
+                                 )
+                                 ),
                 BaseETL.coalesce(t['priority']),
                 BaseETL.coalesce(t['status']),
                 BaseETL.coalesce(t['recipient']),
@@ -507,12 +528,10 @@ class ZendeskDataToODS(object):
                 str(self.__check_existence(field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
                 str(self.__check_existence(field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']',
                                                                                                                  '}'),
-                'null' if self.__check_existence(field='score',
-                                                 dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    t['satisfaction_rating']['score']),
-                'null' if self.__check_existence(field='comment',
-                                                 dict_var=t['satisfaction_rating']) == 'null' else BaseETL.coalesce(
-                    self.__format_string(t['satisfaction_rating']['comment']))
+                'null' if self.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null' \
+                    else BaseETL.coalesce(t['satisfaction_rating']['score']),
+                'null' if self.__check_existence(field='comment', dict_var=t['satisfaction_rating']) == 'null' \
+                    else BaseETL.coalesce(self.__format_string(t['satisfaction_rating']['comment']))
             )
 
             self.__execute_command(command=upsert_ticket_command)
