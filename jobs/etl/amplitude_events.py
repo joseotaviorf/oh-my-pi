@@ -3,6 +3,7 @@ import sys
 import boto3
 import pytz
 import json
+import dateutil
 from pytz import timezone
 from datetime import datetime, timedelta
 from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log, EnumDb
@@ -32,7 +33,10 @@ class AmplitudeEventsETL(BaseETL):
         if type(data) is str:
             data = json.loads(data)
 
-        event_time = datetime.strptime(data['event_time'], '%Y-%m-%d %H:%M:%S.%f')
+        try:
+            event_time = dateutil.parser.parse(data['event_time'])
+        except ValueError:
+            event_time = datetime.today()
 
         target_file = '{}/{}/{}/{}.json'.format(str(event_time.date()), data['app'], data['event_type'], data['uuid'])
         fake_handle = StringIO(str(json.dumps(data)).encode(encoding))
