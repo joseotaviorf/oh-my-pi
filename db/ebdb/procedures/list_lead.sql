@@ -64,8 +64,11 @@ select  -- count(1)
   l.region_id,
   l.atualizadoEm	as atualizado_em,
   l.criadoEm	as criado_em,
-  coalesce(ua.network, l.utmSource) as network -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
-from 
+  l.utmSource,
+  l.urlSource,
+  l.utmMedium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
+  da.usuario_id as usuarioQueIndicou_id
+from
   Lead l
 left join
   Estado e
@@ -93,8 +96,5 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
-left join
-  Usuario ua
-  on da.usuario_id=ua.id
 ;
 END
