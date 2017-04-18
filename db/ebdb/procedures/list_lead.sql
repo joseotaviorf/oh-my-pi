@@ -64,7 +64,10 @@ select  -- count(1)
   l.region_id,
   l.atualizadoEm	as atualizado_em,
   l.criadoEm	as criado_em,
-  coalesce(ua.network, l.utmSource) as network -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
+  l.utmSource,
+  coalesce(ua.network, l.utmSource) as network,
+  l.utmMedium
+
 from 
   Lead l
 left join
