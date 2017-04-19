@@ -101,7 +101,7 @@ class AmplitudeEventsETL(BaseETL):
     def dump_events_to_s3(self, g_events, app, start):
         start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
         app_partition = "app=" + app
-        date_partition = "server_upload_time=" + str(start.date())
+        date_partition = "server_upload_date=" + str(start.date())
 
         for k, v in g_events.iteritems():
             event_partition = "event_type="+k
