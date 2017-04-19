@@ -64,10 +64,11 @@ select  -- count(1)
   l.region_id,
   l.atualizadoEm	as atualizado_em,
   l.criadoEm	as criado_em,
+  l.urlSource,
+  l.utmMedium,
+  l.utmCampaign,
   l.utmSource,
-  coalesce(ua.network, l.utmSource) as network,
-  l.utmMedium
-
+  da.usuario_id as usuarioQueIndicou_id
 from 
   Lead l
 left join
@@ -96,8 +97,8 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
-left join
-  Usuario ua
-  on da.usuario_id=ua.id
+-- left join
+  -- Usuario ua
+  -- on da.usuario_id=ua.id
 ;
 END
