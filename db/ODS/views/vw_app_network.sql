@@ -1,4 +1,4 @@
-﻿drop view if exists vw_app_network;
+drop view if exists vw_app_network;
 create view vw_app_network
 as
 SELECT 
