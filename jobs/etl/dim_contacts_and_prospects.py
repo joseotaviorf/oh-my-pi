@@ -25,7 +25,7 @@ if len(args) > 1:
             append=False
         )
         BaseETL.execute_command(
-            'insert into dim_lead values (-1);',
+            'insert into dim_contacts_and_prospects values (-1);',
             db_enum=EnumDb.BI_DW,
             commit=True
         )

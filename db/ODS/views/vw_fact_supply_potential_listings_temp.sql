@@ -1,40 +1,47 @@
 ﻿-- select count(1) from public.potential_listings
 -- CREATE EXTENSION pg_trgm;
 
-DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
-CREATE VIEW vw_fact_supply_potential_listings as
+DROP VIEW IF EXISTS vw_fact_supply_potential_listings_temp ;
+CREATE VIEW vw_fact_supply_potential_listings_temp as
 with first_pub as
 (
   SELECT
     p.first_publication as first_publication_date,
     (listing_publication_date = first_publication) as is_first_publication,
-    l.*,
-    le.reason
+    l.*
   FROM
-    public.potential_listings l
-  left join
-  	public.lead le
-    on le.id = l.lead_id
+
+    (SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+      cap.cap_id,
+      pl.*,
+      cap.reason
+    FROM
+    public.potential_listings pl
+    left join
+      public.contacts_and_prospects cap
+      on (cap.lead_id = pl.lead_id OR cap.imovel_id = pl.property_id)
+    ) l
+
   left join
     vw_dim_property p
     on p.id = l.property_id
---  where	l.property_id = 892776892
+--  where l.property_id = 892776892
   WINDOW
-  	w_prop_id as (partition by l.property_id)
+    w_prop_id as (partition by l.property_id)
 )
 , listings as
 (
-	select
+  select
       l.*,
-  	  ------ LISTING DATE COUNTS ------
+      ------ LISTING DATE COUNTS ------
       (dense_rank()
-      	over (
+        over (
           partition by
             date_part('month', first_publication_date),
             date_part('year', first_publication_date)
           order BY
             l.property_id  asc
-      	)
+        )
       + dense_rank()
           over (
             partition by
@@ -42,7 +49,7 @@ with first_pub as
               date_part('year', first_publication_date)
             order BY
               l.property_id  desc
-     	 )
+       )
       -1) as listing_month_distinct_count, -- distinct count inside partition 'year/month'
 
       (
@@ -80,7 +87,7 @@ with first_pub as
       over (partition by first_publication_date::date)
       as self_service_listing_day_times, -- count over day using listing date and filter self-service
 
-	  mu.adquirido_em::date as adquirido_em,
+    mu.adquirido_em::date as adquirido_em,
 
       ------ CONTACT DATE COUNTS ------
       (
@@ -133,7 +140,7 @@ with first_pub as
       )
       as contact_month_times,  -- how many times they appear over month using listing_date
 
-      count(1)	over (
+      count(1)  over (
         partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
       )
       as contact_day_times,  -- how many times they appear over day using listing_date
@@ -196,7 +203,7 @@ with first_pub as
       )
       as opportunity_month_times,  -- how many times they appear over month using listing_date
 
-      count(1)	over (
+      count(1)  over (
         partition by opportunity_date::date
       )
       as opportunity_day_times,  -- how many times they appear over day using listing_date
@@ -207,7 +214,7 @@ with first_pub as
       )
       as self_service_opportunity_day_times -- count over day using listing date and filter self-service
   from
-  	first_pub l
+    first_pub l
   left join
     (
         select
@@ -222,6 +229,7 @@ with first_pub as
 
 )
 SELECT -- count(1)
+  l.cap_id,
   l.id as ods_id,
   ref_date as dt_last_updated,
   created_date as dt_created,
@@ -239,10 +247,10 @@ SELECT -- count(1)
   contract_date as dt_contract,
 
   CASE
-  	WHEN listing_publication_date IS NOT NULL THEN NULL
-  	WHEN funnel_source = 'Self-Service' THEN 'Unfinished Process'
-  	WHEN l.reason IS NOT NULL THEN l.reason
-  	ELSE 'Unknown' -- meaning it's an unpublished lead (from the lead flow) without a reason not to publish
+    WHEN listing_publication_date IS NOT NULL THEN NULL
+    WHEN funnel_source = 'Self-Service' THEN 'Unfinished Process'
+    WHEN l.reason IS NOT NULL THEN l.reason
+    ELSE 'Unknown' -- meaning it's an unpublished lead (from the lead flow) without a reason not to publish
   END as reason,
 
   is_first_publication,
@@ -327,13 +335,13 @@ SELECT -- count(1)
   f.cost + f_install.cost + g.cost as marketing_day_cost,
 
   /*
-  	f_install.cost /
+    f_install.cost /
     coalesce(nullif(l.contact_day_distinct_count,0),1) /
     coalesce(nullif(l.self_service_contact_day_times,0),1) as fb_self_service_marketing_cost,
   */
 
   f_install.cost /
-	coalesce(nullif(
+  coalesce(nullif(
           count(1) filter (where l.attribution_category='Self-Service')
           over (
             partition by created_date::date
@@ -385,34 +393,34 @@ left join
   and ph."Category"='Listing Photos'
 
 left join
-	usuario u
+  usuario u
     on u.id = l.rep_id
 
 left join
   files.personnel_allocation e
   on similarity(trim(upper(e."Employee")), trim(upper(u.nome))) >= 0.8
   and date_part('month', (to_date(e."Month"::varchar, 'DD/MM/YYYY')))
-  		= date_part('month', l.first_publication_date)
+      = date_part('month', l.first_publication_date)
   and date_part('year', (to_date(e."Month"::varchar, 'DD/MM/YYYY')))
-  		= date_part('year', l.first_publication_date)
+      = date_part('year', l.first_publication_date)
 
 left join
 (
   select
-  	to_date(e."Month"::varchar, 'DD/MM/YYYY') as date_employee_area,
+    to_date(e."Month"::varchar, 'DD/MM/YYYY') as date_employee_area,
     count(1)::integer as count_employees_outbound
   from
-	  files.personnel_allocation e
+    files.personnel_allocation e
   where lower(e."Team") = 'outbound'
   group by
-   	to_date(e."Month"::varchar, 'DD/MM/YYYY')
+    to_date(e."Month"::varchar, 'DD/MM/YYYY')
 ) qt
-	on date_part('month', qt.date_employee_area) = date_part('month', l.first_publication_date)
-	and date_part('year', qt.date_employee_area) = date_part('year', l.first_publication_date)
+  on date_part('month', qt.date_employee_area) = date_part('month', l.first_publication_date)
+  and date_part('year', qt.date_employee_area) = date_part('year', l.first_publication_date)
 
 left join
   (
-  	select
+    select
       a.date,
       sum(a.spend::decimal(18,4)) as cost
     from facebook_ads_campaigns a

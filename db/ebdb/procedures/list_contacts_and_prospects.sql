@@ -7,6 +7,7 @@ BEGIN
 SELECT
 (@cnt := @cnt + 1) AS cap_id, -- creates the new contact and prospect ID (key)
 lead_id,
+imovel_id,
 anuncio_criado_em,
 area_total,
 bairro,
@@ -43,20 +44,20 @@ dados_afiliado_inicio_atuacao,
 dados_afiliado_cidade_atuacao,
 region_id,
 atualizado_em,
-urlSource,
-utmMedium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
-utmCampaign,
-network,
-usuarioQueIndicou_id,
-selfService
+url_source,
+utm_medium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
+utm_campaign,
+utm_source,
+usuario_que_indicou_id,
+self_service
 FROM
 (
-  SELECT
+  SELECT -- leads have a lead_id and self service have a a imovel id. the other values are null. this will allow us to match this table with the fact table in order to add the cap_id to it.
 
   -- the leads as in the lead table (does not include self service)
     -- autoincrement as cap_id
     l.id as lead_id,
-    -- i.id as imovel_id,
+    null as imovel_id,
     l.anuncioCriadoEm as anuncio_criado_em,
     l.areaTotal as area_total,
     l.bairro,
@@ -115,12 +116,12 @@ FROM
     l.region_id,
     l.atualizadoEm  as atualizado_em,
     -- l.criadoEm  as criado_em,
-    l.urlSource,
-    l.utmMedium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
-    l.utmCampaign,
-    l.utmSource as network,
-    da.usuario_id as usuarioQueIndicou_id,
-    0 as selfService
+    l.urlSource as url_source,
+    l.utmMedium as utm_medium,
+    l.utmCampaign as utm_campaign,
+    l.utmSource as utm_source,
+    da.usuario_id as usuario_que_indicou_id,
+    0 as self_service
     
   from 
     Lead l
@@ -150,7 +151,7 @@ FROM
   left join
     DadosAfiliado da
     on da.id = l.afiliadoQueIndicou_id
-  limit 50
+  -- limit 50
 
   UNION
 
@@ -158,7 +159,7 @@ FROM
   SELECT
     -- autoincrement as cap_id -- the key referenced in the fact table
     null as lead_id, -- l.id
-    -- i.id as imovel_id,
+    i.id as imovel_id, --
     i.dataCriacao as anuncio_criado_em,
     i.areaTotal as area_total,
     i.bairro,
@@ -229,12 +230,12 @@ FROM
     i.regiao_id as region_id,
     i.atualizadoEm  as atualizado_em,
     -- l.criadoEm  as criado_em, -- delete field for leads and ss (same as dataCriacao)
-    null as urlSource,
-    null as utmMedium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
-    null as utmCampaign,
-    null as network, -- network will be known later, when we have the list of amplitude events in ods
-    null as usuarioQueIndicou_id,
-    1 as selfService
+    null as url_source,
+    null as utm_medium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
+    null as utm_campaign,
+    null as utm_source, -- network will be known later, when we have the list of amplitude events in ods
+    null as usuario_que_indicou_id,
+    1 as self_service
 
   FROM
       Imovel i
@@ -249,8 +250,8 @@ FROM
   left join
     Usuario u
     on i.usuario_id = u.id
-  WHERE cl.imovel_id = null -- select only the immoveis that are not already selected by what precedes the union
-  limit 100
+  WHERE cl.imovel_id is null -- select only the immoveis that are not already selected by what precedes the union
+  -- limit 100
 ) t CROSS JOIN (SELECT @cnt := 0) AS dummy
 ;
 END
