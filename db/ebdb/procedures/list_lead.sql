@@ -64,11 +64,11 @@ select  -- count(1)
   l.region_id,
   l.atualizadoEm	as atualizado_em,
   l.criadoEm	as criado_em,
-  l.urlSource,
-  l.utmMedium,
-  l.utmCampaign,
-  l.utmSource,
-  da.usuario_id as usuarioQueIndicou_id
+  l.urlSource as url_source,
+  l.utmMedium as utm_medium,
+  l.utmCampaign as utm_campaign,
+  l.utmSource as utm_source,
+  da.usuario_id as usuario_que_indicou_id
 from 
   Lead l
 left join
