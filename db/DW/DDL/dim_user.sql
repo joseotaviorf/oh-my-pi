@@ -1,7 +1,7 @@
-﻿drop table if exists dim_user;
+drop table if exists dim_user;
 
 CREATE TABLE dim_user (
-  sk_user bigint not null,
+  sk_user bigint not null primary key,
   id bigint,
   nome varchar(255) DEFAULT NULL,
   bairro varchar(255) DEFAULT NULL,
@@ -118,6 +118,5 @@ CREATE TABLE dim_user (
   criado_em timestamp ,
   atualizado_em timestamp DEFAULT NULL,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  network varchar(255) DEFAULT NULL,
-  CONSTRAINT dim_user_pkey PRIMARY KEY(sk_user)
+  network varchar(255) DEFAULT NULL
 ) ;

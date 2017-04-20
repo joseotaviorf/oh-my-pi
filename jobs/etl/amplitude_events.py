@@ -1,10 +1,12 @@
 import os
+import io
 import sys
 import boto3
+import json
+import gzip
 import pytz
-from pytz import timezone
 from datetime import datetime, timedelta
-from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log, EnumDb
+from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 from jobs.base.base_etl import BaseETL, log, EnumDb
 
@@ -17,6 +19,8 @@ class AmplitudeEventsETL(BaseETL):
 
     def __init__(self, *args, **kwargs):
         super(AmplitudeEventsETL, self).__init__(*args, **kwargs)
+        self.s3 = boto3.resource('s3')
+        self.BUCKET = "5a-amplitude-events"
 
     def __append(self, message, table=None):
         if not table:
@@ -84,6 +88,30 @@ class AmplitudeEventsETL(BaseETL):
             messages_to_delete.remove(mes)
         return messages_to_delete
 
+    @staticmethod
+    def group_events(ev):
+        events = {}
+        for e in ev:
+            if json.loads(e)['event_type'] not in events:
+                events[json.loads(e)['event_type']] = ""
+            events[json.loads(e)['event_type']] += e
+            events[json.loads(e)['event_type']] += "\n"
+        return events, str(json.loads(e)['app'])
+
+    def dump_events_to_s3(self, g_events, app, start):
+        if type(start) is str:
+            start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
+        app_partition = "app=" + app
+        date_partition = "server_upload_date=" + str(start.date())
+
+        for k, v in g_events.iteritems():
+            event_partition = "event_type="+k
+            file_name = "/".join([app_partition, event_partition, date_partition, str(start.hour)])+".json.gz"
+            gz_body = io.BytesIO()
+            with gzip.GzipFile(fileobj=gz_body, mode="w") as fp:
+                fp.write(v.encode('utf-8'))
+            self.s3.Bucket(self.BUCKET).put_object(Body=gz_body.getvalue(), Key=file_name)
+
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
             raise Exception("Param: topic_arn can't be None!")
@@ -102,10 +130,12 @@ class AmplitudeEventsETL(BaseETL):
             log('Param End String: {}'.format(end))
 
             for key in props.get_keys():
-                a = AmplitudeExportApi(key['app_key'],key['secret_key'])
+                a = AmplitudeExportApi(key['app_key'], key['secret_key'])
                 f = a.get_files_from_extract_api(start, end)
                 if f:
                     events = a.get_json_from_zipfile(f)
+                    g_events, app = self.group_events(events)
+                    self.dump_events_to_s3(g_events, app, start_date)
                     count = a.publish_notifications(events, topic_arn=topic_arn)
                     print('{} messages were published in SNS!'.format(count))
                     sys.stdout.flush()
@@ -129,11 +159,11 @@ class AmplitudeEventsETL(BaseETL):
 
 def convert_date(date_str):
     dt = datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
-    return dt.replace(tzinfo=pytz.utc).astimezone(timezone(LOCAL_TZ))
+    return dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(LOCAL_TZ))
 
 
 if __name__ == '__main__':
-    now = convert_date(datetime.utcnow().strftime(DEFAULT_DATETIME_FORMAT))
+    now = (datetime.utcnow() - timedelta(hours=2)).strftime(DEFAULT_DATETIME_FORMAT)
     args = sys.argv
     arg_count = len(args)
 
@@ -173,7 +203,6 @@ if __name__ == '__main__':
             append=False,
             commit=True
         )
-
 
     print('END')
     sys.stdout.flush()

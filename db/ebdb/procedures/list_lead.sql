@@ -1,4 +1,4 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_lead;
+DROP PROCEDURE IF EXISTS ebdb.list_lead;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_lead()
@@ -64,11 +64,12 @@ select  -- count(1)
   l.region_id,
   l.atualizadoEm	as atualizado_em,
   l.criadoEm	as criado_em,
-  l.utmSource,
-  l.urlSource,
-  l.utmMedium, -- add the network of the afiliado (if the lead was recommended by an affiliate), the utmSource (currenlty only present for leads from the landing page)
-  da.usuario_id as usuarioQueIndicou_id
-from
+  l.urlSource as url_source,
+  l.utmMedium as utm_medium,
+  l.utmCampaign as utm_campaign,
+  l.utmSource as utm_source,
+  da.usuario_id as usuario_que_indicou_id
+from 
   Lead l
 left join
   Estado e
@@ -96,5 +97,8 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
+-- left join
+  -- Usuario ua
+  -- on da.usuario_id=ua.id
 ;
 END

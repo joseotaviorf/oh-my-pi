@@ -1,7 +1,8 @@
-﻿drop view if exists vw_app_install;
-create view vw_app_install
+drop view if exists vw_app_network;
+create view vw_app_network
 as
-SELECT a.event_id,
+SELECT 
+    a.event_id,
     a.user_id::integer,
     -- a.amplitude_id,
     -- a.version_name,
