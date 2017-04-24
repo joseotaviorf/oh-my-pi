@@ -9,18 +9,18 @@ if len(args) > 1:
 
         print("Start query: {}".format(datetime.now()))
 
-        # listODS = BaseETL.from_db_query(
-        #     db_enum=EnumDb.QuintoAndar_ebdb,
-        #     query="call ebdb.list_potential_listings_temp(null);")
+        listODS = BaseETL.from_db_query(
+            db_enum=EnumDb.QuintoAndar_ebdb,
+            query="call ebdb.list_potential_listings_temp(null);")
 
-        # print("To ODS: {}".format(datetime.now()))
+        print("To ODS: {}".format(datetime.now()))
 
-        # BaseETL.to_db(
-        #     db_enum=EnumDb.BI_ODS,
-        #     data_table=listODS,
-        #     table_name='potential_listings_temp',
-        #     append=False
-        # ) do nothing because same script as usual
+        BaseETL.to_db(
+            db_enum=EnumDb.BI_ODS,
+            data_table=listODS,
+            table_name='potential_listings_temp',
+            append=False
+        ) do nothing because same script as usual
 
     elif args[1] == 'DW':
         BaseETL.move_table(
