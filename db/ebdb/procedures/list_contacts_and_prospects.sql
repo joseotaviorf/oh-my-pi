@@ -121,7 +121,23 @@ FROM
     l.utmCampaign as utm_campaign,
     l.utmSource as utm_source,
     da.usuario_id as usuario_que_indicou_id,
+    null as usuario_que_cadastrou_id,
     0 as self_service
+
+    CASE -- to be improved !!
+      -- WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
+      WHEN l.tipo='Afiliado' AND l.origem='App' THEN 'Affiliate App'
+      WHEN l.tipo='Afiliado' AND l.origem='Form' THEN 'Affiliate Form'
+      WHEN l.tipo='Afiliado' AND l.origem='Planilha' THEN 'Affiliate Spreadsheet'
+      WHEN l.tipo='Afiliado' AND l.origem='Desconhecida' THEN 'Affiliate Unknown'
+      WHEN l.origem='Landing' THEN 'Landing Page Leads'
+      -- WHEN p.conversao_tipo='Lead' AND p.lead_tipo='Marketing' AND p.lead_origem<>'Landing' THEN 'Marketing Leads'
+      -- WHEN cl.tipo='InsideSales' THEN 'Organic/Duplicate/Referred Leads'
+      
+      -- WHEN cl.tipo='Lead' THEN 'Other Lead Source'
+      -- WHEN ia.imovelAttribution NOT IN ('Self-Service','Undetermined') THEN 'Organic/Duplicate/Referred Leads'
+      ELSE 'Other' 
+    END AS attribution_type,
     
   from 
     Lead l
@@ -155,7 +171,7 @@ FROM
 
   UNION
 
-  -- the imoveis that do not have a lead, which are the ones from self service :
+  -- the imoveis that do not have a lead, which are the ones from self service. ?what about organic IS?
   SELECT
     -- autoincrement as cap_id -- the key referenced in the fact table
     null as lead_id, -- l.id
@@ -199,7 +215,12 @@ FROM
     i.lng,
     i.condominio, 
     i.iptu, 
-    null as reason, -- does not exist for imoveis. null for ss
+    
+    CASE
+      WHEN ip.datePublication IS NOT NULL THEN NULL -- if already published, there is no reason.
+      ELSE 'Unfinished Process'
+    END as reason,
+    -- null as reason, -- does not exist for imoveis. null for ss
     null as status, -- i.status and l.status are the same thing ? new, in prospection, converted for leads VS rented, published, edition. see with catach for rule to get the status
     null as envio_email_apresentacao_pos, -- always null for ss
     null as envio_email_apresentacao_pre, -- always null for ss
@@ -235,7 +256,11 @@ FROM
     null as utm_campaign,
     null as utm_source, -- network will be known later, when we have the list of amplitude events in ods
     null as usuario_que_indicou_id,
+    i.usuario_id as usuario_que_cadastrou_id,
     1 as self_service
+    'Owner app' as attribution_type
+
+
 
   FROM
       Imovel i
@@ -250,7 +275,18 @@ FROM
   left join
     Usuario u
     on i.usuario_id = u.id
-  WHERE cl.imovel_id is null -- select only the immoveis that are not already selected by what precedes the union
+
+  LEFT JOIN 
+    (
+    SELECT id, min(REV) as REV, datePublication
+    FROM imovel_status_history
+    WHERE published = 1
+    group by id
+    ) ip
+    on ip.id = i.imovel_id
+
+  WHERE cl.leadConvertido_id is null -- select only the immoveis that are not already selected by what precedes the union
+
   -- limit 100
 ) t CROSS JOIN (SELECT @cnt := 0) AS dummy
 ;
