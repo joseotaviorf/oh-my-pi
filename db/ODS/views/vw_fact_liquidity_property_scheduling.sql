@@ -74,9 +74,9 @@ select
   	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
   as vl_cost_visit_support,
 
-  -- ratear custo do mes, por dia pelos imoveis que tiveram contrato
+  -- ratear custo do mes, por dia 'pelos imoveis que tiveram contrato
   c.cost_closing_support ::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
+  	/ coalesce(nullif(count(1) over (partition by f.id_contract),0),1)
   as vl_cost_closing_support,
 
   -- ratear custo do dia pelos imoveis publicados no dia determinado
@@ -130,16 +130,18 @@ left join
   vw_imovel_liquidity_agents_costs ac
   on f.id_scheduling = ac.id_scheduling
   and f.id_imovel = ac.id_imovel
-
+  
 left join
   vw_imovel_liquidity_closing_costs c
   on f.id_scheduling = c.id_scheduling
   and f.id_imovel = c.id_imovel
+  and f.id_contract = c.id_contract
 
 left join
   vw_imovel_liquidity_visit_costs v
   on f.id_scheduling = v.id_scheduling
   and f.id_imovel = v.id_imovel
+  and f.id_visit = v.id_visit
 
 left join
 (

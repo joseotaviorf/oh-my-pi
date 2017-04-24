@@ -16,7 +16,7 @@
 			<network-handler type="CONFIG" id="postgre_ssl" enabled="false" save-password="false"/>
 			<bootstrap autocommit="true"/>
 		</connection>
-		<custom-property name="resultset.maxrows" value="0"/>
+		<custom-property name="resultset.maxrows" value="2000"/>
 	</data-source>
 	<data-source id="aws_redshift-15b7ced4c84-4ffb1d8dfef998bc" provider="generic" driver="aws_redshift" name="DW" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com" port="5439" server="" database="dw" url="jdbc:redshift://quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com:5439/dw" user="quintoandar" password="HBEUFFdrHDsoGQsMMgxKbjERV0ZAV2IUDSkxIQIMET935w==" type="prod">
@@ -30,6 +30,7 @@
 			</network-handler>
 			<bootstrap autocommit="true"/>
 		</connection>
+		<custom-property name="resultset.maxrows" value="2000"/>
 	</data-source>
 	<data-source id="mysql5-15b7cf0b0f1-303dc0aa9493946a" provider="mysql" driver="mysql5" name="EBDB - REPLICA" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="ebdb" url="jdbc:mysql://quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/ebdb" user="bi" password="AwUUIUZWRQ9IExIqGARLUz9aAUxDSkoyP0f2" type="test">
