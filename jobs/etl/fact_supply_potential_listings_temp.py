@@ -20,7 +20,7 @@ if len(args) > 1:
             data_table=listODS,
             table_name='potential_listings_temp',
             append=False
-        ) do nothing because same script as usual
+        )
 
     elif args[1] == 'DW':
         BaseETL.move_table(
