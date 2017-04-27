@@ -1,4 +1,4 @@
-﻿drop table if exists dim_user;
+drop table if exists dim_user;
 
 CREATE TABLE dim_user (
   sk_user bigint not null primary key,
@@ -120,5 +120,3 @@ CREATE TABLE dim_user (
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
   network varchar(255) DEFAULT NULL
 ) ;
---SET client_encoding TO 'LATIN1';
---SHOW client_encoding;

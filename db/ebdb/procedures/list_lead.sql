@@ -1,4 +1,4 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_lead;
+DROP PROCEDURE IF EXISTS ebdb.list_lead;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_lead()
