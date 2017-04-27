@@ -1,4 +1,5 @@
-﻿-- select count(1) from public.potential_listings
+﻿-- select count(1) from public.potential_listings_temp
+  
 -- CREATE EXTENSION pg_trgm;
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings_temp ;
@@ -9,37 +10,37 @@ with first_pub as
     p.first_publication as first_publication_date,
     (listing_publication_date = first_publication) as is_first_publication,
     l.*
+
   FROM
 
     (SELECT * FROM
       
-      (SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+      (
+      SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
         cap.cap_id,
         pl.*
         -- cap.reason
       FROM
-        public.potential_listings pl
+        public.potential_listings_temp pl
       left join
         public.contacts_and_prospects cap
-        on (cap.lead_id = pl.lead_id and pl.property_id IS NULL)
-      WHERE pl.property_id IS NULL
-      ) a
+        on (cap.lead_id = pl.lead_id)
+      WHERE pl.lead_id IS NOT NULL
 
       UNION
 
-      (SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+      SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
         cap.cap_id,
         pl.*
         -- cap.reason
       FROM
-        public.potential_listings pl
+        public.potential_listings_temp pl
       left join
         public.contacts_and_prospects cap
         on (cap.imovel_id = pl.property_id and pl.lead_id IS NULL)
-      WHERE pl.lead_id IS NULL
-      )
+      WHERE pl.lead_id IS NULL and pl.property_id IS NOT NULL
+      ) l
 
-    ) l
 
 
 
@@ -104,7 +105,6 @@ with first_pub as
 
       count(1) over (partition by first_publication_date::date)
       as listing_day_times,  -- how many times they appear over day using listing_date
-
       -- count(1) filter (where l.attribution_category='Self-Service')
       count(1) filter (where l.imovel_attribution = 'Self-Service')
       over (partition by first_publication_date::date)
@@ -487,12 +487,16 @@ left join
 ;
 
 /*
- drop table tmp_fact_supply_potential_listings;
+ drop table tmp_fact_supply_potential_listings_temp
+  ;
  select *
- into tmp_fact_supply_potential_listings
- from public.vw_fact_supply_potential_listings l
+ into tmp_fact_supply_potential_listings_temp
+  
+ from public.vw_fact_supply_potential_listings_temp
+   l
  where  l.sk_property in (892786407, 892786573, 892788018, 892789866)
  -- where  l.sk_property = 892786407
  ;
- select * from tmp_fact_supply_potential_listings;
+ select * from tmp_fact_supply_potential_listings_temp
+  ;
 */
