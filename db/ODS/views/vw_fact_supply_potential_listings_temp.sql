@@ -12,43 +12,39 @@ with first_pub as
     l.*
 
   FROM
-
-    (SELECT * FROM
-      
+    (
+      SELECT * FROM
       (
-      SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
-        cap.cap_id,
-        pl.*
-        -- cap.reason
-      FROM
-        public.potential_listings_temp pl
-      left join
-        public.contacts_and_prospects cap
-        on (cap.lead_id = pl.lead_id)
-      WHERE pl.lead_id IS NOT NULL
+        SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+          cap.cap_id,
+          pl.*
+          -- cap.reason
+        FROM
+          public.potential_listings_temp pl
+        left join
+          public.contacts_and_prospects cap
+          on (cap.lead_id = pl.lead_id)
+        WHERE pl.lead_id IS NOT NULL
 
-      UNION
+        UNION
 
-      SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
-        cap.cap_id,
-        pl.*
-        -- cap.reason
-      FROM
-        public.potential_listings_temp pl
-      left join
-        public.contacts_and_prospects cap
-        on (cap.imovel_id = pl.property_id and pl.lead_id IS NULL)
-      WHERE pl.lead_id IS NULL and pl.property_id IS NOT NULL
-      ) l
+        SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+          cap.cap_id,
+          pl.*
+          -- cap.reason
+        FROM
+          public.potential_listings_temp pl
+        left join
+          public.contacts_and_prospects cap
+          on (cap.imovel_id = pl.property_id and pl.lead_id IS NULL)
+        WHERE pl.lead_id IS NULL and pl.property_id IS NOT NULL
+      ) a
+    )l
 
+    left join
+      vw_dim_property p
+      on p.id = l.property_id
 
-
-
-
-  left join
-    vw_dim_property p
-    on p.id = l.property_id
---  where l.property_id = 892776892
   WINDOW
     w_prop_id as (partition by l.property_id)
 )
