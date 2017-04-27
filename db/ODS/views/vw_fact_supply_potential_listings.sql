@@ -1,4 +1,5 @@
 ﻿-- select count(1) from public.potential_listings
+
 -- CREATE EXTENSION pg_trgm;
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
@@ -21,7 +22,28 @@ with first_pub as
 
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   left join
   	public.lead le
     on le.id = l.lead_id
@@ -432,6 +454,7 @@ left join
     group by a.date
   ) f_install
   on cast(f_install.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  
   and l.funnel_source = 'Self-Service'
 
 left join

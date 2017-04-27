@@ -49,7 +49,8 @@ utm_medium, -- add the network of the afiliado (if the lead was recommended by a
 utm_campaign,
 utm_source,
 usuario_que_indicou_id,
-self_service
+self_service,
+attribution_type
 FROM
 (
   SELECT -- leads have a lead_id and self service have a a imovel id. the other values are null. this will allow us to match this table with the fact table in order to add the cap_id to it.
@@ -120,24 +121,19 @@ FROM
     l.utmMedium as utm_medium,
     l.utmCampaign as utm_campaign,
     l.utmSource as utm_source,
-    da.usuario_id as usuario_que_indicou_id,
+    uda.id as usuario_que_indicou_id, -- da.usuario_id is deprecated !!!
     null as usuario_que_cadastrou_id,
-    0 as self_service
+    0 as self_service,
 
-    CASE -- to be improved !!
-      -- WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
+    CASE 
       WHEN l.tipo='Afiliado' AND l.origem='App' THEN 'Affiliate App'
       WHEN l.tipo='Afiliado' AND l.origem='Form' THEN 'Affiliate Form'
       WHEN l.tipo='Afiliado' AND l.origem='Planilha' THEN 'Affiliate Spreadsheet'
       WHEN l.tipo='Afiliado' AND l.origem='Desconhecida' THEN 'Affiliate Unknown'
+      WHEN l.tipo='Marketing' AND l.origem='Facebook' THEN 'Facebook' -- facebook link that gives us his info, so we can contact him
       WHEN l.origem='Landing' THEN 'Landing Page Leads'
-      -- WHEN p.conversao_tipo='Lead' AND p.lead_tipo='Marketing' AND p.lead_origem<>'Landing' THEN 'Marketing Leads'
-      -- WHEN cl.tipo='InsideSales' THEN 'Organic/Duplicate/Referred Leads'
-      
-      -- WHEN cl.tipo='Lead' THEN 'Other Lead Source'
-      -- WHEN ia.imovelAttribution NOT IN ('Self-Service','Undetermined') THEN 'Organic/Duplicate/Referred Leads'
       ELSE 'Other' 
-    END AS attribution_type,
+    END AS attribution_type
     
   from 
     Lead l
@@ -167,11 +163,14 @@ FROM
   left join
     DadosAfiliado da
     on da.id = l.afiliadoQueIndicou_id
+  left join
+    Usuario uda
+    on uda.dadosAfiliado_id = da.id
   -- limit 50
 
   UNION
 
-  -- the imoveis that do not have a lead, which are the ones from self service. ?what about organic IS?
+  -- the imoveis that do not have a lead, which are the ones from self service amd the organic IS.
   SELECT
     -- autoincrement as cap_id -- the key referenced in the fact table
     null as lead_id, -- l.id
@@ -190,9 +189,9 @@ FROM
     i.numeroBanheiros as numero_banheiros,
     i.numeroQuartos as numero_quartos,
     i.numeroSuites as numero_suites,
-    null as url_anuncio, -- used for leads coming from the crawler, null for self service
+    null as url_anuncio, -- used for leads coming from the crawler, null for self service and organic is
     i.aluguel as valor,
-    u.telefonePrincipal as telefone_anunciante, -- by joining with usuario
+    u.telefonePrincipal as telefone_anunciante, -- by joining with usuario -- also ok for organic is ?
     -- probably not used :
     -- l.valorPorMetroQuad as valor_por_metro_quad, -- x
     -- l.valorPorQuartos as valor_por_quartos, -- x
@@ -218,14 +217,20 @@ FROM
     
     CASE
       WHEN ip.datePublication IS NOT NULL THEN NULL -- if already published, there is no reason.
-      ELSE 'Unfinished Process'
+      WHEN cl.tipo = 'InsideSales' then 'Unfinished Organic Inside Sales Process'
+      ELSE 'Unfinished Self-Service Process'
     END as reason,
     -- null as reason, -- does not exist for imoveis. null for ss
     null as status, -- i.status and l.status are the same thing ? new, in prospection, converted for leads VS rented, published, edition. see with catach for rule to get the status
     null as envio_email_apresentacao_pos, -- always null for ss
     null as envio_email_apresentacao_pre, -- always null for ss
     null as processado, -- ss has only the checks built into the app
-    'prop app' as origem, -- fix the origin for ss.
+    
+    CASE
+      WHEN cl.tipo = 'InsideSales' then 'Organic Inside Sales'
+      ELSE 'Prop app'-- fix the origin for ss.
+    END as origem,
+
     null as external_id, -- reference to the crawled leads. never the case for self service
     null as mencionar, -- null for ss
     -- l.referencia, -- same as i. referencias? -- not used at all
@@ -257,18 +262,22 @@ FROM
     null as utm_source, -- network will be known later, when we have the list of amplitude events in ods
     null as usuario_que_indicou_id,
     i.usuario_id as usuario_que_cadastrou_id,
-    1 as self_service
-    'Owner app' as attribution_type
 
+    CASE
+      WHEN cl.tipo = 'InsideSales' then 0
+      ELSE 1
+    END as self_service,
+
+    CASE
+      WHEN cl.tipo = 'InsideSales' then 'Organic Inside Sales'
+      ELSE 'Owner app' 
+    END as attribution_type
 
 
   FROM
-      Imovel i
+    Imovel i
   LEFT JOIN ConversaoLead cl
-      on cl.imovel_id = i.id
-      -- and cl.status = 'Concluido'
-  -- left join Lead l
-      -- on l.id = cl.leadConvertido_id
+    on cl.imovel_id = i.id
   left join
     Estado e
     on e.id = i.estado_id
@@ -279,81 +288,14 @@ FROM
   LEFT JOIN 
     (
     SELECT id, min(REV) as REV, datePublication
-    FROM imovel_status_history
+    FROM v_ImovelStatusHistory
     WHERE published = 1
     group by id
     ) ip
-    on ip.id = i.imovel_id
+    on ip.id = i.id
 
   WHERE cl.leadConvertido_id is null -- select only the immoveis that are not already selected by what precedes the union
 
-  -- limit 100
 ) t CROSS JOIN (SELECT @cnt := 0) AS dummy
 ;
 END
-
--- 
-
--- left join
-  -- ProprietarioLead pl
-  -- on pl.id = l.proprietarioLead_id -- can we fix this join or find another way to get pl.nome (prop name) and pl.email (proprietario email)
--- left join
---   AgrupamentoLeadsPorTelefone at
---   on at.id = l.agrupamentoLeadsPorTelefone_id -- useless join? (used nowhere)
-/*  
-LEFT JOIN 
-  (
-    select
-      ie.imovel_id,
-      min(ie.data) as dt_etapa_endereco
-    from
-      Imovel_Etapas ie
-    where 
-      ie.etapa = 'MOB_ENDERECO'            
-    group BY
-      ie.imovel_id
-  ) ie
-    on ie.imovel_id = i.id      
-LEFT JOIN 
-    Lead_AUD lre
-    ON l.id = lre.id
-    and lre.REV = (
-      SELECT
-        a.REV            
-      from
-        Lead_AUD a  
-      where
-        a.id = l.id
-        and (
-             (a.processado = 1 and processado_MOD = 1 and coalesce(a.automaticallyDiscarded, false) = false)
-              or (a.status_MOD = 1 and a.status != 'Descartado')
-            )
-  
-      order by 
-        rev asc
-      limit 1
-  ) 
-LEFT JOIN
-    UsuarioRevisionEntity lu
-    on lu.id = lre.REV  
-left join Usuario u
-    on u.id = i.usuario_id 
-*/
-
-
-/*  proprietarioLead_id,
-  lead_tipo,
-  lead_criadoEm,
-  lead_timestamp,
-  dataConversao,
-  cl_criadoEm,
-  imovel_id,
-  aluguel,
-  status,
-  recaptadoEm,
-  usuario_id,
-  usuarioQueCadastrou_id,
-  vendedor_id,
-  tipoAdmin,
-  conversao_tipo,  
-  lead_origem */
