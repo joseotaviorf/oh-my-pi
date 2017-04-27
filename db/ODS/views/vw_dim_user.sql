@@ -167,7 +167,7 @@ inner join
 on user_dates.id = u.id
 left join 
   app_network an
-on u.id = an.user_id::integer
+on u.id = an.user_id
 ;
 
 -- select data_nascimento from vw_dim_user
