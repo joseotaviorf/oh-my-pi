@@ -30,7 +30,6 @@ select
   esv.initial_utm_medium as initial_medium,
   esv.initial_utm_campaign as initial_campaign,
   esv.initial_referring_domain  as initial_referring_domain,
-
   esv.utm_source as source,
   esv.utm_medium as medium,
   esv.utm_campaign as campaign,
@@ -60,13 +59,13 @@ select
 
   -- ratear custo do mes, por dia pelos agendamentos que geraram contrato
   ac.cost_agents_comission
-  	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
+  -- 	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
   as vl_cost_agents_comission,
 
   -- ratear custo do mes de cada agente,
   -- ratear por regiao e rateia pelos agendamentos dos imoveis da regiao
   acs.agent_comission_per_slot::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
   as vl_cost_agents_slot,
 
   -- ratear custo do mes, por dia pelos imoveis que tiveram agendamento
@@ -76,12 +75,11 @@ select
 
   -- ratear custo do mes, por dia 'pelos imoveis que tiveram contrato
   c.cost_closing_support ::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_contract),0),1)
   as vl_cost_closing_support,
 
   -- ratear custo do dia pelos imoveis publicados no dia determinado
   cc.classified_cost::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
    as vl_cost_classifieds,
 
   now()::timestamp as dt_timestamp
@@ -95,7 +93,7 @@ left join booking b
 left join
 	vw_property_listing p
 	on p.id = f.id_imovel
-	and b."criadoEm" between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
+	and coalesce(b."criadoEm", '1901-01-01') between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
 	
 /*
 left join lateral
@@ -125,45 +123,56 @@ left join lateral
 left join
   vw_imovel_liquidity_marketing_costs h
   on f.id_imovel = h.id
+  and p.version = h.version
 
 left join
   vw_imovel_liquidity_agents_costs ac
-  on f.id_scheduling = ac.id_scheduling
-  and f.id_imovel = ac.id_imovel
-  
+  on coalesce(f.id_scheduling, -1) = coalesce(ac.id_scheduling, -1)
+  and coalesce(f.id_imovel, -1) = coalesce(ac.id_imovel, -1)
+  and coalesce(f.id_contract, -1) = coalesce(ac.id_contract, -1)
+
 left join
   vw_imovel_liquidity_closing_costs c
-  on f.id_scheduling = c.id_scheduling
-  and f.id_imovel = c.id_imovel
-  and f.id_contract = c.id_contract
+  on coalesce(f.id_scheduling, -1) = coalesce(c.id_scheduling, -1)
+  and coalesce(f.id_imovel, -1) = coalesce(c.id_imovel, -1)
+  and coalesce(f.id_contract, -1) = coalesce(c.id_contract, -1)
 
 left join
   vw_imovel_liquidity_visit_costs v
-  on f.id_scheduling = v.id_scheduling
-  and f.id_imovel = v.id_imovel
-  and f.id_visit = v.id_visit
+  on coalesce(f.id_scheduling, -1) = coalesce(v.id_scheduling, -1)
+  and coalesce(f.id_imovel, -1) = coalesce(v.id_imovel, -1)
+  and coalesce(f.id_visit, -1) = coalesce(v.id_visit, -1)
+  and coalesce(f.id_pre_proposal, -1) = coalesce(v.id_pre_proposal, -1)
+  and coalesce(f.id_proposal, -1) = coalesce(v.id_proposal, -1)
+  and coalesce(f.id_contract, -1) = coalesce(v.id_contract, -1)
 
 left join
 (
   select
   	id_property,
+    version,
     sum(comission_per_slot) as agent_comission_per_slot
   from
   	vw_imovel_agent_comission_slot s
   group by
-  	id_property
+  	id_property,
+    version
 ) acs
 on acs.id_property = f.id_imovel -- 892792831
+and acs.version = p.version
 
 left join
 (
   select
 	id,
+    version,
     sum(classified_cost) as classified_cost
   from
   	vw_imovel_liquidity_classifieds_costs
   group by
-	id
+	id,
+    version
 ) cc
 on cc.id = f.id_imovel
+and cc.version = p.version
 ;

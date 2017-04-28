@@ -48,6 +48,7 @@ select
   criadoEm,
   atualizadoEm 
 from 
-  Contrato;
+  Contrato
+where id != 4055; -- esse contrato tem varios cobrancas de TaxaCorretagem, entao decidimos por enquanto em nao trazer ele para o DW
 
 END
