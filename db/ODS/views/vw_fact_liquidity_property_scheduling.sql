@@ -59,13 +59,13 @@ select
 
   -- ratear custo do mes, por dia pelos agendamentos que geraram contrato
   ac.cost_agents_comission
-  	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
+  -- 	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
   as vl_cost_agents_comission,
 
   -- ratear custo do mes de cada agente,
   -- ratear por regiao e rateia pelos agendamentos dos imoveis da regiao
   acs.agent_comission_per_slot::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
   as vl_cost_agents_slot,
 
   -- ratear custo do mes, por dia pelos imoveis que tiveram agendamento
@@ -79,7 +79,7 @@ select
 
   -- ratear custo do dia pelos imoveis publicados no dia determinado
   cc.classified_cost::DECIMAL(14,4)
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
    as vl_cost_classifieds,
 
   now()::timestamp as dt_timestamp
@@ -93,7 +93,7 @@ left join booking b
 left join
 	vw_property_listing p
 	on p.id = f.id_imovel
-	and b."criadoEm" between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
+	and coalesce(b."criadoEm", '1901-01-01') between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
 	
 /*
 left join lateral
