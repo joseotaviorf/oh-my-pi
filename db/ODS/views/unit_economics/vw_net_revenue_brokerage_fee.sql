@@ -17,7 +17,6 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
         ELSE contract."atualizadoEm"
         END                                                     AS contract_date
       FROM contract
-    where id = 249
   ), all_dates AS (
       SELECT DISTINCT
         cd.contract_id,
@@ -62,10 +61,12 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
   ), brokerage_expense AS (
       SELECT
         ch.contrato_id,
-        date_trunc('month', e."dataDespesa") as "dataDespesa",
+        date_trunc('month', e."dataDespesa")                                AS "dataDespesa",
         e.pagante,
         e.responsavel,
-        sum(valor) over (PARTITION BY ch.contrato_id, date_trunc('month', "dataDespesa")) as valor
+        sum(valor)
+        OVER (
+          PARTITION BY ch.contrato_id, date_trunc('month', "dataDespesa") ) AS valor
       FROM expense e
         JOIN charging ch ON e.cobranca_id = ch.id
       WHERE e.tipo = 'TaxaCorretagem'
@@ -75,11 +76,11 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
         ct.rent_value,
         ct.imovel_id,
         ct.date_range,
-        be."dataDespesa"            AS expense_date,
-        be.pagante                  AS paying,
-        be.responsavel              AS responsible,
-        be.valor                    AS brokerage_fee,
-        be.valor IS NOT NULL          AS flg_incurred
+        be."dataDespesa"     AS expense_date,
+        be.pagante           AS paying,
+        be.responsavel       AS responsible,
+        be.valor             AS brokerage_fee,
+        be.valor IS NOT NULL AS flg_incurred
       FROM brokerage_expense be
         RIGHT JOIN ct ON (
           ct.contract_id = be.contrato_id
@@ -140,24 +141,3 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
       ON mrc.contract_id = pv.contract_id
   WINDOW w AS (
     PARTITION BY pv.contract_id, pv.imovel_id )
-
-
--- select *
--- from contract
--- where id = 250
-
--- select *
--- FROM expense
---   join charging
---   on cobranca_id = charging.id
--- where contrato_id = 250
--- ;
-
--- select *
--- from expense
--- join charging
---   on cobranca_id = charging.id
--- right join contract
---   on contrato_id = contract.id
--- where imovel_id = 892764794
--- ;
