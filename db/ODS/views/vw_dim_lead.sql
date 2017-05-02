@@ -77,7 +77,7 @@ left join lateral
   from
   	app_network an
   where
-  	l.usuario_que_indicou_id = an.user_id
+  	l.usuario_que_indicou_id::integer = an.user_id
   limit 1
 )  an
   on true;
