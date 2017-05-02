@@ -1,24 +1,24 @@
 DROP VIEW vw_rental_mgmt_onboarding_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_onboarding_costs AS WITH c_dates AS (
     SELECT
-      contract.id             AS contract_id,
+      contract.id                                             AS contract_id,
       contract.imovel_id,
-      contract."criadoEm"     AS created_date,
-      contract."dataAssinado" AS signature_date,
-      coalesce(contract."dataEntrada",contract."dataInicio")  AS contract_init_date,
-      contract."dataRescisao" AS termination_date,
+      contract."criadoEm"                                     AS created_date,
+      contract."dataAssinado"                                 AS signature_date,
+      coalesce(contract."dataEntrada", contract."dataInicio") AS contract_init_date,
+      contract."dataRescisao"                                 AS termination_date,
       contract.status,
       CASE
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Ativo' :: CHARACTER VARYING) :: TEXT, ('PreAssinaturas' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status IN ('Ativo', 'PreAssinaturas')
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE,
                       (contract."dataFimContratoPrevisto") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Cancelado' :: CHARACTER VARYING) :: TEXT, ('Finalizado' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status = 'Finalizado'
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
       ELSE contract."atualizadoEm"
-      END                     AS contract_date
+      END                                                     AS contract_date
     FROM contract
+    WHERE contract.tipo <> 'DealOnly'
+          AND contract.status <> 'Cancelado'
 ), all_dates AS (
     SELECT DISTINCT
       cd.contract_init_date,
@@ -103,22 +103,22 @@ CREATE VIEW vw_rental_mgmt_onboarding_costs AS WITH c_dates AS (
       cdre_dates.init_days,
       cdre_dates.end_days,
       cdre_dates.full_contract_days,
-      cdre_dates.value                                                                                                AS total_month_year_cost,
+      cdre_dates.value                                                                AS total_month_year_cost,
       cdre_dates.date_range,
       cdre_dates.cost_days,
       count(*)
-      OVER w                                                                                                          AS contracts_count,
+      OVER w                                                                          AS contracts_count,
       date_part('days' :: TEXT, ((date_trunc('month' :: TEXT, cdre_dates.date_range) + '1 mon' :: INTERVAL) -
-                                 cdre_dates.date_range))                                                              AS current_month_days,
+                                 cdre_dates.date_range))                              AS current_month_days,
       sum(cdre_dates.cost_days)
-      OVER w                                                                                                          AS current_month_sum,
+      OVER w                                                                          AS current_month_sum,
       count(*)
-      OVER w                                                                                                          AS count,
+      OVER w                                                                          AS count,
       (cdre_dates.value / ((COALESCE(NULLIF(count(*)
                                             OVER w, 0),
-                                     (1) :: BIGINT)) :: NUMERIC) :: DOUBLE PRECISION)                                 AS average_contract_cost,
+                                     (1) :: BIGINT)) :: NUMERIC) :: DOUBLE PRECISION) AS average_contract_cost,
       ((cdre_dates.value * cdre_dates.cost_days) / sum(cdre_dates.cost_days)
-      OVER w)                                                                                                         AS average_days_cost
+      OVER w)                                                                         AS average_days_cost
     FROM cdre_dates
     WINDOW w AS (
       PARTITION BY (date_part('month' :: TEXT, cdre_dates.date_range)), (date_part('year' :: TEXT,

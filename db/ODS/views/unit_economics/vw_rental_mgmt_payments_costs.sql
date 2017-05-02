@@ -1,23 +1,23 @@
 DROP VIEW vw_rental_mgmt_payments_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_payments_costs AS WITH c_dates AS (
     SELECT
-      contract.id             AS contract_id,
+      contract.id                                             AS contract_id,
       contract.imovel_id,
-      contract."criadoEm"     AS created_date,
-      contract."dataAssinado" AS signature_date,
-      coalesce(contract."dataEntrada",contract."dataInicio")  AS contract_init_date,
+      contract."criadoEm"                                     AS created_date,
+      contract."dataAssinado"                                 AS signature_date,
+      coalesce(contract."dataEntrada", contract."dataInicio") AS contract_init_date,
       contract.status,
       CASE
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Ativo' :: CHARACTER VARYING) :: TEXT, ('PreAssinaturas' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status IN ('Ativo', 'PreAssinaturas')
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE,
                       (contract."dataFimContratoPrevisto") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Cancelado' :: CHARACTER VARYING) :: TEXT, ('Finalizado' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status = 'Finalizado'
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
       ELSE contract."atualizadoEm"
-      END                     AS contract_date
+      END                                                     AS contract_date
     FROM contract
+    WHERE contract.tipo <> 'DealOnly'
+          AND contract.status <> 'Cancelado'
 ), all_dates AS (
     SELECT DISTINCT
       cd.contract_id,
@@ -40,22 +40,22 @@ CREATE VIEW vw_rental_mgmt_payments_costs AS WITH c_dates AS (
               END))))
 ), ct AS (
     SELECT
-      co.id                                                                                                           AS contract_id,
+      co.id                                            AS contract_id,
       co.imovel_id,
-      co."valorAluguel"                                                                                               AS rent_value,
-      (ad.date_range) :: TIMESTAMP WITHOUT TIME ZONE                                                                  AS date_range,
-      co."criadoEm"                                                                                                   AS created_date,
-      co."atualizadoEm"                                                                                               AS updated_date,
-      co."dataAssinado"                                                                                               AS signature_date,
-      co."dataRescisao"                                                                                               AS termination_date,
-      co."dataFimContratoPrevisto"                                                                                    AS contract_end_date,
+      co."valorAluguel"                                AS rent_value,
+      (ad.date_range) :: TIMESTAMP WITHOUT TIME ZONE   AS date_range,
+      co."criadoEm"                                    AS created_date,
+      co."atualizadoEm"                                AS updated_date,
+      co."dataAssinado"                                AS signature_date,
+      co."dataRescisao"                                AS termination_date,
+      co."dataFimContratoPrevisto"                     AS contract_end_date,
       ad.contract_date,
       date_part('days' :: TEXT, ((date_trunc('month' :: TEXT, co."criadoEm") + '1 mon' :: INTERVAL) -
-                                 co."criadoEm"))                                                                      AS init_days,
+                                 co."criadoEm"))       AS init_days,
       date_part('days' :: TEXT, ((ad.contract_date - date_trunc('month' :: TEXT, ad.contract_date)) -
-                                 '1 mon' :: INTERVAL))                                                                AS end_days,
+                                 '1 mon' :: INTERVAL)) AS end_days,
       ((ad.contract_date) :: DATE -
-       (co."criadoEm") :: DATE)                                                                                       AS full_contract_days
+       (co."criadoEm") :: DATE)                        AS full_contract_days
     FROM (contract co
       JOIN all_dates ad ON (((ad.contract_id = co.id) AND (ad.imovel_id = co.imovel_id))))
 ), cdre_payments AS (
@@ -107,22 +107,22 @@ CREATE VIEW vw_rental_mgmt_payments_costs AS WITH c_dates AS (
       cdre_dates.init_days,
       cdre_dates.end_days,
       cdre_dates.full_contract_days,
-      cdre_dates.value                                                                                                AS total_month_year_cost,
+      cdre_dates.value                                                                AS total_month_year_cost,
       cdre_dates.date_range,
       cdre_dates.cost_days,
       count(*)
-      OVER w                                                                                                          AS contracts_count,
+      OVER w                                                                          AS contracts_count,
       date_part('days' :: TEXT, ((date_trunc('month' :: TEXT, cdre_dates.date_range) + '1 mon' :: INTERVAL) -
-                                 cdre_dates.date_range))                                                              AS current_month_days,
+                                 cdre_dates.date_range))                              AS current_month_days,
       sum(cdre_dates.cost_days)
-      OVER w                                                                                                          AS current_month_sum,
+      OVER w                                                                          AS current_month_sum,
       count(*)
-      OVER w                                                                                                          AS count,
+      OVER w                                                                          AS count,
       (cdre_dates.value / ((COALESCE(NULLIF(count(*)
                                             OVER w, 0),
-                                     (1) :: BIGINT)) :: NUMERIC) :: DOUBLE PRECISION)                                 AS average_contract_cost,
+                                     (1) :: BIGINT)) :: NUMERIC) :: DOUBLE PRECISION) AS average_contract_cost,
       ((cdre_dates.value * cdre_dates.cost_days) / sum(cdre_dates.cost_days)
-      OVER w)                                                                                                         AS average_days_cost
+      OVER w)                                                                         AS average_days_cost
     FROM cdre_dates
     WINDOW w AS (
       PARTITION BY (date_part('month' :: TEXT, cdre_dates.date_range)), (date_part('year' :: TEXT,
@@ -153,13 +153,13 @@ SELECT
   gap_fill(pre_final_result.average_days_cost)
   OVER (
     PARTITION BY pre_final_result.contract_id, pre_final_result.imovel_id
-    ORDER BY pre_final_result.date_range )                                                                  AS gap_fill,
+    ORDER BY pre_final_result.date_range )                            AS gap_fill,
   (pre_final_result.average_days_cost IS NOT
-   NULL)                                                                                                    AS flg_incurred,
+   NULL)                                                              AS flg_incurred,
   ((gap_fill(pre_final_result.average_days_cost)
     OVER (
       PARTITION BY pre_final_result.contract_id, pre_final_result.imovel_id
       ORDER BY pre_final_result.date_range ) IS NOT NULL) AND (pre_final_result.average_days_cost IS
-                                                               NULL))                                       AS flg_projected
+                                                               NULL)) AS flg_projected
 FROM pre_final_result;
 

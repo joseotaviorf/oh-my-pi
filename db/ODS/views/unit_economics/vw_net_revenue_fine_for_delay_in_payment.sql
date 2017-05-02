@@ -10,6 +10,8 @@ CREATE VIEW vw_net_revenue_fine_for_delay_in_payment AS WITH leads AS (
         PARTITION BY contract.imovel_id
         ORDER BY contract.id )) :: TIMESTAMP WITH TIME ZONE)                             AS lead_date
     FROM contract
+    WHERE contract.tipo <> 'DealOnly'
+          AND contract.status <> 'Cancelado'
 )
 SELECT
   c.id                                                                           AS contract_id,

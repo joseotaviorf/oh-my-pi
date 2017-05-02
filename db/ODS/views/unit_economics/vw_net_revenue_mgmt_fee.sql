@@ -17,8 +17,10 @@ CREATE VIEW vw_net_revenue_mgmt_fee AS
     sum(e.valor)
     OVER (
       PARTITION BY c.contrato_id, e."dataDespesa" ) AS mgmt_fee
-  FROM ((expense e
-    JOIN charging c ON ((e.cobranca_id = c.id)))
-    JOIN contract ct ON ((ct.id = c.contrato_id)))
-  WHERE ((e.tipo) :: TEXT = 'TaxaAdministracao' :: TEXT);
+  FROM expense e
+    JOIN charging c ON e.cobranca_id = c.id
+    JOIN contract ct ON ct.id = c.contrato_id
+  WHERE e.tipo :: TEXT = 'TaxaAdministracao'
+        AND ct.tipo <> 'DealOnly'
+        AND ct.status <> 'Cancelado';
 

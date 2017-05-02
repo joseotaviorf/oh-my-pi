@@ -1,25 +1,25 @@
 DROP VIEW vw_rental_mgmt_inspections_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_inspections_costs AS WITH c_dates AS (
     SELECT
-      contract.id             AS contract_id,
+      contract.id                                             AS contract_id,
       contract.imovel_id,
-      contract."criadoEm"     AS created_date,
-      contract."dataAssinado" AS signature_date,
-      coalesce(contract."dataEntrada",contract."dataInicio")  AS contract_init_date,
-      contract."dataRescisao" AS termination_date,
+      contract."criadoEm"                                     AS created_date,
+      contract."dataAssinado"                                 AS signature_date,
+      coalesce(contract."dataEntrada", contract."dataInicio") AS contract_init_date,
+      contract."dataRescisao"                                 AS termination_date,
       contract.status,
       CASE
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Ativo' :: CHARACTER VARYING) :: TEXT, ('PreAssinaturas' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status IN ('Ativo', 'PreAssinaturas')
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE,
                       (contract."dataFimContratoPrevisto") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-      WHEN ((contract.status) :: TEXT = ANY
-            (ARRAY [('Cancelado' :: CHARACTER VARYING) :: TEXT, ('Finalizado' :: CHARACTER VARYING) :: TEXT]))
+      WHEN contract.status = 'Finalizado'
         THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
       ELSE contract."atualizadoEm"
-      END                     AS contract_date
+      END                                                     AS contract_date
     FROM contract
-    WHERE (contract."dataAssinado" IS NOT NULL)
+    WHERE contract."dataAssinado" IS NOT NULL
+          AND contract.tipo <> 'DealOnly'
+          AND contract.status <> 'Cancelado'
 ), all_dates AS (
     SELECT DISTINCT
       cd.contract_init_date,

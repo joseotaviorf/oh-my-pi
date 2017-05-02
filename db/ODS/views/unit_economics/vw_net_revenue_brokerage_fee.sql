@@ -12,11 +12,13 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
         WHEN contract.status IN ('Ativo', 'PreAssinaturas')
           THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE,
                         (contract."dataFimContratoPrevisto") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-        WHEN contract.status IN ('Cancelado', 'Finalizado')
+        WHEN contract.status = 'Finalizado'
           THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
         ELSE contract."atualizadoEm"
         END                                                     AS contract_date
       FROM contract
+      WHERE contract.tipo <> 'DealOnly'
+            AND contract.status <> 'Cancelado'
   ), all_dates AS (
       SELECT DISTINCT
         cd.contract_id,
