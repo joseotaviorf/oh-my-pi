@@ -1,4 +1,4 @@
-DROP VIEW vw_rental_mgmt_offboarding_costs CASCADE;
+DROP VIEW IF EXISTS vw_rental_mgmt_offboarding_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_offboarding_costs AS
   WITH all_dates AS (
       SELECT DISTINCT
@@ -7,19 +7,14 @@ CREATE VIEW vw_rental_mgmt_offboarding_costs AS
         cd.created_date,
         cd.signature_date,
         cd.contract_date,
-        date_trunc('month' :: TEXT, (dd.date) :: TIMESTAMP WITH TIME ZONE) AS date_range
-      FROM (dim_date dd
-        JOIN vw_rental_mgmt_contract cd ON (((dd.date >= cd.contract_init_date) AND (dd.date <=
-                                                                                     CASE
-                                                                                     WHEN (((cd.status) :: TEXT = ANY
-                                                                                            (ARRAY [('Cancelado' :: CHARACTER VARYING) :: TEXT, ('Finalizado' :: CHARACTER VARYING) :: TEXT]))
-                                                                                           OR (cd.contract_init_date IS
-                                                                                               NULL))
-                                                                                       THEN cd.contract_date
-                                                                                     ELSE (cd.contract_init_date +
-                                                                                           ((30) :: DOUBLE PRECISION *
-                                                                                            '1 mon' :: INTERVAL))
-                                                                                     END))))
+        date_trunc('month', (dd.date) :: TIMESTAMP WITH TIME ZONE) AS date_range
+      FROM dim_date dd
+        JOIN vw_rental_mgmt_contract cd ON dd.date BETWEEN cd.contract_init_date AND
+                       CASE
+                       WHEN cd.status in ('Cancelado', 'Finalizado') OR cd.contract_init_date IS NULL
+                         THEN cd.contract_date
+                       ELSE cd.contract_init_date + (30 * '1 mon' :: INTERVAL)
+                       END
   ), ct AS (
       SELECT
         co.id                                            AS contract_id,

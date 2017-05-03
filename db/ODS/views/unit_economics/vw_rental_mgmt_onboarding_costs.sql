@@ -1,5 +1,5 @@
-DROP VIEW vw_rental_mgmt_onboarding_costs CASCADE;
-CREATE VIEW vw_rental_mgmt_onboarding_costs AS WITH c_dates AS (
+DROP VIEW IF EXISTS vw_rental_mgmt_onboarding_costs CASCADE;
+CREATE VIEW vw_rental_mgmt_onboarding_costs AS
   WITH all_dates AS (
       SELECT DISTINCT
         cd.contract_init_date,
@@ -9,19 +9,19 @@ CREATE VIEW vw_rental_mgmt_onboarding_costs AS WITH c_dates AS (
         cd.signature_date,
         cd.contract_date,
         date_trunc('month' :: TEXT, (dd.date) :: TIMESTAMP WITH TIME ZONE) AS date_range
-      FROM (dim_date dd
-        JOIN vw_rental_mgmt_contract cd ON ((dd.date = date_trunc('month' :: TEXT, cd.contract_init_date))))
+      FROM dim_date dd
+        JOIN vw_rental_mgmt_contract cd ON dd.date = date_trunc('month', cd.contract_init_date)
   ), ct AS (
       SELECT
-        co.id                                                                                                 AS contract_id,
+        co.id                                          AS contract_id,
         co.imovel_id,
-        co."valorAluguel"                                                                                     AS rent_value,
-        (ad.date_range) :: TIMESTAMP WITHOUT TIME ZONE                                                        AS date_range,
-        co."criadoEm"                                                                                         AS created_date,
-        co."atualizadoEm"                                                                                     AS updated_date,
-        co."dataAssinado"                                                                                     AS signature_date,
-        co."dataRescisao"                                                                                     AS termination_date,
-        co."dataFimContratoPrevisto"                                                                          AS contract_end_date,
+        co."valorAluguel"                              AS rent_value,
+        (ad.date_range) :: TIMESTAMP WITHOUT TIME ZONE AS date_range,
+        co."criadoEm"                                  AS created_date,
+        co."atualizadoEm"                              AS updated_date,
+        co."dataAssinado"                              AS signature_date,
+        co."dataRescisao"                              AS termination_date,
+        co."dataFimContratoPrevisto"                   AS contract_end_date,
         ad.contract_date,
         CASE
         WHEN (date_part('days' :: TEXT,
@@ -30,12 +30,12 @@ CREATE VIEW vw_rental_mgmt_onboarding_costs AS WITH c_dates AS (
           THEN date_part('days' :: TEXT,
                          ((date_trunc('month' :: TEXT, co."dataAssinado") + '1 mon' :: INTERVAL) - co."dataAssinado"))
         ELSE (1) :: DOUBLE PRECISION
-        END                                                                                                   AS init_days,
+        END                                            AS init_days,
         date_part('days' :: TEXT,
                   ((ad.contract_date - date_trunc('month' :: TEXT, ad.contract_date)) -
-                   '1 mon' :: INTERVAL))                                                                      AS end_days,
+                   '1 mon' :: INTERVAL))               AS end_days,
         ((ad.contract_date) :: DATE -
-         (co."dataAssinado") :: DATE)                                                                         AS full_contract_days
+         (co."dataAssinado") :: DATE)                  AS full_contract_days
       FROM (contract co
         JOIN all_dates ad ON (((ad.contract_id = co.id) AND (ad.imovel_id = co.imovel_id))))
   ), cdre_onboarding AS (

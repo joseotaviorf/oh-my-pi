@@ -1,5 +1,5 @@
-DROP VIEW vw_rental_mgmt_payments_costs CASCADE;
-CREATE VIEW vw_rental_mgmt_payments_costs AS WITH c_dates AS (
+DROP VIEW IF EXISTS vw_rental_mgmt_payments_costs CASCADE;
+CREATE VIEW vw_rental_mgmt_payments_costs AS
   WITH all_dates AS (
       SELECT DISTINCT
         cd.contract_id,

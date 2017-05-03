@@ -1,4 +1,4 @@
-DROP VIEW vw_rental_mgmt_contract CASCADE;
+DROP VIEW IF EXISTS vw_rental_mgmt_contract CASCADE;
 CREATE VIEW vw_rental_mgmt_contract AS
   SELECT
     id                                                                   AS contract_id,

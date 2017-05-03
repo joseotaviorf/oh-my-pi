@@ -1,4 +1,4 @@
-DROP VIEW vw_rental_mgmt_ongoing_and_offboarding_costs CASCADE;
+DROP VIEW IF EXISTS vw_rental_mgmt_ongoing_and_offboarding_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_ongoing_and_offboarding_costs AS
   WITH all_dates AS (
       SELECT DISTINCT

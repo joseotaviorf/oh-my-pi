@@ -1,4 +1,4 @@
-DROP VIEW vw_net_revenue_mgmt_fee CASCADE;
+DROP VIEW IF EXISTS vw_net_revenue_mgmt_fee CASCADE;
 CREATE VIEW vw_net_revenue_mgmt_fee AS
   SELECT
     e.id                                            AS expense_id,
@@ -22,5 +22,6 @@ CREATE VIEW vw_net_revenue_mgmt_fee AS
     JOIN contract ct ON ct.id = c.contrato_id
   WHERE e.tipo :: TEXT = 'TaxaAdministracao'
         AND ct.tipo <> 'DealOnly'
-        AND ct.status <> 'Cancelado';
+        AND ct.status <> 'Cancelado'
+        AND coalesce(ct."dataRescisao", ct."dataFimContratoPrevisto") > coalesce(ct."dataEntrada", ct."dataInicio");
 

@@ -1,4 +1,4 @@
-DROP VIEW vw_rental_mgmt_inspections_costs CASCADE;
+DROP VIEW IF EXISTS vw_rental_mgmt_inspections_costs CASCADE;
 CREATE VIEW vw_rental_mgmt_inspections_costs AS
   WITH all_dates AS (
       SELECT DISTINCT

@@ -1,4 +1,4 @@
-DROP VIEW vw_net_revenue_mgmt_fee_over_termination_fine CASCADE;
+DROP VIEW IF EXISTS vw_net_revenue_mgmt_fee_over_termination_fine CASCADE;
 CREATE VIEW vw_net_revenue_mgmt_fee_over_termination_fine AS
   SELECT DISTINCT
     c.id                                                           AS contract_id,
@@ -8,5 +8,7 @@ CREATE VIEW vw_net_revenue_mgmt_fee_over_termination_fine AS
   FROM files.termination_fine tf
     JOIN contract c ON tf."ID imovel" = c.imovel_id
   WHERE c.tipo <> 'DealOnly'
-        AND c.status <> 'Cancelado';
+        AND c.status <> 'Cancelado'
+        AND coalesce(c."dataRescisao", c."dataFimContratoPrevisto") > coalesce(c."dataEntrada", c."dataInicio");
+;
 
