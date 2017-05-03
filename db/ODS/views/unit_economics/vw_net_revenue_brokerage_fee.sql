@@ -1,25 +1,6 @@
 DROP VIEW IF EXISTS vw_net_revenue_brokerage_fee CASCADE;
 CREATE VIEW vw_net_revenue_brokerage_fee AS
-  WITH c_dates AS (
-      SELECT
-        contract.id                                             AS contract_id,
-        contract.imovel_id,
-        contract."criadoEm"                                     AS created_date,
-        contract."dataAssinado"                                 AS signature_date,
-        coalesce(contract."dataEntrada", contract."dataInicio") AS contract_init_date,
-        contract.status,
-        CASE
-        WHEN contract.status IN ('Ativo', 'PreAssinaturas')
-          THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE,
-                        (contract."dataFimContratoPrevisto") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-        WHEN contract.status = 'Finalizado'
-          THEN COALESCE((contract."dataRescisao") :: TIMESTAMP WITHOUT TIME ZONE, contract."atualizadoEm")
-        ELSE contract."atualizadoEm"
-        END                                                     AS contract_date
-      FROM contract
-      WHERE contract.tipo <> 'DealOnly'
-            AND contract.status <> 'Cancelado'
-  ), all_dates AS (
+  WITH all_dates AS (
       SELECT DISTINCT
         cd.contract_id,
         cd.imovel_id,
@@ -28,7 +9,7 @@ CREATE VIEW vw_net_revenue_brokerage_fee AS
         cd.contract_date,
         date_trunc('month', (dd.date) :: TIMESTAMP WITH TIME ZONE) AS date_range
       FROM dim_date dd
-        JOIN c_dates cd
+        JOIN vw_rental_mgmt_contract cd
           ON ((dd.date >= (date_trunc('month' :: TEXT, (cd.contract_init_date) :: TIMESTAMP WITH TIME ZONE)) :: DATE)
               AND
               (dd.date <=
