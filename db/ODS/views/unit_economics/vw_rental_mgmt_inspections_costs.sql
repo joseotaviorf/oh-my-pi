@@ -192,6 +192,37 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
       WHERE total_avg IS NOT NULL AND total_avg <> 0
       ORDER BY date_range DESC
       LIMIT 1
+  ), projected_values AS (
+      SELECT
+        contract_id,
+        imovel_id,
+        rent_value,
+        created_date,
+        updated_date,
+        signature_date,
+        termination_date,
+        contract_end_date,
+        contract_date,
+        init_days,
+        end_days,
+        full_contract_days,
+        total_month_year_cost,
+        date_range,
+        cost_days,
+        current_month_days,
+        current_month_sum,
+        contracts_signed_count,
+        contracts_terminated_count,
+        average_contract_cost,
+        CASE
+        WHEN cost IS NULL AND date_range > (SELECT max_date
+                                            FROM inspection_costs)
+          THEN (SELECT cost
+                FROM inspection_costs)
+        ELSE cost
+        END AS cost,
+        flg_incurred
+      FROM updated_final_result
   )
   SELECT
     contract_id,
@@ -214,14 +245,7 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
     contracts_signed_count,
     contracts_terminated_count,
     average_contract_cost,
-    CASE
-    WHEN cost IS NULL AND date_range > (SELECT max_date
-                                        FROM inspection_costs)
-      THEN (SELECT cost
-            FROM inspection_costs)
-    ELSE cost
-    END                                                   AS cost,
+    cost,
     flg_incurred,
-    cost IS NULL AND date_range > (SELECT max_date
-                                   FROM inspection_costs) AS flg_projected
-  FROM updated_final_result;
+    average_contract_cost IS NULL AND cost IS NOT NULL AND flg_incurred IS FALSE AS flg_projected
+  FROM projected_values;
