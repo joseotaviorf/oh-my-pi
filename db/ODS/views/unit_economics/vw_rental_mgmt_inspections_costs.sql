@@ -176,6 +176,7 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
         contracts_signed_count,
         contracts_terminated_count,
         average_contract_cost,
+        total_avg,
         gap_fill(total_avg)
         OVER w                AS cost,
         total_avg IS NOT NULL AS flg_incurred
@@ -183,6 +184,14 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
       WINDOW w AS (
         PARTITION BY contract_id, imovel_id
         ORDER BY date_range )
+  ), inspection_costs AS (
+      SELECT DISTINCT
+        date_range           AS max_date,
+        total_avg :: NUMERIC AS cost
+      FROM updated_final_result
+      WHERE total_avg IS NOT NULL AND total_avg <> 0
+      ORDER BY date_range DESC
+      LIMIT 1
   )
   SELECT
     contract_id,
@@ -205,7 +214,14 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
     contracts_signed_count,
     contracts_terminated_count,
     average_contract_cost,
-    cost,
+    CASE
+    WHEN cost IS NULL AND date_range > (SELECT max_date
+                                        FROM inspection_costs)
+      THEN (SELECT cost
+            FROM inspection_costs)
+    ELSE cost
+    END                                                   AS cost,
     flg_incurred,
-    cost IS NOT NULL AND flg_incurred IS FALSE AS flg_projected
+    cost IS NULL AND date_range > (SELECT max_date
+                                   FROM inspection_costs) AS flg_projected
   FROM updated_final_result;
