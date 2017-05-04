@@ -2,6 +2,7 @@
 
 -- CREATE EXTENSION pg_trgm;
 
+
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
 CREATE VIEW vw_fact_supply_potential_listings as
 with first_pub as

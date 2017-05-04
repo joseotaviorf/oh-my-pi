@@ -33,7 +33,7 @@
 		<custom-property name="resultset.maxrows" value="2000"/>
 	</data-source>
 	<data-source id="mysql5-15b7cf0b0f1-303dc0aa9493946a" provider="mysql" driver="mysql5" name="EBDB - REPLICA" save-password="true" show-system-objects="true" read-only="false">
-		<connection host="quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="ebdb" url="jdbc:mysql://quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/ebdb" user="bi" password="AwUUIUZWRQ9IExIqGARLUz9aAUxDSkoyP0f2" type="test">
+		<connection host="quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="ebdb" url="jdbc:mysql://quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/ebdb" user="QuintoAndarMain" password="S1wUF0BPd0RdQyskRQVWZUb2" type="test">
 			<property name="connectTimeout" value="20000"/>
 			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
 				<property name="sshConnectTimeout" value="10000"/>
