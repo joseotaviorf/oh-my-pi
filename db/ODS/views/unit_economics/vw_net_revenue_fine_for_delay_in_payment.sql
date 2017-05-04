@@ -1,17 +1,18 @@
-DROP VIEW vw_net_revenue_fine_for_delay_in_payment CASCADE;
+DROP VIEW IF EXISTS vw_net_revenue_fine_for_delay_in_payment CASCADE;
 CREATE VIEW vw_net_revenue_fine_for_delay_in_payment AS WITH leads AS (
     SELECT
-      contract.id,
-      contract.imovel_id,
-      date_trunc('month' :: TEXT, (contract."dataEntrada") :: TIMESTAMP WITH TIME ZONE)  AS entrance_date,
-      date_trunc('month' :: TEXT, (contract."dataRescisao") :: TIMESTAMP WITH TIME ZONE) AS termination_date,
-      date_trunc('month' :: TEXT, (lead(contract."dataEntrada")
+      id,
+      imovel_id,
+      date_trunc('month', ("dataEntrada") :: TIMESTAMP WITH TIME ZONE)  AS entrance_date,
+      date_trunc('month', ("dataRescisao") :: TIMESTAMP WITH TIME ZONE) AS termination_date,
+      date_trunc('month', (lead("dataEntrada")
       OVER (
-        PARTITION BY contract.imovel_id
-        ORDER BY contract.id )) :: TIMESTAMP WITH TIME ZONE)                             AS lead_date
+        PARTITION BY imovel_id
+        ORDER BY id )) :: TIMESTAMP WITH TIME ZONE)                     AS lead_date
     FROM contract
-    WHERE contract.tipo <> 'DealOnly'
-          AND contract.status <> 'Cancelado'
+    WHERE tipo <> 'DealOnly'
+          AND status <> 'Cancelado'
+          AND coalesce("dataRescisao", "dataFimContratoPrevisto") > coalesce("dataEntrada", "dataInicio")
 )
 SELECT
   c.id                                                                           AS contract_id,
