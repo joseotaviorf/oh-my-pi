@@ -15,7 +15,7 @@ with first_pub as
   FROM
     public.potential_listings l
   left join
-  	public.lead le
+    public.lead le
     on le.id = l.lead_id
   left join
     vw_dim_property p
