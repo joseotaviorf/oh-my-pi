@@ -1,4 +1,5 @@
-﻿-- select count(1) from public.potential_listings
+﻿-- select count(1) from public.potential_listings_temp
+  
 -- CREATE EXTENSION pg_trgm;
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings_temp ;
@@ -9,23 +10,41 @@ with first_pub as
     p.first_publication as first_publication_date,
     (listing_publication_date = first_publication) as is_first_publication,
     l.*
+
   FROM
+    (
+      SELECT * FROM
+      (
+        SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+          cap.cap_id,
+          pl.*
+          -- cap.reason
+        FROM
+          public.potential_listings_temp pl
+        left join
+          public.contacts_and_prospects cap
+          on (cap.lead_id = pl.lead_id)
+        WHERE pl.lead_id IS NOT NULL
 
-    (SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
-      cap.cap_id,
-      pl.*,
-      cap.reason
-    FROM
-    public.potential_listings pl
+        UNION
+
+        SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
+          cap.cap_id,
+          pl.*
+          -- cap.reason
+        FROM
+          public.potential_listings_temp pl
+        left join
+          public.contacts_and_prospects cap
+          on (cap.imovel_id = pl.property_id and pl.lead_id IS NULL)
+        WHERE pl.lead_id IS NULL and pl.property_id IS NOT NULL
+      ) a
+    )l
+
     left join
-      public.contacts_and_prospects cap
-      on (cap.lead_id = pl.lead_id OR cap.imovel_id = pl.property_id)
-    ) l
+      vw_dim_property p
+      on p.id = l.property_id
 
-  left join
-    vw_dim_property p
-    on p.id = l.property_id
---  where l.property_id = 892776892
   WINDOW
     w_prop_id as (partition by l.property_id)
 )
@@ -82,8 +101,8 @@ with first_pub as
 
       count(1) over (partition by first_publication_date::date)
       as listing_day_times,  -- how many times they appear over day using listing_date
-
-      count(1) filter (where l.attribution_category='Self-Service')
+      -- count(1) filter (where l.attribution_category='Self-Service')
+      count(1) filter (where l.imovel_attribution = 'Self-Service')
       over (partition by first_publication_date::date)
       as self_service_listing_day_times, -- count over day using listing date and filter self-service
 
@@ -145,7 +164,8 @@ with first_pub as
       )
       as contact_day_times,  -- how many times they appear over day using listing_date
 
-      count(1) filter (where l.attribution_category='Self-Service')
+      -- count(1) filter (where l.attribution_category='Self-Service')
+      count(1) filter (where l.imovel_attribution = 'Self-Service')
       over (
         partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
       )
@@ -208,7 +228,8 @@ with first_pub as
       )
       as opportunity_day_times,  -- how many times they appear over day using listing_date
 
-      count(1) filter (where l.attribution_category='Self-Service')
+      -- count(1) filter (where l.attribution_category='Self-Service')
+      count(1) filter (where l.imovel_attribution != 'Self-Service')
       over (
         partition by opportunity_date::date
       )
@@ -246,12 +267,12 @@ SELECT -- count(1)
   listing_publication_date as dt_listing_publication,
   contract_date as dt_contract,
 
-  CASE
+/*  CASE
     WHEN listing_publication_date IS NOT NULL THEN NULL
     WHEN funnel_source = 'Self-Service' THEN 'Unfinished Process'
     WHEN l.reason IS NOT NULL THEN l.reason
     ELSE 'Unknown' -- meaning it's an unpublished lead (from the lead flow) without a reason not to publish
-  END as reason,
+  END as reason, */
 
   is_first_publication,
 
@@ -280,10 +301,10 @@ SELECT -- count(1)
   l.tipo_admin as admin_type,
   imovel_attribution as property_attribution_agent,
   lead_tipo as lead_type,
-  attribution_type,
-  attribution_category,
+  -- attribution_type,
+  -- attribution_category,
 
-  funnel_source,
+  -- funnel_source,
   contact_to_lead_diff_minutes,
   lead_to_qualified_diff_minutes,
   qualified_to_opportunity_diff_minutes,
@@ -342,7 +363,8 @@ SELECT -- count(1)
 
   f_install.cost /
   coalesce(nullif(
-          count(1) filter (where l.attribution_category='Self-Service')
+          -- count(1) filter (where l.attribution_category='Self-Service')
+          count(1) filter (where l.imovel_attribution = 'Self-Service')
           over (
             partition by created_date::date
           )
@@ -430,7 +452,8 @@ left join
     group by a.date
   ) f_install
   on cast(f_install.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
-  and l.funnel_source = 'Self-Service'
+  -- and l.funnel_source = 'Self-Service'
+  and l.imovel_attribution = 'Self-Service'
 
 left join
   (
@@ -445,7 +468,8 @@ left join
         a.date
   ) f
   on cast(f.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
-  and l.funnel_source != 'Self-Service'
+  -- and l.funnel_source != 'Self-Service'
+  and l.imovel_attribution != 'Self-Service'
 
 left join
   (
@@ -459,12 +483,16 @@ left join
 ;
 
 /*
- drop table tmp_fact_supply_potential_listings;
+ drop table tmp_fact_supply_potential_listings_temp
+  ;
  select *
- into tmp_fact_supply_potential_listings
- from public.vw_fact_supply_potential_listings l
+ into tmp_fact_supply_potential_listings_temp
+  
+ from public.vw_fact_supply_potential_listings_temp
+   l
  where  l.sk_property in (892786407, 892786573, 892788018, 892789866)
  -- where  l.sk_property = 892786407
  ;
- select * from tmp_fact_supply_potential_listings;
+ select * from tmp_fact_supply_potential_listings_temp
+  ;
 */

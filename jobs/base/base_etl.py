@@ -114,8 +114,8 @@ class BaseETL(object):
         return m
 
     @staticmethod
-    def get_connection(db_enum, encoding='LATIN1'):
-        return DBFactory.get_connection(db_enum, encoding)
+    def get_connection(db_enum, encoding='LATIN1', timeout=0):
+        return DBFactory.get_connection(db_enum, encoding, timeout)
 
     @classmethod
     def to_db(cls, db_enum, data_table, table_name,
@@ -177,13 +177,13 @@ class BaseETL(object):
 
     @classmethod
     def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
-                        return_value=False, show_logs=True):
+                        return_value=False, show_logs=True, timeout=0):
         if not db_enum and not conn:
             raise AttributeError()
-        if not conn:
-            conn = cls.get_connection(db_enum, encoding)
         if not in_iterator and conn and conn.autocommit != commit:
             conn.autocommit = commit
+        if not conn:
+            conn = cls.get_connection(db_enum, encoding, timeout)
 
         if show_logs:
             print ('Start Execute Command at: {}'.format(cls.now()))
@@ -277,12 +277,12 @@ class BaseETL(object):
     @classmethod
     def drop_table(cls, db_enum, table_name, schema='public'):
         cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True)
+                            commit=True, timeout=30)
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
         cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True)
+                            commit=True, timeout=30)
 
     @classmethod
     def move_table(cls, table_name, enum_db_source, enum_db_dest,
