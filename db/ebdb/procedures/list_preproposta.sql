@@ -18,7 +18,8 @@ select
   usuario_id,
   imovel_id,
   criadoEm,
-  atualizadoEm
+  atualizadoEm,
+  ultimoUpdateEdicao
 from 
   PreProposta;
 END

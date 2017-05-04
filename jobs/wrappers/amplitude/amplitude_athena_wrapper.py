@@ -11,7 +11,6 @@ class AthenaAmplitudeETL(BaseETL):
     def _execute_query(self, sql, s3_staging_dir=None):
         if s3_staging_dir is None:
             s3_staging_dir = 's3://{}/query_results/'.format(self.amplitude_bucket)
-
         conn = pyathenajdbc.connect(s3_staging_dir=s3_staging_dir, region_name='us-east-1')
 
         with conn.cursor() as cursor:

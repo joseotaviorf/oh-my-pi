@@ -13,7 +13,7 @@ class DBFactory(object):
     """
 
     @staticmethod
-    def get_connection(db_enum, encoding):
+    def get_connection(db_enum, encoding, timeout=0):
         env_str = os.environ.get(str(db_enum))
         env = json.loads(env_str)
 
@@ -34,6 +34,10 @@ class DBFactory(object):
                 print('setting client encoding to {}'.format(encoding))
                 conn.set_client_encoding(encoding)
             #   conn.cursor().execute('select set_limit(0.8)')
+
+            if timeout:
+                conn.cursor().execute("SET statement_timeout = '{}s'".format(timeout))
+
             return conn
         elif dbtype == EnumDbType.MySQL:
             conn = pymysql.connect(host, user, pwd, db)

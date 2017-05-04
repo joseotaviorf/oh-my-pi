@@ -1,4 +1,4 @@
-﻿DROP TABLE IF EXISTS public.pre_proposal;
+DROP TABLE IF EXISTS public.pre_proposal;
 CREATE TABLE public.pre_proposal (
   id INTEGER NOT NULL,
   "aceitoAluguel" INTEGER,
@@ -19,3 +19,7 @@ CREATE TABLE public.pre_proposal (
 WITH (oids = false);
 
 -- select * from pre_proposal
+
+alter table public.pre_proposal
+	add  "ultimoUpdateEdicao" integer
+;
