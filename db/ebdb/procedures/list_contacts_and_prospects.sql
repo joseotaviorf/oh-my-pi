@@ -49,6 +49,7 @@ utm_medium, -- add the network of the afiliado (if the lead was recommended by a
 utm_campaign,
 utm_source,
 usuario_que_indicou_id,
+usuario_que_cadastrou_id,
 self_service,
 attribution_type
 FROM

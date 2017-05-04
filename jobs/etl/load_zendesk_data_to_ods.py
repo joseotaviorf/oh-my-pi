@@ -518,7 +518,7 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['problem_id']),
                 BaseETL.coalesce(t['has_incidents']),
                 BaseETL.coalesce(via_id),
-                BaseETL.coalesce(t['ticket_form_id']),
+                self.__check_existence(field='ticket_form_id', dict_var=t),
                 BaseETL.coalesce(t['brand_id']),
                 BaseETL.coalesce(t['allow_channelback']),
                 BaseETL.coalesce(t['is_public']),
