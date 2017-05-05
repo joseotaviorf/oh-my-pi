@@ -186,8 +186,14 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
         ORDER BY date_range )
   ), inspection_costs AS (
       SELECT DISTINCT
-        date_range           AS max_date,
-        total_avg :: NUMERIC AS cost
+        date_range                       AS max_date,
+        total_month_year_cost :: NUMERIC AS cost,
+        count(*)
+        OVER (
+          PARTITION BY date_range )      AS count_sig_term,
+        (total_month_year_cost :: NUMERIC) / count(*)
+        OVER (
+          PARTITION BY date_range )      AS cost_divided
       FROM updated_final_result
       WHERE total_avg IS NOT NULL AND total_avg <> 0
       ORDER BY date_range DESC
@@ -215,9 +221,9 @@ CREATE VIEW vw_rental_mgmt_inspections_costs AS
         contracts_terminated_count,
         average_contract_cost,
         CASE
-        WHEN cost IS NULL AND date_range > (SELECT max_date
-                                            FROM inspection_costs)
-          THEN (SELECT cost
+        WHEN cost IS NULL AND date_range >= (SELECT max_date
+                                             FROM inspection_costs)
+          THEN (SELECT cost_divided
                 FROM inspection_costs)
         ELSE cost
         END AS cost,
