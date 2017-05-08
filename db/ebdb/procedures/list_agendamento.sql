@@ -22,7 +22,9 @@ select
   atendente_id,
   fluxoLocacao_id,
   criadoEm,
-  atualizadoEm
+  atualizadoEm,
+  slotDia
+  
 from 
   Agendamento;
 END
