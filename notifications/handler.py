@@ -1,12 +1,14 @@
 import json
 import os
 import sys
+from base64 import b64decode
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, 'vendor'))
 
 import requests
 import psycopg2
+import boto3
 
 
 def dre_costs_last_update_date(event, context):
@@ -25,9 +27,14 @@ def dre_costs_last_update_date(event, context):
 
 
 def connect_to_db():
+    db_host = decrypt_variable(os.environ['DB_HOST'])
+    db_user = decrypt_variable(os.environ['DB_USER'])
+    db_password = decrypt_variable(os.environ['DB_PASSWORD'])
+    db_database = decrypt_variable(os.environ['DB_DATABASE'])
+    db_port = decrypt_variable(os.environ['DB_PORT'])
+
     print 'connecting to db'
-    conn = psycopg2.connect(host=os.environ['DB_HOST'], user=os.environ['DB_USER'], password=os.environ['DB_PASSWORD'],
-                            database=os.environ['DB_DATABASE'], port=os.environ['DB_PORT'])
+    conn = psycopg2.connect(host=db_host, user=db_user, password=db_password, database=db_database, port=db_port)
     return conn.cursor()
 
 
@@ -35,3 +42,7 @@ def get_last_update_date(cursor):
     print 'executing select on files.costs_dre'
     cursor.execute('select max("Month")::date from files.costs_dre')
     return cursor.fetchone()[0]
+
+
+def decrypt_variable(var):
+    return boto3.client('kms').decrypt(CiphertextBlob=b64decode(var))['Plaintext']
