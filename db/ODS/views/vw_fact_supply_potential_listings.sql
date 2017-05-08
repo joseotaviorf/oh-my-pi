@@ -1,9 +1,9 @@
-﻿-- select count(1) from public.potential_listings
 
 -- CREATE EXTENSION pg_trgm;
 
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
+
 CREATE VIEW vw_fact_supply_potential_listings as
 with first_pub as
 (
@@ -15,12 +15,13 @@ with first_pub as
   FROM
     public.potential_listings l
   left join
-    public.lead le
+  	public.lead le
     on le.id = l.lead_id
   left join
     vw_dim_property p
     on p.id = l.property_id
---  where	l.property_id = 892776892
+    and p."version" = 1
+ -- where	l.property_id = 892776892
   WINDOW
   	w_prop_id as (partition by l.property_id)
 )
@@ -82,15 +83,13 @@ with first_pub as
       over (partition by first_publication_date::date)
       as self_service_listing_day_times, -- count over day using listing date and filter self-service
 
-	  mu.adquirido_em::date as adquirido_em,
-
-      ------ CONTACT DATE COUNTS ------
+	  	------ CONTACT DATE COUNTS ------
       (
         dense_rank()
           over (
             partition by
-              date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-              date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+              date_part('month', cast(l.created_date as date)  ),
+              date_part('year', cast(l.created_date as date)  )
             order BY
               l.property_id
           )
@@ -98,8 +97,8 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-              date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+              date_part('month', cast(l.created_date as date)  ),
+              date_part('year', cast(l.created_date as date)  )
             order BY
               l.property_id  desc
           )
@@ -111,7 +110,7 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              cast(coalesce(mu.adquirido_em, l.created_date) as date)
+              cast(l.created_date as date)
             order BY
               l.property_id
           )
@@ -119,7 +118,7 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              cast(coalesce(mu.adquirido_em, l.created_date) as date)
+              cast(l.created_date as date)
             order BY
               l.property_id  desc
           )
@@ -130,19 +129,26 @@ with first_pub as
       count(1) over (
         partition by
           property_id,
-          date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-          date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+          date_part('month', cast(l.created_date as date)  ),
+          date_part('year', cast(l.created_date as date)  )
       )
       as contact_month_times,  -- how many times they appear over month using listing_date
 
       count(1)	over (
-        partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
+        partition by cast(l.created_date as date)
       )
       as contact_day_times,  -- how many times they appear over day using listing_date
+      
+      count(1)	
+      	filter (where l.listing_publication_date is not null)
+      over (
+        partition by cast(l.created_date as date)
+      )
+      as contact_day_times_w_listings,  -- how many times they appear over day using listing_date
 
       count(1) filter (where l.attribution_category='Self-Service')
       over (
-        partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
+        partition by cast(l.created_date as date)
       )
       as self_service_contact_day_times, -- count over day using listing date and filter self-service
 
@@ -196,7 +202,7 @@ with first_pub as
           date_part('month', l.opportunity_date),
           date_part('year', l.opportunity_date)
       )
-      as opportunity_month_times,  -- how many times they appear over month using listing_date
+      as opportunity_month_times,  -- how many times they appear over month using opportunity_date
 
       count(1)	over (
         partition by opportunity_date::date
@@ -210,17 +216,6 @@ with first_pub as
       as self_service_opportunity_day_times -- count over day using listing date and filter self-service
   from
   	first_pub l
-  left join
-    (
-        select
-            mu.usuario_id,
-            min(mu.adquirido_em) as adquirido_em
-        from
-            marketing_attribution mu
-        group by
-            mu.usuario_id
-    ) mu
-        on mu.usuario_id = l.owner_id
 
 )
 SELECT -- count(1)
@@ -312,6 +307,7 @@ SELECT -- count(1)
   contact_day_distinct_count,  -- distinct count inside partition 'day'
   contact_month_times,  -- how many times they appear over month using listing_date
   contact_day_times,  -- how many times they appear over day using listing_date
+  contact_day_times_w_listings, -- how many times they appear over day using listing [publication] date
   self_service_contact_day_times, -- count over day using listing date and filter self-service
   opportunity_month_distinct_count, -- distinct count inside partition 'year/month'
   opportunity_day_distinct_count,  -- distinct count inside partition 'day'
@@ -328,25 +324,46 @@ SELECT -- count(1)
   g.cost as google_adwords_day_cost,
   f.cost + f_install.cost + g.cost as marketing_day_cost,
 
-  /*
-  	f_install.cost /
-    coalesce(nullif(l.contact_day_distinct_count,0),1) /
-    coalesce(nullif(l.self_service_contact_day_times,0),1) as fb_self_service_marketing_cost,
-  */
-
-  f_install.cost /
+  coalesce(f_install.cost,0) /
 	coalesce(nullif(
           count(1) filter (where l.attribution_category='Self-Service')
           over (
             partition by created_date::date
           )
     ,0),1) as fb_self_service_marketing_cost,
+    
+  case when l.listing_publication_date is not null and l.attribution_category='Self-Service'
+  	then 
+  		coalesce(f_install.cost,0) / 
+  				coalesce(
+  					nullif(
+          		count(1) filter (where l.listing_publication_date is not null and l.attribution_category='Self-Service')
+          		over (
+            		partition by created_date::date
+          		),0
+        		),1
+					)					
+   else 0
+  end  as fb_self_service_marketing_cost_per_listing,
 
+    
+  
   coalesce(f.cost,0) / coalesce(nullif(l.contact_day_times,0),1) as fb_marketing_cost,
-
+  
+  case when l.listing_publication_date is not null
+  	then coalesce(f.cost,0) / coalesce(nullif(l.contact_day_times_w_listings,0),1)
+  	else 0
+  end as fb_marketing_cost_per_published_listing,
+  
   coalesce(g.cost,0) / coalesce(nullif(l.contact_day_times,0),1) as google_marketing_cost,
+  
+  case when l.listing_publication_date is not null
+  	then coalesce(g.cost,0) / coalesce(nullif(l.contact_day_times_w_listings,0),1) 
+  	else 0
+  end as google_marketing_cost_per_published_listing,
 
-
+  
+ 
   CASE WHEN is_first_publication
   THEN -ph."Value"::decimal(18,4) /
     coalesce(f_get_days_in_month(l.first_publication_date),1) /
@@ -365,9 +382,46 @@ SELECT -- count(1)
 
   -- cac_affiliate_total::decimal(18,4) / coalesce(count(1) over (partition by sk_property),1) as cac_affiliate,
 
-  (coalesce(f_install.cost,0) / coalesce(nullif(l.contact_day_distinct_count,0),1) / coalesce(nullif(l.self_service_contact_day_times,0),1))
+  coalesce(f_install.cost,0) /
+		coalesce(nullif(
+          count(1) filter (where l.attribution_category='Self-Service')
+          over (
+            partition by created_date::date
+          )
+    ,0),1) 
   + (coalesce(f.cost,0) / coalesce(nullif(l.contact_day_times,0),1))
   + (coalesce(g.cost,0) / coalesce(nullif(l.contact_day_times,0),1))::NUMERIC(18,4) as cac_marketing,
+  
+  (
+	  case when l.listing_publication_date is not null and l.attribution_category='Self-Service'
+	  	then 
+	  		coalesce(f_install.cost,0) / 
+	  				coalesce(
+	  					nullif(
+	          		count(1) filter (where l.listing_publication_date is not null and l.attribution_category='Self-Service')
+	          		over (
+	            		partition by created_date::date
+	          		),0
+	        		),1
+						)					
+	   else 0
+	  end
+	  
+  	+
+	  
+  	case when l.listing_publication_date is not null
+	  	then coalesce(f.cost,0) / coalesce(nullif(l.contact_day_times_w_listings,0),1)
+	  	else 0
+	  end
+	  
+	  + 
+	  
+	  case when l.listing_publication_date is not null
+	  	then coalesce(g.cost,0) / coalesce(nullif(l.contact_day_times_w_listings,0),1) 
+	  	else 0
+	  end 
+  )
+  as cac_marketing_per_published_listing,
 
   now()::timestamp as load_timestamp
 
@@ -423,7 +477,7 @@ left join
     and a.account_name = 'Supply'
     group by a.date
   ) f_install
-  on cast(f_install.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(f_install.date as date) = l.created_date::date
   
   and l.funnel_source = 'Self-Service'
 
@@ -439,7 +493,7 @@ left join
     group by
         a.date
   ) f
-  on cast(f.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(f.date as date) = l.created_date::date
   and l.funnel_source != 'Self-Service'
 
 left join
@@ -449,7 +503,8 @@ left join
     where ad.campaign_area = 'supply'
     group by ad.day
   ) g
-  on cast(g.day as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(g.day as date) = l.created_date::date
+
 
 ;
 
