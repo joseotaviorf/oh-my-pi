@@ -25,7 +25,7 @@ def dre_costs_last_update_date(event, context):
                                      last_update_date)}))
 
     if response.status_code != 200:
-        print 'error: {}'.format(response.content)
+        print 'error sending notification to slack: {}'.format(response.content)
 
 
 def connect_to_db():
@@ -45,7 +45,7 @@ def get_last_update_date(cursor):
     cursor.execute(" select true "
                    " from files.costs_dre "
                    " having (max(\"Month\") + '2 mon' :: INTERVAL) :: DATE "
-                   "  < date_trunc('month', now() + '1 mon' :: INTERVAL) :: DATE ")
+                   "  < date_trunc('month', now()) :: DATE ")
 
     result = cursor.fetchone()
     return False if not result else result[0]
