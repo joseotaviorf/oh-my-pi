@@ -94,7 +94,7 @@ def send_notification_to_slack(agents_list):
     response = requests.post(url='https://hooks.slack.com/services/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',
                              headers={'Content-type': 'application/json'},
                              data=json.dumps(
-                                 {'text': 'Some agents don\'t have available slots! *IDs={}*'.format(agents_list)}))
+                                 {'text': 'Some agents have errors in their schedules! *IDs={}*'.format(agents_list)}))
 
     if response.status_code != 200:
         print 'error sending agents ids to slack: {}'.format(response.content)
