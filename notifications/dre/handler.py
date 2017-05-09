@@ -14,6 +14,8 @@ import boto3
 def dre_costs_last_update_date(event, context):
     cursor = connect_to_db()
     last_update_date = get_last_update_date(cursor)
+    if not last_update_date:
+        return
 
     print 'posting to slack'
     response = requests.post(url='https://hooks.slack.com/services/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',
@@ -40,8 +42,13 @@ def connect_to_db():
 
 def get_last_update_date(cursor):
     print 'executing select on files.costs_dre'
-    cursor.execute('select max("Month")::date from files.costs_dre')
-    return cursor.fetchone()[0]
+    cursor.execute(" select true "
+                   " from files.costs_dre "
+                   " having (max(\"Month\") + '2 mon' :: INTERVAL) :: DATE "
+                   "  < date_trunc('month', now() + '1 mon' :: INTERVAL) :: DATE ")
+
+    result = cursor.fetchone()
+    return False if not result else result[0]
 
 
 def decrypt_variable(var):
