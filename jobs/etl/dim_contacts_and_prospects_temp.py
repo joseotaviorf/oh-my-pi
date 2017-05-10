@@ -12,8 +12,8 @@ if len(args) > 1:
             if args[2] == 'test':
                 db_source = EnumDb.QuintoAndar_ebdb_test
                 db_dest = EnumDb.BI_ODS_test
-            except NameError:
-                pass    
+        except NameError:
+            pass
 
         listODS = BaseETL.from_db_query(
             db_enum=db_source,
