@@ -91,6 +91,7 @@ def get_table_agents_planner(agents_ids):
 
 
 def send_notification_to_slack(agents_list):
+    print 'posting notification to slack'
     response = requests.post(url='https://hooks.slack.com/services/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',
                              headers={'Content-type': 'application/json'},
                              data=json.dumps(
