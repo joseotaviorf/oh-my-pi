@@ -16,7 +16,7 @@
 			<network-handler type="CONFIG" id="postgre_ssl" enabled="false" save-password="false"/>
 			<bootstrap autocommit="true"/>
 		</connection>
-		<custom-property name="resultset.maxrows" value="2000"/>
+		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 	<data-source id="aws_redshift-15b7ced4c84-4ffb1d8dfef998bc" provider="generic" driver="aws_redshift" name="DW" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com" port="5439" server="" database="dw" url="jdbc:redshift://quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com:5439/dw" user="quintoandar" password="HBEUFFdrHDsoGQsMMgxKbjERV0ZAV2IUDSkxIQIMET935w==" type="prod">
@@ -30,7 +30,7 @@
 			</network-handler>
 			<bootstrap autocommit="true"/>
 		</connection>
-		<custom-property name="resultset.maxrows" value="2000"/>
+		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 	<data-source id="mysql5-15b7cf0b0f1-303dc0aa9493946a" provider="mysql" driver="mysql5" name="EBDB - REPLICA" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="ebdb" url="jdbc:mysql://quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/ebdb" user="QuintoAndarMain" password="S1wUF0BPd0RdQyskRQVWZUb2" type="test">
@@ -86,5 +86,19 @@
 				<property name="authType" value="PASSWORD"/>
 			</network-handler>
 		</connection>
+	</data-source>
+	<data-source id="ECE4C74F-F324-5C88-1407-5A94C423BE59-15bef36e9c7-5b3779b3ae5033b" provider="generic" driver="ECE4C74F-F324-5C88-1407-5A94C423BE59" name="Athena" save-password="true" show-system-objects="true" read-only="false">
+		<connection server="" database="" url="jdbc:awsathena://athena.us-east-1.amazonaws.com:443/" user="AKIAIJQD5DZVAPKRODUQ" password="NCIfJFRTdR0cGzwbMBR1bCkTNwp+blUXDX4UAwE0Uy0QE1YDR3EFcF7J" type="dev">
+			<property name="s3_staging_dir" value="s3://bi-etl-ejuice-ods/query_results/"/>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+		</connection>
+		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 </data-sources>
