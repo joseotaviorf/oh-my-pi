@@ -55,6 +55,9 @@ def get_table_agents_planner(agents_ids):
             )
 
             content = json.loads(ret.content)
+            if not content:
+                agents_list.append(agent[0])
+
             agent_user_id = content['agentId']
             available_date = content['availabilityDate']
             region_id = region_name = slot_id = slot_start = slot_end = slot_available = slot_status = None
@@ -77,7 +80,6 @@ def get_table_agents_planner(agents_ids):
             else:
                 lines.append([agent_user_id, available_date, region_id, region_name,
                               slot_id, slot_start, slot_end, slot_available, slot_status])
-                agents_list.append(agent[0])
 
         except Exception as ex:
             print 'Error: {} - Agent: {}'.format(ex, agent[0])
@@ -91,6 +93,7 @@ def get_table_agents_planner(agents_ids):
 
 
 def send_notification_to_slack(agents_list):
+    print 'posting notification to slack'
     response = requests.post(url='https://hooks.slack.com/services/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',
                              headers={'Content-type': 'application/json'},
                              data=json.dumps(
