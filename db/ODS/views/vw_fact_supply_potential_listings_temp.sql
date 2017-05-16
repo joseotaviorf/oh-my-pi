@@ -106,15 +106,13 @@ with first_pub as
       over (partition by first_publication_date::date)
       as self_service_listing_day_times, -- count over day using listing date and filter self-service
 
-    mu.adquirido_em::date as adquirido_em,
-
       ------ CONTACT DATE COUNTS ------
       (
         dense_rank()
           over (
             partition by
-              date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-              date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+              date_part('month', cast(l.created_date as date)  ),
+              date_part('year', cast(l.created_date as date)  )
             order BY
               l.property_id
           )
@@ -122,8 +120,8 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-              date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+              date_part('month', cast(l.created_date as date)  ),
+              date_part('year', cast(l.created_date as date)  )
             order BY
               l.property_id  desc
           )
@@ -135,7 +133,7 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              cast(coalesce(mu.adquirido_em, l.created_date) as date)
+              cast(l.created_date as date)
             order BY
               l.property_id
           )
@@ -143,7 +141,7 @@ with first_pub as
         dense_rank()
           over (
             partition by
-              cast(coalesce(mu.adquirido_em, l.created_date) as date)
+              cast(l.created_date as date)
             order BY
               l.property_id  desc
           )
@@ -154,20 +152,20 @@ with first_pub as
       count(1) over (
         partition by
           property_id,
-          date_part('month', cast(coalesce(mu.adquirido_em, l.created_date) as date)  ),
-          date_part('year', cast(coalesce(mu.adquirido_em, l.created_date) as date)  )
+          date_part('month', cast(l.created_date as date)  ),
+          date_part('year', cast(l.created_date as date)  )
       )
       as contact_month_times,  -- how many times they appear over month using listing_date
 
       count(1)  over (
-        partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
+        partition by cast(l.created_date as date)
       )
       as contact_day_times,  -- how many times they appear over day using listing_date
 
       -- count(1) filter (where l.attribution_category='Self-Service')
       count(1) filter (where l.imovel_attribution = 'Self-Service')
       over (
-        partition by cast(coalesce(mu.adquirido_em, l.created_date) as date)
+        partition by cast(l.created_date as date)
       )
       as self_service_contact_day_times, -- count over day using listing date and filter self-service
 
@@ -236,17 +234,6 @@ with first_pub as
       as self_service_opportunity_day_times -- count over day using listing date and filter self-service
   from
     first_pub l
-  left join
-    (
-        select
-            mu.usuario_id,
-            min(mu.adquirido_em) as adquirido_em
-        from
-            marketing_attribution mu
-        group by
-            mu.usuario_id
-    ) mu
-        on mu.usuario_id = l.owner_id
 
 )
 SELECT -- count(1)
@@ -451,7 +438,7 @@ left join
     and a.account_name = 'Supply'
     group by a.date
   ) f_install
-  on cast(f_install.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(f_install.date as date) = cast(l.created_date as date)
   -- and l.funnel_source = 'Self-Service'
   and l.imovel_attribution = 'Self-Service'
 
@@ -467,7 +454,7 @@ left join
     group by
         a.date
   ) f
-  on cast(f.date as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(f.date as date) = cast( l.created_date as date)
   -- and l.funnel_source != 'Self-Service'
   and l.imovel_attribution != 'Self-Service'
 
@@ -478,7 +465,7 @@ left join
     where ad.campaign_area = 'supply'
     group by ad.day
   ) g
-  on cast(g.day as date) = cast(coalesce(l.adquirido_em, l.created_date) as date)
+  on cast(g.day as date) = cast(l.created_date as date)
 
 ;
 
