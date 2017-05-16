@@ -1,7 +1,7 @@
 drop view if exists vw_app_network;
 create view vw_app_network
 as
-SELECT distinct
+SELECT distinct ON (a.user_id::integer)
     -- a.event_id,
     a.user_id::integer,
     -- a.amplitude_id,
