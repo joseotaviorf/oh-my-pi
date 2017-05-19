@@ -93,3 +93,6 @@ ENV/
 
 # IDE Sql Design Files
 .sql.design
+
+# db test scripts
+db/Scripts/
