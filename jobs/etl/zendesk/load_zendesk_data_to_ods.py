@@ -12,30 +12,35 @@ class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
         self.start_time = int(datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.human_readable_start_time = args[2]
         self.s3_bucket = args[3]
-        self.ods_schema = args[4]
+        self.s3_bucket_raw_folder_path = args[4]
+        self.ods_schema = args[5]
         self.s3 = boto3.client('s3')
 
         self.db_enum = EnumDb.BI_ODS
 
-        print 'c=ZendeskDataToODS, object_type={}, start_time={}, s3_bucket={}, ods_schema={}, db_enum={}'.format(
-            self.object_type,
-            self.start_time,
-            self.s3_bucket,
-            self.ods_schema,
-            self.db_enum)
+        print (
+            'c=ZendeskDataToODS, object_type={}, start_time={}, s3_bucket={}, s3_bucket_raw_folder_path={}, '
+            'ods_schema={}, db_enum={}'.format(self.object_type, self.start_time, self.s3_bucket,
+                                               self.s3_bucket_raw_folder_path, self.ods_schema, self.db_enum))
 
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
-        return self.s3.list_objects_v2(Bucket=self.s3_bucket, Prefix='{}/{}'.format(self.object_type, self.start_time))
+        return self.s3.list_objects_v2(Bucket=self.s3_bucket,
+                                       Prefix='{0}/{1}/{2}'.format(self.s3_bucket_raw_folder_path,
+                                                                   self.object_type,
+                                                                   self.start_time))
 
-    def __format_string(self, string):
+    @staticmethod
+    def __format_string(string):
         return string.encode('utf-8').replace('"', '""').replace("'", "''") if string else None
 
-    def __convert_value(self, value):
+    @staticmethod
+    def __convert_value(value):
         if isinstance(value, (str, unicode)):
-            return self.__format_string(value)
+            return ZendeskDataToODS.__format_string(value)
 
         if isinstance(value, (bool, int, long)):
             return value
@@ -43,7 +48,7 @@ class ZendeskDataToODS(object):
         return None
 
     def save_s3_data_to_ods(self):
-        print 'm=save_s3_data_to_ods, init'
+        print ('m=save_s3_data_to_ods, init')
 
         files = self.__load_files_from_bucket()
         for i in range(0, len(files['Contents'])):
@@ -68,14 +73,15 @@ class ZendeskDataToODS(object):
         return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
                                        commit=True, return_value=return_value, show_logs=False)
 
-    def __check_existence(self, field, dict_var):
+    @staticmethod
+    def __check_existence(field, dict_var):
         return 'null' if field not in dict_var else BaseETL.coalesce(dict_var[field])
 
     def upsert_groups(self, groups):
-        print 'upsert_groups, init'
+        print ('upsert_groups, init')
         count = 0
         for g in groups:
-            print 'processing group [id={}]'.format(g['id'])
+            print ('processing group [id={}]'.format(g['id']))
 
             count += 1
             upsert_groups_command = " insert into {}.group (id, url, \"name\", deleted, created_at, updated_at) " \
@@ -92,13 +98,13 @@ class ZendeskDataToODS(object):
                                                                                 )
 
             self.__execute_command(command=upsert_groups_command)
-        print 'upsert_groups, end, count: {}'.format(count)
+        print ('upsert_groups, end, count: {}'.format(count))
 
     def upsert_group_memberships(self, group_memberships):
-        print 'upsert_group_memberships, init'
+        print ('upsert_group_memberships, init')
         count = 0
         for gm in group_memberships:
-            print 'processing group_memberships [id={}]'.format(gm['id'])
+            print ('processing group_memberships [id={}]'.format(gm['id']))
 
             count += 1
             upsert_group_memberships_command = " insert into {}.group_membership (id, url, user_id, group_id, " \
@@ -120,13 +126,13 @@ class ZendeskDataToODS(object):
 
             self.__execute_command(command=upsert_group_memberships_command)
 
-        print 'upsert_group_memberships, end, count: {}'.format(count)
+        print ('upsert_group_memberships, end, count: {}'.format(count))
 
     def upsert_users(self, users):
-        print 'upsert_users, init'
+        print ('upsert_users, init')
         count = 0
         for u in users:
-            print 'processing user [id={}]'.format(u['id'])
+            print ('processing user [id={}]'.format(u['id']))
 
             count += 1
             if u['tags'] and len(u['tags']) > 0:
@@ -192,11 +198,11 @@ class ZendeskDataToODS(object):
                     self.ods_schema,
                     u['id'],
                     BaseETL.coalesce(None if not file_name else file_name.encode('utf-8')),
-                    BaseETL.coalesce(self.__format_string(user_photo['content_url'])),
+                    BaseETL.coalesce(ZendeskDataToODS.__format_string(user_photo['content_url'])),
                     BaseETL.coalesce(user_photo['content_type']),
                     BaseETL.coalesce(user_photo['size']),
                     BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(self.__format_string(thumbnail_url))
+                    BaseETL.coalesce(ZendeskDataToODS.__format_string(thumbnail_url))
                 )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
@@ -230,17 +236,21 @@ class ZendeskDataToODS(object):
                                   " verified = excluded.verified ".format(self.ods_schema,
                                                                           u['id'],
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['email'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['email'])),
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['name'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['name'])),
                                                                           BaseETL.coalesce(u['active']),
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['alias'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['alias'])),
                                                                           u['chat_only'],
                                                                           BaseETL.format_date(u['created_at']),
                                                                           BaseETL.coalesce(u['custom_role_id']),
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['details'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['details'])),
                                                                           BaseETL.coalesce(u['external_id']),
                                                                           BaseETL.format_date(u['last_login_at']),
                                                                           BaseETL.coalesce(u['locale']),
@@ -249,11 +259,12 @@ class ZendeskDataToODS(object):
                                                                           BaseETL.coalesce(u['notes']),
                                                                           u['only_private_comments'],
                                                                           BaseETL.coalesce(u['organization_id']),
-                                                                          self.__check_existence(
+                                                                          ZendeskDataToODS.__check_existence(
                                                                               field='default_group_id',
                                                                               dict_var=u),
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['phone'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['phone'])),
                                                                           BaseETL.coalesce(photo_id),
                                                                           BaseETL.coalesce(u['restricted_agent']),
                                                                           BaseETL.coalesce(u['role']),
@@ -263,7 +274,8 @@ class ZendeskDataToODS(object):
                                                                           BaseETL.coalesce(u['suspended']),
                                                                           BaseETL.coalesce(u['ticket_restriction']),
                                                                           BaseETL.coalesce(
-                                                                              self.__format_string(u['time_zone'])),
+                                                                              ZendeskDataToODS.__format_string(
+                                                                                  u['time_zone'])),
                                                                           BaseETL.coalesce(
                                                                               u['two_factor_auth_enabled']),
                                                                           BaseETL.format_date(u['updated_at']),
@@ -272,13 +284,13 @@ class ZendeskDataToODS(object):
                                                                           )
             self.__execute_command(command=upsert_user_command)
 
-        print 'upsert_users, end, count: {}'.format(count)
+        print ('upsert_users, end, count: {}'.format(count))
 
     def upsert_ticket_metrics(self, ticket_metrics):
-        print 'upsert_ticket_metrics, init'
+        print ('upsert_ticket_metrics, init')
         count = 0
         for tm in ticket_metrics:
-            print 'processing ticket_metrics [id={}]'.format(tm['id'])
+            print ('processing ticket_metrics [id={}]'.format(tm['id']))
             count += 1
             upsert_ticket_metrics_command = " insert into {}.ticket_metrics (id, ticket_id, url, group_stations, " \
                                             " assignee_stations, reopens, replies, assignee_updated_at, " \
@@ -356,13 +368,13 @@ class ZendeskDataToODS(object):
 
             self.__execute_command(command=upsert_ticket_metrics_command)
 
-        print 'upsert_ticket_metrics, end, count: {}'.format(count)
+        print ('upsert_ticket_metrics, end, count: {}'.format(count))
 
     def upsert_tickets(self, tickets):
-        print 'upsert_tickets, init'
+        print ('upsert_tickets, init')
         count = 0
         for t in tickets:
-            print 'processing ticket [id={}]'.format(t['id'])
+            print ('processing ticket [id={}]'.format(t['id']))
             count += 1
 
             delete_via_command = " delete from {}.via where object_id = '{}' ".format(self.ods_schema, t['id'])
@@ -382,13 +394,13 @@ class ZendeskDataToODS(object):
                 upsert_source_command = " insert into {}.source (\"to\", \"from\", rel, via_id) " \
                                         " values ('{}','{}','{}', {}) returning id ".format(self.ods_schema,
                                                                                             BaseETL.coalesce(
-                                                                                                self.__format_string(
+                                                                                                ZendeskDataToODS.__format_string(
                                                                                                     json.dumps(
                                                                                                         t['via'][
                                                                                                             'source'][
                                                                                                             'to']))),
                                                                                             BaseETL.coalesce(
-                                                                                                self.__format_string(
+                                                                                                ZendeskDataToODS.__format_string(
                                                                                                     json.dumps(
                                                                                                         t['via'][
                                                                                                             'source'][
@@ -409,7 +421,7 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_custom_fields_command)
 
                 for cf in t['custom_fields']:
-                    custom_field_value = self.__convert_value(cf['value'])
+                    custom_field_value = ZendeskDataToODS.__convert_value(cf['value'])
                     upsert_custom_fields_command = " insert into {}.custom_fields (id, object_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, object_id) do update set " \
                                                    "\"value\" = excluded.\"value\" ".format(self.ods_schema,
@@ -427,7 +439,7 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_ticket_fields_command)
 
                 for f in t['fields']:
-                    field_value = self.__convert_value(f['value'])
+                    field_value = ZendeskDataToODS.__convert_value(f['value'])
 
                     upsert_ticket_fields_command = " insert into {}.ticket_fields (id, ticket_id, \"value\") " \
                                                    " values ('{}','{}','{}') on conflict (id, ticket_id) do update set " \
@@ -499,10 +511,10 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['url']),
                 BaseETL.coalesce(t['external_id']),
                 BaseETL.coalesce(t['type']),
-                BaseETL.coalesce(self.__format_string(t['subject'])),
-                BaseETL.coalesce(self.__format_string(t['raw_subject'])),
+                BaseETL.coalesce(ZendeskDataToODS.__format_string(t['subject'])),
+                BaseETL.coalesce(ZendeskDataToODS.__format_string(t['raw_subject'])),
                 BaseETL.coalesce(None if not t['description'] else
-                                 self.__format_string(
+                                 ZendeskDataToODS.__format_string(
                                      str(t['description'].encode('utf-8')).decode('utf-8').replace(u'\u0000', u'')
                                  )
                                  ),
@@ -518,31 +530,33 @@ class ZendeskDataToODS(object):
                 BaseETL.coalesce(t['problem_id']),
                 BaseETL.coalesce(t['has_incidents']),
                 BaseETL.coalesce(via_id),
-                self.__check_existence(field='ticket_form_id', dict_var=t),
+                ZendeskDataToODS.__check_existence(field='ticket_form_id', dict_var=t),
                 BaseETL.coalesce(t['brand_id']),
                 BaseETL.coalesce(t['allow_channelback']),
                 BaseETL.coalesce(t['is_public']),
                 BaseETL.format_date(t['created_at']),
                 BaseETL.format_date(t['updated_at']),
                 BaseETL.format_date(t['due_at']),
-                str(self.__check_existence(field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
-                str(self.__check_existence(field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']',
-                                                                                                                 '}'),
-                'null' if self.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null' \
+                str(ZendeskDataToODS.__check_existence(
+                    field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
+                str(ZendeskDataToODS.__check_existence(
+                    field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
+                'null' if ZendeskDataToODS.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null' \
                     else BaseETL.coalesce(t['satisfaction_rating']['score']),
-                'null' if self.__check_existence(field='comment', dict_var=t['satisfaction_rating']) == 'null' \
-                    else BaseETL.coalesce(self.__format_string(t['satisfaction_rating']['comment']))
+                'null' if ZendeskDataToODS.__check_existence(field='comment',
+                                                             dict_var=t['satisfaction_rating']) == 'null' \
+                    else BaseETL.coalesce(ZendeskDataToODS.__format_string(t['satisfaction_rating']['comment']))
             )
 
             self.__execute_command(command=upsert_ticket_command)
 
-        print 'upsert_tickets, end, count: {}'.format(count)
+        print ('upsert_tickets, end, count: {}'.format(count))
 
 
 if __name__ == '__main__':
     args = sys.argv
-    print 'START'
+    print ('START')
     zendesk_data_to_ods = ZendeskDataToODS(args)
     zendesk_data_to_ods.save_s3_data_to_ods()
-    print 'END'
+    print ('END')
     sys.stdout.flush()
