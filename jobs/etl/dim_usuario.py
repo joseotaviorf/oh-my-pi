@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 args = sys.argv
-bucket_datalake = os.environ['bucket_datalake']
+bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = ''
 
 if len(args) > 1:

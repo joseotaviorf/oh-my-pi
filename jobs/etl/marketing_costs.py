@@ -147,7 +147,7 @@ def extract_google_marketing_campaigns(dt, config_string):
 
 if __name__ == '__main__':
     args = sys.argv
-    bucket_datalake = os.environ['bucket_datalake']
+    bucket_datalake = os.environ['bi-datalake-s3-bucket']
     if len(args) > 1:
         if args[1] == 'fb':
             facebook_table = extract_facebook_marketing_campaigns(date(2016, 1, 1))

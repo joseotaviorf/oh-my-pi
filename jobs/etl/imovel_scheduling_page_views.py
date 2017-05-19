@@ -157,7 +157,7 @@ def load_data():
 
 
     process_name = 'imovel_scheduling_page_views'
-    bucket_datalake = os.environ['bucket_datalake']
+    bucket_datalake = os.environ['bi-datalake-s3-bucket']
     BaseETL.bulk_insert(
         table=finalData,
         table_name=process_name,

@@ -7,7 +7,7 @@ import os
 if __name__ == '__main__':
     args = sys.argv
     process_name = BaseETL.get_current_filename()
-    bucket_datalake = os.environ['bucket_datalake']
+    bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
     s3 = S3FileReader()
     files = s3.get_files_from_bucket('bi-etl-ejuice-xls2ods')
