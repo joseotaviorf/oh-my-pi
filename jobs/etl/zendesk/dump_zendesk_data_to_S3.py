@@ -12,7 +12,9 @@ class ZendeskDataToS3(object):
     def __init__(self, args):
         self.object_type = args[1]
         self.start_time = int(datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.human_readable_start_time = args[2]
         self.s3_bucket = args[3]
+        self.s3_bucket_raw_folder_path = args[4]
         self.s3 = boto3.client('s3')
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
@@ -20,7 +22,6 @@ class ZendeskDataToS3(object):
                                       password=zendesk_login['password'], start_time=self.start_time)
 
     def load_data_from_zendesk(self):
-        result = None
         if self.object_type == 'ticket':
             result = self.zendesk_api.get_tickets_data()
         elif self.object_type == 'user':
@@ -31,8 +32,7 @@ class ZendeskDataToS3(object):
             result = self.zendesk_api.get_groups_data()
         elif self.object_type == 'group_membership':
             result = self.zendesk_api.get_group_memberships_data()
-
-        if not result:
+        else:
             return
 
         count = 0
@@ -44,21 +44,22 @@ class ZendeskDataToS3(object):
         # save remaining data
         self.save_data_to_s3(result._json, count)
 
-        print 'final count: {}'.format(count)
+        print ('final count: {}'.format(count))
 
     def save_data_to_s3(self, data, count):
         target_file = '{}_{}-{}.json'.format(self.start_time, self.object_type, count)
-        print 'm=save_data_to_s3, target_file={}'.format(target_file)
+        print ('m=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(self.s3_bucket, target_file))
 
         fake_handle = StringIO(str(json.dumps(data)).encode('utf-8'))
-        self.s3.put_object(Bucket=self.s3_bucket, Key='{}/{}'.format(self.object_type, target_file),
+        self.s3.put_object(Bucket=self.s3_bucket, Key='{0}/{1}/{2}'.format(self.s3_bucket_raw_folder_path,
+                                                                           self.object_type, target_file),
                            Body=fake_handle.read())
 
 
 if __name__ == '__main__':
     args = sys.argv
-    print 'START'
+    print ('START')
     zendesk_data_to_s3 = ZendeskDataToS3(args)
     zendesk_data_to_s3.load_data_from_zendesk()
-    print 'END'
+    print ('END')
     sys.stdout.flush()
