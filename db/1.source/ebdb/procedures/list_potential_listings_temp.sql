@@ -39,10 +39,8 @@ BEGIN
       o.updated_date,
       coalesce(ai.id, au.id) as attribution_id,
       coalesce(ai.uuid, au.uuid) as attribution_uuid,
-      
       coalesce(o.lead_criadoEm, o.lead_timestamp, o.dataConversao, o.lead_captadoEm, o.lead_anuncioCriadoEm) as contact_date,
       coalesce(o.prospect_date, o.lead_timestamp, o.dataConversao, o.lead_criadoEm) as lead_and_prospect_date,  -- coalesce prospect and lead date
-      
       o.first_inside_sales_contact_date,
       
       case 
@@ -235,6 +233,7 @@ BEGIN
           cl.vendedor_id,
           u.tipoAdmin,
           null as first_inside_sales_contact_date,
+          dt_etapa_endereco as prospect_date,
           i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo, 
           l.origem as lead_origem ,
@@ -243,7 +242,7 @@ BEGIN
           coalesce(l.atualizadoEm, i.atualizadoEm)  as updated_date
         FROM
           Imovel i
-        /*LEFT JOIN 
+        LEFT JOIN 
         (
           select
             ie.imovel_id,

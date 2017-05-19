@@ -21,12 +21,11 @@ if __name__ == '__main__':
             if exists:
                 BaseETL.truncate_table(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
 
-            BaseETL.to_db(db_enum=EnumDb.BI_ODS,
-                          data_table=table,
-                          table_name=f[1],
-                          schema=schema,
-                          create=not exists,
-                          append=False)
+            BaseETL.bulk_insert(
+                db_enum=EnumDb.BI_ODS,
+                table=table,
+                table_name=schema + '.' + f[1],
+                append=False)
 
             BaseETL.to_s3(
                 filename=table_name,

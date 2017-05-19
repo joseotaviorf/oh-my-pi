@@ -20,4 +20,3 @@ CREATE TABLE public.pre_proposal (
 WITH (oids = false);
 
 -- select * from pre_proposal
- 

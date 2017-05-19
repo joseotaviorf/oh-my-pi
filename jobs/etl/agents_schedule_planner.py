@@ -14,12 +14,13 @@
 # UNKNOWN:
 # TooShortNotice
 
-import petl
-import sys
-import requests
-from datetime import datetime
 import json
 import os
+import sys
+from datetime import datetime
+
+import petl
+import requests
 from jobs.base.base_etl import BaseETL, EnumDb
 
 
@@ -45,6 +46,7 @@ def get_table_agents_planner(agents_ids):
               'slot_id', 'slot_start', 'slot_end', 'slot_available', 'slot_status']]
     now = datetime.utcnow()
 
+    agents_list = []
     for agent in agents_ids:
         try:
             ret = requests.get(service_endpoint.format(
@@ -53,6 +55,9 @@ def get_table_agents_planner(agents_ids):
             )
 
             content = json.loads(ret.content)
+            if not content:
+                agents_list.append(agent[0])
+
             agent_user_id = content['agentId']
             available_date = content['availabilityDate']
             region_id = region_name = slot_id = slot_start = slot_end = slot_available = slot_status = None
@@ -75,12 +80,27 @@ def get_table_agents_planner(agents_ids):
             else:
                 lines.append([agent_user_id, available_date, region_id, region_name,
                               slot_id, slot_start, slot_end, slot_available, slot_status])
+
         except Exception as ex:
             print 'Error: {} - Agent: {}'.format(ex, agent[0])
+
+    if agents_list:
+        send_notification_to_slack(agents_list)
 
     table = petl.addfield(lines, 'timestamp', now)
     table = table.addrownumbers(field='row_number')
     return table
+
+
+def send_notification_to_slack(agents_list):
+    print 'posting notification to slack'
+    response = requests.post(url='https://hooks.slack.com/services/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',
+                             headers={'Content-type': 'application/json'},
+                             data=json.dumps(
+                                 {'text': 'Some agents have errors in their schedules! *IDs={}*'.format(agents_list)}))
+
+    if response.status_code != 200:
+        print 'error sending agents ids to slack: {}'.format(response.content)
 
 
 if __name__ == '__main__':
