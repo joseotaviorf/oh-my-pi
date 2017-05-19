@@ -369,29 +369,45 @@ class BaseETL(object):
             conn.commit()
 
     @classmethod
-    def to_s3(cls, filename, data_table, bucket_name=None, encoding='utf8', tmp_dir='/tmp'):
+    def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp'):
         tmp_fn = '{}/{}'.format(tmp_dir, filename)
         try:
             petl.tocsv(data_table, tmp_fn, encoding=encoding)
 
-            if not bucket_name:
-                bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+            if not bucket_folder_path:
+                bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
             else:
-                bucket_arr = bucket_name.split('/')
+                bucket_arr = bucket_folder_path.split('/')
                 if len(bucket_arr) > 1:
-                    bucket_name = bucket_arr[0]
+                    bucket_folder_path = bucket_arr[0]
                     folder = '/'.join(bucket_arr[1:])
                     filename = '{}/{}'.format(folder, filename)
 
             s3 = boto3.client('s3')
-            s3.upload_file(tmp_fn, bucket_name, filename)
+            s3.upload_file(tmp_fn, bucket_folder_path, filename)
         except Exception as ex:
             log(ex)
             sys.stdout.flush()
             return None
 
-        return bucket_name, filename
+        return bucket_folder_path, filename
 
+
+    @classmethod
+    def dump_ODS_to_datalake(cls, table_name):
+        bucket_datalake = os.environ['bi-datalake-s3-bucket']
+        BaseETL.to_s3(
+            filename='{}.csv'.format(table_name),
+            data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+            bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
+        )
+        BaseETL.copy_file_between_s3_buckets(
+            bucket_source=bucket_datalake,
+            bucket_destination=bucket_datalake,
+            full_filename_source='raw/ebdb/{0}/{0}.csv'.format(table_name),
+            full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(table_name)
+        )
+        
     @staticmethod
     def delete_file_s3(bucket_name, fn):
         s3 = boto3.resource('s3')

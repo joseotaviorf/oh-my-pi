@@ -31,7 +31,7 @@ if __name__ == '__main__':
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_name='{}/raw/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, f[1]),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_name='{}/clean/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, f[1]),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )

@@ -84,3 +84,6 @@ if __name__ == '__main__':
                 print 'Income Statement {} loaded on ODS! - {}'.format(file_name, datetime.now())
                 append = True  # append data on the next steps
             date += relativedelta(months=1)
+
+    # move to lake
+    BaseETL.dump_ODS_to_datalake('income_statement')
