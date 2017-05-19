@@ -8,8 +8,9 @@ bucket_datalake = os.environ['bucket_datalake']
 print("Start query: {}".format(datetime.now()))
 
 table = BaseETL.from_db_table(
-db_enum=EnumDb.QuintoAndar_ebdb,
-table_name='FluxoLocacao')
+    db_enum=EnumDb.QuintoAndar_ebdb,
+    table_name='FluxoLocacao'
+)
 
 print("To ODS: {}".format(datetime.now()))
 

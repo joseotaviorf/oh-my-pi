@@ -147,22 +147,45 @@ def extract_google_marketing_campaigns(dt, config_string):
 
 if __name__ == '__main__':
     args = sys.argv
+    bucket_datalake = os.environ['bucket_datalake']
     if len(args) > 1:
         if args[1] == 'fb':
             facebook_table = extract_facebook_marketing_campaigns(date(2016, 1, 1))
-            BaseETL.to_db(
+            process_name = 'facebook_ads_campaigns'
+
+            BaseETL.bulk_insert(
+                table=facebook_table,
+                table_name=process_name,
                 db_enum=EnumDb.BI_ODS,
-                data_table=facebook_table,
-                table_name='facebook_ads_campaigns',
-                encoding='UTF-8',
-                append=False
+                encoding='UTF8',
+                append=False,
+                commit=True,
+                bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
             )
+            BaseETL.copy_file_between_s3_buckets(
+                bucket_source=bucket_datalake,
+                bucket_destination=bucket_datalake,
+                full_filename_source='raw/ebdb/{0}/{0}.csv'.format(process_name),
+                full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(process_name)
+            )
+
         if args[1] == 'google':
             config_key = os.environ['ADWORDS_KEY']
             ga_table = extract_google_marketing_campaigns(date(2016, 1, 1), config_key)
-            BaseETL.to_db(
+            process_name = 'google_ads_campaigns'
+
+            BaseETL.bulk_insert(
+                table=ga_table,
+                table_name=process_name,
                 db_enum=EnumDb.BI_ODS,
-                data_table=ga_table,
-                table_name='google_ads_campaigns',
-                append=False
+                encoding='UTF8',
+                append=False,
+                commit=True,
+                bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+            )
+            BaseETL.copy_file_between_s3_buckets(
+                bucket_source=bucket_datalake,
+                bucket_destination=bucket_datalake,
+                full_filename_source='raw/ebdb/{0}/{0}.csv'.format(process_name),
+                full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(process_name)
             )
