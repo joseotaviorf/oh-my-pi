@@ -203,8 +203,10 @@ class BaseETL(object):
             return None if not return_value else return_value[0]
 
     @staticmethod
-    def coalesce(value):
-        return 'null' if value is None else value
+    def coalesce(value, ret=None):
+        if not ret:
+            ret='null'
+        return ret if value is None else value
 
     @staticmethod
     def format_date(date):
@@ -346,7 +348,11 @@ class BaseETL(object):
     def bulk_insert(cls, table, table_name, db_enum,
                     encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None):
         tmpdir = '/tmp'
-        filename = '{}.csv'.format(table_name)
+        filename = table_name
+        if append:
+            filename = '{}_{}'.format(filename, cls.now())
+        filename = '{}.csv'.format(filename)
+
         cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
 
         csv_temp_file = '{}/{}'.format(tmpdir, filename)

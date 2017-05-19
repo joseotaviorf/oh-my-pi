@@ -155,13 +155,17 @@ def load_data():
 
     db.close()
 
+
+    process_name = 'imovel_scheduling_page_views'
+    bucket_datalake = os.environ['bucket_datalake']
     BaseETL.bulk_insert(
         table=finalData,
-        table_name='imovel_scheduling_page_views',
+        table_name=process_name,
         db_enum=EnumDb.BI_ODS,
         encoding='UTF8',
         append=True,
-        commit=True
+        commit=True,
+        bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
     )
 
 if __name__ == "__main__":
