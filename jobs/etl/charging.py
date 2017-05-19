@@ -1,8 +1,13 @@
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 import sys
+import os
+from datetime import datetime
+
 
 args = sys.argv
+bucket_datalake = os.environ['bucket_datalake']
+process_name = BaseETL.get_current_filename().replace('dim_','')
 
 t = BaseETL.from_db_query(
     db_enum=EnumDb.QuintoAndar_ebdb,
@@ -36,11 +41,19 @@ t = BaseETL.from_db_query(
     """)
 
 
-
-BaseETL.to_db(
+BaseETL.bulk_insert(
+    table=t,
+    table_name=process_name,
     db_enum=EnumDb.BI_ODS,
-    data_table=t,
-    table_name='charging',
+    encoding='UTF8',
     append=False,
-    create=False
+    commit=True,
+    bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+)
+
+BaseETL.copy_file_between_s3_buckets(
+    bucket_source=bucket_datalake,
+    bucket_destination=bucket_datalake,
+    full_filename_source='raw/ebdb/{0}/{0}.csv'.format(process_name),
+    full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(process_name)
 )

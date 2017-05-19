@@ -1,4 +1,4 @@
-﻿DROP TABLE IF EXISTS public.pre_proposal;
+DROP TABLE IF EXISTS public.pre_proposal;
 CREATE TABLE public.pre_proposal (
   id INTEGER NOT NULL,
   "aceitoAluguel" INTEGER,
@@ -14,8 +14,10 @@ CREATE TABLE public.pre_proposal (
   usuario_id BIGINT,
   imovel_id BIGINT,
   "criadoEm" public.datetime,
-  "atualizadoEm" public.datetime
+  "atualizadoEm" public.datetime,
+  "ultimoUpdateEdicao" INTEGER
 )
 WITH (oids = false);
 
 -- select * from pre_proposal
+ 

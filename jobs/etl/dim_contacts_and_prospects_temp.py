@@ -12,8 +12,8 @@ if len(args) > 1:
             if args[2] == 'test':
                 db_source = EnumDb.QuintoAndar_ebdb_test
                 db_dest = EnumDb.BI_ODS_test
-            except NameError:
-                pass    
+        except NameError:
+            pass
 
         listODS = BaseETL.from_db_query(
             db_enum=db_source,
@@ -27,7 +27,7 @@ if len(args) > 1:
         )
 
     elif args[1] == 'DW':
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_dim_contacts_and_prospects',
             table_name_dest='dim_contacts_and_prospects',
             enum_db_source=EnumDb.BI_ODS,

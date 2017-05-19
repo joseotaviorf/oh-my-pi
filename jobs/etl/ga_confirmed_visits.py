@@ -95,7 +95,7 @@ def load_dw():
         commit=True
     )
 
-    BaseETL.move_table(
+    BaseETL.move_table_to_dw(
         table_name='vw_fact_liquidity_ga_confirmed_visits',
         table_name_dest=fact_table,
         enum_db_source=EnumDb.BI_ODS,
