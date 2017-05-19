@@ -7,7 +7,7 @@ if len(args) > 1:
     if args[1] == 'EBDB':
 
         ########################################### Lead
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_Lead_test',
             table_name_dest='Lead',
             enum_db_source=EnumDb.QuintoAndar_ebdb,
@@ -21,7 +21,7 @@ if len(args) > 1:
         )
 
         ########################################### Imovel
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_Imovel_test',
             table_name_dest='Lead',
             enum_db_source=EnumDb.QuintoAndar_ebdb,
@@ -35,7 +35,7 @@ if len(args) > 1:
         )
 
         ########################################### 
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_Lead_test',
             table_name_dest='Lead',
             enum_db_source=EnumDb.QuintoAndar_ebdb,
@@ -49,7 +49,7 @@ if len(args) > 1:
         )
 
         ###########################################
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_Lead_test',
             table_name_dest='Lead',
             enum_db_source=EnumDb.QuintoAndar_ebdb,

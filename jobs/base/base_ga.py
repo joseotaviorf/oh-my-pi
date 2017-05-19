@@ -1,5 +1,5 @@
 from jobs.wrappers.GA.ga_api import GA_API
-from jobs.base.base_etl import BaseETL
+from jobs.base.base_etl import BaseETL, EnumDb
 from datetime import datetime, timedelta
 import petl
 

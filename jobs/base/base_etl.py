@@ -25,6 +25,14 @@ class BaseETL(object):
     def now():
         return datetime.datetime.utcnow()
 
+    @staticmethod
+    def get_current_filename():
+        import inspect
+        frame = inspect.stack()[1]
+        module = inspect.getmodule(frame[0])
+        return module.__file__.split('/')[-1:][0].replace('.py', '')
+
+
     @classmethod
     def decode_table(cls, table, encoding):
         table_r = []
@@ -106,9 +114,6 @@ class BaseETL(object):
     @classmethod
     def get_message_content(cls, message):
         body = json.loads(message.body)
-        # m = json.loads(body[u'Message']) if body.get(u'Message') else body
-        # m = ast.literal_eval(json.dumps(body[u'Message'])) if body.get(u'Message') else body
-        # m = body[u'Message'] if body.get(u'Message') else body
         m = cls.json_loads_byteified(body[u'Message'] if body.get(u'Message') else body)
         m = json.dumps(m)
         return m
@@ -198,8 +203,10 @@ class BaseETL(object):
             return None if not return_value else return_value[0]
 
     @staticmethod
-    def coalesce(value):
-        return 'null' if value is None else value
+    def coalesce(value, ret=None):
+        if not ret:
+            ret='null'
+        return ret if value is None else value
 
     @staticmethod
     def format_date(date):
@@ -285,51 +292,75 @@ class BaseETL(object):
                             commit=True, timeout=30)
 
     @classmethod
-    def move_table(cls, table_name, enum_db_source, enum_db_dest,
-                   table_name_dest=None, append=True, encoding='utf8', server_cursor_postgres=None):
+    def move_table_to_dw(cls, table_name, enum_db_source, enum_db_dest,
+                         table_name_dest=None, append=True, encoding='utf8', server_cursor_postgres=None,
+                         bucket_name=None, process_name=None):
         data_table = cls.from_db_table(db_enum=enum_db_source, table_name=table_name,
                                        encoding=encoding, server_cursor_postgres=server_cursor_postgres)
         if not table_name_dest:
             table_name_dest = table_name
-        filename = '{}.csv'.format(table_name_dest)
-        bucket_name = cls.to_s3(filename, data_table, encoding=encoding)
-        cls.bulk_insert_from_s3(bucket_name, filename, enum_db_dest, table_name_dest, append, encoding)
+        if not process_name:
+            process_name = table_name_dest
+
+        filename = '{}.csv'.format(process_name)
+        bucket_name, filename = cls.to_s3(filename, data_table, bucket_name, encoding=encoding)
+        cls.bulk_insert_from_s3_to_dw(bucket_name, filename, enum_db_dest, table_name_dest, append, encoding)
 
         return bucket_name, filename
 
     @classmethod
-    def bulk_insert_from_s3(cls, bucket_name, filename, enum_db_dest, table_name, append=True, encoding='LATIN1'):
+    def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
+                                  append=True, encoding='LATIN1', prefix=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        bucket_dw = os.environ.get('bucket_dw')
         con = cls.get_connection(enum_db_dest, encoding)
+        file = 's3://{}/{}'.format(bucket_name, filename)
+
         sql = """COPY {} FROM '{}'
                     CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                     DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
             table_name,
-            's3://{}/{}'.format(bucket_name, filename),
+            file,
             aws_access_key_id,
             aws_secret_access_key,
             ',')
         try:
+            cls.copy_file_between_s3_buckets(bucket_name, bucket_dw, filename,  '{}.csv'.format(table_name))
+
             if not append:
                 con.cursor().execute('truncate table {};'.format(table_name))
             con.cursor().execute(sql)
         finally:
             con.close()
-            cls.delete_file_s3(bucket_name, filename)
+
+    @classmethod
+    def copy_file_between_s3_buckets(cls, bucket_source, bucket_destination,
+                                     full_filename_source, full_filename_dest):
+        s3 = boto3.resource('s3')
+        copy_source = {
+            'Bucket': bucket_source,
+            'Key': full_filename_source
+        }
+        s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
-                    encoding='LATIN1', append=True, commit=True, delimiter=','):
-        csv_temp = '/tmp/{}.csv'.format(table_name)
-        petl.tocsv(table=table, source=csv_temp, delimiter=delimiter, encoding=encoding)
+                    encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None):
+        tmpdir = '/tmp'
+        filename = table_name
+        if append:
+            filename = '{}_{}'.format(filename, cls.now())
+        filename = '{}.csv'.format(filename)
 
-        conn = BaseETL.get_connection(db_enum=db_enum, encoding=encoding)
+        cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
+
+        csv_temp_file = '{}/{}'.format(tmpdir, filename)
+        conn = cls.get_connection(db_enum=db_enum, encoding=encoding)
         cur = conn.cursor()
         if not append:
             cur.execute('TRUNCATE TABLE {}'.format(table_name))
-        # with open(csv_temp) as f:
-        with codecs.open(filename=csv_temp, encoding=encoding) as f:
+        with codecs.open(filename=csv_temp_file, encoding=encoding) as f:
             # cur.copy_from(f, table_name, delimiter)
             sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
             cur.copy_expert(sql, f)
@@ -338,24 +369,45 @@ class BaseETL(object):
             conn.commit()
 
     @classmethod
-    def to_s3(cls, filename, data_table, encoding='utf8'):
-        tmp_dir = '/tmp/'
-        tmp_fn = tmp_dir + filename
+    def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp'):
+        tmp_fn = '{}/{}'.format(tmp_dir, filename)
         try:
-            bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
             petl.tocsv(data_table, tmp_fn, encoding=encoding)
 
+            if not bucket_folder_path:
+                bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+            else:
+                bucket_arr = bucket_folder_path.split('/')
+                if len(bucket_arr) > 1:
+                    bucket_folder_path = bucket_arr[0]
+                    folder = '/'.join(bucket_arr[1:])
+                    filename = '{}/{}'.format(folder, filename)
+
             s3 = boto3.client('s3')
-            s3.upload_file(tmp_fn, bucket_name, filename)
+            s3.upload_file(tmp_fn, bucket_folder_path, filename)
         except Exception as ex:
             log(ex)
             sys.stdout.flush()
             return None
-        finally:
-            os.remove(tmp_fn)
 
-        return bucket_name
+        return bucket_folder_path, filename
 
+
+    @classmethod
+    def dump_ODS_to_datalake(cls, table_name):
+        bucket_datalake = os.environ['bi-datalake-s3-bucket']
+        BaseETL.to_s3(
+            filename='{}.csv'.format(table_name),
+            data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+            bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
+        )
+        BaseETL.copy_file_between_s3_buckets(
+            bucket_source=bucket_datalake,
+            bucket_destination=bucket_datalake,
+            full_filename_source='raw/ebdb/{0}/{0}.csv'.format(table_name),
+            full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(table_name)
+        )
+        
     @staticmethod
     def delete_file_s3(bucket_name, fn):
         s3 = boto3.resource('s3')

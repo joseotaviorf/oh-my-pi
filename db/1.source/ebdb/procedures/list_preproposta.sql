@@ -1,4 +1,4 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_preproposta;
+DROP PROCEDURE IF EXISTS ebdb.list_preproposta;
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_preproposta()
 BEGIN

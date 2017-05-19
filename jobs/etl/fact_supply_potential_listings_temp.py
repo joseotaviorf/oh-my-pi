@@ -23,7 +23,7 @@ if len(args) > 1:
         )
 
     elif args[1] == 'DW':
-        BaseETL.move_table(
+        BaseETL.move_table_to_dw(
             table_name='vw_fact_supply_potential_listings_temp',
             table_name_dest='fact_supply_potential_listings_temp',
             enum_db_source=EnumDb.BI_ODS,

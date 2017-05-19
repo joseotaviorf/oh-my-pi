@@ -14,12 +14,9 @@ CREATE TABLE public.pre_proposal (
   usuario_id BIGINT,
   imovel_id BIGINT,
   "criadoEm" public.datetime,
-  "atualizadoEm" public.datetime
+  "atualizadoEm" public.datetime,
+  "ultimoUpdateEdicao" INTEGER
 )
 WITH (oids = false);
 
 -- select * from pre_proposal
-
-alter table public.pre_proposal
-	add  "ultimoUpdateEdicao" integer
-;
