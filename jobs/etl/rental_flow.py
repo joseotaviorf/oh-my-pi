@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 
 process_name = BaseETL.get_current_filename()
-bucket_datalake = os.environ['bucket_datalake']
+bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
 print("Start query: {}".format(datetime.now()))
 

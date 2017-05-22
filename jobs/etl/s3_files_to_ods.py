@@ -7,7 +7,7 @@ import os
 if __name__ == '__main__':
     args = sys.argv
     process_name = BaseETL.get_current_filename()
-    bucket_datalake = os.environ['bucket_datalake']
+    bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
     s3 = S3FileReader()
     files = s3.get_files_from_bucket('bi-etl-ejuice-xls2ods')
@@ -21,17 +21,16 @@ if __name__ == '__main__':
             if exists:
                 BaseETL.truncate_table(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
 
-            BaseETL.to_db(db_enum=EnumDb.BI_ODS,
-                          data_table=table,
-                          table_name=f[1],
-                          schema=schema,
-                          create=not exists,
-                          append=False)
+            BaseETL.bulk_insert(
+                db_enum=EnumDb.BI_ODS,
+                table=table,
+                table_name=schema + '.' + f[1],
+                append=False)
 
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_name='{}/raw/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, f[1]),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )
@@ -41,7 +40,7 @@ if __name__ == '__main__':
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_name='{}/clean/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, f[1]),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )

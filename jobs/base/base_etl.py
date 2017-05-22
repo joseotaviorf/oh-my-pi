@@ -119,8 +119,8 @@ class BaseETL(object):
         return m
 
     @staticmethod
-    def get_connection(db_enum, encoding='LATIN1'):
-        return DBFactory.get_connection(db_enum, encoding)
+    def get_connection(db_enum, encoding='LATIN1', timeout=0):
+        return DBFactory.get_connection(db_enum, encoding, timeout)
 
     @classmethod
     def to_db(cls, db_enum, data_table, table_name,
@@ -182,13 +182,13 @@ class BaseETL(object):
 
     @classmethod
     def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
-                        return_value=False, show_logs=True):
+                        return_value=False, show_logs=True, timeout=0):
         if not db_enum and not conn:
             raise AttributeError()
-        if not conn:
-            conn = cls.get_connection(db_enum, encoding)
         if not in_iterator and conn and conn.autocommit != commit:
             conn.autocommit = commit
+        if not conn:
+            conn = cls.get_connection(db_enum, encoding, timeout)
 
         if show_logs:
             print ('Start Execute Command at: {}'.format(cls.now()))
@@ -284,12 +284,12 @@ class BaseETL(object):
     @classmethod
     def drop_table(cls, db_enum, table_name, schema='public'):
         cls.execute_command(command='DROP TABLE IF EXISTS "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True)
+                            commit=True, timeout=30)
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
         cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True)
+                            commit=True, timeout=30)
 
     @classmethod
     def move_table_to_dw(cls, table_name, enum_db_source, enum_db_dest,
@@ -369,29 +369,45 @@ class BaseETL(object):
             conn.commit()
 
     @classmethod
-    def to_s3(cls, filename, data_table, bucket_name=None, encoding='utf8', tmp_dir='/tmp'):
+    def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp'):
         tmp_fn = '{}/{}'.format(tmp_dir, filename)
         try:
             petl.tocsv(data_table, tmp_fn, encoding=encoding)
 
-            if not bucket_name:
-                bucket_name = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+            if not bucket_folder_path:
+                bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
             else:
-                bucket_arr = bucket_name.split('/')
+                bucket_arr = bucket_folder_path.split('/')
                 if len(bucket_arr) > 1:
-                    bucket_name = bucket_arr[0]
+                    bucket_folder_path = bucket_arr[0]
                     folder = '/'.join(bucket_arr[1:])
                     filename = '{}/{}'.format(folder, filename)
 
             s3 = boto3.client('s3')
-            s3.upload_file(tmp_fn, bucket_name, filename)
+            s3.upload_file(tmp_fn, bucket_folder_path, filename)
         except Exception as ex:
             log(ex)
             sys.stdout.flush()
             return None
 
-        return bucket_name, filename
+        return bucket_folder_path, filename
 
+
+    @classmethod
+    def dump_ODS_to_datalake(cls, table_name):
+        bucket_datalake = os.environ['bi-datalake-s3-bucket']
+        BaseETL.to_s3(
+            filename='{}.csv'.format(table_name),
+            data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+            bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
+        )
+        BaseETL.copy_file_between_s3_buckets(
+            bucket_source=bucket_datalake,
+            bucket_destination=bucket_datalake,
+            full_filename_source='raw/ebdb/{0}/{0}.csv'.format(table_name),
+            full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(table_name)
+        )
+        
     @staticmethod
     def delete_file_s3(bucket_name, fn):
         s3 = boto3.resource('s3')

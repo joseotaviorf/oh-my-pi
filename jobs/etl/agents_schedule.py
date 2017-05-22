@@ -4,7 +4,7 @@ from jobs.base.base_etl import BaseETL, EnumDb
 from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 import os
 
-bucket_datalake = os.environ['bucket_datalake']
+bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename()
 
 def get_list_descredenciados():

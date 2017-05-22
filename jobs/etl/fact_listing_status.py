@@ -2,7 +2,7 @@ from jobs.base.base_etl import BaseETL, EnumDb
 import os
 from datetime import datetime
 
-bucket_datalake = os.environ['bucket_datalake']
+bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename().replace('dim_','')
 
 print("Start query: {}".format(datetime.now()))

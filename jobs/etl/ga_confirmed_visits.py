@@ -82,6 +82,7 @@ def load_ods():
         db_enum=EnumDb.BI_ODS,
         commit=True
     )
+    return ga.table_name
 
 
 def load_dw():
@@ -109,6 +110,7 @@ def load_dw():
         commit=True
     )
 
+    # criar dump
 
 if __name__ == "__main__":
     args = sys.argv
@@ -117,7 +119,8 @@ if __name__ == "__main__":
 
     if len(args) > 1:
         if args[1] == 'ODS':
-            load_ods()
+            table_name = load_ods()
+            BaseETL.dump_ODS_to_datalake(table_name)
 
         elif args[1] == 'DW':
             load_dw()

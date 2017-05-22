@@ -4,7 +4,7 @@ import sys
 import os
 
 args = sys.argv
-bucket_datalake = os.environ['bucket_datalake']
+bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename()
 
 print("Start query: {}".format(datetime.now()))

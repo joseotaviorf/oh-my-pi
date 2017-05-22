@@ -48,24 +48,24 @@ select
 
   -- ratear custo do dia pelos imoveis publicados no dia determinado
   h.vl_cost_marketing_campaigns_per_published_listings
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  	/ coalesce(nullif(count(1) over (partition by f.id_imovel, p."version"),0),1)
   as vl_cost_marketing_campaigns,
 
   h.vl_cost_marketing_ads_per_published_listings
-  	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  	/ coalesce(nullif(count(1) over (partition by f.id_imovel, p."version"),0),1)
   as vl_cost_marketing_ads,
 
   0::DECIMAL(14,4) as vl_cost_marketing_sms,
 
   -- ratear custo do mes, por dia pelos agendamentos que geraram contrato
   ac.cost_agents_comission
-  -- 	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
+   	/ coalesce(nullif(count(1) over (partition by f.id_scheduling),0),1)
   as vl_cost_agents_comission,
 
   -- ratear custo do mes de cada agente,
   -- ratear por regiao e rateia pelos agendamentos dos imoveis da regiao
   acs.agent_comission_per_slot::DECIMAL(14,4)
-  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  	/ coalesce(nullif(count(1) over (partition by f.id_imovel, p."version"),0),1)
   as vl_cost_agents_slot,
 
   -- ratear custo do mes, por dia pelos imoveis que tiveram agendamento
@@ -79,7 +79,7 @@ select
 
   -- ratear custo do dia pelos imoveis publicados no dia determinado
   cc.classified_cost::DECIMAL(14,4)
-  --	/ coalesce(nullif(count(1) over (partition by f.id_imovel),0),1)
+  	/ coalesce(nullif(count(1) over (partition by f.id_imovel, p."version"),0),1)
    as vl_cost_classifieds,
 
   now()::timestamp as dt_timestamp
