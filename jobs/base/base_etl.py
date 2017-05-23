@@ -313,7 +313,7 @@ class BaseETL(object):
                                   append=True, encoding='LATIN1', prefix=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        bucket_dw = os.environ.get('bucket_dw')
+        bucket_dw = os.environ.get('bi-dw-s3-bucket')
         con = cls.get_connection(enum_db_dest, encoding)
         file = 's3://{}/{}'.format(bucket_name, filename)
 

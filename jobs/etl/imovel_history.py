@@ -56,7 +56,7 @@ BaseETL.bulk_insert(
 conn = BaseETL.get_connection(db_enum=EnumDb.BI_ODS, encoding='UTF-8')
 
 # delete repeated ids
-q_del = """"delete from {} where id in {}""".format(
+q_del = 'delete from {} where id in {}'.format(
     table_name,
     list(petl.aggregate(imoveis, 'id')['id'])
 ).replace(
@@ -69,10 +69,7 @@ BaseETL.execute_command(command=q_del, conn=conn, commit=False)
 
 # load into ods/datalake (in same transaction)
 BaseETL.execute_command(
-    command="""
-    insert into public.{0}
-    select * from stg.{0}
-    """.format(table_name),
+    command='insert into public.{0} select * from stg.{0}'.format(table_name),
     conn=conn,
     commit=False
 )
