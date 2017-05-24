@@ -369,10 +369,10 @@ class BaseETL(object):
             conn.commit()
 
     @classmethod
-    def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp'):
+    def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
         tmp_fn = '{}/{}'.format(tmp_dir, filename)
         try:
-            petl.tocsv(data_table, tmp_fn, encoding=encoding)
+            petl.tocsv(data_table, tmp_fn, encoding=encoding, write_header=write_header)
 
             if not bucket_folder_path:
                 bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
