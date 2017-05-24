@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS public.property_scheduling;
 CREATE TABLE public.property_scheduling (
-  id_property_scheduling BIGSERIAL,
+  id_property_scheduling BIGINT,
   id_imovel INTEGER NOT NULL,
   id_scheduling INTEGER,
   id_owner INTEGER,
