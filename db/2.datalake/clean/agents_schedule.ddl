@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.agents_schedule;
-CREATE TABLE IF NOT EXISTS datalake_clean.agents_schedule (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.agents_schedule (
  row_number INT,
  agent_user_id INT,
  available_date DATE,

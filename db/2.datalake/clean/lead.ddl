@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.lead;
-CREATE TABLE IF NOT EXISTS datalake_clean.lead (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.lead (
  id BIGINT,
  anuncio_criado_em DATE,
  area_total INT,

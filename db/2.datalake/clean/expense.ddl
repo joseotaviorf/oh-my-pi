@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.expense;
-CREATE TABLE IF NOT EXISTS datalake_clean.expense (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.expense (
  id BIGINT,
  dataConsolidado DATE,
  dataDespesa DATE,
@@ -16,5 +16,4 @@ CREATE TABLE IF NOT EXISTS datalake_clean.expense (
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
 LOCATION 's3://5a-datalake/clean/expense'
-PRIMARY KEY (id)
 ;

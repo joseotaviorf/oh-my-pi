@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.property_scheduling;
-CREATE TABLE IF NOT EXISTS datalake_clean.property_scheduling (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_scheduling (
  id_property_scheduling BIGINT,
  id_imovel INT,
  id_scheduling INT,

@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.property_status_history;
-CREATE TABLE IF NOT EXISTS datalake_clean.property_status_history (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_status_history (
  id BIGINT,
  aluguel INT,
  andar INT,

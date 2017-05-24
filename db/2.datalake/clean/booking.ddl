@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.booking;
-CREATE TABLE IF NOT EXISTS datalake_clean.booking (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.booking (
  id INT,
  data DATE,
  status STRING,

@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.property;
-CREATE TABLE IF NOT EXISTS datalake_clean.property (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property (
  id BIGINT,
  aluguel INT,
  bairro STRING,

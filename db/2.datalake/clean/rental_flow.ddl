@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.rental_flow;
-CREATE TABLE IF NOT EXISTS datalake_clean.rental_flow (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.rental_flow (
   id BIGINT,
   atualizadoEm TIMESTAMP,
   criadoEm TIMESTAMP,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS datalake_clean.rental_flow (
   ignorarAntesDe TIMESTAMP,
   status STRING,
   etapaRejeitada SMALLINT,
-  withoutIptu CHAR
+  withoutIptu STRING
 ) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'

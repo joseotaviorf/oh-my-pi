@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.contacts_and_prospects;
-CREATE TABLE IF NOT EXISTS datalake_clean.contacts_and_prospects (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.contacts_and_prospects (
  cap_id BIGINT,
  lead_id BIGINT,
  imovel_id BIGINT,

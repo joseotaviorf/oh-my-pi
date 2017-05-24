@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.contract;
-CREATE TABLE IF NOT EXISTS datalake_clean.contract (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.contract (
  id INT,
  emailFatura STRING,
  emailProprietario STRING,

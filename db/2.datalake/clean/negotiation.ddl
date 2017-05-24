@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.negotiation;
-CREATE TABLE IF NOT EXISTS datalake_clean.negotiation (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.negotiation (
  id INT,
  dataParaMudanca TIMESTAMP,
  deadlineEm TIMESTAMP,

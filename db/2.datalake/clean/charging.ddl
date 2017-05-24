@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.charging;
-CREATE TABLE IF NOT EXISTS datalake_clean.charging (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.charging (
  id BIGINT,
  dataInquilinoPagou TIMESTAMP,
  dataPagarProprietario DATE,
@@ -27,5 +27,4 @@ CREATE TABLE IF NOT EXISTS datalake_clean.charging (
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
 LOCATION 's3://5a-datalake/clean/charging'
-PRIMARY KEY (id)
 ;

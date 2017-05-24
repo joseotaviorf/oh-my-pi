@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS datalake_clean.proposal;
-CREATE TABLE IF NOT EXISTS datalake_clean.proposal (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.proposal (
  id INT,
  dataParaMudanca TIMESTAMP,
  dataProposta TIMESTAMP,
  garantia STRING,
  motivacao STRING,
- propostaAluguel DOUBLE PRECISION,
+ propostaAluguel DOUBLE,
  status STRING,
  ticketID INT,
  dataAprovacao TIMESTAMP,

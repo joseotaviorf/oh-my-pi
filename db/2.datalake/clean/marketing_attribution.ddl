@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.marketing_attribution;
-CREATE TABLE IF NOT EXISTS datalake_clean.marketing_attribution (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.marketing_attribution (
  id BIGINT,
  uuid STRING,
  tipo STRING,

@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.user;
-CREATE TABLE IF NOT EXISTS datalake_clean.user (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.user (
   id BIGINT,
   nome STRING,
   bairro STRING,
@@ -111,5 +111,4 @@ CREATE TABLE IF NOT EXISTS datalake_clean.user (
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
 LOCATION 's3://5a-datalake/clean/user'
-PRIMARY KEY (id)
 ;

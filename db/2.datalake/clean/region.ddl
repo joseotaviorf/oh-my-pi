@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.region;
-CREATE TABLE IF NOT EXISTS datalake_clean.region (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.region (
  id INT,
  criadaEm TIMESTAMP,
  atualizadoEm TIMESTAMP,

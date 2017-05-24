@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS datalake_clean.pre_proposal;
-CREATE TABLE IF NOT EXISTS datalake_clean.pre_proposal (
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.pre_proposal (
  id INT,
  aceitoAluguel INT,
  aceitoComprovarRenda INT,
