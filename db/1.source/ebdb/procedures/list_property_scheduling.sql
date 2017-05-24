@@ -14,15 +14,18 @@ CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE list_property_scheduling()
 BEGIN
 
+SET @ix=0;
+
 select
-  i.id as id_imovel,  
-  a.id as id_scheduling,  
+  @ix := @ix+1 as id_property_scheduling,
+  i.id as id_imovel,
+  a.id as id_scheduling,
   prop.id as id_owner,
   daf.usuario_id as id_user_affiliate,
   dau.id as id_user_agent,
   v.visitante_id as id_user_visitor,
-  dav.id as id_user_visit_agent, 
-  v.id as id_visit, 
+  dav.id as id_user_visit_agent,
+  v.id as id_visit,
   vo_cr.isApp as visit_created_from_app,
   vo_cr.nome as visit_created_type,
   coalesce(vo_up.isApp, FALSE) as visit_last_updated_from_app,
@@ -36,8 +39,8 @@ select
   c.dataRescisao as dt_contract_anullment
   -- count(1)
   -- *
-  
-from 
+
+from
   Imovel i
 
 left join
@@ -45,7 +48,7 @@ left join
   on prop.id = i.usuario_id
 
 -- DADOS AFILIADO
-left join 
+left join
   DadosAfiliado daf
   on daf.id = i.dadosAfiliado_id
 
@@ -74,33 +77,33 @@ left join
   on dav.dadosAgente_id = v.agente_id
 
 -- FLUXOLOCACAO
-left join  
+left join
   FluxoLocacao fl
   on a.fluxoLocacao_id = fl.id
 
-left join 
+left join
   Negociacao n
   on n.imovel_id = fl.imovel_id
   and n.proponente_id = fl.cliente_id
 
 -- PRE-PROPOSTA
-left join 
+left join
   PreProposta pp
   on pp.imovel_id = i.id
   and pp.usuario_id = fl.cliente_id
   and pp.ultimoUpdateEdicao > 0
 
 -- PROPOSTA
-left join 
+left join
   Proposta p
   on p.preProposta_id = pp.id
-  
+
 left join
   Proposta p_n
   on p_n.negociacao_id = n.id
 
 -- CONTRATO
-left join 
+left join
   Contrato c
   on c.proposta_id =  coalesce(p.id, p_n.id)
   -- and c.status != 'Cancelado'
