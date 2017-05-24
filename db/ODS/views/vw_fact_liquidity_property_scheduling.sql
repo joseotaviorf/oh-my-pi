@@ -1,4 +1,4 @@
-drop view if exists vw_fact_liquidity_property_scheduling;
+﻿drop view if exists vw_fact_liquidity_property_scheduling;
 
 create view vw_fact_liquidity_property_scheduling
 as

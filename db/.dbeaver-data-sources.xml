@@ -16,6 +16,20 @@
 			<network-handler type="CONFIG" id="postgre_ssl" enabled="false" save-password="false"/>
 			<bootstrap autocommit="true"/>
 		</connection>
+		<virtual-meta-data>
+			<container name="model">
+				<container name="ods">
+					<container name="files">
+						<entity name="period_to_be_selected">
+							<constraint name="PRIMARY" type="VIRTUAL KEY">
+								<attribute name="Period to be selected"/>
+								<attribute name="Correspondent # days"/>
+							</constraint>
+						</entity>
+					</container>
+				</container>
+			</container>
+		</virtual-meta-data>
 		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 	<data-source id="aws_redshift-15b7ced4c84-4ffb1d8dfef998bc" provider="generic" driver="aws_redshift" name="Redshift" save-password="true" show-system-objects="true" read-only="false">
@@ -120,35 +134,21 @@
 			</network-handler>
 		</connection>
 	</data-source>
-	<data-source id="mysql5-15bafa62327-4e256500a7f2abe" provider="mysql" driver="mysql5" name="Airflow - PROD" save-password="true" show-system-objects="true" read-only="false">
-		<connection host="quintoandar-capiroto.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="airflow" url="jdbc:mysql://quintoandar-capiroto.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/airflow" user="QuintoAndar" password="EFItAlBUYwI9FSIMHEBmYjA1I11wQW4wAj0wLBYMKA535w==" type="dev">
-			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
-				<property name="socks-port" value="1080"/>
+	<data-source id="mysql5-15c3663eeac-4b08bbb4b55c0d09" provider="mysql" driver="mysql5" name="Airflow - Forno" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="quintoandar-capiroto-forno.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="airflow" url="jdbc:mysql://quintoandar-capiroto-forno.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/airflow" user="QuintoAndar" password="HAsudEdVfhtWCi4/AzthZxAWJ0BRZ0YQLyw/JD4PDCt35w==" type="dev">
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
 			</network-handler>
 			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
 				<property name="ssl.public.key.retrieve" value="false"/>
 				<property name="ssl.verify.server" value="true"/>
 				<property name="ssl.require" value="false"/>
 			</network-handler>
-			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
-				<property name="sshConnectTimeout" value="10000"/>
-				<property name="port" value="22"/>
-				<property name="authType" value="PASSWORD"/>
-			</network-handler>
-		</connection>
-	</data-source>
-	<data-source id="ECE4C74F-F324-5C88-1407-5A94C423BE59-15bef36e9c7-5b3779b3ae5033b" provider="generic" driver="ECE4C74F-F324-5C88-1407-5A94C423BE59" name="Athena" save-password="true" show-system-objects="true" read-only="false">
-		<connection server="" database="" url="jdbc:awsathena://athena.us-east-1.amazonaws.com:443/" user="AKIAIJQD5DZVAPKRODUQ" password="NCIfJFRTdR0cGzwbMBR1bCkTNwp+blUXDX4UAwE0Uy0QE1YDR3EFcF7J" type="dev">
-			<property name="s3_staging_dir" value="s3://bi-etl-ejuice-ods/query_results/"/>
-			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
-				<property name="sshConnectTimeout" value="10000"/>
-				<property name="port" value="22"/>
-				<property name="authType" value="PASSWORD"/>
-			</network-handler>
 			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
 				<property name="socks-port" value="1080"/>
 			</network-handler>
 		</connection>
-		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 </data-sources>

@@ -108,28 +108,27 @@ if __name__ == '__main__':
     service_endpoint = os.environ['SCHEDULING_PLANNER_ENDPOINT']
     bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
-
     print('START')
-
+    table_name = 'agents_schedule'
     agents_ids = get_agents_ids()
-
     table = get_table_agents_planner(agents_ids)
 
     BaseETL.bulk_insert(
         db_enum=EnumDb.BI_ODS,
         table=table,
-        table_name='agents_schedule',
+        table_name=table_name,
         append=True,
         encoding='UTF8',
         bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
     )
 
-    BaseETL.copy_file_between_s3_buckets(
-        bucket_source=bucket_datalake,
-        bucket_destination=bucket_datalake,
-        full_filename_source='raw/ebdb/{0}/{0}.csv'.format(process_name),
-        full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(process_name)
+    BaseETL.to_s3(
+        filename='{}.csv'.format(table_name),
+        data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+        bucket_folder_path='{}/clean/ebdb/{}'.format(bucket_datalake, table_name)
     )
+
+    BaseETL.dump_ODS_to_datalake(table_name)
 
     print('END')
     sys.stdout.flush()
