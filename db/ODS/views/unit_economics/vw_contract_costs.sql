@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS vw_contract_costs CASCADE;
+DROP VIEW IF EXISTS vw_contract_costs;
 CREATE VIEW vw_contract_costs AS
   SELECT
     contract_id                                                                  AS sk_contract,

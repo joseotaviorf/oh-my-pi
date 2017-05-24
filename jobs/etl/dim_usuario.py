@@ -23,7 +23,7 @@ if len(args) > 1:
 
         BaseETL.bulk_insert(
             table=table,
-            table_name=process_name,
+            table_name='usuario',
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
             append=False,

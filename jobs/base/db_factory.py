@@ -33,7 +33,6 @@ class DBFactory(object):
             if int(p) == 5432:
                 print('setting client encoding to {}'.format(encoding))
                 conn.set_client_encoding(encoding)
-            #   conn.cursor().execute('select set_limit(0.8)')
 
             if timeout:
                 conn.cursor().execute("SET statement_timeout = '{}s'".format(timeout))
@@ -42,7 +41,6 @@ class DBFactory(object):
         elif dbtype == EnumDbType.MySQL:
             conn = pymysql.connect(host, user, pwd, db)
             conn.set_charset(encoding)
-
             cur = conn.cursor()
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
             return conn
