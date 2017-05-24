@@ -22,7 +22,8 @@ table = BaseETL.decode_table(table, 'LATIN-1')
 BaseETL.to_s3(
     filename='{}.csv'.format(process_name),
     data_table=table,
-    bucket_folder_path='{0}/raw/darkrum/{1}'.format(bucket_datalake, process_name)
+    bucket_folder_path='{0}/raw/darkrum/{1}'.format(bucket_datalake, process_name),
+    write_header=False
 )
 
 print("Copying files between s3 buckets: {}".format(datetime.now()))
