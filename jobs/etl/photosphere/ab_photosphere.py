@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import boto3
 import numpy as np
 import pandas as pd
@@ -16,6 +18,8 @@ def create_parquet(key, query, null_column=None):
     if null_column is not None:
         for col, _type in null_column:
             for row in xrange(data[col].shape[0]):
+                if type(data.loc[row, col]) == unicode:
+                    data.loc[row, col] = data.loc[row, col].encode('utf-8')
                 data.loc[row, col] = _type(data.loc[row, col]) if data.loc[row, col] is not None else None
     # fake numbers for test with DW
     # data['imovel_id'] = [892765889, 892779318, 892777560, 892765889, 892785924, 892790924, 892799294, 892797389, 892782345,
@@ -46,30 +50,22 @@ athena = AthenaAmplitudeETL()
 
 metrics = {"usability":
                """select 
-               platform,
-               eventdate,
-               count(distinct amplitude_id) as nbr_users,
-               count(distinct imovel_id) as nbr_imoveis,
-               sum(viewed) as viewed,
-               sum(opened) as opened
-               
-               from (
-               
-                       select 
-                       pv.user_properties.platform,
-                       pv.amplitude_id, 
-                       pv.event_properties.imovel_id,
-                       pv.server_upload_date as eventdate,
-                       count (distinct pv.event_type) as viewed,
-                       count (distinct po.event_type) as opened
-                       from amplitude_prod.ev_listing_photo_viewed pv
-                       left join amplitude_prod.ev_listing_photosphere_opened po on po.amplitude_id=pv.amplitude_id and po.event_properties.imovel_id=pv.event_properties.imovel_id
-                       where pv.user_properties.ab_photosphere = 'B'
-                       and pv.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)
-                       group by 1,2,3,4
-               
-               )
-               group by 1,2""",
+                    pv.server_upload_date as eventdate,
+                    pv.user_properties.platform,
+                    pv.amplitude_id, 
+                    pv.user_id,
+                    pv.event_properties.imovel_id,
+                    pv.event_properties.photosphere_id,
+                    count (distinct pv.event_type) as viewed,
+                    count (distinct po.event_type) as opened
+                    from amplitude_prod.ev_listing_photo_viewed pv
+                    left join amplitude_prod.ev_listing_photosphere_opened po 
+                        on po.amplitude_id=pv.amplitude_id 
+                        and po.event_properties.imovel_id=pv.event_properties.imovel_id
+                        and po.event_properties.photosphere_id=pv.event_properties.photosphere_id
+                    where pv.user_properties.ab_photosphere = 'B'
+                    and pv.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)
+                    group by 1,2,3,4,5,6""",
 
            "funnel_conversion":
                """select 
@@ -97,43 +93,56 @@ metrics = {"usability":
                        and pav.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)
                )
                group by 1,2,3,4,5,6
-               order by 1,2,3"""}
+               order by 1,2,3""",
 
-usability_key = 'clean/amplitude/ab_tests/photosphere/usability/tmp.parq'
-create_parquet(usability_key, metrics['usability'])
+           "conversion_views":
+               """select 
+                    eventdate,
+                    neighborhood,
+                    count(distinct inq.imovel_id) as count_imovel,
+                    count(distinct inq.schedule_viewed) as schedule_viewed,
+                    count(distinct inq.visit_scheduled) as visit_scheduled
+                    from (
+                        select
+                        sv.server_upload_date as eventdate,
+                        sv.event_properties.neighborhood,
+                        sv.event_properties.imovel_id,
+                        sv.amplitude_id as schedule_viewed, 
+                        vc.amplitude_id as visit_scheduled
+                        
+                        from amplitude_prod.ev_schedule_page_viewed sv
+                        left join amplitude_prod.ev_confirmation_visit_confirmed vc 
+                            on vc.amplitude_id = sv.amplitude_id and vc.event_properties.imovel_id = sv.event_properties.imovel_id
+                        
+                        where sv.server_upload_date >= cast('2017-05-23' as date)
+                        group by 1,2,3,4,5
+                    ) inq
+                    group by 1,2
+                    order by 1 desc, 2 asc"""
+           }
 
-funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/tmp.parq'
-# null_columns = [('user_id', np.int64)]
-schema = [('eventdate', np.str),
-          ('ab_photosphere', np.str),
-          ('platform', np.str),
-          ('amplitude_id', np.int64),
-          ('imovel_id', np.int64),
-          ('user_id', np.int64)]
-create_parquet(funnel_key, metrics['funnel_conversion'], schema)
+usability_key = 'clean/amplitude/ab_tests/photosphere/usability/usability.parq'
+usability_schema = [('eventdate', np.str),
+                    ('platform', np.str),
+                    ('amplitude_id', np.int64),
+                    ('user_id', np.int64),
+                    ('imovel_id', np.int64),
+                    ('photosphere_id', np.str)]
+create_parquet(usability_key, metrics['usability'], usability_schema)
 
+funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq'
+funnel_schema = [('eventdate', np.str),
+                 ('ab_photosphere', np.str),
+                 ('platform', np.str),
+                 ('amplitude_id', np.int64),
+                 ('imovel_id', np.int64),
+                 ('user_id', np.int64)]
+create_parquet(funnel_key, metrics['funnel_conversion'], funnel_schema)
 
-# funnel_conversion_table =\
-# """CREATE EXTERNAL TABLE amplitude.ab_photosphere_funnel_conversion (
-#   eventdate STRING,
-#   ab_photosphere STRING,
-# 	platform STRING,
-# 	amplitude_id BIGINT,
-# 	imovel_id BIGINT,
-# 	user_id BIGINT
-# )
-# STORED AS PARQUET
-# LOCATION 's3://5a-amplitude-events/ab_tests/photosphere/funnel_conversion/'"""
-
-# usability_table =\
-# """CREATE EXTERNAL TABLE amplitude.ab_photosphere_usability (
-#   	platform STRING,
-#   eventdate STRING,
-#   nbr_users BIGINT,
-#   nbr_imoveis BIGINT,
-#   viewed BIGINT,
-#   opened BIGINT,
-#   conversion DOUBLE
-# )
-# STORED AS PARQUET
-# LOCATION 's3://5a-amplitude-events/ab_tests/photosphere/usability//'"""
+scheduled_key = 'clean/amplitude/ab_tests/poolvisit/conv_scheduleviewed_to_confirmed/conversion_viewschedule_to_scheduled.parq'
+scheduled_schema = [('eventdate', np.str),
+                    ('neighborhood', np.str),
+                    ('count_imovel', np.int64),
+                    ('schedule_viewed', np.int64),
+                    ('visit_scheduled', np.int64)]
+create_parquet(scheduled_key, metrics['conversion_views'], scheduled_schema)
