@@ -5,7 +5,6 @@ BEGIN
 select 
   id,
   emailFatura,
-  emailProprietario,
   valorAluguel,
   numImovel,
   diaMesCobranca,
