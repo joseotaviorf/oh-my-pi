@@ -6,6 +6,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+import os
+import sys
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../../'))
 from jobs.wrappers.amplitude.amplitude_athena_wrapper import AthenaAmplitudeETL
 
 
@@ -42,11 +46,11 @@ def create_parquet(key, query, null_column=None):
 
 athena = AthenaAmplitudeETL()
 
-# database = "amplitude_prod"
-# table_list = ["ev_listing_photo_viewed", "ev_listing_photosphere_opened", "ev_listing_page_viewed",
-#               "ev_confirmation_visit_confirmed"]
-# for t in table_list:
-#     athena.msck_repair_table(database, t)
+database = "amplitude_prod"
+table_list = ["ev_listing_photo_viewed", "ev_listing_photosphere_opened", "ev_listing_page_viewed",
+              "ev_confirmation_visit_confirmed"]
+for t in table_list:
+    athena.msck_repair_table(database, t)
 
 metrics = {"usability":
                """select 
@@ -127,7 +131,9 @@ usability_schema = [('eventdate', np.str),
                     ('amplitude_id', np.int64),
                     ('user_id', np.int64),
                     ('imovel_id', np.int64),
-                    ('photosphere_id', np.str)]
+                    ('photosphere_id', np.str),
+                    ('viewed', np.int8),
+                    ('opened', np.int)]
 create_parquet(usability_key, metrics['usability'], usability_schema)
 
 funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq'
