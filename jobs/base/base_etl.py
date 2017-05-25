@@ -399,20 +399,23 @@ class BaseETL(object):
 
 
     @classmethod
-    def dump_ODS_to_datalake(cls, table_name):
+    def dump_ODS_to_datalake(cls, table_name, filename=None):
+        if not filename:
+            filename = table_name
+
         bucket_datalake = os.environ['bi-datalake-s3-bucket']
         BaseETL.to_s3(
             filename='{}.csv'.format(table_name),
             data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
-            bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
+            bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, filename)
         )
         BaseETL.copy_file_between_s3_buckets(
             bucket_source=bucket_datalake,
             bucket_destination=bucket_datalake,
-            full_filename_source='raw/ebdb/{0}/{0}.csv'.format(table_name),
-            full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(table_name)
+            full_filename_source='raw/ebdb/{0}/{0}.csv'.format(filename),
+            full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(filename)
         )
-        
+
     @staticmethod
     def delete_file_s3(bucket_name, fn):
         s3 = boto3.resource('s3')
