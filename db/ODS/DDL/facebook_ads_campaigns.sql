@@ -8,4 +8,5 @@ CREATE TABLE public.facebook_ads_campaigns (
 )
 WITH (
 	OIDS=FALSE
-) ;
+)
+;

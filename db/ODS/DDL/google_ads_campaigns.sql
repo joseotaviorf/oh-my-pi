@@ -11,4 +11,5 @@ CREATE TABLE public.google_ads_campaigns (
 )
 WITH (
 	OIDS=FALSE
-) ;
+)
+;
