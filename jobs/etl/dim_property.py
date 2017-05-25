@@ -22,7 +22,7 @@ if len(args) > 1:
         table = BaseETL.decode_table(table, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
-            table_name=process_name,
+            table_name='imovel',
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
             append=False,

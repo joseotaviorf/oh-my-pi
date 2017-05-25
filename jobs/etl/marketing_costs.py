@@ -83,7 +83,7 @@ def extract_facebook_marketing_campaigns(dt):
 
     table = petl.fromdicts(insights)
     table = table.rename('date_start', 'date')
-    table = table.cut('date', 'campaign_id', 'campaign_name', 'spend', 'account_name')
+    table = table.cut('campaign_name', 'date', 'campaign_id', 'spend', 'account_name')
 
     return list(table)
 
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     bucket_datalake = os.environ['bi-datalake-s3-bucket']
     if len(args) > 1:
         if args[1] == 'fb':
-            facebook_table = extract_facebook_marketing_campaigns(date(2016, 1, 1))
+            facebook_table = extract_facebook_marketing_campaigns(date(2017, 5, 23))
             process_name = 'facebook_ads_campaigns'
 
             BaseETL.bulk_insert(

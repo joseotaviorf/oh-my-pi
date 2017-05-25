@@ -310,21 +310,26 @@ class BaseETL(object):
 
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
-                                  append=True, encoding='LATIN1', prefix=None):
+                                  append=True, encoding='LATIN1'):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         bucket_dw = os.environ.get('bi-dw-s3-bucket')
+        forno = os.environ.get('forno')
         con = cls.get_connection(enum_db_dest, encoding)
         file = 's3://{}/{}'.format(bucket_name, filename)
+        delimiter = ','
 
-        sql = """COPY {} FROM '{}'
-                    CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
-                    DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
-            table_name,
-            file,
-            aws_access_key_id,
-            aws_secret_access_key,
-            ',')
+        if not forno: # if env = forno, we got a postgres database, so COPY command is not equal
+            sql = """COPY {} FROM '{}'
+                        CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
+                        DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
+                table_name,
+                file,
+                aws_access_key_id,
+                aws_secret_access_key,
+                delimiter)
+        else:
+            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
         try:
             cls.copy_file_between_s3_buckets(bucket_name, bucket_dw, filename,  '{}.csv'.format(table_name))
 
