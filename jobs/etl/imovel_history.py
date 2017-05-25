@@ -3,7 +3,7 @@ from datetime import datetime
 import petl
 import os
 
-table_name='imovel_status_history'
+table_name = 'imovel_status_history'
 
 # get max loaded date
 max_date = BaseETL.from_db_query(
@@ -79,4 +79,4 @@ conn.commit()
 conn.close()
 
 # move to lake
-BaseETL.dump_ODS_to_datalake(table_name)
+BaseETL.dump_ODS_to_datalake(table_name=table_name, filename='property_status_history')

@@ -44,4 +44,4 @@ sys.stdout.flush()
 
 
 # move to lake
-BaseETL.dump_ODS_to_datalake(table_name)
+BaseETL.dump_ODS_to_datalake(table_name=table_name, filename='property_status_full_history')
