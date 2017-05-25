@@ -1,16 +1,11 @@
 # coding=utf-8
 
-import os
-import sys
-
 import boto3
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../../'))
 from jobs.wrappers.amplitude.amplitude_athena_wrapper import AthenaAmplitudeETL
 
 
@@ -49,7 +44,7 @@ athena = AthenaAmplitudeETL()
 
 database = "amplitude_prod"
 table_list = ["ev_listing_photo_viewed", "ev_listing_photosphere_opened", "ev_listing_page_viewed",
-              "ev_confirmation_visit_confirmed"]
+              "ev_confirmation_visit_confirmed", "ev_schedule_page_viewed"]
 for t in table_list:
     athena.msck_repair_table(database, t)
 
