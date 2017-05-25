@@ -77,12 +77,8 @@ select
 	"Amount earned"::decimal(14,4) as value
 from
 	files.agent_comission_over_contract_closed
-
 -- select * from contract where imovel_id = 892783195
-
 -- select status, * from imovel where id = 892783195
-
-
 select * from vw_imovel_liquidity_agents_costs where
 id_imovel = 892795246
 */
