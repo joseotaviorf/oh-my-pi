@@ -6,7 +6,6 @@ select
     c.id as id_contract,
 
     "emailFatura" as email_invoice,
-    "emailProprietario" as email_owner,
     "valorAluguel" as renting_value,
     "numImovel" as property_number,
     "diaMesCobranca" as day_month_due,
