@@ -83,7 +83,7 @@ def extract_facebook_marketing_campaigns(dt):
 
     table = petl.fromdicts(insights)
     table = table.rename('date_start', 'date')
-    table = table.cut('campaign_id', 'date', 'campaign_name', 'spend', 'account_name')
+    table = table.cut('campaign_name', 'date', 'campaign_id', 'spend', 'account_name')
 
     return list(table)
 
