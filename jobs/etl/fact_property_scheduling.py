@@ -32,6 +32,22 @@ if len(args) > 1:
         )
 
     elif args[1] == 'DW':
+        BaseETL.execute_command(
+            command="""
+                truncate table property_listing;
+                insert into 
+                    property_listing
+                select 
+                    *  
+                from 
+                    vw_property_listing
+                ;
+            """,
+            db_enum=EnumDb.BI_ODS,
+            commit=True
+        )
+        print("{} - property_listing table created!", BaseETL.now())
+
         BaseETL.move_table_to_dw(
             table_name='vw_fact_liquidity_property_scheduling',
             table_name_dest='fact_liquidity_property_scheduling',

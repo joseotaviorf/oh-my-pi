@@ -19,6 +19,16 @@ select
   coalesce(f.id_proposal, -1) as sk_proposal,
   coalesce(f.id_contract, -1) as sk_contract,
   coalesce(f.id_rental_flow, -1) as id_rental_flow,
+
+  coalesce(to_char(fp.publication_date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
+  coalesce(to_char(p.publication_date,'YYYYMMDD')::integer, -1) as sk_listing_date,
+  coalesce(to_char(b."criadoEm",'YYYYMMDD')::integer, -1) as sk_booking_created_date,
+  coalesce(to_char(b.data,'YYYYMMDD')::integer, -1) as sk_visit_date,
+  coalesce(to_char(visitor.criado_em,'YYYYMMDD')::integer, -1) as sk_visitor_user_signup_date,
+  coalesce(to_char(offer."criadoEm",'YYYYMMDD')::integer, -1) as sk_offer_created_date,
+  coalesce(to_char(contract."dataAssinado",'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
+  coalesce(to_char(agent.criado_em,'YYYYMMDD')::integer, -1) as sk_user_agent_date,
+
   dt_contract_anullment,
   visit_created_from_app,
   visit_created_type,
@@ -89,12 +99,33 @@ from
 
 left join booking b
   on b.id = f.id_scheduling
-  
+
 left join
-	vw_property_listing p
-	on p.id = f.id_imovel
-	and coalesce(b."criadoEm", '1901-01-01') between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
-	
+  property_listing p
+  on p.id = f.id_imovel
+  and coalesce(b."criadoEm", '1901-01-01') between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now())
+
+left join
+  property_listing fp
+  on fp.id = f.id_imovel
+  and fp.version = 1
+
+left join
+  usuario visitor
+  on visitor.id = f.id_user_visitor
+
+left join
+  usuario agent
+  on agent.id = f.id_user_visit_agent
+
+left join
+  pre_proposal offer
+  on offer.id = f.id_pre_proposal
+
+left join
+  contract
+  on contract.id = f.id_contract
+
 /*
 left join lateral
 (
