@@ -34,25 +34,14 @@ if len(args) > 1:
     elif args[1] == 'DW':
         BaseETL.execute_command(
             command="""
-                drop table if exists property_listing;
+                truncate table property_listing;
+                insert into 
+                    property_listing
                 select 
-                    * 
-                into 
-                    property_listing 
+                    *  
                 from 
                     vw_property_listing
                 ;
-                
-                
-                ALTER TABLE public.property_listing
-                  ADD CONSTRAINT property_listing_pk 
-                    PRIMARY KEY ("id", "version");
-                    
-                CREATE INDEX property_listing_idx_min_v ON public.property_listing
-                  USING btree ("min_version_time");
-                  
-                CREATE INDEX property_listing_idx_max_v ON public.property_listing
-                  USING btree ("max_version_time");
             """,
             db_enum=EnumDb.BI_ODS,
             commit=True
