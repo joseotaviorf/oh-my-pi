@@ -112,6 +112,7 @@ select -- count(1)
   r.cidade as regiao_cidade,
   r.macro_regiao as regiao_macro,
   r.sub_regiao as regiao_sub,
+  i.regiao_id,
   c.nome as condominio_nome,
   l.nome as local_nome,
   cor.nome as corretor_nome,
@@ -128,8 +129,7 @@ select -- count(1)
   ie.MOB_VISITAS as etapa_data_mob_visitas,
   ie.MOB_VISTORIA as etapa_data_mob_vistoria,
   i.dataCriacao as data_criacao,
-  i.atualizadoEm as atualizado_em,
-  i.regiao_id
+  i.atualizadoEm as atualizado_em
 
 from 
   Imovel i
