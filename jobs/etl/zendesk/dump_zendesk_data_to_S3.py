@@ -37,6 +37,10 @@ class ZendeskDataToS3(object):
         else:
             return
 
+        if not result:
+            print ('ZendeskResultGenerator is None!')
+            return
+
         count = 0
         for _ in result:
             count += 1
