@@ -6,7 +6,7 @@ BEGIN
 
  SELECT
     r.*,
-    CASE   
+/*    CASE   
         WHEN r.lead_id is not null and r.lead_tipo = 'Afiliado' THEN 'Affiliates' 
         
         WHEN r.lead_id is not null and r.lead_tipo <> 'Afiliado' THEN 'Other Lead (Marketing, Crawler...)' 
@@ -16,15 +16,15 @@ BEGIN
         WHEN r.lead_id is null and (r.vendedor_id IS NOT NULL OR r.tipo_admin <> 'Normal' or r.attribution_type = 'Organic/Duplicate/Referred Leads') THEN 'Inside Sales - Organic'       
         
         ELSE 'Unknown' 
-    END AS funnel_source,
+    END AS funnel_source,*/
   
     affiliate_listing_value + affiliate_renting_value as cac_affiliate,
     0.0000 as cac_marketing,
     0.0000 as cac_photo,
     0.0000 as cac_inside_sales,
 
-    TIMESTAMPDIFF(MINUTE, r.contact_date, r.lead_date) as contact_to_lead_diff_minutes,  
-    TIMESTAMPDIFF(MINUTE, r.lead_date, r.qualified_date) as lead_to_qualified_diff_minutes,
+    TIMESTAMPDIFF(MINUTE, r.contact_date, r.lead_and_prospect_date) as contact_to_lead_diff_minutes,  
+    TIMESTAMPDIFF(MINUTE, r.lead_and_prospect_date, r.qualified_date) as lead_and_prospect_to_qualified_diff_minutes,
     TIMESTAMPDIFF(MINUTE, r.qualified_date, r.opportunity_date) as qualified_to_opportunity_diff_minutes,
     TIMESTAMPDIFF(MINUTE, r.opportunity_date, r.listing_publication_date) as opportunity_to_listing_diff_minutes,
     TIMESTAMPDIFF(MINUTE, r.listing_publication_date, r.contract_date) as listing_to_1stcontract_diff_minutes,  
@@ -39,11 +39,8 @@ BEGIN
       o.updated_date,
       coalesce(ai.id, au.id) as attribution_id,
       coalesce(ai.uuid, au.uuid) as attribution_uuid,
-      
-      coalesce(o.lead_criadoEm, o.lead_timestamp, o.dataConversao) as contact_date,
-      coalesce(o.lead_timestamp, o.dataConversao, o.lead_criadoEm) as lead_date,  
-      o.prospect_date,
-      
+      coalesce(o.lead_criadoEm, o.lead_timestamp, o.dataConversao, o.lead_captadoEm, o.lead_anuncioCriadoEm) as contact_date,
+      coalesce(o.prospect_date, o.lead_timestamp, o.dataConversao, o.lead_criadoEm) as lead_and_prospect_date,  -- coalesce prospect and lead date
       o.first_inside_sales_contact_date,
       
       case 
@@ -54,8 +51,9 @@ BEGIN
         else o.qualified_date -- in all other cases we choose the qualified date
       end as qualified_date,
 
-      case when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01' 
-        then NULL
+      case 
+        when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01' 
+          then NULL
         ELSE coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
       END as opportunity_date,
 
@@ -79,7 +77,7 @@ BEGIN
       ia.imovelAttribution as imovel_attribution,
       o.lead_tipo as lead_tipo,
       
-      CASE
+/*      CASE
         WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='App' THEN 'Affiliate App'
       	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Form' THEN 'Affiliate Form'
@@ -102,7 +100,7 @@ BEGIN
     	  WHEN o.conversao_tipo='Lead' THEN 'Other Lead Source'
     	  WHEN ia.imovelAttribution NOT IN ('Self-Service','Undetermined') THEN 'Organic/Duplicate/Referred Lead'
     	  ELSE 'Unknown' 
-      END AS attribution_category,
+      END AS attribution_category,*/
   
       case 
         when o.lead_tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0 
@@ -119,6 +117,8 @@ BEGIN
         proprietarioLead_id,
         lead_tipo,
         lead_criadoEm,
+        lead_captadoEm,
+        lead_anuncioCriadoEm,
         lead_timestamp,
         dataConversao,
         cl_criadoEm,
@@ -130,13 +130,13 @@ BEGIN
         usuarioQueCadastrou_id,
         vendedor_id,
         tipoAdmin,
-        o.conversao_tipo, 
-        o.lead_origem, 
-        min(o.prospect_date) as prospect_date,
-        min(o.first_inside_sales_contact_date) as first_inside_sales_contact_date,
-        min(o.qualified_date) as qualified_date,   --  sera q nao serviria f.dataCriacao ??
-        max(o.created_date) as created_date,
-        max(o.updated_date) as updated_date
+        n.conversao_tipo, 
+        n.lead_origem, 
+        min(n.prospect_date) as prospect_date,
+        min(n.first_inside_sales_contact_date) as first_inside_sales_contact_date,
+        min(n.qualified_date) as qualified_date,   --  sera q nao serviria f.dataCriacao ??
+        max(n.created_date) as created_date,
+        max(n.updated_date) as updated_date
       FROM
       (
         SELECT
@@ -144,6 +144,8 @@ BEGIN
           l.proprietarioLead_id,
           l.tipo as lead_tipo,
           l.criadoEm as lead_criadoEm,
+          l.captadoEm as lead_captadoEm,
+          l.anuncioCriadoEm as lead_anuncioCriadoEm,
           from_unixtime(lu.timestamp/1000) as lead_timestamp,
           cl.dataConversao,
           cl.criadoEm as cl_criadoEm,
@@ -217,6 +219,8 @@ BEGIN
           l.proprietarioLead_id,
           l.tipo as lead_tipo,
           l.criadoEm as lead_criadoEm,
+          l.captadoEm as lead_captadoEm,
+          l.anuncioCriadoEm as lead_anuncioCriadoEm,
           from_unixtime(lu.timestamp/1000) as lead_timestamp,
           cl.dataConversao,
           cl.criadoEm as cl_criadoEm,
@@ -230,6 +234,7 @@ BEGIN
           u.tipoAdmin,
           null as first_inside_sales_contact_date,
           dt_etapa_endereco as prospect_date,
+          i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo, 
           l.origem as lead_origem ,
           null  as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
@@ -249,7 +254,7 @@ BEGIN
           group BY
             ie.imovel_id
         ) ie
-          on ie.imovel_id = i.id 
+          on ie.imovel_id = i.id */
                    
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
@@ -280,7 +285,7 @@ BEGIN
           on lu.id = lre.REV  
         left join Usuario u
           on u.id = i.usuario_id 
-      ) o
+      ) n
       GROUP BY
         lead_id,
         proprietarioLead_id,

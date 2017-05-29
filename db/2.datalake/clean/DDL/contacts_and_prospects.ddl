@@ -42,7 +42,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.contacts_and_prospects (
  url_source STRING,
  utm_medium STRING,
  utm_campaign STRING,
- utm_source STRING,
+ network STRING,
  usuario_que_indicou_id INT,
  usuario_que_cadastrou_id INT,
  self_service INT,

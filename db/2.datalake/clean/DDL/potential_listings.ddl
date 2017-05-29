@@ -7,8 +7,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.potential_listings (
  attribution_id INT,
  attribution_uuid STRING,
  contact_date TIMESTAMP,
- lead_date TIMESTAMP,
- prospect_date TIMESTAMP,
+ lead_and_prospect_date TIMESTAMP,
  first_inside_sales_contact_date TIMESTAMP,
  qualified_date TIMESTAMP,
  opportunity_date TIMESTAMP,
@@ -27,23 +26,20 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.potential_listings (
  tipo_admin STRING,
  imovel_attribution STRING,
  lead_tipo STRING,
- attribution_type STRING,
- attribution_category STRING,
  affiliate_listing_value DECIMAL(12,4),
  affiliate_renting_value DECIMAL(12,4),
- funnel_source STRING,
  cac_affiliate DECIMAL(12,4),
  cac_marketing DECIMAL(12,4),
  cac_photo DECIMAL(12,4),
  cac_inside_sales DECIMAL(12,4),
  contact_to_lead_diff_minutes INT,
- lead_to_qualified_diff_minutes INT,
+ lead_and_prospect_to_qualified_diff_minutes INT,
  qualified_to_opportunity_diff_minutes INT,
  opportunity_to_listing_diff_minutes INT,
  listing_to_1stcontract_diff_minutes INT,
  contact_to_listing_diff_minutes INT,
  contact_to_1stcontract_diff_minutes INT
- ) ROW FORMAT DELIMITED
+) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
 LOCATION 's3://5a-datalake/clean/potential_listings'
