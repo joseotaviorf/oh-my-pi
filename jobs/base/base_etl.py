@@ -405,7 +405,7 @@ class BaseETL(object):
 
         bucket_datalake = os.environ['bi-datalake-s3-bucket']
         BaseETL.to_s3(
-            filename='{}.csv'.format(table_name),
+            filename='{}.csv'.format(filename),
             data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
             bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, filename)
         )
