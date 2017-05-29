@@ -17,7 +17,13 @@ class ZendeskDataToS3(object):
         self.start_time = int(datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%s'))
         self.human_readable_start_time = args[3]
         self.s3_bucket = args[4]
+        self.s3_bucket_raw_folder_path = args[5]
         self.s3 = boto3.client('s3')
+
+        print ('m=init, datalake_bucket_type={}, object_type={}, start_time={}, human_readable_start_time={},'
+               ' s3_bucket={}, s3_bucket_raw_folder_path={}'.format(self.datalake_bucket_type, self.object_type,
+                                                                    self.start_time, self.human_readable_start_time,
+                                                                    self.s3_bucket, self.s3_bucket_raw_folder_path))
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
         self.zendesk_api = ZendeskAPI(subdomain=zendesk_login['host'], email=zendesk_login['email'],
@@ -37,10 +43,6 @@ class ZendeskDataToS3(object):
         else:
             return
 
-        if not result:
-            print ('ZendeskResultGenerator is None!')
-            return
-
         count = 0
         for _ in result:
             count += 1
@@ -57,7 +59,7 @@ class ZendeskDataToS3(object):
         print ('m=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(self.s3_bucket, target_file))
 
         fake_handle = StringIO(str(json.dumps(data)).encode('utf-8'))
-        self.s3.put_object(Bucket=self.s3_bucket, Key='{0}/{1}/{2}'.format(self.datalake_bucket_type,
+        self.s3.put_object(Bucket=self.s3_bucket, Key='{0}/{1}/{2}'.format(self.s3_bucket_raw_folder_path,
                                                                            self.object_type, target_file),
                            Body=fake_handle.read())
 
@@ -70,7 +72,7 @@ class ZendeskDataToS3(object):
         BaseETL.to_s3(
             filename=self.object_type + '.csv',
             data_table=table,
-            bucket_name='{0}/{1}/{2}'.format(self.s3_bucket, self.datalake_bucket_type, self.object_type)
+            bucket_name='{0}/{1}/{2}'.format(self.s3_bucket, self.s3_bucket_raw_folder_path, self.object_type)
         )
 
 
