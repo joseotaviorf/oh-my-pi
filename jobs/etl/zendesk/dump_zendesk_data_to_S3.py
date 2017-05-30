@@ -43,14 +43,15 @@ class ZendeskDataToS3(object):
         else:
             return
 
+        print ('result_type: {}'.format(type(result)))
         count = 0
         for _ in result:
             count += 1
             if (count % 1000) == 0:
-                self.save_data_to_s3(result._json, count)
+                self.save_data_to_s3(result._response_json, count)
 
         # save remaining data
-        self.save_data_to_s3(result._json, count)
+        self.save_data_to_s3(result._response_json, count)
 
         print ('final count: {}'.format(count))
 
