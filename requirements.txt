@@ -42,7 +42,7 @@ xmltodict==0.10.2
 PyDrive
 s3fs
 numpy==1.12.1
-# pandas==0.19.1
+pandas==0.20.1
 # Google2Pandas==0.1.0
 zenpy
 
