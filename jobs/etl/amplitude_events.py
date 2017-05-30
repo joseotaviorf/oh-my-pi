@@ -129,7 +129,7 @@ class AmplitudeEventsETL(BaseETL):
             log('Param Start String: {}'.format(start))
             log('Param End String: {}'.format(end))
             keys = props.get_keys()
-            for key in keys[:-1]:
+            for key in keys:
                 a = AmplitudeExportApi(key['app_key'], key['secret_key'])
                 f = a.get_files_from_extract_api(start, end)
                 if f:
@@ -139,17 +139,6 @@ class AmplitudeEventsETL(BaseETL):
                     count = a.publish_notifications(events, topic_arn=topic_arn)
                     print('{} messages were published in SNS!'.format(count))
                     sys.stdout.flush()
-
-            # Temporary dump of WebDesktop Forno Project Events to S3
-            print('Temporary dump of WebDesktop Forno Events to S3...')
-            key = keys[-1]
-            a = AmplitudeExportApi(key['app_key'], key['secret_key'])
-            f = a.get_files_from_extract_api(start, end)
-            if f:
-                events = a.get_json_from_zipfile(f)
-                g_events, app = self.group_events(events)
-                self.dump_events_to_s3(g_events, app, start_date)
-                sys.stdout.flush()
 
     @classmethod
     def check_dates(cls, start_date, end_date, td, kwargs):
