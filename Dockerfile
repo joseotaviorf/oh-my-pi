@@ -14,7 +14,8 @@ RUN apt-get update && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     apt-get install -y oracle-java8-installer && \
-    apt-get clean
+    apt-get clean && \
+    apt-get install -y libpq-dev python-dev
 
 RUN apt-get -y install python-pip python-dev build-essential
 RUN pip install --upgrade pip
