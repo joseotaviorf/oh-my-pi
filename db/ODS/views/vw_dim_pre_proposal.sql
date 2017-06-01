@@ -17,7 +17,8 @@ SELECT
   "atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
   "ultimoUpdateEdicao" > 0 as offer_submitted,
-  "ultimoUpdateEdicao" as ultimo_update_edicao
+  "ultimoUpdateEdicao" as ultimo_update_edicao,
+  "dataPrimerioEnvio" as dt_first_sent
 FROM
   public.pre_proposal;
 

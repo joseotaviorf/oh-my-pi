@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS datalake_clean.booking;
+
 CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.booking (
  id INT,
- data DATE,
+ data TIMESTAMP,
  status STRING,
  tipo STRING,
  hash STRING,
@@ -23,5 +24,4 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.booking (
    ) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
-LOCATION 's3://5a-datalake/clean/booking'
-;
+LOCATION 's3://5a-datalake/clean/ebdb/booking'
