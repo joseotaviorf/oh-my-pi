@@ -5,7 +5,7 @@ PROCEDURE ebdb.list_contacts_and_prospects()
 BEGIN
 
 SELECT
-(@cnt := @cnt + 1) AS cap_id, -- creates the new contact and prospect ID (key)
+CAST((@cnt := @cnt + 1) AS UNSIGNED)AS cap_id, -- creates the new contact and prospect ID (key)
 lead_id,
 imovel_id,
 anuncio_criado_em,
