@@ -64,7 +64,6 @@
 			</network-handler>
 			<bootstrap autocommit="true"/>
 		</connection>
-		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 	<data-source id="mysql5-15b7cf1cc9f-117139ffa8f45e1b" provider="mysql" driver="mysql5" name="EBDB - PROD" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandardbprod.ciuoqxapzjot.us-east-1.rds.amazonaws.com" port="3306" server="" database="ebdb" url="jdbc:mysql://quintoandardbprod.ciuoqxapzjot.us-east-1.rds.amazonaws.com:3306/ebdb" user="QuintoAndarMain" password="S1wUF0BPd0RdQyskRQVWZUb2" type="prod">

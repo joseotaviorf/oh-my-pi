@@ -7,7 +7,8 @@ CREATE TABLE public.pre_proposal (
   aluguel INTEGER,
   "aluguelOriginal" INTEGER,
   "condominioOriginal" INTEGER,
-  "dataAprovacao" INTEGER,
+  -- "iptuOriginal" integer,
+  "dataAprovacao" public.datetime,
   edicao VARCHAR(50) NOT NULL,
   status VARCHAR(50) NOT NULL,
   "proprietarioAceitouCondicoes5A" INTEGER,
@@ -15,8 +16,10 @@ CREATE TABLE public.pre_proposal (
   imovel_id BIGINT,
   "criadoEm" public.datetime,
   "atualizadoEm" public.datetime,
-  "ultimoUpdateEdicao" INTEGER
+  "ultimoUpdateEdicao" INTEGER,
+  "dataPrimerioEnvio" public.datetime
 )
 WITH (oids = false);
 
 -- select * from pre_proposal
+
