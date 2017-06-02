@@ -13,7 +13,7 @@ def create_parquet(key, query, null_column=None):
     print("Querying on Athena...")
     print(query)
     data = athena._execute_query(query)
-    data = data.where(pd.notnull(data), None)
+    data = data.astype(object).where(pd.notnull(data), None)
 
     if null_column is not None:
         for col, _type in null_column:
@@ -64,8 +64,8 @@ metrics = {"usability":
 
            "funnel_conversion":
                """select 
-                    CAST(min(client_event_time) AS VARCHAR) as listing_viewed_dt,
-                    CAST(min(photosphere_open_dt) AS VARCHAR) as photosphere_open_dt,
+                    min(client_event_time) as listing_viewed_dt,
+                    min(photosphere_open_dt) as photosphere_open_dt,
                     case when avg(if(ab_photosphere='A',10,20)) = 10 then 'A' 
                          when avg(if(ab_photosphere='A',10,20)) = 20 then 'B' else 'E' end as ab_photosphere,
                     min(amplitude_id) as amplitude_id,
@@ -125,8 +125,8 @@ usability_schema = [('eventdate', np.str),
 create_parquet(usability_key, metrics['usability'], usability_schema)
 
 funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq'
-funnel_schema = [('listing_viewed_dt', np.datetime64),
-                 ('photosphere_open_dt', np.datetime64),
+funnel_schema = [('listing_viewed_dt', np.str),
+                 ('photosphere_open_dt', np.str),
                  ('ab_photosphere', np.str),
                  ('amplitude_id', np.int64),
                  ('imovel_id', np.int64),
