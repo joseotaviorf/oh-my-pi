@@ -21,11 +21,6 @@ def create_parquet(key, query, null_column=None):
                 if type(data.loc[row, col]) == unicode:
                     data.loc[row, col] = data.loc[row, col].encode('utf-8')
                 data.loc[row, col] = _type(data.loc[row, col]) if data.loc[row, col] is not None else None
-    # fake numbers for test with DW
-    # data['imovel_id'] = [892765889, 892779318, 892777560, 892765889, 892785924, 892790924, 892799294, 892797389, 892782345,
-    #                      892790306, 892782498, 892776230]
-    # data['user_id'] = [587, -1, 129667, 130359, 587, 3274, 3274, 181860, 92716, -1, 154104, -1]
-    # data['amplitude_id'] = data['user_id']
 
     print("Creating parquet file...")
 
@@ -69,8 +64,8 @@ metrics = {"usability":
 
            "funnel_conversion":
                """select 
-                    min(client_event_time) as listing_viewed_dt,
-                    min(photosphere_open_dt) as photosphere_open_dt,
+                    CAST(min(client_event_time) AS VARCHAR) as listing_viewed_dt,
+                    CAST(min(photosphere_open_dt) AS VARCHAR) as photosphere_open_dt,
                     case when avg(if(ab_photosphere='A',10,20)) = 10 then 'A' 
                          when avg(if(ab_photosphere='A',10,20)) = 20 then 'B' else 'E' end as ab_photosphere,
                     min(amplitude_id) as amplitude_id,
@@ -130,8 +125,8 @@ usability_schema = [('eventdate', np.str),
 create_parquet(usability_key, metrics['usability'], usability_schema)
 
 funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq'
-funnel_schema = [('listing_viewed_dt', np.str),
-                 ('photosphere_open_dt', np.str),
+funnel_schema = [('listing_viewed_dt', np.datetime64),
+                 ('photosphere_open_dt', np.datetime64),
                  ('ab_photosphere', np.str),
                  ('amplitude_id', np.int64),
                  ('imovel_id', np.int64),
