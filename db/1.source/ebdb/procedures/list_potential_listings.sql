@@ -5,7 +5,6 @@ PROCEDURE ebdb.list_potential_listings(IN _ref_date DATE)
 BEGIN
 
  SELECT
-    CAST((@cnt := @cnt + 1) AS UNSIGNED) AS id, -- creates the new contact and prospect ID (key)
     r.*,
 
     affiliate_listing_value + affiliate_renting_value as cac_affiliate,
@@ -24,6 +23,7 @@ BEGIN
   FROM
   (
     SELECT
+      CAST((@cnt := @cnt + 1) AS UNSIGNED) AS id, -- creates the fact ID (key)   
       coalesce(o.updated_date, o.created_date) as ref_date,
       o.created_date,
       o.updated_date,
@@ -125,7 +125,7 @@ BEGIN
           lfu.firstUpdateDate as first_inside_sales_contact_date,
           null as prospect_date,
           cl.tipo as conversao_tipo, 
-          l.origem as lead_origem, 
+          l.origem as lead_origem,
 
           CASE WHEN cl.leadConvertido_id IS NOT NULL
             THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) -- if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
@@ -198,7 +198,6 @@ BEGIN
           cl.vendedor_id,
           u.tipoAdmin,
           null as first_inside_sales_contact_date,
-          dt_etapa_endereco as prospect_date,
           i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo, 
           l.origem as lead_origem ,
@@ -420,8 +419,10 @@ BEGIN
       -- and l.id = 261579
       -- and l.id = 331494
       -- l.id = 43106
+
+    CROSS JOIN (SELECT @cnt := 0) AS dummy
   )r
- CROSS JOIN (SELECT @cnt := 0) AS dummy
+ 
 
 WHERE
   cast(r.ref_date as date) >= coalesce(_ref_date, '2012-12-01')
@@ -430,3 +431,4 @@ WHERE
 ;
 
 END
+
