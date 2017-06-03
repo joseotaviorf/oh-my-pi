@@ -1,23 +1,13 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_potential_listings;
+DROP PROCEDURE IF EXISTS ebdb.list_potential_listings;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_potential_listings(IN _ref_date DATE)
 BEGIN
 
  SELECT
+    CAST((@cnt := @cnt + 1) AS UNSIGNED) AS id, -- creates the new contact and prospect ID (key)
     r.*,
-/*    CASE   
-        WHEN r.lead_id is not null and r.lead_tipo = 'Afiliado' THEN 'Affiliates' 
-        
-        WHEN r.lead_id is not null and r.lead_tipo <> 'Afiliado' THEN 'Other Lead (Marketing, Crawler...)' 
-       
-        WHEN r.lead_id is null and r.imovel_attribution = 'Self-Service' THEN 'Self-Service'       
-       
-        WHEN r.lead_id is null and (r.vendedor_id IS NOT NULL OR r.tipo_admin <> 'Normal' or r.attribution_type = 'Organic/Duplicate/Referred Leads') THEN 'Inside Sales - Organic'       
-        
-        ELSE 'Unknown' 
-    END AS funnel_source,*/
-  
+
     affiliate_listing_value + affiliate_renting_value as cac_affiliate,
     0.0000 as cac_marketing,
     0.0000 as cac_photo,
@@ -77,31 +67,6 @@ BEGIN
       ia.imovelAttribution as imovel_attribution,
       o.lead_tipo as lead_tipo,
       
-/*      CASE
-        WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
-      	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='App' THEN 'Affiliate App'
-      	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Form' THEN 'Affiliate Form'
-      	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Planilha' THEN 'Affiliate Spreadsheet'
-      	WHEN o.lead_origem='Landing' THEN 'Landing Page Leads'
-      	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem<>'Landing' THEN 'Marketing Leads'
-       	WHEN o.conversao_tipo='InsideSales' THEN 'Organic/Duplicate/Referred Leads'
-      	WHEN o.lead_tipo='Afiliado' AND o.lead_origem='Desconhecida' THEN 'Affiliate Unknown'
-      	WHEN o.conversao_tipo='Lead' THEN 'Other Lead Source'
-      	WHEN ia.imovelAttribution NOT IN ('Self-Service','Undetermined') THEN 'Organic/Duplicate/Referred Leads'
-      	ELSE 'Unknown' 
-      END AS attribution_type,
-
-    	CASE 
-        WHEN ia.imovelAttribution='Self-Service' THEN 'Self-Service'
-      	WHEN o.lead_tipo='Afiliado' THEN 'Affiliate Lead'
-      	WHEN o.lead_origem='Landing' THEN 'Landing Page Lead'
-      	WHEN o.conversao_tipo='Lead' AND o.lead_tipo='Marketing' AND o.lead_origem<>'Landing' THEN 'Marketing Lead'
-     	  WHEN o.conversao_tipo='InsideSales' THEN 'Organic/Duplicate/Referred Lead'
-    	  WHEN o.conversao_tipo='Lead' THEN 'Other Lead Source'
-    	  WHEN ia.imovelAttribution NOT IN ('Self-Service','Undetermined') THEN 'Organic/Duplicate/Referred Lead'
-    	  ELSE 'Unknown' 
-      END AS attribution_category,*/
-  
       case 
         when o.lead_tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0 
       end as affiliate_listing_value,
@@ -254,7 +219,7 @@ BEGIN
           group BY
             ie.imovel_id
         ) ie
-          on ie.imovel_id = i.id */
+          on ie.imovel_id = i.id 
                    
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
@@ -456,11 +421,10 @@ BEGIN
       -- and l.id = 331494
       -- l.id = 43106
   )r
+ CROSS JOIN (SELECT @cnt := 0) AS dummy
 
 WHERE
   cast(r.ref_date as date) >= coalesce(_ref_date, '2012-12-01')
--- order BY
---  1
 
 -- call list_potential_listings(null)
 ;
