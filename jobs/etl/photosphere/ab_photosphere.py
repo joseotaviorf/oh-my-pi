@@ -1,12 +1,22 @@
 # coding=utf-8
+import logging
+import sys
+import traceback
 
 import boto3
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-
 from jobs.wrappers.amplitude.amplitude_athena_wrapper import AthenaAmplitudeETL
+
+
+def log_uncaught_exceptions(exception_type, exception, tb):
+    logging.critical(''.join(traceback.format_tb(tb)))
+    logging.critical('{0}: {1}'.format(exception_type, exception))
+
+
+sys.excepthook = log_uncaught_exceptions
 
 
 def create_parquet(key, query, null_column=None):
