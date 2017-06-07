@@ -8,6 +8,10 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+
+import os
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../../'))
 from jobs.wrappers.amplitude.amplitude_athena_wrapper import AthenaAmplitudeETL
 
 
@@ -35,8 +39,8 @@ def create_parquet(key, query, null_column=None):
     print("Creating parquet file...")
 
     table = pa.Table.from_pandas(df=data)
-    file_handler = pa.InMemoryOutputStream()
-    pq.write_table(table, file_handler)
+    with pa.InMemoryOutputStream() as file_handler:
+        pq.write_table(table, file_handler)
 
     print("Saving to s3...")
     s3_bucket = boto3.resource('s3').Bucket('5a-datalake')
