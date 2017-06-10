@@ -179,8 +179,8 @@ relisting as
 (
 	select distinct
 		*,
-		sum(prev_rented) over (partition by id order by version) as nr_relisting,
-		sum(rented) over (partition by id order by version) as nr_rerenting
+		sum(prev_rented) over (partition by id order by version) as nr_listing,
+		sum(rented) over (partition by id order by version) as nr_renting
 	from
 		rent
 )
@@ -190,7 +190,9 @@ select
 	min_version_time,
 	max_version_time,
 	last_status_version,
-	min(publication_date) over (partition by id,nr_relisting order by version) as publication_date -- considering nr_relisting rule instead of version!
+	nr_listing,
+	nr_renting,
+	min(publication_date) over (partition by id,nr_listing order by version) as publication_date -- considering nr_relisting rule instead of version!
 from
 	relisting
 -- where
