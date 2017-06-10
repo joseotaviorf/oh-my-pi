@@ -1,4 +1,5 @@
 drop view if exists vw_dim_property;
+
 CREATE VIEW public.vw_dim_property 
 as
 SELECT ((i.id || '00') || COALESCE(i_dates.version, 1))::bigint AS sk_property,
@@ -156,6 +157,8 @@ SELECT ((i.id || '00') || COALESCE(i_dates.version, 1))::bigint AS sk_property,
         COALESCE(h.dt_first_publication, i.first_publication)) / 86400::double precision AS time_listing_created_to_first_refuse_by_security,
     date_part('epoch'::text, i_dates.first_visit_date::timestamp without time
         zone - COALESCE(h.dt_first_publication, i.first_publication)) / 86400::double precision AS time_listing_created_to_first_visit_realized,
+    i_dates.nr_listing,
+    i_dates.nr_renting,
     i.data_criacao,
     i.atualizado_em,
     now() AS load_timestamp
@@ -174,6 +177,8 @@ FROM imovel i
             pl.max_version_time,
             pl.last_status_version,
             pl.publication_date,
+            pl.nr_listing,
+    				pl.nr_renting,
             min(b."criadoEm") AS first_booking_date,
             min(b."criadoEm") FILTER (
     WHERE b."criadoEm" > COALESCE(pl.min_version_time,
@@ -232,6 +237,13 @@ FROM imovel i
              LEFT JOIN pre_proposal pp ON fl.imovel_id = pp.imovel_id
              LEFT JOIN proposal p ON p."preProposta_id" = pp.id
              LEFT JOIN contract c ON c.proposta_id = p.id
-    GROUP BY i_1.id, pl.version, pl.min_version_time, pl.max_version_time,
-        pl.last_status_version, pl.publication_date
+    GROUP BY 
+    	i_1.id, 
+    	pl.version, 
+    	pl.min_version_time, 
+    	pl.max_version_time,
+      pl.last_status_version, 
+      pl.publication_date,
+      pl.nr_listing,
+			pl.nr_renting
     ) i_dates ON i_dates.id = i.id;
