@@ -1,4 +1,4 @@
-﻿-- select count(1) from public.potential_listings
+-- select count(1) from public.potential_listings
   
 -- CREATE EXTENSION pg_trgm;
 
