@@ -1,4 +1,4 @@
-﻿-- select count(1) from public.potential_listings
+-- select count(1) from public.potential_listings
   
 -- CREATE EXTENSION pg_trgm;
 
@@ -356,7 +356,7 @@ SELECT -- count(1)
           over (
             partition by created_date::date
           )
-    ,0),1) as fb_self_service_marketing_cost
+    ,0),1) as fb_self_service_marketing_cost,
 
   case when l.listing_publication_date is not null and l.imovel_attribution='Self-Service'
   	then
