@@ -123,8 +123,8 @@ if __name__ == '__main__':
     )
 
     BaseETL.to_s3(
-        filename='{}.csv'.format(table_name),
-        data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+        filename='{}_{}.csv'.format(table_name, BaseETL.now()),
+        data_table=table,
         bucket_folder_path='{}/clean/ebdb/{}'.format(bucket_datalake, table_name)
     )
 

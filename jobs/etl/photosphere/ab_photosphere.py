@@ -1,19 +1,29 @@
 # coding=utf-8
+import logging
+import sys
+import traceback
 
 import boto3
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-
 from jobs.wrappers.amplitude.amplitude_athena_wrapper import AthenaAmplitudeETL
+
+
+def log_uncaught_exceptions(exception_type, exception, tb):
+    logging.critical(''.join(traceback.format_tb(tb)))
+    logging.critical('{0}: {1}'.format(exception_type, exception))
+
+
+sys.excepthook = log_uncaught_exceptions
 
 
 def create_parquet(key, query, null_column=None):
     print("Querying on Athena...")
     print(query)
     data = athena._execute_query(query)
-    data = data.where(pd.notnull(data), None)
+    data = data.astype(object).where(pd.notnull(data), None)
 
     if null_column is not None:
         for col, _type in null_column:
@@ -21,11 +31,6 @@ def create_parquet(key, query, null_column=None):
                 if type(data.loc[row, col]) == unicode:
                     data.loc[row, col] = data.loc[row, col].encode('utf-8')
                 data.loc[row, col] = _type(data.loc[row, col]) if data.loc[row, col] is not None else None
-    # fake numbers for test with DW
-    # data['imovel_id'] = [892765889, 892779318, 892777560, 892765889, 892785924, 892790924, 892799294, 892797389, 892782345,
-    #                      892790306, 892782498, 892776230]
-    # data['user_id'] = [587, -1, 129667, 130359, 587, 3274, 3274, 181860, 92716, -1, 154104, -1]
-    # data['amplitude_id'] = data['user_id']
 
     print("Creating parquet file...")
 
@@ -69,31 +74,28 @@ metrics = {"usability":
 
            "funnel_conversion":
                """select 
-               cast (eventdate as varchar) eventdate,
-               ab_photosphere,
-               platform,
-               amplitude_id,
-               imovel_id,
-               user_id
-               from
-               (
-                       select
-                       pav.user_properties.ab_photosphere,
-                       pav.user_properties.platform,
-                       pav.amplitude_id, 
-                       pav.event_properties.imovel_id,
-                       pav.server_upload_date as eventdate,
-                       vc.user_id
-                       from amplitude_prod.ev_listing_page_viewed pav
-                       left join amplitude_prod.ev_listing_photosphere_opened po on po.amplitude_id=pav.amplitude_id and po.event_properties.imovel_id=pav.event_properties.imovel_id
-                       left join amplitude_prod.ev_confirmation_visit_confirmed vc on vc.amplitude_id = pav.amplitude_id and vc.user_id is not null
-                       where (
-                           (pav.user_properties.ab_photosphere = 'A' and po.event_type is null) or 
-                           (pav.user_properties.ab_photosphere = 'B' and po.event_type is not null))
-                       and pav.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)
-               )
-               group by 1,2,3,4,5,6
-               order by 1,2,3""",
+                    min(client_event_time) as listing_viewed_dt,
+                    min(photosphere_open_dt) as photosphere_open_dt,
+                    case when avg(if(ab_photosphere='A',10,20)) = 10 then 'A' 
+                         when avg(if(ab_photosphere='A',10,20)) = 20 then 'B' else 'E' end as ab_photosphere,
+                    min(amplitude_id) as amplitude_id,
+                    imovel_id,
+                    min(user_id) as user_id		
+                    from (
+                        select
+                        a.amplitude_id, 
+                        a.event_properties.imovel_id,     
+                        a.client_event_time,
+                        a.user_properties.ab_photosphere,
+                        usr.user_id,
+                        b.client_event_time as photosphere_open_dt
+                        from amplitude_prod.ev_listing_page_viewed a
+                        left join amplitude_prod.ev_confirmation_visit_confirmed usr on usr.amplitude_id = a.amplitude_id
+                        left join amplitude_prod.ev_listing_photosphere_opened b on b.amplitude_id=a.amplitude_id and b.event_properties.imovel_id=a.event_properties.imovel_id
+                        where a.user_properties.ab_photosphere in ('A','B')
+                        and a.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)                  
+                    ) x 
+                    group by coalesce(user_id, amplitude_id), imovel_id having avg(if(ab_photosphere='A',10,20)) in (10,20)""",
 
            "conversion_views":
                """select 
@@ -133,9 +135,9 @@ usability_schema = [('eventdate', np.str),
 create_parquet(usability_key, metrics['usability'], usability_schema)
 
 funnel_key = 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq'
-funnel_schema = [('eventdate', np.str),
+funnel_schema = [('listing_viewed_dt', np.str),
+                 ('photosphere_open_dt', np.str),
                  ('ab_photosphere', np.str),
-                 ('platform', np.str),
                  ('amplitude_id', np.int64),
                  ('imovel_id', np.int64),
                  ('user_id', np.int64)]

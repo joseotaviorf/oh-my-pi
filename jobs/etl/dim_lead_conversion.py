@@ -1,4 +1,4 @@
-from jobs.base.base_etl import BaseETL, EnumDb
+from jobs.base.base_etl import BaseETL, EnumDb, petl
 import sys
 import os
 from datetime import datetime
@@ -6,7 +6,7 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('fact_supply_','')
+process_name = BaseETL.get_current_filename().replace('dim_','')
 
 if len(args) > 1:
     if args[1] == 'ODS':
@@ -15,7 +15,7 @@ if len(args) > 1:
 
         table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
-            query="call ebdb.list_potential_listings(null);")
+            query='call ebdb.list_lead_conversion();')
 
         print("To ODS: {}".format(datetime.now()))
 
@@ -33,11 +33,16 @@ if len(args) > 1:
 
     elif args[1] == 'DW':
         BaseETL.move_table_to_dw(
-            table_name='vw_fact_supply_potential_listings',
-            table_name_dest='fact_supply_potential_listings',
+            table_name='vw_dim_lead_conversion',
+            table_name_dest='dim_lead_conversion',
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False,
             bucket_name='{}/clean/ebdb/{}'.format(bucket_datalake, process_name),
             process_name=process_name
+        )
+        BaseETL.execute_command(
+            'insert into dim_lead_conversion values (-1);',
+            db_enum=EnumDb.BI_DW,
+            commit=True
         )

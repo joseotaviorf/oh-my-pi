@@ -319,7 +319,7 @@ class BaseETL(object):
         file = 's3://{}/{}'.format(bucket_name, filename)
         delimiter = ','
 
-        if not forno: # if env = forno, we got a postgres database, so COPY command is not equal
+        if not eval(str(forno)): # if env = forno, we got a postgres database, so COPY command is not equal
             sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                         DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
@@ -405,7 +405,7 @@ class BaseETL(object):
 
         bucket_datalake = os.environ['bi-datalake-s3-bucket']
         BaseETL.to_s3(
-            filename='{}.csv'.format(table_name),
+            filename='{}.csv'.format(filename),
             data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
             bucket_folder_path='{}/raw/ebdb/{}'.format(bucket_datalake, filename)
         )

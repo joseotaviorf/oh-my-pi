@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS datalake_clean.potential_listings_temp;
-CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.potential_listings_temp (
+DROP TABLE IF EXISTS datalake_clean.potential_listings;
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.potential_listings (
  id BIGINT,
  ref_date TIMESTAMP,
  created_date TIMESTAMP,
@@ -42,5 +42,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.potential_listings_temp (
 ) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
-LOCATION 's3://5a-datalake/clean/potential_listings_temp'
+LOCATION 's3://5a-datalake/clean/potential_listings'
 ;

@@ -13,29 +13,8 @@ with ish as
 	imovel_status_history
   where
     status_history in ('alugado', 'publicado')
-),
-
-hist as
-(
-  select
-    act.id,
-    act.status_history as status,
-    act.status_time,
-    nxt.status_history as next_status,
-    nxt.status_time as next_status_time,
-    act.rn,
-    nxt.rn
-  from
-    ish act
-  left join
-    ish nxt
-    on act.id = nxt.id
-    and act.rn = nxt.rn-1
-  order by
-  	act.rn
-),
-
-diff_status as
+)
+,diff_status as
 (
   select
     act.id,
@@ -59,8 +38,8 @@ diff_status as
     and act.rn = nxt.rn-1
   order by
   	act.rn
-),
-check_status as
+)
+,check_status as
 (
   select
     *,
@@ -77,25 +56,23 @@ check_status as
 
   from
     diff_status
-),
-times as
+)
+,times as
 (
   select distinct
   	id,
     status,
     row_number() over w as rn,
     lag(status_time) over w as min_version_time,
-    status_time as max_version_time
+    max(status_time) over w as max_version_time
   from
     check_status
   where
     (new_version_alugado or new_version_publicado)
   window
-  	w as (partition by id order by status_time)
-  order by
-  	status_time
-),
-result as
+  	w as (partition by id order by status_time)  
+)
+,history_times as
 (
   select
     i.id,
@@ -129,9 +106,9 @@ result_version as
       coalesce(max(version) over (partition by id order by status_time),0) + 1
     ) as version
   from
-  	result
+  	history_times
 ),
-p_listing as
+prev_listing as
 (
   select
     id,
@@ -146,22 +123,84 @@ p_listing as
         )
     end  as min_version_time,
     max_version_time,
-    version
+    version,
+    row_number() over (partition by id, version order by status_time desc) as rn,
+    min(status_time) 
+    	filter (where status_history in ('publicado', 'alugado')) 
+    	over (partition by id, version order by status_time) as publication_date
   from
     result_version
 )
-select distinct
-  id,
-  version,
-  min_version_time,
-  max_version_time,
-  last_value(status_history) over (partition by id, version order by version) as last_status_version
+-- select * from prev_listing where id = 892779727
+,last_version as
+(
+	select distinct
+	  id,
+	  version,
+	  min_version_time,
+	  max_version_time,
+	  publication_date,
+	  last_value(status_history) 
+	  	over (
+	  		partition by id, version
+	  		order by status_time
+	  		RANGE BETWEEN current row AND unbounded following
+	  	) as last_status_version
+	from
+	  prev_listing
+	-- where rn = 1
+)
+,prev as
+(
+	select	
+		*,
+		lag(last_status_version) over (partition by id order by version) prev_status	
+	from
+		last_version	
+	where 
+		publication_date is not null 
+),
+rent as
+(
+	select
+		id,
+		version,
+		min_version_time,
+		max_version_time,
+		last_status_version,
+		coalesce(publication_date, max_version_time) as publication_date,
+		case coalesce(prev_status, 'alugado') when 'alugado' then 1 else 0 end as prev_rented,
+		case coalesce(last_status_version, 'alugado') when 'alugado' then 1 else 0 end as rented
+	from
+		prev
+	
+),
+relisting as
+(
+	select distinct
+		*,
+		sum(prev_rented) over (partition by id order by version) as nr_listing,
+		sum(rented) over (partition by id order by version) as nr_renting
+	from
+		rent
+)
+select
+	id,
+	version,
+	min_version_time,
+	max_version_time,
+	last_status_version,
+	nr_listing,
+	nr_renting,
+	min(publication_date) over (partition by id,nr_listing order by version) as publication_date -- considering nr_relisting rule instead of version!
 from
-  p_listing
+	relisting
 -- where
---   id = 892763624
-  -- id = 892779727 -- 892797518 -- 892798596 -- 892779727
-  -- id in(892797518, 892798596, 892779727)
+	--  id = 892763624
+  --  id = 892779727 -- 892797518 -- 892798596 -- 892779727
+	--  id in(892797518, 892798596, 892779727)
 order by
   id,
   version
+  
+  
