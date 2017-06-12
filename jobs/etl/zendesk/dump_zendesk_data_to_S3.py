@@ -75,7 +75,7 @@ class ZendeskDataToS3(object):
         BaseETL.to_s3(
             filename=self.object_type + '.csv',
             data_table=table,
-            bucket_name='{0}/{1}/{2}'.format(self.s3_datalake_bucket, self.s3_folder_path, self.object_type)
+            bucket_folder_path='{0}/{1}/{2}'.format(self.s3_datalake_bucket, self.s3_folder_path, self.object_type)
         )
 
 
