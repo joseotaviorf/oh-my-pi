@@ -68,7 +68,8 @@ class ZendeskDataToS3(object):
     def load_data_from_zendesk_to_clean(self):
         table = BaseETL.from_db_table(
             db_enum=EnumDb.BI_ODS,
-            table_name='zendesk.{}'.format(self.object_type)
+            table_name='zendesk.{}'.format(self.object_type),
+            encoding='utf-8'
         )
 
         BaseETL.to_s3(
