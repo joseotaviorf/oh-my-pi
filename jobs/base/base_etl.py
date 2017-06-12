@@ -350,6 +350,16 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
+    def dataframe_to_ods(cls, df, table_name, encoding='LATIN1'):
+        df_table = petl.fromdataframe(df=df)
+        BaseETL.bulk_insert(
+            table=df_table,
+            table_name=table_name,
+            db_enum=EnumDb.BI_ODS,
+            encoding=encoding
+        )
+
+    @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
                     encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None):
         tmpdir = '/tmp'
@@ -375,12 +385,23 @@ class BaseETL(object):
 
     @classmethod
     def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
-        tmp_fn = '{}/{}'.format(tmp_dir, filename)
         try:
-            petl.tocsv(data_table, tmp_fn, encoding=encoding, write_header=write_header)
+            petl.tocsv(data_table, '{}/{}'.format(tmp_dir, filename), encoding=encoding, write_header=write_header)
+            cls.file_to_s3(filename=filename, dir_path=tmp_dir, bucket_folder_path=bucket_folder_path)
+        except Exception as ex:
+            log(ex)
+            sys.stdout.flush()
+            return None
 
+        return bucket_folder_path, filename
+
+    @classmethod
+    def file_to_s3(cls, filename, dir_path='/tmp', bucket_folder_path=None):
+        tmp_fn = '{}/{}'.format(dir_path, filename)
+        try:
             if not bucket_folder_path:
-                bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get('s3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+                bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get(
+                    's3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
             else:
                 bucket_arr = bucket_folder_path.split('/')
                 if len(bucket_arr) > 1:
@@ -395,8 +416,13 @@ class BaseETL(object):
             sys.stdout.flush()
             return None
 
-        return bucket_folder_path, filename
+    @classmethod
+    def obj_to_s3(cls, obj_io, bucket, file_path):
+        if not obj_io or not bucket or not file_path:
+            return
 
+        s3 = boto3.resource('s3')
+        s3.Bucket(bucket).put_object(Body=obj_io.getvalue(), Key=file_path)
 
     @classmethod
     def dump_ODS_to_datalake(cls, table_name, filename=None):
