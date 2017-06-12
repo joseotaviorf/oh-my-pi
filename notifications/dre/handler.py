@@ -9,12 +9,20 @@ sys.path.append(os.path.join(here, 'vendor'))
 import requests
 import psycopg2
 import boto3
+from datetime import datetime
+import dateutil.relativedelta
 
 
 def dre_costs_last_update_date(event, context):
     cursor = connect_to_db()
     last_update_date = get_last_update_date(cursor)
     if not last_update_date:
+        return
+
+    dt = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, day=1)
+    dt_2months = dt.date() - dateutil.relativedelta.relativedelta(months=2)
+
+    if last_update_date >= dt_2months:
         return
 
     print 'posting to slack'
@@ -42,13 +50,13 @@ def connect_to_db():
 
 def get_last_update_date(cursor):
     print 'executing select on files.costs_dre'
-    cursor.execute(" select true "
-                   " from files.costs_dre "
-                   " having (max(\"Month\") + '2 mon' :: INTERVAL) :: DATE "
-                   "  < date_trunc('month', now()) :: DATE ")
+    cursor.execute("""
+                    select max("Month") :: DATE
+                    from files.costs_dre
+                   """)
 
     result = cursor.fetchone()
-    return False if not result else result[0]
+    return None if not result else result[0]
 
 
 def decrypt_variable(var):
