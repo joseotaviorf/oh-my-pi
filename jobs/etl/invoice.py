@@ -6,6 +6,7 @@ import sys
 import time
 from StringIO import StringIO
 from collections import OrderedDict
+from datetime import datetime
 
 import pandas
 import requests
@@ -14,6 +15,9 @@ from jobs.base.enum_db import EnumDb
 from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
 
 args = sys.argv
+
+full_date = datetime.strptime(args[2], '%Y-%m-%d')
+exec_year, exec_month = full_date.strftime('%m'), full_date.strftime('%d')
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename()
@@ -38,7 +42,8 @@ class Invoice(object):
         print ('m=request_data')
 
         request_result = requests.get(
-            url='{0}/{1}/{2}/{3}/all'.format(os.environ['seubarriga-reports-endpoint'], process_name, args[2], args[3]),
+            url='{0}/{1}/{2}/{3}/all'.format(os.environ['seubarriga-reports-endpoint'], process_name, exec_year,
+                                             exec_month),
             headers={'jwt-token': os.environ['seubarriga-reports-token']}
         )
 
@@ -77,7 +82,7 @@ class Invoice(object):
         BaseETL.obj_to_s3(
             obj_io=object,
             bucket=bucket_datalake,
-            file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, args[2], args[3]))
+            file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, exec_year, exec_month))
 
     def transform_data(self):
         print('m=transform_data')
@@ -86,10 +91,10 @@ class Invoice(object):
                     "from", "to", description, amount, item, "year-month", "due-date"
                     from datalake_raw.seubarriga_invoice
                     where "year-month" = '{0}{1}'
-                """.format(args[2], args[3])
+                """.format(exec_year, exec_month)
         athena_wrapper = AthenaWrapper(bucket_datalake)
         athena_wrapper.create_parquet(
-            key='clean/seubarriga/{0}/{1}_{2}-{3}.parq'.format(process_name, process_name, args[2], args[3]),
+            key='clean/seubarriga/{0}/{1}_{2}-{3}.parq'.format(process_name, process_name, exec_year, exec_month),
             query=query,
             raw_columns=OrderedDict([
                 ('contract-id', str),
@@ -125,11 +130,11 @@ class Invoice(object):
                 select contract_id, version, blocked, "from", "to", description, amount, item, year_month, due_date 
                 from datalake_clean.invoice
                 where year_month = '{0}{1}'
-            """.format(args[2], args[3])
+            """.format(exec_year, exec_month)
         )
 
         BaseETL.execute_command(
-            command="delete from invoice where year_month = '{0}{1}';".format(args[2], args[3]),
+            command="delete from invoice where year_month = '{0}{1}';".format(exec_year, exec_month),
             db_enum=EnumDb.BI_ODS,
             encoding='utf-8',
             commit=True
