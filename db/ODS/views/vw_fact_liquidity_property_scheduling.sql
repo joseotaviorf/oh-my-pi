@@ -5,7 +5,7 @@ as
 select
   id_property_scheduling as ods_id,
   -- coalesce(f.id_imovel, -1) as sk_property,
-  coalesce((f.id_imovel || '00' || coalesce(p."version", '1'))::bigint, -1::bigint) as sk_property,
+  coalesce((f.id_imovel || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
   p."version"::integer as listing_number,
   coalesce(b.id, -1) as sk_booking,
   coalesce(id_owner, -1) as sk_owner,
