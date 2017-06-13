@@ -104,7 +104,6 @@ def send_notification_to_slack(agents_list):
 
 
 if __name__ == '__main__':
-    process_name = BaseETL.get_current_filename()
     service_endpoint = os.environ['SCHEDULING_PLANNER_ENDPOINT']
     bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
@@ -119,7 +118,7 @@ if __name__ == '__main__':
         table_name=table_name,
         append=True,
         encoding='UTF8',
-        bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+        bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
     )
 
     BaseETL.to_s3(
