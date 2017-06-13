@@ -44,6 +44,7 @@ with first_pub as
     left join
       vw_dim_property p
       on p.id = l.property_id
+      and p."version" = 1 -- for supply models, always we have to get the first version of listings because we need first_publication only
 
   WINDOW
     w_prop_id as (partition by l.property_id)
