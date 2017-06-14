@@ -16,7 +16,7 @@ from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
 
 args = sys.argv
 
-full_date = datetime.strptime(args[2], '%Y-%m-%d')
+full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
 exec_year, exec_month = full_date.strftime('%m'), full_date.strftime('%d')
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
