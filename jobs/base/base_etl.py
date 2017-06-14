@@ -387,13 +387,11 @@ class BaseETL(object):
     def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
         try:
             petl.tocsv(data_table, '{}/{}'.format(tmp_dir, filename), encoding=encoding, write_header=write_header)
-            cls.file_to_s3(filename=filename, dir_path=tmp_dir, bucket_folder_path=bucket_folder_path)
+            return cls.file_to_s3(filename=filename, dir_path=tmp_dir, bucket_folder_path=bucket_folder_path)
         except Exception as ex:
             log(ex)
             sys.stdout.flush()
             return None
-
-        return bucket_folder_path, filename
 
     @classmethod
     def file_to_s3(cls, filename, dir_path='/tmp', bucket_folder_path=None):
@@ -415,6 +413,7 @@ class BaseETL(object):
             log(ex)
             sys.stdout.flush()
             return None
+        return bucket_folder_path, filename
 
     @classmethod
     def obj_to_s3(cls, obj_io, bucket, file_path):
