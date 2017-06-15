@@ -51,7 +51,7 @@ if len(args) > 1:
 
         execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_AUD', process_name + '_AUD')
         execute_etl(EnumDb.QuintoAndar_ebdb, 'CondicaoProposta', 'condition')
-        execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_CondicaoProposta', 'pre_proposal_conditions')
+        execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_CondicaoProposta', 'pre_proposal_condition')
 
     elif args[1] == 'DW':
         BaseETL.move_table_to_dw(
