@@ -1,5 +1,5 @@
-drop table if exists PreProposta_AUD;
-CREATE TABLE PreProposta_AUD (
+drop table if exists pre_proposal_AUD;
+CREATE TABLE pre_proposal_AUD (
   "id" bigint NOT NULL,
   "REV" integer NOT NULL,
   "rEVTYPE" smallint DEFAULT NULL,
