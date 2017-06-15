@@ -30,7 +30,6 @@
 				</container>
 			</container>
 		</virtual-meta-data>
-		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
 	<data-source id="aws_redshift-15b7ced4c84-4ffb1d8dfef998bc" provider="generic" driver="aws_redshift" name="Redshift" save-password="true" show-system-objects="true" read-only="false">
 		<connection host="quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com" port="5439" server="" database="dw" url="jdbc:redshift://quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com:5439/dw" user="quintoandar" password="HBEUFFdrHDsoGQsMMgxKbjERV0ZAV2IUDSkxIQIMET935w==" type="prod">
