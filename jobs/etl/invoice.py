@@ -39,13 +39,16 @@ class Invoice(object):
     """
 
     def request_data(self):
-        print ('m=request_data')
+        print (
+        'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
 
         request_result = requests.get(
-            url='{0}/{1}/{2}/{3}/all'.format(os.environ['seubarriga-reports-endpoint'], process_name, exec_year,
-                                             exec_month),
+            url='{0}/{1}/{2}/{3}/preview'.format(os.environ['seubarriga-reports-endpoint'], process_name, exec_year,
+                                                 exec_month),
             headers={'jwt-token': os.environ['seubarriga-reports-token']}
         )
+
+        print ('m=request_data, request_result={}'.format(request_result.content))
 
         return request_result.json()['file-url']
 
