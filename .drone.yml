@@ -6,7 +6,7 @@ publish:
     secret_key: $$AWS_SECRET_KEY
     region: us-east-1
     repo: quintoandar/bi-etl-ejuice
-    storage_driver: vfs
+    storage_driver: overlay
     tag:
       - $$BRANCH-$$BUILD_NUMBER
       - $$BRANCH-latest
