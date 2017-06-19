@@ -26,7 +26,7 @@ SELECT
   cap.condominio,
   cap.iptu,
   CASE
-    WHEN cap.imovel_id IS NULL THEN(
+    WHEN cap.imovel_id IS NOT NULL THEN(
     CASE
         WHEN ip.date_publication IS NOT NULL THEN NULL -- if already published, there is no reason.
         WHEN cl.tipo = 'InsideSales' then 'Unfinished Organic Inside Sales Process'
