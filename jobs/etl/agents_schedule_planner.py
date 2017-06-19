@@ -107,7 +107,8 @@ if __name__ == '__main__':
     service_endpoint = os.environ['SCHEDULING_PLANNER_ENDPOINT']
     bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
-    print('START')
+    print('Load ODS Started at {}'.format(BaseETL.now()))
+
     table_name = 'agents_schedule'
     agents_ids = get_agents_ids()
     table = get_table_agents_planner(agents_ids)
@@ -121,13 +122,16 @@ if __name__ == '__main__':
         bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
     )
 
+    print ('Load ODS Finished at {}'.format(BaseETL.now()))
+
+    filename = '{}_{}.csv'.format(table_name, BaseETL.now())
     BaseETL.to_s3(
-        filename='{}_{}.csv'.format(table_name, BaseETL.now()),
+        filename=filename,
         data_table=table,
         bucket_folder_path='{}/clean/ebdb/{}'.format(bucket_datalake, table_name)
     )
 
-    BaseETL.dump_ODS_to_datalake(table_name)
+    print ('Load {} DataLake[Clean] Finished at {}'.format(filename, BaseETL.now()))
 
     print('END')
     sys.stdout.flush()
