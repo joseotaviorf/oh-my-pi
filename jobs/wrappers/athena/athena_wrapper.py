@@ -49,34 +49,41 @@ class AthenaWrapper(BaseETL):
             }
         )
 
-        query_execution_status = self.__get_query_execution_status(response)
-        start_time = time.time()
-        while query_execution_status in ('QUEUED', 'RUNNING'):
-            if time.time() - start_time > 7200:
-                self.athena_client.stop_query_execution(QueryExecutionId=response['QueryExecutionId'])
-                raise Exception('msg=query execution timed out')
-
-            query_execution_status = self.__get_query_execution_status(response)
-
-        if query_execution_status in ('FAILED', 'CANCELLED'):
-            raise Exception('msg=query execution status {}, time_elapsed={}'.format(query_execution_status,
-                                                                                    time.time() - start_time))
-
         return response['QueryExecutionId']
 
-    def get_dataframe_from_query_execution_id(self, query_execution_id):
+    def get_dataframe_from_query_execution_id(self, query_execution_id, check_sleep_time=2):
         _logger.info(
             'm=get_dataframe_from_query_execution_id, query_execution_id={0}, msg=getting object \'{0}\' from s3 folder path \'{1}/{2}\''.format(
                 query_execution_id,
                 self.staging_dir,
                 self.bucket_folder_path))
 
+        self.__wait_for_query_results(query_execution_id, check_sleep_time)
         obj = self.s3_client.get_object(Bucket=self.staging_dir,
                                         Key='{}/{}.csv'.format(self.bucket_folder_path, query_execution_id))
         return pd.read_csv(obj['Body'])
 
-    def __get_query_execution_status(self, response):
-        query_execution = self.athena_client.get_query_execution(QueryExecutionId=response['QueryExecutionId'])
+    def __wait_for_query_results(self, query_execution_id, check_sleep_time=2):
+        _logger.info('m=__wait_for_query_results, query_execution_id={}, check_sleep_time={}'.format(query_execution_id,
+                                                                                                     check_sleep_time))
+
+        query_execution_status = self.__get_query_execution_status(query_execution_id)
+        start_time = time.time()
+        while query_execution_status in ('QUEUED', 'RUNNING'):
+            time.sleep(check_sleep_time)
+
+            if time.time() - start_time > 7200:
+                self.athena_client.stop_query_execution(QueryExecutionId=query_execution_id)
+                raise Exception('msg=query execution timed out')
+
+            query_execution_status = self.__get_query_execution_status(query_execution_id)
+
+        if query_execution_status in ('FAILED', 'CANCELLED'):
+            raise Exception('msg=query execution status {}, time_elapsed={}'.format(query_execution_status,
+                                                                                    time.time() - start_time))
+
+    def __get_query_execution_status(self, query_execution_id):
+        query_execution = self.athena_client.get_query_execution(QueryExecutionId=query_execution_id)
         return query_execution['QueryExecution']['Status']['State']
 
     def create_parquet(self, key, query, raw_columns, clean_columns=None):
@@ -144,7 +151,8 @@ class AthenaWrapper(BaseETL):
             'm=create_parquet, msg=Table created! If it has partitions and you need them right now, run msck_repair_table function.')
 
     def msck_repair_table(self, database, table_name):
-        self.execute_raw_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
+        query_execution_id = self.execute_raw_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
+        self.__wait_for_query_results(query_execution_id)
 
     def update_partitions(self, table, location):
         # An alternative approach would be to simply use an
