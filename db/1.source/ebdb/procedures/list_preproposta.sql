@@ -20,7 +20,8 @@ select
   p.criadoEm,
   p.atualizadoEm,
   p.ultimoUpdateEdicao,
-  pp_aud.dataPrimerioEnvio
+  pp_aud.dataPrimerioEnvio,
+  p.code
 from 
   PreProposta p
 left join
