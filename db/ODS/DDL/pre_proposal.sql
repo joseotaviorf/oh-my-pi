@@ -17,9 +17,11 @@ CREATE TABLE public.pre_proposal (
   "criadoEm" public.datetime,
   "atualizadoEm" public.datetime,
   "ultimoUpdateEdicao" INTEGER,
-  "dataPrimerioEnvio" public.datetime
+  "dataPrimerioEnvio" public.datetime,
+  code varchar(10)
 )
 WITH (oids = false);
 
 -- select * from pre_proposal
+
 
