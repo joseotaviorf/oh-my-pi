@@ -30,7 +30,13 @@ class AthenaWrapper(BaseETL):
         _logger.info('m=execute_file_query, filename={}'.format(filename))
 
         with open(filename) as f:
-            return self.execute_query_and_return_dataframe(sql=f.read())
+            return self.execute_raw_query(sql=f.read())
+
+    def execute_file_query_and_return_dataframe(self, filename):
+        _logger.info('m=execute_file_query_and_return_dataframe, filename={}'.format(filename))
+
+        query_execution_id = self.execute_file_query(filename)
+        return self.get_dataframe_from_query_execution_id(query_execution_id)
 
     def execute_query_and_return_dataframe(self, sql):
         _logger.info('m=execute_query_and_return_dataframe, sql={}'.format(sql))
