@@ -133,7 +133,7 @@ class Invoice(object):
         logger.info('m=load_into_ODS')
 
         athena_wrapper = AthenaWrapper(bucket_datalake)
-        data_frame = athena_wrapper.execute_query(
+        data_frame = athena_wrapper.execute_query_and_return_dataframe(
             """
                 select contract_id, version, blocked, "from", "to", description, amount, item, year_month, due_date 
                 from datalake_clean.invoice
