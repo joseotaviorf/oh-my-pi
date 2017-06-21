@@ -1,5 +1,10 @@
 # coding=utf-8
+import os
+import sys
 from collections import OrderedDict
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../../'))
 
 from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
 

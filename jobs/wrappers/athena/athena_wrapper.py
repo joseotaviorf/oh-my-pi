@@ -1,12 +1,16 @@
 # TODO Create table from dictionary or array.
+import logging
 import re
 import sys
+import time
 
 import boto3
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-import pyathenajdbc
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger(__name__)
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -18,22 +22,67 @@ class AthenaWrapper(BaseETL):
     def __init__(self, staging_dir, *args, **kwargs):
         super(AthenaWrapper, self).__init__(*args, **kwargs)
         self.staging_dir = staging_dir
+        self.athena_client = boto3.client('athena')
+        self.s3_client = boto3.client('s3')
+        self.bucket_folder_path = 'query_results'
 
-    def execute_query(self, sql):
-        s3_staging_dir = 's3://{}/query_results/'.format(self.staging_dir)
-        conn = pyathenajdbc.connect(s3_staging_dir=s3_staging_dir, region_name='us-east-1')
+    def execute_file_query(self, filename):
+        _logger.info('m=execute_file_query, filename={}'.format(filename))
 
-        with conn.cursor() as cursor:
-            cursor.execute(sql)
-            try:
-                return pyathenajdbc.util.as_pandas(cursor)
-            except ValueError:
-                return None
+        with open(filename) as f:
+            return self.execute_query_and_return_dataframe(sql=f.read())
+
+    def execute_query_and_return_dataframe(self, sql):
+        _logger.info('m=execute_query_and_return_dataframe, sql={}'.format(sql))
+
+        query_execution_id = self.execute_raw_query(sql)
+        return self.get_dataframe_from_query_execution_id(query_execution_id)
+
+    def execute_raw_query(self, sql):
+        _logger.info('m=execute_raw_query, sql={}'.format(sql))
+
+        s3_staging_dir = 's3://{}/{}/'.format(self.staging_dir, self.bucket_folder_path)
+        response = self.athena_client.start_query_execution(
+            QueryString=sql,
+            ResultConfiguration={
+                'OutputLocation': s3_staging_dir
+            }
+        )
+
+        query_execution_status = self.__get_query_execution_status(response)
+        start_time = time.time()
+        while query_execution_status in ('QUEUED', 'RUNNING'):
+            if time.time() - start_time > 7200:
+                self.athena_client.stop_query_execution(QueryExecutionId=response['QueryExecutionId'])
+                raise Exception('msg=query execution timed out')
+
+            query_execution_status = self.__get_query_execution_status(response)
+
+        if query_execution_status in ('FAILED', 'CANCELLED'):
+            raise Exception('msg=query execution status {}, time_elapsed={}'.format(query_execution_status,
+                                                                                    time.time() - start_time))
+
+        return response['QueryExecutionId']
+
+    def get_dataframe_from_query_execution_id(self, query_execution_id):
+        _logger.info(
+            'm=get_dataframe_from_query_execution_id, query_execution_id={0}, msg=getting object \'{0}\' from s3 folder path \'{1}/{2}\''.format(
+                query_execution_id,
+                self.staging_dir,
+                self.bucket_folder_path))
+
+        obj = self.s3_client.get_object(Bucket=self.staging_dir,
+                                        Key='{}/{}.csv'.format(self.bucket_folder_path, query_execution_id))
+        return pd.read_csv(obj['Body'])
+
+    def __get_query_execution_status(self, response):
+        query_execution = self.athena_client.get_query_execution(QueryExecutionId=response['QueryExecutionId'])
+        return query_execution['QueryExecution']['Status']['State']
 
     def create_parquet(self, key, query, raw_columns, clean_columns=None):
-        print("Querying on Athena...")
-        print(query)
-        data = self.execute_query(query)
+        _logger.info('m=create_parquet, key={}, query={}, msg=querying on athena...'.format(key, query))
+
+        data = self.execute_query_and_return_dataframe(query)
         data = data.astype(object).where(pd.notnull(data), None)
 
         new_data = pd.DataFrame()
@@ -54,17 +103,15 @@ class AthenaWrapper(BaseETL):
 
                         new_data.loc[row, list_clean_columns[index]] = new_value if new_value else None
 
-        print("Creating parquet file...")
-
+        _logger.info('m=create_parquet, msg=creating parquet file')
         table = pa.Table.from_pandas(df=new_data if clean_columns else data)
         with pa.BufferOutputStream() as file_handler:
             pq.write_table(table, file_handler)
 
-        print("Saving to s3...")
-        s3_bucket = boto3.resource('s3').Bucket(self.staging_dir)
-        s3_bucket.put_object(Key=key, Body=file_handler.get_result().to_pybytes())
+        _logger.info('m=create_parquet, msg=saving to s3')
+        self.s3_client.put_object(Bucket=self.staging_dir, Key=key, Body=file_handler.get_result().to_pybytes())
 
-        print("{} ready!".format(key))
+        _logger.info('m=create_parquet, msg={} ready!'.format(key))
 
     def create_athena_table_with_json_serde(self, database, table_name, schema, location, partitions=None,
                                             serde_options=None, drop_if_exists=True):
@@ -75,7 +122,7 @@ class AthenaWrapper(BaseETL):
     def __create_athena_table(self, database, table_name, schema, location, serde, partitions=None,
                               serde_options=None, drop_if_exists=True):
         if drop_if_exists:
-            self.execute_query("""DROP TABLE IF EXISTS {}.{}""".format(database, table_name))
+            self.execute_raw_query("""DROP TABLE IF EXISTS {}.{}""".format(database, table_name))
 
         query = """CREATE EXTERNAL TABLE IF NOT EXISTS {}.{} ({}) """.format(database, table_name, schema)
 
@@ -89,14 +136,15 @@ class AthenaWrapper(BaseETL):
 
         query += """LOCATION '{}'""".format(location)
 
-        print("Trying to create {}.{}...".format(database, table_name))
+        _logger.info('m=create_parquet, msg=Trying to create {}.{}...'.format(database, table_name))
 
-        self.execute_query(query)
+        self.execute_raw_query(query)
 
-        print("Table created! If it has partitions and you need them right now, run msck_repair_table function.")
+        _logger.info(
+            'm=create_parquet, msg=Table created! If it has partitions and you need them right now, run msck_repair_table function.')
 
     def msck_repair_table(self, database, table_name):
-        self.execute_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
+        self.execute_raw_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
 
     def update_partitions(self, table, location):
         # An alternative approach would be to simply use an
@@ -126,7 +174,7 @@ class AthenaWrapper(BaseETL):
         #         format(pp[1], pp[3], pp[5])
         #     sql += """LOCATION '{}'""".format(bucket_path + p)
         #
-        #     print ("Adding new partition at {}".format(bucket_path + p))
+        #     _logger.info('m=update_partitions, msg=Adding new partition at {}'.format(bucket_path + p))
         #     self._execute_query(sql)
 
         # TODO Need to figure out how to implement this one to be generic at location and partitions!
