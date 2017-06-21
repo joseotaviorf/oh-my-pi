@@ -86,6 +86,12 @@ class AthenaWrapper(BaseETL):
         query_execution = self.athena_client.get_query_execution(QueryExecutionId=query_execution_id)
         return query_execution['QueryExecution']['Status']['State']
 
+    def execute_query_and_wait_for_results(self, sql):
+        _logger.info('m=execute_query_and_wait_for_results, sql={}'.format(sql))
+
+        query_execution_id = self.execute_raw_query(sql)
+        self.__wait_for_query_results(query_execution_id)
+
     def create_parquet(self, key, query, raw_columns, clean_columns=None):
         _logger.info('m=create_parquet, key={}, query={}, msg=querying on athena...'.format(key, query))
 
@@ -129,7 +135,7 @@ class AthenaWrapper(BaseETL):
     def __create_athena_table(self, database, table_name, schema, location, serde, partitions=None,
                               serde_options=None, drop_if_exists=True):
         if drop_if_exists:
-            self.execute_raw_query("""DROP TABLE IF EXISTS {}.{}""".format(database, table_name))
+            self.execute_query_and_wait_for_results("""DROP TABLE IF EXISTS {}.{}""".format(database, table_name))
 
         query = """CREATE EXTERNAL TABLE IF NOT EXISTS {}.{} ({}) """.format(database, table_name, schema)
 
@@ -145,14 +151,13 @@ class AthenaWrapper(BaseETL):
 
         _logger.info('m=create_parquet, msg=Trying to create {}.{}...'.format(database, table_name))
 
-        self.execute_raw_query(query)
+        self.execute_query_and_wait_for_results(query)
 
         _logger.info(
             'm=create_parquet, msg=Table created! If it has partitions and you need them right now, run msck_repair_table function.')
 
     def msck_repair_table(self, database, table_name):
-        query_execution_id = self.execute_raw_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
-        self.__wait_for_query_results(query_execution_id)
+        self.execute_query_and_wait_for_results("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
 
     def update_partitions(self, table, location):
         # An alternative approach would be to simply use an
