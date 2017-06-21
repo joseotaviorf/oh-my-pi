@@ -1,4 +1,4 @@
-drop table if exists invoice
+drop table if exists invoice;
 create table invoice
 (
 	contract_id bigint not null,
@@ -18,8 +18,8 @@ create index invoice_contract_id_index
 	on invoice (contract_id)
 ;
 
-create index invoice_item_index
-	on invoice (item)
+create index invoice_item_from_to_index
+	on invoice (item, "from", "to")
 ;
 
 create index invoice_year_month_index
