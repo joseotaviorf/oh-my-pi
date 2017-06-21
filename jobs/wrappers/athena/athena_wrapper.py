@@ -1,4 +1,5 @@
 # TODO Create table from dictionary or array.
+import logging
 import re
 import sys
 
@@ -7,6 +8,9 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pyathenajdbc
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -31,8 +35,9 @@ class AthenaWrapper(BaseETL):
                 return None
 
     def create_parquet(self, key, query, raw_columns, clean_columns=None):
-        print("Querying on Athena...")
-        print(query)
+        logger.info('m=create_parquet, msg=Querying on Athena...')
+        logger.info('query={}'.format(query))
+
         data = self.execute_query(query)
         data = data.astype(object).where(pd.notnull(data), None)
 
@@ -54,17 +59,17 @@ class AthenaWrapper(BaseETL):
 
                         new_data.loc[row, list_clean_columns[index]] = new_value if new_value else None
 
-        print("Creating parquet file...")
+                logger.info('m=create_parquet, msg=Creating parquet file...')
 
         table = pa.Table.from_pandas(df=new_data if clean_columns else data)
         with pa.BufferOutputStream() as file_handler:
             pq.write_table(table, file_handler)
 
-        print("Saving to s3...")
+        logger.info('m=create_parquet, msg=Saving to s3...')
         s3_bucket = boto3.resource('s3').Bucket(self.staging_dir)
         s3_bucket.put_object(Key=key, Body=file_handler.get_result().to_pybytes())
 
-        print("{} ready!".format(key))
+        logger.info('m=create_parquet, msg={} ready!'.format(key))
 
     def create_athena_table_with_json_serde(self, database, table_name, schema, location, partitions=None,
                                             serde_options=None, drop_if_exists=True):
@@ -89,11 +94,12 @@ class AthenaWrapper(BaseETL):
 
         query += """LOCATION '{}'""".format(location)
 
-        print("Trying to create {}.{}...".format(database, table_name))
+        logger.info('m=create_parquet, msg=Trying to create {}.{}...'.format(database, table_name))
 
         self.execute_query(query)
 
-        print("Table created! If it has partitions and you need them right now, run msck_repair_table function.")
+        logger.info(
+            'm=create_parquet, msg=Table created! If it has partitions and you need them right now, run msck_repair_table function.')
 
     def msck_repair_table(self, database, table_name):
         self.execute_query("""MSCK REPAIR TABLE {}.{}""".format(database, table_name))
@@ -126,7 +132,7 @@ class AthenaWrapper(BaseETL):
         #         format(pp[1], pp[3], pp[5])
         #     sql += """LOCATION '{}'""".format(bucket_path + p)
         #
-        #     print ("Adding new partition at {}".format(bucket_path + p))
+        #     logger.info('m=update_partitions, msg=Adding new partition at {}'.format(bucket_path + p))
         #     self._execute_query(sql)
 
         # TODO Need to figure out how to implement this one to be generic at location and partitions!

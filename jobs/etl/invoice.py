@@ -1,5 +1,6 @@
 import gzip
 import io
+import logging
 import os
 import re
 import sys
@@ -8,15 +9,19 @@ from StringIO import StringIO
 from collections import OrderedDict
 from datetime import datetime
 
+import dateutil.relativedelta
 import pandas
 import requests
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 args = sys.argv
 
-full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
+full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - dateutil.relativedelta.relativedelta(months=1)
 exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -39,8 +44,8 @@ class Invoice(object):
     """
 
     def request_data(self):
-        print (
-        'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
+        logger.info(
+            'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
 
         request_result = requests.get(
             url='{0}/{1}/{2}/{3}/preview'.format(os.environ['seubarriga-reports-endpoint'], process_name, exec_year,
@@ -48,12 +53,12 @@ class Invoice(object):
             headers={'jwt-token': os.environ['seubarriga-reports-token']}
         )
 
-        print ('m=request_data, request_result={}'.format(request_result.content))
+        logger.info('m=request_data, request_result={}'.format(request_result.content))
 
         return request_result.json()['file-url']
 
     def request_job_data(self, job_url):
-        print ('m=request_job_data, job_url={}'.format(job_url))
+        logger.info('m=request_job_data, job_url={}'.format(job_url))
 
         job_result = requests.get(
             url=job_url,
@@ -63,13 +68,13 @@ class Invoice(object):
         return job_result.content.decode('utf-8')
 
     def load_content_to_memory_as_csv(self, content):
-        print('m=load_content_to_memory_as_csv')
+        logger.info('m=load_content_to_memory_as_csv')
 
         memory_content = StringIO(content)
         return pandas.read_csv(memory_content)
 
     def convert_csv_to_json(self, data_frame):
-        print ('m=convert_csv_to_json')
+        logger.info('m=convert_csv_to_json')
 
         gz_body = io.BytesIO()
         with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -80,7 +85,7 @@ class Invoice(object):
         return gz_body
 
     def save_into_s3(self, object, file_path_prefix):
-        print ('m=save_into_s3, file_path={0}/{1}.gz'.format(file_path_prefix, process_name))
+        logger.info('m=save_into_s3, file_path={0}/{1}.gz'.format(file_path_prefix, process_name))
 
         BaseETL.obj_to_s3(
             obj_io=object,
@@ -88,7 +93,7 @@ class Invoice(object):
             file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, exec_year, exec_month))
 
     def transform_data(self):
-        print('m=transform_data')
+        logger.info('m=transform_data')
         query = """
                     select "contract-id", version, blocked, 
                     "from", "to", description, amount, item, "year-month", "due-date"
@@ -125,7 +130,7 @@ class Invoice(object):
             ]))
 
     def load_into_ODS(self):
-        print ('m=load_into_ODS')
+        logger.info('m=load_into_ODS')
 
         athena_wrapper = AthenaWrapper(bucket_datalake)
         data_frame = athena_wrapper.execute_query(
@@ -155,7 +160,7 @@ if __name__ == '__main__':
 
     if args[1] == 'extract':
         job_url = invoice.request_data()
-        print ('waiting for results to be available')
+        logger.info('m=main, msg=waiting for results to be available')
 
         time.sleep(60)
 
