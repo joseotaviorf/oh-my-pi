@@ -1,5 +1,4 @@
-pyathenajdbc==1.1.1
-boto3==1.4.1
+boto3==1.4.4
 botocore==1.4.69
 cffi==1.9.1
 cryptography==1.7.1
