@@ -1,5 +1,5 @@
 boto3==1.4.4
-botocore==1.4.69
+botocore==1.5.74
 cffi==1.9.1
 cryptography==1.7.1
 docutils==0.12
