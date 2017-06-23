@@ -65,9 +65,7 @@ class AthenaWrapper(BaseETL):
                 self.bucket_folder_path))
 
         self.__wait_for_query_results(query_execution_id, check_sleep_time)
-        obj = self.s3_client.get_object(Bucket=self.staging_dir,
-                                        Key='{}/{}.csv'.format(self.bucket_folder_path, query_execution_id))
-        return pd.read_csv(obj['Body'])
+        return pd.read_csv('s3://{}/{}/{}.csv'.format(self.staging_dir, self.bucket_folder_path, query_execution_id))
 
     def __wait_for_query_results(self, query_execution_id, check_sleep_time=2):
         _logger.info('m=__wait_for_query_results, query_execution_id={}, check_sleep_time={}'.format(query_execution_id,
