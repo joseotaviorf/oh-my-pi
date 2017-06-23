@@ -46,10 +46,10 @@ if len(args) > 1:
             db_enum=EnumDb.BI_ODS,
             commit=True
         )
-        print("{} - property_listing table created on staging area!", BaseETL.now())
+        print("{} - property_listing table created on staging area!".format(BaseETL.now()))
 
         BaseETL.dump_ODS_to_datalake(table_name='property_listing')
-        print("{} - property_listing file created on datalake!", BaseETL.now())
+        print("{} - property_listing file created on datalake!".format(BaseETL.now()))
 
         BaseETL.move_table_to_dw(
             table_name='vw_fact_liquidity_property_scheduling',
@@ -60,3 +60,6 @@ if len(args) > 1:
             bucket_name='{}/clean/ebdb/{}'.format(bucket_datalake, process_name),
             process_name=process_name
         )
+
+    sys.stdout.flush()
+    sys.stdout.close()
