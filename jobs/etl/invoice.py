@@ -122,7 +122,7 @@ class Invoice(object):
             clean_columns=OrderedDict([
                 ('contract_id', long),
                 ('version', str),
-                ('blocked', bool),
+                ('blocked', str),
                 ('from', str),
                 ('to', str),
                 ('description', str),
