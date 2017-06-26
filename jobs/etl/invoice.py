@@ -12,6 +12,8 @@ from datetime import datetime
 import dateutil.relativedelta
 import pandas
 import requests
+import json
+
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
@@ -24,6 +26,7 @@ args = sys.argv
 full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - dateutil.relativedelta.relativedelta(months=1)
 exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
 
+seubarriga_invoice = json.loads(os.environ['seubarriga'])['invoice']
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename()
 tmp_dir = '/tmp'
@@ -48,9 +51,9 @@ class Invoice(object):
             'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
 
         request_result = requests.get(
-            url='{0}/{1}/{2}/{3}/preview'.format(os.environ['seubarriga-reports-endpoint'], process_name, exec_year,
+            url='{0}/{1}/{2}/{3}/preview'.format(seubarriga_invoice['reports-endpoint'], process_name, exec_year,
                                                  exec_month),
-            headers={'jwt-token': os.environ['seubarriga-reports-token']}
+            headers={'jwt-token': seubarriga_invoice['reports-token']}
         )
 
         _logger.info('m=request_data, request_result={}'.format(request_result.content))
@@ -62,7 +65,7 @@ class Invoice(object):
 
         job_result = requests.get(
             url=job_url,
-            headers={'jwt-token': os.environ['seubarriga-reports-token']}
+            headers={'jwt-token': seubarriga_invoice['reports-token']}
         )
 
         return job_result.content.decode('utf-8')
@@ -162,7 +165,7 @@ if __name__ == '__main__':
         job_url = invoice.request_data()
         _logger.info('m=main, msg=waiting for results to be available')
 
-        time.sleep(300)
+        time.sleep(seubarriga_invoice['job-waiting-time'])
 
         content = invoice.request_job_data(job_url=job_url)
         data_frame = invoice.load_content_to_memory_as_csv(content=content)
