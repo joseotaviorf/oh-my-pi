@@ -1,5 +1,6 @@
 import gzip
 import io
+import json
 import logging
 import os
 import re
@@ -9,21 +10,19 @@ from StringIO import StringIO
 from collections import OrderedDict
 from datetime import datetime
 
-import dateutil.relativedelta
 import pandas
 import requests
-import json
-
+from dateutil.relativedelta import relativedelta
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
-from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
+from qa_python_utils.aws.athena import AthenaClient
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 args = sys.argv
 
-full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - dateutil.relativedelta.relativedelta(months=1)
+full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - relativedelta(months=1)
 exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
 
 seubarriga_invoice = json.loads(os.environ['seubarriga'])['invoice']
@@ -34,16 +33,20 @@ tmp_dir = '/tmp'
 
 class Invoice(object):
     """columns:
-            contract-id (raw) - contract_id (clean),
-            version,
-            blocked,
-            from,
-            to,
-            description,
-            amount,
-            item,
-            year-month (raw) - year_month (clean),
-            due-date (raw) - due_date (clean)
+    -----------------------------
+    |    raw      |    clean    |
+    -----------------------------
+    | contract-id | contract_id |
+    |   version   |   version   |
+    |   blocked   |   blocked   |
+    |    from     |    from     |
+    |     to      |     to      |
+    | description | description |
+    |   amount    |   amount    |
+    |    item     |    item     |
+    | year-month  | year_month  |
+    |  due-date   |  due_date   |
+    -----------------------------
     """
 
     def request_data(self):
@@ -93,18 +96,22 @@ class Invoice(object):
         BaseETL.obj_to_s3(
             obj_io=object,
             bucket=bucket_datalake,
-            file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, exec_year, exec_month))
+            file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, exec_year, exec_month)
+        )
 
     def transform_data(self):
         _logger.info('m=transform_data')
-        query = """
-                    select "contract-id", version, blocked, 
+        query = """select "contract-id", version, 
+                    case 
+                      when lower(blocked) = 'true' 
+                        then 'True' 
+                      else 'False' 
+                    end as blocked, 
                     "from", "to", description, amount, item, "year-month", "due-date"
                     from datalake_raw.seubarriga_invoice
-                    where "year-month" = '{0}{1}'
-                """.format(exec_year, exec_month)
-        athena_wrapper = AthenaWrapper(bucket_datalake)
-        athena_wrapper.create_parquet(
+                    where rtrim("year-month") = '{0}{1}'""".format(exec_year, exec_month)
+        athena_client = AthenaClient(bucket_datalake)
+        athena_client.create_parquet(
             key='clean/seubarriga/{0}/{1}_{2}-{3}.parq'.format(process_name, process_name, exec_year, exec_month),
             query=query,
             raw_columns=OrderedDict([
@@ -122,7 +129,7 @@ class Invoice(object):
             clean_columns=OrderedDict([
                 ('contract_id', long),
                 ('version', str),
-                ('blocked', str),
+                ('blocked', bool),
                 ('from', str),
                 ('to', str),
                 ('description', str),
@@ -135,14 +142,11 @@ class Invoice(object):
     def load_into_ODS(self):
         _logger.info('m=load_into_ODS')
 
-        athena_wrapper = AthenaWrapper(bucket_datalake)
-        data_frame = athena_wrapper.execute_query_and_return_dataframe(
-            """
-                select contract_id, version, blocked, "from", "to", description, amount, item, year_month, due_date 
+        athena_client = AthenaClient(bucket_datalake)
+        data_frame = athena_client.execute_query_and_return_dataframe(
+            """select contract_id, version, blocked, "from", "to", description, amount, item, year_month, due_date 
                 from datalake_clean.invoice
-                where year_month = '{0}{1}'
-            """.format(exec_year, exec_month)
-        )
+                where rtrim(year_month) = '{0}{1}'""".format(exec_year, exec_month))
 
         BaseETL.execute_command(
             command="""delete from invoice where year_month = '{0}{1}';""".format(exec_year, exec_month),
@@ -173,8 +177,11 @@ if __name__ == '__main__':
         invoice.save_into_s3(object=object, file_path_prefix='raw/seubarriga/{0}'.format(process_name))
         object.flush()
 
-    if args[1] == 'transform':
+    elif args[1] == 'transform':
         invoice.transform_data()
 
-    if args[1] == 'load':
+    elif args[1] == 'load':
         invoice.load_into_ODS()
+
+    else:
+        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
