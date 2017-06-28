@@ -14,7 +14,7 @@ BaseETL.move_table_to_dw(
     table_name_dest='fact_listing_status',
     encoding='utf8',
     append=False,
-    bucket_name='{}/clean/ebdb/{}'.format(bucket_datalake, process_name),
+    bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
     process_name=process_name
 )
 
