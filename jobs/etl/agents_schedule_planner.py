@@ -119,7 +119,7 @@ if __name__ == '__main__':
         table_name=table_name,
         append=True,
         encoding='UTF8',
-        bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, table_name)
+        bucket_name='{}/raw/ods/{}'.format(bucket_datalake, table_name)
     )
 
     print ('Load ODS Finished at {}'.format(BaseETL.now()))
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     BaseETL.to_s3(
         filename=filename,
         data_table=table,
-        bucket_folder_path='{}/clean/ebdb/{}'.format(bucket_datalake, table_name)
+        bucket_folder_path='{}/clean/ods/{}'.format(bucket_datalake, table_name)
     )
 
     print ('Load {} DataLake[Clean] Finished at {}'.format(filename, BaseETL.now()))

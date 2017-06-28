@@ -165,7 +165,7 @@ def load_data():
         encoding='UTF8',
         append=True,
         commit=True,
-        bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+        bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
     )
 
 if __name__ == "__main__":

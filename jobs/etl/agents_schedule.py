@@ -180,12 +180,12 @@ BaseETL.bulk_insert(
     db_enum=EnumDb.BI_ODS,
     append=False,
     commit=True,
-    bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+    bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
 )
 
 BaseETL.copy_file_between_s3_buckets(
     bucket_source=bucket_datalake,
     bucket_destination=bucket_datalake,
-    full_filename_source='raw/ebdb/{0}/{0}.csv'.format(process_name),
-    full_filename_dest='clean/ebdb/{0}/{0}.csv'.format(process_name)
+    full_filename_source='raw/ods/{0}/{0}.csv'.format(process_name),
+    full_filename_dest='clean/ods/{0}/{0}.csv'.format(process_name)
 )
