@@ -5,12 +5,11 @@ where available_date in ('2017-05-08', '2017-05-15', '2017-05-01')
 group by available_date; -- , '2017-05-04', '2017-05-05', '2017-05-06', '2017-05-07');
 
 */
-
 -- delete
-select count(1)
+ select count(1)
 from agents_schedule 
 where available_date 
-in ('2017-05-15');
+in ('2017-05-23');
 
 insert into public.agents_schedule
 SELECT 
@@ -26,6 +25,6 @@ SELECT
 	slot_status, 
 	"timestamp" + '7 days'::interval  as "timestamp"
 FROM public.agents_schedule
-where available_date in ('2017-05-08');
+where available_date in ('2017-05-16');
 
 

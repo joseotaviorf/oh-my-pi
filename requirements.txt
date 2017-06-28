@@ -40,8 +40,9 @@ win-inet-pton==1.0.1
 xmltodict==0.10.2
 PyDrive
 s3fs
-numpy==1.12.1
+numpy==1.13.0
 pandas==0.20.1
 # Google2Pandas==0.1.0
 zenpy==1.2.2
 pyarrow==0.4.0
+git+git://github.com/quintoandar/python-utils.git
