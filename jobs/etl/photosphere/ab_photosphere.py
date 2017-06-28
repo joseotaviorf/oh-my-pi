@@ -1,9 +1,9 @@
 # coding=utf-8
 from collections import OrderedDict
 
-from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
+from qa_python_utils.aws.athena import AthenaClient
 
-athena = AthenaWrapper(staging_dir='5a-datalake')
+athena = AthenaClient(staging_dir='5a-datalake')
 
 database = 'amplitude_prod'
 table_list = [
