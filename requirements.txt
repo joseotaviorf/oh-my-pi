@@ -39,7 +39,7 @@ uritemplate==3.0.0
 win-inet-pton==1.0.1
 xmltodict==0.10.2
 PyDrive
-s3fs
+s3fs==0.0.9
 numpy==1.13.0
 pandas==0.20.1
 # Google2Pandas==0.1.0

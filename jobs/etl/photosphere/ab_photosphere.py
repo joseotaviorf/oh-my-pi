@@ -1,9 +1,9 @@
 # coding=utf-8
 from collections import OrderedDict
 
-from jobs.wrappers.athena.athena_wrapper import AthenaWrapper
+from qa_python_utils.aws.athena import AthenaClient
 
-athena = AthenaWrapper(staging_dir='5a-datalake')
+athena = AthenaClient(staging_dir='5a-datalake')
 
 database = 'amplitude_prod'
 table_list = [
@@ -54,28 +54,31 @@ metrics = {
         {
             'query':
                 """select 
-                     min(client_event_time) as listing_viewed_dt,
-                     min(photosphere_open_dt) as photosphere_open_dt,
-                     case when avg(if(ab_photosphere='A',10,20)) = 10 then 'A' 
-                          when avg(if(ab_photosphere='A',10,20)) = 20 then 'B' else 'E' end as ab_photosphere,
-                     min(amplitude_id) as amplitude_id,
-                     imovel_id,
-                     min(user_id) as user_id		
-                     from (
-                         select
-                         a.amplitude_id, 
-                         a.event_properties.imovel_id,     
-                         a.client_event_time,
-                         a.user_properties.ab_photosphere,
-                         usr.user_id,
-                         b.client_event_time as photosphere_open_dt
-                         from amplitude_prod.ev_listing_page_viewed a
-                         left join amplitude_prod.ev_confirmation_visit_confirmed usr on usr.amplitude_id = a.amplitude_id
-                         left join amplitude_prod.ev_listing_photosphere_opened b on b.amplitude_id=a.amplitude_id and b.event_properties.imovel_id=a.event_properties.imovel_id
-                         where a.user_properties.ab_photosphere in ('A','B')
-                         and a.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)                  
-                     ) x 
-                     group by coalesce(user_id, amplitude_id), imovel_id having avg(if(ab_photosphere='A',10,20)) in (10,20)""",
+                  min(event_time) as listing_viewed_dt, 
+                  min(photosphere_open_dt) as photosphere_open_dt,
+                  case when avg(if(ab_photosphere='A',10,20)) = 10 then 'A' 
+                        when avg(if(ab_photosphere='A',10,20)) = 20 then 'B' else 'E' end as ab_photosphere,
+                  min(amplitude_id) as amplitude_id,
+                  imovel_id,
+                  min(user_id) as user_id,      
+                  avg(platform) as platform 
+                  from (
+                      select
+                      a.amplitude_id, 
+                      a.event_properties.imovel_id,     
+                      a.event_time,     
+                      a.user_properties.ab_photosphere,
+                      usr.user_id,
+                          case when a.user_properties.platform = 'web_mobile' then 0    
+                          when a.user_properties.platform = 'web_desktop' then 1 end as platform,
+                      b.event_time as photosphere_open_dt   
+                      from amplitude_prod.ev_listing_page_viewed a
+                      left join amplitude_prod.ev_confirmation_visit_confirmed usr on usr.amplitude_id = a.amplitude_id
+                      left join amplitude_prod.ev_listing_photosphere_opened b on b.amplitude_id=a.amplitude_id and b.event_properties.imovel_id=a.event_properties.imovel_id
+                      where a.user_properties.ab_photosphere in ('A','B')
+                      and a.event_properties.imovel_id IN(select distinct cast(house_id as bigint) from amplitude_prod.ab_photosphere_ids where house_id is not null)
+                  ) x 
+                group by coalesce(user_id, amplitude_id), imovel_id having avg(if(ab_photosphere='A',10,20)) in (10,20)""",
             'key': 'clean/amplitude/ab_tests/photosphere/funnel_conversion/funnel_conversion.parq',
             'schema': OrderedDict([
                 ('listing_viewed_dt', str),
@@ -83,7 +86,8 @@ metrics = {
                 ('ab_photosphere', str),
                 ('amplitude_id', long),
                 ('imovel_id', long),
-                ('user_id', long)
+                ('user_id', long),
+                ('platform', int)
             ])
         },
 
