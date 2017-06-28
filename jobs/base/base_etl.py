@@ -474,3 +474,20 @@ class BaseETL(object):
             table = table.rename(rename_dict)
 
         return table
+
+    @classmethod
+    def convert_dataframe_to_json_gzip(cls, data_frame, encode='utf-8'):
+        print('m=convert_dataframe_to_json_gzip')
+
+        gz_body = io.BytesIO()
+        with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
+            for row in data_frame.iterrows():
+                fp.write(row[1].to_json().encode(encode).replace('"None"', 'null'))
+                fp.write('\n')
+
+        return gz_body
+
+    @classmethod
+    def convert_camel_to_snake_case(cls, name):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
