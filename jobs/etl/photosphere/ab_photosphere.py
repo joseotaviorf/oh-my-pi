@@ -87,7 +87,7 @@ metrics = {
                 ('amplitude_id', long),
                 ('imovel_id', long),
                 ('user_id', long),
-                ('platform', int)
+                ('platform', float)
             ])
         },
 
