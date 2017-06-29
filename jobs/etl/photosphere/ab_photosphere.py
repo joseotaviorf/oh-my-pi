@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from qa_python_utils.aws.athena import AthenaClient
 
-athena = AthenaClient(staging_dir='5a-datalake')
+athena = AthenaClient('5a-datalake')
 
 database = 'amplitude_prod'
 table_list = [
