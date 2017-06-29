@@ -14,7 +14,7 @@ BaseETL.move_table_to_dw(
     enum_db_dest=EnumDb.BI_DW,
     table_name_dest=table_name,
     append=False,
-    bucket_name='{}/clean/ebdb/{}'.format(bucket_datalake, process_name),
+    bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
     process_name=process_name
 )
 

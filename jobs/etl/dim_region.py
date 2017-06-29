@@ -30,7 +30,7 @@ if len(args) > 1:
             encoding='UTF8',
             append=True,
             commit=True,
-            bucket_name='{}/raw/ebdb/{}'.format(bucket_datalake, process_name)
+            bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
         )
 
     elif args[1] == 'DW':
@@ -40,7 +40,7 @@ if len(args) > 1:
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False,
-            bucket_name='{}/clean/ebdb/{}'.format(bucket_datalake, process_name),
+            bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
             process_name=process_name
         )
 
