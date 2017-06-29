@@ -10,6 +10,8 @@ def move_to_datalake(schema_name, table_name):
     db = EnumDb.QuintoAndar_ebdb
 
     print("Start query: {}".format(now))
+
+    # get data from table
     table = BaseETL.from_db_table(
         db_enum=db,
         table_name=table_name,
@@ -17,12 +19,20 @@ def move_to_datalake(schema_name, table_name):
     ).addfield('dt_timestamp', now)
 
     print("To ODS: {}".format(now))
-    file_path = 'raw/{0}/{1}/{1}.gz'.format(schema_name, table_name)
-    table = BaseETL.decode_table(table, 'LATIN-1')
-    table = petl.convertall(table, unicode)
+
+    table = BaseETL.decode_table(table, 'LATIN-1') # decode table from LATIN-1
+    table = petl.convertall(table, unicode) # convert all fields to unicode
+
+    # get all columns declared as BIT because we have a bug converting BIT columns on mysql
+    bit_columns = petl.select(get_columns(schema_name, table_name, False), lambda rec: rec.DATA_TYPE == 'bit')
+    table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
+
+    # compact all table values into a gzip
     df_table = petl.todataframe(table)
     gz = BaseETL.convert_dataframe_to_json_gzip(df_table)
 
+    # move to s3
+    file_path = 'raw/{0}/{1}/{1}.gz'.format(schema_name, table_name)
     BaseETL.obj_to_s3(
         obj_io=gz,
         bucket=bucket_datalake,
@@ -31,7 +41,7 @@ def move_to_datalake(schema_name, table_name):
     print ("{} moved to Datalake!".format(table_name))
 
 
-def get_columns(schema_name, table_name):
+def get_columns(schema_name, table_name, skip_header=True):
     columns_table = BaseETL.from_db_query(
         db_enum=EnumDb.QuintoAndar_ebdb,
         query="""
@@ -44,7 +54,8 @@ def get_columns(schema_name, table_name):
                 and TABLE_NAME = '{}'
             """.format(schema_name, table_name),
     )
-    columns_table.pop(0)  # skip header
+    if skip_header:
+        columns_table.pop(0)
     return columns_table
 
 
@@ -87,18 +98,19 @@ def create_external_table(bucket_datalake, database_name, schema_name, table_nam
     c.execute_query_and_wait_for_results(command)
 
 
-def get_table_names():
+def get_table_names(skip_header=True):
     sql_tables = """
     select TABLE_NAME
     from information_schema.TABLES
     where TABLE_SCHEMA = '{}'
-    and TABLE_TYPE = 'BASE TABLE'
+    and TABLE_TYPE = 'BASE TABLE'    
 """.format(schema_name)
     table_names = BaseETL.from_db_query(
         db_enum=EnumDb.QuintoAndar_ebdb,
         query=sql_tables
     )
-    table_names.pop(0)  # remove header
+    if skip_header:
+        table_names.pop(0)  # remove header
     return table_names
 
 
