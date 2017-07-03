@@ -82,8 +82,7 @@ def get_type_conversion_dict():
     return conversions
 
 
-def create_external_table(bucket_datalake, database_name, schema_name, table_name):
-    conv = get_type_conversion_dict()
+def create_external_table(bucket_datalake, database_name, schema_name, table_name, conv):
     columns = get_columns(schema_name, table_name)
     c = AthenaClient(bucket_datalake)
     c.execute_query_and_wait_for_results('drop table if exists {}.{}_{};'.format(database_name, schema_name, table_name))
@@ -126,5 +125,6 @@ if __name__ == "__main__":
             for table_name in table_names:
                 move_to_datalake(schema_name, table_name[0])
         elif args[1] == 'CREATE_TABLES':
+            conversions = get_type_conversion_dict()
             for table_name in table_names:
-                create_external_table(bucket_datalake, athena_db, schema_name, table_name[0])
+                create_external_table(bucket_datalake, athena_db, schema_name, table_name[0], conversions)

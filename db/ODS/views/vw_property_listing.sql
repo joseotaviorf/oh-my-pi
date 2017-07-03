@@ -4,7 +4,7 @@ create view vw_property_listing as
 with ish as
 (
   select
-	status_history,
+		status_history,
     status_time,
     id,
     row_number() over (partition by id order by status_time) as rn,
@@ -131,7 +131,7 @@ prev_listing as
   from
     result_version
 )
--- select * from prev_listing where id = 892779727
+-- select * from prev_listing where id = 892763959
 ,last_version as
 (
 	select distinct
@@ -150,6 +150,7 @@ prev_listing as
 	  prev_listing
 	-- where rn = 1
 )
+-- select * from last_version where id = 892763959
 ,prev as
 (
 	select	
@@ -196,9 +197,10 @@ select
 from
 	relisting
 -- where
-	--  id = 892763624
-  --  id = 892779727 -- 892797518 -- 892798596 -- 892779727
-	--  id in(892797518, 892798596, 892779727)
+-- 	id = 892763959
+--  id = 892763624
+--  id = 892779727 -- 892797518 -- 892798596 -- 892779727
+--  id in(892797518, 892798596, 892779727)
 order by
   id,
   version
