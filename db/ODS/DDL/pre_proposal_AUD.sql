@@ -35,5 +35,7 @@ CREATE TABLE pre_proposal_AUD (
   "expirationDate" timestamp DEFAULT NULL,
   "rejectionReason" varchar(255) DEFAULT NULL,
   "code" varchar(255) DEFAULT NULL,
+  "visualizedDate" timestamp DEFAULT NULL,
+  "visualizedDate_MOD" smallint DEFAULT NULL,
   PRIMARY KEY ("id","REV")
 ) ;
