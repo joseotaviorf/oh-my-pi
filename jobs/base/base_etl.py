@@ -242,10 +242,10 @@ class BaseETL(object):
                                  encoding=encoding, server_cursor_postgres=server_cursor_postgres, generator=generator)
         if convert_bit_mysql:
             # get all columns declared as BIT because we have a bug converting BIT columns on mysql
-            bit_columns = petl.select(
-                BaseETL.get_columns_schema(db_enum, table_name, None, False),
-                lambda rec: rec.DATA_TYPE == 'bit')
-            table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
+            types = BaseETL.get_columns_schema(db_enum, table_name, None, False)
+            if types:
+                bit_columns = petl.select(types,lambda rec: rec.DATA_TYPE == 'bit')
+                table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
 
         return table
 
@@ -503,21 +503,25 @@ class BaseETL(object):
 
     @classmethod
     def get_columns_schema(cls, db_enum, table_name, schema_name=None, skip_header=True):
-        query = """
-                        select 
-                            COLUMN_NAME,
-                            DATA_TYPE
-                        from information_schema.COLUMNS
-                        where 
-                            TABLE_NAME = '{}'                    
-                        """.format(table_name)
-        if schema_name:
-            query += " and TABLE_SCHEMA = '{}'".format(schema_name)
+        columns_table = None
 
-        columns_table = BaseETL.from_db_query(
-            db_enum=db_enum,
-            query=query
-        )
-        if skip_header:
-            columns_table.pop(0)
+        if db_enum==EnumDb.QuintoAndar_ebdb:
+            query = """
+                            select 
+                                COLUMN_NAME,
+                                DATA_TYPE
+                            from information_schema.COLUMNS
+                            where 
+                                TABLE_NAME = '{}'                    
+                            """.format(table_name)
+            if schema_name:
+                query += " and TABLE_SCHEMA = '{}'".format(schema_name)
+
+            columns_table = BaseETL.from_db_query(
+                db_enum=db_enum,
+                query=query
+            )
+            if skip_header:
+                columns_table.pop(0)
+
         return columns_table
