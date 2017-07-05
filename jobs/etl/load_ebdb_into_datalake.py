@@ -24,7 +24,8 @@ def move_to_datalake(schema_name, table_name):
     table = petl.convertall(table, unicode) # convert all fields to unicode
 
     # get all columns declared as BIT because we have a bug converting BIT columns on mysql
-    bit_columns = petl.select(get_columns(schema_name, table_name, False), lambda rec: rec.DATA_TYPE == 'bit')
+    bit_columns = petl.select(BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, schema_name, False),
+                              lambda rec: rec.DATA_TYPE == 'bit')
     table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
 
     # compact all table values into a gzip
@@ -39,24 +40,6 @@ def move_to_datalake(schema_name, table_name):
         file_path=file_path
     )
     print ("{} moved to Datalake!".format(table_name))
-
-
-def get_columns(schema_name, table_name, skip_header=True):
-    columns_table = BaseETL.from_db_query(
-        db_enum=EnumDb.QuintoAndar_ebdb,
-        query="""
-            select 
-                COLUMN_NAME,
-                DATA_TYPE
-            from information_schema.COLUMNS
-            where 
-                TABLE_SCHEMA = '{}' 
-                and TABLE_NAME = '{}'
-            """.format(schema_name, table_name),
-    )
-    if skip_header:
-        columns_table.pop(0)
-    return columns_table
 
 
 def get_type_conversion_dict():

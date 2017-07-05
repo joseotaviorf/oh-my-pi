@@ -30,24 +30,24 @@ def execute_etl(db_enum_src, table_src_name, table_dest_name):
 if len(args) > 1:
     if args[1] == 'ODS':
 
-        print("Start query PreProposta: {}".format(datetime.now()))
-
-        table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
-            query='call ebdb.list_preproposta();')
-
-        print("To ODS PreProposta: {}".format(datetime.now()))
-
-        table = BaseETL.decode_table(table, 'LATIN-1')
-        BaseETL.bulk_insert(
-            table=table,
-            table_name=process_name,
-            db_enum=EnumDb.BI_ODS,
-            encoding='UTF8',
-            append=False,
-            commit=True,
-            bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
-        )
+        # print("Start query PreProposta: {}".format(datetime.now()))
+        #
+        # table = BaseETL.from_db_query(
+        #     db_enum=EnumDb.QuintoAndar_ebdb,
+        #     query='call ebdb.list_preproposta();')
+        #
+        # print("To ODS PreProposta: {}".format(datetime.now()))
+        #
+        # table = BaseETL.decode_table(table, 'LATIN-1')
+        # BaseETL.bulk_insert(
+        #     table=table,
+        #     table_name=process_name,
+        #     db_enum=EnumDb.BI_ODS,
+        #     encoding='UTF8',
+        #     append=False,
+        #     commit=True,
+        #     bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
+        # )
 
         execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_AUD', process_name + '_AUD')
         execute_etl(EnumDb.QuintoAndar_ebdb, 'CondicaoProposta', 'condition')
