@@ -21,7 +21,8 @@ select
   i.id as id_imovel,
   a.id as id_scheduling,
   prop.id as id_owner,
-  daf.usuario_id as id_user_affiliate,
+--  daf.usuario_id as id_user_affiliate,
+  null as id_user_affiliate,
   dau.id as id_user_agent,
   v.visitante_id as id_user_visitor,
   dav.id as id_user_visit_agent,
@@ -48,9 +49,9 @@ left join
   on prop.id = i.usuario_id
 
 -- DADOS AFILIADO
-left join
-  DadosAfiliado daf
-  on daf.id = i.dadosAfiliado_id
+-- left join
+--  DadosAfiliado daf
+--  on daf.id = i.dadosAfiliado_id
 
 -- AGENDAMENTO
 left join

@@ -1,4 +1,5 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_imovel;
+﻿
+DROP PROCEDURE IF EXISTS ebdb.list_imovel;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_imovel()
@@ -106,9 +107,12 @@ select -- count(1)
   i.confirmadoInformacoesVisita+0	  as confirmado_informacoes_visita,
   e.abreviacao as estado_abreviacao,
   e.nome as estado_nome,
-  da.tipoAfiliado as dados_afiliado_tipo_afiliado,
-  da.inicioAtuacao as dados_afiliado_inicio_atuacao,
-  da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
+--  da.tipoAfiliado as dados_afiliado_tipo_afiliado,
+--  da.inicioAtuacao as dados_afiliado_inicio_atuacao,
+--  da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
+  null as dados_afiliado_tipo_afiliado,
+  null as dados_afiliado_inicio_atuacao,
+  null as dados_afiliado_cidade_atuacao,
   r.cidade as regiao_cidade,
   r.macro_regiao as regiao_macro,
   r.sub_regiao as regiao_sub,
@@ -136,9 +140,9 @@ from
 left join
   Estado e
   on e.id = i.estado_id
-left join
-  DadosAfiliado da
-  on da.id = i.dadosAfiliado_id
+-- left join
+--  DadosAfiliado da
+--  on da.id = i.dadosAfiliado_id
 left join
   (
     select
