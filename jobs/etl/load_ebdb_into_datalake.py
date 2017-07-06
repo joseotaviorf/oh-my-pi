@@ -66,7 +66,7 @@ def get_type_conversion_dict():
 
 
 def create_external_table(bucket_datalake, database_name, schema_name, table_name, conv):
-    columns = get_columns(schema_name, table_name)
+    columns = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, schema_name)
     c = AthenaClient(bucket_datalake)
     c.execute_query_and_wait_for_results('drop table if exists {}.{}_{};'.format(database_name, schema_name, table_name))
 

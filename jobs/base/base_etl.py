@@ -507,13 +507,13 @@ class BaseETL(object):
 
         if db_enum==EnumDb.QuintoAndar_ebdb:
             query = """
-                            select 
-                                COLUMN_NAME,
-                                DATA_TYPE
-                            from information_schema.COLUMNS
-                            where 
-                                TABLE_NAME = '{}'                    
-                            """.format(table_name)
+                select 
+                    COLUMN_NAME,
+                    DATA_TYPE
+                from information_schema.COLUMNS
+                where 
+                    TABLE_NAME = '{}'                    
+                """.format(table_name)
             if schema_name:
                 query += " and TABLE_SCHEMA = '{}'".format(schema_name)
 
