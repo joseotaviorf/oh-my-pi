@@ -6,13 +6,10 @@ SELECT
   u.id,
   nome,
   bairro,
-  cargo,
   cep,
   cidade,
   complemento,
   cpf,
-  cpf_validado_receita,
-  data_inicio_empresa,
 
   case
       when date_part('year', data_nascimento) < 100 then data_nascimento + interval '1900 years' -- dateadd(year, 1900, data_nascimento)
@@ -22,32 +19,19 @@ SELECT
 
   email,
   email_alternativo,
-  empresa,
   endereco,
   numero,
   facebook_id,
   linkedin_id,
-  formacao_curso,
-  formacao_escola,
-  formacao_tipo,
-  formacao_data_inicio,
-  formacao_data_fim,
-  novo_email,
   salario,
   sexo,
   telefone_principal,
   estado_abreviacao,
   estado_nome,
   contadorlogin,
-  apelido,
   nao_me_prgunte_telefone,
   bloqueado,
   rg,
-  tempo_resposta_medio_segundos,
-  estado_civil,
-  nacionalidade,
-  profissao,
-  salesforce_contato_id,
   detalhes_lead_busca_guiada,
   recebeu_busca_guiada,
   dadosagente_email_coordinator,
@@ -57,7 +41,6 @@ SELECT
   dadosagente_numero_creci,
   dadosagente_ativo,
   aceita_sms,
-  salesforce_account_id,
   preferencia_contato,
   prefere_contato,
   data_clickanuncie,
@@ -72,7 +55,6 @@ SELECT
   nao_enviar_aviso_mensal_procura,
   cod_ativacao_sms,
   data_geracao_cod_sms,
-  emailsf,
   tipo_admin,
   last_update_oportunidade,
   data_avisado_condicoes_cardiff,
@@ -169,5 +151,3 @@ left join
   app_network an
 on u.id = an.user_id
 ;
-
--- select data_nascimento from vw_dim_user
