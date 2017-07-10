@@ -57,6 +57,7 @@ SELECT
   cap.usuario_que_cadastrou_id,
   cap.self_service,
   cap.attribution_type,
+  cap.flow,
   now() as load_timestamp
 
 FROM
