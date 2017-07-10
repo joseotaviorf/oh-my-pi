@@ -51,7 +51,8 @@ utm_source,
 usuario_que_indicou_id,
 usuario_que_cadastrou_id,
 self_service,
-attribution_type
+attribution_type,
+flow
 FROM
 (
   SELECT -- leads have a lead_id and self service have a a imovel id. the other values are null. this will allow us to match this table with the fact table in order to add the cap_id to it.
@@ -111,7 +112,9 @@ FROM
       WHEN l.tipo='Marketing' AND l.origem='Facebook' THEN 'Facebook' -- facebook link that gives us his info, so we can contact him
       WHEN l.origem='Landing' THEN 'Landing Page Leads'
       ELSE 'Other' 
-    END AS attribution_type
+    END AS attribution_type,
+
+    "Lead Flow" as flow
     
   from 
     Lead l
@@ -211,8 +214,15 @@ FROM
 
     CASE
       WHEN cl.tipo = 'InsideSales' then 'Organic Inside Sales'
-      ELSE 'Owner app' 
-    END as attribution_type
+      WHEN cl.imovel_id is NULL AND i.usuario_id=i.usuarioQueCadastrou_id and u.tipoAdmin='Normal' then 'Owner app'
+      ELSE 'Other'
+    END as attribution_type,
+
+    CASE
+      WHEN cl.tipo = 'InsideSales' then 'Lead Flow'
+      WHEN cl.imovel_id is NULL AND i.usuario_id=i.usuarioQueCadastrou_id and u.tipoAdmin='Normal' then 'App Flow'
+      ELSE 'Other Flow'
+    END as flow
 
 
   FROM
@@ -225,15 +235,6 @@ FROM
   left join
     Usuario u
     on i.usuario_id = u.id
-
---  LEFT JOIN
---    (
---    SELECT id, min(REV) as REV, datePublication
---    FROM v_ImovelStatusHistory
---    WHERE published = 1
---    group by id
---    ) ip
---    on ip.id = i.id
 
   WHERE cl.leadConvertido_id is null -- select only the immoveis that are not already selected by what precedes the union
 

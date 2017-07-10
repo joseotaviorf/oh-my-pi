@@ -9,6 +9,8 @@ CREATE TABLE public.potential_listings
   attribution_id integer,
   attribution_uuid character varying(255) DEFAULT NULL::character varying,
   contact_date timestamp without time zone,
+  lead_date timestamp without time zone,
+  prospect_date timestamp without time zone,
   lead_and_prospect_date timestamp without time zone,
   first_inside_sales_contact_date timestamp without time zone,
   qualified_date timestamp without time zone,
