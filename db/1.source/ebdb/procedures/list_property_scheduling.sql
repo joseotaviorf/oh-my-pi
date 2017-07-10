@@ -14,14 +14,16 @@ CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE list_property_scheduling()
 BEGIN
 
-SET @ix=0;
+SET @rank=0;
 
 select
-  @ix := @ix+1 as id_property_scheduling,
+  @rank := @rank+1 as id_property_scheduling,
   i.id as id_imovel,
   a.id as id_scheduling,
   prop.id as id_owner,
-  daf.usuario_id as id_user_affiliate,
+  ##
+  -1 as id_user_affiliate,
+  ##
   dau.id as id_user_agent,
   v.visitante_id as id_user_visitor,
   dav.id as id_user_visit_agent,
@@ -46,11 +48,6 @@ from
 left join
   Usuario prop
   on prop.id = i.usuario_id
-
--- DADOS AFILIADO
-left join
-  DadosAfiliado daf
-  on daf.id = i.dadosAfiliado_id
 
 -- AGENDAMENTO
 left join
@@ -102,12 +99,73 @@ left join
   Proposta p_n
   on p_n.negociacao_id = n.id
 
+left join
+  Proposta p_fl
+  on p_fl.imovel_id = i.id
+  and p_fl.proponente_id = fl.cliente_id
+
 -- CONTRATO
 left join
   Contrato c
-  on c.proposta_id =  coalesce(p.id, p_n.id)
+  on c.proposta_id =  coalesce(p.id, p_fl.id, p_n.id)
   -- and c.status != 'Cancelado'
-;
+
+union all
+
+select
+  @rank := @rank+1 as id_property_scheduling,
+  i.id as id_imovel,
+  -1 as id_scheduling,
+  i.usuario_id as id_owner,
+  ##
+  -1 as id_user_affiliate,
+  ##
+  -1 as id_user_agent,
+  -1 as id_user_visitor,
+  -1 as id_user_visit_agent,
+  -1 as id_visit,
+  null as visit_created_from_app,
+  '' as visit_created_type,
+  false as visit_last_updated_from_app,
+  false as visit_last_updated_type,
+  fl.id as id_rental_flow,
+  coalesce(n.id, -1) as id_negotiation,
+  n.criadoEm as dt_negotiation,
+  coalesce(pp.id, -1) as id_pre_proposal,
+  coalesce(p_fl.id, -1) as id_proposal,
+  c.id as id_contract,
+  c.dataRescisao as dt_contract_anullment
+  from Contrato c
+
+    join Imovel i
+      on c.imovel_id = i.id
+
+    left join Agendamento a
+      on c.imovel_id = a.imovel_id
+      and c.usuario_id = a.visitante_id
+
+    join FluxoLocacao fl
+      on c.imovel_id = fl.imovel_id
+      and c.usuario_id = fl.cliente_id
+
+    left join
+      Negociacao n
+      on n.imovel_id = fl.imovel_id
+      and n.proponente_id = fl.cliente_id
+
+    left join
+      PreProposta pp
+      on pp.imovel_id = i.id
+      and pp.usuario_id = fl.cliente_id
+      and pp.ultimoUpdateEdicao > 0
+
+    left join
+      Proposta p_fl
+      on (p_fl.imovel_id = i.id
+      and p_fl.proponente_id = fl.cliente_id) or (p_fl.id = c.proposta_id)
+
+    where (a.id is null or a.visita_id is null)
+      and c.status != 'Cancelado';
 
 END
 $$

@@ -185,10 +185,10 @@ class BaseETL(object):
                         return_value=False, show_logs=True, timeout=0):
         if not db_enum and not conn:
             raise AttributeError()
-        if not in_iterator and conn and conn.autocommit != commit:
-            conn.autocommit = commit
         if not conn:
             conn = cls.get_connection(db_enum, encoding, timeout)
+        if not in_iterator and conn.autocommit != commit:
+            conn.autocommit = commit
 
         if show_logs:
             print ('Start Execute Command at: {}'.format(cls.now()))
@@ -236,9 +236,18 @@ class BaseETL(object):
         raise Exception("Not implemented")
 
     @classmethod
-    def from_db_table(cls, db_enum, table_name, encoding='LATIN1', server_cursor_postgres=None, generator=False):
-        return cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name),
+    def from_db_table(cls, db_enum, table_name, encoding='LATIN1',
+                      server_cursor_postgres=None, generator=False, convert_bit_mysql=True):
+        table = cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name),
                                  encoding=encoding, server_cursor_postgres=server_cursor_postgres, generator=generator)
+        if convert_bit_mysql:
+            # get all columns declared as BIT because we have a bug converting BIT columns on mysql
+            types = BaseETL.get_columns_schema(db_enum, table_name, None, False)
+            if types:
+                bit_columns = petl.select(types,lambda rec: rec.DATA_TYPE == 'bit')
+                table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
+
+        return table
 
     @classmethod
     def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor_postgres=None, conn=None, generator=False):
@@ -491,3 +500,28 @@ class BaseETL(object):
     def convert_camel_to_snake_case(cls, name):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    @classmethod
+    def get_columns_schema(cls, db_enum, table_name, schema_name=None, skip_header=True):
+        columns_table = None
+
+        if db_enum==EnumDb.QuintoAndar_ebdb:
+            query = """
+                select 
+                    COLUMN_NAME,
+                    DATA_TYPE
+                from information_schema.COLUMNS
+                where 
+                    TABLE_NAME = '{}'                    
+                """.format(table_name)
+            if schema_name:
+                query += " and TABLE_SCHEMA = '{}'".format(schema_name)
+
+            columns_table = BaseETL.from_db_query(
+                db_enum=db_enum,
+                query=query
+            )
+            if skip_header:
+                columns_table.pop(0)
+
+        return columns_table
