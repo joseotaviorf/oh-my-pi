@@ -128,12 +128,12 @@ metrics = {
         },
 }
 
-athena.create_parquet(key=metrics['usability']['key'],
+athena.create_parquet_from_query(key=metrics['usability']['key'],
                       query=metrics['usability']['query'],
                       raw_columns=metrics['usability']['schema'])
-athena.create_parquet(key=metrics['funnel_conversion']['key'],
+athena.create_parquet_from_query(key=metrics['funnel_conversion']['key'],
                       query=metrics['funnel_conversion']['query'],
                       raw_columns=metrics['funnel_conversion']['schema'])
-athena.create_parquet(key=metrics['conversion_views']['key'],
+athena.create_parquet_from_query(key=metrics['conversion_views']['key'],
                       query=metrics['conversion_views']['query'],
                       raw_columns=metrics['conversion_views']['schema'])
