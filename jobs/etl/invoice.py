@@ -111,7 +111,7 @@ class Invoice(object):
                     from datalake_raw.seubarriga_invoice
                     where rtrim("year-month") = '{0}{1}'""".format(exec_year, exec_month)
         athena_client = AthenaClient(bucket_datalake)
-        athena_client.create_parquet(
+        athena_client.create_parquet_from_query(
             key='clean/seubarriga/{0}/{1}_{2}-{3}.parq'.format(process_name, process_name, exec_year, exec_month),
             query=query,
             raw_columns=OrderedDict([
