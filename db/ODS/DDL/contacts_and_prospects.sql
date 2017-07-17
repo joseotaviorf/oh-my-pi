@@ -51,7 +51,8 @@ CREATE TABLE public.contacts_and_prospects
   usuario_que_indicou_id integer DEFAULT NULL,
   usuario_que_cadastrou_id integer DEFAULT NULL,
   self_service integer,
-  attribution_type character varying(100) DEFAULT NULL::character varying
+  attribution_type character varying(100) DEFAULT NULL::character varying,
+  flow character varying(100) DEFAULT NULL::character varying
 )
 WITH (
   OIDS=FALSE
