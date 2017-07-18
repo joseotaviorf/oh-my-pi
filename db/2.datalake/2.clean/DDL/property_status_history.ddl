@@ -79,14 +79,13 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_status_history (
  infosAdminInterna STRING,
  historicoAgendamentoFotos STRING,
  calculoPagamentoLeadAfiliado TIMESTAMP,
- dadosAfiliado_id BIGINT,
  possuiBanheiroServico STRING,
  possuiQuartoServico STRING,
  bairroPadrao STRING,
  salesforceId STRING,
  tipoCondominio STRING,
  tipoIptu STRING,
- disponivelAte DATE,
+ disponivelAte STRING,
  flagVerificarPrecoComparandoComMedia STRING,
  sempreconsultarproprietariovisita SMALLINT,
  codCartografico STRING,
@@ -125,17 +124,19 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_status_history (
  confirmadoInformacoesVisita STRING,
  homeownersInsuranceValue DECIMAL(14,4),
  infoPagamentoCondominio_id BIGINT,
+ suspensionReason STRING,
+ areaTerreno INT,
  REV INT,
  date_status_changed TIMESTAMP,
  datePublication TIMESTAMP,
  published SMALLINT,
  status_time TIMESTAMP,
- status_date DATE,
+ status_date STRING,
  status_history STRING,
  current_status STRING,
  dt_timestamp TIMESTAMP
  ) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
-LOCATION 's3://5a-datalake/clean/property_status_history'
+LOCATION 's3://5a-datalake/clean/ods/property_status_history'
 ;
