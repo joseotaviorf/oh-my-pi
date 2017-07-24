@@ -7,6 +7,7 @@ import sys
 
 from createsend import CreateSend, Client, Campaign
 from jobs.base.base_etl import BaseETL
+from qa_python_utils.aws.athena import AthenaClient
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ bucket_datalake = os.environ['bi-datalake-forno-s3-bucket']
 cm_auth = json.loads(os.environ['campaign-monitor-auth'])
 
 DEFAULT_PAGE_SIZE = 1000
+DATABASE = 'datalake_raw'
 
 
 class CampaignMonitor(object):
@@ -26,6 +28,8 @@ class CampaignMonitor(object):
         cs.user_agent = cm_auth['user_agent']
         self.clients = cs.clients()
         self.execution_date = args[2]
+
+        self.athena_client = AthenaClient(bucket_datalake)
 
         self.full_params = self.__build_full_params()
         self.incremental_params = self.__build_incremental_params()
@@ -66,6 +70,13 @@ class CampaignMonitor(object):
                 self.__request_clicks_data(campaign)
                 self.__request_unsubscribes_data(campaign)
                 self.__request_spam_data(campaign)
+
+            self.athena_client.msck_repair_table(DATABASE, 'recipients')
+            self.athena_client.msck_repair_table(DATABASE, 'bounces')
+            self.athena_client.msck_repair_table(DATABASE, 'opens')
+            self.athena_client.msck_repair_table(DATABASE, 'clicks')
+            self.athena_client.msck_repair_table(DATABASE, 'unsubscribes')
+            self.athena_client.msck_repair_table(DATABASE, 'spam')
 
     def __request_recipients_data(self, campaign):
         self.__request_incremental_data(campaign, 'recipients', self.full_params)
