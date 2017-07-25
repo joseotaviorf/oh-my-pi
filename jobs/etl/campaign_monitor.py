@@ -1,5 +1,5 @@
 import gzip
-import io
+from io import BytesIO
 import json
 import logging
 import os
@@ -104,7 +104,7 @@ class CampaignMonitor(object):
         j = campaign._get("/campaigns/{}/{}.json".format(campaign.campaign_id, object_type), params=params)
         result = json.loads(j.decode('utf-8'))
 
-        gz_body = io.BytesIO()
+        gz_body = BytesIO()
         with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
             for _ in range(0, result['NumberOfPages']):
                 for r in result['Results']:
