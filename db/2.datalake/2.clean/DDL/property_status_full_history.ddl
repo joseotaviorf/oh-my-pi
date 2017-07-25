@@ -1,18 +1,18 @@
 DROP TABLE IF EXISTS datalake_clean.property_status_full_history;
 CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_status_full_history (
- date DATE,
+ `date` STRING,
  id BIGINT,
  status STRING,
- status_date DATE,
+ status_date STRING,
  status_time TIMESTAMP,
  status_history STRING,
  current_status STRING,
  datePublication TIMESTAMP,
  published SMALLINT,
  rnk BIGINT,
- first_status_date DATE,
- last_status_date DATE,
- next_status_date DATE,
+ first_status_date STRING,
+ last_status_date STRING,
+ next_status_date STRING,
  next_status_time TIMESTAMP,
  next_status STRING,
  diff_status_time STRING,
@@ -23,5 +23,5 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.property_status_full_history 
  ) ROW FORMAT DELIMITED
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
-LOCATION 's3://5a-datalake/clean/property_status_full_history'
+LOCATION 's3://5a-datalake/clean/ods/property_status_full_history'
 ;
