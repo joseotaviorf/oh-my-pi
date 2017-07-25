@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import sys
+from datetime import datetime
 
 from createsend import CreateSend, Client, Campaign
 from jobs.base.base_etl import BaseETL
@@ -27,7 +28,7 @@ class CampaignMonitor(object):
         cs = CreateSend(self.auth)
         cs.user_agent = cm_auth['user_agent']
         self.clients = cs.clients()
-        self.execution_date = args[2]
+        self.execution_date = str(datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S").date())
 
         self.athena_client = AthenaClient(bucket_datalake)
 
