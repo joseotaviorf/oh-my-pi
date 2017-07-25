@@ -5,12 +5,17 @@ from zenpy import Zenpy
 
 
 class ZendeskAPI(object):
-    def __init__(self, subdomain, email, password, start_time):
-        self.zenpy_client = Zenpy(subdomain=subdomain, email=email, password=password)
+    def __init__(self, subdomain, email, password, start_time, token=None, oauth_token=None):
+        self.zenpy_client = Zenpy(subdomain=subdomain, email=email, password=password,
+                                  token=token, oauth_token=oauth_token)
         self.start_time = start_time
 
     def get_tickets_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.tickets)
+
+    def get_ticket_fields_type_data(self):
+        logging.info('m=get_ticket_fields_type_data, init')
+        return self.zenpy_client.ticket_fields()
 
     def get_ticket_metrics_data(self):
         logging.info('m=get_ticket_metrics_data, init')

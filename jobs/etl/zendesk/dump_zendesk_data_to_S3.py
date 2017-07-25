@@ -3,6 +3,8 @@ import os
 import sys
 from cStringIO import StringIO
 from datetime import datetime
+import io
+import gzip
 
 import boto3
 from jobs.base.base_etl import BaseETL
@@ -30,6 +32,7 @@ class ZendeskDataToS3(object):
                                       password=zendesk_login['password'], start_time=self.start_time)
 
     def load_data_from_zendesk_to_raw(self):
+        partition = 'dt_timestamp={}'.format(datetime.now().strftime('%Y-%m-%d'))
         if self.object_type == 'ticket':
             result = self.zendesk_api.get_tickets_data()
         elif self.object_type == 'user':
@@ -40,43 +43,48 @@ class ZendeskDataToS3(object):
             result = self.zendesk_api.get_groups_data()
         elif self.object_type == 'group_membership':
             result = self.zendesk_api.get_group_memberships_data()
+        elif self.object_type == 'ticket_fields_type':
+            result = self.zendesk_api.get_ticket_fields_type_data()
+        elif self.object_type == 'chat':
+            result = self.zendesk_api.zenpy_client.chats()
         else:
             return
-
         print ('result_type: {}'.format(type(result)))
-        count = 0
-        for _ in result:
-            count += 1
-            if (count % 1000) == 0:
-                self.save_data_to_s3(result._response_json, count)
 
-        # save remaining data
-        self.save_data_to_s3(result._response_json, count)
+        count = 0
+        handle = None
+        with BaseETL.open_gzip_fp('wb') as fp:
+            for item in result:
+                BaseETL.write_json_in_fp(json.dumps(item.to_dict()), fp)
+                count += 1
+            handle = fp.fileobj
+        self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
 
         print ('final count: {}'.format(count))
 
-    def save_data_to_s3(self, data, count):
-        target_file = '{}_{}-{}.json'.format(self.start_time, self.object_type, count)
-        print (
-            'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(self.s3_datalake_bucket, target_file))
+    def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
+        if not data and not handle:
+            raise Exception
+        if not handle:
+            handle = StringIO(str(json.dumps(data)).encode('utf-8'))
 
-        fake_handle = StringIO(str(json.dumps(data)).encode('utf-8'))
-        self.s3.put_object(Bucket=self.s3_datalake_bucket, Key='{0}/{1}/{2}'.format(self.s3_folder_path,
-                                                                                    self.object_type, target_file),
-                           Body=fake_handle.read())
+        target_file = '{}-{}.{}'.format(self.object_type, self.start_time, extension_file)
+        if partition:
+            target_file = '{}/{}'.format(partition, target_file)
+
+        print (
+            'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(
+                self.s3_datalake_bucket, target_file
+            )
+        )
+        BaseETL.obj_to_s3(
+            obj_io=handle,
+            bucket=self.s3_datalake_bucket,
+            file_path='{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
+        )
 
     def load_data_from_zendesk_to_clean(self):
-        table = BaseETL.from_db_table(
-            db_enum=EnumDb.BI_ODS,
-            table_name='zendesk.{}'.format(self.object_type),
-            encoding='utf-8'
-        )
-
-        BaseETL.to_s3(
-            filename=self.object_type + '.csv',
-            data_table=table,
-            bucket_folder_path='{0}/{1}/{2}'.format(self.s3_datalake_bucket, self.s3_folder_path, self.object_type)
-        )
+        print('Not implemented yet...')
 
 
 if __name__ == '__main__':

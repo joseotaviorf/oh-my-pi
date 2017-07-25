@@ -65,6 +65,8 @@ class ZendeskDataToODS(object):
                 self.upsert_group_memberships(file_content['group_memberships'])
             elif self.object_type == 'group':
                 self.upsert_groups(file_content['groups'])
+            elif self.object_type == 'ticket_fields_type':
+                self.upsert_ticket_fields_type(file_content['ticket_fields'])
             else:
                 return
 
@@ -552,6 +554,8 @@ class ZendeskDataToODS(object):
 
         print ('upsert_tickets, end, count: {}'.format(count))
 
+    def upsert_ticket_fields_type(self, ticket_fields):
+        pass
 
 if __name__ == '__main__':
     args = sys.argv

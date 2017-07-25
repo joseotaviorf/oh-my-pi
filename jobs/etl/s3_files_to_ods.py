@@ -2,6 +2,7 @@ import sys
 from jobs.base.base_etl import BaseETL, EnumDb
 from jobs.wrappers.S3.S3_file_reader import S3FileReader
 import os
+import logging as log
 
 
 if __name__ == '__main__':
@@ -12,20 +13,28 @@ if __name__ == '__main__':
     s3 = S3FileReader()
     files = s3.get_files_from_bucket('bi-etl-ejuice-xls2ods')
     schema = 'files'
+    # files = list(files)
     for f in files:
         try:
             table = s3.get_tables_from_files(f[0])
             table_name=f[1]
 
             exists = BaseETL.table_exists(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
-            if exists:
-                BaseETL.truncate_table(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
+            if not exists:
+                BaseETL.create_table(
+                    conn=BaseETL.get_connection(db_enum=EnumDb.BI_ODS),
+                    table=table,
+                    tablename=table_name,
+                    schema=schema,
+                    sample=100000
+                )
 
             BaseETL.bulk_insert(
                 db_enum=EnumDb.BI_ODS,
                 table=table,
                 table_name=schema + '.' + f[1],
-                append=False)
+                append=False,
+                encoding='utf-8')
 
             BaseETL.to_s3(
                 filename=table_name,
@@ -45,6 +54,7 @@ if __name__ == '__main__':
                 tmp_dir='/tmp'
             )
 
-
         except Exception as ex:
-            print(ex)
+            log.error(ex)
+
+    sys.stdout.close()
