@@ -6,7 +6,8 @@ import json
 from datetime import datetime, date, timedelta
 from jobs.base.base_etl import BaseETL, EnumDb
 from facebookads import FacebookAdsApi
-from facebookads.objects import AdAccount, Insights
+from facebookads.adobjects.adaccount import AdAccount
+from facebookads.adobjects.adsinsights import AdsInsights as Insights
 from googleads import adwords
 import tempfile
 
