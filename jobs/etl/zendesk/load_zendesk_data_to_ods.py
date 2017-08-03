@@ -8,6 +8,7 @@ from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 
 
+# TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
@@ -55,16 +56,18 @@ class ZendeskDataToODS(object):
             s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
             file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
 
-            if self.object_type == 'ticket':
+            if self.object_type == 'tickets':
                 self.upsert_tickets(file_content['tickets'])
             elif self.object_type == 'ticket_metrics':
                 self.upsert_ticket_metrics(file_content['ticket_metrics'])
-            elif self.object_type == 'user':
+            elif self.object_type == 'users':
                 self.upsert_users(file_content['users'])
             elif self.object_type == 'group_membership':
                 self.upsert_group_memberships(file_content['group_memberships'])
-            elif self.object_type == 'group':
+            elif self.object_type == 'groups':
                 self.upsert_groups(file_content['groups'])
+            elif self.object_type == 'ticket_fields_type':
+                self.upsert_ticket_fields_type(file_content['ticket_fields'])
             else:
                 return
 
@@ -552,6 +555,8 @@ class ZendeskDataToODS(object):
 
         print ('upsert_tickets, end, count: {}'.format(count))
 
+    def upsert_ticket_fields_type(self, ticket_fields):
+        pass
 
 if __name__ == '__main__':
     args = sys.argv

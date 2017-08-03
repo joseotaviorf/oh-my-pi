@@ -3,13 +3,13 @@ import os
 import sys
 from cStringIO import StringIO
 from datetime import datetime
+
 import boto3
 from jobs.base.base_etl import BaseETL
 from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
 
 
-# TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!
-class ZendeskDataToS3(object):
+class ExtractZendeskDataToDatalake(object):
     def __init__(self, args):
         self.datalake_bucket_type = args[1]
         self.object_type = args[2]
@@ -27,15 +27,30 @@ class ZendeskDataToS3(object):
                                                                   self.s3_datalake_bucket, self.s3_folder_path))
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
-        self.zendesk_api = ZendeskAPI(self.object_type,
-                                      subdomain=zendesk_login['host'], client_id=zendesk_login['client_id'],
-                                      client_secret=zendesk_login['client_secret'], start_time=self.start_time)
+        self.zendesk_api = ZendeskAPI(
+            object_type=self.object_type,
+            subdomain=zendesk_login['host'],
+            client_id=zendesk_login['client_id'],
+            client_secret=zendesk_login['client_secret'],
+            chat_client_id=zendesk_login['chat_client_id'],
+            chat_client_secret=zendesk_login['chat_client_secret'],
+            chat_token=zendesk_login['chat_token'],
+            start_time=self.start_time,
+            end_time=self.end_time
+        )
 
     def load_data_from_zendesk_to_raw(self):
+        partition = 'dt_timestamp={}'.format(self.human_readable_start_time)
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
-        self.save_data_to_s3(result)
+        handle = None
+        with BaseETL.open_gzip_fp('wb') as fp:
+            for item in result:
+                i = item if type(item) is dict else item.to_dict()
+                BaseETL.write_json_in_fp(json.dumps(i), fp)
+            handle = fp.fileobj
+        self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
 
         print ('final count: {}'.format(len(result)))
 
@@ -68,7 +83,7 @@ class ZendeskDataToS3(object):
 if __name__ == '__main__':
     args = sys.argv
     print ('START')
-    zendesk_data_to_s3 = ZendeskDataToS3(args)
+    zendesk_data_to_s3 = ExtractZendeskDataToDatalake(args)
 
     if zendesk_data_to_s3.datalake_bucket_type == 'raw':
         zendesk_data_to_s3.load_data_from_zendesk_to_raw()
