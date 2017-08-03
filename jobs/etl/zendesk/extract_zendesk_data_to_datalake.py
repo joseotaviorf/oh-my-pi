@@ -28,6 +28,7 @@ class ExtractZendeskDataToDatalake(object):
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
         self.zendesk_api = ZendeskAPI(
+            object_type=self.object_type,
             subdomain=zendesk_login['host'],
             client_id=zendesk_login['client_id'],
             client_secret=zendesk_login['client_secret'],
@@ -39,16 +40,15 @@ class ExtractZendeskDataToDatalake(object):
         )
 
     def load_data_from_zendesk_to_raw(self):
-        partition = 'dt_timestamp={}'.format(datetime.now().strftime('%Y-%m-%d'))
+        partition = 'dt_timestamp={}'.format(self.human_readable_start_time)
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
-        count = 0
         handle = None
         with BaseETL.open_gzip_fp('wb') as fp:
             for item in result:
-                BaseETL.write_json_in_fp(json.dumps(item.to_dict()), fp)
-                count += 1
+                i = item if type(item) is dict else item.to_dict()
+                BaseETL.write_json_in_fp(json.dumps(i), fp)
             handle = fp.fileobj
         self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
 
@@ -64,15 +64,16 @@ class ExtractZendeskDataToDatalake(object):
         if partition:
             target_file = '{}/{}'.format(partition, target_file)
 
+        file_path = '{0}/zendesk/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
         print (
             'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(
-                self.s3_datalake_bucket, target_file
+                self.s3_datalake_bucket, file_path
             )
         )
         BaseETL.obj_to_s3(
             obj_io=handle,
             bucket=self.s3_datalake_bucket,
-            file_path='{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
+            file_path=file_path
         )
 
     def load_data_from_zendesk_to_clean(self):

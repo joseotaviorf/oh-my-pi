@@ -13,10 +13,12 @@ class ZendeskDataToS3(object):
     def __init__(self, args):
         self.datalake_bucket_type = args[1]
         self.object_type = args[2]
+        self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+        self.human_readable_end_time = datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
         self.start_time = int(datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%s'))
-        self.human_readable_start_time = args[3]
-        self.s3_datalake_bucket = args[4]
-        self.s3_folder_path = args[5]
+        self.end_time = int(datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.s3_datalake_bucket = args[5]
+        self.s3_folder_path = args[6]
         self.s3 = boto3.client('s3')
 
         print ('m=init, datalake_bucket_type={}, object_type={}, start_time={}, human_readable_start_time={},'
@@ -33,16 +35,9 @@ class ZendeskDataToS3(object):
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
-        count = 0
-        for _ in result:
-            count += 1
-            if (count % 1000) == 0:
-                self.save_data_to_s3(result._response_json, count)
+        self.save_data_to_s3(result)
 
-        # save remaining data
-        self.save_data_to_s3(result._response_json, count)
-
-        print ('final count: {}'.format(count))
+        print ('final count: {}'.format(len(result)))
 
     def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
         if not data and not handle:
@@ -54,15 +49,16 @@ class ZendeskDataToS3(object):
         if partition:
             target_file = '{}/{}'.format(partition, target_file)
 
+        file_path = '{0}/zendesk/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
         print (
             'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(
-                self.s3_datalake_bucket, target_file
+                self.s3_datalake_bucket, file_path
             )
         )
         BaseETL.obj_to_s3(
             obj_io=handle,
             bucket=self.s3_datalake_bucket,
-            file_path='{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
+            file_path=file_path
         )
 
     def load_data_from_zendesk_to_clean(self):

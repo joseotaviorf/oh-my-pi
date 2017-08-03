@@ -141,14 +141,13 @@ class ZendeskAPI(object):
         incremental_data_result = zendesk_object.incremental(start_time=self.start_time)
         return self.__do_all_pages(incremental_data_result, True)
 
-    def __do_all_pages(self, result, root_key=None, incremental=False):
+    def __do_all_pages(self, result, incremental=False):
         response = []
         while True:
             try:
                 r = result._response_json
 
-                key_name = root_key if root_key else r.keys()[0] # key name of first element (tickets, groups, etc)
-                for item in r[key_name]:
+                for item in r[self.object_type]:
                     end_time = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get('updated_at') or end_time <= self.end_time:
                         response.append(item)
@@ -174,7 +173,7 @@ class ZendeskAPI(object):
             result = self.__get_group_memberships_data()
         elif self.object_type == 'ticket_fields_type':
             result = self.__get_ticket_fields_type_data()
-        elif self.object_type == 'chat':
+        elif self.object_type == 'chats':
             result = self.__get_chats_data()
 
         return result
