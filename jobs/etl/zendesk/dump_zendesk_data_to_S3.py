@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from cStringIO import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 import boto3
 from jobs.base.base_etl import BaseETL
 from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
@@ -13,10 +13,10 @@ class ZendeskDataToS3(object):
     def __init__(self, args):
         self.datalake_bucket_type = args[1]
         self.object_type = args[2]
-        self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-        self.human_readable_end_time = datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-        self.start_time = int(datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%s'))
-        self.end_time = int(datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').date()
+        self.human_readable_end_time = self.human_readable_start_time + timedelta(days=args[4])
+        self.start_time = int(self.human_readable_start_time.strftime('%s'))
+        self.end_time = int(self.human_readable_end_time.strftime('%s'))
         self.s3_datalake_bucket = args[5]
         self.s3_folder_path = args[6]
         self.s3 = boto3.client('s3')
