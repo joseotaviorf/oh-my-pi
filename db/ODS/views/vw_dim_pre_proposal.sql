@@ -24,7 +24,16 @@ SELECT
   pp_aud.expiration_date,
   last_rent_value_tenant,
   last_rent_value_landlord,
-  total_rent_value
+  total_rent_value,
+  p.animais_condition,
+  p.quando_vai_mudar_condition,
+  p.quem_vai_morar_condition,
+  p.special_conditions_count,
+  p.remove_conditions,
+  p.include_conditions,
+  p.maintenance_or_repair_conditions,
+  p.replace_or_modify_conditions,
+  p.other_conditions
 FROM
   public.pre_proposal p
 left join
