@@ -54,7 +54,8 @@ with bookings as
 	    	end,
 	    	s.reason_category    	
 	   	) as responsible,
-	   	cancel_timestamp,
+	   	
+	   	s.cancel_timestamp,
 	   	
 	   	s."criadoEm" as dt_created,
 			s."atualizadoEm" as dt_updated,
@@ -101,6 +102,7 @@ select
 		else responsible
 	end as responsible,
   
+	cancel_timestamp,
   dt_created,
   dt_updated,
   dt_timestamp
@@ -137,4 +139,7 @@ on r2."reagendadoDe_id" = s.id
 
 -- where  s.id in (145513, 146371, 146372)
 
+	
+-- select * from vw_dim_booking limit 10
+-- select * from vw_dim_booking  where id_visit in (193581, 215953)
 

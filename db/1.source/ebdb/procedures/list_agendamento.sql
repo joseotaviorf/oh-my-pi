@@ -27,7 +27,10 @@ select
   m.motivo as reason,
   ap.name as reason_category,
   vo.nome as last_update_source,
-  FROM_UNIXTIME(rcanc.`timestamp`/1000) as cancel_timestamp
+  case 
+  	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null 
+  	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
+  end as cancel_timestamp
 from 
   Agendamento a
 -- MUDANCA STATUS
@@ -59,11 +62,12 @@ left join
 	(
 		select
 			id,
-			max(REV) as REV_Cancelado
+			min(REV) as REV_Cancelado
 		from
 			Agendamento_AUD
 		where
-			status='Cancelado'	
+			status='Cancelado'
+			and status_MOD = 1
 		group by
 			id
 	) c

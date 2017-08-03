@@ -22,7 +22,7 @@ CREATE TABLE dim_booking (
   reason VARCHAR(255),
   reason_category VARCHAR(255),
   responsible VARCHAR(255),
-  dt_cancel TIMESTAMP,
+  dt_cancel TIMESTAMP WITHOUT TIME ZONE,
   dt_created TIMESTAMP WITHOUT TIME ZONE,
   dt_updated TIMESTAMP WITHOUT TIME ZONE,
   dt_timestamp TIMESTAMP WITHOUT TIME ZONE,

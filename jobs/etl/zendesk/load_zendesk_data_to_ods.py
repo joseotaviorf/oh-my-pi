@@ -8,6 +8,7 @@ from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 
 
+# TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]

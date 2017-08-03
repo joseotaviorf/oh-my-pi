@@ -1,41 +1,126 @@
 import logging
+import requests
+import json
+import pandas as pd
 from datetime import datetime
-
 from zenpy import Zenpy
 
 
 class ZendeskAPI(object):
-    def __init__(self, subdomain, email, password, start_time, token=None, oauth_token=None):
-        self.zenpy_client = Zenpy(subdomain=subdomain, email=email, password=password,
-                                  token=token, oauth_token=oauth_token)
+    def __init__(self, client_id, client_secret,
+                 start_time, end_time=None,
+                 chat_client_id=None, chat_client_secret=None, chat_token=None,
+                 subdomain='quintoandar'):
+        self.zenpy_client = self.__get_zendek_client(
+            client_id=client_id,
+            client_secret=client_secret,
+            subdomain=subdomain
+        )
+        self.chat_client = self.__get_chat_client(
+            client_id=chat_client_id,
+            client_secret=chat_client_secret,
+            auth_token=chat_token,
+            subdomain=subdomain
+        )
         self.start_time = start_time
+        self.end_time = end_time
+
+    @classmethod
+    def __get_zendek_client(cls, client_id, client_secret, subdomain='quintoandar'):
+        payload_zendesk = {
+            'grant_type': 'client_credentials',
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'scope': 'read',
+        }
+
+        response_zen = requests.post("https://{}.zendesk.com/oauth/tokens".format(subdomain), data=payload_zendesk).json()
+        creds_zen = {
+            "subdomain": "quintoandar",
+            "oauth_token": response_zen.get('access_token')
+        }
+        return Zenpy(**creds_zen)
+
+    @classmethod
+    def __get_chat_client(cls, client_id, client_secret, auth_token,
+                          subdomain='quintoandar', name='Data Team - Confidential Client'):
+        if not client_id or not client_secret or not auth_token:
+            return None
+
+        json = {
+            "name": name,
+            "company": "QuintoAndar",
+            "client_secret": client_secret,
+            "client_identifier": client_id,
+            "client_type": "confidential",
+            "redirect_uris": "https://localhost:5000/autorize",
+            "scopes": "read write"
+        }
+        headers = {
+            "Authorization": "Bearer {}".format(auth_token)
+        }
+
+        # TODO: Change DELETE/CREATE to UPDATE an existing Confidential Client
+        url_clients = 'https://www.zopim.com/api/v2/oauth/clients'
+        response_list = requests.get(url_clients, json=json, headers=headers).json()
+        df = pd.DataFrame.from_dict(response_list)
+        frame_to_delete = df.loc[df['name'] == name]
+        if not frame_to_delete.empty:
+            for item in frame_to_delete.to_records():
+                id = item['id']
+                requests.delete("{}/{}".format(url_clients, id), json=json, headers=headers)
+        response_creation = requests.post(url_clients, json=json, headers=headers).json()
+
+        payload_chat = {
+            'grant_type': 'client_credentials',
+            "client_type": response_creation.get('client_type'),
+            'client_id': response_creation.get('client_identifier'),
+            'client_secret': response_creation.get('client_secret'),
+            'redirect_uri': response_creation.get('redirect_uris')
+        }
+
+        response_chat = requests.post(
+            "https://www.zopim.com/oauth2/token",
+            params=payload_chat
+        ).json()
+        creds_chat = {
+            "subdomain": subdomain,
+            "oauth_token": response_chat.get('access_token')
+        }
+        return Zenpy(**creds_chat)
 
     def get_tickets_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.tickets)
 
     def get_ticket_fields_type_data(self):
         logging.info('m=get_ticket_fields_type_data, init')
-        return self.zenpy_client.ticket_fields()
+        result = self.zenpy_client.ticket_fields()
+        return self.__do_all_pages(result)
 
     def get_ticket_metrics_data(self):
         logging.info('m=get_ticket_metrics_data, init')
-        return self.zenpy_client.ticket_metrics()
+        result = self.zenpy_client.ticket_metrics()
+        return self.__do_all_pages(result)
 
     def get_satisfaction_ratings_data(self):
         logging.info('m=get_satisfaction_ratings_data, init')
-        return self.zenpy_client.satisfaction_ratings(sort_order='asc')
+        result = self.zenpy_client.satisfaction_ratings(sort_order='asc')
+        return self.__do_all_pages(result)
 
     def get_requests_data(self):
         logging.info('m=get_requests_data, init')
-        return self.zenpy_client.requests()
+        result = self.zenpy_client.requests()
+        return self.__do_all_pages(result)
 
     def get_groups_data(self):
         logging.info('m=get_groups_data, init')
-        return self.zenpy_client.groups()
+        result = self.zenpy_client.groups()
+        return self.__do_all_pages(result)
 
     def get_group_memberships_data(self):
         logging.info('m=get_group_memberships_data, init')
-        return self.zenpy_client.group_memberships()
+        result = self.zenpy_client.group_memberships()
+        return self.__do_all_pages(result)
 
     def get_users_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.users)
@@ -49,8 +134,23 @@ class ZendeskAPI(object):
         logging.info(
             'm=__get_incremental_data, zendesk_object={}, start_time={}'.format(zendesk_object, self.start_time))
         incremental_data_result = zendesk_object.incremental(start_time=self.start_time)
-        if not incremental_data_result:
-            logging.warn('m=__get_incremental_data, message=no result')
-            return None
+        return self.__do_all_pages(incremental_data_result, True)
 
-        return incremental_data_result
+    def __do_all_pages(self, result, incremental=False):
+        response = []
+        while True:
+            try:
+                r = result._response_json
+
+                key_name = r.keys()[0] # get the key name of first element (tickets, users, groups, etc)
+                for item in r[key_name]:
+                    end_time = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
+                    if not incremental or not item.get('updated_at') or end_time <= self.end_time:
+                        response.append(item)
+
+                result.handle_pagination()
+            except StopIteration:
+                return response
+            except Exception as e:
+                print(e)
+                raise

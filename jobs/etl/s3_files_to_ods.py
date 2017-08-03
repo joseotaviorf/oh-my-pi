@@ -32,14 +32,14 @@ if __name__ == '__main__':
             BaseETL.bulk_insert(
                 db_enum=EnumDb.BI_ODS,
                 table=table,
-                table_name=schema + '.' + f[1],
+                table_name='{}."{}"'.format(schema, table_name),
                 append=False,
                 encoding='utf-8')
 
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, table_name),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )
@@ -49,7 +49,7 @@ if __name__ == '__main__':
             BaseETL.to_s3(
                 filename=table_name,
                 data_table=table,
-                bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, f[1]),
+                bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, table_name),
                 encoding='utf8',
                 tmp_dir='/tmp'
             )

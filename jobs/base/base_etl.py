@@ -507,7 +507,7 @@ class BaseETL(object):
 
     @classmethod
     def write_json_in_fp(cls, item, fp):
-        fp.write(item.replace('"None"', 'null'))
+        fp.write(unicode(item).replace('"None"', 'null'))
         fp.write('\n')
 
     @classmethod
