@@ -18,7 +18,16 @@ CREATE TABLE public.pre_proposal (
   "atualizadoEm" public.datetime,
   "ultimoUpdateEdicao" INTEGER,
   "dataPrimerioEnvio" public.datetime,
-  code varchar(10)
+  code varchar(10),
+  animais_condition INTEGER,
+  quando_vai_mudar_condition INTEGER,
+  quem_vai_morar_condition INTEGER,
+  special_conditions_count INTEGER,
+  remove_conditions INTEGER,
+  include_conditions INTEGER,
+  maintenance_or_repair_conditions INTEGER,
+  replace_or_modify_conditions INTEGER,
+  other_conditions INTEGER
 )
 WITH (oids = false);
 
