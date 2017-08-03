@@ -12,6 +12,7 @@ from logging import info as log
 
 import boto3
 import petl
+from petl.io.db import create_table
 
 from db_factory import DBFactory
 from enum_db import EnumDb, EnumDbType
@@ -31,7 +32,6 @@ class BaseETL(object):
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         return module.__file__.split('/')[-1:][0].replace('.py', '')
-
 
     @classmethod
     def decode_table(cls, table, encoding):
@@ -234,6 +234,11 @@ class BaseETL(object):
     @staticmethod
     def update_data(table, db_enum, table_name, key_name=None, conn=None, commit=True):
         raise Exception("Not implemented")
+
+    @classmethod
+    def create_table(cls, conn, table, tablename, schema=None, commit=True,
+                     constraints=True, metadata=None, dialect=None, sample=10000):
+        return create_table(table, conn, tablename, schema, commit, constraints, metadata, dialect, sample)
 
     @classmethod
     def from_db_table(cls, db_enum, table_name, encoding='LATIN1',
@@ -487,14 +492,23 @@ class BaseETL(object):
     @classmethod
     def convert_dataframe_to_json_gzip(cls, data_frame, encode='utf-8'):
         print('m=convert_dataframe_to_json_gzip')
-
-        gz_body = io.BytesIO()
-        with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
+        with cls.open_gzip_fp() as fp:
             for row in data_frame.iterrows():
-                fp.write(row[1].to_json().encode(encode).replace('"None"', 'null'))
-                fp.write('\n')
+                item = row[1].to_json().encode(encode)
+                cls.write_json_in_fp(item, fp)
+        return fp.fileobj
 
-        return gz_body
+    @classmethod
+    def open_gzip_fp(cls, mode='w'):
+        print('m=open_gzip_fp')
+        gz_obj = io.BytesIO()
+        fp = gzip.GzipFile(fileobj=gz_obj, mode=mode)
+        return fp
+
+    @classmethod
+    def write_json_in_fp(cls, item, fp):
+        fp.write(unicode(item).replace('"None"', 'null'))
+        fp.write('\n')
 
     @classmethod
     def convert_camel_to_snake_case(cls, name):
