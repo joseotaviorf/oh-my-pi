@@ -39,27 +39,16 @@ class ExtractZendeskDataToDatalake(object):
         )
 
     def load_data_from_zendesk_to_raw(self):
-        partition = 'dt_timestamp={}'.format(self.human_readable_start_time)
-        if self.object_type == 'ticket':
-            result = self.zendesk_api.get_tickets_data()
-        elif self.object_type == 'user':
-            result = self.zendesk_api.get_users_data()
-        elif self.object_type == 'ticket_metrics':
-            result = self.zendesk_api.get_ticket_metrics_data()
-        elif self.object_type == 'group':
-            result = self.zendesk_api.get_groups_data()
-        elif self.object_type == 'group_membership':
-            result = self.zendesk_api.get_group_memberships_data()
-        elif self.object_type == 'ticket_fields_type':
-            result = self.zendesk_api.get_ticket_fields_type_data()
-        elif self.object_type == 'chat':
-            result = self.zendesk_api.chat_client.chats()
-        else:
-            return
+        partition = 'dt_timestamp={}'.format(datetime.now().strftime('%Y-%m-%d'))
+        result = self.zendesk_api.get_data()
+        print ('result_type: {}'.format(type(result)))
 
-        # handle = None
+        count = 0
+        handle = None
         with BaseETL.open_gzip_fp('wb') as fp:
-            BaseETL.write_json_in_fp(json.dumps(result), fp)
+            for item in result:
+                BaseETL.write_json_in_fp(json.dumps(item.to_dict()), fp)
+                count += 1
             handle = fp.fileobj
         self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
 

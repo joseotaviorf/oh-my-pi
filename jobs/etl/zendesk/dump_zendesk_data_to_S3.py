@@ -25,37 +25,22 @@ class ZendeskDataToS3(object):
                                                                   self.s3_datalake_bucket, self.s3_folder_path))
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
-        self.zendesk_api = ZendeskAPI(subdomain=zendesk_login['host'], client_id=zendesk_login['client_id'],
+        self.zendesk_api = ZendeskAPI(self.object_type,
+                                      subdomain=zendesk_login['host'], client_id=zendesk_login['client_id'],
                                       client_secret=zendesk_login['client_secret'], start_time=self.start_time)
 
     def load_data_from_zendesk_to_raw(self):
-        partition = 'dt_timestamp={}'.format(datetime.now().strftime('%Y-%m-%d'))
-        if self.object_type == 'ticket':
-            result = self.zendesk_api.get_tickets_data()
-        elif self.object_type == 'user':
-            result = self.zendesk_api.get_users_data()
-        elif self.object_type == 'ticket_metrics':
-            result = self.zendesk_api.get_ticket_metrics_data()
-        elif self.object_type == 'group':
-            result = self.zendesk_api.get_groups_data()
-        elif self.object_type == 'group_membership':
-            result = self.zendesk_api.get_group_memberships_data()
-        elif self.object_type == 'ticket_fields_type':
-            result = self.zendesk_api.get_ticket_fields_type_data()
-        elif self.object_type == 'chat':
-            result = self.zendesk_api.zenpy_client.chats()
-        else:
-            return
+        result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
         count = 0
-        handle = None
-        with BaseETL.open_gzip_fp('wb') as fp:
-            for item in result:
-                BaseETL.write_json_in_fp(json.dumps(item.to_dict()), fp)
-                count += 1
-            handle = fp.fileobj
-        self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
+        for _ in result:
+            count += 1
+            if (count % 1000) == 0:
+                self.save_data_to_s3(result._response_json, count)
+
+        # save remaining data
+        self.save_data_to_s3(result._response_json, count)
 
         print ('final count: {}'.format(count))
 

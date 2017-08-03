@@ -7,10 +7,12 @@ from zenpy import Zenpy
 
 
 class ZendeskAPI(object):
-    def __init__(self, client_id, client_secret,
+    def __init__(self, object_type,
+                 client_id, client_secret,
                  start_time, end_time=None,
                  chat_client_id=None, chat_client_secret=None, chat_token=None,
                  subdomain='quintoandar'):
+        self.object_type = object_type
         self.zenpy_client = self.__get_zendek_client(
             client_id=client_id,
             client_secret=client_secret,
@@ -89,40 +91,43 @@ class ZendeskAPI(object):
         }
         return Zenpy(**creds_chat)
 
-    def get_tickets_data(self):
+    def __get_tickets_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.tickets)
 
-    def get_ticket_fields_type_data(self):
+    def __get_chats_data(self):
+        return self.__get_incremental_data(zendesk_object=self.chat_client.chats)
+
+    def __get_ticket_fields_type_data(self):
         logging.info('m=get_ticket_fields_type_data, init')
         result = self.zenpy_client.ticket_fields()
         return self.__do_all_pages(result)
 
-    def get_ticket_metrics_data(self):
+    def __get_ticket_metrics_data(self):
         logging.info('m=get_ticket_metrics_data, init')
         result = self.zenpy_client.ticket_metrics()
         return self.__do_all_pages(result)
 
-    def get_satisfaction_ratings_data(self):
+    def __get_satisfaction_ratings_data(self):
         logging.info('m=get_satisfaction_ratings_data, init')
         result = self.zenpy_client.satisfaction_ratings(sort_order='asc')
         return self.__do_all_pages(result)
 
-    def get_requests_data(self):
+    def __get_requests_data(self):
         logging.info('m=get_requests_data, init')
         result = self.zenpy_client.requests()
         return self.__do_all_pages(result)
 
-    def get_groups_data(self):
+    def __get_groups_data(self):
         logging.info('m=get_groups_data, init')
         result = self.zenpy_client.groups()
         return self.__do_all_pages(result)
 
-    def get_group_memberships_data(self):
+    def __get_group_memberships_data(self):
         logging.info('m=get_group_memberships_data, init')
         result = self.zenpy_client.group_memberships()
         return self.__do_all_pages(result)
 
-    def get_users_data(self):
+    def __get_users_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.users)
 
     def __get_search_data(self, zendesk_object):
@@ -136,13 +141,13 @@ class ZendeskAPI(object):
         incremental_data_result = zendesk_object.incremental(start_time=self.start_time)
         return self.__do_all_pages(incremental_data_result, True)
 
-    def __do_all_pages(self, result, incremental=False):
+    def __do_all_pages(self, result, root_key=None, incremental=False):
         response = []
         while True:
             try:
                 r = result._response_json
 
-                key_name = r.keys()[0] # get the key name of first element (tickets, users, groups, etc)
+                key_name = root_key if root_key else r.keys()[0] # key name of first element (tickets, groups, etc)
                 for item in r[key_name]:
                     end_time = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get('updated_at') or end_time <= self.end_time:
@@ -154,3 +159,22 @@ class ZendeskAPI(object):
             except Exception as e:
                 print(e)
                 raise
+
+    def get_data(self):
+        result = None
+        if self.object_type == 'tickets':
+            result = self.__get_tickets_data()
+        elif self.object_type == 'users':
+            result = self.__get_users_data()
+        elif self.object_type == 'ticket_metrics':
+            result = self.__get_ticket_metrics_data()
+        elif self.object_type == 'groups':
+            result = self.__get_groups_data()
+        elif self.object_type == 'group_membership':
+            result = self.__get_group_memberships_data()
+        elif self.object_type == 'ticket_fields_type':
+            result = self.__get_ticket_fields_type_data()
+        elif self.object_type == 'chat':
+            result = self.__get_chats_data()
+
+        return result
