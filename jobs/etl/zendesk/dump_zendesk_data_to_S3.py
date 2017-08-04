@@ -49,7 +49,7 @@ class ZendeskDataToS3(object):
         if partition:
             target_file = '{}/{}'.format(partition, target_file)
 
-        file_path = '{0}/zendesk/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
+        file_path = '{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
         print (
             'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(
                 self.s3_datalake_bucket, file_path
