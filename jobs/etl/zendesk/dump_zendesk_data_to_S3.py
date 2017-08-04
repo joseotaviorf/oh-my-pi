@@ -68,8 +68,8 @@ class ZendeskDataToS3(object):
 if __name__ == '__main__':
     args = sys.argv
     print ('START')
-    zendesk_data_to_s3 = ZendeskDataToS3(args)
 
+    zendesk_data_to_s3 = ZendeskDataToS3(args)
     if zendesk_data_to_s3.datalake_bucket_type == 'raw':
         zendesk_data_to_s3.load_data_from_zendesk_to_raw()
     if zendesk_data_to_s3.datalake_bucket_type == 'clean':
