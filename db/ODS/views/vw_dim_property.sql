@@ -324,7 +324,7 @@ SELECT
   
   coalesce(imovel_dates.nr_listing, 0) as nr_listing,
   coalesce(imovel_dates.nr_renting, 0) as nr_renting,
-  
+  i.informacoes_visita,
   i.data_criacao,
   i.atualizado_em,
   now() AS load_timestamp

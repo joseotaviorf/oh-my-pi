@@ -132,6 +132,7 @@ select -- count(1)
   ie.MOB_TITULO as etapa_data_mob_titulo,
   ie.MOB_VISITAS as etapa_data_mob_visitas,
   ie.MOB_VISTORIA as etapa_data_mob_vistoria,
+  iv.informacoesVisita as informacoes_visita,
   i.dataCriacao as data_criacao,
   i.atualizadoEm as atualizado_em
 
@@ -193,7 +194,9 @@ left join
     i.id
 ) ie
   on ie.imovel_id = i.id
-
+left join
+  Imovel_informacoesVisita iv
+  on iv.Imovel_id = i.id
 ;
 
 END
