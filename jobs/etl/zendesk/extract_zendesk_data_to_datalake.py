@@ -14,7 +14,7 @@ class ExtractZendeskDataToDatalake(object):
         self.datalake_bucket_type = args[1]
         self.object_type = args[2]
         self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').date()
-        self.human_readable_end_time = self.human_readable_start_time + timedelta(days=args[4])
+        self.human_readable_end_time = self.human_readable_start_time + timedelta(days=int(args[4]))
         self.start_time = int(self.human_readable_start_time.strftime('%s'))
         self.end_time = int(self.human_readable_end_time.strftime('%s'))
         self.s3_datalake_bucket = args[5]
