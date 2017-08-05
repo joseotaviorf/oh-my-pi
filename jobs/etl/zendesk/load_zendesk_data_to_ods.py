@@ -29,7 +29,7 @@ class ZendeskDataToODS(object):
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
-        prefix = '{0}/{1}/{1}'.format(self.s3_bucket_raw_folder_path, self.object_type)
+        prefix = '{0}/{1}/{1}-{2}'.format(self.s3_bucket_raw_folder_path, self.object_type, self.start_time)
         print('prefix: {}'.format(prefix))
         return self.s3.list_objects_v2(Bucket=self.s3_bucket,
                                        Prefix=prefix)
