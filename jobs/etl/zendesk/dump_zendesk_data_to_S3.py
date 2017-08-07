@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import boto3
 from jobs.base.base_etl import BaseETL
 from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
+from exceptions import ValueError
 
 
 # TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!
@@ -35,15 +36,15 @@ class ZendeskDataToS3(object):
 
     def load_data_from_zendesk_to_raw(self):
         result = self.zendesk_api.get_data()
+        partition = 'extracted_date={}'.format(self.human_readable_start_time)
+
         print ('result_type: {}'.format(type(result)))
-
-        self.save_data_to_s3(result)
-
+        self.save_data_to_s3(data=result, partition=partition)
         print ('final count: {}'.format(len(result)))
 
     def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
         if not data and not handle:
-            raise Exception('Argument Exception') # TODO change exception type
+            raise ValueError
         if not handle:
             handle = StringIO(str(json.dumps(data)).encode('utf-8'))
 
