@@ -28,8 +28,13 @@ class ZendeskDataToODS(object):
 
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
-    def __load_files_from_bucket(self):
-        prefix = '{0}/{1}/{1}-{2}'.format(self.s3_bucket_raw_folder_path, self.object_type, self.start_time)
+    def __load_files_from_bucket(self, partition=''):
+        prefix = '{0}/{1}{2}/{1}-{3}'.format(
+            self.s3_bucket_raw_folder_path,
+            self.object_type,
+            partition,
+            self.start_time
+        )
         print('prefix: {}'.format(prefix))
         return self.s3.list_objects_v2(Bucket=self.s3_bucket,
                                        Prefix=prefix)
@@ -50,8 +55,8 @@ class ZendeskDataToODS(object):
 
     def save_s3_data_to_ods(self):
         print ('m=save_s3_data_to_ods, init')
-
-        files = self.__load_files_from_bucket()
+        partition = '/extracted_date={}'.format(self.human_readable_start_time)
+        files = self.__load_files_from_bucket(partition)
         for i in range(0, len(files['Contents'])):
             s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
             file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
