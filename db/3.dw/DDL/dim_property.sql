@@ -152,7 +152,13 @@ CREATE TABLE public.dim_property (
   
   nr_listing integer,   
   nr_renting integer,
-  informacoes_visita VARCHAR(255),
+
+  info_visita_autorizacao_de_entrada integer,
+  info_visita_proprietario_acompanha integer,
+  info_visita_estamos_liberados integer,
+  info_visita_prop_precisa_liberar integer,
+  info_visita_chave_box_quintoandar integer,
+
   data_criacao TIMESTAMP WITHOUT TIME ZONE,
   atualizado_em TIMESTAMP WITHOUT TIME ZONE,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,

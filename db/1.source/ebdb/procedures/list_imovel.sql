@@ -132,7 +132,12 @@ select -- count(1)
   ie.MOB_TITULO as etapa_data_mob_titulo,
   ie.MOB_VISITAS as etapa_data_mob_visitas,
   ie.MOB_VISTORIA as etapa_data_mob_vistoria,
-  iv.informacoesVisita as informacoes_visita,
+  coalesce(iv.autorizacao_de_entrada,0) as info_visita_autorizacao_de_entrada,
+  coalesce(iv.proprietario_acompanha,0) as info_visita_proprietario_acompanha,
+  coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
+  coalesce(iv.prop_precisa_liberar,0) as info_visita_prop_precisa_liberar,
+  coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
+
   i.dataCriacao as data_criacao,
   i.atualizadoEm as atualizado_em
 
@@ -195,7 +200,18 @@ left join
 ) ie
   on ie.imovel_id = i.id
 left join
-  Imovel_informacoesVisita iv
+(
+    select
+        iv.Imovel_id,
+        sum(informacoesVisita='AUTORIZACAO_DE_ENTRADA') as autorizacao_de_entrada,
+        sum(informacoesVisita='PROPRIETARIO_ACOMPANHA') as proprietario_acompanha,
+        sum(informacoesVisita='ESTAMOS_LIBERADOS') as estamos_liberados,
+        sum(informacoesVisita='PROPRIETARIO_PRECISA_LIBERAR') as prop_precisa_liberar,
+        sum(informacoesVisita='CHAVE_CAIXA_QUINTOANDAR') as chave_box_quintoandar
+    from
+        Imovel_informacoesVisita iv
+    group by iv.Imovel_id
+) iv
   on iv.Imovel_id = i.id
 ;
 
