@@ -161,6 +161,7 @@ class ZendeskAPI(object):
 
     def get_data(self):
         result = None
+        partition = None
         if self.object_type == 'tickets':
             result = self.__get_tickets_data()
         elif self.object_type == 'users':
