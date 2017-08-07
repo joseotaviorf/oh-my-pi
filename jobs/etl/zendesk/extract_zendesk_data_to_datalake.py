@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from cStringIO import StringIO
-from datetime import datetime
+from datetime import datetime,timedelta
 
 import boto3
 from jobs.base.base_etl import BaseETL
@@ -13,10 +13,10 @@ class ExtractZendeskDataToDatalake(object):
     def __init__(self, args):
         self.datalake_bucket_type = args[1]
         self.object_type = args[2]
-        self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-        self.human_readable_end_time = datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-        self.start_time = int(datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').strftime('%s'))
-        self.end_time = int(datetime.strptime(args[4], '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.human_readable_start_time = datetime.strptime(args[3], '%Y-%m-%d %H:%M:%S').date()
+        self.human_readable_end_time = self.human_readable_start_time + timedelta(days=int(args[4]))
+        self.start_time = int(self.human_readable_start_time.strftime('%s'))
+        self.end_time = int(self.human_readable_end_time.strftime('%s'))
         self.s3_datalake_bucket = args[5]
         self.s3_folder_path = args[6]
         self.s3 = boto3.client('s3')
@@ -64,7 +64,7 @@ class ExtractZendeskDataToDatalake(object):
         if partition:
             target_file = '{}/{}'.format(partition, target_file)
 
-        file_path = '{0}/zendesk/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
+        file_path = '{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
         print (
             'm=save_data_to_s3, bucket_folder_path={0}, target_file={1}'.format(
                 self.s3_datalake_bucket, file_path

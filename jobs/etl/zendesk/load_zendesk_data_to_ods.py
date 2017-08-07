@@ -29,10 +29,10 @@ class ZendeskDataToODS(object):
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self):
+        prefix = '{0}/{1}/{1}-{2}'.format(self.s3_bucket_raw_folder_path, self.object_type, self.start_time)
+        print('prefix: {}'.format(prefix))
         return self.s3.list_objects_v2(Bucket=self.s3_bucket,
-                                       Prefix='{0}/{1}/{2}'.format(self.s3_bucket_raw_folder_path,
-                                                                   self.object_type,
-                                                                   self.start_time))
+                                       Prefix=prefix)
 
     @staticmethod
     def __format_string(string):
@@ -57,17 +57,17 @@ class ZendeskDataToODS(object):
             file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
 
             if self.object_type == 'tickets':
-                self.upsert_tickets(file_content['tickets'])
+                self.upsert_tickets(file_content)
             elif self.object_type == 'ticket_metrics':
-                self.upsert_ticket_metrics(file_content['ticket_metrics'])
+                self.upsert_ticket_metrics(file_content)
             elif self.object_type == 'users':
-                self.upsert_users(file_content['users'])
-            elif self.object_type == 'group_membership':
-                self.upsert_group_memberships(file_content['group_memberships'])
+                self.upsert_users(file_content)
+            elif self.object_type == 'group_memberships':
+                self.upsert_group_memberships(file_content)
             elif self.object_type == 'groups':
-                self.upsert_groups(file_content['groups'])
+                self.upsert_groups(file_content)
             elif self.object_type == 'ticket_fields_type':
-                self.upsert_ticket_fields_type(file_content['ticket_fields'])
+                self.upsert_ticket_fields_type(file_content)
             else:
                 return
 
