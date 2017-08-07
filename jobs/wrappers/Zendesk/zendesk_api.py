@@ -148,11 +148,13 @@ class ZendeskAPI(object):
                 r = result._response_json
 
                 for item in r[self.object_type]:
-                    end_time = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
-                    if not incremental or not item.get('updated_at') or end_time <= self.end_time:
+                    updated_at = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
+                    if not incremental or not item.get('updated_at') or self.start_time <= updated_at <= self.end_time:
                         response.append(item)
-
-                result.handle_pagination()
+                if r['end_time'] <= self.end_time:
+                    result.handle_pagination()
+                else:
+                    return response
             except StopIteration:
                 return response
             except Exception as e:
