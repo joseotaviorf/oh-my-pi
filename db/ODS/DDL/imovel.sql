@@ -123,7 +123,11 @@ CREATE TABLE public.imovel (
   etapa_data_mob_titulo TIMESTAMP WITHOUT TIME ZONE,
   etapa_data_mob_visitas TIMESTAMP WITHOUT TIME ZONE,
   etapa_data_mob_vistoria TIMESTAMP WITHOUT TIME ZONE,
-  informacoes_visita VARCHAR(200) DEFAULT NULL::character varying,
+  info_visita_autorizacao_de_entrada VARCHAR(255) DEFAULT NULL::character varying,
+  info_visita_proprietario_acompanha VARCHAR(255) DEFAULT NULL::character varying,
+  info_visita_estamos_liberados VARCHAR(255) DEFAULT NULL::character varying,
+  info_visita_prop_precisa_liberar VARCHAR(255) DEFAULT NULL::character varying,
+  info_visita_chave_box_quintoandar VARCHAR(255) DEFAULT NULL::character varying,
   data_criacao TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
   atualizado_em TIMESTAMP WITHOUT TIME ZONE
 )
