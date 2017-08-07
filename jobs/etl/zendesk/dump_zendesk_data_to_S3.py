@@ -36,7 +36,7 @@ class ZendeskDataToS3(object):
 
     def load_data_from_zendesk_to_raw(self):
         result = self.zendesk_api.get_data()
-        partition = 'dt_timestamp={}'.format(self.human_readable_start_time)
+        partition = 'extracted_date={}'.format(self.human_readable_start_time)
 
         print ('result_type: {}'.format(type(result)))
         self.save_data_to_s3(data=result, partition=partition)
