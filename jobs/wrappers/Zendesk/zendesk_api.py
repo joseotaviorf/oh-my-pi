@@ -169,7 +169,7 @@ class ZendeskAPI(object):
             result = self.__get_ticket_metrics_data()
         elif self.object_type == 'groups':
             result = self.__get_groups_data()
-        elif self.object_type == 'group_membership':
+        elif self.object_type == 'group_memberships':
             result = self.__get_group_memberships_data()
         elif self.object_type == 'ticket_fields_type':
             result = self.__get_ticket_fields_type_data()
