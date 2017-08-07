@@ -27,9 +27,11 @@ class ZendeskDataToS3(object):
                                                                   self.s3_datalake_bucket, self.s3_folder_path))
 
         zendesk_login = json.loads(os.environ.get('ZENDESK_LOGIN'))
-        self.zendesk_api = ZendeskAPI(self.object_type,
-                                      subdomain=zendesk_login['host'], client_id=zendesk_login['client_id'],
-                                      client_secret=zendesk_login['client_secret'], start_time=self.start_time)
+        self.zendesk_api = ZendeskAPI(self.object_type, subdomain=zendesk_login['host'],
+                                      client_id=zendesk_login['client_id'],
+                                      client_secret=zendesk_login['client_secret'],
+                                      start_time=self.start_time,
+                                      end_time=self.end_time)
 
     def load_data_from_zendesk_to_raw(self):
         result = self.zendesk_api.get_data()
@@ -41,7 +43,7 @@ class ZendeskDataToS3(object):
 
     def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
         if not data and not handle:
-            raise Exception
+            raise Exception('Argument Exception') # TODO change exception type
         if not handle:
             handle = StringIO(str(json.dumps(data)).encode('utf-8'))
 
