@@ -21,15 +21,16 @@ select
   p.ultimoUpdateEdicao,
   pp_aud.dataPrimerioEnvio,
   p.code,
+  p.rejectionReason as rejection_reason,
   (ani.descricao is null) as animais_condition,
   (mudar.descricao is null) as quando_vai_mudar_condition,
   (morar.descricao is null) as quem_vai_morar_condition,
-  special_conditions.special_conditions_count,
-  special_conditions.remove_conditions,
-  special_conditions.include_conditions,
-  special_conditions.maintenance_or_repair_conditions,
-  special_conditions.replace_or_modify_conditions,
-  special_conditions.other_conditions
+  coalesce(special_conditions.special_conditions_count,0) as special_conditions_count,
+  coalesce(special_conditions.remove_conditions,0) as remove_conditions,
+  coalesce(special_conditions.include_conditions,0) as include_conditions,
+  coalesce(special_conditions.maintenance_or_repair_conditions,0) as maintenance_or_repair_conditions,
+  coalesce(special_conditions.replace_or_modify_conditions,0) as replace_or_modify_conditions,
+  coalesce(special_conditions.other_conditions,0) as other_conditions
 from 
     PreProposta p
 left join
