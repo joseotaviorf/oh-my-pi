@@ -19,6 +19,7 @@ CREATE TABLE public.pre_proposal (
   "ultimoUpdateEdicao" INTEGER,
   "dataPrimerioEnvio" public.datetime,
   code varchar(10),
+  rejection_reason varchar(255),
   animais_condition INTEGER,
   quando_vai_mudar_condition INTEGER,
   quem_vai_morar_condition INTEGER,

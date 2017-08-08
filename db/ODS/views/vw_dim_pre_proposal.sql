@@ -25,6 +25,7 @@ SELECT
   last_rent_value_tenant,
   last_rent_value_landlord,
   total_rent_value,
+  p.rejection_reason,
   p.animais_condition,
   p.quando_vai_mudar_condition,
   p.quem_vai_morar_condition,

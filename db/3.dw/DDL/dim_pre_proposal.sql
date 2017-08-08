@@ -23,6 +23,7 @@ CREATE TABLE public.dim_pre_proposal (
   last_rent_value_tenant decimal(18,4),
   last_rent_value_landlord decimal(18,4),
   total_rent_value decimal(18,4),
+  rejection_reason VARCHAR(255),
   animais_condition INTEGER,
   quando_vai_mudar_condition INTEGER,
   quem_vai_morar_condition INTEGER,
