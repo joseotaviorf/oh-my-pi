@@ -151,7 +151,7 @@ class ZendeskAPI(object):
                     updated_at = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get('updated_at') or self.start_time <= updated_at <= self.end_time:
                         response.append(item)
-                if r['end_time'] <= self.end_time:
+                if r.get('end_time') <= self.end_time:
                     result.handle_pagination()
                 else:
                     return response
