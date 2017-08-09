@@ -38,13 +38,15 @@ class ZendeskDataToS3(object):
         result = self.zendesk_api.get_data()
         partition = 'extracted_date={}'.format(self.human_readable_start_time)
 
-        print ('result_type: {}'.format(type(result)))
-        self.save_data_to_s3(data=result, partition=partition)
-        print ('final count: {}'.format(len(result)))
+        r = self.save_data_to_s3(data=result, partition=partition)
+        if r:
+            print('final count: {}'.format(len(result)))
+        else:
+            print('No data - {}'.format(self.human_readable_start_time))
 
     def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
         if not data and not handle:
-            raise ValueError
+            return False
         if not handle:
             handle = StringIO(str(json.dumps(data)).encode('utf-8'))
 
@@ -63,6 +65,7 @@ class ZendeskDataToS3(object):
             bucket=self.s3_datalake_bucket,
             file_path=file_path
         )
+        return True
 
     def load_data_from_zendesk_to_clean(self):
         print('Not implemented yet...')
