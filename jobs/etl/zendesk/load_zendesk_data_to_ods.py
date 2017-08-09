@@ -57,24 +57,27 @@ class ZendeskDataToODS(object):
         print ('m=save_s3_data_to_ods, init')
         partition = '/extracted_date={}'.format(self.human_readable_start_time)
         files = self.__load_files_from_bucket(partition)
-        for i in range(0, len(files['Contents'])):
-            s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
-            file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
+        if files.get('Contents'):
+            for i in range(0, len(files['Contents'])):
+                s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
+                file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
 
-            if self.object_type == 'tickets':
-                self.upsert_tickets(file_content)
-            elif self.object_type == 'ticket_metrics':
-                self.upsert_ticket_metrics(file_content)
-            elif self.object_type == 'users':
-                self.upsert_users(file_content)
-            elif self.object_type == 'group_memberships':
-                self.upsert_group_memberships(file_content)
-            elif self.object_type == 'groups':
-                self.upsert_groups(file_content)
-            elif self.object_type == 'ticket_fields_type':
-                self.upsert_ticket_fields_type(file_content)
-            else:
-                return
+                if self.object_type == 'tickets':
+                    self.upsert_tickets(file_content)
+                elif self.object_type == 'ticket_metrics':
+                    self.upsert_ticket_metrics(file_content)
+                elif self.object_type == 'users':
+                    self.upsert_users(file_content)
+                elif self.object_type == 'group_memberships':
+                    self.upsert_group_memberships(file_content)
+                elif self.object_type == 'groups':
+                    self.upsert_groups(file_content)
+                elif self.object_type == 'ticket_fields_type':
+                    self.upsert_ticket_fields_type(file_content)
+                else:
+                    return
+        else:
+            print('No data - {}'.format(self.human_readable_start_time))
 
     def __execute_command(self, command, return_value=False):
         command = str(command).replace("'null'", "null").replace('\n', '')
