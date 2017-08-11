@@ -96,11 +96,27 @@ class ZendeskAPI(object):
     def __get_tickets_data(self):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.tickets)
 
-    def __get_chats_data(self):
+    def __get_chats_data(self, batch_limit=50):
         search_clause = 'timestamp:[{} TO {}]'.format(self.human_start_time, self.human_end_time)
         logging.info('m=__get_chats_data ({}), init'.format(search_clause))
-        result = self.chat_client.chats.search(search_clause)
-        return self.__do_all_pages(result=result, key_timestamp='timestamp')
+        result_search = self.chat_client.chats.search(search_clause)
+        result_search = self.__do_all_pages(result=result_search, key_timestamp='timestamp')
+
+        # with result_search, get chat by chat!
+        URL = 'https://www.zopim.com/api/v2/chats?ids={}'
+        result = []
+        ids = []
+        for item in result_search:
+            ids.append(item['id'])
+            if len(ids) == batch_limit or result_search[-1] == item: # batch limit or last item
+                str_ids = ','.join(ids)
+                url_request = URL.format(str_ids)
+                logging.info('m=__get_chat (id: {}), init'.format(str_ids))
+                chats = self.chat_client.chats._get(url_request, True).json().get('docs')
+                for id in chats:
+                    result.append(chats[id])
+                ids = []
+        return result
 
     def __get_ticket_fields_type_data(self):
         logging.info('m=get_ticket_fields_type_data, init')
