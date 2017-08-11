@@ -19,7 +19,7 @@ class ExtractZendeskDataToDatalake(object):
         self.end_time = int(self.human_readable_end_time.strftime('%s'))
         self.s3_datalake_bucket = args[5]
         self.s3_folder_path = args[6]
-        self.output_gzip = args[7] if len(args) > 7 else False
+        self.output_gzip = args[7] if len(args) > 7 else 'False'
         self.s3 = boto3.client('s3')
 
         print ('m=init, datalake_bucket_type={}, object_type={}, start_time={}, human_readable_start_time={},'
@@ -45,7 +45,7 @@ class ExtractZendeskDataToDatalake(object):
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
-        if self.output_gzip:
+        if json.loads(str(self.output_gzip).lower()): # convert str to bool
             handle = None
             with BaseETL.open_gzip_fp('wb') as fp:
                 for item in result:
