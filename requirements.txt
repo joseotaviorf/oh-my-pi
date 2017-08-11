@@ -42,7 +42,6 @@ s3fs==0.0.9
 numpy==1.13.0
 pandas==0.20.1
 # Google2Pandas==0.1.0
-# zenpy==1.2.2
 pyarrow==0.4.0
 Cython==0.25.2
 createsend==4.2.1
