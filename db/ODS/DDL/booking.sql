@@ -21,6 +21,10 @@ CREATE TABLE public.booking (
   "fluxoLocacao_id" bigint,
   "criadoEm" TIMESTAMP WITHOUT TIME ZONE,
   "atualizadoEm" TIMESTAMP WITHOUT TIME ZONE,
-  "slotDia" integer
+  "slotDia" integer,
+  reason text,
+  reason_category varchar(255),
+  last_update_source varchar(255),
+  cancel_timestamp timestamp
 )
 WITH (oids = false);

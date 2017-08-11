@@ -8,11 +8,12 @@ from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 
 
+# TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
-        self.start_time = int(datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').strftime('%s'))
-        self.human_readable_start_time = args[2]
+        self.human_readable_start_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
+        self.start_time = int(self.human_readable_start_time.strftime('%s'))
         self.s3_bucket = args[3]
         self.s3_bucket_raw_folder_path = args[4]
         self.ods_schema = args[5]
@@ -27,11 +28,16 @@ class ZendeskDataToODS(object):
 
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
-    def __load_files_from_bucket(self):
+    def __load_files_from_bucket(self, partition=''):
+        prefix = '{0}/{1}{2}/{1}-{3}'.format(
+            self.s3_bucket_raw_folder_path,
+            self.object_type,
+            partition,
+            self.start_time
+        )
+        print('prefix: {}'.format(prefix))
         return self.s3.list_objects_v2(Bucket=self.s3_bucket,
-                                       Prefix='{0}/{1}/{2}'.format(self.s3_bucket_raw_folder_path,
-                                                                   self.object_type,
-                                                                   self.start_time))
+                                       Prefix=prefix)
 
     @staticmethod
     def __format_string(string):
@@ -49,24 +55,29 @@ class ZendeskDataToODS(object):
 
     def save_s3_data_to_ods(self):
         print ('m=save_s3_data_to_ods, init')
+        partition = '/extracted_date={}'.format(self.human_readable_start_time)
+        files = self.__load_files_from_bucket(partition)
+        if files.get('Contents'):
+            for i in range(0, len(files['Contents'])):
+                s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
+                file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
 
-        files = self.__load_files_from_bucket()
-        for i in range(0, len(files['Contents'])):
-            s3_object = self.s3.get_object(Bucket=self.s3_bucket, Key=files['Contents'][i]['Key'])
-            file_content = json.loads(s3_object['Body'].read().decode('utf-8'))
-
-            if self.object_type == 'ticket':
-                self.upsert_tickets(file_content['tickets'])
-            elif self.object_type == 'ticket_metrics':
-                self.upsert_ticket_metrics(file_content['ticket_metrics'])
-            elif self.object_type == 'user':
-                self.upsert_users(file_content['users'])
-            elif self.object_type == 'group_membership':
-                self.upsert_group_memberships(file_content['group_memberships'])
-            elif self.object_type == 'group':
-                self.upsert_groups(file_content['groups'])
-            else:
-                return
+                if self.object_type == 'tickets':
+                    self.upsert_tickets(file_content)
+                elif self.object_type == 'ticket_metrics':
+                    self.upsert_ticket_metrics(file_content)
+                elif self.object_type == 'users':
+                    self.upsert_users(file_content)
+                elif self.object_type == 'group_memberships':
+                    self.upsert_group_memberships(file_content)
+                elif self.object_type == 'groups':
+                    self.upsert_groups(file_content)
+                elif self.object_type == 'ticket_fields_type':
+                    self.upsert_ticket_fields_type(file_content)
+                else:
+                    return
+        else:
+            print('No data - {}'.format(self.human_readable_start_time))
 
     def __execute_command(self, command, return_value=False):
         command = str(command).replace("'null'", "null").replace('\n', '')
@@ -552,6 +563,8 @@ class ZendeskDataToODS(object):
 
         print ('upsert_tickets, end, count: {}'.format(count))
 
+    def upsert_ticket_fields_type(self, ticket_fields):
+        pass
 
 if __name__ == '__main__':
     args = sys.argv
