@@ -19,6 +19,7 @@ class ExtractZendeskDataToDatalake(object):
         self.end_time = int(self.human_readable_end_time.strftime('%s'))
         self.s3_datalake_bucket = args[5]
         self.s3_folder_path = args[6]
+        self.output_gzip = args[7] if len(args) > 7 else False
         self.s3 = boto3.client('s3')
 
         print ('m=init, datalake_bucket_type={}, object_type={}, start_time={}, human_readable_start_time={},'
@@ -40,23 +41,29 @@ class ExtractZendeskDataToDatalake(object):
         )
 
     def load_data_from_zendesk_to_raw(self):
-        partition = 'dt_timestamp={}'.format(self.human_readable_start_time)
+        partition = 'extracted_date={}'.format(self.human_readable_start_time)
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
-        handle = None
-        with BaseETL.open_gzip_fp('wb') as fp:
-            for item in result:
-                i = item if type(item) is dict else item.to_dict()
-                BaseETL.write_json_in_fp(json.dumps(i), fp)
-            handle = fp.fileobj
-        self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
+        if self.output_gzip:
+            handle = None
+            with BaseETL.open_gzip_fp('wb') as fp:
+                for item in result:
+                    i = item if type(item) is dict else item.to_dict()
+                    BaseETL.write_json_in_fp(json.dumps(i), fp)
+                handle = fp.fileobj
+            r = self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
+        else:
+            r = self.save_data_to_s3(data=result, partition=partition)
 
-        print ('final count: {}'.format(len(result)))
+        if r:
+            print('final count: {}'.format(len(result)))
+        else:
+            print('No data - {}'.format(self.human_readable_start_time))
 
     def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
         if not data and not handle:
-            raise Exception
+            return False
         if not handle:
             handle = StringIO(str(json.dumps(data)).encode('utf-8'))
 
@@ -75,6 +82,7 @@ class ExtractZendeskDataToDatalake(object):
             bucket=self.s3_datalake_bucket,
             file_path=file_path
         )
+        return True
 
     def load_data_from_zendesk_to_clean(self):
         print('Not implemented yet...')

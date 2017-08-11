@@ -1,6 +1,4 @@
-drop view if exists vw_property_listing;
-
-create view vw_property_listing as
+create or replace view vw_property_listing as
 with ish as
 (
   select
@@ -45,7 +43,7 @@ with ish as
     *,
     status = 'alugado'
       and next_different_status_time is not null
-      and next_different_status_time - status_time >= INTERVAL '90 days'
+      and next_different_status_time - status_time >= INTERVAL '45 days'
     as new_version_alugado,
 
     status = 'publicado'
