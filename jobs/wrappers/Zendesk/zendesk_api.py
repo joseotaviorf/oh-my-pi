@@ -26,6 +26,8 @@ class ZendeskAPI(object):
         )
         self.start_time = start_time
         self.end_time = end_time
+        self.human_start_time = datetime.fromtimestamp(self.start_time).strftime('%Y-%m-%d')
+        self.human_end_time = datetime.fromtimestamp(self.end_time).strftime('%Y-%m-%d')
 
     @classmethod
     def __get_zendek_client(cls, client_id, client_secret, subdomain='quintoandar'):
@@ -95,7 +97,10 @@ class ZendeskAPI(object):
         return self.__get_incremental_data(zendesk_object=self.zenpy_client.tickets)
 
     def __get_chats_data(self):
-        return self.__get_incremental_data(zendesk_object=self.chat_client.chats)
+        search_clause = 'timestamp:[{} TO {}]'.format(self.human_start_time, self.human_end_time)
+        logging.info('m=__get_chats_data ({}), init'.format(search_clause))
+        result = self.chat_client.chats.search(search_clause)
+        return self.__do_all_pages(result=result, key_timestamp='timestamp')
 
     def __get_ticket_fields_type_data(self):
         logging.info('m=get_ticket_fields_type_data, init')
@@ -141,17 +146,17 @@ class ZendeskAPI(object):
         incremental_data_result = zendesk_object.incremental(start_time=self.start_time)
         return self.__do_all_pages(incremental_data_result, True)
 
-    def __do_all_pages(self, result, incremental=False):
+    def __do_all_pages(self, result, incremental=False, key_timestamp='updated_at'):
         response = []
         while True:
             try:
                 r = result._response_json
-
-                for item in r[self.object_type]:
-                    updated_at = int(datetime.strptime(item['updated_at'],'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
-                    if not incremental or not item.get('updated_at') or self.start_time <= updated_at <= self.end_time:
+                items = r.get(self.object_type) or r.get('results')
+                for item in items:
+                    updated_at = int(datetime.strptime(item.get(key_timestamp),'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
+                    if not incremental or not item.get(key_timestamp) or self.start_time <= updated_at <= self.end_time:
                         response.append(item)
-                if r.get('end_time') <= self.end_time:
+                if (r.get('end_time') and r.get('end_time') <= self.end_time) or r.get('next_url'):
                     result.handle_pagination()
                 else:
                     return response
