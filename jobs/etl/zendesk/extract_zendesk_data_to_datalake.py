@@ -7,6 +7,7 @@ from datetime import datetime,timedelta
 import boto3
 from jobs.base.base_etl import BaseETL
 from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
+from qa_python_utils.aws.athena import AthenaClient
 
 
 class ExtractZendeskDataToDatalake(object):
@@ -42,6 +43,7 @@ class ExtractZendeskDataToDatalake(object):
 
     def load_data_from_zendesk_to_raw(self):
         partition = 'extracted_date={}'.format(self.human_readable_start_time)
+        table_name = 'zendesk_{}'.format(self.object_type)
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
@@ -52,16 +54,16 @@ class ExtractZendeskDataToDatalake(object):
                     i = item if type(item) is dict else item.to_dict()
                     BaseETL.write_json_in_fp(json.dumps(i), fp)
                 handle = fp.fileobj
-            r = self.save_data_to_s3(handle=handle, partition=partition, extension_file='gz')
+            r = self.save_data_to_s3(handle=handle, partition=partition, table_name=table_name, extension_file='gz')
         else:
-            r = self.save_data_to_s3(data=result, partition=partition)
+            r = self.save_data_to_s3(data=result, partition=partition, table_name=table_name)
 
         if r:
             print('final count: {}'.format(len(result)))
         else:
             print('No data - {}'.format(self.human_readable_start_time))
 
-    def save_data_to_s3(self, data=None, handle=None, partition=None, extension_file='json'):
+    def save_data_to_s3(self, data=None, handle=None, partition=None, table_name=None, extension_file='json'):
         if not data and not handle:
             return False
         if not handle:
@@ -70,6 +72,14 @@ class ExtractZendeskDataToDatalake(object):
         target_file = '{}-{}.{}'.format(self.object_type, self.start_time, extension_file)
         if partition:
             target_file = '{}/{}'.format(partition, target_file)
+            if table_name:
+                p_split = partition.split('=')
+                sql = 'ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION {};'.format(
+                    self.datalake_bucket_type,
+                    'datalake_{}'.format(table_name),
+                    "({}='{}')".format(p_split[0], p_split[1])
+                )
+                AthenaClient(self.s3_datalake_bucket).execute_raw_query(sql=sql)
 
         file_path = '{0}/{1}/{2}'.format(self.s3_folder_path, self.object_type, target_file)
         print (
@@ -84,9 +94,6 @@ class ExtractZendeskDataToDatalake(object):
         )
         return True
 
-    def load_data_from_zendesk_to_clean(self):
-        print('Not implemented yet...')
-
 
 if __name__ == '__main__':
     args = sys.argv
@@ -95,8 +102,6 @@ if __name__ == '__main__':
 
     if zendesk_data_to_s3.datalake_bucket_type == 'raw':
         zendesk_data_to_s3.load_data_from_zendesk_to_raw()
-    if zendesk_data_to_s3.datalake_bucket_type == 'clean':
-        zendesk_data_to_s3.load_data_from_zendesk_to_clean()
 
     print ('END')
     sys.stdout.flush()
