@@ -74,10 +74,14 @@ class ExtractZendeskDataToDatalake(object):
             target_file = '{}/{}'.format(partition, target_file)
             if table_name:
                 p_split = partition.split('=')
+                partition_formatted = "({}='{}')".format(p_split[0], p_split[1])
+                database = 'datalake_{}'.format(self.datalake_bucket_type)
+
+                # TODO: Put this code in Athena Client - Add Partition
                 sql = 'ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION {};'.format(
-                    'datalake_{}'.format(self.datalake_bucket_type),
+                    database,
                     table_name,
-                    "({}='{}')".format(p_split[0], p_split[1])
+                    partition_formatted
                 )
                 AthenaClient(self.s3_datalake_bucket).execute_raw_query(sql=sql)
 
