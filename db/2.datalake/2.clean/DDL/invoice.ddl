@@ -9,7 +9,13 @@ create external table datalake_clean.invoice (
   amount double,
   item string,
   year_month string,
-  due_date string
+  due_date string,
+  tenant_due_date string,
+  tenant_paid_date string,
+  tenant_status string,
+  landlord_due_date string,
+  landlord_paid_date string,
+  landlord_status string
 )
 stored as parquet
 location 's3://5a-datalake/clean/seubarriga/invoice/'
