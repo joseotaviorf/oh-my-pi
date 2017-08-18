@@ -364,14 +364,25 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
-    def dataframe_to_ods(cls, df, table_name, encoding='LATIN1'):
+    def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True):
         df_table = petl.fromdataframe(df=df)
-        BaseETL.bulk_insert(
-            table=df_table,
-            table_name=table_name,
-            db_enum=EnumDb.BI_ODS,
-            encoding=encoding
-        )
+
+        if enum_db == EnumDb.BI_DW:
+            bucket_name, filename = cls.to_s3('x.csv', df_table, os.environ.get('bi-dw-s3-bucket'), encoding=encoding)
+            cls.bulk_insert_from_s3_to_dw(bucket_name, filename, enum_db, table_name, append, encoding)
+        else:
+            BaseETL.bulk_insert(
+                table=df_table,
+                table_name=table_name,
+                db_enum=enum_db,
+                encoding=encoding,
+                append=append,
+                commit=commit
+            )
+
+    @classmethod
+    def dataframe_to_ods(cls, df, table_name, encoding='LATIN1', append=True, commit=True):
+        cls.dataframe_to_db(df, table_name, EnumDb.BI_ODS, encoding='LATIN1', append=True, commit=True)
 
     @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
