@@ -191,7 +191,7 @@ class Crawlers(object):
     def load_dim_external_property(self):
         _logger.info('m=load_dim_external_property, msg=cleaning dim_external_property at {}'.format(today))
         BaseETL.execute_command(
-            command="""delete from dim_external_property_tmp where start_date = '{0}'""".format(today),
+            command="""delete from dim_external_property where start_date = '{0}'""".format(today),
             db_enum=EnumDb.BI_DW,
             encoding='UTF8',
             commit=True
@@ -199,11 +199,11 @@ class Crawlers(object):
 
         _logger.info('m=load_dim_external_property, msg=updating end_date columns in dim_external_property')
         BaseETL.execute_command(
-            command="""update dim_external_property_tmp set end_date = '{0}' where sk_external_property in (
+            command="""update dim_external_property set end_date = '{0}' where sk_external_property in (
                           select
                             dep.sk_external_property
                             from datalake_clean.external_property cr
-                              right join dim_external_property_tmp dep
+                              right join dim_external_property dep
                                 on cr.id = dep.id and cr.website = dep.source and cr.business = dep.business
                                    and (
                                      (coalesce(cr.price, 0) != coalesce(dep.price, 0))
@@ -242,7 +242,7 @@ class Crawlers(object):
             db_enum=EnumDb.BI_DW,
             query="""with entries_not_changed as  (
                         select dep.id
-                        from dim_external_property_tmp dep
+                        from dim_external_property dep
                         join datalake_clean.external_property cr
                         on cr.id = dep.id 
                           and cr.website = dep.source 
@@ -273,7 +273,7 @@ class Crawlers(object):
                     ),
                     entries_changed as (
                         select dep.id, dep.source, right(sk_external_property, 3) as version
-                        from dim_external_property_tmp dep
+                        from dim_external_property dep
                         join datalake_clean.external_property cr
                         on cr.id = dep.id and cr.website = dep.source
                            and (
@@ -304,7 +304,7 @@ class Crawlers(object):
                     ),
                     end_dates as (
                       select id, source, min(start_date) over (partition by id, source) as end_date
-                        from dim_external_property_tmp
+                        from dim_external_property
                       where start_date > '{0}'
                     ),
                     transformed_data as (
@@ -355,23 +355,23 @@ class Crawlers(object):
                         from transformed_data ext_td""".format(today))
 
         BaseETL.to_s3(
-            filename='dim_external_property_tmp_{}'.format(today),
+            filename='dim_external_property_{}'.format(today),
             data_table=insert_table,
             bucket_folder_path='bi-etl-ejuice-tmpfiles',
         )
 
         BaseETL.bulk_insert_from_s3_to_dw(
             bucket_name='bi-etl-ejuice-tmpfiles',
-            filename='dim_external_property_tmp_{}'.format(today),
+            filename='dim_external_property_{}'.format(today),
             enum_db_dest=EnumDb.BI_DW,
-            table_name='dim_external_property_tmp',
+            table_name='dim_external_property',
             append=True,
             encoding='UTF8'
         )
 
     def load_fact_market_index(self):
         _logger.info('m=load_fact_market_index, msg=deleting data at {}'.format(today))
-        query_clean = """delete from fact_market_index_tmp 
+        query_clean = """delete from fact_market_index 
                           where sk_snapshot_date = replace('{0}', '-', '')::integer""".format(today)
         BaseETL.execute_command(
             command=query_clean,
@@ -381,7 +381,7 @@ class Crawlers(object):
         )
 
         _logger.info('m=load_fact_market_index, msg=inserting data at {}'.format(today))
-        query_insert = """insert into fact_market_index_tmp (sk_property, sk_external_property, sk_snapshot_date,
+        query_insert = """insert into fact_market_index (sk_property, sk_external_property, sk_snapshot_date,
                             sk_updated_on_date, business, advertiser_name, advertiser_type)
                                 with property_user as (
                                   select
@@ -409,7 +409,7 @@ class Crawlers(object):
                                 ),
                                 ext_property_crawler as (
                                     select dep.*, cr.updated_on, cr.advertiser_name, cr.advertiser_type, cr.description
-                                      from dim_external_property_tmp dep
+                                      from dim_external_property dep
                                       join datalake_clean.external_property cr
                                         on dep.id = cr.id
                                            and dep.source = cr.website
