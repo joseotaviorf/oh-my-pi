@@ -95,7 +95,7 @@ class Crawlers(object):
         _logger.info('m=transform_data')
         self.athena_client.msck_repair_table(database='datalake_raw', table_name='crawlers')
 
-        query_crawlers = '../../../db/2.datalake/queries/crawlers/transform_raw.sql'
+        query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(filename=query_crawlers,
                                                                                  params=[today])
         neighs_cities_query = """select distinct lat, lng, cep
