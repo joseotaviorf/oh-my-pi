@@ -15,8 +15,14 @@ create external table datalake_clean.invoice (
   tenant_status string,
   landlord_due_date string,
   landlord_paid_date string,
-  landlord_status string
+  landlord_status string,
+  delayed_days double
+)
+partitioned by (
+  ym string
 )
 stored as parquet
 location 's3://5a-datalake/clean/seubarriga/invoice/'
 ;
+
+msck repair table datalake_clean.invoice;
