@@ -134,7 +134,7 @@ join
 	avg_response_times r
 	on t.id = r.id and t.extracted_date = r.extracted_date
 where
-	t.extracted_date = cast({0} as date)
+	t.extracted_date = cast('{0}' as date)
 	
 --: examples::
 --	t.id = '1708.958463.QS1g4gA4Fc0Hy'

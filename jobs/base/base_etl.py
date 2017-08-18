@@ -323,37 +323,6 @@ class BaseETL(object):
         return bucket_name, filename
 
     @classmethod
-    def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
-                                  append=True, encoding='LATIN1'):
-        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        bucket_dw = os.environ.get('bi-dw-s3-bucket')
-        forno = os.environ.get('forno')
-        con = cls.get_connection(enum_db_dest, encoding)
-        file = 's3://{}/{}'.format(bucket_name, filename)
-        delimiter = ','
-
-        if not eval(str(forno)): # if env = forno, we got a postgres database, so COPY command is not equal
-            sql = """COPY {} FROM '{}'
-                        CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
-                        DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
-                table_name,
-                file,
-                aws_access_key_id,
-                aws_secret_access_key,
-                delimiter)
-        else:
-            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
-        try:
-            cls.copy_file_between_s3_buckets(bucket_name, bucket_dw, filename,  '{}.csv'.format(table_name))
-
-            if not append:
-                con.cursor().execute('truncate table {};'.format(table_name))
-            con.cursor().execute(sql)
-        finally:
-            con.close()
-
-    @classmethod
     def copy_file_between_s3_buckets(cls, bucket_source, bucket_destination,
                                      full_filename_source, full_filename_dest):
         s3 = boto3.resource('s3')
@@ -366,47 +335,68 @@ class BaseETL(object):
     @classmethod
     def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True):
         df_table = petl.fromdataframe(df=df)
-
-        if enum_db == EnumDb.BI_DW:
-            bucket_name, filename = cls.to_s3('x.csv', df_table, os.environ.get('bi-dw-s3-bucket'), encoding=encoding)
-            cls.bulk_insert_from_s3_to_dw(bucket_name, filename, enum_db, table_name, append, encoding)
-        else:
-            BaseETL.bulk_insert(
-                table=df_table,
-                table_name=table_name,
-                db_enum=enum_db,
-                encoding=encoding,
-                append=append,
-                commit=commit
-            )
+        BaseETL.bulk_insert(
+            table=df_table,
+            table_name=table_name,
+            db_enum=enum_db,
+            encoding=encoding,
+            append=append,
+            commit=commit
+        )
 
     @classmethod
     def dataframe_to_ods(cls, df, table_name, encoding='LATIN1', append=True, commit=True):
-        cls.dataframe_to_db(df, table_name, EnumDb.BI_ODS, encoding='LATIN1', append=True, commit=True)
+        cls.dataframe_to_db(df, table_name, EnumDb.BI_ODS, encoding=encoding, append=append, commit=commit)
 
     @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
                     encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None):
+        # create a s3_tmp_file before insert on DB
         tmpdir = '/tmp'
         filename = table_name
         if append:
             filename = '{}_{}'.format(filename, cls.now())
         filename = '{}.csv'.format(filename)
-
         cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
-
         csv_temp_file = '{}/{}'.format(tmpdir, filename)
-        conn = cls.get_connection(db_enum=db_enum, encoding=encoding)
-        cur = conn.cursor()
-        if not append:
-            cur.execute('TRUNCATE TABLE {}'.format(table_name))
-        with codecs.open(filename=csv_temp_file, encoding=encoding) as f:
-            # cur.copy_from(f, table_name, delimiter)
-            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
-            cur.copy_expert(sql, f)
 
-        if commit:
-            conn.commit()
+        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit, delimiter)
+
+    @classmethod
+    def bulk_insert_from_local_file(cls, csv_filepath, table_name, db_enum,
+                                    encoding='LATIN1', append=True, commit=True, delimiter=','):
+        with codecs.open(filename=csv_filepath, encoding=encoding) as f:
+            bucket_folder_path, filename = cls.file_to_s3(filename=csv_filepath, dir_path='')
+            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, encoding)
+
+    @classmethod
+    def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
+                                  append=True, encoding='LATIN1'):
+        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        bucket_dw = os.environ.get('bi-dw-s3-bucket')
+        forno = os.environ.get('forno')
+        con = cls.get_connection(enum_db_dest, encoding)
+        file = 's3://{}/{}'.format(bucket_name, filename)
+        delimiter = ','
+
+        if not eval(str(forno)):  # if env = forno, we got a postgres database, so COPY command is not equal
+            sql = """COPY {} FROM '{}'
+                            CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
+                            DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
+                table_name,
+                file,
+                aws_access_key_id,
+                aws_secret_access_key,
+                delimiter)
+        else:
+            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
+        try:
+            if not append:
+                con.cursor().execute('truncate table {};'.format(table_name))
+            con.cursor().execute(sql)
+        finally:
+            con.close()
 
     @classmethod
     def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
