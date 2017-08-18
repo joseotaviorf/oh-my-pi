@@ -55,6 +55,9 @@ class Invoice(object):
     --------------------------------------------
     """
 
+    def __init__(self):
+        self.athena_client = AthenaClient(bucket_datalake)
+
     def request_data(self):
         _logger.info(
             'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
@@ -105,32 +108,42 @@ class Invoice(object):
         return gz_body
 
     def save_into_s3(self, object, file_path_prefix):
-        _logger.info('m=save_into_s3, file_path={0}/{1}.gz'.format(file_path_prefix, process_name))
+        _logger.info(
+            'm=save_into_s3, file_path={0}/ym={2}-{3}/{1}.gz'.format(file_path_prefix, process_name, exec_year,
+                                                                     exec_month))
 
         BaseETL.obj_to_s3(
             obj_io=object,
             bucket=bucket_datalake,
-            file_path='{0}/{1}_{2}-{3}.gz'.format(file_path_prefix, process_name, exec_year, exec_month)
+            file_path='{0}/ym={2}-{3}/{1}.gz'.format(file_path_prefix, process_name, exec_year, exec_month)
+        )
+
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/raw/seubarriga/{}'.format(bucket_datalake, process_name),
+            database='datalake_raw',
+            table='seubarriga_{}'.format(process_name),
+            partition_name='ym',
+            partition_value='{}-{}'.format(exec_year, exec_month)
         )
 
     def transform_data(self):
-        _logger.info('m=transform_data')
-        query = """select "contract-id", version, 
-                    case 
-                      when lower(blocked) = 'true' 
-                        then 'True' 
-                      else 'False' 
-                    end as blocked, 
+        _logger.info('m=transform_data, msg=converting fields')
+        query = """select "contract-id", version,
+                    case
+                      when lower(blocked) = 'true'
+                        then 'True'
+                      else 'False'
+                    end as blocked,
                     "from", "to", description, amount, item, "year-month", "due-date", "tenant-due-date",
                     "tenant-paid-date", "tenant-status", "landlord-due-date", "landlord-paid-date", "landlord-status"
                     from datalake_raw.seubarriga_invoice
-                    where trim("year-month") = '{0}{1}'""".format(exec_year, exec_month)
-        athena_client = AthenaClient(bucket_datalake)
+                    where ym = '{0}-{1}'""".format(exec_year, exec_month)
 
         regex_date = '(\d{2})/(\d{2})/(\d{4})'
         group_date = '\g<3>-\g<2>-\g<1>'
-        athena_client.create_parquet_from_query(
-            key='clean/seubarriga/{0}/{1}_{2}-{3}.parq'.format(process_name, process_name, exec_year, exec_month),
+        key = 'clean/seubarriga/{0}/ym={2}-{3}/{1}.gz'.format(process_name, process_name, exec_year, exec_month)
+        self.athena_client.create_parquet_from_query(
+            key=key,
             query=query,
             raw_columns=OrderedDict([
                 ('contract-id', str),
@@ -169,17 +182,73 @@ class Invoice(object):
                 ('landlord_status', str)
             ]))
 
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/clean/seubarriga/{}'.format(bucket_datalake, process_name),
+            database='datalake_clean',
+            table=process_name,
+            partition_name='ym',
+            partition_value='{}-{}'.format(exec_year, exec_month)
+        )
+
+        _logger.info('m=transform_data, msg=adding delay column')
+        query = """with rent_delay as (
+                      select *,
+                       date_diff('day', cast(tenant_due_date as timestamp), 
+                                 cast(tenant_paid_date as timestamp)) as rent_delayed_days
+                       from datalake_clean.invoice 
+                      where trim("from") = 'Inquilino'
+                       and trim(item) = 'Aluguel'
+                       and tenant_due_date is not null and tenant_paid_date is not null
+                       and ym = '{0}-{1}'
+                    )
+                    select distinct 
+                       inv.contract_id, inv.version, inv.blocked, inv."from", inv."to", inv.description,
+                       inv.amount, inv.item, inv.year_month, inv.due_date, inv.tenant_due_date, inv.tenant_paid_date, 
+                       inv.tenant_status, inv.landlord_due_date, inv.landlord_paid_date, inv.landlord_status,
+                       cast(rd.rent_delayed_days as smallint) as delayed_days
+                       from datalake_clean.invoice inv
+                     left join rent_delay rd
+                      on inv.contract_id = rd.contract_id
+                       and inv.year_month = rd.year_month
+                       and inv.item = rd.item
+                       and inv.tenant_due_date is not null
+                       and inv.tenant_paid_date is not null
+                    where inv.ym = '{0}-{1}'""".format(exec_year, exec_month)
+
+        self.athena_client.create_parquet_from_query(
+            key=key,
+            query=query,
+            raw_columns=OrderedDict([
+                ('contract_id', long),
+                ('version', str),
+                ('blocked', bool),
+                ('from', str),
+                ('to', str),
+                ('description', str),
+                ('amount', float),
+                ('item', str),
+                ('year_month', str),
+                ('due_date', str),
+                ('tenant_due_date', str),
+                ('tenant_paid_date', str),
+                ('tenant_status', str),
+                ('landlord_due_date', str),
+                ('landlord_paid_date', str),
+                ('landlord_status', str),
+                ('delayed_days', int)
+            ])
+        )
+
     def load_into_ODS(self):
         _logger.info('m=load_into_ODS')
 
-        athena_client = AthenaClient(bucket_datalake)
-        data_frame = athena_client.execute_query_and_return_dataframe(
+        data_frame = self.athena_client.execute_query_and_return_dataframe(
             """select 
                   contract_id, version, blocked, "from", "to", description, amount, item, 
                   year_month, due_date, tenant_due_date, tenant_paid_date, tenant_status, 
-                  landlord_due_date, landlord_paid_date, landlord_status
+                  landlord_due_date, landlord_paid_date, landlord_status, cast(delayed_days as smallint)
                 from datalake_clean.invoice
-                where trim(year_month) = '{0}{1}'""".format(exec_year, exec_month))
+                where ym = '{}-{}'""".format(exec_year, exec_month))
 
         BaseETL.execute_command(
             command="""delete from invoice where year_month = '{0}{1}';""".format(exec_year, exec_month),
