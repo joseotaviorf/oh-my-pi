@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.crawlers;
-create external table datalake_clean.crawlers (
+drop table if exists datalake_clean.external_property;
+create external table datalake_clean.external_property (
   id bigint,
   website string,
   url string,
@@ -37,6 +37,11 @@ create external table datalake_clean.crawlers (
   state string,
   craw_timestamp double
 )
+partitioned by (
+  started_on date
+)
 stored as parquet
-location 's3://5a-datalake/clean/crawlers/'
+location 's3://5a-datalake/clean/external_property/'
 ;
+
+msck repair table datalake_clean.external_property;

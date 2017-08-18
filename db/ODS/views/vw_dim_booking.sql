@@ -2,7 +2,13 @@ drop view if exists public.vw_dim_booking;
 
 create view public.vw_dim_booking
 as
-with bookings as
+with bms as (
+    select
+        row_number() over(partition by bms.visita_id order by bms.event_time) as rn,
+        bms.*
+    from public.booking_media_sources bms
+),
+bookings as
 (
 	select 
 		  s.id as sk_booking,
@@ -54,19 +60,35 @@ with bookings as
 	    	end,
 	    	s.reason_category    	
 	   	) as responsible,
-	   	
+
 	   	s.cancel_timestamp,
-	   	
+
 	   	s."criadoEm" as dt_created,
-			s."atualizadoEm" as dt_updated,
-			now()::timestamp as dt_timestamp
-	    
+		s."atualizadoEm" as dt_updated,
+		now()::timestamp as dt_timestamp,
+		sources.app_type,
+		coalesce(sources.media_source, 'Unknown') as media_source,
+		sources.adjust_network,
+		sources.utm_source,
+		sources.utm_medium,
+		sources.utm_campaign
+
 	from
 		public.booking s
-		
+
 	left join
 		files.de_para_cancelamento d
 		on d.reason = s.reason
+	left join
+		visit v
+		on s.visita_id = v.id
+	left join
+		(
+			select * from bms
+			where rn = 1
+			and bms.visita_id is not null
+		) sources
+		on v.codigo = sources.visita_id
 )
 select
 	sk_booking,
@@ -101,45 +123,17 @@ select
 		when responsible = 'Agent' then 'QuintoAndar'
 		else responsible
 	end as responsible,
-  
+	app_type,
+  	media_source,
+  	adjust_network,
+  	utm_source,
+  	utm_medium,
+  	utm_campaign,
 	cancel_timestamp,
-  dt_created,
-  dt_updated,
-  dt_timestamp
+	dt_created,
+	dt_updated,
+	dt_timestamp
    
 	
 from
 	bookings;
-
-/*
-left join
-(
-	select distinct
-        "reagendadoDe_id",
-        id
-    from
-    	booking
-    where
-    	"reagendadoDe_id" is not null
-) r
-on r."reagendadoDe_id" = s."reagendadoDe_id"
-
-left join
-(
-	select distinct
-        "reagendadoDe_id",
-        id
-    from
-    	booking
-    where
-    	"reagendadoDe_id" is not null
-) r2
-on r2."reagendadoDe_id" = s.id
-*/
-
--- where  s.id in (145513, 146371, 146372)
-
-	
--- select * from vw_dim_booking limit 10
--- select * from vw_dim_booking  where id_visit in (193581, 215953)
-
