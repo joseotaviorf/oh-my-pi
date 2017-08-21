@@ -1,5 +1,4 @@
-﻿
-DROP PROCEDURE IF EXISTS ebdb.list_imovel;
+﻿DROP PROCEDURE IF EXISTS ebdb.list_imovel;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_imovel()
@@ -137,9 +136,10 @@ select -- count(1)
   coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
   coalesce(iv.prop_precisa_liberar,0) as info_visita_prop_precisa_liberar,
   coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
-
+	
   i.dataCriacao as data_criacao,
-  i.atualizadoEm as atualizado_em
+  i.atualizadoEm as atualizado_em,
+  i.usuarioQueCadastrou_id as usuario_que_cadastrou_id
 
 from 
   Imovel i

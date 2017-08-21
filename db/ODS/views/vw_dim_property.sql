@@ -1,6 +1,4 @@
-drop view if exists vw_dim_property;
-
-CREATE VIEW public.vw_dim_property 
+create or replace view public.vw_dim_property 
 as
 
 with imovel_dates as
@@ -331,7 +329,8 @@ SELECT
   i.info_visita_chave_box_quintoandar,
   i.data_criacao,
   i.atualizado_em,
-  now() AS load_timestamp
+  now() AS load_timestamp,
+  i.usuario_que_cadastrou_id
 
 from 
 	imovel i
