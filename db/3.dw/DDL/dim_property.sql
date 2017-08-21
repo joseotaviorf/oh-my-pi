@@ -162,5 +162,8 @@ CREATE TABLE public.dim_property (
   data_criacao TIMESTAMP WITHOUT TIME ZONE,
   atualizado_em TIMESTAMP WITHOUT TIME ZONE,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
+  usuario_que_cadastrou_id INTEGER,
+  
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
+  

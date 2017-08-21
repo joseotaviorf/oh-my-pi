@@ -380,7 +380,8 @@ class BaseETL(object):
         file = 's3://{}/{}'.format(bucket_name, filename)
         delimiter = ','
 
-        if not eval(str(forno)):  # if env = forno, we got a postgres database, so COPY command is not equal
+        # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
+        if enum_db_dest==EnumDb.BI_DW and not eval(str(forno)):
             sql = """COPY {} FROM '{}'
                             CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                             DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
