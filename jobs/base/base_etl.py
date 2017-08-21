@@ -360,21 +360,20 @@ class BaseETL(object):
         cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
         csv_temp_file = '{}/{}'.format(tmpdir, filename)
 
-        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit, delimiter)
+        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit,)
 
     @classmethod
     def bulk_insert_from_local_file(cls, csv_filepath, table_name, db_enum,
-                                    encoding='LATIN1', append=True, commit=True, delimiter=','):
+                                    encoding='LATIN1', append=True, commit=True):
         with codecs.open(filename=csv_filepath, encoding=encoding) as f:
             bucket_folder_path, filename = cls.file_to_s3(filename=csv_filepath, dir_path='')
-            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, encoding, f)
+            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, commit, encoding, f)
 
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
-                                  append=True, encoding='LATIN1', f_cursor=None):
+                                  append=True, commit=True, encoding='LATIN1', f_cursor=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-        bucket_dw = os.environ.get('bi-dw-s3-bucket')
         forno = os.environ.get('forno')
         con = cls.get_connection(enum_db_dest, encoding)
         file = 's3://{}/{}'.format(bucket_name, filename)
@@ -397,6 +396,9 @@ class BaseETL(object):
             else:
                 sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
                 con.cursor().copy_expert(sql, f_cursor)
+
+            if commit:
+                con.commit()
         finally:
             con.close()
 
