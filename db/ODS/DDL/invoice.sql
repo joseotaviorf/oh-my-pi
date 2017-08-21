@@ -16,7 +16,8 @@ create table invoice
   tenant_status varchar,
   landlord_due_date date,
   landlord_paid_date date,
-  landlord_status varchar
+  landlord_status varchar,
+  delayed_days smallint
 )
 ;
 

@@ -16,6 +16,12 @@ create external table datalake_raw.seubarriga_invoice (
   `landlord-due-date` string,
   `landlord-paid-date` string,
   `landlord-status` string
-) row format serde 'org.openx.data.jsonserde.JsonSerDe'
+)
+partitioned by (
+  ym string
+)
+row format serde 'org.openx.data.jsonserde.JsonSerDe'
 location 's3://5a-datalake/raw/seubarriga/invoice/'
 ;
+
+msck repair table datalake_clean.invoice;
