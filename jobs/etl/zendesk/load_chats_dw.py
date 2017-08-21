@@ -17,6 +17,8 @@ if len(sys.argv) < 3:
 
 logging.info("Reading from S3: {}".format(datetime.utcnow()))
 date = sys.argv[2]
+if len(date)>10:
+    date = date[:10]
 data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
 
 # removing times column
