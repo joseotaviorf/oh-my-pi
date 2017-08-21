@@ -367,11 +367,11 @@ class BaseETL(object):
                                     encoding='LATIN1', append=True, commit=True, delimiter=','):
         with codecs.open(filename=csv_filepath, encoding=encoding) as f:
             bucket_folder_path, filename = cls.file_to_s3(filename=csv_filepath, dir_path='')
-            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, encoding)
+            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, encoding, f)
 
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
-                                  append=True, encoding='LATIN1'):
+                                  append=True, encoding='LATIN1', f_cursor=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         bucket_dw = os.environ.get('bi-dw-s3-bucket')
@@ -381,21 +381,22 @@ class BaseETL(object):
         delimiter = ','
 
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
-        if enum_db_dest==EnumDb.BI_DW and not eval(str(forno)):
-            sql = """COPY {} FROM '{}'
-                            CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
-                            DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
-                table_name,
-                file,
-                aws_access_key_id,
-                aws_secret_access_key,
-                delimiter)
-        else:
-            sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
         try:
             if not append:
                 con.cursor().execute('truncate table {};'.format(table_name))
-            con.cursor().execute(sql)
+            if enum_db_dest == EnumDb.BI_DW and not eval(str(forno)):
+                sql = """COPY {} FROM '{}'
+                        CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
+                        DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
+                    table_name,
+                    file,
+                    aws_access_key_id,
+                    aws_secret_access_key,
+                    delimiter)
+                con.cursor().execute(sql)
+            else:
+                sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
+                con.cursor().copy_expert(sql, f_cursor)
         finally:
             con.close()
 
