@@ -12,11 +12,11 @@ athena = AthenaClient('5a-datalake')
 table_name = 'zendesk.chats'
 file_name = './db/2.datalake/queries/zendesk/chats.sql'
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     raise Exception('Missing Parameters')
 
 logging.info("Reading from S3: {}".format(datetime.utcnow()))
-date = sys.argv[1]
+date = sys.argv[2]
 data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
 
 # removing times column
