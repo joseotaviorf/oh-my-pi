@@ -9,7 +9,7 @@ with chats as -- get all chat_histories
 		unread,
 		started_by,
 		rating,
-		substr(comment, 1,255) as comment,
+		substring(comment, 1, 200) as comment,
 		department_name,
 		visitor.email, 
 		visitor.name as visitor_name,
