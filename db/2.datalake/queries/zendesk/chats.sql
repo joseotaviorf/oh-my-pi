@@ -152,6 +152,7 @@ join
 	on t.zendesk_ticket_id = r.zendesk_ticket_id and t.extracted_date = r.extracted_date
 where
 	t.extracted_date = cast('{}' as date)
+	and t.zendesk_ticket_id is not null
 	-- t.zendesk_ticket_id = 212249 -- exemplo de chat com o zen_ticket_id duplicado
 group by
 	t.id,
