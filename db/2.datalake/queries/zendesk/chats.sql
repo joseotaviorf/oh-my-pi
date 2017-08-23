@@ -30,7 +30,6 @@ with chats as -- get all chat_histories
 	where
 		h.type = 'chat.msg'
 		and zendesk_ticket_id is not null
-		-- and zendesk_ticket_id = 104411 # exemplo de chat com o zen_ticket_id duplicado
 	order by 
 		h.timestamp
 ),
@@ -127,7 +126,7 @@ times_pivot as -- pivoting times
 	)
 )
 -- result:
-select
+select distinct
 	t.id,
 	t.zendesk_ticket_id as zendesk_ticket_id,
 	min(t.chat_start_timestamp) as chat_start_timestamp,
@@ -141,10 +140,10 @@ select
 	t.email,
 	t.extracted_date,
 	-- first_value(times) over () as times,
-	min(first_visitor_msg) as first_visitor_msg,
-	min(first_answer) as first_answer,
-	max(last_answer) as last_answer,
-	max(last_visitor_msg) as last_visitor_msg,
+	first_value(first_visitor_msg) over (partition by t.zendesk_ticket_id) as first_visitor_msg,
+	first_value(first_answer) over (partition by t.zendesk_ticket_id) as first_answer,
+	last_value(last_answer) over (partition by t.zendesk_ticket_id) as last_answer,
+	last_value(last_visitor_msg) over (partition by t.zendesk_ticket_id) as last_visitor_msg,
 	r.avg_response_time
 from
 	times_pivot t
@@ -153,6 +152,7 @@ join
 	on t.zendesk_ticket_id = r.zendesk_ticket_id and t.extracted_date = r.extracted_date
 where
 	t.extracted_date = cast('{}' as date)
+	-- t.zendesk_ticket_id = 212249 -- exemplo de chat com o zen_ticket_id duplicado
 group by
 	t.id,
 	t.zendesk_ticket_id,
@@ -164,6 +164,10 @@ group by
 	t.rating,
 	t.email,
 	t.extracted_date,
+	first_visitor_msg,
+	first_answer,
+	last_answer,
+	last_visitor_msg,
 	r.avg_response_time
 	
 --: examples::

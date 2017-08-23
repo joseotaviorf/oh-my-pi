@@ -16,6 +16,7 @@ if len(sys.argv) < 3:
     raise Exception('Missing Parameters')
 
 logging.info("Reading from S3: {}".format(datetime.utcnow()))
+
 date = sys.argv[2]
 if len(date) >= 10:
     date = date[:10]
@@ -29,4 +30,3 @@ BaseETL.dataframe_to_db(
     encoding='utf-8',
     append=True
 )
-
