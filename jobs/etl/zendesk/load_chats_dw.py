@@ -21,9 +21,6 @@ if len(date) >= 10:
     date = date[:10]
 data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
 
-# removing times column
-data_frame.drop('times', axis=1, inplace=True)
-
 logging.info("To Staging: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(
     enum_db=EnumDb.BI_DW,
