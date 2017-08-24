@@ -10,10 +10,11 @@ create table if not exists crm.tasks
   author_name varchar(255),
   assignee_id integer,
   assignee_name varchar(255),
-  workgroup_id varchar(25),
+  workgroup_id varchar(50),
   workgroup_title varchar(255),
-  destinatario_id integer,
+  recipient_id integer,
   status varchar(50),
   description varchar(255),
-  title varchar(255)
+  title varchar(255),
+  extracted_on date
 )
