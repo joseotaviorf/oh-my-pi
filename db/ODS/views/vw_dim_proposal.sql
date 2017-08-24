@@ -19,6 +19,7 @@ SELECT
   "statusDocumentacaoInq" as status_doc_tenant,
   "statusDocumentacaoProp" as status_doc_owner,
   "preProposta_id" as id_pre_proposal,
+  "qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
   "criadoEm" as dt_created,
   "atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp
