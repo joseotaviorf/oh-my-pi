@@ -93,19 +93,21 @@ class Crawlers(object):
 
     def transform_data(self):
         _logger.info('m=transform_data')
-        self.athena_client.msck_repair_table(database='datalake_raw', table_name='crawlers')
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/raw/crawlers/'.format(bucket_datalake),
+            database='datalake_raw',
+            table='crawlers',
+            partition_name='started_on',
+            partition_value=today
+        )
 
         query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
-        neighs_cities_query = """select distinct lat, lng, cep
-                                    from datalake_raw.crawlers
-                                  where started_on = date '{}'
-                                    and ((lat is not null and lng is not null) or (cep is not null and trim(cep) != ''))
-                                    and (neighborhood is null or city is null
-                                    or trim(neighborhood) = '' or trim(city) = '')""".format(today)
-        df_neighs_cities = self.athena_client.execute_query_and_return_dataframe(neighs_cities_query)
+        
+        neighs_cities_query = './db/2.datalake/queries/crawlers/neighs_cities.sql'
+        df_neighs_cities = self.athena_client.execute_query_and_return_dataframe(neighs_cities_query, today)
+        
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
-
         self.athena_client.create_parquet_from_df(
             key='clean/{0}/started_on={1}/{0}.parq'.format('external_property', today),
             df=df_crawlers,
@@ -185,6 +187,14 @@ class Crawlers(object):
                 ('state', str),
                 ('crawl_timestamp', float)
             ])
+        )
+        
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/clean/{}/'.format(bucket_datalake, clean_table_name),
+            database='datalake_clean',
+            table=clean_table_name,
+            partition_name='started_on',
+            partition_value=today
         )
 
     def load_dim_external_property(self):
