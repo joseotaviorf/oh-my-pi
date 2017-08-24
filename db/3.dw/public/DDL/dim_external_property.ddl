@@ -10,7 +10,7 @@ create table public.dim_external_property (
   price decimal(14,2),
   rent decimal(14,2),
   condominium decimal(14,2),
-  iptu decimal(14,2),
+  iptu decimal(16,2),
   total_area decimal(14,2),
   useful_area decimal(14,2),
   bedrooms smallint,
