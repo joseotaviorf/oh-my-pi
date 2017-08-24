@@ -330,7 +330,7 @@ class Crawlers(object):
                         as bigint) as sk_external_property,
                         cr.id, cr.website as source, cr.business, cr.type, cr.primary_phone_number as primary_phone_number,
                         cr.secondary_phone_number as secondary_phone_number, cr.price, cr.rent, cr.condominium,
-                        cr.iptu, cr.total_area, cr.useful_area, cr.bedrooms::smallint, cr.suites::smallint,
+                        left(cr.iptu, 12)::numeric(14, 2) as iptu, cr.total_area, cr.useful_area, cr.bedrooms::smallint, cr.suites::smallint,
                         cr.toilets::smallint, cr.garages::smallint, cr.year_building::smallint,
                         cr.cep, trunc(cr.lat, 7) as lat, trunc(cr.lng, 7) as lng, cr.street, cr.neighborhood, cr.city,
                         cr.state, '{0}' as start_date, ed.end_date as end_date
