@@ -93,7 +93,13 @@ class Crawlers(object):
 
     def transform_data(self):
         _logger.info('m=transform_data')
-        self.athena_client.msck_repair_table(database='datalake_raw', table_name='crawlers')
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/clean/crawlers/'.format(bucket_datalake),
+            database='datalake_raw',
+            table='crawlers',
+            partition_name='started_on',
+            partition_value=today
+        )
 
         query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
@@ -183,7 +189,13 @@ class Crawlers(object):
             ])
         )
         
-        self.athena_client.msck_repair_table(database='datalake_clean', table_name='crawlers')
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/clean/{}/'.format(bucket_datalake, clean_table_name),
+            database='datalake_clean',
+            table=clean_table_name,
+            partition_name='started_on',
+            partition_value=today
+        )
 
     def load_dim_external_property(self):
         _logger.info('m=load_dim_external_property, msg=cleaning dim_external_property at {}'.format(today))
