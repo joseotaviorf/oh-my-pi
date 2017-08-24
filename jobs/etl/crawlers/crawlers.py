@@ -94,7 +94,7 @@ class Crawlers(object):
     def transform_data(self):
         _logger.info('m=transform_data')
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/clean/crawlers/'.format(bucket_datalake),
+            bucket_folder_path='{}/raw/crawlers/'.format(bucket_datalake),
             database='datalake_raw',
             table='crawlers',
             partition_name='started_on',
