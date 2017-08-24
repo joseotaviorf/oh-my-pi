@@ -15,5 +15,6 @@ create table if not exists crm.tasks
   recipient_id integer,
   status varchar(50),
   description varchar(255),
-  title varchar(255)
+  title varchar(255),
+  extracted_on date
 )

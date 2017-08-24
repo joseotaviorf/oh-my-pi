@@ -21,12 +21,12 @@ if len(date) >= 10:
     date = date[:10]
 data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
 
-logging.info("To Staging: {}".format(datetime.utcnow()))
-table_name = 'crm.{}'.format(sys.argv[1])
+logging.info("START - To Staging: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(
     enum_db=EnumDb.BI_DW,
     df=data_frame,
-    table_name=table_name,
+    table_name='crm.{}'.format(sys.argv[1]),
     encoding='utf-8',
     append=True
 )
+logging.info("END - To Staging: {}".format(datetime.utcnow()))

@@ -12,8 +12,9 @@ select
   workgrouptitle as workgroup_title,
   destinatarioid as recipient_id,
   status,
-  descricao as description,
-  titulo as title
+  substring(descricao, 1, 240)  as description,
+  titulo as title,
+  extracted_on
 from
 	datalake_raw.crm_tasks
 where
