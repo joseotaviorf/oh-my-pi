@@ -23,7 +23,20 @@ select
   fazerTermoAditivo, 
   preProposta_id, 
   criadoEm,
-  atualizadoEm
+  atualizadoEm,
+  qtdeEnviosDocumentacaoInq
 from 
-  Proposta;
+  Proposta p
+join
+	(
+		select
+			id as id_aud,
+			count(distinct dataDocumentosEnviados) as qtdeEnviosDocumentacaoInq
+		from
+			Proposta_AUD
+		group by
+			id
+	) aud
+	on aud.id_aud = p.id
+;
 END

@@ -9,8 +9,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 athena = AthenaClient('5a-datalake')
-table_name = 'zendesk.chats'
-file_name = './db/2.datalake/queries/zendesk/chats.sql'
+file_name = './db/2.datalake/queries/crm/list_tasks.sql'
 
 if len(sys.argv) < 3:
     raise Exception('Missing Parameters')
@@ -22,11 +21,12 @@ if len(date) >= 10:
     date = date[:10]
 data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
 
-logging.info("To Staging: {}".format(datetime.utcnow()))
+logging.info("START - To Staging: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(
     enum_db=EnumDb.BI_DW,
     df=data_frame,
-    table_name=table_name,
+    table_name='crm.{}'.format(sys.argv[1]),
     encoding='utf-8',
     append=True
 )
+logging.info("END - To Staging: {}".format(datetime.utcnow()))
