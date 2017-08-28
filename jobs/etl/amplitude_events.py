@@ -120,7 +120,7 @@ class AmplitudeEventsETL(BaseETL):
         print('Started saving events into new s3 structure (5a-datalake/raw/amplitude/events)')
         date_partition = "dt=" + str(start.date())
         for k, v in g_events.iteritems():
-            event_partition = 'event_type={}'.format(k)
+            event_partition = 'et={}'.format(k)
             file_name = '/'.join(['raw/amplitude/events', event_partition, date_partition, str(start.hour)]) + '.json.gz'
             gz_body = io.BytesIO()
             with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
