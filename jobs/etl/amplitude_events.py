@@ -103,6 +103,7 @@ class AmplitudeEventsETL(BaseETL):
             start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
 
         # old job
+        print('Started saving events into old s3 structure (5a-amplitude-events)')
         app_partition = "app=" + app
         date_partition = "server_upload_date=" + str(start.date())
 
@@ -113,8 +114,10 @@ class AmplitudeEventsETL(BaseETL):
             with gzip.GzipFile(fileobj=gz_body, mode="w") as fp:
                 fp.write(v.encode('utf-8'))
             self.s3.Bucket(self.BUCKET).put_object(Body=gz_body.getvalue(), Key=file_name)
+        print('Finished saving events into old s3 structure (5a-amplitude-events)')
 
         # new job
+        print('Started saving events into new s3 structure (5a-datalake/raw/amplitude/events)')
         date_partition = "dt=" + str(start.date())
         for k, v in g_events.iteritems():
             event_partition = 'event_type={}'.format(k)
@@ -123,6 +126,7 @@ class AmplitudeEventsETL(BaseETL):
             with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
                 fp.write(v.encode('utf-8'))
             self.s3.Bucket('5a-datalake').put_object(Body=gz_body.getvalue(), Key=file_name)
+        print('Finished saving events into new s3 structure (5a-datalake/raw/amplitude/events)')
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
