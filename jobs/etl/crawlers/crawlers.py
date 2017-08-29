@@ -102,7 +102,7 @@ class Crawlers(object):
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
         
         neighs_cities_query = './db/2.datalake/queries/crawlers/neighs_cities.sql'
-        df_neighs_cities = self.athena_client.execute_query_and_return_dataframe(neighs_cities_query, today)
+        df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
         
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
         self.athena_client.create_parquet_from_df(
