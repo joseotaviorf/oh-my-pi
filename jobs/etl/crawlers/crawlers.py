@@ -188,7 +188,7 @@ class Crawlers(object):
         
         self.athena_client.msck_repair_table(
             database='datalake_clean',
-            table_name='crawlers'
+            table_name='external_property'
         )
 
     def load_dim_external_property(self):
