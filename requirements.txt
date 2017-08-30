@@ -45,4 +45,5 @@ pandas==0.20.1
 pyarrow==0.4.0
 Cython==0.25.2
 createsend==4.2.1
+pycriteo==0.0.2
 git+git://github.com/quintoandar/zenpy.git
