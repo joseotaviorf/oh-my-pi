@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS public.dim_contract;
+DROP TABLE IF EXISTS  public.dim_contract;
 CREATE TABLE public.dim_contract (
   sk_contract INTEGER,
   id_contract INTEGER,
@@ -9,11 +9,11 @@ CREATE TABLE public.dim_contract (
   guarantee VARCHAR(50),
   contract_type VARCHAR(20),
   contract_status VARCHAR(20),
-  dt_calc_affiliate_comission TIMESTAMPTZ,
-  dt_calc_agent_comission TIMESTAMPTZ,
+  dt_calc_affiliate_comission TIMESTAMP WITHOUT TIME ZONE,
+  dt_calc_agent_comission TIMESTAMP WITHOUT TIME ZONE,
   dt_contract_start DATE,
-  dt_signature TIMESTAMPTZ,
-  dt_draft_approved TIMESTAMPTZ,
+  dt_signature TIMESTAMP WITHOUT TIME ZONE,
+  dt_draft_approved TIMESTAMP WITHOUT TIME ZONE,
   dt_entrance DATE,
   dt_contract_intended_end DATE,
   dt_contract_annulment DATE,
@@ -30,15 +30,15 @@ CREATE TABLE public.dim_contract (
   condo_value DOUBLE PRECISION,
   iptu_value DOUBLE PRECISION,
   signature_type VARCHAR(50),
-  dt_send_eletronic_contract TIMESTAMPTZ,
+  dt_send_eletronic_contract TIMESTAMP WITHOUT TIME ZONE,
   closing_status VARCHAR(50),
   contract_signed VARCHAR(50),
   contract_administration_signed VARCHAR(50),
   contract_authorization_signed VARCHAR(50),
   contract_renting_signed VARCHAR(50),
   dt_ownership_changed VARCHAR(50),
-  dt_created TIMESTAMPTZ,
-  dt_updated TIMESTAMPTZ,
-  dt_timestamp TIMESTAMPTZ,
+  dt_created TIMESTAMP WITHOUT TIME ZONE,
+  dt_updated TIMESTAMP WITHOUT TIME ZONE,
+  dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
   CONSTRAINT dim_contract_pkey PRIMARY KEY(sk_contract)
 ) ;

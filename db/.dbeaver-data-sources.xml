@@ -113,6 +113,7 @@
 			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
 				<property name="socks-port" value="1080"/>
 			</network-handler>
+			<bootstrap autocommit="false"/>
 		</connection>
 		<custom-property name="resultset.maxrows" value="0"/>
 	</data-source>
