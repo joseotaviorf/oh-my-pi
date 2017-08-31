@@ -93,19 +93,16 @@ class Crawlers(object):
 
     def transform_data(self):
         _logger.info('m=transform_data')
-        self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/raw/crawlers/'.format(bucket_datalake),
+        self.athena_client.msck_repair_table(
             database='datalake_raw',
-            table='crawlers',
-            partition_name='started_on',
-            partition_value=today
+            table_name='crawlers'
         )
 
         query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
         
         neighs_cities_query = './db/2.datalake/queries/crawlers/neighs_cities.sql'
-        df_neighs_cities = self.athena_client.execute_query_and_return_dataframe(neighs_cities_query, today)
+        df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
         
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
         self.athena_client.create_parquet_from_df(
@@ -189,12 +186,9 @@ class Crawlers(object):
             ])
         )
         
-        self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/clean/{}/'.format(bucket_datalake, clean_table_name),
+        self.athena_client.msck_repair_table(
             database='datalake_clean',
-            table=clean_table_name,
-            partition_name='started_on',
-            partition_value=today
+            table_name='external_property'
         )
 
     def load_dim_external_property(self):
