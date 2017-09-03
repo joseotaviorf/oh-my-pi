@@ -1,4 +1,3 @@
-import calendar
 import json
 import os
 import re
@@ -8,15 +7,14 @@ from datetime import datetime
 import fastparquet
 import pandas as pd
 import s3fs
-from dateutil.relativedelta import relativedelta
-from qa_python_utils.default_logger import logger, _logger
-
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
+today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 
@@ -37,7 +35,7 @@ class AmplitudeETL(object):
 
     @logger
     def get_all_columns(self):
-        raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
+        raw_query = '../../../db/2.datalake/queries/amplitude/init_events_raw.sql'
         return self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
     def insert_new_columns(self, df, df_json, properties, prefix):
@@ -100,10 +98,11 @@ class AmplitudeETL(object):
 
         ets = df.groupby('et')
         for df_et in ets:
-            key = '{}/clean/amplitude/events/et={}/dt={}/{}.parq'.format(bucket_datalake, df_et[0], today,
-                                                                         'events')
+            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(bucket_datalake, df_et[0], today_ym,
+                                                                                 today, 'events')
 
-            _logger.info('m=create_parquets, et={}, dt={}'.format(df_et[0], today))
+            _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
+                                                                                       'events'))
             filtered_df = df[df['et'] == df_et[0]]
             filtered_df.astype(object).where(pd.notnull(filtered_df), None)
 
@@ -120,6 +119,12 @@ class AmplitudeETL(object):
             )
 
             fastparquet.write(key, filtered_df, open_with=s3.open)
+
+            _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
+            self.athena_client.execute_raw_query("""
+                alter table datalake_clean.amplitude_events 
+                  add partition (et='{0}', ym='{1}')
+                location 's3://{2}/clean/amplitude/events/et={0}/ym={1}'""".format(df_et[0], today_ym, bucket_datalake))
 
     def __convert_columns_to_number(self, df, columns, _type):
         for col in columns:
@@ -222,26 +227,6 @@ class AmplitudeETL(object):
             db_enum=EnumDb.BI_DW,
             commit=True
         )
-
-    @logger
-    def rearrange_partitions(self):
-        if today.day != calendar.monthrange(today.year, today.month)[0]:
-            _logger.info('m=rearrange_partitions, msg=not first day of the month yet')
-            return
-
-        _logger.info('m=rearrange_partitions, msg=is first day of the month')
-        last_month_date = today - relativedelta(months=1)
-        last_month = last_month_date.month
-        year_of_last_month = last_month_date.year
-        last_day_of_last_month = calendar.monthrange(last_month_date.year, last_month_date.month)[1]
-        for i in range(1, last_day_of_last_month):
-            self.athena_client.drop_single_partition(
-                bucket_folder_path='{}/raw/amplitude/events'.format(bucket_datalake),
-                database='datalake_raw',
-                table='amplitude_events',
-                partition_name='dt',
-                partition_value='{}-{}-{}'.format(year_of_last_month, last_month, last_day_of_last_month)
-            )
 
 
 if __name__ == '__main__':
