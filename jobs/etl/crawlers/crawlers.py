@@ -5,10 +5,6 @@ from collections import OrderedDict
 from datetime import datetime
 
 import requests
-
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../../'))
-
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
@@ -17,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 args = sys.argv
-args = ['asd', 'load_fact_market_index', '2017-08-28 00:00:00']
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -98,18 +93,19 @@ class Crawlers(object):
 
     def transform_data(self):
         _logger.info('m=transform_data')
-        self.athena_client.msck_repair_table(
-            database='datalake_raw',
-            table_name='crawlers'
-        )
+        self.athena_client.msck_repair_table(database='datalake_raw', table_name='crawlers')
 
-        query_crawlers = '../../../db/2.datalake/queries/crawlers/transform_raw.sql'
+        query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
-
-        neighs_cities_query = '../../../db/2.datalake/queries/crawlers/neighs_cities.sql'
-        df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
-
+        neighs_cities_query = """select distinct lat, lng, cep
+                                    from datalake_raw.crawlers
+                                  where started_on = date '{}'
+                                    and ((lat is not null and lng is not null) or (cep is not null and trim(cep) != ''))
+                                    and (neighborhood is null or city is null
+                                    or trim(neighborhood) = '' or trim(city) = '')""".format(today)
+        df_neighs_cities = self.athena_client.execute_query_and_return_dataframe(neighs_cities_query)
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
+
         self.athena_client.create_parquet_from_df(
             key='clean/{0}/started_on={1}/{0}.parq'.format('external_property', today),
             df=df_crawlers,
@@ -191,11 +187,6 @@ class Crawlers(object):
             ])
         )
 
-        self.athena_client.msck_repair_table(
-            database='datalake_clean',
-            table_name='external_property'
-        )
-
     def load_dim_external_property(self):
         _logger.info('m=load_dim_external_property, msg=cleaning dim_external_property at {}'.format(today))
         BaseETL.execute_command(
@@ -220,7 +211,7 @@ class Crawlers(object):
                                      or (coalesce(cr.secondary_phone_number, '') != coalesce(dep.secondary_phone_number, ''))
                                      or (coalesce(cr.rent, 0) != coalesce(dep.rent, 0))
                                      or (coalesce(cr.condominium, 0) != coalesce(dep.condominium, 0))
-                                     or (coalesce(left(cr.iptu, 12)::numeric(14,2), 0) != coalesce(left(dep.iptu, 12)::numeric(14,2), 0))
+                                     or (coalesce(cr.iptu, 0) != coalesce(dep.iptu, 0))
                                      or (coalesce(cr.total_area, 0) != coalesce(dep.total_area, 0))
                                      or (coalesce(cr.useful_area, 0) != coalesce(dep.useful_area, 0))
                                      or (coalesce(cr.bedrooms, 0) != coalesce(dep.bedrooms, 0))
@@ -261,7 +252,7 @@ class Crawlers(object):
                           and (coalesce(cr.price, 0) = coalesce(dep.price, 0))
                           and (coalesce(cr.rent, 0) = coalesce(dep.rent, 0))
                           and (coalesce(cr.condominium, 0) = coalesce(dep.condominium, 0))
-                          and (coalesce(left(cr.iptu, 12)::numeric(14,2), 0) = coalesce(left(dep.iptu, 12)::numeric(14,2), 0))
+                          and (coalesce(cr.iptu, 0) = coalesce(dep.iptu, 0))
                           and (coalesce(cr.total_area, 0) = coalesce(dep.total_area, 0))
                           and (coalesce(cr.useful_area, 0) = coalesce(dep.useful_area, 0))
                           and (coalesce(cr.bedrooms, 0) = coalesce(dep.bedrooms, 0))
@@ -292,7 +283,7 @@ class Crawlers(object):
                              or (coalesce(cr.price, 0) != coalesce(dep.price, 0))
                              or (coalesce(cr.rent, 0) != coalesce(dep.rent, 0))
                              or (coalesce(cr.condominium, 0) != coalesce(dep.condominium, 0))
-                             or (coalesce(left(cr.iptu, 12)::numeric(14,2), 0) != coalesce(left(dep.iptu, 12)::numeric(14,2), 0))
+                             or (coalesce(cr.iptu, 0) != coalesce(dep.iptu, 0))
                              or (coalesce(cr.total_area, 0) != coalesce(dep.total_area, 0))
                              or (coalesce(cr.useful_area, 0) != coalesce(dep.useful_area, 0))
                              or (coalesce(cr.bedrooms, 0) != coalesce(dep.bedrooms, 0))
@@ -329,7 +320,7 @@ class Crawlers(object):
                         as bigint) as sk_external_property,
                         cr.id, cr.website as source, cr.business, cr.type, cr.primary_phone_number as primary_phone_number,
                         cr.secondary_phone_number as secondary_phone_number, cr.price, cr.rent, cr.condominium,
-                        left(cr.iptu, 12)::numeric(14, 2) as iptu, cr.total_area, cr.useful_area, cr.bedrooms::smallint, cr.suites::smallint,
+                        cr.iptu, cr.total_area, cr.useful_area, cr.bedrooms::smallint, cr.suites::smallint,
                         cr.toilets::smallint, cr.garages::smallint, cr.year_building::smallint,
                         cr.cep, trunc(cr.lat, 7) as lat, trunc(cr.lng, 7) as lng, cr.street, cr.neighborhood, cr.city,
                         cr.state, '{0}' as start_date, ed.end_date as end_date
