@@ -160,7 +160,8 @@ class BaseETL(object):
             elif isinstance(item, Decimal):
                 l.append(float(item))
             elif isinstance(item, unicode) or isinstance(item, str):
-                l.append(item.encode(encode_to).replace("'", "").replace(",", ""))
+                l.append(item.encode(encode_to).replace(""
+                                                        "", "").replace(",", ""))
             else:
                 l.append(item)
         values = str(l).replace('[', '(').replace(']', ')').replace("'null'", "null")
