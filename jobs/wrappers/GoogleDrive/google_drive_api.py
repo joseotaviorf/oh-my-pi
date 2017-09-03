@@ -32,11 +32,6 @@ class GoogleDriveApi(object):
         results = self.service.files().list(q=query).execute()
         return results.get('files', [])
 
-    def list_folders(self):
-        query = "mimeType = 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(q=query).execute()
-        return results.get('files', [])
-
     def get_file_info(self, file_id):
         """
         Return the info for a file, containing id, name, description, etc
@@ -94,13 +89,3 @@ class GoogleDriveApi(object):
                     continue
 
         return ret_file_name, file_path_destination
-
-
-gda = GoogleDriveApi()
-folders = gda.list_folders()
-file_names = gda.list_filenames()
-for file_name in file_names:
-    gda.download_file(file_name=file_name,
-                      file_path_destination='/home/rafael/Desktop/drive_boa_vista/',
-                      file_name_destination=file_name
-                      )
