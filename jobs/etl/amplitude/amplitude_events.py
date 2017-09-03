@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 from jobs.wrappers.amplitude import amplitude_props_reader as props
 from jobs.base.base_etl import BaseETL, log, EnumDb
+from qa_python_utils.aws.athena import AthenaClient
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -101,16 +102,33 @@ class AmplitudeEventsETL(BaseETL):
     def dump_events_to_s3(self, g_events, app, start):
         if type(start) is str:
             start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
+
+        # old job
         app_partition = "app=" + app
         date_partition = "server_upload_date=" + str(start.date())
 
         for k, v in g_events.iteritems():
-            event_partition = "event_type="+k
-            file_name = "/".join([app_partition, event_partition, date_partition, str(start.hour)])+".json.gz"
+            event_partition = "event_type=" + k
+            file_name = "/".join([app_partition, event_partition, date_partition, str(start.hour)]) + ".json.gz"
             gz_body = io.BytesIO()
             with gzip.GzipFile(fileobj=gz_body, mode="w") as fp:
                 fp.write(v.encode('utf-8'))
             self.s3.Bucket(self.BUCKET).put_object(Body=gz_body.getvalue(), Key=file_name)
+
+        # new job
+        date_partition = "dt=" + str(start.date())
+        for k, v in g_events.iteritems():
+            event_partition = 'et={}'.format(k)
+            file_name = '/'.join(['raw/amplitude/events', event_partition, date_partition, str(start.hour)]) + '.json.gz'
+            gz_body = io.BytesIO()
+            with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
+                fp.write(v.encode('utf-8'))
+
+            self.s3.Bucket('5a-datalake').put_object(Body=gz_body.getvalue(), Key=file_name)
+            AthenaClient('5a-datalake').execute_raw_query(""""
+                alter table datalake_raw.amplitude_events add if not exists partition (et={0}, dt={1})
+                       location 's3://5a-datalake/raw/amplitude/events/et={0}/dt={1}'
+            """.format(k, str(start.date())))
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
