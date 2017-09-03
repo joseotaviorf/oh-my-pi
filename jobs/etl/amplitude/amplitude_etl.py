@@ -35,7 +35,7 @@ class AmplitudeETL(object):
 
     @logger
     def get_all_columns(self):
-        raw_query = '../../../db/2.datalake/queries/amplitude/init_events_raw.sql'
+        raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
         return self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
     def insert_new_columns(self, df, df_json, properties, prefix):
