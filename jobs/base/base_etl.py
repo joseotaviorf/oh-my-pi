@@ -14,15 +14,8 @@ import boto3
 import petl
 from petl.io.db import create_table
 
-from difflib import SequenceMatcher
-
 from db_factory import DBFactory
 from enum_db import EnumDb, EnumDbType
-
-import logging
-
-logging.basicConfig(level=logging.INFO)
-_logger = logging.getLogger(__name__)
 
 
 class BaseETL(object):
@@ -160,8 +153,7 @@ class BaseETL(object):
             elif isinstance(item, Decimal):
                 l.append(float(item))
             elif isinstance(item, unicode) or isinstance(item, str):
-                l.append(item.encode(encode_to).replace(""
-                                                        "", "").replace(",", ""))
+                l.append(item.encode(encode_to).replace("'", "").replace(",", ""))
             else:
                 l.append(item)
         values = str(l).replace('[', '(').replace(']', ')').replace("'null'", "null")
@@ -333,11 +325,6 @@ class BaseETL(object):
     @classmethod
     def copy_file_between_s3_buckets(cls, bucket_source, bucket_destination,
                                      full_filename_source, full_filename_dest):
-        _logger.info(
-            'm=copy_file_between_s3_buckets, bucket_source={}, bucket_destination={}, full_filename_source={}, full_filename_dest={}'.format(
-                bucket_source, bucket_destination, full_filename_source, full_filename_dest)
-        )
-        
         s3 = boto3.resource('s3')
         copy_source = {
             'Bucket': bucket_source,
@@ -417,9 +404,6 @@ class BaseETL(object):
 
     @classmethod
     def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
-        _logger.info('m=to_s3, filename={}, bucket_folder_path={}, encoding={}, tmp_dir={}, write_header={}'.format(
-            filename, bucket_folder_path, encoding, tmp_dir, write_header))
-
         try:
             petl.tocsv(data_table, '{}/{}'.format(tmp_dir, filename), encoding=encoding, write_header=write_header)
             return cls.file_to_s3(filename=filename, dir_path=tmp_dir, bucket_folder_path=bucket_folder_path)
@@ -460,8 +444,6 @@ class BaseETL(object):
 
     @classmethod
     def dump_ODS_to_datalake(cls, table_name, filename=None):
-        _logger.info('m=dump_ODS_to_datalake, table_name={}, filename={}'.format(table_name, filename))
-
         if not filename:
             filename = table_name
 
@@ -562,18 +544,3 @@ class BaseETL(object):
                 columns_table.pop(0)
 
         return columns_table
-
-    @classmethod
-    def get_similarity_tuple(cls, value, array):
-        default_tuple = 0, value
-        if not value:
-            return default_tuple
-
-        max_sim = max([(SequenceMatcher(a=value.lower(), b=internal_value.lower()).ratio(), internal_value) for internal_value in array])
-        if max_sim[0] < 0.75:
-            print 'NO CHANGE!'
-            return default_tuple
-        else:
-            print 'VALUE CHANGED'
-            return max_sim
-        # return default_tuple if max_sim[0] < 0.75 else max_sim
