@@ -18,7 +18,7 @@ args = sys.argv
 bucket_datalake = os.environ['bi-datalake-forno-s3-bucket']
 cm_auth = json.loads(os.environ['campaign-monitor-auth'])
 
-CAMPAIGN_DEFAULT_PAGE_SIZE = 1000
+DEFAULT_PAGE_SIZE = 1000
 DATABASE = 'datalake_raw'
 
 
@@ -32,37 +32,37 @@ class CampaignMonitor(object):
 
         self.athena_client = AthenaClient(bucket_datalake)
 
-        self.full_params = self.__build_campaign_full_params()
-        self.incremental_params = self.__build_campaign_incremental_params()
+        self.full_params = self.__build_full_params()
+        self.incremental_params = self.__build_incremental_params()
 
-    def __build_campaign_full_params(self):
+    def __build_full_params(self):
         return {
-            'pagesize': CAMPAIGN_DEFAULT_PAGE_SIZE,
+            'pagesize': DEFAULT_PAGE_SIZE,
             'orderfield': 'email',
             'orderdirection': 'asc'
         }
 
-    def __build_campaign_incremental_params(self):
+    def __build_incremental_params(self):
         return {
             'date': args[2],
-            'pagesize': CAMPAIGN_DEFAULT_PAGE_SIZE,
+            'pagesize': DEFAULT_PAGE_SIZE,
             'orderfield': 'date',
             'orderdirection': 'asc'
         }
 
-    def request_campaign_data(self):
-        _logger.info('m=request_campaign_data')
+    def request_data(self):
+        _logger.info('m=request_data')
 
         if len(self.clients) != 1:
-            _logger.info('m=request_campaign_data clients length={}'.format(len(self.clients)))
+            _logger.info('m=request_data clients length={}'.format(len(self.clients)))
         else:
             cl = self.clients[0]
-            _logger.info('m=request_campaign_data cl_name={}, cl_id={}'.format(cl.Name, cl.ClientID))
+            _logger.info('m=request_data cl_name={}, cl_id={}'.format(cl.Name, cl.ClientID))
 
             client = Client(self.auth, cl.ClientID)
             client.campaigns()
             for cm in client.campaigns():
-                _logger.info('m=request_campaign_data campaign_id={}'.format(cm.CampaignID))
+                _logger.info('m=request_data campaign_id={}'.format(cm.CampaignID))
 
                 campaign = Campaign(self.auth, cm.CampaignID)
                 self.__request_recipients_data(campaign)
@@ -118,27 +118,11 @@ class CampaignMonitor(object):
                                                                                       self.execution_date)
         )
 
-    def request_transactional_data(self):
-        _logger.info('m=request_transactional_data')
-
-        if len(self.clients) != 1:
-            _logger.info('m=request_transactional_data clients length={}'.format(len(self.clients)))
-        else:
-            cl = self.clients[0]
-            _logger.info('m=request_transactional_data cl_name={}, cl_id={}'.format(cl.Name, cl.ClientID))
-
-            client = Client(self.auth, cl.ClientID)
-            client.campaigns()
-            for cm in client.campaigns():
-                _logger.info('m=request_transactional_data campaign_id={}'.format(cm.CampaignID))
-
 
 if __name__ == '__main__':
     campaign_monitor = CampaignMonitor()
 
-    if args[1] == 'request_campaign_data':
-        campaign_monitor.request_campaign_data()
-    if args[1] == 'request_transactional_data':
-        campaign_monitor.request_transactional_data()
+    if args[1] == 'request_data':
+        campaign_monitor.request_data()
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
