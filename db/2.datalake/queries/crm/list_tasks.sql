@@ -12,7 +12,7 @@ select
   workgrouptitle as workgroup_title,
   destinatarioid as recipient_id,
   status,
-  substring(descricao, 1, 240)  as description,
+  substring(descricao, 1, 200)  as description,
   titulo as title,
   extracted_on
 from

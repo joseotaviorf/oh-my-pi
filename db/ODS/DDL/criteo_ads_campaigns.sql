@@ -1,0 +1,20 @@
+create table if not exists public.criteo_ads_campaigns (
+	"convRate" numeric(12,4) DEFAULT NULL::numeric,
+	"convRatePostView" numeric(12,4) DEFAULT NULL::numeric,
+	"CTE" numeric(12,4) DEFAULT NULL::numeric,
+	"orderValuesPostView" numeric(12,4) DEFAULT NULL::numeric,
+	"revcpc" numeric(12,4) DEFAULT NULL::numeric,
+	"sales" integer,
+	"cost" numeric(12,4) DEFAULT NULL::numeric,
+	"salesPostView" numeric(12,4) DEFAULT NULL::numeric,
+	"ecpm" numeric(12,4) DEFAULT NULL::numeric,
+	"costPerOrder" numeric(12,4) DEFAULT NULL::numeric,
+	"impressions" integer,
+	"click" integer,
+	"dateTimePosix" integer,
+	"campaignID" integer,
+	"orderValue" numeric(12,4) DEFAULT NULL::numeric,
+	"overallCompetititonWin" numeric(12,4) DEFAULT NULL::numeric,
+	"dateTime" timestamp without time zone,
+	"costOfSale" numeric(12,4) DEFAULT NULL::numeric
+)
