@@ -1,0 +1,1 @@
+describe datalake_clean.amplitude_events

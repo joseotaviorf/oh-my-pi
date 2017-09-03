@@ -521,9 +521,9 @@ class Crawlers(object):
                                 )
                                 select *
                                   from left_join l
-                            
+
                                 union
-                            
+
                                 select *
                                   from right_join r""".format(today)
 
