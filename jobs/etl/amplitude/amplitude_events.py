@@ -117,20 +117,15 @@ class AmplitudeEventsETL(BaseETL):
 
         # new job
         date_partition = 'dt={}'.format(str(start.date()))
-        ym_partition = 'ym={}-{}'.format(start.date().year, start.date().strftime('%m'))
         for k, v in g_events.iteritems():
             event_partition = 'et={}'.format(k)
-            file_name = '/'.join(['raw/amplitude/events', event_partition, ym_partition, date_partition,
-                                  str(start.hour)]) + '.json.gz'
+            file_name = 'raw/amplitude/events/{}/{}/{}_h{}.json.gz'.format(date_partition, event_partition, start_date,
+                                                                           str(start.hour))
             gz_body = io.BytesIO()
             with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
                 fp.write(v.encode('utf-8'))
 
             self.s3.Bucket('5a-datalake').put_object(Body=gz_body.getvalue(), Key=file_name)
-            # AthenaClient('5a-datalake').execute_raw_query("""
-            #                 alter table datalake_raw.amplitude_events add if not exists partition (et='{0}', ym='{1}')
-            #                        location 's3://5a-datalake/raw/amplitude/events/et={0}/ym={1}'
-            #             """.format(k, start.date().strftime('%m')))
 
     def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
         if not topic_arn:
