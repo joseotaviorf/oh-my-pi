@@ -234,23 +234,27 @@ if __name__ == '__main__':
 
     if args[1] == 'load_data':
         df_raw = amplitude_etl.get_all_columns()
-        df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
-        df_raw_json['et'], df_raw_json['dt'] = df_raw['et'], df_raw['dt']
 
-        df_raw_json = amplitude_etl.insert_new_columns(
-            df=df_raw,
-            df_json=df_raw_json,
-            properties='user_properties',
-            prefix='u_'
-        )
-        df_raw_json = amplitude_etl.insert_new_columns(
-            df=df_raw,
-            df_json=df_raw_json,
-            properties='event_properties',
-            prefix='e_'
-        )
+        if not df_raw:
+            _logger.warn('m=__main__, msg=empty dataframe')
+        else:
+            df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
+            df_raw_json['et'], df_raw_json['dt'] = df_raw['et'], df_raw['dt']
 
-        amplitude_etl.create_parquets(df_raw_json)
+            df_raw_json = amplitude_etl.insert_new_columns(
+                df=df_raw,
+                df_json=df_raw_json,
+                properties='user_properties',
+                prefix='u_'
+            )
+            df_raw_json = amplitude_etl.insert_new_columns(
+                df=df_raw,
+                df_json=df_raw_json,
+                properties='event_properties',
+                prefix='e_'
+            )
+
+            amplitude_etl.create_parquets(df_raw_json)
     elif args[1] == 'merge_users':
         amplitude_etl.merge_user_ids()
     else:
