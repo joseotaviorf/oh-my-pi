@@ -125,7 +125,7 @@ class AmplitudeEventsETL(BaseETL):
                 fp.write(v.encode('utf-8'))
 
             self.s3.Bucket('5a-datalake').put_object(Body=gz_body.getvalue(), Key=file_name)
-            AthenaClient('5a-datalake').execute_raw_query(""""
+            AthenaClient('5a-datalake').execute_raw_query("""
                 alter table datalake_raw.amplitude_events add if not exists partition (et={0}, dt={1})
                        location 's3://5a-datalake/raw/amplitude/events/et={0}/dt={1}'
             """.format(k, str(start.date())))
