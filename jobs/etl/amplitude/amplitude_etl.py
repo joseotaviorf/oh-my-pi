@@ -37,8 +37,9 @@ class AmplitudeETL(object):
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
         self.athena_client.execute_raw_query("""
-                        alter table datalake_raw.amplitude_events add if not exists partition (dt='{0}')
-                               location 's3://{1}/raw/amplitude/events/dt={0}'
+                        alter table datalake_raw.amplitude_events 
+                          add if not exists partition (dt='{0}')
+                            location 's3://{1}/raw/amplitude/events/dt={0}'
                     """.format(today, bucket_datalake))
 
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
@@ -46,8 +47,8 @@ class AmplitudeETL(object):
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
         self.athena_client.execute_raw_query("""
-                                alter table datalake_raw.amplitude_events drop partition (dt='{0}')
-                                       location 's3://{1}/raw/amplitude/events/dt={0}'
+                                alter table datalake_raw.amplitude_events 
+                                  drop if exists partition (dt='{0}')
                             """.format(today, bucket_datalake))
 
         return df_columns_raw
@@ -94,7 +95,7 @@ class AmplitudeETL(object):
                     property_value=event_json[properties][prop]
                 )
 
-                df_json.rename(columns={'{}.{}'.format(properties, prop): '{}{}'.format(prefix, formatted_prop)},
+                df_json.rename(columns={'{0}.{1}'.format(properties, prop): '{0}{1}'.format(prefix, formatted_prop)},
                                inplace=True)
 
                 already_prop_added_list.append(prop)
@@ -110,14 +111,14 @@ class AmplitudeETL(object):
     def create_parquets(self, df):
         s3 = s3fs.S3FileSystem()
 
-        ets = df.groupby('et')
+        ets = df.groupby('event_type')
         for df_et in ets:
             key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(bucket_datalake, df_et[0], today_ym,
                                                                                  today, 'events')
 
             _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
                                                                                        'events'))
-            filtered_df = df[df['et'] == df_et[0]]
+            filtered_df = df[df['event_type'] == df_et[0]]
             filtered_df.astype(object).where(pd.notnull(filtered_df), None)
 
             filtered_df = self.__convert_columns_to_datetime(
@@ -253,7 +254,7 @@ if __name__ == '__main__':
             _logger.warn('m=__main__, msg=empty dataframe')
         else:
             df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
-            df_raw_json['et'], df_raw_json['dt'] = df_raw['et'], df_raw['dt']
+            df_raw_json['dt'] = df_raw['dt']
 
             df_raw_json = amplitude_etl.insert_new_columns(
                 df=df_raw,
