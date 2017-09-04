@@ -35,8 +35,22 @@ class AmplitudeETL(object):
 
     @logger
     def get_all_columns(self):
+        _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
+        self.athena_client.execute_raw_query("""
+                        alter table datalake_raw.amplitude_events add if not exists partition (dt='{0}')
+                               location 's3://{1}/raw/amplitude/events/dt={0}'
+                    """.format(today, bucket_datalake))
+
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
-        return self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
+        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
+
+        _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
+        self.athena_client.execute_raw_query("""
+                                alter table datalake_raw.amplitude_events drop partition (dt='{0}')
+                                       location 's3://{1}/raw/amplitude/events/dt={0}'
+                            """.format(today, bucket_datalake))
+
+        return df_columns_raw
 
     def insert_new_columns(self, df, df_json, properties, prefix):
         _logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
@@ -123,7 +137,7 @@ class AmplitudeETL(object):
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
             self.athena_client.execute_raw_query("""
                 alter table datalake_clean.amplitude_events 
-                  add partition (et='{0}', ym='{1}')
+                  add if not exists partition (et='{0}', ym='{1}')
                 location 's3://{2}/clean/amplitude/events/et={0}/ym={1}'""".format(df_et[0], today_ym, bucket_datalake))
 
     def __convert_columns_to_number(self, df, columns, _type):
