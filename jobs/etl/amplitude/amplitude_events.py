@@ -116,8 +116,8 @@ class AmplitudeEventsETL(BaseETL):
             self.s3.Bucket(self.BUCKET).put_object(Body=gz_body.getvalue(), Key=file_name)
 
         # new job
-        date_partition = "dt=" + str(start.date())
-        ym_partition = "ym=" + start.date().strftime('%m')
+        date_partition = 'dt={}'.format(str(start.date()))
+        ym_partition = 'ym={}-{}'.format(start.date().year, start.date().strftime('%m'))
         for k, v in g_events.iteritems():
             event_partition = 'et={}'.format(k)
             file_name = '/'.join(['raw/amplitude/events', event_partition, ym_partition, date_partition,
