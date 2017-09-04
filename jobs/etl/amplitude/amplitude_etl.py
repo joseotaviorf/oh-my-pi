@@ -160,13 +160,13 @@ class AmplitudeETL(object):
                           select device_id, amplitude_id, user_id
                             from datalake_clean.amplitude_events
                           where user_id is null
-                             and dt = date '{0}'
+                             and ym = '{0}'
                         ),
                         user_not_nulls as (
                           select device_id, amplitude_id, user_id
                             from datalake_clean.amplitude_events
                           where user_id is not null
-                             and dt = date '{0}'
+                             and ym = '{0}'
                         ),
                         result_out_merge as (
                           select
@@ -195,7 +195,7 @@ class AmplitudeETL(object):
                               and mu.amplitude_id is null
                               and mu.user_id is null
                         )
-                    """.format(today),
+                    """.format(today_ym),
             db_enum=EnumDb.BI_DW,
             commit=True
         )
