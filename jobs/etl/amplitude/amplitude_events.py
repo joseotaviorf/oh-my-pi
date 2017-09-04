@@ -119,8 +119,8 @@ class AmplitudeEventsETL(BaseETL):
         date_partition = 'dt={}'.format(str(start.date()))
         for k, v in g_events.iteritems():
             event_partition = 'et={}'.format(k)
-            file_name = 'raw/amplitude/events/{}/{}/{}_h{}.json.gz'.format(date_partition, event_partition, start_date,
-                                                                           str(start.hour))
+            file_name = 'raw/amplitude/events/{}/{}/{}_h{}.json.gz'.format(date_partition, event_partition,
+                                                                           str(start.date()), str(start.hour))
             gz_body = io.BytesIO()
             with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
                 fp.write(v.encode('utf-8'))
