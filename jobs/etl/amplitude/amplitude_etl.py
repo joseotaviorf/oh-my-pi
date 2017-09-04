@@ -235,7 +235,7 @@ if __name__ == '__main__':
     if args[1] == 'load_data':
         df_raw = amplitude_etl.get_all_columns()
 
-        if not df_raw:
+        if df_raw.empty:
             _logger.warn('m=__main__, msg=empty dataframe')
         else:
             df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
