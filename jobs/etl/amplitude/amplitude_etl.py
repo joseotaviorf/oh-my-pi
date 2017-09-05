@@ -131,7 +131,7 @@ class AmplitudeETL(object):
             self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], today_ym, bucket_datalake)
 
     def get_properties_as_df(self):
-        props_query = './db/2.datalake/queries/amplitude/properties_clean.sql'
+        props_query = """describe datalake_clean.amplitude_events"""
         return amplitude_etl.athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def __convert_columns_to_number(self, df, columns, _type):
