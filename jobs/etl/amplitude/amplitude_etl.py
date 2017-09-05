@@ -30,34 +30,26 @@ class AmplitudeETL(object):
     def __init__(self):
         self.athena_client = AthenaClient(bucket_datalake)
 
-        user_props_query = """describe datalake_clean.amplitude_events"""
-        self.df_props = self.athena_client.execute_txt_query_and_return_dataframe(user_props_query)
-
     @logger
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
-        self.athena_client.execute_raw_query("""
-                        alter table datalake_raw.amplitude_events 
-                          add if not exists partition (dt='{0}')
-                            location 's3://{1}/raw/amplitude/events/dt={0}'
-                    """.format(today, bucket_datalake))
+        add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
+        self.athena_client.execute_file_query(add_partition_raw_query, today, bucket_datalake)
 
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
-        self.athena_client.execute_raw_query("""
-                                alter table datalake_raw.amplitude_events 
-                                  drop if exists partition (dt='{0}')
-                            """.format(today, bucket_datalake))
+        drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
+        self.athena_client.execute_file_query(drop_partition_raw_query, today, bucket_datalake)
 
         return df_columns_raw
 
-    def insert_new_columns(self, df, df_json, properties, prefix):
+    def insert_new_columns(self, df, df_props, df_json, properties, prefix):
         _logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
 
         props_list = list(
-            self.df_props[self.df_props[0].str.contains(prefix).fillna(False)][2].apply(lambda x: x.strip()))
+            df_props[df_props[0].str.contains(prefix).fillna(False)][2].apply(lambda x: x.strip()))
         already_added_list = []
         already_prop_added_list = []
 
@@ -80,9 +72,8 @@ class AmplitudeETL(object):
                     _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
-                self.athena_client.execute_raw_query("""
-                  alter table datalake_clean.amplitude_events
-                    add columns ({0}{1} string comment '{3}')""".format(prefix, formatted_up, type_mapping, up))
+                add_column_clean_query = './db/2.datalake/queries/amplitude/add_column_clean.sql'
+                self.athena_client.execute_file_query(add_column_clean_query, prefix, formatted_up, 'string', up)
 
                 already_added_list.append(up)
 
@@ -136,10 +127,12 @@ class AmplitudeETL(object):
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
-            self.athena_client.execute_raw_query("""
-                alter table datalake_clean.amplitude_events 
-                  add if not exists partition (et='{0}', ym='{1}')
-                location 's3://{2}/clean/amplitude/events/et={0}/ym={1}'""".format(df_et[0], today_ym, bucket_datalake))
+            add_partition_clean_query = './db/2.datalake/queries/amplitude/add_partition_clean.sql'
+            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], today_ym, bucket_datalake)
+
+    def get_properties_as_df(self):
+        props_query = './db/2.datalake/queries/amplitude/properties_clean.sql'
+        return amplitude_etl.athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def __convert_columns_to_number(self, df, columns, _type):
         for col in columns:
@@ -256,14 +249,17 @@ if __name__ == '__main__':
             df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
             df_raw_json['dt'] = df_raw['dt']
 
+            df_properties = amplitude_etl.get_properties_as_df()
             df_raw_json = amplitude_etl.insert_new_columns(
                 df=df_raw,
+                df_props=df_properties,
                 df_json=df_raw_json,
                 properties='user_properties',
                 prefix='u_'
             )
             df_raw_json = amplitude_etl.insert_new_columns(
                 df=df_raw,
+                df_props=df_properties,
                 df_json=df_raw_json,
                 properties='event_properties',
                 prefix='e_'
