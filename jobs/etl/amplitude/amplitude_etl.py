@@ -112,12 +112,6 @@ class AmplitudeETL(object):
             filtered_df = df[df['event_type'] == df_et[0]]
             filtered_df.astype(object).where(pd.notnull(filtered_df), None)
 
-            filtered_df = self.__convert_columns_to_datetime(
-                df=filtered_df,
-                columns=['event_time', 'client_upload_time', 'server_upload_time', 'user_creation_time',
-                         'client_event_time']
-            )
-
             filtered_df = self.__convert_columns_to_text(
                 df=filtered_df,
                 column_prefixes=['u_', 'e_'],
