@@ -1,6 +1,6 @@
 drop view if exists public.vw_dim_booking;
 
-create view public.vw_dim_booking
+create or replace view public.vw_dim_booking
 as
 with bms as (
     select
@@ -60,7 +60,7 @@ bookings as
 	    	end,
 	    	s.reason_category    	
 	   	) as responsible,
-
+        s.last_update_source,
 	   	s.cancel_timestamp,
 
 	   	s."criadoEm" as dt_created,
@@ -132,7 +132,8 @@ select
 	cancel_timestamp,
 	dt_created,
 	dt_updated,
-	dt_timestamp
+	dt_timestamp,
+	last_update_source
    
 	
 from
