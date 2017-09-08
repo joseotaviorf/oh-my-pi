@@ -32,7 +32,7 @@ for obj in amplitude_old.objects.filter(Prefix='app={}'.format(app_env)):
                 'Key': from_bucket
             }
 
-            to_bucket = 'raw/amplitude/events/dt={}/et={}/{}_h{}'.format(dt, et, dt, file_name)
+            to_bucket = 'raw/amplitude/events/dt={}/et={}/{}/{}_h{}'.format(dt, et, app, dt, file_name)
 
             _logger.info('from_bucket={}'.format(from_bucket))
             _logger.info('to_bucket={}'.format(to_bucket))
