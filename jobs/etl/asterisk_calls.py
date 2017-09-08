@@ -7,6 +7,8 @@ import gzip
 import sys
 from datetime import datetime
 from jobs.base.base_etl import BaseETL
+from jobs.base.enum_db import EnumDb
+from qa_python_utils.aws.athena import AthenaClient
 
 args = sys.argv
 
@@ -17,7 +19,8 @@ execution_time = datetime.now()
 
 survey_queue_url = json.loads(os.environ['asterisk'])['survey_queue_url']
 call_queue_url = json.loads(os.environ['asterisk'])['call_queue_url']
-bucket = '5a-datalake'
+bucket = os.environ['bi-datalake-s3-bucket']
+process_name = BaseETL.get_current_filename()
 
 
 class Asterisk(object):
@@ -56,6 +59,28 @@ class Asterisk(object):
         else:
             _logger.info('m=save_asterisk_data_to_s3, msg=no data to save')
 
+    def save_asterisk_data_to_dw(self):
+        _logger.info('m=save_asterisk_data_to_dw, msg=saving to dw')
+        athena = AthenaClient(bucket)
+        file_name = './db/2.datalake/queries/vw_asterisk_calls.sql'
+
+        data_frame = athena.execute_file_query_and_return_dataframe(file_name)
+
+        BaseETL.execute_command(
+            command="""truncate {};""".format(process_name),
+            db_enum=EnumDb.BI_DW,
+            encoding='utf-8',
+            commit=True
+        )
+
+        BaseETL.dataframe_to_db(
+            df=data_frame,
+            enum_db=EnumDb.BI_DW,
+            table_name=process_name,
+            encoding='utf-8'
+        )
+        _logger.info('m=save_asterisk_data_to_dw, msg=saved!')
+
     def delete_asterisk_messages(self, url):
         _logger.info('m=delete_asterisk_messages, msg=purging queue')
         self.sqs.purge_queue(QueueUrl=url)
@@ -71,5 +96,7 @@ if __name__ == '__main__':
     elif args[1] == 'purge':
         asterisk.delete_asterisk_messages(survey_queue_url)
         asterisk.delete_asterisk_messages(call_queue_url)
+    elif args[1] == 'dw':
+        asterisk.save_asterisk_data_to_dw()
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
