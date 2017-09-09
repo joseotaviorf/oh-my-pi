@@ -113,10 +113,6 @@ class CampaignMonitor(object):
 
                 json_messages.append(json.loads(smart_email_details.decode('utf-8')))
 
-                # hold a little to continue hitting the api
-                _logger.info('m=request_transactional_data, msg=sleeping for 3 seconds...')
-                time.sleep(3)
-
             _logger.info(
                 'm=request_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key, last_message))
             self.save_json_messages_to_s3(json_messages, key, last_message)
