@@ -218,8 +218,9 @@ class CampaignMonitor(object):
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=bucket_datalake,
-            file_path='raw/campaign_monitor/{0}/campaign_id={1}/dt={2}/{0}.gz'.format(object_type, campaign.campaign_id,
-                                                                                      today)
+            file_path='raw/campaign_monitor/campaigns/{0}/campaign_id={1}/dt={2}/{0}.gz'.format(object_type,
+                                                                                                campaign.campaign_id,
+                                                                                                today)
         )
 
 
