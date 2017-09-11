@@ -13,6 +13,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
+
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
@@ -97,7 +98,7 @@ class AmplitudeETL(object):
         str_type = re.search('<type \'([a-z]+)\'>', str(type(property_value))).groups()[0]
         formatted_prop = re.sub('\W', '', property_name.replace(' ', '_').replace('.', '_'))
 
-        return str_type, '_{}'.format(formatted_prop.lower()) if formatted_prop[0].isupper() else formatted_prop.lower()
+        return str_type, '_{}'.format(formatted_prop)
 
     def create_parquets(self, df):
         s3 = s3fs.S3FileSystem()
@@ -136,8 +137,9 @@ class AmplitudeETL(object):
 
     def __convert_columns_to_text(self, df, column_prefixes, _type):
         for col_prefix in column_prefixes:
-            cols = df.columns[pd.Series(df.columns).str.startswith(col_prefix)]
-            df[cols] = df[cols].fillna('').astype(str)
+            cols = set(df.columns[pd.Series(df.columns).str.startswith(col_prefix)])
+            for col in cols:
+                df[col] = df[col].fillna('').astype(str)
 
         return df
 
