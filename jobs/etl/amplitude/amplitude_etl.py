@@ -111,7 +111,7 @@ class AmplitudeETL(object):
             _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
                                                                                        'events'))
             filtered_df = df[df['event_type'] == df_et[0]]
-            filtered_df.astype(object).where(pd.notnull(filtered_df), None)
+            filtered_df = filtered_df.astype(object).where(pd.notnull(filtered_df), None)
 
             filtered_df = self.__convert_columns_to_text(
                 df=filtered_df,
