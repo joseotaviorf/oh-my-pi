@@ -37,7 +37,7 @@ class AmplitudeETL(object):
         add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
         self.athena_client.execute_file_query(add_partition_raw_query, today, bucket_datalake)
 
-        raw_query = '.db/2.datalake/queries/amplitude/init_events_raw.sql'
+        raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
