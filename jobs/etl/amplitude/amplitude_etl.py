@@ -13,6 +13,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
+
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
@@ -33,14 +34,14 @@ class AmplitudeETL(object):
     @logger
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
-        add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
+        add_partition_raw_query = '../../../db/2.datalake/queries/amplitude/add_partition_raw.sql'
         self.athena_client.execute_file_query(add_partition_raw_query, today, bucket_datalake)
 
-        raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
+        raw_query = '../../../db/2.datalake/queries/amplitude/init_events_raw.sql'
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
-        drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
+        drop_partition_raw_query = '../../../db/2.datalake/queries/amplitude/drop_partition_raw.sql'
         self.athena_client.execute_file_query(drop_partition_raw_query, today, bucket_datalake)
 
         return df_columns_raw
@@ -72,7 +73,7 @@ class AmplitudeETL(object):
                     _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
-                add_column_clean_query = './db/2.datalake/queries/amplitude/add_column_clean.sql'
+                add_column_clean_query = '../../../db/2.datalake/queries/amplitude/add_column_clean.sql'
                 self.athena_client.execute_file_query(add_column_clean_query, prefix, formatted_up, 'string', up)
 
                 already_added_list.append(up)
@@ -97,7 +98,7 @@ class AmplitudeETL(object):
         str_type = re.search('<type \'([a-z]+)\'>', str(type(property_value))).groups()[0]
         formatted_prop = re.sub('\W', '', property_name.replace(' ', '_').replace('.', '_'))
 
-        return str_type, '_{}'.format(formatted_prop.lower()) if formatted_prop[0].isupper() else formatted_prop.lower()
+        return str_type, '_{}'.format(formatted_prop)
 
     def create_parquets(self, df):
         s3 = s3fs.S3FileSystem()
@@ -121,7 +122,7 @@ class AmplitudeETL(object):
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
-            add_partition_clean_query = './db/2.datalake/queries/amplitude/add_partition_clean.sql'
+            add_partition_clean_query = '../../../db/2.datalake/queries/amplitude/add_partition_clean.sql'
             self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], today_ym, bucket_datalake)
 
     def get_properties_as_df(self):
@@ -136,8 +137,9 @@ class AmplitudeETL(object):
 
     def __convert_columns_to_text(self, df, column_prefixes, _type):
         for col_prefix in column_prefixes:
-            cols = df.columns[pd.Series(df.columns).str.startswith(col_prefix)]
-            df[cols] = df[cols].fillna('').astype(str)
+            cols = set(df.columns[pd.Series(df.columns).str.startswith(col_prefix)])
+            for col in cols:
+                df[col] = df[col].fillna('').astype(str)
 
         return df
 
