@@ -17,8 +17,8 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-
-today = str(datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S").date())
+today_tmsp = datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S")
+today = str(today_tmsp.date())
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 cm_auth = json.loads(os.environ['campaign-monitor-auth'])
@@ -83,7 +83,12 @@ class CampaignMonitor(object):
         key = 'raw/campaign_monitor/transactional_messages'
         max_sent_at = None
         max_last_message_id = None
+        last_sent_at = None
         while last_message:
+            if last_sent_at and datetime.strptime(last_sent_at[:-6], '%Y-%m-%dT%H:%M:%S') > today_tmsp:
+                last_message = None
+                continue
+
             result = transactional._get("/transactional/messages", params={
                 'clientID': client.client_id,
                 'sentAfterID': last_message,
@@ -114,7 +119,6 @@ class CampaignMonitor(object):
                 json_messages.append(json.loads(smart_email_details.decode('utf-8')))
 
                 # hold a little to continue hitting the api
-                _logger.info('m=request_transactional_data, msg=sleeping for 3 seconds...')
                 time.sleep(3)
 
             _logger.info(
@@ -128,7 +132,7 @@ class CampaignMonitor(object):
 
         _logger.info('m=request_transactional_data, final_count={}'.format(count))
         if max_sent_at and max_last_message_id:
-            self.__save_last_message_to_s3(max_last_message_id, max_sent_at)
+            self.__save_last_message_to_s3(max_last_message_id)
 
     @logger
     def __get_last_message_from_s3(self):
