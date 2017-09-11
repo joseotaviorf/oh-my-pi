@@ -13,7 +13,6 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
@@ -97,8 +96,10 @@ class AmplitudeETL(object):
     def __format_properties(self, property_name, property_value):
         str_type = re.search('<type \'([a-z]+)\'>', str(type(property_value))).groups()[0]
         formatted_prop = re.sub('\W', '', property_name.replace(' ', '_').replace('.', '_'))
+        formatted_prop = re.sub('^([A-Z])', '_\g<1>', formatted_prop)
+        formatted_prop = re.sub('(.)_([A-Z])', '\g<1>__\g<2>', formatted_prop)
 
-        return str_type, '_{}'.format(formatted_prop)
+        return str_type, formatted_prop.lower()
 
     def create_parquets(self, df):
         s3 = s3fs.S3FileSystem()
