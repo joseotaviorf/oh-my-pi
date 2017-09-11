@@ -4,6 +4,7 @@ from io import BytesIO
 
 import boto3
 import petl
+import pandas as pd
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
@@ -46,6 +47,9 @@ class EBDBDatalake(object):
         file_path = 'raw/{1}/{2}/{2}.csv'.format(bucket_datalake, schema_name, table_name)
         df_table = petl.todataframe(table)
 
+        # replace Nan for SQL Null
+        df_table = df_table.astype(object).where(pd.notnull(df_table), None)
+
         csv_buffer = BytesIO()
         df_table.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=False)
 
@@ -86,9 +90,13 @@ class EBDBDatalake(object):
         for column, original_type in columns:
             command += '\t{} {},\n'.format(column, conv[original_type])
         command = command[:-2]  # remove last comma
-        command += """) row format delimited
-                          fields terminated by ','
-                          lines terminated by '\n'
+        command += """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+                         with serdeproperties (
+                           'separatorChar' = ',',
+                           'quoteChar' = '\"',
+                           'escapeChar' = '\\'
+                         )
+                        stored as textfile
                         location 's3://{}/raw/{}/{}/'""".format(bucket_datalake, schema_name, table_name)
 
         c.execute_query_and_wait_for_results(command)
