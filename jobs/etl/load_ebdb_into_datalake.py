@@ -3,9 +3,8 @@ import sys
 from io import BytesIO
 
 import boto3
-import petl
 import pandas as pd
-
+import petl
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
@@ -128,7 +127,7 @@ if __name__ == '__main__':
 
     if args[1] == 'move':
         for table_name in table_names:
-            ebdb_datalake.move_to_datalake(table_name)
+            ebdb_datalake.move_to_datalake(table_name[0])
     elif args[1] == 'create_tables':
         conversions = ebdb_datalake.get_type_conversion_dict()
         for table_name in table_names:
