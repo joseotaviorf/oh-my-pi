@@ -5,6 +5,7 @@ from io import BytesIO
 import boto3
 import petl
 import pandas as pd
+
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
@@ -50,6 +51,10 @@ class EBDBDatalake(object):
         # replace Nan for SQL Null
         df_table = df_table.astype(object).where(pd.notnull(df_table), None)
 
+        # replace '\n' and '\r for space
+        df_table.replace('\n', ' ', regex=True, inplace=True)
+        df_table.replace('\r', ' ', regex=True, inplace=True)
+
         csv_buffer = BytesIO()
         df_table.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=False)
 
@@ -88,7 +93,7 @@ class EBDBDatalake(object):
 
         command = 'create external table {}.{}_{} (\n'.format(athena_db, schema_name, table_name)
         for column, original_type in columns:
-            command += '\t{} {},\n'.format(column, conv[original_type])
+            command += '\t{} string,\n'.format(column, conv[original_type])
         command = command[:-2]  # remove last comma
         command += """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
                          with serdeproperties (
@@ -123,7 +128,7 @@ if __name__ == '__main__':
 
     if args[1] == 'move':
         for table_name in table_names:
-            ebdb_datalake.move_to_datalake(table_name[0])
+            ebdb_datalake.move_to_datalake('Imovel')
     elif args[1] == 'create_tables':
         conversions = ebdb_datalake.get_type_conversion_dict()
         for table_name in table_names:
