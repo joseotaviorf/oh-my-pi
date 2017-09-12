@@ -93,8 +93,7 @@ class EBDBDatalake(object):
         command += """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
                          with serdeproperties (
                            'separatorChar' = ',',
-                           'quoteChar' = '\"',
-                           'escapeChar' = '\\'
+                           'quoteChar' = '\"'
                          )
                         stored as textfile
                         location 's3://{}/raw/{}/{}/'""".format(bucket_datalake, schema_name, table_name)
