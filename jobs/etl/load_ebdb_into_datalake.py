@@ -1,7 +1,6 @@
 import os
 import sys
 from io import BytesIO
-
 import boto3
 import pandas as pd
 import petl
@@ -50,7 +49,6 @@ class EBDBDatalake(object):
         # replace Nan for SQL Null
         df_table.replace(['None'], [None], inplace=True)
         df_table = df_table.astype(object).where(pd.notnull(df_table), None)
-
 
         # replace '\n' and '\r for space
         df_table.replace('\n', ' ', regex=True, inplace=True)
@@ -121,7 +119,6 @@ class EBDBDatalake(object):
         if skip_header:
             table_names.pop(0)  # remove header
         return table_names
-
 
 if __name__ == '__main__':
     ebdb_datalake = EBDBDatalake()

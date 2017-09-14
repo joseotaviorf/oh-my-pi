@@ -8,5 +8,5 @@ publish:
     repo: quintoandar/bi-etl-ejuice
     storage_driver: overlay
     tag:
-      - $$BRANCH-$$BUILD_NUMBER
+      - $$BRANCH-$${COMMIT:0:7}
       - $$BRANCH-latest
