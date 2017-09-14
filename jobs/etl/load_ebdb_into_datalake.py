@@ -121,7 +121,6 @@ class EBDBDatalake(object):
             table_names.pop(0)  # remove header
         return table_names
 
-
 if __name__ == '__main__':
     ebdb_datalake = EBDBDatalake()
     table_names = ebdb_datalake.get_table_names()
