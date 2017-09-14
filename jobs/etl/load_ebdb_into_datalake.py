@@ -48,7 +48,9 @@ class EBDBDatalake(object):
         df_table = petl.todataframe(table)
 
         # replace Nan for SQL Null
+        df_table.replace(['None'], [None], inplace=True)
         df_table = df_table.astype(object).where(pd.notnull(df_table), None)
+
 
         # replace '\n' and '\r for space
         df_table.replace('\n', ' ', regex=True, inplace=True)
