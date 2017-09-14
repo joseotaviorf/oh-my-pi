@@ -1,7 +1,6 @@
 import os
 import sys
 from io import BytesIO
-
 import boto3
 import pandas as pd
 import petl
