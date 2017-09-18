@@ -92,7 +92,8 @@ class EBDBDatalake(object):
 
         command = 'create external table {}.{}_{} (\n'.format(athena_db, schema_name, table_name)
         for column, original_type in columns:
-            command += '\t{} string,\n'.format(column, conv[original_type])
+            # command += '\t{} string,\n'.format(column, conv[original_type])
+            command += '\t{} {},\n'.format(column, conv[original_type])
         command = command[:-2]  # remove last comma
         command += """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
                          with serdeproperties (
