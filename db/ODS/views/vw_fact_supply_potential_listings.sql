@@ -17,6 +17,7 @@ with first_pub as
       (
         SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
           cap.cap_id,
+          cap.external_id,
           pl.*
           -- cap.reason
         FROM
@@ -30,6 +31,7 @@ with first_pub as
 
         SELECT -- add the cap_id to the potential listings table by joining it to the cap table.
           cap.cap_id,
+          cap.external_id,
           pl.*
           -- cap.reason
         FROM
@@ -48,6 +50,21 @@ with first_pub as
 
   WINDOW
     w_prop_id as (partition by l.property_id)
+)
+, deduplicated as
+(
+-- Deduplication of facebook leads inserted many times
+    select * from
+    (
+        select
+            *,
+            case when external_id is not null
+                then row_number() over (partition by external_id)
+                else 1
+            end as ext_id
+        from
+            first_pub fp
+    ) a where ext_id = 1
 )
 , listings as
 (
@@ -241,7 +258,7 @@ with first_pub as
       )
       as self_service_opportunity_day_times -- count over day using listing date and filter self-service
   from
-    first_pub l
+    deduplicated l
 
 )
 SELECT -- count(1)
