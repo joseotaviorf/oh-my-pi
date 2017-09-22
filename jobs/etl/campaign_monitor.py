@@ -26,6 +26,14 @@ cm_auth = json.loads(os.environ['campaign-monitor-auth'])
 DEFAULT_PAGE_SIZE = 1000
 DATABASE = 'datalake_raw'
 
+CAMPAIGN_FIRST_MESSAGE = {
+    'homes': 'b3151e06-9246-11e7-a995-de6808d5a69c'
+}
+
+CAMPAIGN_SMART_EMAIL_ID = {
+    'homes': '3c4c3e77-1f62-444b-b6bc-1a8c09192b16'
+}
+
 
 class CampaignMonitor(object):
     def __init__(self):
@@ -68,6 +76,68 @@ class CampaignMonitor(object):
 
         datalake.put_object(Body=gz_body.getvalue(), Key='{}/{}.gz'.format(key, last_message))
         gz_body.flush()
+
+    @logger
+    def request_project_transactional_data(self, project_name, project_first_message, project_smart_email_id):
+        client = self.__get_client()
+        if not client:
+            return
+
+        transactional = Transactional(self.auth, client_id=client.client_id)
+        last_message = project_first_message
+        homes_params = {
+            'clientID': client.client_id,
+            'smartEmailID': project_smart_email_id,
+            'count': 200
+        }
+
+        count = 0
+        json_messages = []
+        key = 'raw/campaign_monitor/transactional_messages/{}'.format(project_name)
+        while last_message:
+            result = transactional._get('/transactional/messages', params=homes_params)
+            messages = json.loads(result.decode('utf-8'))
+            last_message = None
+            for msg in messages:
+                _logger.info('m=request_project_transactional_data, msg=processing msg \'{}\''.format(msg['MessageID']))
+                last_message = msg['MessageID']
+
+                try:
+                    smart_email_details = transactional._get(
+                        '/transactional/messages/{}?statistics={}'.format(last_message, True))
+                except Exception:
+                    _logger.warn('m=request_project_transactional_data, msg=too many requests; waiting...')
+                    # hold a little to continue hitting the api
+                    time.sleep(300)
+                    smart_email_details = transactional._get(
+                        '/transactional/messages/{}?statistics={}'.format(last_message, True))
+
+                json_messages.append(json.loads(smart_email_details.decode('utf-8')))
+
+            if last_message != project_first_message:
+                homes_params['sentBeforeID'] = last_message
+            else:
+                last_message = None
+
+            _logger.info(
+                'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key,
+                                                                                                           last_message))
+            self.save_json_messages_to_s3(json_messages, key, last_message)
+            count += 1
+
+        _logger.info('m=request_project_transactional_data, final_count={}'.format(count))
+
+    @logger
+    def request_homes_transactional_data(self):
+        self.request_project_transactional_data(
+            project_name='homes',
+            project_first_message=CAMPAIGN_FIRST_MESSAGE['homes'],
+            project_smart_email_id=CAMPAIGN_SMART_EMAIL_ID['homes']
+        )
+
+    @logger
+    def deduplicate_homes_transactional_data(self):
+        pass
 
     @logger
     def request_transactional_data(self):
@@ -118,9 +188,6 @@ class CampaignMonitor(object):
 
                 json_messages.append(json.loads(smart_email_details.decode('utf-8')))
 
-                # hold a little to continue hitting the api
-                time.sleep(3)
-
             _logger.info(
                 'm=request_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key, last_message))
             self.save_json_messages_to_s3(json_messages, key, last_message)
@@ -128,7 +195,7 @@ class CampaignMonitor(object):
 
             # hold a little to continue hitting the api
             _logger.info('m=request_transactional_data, msg=sleeping for 60 seconds...')
-            time.sleep(60)
+            time.sleep(30)
 
         _logger.info('m=request_transactional_data, final_count={}'.format(count))
         if max_sent_at and max_last_message_id:
@@ -233,7 +300,9 @@ if __name__ == '__main__':
 
     if args[1] == 'request_campaign_data':
         campaign_monitor.request_campaign_data()
-    elif args[1] == 'request_transactional_data':
-        campaign_monitor.request_transactional_data()
+    elif args[1] == 'request_homes_transactional_data':
+        campaign_monitor.request_homes_transactional_data()
+    elif args[1] == 'deduplicate_homes_transactional_data':
+        campaign_monitor.deduplicate_homes_transactional_data()
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
