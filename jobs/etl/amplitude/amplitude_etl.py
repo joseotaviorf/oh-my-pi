@@ -12,6 +12,7 @@ from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
+
 args = sys.argv
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
