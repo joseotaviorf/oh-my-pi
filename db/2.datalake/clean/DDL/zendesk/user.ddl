@@ -1,0 +1,37 @@
+CREATE EXTERNAL TABLE datalake_clean.zendesk_user (
+  id string,
+  email string,
+  name string,
+  active boolean,
+  alias string,
+  chat_only boolean,
+  created_at string,
+  custom_role_id double,
+  details string,
+  external_id double,
+  last_login_at string,
+  locale string,
+  locale_id int,
+  moderator boolean,
+  notes string,
+  only_private_comments boolean,
+  organization_id string,
+  default_group_id string,
+  phone string,
+  photo_id double,
+  restricted_agent boolean,
+  role string,
+  shared boolean,
+  shared_agent boolean,
+  signature string,
+  suspended boolean,
+  ticket_restriction string,
+  time_zone string,
+  two_factor_auth_enabled boolean,
+  updated_at string,
+  url string,
+  verified boolean
+)
+STORED AS PARQUET
+LOCATION 's3://5a-datalake/clean/zendesk/user/'
+tblproperties ("parquet.compress"="SNAPPY");
