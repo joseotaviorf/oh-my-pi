@@ -38,7 +38,7 @@ def load_zendesk_table_to_datalake(table_name, raw_columns):
     _logger.info('m=load_zendesk_table_to_dw, msg=saved {} to dw'.format(table_name))
 
 if __name__ == '__main__':
-    if args[1] == 'ticket':
+    if args[1] == 'tickets':
         columns = [
             ('id', str),
             ('url', str),
@@ -139,7 +139,7 @@ if __name__ == '__main__':
             ('url', str),
             ('verified', bool)
         ]
-        load_zendesk_table_to_datalake('user', columns)
+        load_zendesk_table_to_datalake('users', columns)
     elif args[1] == 'group_membership':
         columns = [
             ('id', str),
@@ -150,7 +150,7 @@ if __name__ == '__main__':
             ('created_at', str),
             ('updated_at', str)
         ]
-        load_zendesk_table_to_datalake('group_membership', columns)
+        load_zendesk_table_to_datalake('group_memberships', columns)
     elif args[1] == 'group':
         columns = [
             ('id', str),
@@ -160,8 +160,8 @@ if __name__ == '__main__':
             ('created_at', str),
             ('updated_at', str)
         ]
-        load_zendesk_table_to_datalake('group', columns)
-    elif args[1] == 'ticket_fields':
+        load_zendesk_table_to_datalake('groups', columns)
+    elif args[1] == 'ticket_fields_type':
         columns = [
             ('id', str),
             ('ticket_id', str),
