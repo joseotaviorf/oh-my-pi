@@ -61,6 +61,7 @@ bookings as
 	    	s.reason_category    	
 	   	) as responsible,
         s.last_update_source,
+        s.first_update_source,
 	   	s.cancel_timestamp,
 
 	   	s."criadoEm" as dt_created,
@@ -133,7 +134,8 @@ select
 	dt_created,
 	dt_updated,
 	dt_timestamp,
-	last_update_source
+	last_update_source,
+	first_update_source
    
 	
 from

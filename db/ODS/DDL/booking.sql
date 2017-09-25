@@ -25,6 +25,7 @@ CREATE TABLE public.booking (
   reason text,
   reason_category varchar(255),
   last_update_source varchar(255),
-  cancel_timestamp timestamp
+  cancel_timestamp timestamp,
+  first_update_source varchar(255)
 )
 WITH (oids = false);
