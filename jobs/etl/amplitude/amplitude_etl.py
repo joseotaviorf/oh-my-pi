@@ -12,7 +12,6 @@ from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
-
 args = sys.argv
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
@@ -117,7 +116,7 @@ class AmplitudeETL(object):
 
             filtered_df = self.__convert_columns_to_text(
                 df=filtered_df,
-                column_prefixes=['u_', 'e_'],
+                column_prefixes=['u_', 'e_', 'event_time'],
                 _type=str
             )
 
@@ -191,7 +190,7 @@ class AmplitudeETL(object):
                             on n.device_id = nn.device_id
                              and n.amplitude_id = nn.amplitude_id
                         )
-                        select rom.device_id, rom.amplitude_id, rom.user_id
+                        select distinct rom.device_id, rom.amplitude_id, rom.user_id
                           from amplitude_events.merged_users mu
                         right join result_out_merge rom
                           on mu.device_id = rom.device_id
