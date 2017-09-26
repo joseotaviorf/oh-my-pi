@@ -33,5 +33,6 @@ CREATE TABLE dim_booking (
   dt_updated TIMESTAMP WITHOUT TIME ZONE,
   dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
   last_update_source VARCHAR(255),
+  first_update_source VARCHAR(255),
   CONSTRAINT dim_booking_pkey PRIMARY KEY(sk_booking)
 );

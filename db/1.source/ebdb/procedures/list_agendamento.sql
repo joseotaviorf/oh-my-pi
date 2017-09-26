@@ -30,7 +30,8 @@ select
   case 
   	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null 
   	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
-  end as cancel_timestamp
+  end as cancel_timestamp,
+  vo2.nome as first_update_source
 from 
   Agendamento a
 -- MUDANCA STATUS
@@ -75,5 +76,14 @@ left join
 left join
 	UsuarioRevisionEntity rcanc
 	on rcanc.id = c.REV_Cancelado
+left join
+    ( select id, min(REV) as min_rev from Agendamento_AUD group by id ) au1
+    on a.id = au1.id
+left join
+	Agendamento_AUD au2
+    on au1.id = au2.id and au1.min_rev = au2.REV
+left join
+    VisitaOrigem vo2
+    on au2.origemUltimaAtualizacao_id = vo2.id
 ;
 END
