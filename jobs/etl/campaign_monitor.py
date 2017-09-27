@@ -179,7 +179,7 @@ class CampaignMonitor(object):
                 ('clicked', str)
             ]),
             clean_columns=OrderedDict([
-                ('can_be_resent', bool),
+                ('can_be_resent', str),
                 ('subject', str),
                 ('email_from', str),
                 ('email_to', str),
@@ -187,21 +187,21 @@ class CampaignMonitor(object):
                 ('sent_at', str),
                 ('smart_email_id', str),
                 ('status', str),
-                ('total_clicks', int),
-                ('total_opens', int),
-                ('property_email_id', int),
+                ('total_clicks', str),
+                ('total_opens', str),
+                ('property_email_id', str),
                 ('url', str),
-                ('property_link_id', int),
+                ('property_link_id', str),
                 ('first_opened_date', str),
                 ('date', str),
                 ('city', str),
                 ('country_code', str),
                 ('country_name', str),
                 ('region', str),
-                ('long', float),
-                ('lat', float),
-                ('opened', bool),
-                ('clicked', bool)
+                ('long', str),
+                ('lat', str),
+                ('opened', str),
+                ('clicked', str)
             ])
         )
 
