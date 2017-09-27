@@ -13,7 +13,7 @@ if __name__ == '__main__':
     if len(args) > 1:
         if args[1] == 'fb':
             fc = FacebookCampaigns()
-            facebook_table = fc.extract_facebook_marketing_campaigns(date(2017, 5, 23))
+            facebook_table = fc.extract_facebook_marketing_campaigns(date(2016, 11, 1))
             process_name = 'facebook_ads_campaigns'
 
             BaseETL.bulk_insert(
