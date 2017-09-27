@@ -98,7 +98,8 @@ link_interactions as (
     opened,
     clicked
   from clicks c
-)
+),
+all_props as (
 select
   tm.canberesent,
   tm.subject,
@@ -111,7 +112,12 @@ select
   tm.totalclicks,
   tm.totalopens,
   892700000 + cast(p.props as bigint) as property_email_id,
-  row_number() over (partition by tm.messageid) as rn_property_email_id,
+  row_number() over (partition by tm.messageid) as rn_property_email_id
+from transactional_messages tm
+cross join unnest(tm.property_ids) as p (props)
+)
+select
+  ap.*,
   li.url,
   li.imovelid as property_link_id,
   li.first_opened_date,
@@ -124,7 +130,6 @@ select
   li.latitude,
   li.opened,
   li.clicked
-from transactional_messages tm
-cross join unnest(tm.property_ids) as p (props)
+from all_props ap
 left join link_interactions li
-on tm.messageid = li.messageid
+on ap.messageid = li.messageid
