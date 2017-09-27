@@ -3,7 +3,7 @@ create external table datalake_clean.transactional_messages (
   subject string,
   email_from string,
   email_to string,
-  messageid string,
+  message_id string,
   sent_at string,
   smart_email_id string,
   status string,
