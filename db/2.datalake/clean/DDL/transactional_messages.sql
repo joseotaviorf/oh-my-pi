@@ -11,6 +11,7 @@ create external table datalake_clean.transactional_messages (
   total_clicks string,
   total_opens string,
   property_email_id string,
+  rn_property_email_id string,
   url string,
   property_link_id string,
   first_opened_date string,

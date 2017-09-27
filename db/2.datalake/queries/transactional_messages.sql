@@ -2,14 +2,15 @@ with max_tm as (
   select
     messageid, max(dt) as max_dt
   from datalake_raw.cm_transactional_messages
+  where project = '{0}'
   group by messageid
 ),
 transactional_messages as (
   select distinct
     ctm.canberesent,
     ctm.message.subject as subject,
-    regexp_extract(ctm.recipient, '([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})') as email_to,
-    regexp_extract(message."from", '([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})') as email_from,
+    regexp_extract(ctm.recipient, '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+') as email_to,
+    regexp_extract(message."from", '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+') as email_from,
     ctm.messageid,
     ctm.sentat,
     ctm.smartemailid,
@@ -21,6 +22,7 @@ transactional_messages as (
   join max_tm mt
    on ctm.messageid = mt.messageid
     and ctm.dt = mt.max_dt
+  where ctm.project = '{0}'
 ),
 clicks as (
   select distinct
@@ -40,6 +42,7 @@ clicks as (
     true as clicked
   from datalake_raw.cm_transactional_messages tm
   cross join unnest(tm.clicks) as c (click)
+  where tm.project = '{0}'
 ),
 opens as (
   select distinct
@@ -59,6 +62,7 @@ opens as (
     null as clicked
   from datalake_raw.cm_transactional_messages tm
   cross join unnest(tm.opens) as o (open)
+  where tm.project = '{0}'
 ),
 link_interactions as (
   select distinct
@@ -94,7 +98,8 @@ link_interactions as (
     opened,
     clicked
   from clicks c
-)
+),
+all_props as (
 select
   tm.canberesent,
   tm.subject,
@@ -107,6 +112,12 @@ select
   tm.totalclicks,
   tm.totalopens,
   892700000 + cast(p.props as bigint) as property_email_id,
+  row_number() over (partition by tm.messageid) as rn_property_email_id
+from transactional_messages tm
+cross join unnest(tm.property_ids) as p (props)
+)
+select
+  ap.*,
   li.url,
   li.imovelid as property_link_id,
   li.first_opened_date,
@@ -119,8 +130,6 @@ select
   li.latitude,
   li.opened,
   li.clicked
-from transactional_messages tm
-cross join unnest(tm.property_ids) as p (props)
+from all_props ap
 left join link_interactions li
-on tm.messageid = li.messageid
-order by tm.messageid desc
+on ap.messageid = li.messageid
