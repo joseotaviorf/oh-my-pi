@@ -13,14 +13,11 @@ import boto3
 import pandas as pd
 # createsend==4.2.1
 from createsend import CreateSend, Client, Transactional, Campaign
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
 from jobs.base.base_etl import BaseETL
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-args=['asdas', 'deduplicate_homes_transactional_data', '2017-09-25 00:00:00']
 today_tmsp = datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S")
 today = str(today_tmsp.date())
 
