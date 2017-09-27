@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+from collections import OrderedDict
 from datetime import datetime
 from io import BytesIO
 
@@ -93,7 +94,7 @@ class CampaignMonitor(object):
 
         count = 0
         json_messages = []
-        key = 'raw/campaign_monitor/transactional_messages/{}'.format(project_name)
+        key = 'raw/campaign_monitor/transactional_messages/project={}'.format(project_name)
         while last_message:
             result = transactional._get('/transactional/messages', params=homes_params)
             messages = json.loads(result.decode('utf-8'))
@@ -112,12 +113,9 @@ class CampaignMonitor(object):
                     smart_email_details = transactional._get(
                         '/transactional/messages/{}?statistics={}'.format(last_message, True))
 
-                json_messages.append(json.loads(smart_email_details.decode('utf-8')))
-
-            if last_message != project_first_message:
-                homes_params['sentBeforeID'] = last_message
-            else:
-                last_message = None
+                details_json = json.loads(smart_email_details.decode('utf-8'))
+                details_json['dt'] = today
+                json_messages.append(details_json)
 
             _logger.info(
                 'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key,
@@ -125,7 +123,19 @@ class CampaignMonitor(object):
             self.save_json_messages_to_s3(json_messages, key, last_message)
             count += 1
 
+            if last_message != project_first_message:
+                homes_params['sentBeforeID'] = last_message
+            else:
+                last_message = None
+
         _logger.info('m=request_project_transactional_data, final_count={}'.format(count))
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/raw/campaign_monitor/transactional_messages'.format(bucket_datalake),
+            database='datalake_raw',
+            table='cm_transactional_messages',
+            partition_name='project',
+            partition_value='homes'
+        )
 
     @logger
     def request_homes_transactional_data(self):
@@ -137,7 +147,71 @@ class CampaignMonitor(object):
 
     @logger
     def deduplicate_homes_transactional_data(self):
-        pass
+        deduplication_query = './db/2.datalake/queries/transactional_messages.sql'
+        df = self.athena_client.execute_file_query_and_return_dataframe(deduplication_query)
+
+        self.athena_client.create_parquet_from_df(
+            key='clean/campaign_monitor/transactional_messages/project=homes/messages.parq',
+            df=df,
+            raw_columns=OrderedDict([
+                ('canberesent', str),
+                ('subject', str),
+                ('email_from', str),
+                ('email_to', str),
+                ('messageid', str),
+                ('sentat', str),
+                ('smartemailid', str),
+                ('status', str),
+                ('totalclicks', str),
+                ('totalopens', str),
+                ('property_email_id', str),
+                ('url', str),
+                ('property_link_id', str),
+                ('first_opened_date', str),
+                ('date', str),
+                ('city', str),
+                ('countrycode', str),
+                ('countryname', str),
+                ('region', str),
+                ('longitude', str),
+                ('latitude', str),
+                ('opened', str),
+                ('clicked', str)
+            ]),
+            clean_columns=OrderedDict([
+                ('can_be_resent', bool),
+                ('subject', str),
+                ('email_from', str),
+                ('email_to', str),
+                ('message_id', str),
+                ('sent_at', str),
+                ('smart_email_id', str),
+                ('status', str),
+                ('total_clicks', int),
+                ('total_opens', int),
+                ('property_email_id', int),
+                ('url', str),
+                ('property_link_id', int),
+                ('first_opened_date', str),
+                ('date', str),
+                ('city', str),
+                ('country_code', str),
+                ('country_name', str),
+                ('region', str),
+                ('long', float),
+                ('lat', float),
+                ('opened', bool),
+                ('clicked', bool)
+            ])
+        )
+
+        self.athena_client.upsert_single_partition(
+            bucket_folder_path='{}/clean/campaign_monitor/transactional_messages'.format(bucket_datalake),
+            database='datalake_clean',
+            table='transactional_messages',
+            partition_name='project',
+            partition_value='homes'
+        )
 
     @logger
     def request_transactional_data(self):
@@ -300,6 +374,8 @@ if __name__ == '__main__':
 
     if args[1] == 'request_campaign_data':
         campaign_monitor.request_campaign_data()
+    elif args[1] == 'request_transactional_data':
+        campaign_monitor.request_transactional_data()
     elif args[1] == 'request_homes_transactional_data':
         campaign_monitor.request_homes_transactional_data()
     elif args[1] == 'deduplicate_homes_transactional_data':
