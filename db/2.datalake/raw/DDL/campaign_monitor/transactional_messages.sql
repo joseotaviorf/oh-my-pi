@@ -1,3 +1,4 @@
+drop table if exists datalake_raw.cm_transactional_messages;
 create external table datalake_raw.cm_transactional_messages (
   canberesent boolean,
   clicks array<
