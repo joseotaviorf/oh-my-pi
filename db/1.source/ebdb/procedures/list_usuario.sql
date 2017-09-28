@@ -18,7 +18,6 @@ BEGIN
     u.numero, 
     u.facebookId as facebook_id, 
     u.linkedInId as linkedin_id,
-    u.salario, 
     u.sexo, 
     u.telefonePrincipal as telefone_principal, 
     e.abreviacao as estado_abreviacao,
@@ -66,7 +65,7 @@ BEGIN
     daf.contadorPlanilhaDeLeads as dadosafiliado_contador_planilha_leads,
     daf.contratosFechados as dadosafiliado_contratos_fechados,
     daf.indicacaoShortUrl as dadosafiliado_indicacao_shorturl,
-    daf.inicioAtuacao as dadosafiliado_inicio_atuacao,
+    coalesce(da2.inicioAtuacao, daf.inicioAtuacao) as dadosafiliado_inicio_atuacao,
     daf.ultimoCalculoComissaoIndicado as dadosafiliado_ultim_calculo_comissao_indicado,
     daf.verificado+0 as dadosafiliado_verificado,
     daf.tipoAfiliado as dadosafiliado_tipo,
@@ -123,6 +122,12 @@ BEGIN
   left join
     DadosAfiliado daf
     on daf.id = u.dadosAfiliado_id
+  left join
+	(select id, min(REV) as REV from DadosAfiliado_AUD where inicioAtuacao is not null group by id) da1
+	on da1.id = u.dadosAfiliado_id
+  left join
+    DadosAfiliado_AUD da2
+    on da1.id = da2.id and da1.REV = da2.REV
   left join
     DadosGerenteContas gc
     on gc.id = daf.gerenteContas_id
