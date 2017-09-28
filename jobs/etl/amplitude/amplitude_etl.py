@@ -154,17 +154,23 @@ class AmplitudeETL(object):
         BaseETL.execute_command(
             command="""
                     create table amplitude_events.tmp_merge_users_result as (
-                        with user_nulls as (
-                          select device_id, amplitude_id, user_id
+                        with amplitude_events_not_empty as (
+                          select
+                            case when device_id is null or device_id = '' then null else device_id end as device_id,
+                            case when amplitude_id is null or amplitude_id = '' then null else amplitude_id end as amplitude_id,
+                            case when user_id is null or user_id = '' then null else user_id end as user_id
                             from datalake_clean.amplitude_events
+                          where ym = '{}'
+                        ),
+                        user_nulls as (
+                          select device_id, amplitude_id, user_id
+                            from amplitude_events_not_empty
                           where user_id is null
-                             and ym = '{0}'
                         ),
                         user_not_nulls as (
                           select device_id, amplitude_id, user_id
-                            from datalake_clean.amplitude_events
+                            from amplitude_events_not_empty
                           where user_id is not null
-                             and ym = '{0}'
                         ),
                         result_out_merge as (
                           select
@@ -215,6 +221,9 @@ class AmplitudeETL(object):
                         full outer join amplitude_events.tmp_merge_users_result tmur
                           on mu.device_id = tmur.device_id
                             and mu.amplitude_id = tmur.amplitude_id
+                        where mu.device_id is null
+                              and mu.amplitude_id is null
+                              and mu.user_id is null
                     """,
             db_enum=EnumDb.BI_DW,
             commit=True
