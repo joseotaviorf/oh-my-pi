@@ -34,14 +34,14 @@ class AmplitudeETL(object):
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
         add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
-        self.athena_client.execute_file_query(add_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, today, bucket_datalake)
 
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
         drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
-        self.athena_client.execute_file_query(drop_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, today, bucket_datalake)
 
         return df_columns_raw
 
@@ -112,14 +112,7 @@ class AmplitudeETL(object):
             _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
                                                                                        'events'))
             filtered_df = df[df['event_type'] == df_et[0]]
-            filtered_df = filtered_df.astype(object).where(pd.notnull(filtered_df), None)
-
-            filtered_df = self.__convert_columns_to_text(
-                df=filtered_df,
-                column_prefixes=['u_', 'e_', 'event_time'],
-                _type=str
-            )
-
+            filtered_df = filtered_df.fillna('').astype(str)
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
@@ -161,17 +154,23 @@ class AmplitudeETL(object):
         BaseETL.execute_command(
             command="""
                     create table amplitude_events.tmp_merge_users_result as (
-                        with user_nulls as (
-                          select device_id, amplitude_id, user_id
+                        with amplitude_events_not_empty as (
+                          select
+                            case when device_id is null or device_id = '' then null else device_id end as device_id,
+                            case when amplitude_id is null or amplitude_id = '' then null else amplitude_id end as amplitude_id,
+                            case when user_id is null or user_id = '' then null else user_id end as user_id
                             from datalake_clean.amplitude_events
+                          where ym = '{}'
+                        ),
+                        user_nulls as (
+                          select device_id, amplitude_id, user_id
+                            from amplitude_events_not_empty
                           where user_id is null
-                             and ym = '{0}'
                         ),
                         user_not_nulls as (
                           select device_id, amplitude_id, user_id
-                            from datalake_clean.amplitude_events
+                            from amplitude_events_not_empty
                           where user_id is not null
-                             and ym = '{0}'
                         ),
                         result_out_merge as (
                           select
@@ -222,6 +221,9 @@ class AmplitudeETL(object):
                         full outer join amplitude_events.tmp_merge_users_result tmur
                           on mu.device_id = tmur.device_id
                             and mu.amplitude_id = tmur.amplitude_id
+                        where mu.device_id is null
+                              and mu.amplitude_id is null
+                              and mu.user_id is null
                     """,
             db_enum=EnumDb.BI_DW,
             commit=True
