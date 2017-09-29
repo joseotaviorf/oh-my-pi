@@ -1,5 +1,5 @@
 drop view if exists vw_dim_user;
-create view vw_dim_user
+create or replace view vw_dim_user
 as
 SELECT
   u.id as sk_user,
@@ -23,7 +23,6 @@ SELECT
   numero,
   facebook_id,
   linkedin_id,
-  salario,
   sexo,
   telefone_principal,
   estado_abreviacao,
@@ -82,6 +81,11 @@ SELECT
   dadosafiliado_semana_ultima_comunicacao_balanco,
   dadosafiliado_id_planilha_gdocs,
   dadosafiliado_ativo,
+  campaign_total/count(1) filter(where dados_afiliado_id is not null) over
+		( partition by
+			date_part('year', dadosafiliado_inicio_atuacao),
+			date_part('month', dadosafiliado_inicio_atuacao)
+		) as dadosafiliado_custo_aquisicao,
   dadosgerentecontas_inicio_contrato,
   dadosgerentecontas_nome,
   active,
@@ -150,4 +154,20 @@ on user_dates.id = u.id
 left join 
   app_network an
 on u.id = an.user_id
+left join
+	(
+		select
+			date_part('year', "date"::date) as campaign_year,
+			date_part('month', "date"::date) as campaign_month,
+			sum(spend::decimal) as campaign_total
+		from facebook_ads_campaigns
+			where campaign_name like '%IA%'
+			or campaign_name like '%indica%'
+			or campaign_name like '%Indica%'
+		group by
+			date_part('year', "date"::date),
+			date_part('month', "date"::date)
+	) afiliate_campaigns
+on campaign_year = date_part('year', dadosafiliado_inicio_atuacao)
+and campaign_month = date_part('month', dadosafiliado_inicio_atuacao)
 ;
