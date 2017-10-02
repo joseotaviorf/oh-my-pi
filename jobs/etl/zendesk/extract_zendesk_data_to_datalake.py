@@ -47,6 +47,10 @@ class ExtractZendeskDataToDatalake(object):
         result = self.zendesk_api.get_data()
         print ('result_type: {}'.format(type(result)))
 
+        if not result:
+            print('No data - {}'.format(self.human_readable_start_time))
+            return
+        
         if json.loads(str(self.output_gzip).lower()): # convert str to bool
             handle = None
             with BaseETL.open_gzip_fp('wb') as fp:
