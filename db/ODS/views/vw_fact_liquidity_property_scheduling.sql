@@ -3,7 +3,7 @@ drop view if exists vw_fact_liquidity_property_scheduling;
 create view vw_fact_liquidity_property_scheduling
 as
 select
-  id_property_scheduling as ods_id,
+  f.id_property_scheduling as ods_id,
   -- coalesce(f.id_imovel, -1) as sk_property,
   coalesce((f.id_imovel || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
   p."version"::integer as listing_number,
@@ -164,9 +164,7 @@ left join
 
 left join
   vw_imovel_liquidity_closing_costs c
-  on coalesce(f.id_scheduling, -1) = coalesce(c.id_scheduling, -1)
-  and coalesce(f.id_imovel, -1) = coalesce(c.id_imovel, -1)
-  and coalesce(f.id_contract, -1) = coalesce(c.id_contract, -1)
+  on c.id_property_scheduling = f.id_property_scheduling
 
 left join
   vw_imovel_liquidity_visit_costs v
