@@ -73,7 +73,8 @@ class AmplitudeETL(object):
                     type_mapping = 'string'
 
                 add_column_clean_query = './db/2.datalake/queries/amplitude/add_column_clean.sql'
-                self.athena_client.execute_file_query(add_column_clean_query, prefix, formatted_up, 'string', up)
+                self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix, 
+                                                                           formatted_up, 'string', up)
 
                 already_added_list.append(up)
 
