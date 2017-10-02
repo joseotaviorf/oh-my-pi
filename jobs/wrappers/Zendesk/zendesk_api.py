@@ -168,6 +168,9 @@ class ZendeskAPI(object):
             try:
                 r = result._response_json
                 items = r.get(self.object_type) or r.get('results')
+                if not items:
+                    return None
+                
                 for item in items:
                     updated_at = int(datetime.strptime(item.get(key_timestamp),'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get(key_timestamp) or self.start_time <= updated_at <= self.end_time:
