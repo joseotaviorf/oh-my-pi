@@ -74,7 +74,7 @@ CREATE TABLE dim_user (
   dadosafiliado_semana_ultima_comunicacao_balanco integer DEFAULT NULL,
   dadosafiliado_id_planilha_gdocs varchar(200) DEFAULT NULL,
   dadosafiliado_ativo integer DEFAULT NULL,
-  dadosafiliad_custo_aquisicao NUMERIC(18,4),
+  dadosafiliado_custo_aquisicao NUMERIC(18,4),
   dadosgerenteContas_inicio_contrato timestamp,
   dadosgerenteContas_nome varchar(255) DEFAULT NULL,
   active integer DEFAULT NULL,
