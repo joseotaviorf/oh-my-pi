@@ -135,6 +135,7 @@ class HelpCenter(object):
 
         return petl.todataframe(table)
 
+    @logger
     def get_data_from_elasticsearch(self, phone, email):
         result = self.es.search(index='users', params={'q': 'phone:{0}&email:{1}'.format(phone, email)})['hits']
         hits = result['hits']
@@ -144,6 +145,7 @@ class HelpCenter(object):
         for hit in hits:
             _logger.info(hit['_source'])
 
+    @logger
     def clean_elasticsearch(self):
         self.es.delete_by_query(index='users', doc_type='user', q={'match_all': {}})
 
