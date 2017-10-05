@@ -47,3 +47,4 @@ Cython==0.25.2
 createsend==4.2.1
 pycriteo==0.0.2
 git+git://github.com/quintoandar/zenpy.git
+elasticsearch==5.4.0
