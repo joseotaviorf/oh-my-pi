@@ -84,11 +84,11 @@ class EBDBDatalake(object):
             )
 
             self.athena_client.create_parquet_from_df(
-                key='clean/ebdb/{0}/{0}.parq'.format(table_name['new_name']),
+                key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),
                 df=df
             )
 
-            self.create_external_table(table_name['new_name'], ddl_suffix, table_info['original_name'])
+            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'])
 
     @logger
     def get_type_conversion_dict(self):
