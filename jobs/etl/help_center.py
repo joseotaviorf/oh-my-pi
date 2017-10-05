@@ -135,14 +135,19 @@ class HelpCenter(object):
 
         return petl.todataframe(table)
 
+    @logger
     def get_data_from_elasticsearch(self, phone, email):
-        result = self.es.search(index='user', params={'q': 'phone:{0}&email:{1}'.format(phone, email)})['hits']
+        result = self.es.search(index='users', params={'q': 'phone:{0}&email:{1}'.format(phone, email)})['hits']
         hits = result['hits']
         if len(hits) == 0:
             return
 
         for hit in hits:
             _logger.info(hit['_source'])
+
+    @logger
+    def clean_elasticsearch(self):
+        self.es.delete_by_query(index='users', doc_type='user', q={'match_all': {}})
 
     def send_data_to_elasticsearch(self, df_user):
         df_user = df_user.astype(object).where(pd.notnull(df_user), None)
@@ -189,6 +194,7 @@ if __name__ == '__main__':
 
     if args[1] == 'load_data':
         df = help_center.get_user_info()
+        help_center.clean_elasticsearch()
         help_center.send_data_to_elasticsearch(df_user=df)
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
