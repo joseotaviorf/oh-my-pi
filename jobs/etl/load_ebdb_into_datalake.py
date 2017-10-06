@@ -75,9 +75,10 @@ class EBDBDatalake(object):
         self.s3_client.Object(bucket_datalake, file_path).put(Body=csv_buffer.getvalue())
 
         _logger.info('m=move_to_datalake, msg={} moved to Datalake!'.format(table_name))
-
-    @logger
+        
     def transform_tables_to_clean(self, table_infos, ddl_suffix):
+        _logger.info('m=transform_tables_to_clean, msg=init')
+        
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe("""
                   select * from datalake_raw.ebdb_{}""".format(table_info['original_name'])
