@@ -7,11 +7,15 @@ import pandas as pd
 import petl
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../'))
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
+args=['asdas', 'load_data']
 help_center = json.loads(os.environ['help-center'])
 
 
@@ -147,7 +151,13 @@ class HelpCenter(object):
 
     @logger
     def clean_elasticsearch(self):
-        self.es.delete_by_query(index='users', doc_type='user', q={'match_all': {}})
+        success = False
+        while not success:
+            try:
+                response = self.es.delete_by_query(index='users', body={'query': {'match_all': dict()}})
+                success = not response['timed_out'] and len(response['failures']) == 0
+            except Exception as e:
+                _logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
 
     def send_data_to_elasticsearch(self, df_user):
         df_user = df_user.astype(object).where(pd.notnull(df_user), None)
@@ -193,8 +203,8 @@ if __name__ == '__main__':
     help_center = HelpCenter()
 
     if args[1] == 'load_data':
-        df = help_center.get_user_info()
+        # df = help_center.get_user_info()
         help_center.clean_elasticsearch()
-        help_center.send_data_to_elasticsearch(df_user=df)
+        # help_center.send_data_to_elasticsearch(df_user=df)
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
