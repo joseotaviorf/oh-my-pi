@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 
 import pandas as pd
@@ -164,12 +165,12 @@ class HelpCenter(object):
                 '_index': 'users',
                 '_type': 'user',
                 '_source': {
-                    'quintoandar_id': str(int(user_row['quintoandar_id'])) if user_row['quintoandar_id'] else None,
+                    'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
                     'names': list(
                         set(user_row['names'].split(','))
                     ) if user_row['names'] else None,
-                    'phone': str(int(user_row['phone'])) if user_row['phone'] else None,
+                    'phone': (re.sub('[^+\d]', '', (user_row['phone']))).strip() if user_row['phone'] else None,
                     'zendesk_ids': list(
                         set(user_row['zendesk_ids'].split(','))
                     ) if user_row['zendesk_ids'] else None,
