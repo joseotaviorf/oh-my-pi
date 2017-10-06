@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import sys
 
 import pandas as pd
@@ -160,11 +159,6 @@ class HelpCenter(object):
 
         actions = []
         for _, user_row in df_user.iterrows():
-            user_phone = None
-            if user_row['phone']:
-                user_phone_regex = re.sub('\D', '', (user_row['phone']))
-                user_phone = None if user_phone_regex == '' else str(int(user_phone_regex))
-
             actions.append({
                 '_op_type': 'index',
                 '_index': 'users',
@@ -175,7 +169,7 @@ class HelpCenter(object):
                     'names': list(
                         set(user_row['names'].split(','))
                     ) if user_row['names'] else None,
-                    'phone': user_phone,
+                    'phone': str(int(user_row['phone'])) if user_row['phone'] else None,
                     'zendesk_ids': list(
                         set(user_row['zendesk_ids'].split(','))
                     ) if user_row['zendesk_ids'] else None,
