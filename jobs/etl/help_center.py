@@ -7,15 +7,11 @@ import pandas as pd
 import petl
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
-
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-args=['asdas', 'load_data']
 help_center = json.loads(os.environ['help-center'])
 
 
@@ -203,8 +199,8 @@ if __name__ == '__main__':
     help_center = HelpCenter()
 
     if args[1] == 'load_data':
-        # df = help_center.get_user_info()
+        df = help_center.get_user_info()
         help_center.clean_elasticsearch()
-        # help_center.send_data_to_elasticsearch(df_user=df)
+        help_center.send_data_to_elasticsearch(df_user=df)
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
