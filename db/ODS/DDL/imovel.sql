@@ -130,6 +130,7 @@ CREATE TABLE public.imovel (
   info_visita_chave_box_quintoandar INTEGER,
   data_criacao TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
   atualizado_em TIMESTAMP WITHOUT TIME zone,
-  usuario_que_cadastrou_id INTEGER
+  usuario_que_cadastrou_id INTEGER,
+  imovel_v3 INTEGER
 )
 WITH (oids = false);

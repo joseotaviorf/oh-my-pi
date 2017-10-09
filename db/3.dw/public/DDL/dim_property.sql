@@ -119,6 +119,7 @@ CREATE TABLE public.dim_property (
   etapa_data_mob_vistoria TIMESTAMP WITHOUT TIME ZONE,
   first_publication TIMESTAMP WITHOUT TIME ZONE,
   publication_date TIMESTAMP WITHOUT TIME ZONE,
+  de_publication_date TIMESTAMP WITHOUT TIME ZONE,
   first_booking_date TIMESTAMP WITHOUT TIME ZONE,
   first_booking_confirmed_date TIMESTAMP WITHOUT TIME ZONE,
   first_visit_date TIMESTAMP WITHOUT TIME ZONE,
@@ -163,7 +164,8 @@ CREATE TABLE public.dim_property (
   atualizado_em TIMESTAMP WITHOUT TIME ZONE,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
   usuario_que_cadastrou_id INTEGER,
+
+  property_v3 INTEGER
   
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
-  
