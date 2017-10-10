@@ -1,7 +1,23 @@
 create or replace view public.vw_dim_property 
 as
 
-with imovel_dates as
+with de_published_dates as ( 
+    select distinct 
+        vpl.id, 
+        vpl.version, 
+        vpl.min_version_time, 
+        vpl.max_version_time, 
+        vpl.last_status_version, 
+        ish.status_history, 
+        max(ish.status_time) over (partition by ish.id, vpl.version) as de_publication_date
+    from vw_property_listing vpl
+    left join imovel_status_history ish
+        on ish.id = vpl.id
+          and ish.status_time between coalesce(vpl.min_version_time, '1900-01-01') 
+                                  and coalesce(vpl.max_version_time, '2300-01-01')
+          and ish.status_history = 'despublicado'
+),
+imovel_dates as
 (
 	SELECT 
 		im.id,
@@ -10,6 +26,7 @@ with imovel_dates as
 	  pl.max_version_time,
 	  pl.last_status_version,
 	  pl.publication_date,
+	  ud.de_publication_date,
 	  pl.nr_listing,
 		pl.nr_renting,
 	  min(b."criadoEm") AS first_booking_date,
@@ -158,16 +175,22 @@ with imovel_dates as
 	LEFT JOIN 
 		contract c 
 		ON c.proposta_id = p.id
+
+	LEFT JOIN
+	    de_published_dates ud
+	    ON ud.id = pl.id
+	      AND ud.version = pl.version
 		
 	GROUP BY 
 		im.id, 
 		pl.version, 
 		pl.min_version_time, 
 		pl.max_version_time,
-	  pl.last_status_version, 
-	  pl.publication_date,
-	  pl.nr_listing,
-		pl.nr_renting
+	    pl.last_status_version,
+	    pl.publication_date,
+	    pl.nr_listing,
+		pl.nr_renting,
+		ud.de_publication_date
 )
 SELECT 
 	((i.id || '00') || COALESCE(imovel_dates.version, 1))::bigint AS sk_property,
@@ -289,6 +312,7 @@ SELECT
   i.etapa_data_mob_vistoria,
   COALESCE(h.dt_first_publication, i.first_publication) AS first_publication,
   imovel_dates.publication_date,
+  imovel_dates.de_publication_date,
   imovel_dates.first_booking_date,
   imovel_dates.first_booking_confirmed_date,
   imovel_dates.first_visit_date,
@@ -330,7 +354,9 @@ SELECT
   i.data_criacao,
   i.atualizado_em,
   now() AS load_timestamp,
-  i.usuario_que_cadastrou_id
+  i.usuario_que_cadastrou_id,
+  
+  i.imovel_v3 as property_v3
 
 from 
 	imovel i
