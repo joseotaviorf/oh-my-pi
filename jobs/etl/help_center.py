@@ -135,8 +135,9 @@ class HelpCenter(object):
 
         return petl.todataframe(table)
 
+    @logger
     def get_data_from_elasticsearch(self, phone, email):
-        result = self.es.search(index='user', params={'q': 'phone:{0}&email:{1}'.format(phone, email)})['hits']
+        result = self.es.search(index='users', params={'q': 'phone:{0}&email:{1}'.format(phone, email)})['hits']
         hits = result['hits']
         if len(hits) == 0:
             return
@@ -144,27 +145,32 @@ class HelpCenter(object):
         for hit in hits:
             _logger.info(hit['_source'])
 
+    @logger
+    def clean_elasticsearch(self):
+        success = False
+        while not success:
+            try:
+                response = self.es.delete_by_query(index='users', body={'query': {'match_all': dict()}})
+                success = not response['timed_out'] and len(response['failures']) == 0
+            except Exception as e:
+                _logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
+
     def send_data_to_elasticsearch(self, df_user):
         df_user = df_user.astype(object).where(pd.notnull(df_user), None)
 
         actions = []
         for _, user_row in df_user.iterrows():
-            user_phone = None
-            if user_row['phone']:
-                user_phone_regex = re.sub('\D', '', (user_row['phone']))
-                user_phone = None if user_phone_regex == '' else str(int(user_phone_regex))
-
             actions.append({
                 '_op_type': 'index',
                 '_index': 'users',
                 '_type': 'user',
                 '_source': {
-                    'quintoandar_id': str(int(user_row['quintoandar_id'])) if user_row['quintoandar_id'] else None,
+                    'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
                     'names': list(
                         set(user_row['names'].split(','))
                     ) if user_row['names'] else None,
-                    'phone': user_phone,
+                    'phone': (re.sub('[^+\d]', '', (user_row['phone']))).strip() if user_row['phone'] else None,
                     'zendesk_ids': list(
                         set(user_row['zendesk_ids'].split(','))
                     ) if user_row['zendesk_ids'] else None,
@@ -189,6 +195,7 @@ if __name__ == '__main__':
 
     if args[1] == 'load_data':
         df = help_center.get_user_info()
+        help_center.clean_elasticsearch()
         help_center.send_data_to_elasticsearch(df_user=df)
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))

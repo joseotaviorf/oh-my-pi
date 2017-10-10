@@ -139,7 +139,10 @@ select -- count(1)
 	
   i.dataCriacao as data_criacao,
   i.atualizadoEm as atualizado_em,
-  i.usuarioQueCadastrou_id as usuario_que_cadastrou_id
+  i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
+
+  i.announcedBy is not null
+    or i.announcedBy_id is not null as imovel_v3
 
 from 
   Imovel i
