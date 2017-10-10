@@ -115,20 +115,23 @@ class ContractDashboard(object):
     # @logger
     def get_new_data(self):
         sign_tasks = self.__get_new_signature_tasks()
-        assignee_id_list = list(petl.values(sign_tasks, 'agent_id'))
-        assignee_names = self.__get_assignee_names_from_id(assignee_id_list)
+        if len(sign_tasks) > 1:
+            assignee_id_list = list(petl.values(sign_tasks, 'agent_id'))
+            assignee_names = self.__get_assignee_names_from_id(assignee_id_list)
 
-        sign_tasks = petl.leftjoin(sign_tasks, assignee_names, key='agent_id')
-        signed_contracts = list(petl.values(self.__get_new_signed_contracts(), 'imovel_id'))
-        signed_contracts = list([['imovel_id']]) + map(lambda x: [x], signed_contracts)
+            sign_tasks = petl.leftjoin(sign_tasks, assignee_names, key='agent_id')
+            signed_contracts = list(petl.values(self.__get_new_signed_contracts(), 'imovel_id'))
+            signed_contracts = list([['imovel_id']]) + map(lambda x: [x], signed_contracts)
 
-        signed_contracts = petl.rightjoin(
-                                signed_contracts,
-                                sign_tasks,
-                                key='imovel_id'
-                            )
+            signed_contracts = petl.rightjoin(
+                                    signed_contracts,
+                                    sign_tasks,
+                                    key='imovel_id'
+                                )
 
-        return petl.todataframe(signed_contracts)
+            return petl.todataframe(signed_contracts)
+        else:
+            return None
 
     @logger
     def push_updated_data(self, new_data):
@@ -141,5 +144,8 @@ if __name__ == '__main__':
     _logger.info('m=__main__, msg=starting execution fetch={0} run={1}'.format(fetch_timedelta, run_time))
     contract_dashboard = ContractDashboard(run_time, fetch_timedelta)
     updated_data = contract_dashboard.get_new_data()
-    resp = contract_dashboard.push_updated_data(updated_data)
-    _logger.info('m=__main__, msg=pwbi response {}'.format(resp))
+    if updated_data is not None:
+        resp = contract_dashboard.push_updated_data(updated_data)
+        _logger.info('m=__main__, msg=pwbi response {}'.format(resp))
+    else:
+        _logger.info('m=__main__, msg=no new contracts')
