@@ -1,5 +1,5 @@
 select
-	_id,  
+  _id,  
   type,
   datainicio as start_date,
   realizadaem as performed_date,
@@ -12,10 +12,10 @@ select
   workgrouptitle as workgroup_title,
   destinatarioid as recipient_id,
   status,
-  substring(descricao, 1, 200)  as description,
+  descricao as description,
   titulo as title,
   extracted_on
 from
-	datalake_raw.crm_tasks
+  datalake_raw.crm_tasks
 where
-	extracted_on = cast('{}' as date)
+  extracted_on = cast('{}' as date)
