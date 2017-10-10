@@ -27,6 +27,7 @@ pyOpenSSL==16.2.0
 PySocks==1.6.4
 python-dateutil==2.5.3
 pytz==2016.7
+pymongo=3.5.1
 PyYAML==3.12
 requests==2.11.1
 rsa==3.4.2
