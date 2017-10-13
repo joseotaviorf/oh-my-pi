@@ -14,18 +14,14 @@ athena_db = 'datalake_raw'
 schema_name = 'ebdb'
 
 CLEAN_TABLE_INFOS = [
-    {
-        'original_name': 'contratopessoa',
-        'new_name': 'contract_person'
-    },
-    {
-        'original_name': 'propostaproponente',
-        'new_name': 'proponent_proposal'
-    },
-    {
-        'original_name': 'usuario',
-        'new_name': 'user'
-    }
+    {'original_name': 'contratopessoa', 'new_name': 'contract_person'},
+    {'original_name': 'propostaproponente', 'new_name': 'proponent_proposal'},
+    {'original_name': 'usuario', 'new_name': 'user'},
+    {'original_name': 'Entrance', 'new_name': 'entrance'},
+    {'original_name': 'Agendamento', 'new_name': 'booking'},
+    {'original_name': 'Visita', 'new_name': 'visit'},
+    {'original_name': 'Visitor', 'new_name': 'visitor'},
+    {'original_name': 'FollowUpDetails', 'new_name': 'follow_up_details'},
 ]
 
 class EBDBDatalake(object):
