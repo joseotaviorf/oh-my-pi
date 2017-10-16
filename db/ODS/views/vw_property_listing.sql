@@ -125,12 +125,40 @@ prev_listing as
     row_number() over (partition by id, version order by status_time desc) as rn,
     min(status_time) 
     	filter (where status_history in ('publicado', 'alugado')) 
-    	over (partition by id, version order by status_time) as publication_date
+    	over (partition by id, version order by status_time) as publication_date,
+    max(status_time)
+    	filter (where status_history in ('publicado'))
+    	over (partition by id, version order by status_time) as last_publication_date
   from
     result_version
-)
--- select * from prev_listing where id = 892763959
-,last_version as
+),
+last_pub as (
+	select
+		pl.id,
+		pl.status_history,
+		pl.status_time,
+		pl.min_version_time,
+		pl.max_version_time,
+		pl.version,
+		pl.rn,
+		pl.publication_date,
+		pl_max.last_pub_date as last_publication_date
+	from
+		prev_listing pl
+	left join
+		(
+			select
+				id,
+				version,
+				max(last_publication_date) as last_pub_date
+			from
+				prev_listing
+			group by id, version
+
+		) pl_max
+	on pl.id = pl_max.id and pl.version = pl_max.version
+),
+last_version as
 (
 	select distinct
 	  id,
@@ -138,26 +166,27 @@ prev_listing as
 	  min_version_time,
 	  max_version_time,
 	  publication_date,
-	  last_value(status_history) 
+	  last_publication_date,
+	  last_value(status_history)
 	  	over (
 	  		partition by id, version
 	  		order by status_time
 	  		RANGE BETWEEN current row AND unbounded following
 	  	) as last_status_version
 	from
-	  prev_listing
+	  last_pub
 	-- where rn = 1
 )
 -- select * from last_version where id = 892763959
 ,prev as
 (
-	select	
+	select
 		*,
-		lag(last_status_version) over (partition by id order by version) prev_status	
+		lag(last_status_version) over (partition by id order by version) prev_status
 	from
-		last_version	
-	where 
-		publication_date is not null 
+		last_version
+	where
+		publication_date is not null
 ),
 rent as
 (
@@ -168,11 +197,12 @@ rent as
 		max_version_time,
 		last_status_version,
 		coalesce(publication_date, max_version_time) as publication_date,
+		last_publication_date,
 		case coalesce(prev_status, 'alugado') when 'alugado' then 1 else 0 end as prev_rented,
 		case coalesce(last_status_version, 'alugado') when 'alugado' then 1 else 0 end as rented
 	from
 		prev
-	
+
 ),
 relisting as
 (
@@ -191,7 +221,9 @@ select
 	last_status_version,
 	nr_listing,
 	nr_renting,
-	min(publication_date) over (partition by id,nr_listing order by version) as publication_date -- considering nr_relisting rule instead of version!
+	min(publication_date) over (partition by id,nr_listing order by version) as publication_date,
+	last_publication_date
+
 from
 	relisting
 -- where

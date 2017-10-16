@@ -8,6 +8,7 @@ CREATE TABLE public.property_listing (
 	nr_listing integer null,
 	nr_renting integer null,
 	publication_date timestamp NULL,
+	last_publication_date timestamp NULL,
 	CONSTRAINT property_listing_pk PRIMARY KEY (id,"version")
 )
 WITH (
