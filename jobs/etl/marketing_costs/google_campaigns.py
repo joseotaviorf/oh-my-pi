@@ -9,7 +9,7 @@ class GoogleCampaigns(object):
     def __init__(self, config_string):
         # Initialize appropriate service.
         self.client = adwords.AdWordsClient.LoadFromString(config_string)
-        self.report_downloader = self.client.GetReportDownloader(version='v201609')
+        self.report_downloader = self.client.GetReportDownloader(version='v201708')
 
     def extract_google_marketing_campaigns(self, dt):
         # Create report query.

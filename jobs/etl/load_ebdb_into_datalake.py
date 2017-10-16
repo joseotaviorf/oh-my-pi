@@ -13,10 +13,21 @@ bucket_datalake = os.environ['bi-datalake-s3-bucket']
 athena_db = 'datalake_raw'
 schema_name = 'ebdb'
 
+CLEAN_TABLE_INFOS = [
+    {'original_name': 'contratopessoa', 'new_name': 'contract_person'},
+    {'original_name': 'propostaproponente', 'new_name': 'proponent_proposal'},
+    {'original_name': 'usuario', 'new_name': 'user'},
+    {'original_name': 'Entrance', 'new_name': 'entrance'},
+    {'original_name': 'Agendamento', 'new_name': 'booking'},
+    {'original_name': 'Visita', 'new_name': 'visit'},
+    {'original_name': 'Visitor', 'new_name': 'visitor'},
+    {'original_name': 'FollowUpDetails', 'new_name': 'follow_up_details'},
+]
 
 class EBDBDatalake(object):
     def __init__(self):
         self.s3_client = boto3.resource('s3')
+        self.athena_client = AthenaClient(bucket_datalake)
 
     @logger
     def move_to_datalake(self, table_name):
@@ -60,6 +71,21 @@ class EBDBDatalake(object):
         self.s3_client.Object(bucket_datalake, file_path).put(Body=csv_buffer.getvalue())
 
         _logger.info('m=move_to_datalake, msg={} moved to Datalake!'.format(table_name))
+        
+    def transform_tables_to_clean(self, table_infos, ddl_suffix):
+        _logger.info('m=transform_tables_to_clean, msg=init')
+        
+        for table_info in table_infos:
+            df = self.athena_client.execute_query_and_return_dataframe("""
+                  select * from datalake_raw.ebdb_{}""".format(table_info['original_name'])
+            )
+
+            self.athena_client.create_parquet_from_df(
+                key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),
+                df=df
+            )
+
+            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'])
 
     @logger
     def get_type_conversion_dict(self):
@@ -84,26 +110,22 @@ class EBDBDatalake(object):
             conversions[k] = v
         return conversions
 
-    def create_external_table(self, table_name, conv):
-        columns = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, schema_name)
-        c = AthenaClient(bucket_datalake)
-        c.execute_query_and_wait_for_results(
+    def create_external_table(self, table_name, ddl_suffix, original_table_name=None):
+        if not original_table_name:
+            original_table_name = table_name
+
+        columns = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, original_table_name, schema_name)
+        self.athena_client.execute_query_and_wait_for_results(
             'drop table if exists {}.{}_{};'.format(athena_db, schema_name, table_name))
 
         command = 'create external table {}.{}_{} (\n'.format(athena_db, schema_name, table_name)
         for column, original_type in columns:
-            command += '\t{} string,\n'.format(column, conv[original_type])
+            command += '\t{} string,\n'.format(column)
             # command += '\t{} {},\n'.format(column, conv[original_type])
         command = command[:-2]  # remove last comma
-        command += """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-                         with serdeproperties (
-                           'separatorChar' = ',',
-                           'quoteChar' = '\"'
-                         )
-                        stored as textfile
-                        location 's3://{}/raw/{}/{}/'""".format(bucket_datalake, schema_name, table_name)
+        command += ddl_suffix.format(bucket_datalake, schema_name, table_name)
 
-        c.execute_query_and_wait_for_results(command)
+        self.athena_client.execute_query_and_wait_for_results(command)
 
     @logger
     def get_table_names(self, skip_header=True):
@@ -128,9 +150,20 @@ if __name__ == '__main__':
     if args[1] == 'move':
         for table_name in table_names:
             ebdb_datalake.move_to_datalake(table_name[0])
-    elif args[1] == 'create_tables':
+    elif args[1] == 'create_raw_tables':
         conversions = ebdb_datalake.get_type_conversion_dict()
+        ddl_suffix = """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+                                 with serdeproperties (
+                                   'separatorChar' = ',',
+                                   'quoteChar' = '\"'
+                                 )
+                                stored as textfile
+                                location 's3://{}/raw/{}/{}/'"""
         for table_name in table_names:
-            ebdb_datalake.create_external_table(table_name[0], conversions)
+            ebdb_datalake.create_external_table(table_name[0], ddl_suffix)
+    elif args[1] == 'transform_tables_to_clean':
+        ddl_suffix = """) stored as parquet
+                                location 's3://{}/clean/{}/{}/'"""
+        ebdb_datalake.transform_tables_to_clean(CLEAN_TABLE_INFOS, ddl_suffix)
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))

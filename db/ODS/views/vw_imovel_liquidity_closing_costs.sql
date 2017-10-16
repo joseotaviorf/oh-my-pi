@@ -3,6 +3,7 @@ create view vw_imovel_liquidity_closing_costs as
 -- closing support
 -- ratear custo do mes, por dia pelos imoveis que tiveram contrato
 select
+    p.id_property_scheduling,
 	c."criadoEm"::date as contract_date,
     p.id_scheduling,
     p.id_imovel,
