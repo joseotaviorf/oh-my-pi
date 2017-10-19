@@ -1,5 +1,5 @@
-create or replace view vw_supply_mkt_owner_campaigns_costs as
-with google_monthly_supply_costs as (
+create or replace view vw_supply_mkt_affiliate_campaigns_costs as
+with google_monthly_affiliate_costs as (
 	select
 		date_part('month', "day"::date) as "month",
 		date_part('year', "day"::date) as "year",
@@ -7,15 +7,12 @@ with google_monthly_supply_costs as (
 	from
 		google_ads_campaigns
 	where
-		(
-			campaign like '%proprietarios%' or
-			campaign like '%lp_quanto_cobrar%'
-		)
+		campaign like '%indicaai%'
 	group by
 		date_part('month', "day"::date),
 		date_part('year', "day"::date)
 ),
-facebook_monthly_supply_costs as
+facebook_monthly_affiliate_costs as
 (
 	select
         date_part('month', "date"::date) as "month",
@@ -35,16 +32,16 @@ facebook_monthly_supply_costs as
         date_part('month', "date"::date),
         date_part('year', "date"::date)
 ),
-supply_mkt_costs as
+supply_affiliate_costs as
 (
 	select
 		coalesce(g."month", f."month") as month,
 		coalesce(g."year", f."year") as year,
 		(coalesce(g.cost, 0) + coalesce(f.cost, 0)) as cost
 	from
-		google_monthly_supply_costs g
+		google_monthly_affiliate_costs g
 	full outer join
-		facebook_monthly_supply_costs f
+		facebook_monthly_affiliate_costs f
 	on g."year" = f."year" and f."month" = g."month"
 )
 select
@@ -55,10 +52,10 @@ publication_date::date as sk_cash_flow_date,
 	partition by
 	date_part('year', publication_date),
 	date_part('month', publication_date)
-))::decimal(14,4) as vl_owner_campaigns
+))::decimal(14,4) as vl_affiliate_campaigns
 from
 	vw_base_property_costs base
 left join
-	supply_mkt_costs mkt
+	supply_affiliate_costs mkt
 	on date_part('year', publication_date) = mkt.year
 	and date_part('month', publication_date) = mkt.month
