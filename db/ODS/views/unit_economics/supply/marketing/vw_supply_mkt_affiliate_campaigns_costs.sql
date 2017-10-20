@@ -1,4 +1,11 @@
+drop view vw_supply_mkt_affiliate_campaigns_costs;
+---
+--- Returns vl_affiliate_campaigns costs for each versioned property
+--- Cost: Affiliate Campaigns for Google Adwords, Facebook
+--- Cash Flow Date: Date of Listing
+---
 create or replace view vw_supply_mkt_affiliate_campaigns_costs as
+-- Get Google Ads Supply Affiliate Per Year-Month
 with google_monthly_affiliate_costs as (
 	select
 		date_part('month', "day"::date) as "month",
@@ -12,6 +19,7 @@ with google_monthly_affiliate_costs as (
 		date_part('month', "day"::date),
 		date_part('year', "day"::date)
 ),
+-- Get Facebook Supply Affiliate Per Year-Month
 facebook_monthly_affiliate_costs as
 (
 	select
@@ -32,7 +40,8 @@ facebook_monthly_affiliate_costs as
         date_part('month', "date"::date),
         date_part('year', "date"::date)
 ),
-supply_affiliate_costs as
+-- Join all costs into one single table
+affiliate_mkt_costs as
 (
 	select
 		coalesce(g."month", f."month") as month,
@@ -43,19 +52,29 @@ supply_affiliate_costs as
 	full outer join
 		facebook_monthly_affiliate_costs f
 	on g."year" = f."year" and f."month" = g."month"
+),
+-- Divide all costs among versioned properties
+divided_costs as (
+	select
+		sk_property,
+		imovel_id as property_id,
+		publication_date::date as dt_cash_flow,
+		(coalesce(mkt.cost, 0)/count(1) over (
+			partition by
+			date_part('year', publication_date),
+			date_part('month', publication_date)
+		))::decimal(14,4) as vl_affiliate_campaigns
+	from
+		vw_base_property_costs base
+	left join
+		affiliate_mkt_costs mkt
+		on date_part('year', publication_date) = mkt.year
+		and date_part('month', publication_date) = mkt.month
 )
+-- Remove rows where costs equal zero
 select
-sk_property,
-imovel_id as property_id,
-publication_date::date as sk_cash_flow_date,
-(coalesce(mkt.cost, 0)/count(1) over (
-	partition by
-	date_part('year', publication_date),
-	date_part('month', publication_date)
-))::decimal(14,4) as vl_affiliate_campaigns
+	*
 from
-	vw_base_property_costs base
-left join
-	supply_affiliate_costs mkt
-	on date_part('year', publication_date) = mkt.year
-	and date_part('month', publication_date) = mkt.month
+	divided_costs
+where
+	vl_affiliate_campaigns <> 0
