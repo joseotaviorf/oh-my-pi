@@ -2,7 +2,7 @@ drop view vw_supply_mkt_owner_campaigns_costs;
 ---
 --- Returns vl_owner_campaigns costs for each versioned property
 --- Cost: Owner Campaigns for Google Adwords, Facebook
---- Cash Flow Date: Date of Listing
+--- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
 create or replace view vw_supply_mkt_owner_campaigns_costs as
 -- Get Google Ads Owner Costs Per Year-Month
@@ -61,7 +61,7 @@ divided_costs as (
 	select
 		sk_property,
 		imovel_id as property_id,
-		publication_date::date as dt_cash_flow,
+		date_trunc('month', publication_date + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
 			date_part('year', publication_date),
