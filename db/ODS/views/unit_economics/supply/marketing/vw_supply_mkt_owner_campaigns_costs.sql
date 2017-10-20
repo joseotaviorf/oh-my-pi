@@ -1,5 +1,12 @@
+drop view vw_supply_mkt_owner_campaigns_costs;
+---
+--- Returns vl_owner_campaigns costs for each versioned property
+--- Cost: Owner Campaigns for Google Adwords, Facebook
+--- Cash Flow Date: Date of Listing
+---
 create or replace view vw_supply_mkt_owner_campaigns_costs as
-with google_monthly_supply_costs as (
+-- Get Google Ads Owner Costs Per Year-Month
+with google_monthly_owner_costs as (
 	select
 		date_part('month', "day"::date) as "month",
 		date_part('year', "day"::date) as "year",
@@ -15,7 +22,8 @@ with google_monthly_supply_costs as (
 		date_part('month', "day"::date),
 		date_part('year', "day"::date)
 ),
-facebook_monthly_supply_costs as
+-- Get Facebook Owner Costs Per Year-Month
+facebook_monthly_owner_costs as
 (
 	select
         date_part('month', "date"::date) as "month",
@@ -35,30 +43,41 @@ facebook_monthly_supply_costs as
         date_part('month', "date"::date),
         date_part('year', "date"::date)
 ),
-supply_mkt_costs as
+-- Join all costs into one single table
+owner_mkt_costs as
 (
 	select
 		coalesce(g."month", f."month") as month,
 		coalesce(g."year", f."year") as year,
 		(coalesce(g.cost, 0) + coalesce(f.cost, 0)) as cost
 	from
-		google_monthly_supply_costs g
+		google_monthly_owner_costs g
 	full outer join
-		facebook_monthly_supply_costs f
+		facebook_monthly_owner_costs f
 	on g."year" = f."year" and f."month" = g."month"
+),
+-- Divide all costs among versioned properties
+divided_costs as (
+	select
+		sk_property,
+		imovel_id as property_id,
+		publication_date::date as dt_cash_flow,
+		(coalesce(mkt.cost, 0)/count(1) over (
+			partition by
+			date_part('year', publication_date),
+			date_part('month', publication_date)
+		))::decimal(14,4) as vl_owner_campaigns
+	from
+		vw_base_property_costs base
+	left join
+		owner_mkt_costs mkt
+		on date_part('year', publication_date) = mkt.year
+		and date_part('month', publication_date) = mkt.month
 )
+-- Remove rows where costs equal zero
 select
-sk_property,
-imovel_id as property_id,
-publication_date::date as sk_cash_flow_date,
-(coalesce(mkt.cost, 0)/count(1) over (
-	partition by
-	date_part('year', publication_date),
-	date_part('month', publication_date)
-))::decimal(14,4) as vl_owner_campaigns
+	*
 from
-	vw_base_property_costs base
-left join
-	supply_mkt_costs mkt
-	on date_part('year', publication_date) = mkt.year
-	and date_part('month', publication_date) = mkt.month
+	divided_costs
+where
+	vl_owner_campaigns <> 0
