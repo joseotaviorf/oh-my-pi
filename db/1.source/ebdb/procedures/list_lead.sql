@@ -68,7 +68,7 @@ select  -- count(1)
   l.utmMedium as utm_medium,
   l.utmCampaign as utm_campaign,
   l.utmSource as utm_source,
-  da.usuario_id as usuario_que_indicou_id
+  ua.id as usuario_que_indicou_id
 from 
   Lead l
 left join
@@ -97,8 +97,8 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
--- left join
-  -- Usuario ua
-  -- on da.usuario_id=ua.id
+ left join
+   Usuario ua
+   on da.id=ua.dadosAfiliado_id
 ;
 END
