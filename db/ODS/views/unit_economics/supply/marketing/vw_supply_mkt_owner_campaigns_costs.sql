@@ -60,7 +60,7 @@ owner_mkt_costs as
 divided_costs as (
 	select
 		sk_property,
-		imovel_id as property_id,
+		property_id,
 		date_trunc('month', publication_date + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
@@ -73,6 +73,8 @@ divided_costs as (
 		owner_mkt_costs mkt
 		on date_part('year', publication_date) = mkt.year
 		and date_part('month', publication_date) = mkt.month
+	-- filter by first version only, as is a supply cost
+	where mod(base.sk_property, 100) = 1
 )
 -- Remove rows where costs equal zero
 select
