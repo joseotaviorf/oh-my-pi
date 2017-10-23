@@ -2,7 +2,7 @@ drop table if exists public.fact_property_economics;
 create table if not exists public.fact_property_economics (
     sk_property bigint not null,
     property_id bigint not null,
-    sk_cash_flow_date date not null,  
+    sk_cash_flow_date bigint not null,  
     vl_owner_campaigns double precision,
     vl_affiliate_campaigns double precision,
     vl_inside_sales double precision,
