@@ -1,4 +1,4 @@
-﻿DROP PROCEDURE IF EXISTS ebdb.list_imovel;
+DROP PROCEDURE IF EXISTS ebdb.list_imovel;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_imovel()
@@ -142,7 +142,9 @@ select -- count(1)
   i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
 
   i.announcedBy is not null
-    or i.announcedBy_id is not null as imovel_v3
+    or i.announcedBy_id is not null as imovel_v3,
+
+  cl.tipo as tipo_lead
 
 from 
   Imovel i
@@ -216,6 +218,8 @@ left join
     group by iv.Imovel_id
 ) iv
   on iv.Imovel_id = i.id
+left join ConversaoLead cl
+   on cl.imovel_id = i.id
 ;
 
 end
