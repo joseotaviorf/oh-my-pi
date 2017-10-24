@@ -356,9 +356,7 @@ SELECT
   now() AS load_timestamp,
   i.usuario_que_cadastrou_id,
   
-  i.imovel_v3 as property_v3,
-  
-  i.tipo_lead as lead_type
+  i.imovel_v3 as property_v3
 
 from 
 	imovel i
