@@ -6,9 +6,16 @@ drop view vw_liquidity_costs;
 ---
 create or replace view vw_liquidity_costs as
 select
-	sk_property,
-	property_id,
-	dt_cash_flow,
-	vl_tenant_campaigns
+  coalesce(mkt.sk_property, ops.sk_property) as sk_property,
+  coalesce(mkt.property_id, ops.property_id) as property_id,
+  coalesce(mkt.dt_cash_flow, ops.dt_cash_flow) as dt_cash_flow,
+  coalesce(mkt.vl_tenant_campaigns, 0)::decimal(14,4) as vl_tenant_campaigns,
+  coalesce(ops.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
+  coalesce(ops.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
+  coalesce(ops.vl_field_ops, 0) as vl_field_ops
 from
-	vw_liquidity_mkt_costs
+	vw_liquidity_mkt_costs mkt
+full outer join vw_liquidity_ops_costs ops
+  on mkt.sk_property = ops.sk_property
+     and mkt.dt_cash_flow = ops.dt_cash_flow
+;
