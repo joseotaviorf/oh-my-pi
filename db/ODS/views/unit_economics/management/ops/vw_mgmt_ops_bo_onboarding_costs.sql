@@ -27,7 +27,7 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_onboarding
     from filtered_contracts fc
     join cdre_onboarding co
-      on co.dre_date between date_trunc('month', fc."from") and co.dre_date = date_trunc('month', fc."to")
+      on co.dre_date between date_trunc('month', fc."from") and date_trunc('month', fc."to")
 )
 select
   vbpc.sk_property,
