@@ -1,5 +1,5 @@
 drop view if exists vw_liquidity_ops_bo_pre_sale_costs;
-create view vw_liquidity_ops_bo_pre_sale_costs as
+create or replace view vw_liquidity_ops_bo_pre_sale_costs as
 with cdre_bo_pre_sale as (
     select
       "Value" as "value",
@@ -16,7 +16,6 @@ filtered_contracts as (
     where tipo = 'FullService'
       and ("criadoEm" is not null
            or "dataAssinado" is not null)
-           and imovel_id = 892778190
 ),
 costs as (
     select

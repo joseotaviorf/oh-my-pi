@@ -1,5 +1,5 @@
 drop view if exists vw_mgmt_ops_bo_onboarding_costs;
-create view vw_mgmt_ops_bo_onboarding_costs as
+create or replace view vw_mgmt_ops_bo_onboarding_costs as
 with cdre_onboarding as (
     select
       "Value" as "value",

@@ -1,5 +1,5 @@
 drop view if exists vw_mgmt_ops_bo_ongoing_costs;
-create view vw_mgmt_ops_bo_ongoing_costs as
+create or replace view vw_mgmt_ops_bo_ongoing_costs as
 with cdre_ongoing as (
     select
       "Value" as "value",

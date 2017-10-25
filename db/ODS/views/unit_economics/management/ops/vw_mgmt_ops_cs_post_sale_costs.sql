@@ -1,5 +1,5 @@
 drop view if exists vw_mgmt_ops_cs_post_sale_costs;
-create view vw_mgmt_ops_cs_post_sale_costs as
+create or replace view vw_mgmt_ops_cs_post_sale_costs as
 with cdre_cs_post_sale as (
     select
       "Value" as "value",

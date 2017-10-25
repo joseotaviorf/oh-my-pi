@@ -1,5 +1,5 @@
 drop view if exists vw_liquidity_ops_field_ops_costs;
-create view vw_liquidity_ops_field_ops_costs as
+create or replace view vw_liquidity_ops_field_ops_costs as
 with cdre_field_ops as (
     select
       "Value" as "value",

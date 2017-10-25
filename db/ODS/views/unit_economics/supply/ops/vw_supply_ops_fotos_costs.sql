@@ -1,5 +1,5 @@
 drop view if exists vw_supply_ops_photos_costs;
-create view vw_supply_ops_photos_costs as
+create or replace view vw_supply_ops_photos_costs as
 with cdre_photos as (
     select
       "Value" as "value",

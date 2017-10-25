@@ -1,5 +1,5 @@
 drop view if exists vw_mgmt_ops_bo_offboarding_costs;
-create view vw_mgmt_ops_bo_offboarding_costs as
+create or replace view vw_mgmt_ops_bo_offboarding_costs as
 with cdre_offboarding as (
     select
       "Value" as "value",

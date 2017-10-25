@@ -1,5 +1,5 @@
 drop view if exists vw_supply_ops_inside_sales_costs;
-create view vw_supply_ops_inside_sales_costs as
+create or replace view vw_supply_ops_inside_sales_costs as
 with cdre_inside_sales as (
     select
       "Value" as "value",

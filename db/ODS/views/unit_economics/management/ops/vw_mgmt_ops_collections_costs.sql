@@ -1,5 +1,5 @@
 drop view if exists vw_mgmt_ops_collections_costs;
-create view vw_mgmt_ops_collections_costs as
+create or replace view vw_mgmt_ops_collections_costs as
 with rent_delay as (
   select
    contract_id,

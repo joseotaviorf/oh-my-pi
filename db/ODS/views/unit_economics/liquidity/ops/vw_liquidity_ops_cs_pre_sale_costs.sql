@@ -1,5 +1,5 @@
 drop view if exists vw_liquidity_ops_cs_pre_sale_costs;
-create view vw_liquidity_ops_cs_pre_sale_costs as
+create or replace view vw_liquidity_ops_cs_pre_sale_costs as
 with cdre_cs_pre_sale as (
     select
       "Value" as "value",
