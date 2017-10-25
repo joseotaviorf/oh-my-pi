@@ -35,7 +35,7 @@ facebook_monthly_affiliate_costs as
             campaign_name like '%IA%'
             or campaign_name like '%indica%'
             or campaign_name like '%Indica%'
-        ) is false
+        ) is true
     group by
         date_part('month', "date"::date),
         date_part('year', "date"::date)
