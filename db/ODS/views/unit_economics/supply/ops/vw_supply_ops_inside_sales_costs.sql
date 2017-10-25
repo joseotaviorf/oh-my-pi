@@ -12,9 +12,9 @@ filtered_properties as (
       vpl.id as property_id,
       vpl.min_version_time::date as listing_date
     from vw_property_listing vpl
-    join imovel i
-      on vpl.id = i.id
-    where i.tipo_lead = 'InsideSales'
+    join vw_dim_lead_conversion vdlc
+      on vpl.id = vdlc.id_imovel
+    where vdlc."type" = 'InsideSales'
 ),
 costs as (
     select
