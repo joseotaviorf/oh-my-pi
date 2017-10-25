@@ -21,7 +21,7 @@ costs as (
       fp.property_id,
       fp.listing_date,
       cis.dre_date as dt_cash_flow,
-      cis."value" / (count(fp.property_id) over (partition by cis.dre_date))::double precision as vl_photos
+      cis."value" / (count(fp.property_id) over (partition by cis.dre_date))::double precision as vl_inside_sales
     from filtered_properties fp
     join cdre_inside_sales cis
       on cis.dre_date = date_trunc('month', fp.listing_date)
@@ -30,7 +30,7 @@ select
   vbpc.sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_photos
+  c.vl_inside_sales
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
