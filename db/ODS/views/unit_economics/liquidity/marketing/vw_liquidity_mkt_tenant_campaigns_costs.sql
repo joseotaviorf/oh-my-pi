@@ -41,6 +41,19 @@ facebook_daily_costs as (
 	group by
 	    "date"::date
 ),
+-- Get RTB Daily Costs
+rtbhouse_daily_costs as (
+	select
+		"Date"::date as dt_cost,
+		-sum(("Debit"::DECIMAL(14,2))::DECIMAL(14,2)) as cost
+	from
+		rtbhouse_ads_campaigns
+	where
+		"Debit" is not null
+		and "Date" is not null
+	group by
+		"Date"::date
+),
 -- Join all marketing cost sources
 pre_classified as
 (
@@ -49,10 +62,12 @@ pre_classified as
 		coalesce(c.cost,0) as criteo,
 		coalesce(g.cost,0) as google,
 		coalesce(f.cost,0) as facebook,
+		coalesce(r.cost,0) as rtbhouse,
 		(
 			coalesce(c.cost,0) +
 			coalesce(g.cost,0) +
-			coalesce(f.cost,0)
+			coalesce(f.cost,0) +
+			coalesce(r.cost,0)
 		) as total
 	from
 		criteo_daily_costs c
@@ -62,6 +77,9 @@ pre_classified as
 	full outer join
 		facebook_daily_costs f
 		on coalesce(c.dt_cost, g.dt_cost) = f.dt_cost
+	full outer join
+		rtbhouse_daily_costs r
+		on coalesce(c.dt_cost, g.dt_cost, f.dt_cost) = r.dt_cost
 ),
 -- Add classified costs
 daily_costs as (
@@ -70,6 +88,7 @@ select
 	pc.criteo,
 	pc.google,
 	pc.facebook,
+	pc.rtbhouse,
 	trim(REPLACE("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date") as classifieds,
 	(pc.total + (trim(REPLACE("Total",',',''))::decimal(14,4)
@@ -102,6 +121,7 @@ daily_total as (
 		(coalesce(dc.criteo,0)/count(1) over ( partition by dt_status ))::decimal as criteo_cost,
 		(coalesce(dc.google,0)/count(1) over ( partition by dt_status ))::decimal as google_cost,
 		(coalesce(dc.facebook,0)/count(1) over ( partition by dt_status ))::decimal as facebook_cost,
+		(coalesce(dc.rtbhouse,0)/count(1) over ( partition by dt_status ))::decimal as rtbhouse_cost,
 		(coalesce(dc.classifieds,0)/count(1) over ( partition by dt_status ))::decimal as classifieds_cost,
 		(coalesce(dc.total,0)/count(1) over ( partition by dt_status ))::decimal as total_cost
 	from
@@ -119,6 +139,7 @@ monthly_total_versioned as (
 		sum(daily.criteo_cost)::decimal(14,4) as criteo_cost,
 		sum(daily.google_cost)::decimal(14,4) as google_cost,
 		sum(daily.facebook_cost)::decimal(14,4) as facebook_cost,
+		sum(daily.rtbhouse_cost)::decimal(14,4) as rtbhouse_cost,
 		sum(daily.classifieds_cost)::decimal(14,4) as classifieds_cost,
 		sum(daily.total_cost)::decimal(14,4) as vl_tenant_campaigns
 	from
