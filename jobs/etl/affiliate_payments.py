@@ -16,6 +16,7 @@ logging.info("Reading from S3: {}".format(datetime.utcnow()))
 data_frame = athena.execute_file_query_and_return_dataframe(file_name)
 
 logging.info("START - To Staging: {}".format(datetime.utcnow()))
+
 BaseETL.dataframe_to_db(
     enum_db=EnumDb.BI_ODS,
     df=data_frame,
@@ -23,4 +24,5 @@ BaseETL.dataframe_to_db(
     encoding='utf-8',
     append=True
 )
+
 logging.info("END - To Staging: {}".format(datetime.utcnow()))
