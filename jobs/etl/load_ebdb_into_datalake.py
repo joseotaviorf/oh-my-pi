@@ -10,7 +10,6 @@ from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-athena_db = 'datalake_raw'
 schema_name = 'ebdb'
 
 CLEAN_TABLE_INFOS = [
@@ -88,7 +87,7 @@ class EBDBDatalake(object):
                 df=df
             )
 
-            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'])
+            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'], 'datalake_clean')
 
     @logger
     def get_type_conversion_dict(self):
@@ -113,7 +112,7 @@ class EBDBDatalake(object):
             conversions[k] = v
         return conversions
 
-    def create_external_table(self, table_name, ddl_suffix, original_table_name=None):
+    def create_external_table(self, table_name, ddl_suffix, original_table_name=None, athena_db='datalake_raw'):
         if not original_table_name:
             original_table_name = table_name
 
