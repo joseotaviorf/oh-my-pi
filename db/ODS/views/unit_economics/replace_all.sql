@@ -740,3 +740,513 @@ select
 from
 	vw_mgmt_ops_costs ops
 ;
+
+
+---
+--- Returns vl_tenant_campaigns costs for each first version property
+--- Cost: Tenant Daily Costs for Google Adwords, Facebook, Criteo and Classifieds
+--- Cash Flow Date: Date of Payment ( 1 month after invoice )
+---
+create or replace view vw_liquidity_mkt_tenant_campaigns_costs as
+-- Get Criteo Daily Costs (deduplicated)
+with criteo_daily_costs as (
+	select distinct
+		"dateTime"::date as dt_cost,
+		cost::DECIMAL as cost
+	from criteo_ads_campaigns
+),
+-- Get Google Daily Costs
+google_daily_costs as (
+	select
+		"day"::date dt_cost,
+		sum((cost::DECIMAL/1000000)::DECIMAL) as cost
+	from
+		google_ads_campaigns
+	where
+		-- exclude all supply campaigns
+		(
+			campaign like '%proprietarios%' or
+			campaign like '%lp_quanto_cobrar%' or
+			campaign like '%indicaai%'
+		) is false
+	group by
+		"day"::date
+),
+-- Get Facebook Daily Costs
+facebook_daily_costs as (
+	select
+	    "date"::date as dt_cost,
+	    sum(spend::DECIMAL) as cost
+	from
+	    facebook_ads_campaigns
+	where
+	    account_name <> 'Supply'
+	group by
+	    "date"::date
+),
+-- Get RTB Daily Costs
+rtbhouse_daily_costs as (
+	select
+		"Date"::date as dt_cost,
+		-sum(("Debit"::DECIMAL(14,2))::DECIMAL(14,2)) as cost
+	from
+		rtbhouse_ads_campaigns
+	where
+		"Debit" is not null
+		and "Date" is not null
+	group by
+		"Date"::date
+),
+-- Join all marketing cost sources
+pre_classified as
+(
+	select
+		coalesce(c.dt_cost, g.dt_cost, f.dt_cost) as dt_cost,
+		coalesce(c.cost,0) as criteo,
+		coalesce(g.cost,0) as google,
+		coalesce(f.cost,0) as facebook,
+		coalesce(r.cost,0) as rtbhouse,
+		(
+			coalesce(c.cost,0) +
+			coalesce(g.cost,0) +
+			coalesce(f.cost,0) +
+			coalesce(r.cost,0)
+		) as total
+	from
+		criteo_daily_costs c
+	full outer join
+		google_daily_costs g
+		on c.dt_cost = g.dt_cost
+	full outer join
+		facebook_daily_costs f
+		on coalesce(c.dt_cost, g.dt_cost) = f.dt_cost
+	full outer join
+		rtbhouse_daily_costs r
+		on coalesce(c.dt_cost, g.dt_cost, f.dt_cost) = r.dt_cost
+),
+-- Add classified costs
+daily_costs as (
+select
+	pc.dt_cost,
+	pc.criteo,
+	pc.google,
+	pc.facebook,
+	pc.rtbhouse,
+	trim(REPLACE("Total",',',''))::decimal(14,4)
+	/ f_get_days_in_month("Date") as classifieds,
+	(pc.total + (trim(REPLACE("Total",',',''))::decimal(14,4)
+	/ f_get_days_in_month("Date"))) as total
+from
+	files.classified_costs class
+right join
+	pre_classified pc
+	on date_part('year',"Date") = date_part('year', pc.dt_cost)
+	and date_part('month',"Date") = date_part('month', pc.dt_cost)
+where
+	"Date" is not null
+),
+-- For each property expose the published days
+property_daily_status as  (
+	select
+		id as property_id,
+		"date" as dt_status,
+		status_history as status
+	from
+		imovel_status_full_history
+	where status_history = 'publicado'
+),
+-- Divide costs for published day
+daily_total as (
+	select
+		pds.property_id as property_id,
+		pds.dt_status as dt_cost,
+		coalesce(dc.total,0) as total,
+		(coalesce(dc.criteo,0)/count(1) over ( partition by dt_status ))::decimal as criteo_cost,
+		(coalesce(dc.google,0)/count(1) over ( partition by dt_status ))::decimal as google_cost,
+		(coalesce(dc.facebook,0)/count(1) over ( partition by dt_status ))::decimal as facebook_cost,
+		(coalesce(dc.rtbhouse,0)/count(1) over ( partition by dt_status ))::decimal as rtbhouse_cost,
+		(coalesce(dc.classifieds,0)/count(1) over ( partition by dt_status ))::decimal as classifieds_cost,
+		(coalesce(dc.total,0)/count(1) over ( partition by dt_status ))::decimal as total_cost
+	from
+		property_daily_status pds
+	left join
+		daily_costs dc
+		on pds.dt_status = dt_cost
+),
+-- Get month total for each version with a proper cash flow date
+monthly_total_versioned as (
+	select
+		base.sk_property,
+		base.property_id,
+		date_trunc('month', daily.dt_cost + interval '2 month')::date as dt_cash_flow,
+		sum(daily.criteo_cost)::decimal(14,4) as criteo_cost,
+		sum(daily.google_cost)::decimal(14,4) as google_cost,
+		sum(daily.facebook_cost)::decimal(14,4) as facebook_cost,
+		sum(daily.rtbhouse_cost)::decimal(14,4) as rtbhouse_cost,
+		sum(daily.classifieds_cost)::decimal(14,4) as classifieds_cost,
+		sum(daily.total_cost)::decimal(14,4) as vl_tenant_campaigns
+	from
+		vw_base_property_costs base
+	left join
+		daily_total daily
+		on base.property_id = daily.property_id
+		where base.min_version_time <= daily.dt_cost
+		and base.max_version_time > daily.dt_cost
+	group by
+		base.sk_property,
+		base.property_id,
+		date_trunc('month', daily.dt_cost + interval '2 month')::date
+)
+select
+	*
+from
+	monthly_total_versioned
+where
+	vl_tenant_campaigns <> 0
+;
+
+---
+--- Returns vl_tenant_campaigns costs for each first version property
+--- Cost: Aggregated Marketing Costs
+--- Cash Flow Date: Date of Payment ( 1 month after invoice )
+---
+create or replace view vw_liquidity_mkt_costs as
+select
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	vl_tenant_campaigns
+from
+	vw_liquidity_mkt_tenant_campaigns_costs
+;
+
+
+create or replace view vw_liquidity_ops_bo_pre_sale_costs as
+with cdre_bo_pre_sale as (
+    select
+      "Value" as "value",
+      "Month"::date as dre_date
+    from files.costs_dre
+    where costs_dre."Category" = 'Back-Office (pre-sale)'
+),
+filtered_contracts as (
+    select distinct
+      imovel_id as property_id,
+      "criadoEm"::date as created_date,
+      "dataAssinado"::date as signature_date
+    from contract
+    where tipo = 'FullService'
+      and ("criadoEm" is not null
+           or "dataAssinado" is not null)
+),
+costs as (
+    select
+      fc.property_id,
+      fc.created_date,
+      fc.signature_date,
+      cps.dre_date as dt_cash_flow,
+      cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_bo_pre_sale
+    from filtered_contracts fc
+    join cdre_bo_pre_sale cps
+      on cps.dre_date = date_trunc('month', fc.created_date)
+         or  cps.dre_date = date_trunc('month', fc.signature_date)
+)
+select
+  vbpc.sk_property,
+  c.property_id,
+  c.dt_cash_flow,
+  c.vl_bo_pre_sale
+from costs c
+join vw_base_property_costs vbpc
+  on vbpc.property_id = c.property_id
+    and (c.created_date between vbpc.min_version_time and vbpc.max_version_time
+         or c.signature_date between vbpc.min_version_time and vbpc.max_version_time)
+;
+
+create or replace view vw_liquidity_ops_cs_pre_sale_costs as
+with cdre_cs_pre_sale as (
+    select
+      "Value" as "value",
+      "Month"::date as dre_date
+    from files.costs_dre
+    where costs_dre."Category" = 'Customer Support (pre-sale)'
+),
+
+-- USE VW_BASE_PROPERTY_COSTS
+filtered_properties as (
+    select distinct
+      id as property_id,
+      min_version_time::date,
+      max_version_time::date
+    from vw_property_listing
+    where last_status_version = 'publicado'
+),
+costs as (
+    select
+      fp.property_id,
+      fp.min_version_time,
+      fp.max_version_time,
+      cps.dre_date as dt_cash_flow,
+      cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
+    from filtered_properties fp
+    join cdre_cs_pre_sale cps
+      on cps.dre_date between date_trunc('month', fp.min_version_time) and date_trunc('month', fp.max_version_time)
+)
+select
+  vbpc.sk_property,
+  c.property_id,
+  c.dt_cash_flow,
+  c.vl_cs_pre_sale
+from costs c
+join vw_base_property_costs vbpc
+  on vbpc.property_id = c.property_id
+    and c.min_version_time = vbpc.min_version_time
+    and c.max_version_time = vbpc.max_version_time
+;
+
+
+create or replace view vw_liquidity_ops_field_ops_costs as
+with cdre_field_ops as (
+    select
+      "Value" as "value",
+      "Month"::date as dre_date
+    from files.costs_dre
+    where costs_dre."Category" = 'Field Operation'
+),
+filtered_visits as (
+    select
+      id as visit_id,
+      imovel_id as property_id,
+      data as dt
+    from booking
+    where tipo = 'Visita'
+        and status = 'Realizado'
+),
+costs as (
+    select
+      fv.property_id,
+      fv.dt,
+      cfo.dre_date as dt_cash_flow,
+      cfo."value" / (count(fv.property_id) over (partition by cfo.dre_date))::double precision as vl_field_ops
+    from filtered_visits fv
+    join cdre_field_ops cfo
+      on cfo.dre_date = date_trunc('month', fv.dt)
+)
+select
+  vbpc.sk_property,
+  c.property_id,
+  c.dt_cash_flow,
+  sum(c.vl_field_ops) as vl_field_ops
+from costs c
+join vw_base_property_costs vbpc
+  on vbpc.property_id = c.property_id
+    and c.dt between vbpc.min_version_time and vbpc.max_version_time
+group by vbpc.sk_property, c.property_id, c.dt_cash_flow
+;
+
+create or replace view vw_liquidity_ops_costs as
+select
+  coalesce(bo_pre_sale.sk_property, pre_sale.sk_property, field_ops.sk_property) as sk_property,
+  coalesce(bo_pre_sale.property_id, pre_sale.property_id, field_ops.property_id) as property_id,
+  coalesce(bo_pre_sale.dt_cash_flow, pre_sale.dt_cash_flow, field_ops.dt_cash_flow) as dt_cash_flow,
+  coalesce(bo_pre_sale.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
+  coalesce(pre_sale.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
+  coalesce(field_ops.vl_field_ops, 0) as vl_field_ops
+
+from vw_liquidity_ops_bo_pre_sale_costs bo_pre_sale
+
+full outer join vw_liquidity_ops_cs_pre_sale_costs pre_sale
+  on pre_sale.sk_property = bo_pre_sale.sk_property
+     and pre_sale.dt_cash_flow = bo_pre_sale.dt_cash_flow
+
+full outer join vw_liquidity_ops_field_ops_costs field_ops
+  on field_ops.sk_property = bo_pre_sale.sk_property
+     and field_ops.dt_cash_flow = bo_pre_sale.dt_cash_flow
+;
+
+
+---
+--- Returns vl_tenant_campaigns costs for each first version property
+--- Cost: Aggregated Marketing Costs
+--- Cash Flow Date: Date of Payment ( 1 month after invoice )
+---
+create or replace view vw_liquidity_costs as
+select
+  coalesce(mkt.sk_property, ops.sk_property) as sk_property,
+  coalesce(mkt.property_id, ops.property_id) as property_id,
+  coalesce(mkt.dt_cash_flow, ops.dt_cash_flow) as dt_cash_flow,
+  coalesce(mkt.vl_tenant_campaigns, 0)::decimal(14,4) as vl_tenant_campaigns,
+  coalesce(ops.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
+  coalesce(ops.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
+  coalesce(ops.vl_field_ops, 0) as vl_field_ops
+from
+	vw_liquidity_mkt_costs mkt
+full outer join vw_liquidity_ops_costs ops
+  on mkt.sk_property = ops.sk_property
+     and mkt.dt_cash_flow = ops.dt_cash_flow
+;
+
+
+---
+--- Returns the final view for Unit Economics
+--- Cost: All costs grouped by versioned property / cash flow date
+--- Cash Flow Date: Date of Payment
+--- Placeholders with random int will be kept while developing the remainder values
+---
+create or replace view vw_fact_property_economics as
+select
+	sk_property,
+	property_id,
+	sk_cash_flow_date,
+	-sum(vl_owner_campaigns) as vl_owner_campaigns,
+	-sum(vl_affiliate_campaigns) as vl_affiliate_campaigns,
+	-sum(vl_inside_sales) as vl_inside_sales,
+	-sum(vl_photos) as vl_photos,
+	-sum(vl_affiliate_bonus) as vl_affiliate_bonus,
+	(-1*cast(random()*10000 as int))::double precision as vl_lockbox,
+	-sum(vl_tenant_campaigns) as vl_tenant_campaigns,
+	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
+	sum(vl_field_ops) as vl_field_ops,
+	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
+	(-1*cast(random()*10000 as int))::double precision as vl_agent_hours,
+	(-1*cast(random()*10000 as int))::double precision as vl_pis_cofins,
+	(-1*cast(random()*10000 as int))::double precision as vl_affiliate_commission,
+	-sum(vl_agent_commission) as vl_agent_commission,
+	(-1*cast(random()*10000 as int))::double precision as vl_delay_fine,
+	(-1*cast(random()*10000 as int))::double precision as vl_termination_fine,
+	(-1*cast(random()*10000 as int))::double precision as vl_brokerage_fee,
+	(-1*cast(random()*10000 as int))::double precision as vl_management_fee,
+	sum(vl_cs_post_sale) as vl_cs_post_sale,
+	sum(vl_collection) as vl_collection,
+	sum(vl_bo_onboarding) as vl_bo_onboarding,
+	sum(vl_bo_onboarding) as vl_bo_ongoing,
+	sum(vl_bo_offboarding) as vl_bo_offboarding,
+	(-1*cast(random()*10000 as int))::double precision as vl_insurance_fee
+from
+(
+	select
+		sk_property,
+		property_id,
+		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+		0 as vl_owner_campaigns,
+		0 as vl_affiliate_campaigns,
+		0 as vl_inside_sales,
+		0 as vl_photos,
+		0 as vl_affiliate_bonus,
+		0 as vl_lockbox,
+		vl_tenant_campaigns,
+		vl_cs_pre_sale as vl_cs_pre_sale,
+		vl_field_ops as vl_field_ops,
+		vl_bo_pre_sale as vl_bo_pre_sale,
+		0 as vl_agent_hours,
+		0 as vl_pis_cofins,
+		0 as vl_affiliate_commission,
+		0 as vl_agent_commission,
+		0 as vl_delay_fine,
+		0 as vl_termination_fine,
+		0 as vl_brokerage_fee,
+		0 as vl_management_fee,
+		0 as vl_cs_post_sale,
+		0 as vl_collection,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_bo_offboarding,
+		0 as vl_insurance_fee
+	from
+		vw_liquidity_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+		vl_owner_campaigns,
+		vl_affiliate_campaigns,
+		vl_inside_sales as vl_inside_sales,
+		vl_photos as vl_photos,
+		vl_affiliate_bonus,
+		0 as vl_lockbox,
+		0 as vl_tenant_campaigns,
+		0 as vl_cs_pre_sale,
+		0 as vl_field_ops,
+		0 as vl_bo_pre_sale,
+		0 as vl_agent_hours,
+		0 as vl_pis_cofins,
+		0 as vl_affiliate_commission,
+		0 as vl_agent_commission,
+		0 as vl_delay_fine,
+		0 as vl_termination_fine,
+		0 as vl_brokerage_fee,
+		0 as vl_management_fee,
+		0 as vl_cs_post_sale,
+		0 as vl_collection,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_bo_offboarding,
+		0 as vl_insurance_fee
+	from
+		vw_supply_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+		0 as vl_owner_campaigns,
+		0 as vl_affiliate_campaigns,
+		0 as vl_inside_sales,
+		0 as vl_photos,
+		0 as vl_affiliate_bonus,
+		0 as vl_lockbox,
+		0 as vl_tenant_campaigns,
+		0 as vl_cs_pre_sale,
+		0 as vl_field_ops,
+		0 as vl_bo_pre_sale,
+		0 as vl_agent_hours,
+		0 as vl_pis_cofins,
+		0 as vl_affiliate_commission,
+		0 as vl_agent_commission,
+		0 as vl_delay_fine,
+		0 as vl_termination_fine,
+		0 as vl_brokerage_fee,
+		0 as vl_management_fee,
+		vl_cs_post_sale as vl_cs_post_sale,
+		vl_collection as vl_collection,
+		vl_bo_onboarding as vl_bo_onboarding,
+		vl_bo_ongoing as vl_bo_ongoing,
+		vl_bo_offboarding as vl_bo_offboarding,
+		0 as vl_insurance_fee
+	from
+		vw_mgmt_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+		0 as vl_owner_campaigns,
+		0 as vl_affiliate_campaigns,
+		0 as vl_inside_sales,
+		0 as vl_photos,
+		0 as vl_affiliate_bonus,
+		0 as vl_lockbox,
+		0 as vl_tenant_campaigns,
+		0 as vl_cs_pre_sale,
+		0 as vl_field_ops,
+		0 as vl_bo_pre_sale,
+		0 as vl_agent_hours,
+		0 as vl_pis_cofins,
+		vl_affiliate_commission as vl_affiliate_commission,
+		0 as vl_agent_commission,
+		0 as vl_delay_fine,
+		0 as vl_termination_fine,
+		0 as vl_brokerage_fee,
+		0 as vl_management_fee,
+		0 as vl_cs_post_sale,
+		0 as vl_collection,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_bo_offboarding,
+		0 as vl_insurance_fee
+	from
+		vw_net_revenue_costs
+) tbl
+group by sk_property, property_id, sk_cash_flow_date
+;
