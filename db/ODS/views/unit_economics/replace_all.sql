@@ -12,6 +12,7 @@ drop view if exists vw_net_revenue_commission_costs cascade;
 drop view if exists vw_net_revenue_revenues cascade;
 drop view if exists vw_net_revenue_revenues_brokerage_fee cascade;
 drop view if exists vw_net_revenue_revenues_management_fee cascade;
+drop view if exists vw_net_revenue_agent_commission_costs;
 drop view if exists vw_net_revenue_costs cascade;
 drop view if exists vw_mgmt_ops_bo_offboarding_costs cascade;
 drop view if exists vw_mgmt_ops_bo_onboarding_costs cascade;
@@ -450,12 +451,16 @@ and
 ---
 create or replace view vw_net_revenue_commission_costs as
 select
-    sk_property,
-    property_id,
-    dt_cash_flow,
-    coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission
+    coalesce(affiliate.sk_property, agent.sk_property) as sk_property,
+    coalesce(affiliate.property_id, agent.property_id) as property_id,
+    coalesce(affiliate.dt_cash_flow, agent.dt_cash_flow) as dt_cash_flow,
+    coalesce(affiliate.vl_affiliate_commission, 0) as vl_affiliate_commission,
+    coalesce(agent.vl_agent_commission, 0) as vl_agent_commission
 from
-    vw_net_revenue_affiliate_commission_costs
+    vw_net_revenue_affiliate_commission_costs affiliate
+full outer join vw_net_revenue_agent_commission_costs agent
+  on affiliate.sk_property = agent.sk_property
+     and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;
 
 create or replace view vw_net_revenue_revenues_brokerage_fee as
@@ -552,6 +557,32 @@ full outer join
 	vw_net_revenue_revenues_management_fee m_fee
 	on b_fee.sk_property = m_fee.sk_property
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
+;
+
+create or replace view vw_net_revenue_agent_commission_costs as
+with filtered_properties as (
+  select
+      comm.dt,
+      coalesce(cont.property_id, c.imovel_id) as property_id,
+      sum(comm.percentage * cont.rent) as vl_agent_commission
+  from files.finance_agents_contract cont
+  join files.finance_agents_commission comm
+    on cont.agent_name = comm.agent_name
+       and date_trunc('month', cont.signature_date) = comm.dt
+  join contract c
+    on c.id = cont.contract_id
+  where cont.status = 'Ativo'
+  group by comm.dt, cont.property_id, cont.contract_id, c.id, c.imovel_id
+)
+select
+  vbpc.sk_property,
+  fp.property_id,
+  fp.dt as dt_cash_flow,
+  fp.vl_agent_commission
+from filtered_properties fp
+join vw_base_property_costs vbpc
+  on vbpc.property_id = fp.property_id
+    and fp.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
 
 create or replace view vw_net_revenue_costs as
@@ -656,7 +687,6 @@ left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c."from" >= vbpc.min_version_time
     and c."to" <= vbpc.max_version_time
-    where vbpc.sk_property is null
 ;
 
 

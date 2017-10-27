@@ -46,5 +46,4 @@ left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c."from" >= vbpc.min_version_time
     and c."to" <= vbpc.max_version_time
-    where vbpc.sk_property is null
 ;

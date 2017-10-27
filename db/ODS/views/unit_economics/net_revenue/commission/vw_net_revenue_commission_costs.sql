@@ -6,10 +6,14 @@ drop view vw_net_revenue_commission_costs;
 ---
 create or replace view vw_net_revenue_commission_costs as
 select
-    sk_property,
-    property_id,
-    dt_cash_flow,
-    coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission
+    coalesce(affiliate.sk_property, agent.sk_property) as sk_property,
+    coalesce(affiliate.property_id, agent.property_id) as property_id,
+    coalesce(affiliate.dt_cash_flow, agent.dt_cash_flow) as dt_cash_flow,
+    coalesce(affiliate.vl_affiliate_commission, 0) as vl_affiliate_commission,
+    coalesce(agent.vl_agent_commission, 0) as vl_agent_commission
 from
-    vw_net_revenue_affiliate_commission_costs
+    vw_net_revenue_affiliate_commission_costs affiliate
+full outer join vw_net_revenue_agent_commission_costs agent
+  on affiliate.sk_property = agent.sk_property
+     and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;
