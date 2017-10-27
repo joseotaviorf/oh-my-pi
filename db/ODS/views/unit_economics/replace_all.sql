@@ -1289,7 +1289,7 @@ all_costs as (
 select
   vbpc.sk_property,
   ac.property_id,
-  ac.dt_cash_flow,
+  ac.dt_cash_flow::date,
   sum(ac.vl_agent_hours) as vl_agent_hours
 from all_costs ac
 join vw_base_property_costs vbpc
@@ -1334,10 +1334,10 @@ select
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
-	0 as vl_agent_hours,
+	-sum(vl_agent_hours) as vl_agent_hours,
 	0 as vl_pis_cofins,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
-	0 as vl_agent_commission,
+	-sum(vl_agent_commission) as vl_agent_commission,
 	0 as vl_delay_fine,
 	0 as vl_termination_fine,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,

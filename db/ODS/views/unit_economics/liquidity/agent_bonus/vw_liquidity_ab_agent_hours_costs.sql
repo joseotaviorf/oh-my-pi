@@ -70,7 +70,7 @@ all_costs as (
 select
   vbpc.sk_property,
   ac.property_id,
-  ac.dt_cash_flow,
+  ac.dt_cash_flow::date,
   sum(ac.vl_agent_hours) as vl_agent_hours
 from all_costs ac
 join vw_base_property_costs vbpc
