@@ -63,7 +63,7 @@ class Invoice(object):
             'm=request_data, process_name={}, exec_year={}, exec_month={}'.format(process_name, exec_year, exec_month))
 
         request_result = requests.get(
-            url='{0}/{1}/{2}/{3}/all'.format(seubarriga_invoice['reports-endpoint'], process_name, exec_year,
+            url='{0}/{1}/{2}/{3}/preview'.format(seubarriga_invoice['reports-endpoint'], process_name, exec_year,
                                              exec_month),
             headers={'jwt-token': seubarriga_invoice['reports-token']}
         )
