@@ -10,8 +10,8 @@ with cdre_bo_pre_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      "criadoEm"::date as created_date,
-      "dataAssinado"::date as signature_date
+      (max("criadoEm") over (partition by imovel_id))::date as created_date,
+      (max("dataAssinado") over (partition by imovel_id))::date as signature_date
     from contract
     where tipo = 'FullService'
       and ("criadoEm" is not null
@@ -30,7 +30,7 @@ costs as (
          or  cps.dre_date = date_trunc('month', fc.signature_date)
 )
 select
-  vbpc.sk_property,
+  max(vbpc.sk_property) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_pre_sale
@@ -39,4 +39,5 @@ join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and (c.created_date between vbpc.min_version_time and vbpc.max_version_time
          or c.signature_date between vbpc.min_version_time and vbpc.max_version_time)
+group by c.property_id, c.dt_cash_flow, c.vl_bo_pre_sale
 ;

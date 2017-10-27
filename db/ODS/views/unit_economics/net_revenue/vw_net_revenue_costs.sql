@@ -12,7 +12,8 @@ select
 	coalesce(vnrcc.dt_cash_flow, vnrr.dt_cash_flow) as dt_cash_flow,
     coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission,
 	coalesce(vl_management_fee, 0) as vl_management_fee,
-	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee
+	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
+	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission
 from
     vw_net_revenue_commission_costs vnrcc
 full outer join

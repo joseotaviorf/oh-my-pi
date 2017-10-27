@@ -12,7 +12,7 @@ drop view if exists vw_net_revenue_commission_costs cascade;
 drop view if exists vw_net_revenue_revenues cascade;
 drop view if exists vw_net_revenue_revenues_brokerage_fee cascade;
 drop view if exists vw_net_revenue_revenues_management_fee cascade;
-drop view if exists vw_net_revenue_agent_commission_costs;
+drop view if exists vw_net_revenue_agent_commission_costs cascade;
 drop view if exists vw_net_revenue_costs cascade;
 drop view if exists vw_mgmt_ops_bo_offboarding_costs cascade;
 drop view if exists vw_mgmt_ops_bo_onboarding_costs cascade;
@@ -444,6 +444,39 @@ and
 	tipo='porcentagemPorIndicacaoDeImovel'
 ;
 
+create or replace view vw_net_revenue_agent_commission_costs as
+with agents as (
+  select distinct
+    comm.*,
+    cont.*,
+    c.imovel_id
+  from files.finance_agents_contract cont
+  join files.finance_agents_commission comm
+    on cont.agent_name = comm.agent_name
+       and date_trunc('month', cont.signature_date) = comm.dt
+  left join contract c
+    on c.id = cont.contract_id
+  where cont.status = 'Ativo'
+),
+filtered_properties as (
+  select
+    dt,
+    coalesce(892700000 + property_id, imovel_id) as property_id,
+    sum(percentage * rent) as vl_agent_commission
+  from agents
+  group by dt, property_id, contract_id, imovel_id
+)
+select
+  vbpc.sk_property,
+  fp.property_id,
+  make_date(extract(year from fp.dt )::int, extract(month from fp.dt )::int, 7) as dt_cash_flow,
+  fp.vl_agent_commission
+from filtered_properties fp
+join vw_base_property_costs vbpc
+  on vbpc.property_id = fp.property_id
+    and fp.dt between vbpc.min_version_time and vbpc.max_version_time
+;
+
 ---
 --- Returns vl_affiliate_commission costs for each first version property
 --- Cost: Affiliate Commission on rented properties
@@ -559,31 +592,6 @@ full outer join
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;
 
-create or replace view vw_net_revenue_agent_commission_costs as
-with filtered_properties as (
-  select
-      comm.dt,
-      coalesce(cont.property_id, c.imovel_id) as property_id,
-      sum(comm.percentage * cont.rent) as vl_agent_commission
-  from files.finance_agents_contract cont
-  join files.finance_agents_commission comm
-    on cont.agent_name = comm.agent_name
-       and date_trunc('month', cont.signature_date) = comm.dt
-  join contract c
-    on c.id = cont.contract_id
-  where cont.status = 'Ativo'
-  group by comm.dt, cont.property_id, cont.contract_id, c.id, c.imovel_id
-)
-select
-  vbpc.sk_property,
-  fp.property_id,
-  fp.dt as dt_cash_flow,
-  fp.vl_agent_commission
-from filtered_properties fp
-join vw_base_property_costs vbpc
-  on vbpc.property_id = fp.property_id
-    and fp.dt between vbpc.min_version_time and vbpc.max_version_time
-;
 
 create or replace view vw_net_revenue_costs as
 select
@@ -592,7 +600,8 @@ select
 	coalesce(vnrcc.dt_cash_flow, vnrr.dt_cash_flow) as dt_cash_flow,
     coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission,
 	coalesce(vl_management_fee, 0) as vl_management_fee,
-	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee
+	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
+	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission
 from
     vw_net_revenue_commission_costs vnrcc
 full outer join
@@ -1052,8 +1061,8 @@ with cdre_bo_pre_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      "criadoEm"::date as created_date,
-      "dataAssinado"::date as signature_date
+      (max("criadoEm") over (partition by imovel_id))::date as created_date,
+      (max("dataAssinado") over (partition by imovel_id))::date as signature_date
     from contract
     where tipo = 'FullService'
       and ("criadoEm" is not null
@@ -1072,7 +1081,7 @@ costs as (
          or  cps.dre_date = date_trunc('month', fc.signature_date)
 )
 select
-  vbpc.sk_property,
+  max(vbpc.sk_property) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_pre_sale
@@ -1081,6 +1090,7 @@ join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and (c.created_date between vbpc.min_version_time and vbpc.max_version_time
          or c.signature_date between vbpc.min_version_time and vbpc.max_version_time)
+group by c.property_id, c.dt_cash_flow, c.vl_bo_pre_sale
 ;
 
 
@@ -1212,25 +1222,25 @@ select
 	sum(vl_inside_sales) as vl_inside_sales,
 	sum(vl_photos) as vl_photos,
 	-sum(vl_affiliate_bonus) as vl_affiliate_bonus,
-	(-1*cast(random()*10000 as int))::double precision as vl_lockbox,
+	0 as vl_lockbox,
 	-sum(vl_tenant_campaigns) as vl_tenant_campaigns,
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
-	(-1*cast(random()*10000 as int))::double precision as vl_agent_hours,
-	(-1*cast(random()*10000 as int))::double precision as vl_pis_cofins,
+	0 as vl_agent_hours,
+	0 as vl_pis_cofins,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
-	(-1*cast(random()*10000 as int))::double precision as vl_agent_commission,
-	(-1*cast(random()*10000 as int))::double precision as vl_delay_fine,
-	(-1*cast(random()*10000 as int))::double precision as vl_termination_fine,
+	0 as vl_agent_commission,
+	0 as vl_delay_fine,
+	0 as vl_termination_fine,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_management_fee) as vl_management_fee,
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
 	sum(vl_collections) as vl_collections,
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
-	sum(vl_bo_onboarding) as vl_bo_ongoing,
+	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
-	(-1*cast(random()*10000 as int))::double precision as vl_insurance_fee
+	0 as vl_insurance_fee
 from
 (
 	select
@@ -1343,7 +1353,7 @@ from
 		0 as vl_agent_hours,
 		0 as vl_pis_cofins,
 		vl_affiliate_commission as vl_affiliate_commission,
-		0 as vl_agent_commission,
+		vl_agent_commission as vl_agent_commission,
 		0 as vl_delay_fine,
 		0 as vl_termination_fine,
 		vl_brokerage_fee as vl_brokerage_fee,
