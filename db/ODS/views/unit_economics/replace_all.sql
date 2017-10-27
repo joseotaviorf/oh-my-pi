@@ -17,7 +17,7 @@ drop view if exists vw_net_revenue_costs cascade;
 drop view if exists vw_mgmt_ops_bo_offboarding_costs cascade;
 drop view if exists vw_mgmt_ops_bo_onboarding_costs cascade;
 drop view if exists vw_mgmt_ops_bo_ongoing_costs cascade;
-drop view if exists vw_mgmt_ops_collections_costs cascade;
+drop view if exists vw_mgmt_ops_collection_costs cascade;
 drop view if exists vw_mgmt_ops_cs_post_sale_costs cascade;
 drop view if exists vw_mgmt_ops_costs cascade;
 drop view if exists vw_mgmt_costs cascade;
@@ -27,6 +27,7 @@ drop view if exists vw_liquidity_mkt_costs cascade;
 drop view if exists vw_liquidity_ops_cs_pre_sale_costs cascade;
 drop view if exists vw_liquidity_ops_field_ops_costs cascade;
 drop view if exists vw_liquidity_ops_costs cascade;
+drop view if exists vw_liquidity_ab_agent_hours_costs cascade;
 drop view if exists vw_liquidity_costs cascade;
 drop view if exists vw_fact_property_economics cascade;
 
@@ -449,7 +450,8 @@ with agents as (
   select distinct
     comm.*,
     cont.*,
-    c.imovel_id
+    c.imovel_id,
+    c."dataAssinado"
   from files.finance_agents_contract cont
   join files.finance_agents_commission comm
     on cont.agent_name = comm.agent_name
@@ -465,17 +467,37 @@ filtered_properties as (
     sum(percentage * rent) as vl_agent_commission
   from agents
   group by dt, property_id, contract_id, imovel_id
+),
+-- Agents Commission spreadsheet doesn't contain contracts before Feb-2016
+all_contracts as (
+  select
+    c.imovel_id as property_id,
+    -- '0.5' is the commission average of Jan-2016
+    c."valorAluguel" * 0.5 as vl_agent_commission,
+    date_trunc('month', "dataAssinado") as dt
+  from contract c
+  where date_trunc('month', "dataAssinado") = '2016-01-01'
+    and tipo = 'FullService'
+
+  union
+
+  select
+    property_id,
+    vl_agent_commission,
+    dt
+  from filtered_properties
 )
 select
   vbpc.sk_property,
-  fp.property_id,
-  make_date(extract(year from fp.dt )::int, extract(month from fp.dt )::int, 7) as dt_cash_flow,
-  fp.vl_agent_commission
-from filtered_properties fp
+  ac.property_id,
+  make_date(extract(year from ac.dt)::int, extract(month from ac.dt)::int, 7) as dt_cash_flow,
+  ac.vl_agent_commission
+from all_contracts ac
 join vw_base_property_costs vbpc
-  on vbpc.property_id = fp.property_id
-    and fp.dt between vbpc.min_version_time and vbpc.max_version_time
+  on vbpc.property_id = ac.property_id
+    and ac.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
+
 
 ---
 --- Returns vl_affiliate_commission costs for each first version property
@@ -741,7 +763,7 @@ left join vw_base_property_costs vbpc
     and c.end_date <= vbpc.max_version_time
 ;
 
-create or replace view vw_mgmt_ops_collections_costs as
+create or replace view vw_mgmt_ops_collection_costs as
 with rent_delay as (
   select
    contract_id,
@@ -754,7 +776,7 @@ with rent_delay as (
    and tenant_due_date is not null
    and tenant_paid_date is not null
 ),
-cdre_collections as (
+cdre_collection as (
     select
       "Value" as "value",
       "Month"::date as dre_date
@@ -778,16 +800,16 @@ costs as (
       fc.property_id,
       fc.dt,
       co.dre_date as dt_cash_flow,
-      co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collections
+      co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collection
     from filtered_contracts fc
-    join cdre_collections co
+    join cdre_collection co
       on co.dre_date = date_trunc('month', fc.dt)
 )
 select
   vbpc.sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_collections
+  c.vl_collection
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -839,13 +861,13 @@ left join vw_base_property_costs vbpc
 
 create or replace view vw_mgmt_ops_costs as
 select
-  coalesce(offboarding.sk_property, onboarding.sk_property, ongoing.sk_property, collections.sk_property, post_sale.sk_property) as sk_property,
-  coalesce(offboarding.property_id, onboarding.property_id, ongoing.property_id, collections.property_id, post_sale.property_id) as property_id,
-  coalesce(offboarding.dt_cash_flow, onboarding.dt_cash_flow, ongoing.dt_cash_flow, collections.dt_cash_flow, post_sale.dt_cash_flow) as dt_cash_flow,
+  coalesce(offboarding.sk_property, onboarding.sk_property, ongoing.sk_property, collection.sk_property, post_sale.sk_property) as sk_property,
+  coalesce(offboarding.property_id, onboarding.property_id, ongoing.property_id, collection.property_id, post_sale.property_id) as property_id,
+  coalesce(offboarding.dt_cash_flow, onboarding.dt_cash_flow, ongoing.dt_cash_flow, collection.dt_cash_flow, post_sale.dt_cash_flow) as dt_cash_flow,
   coalesce(offboarding.vl_bo_offboarding, 0) as vl_bo_offboarding,
   coalesce(onboarding.vl_bo_onboarding, 0) as vl_bo_onboarding,
   coalesce(ongoing.vl_bo_ongoing, 0) as vl_bo_ongoing,
-  coalesce(collections.vl_collections, 0) as vl_collections,
+  coalesce(collection.vl_collection, 0) as vl_collection,
   coalesce(post_sale.vl_cs_post_sale, 0) as vl_cs_post_sale
 
 from vw_mgmt_ops_bo_offboarding_costs offboarding
@@ -858,9 +880,9 @@ full outer join vw_mgmt_ops_bo_ongoing_costs ongoing
   on ongoing.sk_property = offboarding.sk_property
      and ongoing.dt_cash_flow = offboarding.dt_cash_flow
 
-full outer join vw_mgmt_ops_collections_costs collections
-  on collections.sk_property = offboarding.sk_property
-     and collections.dt_cash_flow = offboarding.dt_cash_flow
+full outer join vw_mgmt_ops_collection_costs collection
+  on collection.sk_property = offboarding.sk_property
+     and collection.dt_cash_flow = offboarding.dt_cash_flow
 
 full outer join vw_mgmt_ops_cs_post_sale_costs post_sale
   on post_sale.sk_property = offboarding.sk_property
@@ -876,7 +898,7 @@ select
   ops.vl_bo_offboarding,
   ops.vl_bo_onboarding,
   ops.vl_bo_ongoing,
-  ops.vl_collections,
+  ops.vl_collection,
   ops.vl_cs_post_sale
 from
 	vw_mgmt_ops_costs ops
@@ -1196,6 +1218,87 @@ full outer join vw_liquidity_ops_field_ops_costs field_ops
      and field_ops.dt_cash_flow = bo_pre_sale.dt_cash_flow
 ;
 
+create or replace view vw_liquidity_ab_agent_hours_costs as
+with hour_costs as (
+  select distinct
+    cd."Month" as dre_date,
+    (-1 * cd."Value") -
+        sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow) as hours
+  from vw_net_revenue_agent_commission_costs agent_commission
+  join files.costs_dre cd
+    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow)
+  where cd."Category" = 'Agents Commission'
+),
+filtered_visits as (
+    select
+      id as visit_id,
+      imovel_id as property_id,
+      data as dt
+    from booking
+    where tipo = 'Visita'
+        and status = 'Realizado'
+),
+costs as (
+    select
+      fv.property_id,
+      fv.dt,
+      hc.dre_date as dt_cash_flow,
+      hc.hours / (count(fv.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
+    from filtered_visits fv
+    left join hour_costs hc
+      on hc.dre_date = date_trunc('month', fv.dt)
+),
+-- In Jan-2016 there was no FUP; using 'Marcado' as visit confirmed
+old_visists as (
+    select
+      id as visit_id,
+      imovel_id as property_id,
+      "data" as dt
+    from booking
+    where tipo = 'Visita'
+        and status = 'Marcado'
+        and date_trunc('month', "data") = '2016-01-01'
+),
+old_costs as (
+    select
+      ov.property_id,
+      ov.dt,
+      hc.dre_date as dt_cash_flow,
+      hc.hours / (count(ov.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
+    from old_visists ov
+    left join hour_costs hc
+      on hc.dre_date = date_trunc('month', ov.dt)
+),
+all_costs as (
+    select
+        property_id,
+        dt,
+        dt_cash_flow,
+        vl_agent_hours
+    from costs
+
+    union all
+
+    select
+        property_id,
+        dt,
+        dt_cash_flow,
+        vl_agent_hours
+    from old_costs
+)
+select
+  vbpc.sk_property,
+  ac.property_id,
+  ac.dt_cash_flow,
+  sum(ac.vl_agent_hours) as vl_agent_hours
+from all_costs ac
+join vw_base_property_costs vbpc
+  on vbpc.property_id = ac.property_id
+    and ac.dt between vbpc.min_version_time and vbpc.max_version_time
+group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
+;
+
+
 create or replace view vw_liquidity_costs as
 select
   coalesce(mkt.sk_property, ops.sk_property) as sk_property,
@@ -1204,12 +1307,16 @@ select
   coalesce(mkt.vl_tenant_campaigns, 0)::decimal(14,4) as vl_tenant_campaigns,
   coalesce(ops.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
   coalesce(ops.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
-  coalesce(ops.vl_field_ops, 0) as vl_field_ops
+  coalesce(ops.vl_field_ops, 0) as vl_field_ops,
+  coalesce(agent_hours.vl_agent_hours, 0) as vl_agent_hours
 from
 	vw_liquidity_mkt_costs mkt
 full outer join vw_liquidity_ops_costs ops
   on mkt.sk_property = ops.sk_property
      and mkt.dt_cash_flow = ops.dt_cash_flow
+full outer join vw_liquidity_ab_agent_hours_costs agent_hours
+  on mkt.sk_property = agent_hours.sk_property
+     and mkt.dt_cash_flow = agent_hours.dt_cash_flow
 ;
 
 create or replace view vw_fact_property_economics as
@@ -1236,7 +1343,7 @@ select
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_management_fee) as vl_management_fee,
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
-	sum(vl_collections) as vl_collections,
+	sum(vl_collection) as vl_collection,
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
@@ -1257,7 +1364,7 @@ from
 		vl_cs_pre_sale as vl_cs_pre_sale,
 		vl_field_ops as vl_field_ops,
 		vl_bo_pre_sale as vl_bo_pre_sale,
-		0 as vl_agent_hours,
+		vl_agent_hours as vl_agent_hours,
 		0 as vl_pis_cofins,
 		0 as vl_affiliate_commission,
 		0 as vl_agent_commission,
@@ -1266,7 +1373,7 @@ from
 		0 as vl_brokerage_fee,
 		0 as vl_management_fee,
 		0 as vl_cs_post_sale,
-		0 as vl_collections,
+		0 as vl_collection,
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_bo_offboarding,
@@ -1297,7 +1404,7 @@ from
 		0 as vl_brokerage_fee,
 		0 as vl_management_fee,
 		0 as vl_cs_post_sale,
-		0 as vl_collections,
+		0 as vl_collection,
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_bo_offboarding,
@@ -1328,7 +1435,7 @@ from
 		0 as vl_brokerage_fee,
 		0 as vl_management_fee,
 		vl_cs_post_sale as vl_cs_post_sale,
-		vl_collections as vl_collections,
+		vl_collection as vl_collection,
 		vl_bo_onboarding as vl_bo_onboarding,
 		vl_bo_ongoing as vl_bo_ongoing,
 		vl_bo_offboarding as vl_bo_offboarding,
@@ -1359,7 +1466,7 @@ from
 		vl_brokerage_fee as vl_brokerage_fee,
 		vl_management_fee as vl_management_fee,
 		0 as vl_cs_post_sale,
-		0 as vl_collections,
+		0 as vl_collection,
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_bo_offboarding,
