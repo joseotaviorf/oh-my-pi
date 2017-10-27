@@ -32,6 +32,7 @@ left join
 	affiliate_payments ap
 	on ap.imovel_id::integer = base.property_id
 where
-	mod(base.sk_property, 100) = 1
+	base.version = 1
 and
 	tipo='valorFixoPorIndicacaoDeImovel'
+;

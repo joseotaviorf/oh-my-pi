@@ -160,3 +160,4 @@ from
 	monthly_total_versioned
 where
 	vl_tenant_campaigns <> 0
+;

@@ -1,5 +1,5 @@
-drop view if exists vw_mgmt_ops_collections_costs;
-create or replace view vw_mgmt_ops_collections_costs as
+drop view if exists vw_mgmt_ops_collection_costs;
+create or replace view vw_mgmt_ops_collection_costs as
 with rent_delay as (
   select
    contract_id,
@@ -9,14 +9,15 @@ with rent_delay as (
    from invoice
   where trim("from") = 'Inquilino'
    and trim(item) = 'Aluguel'
-   and tenant_due_date is not null and tenant_paid_date is not null
+   and tenant_due_date is not null
+   and tenant_paid_date is not null
 ),
-cdre_collections as (
+cdre_collection as (
     select
       "Value" as "value",
       "Month"::date as dre_date
     from files.costs_dre
-    where costs_dre."Category" = 'Collections'
+    where costs_dre."Category" = 'Collection'
 ),
 filtered_contracts as (
     select distinct
@@ -35,16 +36,16 @@ costs as (
       fc.property_id,
       fc.dt,
       co.dre_date as dt_cash_flow,
-      co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collections
+      co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collection
     from filtered_contracts fc
-    join cdre_collections co
+    join cdre_collection co
       on co.dre_date = date_trunc('month', fc.dt)
 )
 select
   vbpc.sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_collections
+  c.vl_collection
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id

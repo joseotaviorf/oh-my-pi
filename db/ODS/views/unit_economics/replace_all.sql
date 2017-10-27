@@ -51,16 +51,12 @@ with cdre_inside_sales as (
 ),
 filtered_properties as (
     select distinct
-    vbpc.version,
       vbpc.property_id,
       i.first_publication::date as listing_date
     from vw_base_property_costs vbpc
-    join vw_dim_lead_conversion vdlc
-      on vbpc.property_id = vdlc.id_imovel
     join imovel i
       on i.id = vbpc.property_id
-    where vdlc."type" = 'InsideSales'
-      and vbpc.version = 1
+    where vbpc.version = 1
 ),
 costs as (
     select
@@ -80,7 +76,7 @@ select
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
-    and c.listing_date = vbpc.min_version_time::date
+where vbpc.version = 1
 ;
 
 
@@ -603,12 +599,12 @@ costs as (
       on co.dre_date = date_trunc('month', fc.end_date)
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_offboarding
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.end_date between vbpc.min_version_time and vbpc.max_version_time
 ;
@@ -624,13 +620,20 @@ with cdre_onboarding as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max("dataAssinado") over w)::date as "from",
-      (max("dataEntrada") over w)::date as "to"
+      case
+        when "dataAssinado"::date > "dataEntrada"::date
+          then "dataEntrada"::date
+        else "dataAssinado"::date
+      end as "from",
+      case
+        when "dataAssinado"::date > "dataEntrada"::date
+          then "dataAssinado"::date
+        else "dataEntrada"::date
+      end as "to"
     from contract
     where tipo = 'FullService'
-      and ("dataAssinado" is not null
-           or "dataEntrada" is not null)
-    window w as (partition by imovel_id)
+      and "dataAssinado" is not null
+      and "dataEntrada" is not null
 ),
 costs as (
     select
@@ -644,16 +647,18 @@ costs as (
       on co.dre_date between date_trunc('month', fc."from") and date_trunc('month', fc."to")
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_onboarding
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c."from" >= vbpc.min_version_time
     and c."to" <= vbpc.max_version_time
+    where vbpc.sk_property is null
 ;
+
 
 create or replace view vw_mgmt_ops_bo_ongoing_costs as
 with cdre_ongoing as (
@@ -667,13 +672,12 @@ filtered_contracts as (
     select distinct
       imovel_id as property_id,
       "dataInicio" as start_date,
-      (max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over w)::date as end_date
+      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
     from contract
     where tipo = 'FullService'
       and "dataInicio" is not null
       and ("dataRescisao" is not null
             or "dataFimContratoPrevisto" is not null)
-    window w as (partition by imovel_id)
 ),
 costs as (
     select
@@ -687,12 +691,12 @@ costs as (
       on co.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_ongoing
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.start_date >= vbpc.min_version_time
     and c.end_date <= vbpc.max_version_time
@@ -763,14 +767,13 @@ with cdre_cs_post_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      "dataInicio" as start_date,
-      (max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over w)::date as end_date
+      "dataInicio"::date as start_date,
+      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
     from contract
     where tipo = 'FullService'
       and "dataInicio" is not null
       and ("dataRescisao" is not null
             or "dataFimContratoPrevisto" is not null)
-    window w as (partition by imovel_id)
 ),
 costs as (
     select
@@ -784,17 +787,16 @@ costs as (
       on cps.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_cs_post_sale
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.start_date >= vbpc.min_version_time
     and c.end_date <= vbpc.max_version_time
 ;
-
 
 create or replace view vw_mgmt_ops_costs as
 select
@@ -1051,6 +1053,8 @@ join vw_base_property_costs vbpc
          or c.signature_date between vbpc.min_version_time and vbpc.max_version_time)
 ;
 
+
+
 create or replace view vw_liquidity_ops_cs_pre_sale_costs as
 with cdre_cs_pre_sale as (
     select
@@ -1130,6 +1134,7 @@ join vw_base_property_costs vbpc
     and c.dt between vbpc.min_version_time and vbpc.max_version_time
 group by vbpc.sk_property, c.property_id, c.dt_cash_flow
 ;
+
 
 create or replace view vw_liquidity_ops_costs as
 select

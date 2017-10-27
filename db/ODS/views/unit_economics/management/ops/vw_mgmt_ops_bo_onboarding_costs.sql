@@ -10,13 +10,20 @@ with cdre_onboarding as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max("dataAssinado") over w)::date as "from",
-      (max("dataEntrada") over w)::date as "to"
+      case
+        when "dataAssinado"::date > "dataEntrada"::date
+          then "dataEntrada"::date
+        else "dataAssinado"::date
+      end as "from",
+      case
+        when "dataAssinado"::date > "dataEntrada"::date
+          then "dataAssinado"::date
+        else "dataEntrada"::date
+      end as "to"
     from contract
     where tipo = 'FullService'
-      and ("dataAssinado" is not null
-           or "dataEntrada" is not null)
-    window w as (partition by imovel_id)
+      and "dataAssinado" is not null
+      and "dataEntrada" is not null
 ),
 costs as (
     select
@@ -30,13 +37,14 @@ costs as (
       on co.dre_date between date_trunc('month', fc."from") and date_trunc('month', fc."to")
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_onboarding
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c."from" >= vbpc.min_version_time
     and c."to" <= vbpc.max_version_time
+    where vbpc.sk_property is null
 ;

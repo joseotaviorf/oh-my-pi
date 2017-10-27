@@ -27,12 +27,12 @@ costs as (
       on co.dre_date = date_trunc('month', fc.end_date)
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_offboarding
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.end_date between vbpc.min_version_time and vbpc.max_version_time
 ;

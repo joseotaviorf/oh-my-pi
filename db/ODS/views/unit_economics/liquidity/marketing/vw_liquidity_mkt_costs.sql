@@ -12,3 +12,4 @@ select
 	vl_tenant_campaigns
 from
 	vw_liquidity_mkt_tenant_campaigns_costs
+;

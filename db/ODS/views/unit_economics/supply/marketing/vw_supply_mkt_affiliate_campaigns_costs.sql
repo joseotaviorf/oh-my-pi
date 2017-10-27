@@ -87,7 +87,7 @@ divided_costs as (
 		on date_part('year', publication_date) = mkt.year
 		and date_part('month', publication_date) = mkt.month
 	-- filter by first version only, as is a supply cost
-	where mod(base.sk_property, 100) = 1
+	where base.version = 1
 )
 -- Remove rows where costs equal zero
 select
@@ -96,3 +96,4 @@ from
 	divided_costs
 where
 	vl_affiliate_campaigns <> 0
+;

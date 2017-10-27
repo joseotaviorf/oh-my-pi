@@ -7,7 +7,7 @@ select
   ops.vl_bo_offboarding,
   ops.vl_bo_onboarding,
   ops.vl_bo_ongoing,
-  ops.vl_collections,
+  ops.vl_collection,
   ops.vl_cs_post_sale
 from
 	vw_mgmt_ops_costs ops
