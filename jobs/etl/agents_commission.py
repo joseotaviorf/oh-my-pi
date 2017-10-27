@@ -98,12 +98,16 @@ class AgentsFinanceData(object):
                     i += 1
             else:
                 agent_name = row[0].value
-
-                if row[1].value and 'Comissão' in row[1].value:
+                if row[1].value and 'Comissão' in row[1].value \
+                        and agent_name is not None and re.search('=[A-Z]\d*', agent_name) is None:
                     i = 2
                     percentage = 0
-                    while row[i].value is not None:
-                        regex_result = re.search('\*(.*)%?', row[i].value)
+                    while i - 2 < len(dates):
+                        if row[i].value is None:
+                            i += 1
+                            continue
+
+                        regex_result = re.search('\*((.|,)*)%?', row[i].value)
                         if regex_result:
                             percentage = float(regex_result.group(1))
 
@@ -220,7 +224,7 @@ class AgentsFinanceData(object):
 
 if __name__ == '__main__':
     # TODO: get file_name from airflow env var
-    file_name = ''
+    file_name = None
     agents_data = AgentsFinanceData(file_name)
     agents_data.delete_from_aug_2017()
 
