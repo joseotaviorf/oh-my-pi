@@ -5,7 +5,7 @@ with cdre_photos as (
       "Value" as "value",
       "Month"::date as dre_date
     from files.costs_dre
-    where costs_dre."Category" = 'Photos'
+    where costs_dre."Category" = 'Listing Photos'
 ),
 filtered_properties as (
     select distinct
