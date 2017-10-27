@@ -1,7 +1,5 @@
---drop view if exists vw_net_revenue_agent_commission_costs;
---create or replace view vw_net_revenue_agent_commission_costs as
-select dt_cash_flow, sum(vl_agent_commission) from (
---select count(distinct property_id) from (
+drop view if exists vw_net_revenue_agent_commission_costs;
+create or replace view vw_net_revenue_agent_commission_costs as
 with agents as (
   select distinct
     comm.*,
@@ -32,12 +30,4 @@ from filtered_properties fp
 join vw_base_property_costs vbpc
   on vbpc.property_id = fp.property_id
     and fp.dt between vbpc.min_version_time and vbpc.max_version_time
-)a
-group by 1
-order by 1
-;
-
-select distinct dt, percentage
-from files.finance_agents_commission
-order by dt desc
 ;
