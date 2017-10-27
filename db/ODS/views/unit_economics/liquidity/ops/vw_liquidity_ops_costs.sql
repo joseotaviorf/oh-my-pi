@@ -17,5 +17,4 @@ full outer join vw_liquidity_ops_cs_pre_sale_costs pre_sale
 full outer join vw_liquidity_ops_field_ops_costs field_ops
   on field_ops.sk_property = bo_pre_sale.sk_property
      and field_ops.dt_cash_flow = bo_pre_sale.dt_cash_flow
-
 ;

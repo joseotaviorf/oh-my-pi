@@ -19,3 +19,4 @@ full outer join
 	vw_supply_mkt_owner_campaigns_costs owner
 	on affiliate.sk_property = owner.sk_property
 	and affiliate.dt_cash_flow = owner.dt_cash_flow
+;

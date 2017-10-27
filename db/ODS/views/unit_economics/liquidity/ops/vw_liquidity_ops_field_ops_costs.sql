@@ -5,7 +5,7 @@ with cdre_field_ops as (
       "Value" as "value",
       "Month"::date as dre_date
     from files.costs_dre
-    where costs_dre."Category" = 'Field Ops'
+    where costs_dre."Category" = 'Field Operation'
 ),
 filtered_visits as (
     select

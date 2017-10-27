@@ -9,12 +9,12 @@ with cdre_inside_sales as (
 ),
 filtered_properties as (
     select distinct
-      vpl.id as property_id,
-      vpl.min_version_time::date as listing_date
-    from vw_property_listing vpl
-    join vw_dim_lead_conversion vdlc
-      on vpl.id = vdlc.id_imovel
-    where vdlc."type" = 'InsideSales'
+      vbpc.property_id,
+      i.first_publication::date as listing_date
+    from vw_base_property_costs vbpc
+    join imovel i
+      on i.id = vbpc.property_id
+    where vbpc.version = 1
 ),
 costs as (
     select
@@ -34,5 +34,5 @@ select
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
-    and c.listing_date = vbpc.min_version_time::date
+where vbpc.version = 1
 ;

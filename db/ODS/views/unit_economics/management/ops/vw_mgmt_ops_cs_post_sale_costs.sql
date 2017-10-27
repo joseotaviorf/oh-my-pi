@@ -10,14 +10,13 @@ with cdre_cs_post_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      "dataInicio" as start_date,
-      (max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over w)::date as end_date
+      "dataInicio"::date as start_date,
+      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
     from contract
     where tipo = 'FullService'
       and "dataInicio" is not null
       and ("dataRescisao" is not null
             or "dataFimContratoPrevisto" is not null)
-    window w as (partition by imovel_id)
 ),
 costs as (
     select
@@ -31,12 +30,12 @@ costs as (
       on cps.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
 )
 select
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
   c.vl_cs_post_sale
 from costs c
-join vw_base_property_costs vbpc
+left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.start_date >= vbpc.min_version_time
     and c.end_date <= vbpc.max_version_time

@@ -7,7 +7,7 @@ select
   coalesce(offboarding.vl_bo_offboarding, 0) as vl_bo_offboarding,
   coalesce(onboarding.vl_bo_onboarding, 0) as vl_bo_onboarding,
   coalesce(ongoing.vl_bo_ongoing, 0) as vl_bo_ongoing,
-  coalesce(collections.vl_collections, 0) as vl_collections,
+  coalesce(collection.vl_collections, 0) as vl_collection,
   coalesce(post_sale.vl_cs_post_sale, 0) as vl_cs_post_sale
 
 from vw_mgmt_ops_bo_offboarding_costs offboarding
@@ -20,7 +20,7 @@ full outer join vw_mgmt_ops_bo_ongoing_costs ongoing
   on ongoing.sk_property = offboarding.sk_property
      and ongoing.dt_cash_flow = offboarding.dt_cash_flow
 
-full outer join vw_mgmt_ops_collections_costs collections
+full outer join vw_mgmt_ops_collection_costs collection
   on collections.sk_property = offboarding.sk_property
      and collections.dt_cash_flow = offboarding.dt_cash_flow
 
