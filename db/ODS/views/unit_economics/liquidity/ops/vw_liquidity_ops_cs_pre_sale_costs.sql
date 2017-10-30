@@ -9,23 +9,21 @@ with cdre_cs_pre_sale as (
 ),
 filtered_properties as (
     select distinct
+      sk_property,
       property_id,
-      min_version_time::date,
-      max_version_time::date
+      publication_date::date
     from vw_base_property_costs
     where last_status_version = 'publicado'
 ),
 costs as (
     select
+      fp.sk_property,
       fp.property_id,
-      fp.min_version_time,
-      fp.max_version_time,
       cps.dre_date as dt_cash_flow,
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
-                        and date_trunc('month', fp.max_version_time) + interval '1 month'
+      on cps.dre_date = date_trunc('month', fp.publication_date) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -34,7 +32,6 @@ select
   c.vl_cs_pre_sale
 from costs c
 join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.min_version_time = vbpc.min_version_time
-    and c.max_version_time = vbpc.max_version_time
+  on vbpc.sk_property = c.sk_property
 ;
+

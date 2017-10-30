@@ -15,7 +15,7 @@ select
 from
 	vw_net_revenue_revenues_brokerage_fee b_fee
 full outer join
-	vw_net_revenue_revenues_management_fee m_fee
+	vw_net_revenue_revenues_mgmt_fee m_fee
 	on b_fee.sk_property = m_fee.sk_property
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;

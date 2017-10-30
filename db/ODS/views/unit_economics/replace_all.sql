@@ -11,8 +11,12 @@ drop view if exists vw_net_revenue_affiliate_commission_costs cascade;
 drop view if exists vw_net_revenue_commission_costs cascade;
 drop view if exists vw_net_revenue_revenues cascade;
 drop view if exists vw_net_revenue_revenues_brokerage_fee cascade;
-drop view if exists vw_net_revenue_revenues_management_fee cascade;
+drop view if exists vw_net_revenue_revenues_mgmt_fee cascade;
 drop view if exists vw_net_revenue_agent_commission_costs cascade;
+drop view if exists vw_net_revenue_revenues_brokerage_plus_mgmt_aux cascade;
+drop view if exists vw_net_revenue_taxes_sales_tax_iss cascade;
+drop view if exists vw_net_revenue_taxes_sales_tax_pis_cofins cascade;
+drop view if exists vw_net_revenue_taxes cascade;
 drop view if exists vw_net_revenue_costs cascade;
 drop view if exists vw_mgmt_ops_bo_offboarding_costs cascade;
 drop view if exists vw_mgmt_ops_bo_onboarding_costs cascade;
@@ -563,7 +567,7 @@ and
 	landlord_status = 'paid'
 ;
 
-create or replace view vw_net_revenue_revenues_management_fee as
+create or replace view vw_net_revenue_revenues_mgmt_fee as
 with filtered_contracts as (
 select distinct
 	imovel_id as property_id,
@@ -614,27 +618,96 @@ select
 from
 	vw_net_revenue_revenues_brokerage_fee b_fee
 full outer join
-	vw_net_revenue_revenues_management_fee m_fee
+	vw_net_revenue_revenues_mgmt_fee m_fee
 	on b_fee.sk_property = m_fee.sk_property
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;
 
 
+create or replace view vw_net_revenue_revenues_brokerage_plus_mgmt_aux as
+select
+    coalesce(br.sk_property, mg.sk_property) as sk_property,
+    coalesce(br.property_id, mg.property_id) as property_id,
+    coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
+    coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow
+  from vw_net_revenue_revenues_brokerage_fee br
+  full outer join vw_net_revenue_revenues_mgmt_fee mg
+    on br.sk_property = mg.sk_property
+       and br.dt_cash_flow = mg.dt_cash_flow
+  where br.vl_brokerage_fee > 0
+    or mg.vl_management_fee > 0
+;
+
+
+create or replace view vw_net_revenue_taxes_sales_tax_iss as
+with iss as (
+  select
+    sk_property,
+    property_id,
+    0.05 * brokerage_plus_mgmt as vl_st_iss,
+    dt_cash_flow + interval '1 month' as dt_cash_flow
+  from vw_net_revenue_revenues_brokerage_plus_mgmt_aux
+)
+select
+  sk_property,
+  property_id,
+  vl_st_iss,
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow
+from iss
+;
+
+create or replace view vw_net_revenue_taxes_sales_tax_pis_cofins as
+with pis_cofins as (
+    select
+        sk_property,
+        property_id,
+        0.925 * brokerage_plus_mgmt as vl_st_pis_cofins,
+        dt_cash_flow + interval '1 month' as dt_cash_flow
+    from vw_net_revenue_revenues_brokerage_plus_mgmt_aux
+)
+select
+  sk_property,
+  property_id,
+  vl_st_pis_cofins,
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow
+from pis_cofins
+;
+
+create or replace view vw_net_revenue_taxes as
+select
+  coalesce(iss.sk_property, pis_cofins.sk_property) as sk_property,
+  coalesce(iss.property_id, pis_cofins.sk_property) as property_id,
+  coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow) as dt_cash_flow,
+  coalesce(iss.vl_st_iss, 0) as vl_st_iss,
+  coalesce(pis_cofins.vl_st_pis_cofins, 0) as vl_st_pis_cofins
+from vw_net_revenue_taxes_sales_tax_iss iss
+full outer join vw_net_revenue_taxes_sales_tax_pis_cofins pis_cofins
+  on iss.sk_property = pis_cofins.sk_property
+     and iss.dt_cash_flow = pis_cofins.dt_cash_flow
+;
+
+
 create or replace view vw_net_revenue_costs as
 select
-    coalesce(vnrcc.sk_property, vnrr.sk_property) as sk_property,
-	coalesce(vnrcc.property_id, vnrr.property_id) as property_id,
-	coalesce(vnrcc.dt_cash_flow, vnrr.dt_cash_flow) as dt_cash_flow,
+    coalesce(vnrcc.sk_property, vnrr.sk_property, vnrt.sk_property) as sk_property,
+	coalesce(vnrcc.property_id, vnrr.property_id, vnrt.property_id) as property_id,
+	coalesce(vnrcc.dt_cash_flow, vnrr.dt_cash_flow, vnrt.dt_cash_flow) as dt_cash_flow,
     coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission,
 	coalesce(vl_management_fee, 0) as vl_management_fee,
 	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
-	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission
+	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission,
+	coalesce(vnrt.vl_st_iss, 0) as vl_st_iss,
+	coalesce(vnrt.vl_st_pis_cofins, 0) as vl_st_pis_cofins
 from
     vw_net_revenue_commission_costs vnrcc
 full outer join
     vw_net_revenue_revenues vnrr
     on vnrcc.sk_property = vnrr.sk_property
 	and vnrcc.dt_cash_flow = vnrr.dt_cash_flow
+full outer join
+    vw_net_revenue_taxes vnrt
+    on vnrcc.sk_property = vnrt.sk_property
+	and vnrcc.dt_cash_flow = vnrt.dt_cash_flow
 ;
 
 
@@ -1222,23 +1295,21 @@ with cdre_cs_pre_sale as (
 ),
 filtered_properties as (
     select distinct
+      sk_property,
       property_id,
-      min_version_time::date,
-      max_version_time::date
+      publication_date::date
     from vw_base_property_costs
     where last_status_version = 'publicado'
 ),
 costs as (
     select
+      fp.sk_property,
       fp.property_id,
-      fp.min_version_time,
-      fp.max_version_time,
       cps.dre_date as dt_cash_flow,
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
-                        and date_trunc('month', fp.max_version_time) + interval '1 month'
+      on cps.dre_date = date_trunc('month', fp.publication_date) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -1247,10 +1318,9 @@ select
   c.vl_cs_pre_sale
 from costs c
 join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.min_version_time = vbpc.min_version_time
-    and c.max_version_time = vbpc.max_version_time
+  on vbpc.sk_property = c.sk_property
 ;
+
 
 
 create or replace view vw_liquidity_ops_field_ops_costs as
@@ -1341,7 +1411,7 @@ costs as (
       hc.hours / (count(fv.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
     from filtered_visits fv
     left join hour_costs hc
-      on hc.dre_date = date_trunc('month', fv.dt)
+      on hc.dre_date = date_trunc('month', fv.dt) + interval '1 month'
 ),
 -- In Jan-2016 there was no FUP; using 'Marcado' as visit confirmed
 old_visists as (
@@ -1362,7 +1432,7 @@ old_costs as (
       hc.hours / (count(ov.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
     from old_visists ov
     left join hour_costs hc
-      on hc.dre_date = date_trunc('month', ov.dt)
+      on hc.dre_date = date_trunc('month', ov.dt) + interval '1 month'
 ),
 all_costs as (
     select
@@ -1430,7 +1500,8 @@ select
 	sum(vl_field_ops) as vl_field_ops,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
 	-sum(vl_agent_hours) as vl_agent_hours,
-	0 as vl_pis_cofins,
+	-sum(vl_st_pis_cofins) as vl_st_pis_cofins,
+	-sum(vl_st_iss) as vl_st_iss,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
 	-sum(vl_agent_commission) as vl_agent_commission,
 	0 as vl_delay_fine,
@@ -1460,7 +1531,8 @@ from
 		vl_field_ops as vl_field_ops,
 		vl_bo_pre_sale as vl_bo_pre_sale,
 		vl_agent_hours as vl_agent_hours,
-		0 as vl_pis_cofins,
+		0 as vl_st_pis_cofins,
+		0 as vl_st_iss,
 		0 as vl_affiliate_commission,
 		0 as vl_agent_commission,
 		0 as vl_delay_fine,
@@ -1491,7 +1563,8 @@ from
 		0 as vl_field_ops,
 		0 as vl_bo_pre_sale,
 		0 as vl_agent_hours,
-		0 as vl_pis_cofins,
+		0 as vl_st_pis_cofins,
+		0 as vl_st_iss,
 		0 as vl_affiliate_commission,
 		0 as vl_agent_commission,
 		0 as vl_delay_fine,
@@ -1522,7 +1595,8 @@ from
 		0 as vl_field_ops,
 		0 as vl_bo_pre_sale,
 		0 as vl_agent_hours,
-		0 as vl_pis_cofins,
+		0 as vl_st_pis_cofins,
+		0 as vl_st_iss,
 		0 as vl_affiliate_commission,
 		0 as vl_agent_commission,
 		0 as vl_delay_fine,
@@ -1553,7 +1627,8 @@ from
 		0 as vl_field_ops,
 		0 as vl_bo_pre_sale,
 		0 as vl_agent_hours,
-		0 as vl_pis_cofins,
+		vl_st_pis_cofins as vl_st_pis_cofins,
+		vl_st_iss as vl_st_iss,
 		vl_affiliate_commission as vl_affiliate_commission,
 		vl_agent_commission as vl_agent_commission,
 		0 as vl_delay_fine,

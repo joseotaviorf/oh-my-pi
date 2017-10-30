@@ -1,10 +1,10 @@
-drop view vw_net_revenue_revenues_management_fee;
+drop view vw_net_revenue_revenues_mgmt_fee;
 ---
 --- Returns vl_management_fee revenue for each invoice
 --- Revenue: Management Fee on rented properties
 --- Cash Flow Date: Date of Landlord Payment
 ---
-create or replace view vw_net_revenue_revenues_management_fee as
+create or replace view vw_net_revenue_revenues_mgmt_fee as
 with filtered_contracts as (
 select distinct
 	imovel_id as property_id,

@@ -27,7 +27,7 @@ costs as (
       hc.hours / (count(fv.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
     from filtered_visits fv
     left join hour_costs hc
-      on hc.dre_date = date_trunc('month', fv.dt)
+      on hc.dre_date = date_trunc('month', fv.dt) + interval '1 month'
 ),
 -- In Jan-2016 there was no FUP; using 'Marcado' as visit confirmed
 old_visists as (
@@ -48,7 +48,7 @@ old_costs as (
       hc.hours / (count(ov.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
     from old_visists ov
     left join hour_costs hc
-      on hc.dre_date = date_trunc('month', ov.dt)
+      on hc.dre_date = date_trunc('month', ov.dt) + interval '1 month'
 ),
 all_costs as (
     select
