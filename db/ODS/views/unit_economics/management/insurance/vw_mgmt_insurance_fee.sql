@@ -71,9 +71,9 @@ base_contract as (
 		and c.dt_end between base.min_version_time and base.max_version_time
 )
 select
-	max(sk_property)::integer as sk_property,
-	bc.property_id::integer,
-	bc.contract_id::integer,
+	max(sk_property)::bigint as sk_property,
+	bc.property_id,
+	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
 	dt_cash_flow as dt_cash_flow
 from

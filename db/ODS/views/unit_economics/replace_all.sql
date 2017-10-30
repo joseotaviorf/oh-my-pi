@@ -20,6 +20,7 @@ drop view if exists vw_mgmt_ops_bo_ongoing_costs cascade;
 drop view if exists vw_mgmt_ops_collection_costs cascade;
 drop view if exists vw_mgmt_ops_cs_post_sale_costs cascade;
 drop view if exists vw_mgmt_ops_costs cascade;
+drop view if exists vw_mgmt_insurance_fee cascade;
 drop view if exists vw_mgmt_costs cascade;
 drop view if exists vw_liquidity_mkt_tenant_campaigns_costs cascade;
 drop view if exists vw_liquidity_ops_bo_pre_sale_costs cascade;
@@ -965,9 +966,9 @@ base_contract as (
 		and c.dt_end between base.min_version_time and base.max_version_time
 )
 select
-	max(sk_property)::integer as sk_property,
-	bc.property_id::integer,
-	bc.contract_id::integer,
+	max(sk_property)::bigint as sk_property,
+	bc.property_id,
+	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
 	dt_cash_flow as dt_cash_flow
 from
