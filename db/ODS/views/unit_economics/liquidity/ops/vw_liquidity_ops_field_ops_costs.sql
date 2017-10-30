@@ -24,7 +24,7 @@ costs as (
       cfo."value" / (count(fv.property_id) over (partition by cfo.dre_date))::double precision as vl_field_ops
     from filtered_visits fv
     join cdre_field_ops cfo
-      on cfo.dre_date = date_trunc('month', fv.dt)
+      on cfo.dre_date = date_trunc('month', fv.dt) + interval '1 month'
 )
 select
   vbpc.sk_property,

@@ -27,7 +27,8 @@ costs as (
       cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
     from filtered_contracts fc
     join cdre_cs_post_sale cps
-      on cps.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
+      on cps.dre_date between date_trunc('month', fc.start_date) + interval '1 month'
+                        and date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,

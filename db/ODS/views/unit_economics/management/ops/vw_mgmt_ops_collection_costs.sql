@@ -39,7 +39,7 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collection
     from filtered_contracts fc
     join cdre_collection co
-      on co.dre_date = date_trunc('month', fc.dt)
+      on co.dre_date = date_trunc('month', fc.dt) + interval '1 month'
 )
 select
   vbpc.sk_property,

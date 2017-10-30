@@ -24,7 +24,7 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
     from filtered_contracts fc
     join cdre_offboarding co
-      on co.dre_date = date_trunc('month', fc.end_date)
+      on co.dre_date = date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,

@@ -27,7 +27,8 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing
     from filtered_contracts fc
     join cdre_ongoing co
-      on co.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
+      on co.dre_date between date_trunc('month', fc.start_date)  + interval '1 month'
+                        and date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,

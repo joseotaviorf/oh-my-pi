@@ -37,6 +37,7 @@ select
   id as property_id,
   version,
   publication_date,
+  last_status_version,
   coalesce(min_version_time, '1900-01-01')::date as min_version_time,
   coalesce(max_version_time, '2300-01-01')::date as max_version_time
 from vw_property_listing
@@ -661,7 +662,7 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
     from filtered_contracts fc
     join cdre_offboarding co
-      on co.dre_date = date_trunc('month', fc.end_date)
+      on co.dre_date = date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
@@ -709,7 +710,8 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_onboarding
     from filtered_contracts fc
     join cdre_onboarding co
-      on co.dre_date between date_trunc('month', fc."from") and date_trunc('month', fc."to")
+      on co.dre_date between date_trunc('month', fc."from")  + interval '1 month'
+                        and date_trunc('month', fc."to") + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
@@ -722,6 +724,7 @@ left join vw_base_property_costs vbpc
     and c."from" >= vbpc.min_version_time
     and c."to" <= vbpc.max_version_time
 ;
+
 
 
 create or replace view vw_mgmt_ops_bo_ongoing_costs as
@@ -752,7 +755,8 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing
     from filtered_contracts fc
     join cdre_ongoing co
-      on co.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
+      on co.dre_date between date_trunc('month', fc.start_date)  + interval '1 month'
+                        and date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
@@ -765,6 +769,7 @@ left join vw_base_property_costs vbpc
     and c.start_date >= vbpc.min_version_time
     and c.end_date <= vbpc.max_version_time
 ;
+
 
 create or replace view vw_mgmt_ops_collection_costs as
 with rent_delay as (
@@ -806,7 +811,7 @@ costs as (
       co."value" / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_collection
     from filtered_contracts fc
     join cdre_collection co
-      on co.dre_date = date_trunc('month', fc.dt)
+      on co.dre_date = date_trunc('month', fc.dt) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -848,7 +853,8 @@ costs as (
       cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
     from filtered_contracts fc
     join cdre_cs_post_sale cps
-      on cps.dre_date between date_trunc('month', fc.start_date) and date_trunc('month', fc.end_date)
+      on cps.dre_date between date_trunc('month', fc.start_date) + interval '1 month'
+                        and date_trunc('month', fc.end_date) + interval '1 month'
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
@@ -1102,8 +1108,8 @@ costs as (
       cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_bo_pre_sale
     from filtered_contracts fc
     join cdre_bo_pre_sale cps
-      on cps.dre_date = date_trunc('month', fc.created_date)
-         or  cps.dre_date = date_trunc('month', fc.signature_date)
+      on cps.dre_date = date_trunc('month', fc.created_date) + interval '1 month'
+         or  cps.dre_date = date_trunc('month', fc.signature_date) + interval '1 month'
 )
 select
   max(vbpc.sk_property) as sk_property,
@@ -1128,14 +1134,12 @@ with cdre_cs_pre_sale as (
     from files.costs_dre
     where costs_dre."Category" = 'Customer Support (pre-sale)'
 ),
-
--- USE VW_BASE_PROPERTY_COSTS
 filtered_properties as (
     select distinct
-      id as property_id,
+      property_id,
       min_version_time::date,
       max_version_time::date
-    from vw_property_listing
+    from vw_base_property_costs
     where last_status_version = 'publicado'
 ),
 costs as (
@@ -1147,7 +1151,8 @@ costs as (
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date between date_trunc('month', fp.min_version_time) and date_trunc('month', fp.max_version_time)
+      on cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
+                        and date_trunc('month', fp.max_version_time) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -1160,6 +1165,7 @@ join vw_base_property_costs vbpc
     and c.min_version_time = vbpc.min_version_time
     and c.max_version_time = vbpc.max_version_time
 ;
+
 
 create or replace view vw_liquidity_ops_field_ops_costs as
 with cdre_field_ops as (
@@ -1186,7 +1192,7 @@ costs as (
       cfo."value" / (count(fv.property_id) over (partition by cfo.dre_date))::double precision as vl_field_ops
     from filtered_visits fv
     join cdre_field_ops cfo
-      on cfo.dre_date = date_trunc('month', fv.dt)
+      on cfo.dre_date = date_trunc('month', fv.dt) + interval '1 month'
 )
 select
   vbpc.sk_property,

@@ -7,14 +7,12 @@ with cdre_cs_pre_sale as (
     from files.costs_dre
     where costs_dre."Category" = 'Customer Support (pre-sale)'
 ),
-
--- USE VW_BASE_PROPERTY_COSTS
 filtered_properties as (
     select distinct
-      id as property_id,
+      property_id,
       min_version_time::date,
       max_version_time::date
-    from vw_property_listing
+    from vw_base_property_costs
     where last_status_version = 'publicado'
 ),
 costs as (
@@ -26,7 +24,8 @@ costs as (
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date between date_trunc('month', fp.min_version_time) and date_trunc('month', fp.max_version_time)
+      on cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
+                        and date_trunc('month', fp.max_version_time) + interval '1 month'
 )
 select
   vbpc.sk_property,
