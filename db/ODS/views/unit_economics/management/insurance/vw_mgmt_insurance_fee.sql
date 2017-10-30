@@ -1,0 +1,86 @@
+drop view vw_mgmt_insurance_fee;
+---
+--- Returns vl_insurance_costs based on contract
+--- Costs: Insurance costs for Rented properties
+--- Cash Flow Date: 10th of each Contract Month following start and end rule
+---
+create or replace view vw_mgmt_insurance_fee as
+with payed_contracts as (
+	select
+		distinct
+			c.id as contract_id,
+			c.status,
+			c."dataInicio" as dt_start,
+			coalesce(c."dataRescisao",c."dataFimContratoPrevisto") as dt_end,
+			c.imovel_id as property_id,
+			c."valorAluguel" as rent
+	from
+		contract c
+	where c.tipo = 'FullService'
+--  and c.status in ('Finalizado', 'Ativo')
+--	inner join
+--		invoice i
+--		on i.contract_id = c.id
+),
+pay_dates as (
+	select
+		*,
+		case
+			when date_part('day', dt_start) > 20
+			then (date_trunc('month', dt_start + interval '3 month') + interval '9 day')::date
+			else (date_trunc('month', dt_start + interval '2 month') + interval '9 day')::date
+		end as dt_first_pay,
+		greatest(case
+			when date_part('day', dt_start) > 20
+			then (date_trunc('month', dt_start + interval '3 month') + interval '9 day')::date
+			else (date_trunc('month', dt_start + interval '2 month') + interval '9 day')::date
+		end,(date_trunc('month', dt_end + interval '1 month') + interval '9 day')::date) as dt_last_pay
+	from
+		payed_contracts
+),
+insurance_dates as (
+	select
+		pd.contract_id,
+		pd.property_id,
+		dd."date" as dt_cash_flow,
+		coalesce(case
+			when dt_start < '2017-05-21'
+			then rent * 0.0725
+			else rent * 0.045
+		end, 0) as cardiff_amount
+	from
+		pay_dates pd
+	left join
+		dim_date dd
+		on pd.dt_first_pay <= dd."date"
+		and pd.dt_last_pay >= dd."date"
+		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
+		and dd."date" <= now()
+	where dd."date" is not null
+	and rent is not null
+),
+base_contract as (
+	select
+		base.*,
+		c.contract_id
+	from
+		vw_base_property_costs base
+	left join
+		payed_contracts c
+		on base.property_id = c.property_id
+		and c.dt_end between base.min_version_time and base.max_version_time
+)
+select
+	max(sk_property)::integer as sk_property,
+	bc.property_id::integer,
+	bc.contract_id::integer,
+	cardiff_amount::decimal(14,4) as vl_insurance_fee,
+	dt_cash_flow as dt_cash_flow
+from
+	base_contract bc
+left join
+	insurance_dates i
+	on bc.contract_id = i.contract_id
+where coalesce(cardiff_amount, 0) > 0
+group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+;

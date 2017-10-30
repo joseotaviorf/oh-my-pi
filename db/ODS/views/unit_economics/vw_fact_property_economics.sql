@@ -33,7 +33,7 @@ select
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
-	0 as vl_insurance_fee
+	-sum(vl_insurance_fee) as vl_insurance_fee
 from
 (
 	select
@@ -125,7 +125,7 @@ from
 		vl_bo_onboarding as vl_bo_onboarding,
 		vl_bo_ongoing as vl_bo_ongoing,
 		vl_bo_offboarding as vl_bo_offboarding,
-		0 as vl_insurance_fee
+		vl_insurance_fee as vl_insurance_fee
 	from
 		vw_mgmt_costs
 	union all
