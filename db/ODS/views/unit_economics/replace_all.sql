@@ -898,19 +898,104 @@ full outer join vw_mgmt_ops_cs_post_sale_costs post_sale
      and post_sale.dt_cash_flow = offboarding.dt_cash_flow
 ;
 
+create or replace view vw_mgmt_insurance_fee as
+with payed_contracts as (
+	select
+		distinct
+			c.id as contract_id,
+			c.status,
+			c."dataInicio" as dt_start,
+			coalesce(c."dataRescisao",c."dataFimContratoPrevisto") as dt_end,
+			c.imovel_id as property_id,
+			c."valorAluguel" as rent
+	from
+		contract c
+	where c.tipo = 'FullService'
+--  and c.status in ('Finalizado', 'Ativo')
+--	inner join
+--		invoice i
+--		on i.contract_id = c.id
+),
+pay_dates as (
+	select
+		*,
+		case
+			when date_part('day', dt_start) > 20
+			then (date_trunc('month', dt_start + interval '3 month') + interval '9 day')::date
+			else (date_trunc('month', dt_start + interval '2 month') + interval '9 day')::date
+		end as dt_first_pay,
+		greatest(case
+			when date_part('day', dt_start) > 20
+			then (date_trunc('month', dt_start + interval '3 month') + interval '9 day')::date
+			else (date_trunc('month', dt_start + interval '2 month') + interval '9 day')::date
+		end,(date_trunc('month', dt_end + interval '1 month') + interval '9 day')::date) as dt_last_pay
+	from
+		payed_contracts
+),
+insurance_dates as (
+	select
+		pd.contract_id,
+		pd.property_id,
+		dd."date" as dt_cash_flow,
+		coalesce(case
+			when dt_start < '2017-05-21'
+			then rent * 0.0725
+			else rent * 0.045
+		end, 0) as cardiff_amount
+	from
+		pay_dates pd
+	left join
+		dim_date dd
+		on pd.dt_first_pay <= dd."date"
+		and pd.dt_last_pay >= dd."date"
+		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
+		and dd."date" <= now()
+	where dd."date" is not null
+	and rent is not null
+),
+base_contract as (
+	select
+		base.*,
+		c.contract_id
+	from
+		vw_base_property_costs base
+	left join
+		payed_contracts c
+		on base.property_id = c.property_id
+		and c.dt_end between base.min_version_time and base.max_version_time
+)
+select
+	max(sk_property)::integer as sk_property,
+	bc.property_id::integer,
+	bc.contract_id::integer,
+	cardiff_amount::decimal(14,4) as vl_insurance_fee,
+	dt_cash_flow as dt_cash_flow
+from
+	base_contract bc
+left join
+	insurance_dates i
+	on bc.contract_id = i.contract_id
+where coalesce(cardiff_amount, 0) > 0
+group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+;
 
 create or replace view vw_mgmt_costs as
 select
-  ops.sk_property as sk_property,
-  ops.property_id as property_id,
-  ops.dt_cash_flow as dt_cash_flow,
-  ops.vl_bo_offboarding,
-  ops.vl_bo_onboarding,
-  ops.vl_bo_ongoing,
-  ops.vl_collection,
-  ops.vl_cs_post_sale
+  coalesce(ops.sk_property, ins.sk_property) as sk_property,
+  coalesce(ops.property_id, ins.property_id) as property_id,
+  coalesce(ops.dt_cash_flow, ins.dt_cash_flow) as dt_cash_flow,
+  coalesce(ops.vl_bo_offboarding, 0) as vl_bo_offboarding,
+  coalesce(ops.vl_bo_onboarding, 0) as vl_bo_onboarding,
+  coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
+  coalesce(ops.vl_collection, 0) as vl_collection,
+  coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
+  coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee
 from
 	vw_mgmt_ops_costs ops
+full outer join
+	vw_mgmt_insurance_fee ins
+	on ins.sk_property = ops.sk_property
+     and ins.dt_cash_flow = ops.dt_cash_flow
 ;
 
 create or replace view vw_liquidity_mkt_tenant_campaigns_costs as
@@ -1356,7 +1441,7 @@ select
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
-	0 as vl_insurance_fee
+	-sum(vl_insurance_fee) as vl_insurance_fee
 from
 (
 	select
@@ -1448,7 +1533,7 @@ from
 		vl_bo_onboarding as vl_bo_onboarding,
 		vl_bo_ongoing as vl_bo_ongoing,
 		vl_bo_offboarding as vl_bo_offboarding,
-		0 as vl_insurance_fee
+		vl_insurance_fee as vl_insurance_fee
 	from
 		vw_mgmt_costs
 	union all
