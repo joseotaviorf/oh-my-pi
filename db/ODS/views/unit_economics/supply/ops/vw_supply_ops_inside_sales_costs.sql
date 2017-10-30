@@ -24,12 +24,12 @@ costs as (
       cis."value" / (count(fp.property_id) over (partition by cis.dre_date))::double precision as vl_inside_sales
     from filtered_properties fp
     join cdre_inside_sales cis
-      on cis.dre_date = date_trunc('month', fp.listing_date)
+      on cis.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
   vbpc.sk_property,
   c.property_id,
-  c.dt_cash_flow,
+  c.dt_cash_flow as dt_cash_flow,
   c.vl_inside_sales
 from costs c
 join vw_base_property_costs vbpc

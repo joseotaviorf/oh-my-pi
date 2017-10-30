@@ -68,12 +68,12 @@ costs as (
       cis."value" / (count(fp.property_id) over (partition by cis.dre_date))::double precision as vl_inside_sales
     from filtered_properties fp
     join cdre_inside_sales cis
-      on cis.dre_date = date_trunc('month', fp.listing_date)
+      on cis.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
   vbpc.sk_property,
   c.property_id,
-  c.dt_cash_flow,
+  c.dt_cash_flow as dt_cash_flow,
   c.vl_inside_sales
 from costs c
 join vw_base_property_costs vbpc
@@ -91,20 +91,23 @@ with cdre_photos as (
     where costs_dre."Category" = 'Listing Photos'
 ),
 filtered_properties as (
-    select distinct
-      id as property_id,
-      min_version_time::date as listing_date
-    from vw_property_listing
+   select distinct
+      vbpc.property_id,
+      i.first_publication::date as listing_date
+    from vw_base_property_costs vbpc
+    join imovel i
+      on i.id = vbpc.property_id
+    where vbpc.version = 1
 ),
 costs as (
     select
       fp.property_id,
       fp.listing_date,
-      cp.dre_date + interval '1 month' as dt_cash_flow,
+      cp.dre_date as dt_cash_flow,
       cp."value" / (count(fp.property_id) over (partition by cp.dre_date))::double precision as vl_photos
     from filtered_properties fp
     join cdre_photos cp
-      on cp.dre_date = date_trunc('month', fp.listing_date)
+      on cp.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -114,7 +117,7 @@ select
 from costs c
 join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
-    and c.listing_date = vbpc.min_version_time::date
+where vbpc.version = 1
 ;
 
 
