@@ -495,18 +495,24 @@ all_contracts as (
     vl_agent_commission,
     dt
   from filtered_properties
+),
+updated_dates as (
+  select
+    property_id,
+    vl_agent_commission,
+    dt + interval '2 month' as dt
+  from all_contracts
 )
 select
   vbpc.sk_property,
-  ac.property_id,
-  make_date(extract(year from ac.dt)::int, extract(month from ac.dt)::int, 7) as dt_cash_flow,
-  ac.vl_agent_commission
-from all_contracts ac
+  ud.property_id,
+  make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
+  ud.vl_agent_commission
+from updated_dates ud
 join vw_base_property_costs vbpc
-  on vbpc.property_id = ac.property_id
-    and ac.dt between vbpc.min_version_time and vbpc.max_version_time
+  on vbpc.property_id = ud.property_id
+    and ud.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
-
 
 ---
 --- Returns vl_affiliate_commission costs for each first version property
