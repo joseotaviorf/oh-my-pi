@@ -3,11 +3,11 @@ create or replace view vw_liquidity_ab_agent_hours_costs as
 with hour_costs as (
   select distinct
     cd."Month" as dre_date,
-    (-1 * cd."Value") -
-        sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow) as hours
+    sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow)
+       +  cd."Value" as hours
   from vw_net_revenue_agent_commission_costs agent_commission
   join files.costs_dre cd
-    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow)
+    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
   where cd."Category" = 'Agents Commission'
 ),
 filtered_visits as (
@@ -71,7 +71,11 @@ select
   vbpc.sk_property,
   ac.property_id,
   ac.dt_cash_flow::date,
-  sum(ac.vl_agent_hours) as vl_agent_hours
+  case
+    when sum(ac.vl_agent_hours) > 0
+      then 0
+    else sum(ac.vl_agent_hours)
+  end as vl_agent_hours
 from all_costs ac
 join vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id

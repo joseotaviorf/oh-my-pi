@@ -1303,7 +1303,9 @@ filtered_properties as (
     select distinct
       sk_property,
       property_id,
-      publication_date::date
+      publication_date::date,
+      min_version_time::date,
+      max_version_time::date
     from vw_base_property_costs
     where last_status_version = 'publicado'
 ),
@@ -1315,7 +1317,13 @@ costs as (
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date = date_trunc('month', fp.publication_date) + interval '1 month'
+      on
+         case
+            when fp.min_version_time = '1900-01-01' and fp.max_version_time = '2300-01-01'
+              then cps.dre_date = date_trunc('month', fp.publication_date) + interval '1 month'
+            else cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
+                        and date_trunc('month', fp.max_version_time) + interval '1 month'
+         end
 )
 select
   vbpc.sk_property,
@@ -1393,11 +1401,11 @@ create or replace view vw_liquidity_ab_agent_hours_costs as
 with hour_costs as (
   select distinct
     cd."Month" as dre_date,
-    (-1 * cd."Value") -
-        sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow) as hours
+    sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow)
+       +  cd."Value" as hours
   from vw_net_revenue_agent_commission_costs agent_commission
   join files.costs_dre cd
-    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow)
+    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
   where cd."Category" = 'Agents Commission'
 ),
 filtered_visits as (
@@ -1461,14 +1469,17 @@ select
   vbpc.sk_property,
   ac.property_id,
   ac.dt_cash_flow::date,
-  sum(ac.vl_agent_hours) as vl_agent_hours
+  case
+    when sum(ac.vl_agent_hours) > 0
+      then 0
+    else sum(ac.vl_agent_hours)
+  end as vl_agent_hours
 from all_costs ac
 join vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
     and ac.dt between vbpc.min_version_time and vbpc.max_version_time
 group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
 ;
-
 
 create or replace view vw_liquidity_costs as
 select
@@ -1505,7 +1516,7 @@ select
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
-	-sum(vl_agent_hours) as vl_agent_hours,
+	sum(vl_agent_hours) as vl_agent_hours,
 	-sum(vl_st_pis_cofins) as vl_st_pis_cofins,
 	-sum(vl_st_iss) as vl_st_iss,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
