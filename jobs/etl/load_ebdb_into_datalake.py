@@ -23,7 +23,8 @@ CLEAN_TABLE_INFOS = [
     {'original_name': 'FollowUpDetails', 'new_name': 'follow_up_details'},
     {'original_name': 'UsuarioRevisionEntity', 'new_name': 'usuario_revision_entity'},
     {'original_name': 'OperacaoContaCorrente', 'new_name': 'operacao_conta_corrente'},
-    {'original_name': 'ContaCorrente', 'new_name': 'conta_corrente'}
+    {'original_name': 'ContaCorrente', 'new_name': 'conta_corrente'},
+    {'original_name': 'Imovel_informacoesVisita_AUD', 'new_name': 'informacoes_visita_aud'}
 ]
 
 class EBDBDatalake(object):
