@@ -16,6 +16,7 @@ drop view if exists vw_net_revenue_agent_commission_costs cascade;
 drop view if exists vw_net_revenue_revenues_brokerage_plus_mgmt_aux cascade;
 drop view if exists vw_net_revenue_taxes_sales_tax_iss cascade;
 drop view if exists vw_net_revenue_taxes_sales_tax_pis_cofins cascade;
+drop view if exists vw_net_revenue_taxes_delay_fine cascade;
 drop view if exists vw_net_revenue_taxes cascade;
 drop view if exists vw_net_revenue_costs cascade;
 drop view if exists vw_mgmt_ops_bo_offboarding_costs cascade;
@@ -679,17 +680,44 @@ select
 from pis_cofins
 ;
 
+create or replace view vw_net_revenue_taxes_delay_fine as
+with fines as (
+  select
+	inf.fine,
+	inf.paid_date::date as dt,
+	c.imovel_id as property_id
+  from invoice_fines inf
+  join contract c
+    on inf.contract_id = c.id
+  where c.tipo = 'FullService'
+)
+select
+  vbpc.sk_property,
+  f.property_id,
+  f.fine as vl_delay_fine,
+  f.dt as dt_cash_flow
+from fines f
+join vw_base_property_costs vbpc
+  on vbpc.property_id = f.property_id
+    and f.dt between vbpc.min_version_time and vbpc.max_version_time
+;
+
 create or replace view vw_net_revenue_taxes as
 select
-  coalesce(iss.sk_property, pis_cofins.sk_property) as sk_property,
-  coalesce(iss.property_id, pis_cofins.sk_property) as property_id,
-  coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow) as dt_cash_flow,
+  coalesce(iss.sk_property, pis_cofins.sk_property, delay_fine.sk_property) as sk_property,
+  coalesce(iss.property_id, pis_cofins.property_id, delay_fine.property_id) as property_id,
+  coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow, delay_fine.dt_cash_flow) as dt_cash_flow,
   coalesce(iss.vl_st_iss, 0) as vl_st_iss,
-  coalesce(pis_cofins.vl_st_pis_cofins, 0) as vl_st_pis_cofins
+  coalesce(pis_cofins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
+  coalesce(delay_fine.vl_delay_fine, 0) as vl_delay_fine
 from vw_net_revenue_taxes_sales_tax_iss iss
 full outer join vw_net_revenue_taxes_sales_tax_pis_cofins pis_cofins
   on iss.sk_property = pis_cofins.sk_property
      and iss.dt_cash_flow = pis_cofins.dt_cash_flow
+full outer join vw_net_revenue_taxes_delay_fine delay_fine
+  on delay_fine.sk_property = coalesce(iss.sk_property, pis_cofins.sk_property)
+     and delay_fine.dt_cash_flow = coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow)
+
 ;
 
 
@@ -703,7 +731,8 @@ select
 	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
 	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission,
 	coalesce(vnrt.vl_st_iss, 0) as vl_st_iss,
-	coalesce(vnrt.vl_st_pis_cofins, 0) as vl_st_pis_cofins
+	coalesce(vnrt.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
+	coalesce(vnrt.vl_delay_fine, 0) as vl_delay_fine
 from
     vw_net_revenue_commission_costs vnrcc
 full outer join
@@ -1521,7 +1550,7 @@ select
 	-sum(vl_st_iss) as vl_st_iss,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
 	-sum(vl_agent_commission) as vl_agent_commission,
-	0 as vl_delay_fine,
+	sum(vl_delay_fine) as vl_delay_fine,
 	0 as vl_termination_fine,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_management_fee) as vl_management_fee,
@@ -1648,7 +1677,7 @@ from
 		vl_st_iss as vl_st_iss,
 		vl_affiliate_commission as vl_affiliate_commission,
 		vl_agent_commission as vl_agent_commission,
-		0 as vl_delay_fine,
+		vl_delay_fine as vl_delay_fine,
 		0 as vl_termination_fine,
 		vl_brokerage_fee as vl_brokerage_fee,
 		vl_management_fee as vl_management_fee,

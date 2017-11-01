@@ -14,8 +14,9 @@ select
 	coalesce(vl_management_fee, 0) as vl_management_fee,
 	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
 	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission,
-	coalesce(vnrt.vl_sales_tax_iss, 0) as vl_st_iss,
-	coalesce(vnrt.vl_sales_tax_pis_cofins, 0) as vl_st_pis_cofins
+	coalesce(vnrt.vl_st_iss, 0) as vl_st_iss,
+	coalesce(vnrt.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
+	coalesce(vnrt.vl_delay_fine, 0) as vl_delay_fine
 from
     vw_net_revenue_commission_costs vnrcc
 full outer join

@@ -1,15 +1,19 @@
-drop view if exists vw_fact_property_economics;
+--drop view if exists vw_fact_property_economics;
 ---
 --- Returns the final view for Unit Economics
 --- Cost: All costs grouped by versioned property / cash flow date
 --- Cash Flow Date: Date of Payment
 --- Placeholders with random int will be kept while developing the remainder values
 ---
-create or replace view vw_fact_property_economics as
+--create or replace view vw_fact_property_economics as
+
+create view vw_fact_property_economics_ribaldo as
+--with x as (
 select
 	sk_property,
 	property_id,
 	sk_cash_flow_date,
+	sk_contract,
 	-sum(vl_owner_campaigns) as vl_owner_campaigns,
 	-sum(vl_affiliate_campaigns) as vl_affiliate_campaigns,
 	sum(vl_inside_sales) as vl_inside_sales,
@@ -20,7 +24,7 @@ select
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
-	-sum(vl_agent_hours) as vl_agent_hours,
+	sum(vl_agent_hours) as vl_agent_hours,
 	-sum(vl_st_pis_cofins) as vl_st_pis_cofins,
 	-sum(vl_st_iss) as vl_st_iss,
 	-sum(vl_affiliate_commission) as vl_affiliate_commission,
@@ -40,6 +44,7 @@ from
 	select
 		sk_property,
 		property_id,
+		dt_cash_flow,
 		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
 		0 as vl_owner_campaigns,
 		0 as vl_affiliate_campaigns,
@@ -72,6 +77,7 @@ from
 	select
 		sk_property,
 		property_id,
+		dt_cash_flow,
 		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
 		vl_owner_campaigns,
 		vl_affiliate_campaigns,
@@ -104,6 +110,7 @@ from
 	select
 		sk_property,
 		property_id,
+		dt_cash_flow,
 		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
 		0 as vl_owner_campaigns,
 		0 as vl_affiliate_campaigns,
@@ -136,6 +143,7 @@ from
 	select
 		sk_property,
 		property_id,
+		dt_cash_flow,
 		coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
 		0 as vl_owner_campaigns,
 		0 as vl_affiliate_campaigns,
@@ -165,5 +173,13 @@ from
 	from
 		vw_net_revenue_costs
 ) tbl
-group by sk_property, property_id, sk_cash_flow_date
+left join vw_dim_contract vdc
+on tbl.dt_cash_flow between vdc.dt_signature and coalesce(vdc.dt_contract_annulment, vdc.dt_contract_intended_end)
+ and vdc.contract_type = 'FullService'
+group by tbl.sk_property, tbl.property_id, tbl.sk_cash_flow_date, vdc.sk_contract
+--)
+--select sk_contract, count(sk_contract)
+--from x
+--group by sk_contract
+--having count(sk_contract) > 1
 ;
