@@ -33,6 +33,7 @@ drop view if exists vw_liquidity_mkt_costs cascade;
 drop view if exists vw_liquidity_ops_cs_pre_sale_costs cascade;
 drop view if exists vw_liquidity_ops_field_ops_costs cascade;
 drop view if exists vw_liquidity_ops_costs cascade;
+drop view if exists vw_liquidity_lockbox_costs cascade;
 drop view if exists vw_liquidity_ab_agent_hours_costs cascade;
 drop view if exists vw_liquidity_costs cascade;
 drop view if exists vw_fact_property_economics cascade;
@@ -1158,31 +1159,56 @@ rtbhouse_daily_costs as (
 		"Date"::date
 ),
 -- Join all marketing cost sources
+union_costs as
+(
+	select
+		dt_cost,
+		0 as google,
+		cost as rtb,
+		0 as criteo,
+		0 as facebook
+	from
+		rtbhouse_daily_costs
+	union all
+	select
+		dt_cost,
+		0 as google,
+		0 as rtb,
+		cost as criteo,
+		0 as facebook
+	from
+		criteo_daily_costs
+	union all
+	select
+		dt_cost,
+		cost as google,
+		0 as rtb,
+		0 as criteo,
+		0 as facebook
+	from
+		google_daily_costs
+	union all
+	select
+		dt_cost,
+		0 as google,
+		0 as rtb,
+		0 as criteo,
+		cost as facebook
+	from
+		facebook_daily_costs
+),
 pre_classified as
 (
 	select
-		coalesce(c.dt_cost, g.dt_cost, f.dt_cost) as dt_cost,
-		coalesce(c.cost,0) as criteo,
-		coalesce(g.cost,0) as google,
-		coalesce(f.cost,0) as facebook,
-		coalesce(r.cost,0) as rtbhouse,
-		(
-			coalesce(c.cost,0) +
-			coalesce(g.cost,0) +
-			coalesce(f.cost,0) +
-			coalesce(r.cost,0)
-		) as total
+		dt_cost,
+		sum(google) as google,
+		sum(rtb) as rtbhouse,
+		sum(facebook) as facebook,
+		sum(criteo) as criteo,
+		sum(google + rtb + facebook + criteo) as total
 	from
-		criteo_daily_costs c
-	full outer join
-		google_daily_costs g
-		on c.dt_cost = g.dt_cost
-	full outer join
-		facebook_daily_costs f
-		on coalesce(c.dt_cost, g.dt_cost) = f.dt_cost
-	full outer join
-		rtbhouse_daily_costs r
-		on coalesce(c.dt_cost, g.dt_cost, f.dt_cost) = r.dt_cost
+		union_costs
+	group by dt_cost
 ),
 -- Add classified costs
 daily_costs as (
@@ -1405,6 +1431,32 @@ join vw_base_property_costs vbpc
 group by vbpc.sk_property, c.property_id, c.dt_cash_flow
 ;
 
+create or replace view vw_liquidity_lockbox_costs as
+with lockbox_dates as (
+	select
+		imovel_id as property_id,
+		min(dt_added)::date as dt_cash_flow
+	from
+		property_visit_information pvi
+	where
+		pvi.informacoes_visita = 'CHAVE_CAIXA_QUINTOANDAR'
+		and
+		coalesce(date_part('days', dt_deleted - dt_added), 0) > 0
+	group by imovel_id
+)
+select
+	base.sk_property,
+	base.property_id,
+	lock.dt_cash_flow,
+	56.00 as vl_lockbox
+from
+	vw_base_property_costs base
+left join
+	lockbox_dates lock
+	on base.property_id = lock.property_id
+	and lock.dt_cash_flow >= base.min_version_time and lock.dt_cash_flow < base.max_version_time
+where lock.property_id is not null
+;
 
 create or replace view vw_liquidity_ops_costs as
 select
@@ -1512,22 +1564,70 @@ group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
 
 create or replace view vw_liquidity_costs as
 select
-  coalesce(mkt.sk_property, ops.sk_property, agent_hours.sk_property) as sk_property,
-  coalesce(mkt.property_id, ops.property_id, agent_hours.property_id) as property_id,
-  coalesce(mkt.dt_cash_flow, ops.dt_cash_flow, agent_hours.dt_cash_flow) as dt_cash_flow,
-  coalesce(mkt.vl_tenant_campaigns, 0)::decimal(14,4) as vl_tenant_campaigns,
-  coalesce(ops.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
-  coalesce(ops.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
-  coalesce(ops.vl_field_ops, 0) as vl_field_ops,
-  coalesce(agent_hours.vl_agent_hours, 0) as vl_agent_hours
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	sum(vl_tenant_campaigns)::decimal(14,4) as vl_tenant_campaigns,
+	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
+	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
+	sum(vl_field_ops) as vl_field_ops,
+	sum(vl_agent_hours) as vl_agent_hours,
+	sum(vl_lockbox) as vl_lockbox
 from
-	vw_liquidity_mkt_costs mkt
-full outer join vw_liquidity_ops_costs ops
-  on mkt.sk_property = ops.sk_property
-     and mkt.dt_cash_flow = ops.dt_cash_flow
-full outer join vw_liquidity_ab_agent_hours_costs agent_hours
-  on mkt.sk_property = agent_hours.sk_property
-     and mkt.dt_cash_flow = agent_hours.dt_cash_flow
+	(
+		select
+			sk_property,
+			property_id,
+			dt_cash_flow,
+			vl_tenant_campaigns,
+			0 as vl_bo_pre_sale,
+			0 as vl_cs_pre_sale,
+			0 as vl_field_ops,
+			0 as vl_agent_hours,
+			0 as vl_lockbox
+		from
+			vw_liquidity_mkt_costs
+		union all
+		select
+			sk_property,
+			property_id,
+			dt_cash_flow,
+			0 as vl_tenant_campaigns,
+			0 as vl_bo_pre_sale,
+			0 as vl_cs_pre_sale,
+			0 as vl_field_ops,
+			vl_agent_hours,
+			0 as vl_lockbox
+		from
+			vw_liquidity_ab_agent_hours_costs
+		union all
+		select
+			sk_property,
+			property_id,
+			dt_cash_flow,
+			0 as vl_tenant_campaigns,
+			vl_bo_pre_sale,
+			vl_cs_pre_sale,
+			vl_field_ops,
+			0 as vl_agent_hours,
+			0 as vl_lockbox
+		from
+			vw_liquidity_ops_costs
+		union all
+		select
+			sk_property,
+			property_id,
+			dt_cash_flow,
+			0 as vl_tenant_campaigns,
+			0 as vl_bo_pre_sale,
+			0 as vl_cs_pre_sale,
+			0 as vl_field_ops,
+			0 as vl_agent_hours,
+			vl_lockbox
+		from
+			vw_liquidity_lockbox_costs
+	) tbl
+group by sk_property, property_id, dt_cash_flow
 ;
 
 create or replace view vw_fact_property_economics as
@@ -1540,7 +1640,7 @@ select
 	sum(vl_inside_sales) as vl_inside_sales,
 	sum(vl_photos) as vl_photos,
 	-sum(vl_affiliate_bonus) as vl_affiliate_bonus,
-	0 as vl_lockbox,
+	-sum(vl_lockbox) as vl_lockbox,
 	-sum(vl_tenant_campaigns) as vl_tenant_campaigns,
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops,
@@ -1571,7 +1671,7 @@ from
 		0 as vl_inside_sales,
 		0 as vl_photos,
 		0 as vl_affiliate_bonus,
-		0 as vl_lockbox,
+		vl_lockbox as vl_lockbox,
 		vl_tenant_campaigns,
 		vl_cs_pre_sale as vl_cs_pre_sale,
 		vl_field_ops as vl_field_ops,
