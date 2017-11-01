@@ -55,31 +55,56 @@ rtbhouse_daily_costs as (
 		"Date"::date
 ),
 -- Join all marketing cost sources
+union_costs as
+(
+	select
+		dt_cost,
+		0 as google,
+		cost as rtb,
+		0 as criteo,
+		0 as facebook
+	from
+		rtbhouse_daily_costs
+	union all
+	select
+		dt_cost,
+		0 as google,
+		0 as rtb,
+		cost as criteo,
+		0 as facebook
+	from
+		criteo_daily_costs
+	union all
+	select
+		dt_cost,
+		cost as google,
+		0 as rtb,
+		0 as criteo,
+		0 as facebook
+	from
+		google_daily_costs
+	union all
+	select
+		dt_cost,
+		0 as google,
+		0 as rtb,
+		0 as criteo,
+		cost as facebook
+	from
+		facebook_daily_costs
+),
 pre_classified as
 (
 	select
-		coalesce(c.dt_cost, g.dt_cost, f.dt_cost) as dt_cost,
-		coalesce(c.cost,0) as criteo,
-		coalesce(g.cost,0) as google,
-		coalesce(f.cost,0) as facebook,
-		coalesce(r.cost,0) as rtbhouse,
-		(
-			coalesce(c.cost,0) +
-			coalesce(g.cost,0) +
-			coalesce(f.cost,0) +
-			coalesce(r.cost,0)
-		) as total
+		dt_cost,
+		sum(google) as google,
+		sum(rtb) as rtbhouse,
+		sum(facebook) as facebook,
+		sum(criteo) as criteo,
+		sum(google + rtb + facebook + criteo) as total
 	from
-		criteo_daily_costs c
-	full outer join
-		google_daily_costs g
-		on c.dt_cost = g.dt_cost
-	full outer join
-		facebook_daily_costs f
-		on coalesce(c.dt_cost, g.dt_cost) = f.dt_cost
-	full outer join
-		rtbhouse_daily_costs r
-		on coalesce(c.dt_cost, g.dt_cost, f.dt_cost) = r.dt_cost
+		union_costs
+	group by dt_cost
 ),
 -- Add classified costs
 daily_costs as (
