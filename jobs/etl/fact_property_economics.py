@@ -1,20 +1,21 @@
-from jobs.base.base_etl import BaseETL, EnumDb
 import os
 from datetime import datetime
 
+from jobs.base.base_etl import BaseETL, EnumDb
+
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 table_name = BaseETL.get_current_filename()
-process_name = table_name.replace('fact_','')
+process_name = table_name.replace('fact_', '')
 
 print("Start query: {}".format(datetime.now()))
 
 BaseETL.move_table_to_dw(
-    table_name='vw_fact_property_economics',
+    table_name='vw_fact_property_economics_ribaldo',
     enum_db_source=EnumDb.BI_ODS,
     enum_db_dest=EnumDb.BI_DW,
-    table_name_dest=table_name,
+    table_name_dest='{}_ribaldo'.format(table_name),
     append=False,
-    bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
+    bucket_name='{}/clean/ods/{}_ribaldo'.format(bucket_datalake, process_name),
     process_name=process_name
 )
 
