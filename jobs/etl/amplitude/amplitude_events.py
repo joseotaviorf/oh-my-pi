@@ -187,9 +187,9 @@ if __name__ == '__main__':
     a = AmplitudeEventsETL()
     if args[1] == 'source_to_sns':
         topic_arn = args[2] if arg_count > 2 else None
-        start_date = convert_date(args[3]) if arg_count > 3 else now
+        start_date = convert_date(args[3]) - timedelta(hours=1) if arg_count > 3 else now
         print start_date
-        end_date = convert_date(args[4]) if arg_count > 4 else now
+        end_date = convert_date(args[4]) - timedelta(hours=1) if arg_count > 4 else now
         print end_date
         td = args[5] if arg_count > 5 else None
         a.run_source_to_sns(topic_arn=topic_arn, start_date=start_date, end_date=end_date, td=td)
