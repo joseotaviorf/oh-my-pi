@@ -174,8 +174,8 @@ class AmplitudeEventsETL(BaseETL):
 
 
 def convert_date(date_str):
-    dt = datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
-    return dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(LOCAL_TZ))
+    return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
+#     return dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(LOCAL_TZ))
 
 
 if __name__ == '__main__':
