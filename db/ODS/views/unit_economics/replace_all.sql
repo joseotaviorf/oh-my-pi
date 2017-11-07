@@ -1,4 +1,5 @@
 drop view if exists vw_base_property_costs cascade;
+drop view if exists vw_base_contract_costs cascade;
 drop view if exists vw_supply_ops_inside_sales_costs cascade;
 drop view if exists vw_supply_ops_photos_costs cascade;
 drop view if exists vw_supply_ops_costs cascade;
@@ -43,13 +44,30 @@ select
   ((id || '00') || coalesce(version, 1))::bigint as sk_property,
   id as property_id,
   version,
-  publication_date,
-  last_status_version,
-  coalesce(min_version_time, '1900-01-01')::date as min_version_time,
+  min_version_time as publication_date,
+  status,
+  min_version_time,
   coalesce(max_version_time, '2300-01-01')::date as max_version_time
-from vw_property_listing
+from vw_property_listing_ribs
 ;
 
+
+create or replace view vw_base_contract_costs as
+select
+  id,
+  imovel_id as property_id,
+  status,
+  "valorAluguel" as rent_value,
+  "dataRescisao" as termination_date,
+  "dataFimContratoPrevisto" as expected_end_date,
+  "dataAssinado" as signature_date,
+  "dataEntrada" as entrance_date,
+  "dataInicio" as init_date,
+  "criadoEm" as created_date
+from contract
+  where tipo = 'FullService'
+    and status in ('Finalizado', 'Ativo')
+;
 
 create or replace view vw_supply_ops_inside_sales_costs as
 with cdre_inside_sales as (
@@ -459,36 +477,38 @@ and
 create or replace view vw_net_revenue_agent_commission_costs as
 with agents as (
   select distinct
-    comm.*,
-    cont.*,
-    c.imovel_id,
-    c."dataAssinado"
+    comm.dt,
+    comm.percentage,
+    cont.property_id as cont_property_id,
+    cont.rent,
+    cont.contract_id,
+    c.property_id as c_property_id,
+    c.signature_date
   from files.finance_agents_contract cont
   join files.finance_agents_commission comm
     on cont.agent_name = comm.agent_name
        and date_trunc('month', cont.signature_date) = comm.dt
-  left join contract c
+  left join vw_base_contract_costs c
     on c.id = cont.contract_id
   where cont.status = 'Ativo'
 ),
 filtered_properties as (
   select
     dt,
-    coalesce(892700000 + property_id, imovel_id) as property_id,
+    coalesce(892700000 + c_property_id, cont_property_id) as property_id,
     sum(percentage * rent) as vl_agent_commission
   from agents
-  group by dt, property_id, contract_id, imovel_id
+  group by dt, c_property_id, contract_id, cont_property_id
 ),
 -- Agents Commission spreadsheet doesn't contain contracts before Feb-2016
 all_contracts as (
   select
-    c.imovel_id as property_id,
+    c.property_id,
     -- '0.5' is the commission average of Jan-2016
-    c."valorAluguel" * 0.5 as vl_agent_commission,
-    date_trunc('month', "dataAssinado") as dt
-  from contract c
-  where date_trunc('month', "dataAssinado") = '2016-01-01'
-    and tipo = 'FullService'
+    c.rent_value * 0.5 as vl_agent_commission,
+    date_trunc('month', signature_date) as dt
+  from vw_base_contract_costs c
+  where date_trunc('month', signature_date) = '2016-01-01'
 
   union
 
@@ -538,15 +558,13 @@ full outer join vw_net_revenue_agent_commission_costs agent
 create or replace view vw_net_revenue_revenues_brokerage_fee as
 with filtered_contracts as (
 select distinct
-	imovel_id as property_id,
+	property_id,
 	id,
-	(max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over (partition by imovel_id))::date as end_date
+	(max(coalesce(termination_date, expected_end_date)) over (partition by property_id))::date as end_date
 from
-	contract
-where
-	tipo = 'FullService'
-	and ("dataRescisao" is not null
-	or "dataFimContratoPrevisto" is not null)
+	vw_base_contract_costs
+where termination_date is not null
+  or expected_end_date is not null
 ),
 base_contract as (
 	select
@@ -578,15 +596,13 @@ and
 create or replace view vw_net_revenue_revenues_mgmt_fee as
 with filtered_contracts as (
 select distinct
-	imovel_id as property_id,
+	property_id,
 	id,
-	(max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over (partition by imovel_id))::date as end_date
+	(max(coalesce(termination_date, expected_end_date)) over (partition by property_id))::date as end_date
 from
-	contract
-where
-	tipo = 'FullService'
-	and ("dataRescisao" is not null
-	or "dataFimContratoPrevisto" is not null)
+	vw_base_contract_costs
+where termination_date is not null
+	or expected_end_date is not null
 ),
 base_contract as (
 	select
@@ -686,11 +702,10 @@ with fines as (
   select
 	inf.fine,
 	inf.paid_date::date as dt,
-	c.imovel_id as property_id
+	c.property_id as property_id
   from invoice_fines inf
-  join contract c
+  join vw_base_contract_costs c
     on inf.contract_id = c.id
-  where c.tipo = 'FullService'
 )
 select
   vbpc.sk_property,
@@ -757,12 +772,11 @@ with cdre_offboarding as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
-    from contract
-    where tipo = 'FullService'
-      and ("dataRescisao" is not null
-           or "dataFimContratoPrevisto" is not null)
+      property_id,
+      coalesce(termination_date, expected_end_date)::date as end_date
+    from vw_base_contract_costs
+    where termination_date is not null
+          or expected_end_date is not null
 ),
 costs as (
     select
@@ -795,21 +809,20 @@ with cdre_onboarding as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
+      property_id,
       case
-        when "dataAssinado"::date > "dataEntrada"::date
-          then "dataEntrada"::date
-        else "dataAssinado"::date
+        when signature_date::date > init_date::date
+          then init_date::date
+        else signature_date::date
       end as "from",
       case
-        when "dataAssinado"::date > "dataEntrada"::date
-          then "dataAssinado"::date
-        else "dataEntrada"::date
+        when signature_date::date > init_date::date
+          then signature_date::date
+        else init_date::date
       end as "to"
-    from contract
-    where tipo = 'FullService'
-      and "dataAssinado" is not null
-      and "dataEntrada" is not null
+    from vw_base_contract_costs
+    where signature_date is not null
+      and init_date is not null
 ),
 costs as (
     select
@@ -847,14 +860,13 @@ with cdre_ongoing as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      "dataInicio" as start_date,
-      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
-    from contract
-    where tipo = 'FullService'
-      and "dataInicio" is not null
-      and ("dataRescisao" is not null
-            or "dataFimContratoPrevisto" is not null)
+      property_id,
+      init_date as start_date,
+      coalesce(termination_date, expected_end_date)::date as end_date
+    from vw_base_contract_costs
+    where init_date is not null
+      and (termination_date is not null
+            or expected_end_date is not null)
 ),
 costs as (
     select
@@ -903,15 +915,15 @@ cdre_collection as (
 ),
 filtered_contracts as (
     select distinct
-      c.imovel_id as property_id,
+      c.property_id as property_id,
       rd.tenant_due_date as dt,
       rd.tenant_paid_date,
       rd.rent_delayed_days
-    from contract c
+    from vw_base_contract_costs c
     join rent_delay rd
       on c.id = rd.contract_id
-    where c.tipo = 'FullService'
-      and (rd.rent_delayed_days > 0 or tenant_paid_date is null)
+    where rd.rent_delayed_days > 0
+        or tenant_paid_date is null
 ),
 costs as (
     select
@@ -945,14 +957,13 @@ with cdre_cs_post_sale as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      "dataInicio"::date as start_date,
-      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
-    from contract
-    where tipo = 'FullService'
-      and "dataInicio" is not null
-      and ("dataRescisao" is not null
-            or "dataFimContratoPrevisto" is not null)
+      property_id,
+      init_date::date as start_date,
+      coalesce(termination_date, expected_end_date)::date as end_date
+    from vw_base_contract_costs
+    where init_date is not null
+      and (termination_date is not null
+            or expected_end_date is not null)
 ),
 costs as (
     select
@@ -1059,17 +1070,12 @@ with payed_contracts as (
 		distinct
 			c.id as contract_id,
 			c.status,
-			c."dataInicio" as dt_start,
-			coalesce(c."dataRescisao",c."dataFimContratoPrevisto") as dt_end,
-			c.imovel_id as property_id,
-			c."valorAluguel" as rent
+			c.init_date as dt_start,
+			coalesce(c.termination_date,c.expected_end_date) as dt_end,
+			c.property_id as property_id,
+			c.rent_value as rent
 	from
-		contract c
-	where c.tipo = 'FullService'
---  and c.status in ('Finalizado', 'Ativo')
---	inner join
---		invoice i
---		on i.contract_id = c.id
+		vw_base_contract_costs c
 ),
 pay_dates as (
 	select
@@ -1356,13 +1362,12 @@ with cdre_bo_pre_sale as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      "criadoEm"::date as created_date,
-      "dataAssinado"::date as signature_date
-    from contract
-    where tipo = 'FullService'
-      and ("criadoEm" is not null
-           or "dataAssinado" is not null)
+      property_id,
+      created_date::date as created_date,
+      signature_date::date as signature_date
+    from vw_base_contract_costs
+    where created_date is not null
+           or signature_date is not null
 ),
 costs as (
     select
@@ -1407,7 +1412,7 @@ filtered_properties as (
       min_version_time::date,
       max_version_time::date
     from vw_base_property_costs
-    where last_status_version = 'publicado'
+    where status = 'publicado'
 ),
 costs as (
     select
@@ -1417,13 +1422,8 @@ costs as (
       cps."value" / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on
-         case
-            when fp.min_version_time = '1900-01-01' and fp.max_version_time = '2300-01-01'
-              then cps.dre_date = date_trunc('month', fp.publication_date) + interval '1 month'
-            else cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
-                        and date_trunc('month', fp.max_version_time) + interval '1 month'
-         end
+      on cps.dre_date between date_trunc('month', fp.min_version_time) + interval '1 month'
+         and date_trunc('month', fp.max_version_time) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -1698,6 +1698,7 @@ from
 group by sk_property, property_id, dt_cash_flow
 ;
 
+
 create or replace view vw_fact_property_economics as
 with unit_economics as (
     select
@@ -1870,17 +1871,16 @@ with unit_economics as (
 contracts as (
 	select
 		id as sk_contract,
-		imovel_id as property_id,
-		"dataAssinado" as start_date,
+		property_id,
+		signature_date as start_date,
 		case
-			when coalesce("dataRescisao", "dataFimContratoPrevisto")::date > now()::date
+			when coalesce(termination_date, expected_end_date)::date > now()::date
 				then now()::date
-			else coalesce("dataRescisao", "dataFimContratoPrevisto")::date
+			else coalesce(termination_date, expected_end_date)::date
 		end as end_date
-	from contract
-	where tipo = 'FullService'
-	  and "dataAssinado" is not null
-	  and ("dataRescisao" is not null or "dataFimContratoPrevisto" is not null)
+	from vw_base_contract_costs
+	where signature_date is not null
+	  and (termination_date is not null or expected_end_date is not null)
 )
 select
   ue.sk_property,
@@ -1917,4 +1917,3 @@ left join contracts c
   on ue.property_id = c.property_id
      and ue.dt_cash_flow between c.start_date and c.end_date
 ;
-
