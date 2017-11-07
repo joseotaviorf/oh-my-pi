@@ -10,8 +10,8 @@ with cdre_bo_pre_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max("criadoEm") over (partition by imovel_id))::date as created_date,
-      (max("dataAssinado") over (partition by imovel_id))::date as signature_date
+      "criadoEm"::date as created_date,
+      "dataAssinado"::date as signature_date
     from contract
     where tipo = 'FullService'
       and ("criadoEm" is not null

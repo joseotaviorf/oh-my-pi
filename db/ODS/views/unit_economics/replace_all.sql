@@ -758,7 +758,7 @@ with cdre_offboarding as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over (partition by imovel_id))::date as end_date
+      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
     from contract
     where tipo = 'FullService'
       and ("dataRescisao" is not null
@@ -980,32 +980,77 @@ left join vw_base_property_costs vbpc
 
 create or replace view vw_mgmt_ops_costs as
 select
-  coalesce(offboarding.sk_property, onboarding.sk_property, ongoing.sk_property, collection.sk_property, post_sale.sk_property) as sk_property,
-  coalesce(offboarding.property_id, onboarding.property_id, ongoing.property_id, collection.property_id, post_sale.property_id) as property_id,
-  coalesce(offboarding.dt_cash_flow, onboarding.dt_cash_flow, ongoing.dt_cash_flow, collection.dt_cash_flow, post_sale.dt_cash_flow) as dt_cash_flow,
-  coalesce(offboarding.vl_bo_offboarding, 0) as vl_bo_offboarding,
-  coalesce(onboarding.vl_bo_onboarding, 0) as vl_bo_onboarding,
-  coalesce(ongoing.vl_bo_ongoing, 0) as vl_bo_ongoing,
-  coalesce(collection.vl_collection, 0) as vl_collection,
-  coalesce(post_sale.vl_cs_post_sale, 0) as vl_cs_post_sale
-
-from vw_mgmt_ops_bo_offboarding_costs offboarding
-
-full outer join vw_mgmt_ops_bo_onboarding_costs onboarding
-  on onboarding.sk_property = offboarding.sk_property
-     and onboarding.dt_cash_flow = offboarding.dt_cash_flow
-
-full outer join vw_mgmt_ops_bo_ongoing_costs ongoing
-  on ongoing.sk_property = offboarding.sk_property
-     and ongoing.dt_cash_flow = offboarding.dt_cash_flow
-
-full outer join vw_mgmt_ops_collection_costs collection
-  on collection.sk_property = offboarding.sk_property
-     and collection.dt_cash_flow = offboarding.dt_cash_flow
-
-full outer join vw_mgmt_ops_cs_post_sale_costs post_sale
-  on post_sale.sk_property = offboarding.sk_property
-     and post_sale.dt_cash_flow = offboarding.dt_cash_flow
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	sum(vl_bo_offboarding) as vl_bo_offboarding,
+	sum(vl_bo_onboarding) as vl_bo_onboarding,
+	sum(vl_bo_ongoing) as vl_bo_ongoing,
+	sum(vl_collection) as vl_collection,
+	sum(vl_cs_post_sale) as vl_cs_post_sale
+from
+(
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_collection,
+		0 as vl_cs_post_sale
+	from
+		vw_mgmt_ops_bo_offboarding_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_collection,
+		0 as vl_cs_post_sale
+	from
+		vw_mgmt_ops_bo_onboarding_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		vl_bo_ongoing,
+		0 as vl_collection,
+		0 as vl_cs_post_sale
+	from
+		vw_mgmt_ops_bo_ongoing_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		vl_collection,
+		0 as vl_cs_post_sale
+	from
+		vw_mgmt_ops_collection_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_collection,
+		vl_cs_post_sale
+	from
+		vw_mgmt_ops_cs_post_sale_costs
+) tbl
+group by sk_property, property_id, dt_cash_flow
 ;
 
 create or replace view vw_mgmt_insurance_fee as
@@ -1312,8 +1357,8 @@ with cdre_bo_pre_sale as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max("criadoEm") over (partition by imovel_id))::date as created_date,
-      (max("dataAssinado") over (partition by imovel_id))::date as signature_date
+      "criadoEm"::date as created_date,
+      "dataAssinado"::date as signature_date
     from contract
     where tipo = 'FullService'
       and ("criadoEm" is not null
@@ -1460,22 +1505,45 @@ where lock.property_id is not null
 
 create or replace view vw_liquidity_ops_costs as
 select
-  coalesce(bo_pre_sale.sk_property, pre_sale.sk_property, field_ops.sk_property) as sk_property,
-  coalesce(bo_pre_sale.property_id, pre_sale.property_id, field_ops.property_id) as property_id,
-  coalesce(bo_pre_sale.dt_cash_flow, pre_sale.dt_cash_flow, field_ops.dt_cash_flow) as dt_cash_flow,
-  coalesce(bo_pre_sale.vl_bo_pre_sale, 0) as vl_bo_pre_sale,
-  coalesce(pre_sale.vl_cs_pre_sale, 0) as vl_cs_pre_sale,
-  coalesce(field_ops.vl_field_ops, 0) as vl_field_ops
-
-from vw_liquidity_ops_bo_pre_sale_costs bo_pre_sale
-
-full outer join vw_liquidity_ops_cs_pre_sale_costs pre_sale
-  on pre_sale.sk_property = bo_pre_sale.sk_property
-     and pre_sale.dt_cash_flow = bo_pre_sale.dt_cash_flow
-
-full outer join vw_liquidity_ops_field_ops_costs field_ops
-  on field_ops.sk_property = bo_pre_sale.sk_property
-     and field_ops.dt_cash_flow = bo_pre_sale.dt_cash_flow
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
+	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
+	sum(vl_field_ops) as vl_field_ops
+from
+(
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		vl_bo_pre_sale,
+		0 as vl_cs_pre_sale,
+		0 as vl_field_ops
+	from
+		vw_liquidity_ops_bo_pre_sale_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_pre_sale,
+		vl_cs_pre_sale,
+		0 as vl_field_ops
+	from
+		vw_liquidity_ops_cs_pre_sale_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_pre_sale,
+		0 as vl_cs_pre_sale,
+		vl_field_ops
+	from
+		vw_liquidity_ops_field_ops_costs
+) tbl
+group by sk_property, property_id, dt_cash_flow
 ;
 
 create or replace view vw_liquidity_ab_agent_hours_costs as

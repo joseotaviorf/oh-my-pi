@@ -10,7 +10,7 @@ with cdre_offboarding as (
 filtered_contracts as (
     select distinct
       imovel_id as property_id,
-      (max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over (partition by imovel_id))::date as end_date
+      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
     from contract
     where tipo = 'FullService'
       and ("dataRescisao" is not null
