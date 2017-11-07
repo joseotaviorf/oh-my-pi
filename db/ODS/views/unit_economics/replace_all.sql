@@ -78,16 +78,16 @@ with cdre_inside_sales as (
     where costs_dre."Category" = 'Inside Sales'
 ),
 filtered_properties as (
-    select distinct
-      vbpc.property_id,
-      i.first_publication::date as listing_date
-    from vw_base_property_costs vbpc
-    join imovel i
-      on i.id = vbpc.property_id
-    where vbpc.version = 1
+   select distinct
+      sk_property,
+      property_id,
+      min_version_time::date as listing_date
+    from vw_base_property_costs
+    where version = 1
 ),
 costs as (
     select
+      fp.sk_property,
       fp.property_id,
       fp.listing_date,
       cis.dre_date as dt_cash_flow,
@@ -97,14 +97,11 @@ costs as (
       on cis.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
-  vbpc.sk_property,
-  c.property_id,
-  c.dt_cash_flow as dt_cash_flow,
-  c.vl_inside_sales
+  sk_property,
+  property_id,
+  dt_cash_flow as dt_cash_flow,
+  vl_inside_sales
 from costs c
-join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-where vbpc.version = 1
 ;
 
 
@@ -118,15 +115,15 @@ with cdre_photos as (
 ),
 filtered_properties as (
    select distinct
-      vbpc.property_id,
-      i.first_publication::date as listing_date
-    from vw_base_property_costs vbpc
-    join imovel i
-      on i.id = vbpc.property_id
-    where vbpc.version = 1
+      sk_property,
+      property_id,
+      min_version_time::date as listing_date
+    from vw_base_property_costs
+    where version = 1
 ),
 costs as (
     select
+      fp.sk_property,
       fp.property_id,
       fp.listing_date,
       cp.dre_date as dt_cash_flow,
@@ -136,14 +133,11 @@ costs as (
       on cp.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
-  vbpc.sk_property,
-  c.property_id,
-  make_date(extract(year from c.dt_cash_flow)::int, extract(month from c.dt_cash_flow)::int, 5) as dt_cash_flow,
-  c.vl_photos
-from costs c
-join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-where vbpc.version = 1
+  sk_property,
+  property_id,
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 5) as dt_cash_flow,
+  vl_photos
+from costs
 ;
 
 
@@ -495,7 +489,7 @@ with agents as (
 filtered_properties as (
   select
     dt,
-    coalesce(892700000 + c_property_id, cont_property_id) as property_id,
+    coalesce(c_property_id, 892700000 + cont_property_id) as property_id,
     sum(percentage * rent) as vl_agent_commission
   from agents
   group by dt, c_property_id, contract_id, cont_property_id
@@ -528,6 +522,7 @@ updated_dates as (
 select
   vbpc.sk_property,
   ud.property_id,
+  ud.dt,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission
 from updated_dates ud
@@ -535,6 +530,8 @@ join vw_base_property_costs vbpc
   on vbpc.property_id = ud.property_id
     and ud.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
+
+
 
 ---
 --- Returns vl_affiliate_commission costs for each first version property
@@ -560,7 +557,7 @@ with filtered_contracts as (
 select distinct
 	property_id,
 	id,
-	(max(coalesce(termination_date, expected_end_date)) over (partition by property_id))::date as end_date
+	coalesce(termination_date, expected_end_date)::date as end_date
 from
 	vw_base_contract_costs
 where termination_date is not null
@@ -581,7 +578,10 @@ select
 	sk_property,
 	property_id,
 	amount::decimal(14,4) as vl_brokerage_fee,
-	landlord_paid_date as dt_cash_flow
+	case
+		when landlord_due_date::date >= due_date::date then landlord_paid_date
+		else due_date
+	end as dt_cash_flow
 from
 	base_contract bc
 left join
@@ -598,7 +598,7 @@ with filtered_contracts as (
 select distinct
 	property_id,
 	id,
-	(max(coalesce(termination_date, expected_end_date)) over (partition by property_id))::date as end_date
+	coalesce(termination_date, expected_end_date)::date as end_date
 from
 	vw_base_contract_costs
 where termination_date is not null
@@ -619,7 +619,10 @@ select
 	sk_property,
 	property_id,
 	amount::decimal(14,4) as vl_management_fee,
-	landlord_paid_date as dt_cash_flow
+	case
+		when landlord_due_date::date >= due_date::date then landlord_paid_date
+		else due_date
+	end as dt_cash_flow
 from
 	base_contract bc
 left join
@@ -1916,4 +1919,9 @@ from unit_economics ue
 left join contracts c
   on ue.property_id = c.property_id
      and ue.dt_cash_flow between c.start_date and c.end_date
+;
+
+
+select *
+from vw_supply_costs
 ;
