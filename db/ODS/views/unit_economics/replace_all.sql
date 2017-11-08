@@ -104,7 +104,6 @@ select
 from costs c
 ;
 
-
 create or replace view vw_supply_ops_photos_costs as
 with cdre_photos as (
     select
@@ -144,7 +143,7 @@ from costs
 create or replace view vw_supply_ops_costs as
 select
   coalesce(vsopc.sk_property, vsoisc.sk_property) as sk_property,
-  coalesce(vsopc.property_id, vsoisc.sk_property) as property_id,
+  coalesce(vsopc.sk_property, vsoisc.sk_property) as property_id,
   coalesce(vsopc.dt_cash_flow, vsoisc.dt_cash_flow) as dt_cash_flow,
   coalesce(vsopc.vl_photos, 0) as vl_photos,
   coalesce(vsoisc.vl_inside_sales, 0) as vl_inside_sales
@@ -578,10 +577,15 @@ select
 	sk_property,
 	property_id,
 	amount::decimal(14,4) as vl_brokerage_fee,
-	case
-		when landlord_due_date::date >= due_date::date then landlord_paid_date
-		else due_date
-	end as dt_cash_flow
+	greatest(
+		landlord_due_date,
+		due_date,
+		landlord_paid_date,
+		(concat(
+			substring(year_month from 1 for 4),'-',
+			substring(year_month from 5 for 6)::int,'-',
+			'15'))::date + interval '1 month'
+	)::date as dt_cash_flow
 from
 	base_contract bc
 left join
@@ -619,10 +623,7 @@ select
 	sk_property,
 	property_id,
 	amount::decimal(14,4) as vl_management_fee,
-	case
-		when landlord_due_date::date >= due_date::date then landlord_paid_date
-		else due_date
-	end as dt_cash_flow
+	greatest(landlord_due_date, due_date, landlord_paid_date) as dt_cash_flow
 from
 	base_contract bc
 left join
@@ -1884,44 +1885,47 @@ contracts as (
 	from vw_base_contract_costs
 	where signature_date is not null
 	  and (termination_date is not null or expected_end_date is not null)
+),
+final_version as (
+  select
+    ue.sk_property,
+    ue.property_id,
+    coalesce(c.sk_contract, -1) as sk_contract,
+    ue.sk_cash_flow_date,
+    ue.vl_owner_campaigns,
+    ue.vl_affiliate_campaigns,
+    ue.vl_inside_sales,
+    ue.vl_photos,
+    ue.vl_affiliate_bonus,
+    ue.vl_lockbox,
+    ue.vl_tenant_campaigns,
+    ue.vl_cs_pre_sale,
+    ue.vl_field_ops,
+    ue.vl_bo_pre_sale,
+    ue.vl_agent_hours,
+    ue.vl_st_pis_cofins,
+    ue.vl_st_iss,
+    ue.vl_affiliate_commission,
+    ue.vl_agent_commission,
+    ue.vl_delay_fine,
+    ue.vl_termination_fine,
+    ue.vl_brokerage_fee,
+    ue.vl_management_fee,
+    ue.vl_cs_post_sale,
+    ue.vl_collection,
+    ue.vl_bo_onboarding,
+    ue.vl_bo_ongoing,
+    ue.vl_bo_offboarding,
+    ue.vl_insurance_fee
+  from unit_economics ue
+  left join contracts c
+    on ue.property_id = c.property_id
+       and ue.dt_cash_flow between c.start_date and c.end_date
 )
-select
-  ue.sk_property,
-  ue.property_id,
-  coalesce(c.sk_contract, -1) as sk_contract,
-  ue.sk_cash_flow_date,
-  ue.vl_owner_campaigns,
-  ue.vl_affiliate_campaigns,
-  ue.vl_inside_sales,
-  ue.vl_photos,
-  ue.vl_affiliate_bonus,
-  ue.vl_lockbox,
-  ue.vl_tenant_campaigns,
-  ue.vl_cs_pre_sale,
-  ue.vl_field_ops,
-  ue.vl_bo_pre_sale,
-  ue.vl_agent_hours,
-  ue.vl_st_pis_cofins,
-  ue.vl_st_iss,
-  ue.vl_affiliate_commission,
-  ue.vl_agent_commission,
-  ue.vl_delay_fine,
-  ue.vl_termination_fine,
-  ue.vl_brokerage_fee,
-  ue.vl_management_fee,
-  ue.vl_cs_post_sale,
-  ue.vl_collection,
-  ue.vl_bo_onboarding,
-  ue.vl_bo_ongoing,
-  ue.vl_bo_offboarding,
-  ue.vl_insurance_fee
-from unit_economics ue
-left join contracts c
-  on ue.property_id = c.property_id
-     and ue.dt_cash_flow between c.start_date and c.end_date
-;
-
-
-select *
-from vw_supply_costs
+select fv.*
+from final_version fv
+left join vw_dim_property_ribs dp
+  on fv.sk_property = dp.sk_property
+where fv.sk_cash_flow_date != -1
+      and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
 ;
