@@ -9,12 +9,11 @@ with cdre_offboarding as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
-    from contract
-    where tipo = 'FullService'
-      and ("dataRescisao" is not null
-           or "dataFimContratoPrevisto" is not null)
+      property_id,
+      coalesce(termination_date, expected_end_date)::date as end_date
+    from vw_base_contract_costs
+    where termination_date is not null
+          or expected_end_date is not null
 ),
 costs as (
     select

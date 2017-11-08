@@ -9,13 +9,12 @@ with cdre_bo_pre_sale as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      "criadoEm"::date as created_date,
-      "dataAssinado"::date as signature_date
-    from contract
-    where tipo = 'FullService'
-      and ("criadoEm" is not null
-           or "dataAssinado" is not null)
+      property_id,
+      created_date::date as created_date,
+      signature_date::date as signature_date
+    from vw_base_contract_costs
+    where created_date is not null
+           or signature_date is not null
 ),
 costs as (
     select

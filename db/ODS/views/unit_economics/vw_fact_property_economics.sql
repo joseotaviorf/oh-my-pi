@@ -178,51 +178,57 @@ with unit_economics as (
 contracts as (
 	select
 		id as sk_contract,
-		imovel_id as property_id,
-		"dataAssinado" as start_date,
+		property_id,
+		signature_date as start_date,
 		case
-			when coalesce("dataRescisao", "dataFimContratoPrevisto")::date > now()::date
+			when coalesce(termination_date, expected_end_date)::date > now()::date
 				then now()::date
-			else coalesce("dataRescisao", "dataFimContratoPrevisto")::date
+			else coalesce(termination_date, expected_end_date)::date
 		end as end_date
-	from contract
-	where tipo = 'FullService'
-	  and "dataAssinado" is not null
-	  and ("dataRescisao" is not null or "dataFimContratoPrevisto" is not null)
+	from vw_base_contract_costs
+	where signature_date is not null
+	  and (termination_date is not null or expected_end_date is not null)
+),
+final_version as (
+  select
+    ue.sk_property,
+    ue.property_id,
+    coalesce(c.sk_contract, -1) as sk_contract,
+    ue.sk_cash_flow_date,
+    ue.vl_owner_campaigns,
+    ue.vl_affiliate_campaigns,
+    ue.vl_inside_sales,
+    ue.vl_photos,
+    ue.vl_affiliate_bonus,
+    ue.vl_lockbox,
+    ue.vl_tenant_campaigns,
+    ue.vl_cs_pre_sale,
+    ue.vl_field_ops,
+    ue.vl_bo_pre_sale,
+    ue.vl_agent_hours,
+    ue.vl_st_pis_cofins,
+    ue.vl_st_iss,
+    ue.vl_affiliate_commission,
+    ue.vl_agent_commission,
+    ue.vl_delay_fine,
+    ue.vl_termination_fine,
+    ue.vl_brokerage_fee,
+    ue.vl_management_fee,
+    ue.vl_cs_post_sale,
+    ue.vl_collection,
+    ue.vl_bo_onboarding,
+    ue.vl_bo_ongoing,
+    ue.vl_bo_offboarding,
+    ue.vl_insurance_fee
+  from unit_economics ue
+  left join contracts c
+    on ue.property_id = c.property_id
+       and ue.dt_cash_flow between c.start_date and c.end_date
 )
-select
-  ue.sk_property,
-  ue.property_id,
-  coalesce(c.sk_contract, -1) as sk_contract,
-  ue.sk_cash_flow_date,
-  ue.vl_owner_campaigns,
-  ue.vl_affiliate_campaigns,
-  ue.vl_inside_sales,
-  ue.vl_photos,
-  ue.vl_affiliate_bonus,
-  ue.vl_lockbox,
-  ue.vl_tenant_campaigns,
-  ue.vl_cs_pre_sale,
-  ue.vl_field_ops,
-  ue.vl_bo_pre_sale,
-  ue.vl_agent_hours,
-  ue.vl_st_pis_cofins,
-  ue.vl_st_iss,
-  ue.vl_affiliate_commission,
-  ue.vl_agent_commission,
-  ue.vl_delay_fine,
-  ue.vl_termination_fine,
-  ue.vl_brokerage_fee,
-  ue.vl_management_fee,
-  ue.vl_cs_post_sale,
-  ue.vl_collection,
-  ue.vl_bo_onboarding,
-  ue.vl_bo_ongoing,
-  ue.vl_bo_offboarding,
-  ue.vl_insurance_fee
-from unit_economics ue
-left join contracts c
-  on ue.property_id = c.property_id
-     and ue.dt_cash_flow between c.start_date and c.end_date
+select fv.*
+from final_version fv
+left join vw_dim_property_ribs dp
+  on fv.sk_property = dp.sk_property
+where fv.sk_cash_flow_date != -1
+      and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
 ;
-

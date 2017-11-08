@@ -9,14 +9,13 @@ with cdre_cs_post_sale as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
-      "dataInicio"::date as start_date,
-      coalesce("dataRescisao", "dataFimContratoPrevisto")::date as end_date
-    from contract
-    where tipo = 'FullService'
-      and "dataInicio" is not null
-      and ("dataRescisao" is not null
-            or "dataFimContratoPrevisto" is not null)
+      property_id,
+      init_date::date as start_date,
+      coalesce(termination_date, expected_end_date)::date as end_date
+    from vw_base_contract_costs
+    where init_date is not null
+      and (termination_date is not null
+            or expected_end_date is not null)
 ),
 costs as (
     select

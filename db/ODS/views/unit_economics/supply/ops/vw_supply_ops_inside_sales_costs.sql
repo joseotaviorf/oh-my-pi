@@ -8,16 +8,16 @@ with cdre_inside_sales as (
     where costs_dre."Category" = 'Inside Sales'
 ),
 filtered_properties as (
-    select distinct
-      vbpc.property_id,
-      i.first_publication::date as listing_date
-    from vw_base_property_costs vbpc
-    join imovel i
-      on i.id = vbpc.property_id
-    where vbpc.version = 1
+   select distinct
+      sk_property,
+      property_id,
+      min_version_time::date as listing_date
+    from vw_base_property_costs
+    where version = 1
 ),
 costs as (
     select
+      fp.sk_property,
       fp.property_id,
       fp.listing_date,
       cis.dre_date as dt_cash_flow,
@@ -27,12 +27,9 @@ costs as (
       on cis.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
 )
 select
-  vbpc.sk_property,
-  c.property_id,
-  c.dt_cash_flow as dt_cash_flow,
-  c.vl_inside_sales
+  sk_property,
+  property_id,
+  dt_cash_flow as dt_cash_flow,
+  vl_inside_sales
 from costs c
-join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-where vbpc.version = 1
 ;

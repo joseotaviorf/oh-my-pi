@@ -21,15 +21,15 @@ cdre_collection as (
 ),
 filtered_contracts as (
     select distinct
-      c.imovel_id as property_id,
+      c.property_id as property_id,
       rd.tenant_due_date as dt,
       rd.tenant_paid_date,
       rd.rent_delayed_days
-    from contract c
+    from vw_base_contract_costs c
     join rent_delay rd
       on c.id = rd.contract_id
-    where c.tipo = 'FullService'
-      and (rd.rent_delayed_days > 0 or tenant_paid_date is null)
+    where rd.rent_delayed_days > 0
+        or tenant_paid_date is null
 ),
 costs as (
     select

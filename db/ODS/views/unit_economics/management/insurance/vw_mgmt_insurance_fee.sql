@@ -10,17 +10,12 @@ with payed_contracts as (
 		distinct
 			c.id as contract_id,
 			c.status,
-			c."dataInicio" as dt_start,
-			coalesce(c."dataRescisao",c."dataFimContratoPrevisto") as dt_end,
-			c.imovel_id as property_id,
-			c."valorAluguel" as rent
+			c.init_date as dt_start,
+			coalesce(c.termination_date,c.expected_end_date) as dt_end,
+			c.property_id as property_id,
+			c.rent_value as rent
 	from
-		contract c
-	where c.tipo = 'FullService'
---  and c.status in ('Finalizado', 'Ativo')
---	inner join
---		invoice i
---		on i.contract_id = c.id
+		vw_base_contract_costs c
 ),
 pay_dates as (
 	select

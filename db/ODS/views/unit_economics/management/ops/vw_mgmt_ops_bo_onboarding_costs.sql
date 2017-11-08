@@ -9,21 +9,20 @@ with cdre_onboarding as (
 ),
 filtered_contracts as (
     select distinct
-      imovel_id as property_id,
+      property_id,
       case
-        when "dataAssinado"::date > "dataEntrada"::date
-          then "dataEntrada"::date
-        else "dataAssinado"::date
+        when signature_date::date > init_date::date
+          then init_date::date
+        else signature_date::date
       end as "from",
       case
-        when "dataAssinado"::date > "dataEntrada"::date
-          then "dataAssinado"::date
-        else "dataEntrada"::date
+        when signature_date::date > init_date::date
+          then signature_date::date
+        else init_date::date
       end as "to"
-    from contract
-    where tipo = 'FullService'
-      and "dataAssinado" is not null
-      and "dataEntrada" is not null
+    from vw_base_contract_costs
+    where signature_date is not null
+      and init_date is not null
 ),
 costs as (
     select
