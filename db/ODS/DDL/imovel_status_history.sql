@@ -137,6 +137,12 @@ CREATE TABLE imovel_status_history (
   dt_timestamp timestamp
 )
 ;
+drop index imovel_status_history_id_idx
+
+CREATE INDEX imovel_status_history_id_idx ON public.imovel_status_history (id) ;
+
+
+
 DROP TABLE IF EXISTS stg.imovel_status_history ;
 CREATE TABLE stg.imovel_status_history (
   "id" BIGINT NOT NULL,

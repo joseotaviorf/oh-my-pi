@@ -1,20 +1,72 @@
-create or replace view vw_property_listing as
-with ish as
-(
+drop view if exists vw_property_listing_ribs;
+create or replace view vw_property_listing_ribs as
+with filt as (
   select
-		status_history,
+	id,
+	status_time,
+	status_history,
+	row_number() over (partition by id order by status_time) as rn
+	from imovel_status_history
+	where status_history in ('despublicado', 'publicado', 'alugado')
+), not_pub as (
+  select
+    filt.id,
+    'publicado'::varchar(255) as status_history,
+    i.first_publication as status_time
+  from
+    filt
+  left join
+    imovel i
+   on i.id = filt.id
+  where filt.rn = 1
+    and i.first_publication != filt.status_time
+), aux_ish as (
+  select
+    id,
+	status_time,
+	status_history
+  from filt
+  where case
+          when status_history = 'despublicado'
+            then rn != 1
+          else true
+        end
+
+  union all
+
+  select
+    id,
+	status_time,
+	status_history
+  from not_pub
+), ish as (
+  select
+	status_history,
     status_time,
     id,
     row_number() over (partition by id order by status_time) as rn,
     row_number() over (partition by id, status_history order by status_time) as rn_status
   from
-	imovel_status_history
-  where
-    status_history in ('alugado', 'publicado')
-)
-,diff_status as
-(
+	aux_ish
+  where status_history in ('alugado', 'publicado', 'despublicado')
+  order by status_time asc
+), contract_dates as (
+    select id, imovel_id, least("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as l,
+    greatest("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as g
+    from contract
+    where tipo = 'FullService'
+      and status in ('Finalizado', 'Ativo')
+), rent as (
+    select distinct ish.id, max(ish.status_time) over (partition by ish.id, c.id) as status_time
+    from ish
+    join contract_dates c
+      on ish.id = c.imovel_id
+         and ish.status_time::date between l - interval '1 days' and g + interval '1 days'
+    where ish.status_history = 'alugado'
+), diff_status as (
   select
+    row_number() over (partition by act.id order by act.status_time asc) as rn_status,
+    row_number() over (partition by act.id, act.status_history order by act.status_time asc) as dr_status,
     act.id,
     act.status_history as status,
     act.status_time,
@@ -36,203 +88,83 @@ with ish as
     and act.rn = nxt.rn-1
   order by
   	act.rn
-)
-,check_status as
-(
+), diff_check_status as (
   select
     *,
-    status = 'alugado'
-      and next_different_status_time is not null
-      and next_different_status_time - status_time >= INTERVAL '45 days'
-    as new_version_alugado,
-
-    status = 'publicado'
-      and next_different_status is null
-      and next_status_time is not null
-      and next_status_time - status_time >= INTERVAL '14 days'
-    as new_version_publicado
-
+    min(dr_status) over (partition by id, status) as min_status
   from
     diff_status
-)
-,times as
-(
+), check_status as (
+  select
+    ds.*,
+    r.id as r_id,
+    ds.status = 'alugado'
+    and r.id is not null
+    as new_version_alugado,
+
+    ds.status = 'alugado'
+      and r.id is not null
+      and lead(ds.status) over (partition by ds.id) = 'publicado'
+    as new_version_pub_rent,
+
+    status = 'publicado'
+    and ( (lag(ds.status) over (partition by ds.id) = 'despublicado'
+          and ds.status_time - lag(ds.status_time) over (partition by ds.id) >= interval '90 days')
+          or
+          dr_status = min_status
+        )
+    as new_version_publicado
+  from
+    diff_check_status ds
+  left join rent r
+   on ds.id = r.id
+    and ds.status_time = r.status_time
+), aux_times as (
   select distinct
-  	id,
+    id,
     status,
-    row_number() over w as rn,
-    lag(status_time) over w as min_version_time,
-    max(status_time) over w as max_version_time
+    case
+        when new_version_publicado is true
+            then status_time
+        when new_version_pub_rent is true
+            then next_different_status_time
+        else null
+    end as min_version_time,
+    status_time,
+    new_version_alugado,
+    new_version_pub_rent,
+    new_version_publicado
   from
     check_status
-  where
-    (new_version_alugado or new_version_publicado)
   window
-  	w as (partition by id order by status_time)  
-)
-,history_times as
-(
-  select
-    i.id,
-    i.status_history,
-    i.status_time,
-    t.min_version_time,
-    t.max_version_time,
-    case
-      when t.min_version_time is null and t.max_version_time is null then NULL
-      when (i.status_time > t.min_version_time or t.min_version_time is null) then t.rn
-      else t.rn + 1
-    end as version
-  from
-    imovel_status_history i
-  left join
-    times t
-    on t.id = i.id
-    and (i.status_time > t.min_version_time or t.min_version_time is null)
-    and (i.status_time <= t.max_version_time or t.max_version_time is null)
-),
-result_version as
-(
-  select
-  	id,
-    status_history,
-    status_time,
-    min_version_time,
-    max_version_time,
-    coalesce(
-      version,
-      coalesce(max(version) over (partition by id order by status_time),0) + 1
-    ) as version
-  from
-  	history_times
-),
-prev_listing as
-(
-  select
+  	w as (partition by id order by status_time)
+), times as (
+  select distinct
     id,
-    status_history,
-    status_time,
-    case
-      when version = 1 then NULL
-      else
-        coalesce(
-          min_version_time,
-          max(max_version_time) over (partition by id order by status_time) -- get the max of previous version
-        )
-    end  as min_version_time,
-    max_version_time,
-    version,
-    row_number() over (partition by id, version order by status_time desc) as rn,
-    min(status_time) 
-    	filter (where status_history in ('publicado', 'alugado')) 
-    	over (partition by id, version order by status_time) as publication_date,
-    max(status_time)
-    	filter (where status_history in ('publicado'))
-    	over (partition by id, version order by status_time) as last_publication_date
+    status,
+    row_number() over w as version,
+    min_version_time,
+    lead(min_version_time) over w as max_version_time
   from
-    result_version
-),
-last_pub as (
-	select
-		pl.id,
-		pl.status_history,
-		pl.status_time,
-		pl.min_version_time,
-		pl.max_version_time,
-		pl.version,
-		pl.rn,
-		pl.publication_date,
-		pl_max.last_pub_date as last_publication_date
-	from
-		prev_listing pl
-	left join
-		(
-			select
-				id,
-				version,
-				max(last_publication_date) as last_pub_date
-			from
-				prev_listing
-			group by id, version
-
-		) pl_max
-	on pl.id = pl_max.id and pl.version = pl_max.version
-),
-last_version as
-(
-	select distinct
-	  id,
-	  version,
-	  min_version_time,
-	  max_version_time,
-	  publication_date,
-	  last_publication_date,
-	  last_value(status_history)
-	  	over (
-	  		partition by id, version
-	  		order by status_time
-	  		RANGE BETWEEN current row AND unbounded following
-	  	) as last_status_version
-	from
-	  last_pub
-	-- where rn = 1
-)
--- select * from last_version where id = 892763959
-,prev as
-(
-	select
-		*,
-		lag(last_status_version) over (partition by id order by version) prev_status
-	from
-		last_version
-	where
-		publication_date is not null
-),
-rent as
-(
-	select
-		id,
-		version,
-		min_version_time,
-		max_version_time,
-		last_status_version,
-		coalesce(publication_date, max_version_time) as publication_date,
-		last_publication_date,
-		case coalesce(prev_status, 'alugado') when 'alugado' then 1 else 0 end as prev_rented,
-		case coalesce(last_status_version, 'alugado') when 'alugado' then 1 else 0 end as rented
-	from
-		prev
-
-),
-relisting as
-(
-	select distinct
-		*,
-		sum(prev_rented) over (partition by id order by version) as nr_listing,
-		sum(rented) over (partition by id order by version) as nr_renting
-	from
-		rent
+    aux_times
+  where new_version_pub_rent
+        or new_version_publicado
+  window
+  	w as (partition by id order by status_time)
+), renting as (
+    select
+        id,
+        version,
+        row_number() over (partition by id order by min_version_time asc) as nr_renting
+    from times
+    where status = 'alugado'
 )
 select
-	id,
-	version,
-	min_version_time,
-	max_version_time,
-	last_status_version,
-	nr_listing,
-	nr_renting,
-	min(publication_date) over (partition by id,nr_listing order by version) as publication_date,
-	last_publication_date
-
-from
-	relisting
--- where
--- 	id = 892763959
---  id = 892763624
---  id = 892779727 -- 892797518 -- 892798596 -- 892779727
---  id in(892797518, 892798596, 892779727)
-order by
-  id,
-  version
-  
-  
+  t.*,
+  coalesce(r.nr_renting, 0) as nr_renting,
+  min(t.min_version_time) over (partition by t.id) as first_publication_date
+from times t
+left join renting r
+  on t.id = r.id
+     and t.version = r.version
+;
