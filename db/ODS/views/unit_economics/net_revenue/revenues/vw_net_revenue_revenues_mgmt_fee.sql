@@ -40,4 +40,8 @@ where
 	item = 'TaxaAdministracao'
 and
 	landlord_status = 'paid'
+and
+	"from" = 'Proprietario'
+and
+	"to" = 'Contrato'
 ;

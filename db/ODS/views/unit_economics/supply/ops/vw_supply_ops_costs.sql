@@ -2,7 +2,7 @@ drop view if exists vw_supply_ops_costs;
 create or replace view vw_supply_ops_costs as
 select
   coalesce(vsopc.sk_property, vsoisc.sk_property) as sk_property,
-  coalesce(vsopc.sk_property, vsoisc.sk_property) as property_id,
+  coalesce(vsopc.property_id, vsoisc.property_id) as property_id,
   coalesce(vsopc.dt_cash_flow, vsoisc.dt_cash_flow) as dt_cash_flow,
   coalesce(vsopc.vl_photos, 0) as vl_photos,
   coalesce(vsoisc.vl_inside_sales, 0) as vl_inside_sales
