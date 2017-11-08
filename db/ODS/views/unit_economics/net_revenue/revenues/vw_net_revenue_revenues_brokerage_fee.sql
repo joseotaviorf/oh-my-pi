@@ -7,15 +7,13 @@ drop view vw_net_revenue_revenues_brokerage_fee;
 create or replace view vw_net_revenue_revenues_brokerage_fee as
 with filtered_contracts as (
 select distinct
-	imovel_id as property_id,
+	property_id,
 	id,
-	(max(coalesce("dataRescisao", "dataFimContratoPrevisto")) over (partition by imovel_id))::date as end_date
+	coalesce(termination_date, expected_end_date)::date as end_date
 from
-	contract
-where
-	tipo = 'FullService'
-	and ("dataRescisao" is not null
-	or "dataFimContratoPrevisto" is not null)
+	vw_base_contract_costs
+where termination_date is not null
+  or expected_end_date is not null
 ),
 base_contract as (
 	select
@@ -32,7 +30,15 @@ select
 	sk_property,
 	property_id,
 	amount::decimal(14,4) as vl_brokerage_fee,
-	landlord_paid_date as dt_cash_flow
+	greatest(
+		landlord_due_date,
+		due_date,
+		landlord_paid_date,
+		(concat(
+			substring(year_month from 1 for 4),'-',
+			substring(year_month from 5 for 6)::int,'-',
+			'15'))::date + interval '1 month'
+	)::date as dt_cash_flow
 from
 	base_contract bc
 left join

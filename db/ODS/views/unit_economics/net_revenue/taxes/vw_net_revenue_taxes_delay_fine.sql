@@ -4,11 +4,10 @@ with fines as (
   select
 	inf.fine,
 	inf.paid_date::date as dt,
-	c.imovel_id as property_id
+	c.property_id as property_id
   from invoice_fines inf
-  join contract c
+  join vw_base_contract_costs c
     on inf.contract_id = c.id
-  where c.tipo = 'FullService'
 )
 select
   vbpc.sk_property,

@@ -429,11 +429,6 @@ full outer join vw_supply_affiliate_bonus_costs vsacc
 	and vsacc.dt_cash_flow = coalesce(vsoc.dt_cash_flow, vsmc.dt_cash_flow)
 ;
 
----
---- Returns vl_affiliate_commission costs for each first version property
---- Cost: Affiliate Commission on rented properties
---- Cash Flow Date: Date of Payment
----
 create or replace view vw_net_revenue_affiliate_commission_costs as
 with affiliate_filtered_base as (
 	select
@@ -521,7 +516,6 @@ updated_dates as (
 select
   vbpc.sk_property,
   ud.property_id,
-  ud.dt,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission
 from updated_dates ud
@@ -530,13 +524,6 @@ join vw_base_property_costs vbpc
     and ud.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
 
-
-
----
---- Returns vl_affiliate_commission costs for each first version property
---- Cost: Affiliate Commission on rented properties
---- Cash Flow Date: Date of Payment
----
 create or replace view vw_net_revenue_commission_costs as
 select
     coalesce(affiliate.sk_property, agent.sk_property) as sk_property,
@@ -724,45 +711,104 @@ join vw_base_property_costs vbpc
 
 create or replace view vw_net_revenue_taxes as
 select
-  coalesce(iss.sk_property, pis_cofins.sk_property, delay_fine.sk_property) as sk_property,
-  coalesce(iss.property_id, pis_cofins.property_id, delay_fine.property_id) as property_id,
-  coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow, delay_fine.dt_cash_flow) as dt_cash_flow,
-  coalesce(iss.vl_st_iss, 0) as vl_st_iss,
-  coalesce(pis_cofins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
-  coalesce(delay_fine.vl_delay_fine, 0) as vl_delay_fine
-from vw_net_revenue_taxes_sales_tax_iss iss
-full outer join vw_net_revenue_taxes_sales_tax_pis_cofins pis_cofins
-  on iss.sk_property = pis_cofins.sk_property
-     and iss.dt_cash_flow = pis_cofins.dt_cash_flow
-full outer join vw_net_revenue_taxes_delay_fine delay_fine
-  on delay_fine.sk_property = coalesce(iss.sk_property, pis_cofins.sk_property)
-     and delay_fine.dt_cash_flow = coalesce(iss.dt_cash_flow, pis_cofins.dt_cash_flow)
-
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	sum(vl_st_iss) as vl_st_iss,
+	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
+	sum(vl_delay_fine) as vl_delay_fine
+from
+(
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		vl_st_iss,
+		0 as vl_st_pis_cofins,
+		0 as vl_delay_fine
+	from
+		vw_net_revenue_taxes_sales_tax_iss
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_st_iss,
+		vl_st_pis_cofins,
+		0 as vl_delay_fine
+	from
+		vw_net_revenue_taxes_sales_tax_pis_cofins
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_st_iss,
+		0 as vl_st_pis_cofins,
+		vl_delay_fine
+	from
+		vw_net_revenue_taxes_delay_fine
+) tbl
+group by sk_property, property_id, dt_cash_flow
 ;
-
 
 create or replace view vw_net_revenue_costs as
 select
-    coalesce(vnrcc.sk_property, vnrr.sk_property, vnrt.sk_property) as sk_property,
-	coalesce(vnrcc.property_id, vnrr.property_id, vnrt.property_id) as property_id,
-	coalesce(vnrcc.dt_cash_flow, vnrr.dt_cash_flow, vnrt.dt_cash_flow) as dt_cash_flow,
-    coalesce(vl_affiliate_commission, 0) as vl_affiliate_commission,
-	coalesce(vl_management_fee, 0) as vl_management_fee,
-	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee,
-	coalesce(vnrcc.vl_agent_commission, 0) as vl_agent_commission,
-	coalesce(vnrt.vl_st_iss, 0) as vl_st_iss,
-	coalesce(vnrt.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
-	coalesce(vnrt.vl_delay_fine, 0) as vl_delay_fine
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	sum(vl_affiliate_commission) as vl_affiliate_commission,
+	sum(vl_management_fee) as vl_management_fee,
+	sum(vl_brokerage_fee) as vl_brokerage_fee,
+	sum(vl_agent_commission) as vl_agent_commission,
+	sum(vl_st_iss) as vl_st_iss,
+	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
+	sum(vl_delay_fine) as vl_delay_fine
 from
-    vw_net_revenue_commission_costs vnrcc
-full outer join
-    vw_net_revenue_revenues vnrr
-    on vnrcc.sk_property = vnrr.sk_property
-	and vnrcc.dt_cash_flow = vnrr.dt_cash_flow
-full outer join
-    vw_net_revenue_taxes vnrt
-    on vnrcc.sk_property = vnrt.sk_property
-	and vnrcc.dt_cash_flow = vnrt.dt_cash_flow
+(
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		vl_affiliate_commission,
+		0 as vl_management_fee,
+		0 as vl_brokerage_fee,
+		vl_agent_commission,
+		0 as vl_st_iss,
+		0 as vl_st_pis_cofins,
+		0 as vl_delay_fine
+	from
+		vw_net_revenue_commission_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_affiliate_commission,
+		vl_management_fee,
+		vl_brokerage_fee,
+		0 as vl_agent_commission,
+		0 as vl_st_iss,
+		0 as vl_st_pis_cofins,
+		0 as vl_delay_fine
+	from
+		vw_net_revenue_revenues
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_affiliate_commission,
+		0 as vl_management_fee,
+		0 as vl_brokerage_fee,
+		0 as vl_agent_commission,
+		vl_st_iss,
+		vl_st_pis_cofins,
+		vl_delay_fine
+	from
+		vw_net_revenue_taxes
+) tbl
+group by sk_property, property_id, dt_cash_flow
 ;
 
 
