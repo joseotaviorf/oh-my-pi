@@ -12,8 +12,8 @@ class FacebookCampaigns(object):
     def __init__(self):
         # accounts
         self.supply = 'act_1260820603984552'
-        self.acquisition = 'act_994644903935458'
-        self.liquidity = self.acquisition
+        self.retargeting = 'act_994644903935458'
+        self.acquisition = 'act_1626589680740974'
         self.social = 'act_994734287259853'
 
     def get_facebook_api(self):
@@ -27,7 +27,8 @@ class FacebookCampaigns(object):
         api = self.get_facebook_api()
         social_account = AdAccount(self.social)
         supply_account = AdAccount(self.supply)
-        liq_account = AdAccount(self.liquidity)
+        ret_account = AdAccount(self.retargeting)
+        acq_account = AdAccount(self.acquisition)
 
         fields = [
             Insights.Field.campaign_name,
@@ -44,12 +45,23 @@ class FacebookCampaigns(object):
                 'limit': 1000
             }
 
-            liq_campaigns = liq_account.get_insights(fields=fields, params=params)
-            for c in liq_campaigns:
+            ret_campaigns = ret_account.get_insights(fields=fields, params=params)
+            for c in ret_campaigns:
                 if dt < date(2016, 3, 1):  # regra para pegar ads na conta de social somente ate dez/2016
                     try:
                         if c['campaign_name']:
                             if c['campaign_name'].startswith('Publica') :
+                                c['account_name'] = 'Social'
+                    except:
+                        pass
+                insights.append(c)
+
+            acq_campaigns = acq_account.get_insights(fields=fields, params=params)
+            for c in acq_campaigns:
+                if dt < date(2016, 3, 1):  # regra para pegar ads na conta de social somente ate dez/2016
+                    try:
+                        if c['campaign_name']:
+                            if c['campaign_name'].startswith('Publica'):
                                 c['account_name'] = 'Social'
                     except:
                         pass
@@ -84,3 +96,4 @@ class FacebookCampaigns(object):
         table = table.cut('campaign_name', 'date', 'campaign_id', 'spend', 'account_name')
 
         return list(table)
+
