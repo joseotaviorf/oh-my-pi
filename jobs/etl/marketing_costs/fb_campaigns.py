@@ -96,3 +96,4 @@ class FacebookCampaigns(object):
         table = table.cut('campaign_name', 'date', 'campaign_id', 'spend', 'account_name')
 
         return list(table)
+
