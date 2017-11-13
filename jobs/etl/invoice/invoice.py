@@ -13,6 +13,9 @@ from datetime import datetime
 import pandas
 import requests
 from dateutil.relativedelta import relativedelta
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../'))
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
@@ -21,9 +24,12 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 args = sys.argv
+args = ['', 'load_fines']
 
-full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - relativedelta(months=1)
-exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
+# full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - relativedelta(months=1)
+# exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
+full_date = ''
+exec_year = exec_month = ''
 
 seubarriga_invoice = json.loads(os.environ['seubarriga'])['invoice']
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -263,6 +269,25 @@ class Invoice(object):
             encoding='utf-8'
         )
 
+    # TODO
+    def load_fines_into_ODS(self):
+        import pandas as pd
+
+        for year in range(2015, 2018):
+            for month in range(1, 13):
+                if year == 2017 and month >= 11:
+                    continue
+
+                print 'processing year={}, month={}'.format(year, month)
+
+                df = pd.read_json('/home/rafael/Desktop/invoices_fines_{}-{}.json'.format(year, str(month).zfill(2)))
+                df['year_month'] = '{}-{}'.format(year, str(month).zfill(2))
+                BaseETL.dataframe_to_ods(
+                    df=df,
+                    table_name='invoice_fines',
+                    encoding='utf-8'
+                )
+
 
 if __name__ == '__main__':
     invoice = Invoice()
@@ -279,12 +304,15 @@ if __name__ == '__main__':
         object = invoice.convert_csv_to_json(data_frame=data_frame)
         invoice.save_into_s3(object=object, file_path_prefix='raw/seubarriga/{0}'.format(process_name))
         object.flush()
-
     elif args[1] == 'transform':
         invoice.transform_data()
-
     elif args[1] == 'load':
         invoice.load_into_ODS()
-
+    elif args[1] == 'extract_fines':
+        pass
+    elif args[1] == 'transform_fines':
+        pass
+    elif args[1] == 'load_fines':
+        invoice.load_fines_into_ODS()
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
