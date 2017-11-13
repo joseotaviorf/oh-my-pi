@@ -7,10 +7,6 @@ from StringIO import StringIO
 
 import pandas
 import requests
-
-import sys
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../../'))
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
