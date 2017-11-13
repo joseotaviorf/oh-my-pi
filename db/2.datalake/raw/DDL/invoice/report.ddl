@@ -21,7 +21,7 @@ partitioned by (
   ym string
 )
 row format serde 'org.openx.data.jsonserde.JsonSerDe'
-location 's3://5a-datalake/raw/seubarriga/invoice/'
+location 's3://5a-datalake/raw/seubarriga/invoice/reports'
 ;
 
-msck repair table datalake_clean.invoice;
+msck repair table datalake_raw.seubarriga_invoice;
