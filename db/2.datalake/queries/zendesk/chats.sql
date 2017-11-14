@@ -30,7 +30,7 @@ with chats as -- get all chat_histories
 	where
 		h.type = 'chat.msg'
 		and zendesk_ticket_id is not null
-	order by 
+	order by
 		h.timestamp
 ),
 avg_response_times as -- calculate response time average
@@ -129,8 +129,8 @@ times_pivot as -- pivoting times
 select distinct
 	t.id,
 	t.zendesk_ticket_id as zendesk_ticket_id,
-	min(t.chat_start_timestamp) as chat_start_timestamp,
-	max(t.chat_end_timestamp) as chat_end_timestamp,
+	date_trunc('second', min(t.chat_start_timestamp)) as chat_start_timestamp,
+	date_trunc('second', max(t.chat_end_timestamp)) as chat_end_timestamp,
 	first_value(missed) over (partition by t.zendesk_ticket_id) as missed,
 	first_value(unread) over (partition by t.zendesk_ticket_id) as unread,
 	first_value(comment) over (partition by t.zendesk_ticket_id) as comment,
@@ -140,10 +140,10 @@ select distinct
 	t.email,
 	t.extracted_date,
 	-- first_value(times) over () as times,
-	first_value(first_visitor_msg) over (partition by t.zendesk_ticket_id) as first_visitor_msg,
-	first_value(first_answer) over (partition by t.zendesk_ticket_id) as first_answer,
-	last_value(last_answer) over (partition by t.zendesk_ticket_id) as last_answer,
-	last_value(last_visitor_msg) over (partition by t.zendesk_ticket_id) as last_visitor_msg,
+	date_trunc('second', first_value(first_visitor_msg) over (partition by t.zendesk_ticket_id)) as first_visitor_msg,
+	date_trunc('second', first_value(first_answer) over (partition by t.zendesk_ticket_id)) as first_answer,
+	date_trunc('second', last_value(last_answer) over (partition by t.zendesk_ticket_id)) as last_answer,
+	date_trunc('second', last_value(last_visitor_msg) over (partition by t.zendesk_ticket_id)) as last_visitor_msg,
 	r.avg_response_time
 from
 	times_pivot t
