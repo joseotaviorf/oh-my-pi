@@ -356,7 +356,10 @@ SELECT
   now() AS load_timestamp,
   i.usuario_que_cadastrou_id,
   
-  i.imovel_v3 as property_v3
+  i.imovel_v3 as property_v3,
+
+  i.area_total as total_area,
+  i.area_terreno as contruction_area
 
 from 
 	imovel i

@@ -165,7 +165,10 @@ CREATE TABLE public.dim_property (
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
   usuario_que_cadastrou_id INTEGER,
 
-  property_v3 INTEGER
+  property_v3 INTEGER,
+
+  total_area INTEGER,
+  construction_area INTEGER
   
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
