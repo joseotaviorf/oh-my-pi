@@ -142,7 +142,10 @@ select -- count(1)
   i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
 
   i.announcedBy is not null
-    or i.announcedBy_id is not null as imovel_v3
+    or i.announcedBy_id is not null as imovel_v3,
+
+  i.areaTotal as area_total,
+  i.areaTerreno as area_terreno
 
 from 
   Imovel i

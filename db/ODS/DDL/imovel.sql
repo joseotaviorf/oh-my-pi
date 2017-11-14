@@ -131,6 +131,8 @@ CREATE TABLE public.imovel (
   data_criacao TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
   atualizado_em TIMESTAMP WITHOUT TIME zone,
   usuario_que_cadastrou_id INTEGER,
-  imovel_v3 INTEGER
+  imovel_v3 INTEGER,
+  area_total INTEGER,
+  area_terreno INTEGER
 )
 WITH (oids = false);
