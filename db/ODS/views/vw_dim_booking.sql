@@ -72,8 +72,16 @@ bookings as
 		sources.adjust_network,
 		sources.utm_source,
 		sources.utm_medium,
-		sources.utm_campaign
-
+		sources.utm_campaign,
+		s.visitor_arrived,
+        s.visitor_missing_reason,
+        s.agent_arrived,
+        s.agent_missing_reason,
+        s.owner_arrived,
+        s.owner_missing_reason,
+        s.successful_entrance,
+        s.troublesome_entrance,
+        s.fup_comments
 	from
 		public.booking s
 
@@ -135,7 +143,16 @@ select
 	dt_updated,
 	dt_timestamp,
 	last_update_source,
-	first_update_source
+	first_update_source,
+	visitor_arrived,
+    visitor_missing_reason,
+    agent_arrived,
+    agent_missing_reason,
+    owner_arrived,
+    owner_missing_reason,
+    successful_entrance,
+    troublesome_entrance,
+    fup_comments
    
 	
 from

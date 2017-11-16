@@ -31,8 +31,17 @@ select
   	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null 
   	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
   end as cancel_timestamp,
-  vo2.nome as first_update_source
-from 
+  vo2.nome as first_update_source,
+  fup.inquilinoCompareceu as visitor_arrived,
+  fup.motivoInquilino as visitor_missing_reason,
+  fup.agenteCompareceu as agent_arrived,
+  fup.motivoAgente as agent_missing_reason,
+  fup.prorietarioCompareceu as owner_arrived,
+  fup.motivoProprietario as owner_missing_reason,
+  e.successful as successful_entrance,
+  e.problem as troublesome_entrance,
+  fup.comentFup as fup_comments
+from
   Agendamento a
 -- MUDANCA STATUS
 left join
@@ -55,8 +64,8 @@ left join
 left join
 	AppointmentChangeReasonCategory ap
 	on ap.id = m.reasonCategory_id
-left join 
-	VisitaOrigem vo 
+left join
+	VisitaOrigem vo
 	on vo.id = a.origemUltimaAtualizacao_id
 -- DATA DE CANCELAMENTO
 left join
@@ -85,5 +94,30 @@ left join
 left join
     VisitaOrigem vo2
     on au2.origemUltimaAtualizacao_id = vo2.id
+left join
+	(
+		SELECT
+			A.id as agendamento_id,
+			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Tenant' limit 1) as inquilinoCompareceu,
+			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Tenant' limit 1) as motivoInquilino,
+			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Agent' limit 1) as agenteCompareceu,
+			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Agent' limit 1) as motivoAgente,
+			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='LandLord' limit 1) as prorietarioCompareceu,
+			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='LandLord' limit 1) as motivoProprietario,
+			F.entrance_id idEntrance,
+			F.comment as comentFup
+		FROM ebdb.Agendamento A
+		LEFT JOIN ebdb.Visita V on V.id = A.visita_id
+		LEFT JOIN ebdb.Usuario UA on UA.id = V.agente_id
+		LEFT JOIN ebdb.Usuario UV on UV.id = V.visitante_id
+		LEFT JOIN ebdb.Visitor VI on VI.agendamento_id = A.id
+		LEFT JOIN ebdb.FollowUpDetails F on A.followUpDetails_id = F.id
+		GROUP BY VI.agendamento_id
+		ORDER BY A.data, A.slotDia
+	) fup
+	on fup.agendamento_id = a.id
+left join
+	ebdb.Entrance e
+	on fup.idEntrance = e.id
 ;
 END

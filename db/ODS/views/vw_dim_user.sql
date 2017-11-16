@@ -10,13 +10,11 @@ SELECT
   cidade,
   complemento,
   cpf,
-
   case
       when date_part('year', data_nascimento) < 100 then data_nascimento + interval '1900 years' -- dateadd(year, 1900, data_nascimento)
       when date_part('year', data_nascimento) < 1000 then data_nascimento + interval '1000 years' -- dateadd(year, 1000, data_nascimento)
       else data_nascimento
   end as data_nascimento,
-
   email,
   email_alternativo,
   endereco,
@@ -111,49 +109,51 @@ SELECT
   criado_em,
   atualizado_em,
   now() as load_timestamp,
-  an.network
+  an.network,
+  b_counts.visits_booked,
+  b_counts.visits_realized,
+  b_counts.visits_expected_to_happen
 FROM
   public.usuario u
 inner join
-(
-  select
-      u.id,
-      min(b."criadoEm") as first_booking_date,
-      min(b."criadoEm") filter (where b.status != 'Canceled') as first_booking_confirmed_date,
-      min(v.dia) as first_visit_date,
-      min(v.dia) filter (where b.status != 'Canceled') as first_visit_confirmed_date,
-      min(pp."criadoEm") as first_pre_proposal_date,
-      min(p."criadoEm") as first_proposal_accepted_date,
-      min(c."criadoEm") as first_contract_date,
-      min(c."dataAssinado") as first_signed_contract
-  from
-      usuario  u
-  left join
-      booking b
-      on b.visitante_id = u.id
-  left join
-      visit v
-      on v.id = b.visita_id
-  left join
-      rental_flow fl
-      on fl.id = b."fluxoLocacao_id"
-  left join
-      pre_proposal pp
-      on fl.cliente_id = pp.usuario_id
-  left join
-      proposal p
-      on p."preProposta_id" = pp.id
-  left join
-      contract c
-      on c.proposta_id = p.id
-
-  group by
-      u.id
-) user_dates
-on user_dates.id = u.id
-left join 
+	(
+	  select
+	      u.id,
+	      min(b."criadoEm") as first_booking_date,
+	      min(b."criadoEm") filter (where b.status != 'Canceled') as first_booking_confirmed_date,
+	      min(v.dia) as first_visit_date,
+	      min(v.dia) filter (where b.status != 'Canceled') as first_visit_confirmed_date,
+	      min(pp."criadoEm") as first_pre_proposal_date,
+	      min(p."criadoEm") as first_proposal_accepted_date,
+	      min(c."criadoEm") as first_contract_date,
+	      min(c."dataAssinado") as first_signed_contract
+	  from
+	      usuario  u
+	  left join
+	      booking b
+	      on b.visitante_id = u.id
+	  left join
+	      visit v
+	      on v.id = b.visita_id
+	  left join
+	      rental_flow fl
+	      on fl.id = b."fluxoLocacao_id"
+	  left join
+	      pre_proposal pp
+	      on fl.cliente_id = pp.usuario_id
+	  left join
+	      proposal p
+	      on p."preProposta_id" = pp.id
+	  left join
+	      contract c
+	      on c.proposta_id = p.id
+	  group by
+	      u.id
+	) user_dates
+	on user_dates.id = u.id
+left join
   app_network an
-on u.id = an.user_id
+	on u.id = an.user_id
 left join
 	(
 		select
@@ -168,6 +168,18 @@ left join
 			date_part('year', "date"::date),
 			date_part('month', "date"::date)
 	) afiliate_campaigns
-on campaign_year = date_part('year', dadosafiliado_inicio_atuacao)
-and campaign_month = date_part('month', dadosafiliado_inicio_atuacao)
+	on campaign_year = date_part('year', dadosafiliado_inicio_atuacao)
+	and campaign_month = date_part('month', dadosafiliado_inicio_atuacao)
+left join
+	(
+		select
+			visitante_id,
+			count(1) as visits_booked,
+			sum(case when "fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho') then 1 else 0 end) as visits_realized,
+			sum(case when "fupVisita" is not null then 1 else 0 end) as visits_expected_to_happen
+		from booking
+		group by
+		visitante_id
+	) b_counts
+	on b_counts.visitante_id = u.id
 ;

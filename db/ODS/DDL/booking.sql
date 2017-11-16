@@ -26,6 +26,15 @@ CREATE TABLE public.booking (
   reason_category varchar(255),
   last_update_source varchar(255),
   cancel_timestamp timestamp,
-  first_update_source varchar(255)
+  first_update_source varchar(255),
+  visitor_arrived varchar(255),
+  visitor_missing_reason varchar(255),
+  agent_arrived varchar(255),
+  agent_missing_reason varchar(255),
+  owner_arrived varchar(255),
+  owner_missing_reason varchar(255),
+  successful_entrance varchar(255),
+  troublesome_entrance varchar(255),
+  fup_comments varchar(255)
 )
 WITH (oids = false);

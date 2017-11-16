@@ -100,5 +100,8 @@ CREATE TABLE dim_user (
   criado_em timestamp ,
   atualizado_em timestamp DEFAULT NULL,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  network varchar(255) DEFAULT NULL
+  network varchar(255) DEFAULT NULL,
+  visits_booked integer,
+  visits_realized integer,
+  visits_expected_to_happen integer
 ) ;

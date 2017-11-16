@@ -34,5 +34,14 @@ CREATE TABLE dim_booking (
   dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
   last_update_source VARCHAR(255),
   first_update_source VARCHAR(255),
+  visitor_arrived varchar(255),
+  visitor_missing_reason varchar(255),
+  agent_arrived varchar(255),
+  agent_missing_reason varchar(255),
+  owner_arrived varchar(255),
+  owner_missing_reason varchar(255),
+  successful_entrance varchar(255),
+  troublesome_entrance varchar(255),
+  fup_comments varchar(255),
   CONSTRAINT dim_booking_pkey PRIMARY KEY(sk_booking)
 );
