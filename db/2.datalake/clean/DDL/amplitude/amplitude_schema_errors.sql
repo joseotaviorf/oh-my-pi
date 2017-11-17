@@ -10,6 +10,7 @@ create external table datalake_clean.amplitude_schema_errors (
   err_validator string,
   err_validator_value string,
   err_instance string,
+  err_details string,
   validation_status string
 )
 partitioned by (
