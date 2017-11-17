@@ -151,8 +151,7 @@ select
     owner_arrived,
     owner_missing_reason,
     successful_entrance,
-    troublesome_entrance,
-    fup_comments
+    troublesome_entrance
    
 	
 from

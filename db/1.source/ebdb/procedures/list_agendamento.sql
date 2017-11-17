@@ -38,7 +38,7 @@ select
   fup.motivoAgente as agent_missing_reason,
   fup.prorietarioCompareceu as owner_arrived,
   fup.motivoProprietario as owner_missing_reason,
-  e.successful as successful_entrance,
+  (case when e.successful=1 then 1 when e.successful=0 then 0 else null end) as successful_entrance,
   e.problem as troublesome_entrance,
   fup.comentFup as fup_comments
 from
