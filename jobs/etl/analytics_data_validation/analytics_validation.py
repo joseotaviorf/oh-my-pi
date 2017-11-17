@@ -107,6 +107,8 @@ class SchemaValidator(object):
 
         tbl = []
         for app, ets in self.schema_dict.iteritems():
+            _logger.info('m=validate_events_and_save_into_s3, msg=processing app: {}'.format(app))
+            
             app = re.search('(\d+)', app)
             if not app or len(app.groups()) == 0:
                 continue
