@@ -28,7 +28,7 @@ class SchemaValidator(object):
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
-        for root, dirs, files in os.walk('schemas'):
+        for root, dirs, files in os.walk('jobs/etl/analytics_data_validation/schemas'):
             self.schema_dict[root] = files
 
     def validate_amplitude_schema(self, event_json, schema_json):
