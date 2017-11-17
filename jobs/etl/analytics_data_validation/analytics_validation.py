@@ -2,78 +2,36 @@ import json
 import os
 import re
 import sys
-import types
-from datetime import datetime, date, timedelta
-from io import BytesIO, StringIO
+from collections import OrderedDict
+from datetime import datetime
 from gzip import GzipFile
+from io import BytesIO
 
 import boto3
 import pandas as pd
 from jsonschema import Draft4Validator
-from tabulate import tabulate
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import logger, _logger
 
-#args = sys.argv
-#args = [1]
-#args[0] = '2017-10-01'
-#dt = args[0]
-#sys.argv = ['2017-10-10']
 args = sys.argv
-date = []
-#date.append(datetime.strptime(args[0], '%Y-%m-%d').date())
 
-date_start = datetime.strptime('13-11-17', '%d-%m-%y').date()
-date_end = datetime.strptime('14-11-17', '%d-%m-%y').date()
-date_delta = date_end - date_start
-
-for d in range(date_delta.days + 1):
-    date.append(date_start + timedelta(days=d))
-
-#var_env = os.environ('airflow_amplitude_schema_validation')
-var_env = {
-    'apps': [
-        {
-            # Dev Supply
-            '183049': [
-
-                'landing_page_viewed',
-                'onboarding_page_viewed',
-
-                'listing_intent_clicked',
-                'listing_intent_clicked',
-                'addressauto_page_viewed',
-                'addressdetails_page_viewed',
-                'property_page_viewed',
-                'condo_page_viewed',
-                'price_page_viewed',
-                'terms_page_viewed',
-                'listing_terms_confirmed',
-
-                'photo_intent_clicked',
-                'photo_intent_clicked',
-                'photo_intent_clicked',
-                'photo_schedule_confirmed',
-
-                'reminder_page_viewed',
-                'photo_reminder_set',
-
-                'homescreen_install_impression',
-                'homescreen_install_confirmed'
-            ]
-        },
-        {
-            # Prod Supply
-            # '183047': [
-            #
-            # ]
-        }
-    ]
-}
+today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
+ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
 
 class SchemaValidator(object):
+    DATA_LAKE_BUCKET = '5a-datalake'
+
+    @logger
+    def __init__(self):
+        self.athena_client = AthenaClient(SchemaValidator.DATA_LAKE_BUCKET)
+        self.s3_client = boto3.client('s3')
+
+        self.schema_dict = {}
+        for root, dirs, files in os.walk('schemas'):
+            self.schema_dict[root] = files
 
     def validate_amplitude_schema(self, event_json, schema_json):
-
         dict_errors = []
         event = event_json
         schema = schema_json
@@ -87,16 +45,14 @@ class SchemaValidator(object):
 
         v = Draft4Validator(schema)
         for error in sorted(v.iter_errors(event), key=str):
-
-            err_validator = ''
             err_validator_value = ''
             err_instance = ''
             err_detail = ''
 
             # error path
-            if (len(list(error.path)) == 1):
+            if len(list(error.path)) == 1:
                 err_path = str(error.path[0])
-            elif (len(list(error.path)) == 2):
+            elif len(list(error.path)) == 2:
                 err_path = str(error.path[0]) + '.' + str(error.path[1])
             else:
                 err_path = str(error.path)
@@ -112,10 +68,8 @@ class SchemaValidator(object):
             else:
                 if type(error.validator_value) == list:
                     for field in error.validator_value:
-                        if err_validator_value != '':
-                            err_validator_value = err_validator_value + ', ' + str(field)
-                        else:
-                            err_validator_value = str(field)
+                        err_validator_value = err_validator_value + ', ' + str(
+                            field) if err_validator_value != '' else str(field)
                 elif type(error.validator_value) == unicode:
                     err_validator_value = str(error.validator_value)
                 else:
@@ -124,127 +78,124 @@ class SchemaValidator(object):
                 # error instance value (received value)
                 if type(error.instance) in (dict, list):
                     for field, value in error.instance.iteritems():
-                        if err_instance != '':
-                            err_instance = err_instance + ', ' + str(field)
-                        else:
-                            err_instance = str(field)
+                        err_instance = err_instance + ', ' + str(field) if err_instance != '' else str(field)
                 elif type(error.instance) == unicode:
                     err_instance = str(error.instance)
                 else:
                     err_instance = json.dumps(error.instance)
 
                 # set a custom detail for the error
-                # if type(error.instance) == dict and error.validator == 'required':
                 if error.validator == 'required':
                     for field in list(set(error.validator_value) - set(error.instance.keys())):
-                        if err_detail != '':
-                            err_detail = err_detail + ', ' + field
-                        else:
-                            err_detail = 'missing: ' + field
+                        err_detail = err_detail + ', ' + field if err_detail != '' else 'missing: ' + field
 
             dict_errors.append(
-                [app_id, event_type, uuid, server_upload_time, platform,
-                 validation_time, err_path, err_validator,
-                 err_validator_value, err_instance, err_detail])
+                [
+                    app_id, event_type, uuid, server_upload_time, platform,
+                    validation_time, err_path, err_validator,
+                    err_validator_value, err_instance, err_detail,
+                    'validated with errors' if err_detail != '' or err_instance != '' or err_validator_value else 'skipped'
+                ]
+            )
 
         return dict_errors
 
-
-
-    def validate_events(self):
-
-        s3c = boto3.client('s3')
-        # s3r = boto3.resource('s3')
-        bucket = '5a-datalake'
-
+    @logger
+    def validate_events_and_save_into_s3(self):
         ts_start = datetime.now()
-        print '### Job started: {}'.format(ts_start)
+        _logger.info('m=validate_events, msg=job started at {}'.format(ts_start))
 
         tbl = []
+        for app, ets in self.schema_dict.iteritems():
+            app = re.search('(\d+)', app)
+            if not app or len(app.groups()) == 0:
+                continue
 
-        for dt in date:
-            for apps in var_env['apps']:
-                for app, ets in apps.iteritems():
-                    for et in ets:
+            app = app.group(1)
+            for et in ets:
+                et = re.search('(.*)\.schema\.json', et)
+                if not et or len(et.groups()) == 0:
+                    continue
 
-                        # read list of files in s3 folder
-                        response = s3c.list_objects_v2(
-                            Bucket='5a-datalake',
-                            Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(dt, et, app)
-                        )
+                et = et.group(1)
+                # read list of files in s3 folder
+                response = self.s3_client.list_objects_v2(
+                    Bucket=SchemaValidator.DATA_LAKE_BUCKET,
+                    Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(today, et, app)
+                )
 
-                        # if no files found jdataLayer = [{ 'pageCategory': 'Statistics', 'visitorType': 'high-value' }]ump to next event
-                        if response['KeyCount'] < 1:
-                             continue
+                if response['KeyCount'] < 1:
+                    continue
 
-                        # set schema path and file
-                        json_schema_path = 'schemas/{}/'.format(app)
-                        json_schema_file = '{}.schema.json'.format(et)
+                # set schema path and file
+                json_schema_path = 'schemas/{}/'.format(app)
+                json_schema_file = '{}.schema.json'.format(et)
 
-                        cnt_evt = 0
-                        cnt_err = 0
+                for key in response['Contents']:
+                    _logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
 
-                        for key in response['Contents']:
+                    json_file = key['Key']
+                    obj = self.s3_client.get_object(Bucket=SchemaValidator.DATA_LAKE_BUCKET, Key=json_file)
+                    byte_stream = BytesIO(obj['Body'].read())
 
-                            json_file = key['Key']
-                            tmp_path, tmp_file = os.path.split(json_file)
+                    result = GzipFile(None, 'rb', fileobj=byte_stream).read().decode('utf-8')
+                    result_final = result.split('\n')
+                    result_final = result_final[:-1] if result_final[len(result_final) - 1] == '' else result_final
 
-                            #print 'evt_nr {} - reading: {}'.format(cnt_evt, json_file)
+                    # event schema validation
+                    with open(json_schema_path + json_schema_file) as json_schema:
+                        schema = json.load(json_schema)
 
-                            obj = s3c.get_object(Bucket=bucket, Key=json_file)
+                    _logger.info('m=validate_events_and_save_into_s3, et={}, dt={}, app={}, '
+                                 'msg=validating schema'.format(et, today, app))
 
-                            byte_stream = BytesIO(obj['Body'].read())
-                            result = GzipFile(None, 'rb', fileobj=byte_stream).read().decode('utf-8')
+                    for line in result_final:
+                        event = json.loads(line)
+                        tbl.extend(self.validate_amplitude_schema(event, schema))
 
-                            result_final = result.split('\n')
-                            result_final = result_final[:-1] if result_final[len(result_final)-1] == '' else result_final
+                    df = self.__build_data_frame(tbl if len(tbl) > 0 else [[app, et, None, None, None, None, None, None,
+                                                                            None, None, None, 'validated without errors'
+                                                                            ]])
+                    self.__save_df_into_s3(df, et, json_file)
 
-                            # event schema validation
-                            with open(json_schema_path + json_schema_file) as json_schema:
-                                schema = json.load(json_schema)
+    @logger(exclude='tbl')
+    def __build_data_frame(self, tbl):
+        return pd.DataFrame.from_records(tbl, columns=['app_id', 'event_type', 'uuid',
+                                                       'server_upload_time', 'platform',
+                                                       'validation_time', 'err_path',
+                                                       'err_validator', 'err_validator_value',
+                                                       'err_instance', 'err_details', 'validation_status'])
 
-                            for line in result_final:
+    @logger(exclude='df')
+    def __save_df_into_s3(self, df, et, json_file):
+        file_name_prefix = re.search('app=\d*/(.*)\.json\.gz', json_file)
+        s3_key = 'clean/amplitude/event_errors/ym={0}/et={1}/{2}.parq'
 
-                                event = json.loads(line)
-                                print event
-                                tbl.extend(self.validate_amplitude_schema(event, schema))
-
-        labels = ['app_id', 'event_type', 'uuid', 'server_upload_time', 'platform', 'validation_time',
-                  'err_path', 'err_validator', 'err_validator_value', 'err_instance', 'err_details']
-
-        df = pd.DataFrame.from_records(tbl, columns=labels)
-
-        print ''
-        print 'errors found:'
-        print ''
-        print tabulate(df.groupby(['app_id','event_type','platform','err_path','err_validator','err_validator_value','err_instance','err_details']).size().reset_index().rename(columns={0:'count'}), headers='keys', tablefmt='psql')
-
-        df.to_csv('supply_errors.csv', index=False, encoding='utf-8')
-
-        return df
-
-                            # set schema path and file
-                            # error_log_path = 'errors_supply/dt={}/et={}/app={}/'.format(dt, et, app)
-                            # error_log_file = '{}_errors.csv'.format(tmp_file)
-                            # if not os.path.exists(error_log_path):
-                            #     os.makedirs(error_log_path)
-                            # df.to_csv(error_log_path + error_log_file, mode='a', header=False, index=False, encoding='utf-8')
-
-                            #csv_buffer = StringIO()
-                            #df.to_csv(csv_buffer)
-                            #s3r.Object(bucket, 'df.csv').put(Body=csv_buffer.getvalue())
-
-                            # write files to s3 bucket
-                            #s3_target_path = 'raw/amplitude/errors/dt={}/et={}/app={}/'.format(dt, et, app)
-                            #s3r.Object(bucket, s3_target_path + error_log_file).put(Body=open(error_log_path + error_log_file, 'rb'))
-
-                        # print ''
-                        # print 'app: {} / event-type: {}'.format(app, et)
-                        # print '{} jsons validated with {} errors, runtime: {}'.format(cnt_evt, cnt_err, datetime.now() - ts_start)
-                        #
-                        # print ''
-                        # print ''
-
-            #print '### {} processed. Total runtime: {}'.format(dt, (datetime.now() - ts_start))
+        self.athena_client.create_parquet_from_df(
+            key=s3_key.format(ym, et, file_name_prefix.groups(1)[0]),
+            df=df,
+            raw_columns=OrderedDict([
+                ('app_id', str),
+                ('event_type', str),
+                ('uuid', str),
+                ('server_upload_time', str),
+                ('platform', str),
+                ('validation_time', str),
+                ('err_path', str),
+                ('err_validator', str),
+                ('err_validator_value', str),
+                ('err_instance', str),
+                ('err_details', str),
+                ('validation_status', str)
+            ])
+        )
 
 
+if __name__ == '__main__':
+    schema_validator = SchemaValidator()
+
+    if args[1] == 'validate':
+        schema_validator.validate_events_and_save_into_s3()
+        schema_validator.athena_client.execute_raw_query('msck repair table datalake_clean.amplitude_schema_errors')
+    else:
+        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
