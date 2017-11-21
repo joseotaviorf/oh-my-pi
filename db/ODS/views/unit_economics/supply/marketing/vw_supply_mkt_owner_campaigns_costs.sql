@@ -8,9 +8,8 @@ create or replace view vw_supply_mkt_owner_campaigns_costs as
 -- Get Google Ads Owner Costs Per Year-Month
 with google_monthly_owner_costs as (
 	select
-		date_part('month', "day"::date) as "month",
-		date_part('year', "day"::date) as "year",
-		sum((cost::DECIMAL(14,2)/1000000)::DECIMAL(14,2)) as cost
+		"day"::date as dt_cost,
+		sum((cost::DECIMAL(14,4)/1000000)::DECIMAL(14,2)) as cost
 	from
 		google_ads_campaigns
 	where
@@ -19,16 +18,14 @@ with google_monthly_owner_costs as (
 			campaign like '%lp_quanto_cobrar%'
 		)
 	group by
-		date_part('month', "day"::date),
-		date_part('year', "day"::date)
+		"day"::date
 ),
 -- Get Facebook Owner Costs Per Year-Month
 facebook_monthly_owner_costs as
 (
 	select
-        date_part('month', "date"::date) as "month",
-        date_part('year', "date"::date) as "year",
-        sum(spend::DECIMAL(14,2)) as cost
+        "date"::date as dt_cost,
+        sum(spend::DECIMAL(14,4)) as cost
     from
         facebook_ads_campaigns
     where
@@ -40,47 +37,70 @@ facebook_monthly_owner_costs as
             or campaign_name like '%Indica%'
         ) is false
     group by
-        date_part('month', "date"::date),
-        date_part('year', "date"::date)
+        "date"::date
 ),
 -- Join all costs into one single table
 owner_mkt_costs as
 (
 	select
-		coalesce(g."month", f."month") as month,
-		coalesce(g."year", f."year") as year,
+		coalesce(g.dt_cost, f.dt_cost) as dt_cost,
 		(coalesce(g.cost, 0) + coalesce(f.cost, 0)) as cost
 	from
 		google_monthly_owner_costs g
 	full outer join
 		facebook_monthly_owner_costs f
-	on g."year" = f."year" and f."month" = g."month"
+	on g.dt_cost = f.dt_cost
+),
+ten_day_base as
+(
+	select
+		base.*,
+		dt."date" as ten_pub_date
+	from
+		vw_base_property_costs base
+	left join
+		dim_date dt
+		on dt."date" between base.publication_date - interval '10 day' and base.publication_date
+	-- filter by first version only, as is a supply cost
+	where base.version = 1
 ),
 -- Divide all costs among versioned properties
 divided_costs as (
 	select
 		sk_property,
 		property_id,
-		date_trunc('month', publication_date + interval '2 month')::date as dt_cash_flow,
+		date_trunc('month', base.ten_pub_date + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
-			date_part('year', publication_date),
-			date_part('month', publication_date)
-		))::decimal(14,4) as vl_owner_campaigns
+			base.ten_pub_date
+		))::decimal(14,8) as vl_owner_campaigns
 	from
-		vw_base_property_costs base
+		ten_day_base base
 	left join
 		owner_mkt_costs mkt
-		on date_part('year', publication_date) = mkt.year
-		and date_part('month', publication_date) = mkt.month
-	-- filter by first version only, as is a supply cost
-	where base.version = 1
+		on base.ten_pub_date = mkt.dt_cost
+),
+total as (
+	-- Remove rows where costs equal zero
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		sum(vl_owner_campaigns)::decimal(14,8) as vl_owner_campaigns
+	from
+		divided_costs
+	where
+		vl_owner_campaigns <> 0
+	group by
+		sk_property,
+		property_id,
+		dt_cash_flow
 )
--- Remove rows where costs equal zero
 select
-	*
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	vl_owner_campaigns::decimal(14,4) as vl_owner_campaigns
 from
-	divided_costs
-where
-	vl_owner_campaigns <> 0
+	total
 ;
