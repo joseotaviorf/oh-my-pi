@@ -21,6 +21,7 @@ ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
 class SchemaValidator(object):
     DATA_LAKE_BUCKET = '5a-datalake'
+    PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger
     def __init__(self):
@@ -28,7 +29,7 @@ class SchemaValidator(object):
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
-        for root, dirs, files in os.walk('jobs/etl/analytics_data_validation/schemas'):
+        for root, dirs, files in os.walk('{}/schemas'.format(SchemaValidator.PATH_PREFIX)):
             self.schema_dict[root] = files
 
     def validate_amplitude_schema(self, event_json, schema_json):
@@ -130,7 +131,7 @@ class SchemaValidator(object):
                     continue
 
                 # set schema path and file
-                json_schema_path = 'schemas/{}/'.format(app)
+                json_schema_path = '{}/schemas/{}/'.format(SchemaValidator.PATH_PREFIX, app)
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
