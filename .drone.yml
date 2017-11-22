@@ -1,12 +1,42 @@
-publish:
-  ecr:
+pipeline:
+
+  test:
+    image: python:2.7.12
+    commands:
+      - pip install -Ur requirements.txt
+
+  install:
+    image: appleboy/drone-ssh
+    host: 204.236.192.147
+    username: airflow
+    port: 22
+    script:
+      - cd /var/www/airflow/bi-etl-ejuice
+      - git fetch origin
+      - git reset --hard origin/${DRONE_COMMIT_BRANCH}
+      - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+    secrets:
+      - plugin_key
     when:
-      branch: [master, forno]
-    access_key: $$AWS_ACCESS_KEY
-    secret_key: $$AWS_SECRET_KEY
-    region: us-east-1
-    repo: quintoandar/bi-etl-ejuice
-    storage_driver: overlay
+      branch:
+        - forno
+        - new-capiroto
+
+  ecr:
+    group: ecr
+    image: plugins/ecr
+    repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+    registry: 632540934959.dkr.ecr.us-east-1.amazonaws.com
+    storage_driver: vfs
+    debug: true
     tag:
-      - $$BRANCH-$${COMMIT:0:7}
-      - $$BRANCH-latest
+      - '${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT:0:7}'
+      - '${DRONE_COMMIT_BRANCH}-latest'
+    secrets:
+      - ecr_access_key
+      - ecr_secret_key
+    when:
+      branch:
+        - forno
+        - master
+
