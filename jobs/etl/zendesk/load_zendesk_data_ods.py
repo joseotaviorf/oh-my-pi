@@ -11,8 +11,9 @@ from jobs.base.enum_db import EnumDb
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
-        self.human_readable_start_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
-        self.start_time = int(self.human_readable_start_time.strftime('%s'))
+        self.human_readable_start_time = datetime.strptime('2017-10-30 00:00:00', '%Y-%m-%d %H:%M:%S').date()
+        self.human_readable_start_x = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
+        self.start_time = int(self.human_readable_start_x.strftime('%s'))
         self.s3_bucket = args[3]
         self.s3_bucket_raw_folder_path = args[4]
         self.ods_schema = args[5]
@@ -28,7 +29,7 @@ class ZendeskDataToODS(object):
         self.ods_conn = BaseETL.get_connection(db_enum=self.db_enum, encoding='UTF-8')
 
     def __load_files_from_bucket(self, partition=''):
-        prefix = '{0}/{1}{2}/{1}-{3}'.format(
+        prefix = '{0}/{1}{2}/{1}-{3}.json'.format(
             self.s3_bucket_raw_folder_path,
             self.object_type,
             partition,
@@ -80,8 +81,10 @@ class ZendeskDataToODS(object):
 
     def __execute_command(self, command, return_value=False):
         command = str(command).replace("'null'", "null").replace('\n', '')
-        return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
-                                       commit=True, return_value=return_value, show_logs=False)
+        print command
+        pass
+        # return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
+        #                                commit=True, return_value=return_value, show_logs=False)
 
     @staticmethod
     def __check_existence(field, dict_var):
@@ -386,6 +389,7 @@ class ZendeskDataToODS(object):
         for t in tickets:
             print ('processing ticket [id={}]'.format(t['id']))
             count += 1
+            is_whatsapp = False
 
             delete_via_command = " delete from {}.via where object_id = '{}' ".format(self.ods_schema, t['id'])
             self.__execute_command(command=delete_via_command)
@@ -467,14 +471,15 @@ class ZendeskDataToODS(object):
                 self.__execute_command(command=delete_ticket_tags_command)
 
                 for tag in t['tags']:
+                    value = BaseETL.coalesce(tag.encode('utf-8') if tag else None)
                     upsert_ticket_tags_command = " insert into {}.tag (object_id, \"value\") " \
                                                  " values ('{}','{}') ".format(self.ods_schema,
                                                                                t['id'],
-                                                                               BaseETL.coalesce(
-                                                                                   tag.encode(
-                                                                                       'utf-8') if tag else None)
+                                                                               value
                                                                                )
                     self.__execute_command(command=upsert_ticket_tags_command)
+                    if value == 'whatsapp':
+                        is_whatsapp = True
 
             if t['collaborator_ids'] and len(t['collaborator_ids']) > 0:
                 delete_collaborator_ids_command = " delete from {}.object_collaborators where object_id = '{}' ".format(
@@ -493,12 +498,12 @@ class ZendeskDataToODS(object):
                                     " organization_id, group_id, forum_topic_id, problem_id, has_incidents," \
                                     " via_id,  ticket_form_id, brand_id, allow_channelback, is_public, created_at, " \
                                     " updated_at, due_at, followup_ids, sharing_agreement_ids, satisfaction_rating_score, " \
-                                    " satisfaction_rating_comment) " \
+                                    " satisfaction_rating_comment, is_whatsapp) " \
                                     " values ('{}', '{}', '{}', '{}','{}','{}'," \
                                     " '{}','{}','{}','{}',{},{},{}," \
                                     " '{}','{}','{}','{}',{}," \
                                     " {},'{}','{}'," \
-                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}') " \
+                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}', {}) " \
                                     " on conflict (id) do update set " \
                                     " url = excluded.url, external_id = excluded.external_id,\"type\" = excluded.\"type\", " \
                                     "subject = excluded.subject, raw_subject = excluded.raw_subject," \
@@ -515,7 +520,8 @@ class ZendeskDataToODS(object):
                                     " followup_ids = excluded.followup_ids, " \
                                     " sharing_agreement_ids = excluded.sharing_agreement_ids, " \
                                     " satisfaction_rating_score = excluded.satisfaction_rating_score, " \
-                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment ".format(
+                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment " \
+                                    " is_whatsapp = excluded.is_whatsapp".format(
                 self.ods_schema,
                 t['id'],
                 BaseETL.coalesce(t['url']),
@@ -555,7 +561,8 @@ class ZendeskDataToODS(object):
                     else BaseETL.coalesce(t['satisfaction_rating']['score']),
                 'null' if ZendeskDataToODS.__check_existence(field='comment',
                                                              dict_var=t['satisfaction_rating']) == 'null' \
-                    else BaseETL.coalesce(ZendeskDataToODS.__format_string(t['satisfaction_rating']['comment']))
+                    else BaseETL.coalesce(ZendeskDataToODS.__format_string(t['satisfaction_rating']['comment'])),
+                is_whatsapp
             )
 
             self.__execute_command(command=upsert_ticket_command)

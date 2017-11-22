@@ -29,5 +29,6 @@ CREATE TABLE zendesk.ticket (
 	is_public bool NULL,
 	created_at timestamp NULL,
 	updated_at timestamp NULL,
+	is_whatsapp bool NULL,
 	CONSTRAINT ticket_pkey PRIMARY KEY (id)
 );
