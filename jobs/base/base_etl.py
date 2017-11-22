@@ -376,7 +376,7 @@ class BaseETL(object):
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         forno = os.environ.get('forno')
         con = cls.get_connection(enum_db_dest, encoding)
-        file = 's3://{}{}'.format(bucket_name, filename)
+        file = 's3://{}/{}'.format(bucket_name, filename)
         delimiter = ','
 
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
