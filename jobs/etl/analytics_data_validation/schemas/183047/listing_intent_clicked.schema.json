@@ -36,7 +36,7 @@
       "properties": {
         "current_page": {
           "type": "string",
-          "enum": ["about","myproperties"]
+          "enum": ["about","myproperties","stepsintro"]
         },
         "uri": {
           "type": "string"
