@@ -157,12 +157,13 @@ class SchemaValidator(object):
                     for line in result_final:
                         event = json.loads(line)
                         result = SchemaValidator.validate_amplitude_schema(event, schema)
-                        tbl.append(result) if len(result) > 0 else tbl.append([app, et, event['uuid'],
-                                                                               event['server_upload_time'],
-                                                                               event['platform'],
-                                                                               str(datetime.utcnow()), None, None, None,
-                                                                               None, None, 'validated without errors'
-                                                                               ])
+                        tbl.extend(result) if len(result) > 0 else tbl.extend([[app, et, event['uuid'],
+                                                                                event['server_upload_time'],
+                                                                                event['platform'],
+                                                                                str(datetime.utcnow()), None, None,
+                                                                                None,
+                                                                                None, None, 'validated without errors'
+                                                                                ]])
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
