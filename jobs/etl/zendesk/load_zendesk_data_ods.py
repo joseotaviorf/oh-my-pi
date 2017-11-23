@@ -11,9 +11,8 @@ from jobs.base.enum_db import EnumDb
 class ZendeskDataToODS(object):
     def __init__(self, args):
         self.object_type = args[1]
-        self.human_readable_start_time = datetime.strptime('2017-10-30 00:00:00', '%Y-%m-%d %H:%M:%S').date()
-        self.human_readable_start_x = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
-        self.start_time = int(self.human_readable_start_x.strftime('%s'))
+        self.human_readable_start_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
+        self.start_time = int(self.human_readable_start_time.strftime('%s'))
         self.s3_bucket = args[3]
         self.s3_bucket_raw_folder_path = args[4]
         self.ods_schema = args[5]
