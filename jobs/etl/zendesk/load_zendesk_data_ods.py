@@ -475,7 +475,7 @@ class ZendeskDataToODS(object):
                                                                                value
                                                                                )
                     self.__execute_command(command=upsert_ticket_tags_command)
-                    if value == 'whatsapp':
+                    if value == 'zapdesk':
                         is_whatsapp = True
 
             if t['collaborator_ids'] and len(t['collaborator_ids']) > 0:
