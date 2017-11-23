@@ -20,7 +20,7 @@ ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
 class SchemaValidator(object):
     DATA_LAKE_BUCKET = '5a-datalake'
-    PATH_PREFIX = ''
+    PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger
     def __init__(self):
