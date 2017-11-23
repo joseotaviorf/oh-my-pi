@@ -80,10 +80,8 @@ class ZendeskDataToODS(object):
 
     def __execute_command(self, command, return_value=False):
         command = str(command).replace("'null'", "null").replace('\n', '')
-        print command
-        pass
-        # return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
-        #                                commit=True, return_value=return_value, show_logs=False)
+        return BaseETL.execute_command(command=command, db_enum=self.db_enum, conn=self.ods_conn, encoding='UTF-8',
+                                       commit=True, return_value=return_value, show_logs=False)
 
     @staticmethod
     def __check_existence(field, dict_var):
@@ -477,7 +475,7 @@ class ZendeskDataToODS(object):
                                                                                value
                                                                                )
                     self.__execute_command(command=upsert_ticket_tags_command)
-                    if value == 'whatsapp':
+                    if value == 'zapdesk':
                         is_whatsapp = True
 
             if t['collaborator_ids'] and len(t['collaborator_ids']) > 0:
@@ -519,7 +517,7 @@ class ZendeskDataToODS(object):
                                     " followup_ids = excluded.followup_ids, " \
                                     " sharing_agreement_ids = excluded.sharing_agreement_ids, " \
                                     " satisfaction_rating_score = excluded.satisfaction_rating_score, " \
-                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment " \
+                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment, " \
                                     " is_whatsapp = excluded.is_whatsapp".format(
                 self.ods_schema,
                 t['id'],
