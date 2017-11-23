@@ -14,7 +14,6 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
@@ -29,23 +28,24 @@ class SchemaValidator(object):
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
+
+        _logger.info('m=__init__, msg=reading dir: {}/schemas'.format(SchemaValidator.PATH_PREFIX))
         for root, dirs, files in os.walk('{}/schemas'.format(SchemaValidator.PATH_PREFIX)):
             self.schema_dict[root] = files
 
-    def validate_amplitude_schema(self, event_json, schema_json):
+    @staticmethod
+    def validate_amplitude_schema(event_json, schema_json):
         dict_errors = []
-        event = event_json
-        schema = schema_json
 
-        app_id = event['app']
-        event_type = event['event_type']
-        uuid = event['uuid']
-        server_upload_time = (event['server_upload_time'])
-        platform = event['platform']
+        app_id = event_json['app']
+        event_type = event_json['event_type']
+        uuid = event_json['uuid']
+        server_upload_time = (event_json['server_upload_time'])
+        platform = event_json['platform']
         validation_time = datetime.utcnow()
 
-        v = Draft4Validator(schema)
-        for error in sorted(v.iter_errors(event), key=str):
+        v = Draft4Validator(schema_json)
+        for error in sorted(v.iter_errors(event_json), key=str):
             err_validator_value = ''
             err_instance = ''
             err_detail = ''
@@ -109,13 +109,15 @@ class SchemaValidator(object):
         tbl = []
         for app, ets in self.schema_dict.iteritems():
             _logger.info('m=validate_events_and_save_into_s3, msg=processing app: {}'.format(app))
-            
+
             app = re.search('(\d+)', app)
             if not app or len(app.groups()) == 0:
                 continue
 
             app = app.group(1)
             for et in ets:
+                _logger.info('m=validate_events_and_save_into_s3, msg=processing event: {} for app: {}'.format(et, app))
+
                 et = re.search('(.*)\.schema\.json', et)
                 if not et or len(et.groups()) == 0:
                     continue
@@ -154,11 +156,15 @@ class SchemaValidator(object):
 
                     for line in result_final:
                         event = json.loads(line)
-                        tbl.extend(self.validate_amplitude_schema(event, schema))
+                        result = SchemaValidator.validate_amplitude_schema(event, schema)
+                        tbl.append(result) if len(result) > 0 else tbl.append([app, et, event['uuid'],
+                                                                               event['server_upload_time'],
+                                                                               event['platform'],
+                                                                               str(datetime.utcnow()), None, None, None,
+                                                                               None, None, 'validated without errors'
+                                                                               ])
 
-                    df = self.__build_data_frame(tbl if len(tbl) > 0 else [[app, et, None, None, None, None, None, None,
-                                                                            None, None, None, 'validated without errors'
-                                                                            ]])
+                    df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
 
     @logger(exclude='tbl')
