@@ -14,7 +14,6 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
-args=['', 'validate', '2017-11-14 04:00:00']
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
 ym = '{}-{}'.format(today.year, today.strftime('%m'))
 
@@ -31,7 +30,7 @@ class SchemaValidator(object):
         self.schema_dict = {}
 
         _logger.info('m=__init__, msg=reading dir: {}/schemas'.format(SchemaValidator.PATH_PREFIX))
-        for root, dirs, files in os.walk('{}schemas'.format(SchemaValidator.PATH_PREFIX)):
+        for root, dirs, files in os.walk('{}/schemas'.format(SchemaValidator.PATH_PREFIX)):
             self.schema_dict[root] = files
 
     @staticmethod
@@ -134,7 +133,7 @@ class SchemaValidator(object):
                     continue
 
                 # set schema path and file
-                json_schema_path = '{}schemas/{}/'.format(SchemaValidator.PATH_PREFIX, app)
+                json_schema_path = '{}/schemas/{}/'.format(SchemaValidator.PATH_PREFIX, app)
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
@@ -159,11 +158,12 @@ class SchemaValidator(object):
                         event = json.loads(line)
                         result = SchemaValidator.validate_amplitude_schema(event, schema)
                         tbl.extend(result) if len(result) > 0 else tbl.extend([[app, et, event['uuid'],
-                                                                               event['server_upload_time'],
-                                                                               event['platform'],
-                                                                               str(datetime.utcnow()), None, None, None,
-                                                                               None, None, 'validated without errors'
-                                                                               ]])
+                                                                                event['server_upload_time'],
+                                                                                event['platform'],
+                                                                                str(datetime.utcnow()), None, None,
+                                                                                None,
+                                                                                None, None, 'validated without errors'
+                                                                                ]])
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
