@@ -106,7 +106,6 @@ class SchemaValidator(object):
         ts_start = datetime.now()
         _logger.info('m=validate_events, msg=job started at {}'.format(ts_start))
 
-        tbl = []
         for app, ets in self.schema_dict.iteritems():
             _logger.info('m=validate_events_and_save_into_s3, msg=processing app: {}'.format(app))
 
@@ -154,6 +153,7 @@ class SchemaValidator(object):
                     _logger.info('m=validate_events_and_save_into_s3, et={}, dt={}, app={}, '
                                  'msg=validating schema'.format(et, today, app))
 
+                    tbl = []
                     for line in result_final:
                         event = json.loads(line)
                         result = SchemaValidator.validate_amplitude_schema(event, schema)
