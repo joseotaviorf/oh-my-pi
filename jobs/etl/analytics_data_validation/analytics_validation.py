@@ -206,6 +206,7 @@ if __name__ == '__main__':
 
     if args[1] == 'validate':
         schema_validator.validate_events_and_save_into_s3()
+    elif args[1] == 'add_partitions':
         schema_validator.athena_client.execute_raw_query('msck repair table datalake_clean.amplitude_schema_errors')
     else:
         _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
