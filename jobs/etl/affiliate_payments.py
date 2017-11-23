@@ -22,7 +22,7 @@ BaseETL.dataframe_to_db(
     df=data_frame,
     table_name=process_name,
     encoding='utf-8',
-    append=True
+    append=False
 )
 
 logging.info("END - To Staging: {}".format(datetime.utcnow()))
