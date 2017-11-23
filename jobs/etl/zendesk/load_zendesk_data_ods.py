@@ -517,7 +517,7 @@ class ZendeskDataToODS(object):
                                     " followup_ids = excluded.followup_ids, " \
                                     " sharing_agreement_ids = excluded.sharing_agreement_ids, " \
                                     " satisfaction_rating_score = excluded.satisfaction_rating_score, " \
-                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment " \
+                                    " satisfaction_rating_comment = excluded.satisfaction_rating_comment, " \
                                     " is_whatsapp = excluded.is_whatsapp".format(
                 self.ods_schema,
                 t['id'],
