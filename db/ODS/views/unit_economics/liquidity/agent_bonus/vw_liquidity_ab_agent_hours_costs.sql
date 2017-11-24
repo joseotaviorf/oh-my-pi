@@ -10,62 +10,25 @@ with hour_costs as (
     on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
   where cd."Category" = 'Agents Commission'
 ),
-filtered_visits as (
-    select
-      id as visit_id,
-      imovel_id as property_id,
-      data as dt
-    from booking
-    where tipo = 'Visita'
-        and status = 'Realizado'
-),
-costs as (
-    select
-      fv.property_id,
-      fv.dt,
-      hc.dre_date as dt_cash_flow,
-      hc.hours / (count(fv.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
-    from filtered_visits fv
-    left join hour_costs hc
-      on hc.dre_date = date_trunc('month', fv.dt) + interval '1 month'
-),
--- In Jan-2016 there was no FUP; using 'Marcado' as visit confirmed
-old_visists as (
-    select
-      id as visit_id,
-      imovel_id as property_id,
-      "data" as dt
-    from booking
-    where tipo = 'Visita'
-        and status = 'Marcado'
-        and date_trunc('month', "data") = '2016-01-01'
-),
-old_costs as (
-    select
-      ov.property_id,
-      ov.dt,
-      hc.dre_date as dt_cash_flow,
-      hc.hours / (count(ov.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
-    from old_visists ov
-    left join hour_costs hc
-      on hc.dre_date = date_trunc('month', ov.dt) + interval '1 month'
+property_daily_status as  (
+	select
+		id as property_id,
+		"date" as dt_status,
+		status_history as status
+	from imovel_status_full_history
+	where status_history = 'publicado'
 ),
 all_costs as (
     select
-        property_id,
-        dt,
-        dt_cash_flow,
-        vl_agent_hours
-    from costs
-
-    union all
-
-    select
-        property_id,
-        dt,
-        dt_cash_flow,
-        vl_agent_hours
-    from old_costs
+      pds.property_id,
+      pds.dt_status,
+      hc.dre_date as dt_cash_flow,
+      hc.hours /
+        date_part('days', hc.dre_date + interval '1 month' - interval '1 day') /
+        (count(pds.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
+    from property_daily_status pds
+    left join hour_costs hc
+      on hc.dre_date = date_trunc('month', pds.dt_status) + interval '1 month'
 )
 select
   vbpc.sk_property,
@@ -79,6 +42,6 @@ select
 from all_costs ac
 join vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
-    and ac.dt between vbpc.min_version_time and vbpc.max_version_time
+    and ac.dt_cash_flow between vbpc.min_version_time and vbpc.max_version_time
 group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
 ;
