@@ -114,6 +114,7 @@ class SchemaValidator(object):
 
             app = re.search('(\d+)', app)
             if not app or len(app.groups()) == 0:
+                _logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find app')
                 continue
 
             app = app.group(1)
@@ -122,6 +123,7 @@ class SchemaValidator(object):
 
                 et = re.search('(.*)\.schema\.json', et)
                 if not et or len(et.groups()) == 0:
+                    _logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find event type')
                     continue
 
                 et = et.group(1)
@@ -132,6 +134,7 @@ class SchemaValidator(object):
                 )
 
                 if response['KeyCount'] < 1:
+                    _logger.info('m=validate_events_and_save_into_s3, msg=response_key_count < 1;skipping...')
                     continue
 
                 # set schema path and file
