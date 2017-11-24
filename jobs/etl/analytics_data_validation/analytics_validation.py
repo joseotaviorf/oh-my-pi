@@ -95,7 +95,10 @@ class SchemaValidator(object):
                     app_id, event_type, uuid, server_upload_time, platform,
                     validation_time, err_path, err_validator,
                     err_validator_value, err_instance, err_detail,
-                    'validated with errors' if err_detail != '' or err_instance != '' or err_validator_value else 'skipped'
+                    'validated with errors' if err_detail != ''
+                                               or err_instance != ''
+                                               or err_validator_value != ''
+                                            else 'skipped'
                 ]
             )
 
