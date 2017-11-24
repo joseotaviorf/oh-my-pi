@@ -148,7 +148,8 @@ class SchemaValidator(object):
                     obj = self.s3_client.get_object(Bucket=SchemaValidator.DATA_LAKE_BUCKET, Key=json_file)
                     byte_stream = BytesIO(obj['Body'].read())
 
-                    result = GzipFile(None, 'rb', fileobj=byte_stream).read().decode('utf-8')
+                    result_obj = GzipFile(None, 'rb', fileobj=byte_stream)
+                    result = result_obj.read().decode('utf-8')
                     result_final = result.split('\n')
                     result_final = result_final[:-1] if result_final[len(result_final) - 1] == '' else result_final
 
@@ -167,12 +168,15 @@ class SchemaValidator(object):
                                                                                 event['server_upload_time'],
                                                                                 event['platform'],
                                                                                 str(datetime.utcnow()), None, None,
-                                                                                None,
-                                                                                None, None, 'validated without errors'
+                                                                                None, None, None,
+                                                                                'validated without errors'
                                                                                 ]])
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
+                    
+                    _logger.info('m=validate_events_and_save_into_s3, msg=closing file')
+                    result_obj.close()
 
     @logger(exclude='tbl')
     def __build_data_frame(self, tbl):
