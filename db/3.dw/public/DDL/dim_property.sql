@@ -168,7 +168,8 @@ CREATE TABLE public.dim_property (
   property_v3 INTEGER,
 
   total_area INTEGER,
-  construction_area INTEGER
+  construction_area INTEGER,
+  unpublished_reason VARCHAR(255)
   
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
