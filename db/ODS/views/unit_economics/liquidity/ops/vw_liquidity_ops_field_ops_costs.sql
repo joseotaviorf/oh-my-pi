@@ -9,15 +9,38 @@ with cdre_field_ops as (
 ),
 filtered_visits as (
     select
-      id as visit_id,
-      imovel_id as property_id,
-      data as dt
-    from booking
-    where tipo = 'Visita'
-        and status = 'Realizado'
+      b.id as visit_id,
+      vbpc.sk_property,
+      b.imovel_id as property_id,
+      b.data as dt
+    from vw_base_property_costs vbpc
+	left join booking b
+	  on vbpc.property_id = b.imovel_id
+	    and b.data between vbpc.min_version_time and vbpc.max_version_time
+    where
+		b.tipo = 'Visita'
+	and -- visits before 2016-02 dont have fup
+		(
+		case
+			when b.status = 'Realizado' then true
+			when (b.status = 'Marcado' and data <= '2016-02-25'::date) then true
+			else false
+		end
+		) = true
+	and -- check for max liquidity date
+		b.data <=
+		(case
+			when min_version_time + interval '1 year' >= max_version_time
+				then max_version_time
+			when min_version_time + interval '1 year' >= now()
+				then now()
+			else
+				min_version_time + interval '1 year'
+		end)
 ),
 costs as (
     select
+      fv.sk_property,
       fv.property_id,
       fv.dt,
       cfo.dre_date as dt_cash_flow,
@@ -27,13 +50,10 @@ costs as (
       on cfo.dre_date = date_trunc('month', fv.dt) + interval '1 month'
 )
 select
-  vbpc.sk_property,
+  c.sk_property,
   c.property_id,
   c.dt_cash_flow,
   sum(c.vl_field_ops) as vl_field_ops
 from costs c
-join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt between vbpc.min_version_time and vbpc.max_version_time
-group by vbpc.sk_property, c.property_id, c.dt_cash_flow
+group by c.sk_property, c.property_id, c.dt_cash_flow
 ;

@@ -10,16 +10,35 @@ with hour_costs as (
     on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
   where cd."Category" = 'Agents Commission'
 ),
-property_daily_status as  (
+filtered_daily_status as  (
 	select
+		base.sk_property,
 		id as property_id,
 		"date" as dt_status,
-		status_history as status
-	from imovel_status_full_history
-	where status_history = 'publicado'
+		row_number()
+			over (partition by isfh.id, base."version" order by isfh.id, isfh."date") as rn
+	from
+		imovel_status_full_history isfh
+	left join
+		vw_base_property_costs base
+		on base.property_id = isfh.id
+		where base.min_version_time <= isfh."date"
+		and base.max_version_time > isfh."date"
+	and status_history = 'publicado'
+),
+property_daily_status as  (
+	select
+		sk_property,
+		property_id,
+		dt_status
+	from
+		filtered_daily_status
+	where
+		rn <= 365
 ),
 all_costs as (
     select
+      pds.sk_property,
       pds.property_id,
       pds.dt_status,
       hc.dre_date as dt_cash_flow,
@@ -31,7 +50,7 @@ all_costs as (
       on hc.dre_date = date_trunc('month', pds.dt_status) + interval '1 month'
 )
 select
-  vbpc.sk_property,
+  ac.sk_property,
   ac.property_id,
   ac.dt_cash_flow::date,
   case
@@ -43,5 +62,5 @@ from all_costs ac
 join vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
     and ac.dt_cash_flow between vbpc.min_version_time and vbpc.max_version_time
-group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
+group by ac.sk_property, ac.property_id, ac.dt_cash_flow
 ;
