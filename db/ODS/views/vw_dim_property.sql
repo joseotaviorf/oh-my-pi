@@ -359,7 +359,8 @@ SELECT
   i.imovel_v3 as property_v3,
 
   i.area_total as total_area,
-  i.area_terreno as contruction_area
+  i.area_terreno as contruction_area,
+  i.unpublished_reason as unpublished_reason
 
 from 
 	imovel i

@@ -133,6 +133,7 @@ CREATE TABLE public.imovel (
   usuario_que_cadastrou_id INTEGER,
   imovel_v3 INTEGER,
   area_total INTEGER,
-  area_terreno INTEGER
+  area_terreno INTEGER,
+  unpublished_reason VARCHAR(255)
 )
 WITH (oids = false);
