@@ -9,13 +9,29 @@ with cdre_bo_pre_sale as (
 ),
 filtered_contracts as (
     select distinct
-      property_id,
-      created_date::date as created_date
-    from vw_base_contract_costs
-    where created_date is not null
+      vbpc.sk_property,
+      c.property_id,
+      c.created_date::date as created_date
+    from vw_base_property_costs vbpc
+	left join vw_base_contract_costs c
+	   on vbpc.property_id = c.property_id
+    	and c.created_date between vbpc.min_version_time and vbpc.max_version_time
+    where
+		created_date is not null
+	and -- check for max liquidity date
+		c.created_date <=
+		(case
+			when min_version_time + interval '1 year' >= max_version_time
+				then max_version_time
+			when min_version_time + interval '1 year' >= now()
+				then now()
+			else
+				min_version_time + interval '1 year'
+		end)
 ),
 costs as (
     select
+      fc.sk_property,
       fc.property_id,
       fc.created_date,
       cps.dre_date as dt_cash_flow,
@@ -25,13 +41,10 @@ costs as (
       on cps.dre_date = date_trunc('month', fc.created_date) + interval '1 month'
 )
 select
-  max(vbpc.sk_property) as sk_property,
+  sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_pre_sale
+  sum(c.vl_bo_pre_sale) as vl_bo_pre_sale
 from costs c
-join vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.created_date between vbpc.min_version_time and vbpc.max_version_time
-group by c.property_id, c.dt_cash_flow, c.vl_bo_pre_sale
+group by c.property_id, c.dt_cash_flow, c.sk_property
 ;
