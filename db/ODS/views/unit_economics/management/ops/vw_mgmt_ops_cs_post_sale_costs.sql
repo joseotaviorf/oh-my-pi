@@ -7,27 +7,37 @@ with cdre_cs_post_sale as (
     from files.costs_dre
     where costs_dre."Category" = 'Customer Support (post-sale)'
 ),
-filtered_contracts as (
-    select distinct
-      property_id,
-      init_date::date as start_date,
-      coalesce(termination_date, expected_end_date)::date as end_date
-    from vw_base_contract_costs
-    where init_date is not null
-      and (termination_date is not null
-            or expected_end_date is not null)
+calculated_qt as (
+  select
+    tt.property_id,
+    tt.dt,
+    tt.qt,
+    tt.qt::double precision + coalesce((select
+                                          count(int_tt.property_id)
+                                        from vw_base_ticket_task int_tt
+                                        where int_tt.dt = tt.dt
+                                              and int_tt.group_name = tt.group_name
+                                              and int_tt.property_id = -1
+                                        group by int_tt.dt, int_tt.group_name), 0)::double precision /
+                                       (select
+                                          count(distinct int_tt.property_id)
+                                        from vw_base_ticket_task int_tt
+                                        where int_tt.dt = tt.dt
+                                              and int_tt.group_name = tt.group_name
+                                        group by int_tt.dt, int_tt.group_name)::double precision as final_qt
+  from vw_base_ticket_task tt
+  where tt.group_name = 'Customer Support (post-sale)'
 ),
 costs as (
     select
-      fc.property_id,
-      fc.start_date,
-      fc.end_date,
+      cq.property_id,
+      cq.dt,
       cps.dre_date as dt_cash_flow,
-      cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
-    from filtered_contracts fc
+      cps."value" * cq.final_qt / (sum(cq.final_qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
+    from calculated_qt cq
     join cdre_cs_post_sale cps
-      on cps.dre_date between date_trunc('month', fc.start_date) + interval '1 month'
-                        and date_trunc('month', fc.end_date) + interval '1 month'
+      on cps.dre_date = cq.dt + interval '1 month'
+    where cq.property_id != -1
 )
 select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
@@ -37,6 +47,5 @@ select
 from costs c
 left join vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
-    and c.start_date >= vbpc.min_version_time
-    and c.end_date <= vbpc.max_version_time
+    and c.dt between vbpc.min_version_time and vbpc.max_version_time
 ;
