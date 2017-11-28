@@ -48,7 +48,7 @@ zendesk_cte as (
   where zg.group_name in ('Customer Support (pre-sale)', 'Customer Support (post-sale)', 'Collection',
                             'Back-Office (onboarding)', 'Back-Office (offboarding)')
   group by ztf.value, zg.group_name, date_trunc('month', ztm.solved_at)::date
-)select distinct dt from zendesk_cte where group_name = 'Collection',
+),
 crm_tasks as (
   select
     coalesce(property_id::varchar, '-1') as property_id,
