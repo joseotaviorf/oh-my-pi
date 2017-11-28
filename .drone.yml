@@ -7,28 +7,43 @@ pipeline:
 
   install:
     image: appleboy/drone-ssh
-    host: 204.236.192.147
+    host: ssh.airflow.forno.quintoandar.com.br
     username: airflow
-    port: 22
-    command_timeout: 180
+    command_timeout: 300
     script:
       - cd /var/www/airflow/bi-etl-ejuice
+      - git reset --hard
       - git fetch origin
-      - git reset --hard origin/${DRONE_COMMIT_BRANCH}
+      - git checkout origin/${DRONE_COMMIT_BRANCH}
       - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
     secrets:
-      - plugin_key
+      - ssh_key
     when:
       branch:
         - forno
-        - new-capiroto
+        - master
+  
+  test-dag:
+    image: appleboy/drone-ssh
+    host: ssh.airflow.forno.quintoandar.com.br
+    username: airflow
+    script:
+      - sleep 3
+      - cd /var/www/airflow
+      - source /etc/airflow.conf
+      - airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
+    secrets:
+      - ssh_key
+    when:
+      branch:
+        - forno
+        - master
 
   ecr:
     group: ecr
     image: plugins/ecr
     repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
     registry: 632540934959.dkr.ecr.us-east-1.amazonaws.com
-    storage_driver: vfs
     debug: true
     tag:
       - '${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT:0:7}'

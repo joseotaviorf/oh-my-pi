@@ -97,3 +97,15 @@ ENV/
 # db test scripts
 db/Scripts/
 db/.dbeaver-data-sources.xml
+
+### Terraform ###
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module directory
+.terraform/
+
+# Secrets file
+**/secrets.tfvars
+
