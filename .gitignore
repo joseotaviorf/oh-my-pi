@@ -105,6 +105,7 @@ db/.dbeaver-data-sources.xml
 
 # Module directory
 .terraform/
+**/.terraform
 
 # Secrets file
 **/secrets.tfvars

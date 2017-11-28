@@ -5,3 +5,4 @@ venv
 .git
 jobs/dags
 jobs/new-etl
+terraform
