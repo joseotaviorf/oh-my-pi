@@ -14,7 +14,7 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class SchemaValidator(object):
-    DATA_LAKE_BUCKET = '5a-datalake'
+    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
     PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger
