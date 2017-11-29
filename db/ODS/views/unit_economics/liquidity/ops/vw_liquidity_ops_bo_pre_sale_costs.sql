@@ -1,19 +1,19 @@
-drop view if exists vw_liquidity_ops_bo_pre_sale_costs;
-create or replace view vw_liquidity_ops_bo_pre_sale_costs as
+drop view if exists unit_economics.vw_liquidity_ops_bo_pre_sale_costs;
+create or replace view unit_economics.vw_liquidity_ops_bo_pre_sale_costs as
 with cdre_bo_pre_sale as (
     select
-      "Value" as "value",
-      "Month"::date as dre_date
-    from files.costs_dre
-    where costs_dre."Category" = 'Back-Office (pre-sale)'
+      dre_value,
+      dre_date
+    from unit_economics.vw_base_dre_costs
+    where dre_category = 'Back-Office (pre-sale)'
 ),
 filtered_contracts as (
     select distinct
       vbpc.sk_property,
       c.property_id,
       c.created_date::date as created_date
-    from vw_base_property_costs vbpc
-	left join vw_base_contract_costs c
+    from unit_economics.vw_base_property_costs vbpc
+	left join unit_economics.vw_base_contract_costs c
 	   on vbpc.property_id = c.property_id
     	and c.created_date between vbpc.min_version_time and vbpc.max_version_time
     where
@@ -35,7 +35,7 @@ costs as (
       fc.property_id,
       fc.created_date,
       cps.dre_date as dt_cash_flow,
-      cps."value" / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_bo_pre_sale
+      cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_bo_pre_sale
     from filtered_contracts fc
     join cdre_bo_pre_sale cps
       on cps.dre_date = date_trunc('month', fc.created_date) + interval '1 month'

@@ -1,4 +1,4 @@
-drop view if exists vw_fact_property_economics;
+drop view if exists unit_economics.vw_fact_property_economics;
 ---
 --- Returns the final view for Unit Economics
 --- Cost: All costs grouped by versioned property / cash flow date
@@ -6,7 +6,7 @@ drop view if exists vw_fact_property_economics;
 --- Placeholders with random int will be kept while developing the remainder values
 ---
 
-create or replace view vw_fact_property_economics as
+create or replace view unit_economics.vw_fact_property_economics as
 with unit_economics as (
     select
         sk_property,
@@ -71,7 +71,7 @@ with unit_economics as (
             0 as vl_bo_offboarding,
             0 as vl_insurance_fee
         from
-            vw_liquidity_costs
+            unit_economics.vw_liquidity_costs
         union all
         select
             sk_property,
@@ -104,7 +104,7 @@ with unit_economics as (
             0 as vl_bo_offboarding,
             0 as vl_insurance_fee
         from
-            vw_supply_costs
+            unit_economics.vw_supply_costs
         union all
         select
             sk_property,
@@ -137,7 +137,7 @@ with unit_economics as (
             vl_bo_offboarding as vl_bo_offboarding,
             vl_insurance_fee as vl_insurance_fee
         from
-            vw_mgmt_costs
+            unit_economics.vw_mgmt_costs
         union all
         select
             sk_property,
@@ -170,7 +170,7 @@ with unit_economics as (
             0 as vl_bo_offboarding,
             0 as vl_insurance_fee
         from
-            vw_net_revenue_costs
+            unit_economics.vw_net_revenue_costs
     ) tbl
     group by sk_property, property_id, sk_cash_flow_date, dt_cash_flow
 ),
@@ -185,7 +185,7 @@ contracts as (
 				then now()::date
 			else coalesce(termination_date, expected_end_date)::date
 		end as end_date
-	from vw_base_contract_costs
+	from unit_economics.vw_base_contract_costs
 	where signature_date is not null
 	  and (termination_date is not null or expected_end_date is not null)
 ),
@@ -227,7 +227,7 @@ final_version as (
 )
 select fv.*
 from final_version fv
-left join vw_dim_property_ribs dp
+left join unit_economics.vw_dim_property_ribs dp
   on fv.sk_property = dp.sk_property
 where fv.sk_cash_flow_date != -1
       and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date

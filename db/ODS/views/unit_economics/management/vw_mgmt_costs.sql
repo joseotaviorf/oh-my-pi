@@ -1,5 +1,5 @@
-drop view if exists vw_mgmt_costs;
-create or replace view vw_mgmt_costs as
+drop view if exists unit_economics.vw_mgmt_costs;
+create or replace view unit_economics.vw_mgmt_costs as
 select
   coalesce(ops.sk_property, ins.sk_property) as sk_property,
   coalesce(ops.property_id, ins.property_id) as property_id,
@@ -11,9 +11,9 @@ select
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
   coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee
 from
-	vw_mgmt_ops_costs ops
+	unit_economics.vw_mgmt_ops_costs ops
 full outer join
-	vw_mgmt_insurance_fee ins
+	unit_economics.vw_mgmt_insurance_fee ins
 	on ins.sk_property = ops.sk_property
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;

@@ -5,8 +5,15 @@ with cdre_offboarding as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where costs_dre.dre_category = 'Back-Office (offboarding)'
-    and "Value" <> 0
+    where dre_category = 'Back-Office (offboarding)'
+),
+filtered_contracts as (
+    select distinct
+      property_id,
+      date_trunc('month', coalesce(termination_date, expected_end_date)::date) as dt
+    from unit_economics.vw_base_contract_costs
+    where termination_date is not null
+          or expected_end_date is not null
 ),
 qt_nulls as (
   select
@@ -26,14 +33,6 @@ calculated_qt as (
   from unit_economics.vw_base_ticket_task tt
   where tt.group_name = 'Back-Office (offboarding)'
     and property_id != -1
-),
-filtered_contracts as (
-    select distinct
-      property_id,
-      date_trunc('month', coalesce(termination_date, expected_end_date)::date) as dt
-    from unit_economics.vw_base_contract_costs
-    where termination_date is not null
-          or expected_end_date is not null
 ),
 ratio as (
   select distinct

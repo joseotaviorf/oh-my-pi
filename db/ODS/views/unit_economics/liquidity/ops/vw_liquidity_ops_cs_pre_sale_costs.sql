@@ -1,10 +1,10 @@
-drop view if exists vw_liquidity_ops_cs_pre_sale_costs;
-create or replace view vw_liquidity_ops_cs_pre_sale_costs as
+drop view if exists unit_economics.vw_liquidity_ops_cs_pre_sale_costs;
+create or replace view unit_economics.vw_liquidity_ops_cs_pre_sale_costs as
 with cdre_cs_pre_sale as (
     select
       dre_value,
       dre_date
-    from vw_base_dre_costs
+    from unit_economics.vw_base_dre_costs
     where dre_category = 'Customer Support (pre-sale)'
 ),
 qt_nulls as (
@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from vw_base_ticket_task
+  from unit_economics.vw_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (pre-sale)'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from vw_base_ticket_task tt
+  from unit_economics.vw_base_ticket_task tt
   where tt.group_name = 'Customer Support (pre-sale)'
     and property_id != -1
 ),
@@ -40,7 +40,7 @@ filtered_properties_prev as (
 			else
 				min_version_time + interval '1 year'
 		end as max_liquidity_date
-    from vw_base_property_costs
+    from unit_economics.vw_base_property_costs
     where status = 'publicado'
 ),
 filtered_properties as (
@@ -61,18 +61,41 @@ ratio as (
   left join qt_nulls qn
     on fp.dt = qn.dt
 ),
-espec_gen as (
+gen_contracts as (
+	select
+	    fp.sk_property,
+		fp.property_id,
+		fp.dt,
+		r.qt as qt_gen
+	from
+  	filtered_properties fp
+  left join ratio r
+  	on fp.dt = r.dt
+),
+espec_gen_prev as (
   select
     fp.sk_property,
     fp.property_id,
-    coalesce(fp.dt, cqt.dt) as dt,
-    coalesce(cqt.qt, 0) + r.qt as qt
-  from calculated_qt cqt
-  right join filtered_properties fp
+    cqt.dt as dt,
+    cqt.qt as qt
+  from
+  	filtered_properties fp
+  join calculated_qt cqt
     on cqt.property_id = fp.property_id
-     and cqt.dt = fp.dt
-  join ratio r
-    on r.dt = fp.dt
+  union
+  select
+  	*
+	from gen_contracts
+),
+espec_gen as (
+	select
+	    sk_property,
+		property_id,
+		dt,
+		sum(qt) as qt
+	from espec_gen_prev
+	group by
+		sk_property, property_id, dt
 ),
 tt_costs as (
     select
@@ -123,6 +146,6 @@ select
   fc.dt_cash_flow,
   fc.vl_cs_pre_sale
 from full_costs fc
-join vw_base_property_costs vbpc
+join unit_economics.vw_base_property_costs vbpc
   on vbpc.sk_property = fc.sk_property
 ;

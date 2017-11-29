@@ -1,10 +1,10 @@
-drop view vw_liquidity_costs;
+drop view if exists unit_economics.vw_liquidity_costs;
 ---
 --- Returns vl_tenant_campaigns costs for each first version property
 --- Cost: Aggregated Marketing Costs
 --- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
-create or replace view vw_liquidity_costs as
+create or replace view unit_economics.vw_liquidity_costs as
 select
 	sk_property,
 	property_id,
@@ -28,7 +28,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			vw_liquidity_mkt_costs
+			unit_economics.vw_liquidity_mkt_costs
 		union all
 		select
 			sk_property,
@@ -41,7 +41,7 @@ from
 			vl_agent_hours,
 			0 as vl_lockbox
 		from
-			vw_liquidity_ab_agent_hours_costs
+			unit_economics.vw_liquidity_ab_agent_hours_costs
 		union all
 		select
 			sk_property,
@@ -54,7 +54,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			vw_liquidity_ops_costs
+			unit_economics.vw_liquidity_ops_costs
 		union all
 		select
 			sk_property,
@@ -67,7 +67,7 @@ from
 			0 as vl_agent_hours,
 			vl_lockbox
 		from
-			vw_liquidity_lockbox_costs
+			unit_economics.vw_liquidity_lockbox_costs
 	) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

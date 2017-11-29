@@ -1,10 +1,10 @@
-drop view vw_supply_mkt_owner_campaigns_costs;
+drop view if exists unit_economics.vw_supply_mkt_owner_campaigns_costs;
 ---
 --- Returns vl_owner_campaigns costs for each versioned property
 --- Cost: Owner Campaigns for Google Adwords, Facebook
 --- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
-create or replace view vw_supply_mkt_owner_campaigns_costs as
+create or replace view unit_economics.vw_supply_mkt_owner_campaigns_costs as
 -- Get Google Ads Owner Costs Per Year-Month
 with google_monthly_owner_costs as (
 	select
@@ -57,7 +57,7 @@ ten_day_base as
 		base.*,
 		dt."date" as ten_pub_date
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		dim_date dt
 		on dt."date" between base.publication_date - interval '10 day' and base.publication_date

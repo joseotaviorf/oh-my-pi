@@ -1,11 +1,11 @@
-drop view if exists vw_liquidity_ops_field_ops_costs;
-create or replace view vw_liquidity_ops_field_ops_costs as
+drop view if exists unit_economics.vw_liquidity_ops_field_ops_costs;
+create or replace view unit_economics.vw_liquidity_ops_field_ops_costs as
 with cdre_field_ops as (
     select
-      "Value" as "value",
-      "Month"::date as dre_date
-    from files.costs_dre
-    where costs_dre."Category" = 'Field Operation'
+      dre_value,
+      dre_date
+    from unit_economics.vw_base_dre_costs
+    where dre_category = 'Field Operation'
 ),
 filtered_visits as (
     select
@@ -13,7 +13,7 @@ filtered_visits as (
       vbpc.sk_property,
       b.imovel_id as property_id,
       b.data as dt
-    from vw_base_property_costs vbpc
+    from unit_economics.vw_base_property_costs vbpc
 	left join booking b
 	  on vbpc.property_id = b.imovel_id
 	    and b.data between vbpc.min_version_time and vbpc.max_version_time
@@ -44,7 +44,7 @@ costs as (
       fv.property_id,
       fv.dt,
       cfo.dre_date as dt_cash_flow,
-      cfo."value" / (count(fv.property_id) over (partition by cfo.dre_date))::double precision as vl_field_ops
+      cfo.dre_value / (count(fv.property_id) over (partition by cfo.dre_date))::double precision as vl_field_ops
     from filtered_visits fv
     join cdre_field_ops cfo
       on cfo.dre_date = date_trunc('month', fv.dt) + interval '1 month'

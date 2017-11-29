@@ -5,7 +5,7 @@ with cdre_onboarding as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where costs_dre.dre_category = 'Back-Office (onboarding)'
+    where dre_category = 'Back-Office (onboarding)'
 ),
 qt_nulls as (
   select

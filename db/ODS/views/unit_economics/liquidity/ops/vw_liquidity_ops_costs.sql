@@ -1,5 +1,5 @@
-drop view if exists vw_liquidity_ops_costs;
-create or replace view vw_liquidity_ops_costs as
+drop view if exists unit_economics.vw_liquidity_ops_costs;
+create or replace view unit_economics.vw_liquidity_ops_costs as
 select
 	sk_property,
 	property_id,
@@ -17,7 +17,7 @@ from
 		0 as vl_cs_pre_sale,
 		0 as vl_field_ops
 	from
-		vw_liquidity_ops_bo_pre_sale_costs
+		unit_economics.vw_liquidity_ops_bo_pre_sale_costs
 	union all
 	select
 		sk_property,
@@ -27,7 +27,7 @@ from
 		vl_cs_pre_sale,
 		0 as vl_field_ops
 	from
-		vw_liquidity_ops_cs_pre_sale_costs
+		unit_economics.vw_liquidity_ops_cs_pre_sale_costs
 	union all
 	select
 		sk_property,
@@ -37,7 +37,7 @@ from
 		0 as vl_cs_pre_sale,
 		vl_field_ops
 	from
-		vw_liquidity_ops_field_ops_costs
+		unit_economics.vw_liquidity_ops_field_ops_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

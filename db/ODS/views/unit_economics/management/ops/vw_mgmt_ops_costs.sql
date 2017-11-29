@@ -1,5 +1,5 @@
-drop view if exists vw_mgmt_ops_costs;
-create or replace view vw_mgmt_ops_costs as
+drop view if exists unit_economics.vw_mgmt_ops_costs;
+create or replace view unit_economics.vw_mgmt_ops_costs as
 select
 	sk_property,
 	property_id,
@@ -21,7 +21,7 @@ from
 		0 as vl_collection,
 		0 as vl_cs_post_sale
 	from
-		vw_mgmt_ops_bo_offboarding_costs
+		unit_economics.vw_mgmt_ops_bo_offboarding_costs
 	union all
 	select
 		sk_property,
@@ -33,7 +33,7 @@ from
 		0 as vl_collection,
 		0 as vl_cs_post_sale
 	from
-		vw_mgmt_ops_bo_onboarding_costs
+		unit_economics.vw_mgmt_ops_bo_onboarding_costs
 	union all
 	select
 		sk_property,
@@ -45,7 +45,7 @@ from
 		0 as vl_collection,
 		0 as vl_cs_post_sale
 	from
-		vw_mgmt_ops_bo_ongoing_costs
+		unit_economics.vw_mgmt_ops_bo_ongoing_costs
 	union all
 	select
 		sk_property,
@@ -57,7 +57,7 @@ from
 		vl_collection,
 		0 as vl_cs_post_sale
 	from
-		vw_mgmt_ops_collection_costs
+		unit_economics.vw_mgmt_ops_collection_costs
 	union all
 	select
 		sk_property,
@@ -69,7 +69,7 @@ from
 		0 as vl_collection,
 		vl_cs_post_sale
 	from
-		vw_mgmt_ops_cs_post_sale_costs
+		unit_economics.vw_mgmt_ops_cs_post_sale_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

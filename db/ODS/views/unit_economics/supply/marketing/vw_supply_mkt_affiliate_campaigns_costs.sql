@@ -1,10 +1,10 @@
-drop view vw_supply_mkt_affiliate_campaigns_costs;
+drop view if exists unit_economics.vw_supply_mkt_affiliate_campaigns_costs;
 ---
 --- Returns vl_affiliate_campaigns costs for each first version property
 --- Cost: Affiliate Campaigns for Google Adwords, Facebook
 --- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
-create or replace view vw_supply_mkt_affiliate_campaigns_costs as
+create or replace view unit_economics.vw_supply_mkt_affiliate_campaigns_costs as
 -- Get Google Ads Supply Affiliate Per Year-Month
 with google_monthly_affiliate_costs as (
 	select
@@ -57,7 +57,7 @@ affiliate_filtered_base as (
 	select
 		base.*
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		potential_listings pl
 		on pl.property_id = base.property_id

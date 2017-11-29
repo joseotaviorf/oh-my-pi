@@ -1,5 +1,5 @@
-drop view if exists vw_net_revenue_taxes;
-create or replace view vw_net_revenue_taxes as
+drop view if exists unit_economics.vw_net_revenue_taxes;
+create or replace view unit_economics.vw_net_revenue_taxes as
 select
 	sk_property,
 	property_id,
@@ -17,7 +17,7 @@ from
 		0 as vl_st_pis_cofins,
 		0 as vl_delay_fine
 	from
-		vw_net_revenue_taxes_sales_tax_iss
+		unit_economics.vw_net_revenue_taxes_sales_tax_iss
 	union all
 	select
 		sk_property,
@@ -27,7 +27,7 @@ from
 		vl_st_pis_cofins,
 		0 as vl_delay_fine
 	from
-		vw_net_revenue_taxes_sales_tax_pis_cofins
+		unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins
 	union all
 	select
 		sk_property,
@@ -37,6 +37,7 @@ from
 		0 as vl_st_pis_cofins,
 		vl_delay_fine
 	from
-		vw_net_revenue_taxes_delay_fine
+		unit_economics.vw_net_revenue_taxes_delay_fine
 ) tbl
 group by sk_property, property_id, dt_cash_flow
+;

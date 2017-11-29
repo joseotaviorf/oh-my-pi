@@ -1,17 +1,17 @@
-drop view vw_net_revenue_revenues_mgmt_fee;
+drop view if exists unit_economics.vw_net_revenue_revenues_mgmt_fee;
 ---
 --- Returns vl_management_fee revenue for each invoice
 --- Revenue: Management Fee on rented properties
 --- Cash Flow Date: Date of Landlord Payment
 ---
-create or replace view vw_net_revenue_revenues_mgmt_fee as
+create or replace view unit_economics.vw_net_revenue_revenues_mgmt_fee as
 with filtered_contracts as (
 select distinct
 	property_id,
 	id,
 	coalesce(termination_date, expected_end_date)::date as end_date
 from
-	vw_base_contract_costs
+	unit_economics.vw_base_contract_costs
 where termination_date is not null
 	or expected_end_date is not null
 ),
@@ -20,7 +20,7 @@ base_contract as (
 		base.*,
 		c.id as contract_id
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		filtered_contracts c
 		on base.property_id = c.property_id

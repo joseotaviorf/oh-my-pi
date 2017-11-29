@@ -1,10 +1,10 @@
-drop view vw_mgmt_insurance_fee;
+drop view if exists unit_economics.vw_mgmt_insurance_fee;
 ---
 --- Returns vl_insurance_costs based on contract
 --- Costs: Insurance costs for Rented properties
 --- Cash Flow Date: 10th of each Contract Month following start and end rule
 ---
-create or replace view vw_mgmt_insurance_fee as
+create or replace view unit_economics.vw_mgmt_insurance_fee as
 with payed_contracts as (
 	select
 		distinct
@@ -15,7 +15,7 @@ with payed_contracts as (
 			c.property_id as property_id,
 			c.rent_value as rent
 	from
-		vw_base_contract_costs c
+		unit_economics.vw_base_contract_costs c
 ),
 pay_dates as (
 	select
@@ -59,7 +59,7 @@ base_contract as (
 		base.*,
 		c.contract_id
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		payed_contracts c
 		on base.property_id = c.property_id

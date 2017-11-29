@@ -1,10 +1,10 @@
-drop view vw_liquidity_mkt_tenant_campaigns_costs;
+drop view if exists unit_economics.vw_liquidity_mkt_tenant_campaigns_costs;
 ---
 --- Returns vl_tenant_campaigns costs for each first version property
 --- Cost: Tenant Daily Costs for Google Adwords, Facebook, Criteo and Classifieds
 --- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
-create or replace view vw_liquidity_mkt_tenant_campaigns_costs as
+create or replace view unit_economics.vw_liquidity_mkt_tenant_campaigns_costs as
 -- Get Criteo Daily Costs (deduplicated)
 with criteo_daily_costs as (
 	select distinct
@@ -138,7 +138,7 @@ filtered_daily_status as  (
 	from
 		imovel_status_full_history isfh
 	left join
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 		on base.property_id = isfh.id
 		where base.min_version_time <= isfh."date"
 		and base.max_version_time > isfh."date"

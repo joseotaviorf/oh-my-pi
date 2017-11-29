@@ -1,5 +1,5 @@
-drop view if exists vw_base_ticket_task;
-create or replace view vw_base_ticket_task as
+drop view if exists unit_economics.vw_base_ticket_task;
+create or replace view unit_economics.vw_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,

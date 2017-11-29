@@ -1,10 +1,10 @@
-drop view if exists vw_mgmt_ops_collection_costs;
-create or replace view vw_mgmt_ops_collection_costs as
+drop view if exists unit_economics.vw_mgmt_ops_collection_costs;
+create or replace view unit_economics.vw_mgmt_ops_collection_costs as
 with cdre_collection as (
     select
       dre_value,
       dre_date
-    from vw_base_dre_costs
+    from unit_economics.vw_base_dre_costs
     where dre_category = 'Collection'
 ),
 qt_nulls as (
@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from vw_base_ticket_task
+  from unit_economics.vw_base_ticket_task
   where property_id = -1
     and group_name = 'Collection'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from vw_base_ticket_task tt
+  from unit_economics.vw_base_ticket_task tt
   where tt.group_name = 'Collection'
     and property_id != -1
 ),
@@ -42,7 +42,7 @@ filtered_contracts as (
     select distinct
       c.property_id as property_id,
       date_trunc('month', rd.tenant_due_date)::date as dt
-    from vw_base_contract_costs c
+    from unit_economics.vw_base_contract_costs c
     join rent_delay rd
       on c.id = rd.contract_id
     where rd.rent_delayed_days > 0
@@ -56,17 +56,38 @@ ratio as (
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
-espec_gen as (
+gen_contracts as (
+	select
+		fc.property_id,
+		fc.dt,
+		r.qt as qt_gen
+	from
+  	filtered_contracts fc
+  left join ratio r
+  	on fc.dt = r.dt
+),
+espec_gen_prev as (
   select
     fc.property_id,
-    coalesce(fc.dt, cqt.dt) as dt,
-    coalesce(cqt.qt, 0) + r.qt as qt
-  from calculated_qt cqt
-  right join filtered_contracts fc
+    cqt.dt as dt,
+    cqt.qt as qt
+  from
+  	filtered_contracts fc
+  join calculated_qt cqt
     on cqt.property_id = fc.property_id
-     and cqt.dt = fc.dt
-  join ratio r
-    on r.dt = fc.dt
+  union
+  select
+  	*
+	from gen_contracts
+),
+espec_gen as (
+	select
+		property_id,
+		dt,
+		sum(qt) as qt
+	from espec_gen_prev
+	group by
+		property_id, dt
 ),
 tt_costs as (
     select
@@ -104,7 +125,7 @@ select
   fc.dt_cash_flow,
   fc.vl_collection
 from full_costs fc
-join vw_base_property_costs vbpc
+join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
     and fc.dt between vbpc.min_version_time and vbpc.max_version_time
 ;

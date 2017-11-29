@@ -1,11 +1,11 @@
-drop view vw_net_revenue_costs;
+drop view if exists unit_economics.vw_net_revenue_costs;
 ---
 --- Returns net revenue costs and fees for each first version property
 --- Cost: Commission and Taxes
 --- Revenue: Brokerage and Management Fees
 --- Cash Flow Date: Date of Payment
 ---
-create or replace view vw_net_revenue_costs as
+create or replace view unit_economics.vw_net_revenue_costs as
 select
 	sk_property,
 	property_id,
@@ -31,7 +31,7 @@ from
 		0 as vl_st_pis_cofins,
 		0 as vl_delay_fine
 	from
-		vw_net_revenue_commission_costs
+		unit_economics.vw_net_revenue_commission_costs
 	union all
 	select
 		sk_property,
@@ -45,7 +45,7 @@ from
 		0 as vl_st_pis_cofins,
 		0 as vl_delay_fine
 	from
-		vw_net_revenue_revenues
+		unit_economics.vw_net_revenue_revenues
 	union all
 	select
 		sk_property,
@@ -59,7 +59,7 @@ from
 		vl_st_pis_cofins,
 		vl_delay_fine
 	from
-		vw_net_revenue_taxes
+		unit_economics.vw_net_revenue_taxes
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

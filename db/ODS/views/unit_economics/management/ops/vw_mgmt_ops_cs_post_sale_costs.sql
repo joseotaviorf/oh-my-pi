@@ -1,10 +1,10 @@
-drop view if exists vw_mgmt_ops_cs_post_sale_costs;
-create or replace view vw_mgmt_ops_cs_post_sale_costs as
+drop view if exists unit_economics.vw_mgmt_ops_cs_post_sale_costs;
+create or replace view unit_economics.vw_mgmt_ops_cs_post_sale_costs as
 with cdre_cs_post_sale as (
     select
       dre_value,
       dre_date
-    from vw_base_dre_costs
+    from unit_economics.vw_base_dre_costs
     where dre_category = 'Customer Support (post-sale)'
 ),
 qt_nulls as (
@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from vw_base_ticket_task
+  from unit_economics.vw_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (post-sale)'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from vw_base_ticket_task tt
+  from unit_economics.vw_base_ticket_task tt
   where tt.group_name = 'Customer Support (post-sale)'
     and property_id != -1
 ),
@@ -55,17 +55,38 @@ ratio as (
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
-espec_gen as (
+gen_contracts as (
+	select
+		fc.property_id,
+		fc.dt,
+		r.qt as qt_gen
+	from
+  	filtered_contracts fc
+  left join ratio r
+  	on fc.dt = r.dt
+),
+espec_gen_prev as (
   select
     fc.property_id,
-    coalesce(fc.dt, cqt.dt) as dt,
-    coalesce(cqt.qt, 0) + r.qt as qt
-  from calculated_qt cqt
-  right join filtered_contracts fc
+    cqt.dt as dt,
+    cqt.qt as qt
+  from
+  	filtered_contracts fc
+  join calculated_qt cqt
     on cqt.property_id = fc.property_id
-     and cqt.dt = fc.dt
-  join ratio r
-    on r.dt = fc.dt
+  union
+  select
+  	*
+	from gen_contracts
+),
+espec_gen as (
+	select
+		property_id,
+		dt,
+		sum(qt) as qt
+	from espec_gen_prev
+	group by
+		property_id, dt
 ),
 tt_costs as (
     select
@@ -112,7 +133,7 @@ select
   fc.dt_cash_flow,
   fc.vl_cs_post_sale
 from full_costs fc
-left join vw_base_property_costs vbpc
+left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
     and fc.dt - interval '1 month' between vbpc.min_version_time and vbpc.max_version_time
 ;

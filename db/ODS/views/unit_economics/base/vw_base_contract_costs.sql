@@ -1,5 +1,5 @@
-drop view if exists vw_base_contract_costs;
-create or replace view vw_base_contract_costs as
+drop view if exists unit_economics.vw_base_contract_costs;
+create or replace view unit_economics.vw_base_contract_costs as
 select
   id,
   imovel_id as property_id,
