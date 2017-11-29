@@ -1,18 +1,18 @@
-drop view if exists vw_mgmt_ops_bo_onboarding_costs;
-create or replace view vw_mgmt_ops_bo_onboarding_costs as
+drop view if exists unit_economics.vw_mgmt_ops_bo_onboarding_costs;
+create or replace view unit_economics.vw_mgmt_ops_bo_onboarding_costs as
 with cdre_onboarding as (
     select
-      "Value" as dre_value,
-      "Month"::date as dre_date
-    from files.costs_dre
-    where costs_dre."Category" = 'Back-Office (onboarding)'
+      dre_value,
+      dre_date
+    from unit_economics.vw_base_dre_costs
+    where costs_dre.dre_category = 'Back-Office (onboarding)'
 ),
 qt_nulls as (
   select
     property_id,
     dt,
     sum(qt) as qt
-  from vw_base_ticket_task
+  from unit_economics.vw_base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (onboarding)'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from vw_base_ticket_task tt
+  from unit_economics.vw_base_ticket_task tt
   where tt.group_name = 'Back-Office (onboarding)'
     and property_id != -1
 ),
@@ -39,7 +39,7 @@ filtered_contracts_prev as (
         then signature_date::date
       else init_date::date
     end as "to"
-  from vw_base_contract_costs
+  from unit_economics.vw_base_contract_costs
   where signature_date is not null
     and init_date is not null
 ),
@@ -62,18 +62,38 @@ ratio as (
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
-espec_gen as (
+gen_contracts as (
+	select
+		fc.property_id,
+		fc.dt,
+		r.qt as qt_gen
+	from
+  	filtered_contracts fc
+  left join ratio r
+  	on fc.dt = r.dt
+),
+espec_gen_prev as (
   select
     fc.property_id,
-    coalesce(fc.dt, cqt.dt) as dt,
-    coalesce(cqt.qt, 0) + r.qt as qt,
-    cqt.dt as not_nulls, cqt.qt as qt_not_nulls,r.qt as ratio_qt
-  from calculated_qt cqt
-  right join filtered_contracts fc
+    cqt.dt as dt,
+    cqt.qt as qt
+  from
+  	filtered_contracts fc
+  join calculated_qt cqt
     on cqt.property_id = fc.property_id
-       and cqt.dt = fc.dt
-  join ratio r
-    on r.dt = fc.dt
+  union
+  select
+  	*
+	from gen_contracts
+),
+espec_gen as (
+	select
+		property_id,
+		dt,
+		sum(qt) as qt
+	from espec_gen_prev
+	group by
+		property_id, dt
 ),
 tt_costs as (
     select
@@ -111,7 +131,7 @@ select
   c.dt_cash_flow,
   c.vl_bo_onboarding
 from full_costs c
-left join vw_base_property_costs vbpc
+left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
     and c.dt >= vbpc.min_version_time
     and c.dt <= vbpc.max_version_time
