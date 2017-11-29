@@ -56,27 +56,27 @@ class HelpCenter(object):
                     ),
                     ns_c as (
                       select
-                        trim(split_part(cp.email, ',', ns.n)) as email, cp.telefone, cp.nome
+                        trim(split_part(cp.email, ',', ns.n)) as email, cp.telefone, cp.nome, cp.tipo
                       from ns
                         join datalake_clean.ebdb_contract_person cp
                           on ns.n <= regexp_count(cp.email, ',') + 1
                     ),
                     ns_p as (
                       select
-                        trim(split_part(cp.email, ';', ns.n)) as email, cp.telefone, cp.nome
+                        trim(split_part(cp.email, ';', ns.n)) as email, cp.telefone, cp.nome, cp.tipo
                       from ns
                         join datalake_clean.ebdb_contract_person cp
                           on ns.n <= regexp_count(cp.email, ';') + 1
                     ),
                     union_all as (
-                      select email, telefone, nome
+                      select email, telefone, nome, tipo
                       from ns_c
                         union all
-                      select email, telefone, nome
+                      select email, telefone, nome, tipo
                       from ns_p
                     ),
                     contrato_pessoa as (
-                      select distinct trim(email) as email, telefone, nome
+                      select distinct trim(email) as email, telefone, nome, tipo
                       from union_all
                         where email is not null
                         and email != ''
@@ -84,9 +84,11 @@ class HelpCenter(object):
                     users as (
                       select distinct
                         coalesce(uc.email, up.email, cp.email, pp.email) as email,
-                        coalesce(uc.telefoneprincipal, up.telefoneprincipal, cp.telefone, pp.telefone) as main_phone,
+                        coalesce(uc.telefoneprincipal, up.telefoneprincipal, up.telefonesecundario, 
+                                 cp.telefone, pp.telefone) as main_phone,
                         coalesce(uc.nome, up.nome, cp.nome) as name,
-                        coalesce(up.id, uc.id, null) as id
+                        coalesce(up.id, uc.id, null) as id,
+                        coalesce(cp.tipo, pp.tipo) as role
                       from contrato_pessoa cp
                         full outer join datalake_clean.ebdb_proponent_proposal pp
                           on pp.email = cp.email
@@ -101,6 +103,7 @@ class HelpCenter(object):
                         trim(us.email) as email,
                         trim(us.name) as "name",
                         trim(us.main_phone) as phone,
+                        trim(us.role) as role,
                         mu.amplitude_id as amplitude_id,
                         zu.id as zendesk_id,
                         astk.caller_number as asterisk_id
@@ -116,6 +119,7 @@ class HelpCenter(object):
                         quintoandar_id,
                         email,
                         phone,
+                        role,
                         listagg("name", ',')
                         within group (order by "name")
                         over (partition by email, phone) as names,
@@ -167,6 +171,7 @@ class HelpCenter(object):
                 '_source': {
                     'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
+                    'role': user_row['role'] if user_row['role'] and user_row['role'] != '' else None,
                     'names': list(
                         set(user_row['names'].split(','))
                     ) if user_row['names'] else None,
