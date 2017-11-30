@@ -140,23 +140,26 @@ select -- count(1)
     or i.announcedBy_id is not null as imovel_v3,
   i.areaTotal as area_total,
   i.areaTerreno as area_terreno,
-  case
+ case
 		when i.status <> 'despublicado'
 			then NULL
 		when i.unpublishedReason is not null
 			then i.unpublishedReason
 		when ure.motivo = 'Imóvel indisponível'
-			or ure.motivo like '[AUTO][RESCISAO]%'
-			or ure.motivo like '[AUTO] [RESCISAO]%'
-			or ure.motivo like '%indisponibilidade%'
 			then 'HOUSE_NOT_AVAILABLE'
-		when ure.motivo like 'Não concordo%'
-			or ure.motivo like 'nao concorda%'
+		when ure.motivo = '[Auto] Proprietario confirmou indisponibilidade'
+			then 'AUTO_OWNER_CONFIRMED_UNAVAILABILITY'
+		when ure.motivo like '[AUTO][RESCISAO]%'
+			or ure.motivo like '[AUTO] [RESCISAO]%'
+			then 'AUTO_CONTRACT_END_DEPUBLICATION'
+		when ure.motivo like '%Não concordo%'
+			or ure.motivo like '%não concorda%'
+			or ure.motivo like '%nao concorda%'
 			then 'OWNER_DOESNT_AGREE'
 		when ure.motivo like '%Desisti%'
 			then 'OWNER_GAVE_UP_RENTING'
 		when ure.motivo like '%MissedNegotiations%'
-			then 'OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED'
+			then 'AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED'
 		when ure.motivo like 'Imóvel alugado direto%'
 			or ure.motivo like '%Fechei com outro%'
 			then 'OWNER_RENTING_DIRECT_WITH_TENANT'
@@ -166,8 +169,11 @@ select -- count(1)
 			or ure.motivo = 'Já aluguei o imóvel'
 			then 'OWNER_RENTING_WITH_OTHER_COMPANY'
 		when ure.motivo = 'Vou vender o imóvel'
-			or ure.motivo = '%vendeu o %'
+			or ure.motivo like '%vendeu o %'
 			then 'OWNER_SELLING_HOUSE'
+		when ure.motivo like '%duplicado%'
+			or ure.motivo like '%Duplicado%'
+			then 'DUPLICATED_HOUSE'
 		when ure.motivo like '%falta de confirmação%'
 			or ure.motivo like '%falta de contato%'
 			or ure.motivo like 'PP não responde%'
@@ -180,8 +186,10 @@ select -- count(1)
 			then 'APP_OWNER_RENTING_WITH_OTHER_COMPANY'
 		when ure.motivo = 'Usuário despublicou pelo app.'
 			then 'APP_USER_DEPUBLISHED'
-		when ure.motivo = 'Usuário rejeitou%'
+		when ure.motivo like 'Usuário rejeitou%'
 			then 'USER_REJECTED_TERMS'
+		when ure.motivo is null
+			then 'UNKNOWN_NULL_VALUE'
 		else 'OTHER'
 	end as unpublished_reason
 from
