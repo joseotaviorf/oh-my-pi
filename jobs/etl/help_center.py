@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+from collections import OrderedDict
 
 import pandas as pd
 import petl
@@ -81,14 +82,22 @@ class HelpCenter(object):
                         where email is not null
                         and email != ''
                     ),
-                    users as (
+                    users_prev as (
                       select distinct
                         coalesce(uc.email, up.email, cp.email, pp.email) as email,
-                        coalesce(uc.telefoneprincipal, up.telefoneprincipal, up.telefonesecundario, 
-                                 cp.telefone, pp.telefone) as main_phone,
+                        coalesce(uc.telefoneprincipal, up.telefoneprincipal) as main_phone,
+                        coalesce(uc.telefonesecundario, up.telefonesecundario) as secondary_phone,
+                        coalesce(uc.telefoneComercial, up.telefoneComercial) as commercial_phone,
+                        cp.telefone as contract_phone,
+                        pp.telefone as proposal_phone,
                         coalesce(uc.nome, up.nome, cp.nome) as name,
-                        coalesce(up.id, uc.id, null) as id,
-                        coalesce(cp.tipo, pp.tipo) as role
+                        coalesce(uc.id, up.id, null) as id,
+                        coalesce(uc.tipoadmin, up.tipoadmin) as tipoadmin,
+                        coalesce(uc.bloqueado, up.bloqueado) as bloqueado,
+                        coalesce(uc.dadosagente_id, up.dadosagente_id) as dadosagente_id,
+                        coalesce(uc.dadosfotografo_id, up.dadosfotografo_id) as dadosfotografo_id,
+                        coalesce(uc.dadosafiliado_id, up.dadosafiliado_id) as dadosafiliado_id,
+                        coalesce(uc.dadosvendedor_id, up.dadosvendedor_id) as dadosvendedor_id
                       from contrato_pessoa cp
                         full outer join datalake_clean.ebdb_proponent_proposal pp
                           on pp.email = cp.email
@@ -97,41 +106,122 @@ class HelpCenter(object):
                         full outer join datalake_clean.ebdb_user uc
                           on uc.email = cp.email
                     ),
+                    users as (
+                      select distinct
+                        up.email,
+                        main_phone,
+                        secondary_phone,
+                        commercial_phone,
+                        contract_phone,
+                        proposal_phone,
+                        up.name,
+                        up.id,
+                        (
+                         '' || 
+                            case
+                              when p.id is not null
+                                then 'proprietario'
+                              else ''
+                            end
+                            ||
+                            case
+                              when up.tipoadmin in ('Admin','Sudo','Contratos','Financeiro','AtendimentoParceiros')
+                                and up.bloqueado = 'false' 
+                                then ',admin'
+                              else ''
+                            end
+                            ||
+                            case
+                              when up.tipoadmin = 'Sudo' and up.bloqueado = 'false'
+                                then ',sudo'
+                              else ''
+                            end
+                            ||
+                            case
+                              when pd.id is not null
+                                then ',fotografo'
+                              else ''
+                            end
+                            ||
+                            case
+                              when ad.id is not null
+                                then ',afiliado'
+                              else ''
+                            end
+                            ||
+                            case
+                              when sd.id is not null
+                                then ',vendedor'
+                              else ''
+                            end
+                            ||
+                            case
+                              when up.dadosagente_id is not null
+                                then ',agente'
+                              else ''
+                            end
+                            ||
+                         ''
+                        ) as roles
+                      from users_prev up
+                      left join datalake_clean.ebdb_property p 
+                        on p.usuario_id = up.id
+                            and p.status != 'excluido'
+                      left join datalake_clean.ebdb_photographer_data pd 
+                        on pd.id = up.dadosfotografo_id
+                          and pd.ativo = 'true'
+                      left join datalake_clean.ebdb_affiliate_data ad 
+                        on ad.id = up.dadosafiliado_id
+                          and ad.ativo = 'true'
+                      left join datalake_clean.ebdb_seller_data sd 
+                        on sd.id = up.dadosvendedor_id 
+                          and sd.ativo = 'true'
+                    ),
                     all_info as (
                       select distinct
                         us.id as quintoandar_id,
                         trim(us.email) as email,
                         trim(us.name) as "name",
-                        trim(us.main_phone) as phone,
-                        trim(us.role) as role,
+                        us.roles as roles,
+                        coalesce(us.main_phone, '') 
+                         || ',' || coalesce(us.secondary_phone, '') 
+                         || ',' || coalesce(us.commercial_phone, '') 
+                         || ',' || coalesce(us.contract_phone, '') 
+                         || ',' || coalesce(us.proposal_phone, '')
+                        as phones,
                         mu.amplitude_id as amplitude_id,
                         zu.id as zendesk_id,
                         astk.caller_number as asterisk_id
                       from users us
-                        left join amplitude_events.merged_users mu
-                          on us.id = mu.user_id
-                        left join asterisk_calls astk
-                          on astk.caller_number = us.main_phone
-                        left join datalake_clean.zendesk_user zu
-                          on zu.email = us.email
+                      left join amplitude_events.merged_users mu
+                        on us.id = mu.user_id
+                      left join asterisk_calls astk
+                        on (astk.caller_number = us.main_phone
+                          or astk.caller_number = us.secondary_phone
+                          or astk.caller_number = us.commercial_phone
+                          or astk.caller_number = us.contract_phone
+                          or astk.caller_number = us.proposal_phone
+                        )
+                      left join datalake_clean.zendesk_user zu
+                        on zu.email = us.email
                     )
                     select distinct
                         quintoandar_id,
                         email,
-                        phone,
-                        role,
+                        roles,
+                        phones,
                         listagg("name", ',')
                         within group (order by "name")
-                        over (partition by email, phone) as names,
+                        over (partition by quintoandar_id, email) as names,
                         listagg(asterisk_id, ',')
                         within group (order by asterisk_id)
-                        over (partition by email, phone) as asterisk_ids,
+                        over (partition by quintoandar_id, email) as asterisk_ids,
                         listagg(zendesk_id, ',')
                         within group (order by zendesk_id)
-                        over (partition by email, phone) as zendesk_ids,
+                        over (partition by quintoandar_id, email) as zendesk_ids,
                         listagg(amplitude_id, ',')
                         within group (order by amplitude_id)
-                        over (partition by email, phone) as amplitude_ids
+                        over (partition by quintoandar_id, email) as amplitude_ids
                     from all_info
                     """,
             db_enum=EnumDb.BI_DW,
@@ -159,6 +249,7 @@ class HelpCenter(object):
             except Exception as e:
                 _logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
 
+    @logger(exclude='df_user')
     def send_data_to_elasticsearch(self, df_user):
         df_user = df_user.astype(object).where(pd.notnull(df_user), None)
 
@@ -171,20 +262,15 @@ class HelpCenter(object):
                 '_source': {
                     'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
-                    'role': user_row['role'] if user_row['role'] and user_row['role'] != '' else None,
-                    'names': list(
-                        set(user_row['names'].split(','))
-                    ) if user_row['names'] else None,
-                    'phone': (re.sub('[^+\d]', '', (user_row['phone']))).strip() if user_row['phone'] else None,
-                    'zendesk_ids': list(
-                        set(user_row['zendesk_ids'].split(','))
-                    ) if user_row['zendesk_ids'] else None,
-                    'asterisk_ids': list(
-                        set(user_row['asterisk_ids'].split(','))
-                    ) if user_row['asterisk_ids'] else None,
-                    'amplitude_ids': list(
-                        set(user_row['amplitude_ids'].split(','))
-                    ) if user_row['amplitude_ids'] else None
+                    'roles': self.__split_and_filter(user_row['roles']),
+                    'names': self.__split_and_filter(user_row['names'].encode('utf-8') if user_row['names'] else None),
+                    'phones': self.__split_and_filter(field_list=user_row['phones']
+                                                                 if user_row['phones'] else None,
+                                                      regex_pattern='[^+\d]',
+                                                      regex_replace=''),
+                    'zendesk_ids': self.__split_and_filter(user_row['zendesk_ids']),
+                    'asterisk_ids': self.__split_and_filter(user_row['asterisk_ids']),
+                    'amplitude_ids': self.__split_and_filter(user_row['amplitude_ids'])
                 }
             })
 
@@ -193,6 +279,17 @@ class HelpCenter(object):
 
         if len(result[1]) > 0:
             _logger.error('m=send_data_to_elasticsearch, errors={}'.format(result[1]))
+
+    def __split_and_filter(self, field_list, regex_pattern=None, regex_replace=None):
+        if field_list is None:
+            return None
+
+        if regex_pattern is not None and regex_replace is not None:
+            result = [re.sub(regex_pattern, regex_replace, f.encode('utf-8')).strip() for f in field_list.split(',')]
+        else:
+            result = field_list.split(',')
+
+        return filter(None, OrderedDict.fromkeys(result).keys())
 
 
 if __name__ == '__main__':
