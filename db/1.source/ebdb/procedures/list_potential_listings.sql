@@ -309,7 +309,13 @@ BEGIN
         left join Usuario u
           on u.id = i.usuario_id
         left join
-            Imovel_garantias_AUD ig
+         	(select
+                max(REV) as REV,
+                garantias,
+                Imovel_id
+                from Imovel_garantias_AUD
+                where garantias = 'SeguroFiancaCardiff'
+                group by Imovel_id) ig
             on i.id = ig.Imovel_id
             and ig.garantias = 'SeguroFiancaCardiff'
         left join
