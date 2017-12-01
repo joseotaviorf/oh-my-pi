@@ -82,7 +82,7 @@ BEGIN
 
       case
         when ia.imovelAttribution='Self-Service' and o.dataConversao is null -- Self service qualified date is set to null below because we cannot distinguish them from organic growth. here we correct the qualified date.
-          then f.dataCriacao -- best value we can get since we miss the exact date.
+          then coalesce(o.qualified_date, f.dataCriacao) -- best value we can get since we miss the exact date.
         when o.qualified_date is null and o.dataConversao is not null -- correcting organic inside sales
           then o.dataConversao --  this is needed because organic inside sales have their qualified date set to null and it needs to be corrected here
         else o.qualified_date -- in all other cases we choose the qualified date
