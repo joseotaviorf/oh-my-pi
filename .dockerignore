@@ -1,5 +1,7 @@
 # docker ignore file
-    pbi
-    venv
-    .idea
-    .git
+pbi
+venv
+.idea
+.git
+jobs/dags
+jobs/new-etl
