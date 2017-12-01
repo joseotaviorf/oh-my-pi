@@ -260,7 +260,7 @@ BEGIN
           i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo,
           l.origem as lead_origem ,
-          null  as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
+          FROM_UNIXTIME(ure.`timestamp`/1000) as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm, i.dataCriacao) as created_date,
           coalesce(l.atualizadoEm, i.atualizadoEm)  as updated_date,
           0 as lead_flow
@@ -279,7 +279,6 @@ BEGIN
             ie.imovel_id
         ) ie
           on ie.imovel_id = i.id
-
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
           -- and cl.status = 'Concluido'
@@ -309,6 +308,19 @@ BEGIN
           on lu.id = lre.REV
         left join Usuario u
           on u.id = i.usuario_id
+        left join
+         	(select
+                max(REV) as REV,
+                garantias,
+                Imovel_id
+                from Imovel_garantias_AUD
+                where garantias = 'SeguroFiancaCardiff'
+                group by Imovel_id) ig
+            on i.id = ig.Imovel_id
+            and ig.garantias = 'SeguroFiancaCardiff'
+        left join
+            UsuarioRevisionEntity ure
+            on ig.REV = ure.id
       ) n
       GROUP BY
         lead_id,
