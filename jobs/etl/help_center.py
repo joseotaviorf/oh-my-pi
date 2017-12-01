@@ -190,18 +190,10 @@ class HelpCenter(object):
                          || ',' || coalesce(us.proposal_phone, '')
                         as phones,
                         mu.amplitude_id as amplitude_id,
-                        zu.id as zendesk_id,
-                        astk.caller_number as asterisk_id
+                        zu.id as zendesk_id
                       from users us
                       left join amplitude_events.merged_users mu
                         on us.id = mu.user_id
-                      left join asterisk_calls astk
-                        on (astk.caller_number = us.main_phone
-                          or astk.caller_number = us.secondary_phone
-                          or astk.caller_number = us.commercial_phone
-                          or astk.caller_number = us.contract_phone
-                          or astk.caller_number = us.proposal_phone
-                        )
                       left join datalake_clean.zendesk_user zu
                         on zu.email = us.email
                     )
@@ -213,9 +205,6 @@ class HelpCenter(object):
                         listagg("name", ',')
                         within group (order by "name")
                         over (partition by quintoandar_id, email) as names,
-                        listagg(asterisk_id, ',')
-                        within group (order by asterisk_id)
-                        over (partition by quintoandar_id, email) as asterisk_ids,
                         listagg(zendesk_id, ',')
                         within group (order by zendesk_id)
                         over (partition by quintoandar_id, email) as zendesk_ids,
@@ -244,7 +233,7 @@ class HelpCenter(object):
         success = False
         while not success:
             try:
-                response = self.es.delete_by_query(index='users', body={'query': {'match_all': dict()}})
+                response = self.es.delete_by_query(index='hc-users', body={'query': {'match_all': dict()}})
                 success = not response['timed_out'] and len(response['failures']) == 0
             except Exception as e:
                 _logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
@@ -257,19 +246,17 @@ class HelpCenter(object):
         for _, user_row in df_user.iterrows():
             actions.append({
                 '_op_type': 'index',
-                '_index': 'users',
+                '_index': 'hc-users',
                 '_type': 'user',
                 '_source': {
                     'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
                     'roles': self.__split_and_filter(user_row['roles']),
                     'names': self.__split_and_filter(user_row['names'].encode('utf-8') if user_row['names'] else None),
-                    'phones': self.__split_and_filter(field_list=user_row['phones']
-                                                                 if user_row['phones'] else None,
+                    'phones': self.__split_and_filter(field_list=user_row['phones'] if user_row['phones'] else None,
                                                       regex_pattern='[^+\d]',
                                                       regex_replace=''),
                     'zendesk_ids': self.__split_and_filter(user_row['zendesk_ids']),
-                    'asterisk_ids': self.__split_and_filter(user_row['asterisk_ids']),
                     'amplitude_ids': self.__split_and_filter(user_row['amplitude_ids'])
                 }
             })
@@ -280,12 +267,14 @@ class HelpCenter(object):
         if len(result[1]) > 0:
             _logger.error('m=send_data_to_elasticsearch, errors={}'.format(result[1]))
 
-    def __split_and_filter(self, field_list, regex_pattern=None, regex_replace=None):
+    @classmethod
+    def __split_and_filter(cls, field_list, regex_pattern=None, regex_replace=None):
         if field_list is None:
             return None
 
         if regex_pattern is not None and regex_replace is not None:
-            result = [re.sub(regex_pattern, regex_replace, f.encode('utf-8')).strip() for f in field_list.split(',')]
+            result = [re.sub(regex_pattern, regex_replace, '+55' + f if '+55' not in f and f != '' else f).strip()
+                      for f in field_list.split(',')]
         else:
             result = field_list.split(',')
 
