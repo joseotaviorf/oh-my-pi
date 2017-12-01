@@ -11,10 +11,10 @@ import pandas as pd
 from jsonschema import Draft4Validator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
-
+from jobs.dags.util import environment as env
 
 class SchemaValidator(object):
-    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
+    DATA_LAKE_BUCKET = env.get('bi-datalake-s3-bucket')
     PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger

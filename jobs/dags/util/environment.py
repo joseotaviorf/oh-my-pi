@@ -7,7 +7,7 @@ import base64
 import pytz
 from datetime import datetime
 from logging import info as log
-
+import os
 
 def __conn_to_json(conn):
     j = {}
@@ -20,45 +20,32 @@ def __conn_to_json(conn):
     return json.dumps(j)
 
 
-def __add_env(env, *keys):
-    for key in keys:
-        ex = None
-        k = None
-        try:
-            env[key] = Variable.get(key)
-        except ValueError as ex:
-            try:
-                k = BaseHook.get_connection(key)
-                env["ENV_" + key] = __conn_to_json(k)
-            except AirflowException as ex:
-                k = None
-        if not k:
-            print ex
-    return env
-
-
-def __initialize_environment():
+def __os_environment():
     return {
-        "AWS_ACCESS_KEY_ID": Variable.get('AWS_ACCESS_KEY_ID'),
-        "AWS_SECRET_ACCESS_KEY": Variable.get('AWS_SECRET_ACCESS_KEY'),
-        "AWS_DEFAULT_REGION": Variable.get('AWS_DEFAULT_REGION')
+        "AWS_ACCESS_KEY_ID": os.environ.get('AWS_ACCESS_KEY_ID'),
+        "AWS_SECRET_ACCESS_KEY":  os.environ.get('AWS_SECRET_ACCESS_KEY'),
+        "AWS_DEFAULT_REGION":  os.environ.get('AWS_DEFAULT_REGION')
     }
 
 
-def get_environment(*keys):
-    return __add_env(__initialize_environment(), *keys)
+def get(key):
+        try:
+            return Variable.get(key)
+        except KeyError:
+            return __os_environment()[key]
 
+def get_conenction(con):
+    return __conn_to_json(BaseHook.get_connection(con))
 
 def get_ecr_credentials(environment):
-    registry = Variable.get('DOCKER_REGISTRY')
     ecr = boto3.client(
         'ecr',
-        region_name=environment['AWS_DEFAULT_REGION'],
-        aws_access_key_id=environment['AWS_ACCESS_KEY_ID'],
-        aws_secret_access_key=environment['AWS_SECRET_ACCESS_KEY'],
+        region_name=get('AWS_DEFAULT_REGION'),
+        aws_access_key_id=get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=get('AWS_SECRET_ACCESS_KEY'),
     )
     user, pwd = base64.b64decode(ecr.get_authorization_token()['authorizationData'][0]['authorizationToken']).split(':')
-    return registry, user, pwd
+    return get('DOCKER_REGISTRY'), user, pwd
 
 
 def docker_login(cli, user, pwd, registry):

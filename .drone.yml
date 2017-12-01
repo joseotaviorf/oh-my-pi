@@ -1,3 +1,8 @@
+clone:
+  clone:
+    image: plugins/git
+    depth: 1
+
 pipeline:
 
   test:
@@ -21,6 +26,22 @@ pipeline:
     when:
       branch:
         - forno
+  
+  install:
+    image: appleboy/drone-ssh
+    host: ssh.airflow.quintoandar.com.br
+    username: airflow
+    command_timeout: 300
+    script:
+      - cd /var/www/airflow/bi-etl-ejuice
+      - git reset --hard
+      - git fetch origin
+      - git checkout origin/${DRONE_COMMIT_BRANCH}
+      - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+    secrets:
+      - ssh_key
+    when:
+      branch:
         - master
   
   test-dags:

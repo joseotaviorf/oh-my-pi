@@ -15,10 +15,12 @@ from base.enum_db import EnumDb
 
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
+from jobs.dags.util import environment as env
 
+AMPL_QUERIES_DIR = os.path.join(here, '../../../db/2.datalake/queries/amplitude')
 
 class AmplitudeETL(object):
-    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
+    DATA_LAKE_BUCKET = env.get('bi-datalake-s3-bucket')
     TYPE_MAPPING = {
         'unicode': 'string',
         'int': 'double',
@@ -27,7 +29,7 @@ class AmplitudeETL(object):
 
     @logger
     def __init__(self, execution_date):
-        self.today = datetime.strptime(execution_date, '%Y-%m-%d %H:%M:%S').date()
+        self.today = execution_date.date()
         self.today_ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
         self.athena_client = AthenaClient(AmplitudeETL.DATA_LAKE_BUCKET)
@@ -35,15 +37,15 @@ class AmplitudeETL(object):
     @logger
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
-        add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
+        add_partition_raw_query = self.__get_sql_file('add_partition_raw.sql')
         self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today,
                                                                    AmplitudeETL.DATA_LAKE_BUCKET)
 
-        raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
+        raw_query = self.__get_sql_files('init_events_raw.sql')
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
-        drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
+        drop_partition_raw_query = self.__get_sql_files('drop_partition_raw.sql')
         self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today,
                                                                    AmplitudeETL.DATA_LAKE_BUCKET)
 
@@ -76,7 +78,7 @@ class AmplitudeETL(object):
                     _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
-                add_column_clean_query = './db/2.datalake/queries/amplitude/add_column_clean.sql'
+                add_column_clean_query = self.__get_sql_files('add_column_clean.sql')
                 self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix, formatted_up,
                                                                            'string', up)
 
@@ -122,7 +124,7 @@ class AmplitudeETL(object):
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
-            add_partition_clean_query = './db/2.datalake/queries/amplitude/add_partition_clean.sql'
+            add_partition_clean_query = self.__get_sql_files('add_partition_clean.sql')
             self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym,
                                                   AmplitudeETL.DATA_LAKE_BUCKET)
 
@@ -241,3 +243,6 @@ class AmplitudeETL(object):
             db_enum=EnumDb.BI_DW,
             commit=True
         )
+
+    def __get_sql_file(self, f):
+        return os.path.join(AMPL_QUERIES_DIR, f)
