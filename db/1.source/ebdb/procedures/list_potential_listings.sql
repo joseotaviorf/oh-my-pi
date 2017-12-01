@@ -80,13 +80,7 @@ BEGIN
       coalesce(o.prospect_date, o.lead_timestamp, o.dataConversao, o.lead_criadoEm) as lead_and_prospect_date,  -- coalesce prospect and lead date
       o.first_inside_sales_contact_date,
 
-      case
-        when ia.imovelAttribution='Self-Service' and o.dataConversao is null -- Self service qualified date is set to null below because we cannot distinguish them from organic growth. here we correct the qualified date.
-          then coalesce(o.qualified_date, f.dataCriacao) -- best value we can get since we miss the exact date.
-        when o.qualified_date is null and o.dataConversao is not null -- correcting organic inside sales
-          then o.dataConversao --  this is needed because organic inside sales have their qualified date set to null and it needs to be corrected here
-        else o.qualified_date -- in all other cases we choose the qualified date
-      end as qualified_date,
+      o.qualified_date as qualified_date,
 
       case
         when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01'
