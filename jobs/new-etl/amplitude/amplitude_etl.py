@@ -7,41 +7,45 @@ from datetime import datetime
 import fastparquet
 import pandas as pd
 import s3fs
-from jobs.base.base_etl import BaseETL
-from jobs.base.enum_db import EnumDb
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../'))
+from base.base_etl import BaseETL
+from base.enum_db import EnumDb
+
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
-args = sys.argv
-today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
-today_ym = '{}-{}'.format(today.year, today.strftime('%m'))
-
-bucket_datalake = os.environ['bi-datalake-s3-bucket']
-
-TYPE_MAPPING = {
-    'unicode': 'string',
-    'int': 'double',
-    'bool': 'bool'
-}
-
 
 class AmplitudeETL(object):
+    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
+    TYPE_MAPPING = {
+        'unicode': 'string',
+        'int': 'double',
+        'bool': 'bool'
+    }
+
     @logger
-    def __init__(self):
-        self.athena_client = AthenaClient(bucket_datalake)
+    def __init__(self, execution_date):
+        self.today = datetime.strptime(execution_date, '%Y-%m-%d %H:%M:%S').date()
+        self.today_ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
+
+        self.athena_client = AthenaClient(AmplitudeETL.DATA_LAKE_BUCKET)
 
     @logger
     def get_all_columns(self):
-        _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
+        _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
         add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
-        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today,
+                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
 
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
-        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
+        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
 
-        _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
+        _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
         drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
-        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today,
+                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
 
         return df_columns_raw
 
@@ -67,14 +71,14 @@ class AmplitudeETL(object):
                 )
 
                 try:
-                    type_mapping = TYPE_MAPPING[str_type]
+                    type_mapping = AmplitudeETL.TYPE_MAPPING[str_type]
                 except KeyError:
                     _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
                 add_column_clean_query = './db/2.datalake/queries/amplitude/add_column_clean.sql'
-                self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix,
-                                                                           formatted_up, 'string', up)
+                self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix, formatted_up,
+                                                                           'string', up)
 
                 already_added_list.append(up)
 
@@ -107,22 +111,24 @@ class AmplitudeETL(object):
 
         ets = df.groupby('event_type')
         for df_et in ets:
-            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(bucket_datalake, df_et[0], today_ym,
-                                                                                 today, 'events')
+            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(AmplitudeETL.DATA_LAKE_BUCKET,
+                                                                                 df_et[0], self.today_ym, self.today,
+                                                                                 'events')
 
-            _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
-                                                                                       'events'))
+            _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], self.today_ym,
+                                                                                       self.today, 'events'))
             filtered_df = df[df['event_type'] == df_et[0]]
             filtered_df = filtered_df.fillna('').astype(str)
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
-            _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
+            _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
             add_partition_clean_query = './db/2.datalake/queries/amplitude/add_partition_clean.sql'
-            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], today_ym, bucket_datalake)
+            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym,
+                                                  AmplitudeETL.DATA_LAKE_BUCKET)
 
     def get_properties_as_df(self):
         props_query = """describe datalake_clean.amplitude_events"""
-        return amplitude_etl.athena_client.execute_txt_query_and_return_dataframe(props_query)
+        return self.athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def __convert_columns_to_number(self, df, columns, _type):
         for col in columns:
@@ -200,7 +206,7 @@ class AmplitudeETL(object):
                               and mu.amplitude_id is null
                               and mu.user_id is null
                         )
-                    """.format(today_ym),
+                    """.format(self.today_ym),
             db_enum=EnumDb.BI_DW,
             commit=True
         )
@@ -235,38 +241,3 @@ class AmplitudeETL(object):
             db_enum=EnumDb.BI_DW,
             commit=True
         )
-
-
-if __name__ == '__main__':
-    amplitude_etl = AmplitudeETL()
-
-    if args[1] == 'load_data':
-        df_raw = amplitude_etl.get_all_columns()
-
-        if df_raw.empty:
-            _logger.warn('m=__main__, msg=empty dataframe')
-        else:
-            df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
-            df_raw_json['dt'] = df_raw['dt']
-
-            df_properties = amplitude_etl.get_properties_as_df()
-            df_raw_json = amplitude_etl.insert_new_columns(
-                df=df_raw,
-                df_props=df_properties,
-                df_json=df_raw_json,
-                properties='user_properties',
-                prefix='u_'
-            )
-            df_raw_json = amplitude_etl.insert_new_columns(
-                df=df_raw,
-                df_props=df_properties,
-                df_json=df_raw_json,
-                properties='event_properties',
-                prefix='e_'
-            )
-
-            amplitude_etl.create_parquets(df_raw_json)
-    elif args[1] == 'merge_users':
-        amplitude_etl.merge_user_ids()
-    else:
-        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))

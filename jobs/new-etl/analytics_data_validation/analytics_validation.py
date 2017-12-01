@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import sys
 from collections import OrderedDict
 from datetime import datetime
 from gzip import GzipFile
@@ -13,17 +12,16 @@ from jsonschema import Draft4Validator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
-args = sys.argv
-today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
-ym = '{}-{}'.format(today.year, today.strftime('%m'))
-
 
 class SchemaValidator(object):
-    DATA_LAKE_BUCKET = '5a-datalake'
+    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
     PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger
-    def __init__(self):
+    def __init__(self, execution_date):
+        self.today = execution_date.date()
+        self.ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
+
         self.athena_client = AthenaClient(SchemaValidator.DATA_LAKE_BUCKET)
         self.s3_client = boto3.client('s3')
 
@@ -98,7 +96,7 @@ class SchemaValidator(object):
                     'validated with errors' if err_detail != ''
                                                or err_instance != ''
                                                or err_validator_value != ''
-                    else 'skipped'
+                                            else 'skipped'
                 ]
             )
 
@@ -130,7 +128,7 @@ class SchemaValidator(object):
                 # read list of files in s3 folder
                 response = self.s3_client.list_objects_v2(
                     Bucket=SchemaValidator.DATA_LAKE_BUCKET,
-                    Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(today, et, app)
+                    Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(self.today, et, app)
                 )
 
                 if response['KeyCount'] < 1:
@@ -158,7 +156,7 @@ class SchemaValidator(object):
                         schema = json.load(json_schema)
 
                     _logger.info('m=validate_events_and_save_into_s3, et={}, dt={}, app={}, '
-                                 'msg=validating schema'.format(et, today, app))
+                                 'msg=validating schema'.format(et, self.today, app))
 
                     tbl = []
                     for line in result_final:
@@ -174,7 +172,7 @@ class SchemaValidator(object):
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
-
+                    
                     _logger.info('m=validate_events_and_save_into_s3, msg=closing file')
                     result_obj.close()
 
@@ -192,7 +190,7 @@ class SchemaValidator(object):
         s3_key = 'clean/amplitude/event_errors/ym={0}/et={1}/{2}.parq'
 
         self.athena_client.create_parquet_from_df(
-            key=s3_key.format(ym, et, file_name_prefix.groups(1)[0]),
+            key=s3_key.format(self.ym, et, file_name_prefix.groups(1)[0]),
             df=df,
             raw_columns=OrderedDict([
                 ('app_id', str),
@@ -210,13 +208,3 @@ class SchemaValidator(object):
             ])
         )
 
-
-if __name__ == '__main__':
-    schema_validator = SchemaValidator()
-
-    if args[1] == 'validate':
-        schema_validator.validate_events_and_save_into_s3()
-    elif args[1] == 'add_partitions':
-        schema_validator.athena_client.execute_raw_query('msck repair table datalake_clean.amplitude_schema_errors')
-    else:
-        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
