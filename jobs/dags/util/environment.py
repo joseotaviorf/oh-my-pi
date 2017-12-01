@@ -26,7 +26,7 @@ def __add_env(env, *keys):
         k = None
         try:
             env[key] = Variable.get(key)
-        except ValueError as ex:
+        except KeyError as ex:
             try:
                 k = BaseHook.get_connection(key)
                 env["ENV_" + key] = __conn_to_json(k)

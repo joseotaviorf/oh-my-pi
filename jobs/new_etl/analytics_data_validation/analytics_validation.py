@@ -14,15 +14,15 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class SchemaValidator(object):
-    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
     PATH_PREFIX = 'jobs/etl/analytics_data_validation'
 
     @logger
-    def __init__(self, execution_date):
+    def __init__(self, execution_date, bucket):
         self.today = execution_date.date()
+        self.bucket = bucket
         self.ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(SchemaValidator.DATA_LAKE_BUCKET)
+        self.athena_client = AthenaClient(self.bucket)
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
@@ -127,7 +127,7 @@ class SchemaValidator(object):
                 et = et.group(1)
                 # read list of files in s3 folder
                 response = self.s3_client.list_objects_v2(
-                    Bucket=SchemaValidator.DATA_LAKE_BUCKET,
+                    Bucket=self.bucket,
                     Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(self.today, et, app)
                 )
 
@@ -143,7 +143,7 @@ class SchemaValidator(object):
                     _logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
 
                     json_file = key['Key']
-                    obj = self.s3_client.get_object(Bucket=SchemaValidator.DATA_LAKE_BUCKET, Key=json_file)
+                    obj = self.s3_client.get_object(Bucket=self.bucket, Key=json_file)
                     byte_stream = BytesIO(obj['Body'].read())
 
                     result_obj = GzipFile(None, 'rb', fileobj=byte_stream)

@@ -18,7 +18,6 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class AmplitudeETL(object):
-    DATA_LAKE_BUCKET = os.environ['bi-datalake-s3-bucket']
     TYPE_MAPPING = {
         'unicode': 'string',
         'int': 'double',
@@ -26,18 +25,19 @@ class AmplitudeETL(object):
     }
 
     @logger
-    def __init__(self, execution_date):
-        self.today = datetime.strptime(execution_date, '%Y-%m-%d %H:%M:%S').date()
+    def __init__(self, execution_date, bucket):
+        self.today = execution_date.date()
+        self.bucket = bucket
         self.today_ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(AmplitudeETL.DATA_LAKE_BUCKET)
+        self.athena_client = AthenaClient(self.bucket)
 
     @logger
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
         add_partition_raw_query = './db/2.datalake/queries/amplitude/add_partition_raw.sql'
         self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today,
-                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
+                                                                   self.bucket)
 
         raw_query = './db/2.datalake/queries/amplitude/init_events_raw.sql'
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
@@ -45,7 +45,7 @@ class AmplitudeETL(object):
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
         drop_partition_raw_query = './db/2.datalake/queries/amplitude/drop_partition_raw.sql'
         self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today,
-                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
+                                                                   self.bucket)
 
         return df_columns_raw
 
@@ -111,7 +111,7 @@ class AmplitudeETL(object):
 
         ets = df.groupby('event_type')
         for df_et in ets:
-            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(AmplitudeETL.DATA_LAKE_BUCKET,
+            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(self.bucket,
                                                                                  df_et[0], self.today_ym, self.today,
                                                                                  'events')
 
@@ -124,7 +124,7 @@ class AmplitudeETL(object):
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
             add_partition_clean_query = './db/2.datalake/queries/amplitude/add_partition_clean.sql'
             self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym,
-                                                  AmplitudeETL.DATA_LAKE_BUCKET)
+                                                  self.bucket)
 
     def get_properties_as_df(self):
         props_query = """describe datalake_clean.amplitude_events"""
