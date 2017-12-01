@@ -88,7 +88,7 @@ BEGIN
         ELSE coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
       END as opportunity_date,
 
-      ip.datePublication AS listing_publication_date,
+      FROM_UNIXTIME(ure.`timestamp`/1000) AS listing_publication_date,
       cast(c.dataInicio as datetime) as contract_date,
 
       o.lead_id AS lead_id,
@@ -109,7 +109,7 @@ BEGIN
       o.lead_tipo as lead_tipo,
 
       case
-        when o.lead_tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0
+        when o.lead_tipo = 'Afiliado' and FROM_UNIXTIME(ure.`timestamp`/1000) is not null then 25 else 0
       end as affiliate_listing_value,
 
       case
@@ -336,13 +336,20 @@ BEGIN
         lead_origem
     ) o
 
-    LEFT JOIN (
-      SELECT id, min(REV) as REV, datePublication
-      FROM v_ImovelStatusHistory
-      WHERE published = 1
-      group by id
-      ) ip
-      on ip.id = o.imovel_id
+    left join
+        (
+            select
+                id, min(REV) as REV
+            from
+                Imovel_AUD i
+            where
+                status = 'publicado'
+            group by id
+        ) audi
+        on audi.id = o.imovel_id
+    left join
+	    UsuarioRevisionEntity ure
+	    on ure.id = audi.REV
 
     left join  -- v_imovel_attribution modified to get properties without first_publication
     (
@@ -446,7 +453,7 @@ BEGIN
         JobFotografo j
       where
         j.imovel_id = o.imovel_id
-        and (j.dataCriacao <= ip.datePublication or ip.datePublication is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
+        and (j.dataCriacao <= FROM_UNIXTIME(ure.`timestamp`/1000) or FROM_UNIXTIME(ure.`timestamp`/1000) is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
     )
 
     LEFT JOIN
@@ -473,7 +480,7 @@ BEGIN
 
     left JOIN
       Contrato c
-      on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= ip.datePublication order BY c2.id limit 1)
+      on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= FROM_UNIXTIME(ure.`timestamp`/1000) order BY c2.id limit 1)
 
       -- where o.imovel_id in (892793760)--, 892763276,892791756 )
       -- year(o.ref_date)= 2016
