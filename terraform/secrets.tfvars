@@ -1,0 +1,8 @@
+db_username = "quintoandar"
+db_password = "quintoandar"
+s3_key = "AKIAIJQD5DZVAPKRODUQ"
+s3_secret = "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"
+google_client_id = "333756844978-cbkcticsqcqj36ifn4pt1j08rrhk6qvl.apps.googleusercontent.com"
+google_client_secret = "SoyGIZ997KZ91dG5LqkfNIz7"
+git_private_key_file = "~/.ssh/id_rsa.bi-etl-ejuice"
+git_branch = "forno"
