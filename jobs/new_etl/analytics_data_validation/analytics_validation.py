@@ -14,7 +14,7 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class SchemaValidator(object):
-    PATH_PREFIX = 'schemas'
+    _PATH_PREFIX = 'schemas'
 
     @logger
     def __init__(self, execution_date, s3_bucket):
@@ -27,8 +27,8 @@ class SchemaValidator(object):
 
         self.schema_dict = {}
 
-        _logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator.PATH_PREFIX))
-        for root, dirs, files in os.walk(SchemaValidator.PATH_PREFIX):
+        _logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator._PATH_PREFIX))
+        for root, dirs, files in os.walk(SchemaValidator._PATH_PREFIX):
             self.schema_dict[root] = files
 
     @staticmethod
@@ -127,7 +127,7 @@ class SchemaValidator(object):
                 et = et.group(1)
                 # read list of files in s3 folder
                 response = self.s3_client.list_objects_v2(
-                    Bucket=self.bucket,
+                    Bucket=self.s3_bucket,
                     Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(self.today, et, app)
                 )
 
@@ -136,14 +136,14 @@ class SchemaValidator(object):
                     continue
 
                 # set schema path and file
-                json_schema_path = '{}/{}/'.format(SchemaValidator.PATH_PREFIX, app)
+                json_schema_path = '{}/{}/'.format(SchemaValidator._PATH_PREFIX, app)
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
                     _logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
 
                     json_file = key['Key']
-                    obj = self.s3_client.get_object(Bucket=self.bucket, Key=json_file)
+                    obj = self.s3_client.get_object(Bucket=self.s3_bucket, Key=json_file)
                     byte_stream = BytesIO(obj['Body'].read())
 
                     result_obj = GzipFile(None, 'rb', fileobj=byte_stream)
