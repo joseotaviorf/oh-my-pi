@@ -1,6 +1,7 @@
+# noinspection PyUnresolvedReferences
+import __init__
+
 import json
-import os
-import sys
 from datetime import datetime
 
 import pandas as pd
@@ -8,22 +9,19 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import logger, _logger
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../'))
-
 from util import environment as env
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
 from new_etl.amplitude.amplitude_etl import AmplitudeETL
 
-environment = env.get_environment('BI_DW', 'bi-datalake-s3-bucket')
-bucket = environment['bi-datalake-s3-bucket']
 
+# functions
 @logger(exclude='kwargs')
 def load_data(**kwargs):
     execution_date = kwargs['execution_date']
-    amplitude_etl = AmplitudeETL(execution_date, bucket)
+    amplitude_etl = AmplitudeETL(
+        execution_date=execution_date,
+        data_lake=env.get_environment('bi-datalake-s3-bucket')
+    )
 
     df_raw = amplitude_etl.get_all_columns()
     if df_raw.empty:
@@ -55,10 +53,14 @@ def load_data(**kwargs):
 def merge_users(**kwargs):
     execution_date = kwargs['execution_date']
 
-    amplitude_etl = AmplitudeETL(execution_date)
+    amplitude_etl = AmplitudeETL(
+        execution_date=execution_date,
+        data_lake=env.get_environment('bi-datalake-s3-bucket')
+    )
     amplitude_etl.merge_user_ids()
 
 
+# dags
 dag = DAG(
     dag_id='bi-amplitude-etl',
     default_args={
@@ -71,6 +73,7 @@ dag = DAG(
     max_active_runs=1
 )
 
+# operators
 load_events_data_to_clean_task = PythonOperator(
     dag=dag,
     task_id='load_events_data_to_clean',
@@ -85,4 +88,5 @@ merge_users_task = PythonOperator(
     python_callable=load_data
 )
 
-load_events_data_to_clean_task.set_downstream(merge_users_task)
+# flow
+load_events_data_to_clean_task >> merge_users_task
