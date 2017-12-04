@@ -20,7 +20,7 @@ def load_data(**kwargs):
     execution_date = kwargs['execution_date']
     amplitude_etl = AmplitudeETL(
         execution_date=execution_date,
-        data_lake=env.get_environment('bi-datalake-s3-bucket')
+        s3_bucket=env.get_environment('bi-datalake-s3-bucket')
     )
 
     df_raw = amplitude_etl.get_all_columns()
@@ -55,7 +55,7 @@ def merge_users(**kwargs):
 
     amplitude_etl = AmplitudeETL(
         execution_date=execution_date,
-        data_lake=env.get_environment('bi-datalake-s3-bucket')
+        s3_bucket=env.get_environment('bi-datalake-s3-bucket')
     )
     amplitude_etl.merge_user_ids()
 
