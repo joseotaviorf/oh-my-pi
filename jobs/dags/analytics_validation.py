@@ -5,18 +5,10 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import logger
-
-from util import environment as env
+from jobs.newetl.analytics_data_validation.analytics_validation import SchemaValidator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
-
-from etl.analytics_data_validation.analytics_validation import SchemaValidator
-
-environment = env.get_environment('bi-datalake-s3-bucket')
-registry, user, pwd = env.get_ecr_credentials(environment)
-image_name = registry + '/' + env.Variable.get('bi-etl-ejuice-repo')
-
 
 @logger(exclude='kwargs')
 def validate_schemas(**kwargs):

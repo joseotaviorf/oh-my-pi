@@ -1,3 +1,8 @@
+clone:
+  clone:
+    image: plugins/git
+    depth: 1
+
 pipeline:
 
   test:
@@ -21,9 +26,25 @@ pipeline:
     when:
       branch:
         - forno
+  
+  install:
+    image: appleboy/drone-ssh
+    host: ssh.airflow.quintoandar.com.br
+    username: airflow
+    command_timeout: 300
+    script:
+      - cd /var/www/airflow/bi-etl-ejuice
+      - git reset --hard
+      - git fetch origin
+      - git checkout origin/${DRONE_COMMIT_BRANCH}
+      - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+    secrets:
+      - ssh_key
+    when:
+      branch:
         - master
   
-  test-dag:
+  test-dags:
     image: appleboy/drone-ssh
     host: ssh.airflow.forno.quintoandar.com.br
     username: airflow
@@ -41,10 +62,12 @@ pipeline:
 
   ecr:
     group: ecr
-    image: plugins/ecr
+    image: plugins/ecr:1.0
     repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-    registry: 632540934959.dkr.ecr.us-east-1.amazonaws.com
     debug: true
+    daemon_off: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     tag:
       - '${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT:0:7}'
       - '${DRONE_COMMIT_BRANCH}-latest'

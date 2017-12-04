@@ -7,17 +7,10 @@ import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import logger, _logger
-
-from util import environment as env
+from jobs.newetl.amplitude.amplitude_etl import AmplitudeETL
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
-from etl.amplitude.amplitude_etl import AmplitudeETL
-
-environment = env.get_environment('BI_DW', 'bi-datalake-s3-bucket')
-registry, user, pwd = env.get_ecr_credentials(environment)
-image_name = registry + '/' + env.Variable.get('bi-etl-ejuice-repo')
-
 
 @logger(exclude='kwargs')
 def load_data(**kwargs):

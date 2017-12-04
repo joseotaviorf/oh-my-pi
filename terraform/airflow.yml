@@ -120,6 +120,7 @@
         - { key: "AWS_ACCESS_KEY_ID", val: "{{ s3_key }}" }  # required by default quintoandar logger
         - { key: "AWS_SECRET_ACCESS_KEY", val: "{{ s3_secret }}" }  # required by default quintoandar logger
         - { key: "AWS_DEFAULT_REGION", val: "us-east-1" }  # required by default quintoandar logger
+        - { key: "PYTHONPATH", val: "/var/www/airflow/bi-etl-ejuice" }  # required by default quintoandar logger
 
     - name: initialize airflow directory
       shell: >
