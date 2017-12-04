@@ -14,13 +14,17 @@ pipeline:
     image: appleboy/drone-ssh
     host: ssh.airflow.forno.quintoandar.com.br
     username: airflow
-    command_timeout: 300
+    command_timeout: 360
     script:
       - cd /var/www/airflow/bi-etl-ejuice
       - git reset --hard
       - git fetch origin
       - git checkout origin/${DRONE_COMMIT_BRANCH}
       - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+      - sleep 3
+      - source /etc/airflow.conf
+      - /var/www/airflow/airflow_venv/bin/airflow variables -i variables.json
+      - /var/www/airflow/airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
     secrets:
       - ssh_key
     when:
@@ -31,35 +35,24 @@ pipeline:
     image: appleboy/drone-ssh
     host: ssh.airflow.quintoandar.com.br
     username: airflow
-    command_timeout: 300
+    command_timeout: 360
     script:
       - cd /var/www/airflow/bi-etl-ejuice
       - git reset --hard
       - git fetch origin
       - git checkout origin/${DRONE_COMMIT_BRANCH}
       - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+      - sleep 3
+      - source /etc/airflow.conf
+      - cd /var/www/airflow/
+      - airflow_venv/bin/airflow variables -i variables.json
+      - airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
     secrets:
       - ssh_key
     when:
       branch:
         - master
   
-  test-dags:
-    image: appleboy/drone-ssh
-    host: ssh.airflow.forno.quintoandar.com.br
-    username: airflow
-    script:
-      - sleep 3
-      - cd /var/www/airflow
-      - source /etc/airflow.conf
-      - airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
-    secrets:
-      - ssh_key
-    when:
-      branch:
-        - forno
-        - master
-
   ecr:
     group: ecr
     image: plugins/ecr:1.0
