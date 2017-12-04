@@ -28,7 +28,7 @@ class AmplitudeETL(object):
         self.today = execution_date.date()
         self.today_ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(s3_bucket)
+        self.athena_client = AthenaClient(self.s3_bucket)
 
     @classmethod
     @logger

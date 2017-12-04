@@ -1,5 +1,6 @@
-import os
-import sys
+# noinspection PyUnresolvedReferences
+import __init__
+
 from datetime import datetime
 
 from airflow.models import DAG
@@ -8,18 +9,15 @@ from qa_python_utils.default_logger import logger
 
 from util import environment as env
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
-
 from new_etl.analytics_data_validation.analytics_validation import SchemaValidator
 
-environment = env.get_environment('bi-datalake-s3-bucket')
-bucket = environment['bi-datalake-s3-bucket']
 
 @logger(exclude='kwargs')
 def validate_schemas(**kwargs):
     execution_date = kwargs['execution_date']
-    schema_validator = SchemaValidator(execution_date, bucket)
+    schema_validator = SchemaValidator(
+        execution_date=execution_date,
+        s3_bucket=env.get_environment('bi-datalake-s3-bucket'))
 
     schema_validator.validate_events_and_save_into_s3()
     schema_validator.athena_client.execute_raw_query('msck repair table datalake_clean.amplitude_schema_errors')

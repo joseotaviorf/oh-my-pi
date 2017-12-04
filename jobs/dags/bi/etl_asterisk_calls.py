@@ -1,17 +1,13 @@
+# noinspection PyUnresolvedReferences
+import __init__
+
 from datetime import datetime
-import os
-import sys
 import json
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../'))
 
 from util import environment as env
-
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
 
 from new_etl.asterisk_calls import Asterisk
 

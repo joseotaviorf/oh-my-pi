@@ -14,21 +14,21 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class SchemaValidator(object):
-    PATH_PREFIX = 'jobs/etl/analytics_data_validation'
+    PATH_PREFIX = 'schemas'
 
     @logger
-    def __init__(self, execution_date, bucket):
+    def __init__(self, execution_date, s3_bucket):
         self.today = execution_date.date()
-        self.bucket = bucket
+        self.s3_bucket = s3_bucket
         self.ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(self.bucket)
+        self.athena_client = AthenaClient(self.s3_bucket)
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
 
-        _logger.info('m=__init__, msg=reading dir: {}/schemas'.format(SchemaValidator.PATH_PREFIX))
-        for root, dirs, files in os.walk('{}/schemas'.format(SchemaValidator.PATH_PREFIX)):
+        _logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator.PATH_PREFIX))
+        for root, dirs, files in os.walk(SchemaValidator.PATH_PREFIX):
             self.schema_dict[root] = files
 
     @staticmethod
@@ -136,7 +136,7 @@ class SchemaValidator(object):
                     continue
 
                 # set schema path and file
-                json_schema_path = '{}/schemas/{}/'.format(SchemaValidator.PATH_PREFIX, app)
+                json_schema_path = '{}/{}/'.format(SchemaValidator.PATH_PREFIX, app)
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
