@@ -1,3 +1,9 @@
+# encoding: utf-8
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import json
 import os
 import re
@@ -252,7 +258,7 @@ class HelpCenter(object):
                     'quintoandar_id': str(user_row['quintoandar_id']) if user_row['quintoandar_id'] else None,
                     'email': user_row['email'] if user_row['email'] and user_row['email'] != '' else None,
                     'roles': self.__split_and_filter(user_row['roles']),
-                    'names': self.__split_and_filter(user_row['names'].encode('utf-8') if user_row['names'] else None),
+                    'names': self.__split_and_filter(user_row['names'].encode('utf8') if user_row['names'] else None),
                     'phones': self.__split_and_filter(field_list=user_row['phones'] if user_row['phones'] else None,
                                                       regex_pattern='[^+\d]',
                                                       regex_replace=''),

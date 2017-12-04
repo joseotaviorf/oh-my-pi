@@ -1,18 +1,9 @@
-FROM python:2
-
+FROM python:2.7.12
 WORKDIR /opt/current-app
-
 ENV PYTHONPATH $PYTHONPATH:/opt/current-app
-
-ADD . .
-
-RUN pip install --upgrade pip
-RUN pip install -r dependency_requirements.txt
+ADD requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install git+git://github.com/quintoandar/python-utils.git
-
+ADD . .
 ENTRYPOINT ["python"]
-
 CMD ["--help"]
-
 # docker run -it bi_etl ./tests/test_default.py

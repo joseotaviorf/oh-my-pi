@@ -1,0 +1,36 @@
+{
+    "AWS_ENDPOINT_URL": "prod",
+    "AWS_REGION": "us-east-1",
+    "CONTRACT_DASH_TIMEDELTA": "3",
+    "DOCKER_REGISTRY": "632540934959.dkr.ecr.us-east-1.amazonaws.com",
+    "LEADS_DOCKER_IMAGE": "quintoandar/analytics:leads-master-latest",
+    "PWBI_CONTRACT_ENDPOINT": "https://api.powerbi.com/beta/7d6db240-e911-4779-baad-d9cc6b020780/datasets/be6dfd00-2148-4fe8-bab9-3569e25ac1a0/rows?key=ojG8jgP9e6tTqBBGY7ukUHK7plZ%2BP%2BYYMFdOQcyZRnfU%2FOVQCL60kuBDRdqAzdBoq5oOBclL6ISUESc3GHeiQQ%3D%3D",
+    "QRFR_PARAMS": {
+        "max_ratio": 0.12,
+        "n_trees": 250,
+        "q80": 62
+    },
+    "READONLY_PROD_HOST": "quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com",
+    "SCHEDULING_PLANNER_ENDPOINT": "https://planner.quintoandar.com.br/schedules/bi/agent/{}/availability/{}",
+    "amplitude_BI_SQS_queue_name": "BIAmplitudeDataQueue",
+    "amplitude_SQS_queue_name": "ProdAmplitudeDataQueue",
+    "asterisk": {
+        "call_queue_url": "https://sqs.us-east-1.amazonaws.com/632540934959/BIAsteriskCalls",
+        "survey_queue_url": "https://sqs.us-east-1.amazonaws.com/632540934959/PesquisaSatisfacaoAsteriskProd"
+    },
+    "bi-datalake-forno-s3-bucket": "5a-datalake-forno",
+    "bi-datalake-s3-bucket": "5a-datalake",
+    "bi-dw-s3-bucket": "5a-dw",
+    "bi-etl-ejuice-repo": "quintoandar/bi-etl-ejuice:master-latest",
+    "bi-etl-ejuice-repo-java": "quintoandar/bi-etl-ejuice:master-java-latest",
+    "bi-zendesk-ods-schema": "zendesk",
+    "bi-zendesk-s3-bucket": "x",
+    "bi-zendesk-s3-clean-folder-path": "clean/zendesk",
+    "bi-zendesk-s3-raw-folder-path": "raw/zendesk",
+    "help-center": {
+        "elasticsearch-host": "https://search-help-center-n5byoc2zffhmnub6hb3gjc4c5m.us-east-1.es.amazonaws.com",
+        "elasticsearch-port": 443
+    },
+    "pe-de-feijao-repo": "quintoandar/pedefeijao:master-latest",
+    "skynet-repo": "quintoandar/skynet:training-master-latest"
+}
