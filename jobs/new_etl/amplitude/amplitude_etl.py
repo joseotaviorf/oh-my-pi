@@ -1,18 +1,15 @@
-# noinspection PyUnresolvedReferences
-import __init__
-from __init__ import QUERIES_DIR
-
 import json
 import re
 
 import fastparquet
 import pandas as pd
 import s3fs
+from jobs.base.base_etl import BaseETL
+from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
-from base.base_etl import BaseETL
-from base.enum_db import EnumDb
+from __init__ import QUERIES_DIR
 
 
 class AmplitudeETL(object):

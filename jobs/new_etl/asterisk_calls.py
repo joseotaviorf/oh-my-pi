@@ -1,16 +1,12 @@
-import boto3
+import gzip
+import io
 import json
 import logging
-import io
-import gzip
 import sys
-import os
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../'))
-
-from base.base_etl import BaseETL
-from base.enum_db import EnumDb
+import boto3
+from jobs.base.base_etl import BaseETL
+from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 
 args = sys.argv
@@ -47,7 +43,7 @@ class Asterisk(object):
     def save_asterisk_data_to_s3(self, data, suffix):
         _logger.info('m=save_asterisk_data_to_s3, msg=saving to s3')
         if len(data) > 0:
-            filename = "raw/asterisk/{}/execution_date={}/{}_{}.json.gz"\
+            filename = "raw/asterisk/{}/execution_date={}/{}_{}.json.gz" \
                 .format(suffix, self.exec_date, suffix, self.exec_time)
             gz_body = io.BytesIO()
             with gzip.GzipFile(fileobj=gz_body, mode="w") as fp:

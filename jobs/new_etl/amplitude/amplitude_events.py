@@ -1,16 +1,14 @@
-# noinspection PyUnresolvedReferences
-import __init__
-
-import os
-import io
-import sys
-import boto3
-import json
 import gzip
+import io
+import json
+import os
+import sys
 from datetime import datetime, timedelta
-from wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
-from wrappers.amplitude import amplitude_props_reader as props
-from base.base_etl import BaseETL, log, EnumDb
+
+import boto3
+from jobs.base.base_etl import BaseETL, log, EnumDb
+from jobs.wrappers.amplitude import amplitude_props_reader as props
+from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'

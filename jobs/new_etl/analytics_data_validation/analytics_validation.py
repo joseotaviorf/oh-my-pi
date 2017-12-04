@@ -96,7 +96,7 @@ class SchemaValidator(object):
                     'validated with errors' if err_detail != ''
                                                or err_instance != ''
                                                or err_validator_value != ''
-                                            else 'skipped'
+                    else 'skipped'
                 ]
             )
 
@@ -172,7 +172,7 @@ class SchemaValidator(object):
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
-                    
+
                     _logger.info('m=validate_events_and_save_into_s3, msg=closing file')
                     result_obj.close()
 
@@ -207,4 +207,3 @@ class SchemaValidator(object):
                 ('validation_status', str)
             ])
         )
-

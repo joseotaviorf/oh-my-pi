@@ -1,15 +1,10 @@
-# noinspection PyUnresolvedReferences
-import __init__
-
 from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from jobs.dags.util import environment as env
+from jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
 from qa_python_utils.default_logger import logger
-
-from util import environment as env
-
-from new_etl.analytics_data_validation.analytics_validation import SchemaValidator
 
 
 @logger(exclude='kwargs')

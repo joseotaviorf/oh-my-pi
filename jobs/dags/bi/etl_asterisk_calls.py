@@ -1,15 +1,10 @@
-# noinspection PyUnresolvedReferences
-import __init__
-
-from datetime import datetime
 import json
+from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-
-from util import environment as env
-
-from new_etl.asterisk_calls import Asterisk
+from jobs.dags.util import environment as env
+from jobs.new_etl.asterisk_calls import Asterisk
 
 environment = env.get_environment('asterisk', 'bi-datalake-s3-bucket', 'BI_ODS', 'BI_DW', )
 survey_queue_url = json.loads(environment['asterisk'])['survey_queue_url']
@@ -37,6 +32,7 @@ def purge_data_from_sqs():
 
 def save_data_to_dw():
     asterisk.save_asterisk_data_to_dw()
+
 
 dag = DAG(
     dag_id='bi-asterisk-calls',
@@ -78,5 +74,3 @@ save_calls_to_dw_task = PythonOperator(
 get_call_data_from_sqs_task >> save_calls_to_dw_task
 get_survey_data_from_sqs_task >> save_calls_to_dw_task
 save_calls_to_dw_task >> delete_survey_messages_task
-
-

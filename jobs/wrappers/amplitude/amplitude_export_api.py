@@ -1,12 +1,8 @@
-# noinspection PyUnresolvedReferences
-import __init__
-
 import io
 
 import petl
 import requests
-
-from base.base_etl import BaseETL
+from jobs.base.base_etl import BaseETL
 
 
 class AmplitudeExportApi(BaseETL):
