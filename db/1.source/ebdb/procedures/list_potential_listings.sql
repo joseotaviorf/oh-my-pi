@@ -146,10 +146,7 @@ BEGIN
         	when lead_flow=1 then min(n.first_inside_sales_contact_date)
         	else NULL
         end as first_inside_sales_contact_date,
-        case
-        	when lead_flow=1 then min(n.qualified_date)
-        	else NULL
-        end as qualified_date,
+        min(n.qualified_date) as qualified_date,
         max(n.created_date) as created_date,
         max(n.updated_date) as updated_date
       FROM
