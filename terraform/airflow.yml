@@ -84,7 +84,7 @@
         state: "{{ item.state | default('present') }}"
         virtualenv: "/var/www/airflow/airflow_venv"
       with_items:
-        - name: 'airflow[mysql,crypto,s3]'
+        - name: 'airflow[mysql,crypto,s3,slack]'
           version: '1.8.0'
         - name: 'flask-oauthlib'
           version: '0.9.4'

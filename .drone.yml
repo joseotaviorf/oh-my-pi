@@ -18,9 +18,9 @@ pipeline:
     script:
       - cd /var/www/airflow/bi-etl-ejuice
       - git reset --hard
-      - git clean -ffdx
       - git fetch origin
       - git checkout origin/${DRONE_COMMIT_BRANCH}
+      - git clean -ffdx
       - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
       - sleep 3
       - source /etc/airflow.conf
@@ -34,15 +34,37 @@ pipeline:
   
   install:
     image: appleboy/drone-ssh
+    host: ssh.airflow.dev.forno.quintoandar.com.br
+    username: airflow
+    command_timeout: 360
+    script:
+      - cd /var/www/airflow/bi-etl-ejuice
+      - git reset --hard
+      - git fetch origin
+      - git checkout origin/${DRONE_COMMIT_BRANCH}
+      - git clean -ffdx
+      - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+      - sleep 3
+      - source /etc/airflow.conf
+      - /var/www/airflow/airflow_venv/bin/airflow variables -i variables.json
+      - /var/www/airflow/airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
+    secrets:
+      - ssh_key
+    when:
+      branch:
+        - develop
+  
+  install:
+    image: appleboy/drone-ssh
     host: ssh.airflow.quintoandar.com.br
     username: airflow
     command_timeout: 360
     script:
       - cd /var/www/airflow/bi-etl-ejuice
       - git reset --hard
-      - git clean -ffdx
       - git fetch origin
       - git checkout origin/${DRONE_COMMIT_BRANCH}
+      - git clean -ffdx
       - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
       - sleep 3
       - source /etc/airflow.conf
