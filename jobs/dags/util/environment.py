@@ -22,21 +22,27 @@ def __conn_to_json(conn):
     })
 
 
-def __add_env(env, *keys):
+def __add_env(*keys):
+    env = {}
     for key in keys:
-        ex = None
-        k = None
-        try:
-            env[key] = Variable.get(key)
-        except KeyError as ex:
-            try:
-                k = BaseHook.get_connection(key)
-                env["ENV_" + key] = __conn_to_json(k)
-            except AirflowException as ex:
-                k = None
-        if not k:
-            print ex
+        __set_env_var(env, key)
+
     return env
+
+
+def __set_env_var(env, key):
+    ex = None
+    k = None
+    try:
+        env[key] = Variable.get(key)
+    except KeyError as ex:
+        try:
+            k = BaseHook.get_connection(key)
+            env["ENV_" + key] = __conn_to_json(k)
+        except AirflowException as ex:
+            k = None
+    if not k:
+        print ex
 
 
 def __initialize_environment():
@@ -47,12 +53,12 @@ def __initialize_environment():
     }
 
 
-def get_airflow_env_var(*keys):
-    return __add_env({}, *keys)
+def get_airflow_env_var(key):
+    return __set_env_var({}, key)[key]
 
 
 def set_airflow_var_to_local_env(*keys):
-    _vars = __add_env(__initialize_environment(), *keys)
+    _vars = __add_env(*keys)
     for key in _vars:
         os.environ[key] = _vars[key]
 
