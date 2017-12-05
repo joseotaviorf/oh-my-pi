@@ -63,7 +63,7 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2017, 11, 29, 0, 0),
+    start_date=datetime(2018, 1, 1, 0, 0, 0),
     schedule_interval='0 4 * * *',
     max_active_runs=1
 )
