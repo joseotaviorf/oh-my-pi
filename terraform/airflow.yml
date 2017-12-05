@@ -237,6 +237,13 @@
         dest: /etc/init/
         mode: 0644
 
+    - name: copy airflow logrotate file
+      become: true
+      copy:
+        src: logrotate/airflow
+        dest: /etc/logdrotate.d/
+        mode: 0644
+
     - name: restart server
       become: true
       command: /sbin/shutdown -r +1

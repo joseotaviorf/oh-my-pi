@@ -16,7 +16,7 @@ variable "key_name" {
   default = "5a-airflow"
 }
 variable "instance_type" {
-  default = "t2.medium"
+  default = "r4.large"
 }
 variable "instance_name" {
   default = "Airflow"
@@ -59,7 +59,7 @@ variable "certificate_arn" {
 variable "db_username" {}
 variable "db_password" {}
 variable "db_instance_type" {
-    default = "t2.micro"
+    default = "db.t2.micro"
 }
 variable "db_subnet_group" {
     default = "default-vpc-7055f514"
