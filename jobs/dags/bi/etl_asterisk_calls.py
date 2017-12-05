@@ -6,11 +6,14 @@ from airflow.operators.python_operator import PythonOperator
 from jobs.dags.util import environment as env
 from jobs.new_etl.asterisk_calls import Asterisk
 
-environment = env.get_environment('asterisk', 'bi-datalake-s3-bucket', 'BI_ODS', 'BI_DW', )
-survey_queue_url = json.loads(environment['asterisk'])['survey_queue_url']
-call_queue_url = json.loads(environment['asterisk'])['call_queue_url']
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
+
+asterisk_json = json.loads(env.get_airflow_env_var('asterisk')['asterisk'])
+
+survey_queue_url = asterisk_json['survey_queue_url']
+call_queue_url = asterisk_json['call_queue_url']
 execution_time = datetime.now()
-bucket = environment['bi-datalake-s3-bucket']
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 asterisk = Asterisk(execution_time, bucket)
 
