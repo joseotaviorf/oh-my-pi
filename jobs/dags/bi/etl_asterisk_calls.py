@@ -8,7 +8,7 @@ from jobs.new_etl.asterisk_calls import Asterisk
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
 
-asterisk_json = json.loads(env.get_airflow_env_var('asterisk')['asterisk'])
+asterisk_json = json.loads(env.get_airflow_env_var('asterisk'))
 
 survey_queue_url = asterisk_json['survey_queue_url']
 call_queue_url = asterisk_json['call_queue_url']
