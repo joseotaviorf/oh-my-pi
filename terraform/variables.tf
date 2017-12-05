@@ -16,7 +16,7 @@ variable "key_name" {
   default = "5a-airflow"
 }
 variable "instance_type" {
-  default = "t2.medium"
+  default = "r4.large"
 }
 variable "instance_name" {
   default = "Airflow"
