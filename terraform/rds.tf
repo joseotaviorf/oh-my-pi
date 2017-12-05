@@ -12,7 +12,7 @@ resource "aws_db_instance" "airflow" {
   db_subnet_group_name    = "${var.db_subnet_group}"
   vpc_security_group_ids  = "${var.db_vpc_security_group_ids}"
   skip_final_snapshot     = true
-  publicly_accessible     = true
+  publicly_accessible     = false
 
   tags {
     Environment   = "${var.environment}"
