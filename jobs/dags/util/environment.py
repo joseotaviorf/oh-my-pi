@@ -1,23 +1,25 @@
-import json
-from airflow.hooks.base_hook import BaseHook
-from airflow.models import Variable
-from airflow.exceptions import AirflowException
-import boto3
 import base64
-import pytz
+import json
+import os
 from datetime import datetime
 from logging import info as log
 
+import boto3
+import pytz
+from airflow.exceptions import AirflowException
+from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variable
+
 
 def __conn_to_json(conn):
-    j = {}
-    j['host'] = conn.host
-    j['user'] = conn.login
-    j['pwd'] = conn.get_password()
-    j['db'] = conn.schema
-    j['dbtype'] = conn.conn_type
-    j['port'] = conn.port
-    return json.dumps(j)
+    return json.dumps({
+        'host': conn.host,
+        'user': conn.login,
+        'pwd': conn.get_password(),
+        'db': conn.schema,
+        'dbtype': conn.conn_type,
+        'port': conn.port
+    })
 
 
 def __add_env(env, *keys):
@@ -45,8 +47,14 @@ def __initialize_environment():
     }
 
 
-def get_environment(*keys):
+def get_airflow_env_var(*keys):
     return __add_env(__initialize_environment(), *keys)
+
+
+def set_airflow_var_to_local_env(*keys):
+    _vars = __add_env(__initialize_environment(), *keys)
+    for key in _vars:
+        os.environ[key] = _vars[key]
 
 
 def get_ecr_credentials(environment):
