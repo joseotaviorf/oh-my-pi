@@ -34,13 +34,6 @@ dag = DAG(
     schedule_interval='0 4 * * *',
     max_active_runs=1)
 
-PythonOperator(
-    dag=dag,
-    task_id='validate_schemas',
-    provide_context=True,
-    python_callable=validate_schemas,
-    on_failure_callback=failed_task)
-
 
 def slack_failed_task(context, **kwargs):
     failed_alert = SlackAPIPostOperator(
@@ -62,3 +55,11 @@ def pd_failed_task(context, **kwargs):
 def failed_task(context, **kwargs):
     slack_failed_task(context, **kwargs)
     pd_failed_task(context, **kwargs)
+
+
+PythonOperator(
+    dag=dag,
+    task_id='validate_schemas',
+    provide_context=True,
+    python_callable=validate_schemas,
+    on_failure_callback=failed_task)
