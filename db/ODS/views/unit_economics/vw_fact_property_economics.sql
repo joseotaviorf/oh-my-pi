@@ -37,7 +37,8 @@ with unit_economics as (
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
-        -sum(vl_insurance_fee) as vl_insurance_fee
+        -sum(vl_insurance_fee) as vl_insurance_fee,
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
     from
     (
         select
@@ -69,7 +70,8 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_liquidity_costs
         union all
@@ -102,7 +104,8 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_supply_costs
         union all
@@ -135,7 +138,8 @@ with unit_economics as (
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
-            vl_insurance_fee as vl_insurance_fee
+            vl_insurance_fee as vl_insurance_fee,
+            flg_expected_insurance_fee as flg_expected_insurance_fee
         from
             unit_economics.vw_mgmt_costs
         union all
@@ -168,7 +172,8 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -219,7 +224,8 @@ final_version as (
     ue.vl_bo_onboarding,
     ue.vl_bo_ongoing,
     ue.vl_bo_offboarding,
-    ue.vl_insurance_fee
+    ue.vl_insurance_fee,
+    ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id
