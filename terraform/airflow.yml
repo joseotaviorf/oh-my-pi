@@ -113,6 +113,7 @@
         - { key: "AIRFLOW__WEBSERVER__AUTHENTICATE", val: "True" }
         - { key: "AIRFLOW__WEBSERVER__ERROR_LOGFILE", val: "/var/log/airflow/gunicorn.log" }
         - { key: "AIRFLOW__WEBSERVER__AUTH_BACKEND", val: "airflow.contrib.auth.backends.google_auth" }
+        - { key: "AIRFLOW__WEBSERVER__BASE_URL", val: "https://{{ server_name }}" }
         - { key: "AIRFLOW__GOOGLE__CLIENT_ID", val: "{{ google_client_id }}" }
         - { key: "AIRFLOW__GOOGLE__CLIENT_SECRET", val: "{{ google_client_secret }}" }
         - { key: "AIRFLOW__GOOGLE__OAUTH_CALLBACK_ROUTE", val: "/oauth2callback" }
@@ -234,14 +235,14 @@
       become: true
       copy:
         src: init/awslogs.conf
-        dest: /etc/init/
+        dest: /etc/init/awslogs.conf
         mode: 0644
 
     - name: copy airflow logrotate file
       become: true
       copy:
         src: logrotate/airflow
-        dest: /etc/logdrotate.d/
+        dest: /etc/logdrotate.d/airflow
         mode: 0644
 
     - name: restart server

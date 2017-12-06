@@ -1,5 +1,4 @@
 environment = "Forno"
-instance_type = "t2.medium"
 
 vpc_id = "vpc-995b8fe0"  # pod-005
 subnet_id = "subnet-4bb46d67"  # public subnet
@@ -17,4 +16,4 @@ db_subnet_group = "default-vpc-7055f514"
 db_vpc_security_group_ids = ["sg-8675bfe0"] # gives access to sg-c5fec3bb
 
 s3_bucket = "5a-airflow-forno"
-git_branch = "master"
+git_branch = "forno"

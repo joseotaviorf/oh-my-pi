@@ -33,6 +33,5 @@
     },
     "pd_service_id": "PHYZ9WS",
     "pe-de-feijao-repo": "quintoandar/pedefeijao:master-latest",
-    "slack_channel": "#jobs",
     "skynet-repo": "quintoandar/skynet:training-master-latest"
 }

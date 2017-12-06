@@ -2,12 +2,10 @@ import os
 import sys
 from datetime import datetime
 
-from airflow.models import DAG, Variable
-from airflow.operators.slack_operator import SlackAPIPostOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.models import DAG
 from qa_python_utils.default_logger import logger
 from jobs.newetl.analytics_data_validation.analytics_validation import SchemaValidator
-from jobs.dags.util.pd_operator import PagerDutyIncidentOperator
+from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
@@ -34,32 +32,8 @@ dag = DAG(
     schedule_interval='0 4 * * *',
     max_active_runs=1)
 
-
-def slack_failed_task(context, **kwargs):
-    failed_alert = SlackAPIPostOperator(
-        task_id='failure',
-        text=str(context['task_instance']),
-        token=Variable.get("slack_access_token"),
-        channel=Variable.get("slack_channel"))
-    failed_alert.execute()
-
-
-def pd_failed_task(context, **kwargs):
-    failed_alert = PagerDutyIncidentOperator(
-        title="{} failed".format(str(context['task_instance'])),
-        api_key=Variable.get("pd_api_key"),
-        service_id=Variable.get("pd_service_id"))
-    failed_alert.execute()
-
-
-def failed_task(context, **kwargs):
-    slack_failed_task(context, **kwargs)
-    pd_failed_task(context, **kwargs)
-
-
-PythonOperator(
+PythonPagerDutyOperator(
     dag=dag,
     task_id='validate_schemas',
     provide_context=True,
-    python_callable=validate_schemas,
-    on_failure_callback=failed_task)
+    python_callable=validate_schemas)

@@ -91,23 +91,24 @@ To avoid certain keys and passwords to be displayed on the UI, we must take the 
 
 1. Connect intto the airflow server:
 
-    $ ssh airflow@ssh.[airflow_url]
+        $ ssh airflow@ssh.[airflow_url]
 
 2. Edit the airflow `views` file:
 
-    $ vi /var/www/airflow/airflow_venv/lib/python2.7/site-packages/airflow/www/views.py
+        $ vi /var/www/airflow/airflow_venv/lib/python2.7/site-packages/airflow/www/views.py
 
 3. Replace the `DEFAULT_SENSITIVE_VARIABLE_FIELDS` variable by this:
 
-    DEFAULT_SENSITIVE_VARIABLE_FIELDS = (
-        'password',
-        'secret',
-        'passwd',
-        'authorization',
-        'token',
-        'key',
-        'login',
-        'criteo',
-    )
+        DEFAULT_SENSITIVE_VARIABLE_FIELDS = (
+            'password',
+            'secret',
+            'passwd',
+            'authorization',
+            'token',
+            'key',
+            'login',
+            'criteo',
+            'mongodb',
+        )
 
 4. Find this line `any(s in key_name for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)` and replace it by `any(s in str.lower(key_name) for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)`, so both uppercase and lowercase keys are hidden.

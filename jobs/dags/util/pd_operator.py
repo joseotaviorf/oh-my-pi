@@ -13,33 +13,35 @@ class PagerDutyIncidentOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 api_key='unset',
+                 api_key=None,
                  title='unset',
                  service_id='No service id has been set',
+                 details='No details have been set',
                  *args,
                  **kwargs):
-        super(PagerDutyAPIOperator, self).__init__(*args, **kwargs)
+        super(PagerDutyIncidentOperator, self).__init__(*args, **kwargs)
         self.api_key = api_key
         self.title = title
-        self.service = service
+        self.service_id = service_id
+        self.details = details
 
     def execute(self, **kwargs):
-        """
-        PagerDutyIncidentOperator calls will not fail even if the call is not 
-        successful. It should not prevent a DAG from completing in success.
-        """
-
         pypd.api_key = self.api_key
 
         try:
-            pypd.Incident.create(data={
+            r = pypd.Incident.create(data={
                 'type': 'incident',
-                'title': self.details,
+                'title': self.title,
                 'service': {
                     'type': 'service_reference',
-                    'id': service_id,
+                    'id': self.service_id,
                 },
+                'body': {
+                    'type': 'incident_body',
+                    'details': self.details,
+                }
             })
+            logging.info(r)
         except Exception as ex:
             msg = "PagerDuty API call failed ({})".format(ex)
             logging.error(msg)
