@@ -13,7 +13,7 @@ env.set_airflow_var_to_local_env('BI_DW')
 
 @logger
 def send_data_to_elasticsearch():
-    help_center_json = json.loads(env.get_airflow_env_var('help-center'))
+    help_center_json = env.get_airflow_env_var('help-center')
     help_center = HelpCenter(es_host=help_center_json['elasticsearch-host'])
 
     df = help_center.get_user_info()
