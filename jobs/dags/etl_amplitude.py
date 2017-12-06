@@ -5,12 +5,13 @@ from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import logger, _logger
 from jobs.newetl.amplitude.amplitude_etl import AmplitudeETL
+from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
+
 
 @logger(exclude='kwargs')
 def load_data(**kwargs):
@@ -21,7 +22,8 @@ def load_data(**kwargs):
     if df_raw.empty:
         _logger.warn('m=__main__, msg=empty dataframe')
     else:
-        df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
+        df_raw_json = pd.io.json.json_normalize(
+            df_raw.event_data.apply(json.loads))
         df_raw_json['dt'] = df_raw['dt']
 
         df_properties = amplitude_etl.get_properties_as_df()
@@ -30,15 +32,13 @@ def load_data(**kwargs):
             df_props=df_properties,
             df_json=df_raw_json,
             properties='user_properties',
-            prefix='u_'
-        )
+            prefix='u_')
         df_raw_json = amplitude_etl.insert_new_columns(
             df=df_raw,
             df_props=df_properties,
             df_json=df_raw_json,
             properties='event_properties',
-            prefix='e_'
-        )
+            prefix='e_')
 
         amplitude_etl.create_parquets(df_raw_json)
 
@@ -60,21 +60,18 @@ dag = DAG(
     },
     start_date=datetime(2017, 11, 29, 0, 0),
     schedule_interval='0 4 * * *',
-    max_active_runs=1
-)
+    max_active_runs=1)
 
-load_events_data_to_clean_task = PythonOperator(
+load_events_data_to_clean_task = PythonPagerDutyOperator(
     dag=dag,
     task_id='load_events_data_to_clean',
     provide_context=True,
-    python_callable=load_data
-)
+    python_callable=load_data)
 
-merge_users_task = PythonOperator(
+merge_users_task = PythonPagerDutyOperator(
     dag=dag,
     task_id='merge_users',
     provide_context=True,
-    python_callable=load_data
-)
+    python_callable=load_data)
 
 load_events_data_to_clean_task.set_downstream(merge_users_task)

@@ -3,12 +3,13 @@ import sys
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import logger
 from jobs.newetl.analytics_data_validation.analytics_validation import SchemaValidator
+from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
+
 
 @logger(exclude='kwargs')
 def validate_schemas(**kwargs):
@@ -16,7 +17,8 @@ def validate_schemas(**kwargs):
     schema_validator = SchemaValidator(execution_date)
 
     schema_validator.validate_events_and_save_into_s3()
-    schema_validator.athena_client.execute_raw_query('msck repair table datalake_clean.amplitude_schema_errors')
+    schema_validator.athena_client.execute_raw_query(
+        'msck repair table datalake_clean.amplitude_schema_errors')
 
 
 dag = DAG(
@@ -28,12 +30,10 @@ dag = DAG(
     },
     start_date=datetime(2017, 11, 20, 0, 0, 0),
     schedule_interval='0 4 * * *',
-    max_active_runs=1
-)
+    max_active_runs=1)
 
-PythonOperator(
+PythonPagerDutyOperator(
     dag=dag,
     task_id='validate_schemas',
     provide_context=True,
-    python_callable=validate_schemas
-)
+    python_callable=validate_schemas)
