@@ -131,7 +131,8 @@ select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_cs_post_sale
+  fc.vl_cs_post_sale,
+  0 as flg_expected
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id

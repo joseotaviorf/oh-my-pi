@@ -973,7 +973,12 @@ insurance_dates as (
 			when dt_start < '2017-05-21'
 			then rent * 0.0725
 			else rent * 0.045
-		end, 0) as cardiff_amount
+		end, 0) as cardiff_amount,
+		case
+			when dd."date" > now()
+				then 1
+			else 0
+		end as flg_expected
 	from
 		pay_dates pd
 	left join
@@ -981,7 +986,7 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
-		and dd."date" <= now()
+--		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
 ),
@@ -1001,14 +1006,20 @@ select
 	bc.property_id,
 	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
-	dt_cash_flow as dt_cash_flow
+	dt_cash_flow as dt_cash_flow,
+	flg_expected
 from
 	base_contract bc
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
 where coalesce(cardiff_amount, 0) > 0
-group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+group by
+	bc.property_id,
+	dt_cash_flow,
+	vl_insurance_fee,
+	bc.contract_id,
+	flg_expected
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_bo_offboarding_costs as
@@ -1122,7 +1133,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_offboarding
+  c.vl_bo_offboarding,
+  0 as flg_expected
 from full_costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1259,7 +1271,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_onboarding
+  c.vl_bo_onboarding,
+  0 as flg_expected
 from full_costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1301,7 +1314,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_ongoing
+  c.vl_bo_ongoing,
+  0 as flg_expected
 from costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1433,7 +1447,8 @@ select
   vbpc.sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_collection
+  fc.vl_collection,
+  0 as flg_expected
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
@@ -1572,7 +1587,8 @@ select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_cs_post_sale
+  fc.vl_cs_post_sale,
+  0 as flg_expected
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
@@ -1588,7 +1604,12 @@ select
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_collection) as vl_collection,
-	sum(vl_cs_post_sale) as vl_cs_post_sale
+	sum(vl_cs_post_sale) as vl_cs_post_sale,
+	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
+    sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+    sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+    sum(flg_expected_collection) as flg_expected_collection,
+    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale
 from
 (
 	select
@@ -1599,7 +1620,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		flg_expected as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_offboarding_costs
 	union all
@@ -1611,7 +1637,12 @@ from
 		vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        flg_expected as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_onboarding_costs
 	union all
@@ -1623,7 +1654,12 @@ from
 		0 as vl_bo_onboarding,
 		vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        flg_expected as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_ongoing_costs
 	union all
@@ -1635,7 +1671,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        flg_expected as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_collection_costs
 	union all
@@ -1647,7 +1688,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		vl_cs_post_sale
+		vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        flg_expected as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_cs_post_sale_costs
 ) tbl
@@ -1664,7 +1710,13 @@ select
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
-  coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee
+  coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
+  coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
+  coalesce(ops.flg_expected_bo_onboarding, 0) as flg_expected_bo_onboarding,
+  coalesce(ops.flg_expected_bo_ongoing, 0) as flg_expected_bo_ongoing,
+  coalesce(ops.flg_expected_collection, 0) as flg_expected_collection,
+  coalesce(ops.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale,
+  coalesce(ins.flg_expected, 0) as flg_expected_insurance_fee
 from
 	unit_economics.vw_mgmt_ops_costs ops
 full outer join
@@ -2380,7 +2432,8 @@ with unit_economics as (
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
-        -sum(vl_insurance_fee) as vl_insurance_fee
+        -sum(vl_insurance_fee) as vl_insurance_fee,
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
     from
     (
         select
@@ -2412,7 +2465,13 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_liquidity_costs
         union all
@@ -2445,7 +2504,13 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_supply_costs
         union all
@@ -2478,7 +2543,13 @@ with unit_economics as (
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
-            vl_insurance_fee as vl_insurance_fee
+            vl_insurance_fee as vl_insurance_fee,
+            flg_expected_bo_offboarding as flg_expected_bo_offboarding,
+            flg_expected_bo_onboarding as flg_expected_bo_onboarding,
+            flg_expected_bo_ongoing as flg_expected_bo_ongoing,
+            flg_expected_collection as flg_expected_collection,
+            flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+            flg_expected_insurance_fee as flg_expected_insurance_fee
         from
             unit_economics.vw_mgmt_costs
         union all
@@ -2511,7 +2582,13 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -2562,7 +2639,8 @@ final_version as (
     ue.vl_bo_onboarding,
     ue.vl_bo_ongoing,
     ue.vl_bo_offboarding,
-    ue.vl_insurance_fee
+    ue.vl_insurance_fee,
+    ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id

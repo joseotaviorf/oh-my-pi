@@ -42,7 +42,11 @@ insurance_dates as (
 			when dt_start < '2017-05-21'
 			then rent * 0.0725
 			else rent * 0.045
-		end, 0) as cardiff_amount
+		end, 0) as cardiff_amount,
+		case
+			when dd."date" > now() then 1
+			else 0
+		end as flg_expected
 	from
 		pay_dates pd
 	left join
@@ -50,7 +54,6 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
-		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
 ),
@@ -70,12 +73,18 @@ select
 	bc.property_id,
 	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
-	dt_cash_flow as dt_cash_flow
+	dt_cash_flow as dt_cash_flow,
+	flg_expected
 from
 	base_contract bc
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
 where coalesce(cardiff_amount, 0) > 0
-group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+group by
+	bc.property_id,
+	dt_cash_flow,
+	vl_insurance_fee,
+	bc.contract_id,
+	flg_expected
 ;
