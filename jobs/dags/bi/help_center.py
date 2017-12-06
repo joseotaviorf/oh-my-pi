@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -14,6 +13,8 @@ env.set_airflow_var_to_local_env('BI_DW')
 @logger
 def send_data_to_elasticsearch():
     help_center_json = env.get_airflow_env_var('help-center')
+    print 'help_center_json: {}'.format(help_center_json)
+    print 'type(help_center_json): {}'.format(type(help_center_json))
     help_center = HelpCenter(es_host=help_center_json['elasticsearch-host'])
 
     df = help_center.get_user_info()

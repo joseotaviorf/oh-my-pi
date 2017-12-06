@@ -14,7 +14,7 @@ from qa_python_utils.default_logger import logger, _logger
 
 
 class SchemaValidator(object):
-    _PATH_PREFIX = 'schemas'
+    _PATH_PREFIX = 'jobs/new_etl/analytics_data_validation/schemas'
 
     @logger
     def __init__(self, execution_date, s3_bucket):
