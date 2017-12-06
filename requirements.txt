@@ -43,6 +43,7 @@ PySocks==1.6.4
 python-dateutil==2.5.3
 pytz==2016.7
 PyYAML==3.12
+raven==6.3.0
 requests==2.11.1
 rsa==3.4.2
 six==1.10.0
