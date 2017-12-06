@@ -54,7 +54,8 @@ def __initialize_environment():
 
 
 def get_airflow_env_var(key):
-    return __add_env(key)[key]
+    _var = __add_env(key)[key]
+    return _var.encode('utf-8') if _var is not None else None
 
 
 def set_airflow_var_to_local_env(*keys):
