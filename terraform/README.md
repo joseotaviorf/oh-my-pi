@@ -82,3 +82,32 @@ $ terraform workspace new prod  # run it only the first time
 $ terraform workspace select prod
 $ terraform apply -var-file="prod.tfvars" -var-file="secrets.tfvars"
 ```
+
+### Hiding Sensitive Variables
+
+Airflow will load all files on bi-etl-ejuce/variables.json, which only contains **non-sensitive** data. Sensitive information is stored elsewhere and must be imported manually.
+
+To avoid certain keys and passwords to be displayed on the UI, we must take the following actions:
+
+1. Connect intto the airflow server:
+
+    $ ssh airflow@ssh.[airflow_url]
+
+2. Edit the airflow `views` file:
+
+    $ vi /var/www/airflow/airflow_venv/lib/python2.7/site-packages/airflow/www/views.py
+
+3. Replace the `DEFAULT_SENSITIVE_VARIABLE_FIELDS` variable by this:
+
+    DEFAULT_SENSITIVE_VARIABLE_FIELDS = (
+        'password',
+        'secret',
+        'passwd',
+        'authorization',
+        'token',
+        'key',
+        'login',
+        'criteo',
+    )
+
+4. Find this line `any(s in key_name for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)` and replace it by `any(s in str.lower(key_name) for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)`, so both uppercase and lowercase keys are hidden.
