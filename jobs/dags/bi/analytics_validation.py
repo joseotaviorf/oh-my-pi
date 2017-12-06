@@ -8,12 +8,13 @@ from jobs.dags.util import environment as env
 from jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
 from qa_python_utils.default_logger import logger
 
+
 @logger(exclude='kwargs')
 def validate_schemas(**kwargs):
     execution_date = kwargs['execution_date']
     schema_validator = SchemaValidator(
         execution_date=execution_date,
-        s3_bucket=env.get_environment('bi-datalake-s3-bucket'))
+        s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket'))
 
     schema_validator.validate_events_and_save_into_s3()
     schema_validator.athena_client.execute_raw_query(

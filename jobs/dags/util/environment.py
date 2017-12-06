@@ -54,13 +54,7 @@ def __initialize_environment():
 
 
 def get_airflow_env_var(key):
-    x = __add_env(key)
-    print 'XXXXXXXXXXXXXXXXXXX'
-    print x
-    print 'keyyyyyyyyyyy'
-    print x[key]
-
-    return x[key]
+    return __add_env(key)[key]
 
 
 def set_airflow_var_to_local_env(*keys):
