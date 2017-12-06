@@ -44,8 +44,7 @@ insurance_dates as (
 			else rent * 0.045
 		end, 0) as cardiff_amount,
 		case
-			when dd."date" > now()
-				then 1
+			when dd."date" > now() then 1
 			else 0
 		end as flg_expected
 	from
@@ -55,7 +54,6 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
---		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
 ),
