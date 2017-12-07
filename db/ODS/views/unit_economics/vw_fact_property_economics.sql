@@ -38,6 +38,11 @@ with unit_economics as (
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
         -sum(vl_insurance_fee) as vl_insurance_fee,
+        sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
+        sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+        sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+        sum(flg_expected_collection) as flg_expected_collection,
+        sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
         sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
     from
     (
@@ -245,6 +250,11 @@ final_version as (
     ue.vl_bo_ongoing,
     ue.vl_bo_offboarding,
     ue.vl_insurance_fee,
+    ue.flg_expected_bo_offboarding,
+    ue.flg_expected_bo_onboarding,
+    ue.flg_expected_bo_ongoing,
+    ue.flg_expected_collection,
+    ue.flg_expected_cs_post_sale,
     ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
