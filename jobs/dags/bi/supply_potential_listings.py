@@ -38,120 +38,133 @@ dag = DAG(
 lead = PythonOperator(
     dag=dag,
     task_id='ODS_lead',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('lead', 'call ebdb.list_lead();')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'lead', 'command': 'call ebdb.list_lead();'}
 )
 dim_lead = PythonOperator(
     dag=dag,
     task_id='DW_dim_lead',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('lead')
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'lead'}
 )
 
 # Contacts and Prospects Dimension
 contacts_and_prospects = PythonOperator(
     dag=dag,
     task_id='ODS_contacts_and_prospects',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('contacts_and_prospects',
-                                                            'call ebdb.list_contacts_and_prospects();')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'contacts_and_prospects', 'command': 'call ebdb.list_contacts_and_prospects();'}
 )
 dim_contacts_and_prospects = PythonOperator(
     dag=dag,
     task_id='DW_contacts_and_prospects',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('contacts_and_prospects')
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'contacts_and_prospects'}
 )
 
 # Property Dimension
 imovel = PythonOperator(
     dag=dag,
     task_id='ODS_imovel',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('property', 'call ebdb.list_imovel();', table_name='imovel')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'property', 'command': 'call ebdb.list_imovel();', 'table_name': 'imovel'}
 )
 dim_property = PythonOperator(
     dag=dag,
     task_id='DW_dim_property',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('property')
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'property'}
 )
 dim_status_over_period = PythonOperator(
     dag=dag,
     task_id='DW_dim_property_status_over',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('property_status_over_period', insert_dummy=False)
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'property_status_over_period', 'insert_dummy': False}
 )
 
 # Region Dimension
 region = PythonOperator(
     dag=dag,
     task_id='ODS_region',
-    python_callable=biz_etl.extract_region_dim_from_ebdb_to_ods()
+    python_callable=biz_etl.extract_region_dim_from_ebdb_to_ods
 )
 dim_region = PythonOperator(
     dag=dag,
     task_id='DW_dim_region',
-    python_callable=biz_etl.load_dim_from_ods_to_dw(
-        dim_name='region',
-        extra_command="update dim_region set dt_timestamp = '{}' where sk_region = -1;"
-            .format(now.strftime('%Y-%m-%d')))
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'region',
+               'extra_command': 'update dim_region set dt_timestamp = "{}" where sk_region = -1;'.format(
+                   now.strftime('%Y-%m-%d'))}
 )
 
 # User Dimension
 usuario = PythonOperator(
     dag=dag,
     task_id='ODS_usuario',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('user', 'call ebdb.list_usuario();')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'user', 'command': 'call ebdb.list_usuario();'}
 )
 dim_user = PythonOperator(
     dag=dag,
     task_id='DW_dim_user',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('user')
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'user'}
 )
 
 # Marketing Attribution Dimension
 mkt = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_attribution',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('marketing_attribution',
-                                                         'call ebdb.list_marketing_attribution();')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'marketing_attribution', 'command': 'call ebdb.list_marketing_attribution();'}
 )
 dim_marketing_attribution = PythonOperator(
     dag=dag,
     task_id='DW_dim_marketing_attribution',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('marketing_attribution')
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'marketing_attribution'}
 )
 
 # Potential Listings Fact Table
 listings = PythonOperator(
     dag=dag,
     task_id='ODS_Potential_Listings',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods('fact_supply_potential_listings',
-                                                         'call ebdb.list_potential_listings(null);')
+    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'command': 'call ebdb.list_potential_listings(null);'}
 )
 fact_supply_cac = PythonOperator(
     dag=dag,
     task_id='DW_Fact_Supply_CAC',
-    python_callable=biz_etl.load_dim_from_ods_to_dw('fact_supply_potential_listings', insert_dummy=False)
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'insert_dummy': False}
 )
 
 # Marketing Ads Costs Dimension
 mkt_fb_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_facebook_ads_costs',
-    python_callable=mkt_etl.load_marketing_costs('facebook')
+    python_callable=mkt_etl.load_marketing_costs,
+    op_kwargs={'dim_name': 'facebook'}
 )
 mkt_g_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_google_adwords_costs',
-    python_callable=mkt_etl.load_marketing_costs('google')
+    python_callable=mkt_etl.load_marketing_costs,
+    op_kwargs={'dim_name': 'google'}
 )
 mkt_crit_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_criteo_costs',
-    python_callable=mkt_etl.load_marketing_costs('criteo')
+    python_callable=mkt_etl.load_marketing_costs,
+    op_kwargs={'dim_name': 'criteo'}
 )
 
 # Affiliate Payments Dimension
 affiliate_payments = PythonOperator(
     dag=dag,
     task_id='ODS_affiliate_payments',
-    python_callable=biz_etl.load_affiliate_payments_to_dw('affiliate_payments',
-                                                          './db/2.datalake/queries/affiliate_payments.sql')
+    python_callable=biz_etl.load_affiliate_payments_to_dw,
+    op_kwargs={'dim_name': 'affiliate_payments', 'file_name': './db/2.datalake/queries/affiliate_payments.sql'}
 )
 
 # flow
