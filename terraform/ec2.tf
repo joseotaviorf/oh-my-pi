@@ -66,6 +66,7 @@ resource "aws_instance" "airflow" {
         --extra-vars "sentry_dsn='${var.sentry_dsn}'" \
         --extra-vars "env='${lower(var.environment)}'" \
         --extra-vars "nr_license_key='${var.nr_license_key}'" \
+        --extra-vars "fernet_key='${var.fernet_key}'" \
         airflow.yml
 EOF
   }

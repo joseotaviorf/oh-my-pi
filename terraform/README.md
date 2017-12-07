@@ -115,12 +115,13 @@ To avoid certain keys and passwords to be displayed on the UI, we must take the 
 
 # Redeploying Airflow
 
-If, for any reason, you make a change to the ansible script and want to reinstall Airflow, you will probably need to force the redeployment of the EC2 instance. Also, you will probably require to redeploy the DB instance, since due to encryption it won't allow a different Airflow installation to access it (so backup your data!).
+If, for any reason, you make a change to the ansible script and want to reinstall Airflow, you will probably need to force the redeployment of the EC2 instance.
 
 To do this, run the commands below:
 
 ```
 $ terraform workspace select <env>
 $ terraform taint aws_instance.airflow 
-$ terraform taint aws_db_instance.airflow 
 ```
+
+NOTE: if you want to keep the same database, take care to not change ferret key!
