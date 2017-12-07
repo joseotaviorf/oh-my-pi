@@ -16,7 +16,7 @@
       - git_branch
       - git_private_key_file
       - sentry_dsn
-      - environment
+      - env
       - nr_license_key
 
   tasks:
@@ -127,9 +127,9 @@
         - { key: "AWS_DEFAULT_REGION", val: "us-east-1" }  # required by default quintoandar logger
         - { key: "PYTHONPATH", val: "/var/www/airflow/bi-etl-ejuice" }
         - { key: "SENTRY_DSN", val: "{{ sentry_dsn }}" }
-        - { key: "SENTRY_ENVIRONMENT", val: "{{ environment }}" }
+        - { key: "SENTRY_ENVIRONMENT", val: "{{ env }}" }
         - { key: "NEW_RELIC_LICENSE_KEY", val: "{{ nr_license_key }}" }
-        - { key: "NEW_RELIC_APP_NAME", val: "airflow-{{ environment }}" }
+        - { key: "NEW_RELIC_APP_NAME", val: "airflow-{{ env }}" }
 
     - name: initialize airflow directory
       shell: >
@@ -138,9 +138,6 @@
         /var/www/airflow/airflow_venv/bin/airflow
         initdb
     
-    # minium required to get our analytics_validation job up
-    # ideally we should have these configured elsewhere, such as in a file
-    # within the bi-etl-ejuice repository
     - name: config airflow initial variables
       shell: >
         AIRFLOW_HOME=/var/www/airflow/
@@ -151,9 +148,6 @@
         - { key: "AWS_ACCESS_KEY_ID", val: "{{ s3_key }}" }
         - { key: "AWS_SECRET_ACCESS_KEY", val: "{{ s3_secret }}" }
         - { key: "AWS_DEFAULT_REGION", val: "us-east-1" }
-        - { key: "DOCKER_REGISTRY", val: "632540934959.dkr.ecr.us-east-1.amazonaws.com" }
-        - { key: "bi-datalake-s3-bucket", val: "5a-datalake" }
-        - { key: "bi-etl-ejuice-repo", val: "quintoandar/bi-etl-ejuice" }
 
     - name: copy airflow wrapper script
       copy:
@@ -215,11 +209,19 @@
         version: "{{ git_branch }}"
         key_file: /home/airflow/.ssh/id_rsa
         accept_hostkey: true
+        force: true
 
     - name: install bi-etl-juice python dependencies
       pip:
         requirements: "/var/www/airflow/bi-etl-ejuice/requirements.txt"
         virtualenv: "/var/www/airflow/airflow_venv"
+
+    - name: load airflow variables
+      shell: >
+        AIRFLOW_HOME=/var/www/airflow/
+        AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://{{ db_username }}:{{ db_password }}@{{ db_hostname }}/{{ db_name }}
+        /var/www/airflow/airflow_venv/bin/airflow
+        variables -i /var/www/airflow/bi-etl-ejuice/variables.json
 
     - name: install awslogs
       become: true
@@ -256,7 +258,7 @@
       become: true
       copy:
         src: logrotate/airflow
-        dest: /etc/logdrotate.d/airflow
+        dest: /etc/logrotate.d/airflow
         mode: 0644
 
     - name: restart server
