@@ -65,6 +65,7 @@ resource "aws_instance" "airflow" {
         --extra-vars "git_private_key_file='${var.git_private_key_file}'" \
         --extra-vars "sentry_dsn='${var.sentry_dsn}'" \
         --extra-vars "environment='${var.environment}'" \
+        --extra-vars "nr_license_key='${var.nr_license_key}'" \
         airflow.yml
 EOF
   }

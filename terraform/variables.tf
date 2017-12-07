@@ -91,3 +91,6 @@ variable "git_branch" {
 
 # Sentry configuration
 variable "sentry_dsn" {}
+
+# New Relic configuration
+variable "nr_license_key" {}
