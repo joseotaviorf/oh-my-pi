@@ -112,3 +112,16 @@ To avoid certain keys and passwords to be displayed on the UI, we must take the 
         )
 
 4. Find this line `any(s in key_name for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)` and replace it by `any(s in str.lower(key_name) for s in DEFAULT_SENSITIVE_VARIABLE_FIELDS)`, so both uppercase and lowercase keys are hidden.
+
+# Redeploying Airflow
+
+If, for any reason, you make a change to the ansible script and want to reinstall Airflow, you will probably need to force the redeployment of the EC2 instance.
+
+To do this, run the commands below:
+
+```
+$ terraform workspace select <env>
+$ terraform taint aws_instance.airflow 
+```
+
+NOTE: if you want to keep the same database, take care to not change ferret key!

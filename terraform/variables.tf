@@ -94,3 +94,11 @@ variable "sentry_dsn" {}
 
 # New Relic configuration
 variable "nr_license_key" {}
+
+# Unique fernet key for database encryption:
+#
+#   IMPORTANT: this is required to connect to an existing database! E.g. should
+#   you need to spin up a new Airflow installation but want to connect to a
+#   database used by a previous installation, make sure that the fernet_key
+#   remains the same!
+variable "fernet_key" {}
