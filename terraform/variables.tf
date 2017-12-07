@@ -88,3 +88,6 @@ variable "git_private_key_file" {}
 variable "git_branch" {
     default = "master"
 }
+
+# Sentry configuration
+variable "sentry_dsn" {}

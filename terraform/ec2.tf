@@ -63,6 +63,8 @@ resource "aws_instance" "airflow" {
         --extra-vars "db_hostname='${aws_db_instance.airflow.endpoint}'" \
         --extra-vars "git_branch='${var.git_branch}'" \
         --extra-vars "git_private_key_file='${var.git_private_key_file}'" \
+        --extra-vars "sentry_dsn='${var.sentry_dsn}'" \
+        --extra-vars "environment='${var.environment}'" \
         airflow.yml
 EOF
   }
