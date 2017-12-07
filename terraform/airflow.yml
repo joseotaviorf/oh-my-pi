@@ -16,8 +16,9 @@
       - git_branch
       - git_private_key_file
       - sentry_dsn
-      - environment
+      - env
       - nr_license_key
+      - fernet_key
 
   tasks:
     - name: check required variables
@@ -105,6 +106,7 @@
       with_items:
         - { key: "AIRFLOW_HOME", val: "/var/www/airflow/" }
         - { key: "AIRFLOW_CONFIG", val: "/var/www/airflow/airflow.cfg" }
+        - { key: "AIRFLOW_CONN_S3", val: "s3://{{ s3_key }}:{{ s3_secret }}@S3" }
         - { key: "AIRFLOW__CORE__DAGS_FOLDER", val: "/var/www/airflow/bi-etl-ejuice/jobs/dags" }
         - { key: "AIRFLOW__CORE__SQL_ALCHEMY_CONN", val: "mysql://{{ db_username }}:{{ db_password }}@{{ db_hostname }}/{{ db_name }}" }
         - { key: "AIRFLOW__CORE__EXECUTOR", val: "LocalExecutor" }
@@ -112,7 +114,7 @@
         - { key: "AIRFLOW__CORE__LOAD_EXAMPLES", val: "False" }
         - { key: "AIRFLOW__CORE__REMOTE_LOG_CONN_ID", val: "s3" }
         - { key: "AIRFLOW__CORE__LOG_LEVEL", val: "INFO" }
-        - { key: "AIRFLOW__CONN__S3", val: '"{"aws_access_key_id": "{{ s3_key }}", "aws_secret_access_key": "{{ s3_secret }}"}"' }
+        - { key: "AIRFLOW__CORE__FERNET_KEY", val: "{{ fernet_key }}" }
         - { key: "AIRFLOW__WEBSERVER__ACCESS_LOGFILE", val: "/var/log/airflow/gunicorn.log" }
         - { key: "AIRFLOW__WEBSERVER__AUTHENTICATE", val: "True" }
         - { key: "AIRFLOW__WEBSERVER__ERROR_LOGFILE", val: "/var/log/airflow/gunicorn.log" }
@@ -127,33 +129,25 @@
         - { key: "AWS_DEFAULT_REGION", val: "us-east-1" }  # required by default quintoandar logger
         - { key: "PYTHONPATH", val: "/var/www/airflow/bi-etl-ejuice" }
         - { key: "SENTRY_DSN", val: "{{ sentry_dsn }}" }
-        - { key: "SENTRY_ENVIRONMENT", val: "{{ environment }}" }
+        - { key: "SENTRY_ENVIRONMENT", val: "{{ env }}" }
         - { key: "NEW_RELIC_LICENSE_KEY", val: "{{ nr_license_key }}" }
-        - { key: "NEW_RELIC_APP_NAME", val: "airflow-{{ environment }}" }
+        - { key: "NEW_RELIC_APP_NAME", val: "airflow-{{ env }}" }
 
     - name: initialize airflow directory
       shell: >
-        AIRFLOW_HOME=/var/www/airflow/
-        AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://{{ db_username }}:{{ db_password }}@{{ db_hostname }}/{{ db_name }}
+        source /etc/airflow.conf &&
         /var/www/airflow/airflow_venv/bin/airflow
         initdb
     
-    # minium required to get our analytics_validation job up
-    # ideally we should have these configured elsewhere, such as in a file
-    # within the bi-etl-ejuice repository
     - name: config airflow initial variables
       shell: >
-        AIRFLOW_HOME=/var/www/airflow/
-        AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://{{ db_username }}:{{ db_password }}@{{ db_hostname }}/{{ db_name }}
+        source /etc/airflow.conf &&
         /var/www/airflow/airflow_venv/bin/airflow
         variables -s {{ item.key }} {{ item.val }}
       with_items:
         - { key: "AWS_ACCESS_KEY_ID", val: "{{ s3_key }}" }
         - { key: "AWS_SECRET_ACCESS_KEY", val: "{{ s3_secret }}" }
         - { key: "AWS_DEFAULT_REGION", val: "us-east-1" }
-        - { key: "DOCKER_REGISTRY", val: "632540934959.dkr.ecr.us-east-1.amazonaws.com" }
-        - { key: "bi-datalake-s3-bucket", val: "5a-datalake" }
-        - { key: "bi-etl-ejuice-repo", val: "quintoandar/bi-etl-ejuice" }
 
     - name: copy airflow wrapper script
       copy:
@@ -215,11 +209,18 @@
         version: "{{ git_branch }}"
         key_file: /home/airflow/.ssh/id_rsa
         accept_hostkey: true
+        force: true
 
     - name: install bi-etl-juice python dependencies
       pip:
         requirements: "/var/www/airflow/bi-etl-ejuice/requirements.txt"
         virtualenv: "/var/www/airflow/airflow_venv"
+
+    - name: load airflow variables
+      shell: >
+        source /etc/airflow.conf &&
+        /var/www/airflow/airflow_venv/bin/airflow
+        variables -i /var/www/airflow/bi-etl-ejuice/variables.json
 
     - name: install awslogs
       become: true
@@ -256,7 +257,7 @@
       become: true
       copy:
         src: logrotate/airflow
-        dest: /etc/logdrotate.d/airflow
+        dest: /etc/logrotate.d/airflow
         mode: 0644
 
     - name: restart server

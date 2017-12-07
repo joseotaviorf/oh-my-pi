@@ -18,4 +18,3 @@ db_subnet_group = "vpc default" # bds production subnet group
 db_vpc_security_group_ids = ["sg-e8c8998c"] # gives acces to sg-bfcfc6c1
 
 s3_bucket = "5a-airflow"
-git_branch = "forno"
