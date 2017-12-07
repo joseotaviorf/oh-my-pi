@@ -1,9 +1,10 @@
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.exceptions import AirflowException
-import pypd
-import json
+from airflow.plugins_manager import AirflowPlugin
+
 import logging
+import pypd
 
 
 class PagerDutyIncidentOperator(BaseOperator):
@@ -46,3 +47,9 @@ class PagerDutyIncidentOperator(BaseOperator):
             msg = "PagerDuty API call failed ({})".format(ex)
             logging.error(msg)
             raise AirflowException(msg)
+
+
+# Defining the plugin class
+class PagerDutyPlugin(AirflowPlugin):
+    name = "pagerduty"
+    operators = [PagerDutyIncidentOperator]
