@@ -16,7 +16,6 @@ mkt_configs['criteo'] = json.loads(criteo_config)
 mkt_configs['facebook'] = json.loads(facebook_config)
 mkt_configs['google'] = google_config
 now = datetime.now()
-owner = 'Data Team'
 
 biz_etl = BusinessDimensionETL(bucket, now)
 mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
@@ -25,7 +24,7 @@ mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
 dag = DAG(
     dag_id='bi-supply-potential-listings',
     default_args={
-        'owner': owner,
+        'owner': 'Data Team',
         'wait_for_downstream': False,
         'depends_on_past': False
     },
@@ -38,7 +37,7 @@ dag = DAG(
 lead = PythonOperator(
     dag=dag,
     task_id='ODS_lead',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'lead', 'command': 'call ebdb.list_lead();'}
 )
 dim_lead = PythonOperator(
@@ -52,7 +51,7 @@ dim_lead = PythonOperator(
 contacts_and_prospects = PythonOperator(
     dag=dag,
     task_id='ODS_contacts_and_prospects',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'contacts_and_prospects', 'command': 'call ebdb.list_contacts_and_prospects();'}
 )
 dim_contacts_and_prospects = PythonOperator(
@@ -66,7 +65,7 @@ dim_contacts_and_prospects = PythonOperator(
 imovel = PythonOperator(
     dag=dag,
     task_id='ODS_imovel',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'property', 'command': 'call ebdb.list_imovel();', 'table_name': 'imovel'}
 )
 dim_property = PythonOperator(
@@ -86,14 +85,15 @@ dim_status_over_period = PythonOperator(
 region = PythonOperator(
     dag=dag,
     task_id='ODS_region',
-    python_callable=biz_etl.extract_region_dim_from_ebdb_to_ods
+    python_callable=biz_etl.extract_table_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'region', 'table_name': 'MapRegiao', 'add_timestamp': True, 'copy_to_clean': False}
 )
 dim_region = PythonOperator(
     dag=dag,
     task_id='DW_dim_region',
     python_callable=biz_etl.load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'region',
-               'extra_command': 'update dim_region set dt_timestamp = "{}" where sk_region = -1;'.format(
+               'post_command': 'update dim_region set dt_timestamp = "{}" where sk_region = -1;'.format(
                    now.strftime('%Y-%m-%d'))}
 )
 
@@ -101,7 +101,7 @@ dim_region = PythonOperator(
 usuario = PythonOperator(
     dag=dag,
     task_id='ODS_usuario',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'user', 'command': 'call ebdb.list_usuario();'}
 )
 dim_user = PythonOperator(
@@ -115,7 +115,7 @@ dim_user = PythonOperator(
 mkt = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_attribution',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'marketing_attribution', 'command': 'call ebdb.list_marketing_attribution();'}
 )
 dim_marketing_attribution = PythonOperator(
@@ -129,14 +129,14 @@ dim_marketing_attribution = PythonOperator(
 listings = PythonOperator(
     dag=dag,
     task_id='ODS_Potential_Listings',
-    python_callable=biz_etl.extract_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'command': 'call ebdb.list_potential_listings(null);'}
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'potential_listings', 'command': 'call ebdb.list_potential_listings(null);'}
 )
 fact_supply_cac = PythonOperator(
     dag=dag,
     task_id='DW_Fact_Supply_CAC',
     python_callable=biz_etl.load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'insert_dummy': False}
+    op_kwargs={'dim_name': 'supply_potential_listings', 'is_fact': True, 'insert_dummy': False}
 )
 
 # Marketing Ads Costs Dimension
@@ -163,7 +163,7 @@ mkt_crit_costs = PythonOperator(
 affiliate_payments = PythonOperator(
     dag=dag,
     task_id='ODS_affiliate_payments',
-    python_callable=biz_etl.load_affiliate_payments_to_dw,
+    python_callable=biz_etl.load_athena_query_to_ods,
     op_kwargs={'dim_name': 'affiliate_payments', 'file_name': './db/2.datalake/queries/affiliate_payments.sql'}
 )
 

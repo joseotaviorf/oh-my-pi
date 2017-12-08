@@ -12,7 +12,7 @@ class BusinessDimensionETL(DimensionETL):
         self.now = now
         self.athena = AthenaClient(bucket)
 
-    def extract_dim_from_ebdb_to_ods(self, dim_name, command, table_name=None):
+    def extract_query_dim_from_ebdb_to_ods(self, dim_name, command, table_name=None):
 
         if table_name is None:
             table_name = dim_name
@@ -35,13 +35,21 @@ class BusinessDimensionETL(DimensionETL):
             bucket_name='{}/raw/ods/{}'.format(self.bucket, dim_name)
         )
 
-    def extract_region_dim_from_ebdb_to_ods(self, dim_name='region'):
+    # TODO: Make some of those parameters decorators
+    def extract_table_dim_from_ebdb_to_ods(self, dim_name, table_name, add_timestamp=False, copy_to_clean=True):
         _logger.info("Start query: {}".format(self.now))
-        table = BaseETL.from_db_table(
-            db_enum=EnumDb.QuintoAndar_ebdb,
-            table_name='MapRegiao',
-            generator=True
-        ).addfield('dt_timestamp', self.now)
+        if add_timestamp:
+            table = BaseETL.from_db_table(
+                db_enum=EnumDb.QuintoAndar_ebdb,
+                table_name=table_name,
+                generator=True
+            ).addfield('dt_timestamp', self.now)
+        else:
+            table = BaseETL.from_db_table(
+                db_enum=EnumDb.QuintoAndar_ebdb,
+                table_name=table_name,
+                generator=True
+            )
 
         _logger.info("To ODS: {}".format(datetime.now()))
         table = BaseETL.decode_table(table, 'LATIN-1')
@@ -54,10 +62,28 @@ class BusinessDimensionETL(DimensionETL):
             commit=True,
             bucket_name='{}/raw/ods/{}'.format(self.bucket, dim_name)
         )
+        if copy_to_clean:
+            BaseETL.copy_file_between_s3_buckets(
+                bucket_source=self.bucket,
+                bucket_destination=self.bucket,
+                full_filename_source='raw/ods/{0}/{0}.csv'.format(table_name),
+                full_filename_dest='clean/ods/{0}/{0}.csv'.format(table_name)
+            )
 
-    def load_dim_from_ods_to_dw(self, dim_name, insert_dummy=True, extra_command=None):
-        table_name = 'vw_dim_{}'.format(dim_name)
-        table_name_dest = 'dim_{}'.format(dim_name)
+    def load_dim_from_ods_to_dw(self, dim_name, insert_dummy=True, is_fact=False, pre_command=None, post_command=None):
+        if is_fact:
+            table_name = 'vw_fact_{}'.format(dim_name)
+            table_name_dest = 'fact_{}'.format(dim_name)
+        else:
+            table_name = 'vw_dim_{}'.format(dim_name)
+            table_name_dest = 'dim_{}'.format(dim_name)
+
+        if pre_command is not None:
+            BaseETL.execute_command(
+                command=pre_command,
+                db_enum=EnumDb.BI_DW,
+                commit=True
+            )
         BaseETL.move_table_to_dw(
             table_name=table_name,
             table_name_dest=table_name_dest,
@@ -73,15 +99,15 @@ class BusinessDimensionETL(DimensionETL):
                 db_enum=EnumDb.BI_DW,
                 commit=True
             )
-        if extra_command is not None:
+        if post_command is not None:
             BaseETL.execute_command(
-                command=extra_command,
+                command=post_command,
                 db_enum=EnumDb.BI_DW,
                 commit=True
             )
 
     # TODO: Migrate all business dimension etl from ODS to Datalake
-    def load_affiliate_payments_to_dw(self, dim_name, file_name):
+    def load_athena_query_to_ods(self, dim_name, file_name, append=False):
         _logger.info("Reading from S3: {}".format(datetime.utcnow()))
         data_frame = self.athena.execute_file_query_and_return_dataframe(file_name)
 
@@ -91,6 +117,6 @@ class BusinessDimensionETL(DimensionETL):
             df=data_frame,
             table_name=dim_name,
             encoding='utf-8',
-            append=False
+            append=append
         )
         _logger.info("END - To Staging: {}".format(datetime.utcnow()))
