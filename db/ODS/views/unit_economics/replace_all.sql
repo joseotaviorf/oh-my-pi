@@ -602,6 +602,31 @@ filtered_properties as (
   from agents
   group by dt, c_property_id, contract_id, cont_property_id
 ),
+new_rule_contract as (
+	select
+		vbcc.property_id,
+		vbcc.rent_value * 0.2 as vl_agent_commission,
+		date_trunc('month', signature_date) as dt
+	from
+		unit_economics.vw_base_contract_costs vbcc
+	left join
+		unit_economics.vw_base_property_costs vbpc
+		on vbcc.property_id = vbpc.property_id
+		and vbcc.signature_date between vbpc.min_version_time and vbpc.max_version_time
+	left join
+		booking b
+		on b.imovel_id = vbcc.property_id
+		and b."data" between vbpc.min_version_time and vbpc.max_version_time
+	where
+		date_trunc('month', signature_date) >= '2017-09-01'
+	group by
+		vbcc.property_id,
+		vbcc.rent_value,
+		vbcc.signature_date,
+		vbpc.min_version_time,
+		vbpc.max_version_time
+	having count(b.id) > 0
+),
 -- Agents Commission spreadsheet doesn't contain contracts before Feb-2016
 all_contracts as (
   select
@@ -611,14 +636,19 @@ all_contracts as (
     date_trunc('month', signature_date) as dt
   from unit_economics.vw_base_contract_costs c
   where date_trunc('month', signature_date) = '2016-01-01'
-
   union
-
   select
     property_id,
     vl_agent_commission,
     dt
   from filtered_properties
+  where dt < '2017-09-01'
+  union
+  select
+    property_id,
+    vl_agent_commission,
+    dt
+  from new_rule_contract
 ),
 updated_dates as (
   select
