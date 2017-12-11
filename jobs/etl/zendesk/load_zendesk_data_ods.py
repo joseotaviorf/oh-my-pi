@@ -503,7 +503,7 @@ class ZendeskDataToODS(object):
                                     " '{}','{}','{}','{}',{},{},{}," \
                                     " '{}','{}','{}','{}',{}," \
                                     " {},'{}','{}'," \
-                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}', {}) " \
+                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}', {}, {}) " \
                                     " on conflict (id) do update set " \
                                     " url = excluded.url, external_id = excluded.external_id,\"type\" = excluded.\"type\", " \
                                     "subject = excluded.subject, raw_subject = excluded.raw_subject," \
