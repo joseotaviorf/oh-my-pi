@@ -17,12 +17,12 @@ More information on the infrastructure is available at the [terraform](terraform
 
 We're currently migrating old jobs ran by a DockerOperator to the new Airflow architecture, which uses a PythonOperator.
 
-It's recommended that all migrated jobs use our custom PythonPagerDutyOperator, which triggers a [PagerDuty](https://quintoandar.pagerduty.com/) incident on failure.
+It's recommended that all migrated jobs use our custom QuintoAndarPythonOperator, which triggers a [PagerDuty](https://quintoandar.pagerduty.com/) incident on failure.
 
 ```
-from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
+from jobs.dags.util.python_pd_operator import QuintoAndarPythonOperator
 
-PythonPagerDutyOperator(
+QuintoAndarPythonOperator(
     dag=dag,
     task_id='validate_schemas',
     provide_context=True,

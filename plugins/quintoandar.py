@@ -1,19 +1,19 @@
+from airflow.models import Variable
+from airflow.plugins_manager import AirflowPlugin
+from airflow.operators.python_operator import PythonOperator
+from plugins.pagerduty import PagerDutyIncidentOperator
+
 import logging
 
-from airflow.models import Variable
-from airflow.configuration import conf
-from airflow.operators.python_operator import PythonOperator
-from jobs.dags.util.pd_operator import PagerDutyIncidentOperator
 
-
-class PythonPagerDutyOperator(PythonOperator):
+class QuintoAndarPythonOperator(PythonOperator):
     """
     A Python Operator that triggers Pager Duty incidents on failures.
     """
 
     def __init__(self, *args, **kwargs):
-        super(PythonPagerDutyOperator, self).__init__(
-            on_failure_callback=PythonPagerDutyOperator.on_failure_callback,
+        super(QuintoAndarPythonOperator, self).__init__(
+            on_failure_callback=QuintoAndarPythonOperator.on_failure_callback,
             *args,
             **kwargs)
 
@@ -41,3 +41,9 @@ class PythonPagerDutyOperator(PythonOperator):
                 context['conf'].get('webserver', 'base_url')))
 
         return operator.execute(context=context)
+
+
+# Defining the plugin class
+class QuintoAndarPlugin(AirflowPlugin):
+    name = "quintoandar"
+    operators = [QuintoAndarPythonOperator]

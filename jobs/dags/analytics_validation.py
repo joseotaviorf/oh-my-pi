@@ -5,7 +5,7 @@ from datetime import datetime
 from airflow.models import DAG
 from qa_python_utils.default_logger import logger
 from jobs.newetl.analytics_data_validation.analytics_validation import SchemaValidator
-from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
@@ -32,7 +32,7 @@ dag = DAG(
     schedule_interval='0 4 * * *',
     max_active_runs=1)
 
-PythonPagerDutyOperator(
+QuintoAndarPythonOperator(
     dag=dag,
     task_id='validate_schemas',
     provide_context=True,
