@@ -126,7 +126,7 @@ select
     sk_property,
     property_id,
     vl_management_fee,
-    dt_cash_flow,
+    dt_cash_flow::date,
     flg_expected_management_fee::integer
 from result
 where vl_management_fee != 0
