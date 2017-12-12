@@ -59,6 +59,7 @@ select
   imovel_id as property_id,
   status,
   "valorAluguel" as rent_value,
+  ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
   "dataFimContratoPrevisto" as expected_end_date,
   "dataAssinado" as signature_date,
@@ -683,53 +684,65 @@ full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
 ;
 
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_fee as
-with filtered_contracts as (
-select distinct
-	property_id,
-	id,
-	coalesce(termination_date, expected_end_date)::date as end_date
+with base_contract as (
+select
+	vbpc.sk_property,
+	vbpc.property_id,
+	vbcc.id as contract_id,
+	vbcc.init_date,
+	vbcc.rent_value,
+	coalesce(vbcc.termination_date, vbcc.expected_end_date)::date as end_date
 from
-	unit_economics.vw_base_contract_costs
-where termination_date is not null
-  or expected_end_date is not null
+	unit_economics.vw_base_contract_costs vbcc
+left join
+	unit_economics.vw_base_property_costs vbpc
+	on vbcc.property_id = vbpc.property_id
+	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time and vbpc.max_version_time
+where (vbcc.termination_date is not null
+  or vbcc.expected_end_date is not null)
+  and vbcc.status in ('Ativo', 'Finalizado')
 ),
-base_contract as (
+brokerage_fill as (
 	select
-		base.*,
-		c.id as contract_id
+		sk_property,
+		property_id,
+		bc.contract_id,
+		case
+			when i.landlord_status = 'paid'
+				then amount::decimal(14,4)
+			when i.contract_id is not null
+				then 0
+			when i.contract_id is null and bc.init_date >= '2017-01-01'
+				then rent_value
+			else 0
+		end as vl_brokerage_fee,
+		init_date,
+		greatest(
+			landlord_due_date,
+			due_date,
+			landlord_paid_date,
+			init_date + interval '1 month'
+		)::date as dt_cash_flow
 	from
-		unit_economics.vw_base_property_costs base
+		base_contract bc
 	left join
-		filtered_contracts c
-		on base.property_id = c.property_id
-		and c.end_date between base.min_version_time and base.max_version_time
+		invoice i
+		on bc.contract_id = i.contract_id
+	and
+		item = 'TaxaCorretagem'
+	and
+		"from" = 'Proprietario'
+	and
+		"to" = 'Contrato'
 )
 select
 	sk_property,
 	property_id,
-	amount::decimal(14,4) as vl_brokerage_fee,
-	greatest(
-		landlord_due_date,
-		due_date,
-		landlord_paid_date,
-		(concat(
-			substring(year_month from 1 for 4),'-',
-			substring(year_month from 5 for 6)::int,'-',
-			'15'))::date + interval '1 month'
-	)::date as dt_cash_flow
+	vl_brokerage_fee,
+	dt_cash_flow
 from
-	base_contract bc
-left join
-	invoice i
-	on bc.contract_id = i.contract_id
-where
-	item = 'TaxaCorretagem'
-and
-	landlord_status = 'paid'
-and
-	"from" = 'Proprietario'
-and
-	"to" = 'Contrato'
+	brokerage_fill
+where vl_brokerage_fee != 0
 ;
 
 create or replace view unit_economics.vw_net_revenue_revenues_mgmt_fee as
@@ -738,8 +751,9 @@ with filtered_contracts as (
         property_id,
         id,
         init_date,
+        package_value,
         coalesce(termination_date, expected_end_date)::date as end_date,
-        date_trunc('month', dd.date)::date as date_range
+        date_trunc('month', dd.date)::date + interval '6 day' as date_range
     from
         unit_economics.vw_base_contract_costs
     join dim_date dd
@@ -752,6 +766,7 @@ base_contract as (
 	select
 		base.*,
 		c.id as contract_id,
+		package_value,
 		date_trunc('month', c.init_date) as contract_init_date,
 		date_trunc('month', c.end_date) as contract_end_date,
 		c.date_range
@@ -764,13 +779,19 @@ base_contract as (
 ),
 incurred as (
     select
+    		row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
         bc.contract_id,
         bc.contract_init_date,
         bc.contract_end_date,
+        bc.package_value,
         amount::decimal(14,4) as vl_management_fee,
-        greatest(landlord_due_date, due_date, landlord_paid_date) as dt_cash_flow,
+        greatest(
+        	landlord_due_date,
+        	due_date,
+        	landlord_paid_date --,
+        	) as dt_cash_flow,
         bc.date_range
     from
         base_contract bc
@@ -787,8 +808,16 @@ incurred_diff as (
     select
         sk_property,
         property_id,
-        vl_management_fee,
-        dt_cash_flow,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then package_value*0.08
+        		else vl_management_fee
+        end as vl_management_fee,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then contract_init_date + interval '2 month' + interval '6 day'
+        		else dt_cash_flow
+        end as dt_cash_flow,
         date_range,
         contract_end_date,
         contract_init_date,
@@ -838,7 +867,7 @@ select
     sk_property,
     property_id,
     vl_management_fee,
-    dt_cash_flow,
+    dt_cash_flow::date,
     flg_expected_management_fee::integer
 from result
 where vl_management_fee != 0

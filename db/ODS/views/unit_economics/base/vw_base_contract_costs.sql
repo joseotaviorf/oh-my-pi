@@ -5,6 +5,7 @@ select
   imovel_id as property_id,
   status,
   "valorAluguel" as rent_value,
+  ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
   "dataFimContratoPrevisto" as expected_end_date,
   "dataAssinado" as signature_date,

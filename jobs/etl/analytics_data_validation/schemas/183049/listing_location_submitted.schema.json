@@ -1,0 +1,159 @@
+{
+  "description": "address result from google places api is received",
+  "self": {
+    "name": "listing_location_submitted",
+    "format": "jsonschema",
+    "version": "1-0-0"
+  },
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": ["listing_location_submitted"]
+    },
+    "app": {
+      "type": "integer",
+      "enum": [183049]
+    },
+    "user_id": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]{0,5}$"
+    },
+    "uuid": {
+      "type": "string"
+    },
+    "event_time": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "amplitude_id": {
+      "type": "integer"
+    },
+    "event_properties": {
+      "type": "object",
+      "properties": {
+        "current_page": {
+          "type": "string",
+          "enum": "addressauto"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "descriptive": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "property_status": {
+          "type": "string",
+          "enum": ["registered", "incomplete"]
+        },
+        "loc_lng": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "loc_lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "loc_neighborhood": {
+          "type": "string"
+        },
+        "loc_city": {
+          "type": "string"
+        },
+        "loc_cep": {
+          "type": ["string"],
+          "pattern": "^([0-9]{5}[-][0-9]{3}|)$"
+        },
+        "loc_inside_5a_area": {
+          "type": "boolean",
+          "enum": [true, false]
+        }
+      },
+      "required": [
+        "current_page",
+        "property_status",
+        "loc_lng",
+        "loc_lat",
+        "loc_inside_5a_area"
+      ]
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "server_upload_time": {
+      "type": "string"
+    },
+    "user_properties": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "web_mobile",
+            "web_desktop",
+            "android",
+            "ios"
+          ]
+        },
+        "web_mobile_mode": {
+          "type": "string",
+          "enum": [
+            "pwa_homescreen",
+            "pwa_browser"
+          ]
+        },
+        "login_status": {
+          "type": "boolean",
+          "enum": [true]
+        },
+        "nbr_onboarding_screens_viewed": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "anyOf": [
+        {
+          "not": {
+            "properties": {
+              "platform": { "enum": ["web_mobile"] }
+            }
+          }
+        },
+        { "required": ["web_mobile_mode"] }
+      ],
+      "required": [
+          "platform",
+          "login_status"]
+    },
+    "session_id": {
+      "type": "integer"
+    },
+    "client_upload_time": {
+      "type": "string"
+    },
+    "client_event_time": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_type",
+    "app",
+    "user_id",
+    "uuid",
+    "event_time",
+    "platform",
+    "amplitude_id",
+    "event_properties",
+    "device_id",
+    "server_upload_time",
+    "user_properties",
+    "session_id",
+    "client_upload_time",
+    "client_event_time"
+  ]
+}
