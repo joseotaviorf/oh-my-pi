@@ -59,6 +59,7 @@ select
   imovel_id as property_id,
   status,
   "valorAluguel" as rent_value,
+  ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
   "dataFimContratoPrevisto" as expected_end_date,
   "dataAssinado" as signature_date,
@@ -602,6 +603,31 @@ filtered_properties as (
   from agents
   group by dt, c_property_id, contract_id, cont_property_id
 ),
+new_rule_contract as (
+	select
+		vbcc.property_id,
+		vbcc.rent_value * 0.2 as vl_agent_commission,
+		date_trunc('month', signature_date) as dt
+	from
+		unit_economics.vw_base_contract_costs vbcc
+	left join
+		unit_economics.vw_base_property_costs vbpc
+		on vbcc.property_id = vbpc.property_id
+		and vbcc.signature_date between vbpc.min_version_time and vbpc.max_version_time
+	left join
+		booking b
+		on b.imovel_id = vbcc.property_id
+		and b."data" between vbpc.min_version_time and vbpc.max_version_time
+	where
+		date_trunc('month', signature_date) >= '2017-09-01'
+	group by
+		vbcc.property_id,
+		vbcc.rent_value,
+		vbcc.signature_date,
+		vbpc.min_version_time,
+		vbpc.max_version_time
+	having count(b.id) > 0
+),
 -- Agents Commission spreadsheet doesn't contain contracts before Feb-2016
 all_contracts as (
   select
@@ -611,14 +637,19 @@ all_contracts as (
     date_trunc('month', signature_date) as dt
   from unit_economics.vw_base_contract_costs c
   where date_trunc('month', signature_date) = '2016-01-01'
-
   union
-
   select
     property_id,
     vl_agent_commission,
     dt
   from filtered_properties
+  where dt < '2017-09-01'
+  union
+  select
+    property_id,
+    vl_agent_commission,
+    dt
+  from new_rule_contract
 ),
 updated_dates as (
   select
@@ -708,8 +739,9 @@ with filtered_contracts as (
         property_id,
         id,
         init_date,
+        package_value,
         coalesce(termination_date, expected_end_date)::date as end_date,
-        date_trunc('month', dd.date)::date as date_range
+        date_trunc('month', dd.date)::date + interval '6 day' as date_range
     from
         unit_economics.vw_base_contract_costs
     join dim_date dd
@@ -722,6 +754,7 @@ base_contract as (
 	select
 		base.*,
 		c.id as contract_id,
+		package_value,
 		date_trunc('month', c.init_date) as contract_init_date,
 		date_trunc('month', c.end_date) as contract_end_date,
 		c.date_range
@@ -734,13 +767,19 @@ base_contract as (
 ),
 incurred as (
     select
+    		row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
         bc.contract_id,
         bc.contract_init_date,
         bc.contract_end_date,
+        bc.package_value,
         amount::decimal(14,4) as vl_management_fee,
-        greatest(landlord_due_date, due_date, landlord_paid_date) as dt_cash_flow,
+        greatest(
+        	landlord_due_date,
+        	due_date,
+        	landlord_paid_date --,
+        	) as dt_cash_flow,
         bc.date_range
     from
         base_contract bc
@@ -757,8 +796,16 @@ incurred_diff as (
     select
         sk_property,
         property_id,
-        vl_management_fee,
-        dt_cash_flow,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then package_value*0.08
+        		else vl_management_fee
+        end as vl_management_fee,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then contract_init_date + interval '2 month' + interval '6 day'
+        		else dt_cash_flow
+        end as dt_cash_flow,
         date_range,
         contract_end_date,
         contract_init_date,

@@ -7,7 +7,7 @@ import pandas as pd
 from airflow.models import DAG
 from qa_python_utils.default_logger import logger, _logger
 from jobs.newetl.amplitude.amplitude_etl import AmplitudeETL
-from jobs.dags.util.python_pd_operator import PythonPagerDutyOperator
+from airflow.operators import QuintoAndarPythonOperator
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../'))
@@ -62,13 +62,13 @@ dag = DAG(
     schedule_interval='0 4 * * *',
     max_active_runs=1)
 
-load_events_data_to_clean_task = PythonPagerDutyOperator(
+load_events_data_to_clean_task = QuintoAndarPythonOperator(
     dag=dag,
     task_id='load_events_data_to_clean',
     provide_context=True,
     python_callable=load_data)
 
-merge_users_task = PythonPagerDutyOperator(
+merge_users_task = QuintoAndarPythonOperator(
     dag=dag,
     task_id='merge_users',
     provide_context=True,
