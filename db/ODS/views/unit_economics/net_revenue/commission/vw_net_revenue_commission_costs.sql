@@ -1,10 +1,10 @@
-drop view vw_net_revenue_commission_costs;
+drop view if exists unit_economics.vw_net_revenue_commission_costs;
 ---
 --- Returns vl_affiliate_commission costs for each first version property
 --- Cost: Affiliate Commission on rented properties
 --- Cash Flow Date: Date of Payment
 ---
-create or replace view vw_net_revenue_commission_costs as
+create or replace view unit_economics.vw_net_revenue_commission_costs as
 select
     coalesce(affiliate.sk_property, agent.sk_property) as sk_property,
     coalesce(affiliate.property_id, agent.property_id) as property_id,
@@ -12,8 +12,8 @@ select
     coalesce(affiliate.vl_affiliate_commission, 0) as vl_affiliate_commission,
     coalesce(agent.vl_agent_commission, 0) as vl_agent_commission
 from
-    vw_net_revenue_affiliate_commission_costs affiliate
-full outer join vw_net_revenue_agent_commission_costs agent
+    unit_economics.vw_net_revenue_affiliate_commission_costs affiliate
+full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
   on affiliate.sk_property = agent.sk_property
      and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;

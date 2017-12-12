@@ -1,15 +1,15 @@
-drop view vw_supply_affiliate_bonus_costs;
+drop view if exists unit_economics.vw_supply_affiliate_bonus_costs;
 ---
 --- Returns vl_affiliate_bonus costs for each first version property
 --- Cost: Affiliate Bonus on Listed properties
 --- Cash Flow Date: Date of Payment
 ---
-create or replace view vw_supply_affiliate_bonus_costs as
+create or replace view unit_economics.vw_supply_affiliate_bonus_costs as
 with affiliate_filtered_base as (
 	select
 		base.*
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		potential_listings pl
 		on pl.property_id = base.property_id

@@ -1,15 +1,15 @@
-drop view vw_net_revenue_affiliate_commission_costs;
+drop view if exists unit_economics.vw_net_revenue_affiliate_commission_costs;
 ---
 --- Returns vl_affiliate_commission costs for each first version property
 --- Cost: Affiliate Commission on rented properties
 --- Cash Flow Date: Date of Payment
 ---
-create or replace view vw_net_revenue_affiliate_commission_costs as
+create or replace view unit_economics.vw_net_revenue_affiliate_commission_costs as
 with affiliate_filtered_base as (
 	select
 		base.*
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		potential_listings pl
 		on pl.property_id = base.property_id

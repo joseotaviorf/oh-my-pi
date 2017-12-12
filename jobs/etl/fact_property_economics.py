@@ -11,7 +11,7 @@ process_name = table_name.replace('fact_', '')
 print("Start query: {}".format(datetime.now()))
 
 BaseETL.move_table_to_dw(
-    table_name='vw_fact_property_economics',
+    table_name='unit_economics.vw_fact_property_economics',
     enum_db_source=EnumDb.BI_ODS,
     enum_db_dest=EnumDb.BI_DW,
     table_name_dest=table_name,

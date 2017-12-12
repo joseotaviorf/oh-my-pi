@@ -1,10 +1,10 @@
-drop view vw_mgmt_insurance_fee;
+drop view if exists unit_economics.vw_mgmt_insurance_fee;
 ---
 --- Returns vl_insurance_costs based on contract
 --- Costs: Insurance costs for Rented properties
 --- Cash Flow Date: 10th of each Contract Month following start and end rule
 ---
-create or replace view vw_mgmt_insurance_fee as
+create or replace view unit_economics.vw_mgmt_insurance_fee as
 with payed_contracts as (
 	select
 		distinct
@@ -15,7 +15,7 @@ with payed_contracts as (
 			c.property_id as property_id,
 			c.rent_value as rent
 	from
-		vw_base_contract_costs c
+		unit_economics.vw_base_contract_costs c
 ),
 pay_dates as (
 	select
@@ -42,7 +42,11 @@ insurance_dates as (
 			when dt_start < '2017-05-21'
 			then rent * 0.0725
 			else rent * 0.045
-		end, 0) as cardiff_amount
+		end, 0) as cardiff_amount,
+		case
+			when dd."date" > now() then 1
+			else 0
+		end as flg_expected
 	from
 		pay_dates pd
 	left join
@@ -50,7 +54,6 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
-		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
 ),
@@ -59,7 +62,7 @@ base_contract as (
 		base.*,
 		c.contract_id
 	from
-		vw_base_property_costs base
+		unit_economics.vw_base_property_costs base
 	left join
 		payed_contracts c
 		on base.property_id = c.property_id
@@ -70,12 +73,18 @@ select
 	bc.property_id,
 	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
-	dt_cash_flow as dt_cash_flow
+	dt_cash_flow as dt_cash_flow,
+	flg_expected
 from
 	base_contract bc
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
 where coalesce(cardiff_amount, 0) > 0
-group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+group by
+	bc.property_id,
+	dt_cash_flow,
+	vl_insurance_fee,
+	bc.contract_id,
+	flg_expected
 ;

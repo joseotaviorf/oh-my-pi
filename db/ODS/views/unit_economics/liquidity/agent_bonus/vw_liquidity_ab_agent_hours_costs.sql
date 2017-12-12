@@ -1,74 +1,56 @@
-drop view if exists vw_liquidity_ab_agent_hours_costs;
-create or replace view vw_liquidity_ab_agent_hours_costs as
+drop view if exists unit_economics.vw_liquidity_ab_agent_hours_costs;
+create or replace view unit_economics.vw_liquidity_ab_agent_hours_costs as
 with hour_costs as (
   select distinct
-    cd."Month" as dre_date,
+    cd.dre_date,
     sum(agent_commission.vl_agent_commission) over (partition by agent_commission.dt_cash_flow)
-       +  cd."Value" as hours
-  from vw_net_revenue_agent_commission_costs agent_commission
-  join files.costs_dre cd
-    on cd."Month" = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
-  where cd."Category" = 'Agents Commission'
+       +  cd.dre_value as hours
+  from unit_economics.vw_net_revenue_agent_commission_costs agent_commission
+  join unit_economics.vw_base_dre_costs cd
+    on cd.dre_date = date_trunc('month', agent_commission.dt_cash_flow) - interval '2 month'
+  where cd.dre_category = 'Agents Commission'
 ),
-filtered_visits as (
-    select
-      id as visit_id,
-      imovel_id as property_id,
-      data as dt
-    from booking
-    where tipo = 'Visita'
-        and status = 'Realizado'
+filtered_daily_status as  (
+	select
+		base.sk_property,
+		id as property_id,
+		"date" as dt_status,
+		row_number()
+			over (partition by isfh.id, base."version" order by isfh.id, isfh."date") as rn
+	from
+		imovel_status_full_history isfh
+	left join
+		unit_economics.vw_base_property_costs base
+		on base.property_id = isfh.id
+		where base.min_version_time <= isfh."date"
+		and base.max_version_time > isfh."date"
+	and status_history = 'publicado'
 ),
-costs as (
-    select
-      fv.property_id,
-      fv.dt,
-      hc.dre_date as dt_cash_flow,
-      hc.hours / (count(fv.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
-    from filtered_visits fv
-    left join hour_costs hc
-      on hc.dre_date = date_trunc('month', fv.dt) + interval '1 month'
-),
--- In Jan-2016 there was no FUP; using 'Marcado' as visit confirmed
-old_visists as (
-    select
-      id as visit_id,
-      imovel_id as property_id,
-      "data" as dt
-    from booking
-    where tipo = 'Visita'
-        and status = 'Marcado'
-        and date_trunc('month', "data") = '2016-01-01'
-),
-old_costs as (
-    select
-      ov.property_id,
-      ov.dt,
-      hc.dre_date as dt_cash_flow,
-      hc.hours / (count(ov.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
-    from old_visists ov
-    left join hour_costs hc
-      on hc.dre_date = date_trunc('month', ov.dt) + interval '1 month'
+property_daily_status as  (
+	select
+		sk_property,
+		property_id,
+		dt_status
+	from
+		filtered_daily_status
+	where
+		rn <= 365
 ),
 all_costs as (
     select
-        property_id,
-        dt,
-        dt_cash_flow,
-        vl_agent_hours
-    from costs
-
-    union all
-
-    select
-        property_id,
-        dt,
-        dt_cash_flow,
-        vl_agent_hours
-    from old_costs
+      pds.sk_property,
+      pds.property_id,
+      pds.dt_status,
+      hc.dre_date as dt_cash_flow,
+      hc.hours /
+        date_part('days', hc.dre_date + interval '1 month' - interval '1 day') /
+        (count(pds.property_id) over (partition by hc.dre_date))::double precision as vl_agent_hours
+    from property_daily_status pds
+    left join hour_costs hc
+      on hc.dre_date = date_trunc('month', pds.dt_status) + interval '1 month'
 )
 select
-  vbpc.sk_property,
+  ac.sk_property,
   ac.property_id,
   ac.dt_cash_flow::date,
   case
@@ -77,8 +59,8 @@ select
     else sum(ac.vl_agent_hours)
   end as vl_agent_hours
 from all_costs ac
-join vw_base_property_costs vbpc
+join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
-    and ac.dt between vbpc.min_version_time and vbpc.max_version_time
-group by vbpc.sk_property, ac.property_id, ac.dt_cash_flow
+    and ac.dt_cash_flow between vbpc.min_version_time and vbpc.max_version_time
+group by ac.sk_property, ac.property_id, ac.dt_cash_flow
 ;

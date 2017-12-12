@@ -23,10 +23,17 @@ create table if not exists public.fact_property_economics (
     vl_termination_fine double precision,
     vl_brokerage_fee double precision,
     vl_management_fee double precision,
+    flg_expected_management_fee int,
     vl_cs_post_sale double precision,
     vl_collection double precision,
     vl_bo_onboarding double precision,
     vl_bo_ongoing double precision,
     vl_bo_offboarding double precision,
-    vl_insurance_fee double precision
+    vl_insurance_fee double precision,
+    flg_expected_bo_offboarding int,
+    flg_expected_bo_onboarding int,
+    flg_expected_bo_ongoing int,
+    flg_expected_collection int,
+    flg_expected_cs_post_sale int,
+    flg_expected_insurance_fee int
 );

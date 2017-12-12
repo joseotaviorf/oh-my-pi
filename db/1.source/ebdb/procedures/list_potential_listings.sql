@@ -80,13 +80,7 @@ BEGIN
       coalesce(o.prospect_date, o.lead_timestamp, o.dataConversao, o.lead_criadoEm) as lead_and_prospect_date,  -- coalesce prospect and lead date
       o.first_inside_sales_contact_date,
 
-      case
-        when ia.imovelAttribution='Self-Service' and o.dataConversao is null -- Self service qualified date is set to null below because we cannot distinguish them from organic growth. here we correct the qualified date.
-          then f.dataCriacao -- best value we can get since we miss the exact date.
-        when o.qualified_date is null and o.dataConversao is not null -- correcting organic inside sales
-          then o.dataConversao --  this is needed because organic inside sales have their qualified date set to null and it needs to be corrected here
-        else o.qualified_date -- in all other cases we choose the qualified date
-      end as qualified_date,
+      o.qualified_date as qualified_date,
 
       case
         when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01'
@@ -94,7 +88,7 @@ BEGIN
         ELSE coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
       END as opportunity_date,
 
-      ip.datePublication AS listing_publication_date,
+      FROM_UNIXTIME(ure.`timestamp`/1000) AS listing_publication_date,
       cast(c.dataInicio as datetime) as contract_date,
 
       o.lead_id AS lead_id,
@@ -115,7 +109,7 @@ BEGIN
       o.lead_tipo as lead_tipo,
 
       case
-        when o.lead_tipo = 'Afiliado' and ip.datePublication is not null then 25 else 0
+        when o.lead_tipo = 'Afiliado' and FROM_UNIXTIME(ure.`timestamp`/1000) is not null then 25 else 0
       end as affiliate_listing_value,
 
       case
@@ -152,10 +146,7 @@ BEGIN
         	when lead_flow=1 then min(n.first_inside_sales_contact_date)
         	else NULL
         end as first_inside_sales_contact_date,
-        case
-        	when lead_flow=1 then min(n.qualified_date)
-        	else NULL
-        end as qualified_date,
+        min(n.qualified_date) as qualified_date,
         max(n.created_date) as created_date,
         max(n.updated_date) as updated_date
       FROM
@@ -260,7 +251,7 @@ BEGIN
           i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo,
           l.origem as lead_origem ,
-          null  as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
+          FROM_UNIXTIME(ure.`timestamp`/1000) as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm, i.dataCriacao) as created_date,
           coalesce(l.atualizadoEm, i.atualizadoEm)  as updated_date,
           0 as lead_flow
@@ -279,7 +270,6 @@ BEGIN
             ie.imovel_id
         ) ie
           on ie.imovel_id = i.id
-
         LEFT JOIN ConversaoLead cl
           on cl.imovel_id = i.id
           -- and cl.status = 'Concluido'
@@ -309,6 +299,19 @@ BEGIN
           on lu.id = lre.REV
         left join Usuario u
           on u.id = i.usuario_id
+        left join
+         	(select
+                max(REV) as REV,
+                garantias,
+                Imovel_id
+                from Imovel_garantias_AUD
+                where garantias = 'SeguroFiancaCardiff'
+                group by Imovel_id) ig
+            on i.id = ig.Imovel_id
+            and ig.garantias = 'SeguroFiancaCardiff'
+        left join
+            UsuarioRevisionEntity ure
+            on ig.REV = ure.id
       ) n
       GROUP BY
         lead_id,
@@ -330,13 +333,20 @@ BEGIN
         lead_origem
     ) o
 
-    LEFT JOIN (
-      SELECT id, min(REV) as REV, datePublication
-      FROM v_ImovelStatusHistory
-      WHERE published = 1
-      group by id
-      ) ip
-      on ip.id = o.imovel_id
+    left join
+        (
+            select
+                id, min(REV) as REV
+            from
+                Imovel_AUD i
+            where
+                status = 'publicado'
+            group by id
+        ) audi
+        on audi.id = o.imovel_id
+    left join
+	    UsuarioRevisionEntity ure
+	    on ure.id = audi.REV
 
     left join  -- v_imovel_attribution modified to get properties without first_publication
     (
@@ -440,7 +450,7 @@ BEGIN
         JobFotografo j
       where
         j.imovel_id = o.imovel_id
-        and (j.dataCriacao <= ip.datePublication or ip.datePublication is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
+        and (j.dataCriacao <= FROM_UNIXTIME(ure.`timestamp`/1000) or FROM_UNIXTIME(ure.`timestamp`/1000) is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
     )
 
     LEFT JOIN
@@ -467,7 +477,7 @@ BEGIN
 
     left JOIN
       Contrato c
-      on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= ip.datePublication order BY c2.id limit 1)
+      on c.id = (select c2.id from Contrato c2 where c2.imovel_id = o.imovel_id and c2.dataInicio >= FROM_UNIXTIME(ure.`timestamp`/1000) order BY c2.id limit 1)
 
       -- where o.imovel_id in (892793760)--, 892763276,892791756 )
       -- year(o.ref_date)= 2016

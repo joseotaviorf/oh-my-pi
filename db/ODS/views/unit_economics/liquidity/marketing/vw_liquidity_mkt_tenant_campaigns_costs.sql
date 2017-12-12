@@ -1,10 +1,10 @@
-drop view vw_liquidity_mkt_tenant_campaigns_costs;
+drop view if exists unit_economics.vw_liquidity_mkt_tenant_campaigns_costs;
 ---
 --- Returns vl_tenant_campaigns costs for each first version property
 --- Cost: Tenant Daily Costs for Google Adwords, Facebook, Criteo and Classifieds
 --- Cash Flow Date: Date of Payment ( 1 month after invoice )
 ---
-create or replace view vw_liquidity_mkt_tenant_campaigns_costs as
+create or replace view unit_economics.vw_liquidity_mkt_tenant_campaigns_costs as
 -- Get Criteo Daily Costs (deduplicated)
 with criteo_daily_costs as (
 	select distinct
@@ -128,20 +128,40 @@ where
 	"Date" is not null
 ),
 -- For each property expose the published days
-property_daily_status as  (
+filtered_daily_status as  (
 	select
+		base.sk_property,
 		id as property_id,
 		"date" as dt_status,
-		status_history as status
+		row_number()
+			over (partition by isfh.id, base."version" order by isfh.id, isfh."date") as rn
 	from
-		imovel_status_full_history
-	where status_history = 'publicado'
+		imovel_status_full_history isfh
+	left join
+		unit_economics.vw_base_property_costs base
+		on base.property_id = isfh.id
+		where base.min_version_time <= isfh."date"
+		and base.max_version_time > isfh."date"
+	and status_history = 'publicado'
+--	and id=892772473
+),
+-- For each property expose the published days
+property_daily_status as  (
+	select
+		sk_property,
+		property_id,
+		dt_status
+	from
+		filtered_daily_status
+	where
+		rn <= 365
 ),
 -- Divide costs for published day
 daily_total as (
 	select
+		pds.sk_property as sk_property,
 		pds.property_id as property_id,
-		pds.dt_status as dt_cost,
+		date_trunc('month', pds.dt_status + interval '2 month')::date as dt_cash_flow,
 		coalesce(dc.total,0) as total,
 		(coalesce(dc.criteo,0)/count(1) over ( partition by dt_status ))::decimal as criteo_cost,
 		(coalesce(dc.google,0)/count(1) over ( partition by dt_status ))::decimal as google_cost,
@@ -158,9 +178,9 @@ daily_total as (
 -- Get month total for each version with a proper cash flow date
 monthly_total_versioned as (
 	select
-		base.sk_property,
-		base.property_id,
-		date_trunc('month', daily.dt_cost + interval '2 month')::date as dt_cash_flow,
+		daily.sk_property,
+		daily.property_id,
+		daily.dt_cash_flow,
 		sum(daily.criteo_cost)::decimal(14,4) as criteo_cost,
 		sum(daily.google_cost)::decimal(14,4) as google_cost,
 		sum(daily.facebook_cost)::decimal(14,4) as facebook_cost,
@@ -168,16 +188,11 @@ monthly_total_versioned as (
 		sum(daily.classifieds_cost)::decimal(14,4) as classifieds_cost,
 		sum(daily.total_cost)::decimal(14,4) as vl_tenant_campaigns
 	from
-		vw_base_property_costs base
-	left join
 		daily_total daily
-		on base.property_id = daily.property_id
-		where base.min_version_time <= daily.dt_cost
-		and base.max_version_time > daily.dt_cost
 	group by
-		base.sk_property,
-		base.property_id,
-		date_trunc('month', daily.dt_cost + interval '2 month')::date
+		daily.sk_property,
+		daily.property_id,
+		daily.dt_cash_flow
 )
 select
 	*

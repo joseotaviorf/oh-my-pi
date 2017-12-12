@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS ebdb.list_imovel;
+﻿DROP PROCEDURE IF EXISTS ebdb.list_imovel;
 
 CREATE DEFINER = 'QuintoAndarMain'@'%'
 PROCEDURE ebdb.list_imovel()
@@ -106,9 +106,6 @@ select -- count(1)
   i.confirmadoInformacoesVisita+0	  as confirmado_informacoes_visita,
   e.abreviacao as estado_abreviacao,
   e.nome as estado_nome,
---  da.tipoAfiliado as dados_afiliado_tipo_afiliado,
---  da.inicioAtuacao as dados_afiliado_inicio_atuacao,
---  da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
   null as dados_afiliado_tipo_afiliado,
   null as dados_afiliado_inicio_atuacao,
   null as dados_afiliado_cidade_atuacao,
@@ -136,35 +133,80 @@ select -- count(1)
   coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
   coalesce(iv.prop_precisa_liberar,0) as info_visita_prop_precisa_liberar,
   coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
-	
   i.dataCriacao as data_criacao,
   i.atualizadoEm as atualizado_em,
   i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
-
   i.announcedBy is not null
     or i.announcedBy_id is not null as imovel_v3,
-
   i.areaTotal as area_total,
-  i.areaTerreno as area_terreno
-
-from 
+  i.areaTerreno as area_terreno,
+ case
+		when i.status <> 'despublicado'
+			then NULL
+		when i.unpublishedReason is not null
+			then i.unpublishedReason
+		when ure.motivo = 'Imóvel indisponível'
+			then 'HOUSE_NOT_AVAILABLE'
+		when ure.motivo = '[Auto] Proprietario confirmou indisponibilidade'
+			then 'AUTO_OWNER_CONFIRMED_UNAVAILABILITY'
+		when ure.motivo like '[AUTO][RESCISAO]%'
+			or ure.motivo like '[AUTO] [RESCISAO]%'
+			then 'AUTO_CONTRACT_END_DEPUBLICATION'
+		when ure.motivo like '%Não concordo%'
+			or ure.motivo like '%não concorda%'
+			or ure.motivo like '%nao concorda%'
+			then 'OWNER_DOESNT_AGREE'
+		when ure.motivo like '%Desisti%'
+			then 'OWNER_GAVE_UP_RENTING'
+		when ure.motivo like '%MissedNegotiations%'
+			then 'AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED'
+		when ure.motivo like 'Imóvel alugado direto%'
+			or ure.motivo like '%Fechei com outro%'
+			then 'OWNER_RENTING_DIRECT_WITH_TENANT'
+		when ure.motivo like 'Aluguei por curta%'
+			then 'OWNER_RENTING_FOR_SHORT_PERIOD'
+		when ure.motivo = 'Imóvel alugado com imobiliária tradicional'
+			or ure.motivo = 'Já aluguei o imóvel'
+			then 'OWNER_RENTING_WITH_OTHER_COMPANY'
+		when ure.motivo = 'Vou vender o imóvel'
+			or ure.motivo like '%vendeu o %'
+			then 'OWNER_SELLING_HOUSE'
+		when ure.motivo like '%duplicado%'
+			or ure.motivo like '%Duplicado%'
+			then 'DUPLICATED_HOUSE'
+		when ure.motivo like '%falta de confirmação%'
+			or ure.motivo like '%falta de contato%'
+			or ure.motivo like 'PP não responde%'
+			then 'HOUSE_NOT_REACHABLE'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Estou reformando'
+			then 'APP_HOME_RENOVATION'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Outro motivo'
+			then 'APP_OTHER_REASON'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Já aluguei'
+			then 'APP_OWNER_RENTING_WITH_OTHER_COMPANY'
+		when ure.motivo = 'Usuário despublicou pelo app.'
+			then 'APP_USER_DEPUBLISHED'
+		when ure.motivo like 'Usuário rejeitou%'
+			then 'USER_REJECTED_TERMS'
+		when ure.motivo is null
+			then 'UNKNOWN_NULL_VALUE'
+		else 'OTHER'
+	end as unpublished_reason
+from
   Imovel i
 left join
   Estado e
   on e.id = i.estado_id
--- left join
---  DadosAfiliado da
---  on da.id = i.dadosAfiliado_id
 left join
   (
     select
       id as id_sub_regiao,
       `macroId` as id_macro_regiao,
-      `cidadeId` as id_cidade, 
+      `cidadeId` as id_cidade,
       `nome` as sub_regiao,
       `macroNome` as macro_regiao,
       `cidadeNome` as cidade
-    from 
+    from
       MapRegiao
   ) r
   on i.regiao_id = coalesce(r.id_sub_regiao, r.id_macro_regiao, r.id_cidade)
@@ -182,7 +224,7 @@ left join
   on dc.usuario_id = cor.id
 left join
 (
-  select 
+  select
     i.id as imovel_id,
     max(if(etapa='WEB_CARACTERISTICAS', data, null)) as WEB_CARACTERISTICAS,
     max(if(etapa='WEB_COPIARMAISDADOS', data, null)) as WEB_COPIARMAISDADOS,
@@ -196,12 +238,12 @@ left join
     max(if(etapa='MOB_TITULO', data, null)) as MOB_TITULO,
     max(if(etapa='MOB_VISITAS', data, null)) as MOB_VISITAS,
     max(if(etapa='MOB_VISTORIA', data, null)) as MOB_VISTORIA
-  from 
+  from
     Imovel i
   left join
     Imovel_Etapas ie
     on ie.imovel_id = i.id
-  group by 
+  group by
     i.id
 ) ie
   on ie.imovel_id = i.id
@@ -219,6 +261,12 @@ left join
     group by iv.Imovel_id
 ) iv
   on iv.Imovel_id = i.id
+left join
+	(select id, max(REV) as REV from Imovel_AUD where status_MOD = 1 group by id) ia_max
+	on ia_max.id = i.id
+left join
+	UsuarioRevisionEntity ure
+	on ia_max.REV = ure.id
 ;
 
 end

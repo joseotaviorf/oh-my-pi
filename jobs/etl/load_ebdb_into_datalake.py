@@ -1,6 +1,7 @@
 import os
 import sys
 from io import BytesIO
+
 import boto3
 import pandas as pd
 import petl
@@ -24,8 +25,16 @@ CLEAN_TABLE_INFOS = [
     {'original_name': 'UsuarioRevisionEntity', 'new_name': 'usuario_revision_entity'},
     {'original_name': 'OperacaoContaCorrente', 'new_name': 'operacao_conta_corrente'},
     {'original_name': 'ContaCorrente', 'new_name': 'conta_corrente'},
-    {'original_name': 'Imovel_informacoesVisita_AUD', 'new_name': 'informacoes_visita_aud'}
+    {'original_name': 'Imovel_informacoesVisita_AUD', 'new_name': 'informacoes_visita_aud'},
+    {'original_name': 'Imovel', 'new_name': 'property'},
+    {'original_name': 'DadosFotografo', 'new_name': 'photographer_data'},
+    {'original_name': 'DadosAfiliado', 'new_name': 'affiliate_data'},
+    {'original_name': 'DadosVendedor', 'new_name': 'seller_data'},
+    {'original_name': 'DadosAgente_tipos', 'new_name': 'agent_data_type'},
+    {'original_name': 'Contrato', 'new_name': 'contract'},
+    {'original_name': 'Offer', 'new_name': 'offer'},
 ]
+
 
 class EBDBDatalake(object):
     def __init__(self):
@@ -74,21 +83,22 @@ class EBDBDatalake(object):
         self.s3_client.Object(bucket_datalake, file_path).put(Body=csv_buffer.getvalue())
 
         _logger.info('m=move_to_datalake, msg={} moved to Datalake!'.format(table_name))
-        
+
     def transform_tables_to_clean(self, table_infos, ddl_suffix):
         _logger.info('m=transform_tables_to_clean, msg=init')
-        
+
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe("""
                   select * from datalake_raw.ebdb_{}""".format(table_info['original_name'])
-            )
+                                                                       )
 
             self.athena_client.create_parquet_from_df(
                 key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),
                 df=df
             )
 
-            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'], 'datalake_clean')
+            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'],
+                                       'datalake_clean')
 
     @logger
     def get_type_conversion_dict(self):
@@ -145,6 +155,7 @@ class EBDBDatalake(object):
         if skip_header:
             table_names.pop(0)  # remove header
         return table_names
+
 
 if __name__ == '__main__':
     ebdb_datalake = EBDBDatalake()
