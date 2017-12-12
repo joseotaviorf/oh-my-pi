@@ -3,7 +3,7 @@ CREATE TABLE public.contract (
   id INTEGER NOT NULL,
   "emailFatura" VARCHAR(100),
   "valorAluguel" DOUBLE PRECISION,
-  "numImovel" INTEGER NOT NULL,
+  "numImovel" INTEGER,
   "diaMesCobranca" INTEGER,
   garantia VARCHAR(50) NOT NULL,
   tipo VARCHAR(20) NOT NULL,
