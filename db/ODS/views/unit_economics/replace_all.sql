@@ -1168,6 +1168,7 @@ with cdre_offboarding as (
 filtered_contracts as (
     select distinct
       property_id,
+      id,
       date_trunc('month', coalesce(termination_date, expected_end_date)::date) as dt
     from unit_economics.vw_base_contract_costs
     where termination_date is not null
@@ -1248,10 +1249,10 @@ contract_costs as (
     select
       fc.property_id,
       fc.dt,
-      co.dre_date as dt_cash_flow,
+      coalesce(co.dre_date, fc.dt) as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
     from filtered_contracts fc
-    join cdre_offboarding co
+    left join cdre_offboarding co
       on co.dre_date = fc.dt + interval '1 month'
 ),
 full_costs as (
@@ -1259,21 +1260,48 @@ full_costs as (
     coalesce(tt.property_id, cc.property_id) as property_id,
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
-    coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding
+    coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding,
+  	0 as flg_expected
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+),
+last_3_avg as (
+	select
+		t1.dt,
+		t1.property_id,
+		t1.dt_cash_flow,
+		t1.vl_bo_offboarding,
+		t1.flg_expected,
+		avg(t2.vl_bo_offboarding) as m_avg
+	from full_costs t1
+	join
+		full_costs t2
+		on t2.dt_cash_flow >= t1.dt_cash_flow - interval '3 month' and t2.dt_cash_flow <= t1.dt_cash_flow
+	group by t1.dt, t1.property_id, t1.dt_cash_flow, t1.vl_bo_offboarding, t1.flg_expected
+),
+coalesced_values as (
+	select
+		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		lavg.property_id,
+		lavg.dt_cash_flow,
+		case
+			when dt_cash_flow >= '2017-01-01'
+			then coalesce(vl_bo_offboarding,max(m_avg) filter (where flg_expected = 0) over ())
+			else coalesce(vl_bo_offboarding, 0)
+		end as vl_bo_offboarding,
+		flg_expected
+	from last_3_avg lavg
+	left join unit_economics.vw_base_property_costs vbpc
+	  on vbpc.property_id = lavg.property_id
+	    and lavg.dt between vbpc.min_version_time and vbpc.max_version_time
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_offboarding,
-  0 as flg_expected
-from full_costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt between vbpc.min_version_time and vbpc.max_version_time
+	*
+from
+	coalesced_values
+where
+	vl_bo_offboarding != 0
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_bo_onboarding_costs as
