@@ -2,6 +2,7 @@ drop view if exists unit_economics.vw_base_property_costs cascade;
 drop view if exists unit_economics.vw_base_contract_costs cascade;
 drop view if exists unit_economics.vw_base_dre_costs cascade;
 drop view if exists unit_economics.vw_base_ticket_task cascade;
+drop view if exists unit_economics.vw_base_ticket_factor;
 drop view if exists unit_economics.vw_supply_ops_inside_sales_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_photos_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_costs cascade;
@@ -196,6 +197,73 @@ select
   group_name
 from final_result
 group by property_id, dt, group_name
+;
+
+create or replace view unit_economics.vw_base_ticket_factor as
+	select
+		*
+	from
+		(values
+		(1,0.55,0.5500),
+		(2,0.41,0.4800),
+		(3,0.38,0.4467),
+		(4,0.29,0.4075),
+		(5,0.27,0.3800),
+		(6,0.29,0.3650),
+		(7,0.17,0.3371),
+		(8,0.21,0.3213),
+		(9,0.14,0.3011),
+		(10,0.16,0.2870),
+		(11,0.2,0.2791),
+		(12,0.2,0.2725),
+		(13,0.29,0.2738),
+		(14,0.2,0.2686),
+		(15,0.2,0.2640),
+		(16,0.2,0.2600),
+		(17,0.2,0.2565),
+		(18,0.2,0.2533),
+		(19,0.2,0.2505),
+		(20,0.2,0.2480),
+		(21,0.2,0.2457),
+		(22,0.2,0.2436),
+		(23,0.2,0.2417),
+		(24,0.2,0.2400),
+		(25,0.2,0.2384),
+		(26,0.2,0.2369),
+		(27,0.2,0.2356),
+		(28,0.2,0.2343),
+		(29,0.2,0.2331),
+		(30,0.2,0.2320),
+		(31,0.2,0.2310),
+		(32,0.2,0.2300),
+		(33,0.2,0.2291),
+		(34,0.2,0.2282),
+		(35,0.2,0.2274),
+		(36,0.2,0.2267),
+		(37,0.2,0.2259),
+		(38,0.2,0.2253),
+		(39,0.2,0.2246),
+		(40,0.2,0.2240),
+		(41,0.2,0.2234),
+		(42,0.2,0.2229),
+		(43,0.2,0.2223),
+		(44,0.2,0.2218),
+		(45,0.2,0.2213),
+		(46,0.2,0.2209),
+		(47,0.2,0.2204),
+		(48,0.2,0.2200),
+		(49,0.2,0.2196),
+		(50,0.2,0.2192),
+		(51,0.2,0.2188),
+		(52,0.2,0.2185),
+		(53,0.2,0.2181),
+		(54,0.2,0.2178),
+		(55,0.2,0.2175),
+		(56,0.2,0.2171),
+		(57,0.2,0.2168),
+		(58,0.2,0.2166),
+		(59,0.2,0.2163),
+		(60,0.2,0.2160)) as t(months,factor,cumm_avg)
 ;
 
 create or replace view unit_economics.vw_supply_ops_inside_sales_costs as
