@@ -47,7 +47,7 @@ pipeline:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
-    source: jobs
+    source: "db jobs"
     target: /var/www/airflow/dags/
     delete: true
     args: '--force -vI'
@@ -61,7 +61,7 @@ pipeline:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
-    source: jobs
+    source: "db jobs"
     target: /var/www/airflow/dags/
     delete: true
     args: '--force -vI'
