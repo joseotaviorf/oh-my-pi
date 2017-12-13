@@ -130,7 +130,7 @@ r0 as (
     select
       coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
       c.property_id,
-      c.dt_cash_flow,
+      c.dt_cash_flow::date,
       c.vl_bo_onboarding,
       (c.vl_bo_onboarding is null)::int as flg_expected_bo_onboarding
     from full_costs c

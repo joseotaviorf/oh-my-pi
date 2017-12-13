@@ -1284,7 +1284,7 @@ coalesced_values as (
 	select
 		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
 		lavg.property_id,
-		lavg.dt_cash_flow,
+		lavg.dt_cash_flow::date,
 		case
 			when dt_cash_flow >= '2017-01-01'
 			then coalesce(vl_bo_offboarding,max(m_avg) filter (where flg_expected = 0) over ())
@@ -1435,7 +1435,7 @@ r0 as (
     select
       coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
       c.property_id,
-      c.dt_cash_flow,
+      c.dt_cash_flow::date,
       c.vl_bo_onboarding,
       (c.vl_bo_onboarding is null)::int as flg_expected_bo_onboarding
     from full_costs c

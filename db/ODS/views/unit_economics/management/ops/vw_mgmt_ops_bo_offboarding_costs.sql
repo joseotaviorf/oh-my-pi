@@ -126,7 +126,7 @@ coalesced_values as (
 	select
 		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
 		lavg.property_id,
-		lavg.dt_cash_flow,
+		lavg.dt_cash_flow::date,
 		case
 			when dt_cash_flow >= '2017-01-01'
 			then coalesce(vl_bo_offboarding,max(m_avg) filter (where flg_expected = 0) over ())
