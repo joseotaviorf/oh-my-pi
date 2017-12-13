@@ -1322,15 +1322,16 @@ filtered_contracts_prev as (
 ),
 filtered_contracts as(
 	select distinct
-		property_id,
-		dre_date as dt
-	from
-		filtered_contracts_prev fc
-	join
-		cdre_onboarding dre
-		on dre_date between date_trunc('month', fc."from")  + interval '1 month'
+		fc.property_id,
+		coalesce(dre.dre_date, date_trunc('month', fc."to") + interval '1 month') as dt
+	from filtered_contracts_prev fc
+	left join cdre_onboarding dre
+		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
                         and date_trunc('month', fc."to") + interval '1 month'
-),
+    where fc."from" >= '2016-01-01'
+        and fc."to" >= '2016-01-01'
+)
+,
 ratio as (
   select distinct
     fc.dt,
@@ -1352,7 +1353,7 @@ gen_contracts as (
 espec_gen_prev as (
   select
     fc.property_id,
-    cqt.dt as dt,
+    coalesce(cqt.dt, fc.dt) as dt,
     cqt.qt as qt
   from
   	filtered_contracts fc
@@ -1361,7 +1362,7 @@ espec_gen_prev as (
   union
   select
   	*
-	from gen_contracts
+    from gen_contracts
 ),
 espec_gen as (
 	select
@@ -1376,21 +1377,21 @@ tt_costs as (
     select
       eg.property_id,
       eg.dt,
-      co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      eg.dt as dt_cash_flow,
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision as vl_bo_onboarding
     from espec_gen eg
-    join cdre_onboarding co
-      on co.dre_date = eg.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = eg.dt
 ),
 contract_costs as (
     select
-    	fc.dt,
+      fc.dt,
       fc.property_id,
-      co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      fc.dt as dt_cash_flow,
+      co.dre_value / (count(fc.property_id) over (partition by fc.dt))::double precision as vl_bo_onboarding
     from filtered_contracts fc
-    join cdre_onboarding co
-      on co.dre_date = fc.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = fc.dt
 ),
 full_costs as (
   select distinct
@@ -1401,18 +1402,39 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+),
+r0 as (
+    select
+      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      c.property_id,
+      c.dt_cash_flow,
+      c.vl_bo_onboarding,
+      (c.vl_bo_onboarding is null)::int as flg_expected_bo_onboarding
+    from full_costs c
+    left join unit_economics.vw_base_property_costs vbpc
+      on vbpc.property_id = c.property_id
+        and c.dt >= vbpc.min_version_time
+        and c.dt <= vbpc.max_version_time
+),
+m_avg as (
+	select distinct
+		t1.sk_property,
+		t1.property_id,
+		t1.dt_cash_flow,
+		t1.vl_bo_onboarding,
+		t1.flg_expected_bo_onboarding,
+		avg(t2.vl_bo_onboarding) over (partition by t1.sk_property, t1.dt_cash_flow, t1.vl_bo_onboarding, t1.flg_expected_bo_onboarding) as m_avg
+	from r0 t1
+	join r0 t2
+		on t2.dt_cash_flow between t1.dt_cash_flow - interval '3 month' and t1.dt_cash_flow
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_onboarding,
-  0 as flg_expected
-from full_costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt >= vbpc.min_version_time
-    and c.dt <= vbpc.max_version_time
+	sk_property,
+	property_id,
+	dt_cash_flow,
+	coalesce(vl_bo_onboarding, max(m_avg) filter (where flg_expected_bo_onboarding = 0) over ()) as vl_bo_onboarding,
+	flg_expected_bo_onboarding
+from m_avg
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_bo_ongoing_costs as
@@ -1774,7 +1796,7 @@ from
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
 		0 as flg_expected_bo_offboarding,
-        flg_expected as flg_expected_bo_onboarding,
+        flg_expected_bo_onboarding as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
         0 as flg_expected_cs_post_sale

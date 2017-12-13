@@ -43,7 +43,7 @@ from
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
 		0 as flg_expected_bo_offboarding,
-        flg_expected as flg_expected_bo_onboarding,
+        flg_expected_bo_onboarding as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
         0 as flg_expected_cs_post_sale
