@@ -2,7 +2,6 @@ drop view if exists unit_economics.vw_base_property_costs cascade;
 drop view if exists unit_economics.vw_base_contract_costs cascade;
 drop view if exists unit_economics.vw_base_dre_costs cascade;
 drop view if exists unit_economics.vw_base_ticket_task cascade;
-drop view if exists unit_economics.vw_base_ticket_factor;
 drop view if exists unit_economics.vw_supply_ops_inside_sales_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_photos_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_costs cascade;
@@ -199,73 +198,6 @@ from final_result
 group by property_id, dt, group_name
 ;
 
-create or replace view unit_economics.vw_base_ticket_factor as
-	select
-		*
-	from
-		(values
-		(1,0.55,0.5500),
-		(2,0.41,0.4800),
-		(3,0.38,0.4467),
-		(4,0.29,0.4075),
-		(5,0.27,0.3800),
-		(6,0.29,0.3650),
-		(7,0.17,0.3371),
-		(8,0.21,0.3213),
-		(9,0.14,0.3011),
-		(10,0.16,0.2870),
-		(11,0.2,0.2791),
-		(12,0.2,0.2725),
-		(13,0.29,0.2738),
-		(14,0.2,0.2686),
-		(15,0.2,0.2640),
-		(16,0.2,0.2600),
-		(17,0.2,0.2565),
-		(18,0.2,0.2533),
-		(19,0.2,0.2505),
-		(20,0.2,0.2480),
-		(21,0.2,0.2457),
-		(22,0.2,0.2436),
-		(23,0.2,0.2417),
-		(24,0.2,0.2400),
-		(25,0.2,0.2384),
-		(26,0.2,0.2369),
-		(27,0.2,0.2356),
-		(28,0.2,0.2343),
-		(29,0.2,0.2331),
-		(30,0.2,0.2320),
-		(31,0.2,0.2310),
-		(32,0.2,0.2300),
-		(33,0.2,0.2291),
-		(34,0.2,0.2282),
-		(35,0.2,0.2274),
-		(36,0.2,0.2267),
-		(37,0.2,0.2259),
-		(38,0.2,0.2253),
-		(39,0.2,0.2246),
-		(40,0.2,0.2240),
-		(41,0.2,0.2234),
-		(42,0.2,0.2229),
-		(43,0.2,0.2223),
-		(44,0.2,0.2218),
-		(45,0.2,0.2213),
-		(46,0.2,0.2209),
-		(47,0.2,0.2204),
-		(48,0.2,0.2200),
-		(49,0.2,0.2196),
-		(50,0.2,0.2192),
-		(51,0.2,0.2188),
-		(52,0.2,0.2185),
-		(53,0.2,0.2181),
-		(54,0.2,0.2178),
-		(55,0.2,0.2175),
-		(56,0.2,0.2171),
-		(57,0.2,0.2168),
-		(58,0.2,0.2166),
-		(59,0.2,0.2163),
-		(60,0.2,0.2160)) as t(months,factor,cumm_avg)
-;
-
 create or replace view unit_economics.vw_supply_ops_inside_sales_costs as
 with cdre_inside_sales as (
     select
@@ -355,7 +287,7 @@ with google_monthly_affiliate_costs as (
 	select
 		date_part('month', "day"::date) as "month",
 		date_part('year', "day"::date) as "year",
-		sum((cost::DECIMAL(14,2)/1000000)::DECIMAL(14,2)) as cost
+		sum((cost::decimal(14,2)/1000000)::decimal(14,2)) as cost
 	from
 		google_ads_campaigns
 	where
@@ -370,7 +302,7 @@ facebook_monthly_affiliate_costs as
 	select
         date_part('month', "date"::date) as "month",
         date_part('year', "date"::date) as "year",
-        sum(spend::DECIMAL(14,2)) as cost
+        sum(spend::decimal(14,2)) as cost
     from
         facebook_ads_campaigns
     where
@@ -448,7 +380,7 @@ create or replace view unit_economics.vw_supply_mkt_owner_campaigns_costs as
 with google_monthly_owner_costs as (
 	select
 		"day"::date as dt_cost,
-		sum((cost::DECIMAL(14,4)/1000000)::DECIMAL(14,2)) as cost
+		sum((cost::decimal(14,4)/1000000)::decimal(14,2)) as cost
 	from
 		google_ads_campaigns
 	where
@@ -464,7 +396,7 @@ facebook_monthly_owner_costs as
 (
 	select
         "date"::date as dt_cost,
-        sum(spend::DECIMAL(14,4)) as cost
+        sum(spend::decimal(14,4)) as cost
     from
         facebook_ads_campaigns
     where
@@ -1538,7 +1470,7 @@ with cdre_ongoing as (
     select
       dre_value,
       dre_date,
-      0 as flg_expected_bo_ongoing_costs
+      0 as flg_expected_bo_ongoing
     from unit_economics.vw_base_dre_costs
     where dre_category = 'Back-Office (ongoing)'
 ),
@@ -1557,7 +1489,7 @@ series as (
 		null::double precision as dre_value,
 		generate_series((max(dre.dre_date) + interval '1 month')::date,
 		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date,
-		1 as flg_expected_bo_ongoing_costs
+		1 as flg_expected_bo_ongoing
 	from cdre_ongoing dre
 
 	union
@@ -1565,14 +1497,14 @@ series as (
 	select
 	    dre_value,
 	    dre_date,
-	    flg_expected_bo_ongoing_costs
+	    flg_expected_bo_ongoing
 	from cdre_ongoing
 ),
 cdre_ongoing_fc as (
     select
         gap_fill(dre_value) over (order by dre_date) as dre_value,
         dre_date,
-        coalesce(flg_expected_bo_ongoing_costs, 1) as flg_expected_bo_ongoing_costs
+        coalesce(flg_expected_bo_ongoing, 1) as flg_expected_bo_ongoing
     from series
 ),
 costs as (
@@ -1582,7 +1514,7 @@ costs as (
       fc.end_date,
       co.dre_date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing,
-      flg_expected_bo_ongoing_costs
+      flg_expected_bo_ongoing
     from filtered_contracts fc
     join cdre_ongoing_fc co
       on co.dre_date between date_trunc('month', fc.start_date)  + interval '1 month'
@@ -1593,7 +1525,7 @@ select
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_ongoing,
-  flg_expected_bo_ongoing_costs
+  flg_expected_bo_ongoing
 from costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1764,7 +1696,7 @@ full_costs as (
   full outer join contract_costs cc
     on tt.property_id = cc.property_id and tt.dt = cc.dt
         and tt.dt_cash_flow = cc.dt_cash_flow
-),
+)
 select
   vbpc.sk_property,
   fc.property_id,
@@ -2012,7 +1944,7 @@ from
 		0 as vl_cs_post_sale,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
-        flg_expected as flg_expected_bo_ongoing,
+        flg_expected_bo_ongoing as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
         0 as flg_expected_cs_post_sale
 	from
@@ -2030,7 +1962,7 @@ from
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
-        flg_expected as flg_expected_collection,
+        flg_expected_collection as flg_expected_collection,
         0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_collection_costs
@@ -2048,7 +1980,7 @@ from
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        flg_expected as flg_expected_cs_post_sale
+        flg_expected_cs_post_sale as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_cs_post_sale_costs
 ) tbl
@@ -2180,14 +2112,14 @@ create or replace view unit_economics.vw_liquidity_mkt_tenant_campaigns_costs as
 with criteo_daily_costs as (
 	select distinct
 		"dateTime"::date as dt_cost,
-		cost::DECIMAL as cost
+		cost::decimal as cost
 	from criteo_ads_campaigns
 ),
 -- Get Google Daily Costs
 google_daily_costs as (
 	select
 		"day"::date dt_cost,
-		sum((cost::DECIMAL/1000000)::DECIMAL) as cost
+		sum((cost::decimal/1000000)::decimal) as cost
 	from
 		google_ads_campaigns
 	where
@@ -2204,7 +2136,7 @@ google_daily_costs as (
 facebook_daily_costs as (
 	select
 	    "date"::date as dt_cost,
-	    sum(spend::DECIMAL) as cost
+	    sum(spend::decimal) as cost
 	from
 	    facebook_ads_campaigns
 	where
@@ -2216,7 +2148,7 @@ facebook_daily_costs as (
 rtbhouse_daily_costs as (
 	select
 		"Date"::date as dt_cost,
-		-sum(("Debit"::DECIMAL(14,2))::DECIMAL(14,2)) as cost
+		-sum(("Debit"::decimal(14,2))::decimal(14,2)) as cost
 	from
 		rtbhouse_ads_campaigns
 	where
@@ -2285,9 +2217,9 @@ select
 	pc.google,
 	pc.facebook,
 	pc.rtbhouse,
-	trim(REPLACE("Total",',',''))::decimal(14,4)
+	trim(replace("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date") as classifieds,
-	(pc.total + (trim(REPLACE("Total",',',''))::decimal(14,4)
+	(pc.total + (trim(replace("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date"))) as total
 from
 	files.classified_costs class

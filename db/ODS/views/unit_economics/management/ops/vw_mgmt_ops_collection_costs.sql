@@ -162,7 +162,7 @@ full_costs as (
   full outer join contract_costs cc
     on tt.property_id = cc.property_id and tt.dt = cc.dt
         and tt.dt_cash_flow = cc.dt_cash_flow
-),
+)
 select
   vbpc.sk_property,
   fc.property_id,
