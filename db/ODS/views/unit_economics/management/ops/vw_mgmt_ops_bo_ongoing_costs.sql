@@ -3,7 +3,8 @@ create or replace view unit_economics.vw_mgmt_ops_bo_ongoing_costs as
 with cdre_ongoing as (
     select
       dre_value,
-      dre_date
+      dre_date,
+      0 as flg_expected_bo_ongoing_costs
     from unit_economics.vw_base_dre_costs
     where dre_category = 'Back-Office (ongoing)'
 ),
@@ -17,15 +18,39 @@ filtered_contracts as (
       and (termination_date is not null
             or expected_end_date is not null)
 ),
+series as (
+	select
+		null::double precision as dre_value,
+		generate_series((max(dre.dre_date) + interval '1 month')::date,
+		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date,
+		1 as flg_expected_bo_ongoing_costs
+	from cdre_ongoing dre
+
+	union
+
+	select
+	    dre_value,
+	    dre_date,
+	    flg_expected_bo_ongoing_costs
+	from cdre_ongoing
+),
+cdre_ongoing_fc as (
+    select
+        gap_fill(dre_value) over (order by dre_date) as dre_value,
+        dre_date,
+        coalesce(flg_expected_bo_ongoing_costs, 1) as flg_expected_bo_ongoing_costs
+    from series
+),
 costs as (
     select
       fc.property_id,
       fc.start_date,
       fc.end_date,
       co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing
+      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing,
+      flg_expected_bo_ongoing_costs
     from filtered_contracts fc
-    join cdre_ongoing co
+    join cdre_ongoing_fc co
       on co.dre_date between date_trunc('month', fc.start_date)  + interval '1 month'
                         and date_trunc('month', fc.end_date) + interval '1 month'
 )
@@ -34,7 +59,7 @@ select
   c.property_id,
   c.dt_cash_flow,
   c.vl_bo_ongoing,
-  0 as flg_expected
+  flg_expected_bo_ongoing_costs
 from costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
