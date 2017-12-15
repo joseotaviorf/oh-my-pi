@@ -1356,8 +1356,8 @@ filtered_contracts as(
 	left join cdre_onboarding dre
 		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
                         and date_trunc('month', fc."to") + interval '1 month'
-    where fc."from" >= '2016-01-01'
-        and fc."to" >= '2016-01-01'
+    where fc."from" >= '2015-12-01'
+        and fc."to" >= '2015-12-01'
 )
 ,
 ratio as (
