@@ -39,8 +39,6 @@ filtered_contracts_prev as (
             or "dataFimContratoPrevisto" is not null)
     window w as (partition by imovel_id)
 ),
-<<<<<<< Updated upstream
-=======
 series as (
 	select
 		null::double precision as dre_value,
@@ -59,7 +57,6 @@ cdre_cs_post_sale_fc as (
         dre_date
     from series
 ),
->>>>>>> Stashed changes
 filtered_contracts as (
   select distinct
     fcp.property_id,
@@ -67,9 +64,10 @@ filtered_contracts as (
     (date_part('year',  cps.dre_date) - date_part('year', start_date)) * 12 +
               (date_part('month',  cps.dre_date) - date_part('month', start_date)) as months_after_init
   from filtered_contracts_prev fcp
-    join cdre_cs_post_sale cps
+  join cdre_cs_post_sale_fc cps
       on cps.dre_date between date_trunc('month', fcp.start_date) + interval '1 month'
                         and date_trunc('month', fcp.end_date) + interval '1 month'
+  where cps.dre_date >= '2016-01-01'
 ),
 ratio as (
   select distinct
@@ -84,20 +82,12 @@ gen_contracts as (
 	select distinct
 		fc.property_id,
 		fc.dt,
-<<<<<<< Updated upstream
-		r.qt as qt_gen
-	from
-  	filtered_contracts fc
-  left join ratio r
-  	on fc.dt = r.dt
-=======
 		r.qt as qt,
 		avg(r.qt) over () as _avg,
 		fc.months_after_init
 	from filtered_contracts fc
     left join ratio r
   	    on fc.dt = r.dt
->>>>>>> Stashed changes
 ),
 calculated as (
     select distinct
@@ -119,16 +109,6 @@ spec_gen_prev as (
     on cc.property_id = gc.property_id
         and gc.dt = cc.dt
 ),
-<<<<<<< Updated upstream
-espec_gen as (
-	select
-		property_id,
-		dt,
-		sum(qt) as qt
-	from espec_gen_prev
-	group by
-		property_id, dt
-=======
 spec_gen as (
 	select distinct
 		property_id,
@@ -144,26 +124,18 @@ spec_gen as (
 		    else 0
 		end as flg_expected_cs_post_sale
 	from spec_gen_prev
->>>>>>> Stashed changes
 ),
 tt_costs as (
     select distinct
       eg.property_id,
       eg.dt,
       cps.dre_date as dt_cash_flow,
-<<<<<<< Updated upstream
-      cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
-    from espec_gen eg
-    join cdre_cs_post_sale cps
-      on cps.dre_date = eg.dt + interval '1 month'
-=======
       cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale,
       flg_expected_cs_post_sale
     from spec_gen eg
     join cdre_cs_post_sale_fc cps
       on cps.dre_date = eg.dt + interval '1 month'
     where eg.qt > 0
->>>>>>> Stashed changes
 ),
 contract_costs as (
     select
@@ -174,27 +146,10 @@ contract_costs as (
     from filtered_contracts fc
     join cdre_cs_post_sale cps
       on cps.dre_date = fc.dt
+    where fc.dt = cps.dre_date
 ),
 full_costs as (
   select distinct
-<<<<<<< Updated upstream
-    property_id,
-    dt,
-    dt_cash_flow,
-    vl_cs_post_sale
-  from tt_costs
-  where dt = dt_cash_flow
-
-  union
-
-  select distinct
-    property_id,
-    dt,
-    dt_cash_flow,
-    vl_cs_post_sale
-  from contract_costs
-  where dt = dt_cash_flow
-=======
     coalesce(tt.property_id, cc.property_id) as property_id,
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
@@ -204,14 +159,13 @@ full_costs as (
   full outer join contract_costs cc
     on tt.property_id = cc.property_id and tt.dt = cc.dt
         and tt.dt_cash_flow = cc.dt_cash_flow
->>>>>>> Stashed changes
 )
 select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
   fc.dt_cash_flow,
   fc.vl_cs_post_sale,
-  0 as flg_expected
+  fc.flg_expected_cs_post_sale
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
