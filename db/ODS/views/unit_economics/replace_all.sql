@@ -1856,7 +1856,7 @@ contract_costs as (
     from filtered_contracts fc
     join cdre_cs_post_sale cps
       on cps.dre_date = fc.dt
-    where fc.dt = cps.dre_date
+    where fc.dt + interval '1 month' = cps.dre_date
 ),
 full_costs as (
   select distinct
