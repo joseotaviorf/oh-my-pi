@@ -1512,7 +1512,7 @@ costs as (
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      co.dre_date as dt_cash_flow,
+      co.dre_date::date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing,
       flg_expected_bo_ongoing
     from filtered_contracts fc
@@ -1700,7 +1700,7 @@ full_costs as (
 select
   vbpc.sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_collection,
   flg_expected_collection
 from full_costs fc
@@ -1873,7 +1873,7 @@ full_costs as (
 select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_cs_post_sale,
   fc.flg_expected_cs_post_sale
 from full_costs fc

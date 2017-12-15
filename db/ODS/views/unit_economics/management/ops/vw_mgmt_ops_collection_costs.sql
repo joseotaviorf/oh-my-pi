@@ -166,7 +166,7 @@ full_costs as (
 select
   vbpc.sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_collection,
   flg_expected_collection
 from full_costs fc

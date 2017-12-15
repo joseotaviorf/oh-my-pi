@@ -163,7 +163,7 @@ full_costs as (
 select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_cs_post_sale,
   fc.flg_expected_cs_post_sale
 from full_costs fc

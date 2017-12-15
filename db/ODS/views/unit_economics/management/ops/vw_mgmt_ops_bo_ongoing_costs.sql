@@ -46,7 +46,7 @@ costs as (
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      co.dre_date as dt_cash_flow,
+      co.dre_date::date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing,
       flg_expected_bo_ongoing
     from filtered_contracts fc
