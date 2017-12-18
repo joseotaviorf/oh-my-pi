@@ -4,7 +4,7 @@ with pis_cofins as (
     select
         sk_property,
         property_id,
-        0.0925 * brokerage_plus_mgmt as vl_st_pis_cofins,
+        0.0701 * brokerage_plus_mgmt as vl_st_pis_cofins,
         dt_cash_flow + interval '1 month' as dt_cash_flow
     from unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux
 )
