@@ -60,7 +60,8 @@ select
 	sk_property,
 	property_id,
 	vl_brokerage_fee,
-	dt_cash_flow
+	dt_cash_flow,
+	0 as flg_expected_brokerage_fee
 from
 	brokerage_fill
 where vl_brokerage_fee != 0

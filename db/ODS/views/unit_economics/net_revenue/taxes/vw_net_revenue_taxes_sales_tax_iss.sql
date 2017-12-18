@@ -12,6 +12,7 @@ select
   sk_property,
   property_id,
   vl_st_iss,
-  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow,
+  0 as flg_expected_sales_tax_iss
 from iss
 ;

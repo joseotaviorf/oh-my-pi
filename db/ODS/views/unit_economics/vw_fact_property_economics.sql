@@ -32,7 +32,6 @@ with unit_economics as (
         0 as vl_termination_fine,
         sum(vl_brokerage_fee) as vl_brokerage_fee,
         sum(vl_management_fee) as vl_management_fee,
-        sum(flg_expected_management_fee) as flg_expected_management_fee,
         sum(vl_cs_post_sale) as vl_cs_post_sale,
         sum(vl_collection) as vl_collection,
         sum(vl_bo_onboarding) as vl_bo_onboarding,
@@ -44,7 +43,14 @@ with unit_economics as (
         sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
         sum(flg_expected_collection) as flg_expected_collection,
         sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
-        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee,
+        sum(flg_expected_management_fee) as flg_expected_management_fee,
+        sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+        sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+        sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+        sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+        sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+        sum(flg_expected_delay_fine) as flg_expected_delay_fine
     from
     (
         select
@@ -71,7 +77,6 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -83,7 +88,14 @@ with unit_economics as (
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            0 as flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_liquidity_costs
         union all
@@ -111,7 +123,6 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -123,7 +134,14 @@ with unit_economics as (
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            0 as flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_supply_costs
         union all
@@ -151,7 +169,6 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             vl_cs_post_sale as vl_cs_post_sale,
             vl_collection as vl_collection,
             vl_bo_onboarding as vl_bo_onboarding,
@@ -163,7 +180,14 @@ with unit_economics as (
             flg_expected_bo_ongoing as flg_expected_bo_ongoing,
             flg_expected_collection as flg_expected_collection,
             flg_expected_cs_post_sale as flg_expected_cs_post_sale,
-            flg_expected_insurance_fee as flg_expected_insurance_fee
+            flg_expected_insurance_fee as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            0 as flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_mgmt_costs
         union all
@@ -191,7 +215,6 @@ with unit_economics as (
             0 as vl_termination_fine,
             vl_brokerage_fee as vl_brokerage_fee,
             vl_management_fee as vl_management_fee,
-            flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -203,7 +226,14 @@ with unit_economics as (
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_insurance_fee,
+            flg_expected_management_fee as flg_expected_management_fee,
+            flg_expected_brokerage_fee as flg_expected_brokerage_fee,
+            flg_expected_affiliate_commission as flg_expected_affiliate_commission,
+            flg_expected_agent_commission as flg_expected_agent_commission,
+            flg_expected_sales_tax_iss as flg_expected_sales_tax_iss,
+            flg_expected_sales_tax_pis_cofins as flg_expected_sales_tax_pis_cofins,
+            flg_expected_delay_fine as flg_expected_delay_fine
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -249,7 +279,6 @@ final_version as (
     ue.vl_termination_fine,
     ue.vl_brokerage_fee,
     ue.vl_management_fee,
-    ue.flg_expected_management_fee,
     ue.vl_cs_post_sale,
     ue.vl_collection,
     ue.vl_bo_onboarding,
@@ -261,7 +290,14 @@ final_version as (
     ue.flg_expected_bo_ongoing,
     ue.flg_expected_collection,
     ue.flg_expected_cs_post_sale,
-    ue.flg_expected_insurance_fee
+    ue.flg_expected_insurance_fee,
+    ue.flg_expected_management_fee,
+    ue.flg_expected_brokerage_fee,
+    ue.flg_expected_affiliate_commission,
+    ue.flg_expected_agent_commission,
+    ue.flg_expected_sales_tax_iss,
+    ue.flg_expected_sales_tax_pis_cofins,
+    ue.flg_expected_delay_fine
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id
