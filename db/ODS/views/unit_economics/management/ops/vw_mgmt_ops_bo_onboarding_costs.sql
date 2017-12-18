@@ -53,8 +53,7 @@ filtered_contracts as(
                         and date_trunc('month', fc."to") + interval '1 month'
     where fc."from" >= '2015-12-01'
         and fc."to" >= '2015-12-01'
-)
-,
+),
 ratio as (
   select distinct
     fc.dt,
@@ -126,7 +125,7 @@ full_costs as (
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
 ),
-r0 as (
+result as (
     select
       coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
       c.property_id,
@@ -139,23 +138,37 @@ r0 as (
         and c.dt >= vbpc.min_version_time
         and c.dt <= vbpc.max_version_time
 ),
+m_avg_prev as (
+    select distinct
+        dt_cash_flow,
+        avg(vl_bo_onboarding) over (partition by dt_cash_flow order by dt_cash_flow) as _avg1
+    from result
+    order by dt_cash_flow asc
+),
+m_avg_3_months as (
+    select
+        dt_cash_flow,
+        _avg1,
+        avg(_avg1) over (rows between 3 preceding and 1 preceding) as m_avg
+    from m_avg_prev
+),
 m_avg as (
 	select distinct
-		t1.sk_property,
-		t1.property_id,
-		t1.dt_cash_flow,
-		t1.vl_bo_onboarding,
-		t1.flg_expected_bo_onboarding,
-		avg(t2.vl_bo_onboarding) over (partition by t1.sk_property, t1.dt_cash_flow, t1.vl_bo_onboarding, t1.flg_expected_bo_onboarding) as m_avg
-	from r0 t1
-	join r0 t2
-		on t2.dt_cash_flow between t1.dt_cash_flow - interval '3 month' and t1.dt_cash_flow
+		r.sk_property,
+		r.property_id,
+		r.dt_cash_flow,
+		r.vl_bo_onboarding,
+		r.flg_expected_bo_onboarding,
+		coalesce(m.m_avg, 0) as _avg
+	from result r
+	left join m_avg_3_months m
+		on m.dt_cash_flow = r.dt_cash_flow
 )
 select
 	sk_property,
 	property_id,
 	dt_cash_flow,
-	coalesce(vl_bo_onboarding, max(m_avg) filter (where flg_expected_bo_onboarding = 0) over ()) as vl_bo_onboarding,
+	coalesce(vl_bo_onboarding, max(_avg) over ()) as vl_bo_onboarding,
 	flg_expected_bo_onboarding
 from m_avg
 ;
