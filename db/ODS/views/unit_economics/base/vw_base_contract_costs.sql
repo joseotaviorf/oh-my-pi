@@ -7,12 +7,16 @@ select
   "valorAluguel" as rent_value,
   ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
-  "dataFimContratoPrevisto" as expected_end_date,
+  "dataInicio" + interval '60 months' as expected_end_date,
+  "dataFimContratoPrevisto",
   "dataAssinado" as signature_date,
   "dataEntrada" as entrance_date,
   "dataInicio" as init_date,
   "criadoEm" as created_date
 from contract
-  where tipo = 'FullService'
+where tipo = 'FullService'
     and status in ('Finalizado', 'Ativo')
+    and date_trunc('month', "dataAssinado") >= '2016-01-01'
+    and date_trunc('month', "dataEntrada") >= '2016-01-01'
+    and date_trunc('month', "dataInicio") >= '2016-01-01'
 ;

@@ -61,14 +61,17 @@ select
   "valorAluguel" as rent_value,
   ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
-  "dataFimContratoPrevisto" as expected_end_date,
+  "dataInicio" + interval '60 months' as expected_end_date,
   "dataAssinado" as signature_date,
   "dataEntrada" as entrance_date,
   "dataInicio" as init_date,
   "criadoEm" as created_date
 from contract
-  where tipo = 'FullService'
+where tipo = 'FullService'
     and status in ('Finalizado', 'Ativo')
+    and date_trunc('month', "dataAssinado") >= '2016-01-01'
+    and date_trunc('month', "dataEntrada") >= '2016-01-01'
+    and date_trunc('month', "dataInicio") >= '2016-01-01'
 ;
 
 create or replace view unit_economics.vw_base_dre_costs as
@@ -1792,8 +1795,6 @@ filtered_contracts as (
       on cps.dre_date between date_trunc('month', fcp.start_date) + interval '1 month'
                         and date_trunc('month', fcp.end_date) + interval '1 month'
   where cps.dre_date >= '2016-01-01'
-    and date_trunc('month', fcp.start_date) >= '2016-01-01'
-    and date_trunc('month', fcp.end_date) >= '2016-01-01'
 ),
 ratio as (
   select distinct

@@ -68,8 +68,6 @@ filtered_contracts as (
       on cps.dre_date between date_trunc('month', fcp.start_date) + interval '1 month'
                         and date_trunc('month', fcp.end_date) + interval '1 month'
   where cps.dre_date >= '2016-01-01'
-    and date_trunc('month', fcp.start_date) >= '2016-01-01'
-    and date_trunc('month', fcp.end_date) >= '2016-01-01'
 ),
 ratio as (
   select distinct
