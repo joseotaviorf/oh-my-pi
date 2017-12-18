@@ -61,14 +61,17 @@ select
   "valorAluguel" as rent_value,
   ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
-  "dataFimContratoPrevisto" as expected_end_date,
+  "dataInicio" + interval '60 months' as expected_end_date,
   "dataAssinado" as signature_date,
   "dataEntrada" as entrance_date,
   "dataInicio" as init_date,
   "criadoEm" as created_date
 from contract
-  where tipo = 'FullService'
+where tipo = 'FullService'
     and status in ('Finalizado', 'Ativo')
+    and date_trunc('month', "dataAssinado") >= '2016-01-01'
+    and date_trunc('month', "dataEntrada") >= '2016-01-01'
+    and date_trunc('month', "dataInicio") >= '2016-01-01'
 ;
 
 create or replace view unit_economics.vw_base_dre_costs as
@@ -1918,7 +1921,8 @@ spec_gen_prev as (
     coalesce(cc.property_id, gc.property_id) as property_id,
     coalesce(cc.dt, gc.dt) as dt,
     coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
-    coalesce(gc._avg, 0) + (gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt) * (0.93 ^ gc.months_after_init)) as _avg,
+    coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)
+                                        * (0.93 ^ gc.months_after_init)), 0) as _avg,
     gc.months_after_init
   from calculated cc
   full outer join gen_contracts gc

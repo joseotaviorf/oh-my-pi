@@ -102,7 +102,8 @@ spec_gen_prev as (
     coalesce(cc.property_id, gc.property_id) as property_id,
     coalesce(cc.dt, gc.dt) as dt,
     coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
-    coalesce(gc._avg, 0) + (gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt) * (0.93 ^ gc.months_after_init)) as _avg,
+    coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)
+                                        * (0.93 ^ gc.months_after_init)), 0) as _avg,
     gc.months_after_init
   from calculated cc
   full outer join gen_contracts gc
