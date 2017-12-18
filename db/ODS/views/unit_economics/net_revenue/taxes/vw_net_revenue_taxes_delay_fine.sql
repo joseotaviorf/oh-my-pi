@@ -59,7 +59,7 @@ select
     vbpc.sk_property,
   f.property_id,
 	coalesce(fine, gap_fill(av) over (partition by id order by dt)) as vl_delay_fine,
-  f.dt as dt_cash_flow,
+  f.dt::date as dt_cash_flow,
   f.flg_expected::integer as flg_expected_delay_fine
 from fines f
 join unit_economics.vw_base_property_costs vbpc
