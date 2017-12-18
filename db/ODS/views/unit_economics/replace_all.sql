@@ -29,6 +29,8 @@ drop view if exists unit_economics.vw_mgmt_ops_collection_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_cs_post_sale_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_costs cascade;
 drop view if exists unit_economics.vw_mgmt_insurance_fee cascade;
+drop view if exists unit_economics.vw_mgmt_insurance_pis_cofins;
+drop view if exists unit_economics.vw_mgmt_insurance;
 drop view if exists unit_economics.vw_mgmt_costs cascade;
 drop view if exists unit_economics.vw_liquidity_mkt_tenant_campaigns_costs cascade;
 drop view if exists unit_economics.vw_liquidity_ops_bo_pre_sale_costs cascade;
@@ -61,7 +63,7 @@ select
   "valorAluguel" as rent_value,
   ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
-  "dataInicio" + interval '60 months' as expected_end_date,
+  "dataFimContratoPrevisto" as expected_end_date,
   "dataAssinado" as signature_date,
   "dataEntrada" as entrance_date,
   "dataInicio" as init_date,
@@ -2097,6 +2099,35 @@ from
 group by sk_property, property_id, dt_cash_flow
 ;
 
+create or replace view unit_economics.vw_mgmt_insurance_pis_cofins as
+select
+	sk_property,
+	property_id,
+	contract_id,
+	-(vl_insurance_fee * 0.0925) as vl_st_pis_cofins,
+	date_trunc('month', dt_cash_flow) + interval '19 day' as dt_cash_flow,
+	flg_expected
+from
+	unit_economics.vw_mgmt_insurance_fee
+;
+
+create or replace view unit_economics.vw_mgmt_insurance as
+select
+	coalesce(i_fee.sk_property, i_pis.sk_property) as sk_property,
+	coalesce(i_fee.property_id, i_pis.property_id) as property_id,
+	coalesce(i_fee.dt_cash_flow, i_pis.dt_cash_flow) as dt_cash_flow,
+	coalesce(i_fee.vl_insurance_fee, 0) as vl_insurance_fee,
+	coalesce(i_pis.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
+	coalesce(i_fee.flg_expected, 0) as flg_expected_insurance_fee,
+	coalesce(i_pis.flg_expected, 0) as flg_expected_sales_tax_pis_cofins
+from
+	unit_economics.vw_mgmt_insurance_fee i_fee
+full outer join
+	unit_economics.vw_mgmt_insurance_pis_cofins i_pis
+	on i_fee.sk_property = i_pis.sk_property
+	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
+;
+
 create or replace view unit_economics.vw_mgmt_costs as
 select
   coalesce(ops.sk_property, ins.sk_property) as sk_property,
@@ -2108,16 +2139,18 @@ select
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
   coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
+  coalesce(ins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
   coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
   coalesce(ops.flg_expected_bo_onboarding, 0) as flg_expected_bo_onboarding,
   coalesce(ops.flg_expected_bo_ongoing, 0) as flg_expected_bo_ongoing,
   coalesce(ops.flg_expected_collection, 0) as flg_expected_collection,
   coalesce(ops.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale,
-  coalesce(ins.flg_expected, 0) as flg_expected_insurance_fee
+  coalesce(ins.flg_expected_insurance_fee, 0) as flg_expected_insurance_fee,
+  coalesce(ins.flg_expected_sales_tax_pis_cofins, 0) as flg_expected_sales_tax_pis_cofins
 from
 	unit_economics.vw_mgmt_ops_costs ops
 full outer join
-	unit_economics.vw_mgmt_insurance_fee ins
+	unit_economics.vw_mgmt_insurance ins
 	on ins.sk_property = ops.sk_property
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;
@@ -2953,7 +2986,7 @@ with unit_economics as (
             0 as vl_field_ops,
             0 as vl_bo_pre_sale,
             0 as vl_agent_hours,
-            0 as vl_st_pis_cofins,
+            vl_st_pis_cofins,
             0 as vl_st_iss,
             0 as vl_affiliate_commission,
             0 as vl_agent_commission,
@@ -2978,7 +3011,7 @@ with unit_economics as (
             0 as flg_expected_affiliate_commission,
             0 as flg_expected_agent_commission,
             0 as flg_expected_sales_tax_iss,
-            0 as flg_expected_sales_tax_pis_cofins,
+            flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
             unit_economics.vw_mgmt_costs
