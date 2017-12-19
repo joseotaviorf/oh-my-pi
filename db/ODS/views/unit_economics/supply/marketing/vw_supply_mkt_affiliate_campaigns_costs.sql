@@ -55,7 +55,9 @@ affiliate_mkt_costs as
 ),
 affiliate_filtered_base as (
 	select
-		base.*
+		base.*,
+		u.id as affiliate_id,
+		u.criado_em as affiliate_dt
 	from
 		unit_economics.vw_base_property_costs base
 	left join
@@ -64,6 +66,9 @@ affiliate_filtered_base as (
 	left join
 		lead l
 		on pl.lead_id = l.id
+	left join
+		usuario u
+		on u.id = l.usuario_que_indicou_id::int
 	where
 		pl.lead_id is not null
 		and l.usuario_que_indicou_id is not null
@@ -74,22 +79,21 @@ divided_costs as (
 	select
 		sk_property,
 		property_id,
-		date_trunc('month', publication_date + interval '2 month')::date as dt_cash_flow,
+		date_trunc('month', affiliate_dt + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
-			date_part('year', publication_date),
-			date_part('month', publication_date)
+			date_part('year', affiliate_dt),
+			date_part('month', affiliate_dt)
 		))::decimal(14,4) as vl_affiliate_campaigns
 	from
 		affiliate_filtered_base base
 	left join
 		affiliate_mkt_costs mkt
-		on date_part('year', publication_date) = mkt.year
-		and date_part('month', publication_date) = mkt.month
+		on date_part('year', affiliate_dt) = mkt.year
+		and date_part('month', affiliate_dt) = mkt.month
 	-- filter by first version only, as is a supply cost
 	where base.version = 1
 )
--- Remove rows where costs equal zero
 select
 	*
 from
