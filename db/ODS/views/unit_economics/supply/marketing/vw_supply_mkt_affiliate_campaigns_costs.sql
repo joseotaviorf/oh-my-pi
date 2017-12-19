@@ -56,7 +56,6 @@ affiliate_mkt_costs as
 affiliate_filtered_base as (
 	select
 		base.*,
-		u.id as affiliate_id,
 		u.criado_em as affiliate_dt
 	from
 		unit_economics.vw_base_property_costs base
