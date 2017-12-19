@@ -1,5 +1,5 @@
---drop view if exists unit_economics.vw_mgmt_ops_bo_ongoing_costs;
---create or replace view unit_economics.vw_mgmt_ops_bo_ongoing_costs as
+drop view if exists unit_economics.vw_mgmt_ops_bo_ongoing_costs;
+create or replace view unit_economics.vw_mgmt_ops_bo_ongoing_costs as
 with cdre_ongoing as (
     select
       dre_value,
@@ -16,8 +16,6 @@ filtered_contracts_prev as (
     where init_date is not null
       and (termination_date is not null
             or expected_end_date is not null)
-
-       and property_id = 892768268
 ),
 filtered_contract as (
     select distinct
