@@ -1,5 +1,5 @@
 drop view if exists vw_dim_proposal;
-create view vw_dim_proposal
+create or replace view vw_dim_proposal
 as
 SELECT
   id as sk_proposal,
@@ -22,7 +22,8 @@ SELECT
   "qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
   "criadoEm" as dt_created,
   "atualizadoEm" as dt_updated,
-  now()::timestamp as dt_timestamp
+  now()::timestamp as dt_timestamp,
+  "primeiroEnvioDocInq" as dt_tenant_first_document_sent
 FROM
   public.proposal ;
 
