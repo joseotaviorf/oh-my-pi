@@ -8,6 +8,7 @@ select
   p.dataProposta,
   p.garantia,
   p.motivacao,
+  p.propostaAluguel,
   p.status,
   p.dataAprovacao,
   p.inquilinoEnviouDocumentos,
