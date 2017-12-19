@@ -81,7 +81,8 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from espec_gen eg
     join cdre_offboarding co
       on co.dre_date = eg.dt + interval '1 month'
@@ -92,7 +93,8 @@ contract_costs as (
       fc.property_id,
       fc.dt,
       coalesce(co.dre_date, fc.dt) as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from filtered_contracts fc
     left join cdre_offboarding co
       on co.dre_date = fc.dt + interval '1 month'
@@ -103,7 +105,7 @@ full_costs as (
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
     coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding,
-  	0 as flg_expected
+  	coalesce(tt.flg_expected, cc.flg_expected) as flg_expected
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow

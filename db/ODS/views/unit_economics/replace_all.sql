@@ -27,6 +27,7 @@ drop view if exists unit_economics.vw_mgmt_ops_bo_onboarding_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_bo_ongoing_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_collection_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_cs_post_sale_costs cascade;
+drop view if exists unit_economics.vw_mgmt_ops_inspection_costs;
 drop view if exists unit_economics.vw_mgmt_ops_costs cascade;
 drop view if exists unit_economics.vw_mgmt_insurance_fee cascade;
 drop view if exists unit_economics.vw_mgmt_insurance_pis_cofins;
@@ -1349,7 +1350,8 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from espec_gen eg
     join cdre_offboarding co
       on co.dre_date = eg.dt + interval '1 month'
@@ -1360,7 +1362,8 @@ contract_costs as (
       fc.property_id,
       fc.dt,
       coalesce(co.dre_date, fc.dt) as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from filtered_contracts fc
     left join cdre_offboarding co
       on co.dre_date = fc.dt + interval '1 month'
@@ -1371,7 +1374,7 @@ full_costs as (
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
     coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding,
-  	0 as flg_expected
+  	coalesce(tt.flg_expected, cc.flg_expected) as flg_expected
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
@@ -2036,6 +2039,95 @@ left join unit_economics.vw_base_property_costs vbpc
     and fc.dt - interval '1 month' between vbpc.min_version_time and vbpc.max_version_time
 ;
 
+create or replace view unit_economics.vw_mgmt_ops_inspection_costs as
+with cdre_inspections as (
+    select
+      dre_value,
+      dre_date
+    from unit_economics.vw_base_dre_costs
+    where dre_category = 'Inspections'
+),
+init_contract_costs as (
+    select distinct
+      property_id,
+      id,
+      date_trunc('month', signature_date)::date as dt
+    from unit_economics.vw_base_contract_costs
+    where signature_date is not null
+),
+end_contract_costs as (
+   select distinct
+      property_id,
+      id,
+      date_trunc('month', coalesce(termination_date, expected_end_date))::date as dt
+    from unit_economics.vw_base_contract_costs
+    where termination_date is not null
+          or expected_end_date is not null
+),
+filtered_contracts as (
+	select
+		property_id,
+    id,
+		dt
+	from
+		init_contract_costs
+	union
+	select
+		property_id,
+    id,
+		dt
+	from
+		end_contract_costs
+),
+contract_costs as (
+	select
+	  fc.property_id,
+	  fc.dt,
+	  coalesce(ci.dre_date, fc.dt) as dt_cash_flow,
+	  ci.dre_value / (count(fc.property_id) over (partition by ci.dre_date))::double precision as vl_inspections,
+	  (dre_value is null)::int as flg_expected_inspection
+	from filtered_contracts fc
+	left join cdre_inspections ci
+	  on ci.dre_date = fc.dt + interval '1 month'
+),
+last_3_avg as (
+	select
+		t1.dt,
+		t1.property_id,
+		t1.dt_cash_flow,
+		t1.vl_inspections,
+		t1.flg_expected_inspection,
+		avg(t2.vl_inspections) as m_avg
+	from contract_costs t1
+	join
+		contract_costs t2
+		on t2.dt_cash_flow >= t1.dt_cash_flow - interval '3 month' and t2.dt_cash_flow <= t1.dt_cash_flow
+	group by t1.dt, t1.property_id, t1.dt_cash_flow, t1.vl_inspections, t1.flg_expected_inspection
+),
+coalesced_values as (
+	select
+		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		lavg.property_id,
+		lavg.dt_cash_flow::date,
+		case
+			when dt_cash_flow >= '2017-01-01'
+			then coalesce(vl_inspections,max(m_avg) filter (where flg_expected_inspection = 0) over ())
+			else coalesce(vl_inspections, 0)
+		end as vl_inspections,
+		flg_expected_inspection
+	from last_3_avg lavg
+	left join unit_economics.vw_base_property_costs vbpc
+	  on vbpc.property_id = lavg.property_id
+	    and lavg.dt between vbpc.min_version_time and vbpc.max_version_time
+)
+select
+	*
+from
+	coalesced_values
+where
+	vl_inspections != 0
+;
+
 create or replace view unit_economics.vw_mgmt_ops_costs as
 select
 	sk_property,
@@ -2046,11 +2138,13 @@ select
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_collection) as vl_collection,
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
+	sum(vl_inspections)  as vl_inspections,
 	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
     sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
     sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
     sum(flg_expected_collection) as flg_expected_collection,
-    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale
+    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+    sum(flg_expected_inspection)  as flg_expected_inspection
 from
 (
 	select
@@ -2062,11 +2156,13 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		flg_expected as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_bo_offboarding_costs
 	union all
@@ -2079,13 +2175,15 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         flg_expected_bo_onboarding as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
-		unit_economics.mgmt_ops_bo_onboarding_costs
+		unit_economics.vw_mgmt_ops_bo_onboarding_costs
 	union all
 	select
 		sk_property,
@@ -2096,11 +2194,13 @@ from
 		vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         flg_expected_bo_ongoing as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_bo_ongoing_costs
 	union all
@@ -2113,11 +2213,13 @@ from
 		0 as vl_bo_ongoing,
 		vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         flg_expected_collection as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_collection_costs
 	union all
@@ -2130,13 +2232,34 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        flg_expected_cs_post_sale as flg_expected_cs_post_sale
+        flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_cs_post_sale_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_collection,
+		0 as vl_cs_post_sale,
+		vl_inspections,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale,
+        flg_expected_inspection as flg_expected_inspection
+	from
+		unit_economics.vw_mgmt_ops_inspection_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -2180,6 +2303,7 @@ select
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
+  coalesce(ops.vl_inspections, 0) as vl_inspections,
   coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
   coalesce(ins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
   coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
@@ -2187,6 +2311,7 @@ select
   coalesce(ops.flg_expected_bo_ongoing, 0) as flg_expected_bo_ongoing,
   coalesce(ops.flg_expected_collection, 0) as flg_expected_collection,
   coalesce(ops.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale,
+  coalesce(ops.flg_expected_inspection, 0) as flg_expected_inspection,
   coalesce(ins.flg_expected_insurance_fee, 0) as flg_expected_insurance_fee,
   coalesce(ins.flg_expected_sales_tax_pis_cofins, 0) as flg_expected_sales_tax_pis_cofins
 from
@@ -2904,12 +3029,14 @@ with unit_economics as (
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
+        sum(vl_inspections) as vl_inspections,
         -sum(vl_insurance_fee) as vl_insurance_fee,
         sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
         sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
         sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
         sum(flg_expected_collection) as flg_expected_collection,
         sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+        sum(flg_expected_inspection) as flg_expected_inspection,
         sum(flg_expected_insurance_fee) as flg_expected_insurance_fee,
         sum(flg_expected_management_fee) as flg_expected_management_fee,
         sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
@@ -2949,12 +3076,14 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
+            0 as flg_expected_inspection,
             0 as flg_expected_insurance_fee,
             0 as flg_expected_management_fee,
             0 as flg_expected_brokerage_fee,
@@ -2995,12 +3124,14 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
+            0 as flg_expected_inspection,
             0 as flg_expected_insurance_fee,
             0 as flg_expected_management_fee,
             0 as flg_expected_brokerage_fee,
@@ -3041,12 +3172,14 @@ with unit_economics as (
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
+            vl_inspections as vl_inspections,
             vl_insurance_fee as vl_insurance_fee,
             flg_expected_bo_offboarding as flg_expected_bo_offboarding,
             flg_expected_bo_onboarding as flg_expected_bo_onboarding,
             flg_expected_bo_ongoing as flg_expected_bo_ongoing,
             flg_expected_collection as flg_expected_collection,
             flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+            flg_expected_inspection as flg_expected_inspection,
             flg_expected_insurance_fee as flg_expected_insurance_fee,
             0 as flg_expected_management_fee,
             0 as flg_expected_brokerage_fee,
@@ -3087,12 +3220,14 @@ with unit_economics as (
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
+            0 as flg_expected_inspection,
             0 as flg_expected_insurance_fee,
             flg_expected_management_fee as flg_expected_management_fee,
             flg_expected_brokerage_fee as flg_expected_brokerage_fee,
@@ -3163,6 +3298,8 @@ final_version as (
     ue.flg_expected_bo_ongoing,
     ue.vl_bo_offboarding,
     ue.flg_expected_bo_offboarding,
+    ue.vl_inspections,
+    ue.flg_expected_inspection,
     ue.vl_insurance_fee,
     ue.flg_expected_insurance_fee
   from unit_economics ue
