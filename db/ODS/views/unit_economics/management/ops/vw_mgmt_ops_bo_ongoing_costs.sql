@@ -22,7 +22,7 @@ filtered_contract as (
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      date_trunc('month', dd."date") as dt_cash_flow
+      date_trunc('month', dd."date")::date as dt_cash_flow
     from dim_date dd
     join filtered_contracts_prev fc
         on date_trunc('month', dd."date") between date_trunc('month', fc.start_date)  + interval '1 month'
