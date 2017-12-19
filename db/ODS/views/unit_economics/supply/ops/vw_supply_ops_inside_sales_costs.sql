@@ -8,12 +8,18 @@ with cdre_inside_sales as (
     where dre_category = 'Inside Sales'
 ),
 filtered_properties as (
-   select distinct
-      sk_property,
-      property_id,
-      min_version_time::date as listing_date
-    from unit_economics.vw_base_property_costs
-    where version = 1
+	select distinct
+	    sk_property,
+	    property_id,
+	    min_version_time::date as listing_date
+	from
+		unit_economics.vw_base_property_costs base
+	left join
+		lead_conversion cl
+		on cl.imovel_id = base.property_id
+	where
+		cl.id is not null
+		and version = 1
 ),
 costs as (
     select
