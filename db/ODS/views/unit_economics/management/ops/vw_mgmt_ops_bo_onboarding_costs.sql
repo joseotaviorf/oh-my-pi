@@ -145,30 +145,32 @@ m_avg_prev as (
     from result
     order by dt_cash_flow asc
 ),
-m_avg_3_months as (
+last_value as (
     select
         dt_cash_flow,
-        _avg1,
-        avg(_avg1) over (rows between 3 preceding and 1 preceding) as m_avg
+        case
+            when _avg1 is null
+                and avg(_avg1) over (rows between 3 preceding and 1 preceding) is not null
+                and lag(_avg1) over () is not null
+                and lead(_avg1) over () is null
+              then avg(_avg1) over (rows between 3 preceding and 1 preceding)
+            else _avg1
+        end as m_avg
     from m_avg_prev
 ),
-m_avg as (
-	select distinct
-		r.sk_property,
-		r.property_id,
-		r.dt_cash_flow,
-		r.vl_bo_onboarding,
-		r.flg_expected_bo_onboarding,
-		coalesce(m.m_avg, 0) as _avg
-	from result r
-	left join m_avg_3_months m
-		on m.dt_cash_flow = r.dt_cash_flow
+last_value_gap_fill as (
+    select
+        dt_cash_flow,
+        coalesce(m_avg, gap_fill(m_avg) over ()) as new_value
+    from last_value
 )
 select
-	sk_property,
-	property_id,
-	dt_cash_flow,
-	coalesce(vl_bo_onboarding, max(_avg) over ()) as vl_bo_onboarding,
-	flg_expected_bo_onboarding
-from m_avg
+    r.sk_property,
+    r.property_id,
+    r.dt_cash_flow,
+    r.flg_expected_bo_onboarding,
+    lv.new_value as vl_bo_onboarding
+from result r
+join last_value_gap_fill lv
+    on r.dt_cash_flow = lv.dt_cash_flow
 ;

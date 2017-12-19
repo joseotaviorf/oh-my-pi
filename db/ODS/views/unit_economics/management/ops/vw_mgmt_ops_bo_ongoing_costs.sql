@@ -85,7 +85,6 @@ select
     r.sk_property,
     r.property_id,
     r.dt_cash_flow,
-    r.vl_bo_ongoing as old_vl_bo_ongoing,
     r.flg_expected_bo_ongoing,
     lv.new_value as vl_bo_ongoing
 from result r

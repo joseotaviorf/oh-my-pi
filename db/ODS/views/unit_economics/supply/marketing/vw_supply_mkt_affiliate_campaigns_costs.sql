@@ -79,7 +79,11 @@ divided_costs as (
 	select
 		sk_property,
 		property_id,
-		date_trunc('month', affiliate_dt + interval '2 month')::date as dt_cash_flow,
+		case
+            when affiliate_dt < publication_date
+            then publication_date::date
+            else date_trunc('month', affiliate_dt + interval '2 month')::date
+        end as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
 			date_part('year', affiliate_dt),
