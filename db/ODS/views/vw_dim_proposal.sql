@@ -8,7 +8,6 @@ SELECT
   garantia as guarantee,
   "propostaAluguel" as renting_proposal_value ,
   status,
-  "ticketID" as id_ticket,
   "dataAprovacao" as dt_proposal_approved,
   "inquilinoEnviouDocumentos" as tenant_document_sent,
   "dataDocumentosEnviados" as dt_tenant_document_sent,
