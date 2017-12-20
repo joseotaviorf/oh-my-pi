@@ -34,11 +34,11 @@ base_contract as (
 	left join
 		filtered_contracts c
 		on base.property_id = c.property_id
-		and c.end_date between base.min_version_time and base.max_version_time
+		and c.end_date between base.min_version_time and (base.max_version_time + interval '1 day')
 ),
 incurred as (
     select
-    		row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
+    	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
         bc.contract_id,
@@ -49,7 +49,7 @@ incurred as (
         greatest(
         	landlord_due_date,
         	due_date,
-        	landlord_paid_date --,
+        	landlord_paid_date
         	) as dt_cash_flow,
         bc.date_range
     from
