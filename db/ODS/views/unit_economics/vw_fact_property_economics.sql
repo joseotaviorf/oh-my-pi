@@ -315,10 +315,28 @@ final_version as (
     on ue.property_id = c.property_id
        and ue.dt_cash_flow between c.start_date and c.end_date
 )
+,
+first_pubs as (
+    select
+        i.id as property_id,
+        COALESCE(h.dt_first_publication, i.first_publication) AS first_publication
+    from
+        imovel i
+    left join
+        (
+          select
+              a.id,
+            min(a.status_time) AS dt_first_publication
+          from imovel_status_history a
+          where a.published = 1
+          group by a.id
+        ) h
+        ON h.id = i.id
+)
 select fv.*
 from final_version fv
-left join unit_economics.vw_dim_property_ribs dp
-  on fv.sk_property = dp.sk_property
+left join first_pubs dp
+  on fv.property_id = dp.property_id
 where fv.sk_cash_flow_date != -1
       and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
 ;
