@@ -6,7 +6,6 @@ CREATE TABLE dim_proposal (
   guarantee VARCHAR(50),
   renting_proposal_value DOUBLE PRECISION,
   status VARCHAR(50),
-  id_ticket INTEGER,
   dt_proposal_approved TIMESTAMP,
   tenant_document_sent INTEGER,
   dt_tenant_document_sent TIMESTAMP,
