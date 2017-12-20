@@ -33,20 +33,14 @@ pay_dates as (
 	from
 		payed_contracts
 ),
-insurance_dates as (
+insurance_dates_prev as (
 	select
 		pd.contract_id,
 		pd.property_id,
 		dd."date" as dt_cash_flow,
-		coalesce(case
-			when dt_start < '2017-05-21'
-			then rent * 0.0725
-			else rent * 0.045
-		end, 0) as cardiff_amount,
-		case
-			when dd."date" > now() then 1
-			else 0
-		end as flg_expected
+		dt_start,
+		rent,
+		row_number() over (partition by pd.contract_id order by dd."date") as rn
 	from
 		pay_dates pd
 	left join
@@ -57,6 +51,28 @@ insurance_dates as (
 	where dd."date" is not null
 	and rent is not null
 ),
+insurance_dates as (
+	select
+		id.contract_id,
+		id.property_id,
+		id.dt_cash_flow,
+		coalesce(
+		case
+			when (id1.dt_cash_flow < '2017-05-21' or id1.dt_cash_flow is null)
+			then id.rent * 0.0725
+			else id.rent * 0.045
+		end, 0
+		) as cardiff_amount,
+		case
+			when id.dt_cash_flow > now() then 1
+			else 0
+		end as flg_expected
+	from insurance_dates_prev id
+		left join insurance_dates_prev id1
+		 on id.contract_id = id1.contract_id
+		 and id1.rn % 12 = 0 and id.rn/12 = id1.rn/12
+)
+,
 base_contract as (
 	select
 		base.*,
@@ -83,8 +99,8 @@ left join
 where coalesce(cardiff_amount, 0) > 0
 group by
 	bc.property_id,
-	dt_cash_flow,
+	dt_ash_flow,
 	vl_insurance_fee,
 	bc.contract_id,
 	flg_expected
-;
+;c
