@@ -3274,7 +3274,7 @@ final_version as (
   select
     ue.sk_property,
     ue.property_id,
-    coalesce(c.sk_contract, -1) as sk_contract,
+    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_property order by ue.sk_cash_flow_date asc), -1) as sk_contract,
     ue.sk_cash_flow_date,
     ue.vl_owner_campaigns,
     ue.vl_affiliate_campaigns,
@@ -3359,81 +3359,173 @@ fact_contract as (
 	from before_loss_factor blf
 	left join contract c
 		on blf.sk_contract = c.id
+),
+fact_factor as (
+    select
+        fc.sk_property,
+        fc.property_id,
+        fc.sk_contract,
+        fc.sk_cash_flow_date,
+        fc.sk_date,
+        fc.vl_owner_campaigns,
+        fc.vl_affiliate_campaigns,
+        fc.vl_inside_sales,
+        fc.vl_photos,
+        fc.vl_affiliate_bonus,
+        fc.vl_lockbox,
+        fc.vl_tenant_campaigns,
+        fc.vl_cs_pre_sale,
+        fc.vl_field_ops,
+        fc.vl_bo_pre_sale,
+        fc.vl_agent_hours,
+        coalesce(fc.vl_st_pis_cofins * (1 - sum(cf.loss_factor)
+                    filter (where fc.flg_expected_sales_tax_pis_cofins = 1)
+                        over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
+        fc.flg_expected_sales_tax_pis_cofins,
+        coalesce(fc.vl_st_iss * (1 - sum(cf.loss_factor)
+                    filter (where fc.flg_expected_sales_tax_iss = 1)
+                        over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
+        fc.flg_expected_sales_tax_iss,
+        coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_affiliate_commission = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
+        fc.flg_expected_affiliate_commission,
+        coalesce(fc.vl_agent_commission * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_agent_commission = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
+        fc.flg_expected_agent_commission,
+        coalesce(fc.vl_delay_fine * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_delay_fine = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
+        fc.flg_expected_delay_fine,
+        fc.vl_termination_fine,
+        coalesce(fc.vl_brokerage_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_brokerage_fee = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
+        fc.flg_expected_brokerage_fee,
+        coalesce(fc.vl_management_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_management_fee = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
+        fc.flg_expected_management_fee,
+        coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_cs_post_sale = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
+        fc.flg_expected_cs_post_sale,
+        coalesce(fc.vl_collection * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_collection = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
+        fc.flg_expected_collection,
+        coalesce(fc.vl_bo_onboarding * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_onboarding = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
+        fc.flg_expected_bo_onboarding,
+        coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_ongoing = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
+        fc.flg_expected_bo_ongoing,
+        coalesce(fc.vl_bo_offboarding * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_offboarding = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
+        fc.flg_expected_bo_offboarding,
+        coalesce(fc.vl_inspections * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_inspection = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
+        fc.flg_expected_inspection,
+        coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_insurance_fee = 1)
+                    over (partition by fc.sk_property, sk_contract rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
+        fc.flg_expected_insurance_fee
+    from fact_contract fc
+    left join unit_economics.contract_factor cf
+        on cf.months_after_signature = fc.months_diff
+),
+last_version as (
+	select
+		max(sk_property) as sk_property
+	from
+		fact_factor
+	group by property_id
+),
+filtered as (
+	select sk_property from fact_factor where sk_contract <> -1 group by sk_property
+),
+min_max as (
+	select
+		base.*,
+		base.sk_date as dt_cash_flow,
+		min(base.sk_cash_flow_date) over (partition by base.sk_property) as min_dt,
+		max(base.sk_cash_flow_date) over (partition by base.sk_property) as max_dt
+	from
+	fact_factor base
+	left join
+		filtered f
+		on f.sk_property = base.sk_property
+	left join
+		last_version lv
+		on f.sk_property = lv.sk_property
+	where lv.sk_property is not null
+	and f.sk_property is not null
+),
+make_date as (
+	select
+		dateadd(
+			'day',
+			dt_cash_flow - (substring(min_dt, 1, 4) || '-' || substring(min_dt, 5, 2) || '-' || substring(min_dt, 7, 2))::date,
+			(substring(max_dt, 1, 4) || '-' ||
+			substring(max_dt, 5, 2)  || '-' ||
+			substring(max_dt, 7, 2))::date
+		)::date as new_dt_cash_flow,
+		*
+	from
+		min_max
 )
 select
-	fc.sk_property,
-	fc.property_id,
-	fc.sk_contract,
-	fc.sk_cash_flow_date,
-	fc.vl_owner_campaigns,
-    fc.vl_affiliate_campaigns,
-    fc.vl_inside_sales,
-    fc.vl_photos,
-    fc.vl_affiliate_bonus,
-    fc.vl_lockbox,
-    fc.vl_tenant_campaigns,
-    fc.vl_cs_pre_sale,
-    fc.vl_field_ops,
-    fc.vl_bo_pre_sale,
-    fc.vl_agent_hours,
-	coalesce(fc.vl_st_pis_cofins * (1 - sum(cf.loss_factor)
-			    filter (where fc.flg_expected_sales_tax_pis_cofins = 1)
-					over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
-    fc.flg_expected_sales_tax_pis_cofins,
-	coalesce(fc.vl_st_iss * (1 - sum(cf.loss_factor)
-				filter (where fc.flg_expected_sales_tax_iss = 1)
-					over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
-    fc.flg_expected_sales_tax_iss,
-	coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_affiliate_commission = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
-    fc.flg_expected_affiliate_commission,
-	coalesce(fc.vl_agent_commission * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_agent_commission = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
-    fc.flg_expected_agent_commission,
-	coalesce(fc.vl_delay_fine * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_delay_fine = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
-    fc.flg_expected_delay_fine,
-    fc.vl_termination_fine,
-	coalesce(fc.vl_brokerage_fee * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_brokerage_fee = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
-    fc.flg_expected_brokerage_fee,
-	coalesce(fc.vl_management_fee * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_management_fee = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
-    fc.flg_expected_management_fee,
-	coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_cs_post_sale = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
-    fc.flg_expected_cs_post_sale,
-	coalesce(fc.vl_collection * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_collection = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
-    fc.flg_expected_collection,
-	coalesce(fc.vl_bo_onboarding * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_bo_onboarding = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
-    fc.flg_expected_bo_onboarding,
-	coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_bo_ongoing = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
-    fc.flg_expected_bo_ongoing,
-	coalesce(fc.vl_bo_offboarding * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_bo_offboarding = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
-    fc.flg_expected_bo_offboarding,
-	coalesce(fc.vl_inspections * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_inspection = 1)
-				over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
-    fc.flg_expected_inspection,
-	coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
-			filter (where fc.flg_expected_insurance_fee = 1)
-				over (partition by fc.sk_property, sk_contract rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
-    fc.flg_expected_insurance_fee
-from fact_contract fc
-left join unit_economics.contract_factor cf
-	on cf.months_after_signature = fc.months_diff
+	sk_property,
+	property_id,
+	-1 as sk_contract,
+	coalesce(replace(new_dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+	0 as vl_owner_campaigns,
+	0 as vl_affiliate_campaigns,
+	0 as vl_inside_sales,
+	0 as vl_photos,
+	0 as vl_affiliate_bonus,
+	vl_lockbox,
+	vl_tenant_campaigns,
+	vl_cs_pre_sale,
+	vl_field_ops,
+	vl_bo_pre_sale,
+	vl_agent_hours,
+	vl_st_pis_cofins,
+	flg_expected_sales_tax_pis_cofins,
+	vl_st_iss,
+	flg_expected_sales_tax_iss,
+	vl_affiliate_commission,
+	flg_expected_affiliate_commission,
+	vl_agent_commission,
+	flg_expected_agent_commission,
+	vl_delay_fine,
+	flg_expected_delay_fine,
+	vl_termination_fine,
+	vl_brokerage_fee,
+	flg_expected_brokerage_fee,
+	vl_management_fee,
+	flg_expected_management_fee,
+	vl_cs_post_sale,
+	flg_expected_cs_post_sale,
+	vl_collection,
+	flg_expected_collection,
+	vl_bo_onboarding,
+	flg_expected_bo_onboarding,
+	vl_bo_ongoing,
+	flg_expected_bo_ongoing,
+	vl_bo_offboarding,
+	flg_expected_bo_offboarding,
+	vl_inspections,
+	flg_expected_inspection,
+	vl_insurance_fee,
+	flg_expected_insurance_fee
+from
+	make_date
+union
+	select * from fact_factor
 ;
