@@ -3468,12 +3468,13 @@ min_max as (
 ),
 make_date as (
 	select
-		dateadd(
-			'day',
-			dt_cash_flow - (substring(min_dt, 1, 4) || '-' || substring(min_dt, 5, 2) || '-' || substring(min_dt, 7, 2))::date,
-			(substring(max_dt, 1, 4) || '-' ||
-			substring(max_dt, 5, 2)  || '-' ||
-			substring(max_dt, 7, 2))::date
+	    ((substring(max_dt::varchar, 1, 4) || '-' ||
+        substring(max_dt::varchar, 5, 2)  || '-' ||
+        substring(max_dt::varchar, 7, 2))::date + (interval '1 day' * (
+            -- diff in days
+            dt_cash_flow - (substring(min_dt::varchar, 1, 4)
+                            || '-' || substring(min_dt::varchar, 5, 2)
+                            || '-' || substring(min_dt::varchar, 7, 2))::date))
 		)::date as new_dt_cash_flow,
 		*
 	from
@@ -3527,5 +3528,50 @@ select
 from
 	make_date
 union
-	select * from fact_factor
+select
+    sk_property,
+	property_id,
+	sk_contract,
+	sk_cash_flow_date,
+	vl_owner_campaigns,
+	vl_affiliate_campaigns,
+	vl_inside_sales,
+	vl_photos,
+	vl_affiliate_bonus,
+	vl_lockbox,
+	vl_tenant_campaigns,
+	vl_cs_pre_sale,
+	vl_field_ops,
+	vl_bo_pre_sale,
+	vl_agent_hours,
+	vl_st_pis_cofins,
+	flg_expected_sales_tax_pis_cofins,
+	vl_st_iss,
+	flg_expected_sales_tax_iss,
+	vl_affiliate_commission,
+	flg_expected_affiliate_commission,
+	vl_agent_commission,
+	flg_expected_agent_commission,
+	vl_delay_fine,
+	flg_expected_delay_fine,
+	vl_termination_fine,
+	vl_brokerage_fee,
+	flg_expected_brokerage_fee,
+	vl_management_fee,
+	flg_expected_management_fee,
+	vl_cs_post_sale,
+	flg_expected_cs_post_sale,
+	vl_collection,
+	flg_expected_collection,
+	vl_bo_onboarding,
+	flg_expected_bo_onboarding,
+	vl_bo_ongoing,
+	flg_expected_bo_ongoing,
+	vl_bo_offboarding,
+	flg_expected_bo_offboarding,
+	vl_inspections,
+	flg_expected_inspection,
+	vl_insurance_fee,
+	flg_expected_insurance_fee
+from fact_factor
 ;
