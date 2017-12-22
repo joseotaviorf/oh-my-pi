@@ -3064,7 +3064,7 @@ with unit_economics as (
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
@@ -3112,7 +3112,7 @@ with unit_economics as (
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             vl_owner_campaigns,
             vl_affiliate_campaigns,
@@ -3160,7 +3160,7 @@ with unit_economics as (
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
@@ -3208,7 +3208,7 @@ with unit_economics as (
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
