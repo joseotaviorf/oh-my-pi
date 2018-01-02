@@ -1,5 +1,5 @@
-drop view if exists vw_property_status_over_period;
-create or replace view public.vw_property_status_over_period as
+drop view if exists vw_property_status_over_period_ribs;
+create or replace view public.vw_property_status_over_period_ribs as
 with dup as (
   select
     ((p.id || '00') || COALESCE(p.version, 1))::bigint AS sk_property,
@@ -11,7 +11,7 @@ with dup as (
     i.status_time,
     i.date as date,
     i.status_history as status
-  from vw_property_listing  p
+  from vw_property_listing_ribs  p
   join imovel_status_full_history i
     on i.id = p.id
        and i.date in (
