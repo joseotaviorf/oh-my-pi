@@ -5,7 +5,7 @@ with cdre_field_ops as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where dre_category = 'Field Operation'
+    where dre_category like 'Field Operation%'
 ),
 filtered_visits as (
     select

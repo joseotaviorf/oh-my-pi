@@ -116,12 +116,22 @@ zendesk_ticket_fields as (
       else value
     end as value
   from zendesk.ticket_fields
-  where id = '31646438'
+  where id = '31646438' -- field id that maps a house id
 ),
 zendesk_cte as (
   select distinct
-    ztf.value as property_id,
-    count(ztf.value) as qt,
+    case
+  	    when ztf.value = '-1' or ztf.value is null
+  		    then coalesce(vbmu0.property_id::varchar, vbmu1.property_id::varchar, '-1')
+        else ztf.value
+    end as property_id,
+    case
+        when vbmu0.property_id is not null
+        	then count(vbmu0.property_id)
+        when vbmu1.property_id is not null
+        	then count(vbmu1.property_id)
+    	else count(ztf.value)
+    end as qt,
     date_trunc('month', ztm.solved_at)::date as dt,
     zg.group_name
   from zendesk.ticket zt
@@ -132,9 +142,15 @@ zendesk_cte as (
          and ztm.solved_at is not null
     left join zendesk_ticket_fields ztf
       on zt.id = ztf.ticket_id
+    left join zendesk.user zu
+      on zt.requester_id = zu.id
+    left join unit_economics.vw_base_merged_users vbmu0
+      on zu.email = vbmu0.email
+    left join unit_economics.vw_base_merged_users vbmu1
+      on regexp_replace(zu.phone, '^\+\d{2}|\D', '', 'g') = vbmu1.phone
   where zg.group_name in ('Customer Support (pre-sale)', 'Customer Support (post-sale)', 'Collection',
                             'Back-Office (onboarding)', 'Back-Office (offboarding)')
-  group by ztf.value, zg.group_name, date_trunc('month', ztm.solved_at)::date
+  group by ztf.value, vbmu0.property_id, vbmu1.property_id, zg.group_name, date_trunc('month', ztm.solved_at)::date
 ),
 crm_tasks as (
   select
@@ -1304,7 +1320,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (offboarding)'
   group by property_id, dt
@@ -1314,7 +1330,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Back-Office (offboarding)'
     and property_id != -1
 ),
@@ -1444,7 +1460,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (onboarding)'
   group by property_id, dt
@@ -1454,7 +1470,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Back-Office (onboarding)'
     and property_id != -1
 ),
@@ -1716,7 +1732,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Collection'
   group by property_id, dt
@@ -1727,7 +1743,7 @@ calculated_qt as (
     dt,
     qt,
     avg(qt) over() as _avg
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where group_name = 'Collection'
     and property_id != -1
 ),
@@ -1892,7 +1908,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (post-sale)'
   group by property_id, dt
@@ -1903,7 +1919,7 @@ calculated_qt as (
     dt,
     qt,
     avg(qt) over() as _avg
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where group_name = 'Customer Support (post-sale)'
     and property_id != -1
 ),
@@ -2704,7 +2720,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (pre-sale)'
   group by property_id, dt
@@ -2714,7 +2730,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Customer Support (pre-sale)'
     and property_id != -1
 ),
@@ -2848,7 +2864,7 @@ with cdre_field_ops as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where dre_category = 'Field Operation'
+    where dre_category like 'Field Operation%'
 ),
 filtered_visits as (
     select
@@ -3438,96 +3454,7 @@ fact_factor as (
     from fact_contract fc
     left join unit_economics.contract_factor cf
         on cf.months_after_signature = fc.months_diff
-),
-last_version as (
-	select
-		max(sk_property) as sk_property
-	from
-		fact_factor
-	group by property_id
-),
-filtered as (
-	select sk_property from fact_factor where sk_contract <> -1 group by sk_property
-),
-min_max as (
-	select
-		base.*,
-		base.sk_date as dt_cash_flow,
-		min(base.sk_cash_flow_date) over (partition by base.sk_property) as min_dt,
-		max(base.sk_cash_flow_date) over (partition by base.sk_property) as max_dt
-	from
-	fact_factor base
-	left join
-		filtered f
-		on f.sk_property = base.sk_property
-	left join
-		last_version lv
-		on f.sk_property = lv.sk_property
-	where lv.sk_property is not null
-	and f.sk_property is not null
-),
-make_date as (
-	select
-	    ((substring(max_dt::varchar, 1, 4) || '-' ||
-        substring(max_dt::varchar, 5, 2)  || '-' ||
-        substring(max_dt::varchar, 7, 2))::date + (interval '1 day' * (
-            -- diff in days
-            dt_cash_flow - (substring(min_dt::varchar, 1, 4)
-                            || '-' || substring(min_dt::varchar, 5, 2)
-                            || '-' || substring(min_dt::varchar, 7, 2))::date))
-		)::date as new_dt_cash_flow,
-		*
-	from
-		min_max
 )
-select
-	sk_property,
-	property_id,
-	-1 as sk_contract,
-	coalesce(replace(new_dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
-	0 as vl_owner_campaigns,
-	0 as vl_affiliate_campaigns,
-	0 as vl_inside_sales,
-	0 as vl_photos,
-	0 as vl_affiliate_bonus,
-	vl_lockbox,
-	vl_tenant_campaigns,
-	vl_cs_pre_sale,
-	vl_field_ops,
-	vl_bo_pre_sale,
-	vl_agent_hours,
-	vl_st_pis_cofins,
-	flg_expected_sales_tax_pis_cofins,
-	vl_st_iss,
-	flg_expected_sales_tax_iss,
-	vl_affiliate_commission,
-	flg_expected_affiliate_commission,
-	vl_agent_commission,
-	flg_expected_agent_commission,
-	vl_delay_fine,
-	flg_expected_delay_fine,
-	vl_termination_fine,
-	vl_brokerage_fee,
-	flg_expected_brokerage_fee,
-	vl_management_fee,
-	flg_expected_management_fee,
-	vl_cs_post_sale,
-	flg_expected_cs_post_sale,
-	vl_collection,
-	flg_expected_collection,
-	vl_bo_onboarding,
-	flg_expected_bo_onboarding,
-	vl_bo_ongoing,
-	flg_expected_bo_ongoing,
-	vl_bo_offboarding,
-	flg_expected_bo_offboarding,
-	vl_inspections,
-	flg_expected_inspection,
-	vl_insurance_fee,
-	flg_expected_insurance_fee
-from
-	make_date
-union
 select
     sk_property,
 	property_id,
