@@ -343,7 +343,7 @@ before_loss_factor as (
     left join first_pubs dp
       on fv.property_id = dp.property_id
     where fv.sk_cash_flow_date != -1
-          and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
+--          and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
 ),
 fact_contract as (
 	select
