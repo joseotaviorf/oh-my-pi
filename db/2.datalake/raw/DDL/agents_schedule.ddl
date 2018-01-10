@@ -1,5 +1,5 @@
-drop table if exists datalake_raw.agents_schedule;
-create external table if not exists datalake_raw.agents_schedule (
+drop table if exists datalake_raw.planner_agents_schedule;
+create external table if not exists datalake_raw.planner_agents_schedule (
   row_number string,
   agent_user_id string,
   available_date string,
