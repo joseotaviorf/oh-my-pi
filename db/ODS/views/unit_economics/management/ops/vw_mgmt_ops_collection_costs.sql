@@ -19,12 +19,32 @@ qt_nulls as (
 ),
 calculated_qt as (
   select
-    tt.property_id,
-    tt.dt,
-    tt.qt
-  from unit_economics.vw_base_ticket_task tt
-  where tt.group_name = 'Collection'
+    property_id,
+    dt,
+    qt,
+    avg(qt) over() as _avg
+  from unit_economics.vw_base_ticket_task
+  where group_name = 'Collection'
     and property_id != -1
+),
+series as (
+	select
+		null::double precision as dre_value,
+		generate_series((max(dre.dre_date) + interval '1 month')::date,
+		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date
+	from cdre_collection dre
+	group by dre_value
+
+	union
+
+	select dre_value, dre_date
+	from cdre_collection
+),
+cdre_collection_fc as (
+    select
+        gap_fill(dre_value) over (order by dre_date) as dre_value,
+        dre_date
+    from series
 ),
 rent_delay as (
   select
@@ -41,63 +61,85 @@ rent_delay as (
 filtered_contracts as (
     select distinct
       c.property_id as property_id,
-      date_trunc('month', rd.tenant_due_date)::date as dt
+      ccs.dre_date as dt,
+      (date_part('year',  ccs.dre_date) - date_part('year', c.init_date)) * 12 +
+              (date_part('month',  ccs.dre_date) - date_part('month', c.init_date)) as months_after_init
     from unit_economics.vw_base_contract_costs c
-    join rent_delay rd
+    join cdre_collection_fc ccs
+      on ccs.dre_date between date_trunc('month', c.init_date) + interval '1 month'
+                        and date_trunc('month', coalesce(c.termination_date, c.expected_end_date)) + interval '1 month'
+    left join rent_delay rd
       on c.id = rd.contract_id
-    where rd.rent_delayed_days > 0
-        or tenant_paid_date is null
+        and (rd.rent_delayed_days > 0
+            or tenant_paid_date is null)
 ),
 ratio as (
   select distinct
     fc.dt,
-    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt
+    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt,
+    fc.months_after_init
   from filtered_contracts fc
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
 gen_contracts as (
-	select
+	select distinct
 		fc.property_id,
 		fc.dt,
-		r.qt as qt_gen
-	from
-  	filtered_contracts fc
-  left join ratio r
-  	on fc.dt = r.dt
+		r.qt as qt,
+		avg(r.qt) over () as _avg,
+		fc.months_after_init
+	from filtered_contracts fc
+    left join ratio r
+  	    on fc.dt = r.dt
 ),
-espec_gen_prev as (
-  select
-    fc.property_id,
-    cqt.dt as dt,
-    cqt.qt as qt
-  from
-  	filtered_contracts fc
-  join calculated_qt cqt
-    on cqt.property_id = fc.property_id
-  union
-  select
-  	*
-	from gen_contracts
+calculated as (
+    select distinct
+        property_id,
+        dt,
+        qt,
+        avg(qt) over (partition by property_id) as _avg
+    from calculated_qt
 ),
-espec_gen as (
-	select
+spec_gen_prev as (
+  select
+    coalesce(cc.property_id, gc.property_id) as property_id,
+    coalesce(cc.dt, gc.dt) as dt,
+    coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
+    coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)), 0) as _avg,
+    gc.months_after_init
+  from calculated cc
+  full outer join gen_contracts gc
+    on cc.property_id = gc.property_id
+        and gc.dt = cc.dt
+),
+spec_gen as (
+	select distinct
 		property_id,
 		dt,
-		sum(qt) as qt
-	from espec_gen_prev
-	group by
-		property_id, dt
+		case
+		    when qt = 0
+		        then coalesce(_avg, 0)
+		    else coalesce(qt, _avg)
+		end as qt,
+		case
+		    when qt = 0 and _avg is not null
+		        then 1
+		    else 0
+		end as flg_expected_collection
+	from spec_gen_prev
 ),
 tt_costs as (
-    select
+    select distinct
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_collection
-    from espec_gen eg
-    join cdre_collection co
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_collection,
+      flg_expected_collection
+    from spec_gen eg
+    join cdre_collection_fc co
       on co.dre_date = eg.dt + interval '1 month'
+    where eg.qt > 0
 ),
 contract_costs as (
     select
@@ -114,17 +156,19 @@ full_costs as (
     coalesce(tt.property_id, cc.property_id) as property_id,
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
-    coalesce(tt.vl_collection, cc.vl_collection) as vl_collection
+    coalesce(tt.vl_collection, cc.vl_collection) as vl_collection,
+    coalesce(tt.flg_expected_collection, 0) as flg_expected_collection
   from tt_costs tt
   full outer join contract_costs cc
-    on tt.dt_cash_flow = cc.dt_cash_flow
+    on tt.property_id = cc.property_id and tt.dt = cc.dt
+        and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
   vbpc.sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_collection,
-  0 as flg_expected
+  flg_expected_collection
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id

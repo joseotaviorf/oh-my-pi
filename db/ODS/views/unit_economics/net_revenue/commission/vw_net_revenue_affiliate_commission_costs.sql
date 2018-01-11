@@ -25,7 +25,8 @@ select
 	base.sk_property,
 	property_id,
 	payment_date::date as dt_cash_flow,
-	valor as vl_affiliate_commission
+	valor as vl_affiliate_commission,
+	0 as flg_expected_affiliate_commission
 from
 	affiliate_filtered_base base
 left join

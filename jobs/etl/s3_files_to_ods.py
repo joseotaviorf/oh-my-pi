@@ -16,7 +16,7 @@ if __name__ == '__main__':
     schema = 'files'
     for f in files:
         try:
-            table = pd.read_excel(f[0], skiprows=1)
+            table = pd.read_excel(f[0])
             table = table.where(pd.notnull(table), None)
 
             table_name = f[1]

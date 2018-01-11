@@ -12,6 +12,7 @@ select
 	coalesce(b_fee.dt_cash_flow, m_fee.dt_cash_flow) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
 	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
+	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
 from
 	unit_economics.vw_net_revenue_revenues_brokerage_fee b_fee

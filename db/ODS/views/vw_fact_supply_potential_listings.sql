@@ -304,6 +304,7 @@ SELECT -- count(1)
   coalesce(property_id || '001' , '-1') as sk_property,
   coalesce(l.contract_id, -1) as sk_contract,
   renting_value,
+  l.job_fotografo_id as sk_photo_job,
   l.dados_fotografo_id as sk_photographer,
   owner_id as sk_owner,
 

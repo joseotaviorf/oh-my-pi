@@ -39,6 +39,7 @@ BEGIN
     r.contract_id,
     r.renting_value,
     r.current_property_status,
+    r.job_fotografo_id,
     r.dados_fotografo_id,
     r.owner_id,
     r.rep_id,
@@ -97,7 +98,7 @@ BEGIN
       c.id as contract_id,
       o.aluguel as renting_value,
       o.status as current_property_status,
-
+      f.id as job_fotografo_id,
       f.dadosFotografo_id as dados_fotografo_id,
       coalesce(o.usuario_id, o.proprietarioLead_id) AS owner_id,
       o.usuarioQueCadastrou_id AS rep_id,

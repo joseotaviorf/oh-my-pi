@@ -1,5 +1,5 @@
-drop view if exists unit_economics.vw_base_ticket_task;
-create or replace view unit_economics.vw_base_ticket_task as
+drop table if exists unit_economics.tbl_base_ticket_task;
+create table unit_economics.tbl_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,
@@ -29,12 +29,22 @@ zendesk_ticket_fields as (
       else value
     end as value
   from zendesk.ticket_fields
-  where id = '31646438'
+  where id = '31646438' -- field id that maps a house id
 ),
 zendesk_cte as (
   select distinct
-    ztf.value as property_id,
-    count(ztf.value) as qt,
+    case
+  	    when ztf.value = '-1' or ztf.value is null
+  		    then coalesce(vbmu0.property_id::varchar, vbmu1.property_id::varchar, '-1')
+        else ztf.value
+    end as property_id,
+    case
+        when vbmu0.property_id is not null
+        	then count(vbmu0.property_id)
+        when vbmu1.property_id is not null
+        	then count(vbmu1.property_id)
+    	else count(ztf.value)
+    end as qt,
     date_trunc('month', ztm.solved_at)::date as dt,
     zg.group_name
   from zendesk.ticket zt
@@ -45,9 +55,15 @@ zendesk_cte as (
          and ztm.solved_at is not null
     left join zendesk_ticket_fields ztf
       on zt.id = ztf.ticket_id
+    left join zendesk.user zu
+      on zt.requester_id = zu.id
+    left join unit_economics.vw_base_merged_users vbmu0
+      on zu.email = vbmu0.email
+    left join unit_economics.vw_base_merged_users vbmu1
+      on regexp_replace(zu.phone, '^\+\d{2}|\D', '', 'g') = vbmu1.phone
   where zg.group_name in ('Customer Support (pre-sale)', 'Customer Support (post-sale)', 'Collection',
                             'Back-Office (onboarding)', 'Back-Office (offboarding)')
-  group by ztf.value, zg.group_name, date_trunc('month', ztm.solved_at)::date
+  group by ztf.value, vbmu0.property_id, vbmu1.property_id, zg.group_name, date_trunc('month', ztm.solved_at)::date
 ),
 crm_tasks as (
   select

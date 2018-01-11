@@ -6,7 +6,10 @@ select
 	dt_cash_flow,
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
-	sum(vl_delay_fine) as vl_delay_fine
+	sum(vl_delay_fine) as vl_delay_fine,
+	sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+	sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+	sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -15,7 +18,10 @@ from
 		dt_cash_flow,
 		vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_sales_tax_iss
 	union all
@@ -25,7 +31,10 @@ from
 		dt_cash_flow,
 		0 as vl_st_iss,
 		vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		0 as flg_expected_sales_tax_iss,
+		flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins
 	union all
@@ -35,7 +44,10 @@ from
 		dt_cash_flow,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		vl_delay_fine
+		vl_delay_fine,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_delay_fine
 ) tbl

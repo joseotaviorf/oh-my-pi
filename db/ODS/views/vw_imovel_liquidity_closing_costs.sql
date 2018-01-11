@@ -10,6 +10,7 @@ select
     p.id_negotiation,
     p.id_visit,
     p.id_proposal,
+    p.id_offer,
     p.id_pre_proposal,
     p.id_contract,
     p.id_user_agent,

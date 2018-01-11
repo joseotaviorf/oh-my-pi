@@ -45,14 +45,14 @@ filtered_contracts_prev as (
 ),
 filtered_contracts as(
 	select distinct
-		property_id,
-		dre_date as dt
-	from
-		filtered_contracts_prev fc
-	join
-		cdre_onboarding dre
-		on dre_date between date_trunc('month', fc."from")  + interval '1 month'
+		fc.property_id,
+		coalesce(dre.dre_date, date_trunc('month', fc."to") + interval '1 month') as dt
+	from filtered_contracts_prev fc
+	left join cdre_onboarding dre
+		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
                         and date_trunc('month', fc."to") + interval '1 month'
+    where fc."from" >= '2015-12-01'
+        and fc."to" >= '2015-12-01'
 ),
 ratio as (
   select distinct
@@ -75,7 +75,7 @@ gen_contracts as (
 espec_gen_prev as (
   select
     fc.property_id,
-    cqt.dt as dt,
+    coalesce(cqt.dt, fc.dt) as dt,
     cqt.qt as qt
   from
   	filtered_contracts fc
@@ -84,7 +84,7 @@ espec_gen_prev as (
   union
   select
   	*
-	from gen_contracts
+    from gen_contracts
 ),
 espec_gen as (
 	select
@@ -99,21 +99,21 @@ tt_costs as (
     select
       eg.property_id,
       eg.dt,
-      co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      eg.dt as dt_cash_flow,
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision as vl_bo_onboarding
     from espec_gen eg
-    join cdre_onboarding co
-      on co.dre_date = eg.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = eg.dt
 ),
 contract_costs as (
     select
-    	fc.dt,
+      fc.dt,
       fc.property_id,
-      co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      fc.dt as dt_cash_flow,
+      co.dre_value / (count(fc.property_id) over (partition by fc.dt))::double precision as vl_bo_onboarding
     from filtered_contracts fc
-    join cdre_onboarding co
-      on co.dre_date = fc.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = fc.dt
 ),
 full_costs as (
   select distinct
@@ -124,16 +124,53 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+),
+result as (
+    select
+      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      c.property_id,
+      c.dt_cash_flow::date,
+      c.vl_bo_onboarding,
+      (c.vl_bo_onboarding is null)::int as flg_expected_bo_onboarding
+    from full_costs c
+    left join unit_economics.vw_base_property_costs vbpc
+      on vbpc.property_id = c.property_id
+        and c.dt >= vbpc.min_version_time
+        and c.dt <= vbpc.max_version_time
+),
+m_avg_prev as (
+    select distinct
+        dt_cash_flow,
+        avg(vl_bo_onboarding) over (partition by dt_cash_flow order by dt_cash_flow) as _avg1
+    from result
+    order by dt_cash_flow asc
+),
+last_value as (
+    select
+        dt_cash_flow,
+        case
+            when _avg1 is null
+                and avg(_avg1) over (rows between 3 preceding and 1 preceding) is not null
+                and lag(_avg1) over () is not null
+                and lead(_avg1) over () is null
+              then avg(_avg1) over (rows between 3 preceding and 1 preceding)
+            else _avg1
+        end as m_avg
+    from m_avg_prev
+),
+last_value_gap_fill as (
+    select
+        dt_cash_flow,
+        coalesce(m_avg, gap_fill(m_avg) over ()) as new_value
+    from last_value
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_onboarding,
-  0 as flg_expected
-from full_costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt >= vbpc.min_version_time
-    and c.dt <= vbpc.max_version_time
+    r.sk_property,
+    r.property_id,
+    r.dt_cash_flow,
+    r.flg_expected_bo_onboarding,
+    lv.new_value as vl_bo_onboarding
+from result r
+join last_value_gap_fill lv
+    on r.dt_cash_flow = lv.dt_cash_flow
 ;

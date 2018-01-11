@@ -18,7 +18,8 @@ from
 left join
 	unit_economics.vw_base_property_costs vbpc
 	on vbcc.property_id = vbpc.property_id
-	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time and vbpc.max_version_time
+	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time
+	                                                                    and (vbpc.max_version_time + interval '1 day')
 where (vbcc.termination_date is not null
   or vbcc.expected_end_date is not null)
   and vbcc.status in ('Ativo', 'Finalizado')
@@ -60,7 +61,8 @@ select
 	sk_property,
 	property_id,
 	vl_brokerage_fee,
-	dt_cash_flow
+	dt_cash_flow,
+	0 as flg_expected_brokerage_fee
 from
 	brokerage_fill
 where vl_brokerage_fee != 0

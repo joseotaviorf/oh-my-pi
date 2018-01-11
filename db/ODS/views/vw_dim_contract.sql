@@ -4,7 +4,6 @@ as
 select
 	c.id as sk_contract,
     c.id as id_contract,
-
     "emailFatura" as email_invoice,
     "valorAluguel" as renting_value,
     "numImovel" as property_number,
@@ -40,7 +39,6 @@ select
     "contratoAutorizacaoEntradaAssinado" as contract_authorization_signed,
     "contratoLocacaoAssinado" as contract_renting_signed,
     "dataTrocaTitularidade" as dt_ownership_changed,
-	c.proposta_id as id_proposal,
     c."criadoEm" as dt_created,
     c."atualizadoEm" as dt_updated,
     now()::timestamp as dt_timestamp

@@ -12,12 +12,18 @@ select
 	dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
-	sum(flg_expected_management_fee) as flg_expected_management_fee,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_agent_commission) as vl_agent_commission,
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
-	sum(vl_delay_fine) as vl_delay_fine
+	sum(vl_delay_fine) as vl_delay_fine,
+    sum(flg_expected_management_fee) as flg_expected_management_fee,
+    sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+    sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+    sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+    sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+    sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+    sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -26,12 +32,18 @@ from
 		dt_cash_flow,
 		vl_affiliate_commission,
 		0 as vl_management_fee,
-		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		vl_agent_commission,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		0 as flg_expected_management_fee,
+		0 as flg_expected_brokerage_fee,
+		flg_expected_affiliate_commission,
+		flg_expected_agent_commission,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_commission_costs
 	union all
@@ -41,12 +53,18 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		vl_management_fee,
-		flg_expected_management_fee,
 		vl_brokerage_fee,
 		0 as vl_agent_commission,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		flg_expected_management_fee,
+		flg_expected_brokerage_fee,
+		0 as flg_expected_affiliate_commission,
+		0 as flg_expected_agent_commission,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_revenues
 	union all
@@ -56,12 +74,18 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		0 as vl_management_fee,
-		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		0 as vl_agent_commission,
 		vl_st_iss,
 		vl_st_pis_cofins,
-		vl_delay_fine
+		vl_delay_fine,
+		0 as flg_expected_management_fee,
+		0 as flg_expected_brokerage_fee,
+		0 as flg_expected_affiliate_commission,
+		0 as flg_expected_agent_commission,
+		flg_expected_sales_tax_iss,
+		flg_expected_sales_tax_pis_cofins,
+		flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes
 ) tbl

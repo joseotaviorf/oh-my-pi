@@ -27,8 +27,11 @@ drop view if exists unit_economics.vw_mgmt_ops_bo_onboarding_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_bo_ongoing_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_collection_costs cascade;
 drop view if exists unit_economics.vw_mgmt_ops_cs_post_sale_costs cascade;
+drop view if exists unit_economics.vw_mgmt_ops_inspection_costs;
 drop view if exists unit_economics.vw_mgmt_ops_costs cascade;
 drop view if exists unit_economics.vw_mgmt_insurance_fee cascade;
+drop view if exists unit_economics.vw_mgmt_insurance_pis_cofins;
+drop view if exists unit_economics.vw_mgmt_insurance;
 drop view if exists unit_economics.vw_mgmt_costs cascade;
 drop view if exists unit_economics.vw_liquidity_mkt_tenant_campaigns_costs cascade;
 drop view if exists unit_economics.vw_liquidity_ops_bo_pre_sale_costs cascade;
@@ -61,14 +64,17 @@ select
   "valorAluguel" as rent_value,
   ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
-  "dataFimContratoPrevisto" as expected_end_date,
+  "dataInicio" + interval '44 months' as expected_end_date,
   "dataAssinado" as signature_date,
   "dataEntrada" as entrance_date,
   "dataInicio" as init_date,
   "criadoEm" as created_date
 from contract
-  where tipo = 'FullService'
+where tipo = 'FullService'
     and status in ('Finalizado', 'Ativo')
+    and date_trunc('month', "dataAssinado") >= '2016-01-01'
+    and date_trunc('month', "dataEntrada") >= '2016-01-01'
+    and date_trunc('month', "dataInicio") >= '2016-01-01'
 ;
 
 create or replace view unit_economics.vw_base_dre_costs as
@@ -110,12 +116,22 @@ zendesk_ticket_fields as (
       else value
     end as value
   from zendesk.ticket_fields
-  where id = '31646438'
+  where id = '31646438' -- field id that maps a house id
 ),
 zendesk_cte as (
   select distinct
-    ztf.value as property_id,
-    count(ztf.value) as qt,
+    case
+  	    when ztf.value = '-1' or ztf.value is null
+  		    then coalesce(vbmu0.property_id::varchar, vbmu1.property_id::varchar, '-1')
+        else ztf.value
+    end as property_id,
+    case
+        when vbmu0.property_id is not null
+        	then count(vbmu0.property_id)
+        when vbmu1.property_id is not null
+        	then count(vbmu1.property_id)
+    	else count(ztf.value)
+    end as qt,
     date_trunc('month', ztm.solved_at)::date as dt,
     zg.group_name
   from zendesk.ticket zt
@@ -126,9 +142,15 @@ zendesk_cte as (
          and ztm.solved_at is not null
     left join zendesk_ticket_fields ztf
       on zt.id = ztf.ticket_id
+    left join zendesk.user zu
+      on zt.requester_id = zu.id
+    left join unit_economics.vw_base_merged_users vbmu0
+      on zu.email = vbmu0.email
+    left join unit_economics.vw_base_merged_users vbmu1
+      on regexp_replace(zu.phone, '^\+\d{2}|\D', '', 'g') = vbmu1.phone
   where zg.group_name in ('Customer Support (pre-sale)', 'Customer Support (post-sale)', 'Collection',
                             'Back-Office (onboarding)', 'Back-Office (offboarding)')
-  group by ztf.value, zg.group_name, date_trunc('month', ztm.solved_at)::date
+  group by ztf.value, vbmu0.property_id, vbmu1.property_id, zg.group_name, date_trunc('month', ztm.solved_at)::date
 ),
 crm_tasks as (
   select
@@ -207,12 +229,18 @@ with cdre_inside_sales as (
     where dre_category = 'Inside Sales'
 ),
 filtered_properties as (
-   select distinct
-      sk_property,
-      property_id,
-      min_version_time::date as listing_date
-    from unit_economics.vw_base_property_costs
-    where version = 1
+   	select distinct
+	    sk_property,
+	    property_id,
+	    min_version_time::date as listing_date
+	from
+		unit_economics.vw_base_property_costs base
+	left join
+		lead_conversion cl
+		on cl.imovel_id = base.property_id
+	where
+		cl.id is not null
+		and version = 1
 ),
 costs as (
     select
@@ -332,7 +360,8 @@ affiliate_mkt_costs as
 ),
 affiliate_filtered_base as (
 	select
-		base.*
+		base.*,
+		u.criado_em as affiliate_dt
 	from
 		unit_economics.vw_base_property_costs base
 	left join
@@ -341,6 +370,9 @@ affiliate_filtered_base as (
 	left join
 		lead l
 		on pl.lead_id = l.id
+	left join
+		usuario u
+		on u.id = l.usuario_que_indicou_id::int
 	where
 		pl.lead_id is not null
 		and l.usuario_que_indicou_id is not null
@@ -351,22 +383,25 @@ divided_costs as (
 	select
 		sk_property,
 		property_id,
-		date_trunc('month', publication_date + interval '2 month')::date as dt_cash_flow,
+		case
+            when affiliate_dt < publication_date
+            then publication_date::date
+            else date_trunc('month', affiliate_dt + interval '2 month')::date
+        end as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
 			partition by
-			date_part('year', publication_date),
-			date_part('month', publication_date)
+			date_part('year', affiliate_dt),
+			date_part('month', affiliate_dt)
 		))::decimal(14,4) as vl_affiliate_campaigns
 	from
 		affiliate_filtered_base base
 	left join
 		affiliate_mkt_costs mkt
-		on date_part('year', publication_date) = mkt.year
-		and date_part('month', publication_date) = mkt.month
+		on date_part('year', affiliate_dt) = mkt.year
+		and date_part('month', affiliate_dt) = mkt.month
 	-- filter by first version only, as is a supply cost
 	where base.version = 1
 )
--- Remove rows where costs equal zero
 select
 	*
 from
@@ -380,7 +415,7 @@ create or replace view unit_economics.vw_supply_mkt_owner_campaigns_costs as
 with google_monthly_owner_costs as (
 	select
 		"day"::date as dt_cost,
-		sum((cost::DECIMAL(14,4)/1000000)::DECIMAL(14,2)) as cost
+		sum((cost::decimal(14,4)/1000000)::decimal(14,2)) as cost
 	from
 		google_ads_campaigns
 	where
@@ -396,7 +431,7 @@ facebook_monthly_owner_costs as
 (
 	select
         "date"::date as dt_cost,
-        sum(spend::DECIMAL(14,4)) as cost
+        sum(spend::decimal(14,4)) as cost
     from
         facebook_ads_campaigns
     where
@@ -565,7 +600,8 @@ select
 	base.sk_property,
 	property_id,
 	payment_date::date as dt_cash_flow,
-	valor as vl_affiliate_commission
+	valor as vl_affiliate_commission,
+	0 as flg_expected_affiliate_commission
 from
 	affiliate_filtered_base base
 left join
@@ -662,7 +698,8 @@ select
   vbpc.sk_property,
   ud.property_id,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
-  ud.vl_agent_commission
+  ud.vl_agent_commission,
+  0 as flg_expected_agent_commission
 from updated_dates ud
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ud.property_id
@@ -675,7 +712,9 @@ select
     coalesce(affiliate.property_id, agent.property_id) as property_id,
     coalesce(affiliate.dt_cash_flow, agent.dt_cash_flow) as dt_cash_flow,
     coalesce(affiliate.vl_affiliate_commission, 0) as vl_affiliate_commission,
-    coalesce(agent.vl_agent_commission, 0) as vl_agent_commission
+    coalesce(agent.vl_agent_commission, 0) as vl_agent_commission,
+    coalesce(affiliate.flg_expected_affiliate_commission, 0) as flg_expected_affiliate_commission,
+    coalesce(agent.flg_expected_agent_commission, 0) as flg_expected_agent_commission
 from
     unit_economics.vw_net_revenue_affiliate_commission_costs affiliate
 full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
@@ -697,7 +736,8 @@ from
 left join
 	unit_economics.vw_base_property_costs vbpc
 	on vbcc.property_id = vbpc.property_id
-	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time and vbpc.max_version_time
+	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time
+	                                                                    and (vbpc.max_version_time + interval '1 day')
 where (vbcc.termination_date is not null
   or vbcc.expected_end_date is not null)
   and vbcc.status in ('Ativo', 'Finalizado')
@@ -739,7 +779,8 @@ select
 	sk_property,
 	property_id,
 	vl_brokerage_fee,
-	dt_cash_flow
+	dt_cash_flow,
+	0 as flg_expected_brokerage_fee
 from
 	brokerage_fill
 where vl_brokerage_fee != 0
@@ -775,7 +816,7 @@ base_contract as (
 	left join
 		filtered_contracts c
 		on base.property_id = c.property_id
-		and c.end_date between base.min_version_time and base.max_version_time
+		and c.end_date between base.min_version_time and (base.max_version_time + interval '1 day')
 ),
 incurred as (
     select
@@ -880,7 +921,8 @@ select
     coalesce(br.property_id, mg.property_id) as property_id,
     coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
     coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
-    coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee
+    coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee,
+    coalesce(br.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee
   from unit_economics.vw_net_revenue_revenues_brokerage_fee br
   full outer join unit_economics.vw_net_revenue_revenues_mgmt_fee mg
     on br.sk_property = mg.sk_property
@@ -896,6 +938,7 @@ select
 	coalesce(b_fee.dt_cash_flow, m_fee.dt_cash_flow) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
 	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
+	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
 from
 	unit_economics.vw_net_revenue_revenues_brokerage_fee b_fee
@@ -907,21 +950,69 @@ full outer join
 
 
 
+
 create or replace view unit_economics.vw_net_revenue_taxes_delay_fine as
-with fines as (
+with filtered_dates as (
+	select distinct
+		date_trunc('month', dd."date") as dt
+	from
+		dim_date dd
+),
+filtered_fines as (
+	select
+		contract_id,
+		sum(fine) as fine,
+		paid_date
+	from invoice_fines
+	where fine > 0
+	group by
+		contract_id,
+		paid_date
+),
+filtered_contracts as (
+	select distinct
+		c.property_id,
+		c.id,
+		c.init_date,
+		coalesce(c.termination_date, c.expected_end_date) as end_date
+	from
+		unit_economics.vw_base_contract_costs c
+	join filtered_fines ff
+    on ff.contract_id = c.id
+),
+contract_dates as (
+	select
+		fc.property_id as property_id,
+		fc.id,
+		fd.dt,
+		row_number() over (partition by fc.id order by fd.dt) as rn,
+		case when fd.dt > now() then 1 else 0 end as flg_expected
+	from
+		filtered_contracts fc
+	left join
+		filtered_dates fd
+	on fd.dt between fc.init_date and fc.end_date
+),
+fines as (
   select
-	inf.fine,
-	inf.paid_date::date as dt,
-	c.property_id as property_id
-  from invoice_fines inf
-  join unit_economics.vw_base_contract_costs c
-    on inf.contract_id = c.id
+		case when flg_expected = 0 then coalesce(ff.fine,0) else ff.fine end as fine,
+		coalesce(ff.paid_date::date, c.dt) as dt,
+		c.property_id as property_id,
+		c.id,
+		avg(case when flg_expected = 0 then coalesce(ff.fine,0) else ff.fine end) filter (where flg_expected=0) over (partition by c.id) as av,
+		rn,
+		flg_expected
+  from contract_dates c
+  left join filtered_fines ff
+    on ff.contract_id = c.id
+    and date_trunc('month',ff.paid_date) = c.dt
 )
 select
-  vbpc.sk_property,
+    vbpc.sk_property,
   f.property_id,
-  f.fine as vl_delay_fine,
-  f.dt as dt_cash_flow
+	coalesce(fine, gap_fill(av) over (partition by id order by dt)) as vl_delay_fine,
+  f.dt::date as dt_cash_flow,
+  f.flg_expected::integer as flg_expected_delay_fine
 from fines f
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = f.property_id
@@ -941,7 +1032,8 @@ select
   sk_property,
   property_id,
   vl_st_iss,
-  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow,
+  0 as flg_expected_sales_tax_iss
 from iss
 ;
 
@@ -958,10 +1050,10 @@ select
   sk_property,
   property_id,
   vl_st_pis_cofins,
-  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow
+  make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow,
+  0 as flg_expected_sales_tax_pis_cofins
 from pis_cofins
 ;
-
 
 create or replace view unit_economics.vw_net_revenue_taxes as
 select
@@ -970,7 +1062,10 @@ select
 	dt_cash_flow,
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
-	sum(vl_delay_fine) as vl_delay_fine
+	sum(vl_delay_fine) as vl_delay_fine,
+	sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+	sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+	sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -979,7 +1074,10 @@ from
 		dt_cash_flow,
 		vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_sales_tax_iss
 	union all
@@ -989,7 +1087,10 @@ from
 		dt_cash_flow,
 		0 as vl_st_iss,
 		vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		0 as flg_expected_sales_tax_iss,
+		flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins
 	union all
@@ -999,7 +1100,10 @@ from
 		dt_cash_flow,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		vl_delay_fine
+		vl_delay_fine,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes_delay_fine
 ) tbl
@@ -1013,12 +1117,18 @@ select
 	dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
-	sum(flg_expected_management_fee) as flg_expected_management_fee,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_agent_commission) as vl_agent_commission,
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
-	sum(vl_delay_fine) as vl_delay_fine
+	sum(vl_delay_fine) as vl_delay_fine,
+    sum(flg_expected_management_fee) as flg_expected_management_fee,
+    sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+    sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+    sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+    sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+    sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+    sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -1027,12 +1137,18 @@ from
 		dt_cash_flow,
 		vl_affiliate_commission,
 		0 as vl_management_fee,
-		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		vl_agent_commission,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		0 as flg_expected_management_fee,
+		0 as flg_expected_brokerage_fee,
+		flg_expected_affiliate_commission,
+		flg_expected_agent_commission,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_commission_costs
 	union all
@@ -1042,12 +1158,18 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		vl_management_fee,
-		flg_expected_management_fee,
 		vl_brokerage_fee,
 		0 as vl_agent_commission,
 		0 as vl_st_iss,
 		0 as vl_st_pis_cofins,
-		0 as vl_delay_fine
+		0 as vl_delay_fine,
+		flg_expected_management_fee,
+		flg_expected_brokerage_fee,
+		0 as flg_expected_affiliate_commission,
+		0 as flg_expected_agent_commission,
+		0 as flg_expected_sales_tax_iss,
+		0 as flg_expected_sales_tax_pis_cofins,
+		0 as flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_revenues
 	union all
@@ -1057,12 +1179,18 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		0 as vl_management_fee,
-		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		0 as vl_agent_commission,
 		vl_st_iss,
 		vl_st_pis_cofins,
-		vl_delay_fine
+		vl_delay_fine,
+		0 as flg_expected_management_fee,
+		0 as flg_expected_brokerage_fee,
+		0 as flg_expected_affiliate_commission,
+		0 as flg_expected_agent_commission,
+		flg_expected_sales_tax_iss,
+		flg_expected_sales_tax_pis_cofins,
+		flg_expected_delay_fine
 	from
 		unit_economics.vw_net_revenue_taxes
 ) tbl
@@ -1099,21 +1227,14 @@ pay_dates as (
 	from
 		payed_contracts
 ),
-insurance_dates as (
+insurance_dates_prev as (
 	select
 		pd.contract_id,
 		pd.property_id,
 		dd."date" as dt_cash_flow,
-		coalesce(case
-			when dt_start < '2017-05-21'
-			then rent * 0.0725
-			else rent * 0.045
-		end, 0) as cardiff_amount,
-		case
-			when dd."date" > now()
-				then 1
-			else 0
-		end as flg_expected
+		dt_start,
+		rent,
+		row_number() over (partition by pd.contract_id order by dd."date")-1 as rn
 	from
 		pay_dates pd
 	left join
@@ -1121,9 +1242,29 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
---		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
+),
+insurance_dates as (
+	select
+		id.contract_id,
+		id.property_id,
+		id.dt_cash_flow,
+		coalesce(
+		case
+			when (id1.dt_cash_flow < '2017-05-21')
+			then id.rent * 0.0725
+			else id.rent * 0.045
+		end, 0
+		) as cardiff_amount,
+		case
+			when id.dt_cash_flow > now() then 1
+			else 0
+		end as flg_expected
+	from insurance_dates_prev id
+		left join insurance_dates_prev id1
+		 on id.contract_id = id1.contract_id
+		 and id1.rn % 12 = 0 and id.rn/12 = id1.rn/12
 ),
 base_contract as (
 	select
@@ -1168,6 +1309,7 @@ with cdre_offboarding as (
 filtered_contracts as (
     select distinct
       property_id,
+      id,
       date_trunc('month', coalesce(termination_date, expected_end_date)::date) as dt
     from unit_economics.vw_base_contract_costs
     where termination_date is not null
@@ -1178,7 +1320,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (offboarding)'
   group by property_id, dt
@@ -1188,7 +1330,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Back-Office (offboarding)'
     and property_id != -1
 ),
@@ -1238,7 +1380,8 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from espec_gen eg
     join cdre_offboarding co
       on co.dre_date = eg.dt + interval '1 month'
@@ -1248,10 +1391,11 @@ contract_costs as (
     select
       fc.property_id,
       fc.dt,
-      co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding
+      coalesce(co.dre_date, fc.dt) as dt_cash_flow,
+      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      (dre_value is null)::int as flg_expected
     from filtered_contracts fc
-    join cdre_offboarding co
+    left join cdre_offboarding co
       on co.dre_date = fc.dt + interval '1 month'
 ),
 full_costs as (
@@ -1259,21 +1403,48 @@ full_costs as (
     coalesce(tt.property_id, cc.property_id) as property_id,
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
-    coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding
+    coalesce(tt.vl_bo_offboarding, cc.vl_bo_offboarding) as vl_bo_offboarding,
+  	coalesce(tt.flg_expected, cc.flg_expected) as flg_expected
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+),
+last_3_avg as (
+	select
+		t1.dt,
+		t1.property_id,
+		t1.dt_cash_flow,
+		t1.vl_bo_offboarding,
+		t1.flg_expected,
+		avg(t2.vl_bo_offboarding) as m_avg
+	from full_costs t1
+	join
+		full_costs t2
+		on t2.dt_cash_flow >= t1.dt_cash_flow - interval '3 month' and t2.dt_cash_flow <= t1.dt_cash_flow
+	group by t1.dt, t1.property_id, t1.dt_cash_flow, t1.vl_bo_offboarding, t1.flg_expected
+),
+coalesced_values as (
+	select
+		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		lavg.property_id,
+		lavg.dt_cash_flow::date,
+		case
+			when dt_cash_flow >= '2017-01-01'
+			then coalesce(vl_bo_offboarding,max(m_avg) filter (where flg_expected = 0) over ())
+			else coalesce(vl_bo_offboarding, 0)
+		end as vl_bo_offboarding,
+		flg_expected
+	from last_3_avg lavg
+	left join unit_economics.vw_base_property_costs vbpc
+	  on vbpc.property_id = lavg.property_id
+	    and lavg.dt between vbpc.min_version_time and vbpc.max_version_time
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_offboarding,
-  0 as flg_expected
-from full_costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt between vbpc.min_version_time and vbpc.max_version_time
+	*
+from
+	coalesced_values
+where
+	vl_bo_offboarding != 0
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_bo_onboarding_costs as
@@ -1289,7 +1460,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (onboarding)'
   group by property_id, dt
@@ -1299,7 +1470,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Back-Office (onboarding)'
     and property_id != -1
 ),
@@ -1322,14 +1493,14 @@ filtered_contracts_prev as (
 ),
 filtered_contracts as(
 	select distinct
-		property_id,
-		dre_date as dt
-	from
-		filtered_contracts_prev fc
-	join
-		cdre_onboarding dre
-		on dre_date between date_trunc('month', fc."from")  + interval '1 month'
+		fc.property_id,
+		coalesce(dre.dre_date, date_trunc('month', fc."to") + interval '1 month') as dt
+	from filtered_contracts_prev fc
+	left join cdre_onboarding dre
+		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
                         and date_trunc('month', fc."to") + interval '1 month'
+    where fc."from" >= '2015-12-01'
+        and fc."to" >= '2015-12-01'
 ),
 ratio as (
   select distinct
@@ -1352,7 +1523,7 @@ gen_contracts as (
 espec_gen_prev as (
   select
     fc.property_id,
-    cqt.dt as dt,
+    coalesce(cqt.dt, fc.dt) as dt,
     cqt.qt as qt
   from
   	filtered_contracts fc
@@ -1361,7 +1532,7 @@ espec_gen_prev as (
   union
   select
   	*
-	from gen_contracts
+    from gen_contracts
 ),
 espec_gen as (
 	select
@@ -1376,21 +1547,21 @@ tt_costs as (
     select
       eg.property_id,
       eg.dt,
-      co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      eg.dt as dt_cash_flow,
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision as vl_bo_onboarding
     from espec_gen eg
-    join cdre_onboarding co
-      on co.dre_date = eg.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = eg.dt
 ),
 contract_costs as (
     select
-    	fc.dt,
+      fc.dt,
       fc.property_id,
-      co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_onboarding
+      fc.dt as dt_cash_flow,
+      co.dre_value / (count(fc.property_id) over (partition by fc.dt))::double precision as vl_bo_onboarding
     from filtered_contracts fc
-    join cdre_onboarding co
-      on co.dre_date = fc.dt + interval '1 month'
+    left join cdre_onboarding co
+      on co.dre_date = fc.dt
 ),
 full_costs as (
   select distinct
@@ -1401,19 +1572,57 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+),
+result as (
+    select
+      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      c.property_id,
+      c.dt_cash_flow::date,
+      c.vl_bo_onboarding,
+      (c.vl_bo_onboarding is null)::int as flg_expected_bo_onboarding
+    from full_costs c
+    left join unit_economics.vw_base_property_costs vbpc
+      on vbpc.property_id = c.property_id
+        and c.dt >= vbpc.min_version_time
+        and c.dt <= vbpc.max_version_time
+),
+m_avg_prev as (
+    select distinct
+        dt_cash_flow,
+        avg(vl_bo_onboarding) over (partition by dt_cash_flow order by dt_cash_flow) as _avg1
+    from result
+    order by dt_cash_flow asc
+),
+last_value as (
+    select
+        dt_cash_flow,
+        case
+            when _avg1 is null
+                and avg(_avg1) over (rows between 3 preceding and 1 preceding) is not null
+                and lag(_avg1) over () is not null
+                and lead(_avg1) over () is null
+              then avg(_avg1) over (rows between 3 preceding and 1 preceding)
+            else _avg1
+        end as m_avg
+    from m_avg_prev
+),
+last_value_gap_fill as (
+    select
+        dt_cash_flow,
+        coalesce(m_avg, gap_fill(m_avg) over ()) as new_value
+    from last_value
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_onboarding,
-  0 as flg_expected
-from full_costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.dt >= vbpc.min_version_time
-    and c.dt <= vbpc.max_version_time
+    r.sk_property,
+    r.property_id,
+    r.dt_cash_flow,
+    r.flg_expected_bo_onboarding,
+    lv.new_value as vl_bo_onboarding
+from result r
+join last_value_gap_fill lv
+    on r.dt_cash_flow = lv.dt_cash_flow
 ;
+
 
 create or replace view unit_economics.vw_mgmt_ops_bo_ongoing_costs as
 with cdre_ongoing as (
@@ -1423,7 +1632,7 @@ with cdre_ongoing as (
     from unit_economics.vw_base_dre_costs
     where dre_category = 'Back-Office (ongoing)'
 ),
-filtered_contracts as (
+filtered_contracts_prev as (
     select distinct
       property_id,
       init_date as start_date,
@@ -1433,30 +1642,82 @@ filtered_contracts as (
       and (termination_date is not null
             or expected_end_date is not null)
 ),
-costs as (
-    select
+filtered_contract as (
+    select distinct
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      co.dre_date as dt_cash_flow,
-      co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_ongoing
-    from filtered_contracts fc
-    join cdre_ongoing co
-      on co.dre_date between date_trunc('month', fc.start_date)  + interval '1 month'
+      date_trunc('month', dd."date")::date as dt_cash_flow
+    from dim_date dd
+    join filtered_contracts_prev fc
+        on date_trunc('month', dd."date") between date_trunc('month', fc.start_date)  + interval '1 month'
                         and date_trunc('month', fc.end_date) + interval '1 month'
+),
+costs as (
+    select distinct
+      fc.property_id,
+      fc.start_date,
+      fc.end_date,
+      fc.dt_cash_flow,
+      co.dre_value,
+      (count(fc.property_id) over (partition by fc.dt_cash_flow)),
+      co.dre_value / (count(fc.property_id) over (partition by fc.dt_cash_flow))::double precision as vl_bo_ongoing,
+      (dre_value is null)::int as flg_expected_bo_ongoing
+    from filtered_contract fc
+    left join cdre_ongoing co
+      on co.dre_date = fc.dt_cash_flow
+),
+result as (
+    select
+      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      c.property_id,
+      c.dt_cash_flow,
+      c.vl_bo_ongoing,
+      flg_expected_bo_ongoing
+    from costs c
+    left join unit_economics.vw_base_property_costs vbpc
+      on vbpc.property_id = c.property_id
+        and c.start_date >= vbpc.min_version_time
+        and c.end_date <= vbpc.max_version_time
+),
+m_avg_prev as (
+    select distinct
+        dt_cash_flow,
+        avg(vl_bo_ongoing) over (partition by dt_cash_flow order by dt_cash_flow) as _avg1
+    from result
+    order by dt_cash_flow asc
+),
+last_value as (
+    select
+        dt_cash_flow,
+        case
+            when _avg1 is null
+                and avg(_avg1) over (rows between 3 preceding and 1 preceding) is not null
+                and lag(_avg1) over () is not null
+                and lead(_avg1) over () is null
+              then avg(_avg1) over (rows between 3 preceding and 1 preceding)
+            else _avg1
+        end as m_avg
+    from m_avg_prev
+),
+last_value_gap_fill as (
+    select
+        dt_cash_flow,
+        coalesce(m_avg, gap_fill(m_avg) over ()) as new_value
+    from last_value
 )
 select
-  coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
-  c.property_id,
-  c.dt_cash_flow,
-  c.vl_bo_ongoing,
-  0 as flg_expected
-from costs c
-left join unit_economics.vw_base_property_costs vbpc
-  on vbpc.property_id = c.property_id
-    and c.start_date >= vbpc.min_version_time
-    and c.end_date <= vbpc.max_version_time
+    r.sk_property,
+    r.property_id,
+    r.dt_cash_flow,
+    r.vl_bo_ongoing as old_vl_bo_ongoing,
+    r.flg_expected_bo_ongoing,
+    lv.new_value as vl_bo_ongoing
+from result r
+join last_value_gap_fill lv
+    on r.dt_cash_flow = lv.dt_cash_flow
 ;
+
 
 create or replace view unit_economics.vw_mgmt_ops_collection_costs as
 with cdre_collection as (
@@ -1471,19 +1732,39 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Collection'
   group by property_id, dt
 ),
 calculated_qt as (
   select
-    tt.property_id,
-    tt.dt,
-    tt.qt
-  from unit_economics.vw_base_ticket_task tt
-  where tt.group_name = 'Collection'
+    property_id,
+    dt,
+    qt,
+    avg(qt) over() as _avg
+  from unit_economics.tbl_base_ticket_task
+  where group_name = 'Collection'
     and property_id != -1
+),
+series as (
+	select
+		null::double precision as dre_value,
+		generate_series((max(dre.dre_date) + interval '1 month')::date,
+		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date
+	from cdre_collection dre
+	group by dre_value
+
+	union
+
+	select dre_value, dre_date
+	from cdre_collection
+),
+cdre_collection_fc as (
+    select
+        gap_fill(dre_value) over (order by dre_date) as dre_value,
+        dre_date
+    from series
 ),
 rent_delay as (
   select
@@ -1500,63 +1781,85 @@ rent_delay as (
 filtered_contracts as (
     select distinct
       c.property_id as property_id,
-      date_trunc('month', rd.tenant_due_date)::date as dt
+      ccs.dre_date as dt,
+      (date_part('year',  ccs.dre_date) - date_part('year', c.init_date)) * 12 +
+              (date_part('month',  ccs.dre_date) - date_part('month', c.init_date)) as months_after_init
     from unit_economics.vw_base_contract_costs c
-    join rent_delay rd
+    join cdre_collection_fc ccs
+      on ccs.dre_date between date_trunc('month', c.init_date) + interval '1 month'
+                        and date_trunc('month', coalesce(c.termination_date, c.expected_end_date)) + interval '1 month'
+    left join rent_delay rd
       on c.id = rd.contract_id
-    where rd.rent_delayed_days > 0
-        or tenant_paid_date is null
+        and (rd.rent_delayed_days > 0
+            or tenant_paid_date is null)
 ),
 ratio as (
   select distinct
     fc.dt,
-    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt
+    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt,
+    fc.months_after_init
   from filtered_contracts fc
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
 gen_contracts as (
-	select
+	select distinct
 		fc.property_id,
 		fc.dt,
-		r.qt as qt_gen
-	from
-  	filtered_contracts fc
-  left join ratio r
-  	on fc.dt = r.dt
+		r.qt as qt,
+		avg(r.qt) over () as _avg,
+		fc.months_after_init
+	from filtered_contracts fc
+    left join ratio r
+  	    on fc.dt = r.dt
 ),
-espec_gen_prev as (
-  select
-    fc.property_id,
-    cqt.dt as dt,
-    cqt.qt as qt
-  from
-  	filtered_contracts fc
-  join calculated_qt cqt
-    on cqt.property_id = fc.property_id
-  union
-  select
-  	*
-	from gen_contracts
+calculated as (
+    select distinct
+        property_id,
+        dt,
+        qt,
+        avg(qt) over (partition by property_id) as _avg
+    from calculated_qt
 ),
-espec_gen as (
-	select
+spec_gen_prev as (
+  select
+    coalesce(cc.property_id, gc.property_id) as property_id,
+    coalesce(cc.dt, gc.dt) as dt,
+    coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
+    coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)), 0) as _avg,
+    gc.months_after_init
+  from calculated cc
+  full outer join gen_contracts gc
+    on cc.property_id = gc.property_id
+        and gc.dt = cc.dt
+),
+spec_gen as (
+	select distinct
 		property_id,
 		dt,
-		sum(qt) as qt
-	from espec_gen_prev
-	group by
-		property_id, dt
+		case
+		    when qt = 0
+		        then coalesce(_avg, 0)
+		    else coalesce(qt, _avg)
+		end as qt,
+		case
+		    when qt = 0 and _avg is not null
+		        then 1
+		    else 0
+		end as flg_expected_collection
+	from spec_gen_prev
 ),
 tt_costs as (
-    select
+    select distinct
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_collection
-    from espec_gen eg
-    join cdre_collection co
+      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_collection,
+      flg_expected_collection
+    from spec_gen eg
+    join cdre_collection_fc co
       on co.dre_date = eg.dt + interval '1 month'
+    where eg.qt > 0
 ),
 contract_costs as (
     select
@@ -1573,17 +1876,19 @@ full_costs as (
     coalesce(tt.property_id, cc.property_id) as property_id,
     coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
-    coalesce(tt.vl_collection, cc.vl_collection) as vl_collection
+    coalesce(tt.vl_collection, cc.vl_collection) as vl_collection,
+    coalesce(tt.flg_expected_collection, 0) as flg_expected_collection
   from tt_costs tt
   full outer join contract_costs cc
-    on tt.dt_cash_flow = cc.dt_cash_flow
+    on tt.property_id = cc.property_id and tt.dt = cc.dt
+        and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
   vbpc.sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_collection,
-  0 as flg_expected
+  flg_expected_collection
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
@@ -1603,18 +1908,19 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (post-sale)'
   group by property_id, dt
 ),
 calculated_qt as (
   select
-    tt.property_id,
-    tt.dt,
-    tt.qt
-  from unit_economics.vw_base_ticket_task tt
-  where tt.group_name = 'Customer Support (post-sale)'
+    property_id,
+    dt,
+    qt,
+    avg(qt) over() as _avg
+  from unit_economics.tbl_base_ticket_task
+  where group_name = 'Customer Support (post-sale)'
     and property_id != -1
 ),
 filtered_contracts_prev as (
@@ -1629,65 +1935,104 @@ filtered_contracts_prev as (
             or "dataFimContratoPrevisto" is not null)
     window w as (partition by imovel_id)
 ),
+series as (
+	select
+		null::double precision as dre_value,
+		generate_series((max(dre.dre_date) + interval '1 month')::date,
+		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date
+	from cdre_cs_post_sale dre
+
+	union
+
+	select dre_value, dre_date
+	from cdre_cs_post_sale
+),
+cdre_cs_post_sale_fc as (
+    select
+        gap_fill(dre_value) over (order by dre_date) as dre_value,
+        dre_date
+    from series
+),
 filtered_contracts as (
   select distinct
     fcp.property_id,
-    cps.dre_date - interval '1 month' as dt
+    cps.dre_date - interval '1 month' as dt,
+    (date_part('year',  cps.dre_date) - date_part('year', start_date)) * 12 +
+              (date_part('month',  cps.dre_date) - date_part('month', start_date)) as months_after_init
   from filtered_contracts_prev fcp
-    join cdre_cs_post_sale cps
+  join cdre_cs_post_sale_fc cps
       on cps.dre_date between date_trunc('month', fcp.start_date) + interval '1 month'
                         and date_trunc('month', fcp.end_date) + interval '1 month'
+  where cps.dre_date >= '2016-01-01'
 ),
 ratio as (
   select distinct
     fc.dt,
-    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt
+    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt,
+    fc.months_after_init
   from filtered_contracts fc
   left join qt_nulls qn
     on fc.dt = qn.dt
 ),
 gen_contracts as (
-	select
+	select distinct
 		fc.property_id,
 		fc.dt,
-		r.qt as qt_gen
-	from
-  	filtered_contracts fc
-  left join ratio r
-  	on fc.dt = r.dt
+		r.qt as qt,
+		avg(r.qt) over () as _avg,
+		fc.months_after_init
+	from filtered_contracts fc
+    left join ratio r
+  	    on fc.dt = r.dt
 ),
-espec_gen_prev as (
-  select
-    fc.property_id,
-    cqt.dt as dt,
-    cqt.qt as qt
-  from
-  	filtered_contracts fc
-  join calculated_qt cqt
-    on cqt.property_id = fc.property_id
-  union
-  select
-  	*
-	from gen_contracts
+calculated as (
+    select distinct
+        cqt.property_id,
+        cqt.dt,
+        cqt.qt,
+        avg(qt) over (partition by property_id) as _avg
+    from calculated_qt cqt
 ),
-espec_gen as (
-	select
+spec_gen_prev as (
+  select
+    coalesce(cc.property_id, gc.property_id) as property_id,
+    coalesce(cc.dt, gc.dt) as dt,
+    coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
+    coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)
+                                        * (0.93 ^ gc.months_after_init)), 0) as _avg,
+    gc.months_after_init
+  from calculated cc
+  full outer join gen_contracts gc
+    on cc.property_id = gc.property_id
+        and gc.dt = cc.dt
+),
+spec_gen as (
+	select distinct
 		property_id,
 		dt,
-		sum(qt) as qt
-	from espec_gen_prev
-	group by
-		property_id, dt
+		case
+		    when qt = 0
+		        then coalesce(_avg, 0)
+		    else coalesce(qt, _avg)
+		end as qt,
+		case
+		    when qt = 0 and _avg is not null
+		        then 1
+		    else 0
+		end as flg_expected_cs_post_sale
+	from spec_gen_prev
 ),
 tt_costs as (
-    select
+    select distinct
       eg.property_id,
       eg.dt,
       cps.dre_date as dt_cash_flow,
-      cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
-    from espec_gen eg
-    join cdre_cs_post_sale cps
+      cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale,
+      flg_expected_cs_post_sale
+    from spec_gen eg
+    join cdre_cs_post_sale_fc cps
       on cps.dre_date = eg.dt + interval '1 month'
+    where eg.qt > 0
 ),
 contract_costs as (
     select
@@ -1698,36 +2043,119 @@ contract_costs as (
     from filtered_contracts fc
     join cdre_cs_post_sale cps
       on cps.dre_date = fc.dt
+    where fc.dt + interval '1 month' = cps.dre_date
 ),
 full_costs as (
   select distinct
-    property_id,
-    dt,
-    dt_cash_flow,
-    vl_cs_post_sale
-  from tt_costs
-  where dt = dt_cash_flow
-
-  union
-
-  select distinct
-    property_id,
-    dt,
-    dt_cash_flow,
-    vl_cs_post_sale
-  from contract_costs
-  where dt = dt_cash_flow
+    coalesce(tt.property_id, cc.property_id) as property_id,
+    coalesce(tt.dt, cc.dt) as dt,
+    coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
+    coalesce(tt.vl_cs_post_sale, cc.vl_cs_post_sale) as vl_cs_post_sale,
+    coalesce(tt.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale
+  from tt_costs tt
+  full outer join contract_costs cc
+    on tt.property_id = cc.property_id and tt.dt = cc.dt
+        and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
-  fc.dt_cash_flow,
+  fc.dt_cash_flow::date,
   fc.vl_cs_post_sale,
-  0 as flg_expected
+  fc.flg_expected_cs_post_sale
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
     and fc.dt - interval '1 month' between vbpc.min_version_time and vbpc.max_version_time
+;
+
+create or replace view unit_economics.vw_mgmt_ops_inspection_costs as
+with cdre_inspections as (
+    select
+      dre_value,
+      dre_date
+    from unit_economics.vw_base_dre_costs
+    where dre_category = 'Inspections'
+),
+init_contract_costs as (
+    select distinct
+      property_id,
+      id,
+      date_trunc('month', signature_date)::date as dt
+    from unit_economics.vw_base_contract_costs
+    where signature_date is not null
+),
+end_contract_costs as (
+   select distinct
+      property_id,
+      id,
+      date_trunc('month', coalesce(termination_date, expected_end_date))::date as dt
+    from unit_economics.vw_base_contract_costs
+    where termination_date is not null
+          or expected_end_date is not null
+),
+filtered_contracts as (
+	select
+		property_id,
+    id,
+		dt
+	from
+		init_contract_costs
+	union
+	select
+		property_id,
+    id,
+		dt
+	from
+		end_contract_costs
+),
+contract_costs as (
+	select
+	  fc.property_id,
+	  fc.dt,
+	  coalesce(ci.dre_date, fc.dt) as dt_cash_flow,
+	  ci.dre_value / (count(fc.property_id) over (partition by ci.dre_date))::double precision as vl_inspections,
+	  (dre_value is null)::int as flg_expected_inspection
+	from filtered_contracts fc
+	left join cdre_inspections ci
+	  on ci.dre_date = fc.dt + interval '1 month'
+),
+last_3_avg as (
+	select
+		t1.dt,
+		t1.property_id,
+		t1.dt_cash_flow,
+		t1.vl_inspections,
+		t1.flg_expected_inspection,
+		avg(t2.vl_inspections) as m_avg
+	from contract_costs t1
+	join
+		contract_costs t2
+		on t2.dt_cash_flow >= t1.dt_cash_flow - interval '3 month' and t2.dt_cash_flow <= t1.dt_cash_flow
+	group by t1.dt, t1.property_id, t1.dt_cash_flow, t1.vl_inspections, t1.flg_expected_inspection
+),
+coalesced_values as (
+	select
+		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		lavg.property_id,
+		lavg.dt_cash_flow::date,
+		case
+			when dt_cash_flow >= '2017-01-01'
+			then coalesce(vl_inspections,max(m_avg) filter (where flg_expected_inspection = 0) over ())
+			else coalesce(vl_inspections, 0)
+		end as vl_inspections,
+		flg_expected_inspection
+	from last_3_avg lavg
+	left join unit_economics.vw_base_property_costs vbpc
+	  on vbpc.property_id = lavg.property_id
+	    and lavg.dt between vbpc.min_version_time and vbpc.max_version_time
+)
+select
+	*
+from
+	coalesced_values
+where
+	vl_inspections != 0
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_costs as
@@ -1740,11 +2168,13 @@ select
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_collection) as vl_collection,
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
+	sum(vl_inspections)  as vl_inspections,
 	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
     sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
     sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
     sum(flg_expected_collection) as flg_expected_collection,
-    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale
+    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+    sum(flg_expected_inspection)  as flg_expected_inspection
 from
 (
 	select
@@ -1756,11 +2186,13 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		flg_expected as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_bo_offboarding_costs
 	union all
@@ -1773,11 +2205,13 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        flg_expected as flg_expected_bo_onboarding,
+        flg_expected_bo_onboarding as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_bo_onboarding_costs
 	union all
@@ -1790,11 +2224,13 @@ from
 		vl_bo_ongoing,
 		0 as vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
-        flg_expected as flg_expected_bo_ongoing,
+        flg_expected_bo_ongoing as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_bo_ongoing_costs
 	union all
@@ -1807,11 +2243,13 @@ from
 		0 as vl_bo_ongoing,
 		vl_collection,
 		0 as vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
-        flg_expected as flg_expected_collection,
-        0 as flg_expected_cs_post_sale
+        flg_expected_collection as flg_expected_collection,
+        0 as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_collection_costs
 	union all
@@ -1824,15 +2262,65 @@ from
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
 		vl_cs_post_sale,
+		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
         0 as flg_expected_bo_onboarding,
         0 as flg_expected_bo_ongoing,
         0 as flg_expected_collection,
-        flg_expected as flg_expected_cs_post_sale
+        flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+        0 as flg_expected_inspection
 	from
 		unit_economics.vw_mgmt_ops_cs_post_sale_costs
+	union all
+	select
+		sk_property,
+		property_id,
+		dt_cash_flow,
+		0 as vl_bo_offboarding,
+		0 as vl_bo_onboarding,
+		0 as vl_bo_ongoing,
+		0 as vl_collection,
+		0 as vl_cs_post_sale,
+		vl_inspections,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale,
+        flg_expected_inspection as flg_expected_inspection
+	from
+		unit_economics.vw_mgmt_ops_inspection_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
+;
+
+create or replace view unit_economics.vw_mgmt_insurance_pis_cofins as
+select
+	sk_property,
+	property_id,
+	contract_id,
+	-(vl_insurance_fee * 0.0925) as vl_st_pis_cofins,
+	(date_trunc('month', dt_cash_flow) + interval '19 day')::date as dt_cash_flow,
+	flg_expected
+from
+	unit_economics.vw_mgmt_insurance_fee
+;
+
+create or replace view unit_economics.vw_mgmt_insurance as
+select
+	coalesce(i_fee.sk_property, i_pis.sk_property) as sk_property,
+	coalesce(i_fee.property_id, i_pis.property_id) as property_id,
+	coalesce(i_fee.dt_cash_flow, i_pis.dt_cash_flow) as dt_cash_flow,
+	coalesce(i_fee.vl_insurance_fee, 0) as vl_insurance_fee,
+	coalesce(i_pis.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
+	coalesce(i_fee.flg_expected, 0) as flg_expected_insurance_fee,
+	coalesce(i_pis.flg_expected, 0) as flg_expected_sales_tax_pis_cofins
+from
+	unit_economics.vw_mgmt_insurance_fee i_fee
+full outer join
+	unit_economics.vw_mgmt_insurance_pis_cofins i_pis
+	on i_fee.sk_property = i_pis.sk_property
+	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_mgmt_costs as
@@ -1845,17 +2333,21 @@ select
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
+  coalesce(ops.vl_inspections, 0) as vl_inspections,
   coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
+  coalesce(ins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
   coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
   coalesce(ops.flg_expected_bo_onboarding, 0) as flg_expected_bo_onboarding,
   coalesce(ops.flg_expected_bo_ongoing, 0) as flg_expected_bo_ongoing,
   coalesce(ops.flg_expected_collection, 0) as flg_expected_collection,
   coalesce(ops.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale,
-  coalesce(ins.flg_expected, 0) as flg_expected_insurance_fee
+  coalesce(ops.flg_expected_inspection, 0) as flg_expected_inspection,
+  coalesce(ins.flg_expected_insurance_fee, 0) as flg_expected_insurance_fee,
+  coalesce(ins.flg_expected_sales_tax_pis_cofins, 0) as flg_expected_sales_tax_pis_cofins
 from
 	unit_economics.vw_mgmt_ops_costs ops
 full outer join
-	unit_economics.vw_mgmt_insurance_fee ins
+	unit_economics.vw_mgmt_insurance ins
 	on ins.sk_property = ops.sk_property
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;
@@ -1960,14 +2452,14 @@ create or replace view unit_economics.vw_liquidity_mkt_tenant_campaigns_costs as
 with criteo_daily_costs as (
 	select distinct
 		"dateTime"::date as dt_cost,
-		cost::DECIMAL as cost
+		cost::decimal as cost
 	from criteo_ads_campaigns
 ),
 -- Get Google Daily Costs
 google_daily_costs as (
 	select
 		"day"::date dt_cost,
-		sum((cost::DECIMAL/1000000)::DECIMAL) as cost
+		sum((cost::decimal/1000000)::decimal) as cost
 	from
 		google_ads_campaigns
 	where
@@ -1984,7 +2476,7 @@ google_daily_costs as (
 facebook_daily_costs as (
 	select
 	    "date"::date as dt_cost,
-	    sum(spend::DECIMAL) as cost
+	    sum(spend::decimal) as cost
 	from
 	    facebook_ads_campaigns
 	where
@@ -1996,7 +2488,7 @@ facebook_daily_costs as (
 rtbhouse_daily_costs as (
 	select
 		"Date"::date as dt_cost,
-		-sum(("Debit"::DECIMAL(14,2))::DECIMAL(14,2)) as cost
+		-sum(("Debit"::decimal(14,2))::decimal(14,2)) as cost
 	from
 		rtbhouse_ads_campaigns
 	where
@@ -2065,9 +2557,9 @@ select
 	pc.google,
 	pc.facebook,
 	pc.rtbhouse,
-	trim(REPLACE("Total",',',''))::decimal(14,4)
+	trim(replace("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date") as classifieds,
-	(pc.total + (trim(REPLACE("Total",',',''))::decimal(14,4)
+	(pc.total + (trim(replace("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date"))) as total
 from
 	files.classified_costs class
@@ -2228,7 +2720,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.tbl_base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (pre-sale)'
   group by property_id, dt
@@ -2238,7 +2730,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.tbl_base_ticket_task tt
   where tt.group_name = 'Customer Support (pre-sale)'
     and property_id != -1
 ),
@@ -2372,7 +2864,7 @@ with cdre_field_ops as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where dre_category = 'Field Operation'
+    where dre_category like 'Field Operation%'
 ),
 filtered_visits as (
     select
@@ -2562,25 +3054,33 @@ with unit_economics as (
         0 as vl_termination_fine,
         sum(vl_brokerage_fee) as vl_brokerage_fee,
         sum(vl_management_fee) as vl_management_fee,
-        sum(flg_expected_management_fee) as flg_expected_management_fee,
         sum(vl_cs_post_sale) as vl_cs_post_sale,
         sum(vl_collection) as vl_collection,
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
+        sum(vl_inspections) as vl_inspections,
         -sum(vl_insurance_fee) as vl_insurance_fee,
         sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
         sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
         sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
         sum(flg_expected_collection) as flg_expected_collection,
         sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
-        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
+        sum(flg_expected_inspection) as flg_expected_inspection,
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee,
+        sum(flg_expected_management_fee) as flg_expected_management_fee,
+        sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+        sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+        sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+        sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+        sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+        sum(flg_expected_delay_fine) as flg_expected_delay_fine
     from
     (
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
@@ -2601,26 +3101,34 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_inspection,
+            0 as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            0 as flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_liquidity_costs
         union all
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             vl_owner_campaigns,
             vl_affiliate_campaigns,
@@ -2641,26 +3149,34 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_inspection,
+            0 as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            0 as flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_supply_costs
         union all
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
@@ -2673,7 +3189,7 @@ with unit_economics as (
             0 as vl_field_ops,
             0 as vl_bo_pre_sale,
             0 as vl_agent_hours,
-            0 as vl_st_pis_cofins,
+            vl_st_pis_cofins,
             0 as vl_st_iss,
             0 as vl_affiliate_commission,
             0 as vl_agent_commission,
@@ -2681,26 +3197,34 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
-            0 as flg_expected_management_fee,
             vl_cs_post_sale as vl_cs_post_sale,
             vl_collection as vl_collection,
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
+            vl_inspections as vl_inspections,
             vl_insurance_fee as vl_insurance_fee,
             flg_expected_bo_offboarding as flg_expected_bo_offboarding,
             flg_expected_bo_onboarding as flg_expected_bo_onboarding,
             flg_expected_bo_ongoing as flg_expected_bo_ongoing,
             flg_expected_collection as flg_expected_collection,
             flg_expected_cs_post_sale as flg_expected_cs_post_sale,
-            flg_expected_insurance_fee as flg_expected_insurance_fee
+            flg_expected_inspection as flg_expected_inspection,
+            flg_expected_insurance_fee as flg_expected_insurance_fee,
+            0 as flg_expected_management_fee,
+            0 as flg_expected_brokerage_fee,
+            0 as flg_expected_affiliate_commission,
+            0 as flg_expected_agent_commission,
+            0 as flg_expected_sales_tax_iss,
+            flg_expected_sales_tax_pis_cofins,
+            0 as flg_expected_delay_fine
         from
             unit_economics.vw_mgmt_costs
         union all
         select
             sk_property,
             property_id,
-            coalesce(replace(dt_cash_flow::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
+            coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
@@ -2721,19 +3245,27 @@ with unit_economics as (
             0 as vl_termination_fine,
             vl_brokerage_fee as vl_brokerage_fee,
             vl_management_fee as vl_management_fee,
-            flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
+            0 as vl_inspections,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
             0 as flg_expected_bo_ongoing,
             0 as flg_expected_collection,
             0 as flg_expected_cs_post_sale,
-            0 as flg_expected_insurance_fee
+            0 as flg_expected_inspection,
+            0 as flg_expected_insurance_fee,
+            flg_expected_management_fee as flg_expected_management_fee,
+            flg_expected_brokerage_fee as flg_expected_brokerage_fee,
+            flg_expected_affiliate_commission as flg_expected_affiliate_commission,
+            flg_expected_agent_commission as flg_expected_agent_commission,
+            flg_expected_sales_tax_iss as flg_expected_sales_tax_iss,
+            flg_expected_sales_tax_pis_cofins as flg_expected_sales_tax_pis_cofins,
+            flg_expected_delay_fine as flg_expected_delay_fine
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -2758,7 +3290,7 @@ final_version as (
   select
     ue.sk_property,
     ue.property_id,
-    coalesce(c.sk_contract, -1) as sk_contract,
+    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_property order by ue.sk_cash_flow_date asc), -1) as sk_contract,
     ue.sk_cash_flow_date,
     ue.vl_owner_campaigns,
     ue.vl_affiliate_campaigns,
@@ -2772,35 +3304,201 @@ final_version as (
     ue.vl_bo_pre_sale,
     ue.vl_agent_hours,
     ue.vl_st_pis_cofins,
+    ue.flg_expected_sales_tax_pis_cofins,
     ue.vl_st_iss,
+    ue.flg_expected_sales_tax_iss,
     ue.vl_affiliate_commission,
+    ue.flg_expected_affiliate_commission,
     ue.vl_agent_commission,
+    ue.flg_expected_agent_commission,
     ue.vl_delay_fine,
+    ue.flg_expected_delay_fine,
     ue.vl_termination_fine,
     ue.vl_brokerage_fee,
+    ue.flg_expected_brokerage_fee,
     ue.vl_management_fee,
     ue.flg_expected_management_fee,
     ue.vl_cs_post_sale,
-    ue.vl_collection,
-    ue.vl_bo_onboarding,
-    ue.vl_bo_ongoing,
-    ue.vl_bo_offboarding,
-    ue.vl_insurance_fee,
-    ue.flg_expected_bo_offboarding,
-    ue.flg_expected_bo_onboarding,
-    ue.flg_expected_bo_ongoing,
-    ue.flg_expected_collection,
     ue.flg_expected_cs_post_sale,
+    ue.vl_collection,
+    ue.flg_expected_collection,
+    ue.vl_bo_onboarding,
+    ue.flg_expected_bo_onboarding,
+    ue.vl_bo_ongoing,
+    ue.flg_expected_bo_ongoing,
+    ue.vl_bo_offboarding,
+    ue.flg_expected_bo_offboarding,
+    ue.vl_inspections,
+    ue.flg_expected_inspection,
+    ue.vl_insurance_fee,
     ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id
        and ue.dt_cash_flow between c.start_date and c.end_date
 )
-select fv.*
-from final_version fv
-left join unit_economics.vw_dim_property_ribs dp
-  on fv.sk_property = dp.sk_property
-where fv.sk_cash_flow_date != -1
-      and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
+,
+first_pubs as (
+    select
+        i.id as property_id,
+        COALESCE(h.dt_first_publication, i.first_publication) AS first_publication
+    from
+        imovel i
+    left join
+        (
+          select
+              a.id,
+            min(a.status_time) AS dt_first_publication
+          from imovel_status_history a
+          where a.published = 1
+          group by a.id
+        ) h
+        ON h.id = i.id
+),
+before_loss_factor as (
+    select
+        fv.*,
+		(substring(fv.sk_cash_flow_date::varchar, 1, 4)
+			|| '-' || substring(fv.sk_cash_flow_date::varchar, 5, 2)
+			|| '-' || substring(fv.sk_cash_flow_date::varchar, 7, 2))::date as sk_date
+    from final_version fv
+    left join first_pubs dp
+      on fv.property_id = dp.property_id
+    where fv.sk_cash_flow_date != -1
+--          and coalesce(replace(dp.first_publication::date::varchar, '-', '')::integer, -1) <= fv.sk_cash_flow_date
+),
+fact_contract as (
+	select
+		blf.*,
+		(date_part('year', blf.sk_date) - date_part('year', c."dataAssinado"::date)) * 12 +
+	              (date_part('month', blf.sk_date) - date_part('month', c."dataAssinado"::date)) as months_diff
+	from before_loss_factor blf
+	left join contract c
+		on blf.sk_contract = c.id
+),
+fact_factor as (
+    select
+        fc.sk_property,
+        fc.property_id,
+        fc.sk_contract,
+        fc.sk_cash_flow_date,
+        fc.sk_date,
+        fc.vl_owner_campaigns,
+        fc.vl_affiliate_campaigns,
+        fc.vl_inside_sales,
+        fc.vl_photos,
+        fc.vl_affiliate_bonus,
+        fc.vl_lockbox,
+        fc.vl_tenant_campaigns,
+        fc.vl_cs_pre_sale,
+        fc.vl_field_ops,
+        fc.vl_bo_pre_sale,
+        fc.vl_agent_hours,
+        coalesce(fc.vl_st_pis_cofins * (1 - sum(cf.loss_factor)
+                    filter (where fc.flg_expected_sales_tax_pis_cofins = 1)
+                        over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
+        fc.flg_expected_sales_tax_pis_cofins,
+        coalesce(fc.vl_st_iss * (1 - sum(cf.loss_factor)
+                    filter (where fc.flg_expected_sales_tax_iss = 1)
+                        over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
+        fc.flg_expected_sales_tax_iss,
+        coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_affiliate_commission = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
+        fc.flg_expected_affiliate_commission,
+        coalesce(fc.vl_agent_commission * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_agent_commission = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
+        fc.flg_expected_agent_commission,
+        coalesce(fc.vl_delay_fine * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_delay_fine = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
+        fc.flg_expected_delay_fine,
+        fc.vl_termination_fine,
+        coalesce(fc.vl_brokerage_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_brokerage_fee = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
+        fc.flg_expected_brokerage_fee,
+        coalesce(fc.vl_management_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_management_fee = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
+        fc.flg_expected_management_fee,
+        coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_cs_post_sale = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
+        fc.flg_expected_cs_post_sale,
+        coalesce(fc.vl_collection * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_collection = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
+        fc.flg_expected_collection,
+        coalesce(fc.vl_bo_onboarding * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_onboarding = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
+        fc.flg_expected_bo_onboarding,
+        coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_ongoing = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
+        fc.flg_expected_bo_ongoing,
+        coalesce(fc.vl_bo_offboarding * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_bo_offboarding = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
+        fc.flg_expected_bo_offboarding,
+        coalesce(fc.vl_inspections * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_inspection = 1)
+                    over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
+        fc.flg_expected_inspection,
+        coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.flg_expected_insurance_fee = 1)
+                    over (partition by fc.sk_property, sk_contract rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
+        fc.flg_expected_insurance_fee
+    from fact_contract fc
+    left join unit_economics.contract_factor cf
+        on cf.months_after_signature = fc.months_diff
+)
+select
+    sk_property,
+	property_id,
+	sk_contract,
+	sk_cash_flow_date,
+	vl_owner_campaigns,
+	vl_affiliate_campaigns,
+	vl_inside_sales,
+	vl_photos,
+	vl_affiliate_bonus,
+	vl_lockbox,
+	vl_tenant_campaigns,
+	vl_cs_pre_sale,
+	vl_field_ops,
+	vl_bo_pre_sale,
+	vl_agent_hours,
+	vl_st_pis_cofins,
+	flg_expected_sales_tax_pis_cofins,
+	vl_st_iss,
+	flg_expected_sales_tax_iss,
+	vl_affiliate_commission,
+	flg_expected_affiliate_commission,
+	vl_agent_commission,
+	flg_expected_agent_commission,
+	vl_delay_fine,
+	flg_expected_delay_fine,
+	vl_termination_fine,
+	vl_brokerage_fee,
+	flg_expected_brokerage_fee,
+	vl_management_fee,
+	flg_expected_management_fee,
+	vl_cs_post_sale,
+	flg_expected_cs_post_sale,
+	vl_collection,
+	flg_expected_collection,
+	vl_bo_onboarding,
+	flg_expected_bo_onboarding,
+	vl_bo_ongoing,
+	flg_expected_bo_ongoing,
+	vl_bo_offboarding,
+	flg_expected_bo_offboarding,
+	vl_inspections,
+	flg_expected_inspection,
+	vl_insurance_fee,
+	flg_expected_insurance_fee
+from fact_factor
 ;
