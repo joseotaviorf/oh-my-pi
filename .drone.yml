@@ -1,44 +1,76 @@
+clone:
+  clone:
+    image: plugins/git
+    depth: 1
+
 pipeline:
 
-  test:
-    image: python:2.7.12
-    commands:
-      - pip install -Ur requirements.txt
+  install:
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: .
+    target: ~/bi
+    include: [ 'requirements.txt', 'variables.json' ]
+    exclude: [ '*' ]
+    args: '-vI'
+    script:
+      - cd /var/www/airflow/
+      - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
+      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+    secrets:
+      - rsync_key
+    when:
+      branch:
+        - forno
 
   install:
-    image: appleboy/drone-ssh
-    host: ssh.airflow.forno.quintoandar.com.br
-    username: airflow
-    command_timeout: 300
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.quintoandar.com.br ]
+    user: airflow
+    source: .
+    target: ~/bi
+    include: [ 'requirements.txt', 'variables.json' ]
+    exclude: [ '*' ]
+    args: '-vI'
     script:
-      - cd /var/www/airflow/bi-etl-ejuice
-      - git reset --hard
-      - git fetch origin
-      - git checkout origin/${DRONE_COMMIT_BRANCH}
-      - /var/www/airflow/airflow_venv/bin/pip install -Ur requirements.txt
+      - cd /var/www/airflow/
+      - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
+      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
     secrets:
-      - ssh_key
+      - rsync_key
     when:
       branch:
-        - forno
-        - master
-  
-  test-dags:
-    image: appleboy/drone-ssh
-    host: ssh.airflow.forno.quintoandar.com.br
-    username: airflow
-    script:
-      - sleep 3
-      - cd /var/www/airflow
-      - source /etc/airflow.conf
-      - airflow_venv/bin/airflow test bi-analytics-data-validation validate_schemas 2017-01-01
-    secrets:
-      - ssh_key
-    when:
-      branch:
-        - forno
         - master
 
+  load-dags:
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: "db jobs"
+    target: /var/www/airflow/dags/
+    delete: true
+    args: '--force -vI'
+    secrets:
+      - rsync_key
+    when:
+      branch:
+        - forno
+  
+  load-dags:
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.quintoandar.com.br ]
+    user: airflow
+    source: "db jobs"
+    target: /var/www/airflow/dags/
+    delete: true
+    args: '--force -vI'
+    secrets:
+      - rsync_key
+    when:
+      branch:
+        - master
+  
   ecr:
     group: ecr
     image: plugins/ecr:1.0

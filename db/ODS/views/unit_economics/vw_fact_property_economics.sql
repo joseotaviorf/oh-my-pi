@@ -32,12 +32,19 @@ with unit_economics as (
         0 as vl_termination_fine,
         sum(vl_brokerage_fee) as vl_brokerage_fee,
         sum(vl_management_fee) as vl_management_fee,
+        sum(flg_expected_management_fee) as flg_expected_management_fee,
         sum(vl_cs_post_sale) as vl_cs_post_sale,
         sum(vl_collection) as vl_collection,
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
-        -sum(vl_insurance_fee) as vl_insurance_fee
+        -sum(vl_insurance_fee) as vl_insurance_fee,
+        sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
+        sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+        sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+        sum(flg_expected_collection) as flg_expected_collection,
+        sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
     from
     (
         select
@@ -64,12 +71,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_liquidity_costs
         union all
@@ -97,12 +111,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_supply_costs
         union all
@@ -130,12 +151,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             vl_cs_post_sale as vl_cs_post_sale,
             vl_collection as vl_collection,
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
-            vl_insurance_fee as vl_insurance_fee
+            vl_insurance_fee as vl_insurance_fee,
+            flg_expected_bo_offboarding as flg_expected_bo_offboarding,
+            flg_expected_bo_onboarding as flg_expected_bo_onboarding,
+            flg_expected_bo_ongoing as flg_expected_bo_ongoing,
+            flg_expected_collection as flg_expected_collection,
+            flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+            flg_expected_insurance_fee as flg_expected_insurance_fee
         from
             unit_economics.vw_mgmt_costs
         union all
@@ -163,12 +191,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             vl_brokerage_fee as vl_brokerage_fee,
             vl_management_fee as vl_management_fee,
+            flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -214,12 +249,19 @@ final_version as (
     ue.vl_termination_fine,
     ue.vl_brokerage_fee,
     ue.vl_management_fee,
+    ue.flg_expected_management_fee,
     ue.vl_cs_post_sale,
     ue.vl_collection,
     ue.vl_bo_onboarding,
     ue.vl_bo_ongoing,
     ue.vl_bo_offboarding,
-    ue.vl_insurance_fee
+    ue.vl_insurance_fee,
+    ue.flg_expected_bo_offboarding,
+    ue.flg_expected_bo_onboarding,
+    ue.flg_expected_bo_ongoing,
+    ue.flg_expected_collection,
+    ue.flg_expected_cs_post_sale,
+    ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id

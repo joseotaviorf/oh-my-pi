@@ -59,6 +59,7 @@ select
   imovel_id as property_id,
   status,
   "valorAluguel" as rent_value,
+  ("valorCondominio" + "valorAluguel") as package_value,
   "dataRescisao" as termination_date,
   "dataFimContratoPrevisto" as expected_end_date,
   "dataAssinado" as signature_date,
@@ -602,6 +603,31 @@ filtered_properties as (
   from agents
   group by dt, c_property_id, contract_id, cont_property_id
 ),
+new_rule_contract as (
+	select
+		vbcc.property_id,
+		vbcc.rent_value * 0.2 as vl_agent_commission,
+		date_trunc('month', signature_date) as dt
+	from
+		unit_economics.vw_base_contract_costs vbcc
+	left join
+		unit_economics.vw_base_property_costs vbpc
+		on vbcc.property_id = vbpc.property_id
+		and vbcc.signature_date between vbpc.min_version_time and vbpc.max_version_time
+	left join
+		booking b
+		on b.imovel_id = vbcc.property_id
+		and b."data" between vbpc.min_version_time and vbpc.max_version_time
+	where
+		date_trunc('month', signature_date) >= '2017-09-01'
+	group by
+		vbcc.property_id,
+		vbcc.rent_value,
+		vbcc.signature_date,
+		vbpc.min_version_time,
+		vbpc.max_version_time
+	having count(b.id) > 0
+),
 -- Agents Commission spreadsheet doesn't contain contracts before Feb-2016
 all_contracts as (
   select
@@ -611,14 +637,19 @@ all_contracts as (
     date_trunc('month', signature_date) as dt
   from unit_economics.vw_base_contract_costs c
   where date_trunc('month', signature_date) = '2016-01-01'
-
   union
-
   select
     property_id,
     vl_agent_commission,
     dt
   from filtered_properties
+  where dt < '2017-09-01'
+  union
+  select
+    property_id,
+    vl_agent_commission,
+    dt
+  from new_rule_contract
 ),
 updated_dates as (
   select
@@ -653,95 +684,193 @@ full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
 ;
 
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_fee as
-with filtered_contracts as (
-select distinct
-	property_id,
-	id,
-	coalesce(termination_date, expected_end_date)::date as end_date
+with base_contract as (
+select
+	vbpc.sk_property,
+	vbpc.property_id,
+	vbcc.id as contract_id,
+	vbcc.init_date,
+	vbcc.rent_value,
+	coalesce(vbcc.termination_date, vbcc.expected_end_date)::date as end_date
 from
-	unit_economics.vw_base_contract_costs
-where termination_date is not null
-  or expected_end_date is not null
+	unit_economics.vw_base_contract_costs vbcc
+left join
+	unit_economics.vw_base_property_costs vbpc
+	on vbcc.property_id = vbpc.property_id
+	and coalesce(vbcc.termination_date, vbcc.expected_end_date)::date between vbpc.min_version_time and vbpc.max_version_time
+where (vbcc.termination_date is not null
+  or vbcc.expected_end_date is not null)
+  and vbcc.status in ('Ativo', 'Finalizado')
 ),
-base_contract as (
+brokerage_fill as (
 	select
-		base.*,
-		c.id as contract_id
+		sk_property,
+		property_id,
+		bc.contract_id,
+		case
+			when i.landlord_status = 'paid'
+				then amount::decimal(14,4)
+			when i.contract_id is not null
+				then 0
+			when i.contract_id is null and bc.init_date >= '2017-01-01'
+				then rent_value
+			else 0
+		end as vl_brokerage_fee,
+		init_date,
+		greatest(
+			landlord_due_date,
+			due_date,
+			landlord_paid_date,
+			init_date + interval '1 month'
+		)::date as dt_cash_flow
 	from
-		unit_economics.vw_base_property_costs base
+		base_contract bc
 	left join
-		filtered_contracts c
-		on base.property_id = c.property_id
-		and c.end_date between base.min_version_time and base.max_version_time
+		invoice i
+		on bc.contract_id = i.contract_id
+	and
+		item = 'TaxaCorretagem'
+	and
+		"from" = 'Proprietario'
+	and
+		"to" = 'Contrato'
 )
 select
 	sk_property,
 	property_id,
-	amount::decimal(14,4) as vl_brokerage_fee,
-	greatest(
-		landlord_due_date,
-		due_date,
-		landlord_paid_date,
-		(concat(
-			substring(year_month from 1 for 4),'-',
-			substring(year_month from 5 for 6)::int,'-',
-			'15'))::date + interval '1 month'
-	)::date as dt_cash_flow
+	vl_brokerage_fee,
+	dt_cash_flow
 from
-	base_contract bc
-left join
-	invoice i
-	on bc.contract_id = i.contract_id
-where
-	item = 'TaxaCorretagem'
-and
-	landlord_status = 'paid'
-and
-	"from" = 'Proprietario'
-and
-	"to" = 'Contrato'
+	brokerage_fill
+where vl_brokerage_fee != 0
 ;
 
 create or replace view unit_economics.vw_net_revenue_revenues_mgmt_fee as
 with filtered_contracts as (
-select distinct
-	property_id,
-	id,
-	coalesce(termination_date, expected_end_date)::date as end_date
-from
-	unit_economics.vw_base_contract_costs
-where termination_date is not null
-	or expected_end_date is not null
+    select distinct
+        property_id,
+        id,
+        init_date,
+        package_value,
+        coalesce(termination_date, expected_end_date)::date as end_date,
+        date_trunc('month', dd.date)::date + interval '6 day' as date_range
+    from
+        unit_economics.vw_base_contract_costs
+    join dim_date dd
+        on date_trunc('month', dd.date) between date_trunc('month', init_date)
+            and date_trunc('month', coalesce(termination_date, expected_end_date)::date)
+    where termination_date is not null
+        or expected_end_date is not null
 ),
 base_contract as (
 	select
 		base.*,
-		c.id as contract_id
+		c.id as contract_id,
+		package_value,
+		date_trunc('month', c.init_date) as contract_init_date,
+		date_trunc('month', c.end_date) as contract_end_date,
+		c.date_range
 	from
 		unit_economics.vw_base_property_costs base
 	left join
 		filtered_contracts c
 		on base.property_id = c.property_id
 		and c.end_date between base.min_version_time and base.max_version_time
+),
+incurred as (
+    select
+    		row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
+        sk_property,
+        property_id,
+        bc.contract_id,
+        bc.contract_init_date,
+        bc.contract_end_date,
+        bc.package_value,
+        amount::decimal(14,4) as vl_management_fee,
+        greatest(
+        	landlord_due_date,
+        	due_date,
+        	landlord_paid_date --,
+        	) as dt_cash_flow,
+        bc.date_range
+    from
+        base_contract bc
+    left join
+        invoice i
+        on bc.contract_id = i.contract_id
+            and date_trunc('month', greatest(landlord_due_date, due_date, landlord_paid_date)) = bc.date_range
+            and item = 'TaxaAdministracao'
+            and landlord_status = 'paid'
+            and "from" = 'Proprietario'
+            and "to" = 'Contrato'
+),
+incurred_diff as (
+    select
+        sk_property,
+        property_id,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then package_value*0.08
+        		else vl_management_fee
+        end as vl_management_fee,
+        case
+        	when (rn=1 and vl_management_fee is null)
+        		then contract_init_date + interval '2 month' + interval '6 day'
+        		else dt_cash_flow
+        end as dt_cash_flow,
+        date_range,
+        contract_end_date,
+        contract_init_date,
+        (extract(year from (contract_end_date - contract_init_date)) * 12
+                + extract(month from (contract_end_date - contract_init_date))
+                + (extract(days from (contract_end_date - contract_init_date)) / 30))::integer as date_diff
+    from incurred
+),
+incurred_plus_dates as (
+    select
+        sk_property,
+        property_id,
+        vl_management_fee,
+        dt_cash_flow,
+        date_range,
+        max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
+    from incurred_diff
+),
+value_fill as (
+    select distinct
+        sk_property,
+        property_id,
+        vl_management_fee,
+        case
+            when date_range > max_dt_cash_flow
+                then date_range
+            else dt_cash_flow
+        end as dt_cash_flow,
+        max_dt_cash_flow,
+        gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
+    from incurred_plus_dates
+),
+result as (
+    select
+        sk_property,
+        property_id,
+        dt_cash_flow,
+        case
+            when dt_cash_flow > max_dt_cash_flow
+                then coalesce(vl_management_fee, gf)
+            else vl_management_fee
+        end as vl_management_fee,
+        dt_cash_flow > max_dt_cash_flow and vl_management_fee is null as flg_expected_management_fee
+    from value_fill
 )
 select
-	sk_property,
-	property_id,
-	amount::decimal(14,4) as vl_management_fee,
-	greatest(landlord_due_date, due_date, landlord_paid_date) as dt_cash_flow
-from
-	base_contract bc
-left join
-	invoice i
-	on bc.contract_id = i.contract_id
-where
-	item = 'TaxaAdministracao'
-and
-	landlord_status = 'paid'
-and
-	"from" = 'Proprietario'
-and
-	"to" = 'Contrato'
+    sk_property,
+    property_id,
+    vl_management_fee,
+    dt_cash_flow::date,
+    flg_expected_management_fee::integer
+from result
+where vl_management_fee != 0
 ;
 
 
@@ -750,7 +879,8 @@ select
     coalesce(br.sk_property, mg.sk_property) as sk_property,
     coalesce(br.property_id, mg.property_id) as property_id,
     coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
-    coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow
+    coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
+    coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee
   from unit_economics.vw_net_revenue_revenues_brokerage_fee br
   full outer join unit_economics.vw_net_revenue_revenues_mgmt_fee mg
     on br.sk_property = mg.sk_property
@@ -764,8 +894,9 @@ select
 	coalesce(b_fee.sk_property, m_fee.sk_property) as sk_property,
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
 	coalesce(b_fee.dt_cash_flow, m_fee.dt_cash_flow) as dt_cash_flow,
-	coalesce(vl_management_fee, 0) as vl_management_fee,
-	coalesce(vl_brokerage_fee, 0) as vl_brokerage_fee
+	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
+	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
+	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
 from
 	unit_economics.vw_net_revenue_revenues_brokerage_fee b_fee
 full outer join
@@ -882,6 +1013,7 @@ select
 	dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
+	sum(flg_expected_management_fee) as flg_expected_management_fee,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_agent_commission) as vl_agent_commission,
 	sum(vl_st_iss) as vl_st_iss,
@@ -895,6 +1027,7 @@ from
 		dt_cash_flow,
 		vl_affiliate_commission,
 		0 as vl_management_fee,
+		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		vl_agent_commission,
 		0 as vl_st_iss,
@@ -909,6 +1042,7 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		vl_management_fee,
+		flg_expected_management_fee,
 		vl_brokerage_fee,
 		0 as vl_agent_commission,
 		0 as vl_st_iss,
@@ -923,6 +1057,7 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		0 as vl_management_fee,
+		0 as flg_expected_management_fee,
 		0 as vl_brokerage_fee,
 		0 as vl_agent_commission,
 		vl_st_iss,
@@ -973,7 +1108,12 @@ insurance_dates as (
 			when dt_start < '2017-05-21'
 			then rent * 0.0725
 			else rent * 0.045
-		end, 0) as cardiff_amount
+		end, 0) as cardiff_amount,
+		case
+			when dd."date" > now()
+				then 1
+			else 0
+		end as flg_expected
 	from
 		pay_dates pd
 	left join
@@ -981,7 +1121,7 @@ insurance_dates as (
 		on pd.dt_first_pay <= dd."date"
 		and pd.dt_last_pay >= dd."date"
 		and date_part('day', pd.dt_first_pay) = date_part('day', dd."date")
-		and dd."date" <= now()
+--		and dd."date" <= now()
 	where dd."date" is not null
 	and rent is not null
 ),
@@ -1001,14 +1141,20 @@ select
 	bc.property_id,
 	bc.contract_id,
 	cardiff_amount::decimal(14,4) as vl_insurance_fee,
-	dt_cash_flow as dt_cash_flow
+	dt_cash_flow as dt_cash_flow,
+	flg_expected
 from
 	base_contract bc
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
 where coalesce(cardiff_amount, 0) > 0
-group by bc.property_id, dt_cash_flow, vl_insurance_fee, bc.contract_id
+group by
+	bc.property_id,
+	dt_cash_flow,
+	vl_insurance_fee,
+	bc.contract_id,
+	flg_expected
 ;
 
 create or replace view unit_economics.vw_mgmt_ops_bo_offboarding_costs as
@@ -1122,7 +1268,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_offboarding
+  c.vl_bo_offboarding,
+  0 as flg_expected
 from full_costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1259,7 +1406,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint )as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_onboarding
+  c.vl_bo_onboarding,
+  0 as flg_expected
 from full_costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1301,7 +1449,8 @@ select
   coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
   c.property_id,
   c.dt_cash_flow,
-  c.vl_bo_ongoing
+  c.vl_bo_ongoing,
+  0 as flg_expected
 from costs c
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = c.property_id
@@ -1433,7 +1582,8 @@ select
   vbpc.sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_collection
+  fc.vl_collection,
+  0 as flg_expected
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
@@ -1572,7 +1722,8 @@ select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_cs_post_sale
+  fc.vl_cs_post_sale,
+  0 as flg_expected
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
@@ -1588,7 +1739,12 @@ select
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
 	sum(vl_collection) as vl_collection,
-	sum(vl_cs_post_sale) as vl_cs_post_sale
+	sum(vl_cs_post_sale) as vl_cs_post_sale,
+	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
+    sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+    sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+    sum(flg_expected_collection) as flg_expected_collection,
+    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale
 from
 (
 	select
@@ -1599,7 +1755,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		flg_expected as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_offboarding_costs
 	union all
@@ -1611,7 +1772,12 @@ from
 		vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        flg_expected as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_onboarding_costs
 	union all
@@ -1623,7 +1789,12 @@ from
 		0 as vl_bo_onboarding,
 		vl_bo_ongoing,
 		0 as vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        flg_expected as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_bo_ongoing_costs
 	union all
@@ -1635,7 +1806,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		vl_collection,
-		0 as vl_cs_post_sale
+		0 as vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        flg_expected as flg_expected_collection,
+        0 as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_collection_costs
 	union all
@@ -1647,7 +1823,12 @@ from
 		0 as vl_bo_onboarding,
 		0 as vl_bo_ongoing,
 		0 as vl_collection,
-		vl_cs_post_sale
+		vl_cs_post_sale,
+		0 as flg_expected_bo_offboarding,
+        0 as flg_expected_bo_onboarding,
+        0 as flg_expected_bo_ongoing,
+        0 as flg_expected_collection,
+        flg_expected as flg_expected_cs_post_sale
 	from
 		unit_economics.vw_mgmt_ops_cs_post_sale_costs
 ) tbl
@@ -1664,7 +1845,13 @@ select
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
-  coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee
+  coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
+  coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
+  coalesce(ops.flg_expected_bo_onboarding, 0) as flg_expected_bo_onboarding,
+  coalesce(ops.flg_expected_bo_ongoing, 0) as flg_expected_bo_ongoing,
+  coalesce(ops.flg_expected_collection, 0) as flg_expected_collection,
+  coalesce(ops.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale,
+  coalesce(ins.flg_expected, 0) as flg_expected_insurance_fee
 from
 	unit_economics.vw_mgmt_ops_costs ops
 full outer join
@@ -2375,12 +2562,19 @@ with unit_economics as (
         0 as vl_termination_fine,
         sum(vl_brokerage_fee) as vl_brokerage_fee,
         sum(vl_management_fee) as vl_management_fee,
+        sum(flg_expected_management_fee) as flg_expected_management_fee,
         sum(vl_cs_post_sale) as vl_cs_post_sale,
         sum(vl_collection) as vl_collection,
         sum(vl_bo_onboarding) as vl_bo_onboarding,
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
-        -sum(vl_insurance_fee) as vl_insurance_fee
+        -sum(vl_insurance_fee) as vl_insurance_fee,
+        sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
+        sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+        sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+        sum(flg_expected_collection) as flg_expected_collection,
+        sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+        sum(flg_expected_insurance_fee) as flg_expected_insurance_fee
     from
     (
         select
@@ -2407,12 +2601,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_liquidity_costs
         union all
@@ -2440,12 +2641,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_supply_costs
         union all
@@ -2473,12 +2681,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as flg_expected_management_fee,
             vl_cs_post_sale as vl_cs_post_sale,
             vl_collection as vl_collection,
             vl_bo_onboarding as vl_bo_onboarding,
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
-            vl_insurance_fee as vl_insurance_fee
+            vl_insurance_fee as vl_insurance_fee,
+            flg_expected_bo_offboarding as flg_expected_bo_offboarding,
+            flg_expected_bo_onboarding as flg_expected_bo_onboarding,
+            flg_expected_bo_ongoing as flg_expected_bo_ongoing,
+            flg_expected_collection as flg_expected_collection,
+            flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+            flg_expected_insurance_fee as flg_expected_insurance_fee
         from
             unit_economics.vw_mgmt_costs
         union all
@@ -2506,12 +2721,19 @@ with unit_economics as (
             0 as vl_termination_fine,
             vl_brokerage_fee as vl_brokerage_fee,
             vl_management_fee as vl_management_fee,
+            flg_expected_management_fee,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
-            0 as vl_insurance_fee
+            0 as vl_insurance_fee,
+            0 as flg_expected_bo_offboarding,
+            0 as flg_expected_bo_onboarding,
+            0 as flg_expected_bo_ongoing,
+            0 as flg_expected_collection,
+            0 as flg_expected_cs_post_sale,
+            0 as flg_expected_insurance_fee
         from
             unit_economics.vw_net_revenue_costs
     ) tbl
@@ -2557,12 +2779,19 @@ final_version as (
     ue.vl_termination_fine,
     ue.vl_brokerage_fee,
     ue.vl_management_fee,
+    ue.flg_expected_management_fee,
     ue.vl_cs_post_sale,
     ue.vl_collection,
     ue.vl_bo_onboarding,
     ue.vl_bo_ongoing,
     ue.vl_bo_offboarding,
-    ue.vl_insurance_fee
+    ue.vl_insurance_fee,
+    ue.flg_expected_bo_offboarding,
+    ue.flg_expected_bo_onboarding,
+    ue.flg_expected_bo_ongoing,
+    ue.flg_expected_collection,
+    ue.flg_expected_cs_post_sale,
+    ue.flg_expected_insurance_fee
   from unit_economics ue
   left join contracts c
     on ue.property_id = c.property_id

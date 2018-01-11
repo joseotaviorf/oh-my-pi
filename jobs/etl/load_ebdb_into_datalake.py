@@ -30,6 +30,9 @@ CLEAN_TABLE_INFOS = [
     {'original_name': 'DadosFotografo', 'new_name': 'photographer_data'},
     {'original_name': 'DadosAfiliado', 'new_name': 'affiliate_data'},
     {'original_name': 'DadosVendedor', 'new_name': 'seller_data'},
+    {'original_name': 'DadosAgente_tipos', 'new_name': 'agent_data_type'},
+    {'original_name': 'Contrato', 'new_name': 'contract'},
+    {'original_name': 'Offer', 'new_name': 'offer'},
 ]
 
 

@@ -123,7 +123,8 @@ select
   vbpc.sk_property,
   fc.property_id,
   fc.dt_cash_flow,
-  fc.vl_collection
+  fc.vl_collection,
+  0 as flg_expected
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
