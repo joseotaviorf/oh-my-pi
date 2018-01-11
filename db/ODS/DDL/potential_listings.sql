@@ -22,6 +22,7 @@ CREATE TABLE public.potential_listings
   contract_id integer,
   renting_value integer,
   current_property_status character varying(255) DEFAULT NULL::character varying,
+  job_fotografo_id integer,
   dados_fotografo_id integer,
   owner_id integer,
   rep_id integer,
