@@ -167,6 +167,20 @@ affiliate_payments = PythonOperator(
     op_kwargs={'dim_name': 'affiliate_payments', 'file_name': './db/2.datalake/queries/affiliate_payments.sql'}
 )
 
+# Photo Job
+photo_job = PythonOperator(
+    dag=dag,
+    task_id='ODS_photo_job',
+    python_callable=biz_etl.extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'photo_job', 'command': 'call ebdb.list_photo_job();'}
+)
+dim_photo_job = PythonOperator(
+    dag=dag,
+    task_id='DW_dim_photo_job',
+    python_callable=biz_etl.load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'photo_job'}
+)
+
 # flow
 contacts_and_prospects >> dim_contacts_and_prospects
 lead >> dim_lead
@@ -174,6 +188,7 @@ imovel >> dim_property
 affiliate_payments >> dim_property
 region >> dim_region
 usuario >> dim_user
+photo_job >> dim_photo_job
 mkt >> dim_marketing_attribution
 mkt_fb_costs >> dim_marketing_attribution
 mkt_g_costs >> dim_marketing_attribution
@@ -184,6 +199,7 @@ dim_region >> fact_supply_cac
 dim_user >> fact_supply_cac
 dim_marketing_attribution >> fact_supply_cac
 dim_contacts_and_prospects >> fact_supply_cac
+dim_photo_job >> fact_supply_cac
 
 dim_property >> dim_status_over_period
 dim_status_over_period >> fact_supply_cac
