@@ -35,8 +35,9 @@ select
   fl.id as id_rental_flow,
   n.id as id_negotiation,
   n.criadoEm as dt_negotiation,
+  o.id as id_offer,
   pp.id as id_pre_proposal,
-  coalesce(p.id, p_n.id) as id_proposal,
+  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
   c.id as id_contract,
   c.dataRescisao as dt_contract_anullment
   -- count(1)
@@ -90,10 +91,20 @@ left join
   and pp.usuario_id = fl.cliente_id
   and pp.ultimoUpdateEdicao > 0
 
+-- OFFER
+left join
+  Offer o
+  on o.house_id = i.id
+    and o.client_id = fl.cliente_id
+
 -- PROPOSTA
 left join
-  Proposta p
-  on p.preProposta_id = pp.id
+  Proposta p1
+  on p1.offer_id = o.id
+
+left join
+  Proposta p2
+  on p2.preProposta_id = pp.id
 
 left join
   Proposta p_n
@@ -107,7 +118,7 @@ left join
 -- CONTRATO
 left join
   Contrato c
-  on c.proposta_id =  coalesce(p.id, p_fl.id, p_n.id)
+  on c.proposta_id =  coalesce(p1.id, p2.id, p_fl.id, p_n.id)
   -- and c.status != 'Cancelado'
 
 union all
@@ -131,6 +142,7 @@ select
   fl.id as id_rental_flow,
   coalesce(n.id, -1) as id_negotiation,
   n.criadoEm as dt_negotiation,
+  coalesce(o.id, -1) as id_offer,
   coalesce(pp.id, -1) as id_pre_proposal,
   coalesce(p_fl.id, -1) as id_proposal,
   c.id as id_contract,
@@ -158,6 +170,11 @@ select
       on pp.imovel_id = i.id
       and pp.usuario_id = fl.cliente_id
       and pp.ultimoUpdateEdicao > 0
+
+    left join
+      Offer o
+      on o.house_id = i.id
+        and o.client_id = fl.cliente_id
 
     left join
       Proposta p_fl
