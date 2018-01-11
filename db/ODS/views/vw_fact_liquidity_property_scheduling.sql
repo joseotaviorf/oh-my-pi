@@ -15,7 +15,21 @@ select
   coalesce(f.id_user_visit_agent, -1) as sk_user_visit_agent,
   coalesce(f.id_visit, -1) as sk_visit,
   coalesce(f.id_negotiation, -1) as sk_negotiation,
-  coalesce(f.id_pre_proposal, -1) as sk_pre_proposal,
+  case
+    when f.id_offer is null
+        then
+            case
+                when f.id_pre_proposal is null or f.id_pre_proposal = -1
+                    then -1
+                else (f.id_pre_proposal * 100) + 1
+            end
+    else
+        case
+            when f.id_offer = -1
+                then -1
+            else (f.id_offer * 100) + 2
+        end
+  end as sk_offer,
   coalesce(f.id_proposal, -1) as sk_proposal,
   coalesce(f.id_contract, -1) as sk_contract,
   coalesce(f.id_rental_flow, -1) as id_rental_flow,
@@ -25,7 +39,7 @@ select
   coalesce(to_char(b."criadoEm",'YYYYMMDD')::integer, -1) as sk_booking_created_date,
   coalesce(to_char(b.data,'YYYYMMDD')::integer, -1) as sk_visit_date,
   coalesce(to_char(visitor.criado_em,'YYYYMMDD')::integer, -1) as sk_visitor_user_signup_date,
-  coalesce(to_char(offer."criadoEm",'YYYYMMDD')::integer, -1) as sk_offer_created_date,
+  coalesce(to_char(coalesce(offer.criado_em, pp."criadoEm"),'YYYYMMDD')::integer, -1) as sk_offer_created_date,
   coalesce(to_char(contract."dataAssinado",'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
   coalesce(to_char(agent.criado_em,'YYYYMMDD')::integer, -1) as sk_user_agent_date,
 
@@ -119,8 +133,12 @@ left join
   on agent.id = f.id_user_visit_agent
 
 left join
-  pre_proposal offer
-  on offer.id = f.id_pre_proposal
+  pre_proposal pp
+  on pp.id = f.id_pre_proposal
+
+left join
+  offer
+  on offer.id = f.id_offer
 
 left join
   contract
@@ -171,7 +189,7 @@ left join
   on coalesce(f.id_scheduling, -1) = coalesce(v.id_scheduling, -1)
   and coalesce(f.id_imovel, -1) = coalesce(v.id_imovel, -1)
   and coalesce(f.id_visit, -1) = coalesce(v.id_visit, -1)
-  and coalesce(f.id_pre_proposal, -1) = coalesce(v.id_pre_proposal, -1)
+  and coalesce(f.id_offer, f.id_pre_proposal, -1) = coalesce(v.id_offer, v.id_pre_proposal, -1)
   and coalesce(f.id_proposal, -1) = coalesce(v.id_proposal, -1)
   and coalesce(f.id_contract, -1) = coalesce(v.id_contract, -1)
 
