@@ -59,19 +59,19 @@ pp = PythonOperator(
 )
 pp_aud = PythonOperator(
     dag=dag,
-    task_id='ODS_region',
+    task_id='ODS_pre_proposal_aud',
     python_callable=biz_etl.extract_table_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'pre_proposal_AUD', 'table_name': 'PreProposta_AUD', 'copy_to_clean': False}
 )
 cp = PythonOperator(
     dag=dag,
-    task_id='ODS_region',
+    task_id='ODS_condition',
     python_callable=biz_etl.extract_table_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'condition', 'table_name': 'CondicaoProposta', 'copy_to_clean': False}
 )
 pp_cp = PythonOperator(
     dag=dag,
-    task_id='ODS_region',
+    task_id='ODS_pre_proposal_condition',
     python_callable=biz_etl.extract_table_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'pre_proposal_condition', 'table_name': 'PreProposta_CondicaoProposta',
                'copy_to_clean': False}
