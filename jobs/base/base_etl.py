@@ -318,7 +318,13 @@ class BaseETL(object):
 
         filename = '{}.csv'.format(process_name)
         bucket_name, filename = cls.to_s3(filename, data_table, bucket_name, encoding=encoding)
-        cls.bulk_insert_from_s3_to_dw(bucket_name, filename, enum_db_dest, table_name_dest, append, encoding)
+        cls.bulk_insert_from_s3_to_dw(
+            bucket_name=bucket_name,
+            filename=filename,
+            enum_db_dest=enum_db_dest,
+            table_name=table_name_dest,
+            append=append,
+            encoding=encoding)
 
         return bucket_name, filename
 
@@ -360,7 +366,7 @@ class BaseETL(object):
         cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
         csv_temp_file = '{}/{}'.format(tmpdir, filename)
 
-        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit,)
+        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit)
 
     @classmethod
     def bulk_insert_from_local_file(cls, csv_filepath, table_name, db_enum,
