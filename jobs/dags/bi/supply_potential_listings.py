@@ -168,7 +168,7 @@ affiliate_payments = PythonOperator(
     dag=dag,
     task_id='ODS_affiliate_payments',
     python_callable=load_athena_query_to_ods,
-    op_kwargs={'dim_name': 'affiliate_payments', 'bucket': bucket, 'file_name': 'affiliate_payments'}
+    op_kwargs={'dim_name': 'affiliate_payments', 'bucket': bucket, 'fname': 'affiliate_payments'}
 )
 
 # Photo Job
