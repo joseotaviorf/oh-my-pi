@@ -1,1 +1,1 @@
-QUERIES_DIR = 'db/2.datalake/queries'
+QUERIES_DIR = '.db/2.datalake/queries'
