@@ -49,7 +49,6 @@ pipeline:
     user: airflow
     source: "db jobs"
     target: /var/www/airflow/dags/
-    delete: true
     args: '--force -vI'
     secrets:
       - rsync_key
@@ -63,7 +62,6 @@ pipeline:
     user: airflow
     source: "db jobs"
     target: /var/www/airflow/dags/
-    delete: true
     args: '--force -vI'
     secrets:
       - rsync_key
