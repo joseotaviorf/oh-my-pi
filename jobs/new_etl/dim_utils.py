@@ -6,9 +6,11 @@ from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
 from qa_python_utils.aws.athena import AthenaClient
-from __init__ import QUERIES_DIR
-now = datetime.now()
+import os
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
+now = datetime.now()
 
 def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None):
     if table_name is None:
