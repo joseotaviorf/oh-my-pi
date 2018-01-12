@@ -1,9 +1,11 @@
 from datetime import datetime, date
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils.aws.athena import AthenaClient
 from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
+from qa_python_utils.aws.athena import AthenaClient
 
 now = datetime.now()
 
@@ -105,7 +107,8 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
 
 
 # TODO: Migrate all business dimension etl from ODS to Datalake
-def load_athena_query_to_ods(dim_name, athena, file_name, append=False):
+def load_athena_query_to_ods(dim_name, bucket, file_name, append=False):
+    athena = AthenaClient(bucket)
     _logger.info("Reading from S3: {}".format(datetime.utcnow()))
     data_frame = athena.execute_file_query_and_return_dataframe(file_name)
 
