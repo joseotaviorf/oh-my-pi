@@ -9,7 +9,7 @@ from qa_python_utils.default_logger import _logger, logger
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename().replace('dim_', '')
-old_process_name = 'pre_proposta'
+old_process_name = 'pre_proposal'
 
 
 @logger
@@ -53,12 +53,13 @@ if len(args) > 1:
             bucket_name='{}/raw/ods/{}'.format(bucket_datalake, old_process_name)
         )
 
-        # Godfather steps
+        _logger.info("GodFather Steps (offer): {} - from db".format(datetime.now()))
         godf_offer_table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_godfather,
             query='select * from business.offer;'
         )
 
+        _logger.info("GodFather Steps (offer): {} - to s3".format(datetime.now()))
         BaseETL.to_s3(
             filename='business_offer.csv',
             data_table=godf_offer_table,
@@ -66,11 +67,13 @@ if len(args) > 1:
             write_header=False
         )
 
+        _logger.info("GodFather Steps (topic): {} - from db".format(datetime.now()))
         godf_topic_table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_godfather,
             query='select * from business.topic;'
         )
 
+        _logger.info("GodFather Steps (topic): {} - to s3".format(datetime.now()))
         BaseETL.to_s3(
             filename='business_topic.csv',
             data_table=godf_topic_table,
