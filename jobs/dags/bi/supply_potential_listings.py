@@ -48,7 +48,7 @@ dim_lead = PythonOperator(
     dag=dag,
     task_id='DW_dim_lead',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'lead', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_lead', 'bucket': bucket}
 )
 
 # Contacts and Prospects Dimension
@@ -62,7 +62,7 @@ dim_contacts_and_prospects = PythonOperator(
     dag=dag,
     task_id='DW_contacts_and_prospects',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'contacts_and_prospects', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_contacts_and_prospects', 'bucket': bucket}
 )
 
 # Property Dimension
@@ -76,13 +76,13 @@ dim_property = PythonOperator(
     dag=dag,
     task_id='DW_dim_property',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'property', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_property', 'bucket': bucket}
 )
 dim_status_over_period = PythonOperator(
     dag=dag,
     task_id='DW_dim_property_status_over',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'dim_property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
 )
 
 # Region Dimension
@@ -96,8 +96,8 @@ dim_region = PythonOperator(
     dag=dag,
     task_id='DW_dim_region',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'region', 'bucket': bucket,
-               'post_command': 'update dim_region set dt_timestamp = "{}" where sk_region = -1;'.format(
+    op_kwargs={'dim_name': 'dim_region', 'bucket': bucket,
+               'post_command': "update dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
                    now.strftime('%Y-%m-%d'))}
 )
 
@@ -112,7 +112,7 @@ dim_user = PythonOperator(
     dag=dag,
     task_id='DW_dim_user',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'user', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_user', 'bucket': bucket}
 )
 
 # Marketing Attribution Dimension
@@ -126,7 +126,7 @@ dim_marketing_attribution = PythonOperator(
     dag=dag,
     task_id='DW_dim_marketing_attribution',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'marketing_attribution', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_marketing_attribution', 'bucket': bucket}
 )
 
 # Potential Listings Fact Table
@@ -140,7 +140,7 @@ fact_supply_cac = PythonOperator(
     dag=dag,
     task_id='DW_Fact_Supply_CAC',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply_potential_listings', 'bucket': bucket, 'is_fact': True, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'bucket': bucket, 'insert_dummy': False}
 )
 
 # Marketing Ads Costs Dimension
@@ -182,7 +182,7 @@ dim_photo_job = PythonOperator(
     dag=dag,
     task_id='DW_dim_photo_job',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'photo_job', 'bucket': bucket}
+    op_kwargs={'dim_name': 'dim_photo_job', 'bucket': bucket}
 )
 
 # flow

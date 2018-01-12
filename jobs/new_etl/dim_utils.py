@@ -71,13 +71,9 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         )
 
 
-def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, pre_command=None, post_command=None):
-    if is_fact:
-        table_name = 'vw_fact_{}'.format(dim_name)
-        table_name_dest = 'fact_{}'.format(dim_name)
-    else:
-        table_name = 'vw_dim_{}'.format(dim_name)
-        table_name_dest = 'dim_{}'.format(dim_name)
+def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, pre_command=None, post_command=None):
+    table_name = 'vw_{}'.format(dim_name)
+    table_name_dest = '{}'.format(dim_name)
 
     if pre_command is not None:
         BaseETL.execute_command(
