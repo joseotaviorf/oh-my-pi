@@ -109,8 +109,8 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
 # TODO: Migrate all business dimension etl from ODS to Datalake
 def load_athena_query_to_ods(dim_name, bucket, file_name, append=False):
     athena = AthenaClient(bucket)
-    _logger.info("Reading from S3: {}".format(datetime.utcnow()))
     filename = '{}/{}.sql'.format(QUERIES_DIR, file_name)
+    _logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), filename))
     data_frame = athena.execute_file_query_and_return_dataframe(filename)
 
     _logger.info("START - To Staging: {}".format(datetime.utcnow()))

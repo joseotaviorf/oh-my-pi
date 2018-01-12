@@ -106,7 +106,7 @@ usuario = PythonOperator(
     dag=dag,
     task_id='ODS_usuario',
     python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'user',  'bucket': bucket, 'command': 'call ebdb.list_usuario();'}
+    op_kwargs={'dim_name': 'user', 'table_name': 'usuario', 'bucket': bucket, 'command': 'call ebdb.list_usuario();'}
 )
 dim_user = PythonOperator(
     dag=dag,
