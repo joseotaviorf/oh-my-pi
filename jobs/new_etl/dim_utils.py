@@ -111,6 +111,7 @@ def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
     athena = AthenaClient(bucket)
     filename = '{}/{}.sql'.format(QUERIES_DIR, fname)
     _logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), filename))
+    print filename
     data_frame = athena.execute_file_query_and_return_dataframe(filename)
 
     _logger.info("START - To Staging: {}".format(datetime.utcnow()))
