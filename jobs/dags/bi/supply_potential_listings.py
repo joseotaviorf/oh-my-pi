@@ -82,7 +82,7 @@ dim_status_over_period = PythonOperator(
     dag=dag,
     task_id='DW_dim_property_status_over',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'dim_property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
 )
 
 # Region Dimension
