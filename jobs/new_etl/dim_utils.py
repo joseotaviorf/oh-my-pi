@@ -56,7 +56,7 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         table_name=dim_name,
         db_enum=EnumDb.BI_ODS,
         encoding='UTF8',
-        append=True,
+        append=False,
         commit=True,
         bucket_name='{}/raw/ods/{}'.format(bucket, dim_name)
     )
