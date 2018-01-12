@@ -9,7 +9,7 @@ from qa_python_utils.default_logger import _logger, logger
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename().replace('dim_', '')
-old_process_name = 'pre_proposta'
+old_process_name = 'pre_proposal'
 
 
 @logger
