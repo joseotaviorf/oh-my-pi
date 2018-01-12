@@ -1,51 +1,79 @@
-import json
-from airflow.hooks.base_hook import BaseHook
-from airflow.models import Variable
-from airflow.exceptions import AirflowException
-import boto3
 import base64
-import pytz
+import json
+import os
 from datetime import datetime
 from logging import info as log
-import os
+
+import boto3
+import pytz
+from airflow.exceptions import AirflowException
+from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variable
+
 
 def __conn_to_json(conn):
-    j = {}
-    j['host'] = conn.host
-    j['user'] = conn.login
-    j['pwd'] = conn.get_password()
-    j['db'] = conn.schema
-    j['dbtype'] = conn.conn_type
-    j['port'] = conn.port
-    return json.dumps(j)
+    return json.dumps({
+        'host': conn.host,
+        'user': conn.login,
+        'pwd': conn.get_password(),
+        'db': conn.schema,
+        'dbtype': conn.conn_type,
+        'port': conn.port
+    })
 
 
-def __os_environment():
+def __add_env(*keys):
+    env = {}
+    for key in keys:
+        __set_env_var(env, key)
+
+    return env
+
+
+def __set_env_var(env, key):
+    ex = None
+    k = None
+    try:
+        env[key] = Variable.get(key)
+    except KeyError as ex:
+        try:
+            k = BaseHook.get_connection(key)
+            env["ENV_" + key] = __conn_to_json(k)
+        except AirflowException as ex:
+            k = None
+    if not k:
+        print ex
+
+
+def __initialize_environment():
     return {
-        "AWS_ACCESS_KEY_ID": os.environ.get('AWS_ACCESS_KEY_ID'),
-        "AWS_SECRET_ACCESS_KEY":  os.environ.get('AWS_SECRET_ACCESS_KEY'),
-        "AWS_DEFAULT_REGION":  os.environ.get('AWS_DEFAULT_REGION')
+        "AWS_ACCESS_KEY_ID": Variable.get('AWS_ACCESS_KEY_ID'),
+        "AWS_SECRET_ACCESS_KEY": Variable.get('AWS_SECRET_ACCESS_KEY'),
+        "AWS_DEFAULT_REGION": Variable.get('AWS_DEFAULT_REGION')
     }
 
 
-def get(key):
-        try:
-            return Variable.get(key)
-        except KeyError:
-            return __os_environment()[key]
+def get_airflow_env_var(key):
+    _var = __add_env(key)[key]
+    return _var.encode('utf-8') if _var is not None else None
 
-def get_conenction(con):
-    return __conn_to_json(BaseHook.get_connection(con))
+
+def set_airflow_var_to_local_env(*keys):
+    _vars = __add_env(*keys)
+    for key in _vars:
+        os.environ[key] = _vars[key]
+
 
 def get_ecr_credentials(environment):
+    registry = Variable.get('DOCKER_REGISTRY')
     ecr = boto3.client(
         'ecr',
-        region_name=get('AWS_DEFAULT_REGION'),
-        aws_access_key_id=get('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=get('AWS_SECRET_ACCESS_KEY'),
+        region_name=environment['AWS_DEFAULT_REGION'],
+        aws_access_key_id=environment['AWS_ACCESS_KEY_ID'],
+        aws_secret_access_key=environment['AWS_SECRET_ACCESS_KEY'],
     )
     user, pwd = base64.b64decode(ecr.get_authorization_token()['authorizationData'][0]['authorizationToken']).split(':')
-    return get('DOCKER_REGISTRY'), user, pwd
+    return registry, user, pwd
 
 
 def docker_login(cli, user, pwd, registry):

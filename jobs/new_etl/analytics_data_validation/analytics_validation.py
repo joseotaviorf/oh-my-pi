@@ -11,24 +11,24 @@ import pandas as pd
 from jsonschema import Draft4Validator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
-from jobs.dags.util import environment as env
+
 
 class SchemaValidator(object):
-    DATA_LAKE_BUCKET = env.get('bi-datalake-s3-bucket')
-    PATH_PREFIX = 'jobs/etl/analytics_data_validation'
+    _PATH_PREFIX = 'jobs/new_etl/analytics_data_validation/schemas'
 
     @logger
-    def __init__(self, execution_date):
+    def __init__(self, execution_date, s3_bucket):
         self.today = execution_date.date()
+        self.s3_bucket = s3_bucket
         self.ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(SchemaValidator.DATA_LAKE_BUCKET)
+        self.athena_client = AthenaClient(self.s3_bucket)
         self.s3_client = boto3.client('s3')
 
         self.schema_dict = {}
 
-        _logger.info('m=__init__, msg=reading dir: {}/schemas'.format(SchemaValidator.PATH_PREFIX))
-        for root, dirs, files in os.walk('{}/schemas'.format(SchemaValidator.PATH_PREFIX)):
+        _logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator._PATH_PREFIX))
+        for root, dirs, files in os.walk(SchemaValidator._PATH_PREFIX):
             self.schema_dict[root] = files
 
     @staticmethod
@@ -96,7 +96,7 @@ class SchemaValidator(object):
                     'validated with errors' if err_detail != ''
                                                or err_instance != ''
                                                or err_validator_value != ''
-                                            else 'skipped'
+                    else 'skipped'
                 ]
             )
 
@@ -127,7 +127,7 @@ class SchemaValidator(object):
                 et = et.group(1)
                 # read list of files in s3 folder
                 response = self.s3_client.list_objects_v2(
-                    Bucket=SchemaValidator.DATA_LAKE_BUCKET,
+                    Bucket=self.s3_bucket,
                     Prefix='raw/amplitude/events/dt={}/et={}/app={}/'.format(self.today, et, app)
                 )
 
@@ -136,14 +136,14 @@ class SchemaValidator(object):
                     continue
 
                 # set schema path and file
-                json_schema_path = '{}/schemas/{}/'.format(SchemaValidator.PATH_PREFIX, app)
+                json_schema_path = '{}/{}/'.format(SchemaValidator._PATH_PREFIX, app)
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
                     _logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
 
                     json_file = key['Key']
-                    obj = self.s3_client.get_object(Bucket=SchemaValidator.DATA_LAKE_BUCKET, Key=json_file)
+                    obj = self.s3_client.get_object(Bucket=self.s3_bucket, Key=json_file)
                     byte_stream = BytesIO(obj['Body'].read())
 
                     result_obj = GzipFile(None, 'rb', fileobj=byte_stream)
@@ -172,7 +172,7 @@ class SchemaValidator(object):
 
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
-                    
+
                     _logger.info('m=validate_events_and_save_into_s3, msg=closing file')
                     result_obj.close()
 
@@ -207,4 +207,3 @@ class SchemaValidator(object):
                 ('validation_status', str)
             ])
         )
-

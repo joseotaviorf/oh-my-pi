@@ -1,26 +1,18 @@
 import json
-import os
 import re
-import sys
-from datetime import datetime
 
 import fastparquet
 import pandas as pd
 import s3fs
-
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
-from base.base_etl import BaseETL
-from base.enum_db import EnumDb
-
+from jobs.base.base_etl import BaseETL
+from jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
-from jobs.dags.util import environment as env
 
-AMPL_QUERIES_DIR = os.path.join(here, '../../../db/2.datalake/queries/amplitude')
+from __init__ import QUERIES_DIR
+
 
 class AmplitudeETL(object):
-    DATA_LAKE_BUCKET = env.get('bi-datalake-s3-bucket')
     TYPE_MAPPING = {
         'unicode': 'string',
         'int': 'double',
@@ -28,26 +20,30 @@ class AmplitudeETL(object):
     }
 
     @logger
-    def __init__(self, execution_date):
+    def __init__(self, execution_date, s3_bucket):
+        self.s3_bucket = s3_bucket
         self.today = execution_date.date()
         self.today_ym = '{}-{}'.format(self.today.year, self.today.strftime('%m'))
 
-        self.athena_client = AthenaClient(AmplitudeETL.DATA_LAKE_BUCKET)
+        self.athena_client = AthenaClient(self.s3_bucket)
+
+    @classmethod
+    @logger
+    def __format_query_filename(cls, filename):
+        return '{}/{}.sql'.format(QUERIES_DIR, filename)
 
     @logger
     def get_all_columns(self):
         _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
-        add_partition_raw_query = self.__get_sql_file('add_partition_raw.sql')
-        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today,
-                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
+        add_partition_raw_query = self.__format_query_filename('add_partition_raw')
+        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today, self.s3_bucket)
 
-        raw_query = self.__get_sql_file('init_events_raw.sql')
+        raw_query = self.__format_query_filename('init_events_raw')
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
 
         _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
-        drop_partition_raw_query = self.__get_sql_file('drop_partition_raw.sql')
-        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today,
-                                                                   AmplitudeETL.DATA_LAKE_BUCKET)
+        drop_partition_raw_query = self.__format_query_filename('drop_partition_raw')
+        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today, self.s3_bucket)
 
         return df_columns_raw
 
@@ -78,7 +74,7 @@ class AmplitudeETL(object):
                     _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
-                add_column_clean_query = self.__get_sql_file('add_column_clean.sql')
+                add_column_clean_query = self.__format_query_filename('add_column_clean')
                 self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix, formatted_up,
                                                                            'string', up)
 
@@ -100,7 +96,8 @@ class AmplitudeETL(object):
 
         return df_json
 
-    def __format_properties(self, property_name, property_value):
+    @classmethod
+    def __format_properties(cls, property_name, property_value):
         str_type = re.search('<type \'([a-z]+)\'>', str(type(property_value))).groups()[0]
         formatted_prop = re.sub('\W', '', property_name.replace(' ', '_').replace('.', '_'))
         formatted_prop = re.sub('^([A-Z])', '_\g<1>', formatted_prop)
@@ -113,9 +110,8 @@ class AmplitudeETL(object):
 
         ets = df.groupby('event_type')
         for df_et in ets:
-            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(AmplitudeETL.DATA_LAKE_BUCKET,
-                                                                                 df_et[0], self.today_ym, self.today,
-                                                                                 'events')
+            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(self.s3_bucket, df_et[0],
+                                                                                 self.today_ym, self.today, 'events')
 
             _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], self.today_ym,
                                                                                        self.today, 'events'))
@@ -124,21 +120,22 @@ class AmplitudeETL(object):
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
             _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
-            add_partition_clean_query = self.__get_sql_file('add_partition_clean.sql')
-            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym,
-                                                  AmplitudeETL.DATA_LAKE_BUCKET)
+            add_partition_clean_query = self.__format_query_filename('add_partition_clean')
+            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym, self.s3_bucket)
 
     def get_properties_as_df(self):
         props_query = """describe datalake_clean.amplitude_events"""
         return self.athena_client.execute_txt_query_and_return_dataframe(props_query)
 
-    def __convert_columns_to_number(self, df, columns, _type):
+    @classmethod
+    def __convert_columns_to_number(cls, df, columns, _type):
         for col in columns:
             df[col].fillna(0).astype(_type)
 
         return df
 
-    def __convert_columns_to_text(self, df, column_prefixes, _type):
+    @classmethod
+    def __convert_columns_to_text(cls, df, column_prefixes, _type):
         for col_prefix in column_prefixes:
             cols = set(df.columns[pd.Series(df.columns).str.startswith(col_prefix)])
             for col in cols:
@@ -146,7 +143,8 @@ class AmplitudeETL(object):
 
         return df
 
-    def __convert_columns_to_datetime(self, df, columns):
+    @classmethod
+    def __convert_columns_to_datetime(cls, df, columns):
         for col in columns:
             df[col] = pd.to_datetime(df[col])
 
@@ -243,6 +241,3 @@ class AmplitudeETL(object):
             db_enum=EnumDb.BI_DW,
             commit=True
         )
-
-    def __get_sql_file(self, f):
-        return os.path.join(AMPL_QUERIES_DIR, f)
