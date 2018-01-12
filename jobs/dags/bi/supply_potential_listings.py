@@ -148,19 +148,19 @@ mkt_fb_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_facebook_ads_costs',
     python_callable=load_marketing_costs,
-    op_kwargs={'dim_name': 'facebook', 'bucket': bucket}
+    op_kwargs={'dim_name': 'facebook', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
 mkt_g_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_google_adwords_costs',
     python_callable=load_marketing_costs,
-    op_kwargs={'dim_name': 'google', 'bucket': bucket}
+    op_kwargs={'dim_name': 'google', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
 mkt_crit_costs = PythonOperator(
     dag=dag,
     task_id='ODS_marketing_criteo_costs',
     python_callable=load_marketing_costs,
-    op_kwargs={'dim_name': 'criteo', 'bucket': bucket}
+    op_kwargs={'dim_name': 'criteo', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
 
 # Affiliate Payments Dimension

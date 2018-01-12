@@ -6,7 +6,7 @@ from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
 from qa_python_utils.aws.athena import AthenaClient
-
+from __init__ import QUERIES_DIR
 now = datetime.now()
 
 
@@ -110,7 +110,8 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
 def load_athena_query_to_ods(dim_name, bucket, file_name, append=False):
     athena = AthenaClient(bucket)
     _logger.info("Reading from S3: {}".format(datetime.utcnow()))
-    data_frame = athena.execute_file_query_and_return_dataframe(file_name)
+    filename = '{}/{}.sql'.format(QUERIES_DIR, file_name)
+    data_frame = athena.execute_file_query_and_return_dataframe(filename)
 
     _logger.info("START - To Staging: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
@@ -123,7 +124,7 @@ def load_athena_query_to_ods(dim_name, bucket, file_name, append=False):
     _logger.info("END - To Staging: {}".format(datetime.utcnow()))
 
 
-def load_marketing_costs(dim_name, mkt_configs):
+def load_marketing_costs(dim_name, bucket, mkt_configs):
     table_name = '{}_ads_campaigns'.format(dim_name)
     table = None
     if dim_name == 'google':
@@ -144,11 +145,11 @@ def load_marketing_costs(dim_name, mkt_configs):
             encoding='UTF8',
             append=False,
             commit=True,
-            bucket_name='{}/raw/ods/{}'.format(self.bucket, table_name)
+            bucket_name='{}/raw/ods/{}'.format(bucket, table_name)
         )
         BaseETL.copy_file_between_s3_buckets(
-            bucket_source=self.bucket,
-            bucket_destination=self.bucket,
+            bucket_source=bucket,
+            bucket_destination=bucket,
             full_filename_source='raw/ods/{0}/{0}.csv'.format(table_name),
             full_filename_dest='clean/ods/{0}/{0}.csv'.format(table_name)
         )
