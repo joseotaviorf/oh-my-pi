@@ -1,5 +1,5 @@
-drop table if exists unit_economics.tbl_base_ticket_task;
-create table unit_economics.tbl_base_ticket_task as
+drop table if exists unit_economics.vw_base_ticket_task;
+create table unit_economics.vw_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,
