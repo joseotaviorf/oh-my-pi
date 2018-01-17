@@ -76,9 +76,9 @@ new_offer as (
         original_rent as renting_original_value,
         original_condo as condo_original_value,
         case
-            when status = 'Approved'
+            when status = 'Aprovada'
                 then atualizado_em
-            else atualizado_em
+            else null
         end as dt_approved,
         turn as editing,
         status,
