@@ -29,7 +29,7 @@ bookings as
 	    as confirmed,
 	
 	    s.encerrado as closed,
-	    s."fupVisita" as visit_follow_up,
+	    nullif(s."fupVisita", '') as visit_follow_up,
 	    s."dataFupVisita" as dt_visit_follow_up,
 	    s."reagendadoDe_id" as rescheduled_from_id,
 	    s.visitante_id as id_visitor,
