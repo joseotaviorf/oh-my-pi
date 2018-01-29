@@ -34,8 +34,8 @@ select
   coalesce(f.id_contract, -1) as sk_contract,
   coalesce(f.id_rental_flow, -1) as id_rental_flow,
 
-  coalesce(to_char(fp.publication_date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
-  coalesce(to_char(p.publication_date,'YYYYMMDD')::integer, -1) as sk_listing_date,
+  coalesce(to_char(p.first_publication_date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
+  coalesce(to_char(p.min_version_time,'YYYYMMDD')::integer, -1) as sk_listing_date,
   coalesce(to_char(b."criadoEm",'YYYYMMDD')::integer, -1) as sk_booking_created_date,
   coalesce(to_char(b.data,'YYYYMMDD')::integer, -1) as sk_visit_date,
   coalesce(to_char(visitor.criado_em,'YYYYMMDD')::integer, -1) as sk_visitor_user_signup_date,
@@ -118,11 +118,6 @@ left join
   property_listing p
   on p.id = f.id_imovel
   and coalesce(b."criadoEm", '1901-01-01') between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now())
-
-left join
-  property_listing fp
-  on fp.id = f.id_imovel
-  and fp.version = 1
 
 left join
   usuario visitor

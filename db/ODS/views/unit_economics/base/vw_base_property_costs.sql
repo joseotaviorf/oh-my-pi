@@ -8,5 +8,5 @@ select
   status,
   min_version_time,
   coalesce(max_version_time, '2300-01-01')::date as max_version_time
-from unit_economics.vw_property_listing_ribs
+from unit_economics.vw_property_listing
 ;
