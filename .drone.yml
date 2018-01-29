@@ -5,7 +5,7 @@ clone:
 
 pipeline:
 
-  install:
+  install-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
@@ -18,13 +18,11 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-    secrets:
-      - rsync_key
+    secrets: [ rsync_key ]
     when:
-      branch:
-        - forno
+      branch: [ forno ]
 
-  install:
+  install-production:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -37,54 +35,45 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-    secrets:
-      - rsync_key
+    secrets: [ rsync_key ]
     when:
-      branch:
-        - master
+      branch: [ master ]
 
-  load-dags:
+  load-dags-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
     source: "db jobs"
     target: /var/www/airflow/dags/
     args: '--force -vI'
-    secrets:
-      - rsync_key
+    secrets: [ rsync_key ]
     when:
-      branch:
-        - forno
-  
-  load-dags:
+      branch: [ forno ]
+
+  load-dags-production:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: "db jobs"
     target: /var/www/airflow/dags/
     args: '--force -vI'
-    secrets:
-      - rsync_key
+    secrets: [ rsync_key ]
     when:
-      branch:
-        - master
-  
-  ecr:
-    group: ecr
-    image: plugins/ecr:1.0
+      branch: [ master ]
+
+  publish:
+    image: quintoandar/drone-ecr
+    pull: true
     repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-    debug: true
-    daemon_off: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    tag:
-      - '${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT:0:7}'
-      - '${DRONE_COMMIT_BRANCH}-latest'
-    secrets:
-      - ecr_access_key
-      - ecr_secret_key
+    tag: [ '${DRONE_BRANCH}-${DRONE_COMMIT:0:7}', '${DRONE_BRANCH}-latest' ]
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     when:
-      branch:
-        - forno
-        - master
+      branch: [ master, forno ]
 
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: dataops
+    when:
+      branch: [ forno, master ]
+      status: [ success, failure ]
