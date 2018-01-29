@@ -1,38 +1,29 @@
 drop view if exists vw_fact_liquidity_property_scheduling;
-
-create view vw_fact_liquidity_property_scheduling
-as
-select
-  f.id_property_scheduling as ods_id,
-  -- coalesce(f.id_imovel, -1) as sk_property,
-  coalesce((f.id_imovel || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
-  p."version"::integer as listing_number,
-  coalesce(b.id, -1) as sk_booking,
-  coalesce(id_owner, -1) as sk_owner,
-  coalesce(id_user_affiliate, -1) as sk_user_affiliate,
-  coalesce(f.id_user_agent, -1) as sk_user_agent,
-  coalesce(f.id_user_visitor, -1) as sk_user_visitor,
-  coalesce(f.id_user_visit_agent, -1) as sk_user_visit_agent,
-  coalesce(f.id_visit, -1) as sk_visit,
-  coalesce(f.id_negotiation, -1) as sk_negotiation,
-  case
-    when f.id_offer is null
-        then
-            case
-                when f.id_pre_proposal is null or f.id_pre_proposal = -1
-                    then -1
-                else (f.id_pre_proposal * 100) + 1
-            end
-    else
-        case
-            when f.id_offer = -1
-                then -1
-            else (f.id_offer * 100) + 2
-        end
-  end as sk_offer,
-  coalesce(f.id_proposal, -1) as sk_proposal,
-  coalesce(f.id_contract, -1) as sk_contract,
-  coalesce(f.id_rental_flow, -1) as id_rental_flow,
+create view vw_fact_liquidity_property_scheduling as
+with fact as (
+    select
+      f.id_property_scheduling as ods_id,
+      -- coalesce(f.id_imovel, -1) as sk_property,
+      coalesce((f.id_imovel || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
+      p."version"::integer as listing_number,
+      coalesce(b.id, -1) as sk_booking,
+      coalesce(id_owner, -1) as sk_owner,
+      coalesce(id_user_affiliate, -1) as sk_user_affiliate,
+      coalesce(f.id_user_agent, -1) as sk_user_agent,
+      coalesce(f.id_user_visitor, -1) as sk_user_visitor,
+      coalesce(f.id_user_visit_agent, -1) as sk_user_visit_agent,
+      coalesce(f.id_visit, -1) as sk_visit,
+      coalesce(f.id_negotiation, -1) as sk_negotiation,
+      case
+        when f.id_offer > 0
+            then (f.id_offer * 100) + 2
+        when f.id_pre_proposal > 0
+            then (f.id_pre_proposal * 100) + 1
+        else -1
+      end as sk_offer,
+      coalesce(f.id_proposal, -1) as sk_proposal,
+      coalesce(f.id_contract, -1) as sk_contract,
+      coalesce(f.id_rental_flow, -1) as id_rental_flow,
 
   coalesce(to_char(p.first_publication_date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
   coalesce(to_char(p.min_version_time,'YYYYMMDD')::integer, -1) as sk_listing_date,
@@ -48,17 +39,6 @@ select
   visit_created_type,
   visit_last_updated_from_app,
   visit_last_updated_type,
-
-  /*
-  esv.initial_utm_source as initial_source,
-  esv.initial_utm_medium as initial_medium,
-  esv.initial_utm_campaign as initial_campaign,
-  esv.initial_referring_domain  as initial_referring_domain,
-  esv.utm_source as source,
-  esv.utm_medium as medium,
-  esv.utm_campaign as campaign,
-  esv.referring_domain as referring_domain,
-  */
 
   '' as initial_source,
   '' as initial_medium,
@@ -128,41 +108,16 @@ left join
   on agent.id = f.id_user_visit_agent
 
 left join
-  pre_proposal pp
-  on pp.id = f.id_pre_proposal
-
-left join
   offer
   on offer.id = f.id_offer
 
 left join
+  pre_proposal pp
+  on pp.id = f.id_pre_proposal
+
+left join
   contract
   on contract.id = f.id_contract
-
-/*
-left join lateral
-(
-  select
-  	esv.imovel_id,
-    esv.initial_utm_source,
-    esv.initial_utm_medium,
-    esv.initial_utm_campaign,
-    esv.initial_referring_domain,
-    esv.utm_source,
-    esv.utm_medium,
-    esv.utm_campaign,
-    esv.referring_domain
-  from
-    amplitude_event_schedule_visit esv
-  where
-  	esv.imovel_id = f.id_imovel
-    and esv.event_time::timestamp <= coalesce(b."criadoEm", '2999-01-01')
-  order by
-  	esv.event_time desc
-  limit 1
-) esv
-  on true
-*/
 
 left join
   vw_imovel_liquidity_marketing_costs h
@@ -203,18 +158,107 @@ left join
 on acs.id_property = f.id_imovel -- 892792831
 and acs.version = p.version
 
-left join
-(
-  select
-	id,
-    version,
-    sum(classified_cost) as classified_cost
-  from
-  	vw_imovel_liquidity_classifieds_costs
-  group by
-	id,
-    version
-) cc
-on cc.id = f.id_imovel
-and cc.version = p.version
+    left join
+    (
+      select
+        id,
+        version,
+        sum(classified_cost) as classified_cost
+      from
+        vw_imovel_liquidity_classifieds_costs
+      group by
+        id,
+        version
+    ) cc
+    on cc.id = f.id_imovel
+    and cc.version = p.version
+),
+calculated_dates as (
+    select
+        f.*,
+        dof.dt_created as offer_date,
+        case
+          when dof.status in ('Rejeitada', 'Aprovada')
+              then dof.dt_updated
+          else null::timestamp
+        end as internal_analysis_date,
+        dof.dt_approved as offer_approved_date,
+        case
+          when dpr.status in ('Rejeitada', 'Aprovada')
+           then dpr.dt_updated
+          else null::timestamp
+        end as credit_analysis_date,
+        dpr.dt_proposal_approved as credit_analysis_approved_date,
+        case
+          when dct.contract_status in ('Cancelado', 'Finalizado')
+              then dct.dt_updated
+          else dct.dt_signature
+        end as contract_date,
+        dbo.dt_booking as visit_date,
+        dbo.dt_created as booking_date
+    from fact f
+    left join vw_dim_offer dof
+        on f.sk_offer = dof.sk_offer
+    left join vw_dim_proposal dpr
+        on f.sk_proposal = dpr.sk_proposal
+    left join vw_dim_contract dct
+        on f.sk_contract = dct.sk_contract
+    left join vw_dim_booking dbo
+        on f.sk_booking = dbo.sk_booking
+)
+select
+  ods_id,
+  sk_property,
+  listing_number,
+  sk_booking,
+  sk_owner,
+  sk_user_affiliate,
+  sk_user_agent,
+  sk_user_visitor,
+  sk_user_visit_agent,
+  sk_visit,
+  sk_negotiation,
+  sk_offer,
+  sk_proposal,
+  sk_contract,
+  id_rental_flow,
+  sk_first_listing_date,
+  sk_listing_date,
+  sk_booking_created_date,
+  sk_visit_date,
+  sk_visitor_user_signup_date,
+  sk_offer_created_date,
+  sk_contract_signed_date,
+  sk_user_agent_date,
+  dt_contract_anullment,
+  visit_created_from_app,
+  visit_created_type,
+  visit_last_updated_from_app,
+  visit_last_updated_type,
+  initial_source,
+  initial_medium,
+  initial_campaign,
+  initial_referring_domain,
+  source,
+  medium,
+  campaign,
+  referring_domain,
+  vl_cost_marketing_campaigns,
+  vl_cost_marketing_ads,
+  vl_cost_marketing_sms,
+  vl_cost_agents_comission,
+  vl_cost_agents_slot,
+  vl_cost_visit_support,
+  vl_cost_closing_support,
+  vl_cost_classifieds,
+  dt_timestamp,
+  (date_part('day', visit_date - booking_date) * 24 +
+              date_part('hour', visit_date - booking_date)) / 24.0 as booking_to_visit,
+  (date_part('day', internal_analysis_date - offer_date) * 24 +
+              date_part('hour', internal_analysis_date - offer_date)) / 24.0 as offer_to_internal_analyis,
+  (date_part('day', credit_analysis_date- offer_approved_date) * 24 +
+              date_part('hour', credit_analysis_date - offer_approved_date)) / 24.0 as offer_to_credit_analysis,
+  (date_part('day', contract_date- credit_analysis_approved_date) * 24 +
+              date_part('hour', contract_date - credit_analysis_approved_date)) / 24.0 as credit_analysis_to_contract
+from calculated_dates
 ;

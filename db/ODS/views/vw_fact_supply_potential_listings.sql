@@ -461,7 +461,15 @@ SELECT -- count(1)
   )
   as cac_marketing_per_published_listing,
 
-  now()::timestamp as load_timestamp
+  now()::timestamp as load_timestamp,
+
+  (date_part('day', first_inside_sales_contact_date - contact_date) * 24 +
+              date_part('hour', first_inside_sales_contact_date - contact_date)) / 24.0 as lead_to_first_contact,
+  (date_part('day', first_inside_sales_contact_date - prospect_date) * 24 +
+              date_part('hour', first_inside_sales_contact_date - prospect_date)) / 24.0 as prospect_to_first_contact,
+  (date_part('day', first_publication_date - qualified_date) * 24 +
+              date_part('hour', first_publication_date - qualified_date)) / 24.0 as qualified_to_listing
+
 
 FROM
   listings l

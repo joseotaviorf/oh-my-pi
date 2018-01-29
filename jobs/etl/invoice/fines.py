@@ -5,13 +5,12 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from dateutil.relativedelta import relativedelta
 from qa_python_utils.default_logger import logger, _logger
 
 from invoice import Invoice
 
 args = sys.argv
-full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S') - relativedelta(months=1)
+full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
 exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
 
 

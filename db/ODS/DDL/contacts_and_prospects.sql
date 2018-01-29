@@ -46,7 +46,7 @@ CREATE TABLE public.contacts_and_prospects
   atualizado_em timestamp without time zone,
   url_source character varying(100) DEFAULT NULL::character varying,
   utm_medium character varying(100) DEFAULT NULL::character varying,
-  utm_campaign character varying(100) DEFAULT NULL::character varying,
+  utm_campaign character varying(255) DEFAULT NULL::character varying,
   utm_source character varying(100) DEFAULT NULL::character varying,
   usuario_que_indicou_id integer DEFAULT NULL,
   usuario_que_cadastrou_id integer DEFAULT NULL,
