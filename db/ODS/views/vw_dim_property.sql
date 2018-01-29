@@ -1,4 +1,5 @@
-create or replace view public.vw_dim_property 
+drop view if exists public.vw_dim_property;
+create or replace view public.vw_dim_property
 as
 
 with de_published_dates as ( 
@@ -7,7 +8,7 @@ with de_published_dates as (
         vpl.version, 
         vpl.min_version_time, 
         vpl.max_version_time, 
-        vpl.last_status_version, 
+        vpl.status as last_status_version,
         ish.status_history, 
         max(ish.status_time) over (partition by ish.id, vpl.version) as de_publication_date
     from vw_property_listing vpl
@@ -24,10 +25,10 @@ imovel_dates as
 	  pl.version,
 	  pl.min_version_time,
 	  pl.max_version_time,
-	  pl.last_status_version,
-	  pl.publication_date,
+	  pl.status as last_status_version,
+	  pl.min_version_time::date as publication_date,
 	  ud.de_publication_date,
-	  pl.nr_listing,
+	  pl.version as nr_listing,
 		pl.nr_renting,
 	  min(b."criadoEm") AS first_booking_date,
 	  
@@ -186,9 +187,9 @@ imovel_dates as
 		pl.version, 
 		pl.min_version_time, 
 		pl.max_version_time,
-	    pl.last_status_version,
-	    pl.publication_date,
-	    pl.nr_listing,
+	    pl.status,
+	    pl.min_version_time::date,
+	    pl.version,
 		pl.nr_renting,
 		ud.de_publication_date
 )

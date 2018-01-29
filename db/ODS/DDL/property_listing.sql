@@ -1,14 +1,12 @@
 drop table if exists public.property_listing;
 CREATE TABLE public.property_listing (
 	id int8 NOT NULL,
+	status varchar NULL,
 	"version" int8 NOT NULL,
 	min_version_time timestamp NULL,
 	max_version_time timestamp NULL,
-	last_status_version varchar NULL,
-	nr_listing integer null,
 	nr_renting integer null,
-	publication_date timestamp NULL,
-	last_publication_date timestamp NULL,
+	first_publication_date timestamp NULL,
 	CONSTRAINT property_listing_pk PRIMARY KEY (id,"version")
 )
 WITH (

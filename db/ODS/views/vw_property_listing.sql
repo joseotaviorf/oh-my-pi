@@ -1,5 +1,5 @@
-drop view if exists vw_property_listing_ribs;
-create or replace view vw_property_listing_ribs as
+drop view if exists public.vw_property_listing;
+create or replace view public.vw_property_listing as
 with filt as (
   select
 	id,
