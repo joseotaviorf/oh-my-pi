@@ -3,7 +3,7 @@
 -- CREATE EXTENSION pg_trgm;
 
 DROP VIEW IF EXISTS vw_fact_supply_potential_listings ;
-CREATE VIEW vw_fact_supply_potential_listings as
+CREATE OR REPLACE VIEW vw_fact_supply_potential_listings as
 with first_pub as
 (
   SELECT
@@ -46,7 +46,7 @@ with first_pub as
     left join
       vw_dim_property p
       on p.id = l.property_id
-      and p."version" = 1 -- for supply models, always we have to get the first version of listings because we need first_publication only
+      and (p."version" = 1 or p."version" is null) -- for supply models, always we have to get the first version of listings because we need first_publication only
 
   WINDOW
     w_prop_id as (partition by l.property_id)
