@@ -69,3 +69,11 @@ pipeline:
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     when:
       branch: [ master, forno ]
+
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: dataops
+    when:
+      branch: [ forno, master ]
+      status: [ success, failure ]
