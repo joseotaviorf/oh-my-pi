@@ -1,33 +1,50 @@
 DROP VIEW IF EXISTS vw_dim_region;
 CREATE VIEW vw_dim_region as
 SELECT
-  r.id,
   r.id as sk_region,
-  r.nivel,
-  r.nome,
-  r."macroId",
-  r."macroNome",
-  r."cidadeId",
-  r."cidadeNome",
-  r."criadaEm",
-  r."atualizadoEm",
+  coalesce(r.id, ar.id) as id,
+  r.nivel as level,
+  coalesce(r.nome,ar.nome) as name,
+  r."macroId" as macro_id,
+  r."macroNome" as macro_name,
+  r."cidadeId" as city_id,
+  coalesce(r."cidadeNome", ar."cidadeNome") as city_name,
+  ar."Nossa nomenclatura" as region_code,
+	ar."Short region name" as short_region_name,
+	ar."Long region name" as long_region_name,
+	case
+		when coalesce(r."cidadeNome", ar."cidadeNome") in ('Rio de Janeiro') then coalesce(r."cidadeNome", ar."cidadeNome")
+		when coalesce(r."cidadeNome", ar."cidadeNome") in ('Campinas') then coalesce(r."cidadeNome", ar."cidadeNome")
+		when coalesce(r."cidadeNome", ar."cidadeNome") in
+			('São Paulo',
+			'São Bernardo do Campo',
+			'São Caetano do Sul',
+			'Santo André',
+			'Guarulhos',
+			'Osasco',
+			'Barueri') then 'Grande São Paulo'
+		else NULL
+	end as greater_region,
+  r."criadaEm" as dt_created,
+  r."atualizadoEm" as dt_updated,
   r.dt_timestamp::date as dt_timestamp,
   i.dt_first_property_created
 FROM
   public.region r
 left join
-(
-	select
-    	i.regiao_id,
-        min(i.data_criacao) as dt_first_property_created
-    from
-	    imovel i
-    where
-    	i.regiao_id is not null
-    group by
-    	i.regiao_id
-) i
+	(
+		select
+	    	i.regiao_id,
+	        min(i.data_criacao) as dt_first_property_created
+	    from
+		    imovel i
+	    where
+	    	i.regiao_id is not null
+	    group by
+	    	i.regiao_id
+	) i
   on i.regiao_id = r.id
+left join
+	files.aux_regiao ar
+	on r.id = ar.id
 ;
-
--- select * from vw_dim_region
