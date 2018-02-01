@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from jobs.dags.util import environment as env
 from qa_python_utils.aws.athena import AthenaClient
 from jobs.new_etl.business_dim_etl import BusinessDimensionETL
@@ -27,6 +27,7 @@ mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
 # create DAG definition
 dag = DAG(
     dag_id='bi-supply-potential-listings',
+    description='ETL Pipeline for creating Supply Model inside the DW',
     default_args={
         'owner': 'Data Team',
         'wait_for_downstream': False,
@@ -38,63 +39,72 @@ dag = DAG(
 )
 
 # Lead Dimension
-lead = PythonOperator(
+lead = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_lead',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'lead', 'bucket': bucket, 'command': 'call ebdb.list_lead();'}
 )
-dim_lead = PythonOperator(
+dim_lead = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_lead',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_lead', 'bucket': bucket}
 )
 
 # Contacts and Prospects Dimension
-contacts_and_prospects = PythonOperator(
+contacts_and_prospects = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_contacts_and_prospects',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'contacts_and_prospects',  'bucket': bucket, 'command': 'call ebdb.list_contacts_and_prospects();'}
 )
-dim_contacts_and_prospects = PythonOperator(
+dim_contacts_and_prospects = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_contacts_and_prospects',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_contacts_and_prospects', 'bucket': bucket}
 )
 
 # Property Dimension
-imovel = PythonOperator(
+imovel = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_imovel',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'property',  'bucket': bucket, 'command': 'call ebdb.list_imovel();', 'table_name': 'imovel'}
 )
-dim_property = PythonOperator(
+dim_property = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_property',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_property', 'bucket': bucket}
 )
-dim_status_over_period = PythonOperator(
+dim_status_over_period = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_property_status_over',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
 )
 
 # Region Dimension
-region = PythonOperator(
+region = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_region',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_table_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'region',  'bucket': bucket, 'table_name': 'MapRegiao', 'add_timestamp': True, 'copy_to_clean': False}
 )
-dim_region = PythonOperator(
+dim_region = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_region',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_region', 'bucket': bucket,
                'post_command': "update dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
@@ -102,85 +112,97 @@ dim_region = PythonOperator(
 )
 
 # User Dimension
-usuario = PythonOperator(
+usuario = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_usuario',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'user', 'table_name': 'usuario', 'bucket': bucket, 'command': 'call ebdb.list_usuario();'}
 )
-dim_user = PythonOperator(
+dim_user = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_user',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_user', 'bucket': bucket}
 )
 
 # Marketing Attribution Dimension
-mkt = PythonOperator(
+mkt = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_marketing_attribution',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'marketing_attribution',  'bucket': bucket, 'command': 'call ebdb.list_marketing_attribution();'}
 )
-dim_marketing_attribution = PythonOperator(
+dim_marketing_attribution = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_marketing_attribution',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_marketing_attribution', 'bucket': bucket}
 )
 
 # Potential Listings Fact Table
-listings = PythonOperator(
+listings = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_Potential_Listings',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'potential_listings',  'bucket': bucket, 'command': 'call ebdb.list_potential_listings(null);'}
 )
-fact_supply_cac = PythonOperator(
+fact_supply_cac = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_Fact_Supply_CAC',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'fact_supply_potential_listings', 'bucket': bucket, 'insert_dummy': False}
 )
 
 # Marketing Ads Costs Dimension
-mkt_fb_costs = PythonOperator(
+mkt_fb_costs = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_marketing_facebook_ads_costs',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_marketing_costs,
     op_kwargs={'dim_name': 'facebook', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
-mkt_g_costs = PythonOperator(
+mkt_g_costs = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_marketing_google_adwords_costs',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_marketing_costs,
     op_kwargs={'dim_name': 'google', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
-mkt_crit_costs = PythonOperator(
+mkt_crit_costs = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_marketing_criteo_costs',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_marketing_costs,
     op_kwargs={'dim_name': 'criteo', 'bucket': bucket, 'mkt_configs': mkt_configs}
 )
 
 # Affiliate Payments Dimension
-affiliate_payments = PythonOperator(
+affiliate_payments = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_affiliate_payments',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_athena_query_to_ods,
     op_kwargs={'dim_name': 'affiliate_payments', 'bucket': bucket, 'fname': 'affiliate_payments'}
 )
 
 # Photo Job
-photo_job = PythonOperator(
+photo_job = QuintoAndarPythonOperator(
     dag=dag,
     task_id='ODS_photo_job',
+    execution_timeout=timedelta(hours=3),
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'dim_name': 'photo_job',  'bucket': bucket, 'command': 'call ebdb.list_photo_job();'}
 )
-dim_photo_job = PythonOperator(
+dim_photo_job = QuintoAndarPythonOperator(
     dag=dag,
     task_id='DW_dim_photo_job',
+    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'dim_photo_job', 'bucket': bucket}
 )
