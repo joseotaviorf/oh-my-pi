@@ -337,4 +337,24 @@ insert into fact_growth (
 		mom,
 		yoy
 	from growth.documentation_sent
+
+	union all
+
+	select
+		sk_date,
+	  sk_week_start_date,
+	  'ongoing_contracts' as funnel_step,
+	  region,
+	  city,
+	  _year,
+	  _month,
+	  _week,
+		count_prev_week,
+		_count,
+		wow,
+		mtd,
+		ytd,
+		mom,
+		yoy
+	from growth.ongoing_contracts
 )
