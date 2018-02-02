@@ -17,7 +17,7 @@ with all_dates_all as (
 			|| lpad(date_part('week', dd."date")::varchar, 2, '0'))::int  as concat_all,
 		(date_part('year', dd."date")::varchar
 			|| lpad(date_part('month', dd."date")::varchar, 2, '0'))::int  as concat_month,
-		count(distinct(liq.sk_contract)) as c
+		count(distinct(liq.sk_contract)) as _count
 	from
 		public.fact_liquidity_property_scheduling liq
 	left join
@@ -54,7 +54,7 @@ all_dates_region as (
 			|| lpad(date_part('week', dd."date")::varchar, 2, '0'))::int  as concat_all,
 		(date_part('year', dd."date")::varchar
 			|| lpad(date_part('month', dd."date")::varchar, 2, '0'))::int  as concat_month,
-		count(distinct(liq.sk_contract)) as c
+		count(distinct(liq.sk_contract)) as _count
 	from
 		public.fact_liquidity_property_scheduling liq
 	left join
