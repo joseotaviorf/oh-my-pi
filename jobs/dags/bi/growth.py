@@ -216,23 +216,24 @@ fact_growth = PythonOperator(
     op_kwargs={'query_path': 'fact_growth'}
 )
 
-leads >> fact_growth
-new_listings >> fact_growth
-opportunities >> fact_growth
-prospects >> fact_growth
-qualifieds >> fact_growth
+leads.set_downstream([approved_by_insurer, documentation_sent, offerers, offerers_approved, offerers_sent_doc])
+new_listings.set_downstream([approved_by_insurer, documentation_sent, offerers, offerers_approved, offerers_sent_doc])
+opportunities.set_downstream([approved_by_insurer, documentation_sent, offerers, offerers_approved, offerers_sent_doc])
+prospects.set_downstream([approved_by_insurer, documentation_sent, offerers, offerers_approved, offerers_sent_doc])
+qualifieds.set_downstream([approved_by_insurer, documentation_sent, offerers, offerers_approved, offerers_sent_doc])
 
-approved_by_insurer >> fact_growth
-documentation_sent >> fact_growth
-offerers >> fact_growth
-offerers_approved >> fact_growth
-offerers_sent_doc >> fact_growth
-offers_approved >> fact_growth
-offers_submitted >> fact_growth
-tenant_prospects >> fact_growth
-tenants >> fact_growth
-visitors >> fact_growth
-visits_booked >> fact_growth
-visits_completed >> fact_growth
+approved_by_insurer.set_downstream([offers_approved, offers_submitted, tenant_prospects, tenants, visitors])
+documentation_sent.set_downstream([offers_approved, offers_submitted, tenant_prospects, tenants, visitors])
+offerers.set_downstream([offers_approved, offers_submitted, tenant_prospects, tenants, visitors])
+offerers_approved.set_downstream([offers_approved, offers_submitted, tenant_prospects, tenants, visitors])
+offerers_sent_doc.set_downstream([offers_approved, offers_submitted, tenant_prospects, tenants, visitors])
 
-ongoing_contracts >> fact_growth
+offers_approved.set_downstream([visits_booked, visits_completed, ongoing_contracts])
+offers_submitted.set_downstream([visits_booked, visits_completed, ongoing_contracts])
+tenant_prospects.set_downstream([visits_booked, visits_completed, ongoing_contracts])
+tenants.set_downstream([visits_booked, visits_completed, ongoing_contracts])
+visitors.set_downstream([visits_booked, visits_completed, ongoing_contracts])
+
+visits_booked.set_downstream([fact_growth])
+visits_completed.set_downstream([fact_growth])
+ongoing_contracts.set_downstream([fact_growth])
