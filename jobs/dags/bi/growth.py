@@ -6,7 +6,7 @@ from airflow.operators.quintoandar import QuintoAndarPythonOperator
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-GROWTH_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/public/queries/growth')
+GROWTH_QUERIES_DIR = os.path.join(dir_path, '../../../db/3.dw/public/queries/growth')
 env.set_airflow_var_to_local_env('BI_DW', 'EBDB')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
