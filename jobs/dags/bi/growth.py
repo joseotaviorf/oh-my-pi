@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from jobs.base.base_etl import BaseETL, EnumDb
 from jobs.dags.util import environment as env
 from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
+from airflow.operators.python_operator import PythonOperator
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -66,35 +66,35 @@ dag = DAG(
 )
 
 # Supply Measures
-leads = QuintoAndarPythonOperator(
+leads = PythonOperator(
     dag=dag,
     task_id='extract_leads',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'leads', 'query_path': 'supply/leads',  'suffix_path': 'suffix_base'}
 )
-new_listings = QuintoAndarPythonOperator(
+new_listings = PythonOperator(
     dag=dag,
     task_id='extract_new_listings',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'new_listings', 'query_path': 'supply/new_listings',  'suffix_path': 'suffix_base'}
 )
-opportunities = QuintoAndarPythonOperator(
+opportunities = PythonOperator(
     dag=dag,
     task_id='extract_opportunities',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'opportunities', 'query_path': 'supply/opportunities',  'suffix_path': 'suffix_base'}
 )
-prospects = QuintoAndarPythonOperator(
+prospects = PythonOperator(
     dag=dag,
     task_id='extract_prospects',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'prospects', 'query_path': 'supply/prospects',  'suffix_path': 'suffix_base'}
 )
-qualifieds = QuintoAndarPythonOperator(
+qualifieds = PythonOperator(
     dag=dag,
     task_id='extract_qualifieds',
     execution_timeout=timedelta(hours=3),
@@ -103,7 +103,7 @@ qualifieds = QuintoAndarPythonOperator(
 )
 
 # Demand Measures
-approved_by_insurer = QuintoAndarPythonOperator(
+approved_by_insurer = PythonOperator(
     dag=dag,
     task_id='extract_approved_by_insurer',
     execution_timeout=timedelta(hours=3),
@@ -111,7 +111,7 @@ approved_by_insurer = QuintoAndarPythonOperator(
     op_kwargs={'dim_name': 'approved_by_insurer', 'query_path': 'demand/approved_by_insurer',
                'suffix_path': 'suffix_base'}
 )
-documentation_sent = QuintoAndarPythonOperator(
+documentation_sent = PythonOperator(
     dag=dag,
     task_id='extract_documentation_sent',
     execution_timeout=timedelta(hours=3),
@@ -119,70 +119,70 @@ documentation_sent = QuintoAndarPythonOperator(
     op_kwargs={'dim_name': 'documentation_sent', 'query_path': 'demand/documentation_sent',
                'suffix_path': 'suffix_base'}
 )
-offerers = QuintoAndarPythonOperator(
+offerers = PythonOperator(
     dag=dag,
     task_id='extract_offerers',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'offerers', 'query_path': 'demand/offerers',  'suffix_path': 'suffix_base'}
 )
-offerers_approved = QuintoAndarPythonOperator(
+offerers_approved = PythonOperator(
     dag=dag,
     task_id='extract_offerers_approved',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'offerers_approved', 'query_path': 'demand/offerers_approved',  'suffix_path': 'suffix_base'}
 )
-offerers_sent_doc = QuintoAndarPythonOperator(
+offerers_sent_doc = PythonOperator(
     dag=dag,
     task_id='extract_offerers_sent_doc',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'offerers_sent_doc', 'query_path': 'demand/offerers_sent_doc',  'suffix_path': 'suffix_base'}
 )
-offers_approved = QuintoAndarPythonOperator(
+offers_approved = PythonOperator(
     dag=dag,
     task_id='extract_offers_approved',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'offers_approved', 'query_path': 'demand/offers_approved',  'suffix_path': 'suffix_base'}
 )
-offers_submitted = QuintoAndarPythonOperator(
+offers_submitted = PythonOperator(
     dag=dag,
     task_id='extract_offers_submitted',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'offers_submitted', 'query_path': 'demand/offers_submitted',  'suffix_path': 'suffix_base'}
 )
-tenant_prospects = QuintoAndarPythonOperator(
+tenant_prospects = PythonOperator(
     dag=dag,
     task_id='extract_tenant_prospects',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'tenant_prospects', 'query_path': 'demand/tenant_prospects',  'suffix_path': 'suffix_base'}
 )
-tenants = QuintoAndarPythonOperator(
+tenants = PythonOperator(
     dag=dag,
     task_id='extract_tenants',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'tenants', 'query_path': 'demand/tenants',  'suffix_path': 'suffix_base'}
 )
-visitors = QuintoAndarPythonOperator(
+visitors = PythonOperator(
     dag=dag,
     task_id='extract_visitors',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'visitors', 'query_path': 'demand/visitors',  'suffix_path': 'suffix_base'}
 )
-visits_booked = QuintoAndarPythonOperator(
+visits_booked = PythonOperator(
     dag=dag,
     task_id='extract_visits_booked',
     execution_timeout=timedelta(hours=3),
     python_callable=materialize_growth_measure_table_query,
     op_kwargs={'dim_name': 'visits_booked', 'query_path': 'demand/visits_booked',  'suffix_path': 'suffix_base'}
 )
-visits_completed = QuintoAndarPythonOperator(
+visits_completed = PythonOperator(
     dag=dag,
     task_id='extract_visits_completed',
     execution_timeout=timedelta(hours=3),
@@ -191,7 +191,7 @@ visits_completed = QuintoAndarPythonOperator(
 )
 
 # Closing Measures
-ongoing_contracts = QuintoAndarPythonOperator(
+ongoing_contracts = PythonOperator(
     dag=dag,
     task_id='extract_ongoing_contracts',
     execution_timeout=timedelta(hours=3),
@@ -208,7 +208,7 @@ ongoing_contracts = QuintoAndarPythonOperator(
 #     op_kwargs={'dim_name': 'active_users', 'query_path': 'demand/active_users',  'suffix_path': 'suffix_base'}
 # )
 
-fact_growth = QuintoAndarPythonOperator(
+fact_growth = PythonOperator(
     dag=dag,
     task_id='load_fact_growth',
     execution_timeout=timedelta(hours=3),
