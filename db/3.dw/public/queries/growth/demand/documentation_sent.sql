@@ -1,4 +1,4 @@
-drop table if exists growth.documentation_sent;
+--drop table if exists growth.documentation_sent;
 create table growth.documentation_sent as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

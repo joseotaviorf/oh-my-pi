@@ -1,4 +1,4 @@
-drop table if exists growth.visitors;
+--drop table if exists growth.visitors;
 create table growth.visitors as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

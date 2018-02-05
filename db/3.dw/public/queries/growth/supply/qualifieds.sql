@@ -1,4 +1,4 @@
-drop table if exists growth.qualifieds;
+--drop table if exists growth.qualifieds;
 create table growth.qualifieds as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

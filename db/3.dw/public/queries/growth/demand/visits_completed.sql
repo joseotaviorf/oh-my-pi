@@ -1,4 +1,4 @@
-drop table if exists growth.visits_completed;
+--drop table if exists growth.visits_completed;
 create table growth.visits_completed as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month
