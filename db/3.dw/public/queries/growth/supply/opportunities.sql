@@ -10,40 +10,32 @@ with all_dates_all as (
 		date_part('year', f.dt_opportunity) as _year,
 		date_part('month', f.dt_opportunity) as _month,
 		date_part('week', f.dt_opportunity) as _week,
+		date_part('day', f.dt_opportunity) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', f.dt_opportunity)::varchar
-			|| lpad(date_part('month', f.dt_opportunity)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_opportunity)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_opportunity)::varchar
-			|| lpad(date_part('month', f.dt_opportunity)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_opportunity) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
-	group by date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity)
-	order by date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity)
+	group by date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity), date_part('day', f.dt_opportunity)
+	order by date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity), date_part('day', f.dt_opportunity)
 ),
 all_dates_region as (
   select
 		date_part('year', f.dt_opportunity) as _year,
 		date_part('month', f.dt_opportunity) as _month,
 		date_part('week', f.dt_opportunity) as _week,
+		date_part('day', f.dt_opportunity) as _day,
 		r.long_region_name as region,
 		r.city_name as city,
-		(date_part('year', f.dt_opportunity)::varchar
-			|| lpad(date_part('month', f.dt_opportunity)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_opportunity)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_opportunity)::varchar
-			|| lpad(date_part('month', f.dt_opportunity)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_opportunity) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
 	left join dim_region r
 		on cap.region_id = r.id
-	group by r.long_region_name, r.city_name, date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity)
-	order by r.long_region_name, r.city_name, date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity)
+	group by r.long_region_name, r.city_name, date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity), date_part('day', f.dt_opportunity)
+	order by r.long_region_name, r.city_name, date_part('year', f.dt_opportunity), date_part('month', f.dt_opportunity), date_part('week', f.dt_opportunity), date_part('day', f.dt_opportunity)
 ),
 all_dates as (
 	select *

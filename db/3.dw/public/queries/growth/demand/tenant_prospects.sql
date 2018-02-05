@@ -10,32 +10,24 @@ with all_dates_all as (
 		date_part('year', db.dt_created) as _year,
 		date_part('month', db.dt_created) as _month,
 		date_part('week', db.dt_created) as _week,
+		date_part('day', db.dt_created) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', db.dt_created)::varchar
-			|| lpad(date_part('month', db.dt_created)::varchar, 2, '0')
-			|| lpad(date_part('week', db.dt_created)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', db.dt_created)::varchar
-			|| lpad(date_part('month', db.dt_created)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct f.sk_user_visitor) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-	group by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created)
-	order by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created)
+	group by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
+	order by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
 ),
 all_dates_region as (
 	select
 		date_part('year', db.dt_created) as _year,
 		date_part('month', db.dt_created) as _month,
 		date_part('week', db.dt_created) as _week,
+		date_part('day', db.dt_created) as _day,
 		dr.long_region_name as region,
 		dr.city_name as city,
-		(date_part('year', db.dt_created)::varchar
-			|| lpad(date_part('month', db.dt_created)::varchar, 2, '0')
-			|| lpad(date_part('week', db.dt_created)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', db.dt_created)::varchar
-			|| lpad(date_part('month', db.dt_created)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct f.sk_user_visitor) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_booking db
@@ -44,8 +36,8 @@ all_dates_region as (
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	group by dr.long_region_name, dr.city_name, date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created)
-	order by dr.long_region_name, dr.city_name, date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created)
+	group by dr.long_region_name, dr.city_name, date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
+	order by dr.long_region_name, dr.city_name, date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
 ),
 all_dates as (
 	select *

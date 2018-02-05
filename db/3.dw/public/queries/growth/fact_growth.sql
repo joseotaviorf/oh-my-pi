@@ -1,360 +1,417 @@
-truncate fact_growth;
-insert into fact_growth (
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'lead' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.leads
+drop table if exists fact_growth;
+create table fact_growth as
+select
+	sk_date,
+  sk_week_start_date,
+  'lead' as funnel_step,
+	region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.leads
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'prospect' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.prospects
+select
+	sk_date,
+  sk_week_start_date,
+  'prospect' as funnel_step,
+	region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.prospects
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'qualified' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.qualifieds
+select
+	sk_date,
+  sk_week_start_date,
+  'qualified' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.qualifieds
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'opportunity' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.opportunities
+select
+	sk_date,
+  sk_week_start_date,
+  'opportunity' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.opportunities
 
-  union all
+union all
 
-  select
-		sk_date,
-	  sk_week_start_date,
-	  cast('new_listing' as varchar) as funnel_step,
-	  cast(region as varchar),
-	  cast(city as varchar),
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.new_listings
+select
+	sk_date,
+  sk_week_start_date,
+  'new_listing' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.new_listings
 
-	union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-		'tenant_prospects' as funnel_step,
-		region,
-		city,
-		_year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.tenant_prospects
+select
+	sk_date,
+  sk_week_start_date,
+	'tenant_prospects' as funnel_step,
+	region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.tenant_prospects
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'visitors' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.visitors
+select
+	sk_date,
+  sk_week_start_date,
+  'visitors' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.visitors
 
-	union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'offerers' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.offerers
+select
+	sk_date,
+  sk_week_start_date,
+  'offerers' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.offerers
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'offerers_approved' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.offerers_approved
+select
+	sk_date,
+  sk_week_start_date,
+  'offerers_approved' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.offerers_approved
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'offerers_sent_doc' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.offerers_sent_doc
+select
+	sk_date,
+  sk_week_start_date,
+  'offerers_sent_doc' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.offerers_sent_doc
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'approved_by_insurer' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.approved_by_insurer
+select
+	sk_date,
+  sk_week_start_date,
+  'approved_by_insurer' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.approved_by_insurer
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'tenants' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.tenants
+select
+	sk_date,
+  sk_week_start_date,
+  'tenants' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.tenants
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'visits_booked' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.visits_booked
+select
+	sk_date,
+  sk_week_start_date,
+  'visits_booked' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.visits_booked
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'visits_completed' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.visits_completed
+select
+	sk_date,
+  sk_week_start_date,
+  'visits_completed' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.visits_completed
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'offers_submitted' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.offers_submitted
+select
+	sk_date,
+  sk_week_start_date,
+  'offers_submitted' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.offers_submitted
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'offers_approved' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.offers_approved
+select
+	sk_date,
+  sk_week_start_date,
+  'offers_approved' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.offers_approved
 
-  union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'documentation_sent' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.documentation_sent
+select
+	sk_date,
+  sk_week_start_date,
+  'documentation_sent' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.documentation_sent
 
-	union all
+union all
 
-	select
-		sk_date,
-	  sk_week_start_date,
-	  'ongoing_contracts' as funnel_step,
-	  region,
-	  city,
-	  _year,
-	  _month,
-	  _week,
-		count_prev_week,
-		_count,
-		wow,
-		mtd,
-		ytd,
-		mom,
-		yoy
-	from growth.ongoing_contracts
-)
+select
+	sk_date,
+  sk_week_start_date,
+  'ongoing_contracts' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.ongoing_contracts
+
+union all
+
+select
+	sk_date,
+  sk_week_start_date,
+  'active_users' as funnel_step,
+  region,
+	city,
+	_year,
+	_month,
+	_week,
+	_day,
+	_count,
+	sum_prev_week,
+	sum_week,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy
+from growth.active_users

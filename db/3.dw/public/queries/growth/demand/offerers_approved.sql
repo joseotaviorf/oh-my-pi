@@ -10,33 +10,25 @@ with all_dates_all as (
 		date_part('year', dof.dt_approved) as _year,
 		date_part('month', dof.dt_approved) as _month,
 		date_part('week', dof.dt_approved) as _week,
+		date_part('day', dof.dt_approved) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', dof.dt_approved)::varchar
-			|| lpad(date_part('month', dof.dt_approved)::varchar, 2, '0')
-			|| lpad(date_part('week', dof.dt_approved)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dof.dt_approved)::varchar
-			|| lpad(date_part('month', dof.dt_approved)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct f.sk_user_visitor) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.status = 'Aprovada'
-	group by date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved)
-	order by date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved)
+	group by date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved), date_part('day', dof.dt_approved)
+	order by date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved), date_part('day', dof.dt_approved)
 ),
 all_dates_region as (
 	select
 		date_part('year', dof.dt_approved) as _year,
 		date_part('month', dof.dt_approved) as _month,
 		date_part('week', dof.dt_approved) as _week,
+		date_part('day', dof.dt_approved) as _day,
 		dr.long_region_name as region,
 		dr.city_name as city,
-		(date_part('year', dof.dt_approved)::varchar
-			|| lpad(date_part('month', dof.dt_approved)::varchar, 2, '0')
-			|| lpad(date_part('week', dof.dt_approved)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dof.dt_approved)::varchar
-			|| lpad(date_part('month', dof.dt_approved)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct f.sk_user_visitor) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_offer dof
@@ -46,8 +38,8 @@ all_dates_region as (
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	group by dr.long_region_name, dr.city_name, date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved)
-	order by dr.long_region_name, dr.city_name, date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved)
+	group by dr.long_region_name, dr.city_name, date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved), date_part('day', dof.dt_approved)
+	order by dr.long_region_name, dr.city_name, date_part('year', dof.dt_approved), date_part('month', dof.dt_approved), date_part('week', dof.dt_approved), date_part('day', dof.dt_approved)
 ),
 all_dates as (
 	select *

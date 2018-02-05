@@ -10,33 +10,25 @@ with all_dates_all as (
 		date_part('year', dc.dt_signature) as _year,
 		date_part('month', dc.dt_signature) as _month,
 		date_part('week', dc.dt_signature) as _week,
+		date_part('day', dc.dt_signature) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', dc.dt_signature)::varchar
-			|| lpad(date_part('month', dc.dt_signature)::varchar, 2, '0')
-			|| lpad(date_part('week', dc.dt_signature)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dc.dt_signature)::varchar
-			|| lpad(date_part('month', dc.dt_signature)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct dc.id_contract) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature is not null
-	group by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature)
-	order by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature)
+	group by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
+	order by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
 ),
 all_dates_region as (
 	select
 		date_part('year', dc.dt_signature) as _year,
 		date_part('month', dc.dt_signature) as _month,
 		date_part('week', dc.dt_signature) as _week,
+		date_part('day', dc.dt_signature) as _day,
 		dr.long_region_name as region,
 		dr.city_name as city,
-		(date_part('year', dc.dt_signature)::varchar
-			|| lpad(date_part('month', dc.dt_signature)::varchar, 2, '0')
-			|| lpad(date_part('week', dc.dt_signature)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dc.dt_signature)::varchar
-			|| lpad(date_part('month', dc.dt_signature)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct dc.id_contract) as _count
 	from fact_liquidity_property_scheduling f
 	join dim_contract dc
@@ -46,8 +38,8 @@ all_dates_region as (
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	group by dr.long_region_name, dr.city_name, date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature)
-	order by dr.long_region_name, dr.city_name, date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature)
+	group by dr.long_region_name, dr.city_name, date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
+	order by dr.long_region_name, dr.city_name, date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
 ),
 all_dates as (
 	select *

@@ -10,40 +10,32 @@ with all_dates_all as (
 		date_part('year', dp.publication_date) as _year,
 		date_part('month', dp.publication_date) as _month,
 		date_part('week', dp.publication_date) as _week,
+		date_part('day', dp.publication_date) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', dp.publication_date)::varchar
-			|| lpad(date_part('month', dp.publication_date)::varchar, 2, '0')
-			|| lpad(date_part('week', dp.publication_date)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dp.publication_date)::varchar
-			|| lpad(date_part('month', dp.publication_date)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct dp.sk_property) as _count
 	from fact_supply_potential_listings f
 	join dim_property dp
 		on f.sk_property = dp.sk_property
-	group by date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date)
-	order by date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date)
+	group by date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date), date_part('day', dp.publication_date)
+	order by date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date), date_part('day', dp.publication_date)
 ),
 all_dates_region as (
   select
 		date_part('year', dp.publication_date) as _year,
 		date_part('month', dp.publication_date) as _month,
 		date_part('week', dp.publication_date) as _week,
+		date_part('day', dp.publication_date) as _day,
 		r.long_region_name as region,
 		r.city_name as city,
-		(date_part('year', dp.publication_date)::varchar
-			|| lpad(date_part('month', dp.publication_date)::varchar, 2, '0')
-			|| lpad(date_part('week', dp.publication_date)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', dp.publication_date)::varchar
-			|| lpad(date_part('month', dp.publication_date)::varchar, 2, '0'))::int  as concat_month,
 		count(distinct dp.sk_property) as _count
 	from fact_supply_potential_listings f
 	join dim_property dp
 		on f.sk_property = dp.sk_property
 	left join dim_region r
 		on dp.regiao_id = r.id
-	group by r.long_region_name, r.city_name, date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date)
-	order by r.long_region_name, r.city_name, date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date)
+	group by r.long_region_name, r.city_name, date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date), date_part('day', dp.publication_date)
+	order by r.long_region_name, r.city_name, date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date), date_part('day', dp.publication_date)
 ),
 all_dates as (
 	select *

@@ -10,13 +10,9 @@ with all_dates_all as (
 		date_part('year', f.dt_lead_and_prospect) as _year,
 		date_part('month', f.dt_lead_and_prospect) as _month,
 		date_part('week', f.dt_lead_and_prospect) as _week,
+		date_part('day', f.dt_lead_and_prospect) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', f.dt_lead_and_prospect)::varchar
-			|| lpad(date_part('month', f.dt_lead_and_prospect)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_lead_and_prospect)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_lead_and_prospect)::varchar
-			|| lpad(date_part('month', f.dt_lead_and_prospect)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_lead_and_prospect) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cp
@@ -25,21 +21,17 @@ with all_dates_all as (
 	  		and cp.automatically_discarded is not true
 	  		and cp.self_service is false)
 	  	or cp.self_service is true)
-	group by date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect)
-	order by date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect)
+	group by date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect), date_part('day', f.dt_lead_and_prospect)
+	order by date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect), date_part('day', f.dt_lead_and_prospect)
 ),
 all_dates_region as (
 	select
 		date_part('year', f.dt_lead_and_prospect) as _year,
 		date_part('month', f.dt_lead_and_prospect) as _month,
 		date_part('week', f.dt_lead_and_prospect) as _week,
+		date_part('day', f.dt_lead_and_prospect) as _day,
 		r.long_region_name as region,
 		r.city_name as city,
-		(date_part('year', f.dt_lead_and_prospect)::varchar
-			|| lpad(date_part('month', f.dt_lead_and_prospect)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_lead_and_prospect)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_lead_and_prospect)::varchar
-			|| lpad(date_part('month', f.dt_lead_and_prospect)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_lead_and_prospect) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cp
@@ -50,8 +42,8 @@ all_dates_region as (
 	  	or cp.self_service is true)
 	left join dim_region r
 		on cp.region_id = r.id
-	group by r.long_region_name, r.city_name, date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect)
-	order by r.long_region_name, r.city_name, date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect)
+	group by r.long_region_name, r.city_name, date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect), date_part('day', f.dt_lead_and_prospect)
+	order by r.long_region_name, r.city_name, date_part('year', f.dt_lead_and_prospect), date_part('month', f.dt_lead_and_prospect), date_part('week', f.dt_lead_and_prospect), date_part('day', f.dt_lead_and_prospect)
 ),
 all_dates as (
 	select *

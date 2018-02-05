@@ -10,40 +10,32 @@ with all_dates_all as (
 		date_part('year', f.dt_qualified) as _year,
 		date_part('month', f.dt_qualified) as _month,
 		date_part('week', f.dt_qualified) as _week,
+		date_part('day', f.dt_qualified) as _day,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		(date_part('year', f.dt_qualified)::varchar
-			|| lpad(date_part('month', f.dt_qualified)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_qualified)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_qualified)::varchar
-			|| lpad(date_part('month', f.dt_qualified)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_qualified) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
-	group by date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified)
-	order by date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified)
+	group by date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified), date_part('day', f.dt_qualified)
+	order by date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified), date_part('day', f.dt_qualified)
 ),
 all_dates_region as (
   select
 		date_part('year', f.dt_qualified) as _year,
 		date_part('month', f.dt_qualified) as _month,
 		date_part('week', f.dt_qualified) as _week,
+		date_part('day', f.dt_qualified) as _day,
 		r.long_region_name as region,
 		r.city_name as city,
-		(date_part('year', f.dt_qualified)::varchar
-			|| lpad(date_part('month', f.dt_qualified)::varchar, 2, '0')
-			|| lpad(date_part('week', f.dt_qualified)::varchar, 2, '0'))::int  as concat_all,
-		(date_part('year', f.dt_qualified)::varchar
-			|| lpad(date_part('month', f.dt_qualified)::varchar, 2, '0'))::int  as concat_month,
 		count(f.dt_qualified) as _count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
 	left join dim_region r
 		on cap.region_id = r.id
-	group by r.long_region_name, r.city_name, date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified)
-	order by r.long_region_name, r.city_name, date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified)
+	group by r.long_region_name, r.city_name, date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified), date_part('day', f.dt_qualified)
+	order by r.long_region_name, r.city_name, date_part('year', f.dt_qualified), date_part('month', f.dt_qualified), date_part('week', f.dt_qualified), date_part('day', f.dt_qualified)
 ),
 all_dates as (
 	select *
