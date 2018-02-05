@@ -181,6 +181,13 @@ class BaseETL(object):
             conn.cursor().execute(command)
 
     @classmethod
+    def execute_file_query(cls, filename, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
+                           return_value=False, show_logs=True, timeout=0):
+        with open(filename) as f:
+            command = f.read()
+        cls.execute_command(command, db_enum, conn, encoding, commit, in_iterator, return_value, show_logs, timeout)
+
+    @classmethod
     def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
                         return_value=False, show_logs=True, timeout=0):
         if not db_enum and not conn:

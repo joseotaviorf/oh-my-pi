@@ -1,4 +1,4 @@
-drop table if exists growth.tenant_prospects;
+--drop table if exists growth.tenant_prospects;
 create table growth.tenant_prospects as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

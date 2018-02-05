@@ -1,4 +1,4 @@
-drop table if exists growth.ongoing_contracts;
+--drop table if exists growth.ongoing_contracts;
 create table growth.ongoing_contracts as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

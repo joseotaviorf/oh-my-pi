@@ -1,4 +1,4 @@
-drop table if exists growth.approved_by_insurer;
+--drop table if exists growth.approved_by_insurer;
 create table growth.approved_by_insurer as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

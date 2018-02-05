@@ -1,4 +1,4 @@
-drop table if exists growth.leads;
+--drop table if exists growth.leads;
 create table growth.leads as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

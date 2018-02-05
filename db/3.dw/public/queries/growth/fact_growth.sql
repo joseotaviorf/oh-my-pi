@@ -1,5 +1,4 @@
-drop table if exists fact_growth;
-create table fact_growth as
+create table growth.fact_growth as
 select
 	sk_date,
   sk_week_start_date,
@@ -393,25 +392,25 @@ select
 	mom,
 	yoy
 from growth.ongoing_contracts
-
-union all
-
-select
-	sk_date,
-  sk_week_start_date,
-  'active_users' as funnel_step,
-  region,
-	city,
-	_year,
-	_month,
-	_week,
-	_day,
-	_count,
-	sum_prev_week,
-	sum_week,
-	wow,
-	mtd,
-	ytd,
-	mom,
-	yoy
-from growth.active_users
+--
+--union all
+--
+--select
+--	sk_date,
+--  sk_week_start_date,
+--  'active_users' as funnel_step,
+--  region,
+--	city,
+--	_year,
+--	_month,
+--	_week,
+--	_day,
+--	_count,
+--	sum_prev_week,
+--	sum_week,
+--	wow,
+--	mtd,
+--	ytd,
+--	mom,
+--	yoy
+--from growth.active_users

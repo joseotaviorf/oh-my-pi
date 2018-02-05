@@ -1,4 +1,4 @@
-drop table if exists growth.offerers_sent_doc;
+--drop table if exists growth.offerers_sent_doc;
 create table growth.offerers_sent_doc as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month

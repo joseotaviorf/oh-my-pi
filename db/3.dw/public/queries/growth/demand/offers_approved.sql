@@ -1,4 +1,4 @@
-drop table if exists growth.offers_approved;
+--drop table if exists growth.offers_approved;
 create table growth.offers_approved as
 
 -- Get each date part from the corresponding column and make two concatenations: year+month+week and year+month
