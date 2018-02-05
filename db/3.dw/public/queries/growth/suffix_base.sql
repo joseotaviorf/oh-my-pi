@@ -29,7 +29,7 @@ partial_calc_lag as (
 		region,
 		city,
 		sum_week,
-		lag(sum_week) over (partition by region, city order by _year, _week) as sum_prev_week
+		lag(sum_week) over (partition by region, city, _year, _week order by _year, _week) as sum_prev_week
 	from partial_calc_lag_prev
 ),
 partial_calc_prev as (
@@ -193,7 +193,7 @@ last_year_calc as (
 ),
 result as (
 	select
-		(mycp._year::varchar || mycp._month::varchar || mycp._day::varchar)::integer as sk_date,
+		(mycp._year::varchar || lpad(mycp._month::varchar, 2 , '0') || lpad(mycp._day::varchar, 2, '0'))::integer as sk_date,
 		case
 			when mycp._week = 1
 				then to_date(mycp._year::varchar || '0101', 'YYYYMMDD')
