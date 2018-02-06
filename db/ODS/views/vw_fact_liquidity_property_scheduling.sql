@@ -5,6 +5,7 @@ with fact as (
       f.id_property_scheduling as ods_id,
       -- coalesce(f.id_imovel, -1) as sk_property,
       coalesce((f.id_imovel || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
+      coalesce(i.regiao_id, -1)as sk_region,
       p."version"::integer as listing_number,
       coalesce(b.id, -1) as sk_booking,
       coalesce(id_owner, -1) as sk_owner,
@@ -120,6 +121,10 @@ left join
   on contract.id = f.id_contract
 
 left join
+  imovel i
+  on i.id = b.imovel_id
+
+left join
   vw_imovel_liquidity_marketing_costs h
   on f.id_imovel = h.id
   and p.version = h.version
@@ -209,6 +214,7 @@ calculated_dates as (
 select
   ods_id,
   sk_property,
+  sk_region,
   listing_number,
   sk_booking,
   sk_owner,

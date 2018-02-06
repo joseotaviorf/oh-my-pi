@@ -2,6 +2,7 @@ drop table if exists fact_liquidity_property_scheduling;
 create table fact_liquidity_property_scheduling (
   ods_id bigint,
   sk_property bigint,
+  sk_region bigint,
   listing_number integer,
   sk_booking integer,
   sk_owner integer,
