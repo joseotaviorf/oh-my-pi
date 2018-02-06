@@ -1,5 +1,5 @@
 DROP VIEW IF EXISTS vw_dim_region;
-CREATE VIEW vw_dim_region as
+CREATE OR REPLACE vw_dim_region as
 SELECT
   r.id as sk_region,
   coalesce(r.id, ar.id) as id,
@@ -28,7 +28,9 @@ SELECT
   r."criadaEm" as dt_created,
   r."atualizadoEm" as dt_updated,
   r.dt_timestamp::date as dt_timestamp,
-  i.dt_first_property_created
+  i.dt_first_property_created,
+  age.dt_first_booking,
+  (current_date - age.dt_first_booking) as days_from_first_booking
 FROM
   public.region r
 left join
@@ -47,4 +49,20 @@ left join
 left join
 	files.aux_regiao ar
 	on r.id = ar.id
+left join
+	(
+		select
+			i.regiao_id,
+			min(b."data") as dt_first_booking
+		from
+			booking b
+		left join
+			imovel i
+			on b.imovel_id = i.id
+		left join
+			region r
+			on r.id = i.regiao_id
+		group by i.regiao_id
+	) age
+	on age.regiao_id = r.id
 ;
