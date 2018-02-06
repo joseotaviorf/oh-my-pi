@@ -312,7 +312,7 @@ SELECT
   i.etapa_data_mob_visitas,
   i.etapa_data_mob_vistoria,
   COALESCE(h.dt_first_publication, i.first_publication) AS first_publication,
-  imovel_dates.publication_date,
+  coalesce(imovel_dates.publication_date, h.dt_first_publication, i.first_publication) as publication_date,
   imovel_dates.de_publication_date,
   imovel_dates.first_booking_date,
   imovel_dates.first_booking_confirmed_date,
