@@ -1,5 +1,9 @@
 DROP VIEW IF EXISTS vw_dim_region;
+<<<<<<< Updated upstream
 CREATE or Replace view vw_dim_region as
+=======
+CREATE OR REPLACE vw_dim_region as
+>>>>>>> Stashed changes
 SELECT
   r.id as sk_region,
   coalesce(r.id, ar.id) as id,
