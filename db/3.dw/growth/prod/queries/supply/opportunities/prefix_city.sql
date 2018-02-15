@@ -6,35 +6,35 @@ with all_dates_prev as (
     date_part('day', f.dt_opportunity) as _day,
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
-    row_number() over (partition by coalesce(dr.city_name, ''),
+    rank() over (partition by coalesce(dr.city_name, ''),
                                     date_part('year', f.dt_opportunity),
     																date_part('month', f.dt_opportunity),
     																date_part('week', f.dt_opportunity),
-    																date_part('day', f.dt_opportunity) order by f.dt_opportunity asc)
-    	+ row_number() over (partition by coalesce(dr.city_name, ''),
+    																date_part('day', f.dt_opportunity) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_opportunity),
     																		date_part('month', f.dt_opportunity),
     																		date_part('week', f.dt_opportunity),
-    																		date_part('day', f.dt_opportunity) order by f.dt_opportunity desc)
+    																		date_part('day', f.dt_opportunity) order by f.cap_id desc)
 			- 1 as daily_count,
-    row_number() over (partition by coalesce(dr.city_name, ''),
+    rank() over (partition by coalesce(dr.city_name, ''),
                                     date_part('year', f.dt_opportunity),
-    																date_part('week', f.dt_opportunity) order by f.dt_opportunity asc)
-    	+ row_number() over (partition by coalesce(dr.city_name, ''),
+    																date_part('week', f.dt_opportunity) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_opportunity),
-    																		date_part('week', f.dt_opportunity) order by f.dt_opportunity desc)
+    																		date_part('week', f.dt_opportunity) order by f.cap_id desc)
 			- 1 as weekly_count,
-    row_number() over (partition by coalesce(dr.city_name, ''),
+    rank() over (partition by coalesce(dr.city_name, ''),
                                     date_part('year', f.dt_opportunity),
-    																date_part('month', f.dt_opportunity) order by f.dt_opportunity asc)
-    	+ row_number() over (partition by coalesce(dr.city_name, ''),
+    																date_part('month', f.dt_opportunity) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_opportunity),
-    																		date_part('month', f.dt_opportunity) order by f.dt_opportunity desc)
+    																		date_part('month', f.dt_opportunity) order by f.cap_id desc)
 			- 1 as monthly_count,
-    row_number() over (partition by coalesce(dr.city_name, ''),
-                                    date_part('year', f.dt_opportunity) order by f.dt_opportunity asc)
-    	+ row_number() over (partition by coalesce(dr.city_name, ''),
-    	                                  date_part('year', f.dt_opportunity) order by f.dt_opportunity desc)
+    rank() over (partition by coalesce(dr.city_name, ''),
+                                    date_part('year', f.dt_opportunity) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.city_name, ''),
+    	                                  date_part('year', f.dt_opportunity) order by f.cap_id desc)
 			- 1 as yearly_count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cap

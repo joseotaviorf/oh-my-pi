@@ -6,44 +6,47 @@ with all_dates_prev as (
     date_part('day', f.dt_lead_and_prospect) as _day,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    row_number() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', f.dt_lead_and_prospect),
     																date_part('month', f.dt_lead_and_prospect),
     																date_part('week', f.dt_lead_and_prospect),
-    																date_part('day', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect asc)
-    	+ row_number() over (partition by coalesce(dr.long_region_name, ''),
+    																date_part('day', f.dt_lead_and_prospect) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
     																		date_part('month', f.dt_lead_and_prospect),
     																		date_part('week', f.dt_lead_and_prospect),
-    																		date_part('day', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect desc)
+    																		date_part('day', f.dt_lead_and_prospect) order by f.cap_id desc)
 			- 1 as daily_count,
-    row_number() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', f.dt_lead_and_prospect),
-    																date_part('week', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect asc)
-    	+ row_number() over (partition by coalesce(dr.long_region_name, ''),
+    																date_part('week', f.dt_lead_and_prospect) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
-    																		date_part('week', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect desc)
+    																		date_part('week', f.dt_lead_and_prospect) order by f.cap_id desc)
 			- 1 as weekly_count,
-    row_number() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', f.dt_lead_and_prospect),
-    																date_part('month', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect asc)
-    	+ row_number() over (partition by coalesce(dr.long_region_name, ''),
+    																date_part('month', f.dt_lead_and_prospect) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
-    																		date_part('month', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect desc)
+    																		date_part('month', f.dt_lead_and_prospect) order by f.cap_id desc)
 			- 1 as monthly_count,
-    row_number() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect asc)
-    	+ row_number() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', f.dt_lead_and_prospect) order by f.dt_lead_and_prospect desc)
+    rank() over (partition by coalesce(dr.long_region_name, ''),
+                                    date_part('year', f.dt_lead_and_prospect) order by f.cap_id asc)
+    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
+    	                                  date_part('year', f.dt_lead_and_prospect) order by f.cap_id desc)
 			- 1 as yearly_count
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
-			and ((not(cp.status = 'Descartado'
+				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false)
-	  	or cp.self_service is true)
+	  		and cp.self_service is false
+	  		and f.dt_lead is not null)
+	  	or (cp.self_service is true and f.dt_prospect is not null)
+	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01'
+	  	and f.cap_id != -1
 	  	and f.cap_id != -1
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
@@ -78,10 +81,12 @@ all_dates_last_month as (
 	from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
-			and ((not(cp.status = 'Descartado'
+				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false)
-	  	or cp.self_service is true)
+	  		and cp.self_service is false
+	  		and f.dt_lead is not null)
+	  	or (cp.self_service is true and f.dt_prospect is not null)
+	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01'
 	  	and f.cap_id != -1
 	join dim_property dpr
@@ -103,10 +108,12 @@ all_dates_last_year as (
   from fact_supply_potential_listings f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
-			and ((not(cp.status = 'Descartado'
+				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false)
-	  	or cp.self_service is true)
+	  		and cp.self_service is false
+	  		and f.dt_lead is not null)
+	  	or (cp.self_service is true and f.dt_prospect is not null)
+	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01'
 	  	and f.cap_id != -1
   join dim_property dpr
