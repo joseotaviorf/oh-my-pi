@@ -71,7 +71,8 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         )
 
 
-def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, pre_command=None, post_command=None):
+def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, pre_command=None, post_command=None,
+                            schema_source='public', schema_dest='public'):
     table_name = 'vw_{}'.format(dim_name)
     table_name_dest = '{}'.format(dim_name)
 
@@ -82,8 +83,8 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, pre_command=Non
             commit=True
         )
     BaseETL.move_table_to_dw(
-        table_name=table_name,
-        table_name_dest=table_name_dest,
+        table_name='{}.{}'.format(schema_source, table_name),
+        table_name_dest='{}.{}'.format(schema_dest, table_name_dest),
         enum_db_source=EnumDb.BI_ODS,
         enum_db_dest=EnumDb.BI_DW,
         append=False,
