@@ -1,7 +1,6 @@
 partial_calc_lag_prev as (
 	select distinct
 		_year,
-		_month,
 		_week,
 		region,
 		city,
@@ -11,12 +10,11 @@ partial_calc_lag_prev as (
 partial_calc_lag as (
 	select
 		_year,
-		_month,
 		_week,
 		region,
 		city,
 		weekly_count,
-		lag(weekly_count) over (order by _year, _month, _week) as prev_weekly_count
+		lag(weekly_count) over (partition by region, city order by _year, _week) as prev_weekly_count
 	from partial_calc_lag_prev
 ),
 partial_calc_prev as (

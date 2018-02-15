@@ -3,8 +3,8 @@ year_lag_prev as (
 		_year,
 		region,
 		city,
-		ytd
-	from partial_calc
+		yearly_count as ytd
+	from all_dates
 ),
 year_lag as (
 	select
@@ -17,21 +17,21 @@ year_lag as (
 ),
 year_calc_prev as (
 	select
-		pc._year,
-		pc._month,
-		pc._week,
-		pc._day,
-		pc.region,
-		pc.city,
-		pc.yearly_count,
+		ad._year,
+		ad._month,
+		ad._week,
+		ad._day,
+		ad.region,
+		ad.city,
+		ad.yearly_count,
 		yl.ytd_lag,
-		pc.ytd,
-		round(pc.ytd::float / nullif(yl.ytd_lag, 0) - 1.0, 4) as yoy
-	from partial_calc pc
+		ad.yearly_count as ytd,
+		round(ad.yearly_count::float / nullif(yl.ytd_lag, 0) - 1.0, 4) as yoy
+	from all_dates ad
 	join year_lag yl
-		on pc._year = yl._year
-			and pc.region = yl.region
-			and pc.city = yl.city
+		on ad._year = yl._year
+			and ad.region = yl.region
+			and ad.city = yl.city
 ),
 result as (
 	select
@@ -58,7 +58,7 @@ result as (
 		mycp.ytd_lag,
 		mycp.ytd,
 		0 as mom,
-		coalesce(round((mycp.ytd / nullif(lyc._count, 0)::float) - 1.0, 4), mycp.yoy) as yoy
+		coalesce(round((mycp.ytd / nullif(lyc.yearly_count, 0)::float) - 1.0, 4), mycp.yoy) as yoy
 	from year_calc_prev mycp
 	left join all_dates_last_year lyc
 		on mycp._year = lyc._year + 1

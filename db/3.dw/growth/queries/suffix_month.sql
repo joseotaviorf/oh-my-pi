@@ -19,22 +19,22 @@ month_lag as (
 ),
 month_calc_prev as (
 	select
-		pc._year,
-		pc._month,
-		pc._week,
-		pc._day,
-		pc.region,
-		pc.city,
-		pc.monthly_count,
+		ad._year,
+		ad._month,
+		ad._week,
+		ad._day,
+		ad.region,
+		ad.city,
+		ad.monthly_count,
 		ml.mtd_lag,
-		pc.mtd,
-		round(pc.mtd::float / nullif(ml.mtd_lag, 0) - 1.0, 4) as mom
-	from partial_calc pc
+		ad.monthly_count as mtd,
+		round(ad.monthly_count::float / nullif(ml.mtd_lag, 0) - 1.0, 4) as mom
+	from all_dates ad
 	join month_lag ml
-		on pc._year = ml._year
-			and pc._month = ml._month
-			and pc.region = ml.region
-			and pc.city = ml.city
+		on ad._year = ml._year
+			and ad._month = ml._month
+			and ad.region = ml.region
+			and ad.city = ml.city
 ),
 result as (
 	select
@@ -60,7 +60,7 @@ result as (
 		mycp.mtd,
 		0 as ytd_lag,
 		0 as ytd,
-		coalesce(round((mycp.mtd / nullif(lmc._count, 0)::float) - 1.0, 4), mycp.mom) as mom,
+		coalesce(round((mycp.mtd / nullif(lmc.monthly_count, 0)::float) - 1.0, 4), mycp.mom) as mom,
 		0 as yoy
 	from month_calc_prev mycp
 	left join all_dates_last_month lmc

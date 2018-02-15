@@ -1,4 +1,4 @@
-create table growth.{0}_all as
+create table growth.{0} as
 select
 	sk_date,
 	sk_week_start_date,
