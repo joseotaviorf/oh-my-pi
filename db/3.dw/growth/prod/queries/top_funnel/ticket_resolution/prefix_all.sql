@@ -19,7 +19,7 @@ all_dates_last_month as (
 		_month,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		last_monthly_avg as monthly_count
+		last_month_avg as monthly_count
   from growth_staging.post_contract_ticket_full_resolution_time
 	order by _year, _month
 ),
@@ -28,7 +28,7 @@ all_dates_last_year as (
 		_year,
 		'QuintoAndar'::varchar as region,
 		'QuintoAndar'::varchar as city,
-		last_yearly_avg as yearly_count
+		last_year_avg as yearly_count
   from growth_staging.post_contract_ticket_full_resolution_time
 	order by _year
 ),
