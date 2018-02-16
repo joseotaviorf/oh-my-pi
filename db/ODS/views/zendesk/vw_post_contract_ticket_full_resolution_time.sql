@@ -1,11 +1,11 @@
 drop view if exists zendesk.vw_post_contract_ticket_full_resolution_time;
-create view zendesk.vw_post_contract_ticket_full_resolution_time as
+create or replace view zendesk.vw_post_contract_ticket_full_resolution_time as
 select distinct
 	t.created_at::date as dt_created,
-	date_part('day', t.created_at) as _day,
-	date_part('week', t.created_at) as _week,
-	date_part('month', t.created_at) as _month,
-	date_part('year', t.created_at) as _year,
+	date_part('day', t.created_at)::integer as _day,
+	date_part('week', t.created_at)::integer as _week,
+	date_part('month', t.created_at)::integer as _month,
+	date_part('year', t.created_at)::integer as _year,
 	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
 		filter (where tm.full_resolution_time_in_minutes_business > 0 )
 		over (partition by t.created_at::date) as daily_avg,
@@ -23,21 +23,23 @@ select distinct
 			where tm.full_resolution_time_in_minutes_business > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 week')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 week')::date)
-  		and date_part('day', t.created_at) <= date_part('day', (current_date - interval '1 week')::date)
+  		and date_part('day', t.created_at) < date_part('day', (current_date - interval '1 week')::date)
 		) over () as last_week_avg,
 	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
 		filter (
 			where tm.full_resolution_time_in_minutes_business > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 month')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 month')::date)
-  		and date_part('day', t.created_at) <= date_part('day', current_date)
+  		and date_part('day', t.created_at) < date_part('day', current_date)
 		) over () as last_month_avg,
 	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
 		filter (
 			where tm.full_resolution_time_in_minutes_business > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '12 month')::date)
-  		and date_part('month', t.created_at) = date_part('month', (current_date - interval '12 month')::date)
-  		and date_part('day', t.created_at) <= date_part('day', (current_date - interval '12 month')::date)
+  		and ((date_part('month', t.created_at) = date_part('month', (current_date - interval '12 month')::date)
+  		      and date_part('day', t.created_at) < date_part('day', (current_date - interval '12 month')::date))
+  		  or date_part('month', t.created_at) < date_part('month', (current_date - interval '12 month')::date)
+  		  )
 		) over () as last_year_avg
 from
 	zendesk.ticket t

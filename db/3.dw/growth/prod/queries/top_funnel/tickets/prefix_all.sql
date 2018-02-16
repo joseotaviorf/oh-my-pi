@@ -28,7 +28,7 @@ all_dates_last_month as (
 	from growth_staging.post_contract_ticket_base b
   where date_part('year', b.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', b.dt_created) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', b.dt_created) <= date_part('day', current_date)
+  		and date_part('day', b.dt_created) < date_part('day', current_date)
   group by date_part('year', b.dt_created), date_part('month', b.dt_created)
   order by date_part('year', b.dt_created), date_part('month', b.dt_created)
 ),
@@ -39,9 +39,11 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as city,
   	sum(_count) as yearly_count
 	from growth_staging.post_contract_ticket_base b
-  where date_part('year', b.dt_created) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', b.dt_created) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', b.dt_created) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', b.dt_created) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', b.dt_created) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', b.dt_created) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', b.dt_created) < date_part('month', add_months(current_date, -12))
+  		  )
   group by date_part('year', b.dt_created)
   order by date_part('year', b.dt_created)
 ),
