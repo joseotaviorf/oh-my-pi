@@ -67,6 +67,15 @@ tickets_whats = QuintoAndarPythonOperator(
                'schema_source': 'zendesk', 'schema_dest': 'growth_staging'}
 )
 
+ticket_res_time = QuintoAndarPythonOperator(
+    dag=dag,
+    task_id='etl_ticket_res_time',
+    execution_timeout=timedelta(hours=3),
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'post_contract_ticket_full_resolution_time', 'bucket': bucket, 'insert_dummy': False,
+               'schema_source': 'zendesk', 'schema_dest': 'growth_staging'}
+)
+
 ticket_base = QuintoAndarPythonOperator(
     dag=dag,
     task_id='etl_ticket_base_data',
@@ -85,3 +94,4 @@ ticket_growth = QuintoAndarPythonOperator(
 
 tickets_whats >> ticket_base
 ticket_base >> ticket_growth
+ticket_res_time >> ticket_growth
