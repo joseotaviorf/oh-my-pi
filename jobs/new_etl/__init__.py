@@ -1,1 +1,1 @@
-DW_DIR = '../db/3.dw'
+DW_DIR = '../../db/3.dw'
