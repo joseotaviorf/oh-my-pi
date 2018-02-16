@@ -63,7 +63,7 @@ class Growth(object):
         suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(QUERIES_DIR, period))
 
         self.execute_command(
-            'create table {}.{}_{}_{}\n{}'.format(Growth.SCHEMA, measure, filter, period, prefix_file + suffix_file))
+            'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, filter, period, prefix_file + suffix_file))
 
     @logger
     def execute_command(self, query):
