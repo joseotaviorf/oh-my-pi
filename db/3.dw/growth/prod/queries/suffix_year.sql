@@ -26,7 +26,7 @@ year_calc_prev as (
 		ad.yearly_count,
 		yl.ytd_lag,
 		ad.yearly_count as ytd,
-		round(ad.yearly_count::float / nullif(yl.ytd_lag, 0) - 1.0, 4) as yoy
+		round(ad.yearly_count / nullif(yl.ytd_lag, 0)::float, 4) as yoy
 	from all_dates ad
 	join year_lag yl
 		on ad._year = yl._year
@@ -58,7 +58,7 @@ result as (
 		mycp.ytd_lag,
 		mycp.ytd,
 		0 as mom,
-		coalesce(round((mycp.ytd / nullif(lyc.yearly_count, 0)::float) - 1.0, 4), mycp.yoy) as yoy
+		coalesce(round(mycp.ytd / nullif(lyc.yearly_count, 0)::float, 4), mycp.yoy) as yoy
 	from year_calc_prev mycp
 	left join all_dates_last_year lyc
 		on mycp._year = lyc._year + 1

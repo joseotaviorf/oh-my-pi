@@ -39,7 +39,7 @@ with all_dates as (
 	from fact_liquidity_property_scheduling f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
-			and dof.dt_approved >= '2017-01-01'
+			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date
 			and f.sk_offer != -1
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
@@ -60,7 +60,7 @@ all_dates_last_month as (
 	from fact_liquidity_property_scheduling f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
-			and dof.dt_approved >= '2017-01-01'
+			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date
 			and f.sk_offer != -1
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
@@ -68,7 +68,7 @@ all_dates_last_month as (
 		on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_approved) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dof.dt_approved) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', dof.dt_approved) <= date_part('day', current_date)
+  		and date_part('day', dof.dt_approved) < date_part('day', current_date)
  	group by coalesce(dr.city_name, ''), date_part('year', dof.dt_approved), date_part('month', dof.dt_approved)
   order by coalesce(dr.city_name, ''), date_part('year', dof.dt_approved), date_part('month', dof.dt_approved)
 ),
@@ -81,15 +81,17 @@ all_dates_last_year as (
   from fact_liquidity_property_scheduling f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
-			and dof.dt_approved >= '2017-01-01'
+			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date
 			and f.sk_offer != -1
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
-  where date_part('year', dof.dt_approved) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', dof.dt_approved) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', dof.dt_approved) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', dof.dt_approved) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', dof.dt_approved) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', dof.dt_approved) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', dof.dt_approved) < date_part('month', add_months(current_date, -12))
+  		  )
 	group by coalesce(dr.city_name, ''), date_part('year', dof.dt_approved)
 	order by coalesce(dr.city_name, ''), date_part('year', dof.dt_approved)
 ),

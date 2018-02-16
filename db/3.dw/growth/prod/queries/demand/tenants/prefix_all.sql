@@ -31,7 +31,7 @@ with all_dates as (
 	from fact_liquidity_property_scheduling f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-			and dc.dt_signature >= '2017-01-01'
+			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
   order by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
 ),
@@ -48,11 +48,11 @@ all_dates_last_month as (
 	from fact_liquidity_property_scheduling f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-			and dc.dt_signature >= '2017-01-01'
+			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
   where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dc.dt_signature) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', dc.dt_signature) <= date_part('day', current_date)
+  		and date_part('day', dc.dt_signature) < date_part('day', current_date)
   group by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature)
   order by date_part('year', dc.dt_signature), date_part('month', dc.dt_signature)
 ),
@@ -65,11 +65,13 @@ all_dates_last_year as (
 	from fact_liquidity_property_scheduling f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-			and dc.dt_signature >= '2017-01-01'
+			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
-  where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', dc.dt_signature) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', dc.dt_signature) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', dc.dt_signature) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', dc.dt_signature) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', dc.dt_signature) < date_part('month', add_months(current_date, -12))
+  		  )
   group by date_part('year', dc.dt_signature)
   order by date_part('year', dc.dt_signature)
 ),

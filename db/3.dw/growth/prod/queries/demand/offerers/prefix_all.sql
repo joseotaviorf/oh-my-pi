@@ -32,7 +32,7 @@ with all_dates as (
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
-			and dof.dt_first_sent >= '2017-01-01'
+			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
   order by date_part('year', dof.dt_first_sent), date_part('month', dof.dt_first_sent), date_part('week', dof.dt_first_sent), date_part('day', dof.dt_first_sent)
 ),
@@ -50,11 +50,11 @@ all_dates_last_month as (
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
-			and dof.dt_first_sent >= '2017-01-01'
+			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
   where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dof.dt_first_sent) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', dof.dt_first_sent) <= date_part('day', current_date)
+  		and date_part('day', dof.dt_first_sent) < date_part('day', current_date)
   group by date_part('year', dof.dt_first_sent), date_part('month', dof.dt_first_sent)
   order by date_part('year', dof.dt_first_sent), date_part('month', dof.dt_first_sent)
 ),
@@ -68,11 +68,13 @@ all_dates_last_year as (
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
-			and dof.dt_first_sent >= '2017-01-01'
+			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
-  where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', dof.dt_first_sent) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', dof.dt_first_sent) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', dof.dt_first_sent) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', dof.dt_first_sent) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', dof.dt_first_sent) < date_part('month', add_months(current_date, -12))
+  		  )
   group by date_part('year', dof.dt_first_sent)
   order by date_part('year', dof.dt_first_sent)
 ),

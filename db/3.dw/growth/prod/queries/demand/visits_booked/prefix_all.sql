@@ -32,7 +32,7 @@ with all_dates as (
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
-			and db.dt_created >= '2017-01-01'
+			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
   order by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
 ),
@@ -50,11 +50,11 @@ all_dates_last_month as (
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
-			and db.dt_created >= '2017-01-01'
+			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
   where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', db.dt_created) <= date_part('day', current_date)
+  		and date_part('day', db.dt_created) < date_part('day', current_date)
   group by date_part('year', db.dt_created), date_part('month', db.dt_created)
   order by date_part('year', db.dt_created), date_part('month', db.dt_created)
 ),
@@ -68,11 +68,13 @@ all_dates_last_year as (
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
-			and db.dt_created >= '2017-01-01'
+			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
-  where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', db.dt_created) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', db.dt_created) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', db.dt_created) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', db.dt_created) < date_part('month', add_months(current_date, -12))
+  		  )
   group by date_part('year', db.dt_created)
   order by date_part('year', db.dt_created)
 ),

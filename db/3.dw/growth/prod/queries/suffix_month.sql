@@ -28,7 +28,7 @@ month_calc_prev as (
 		ad.monthly_count,
 		ml.mtd_lag,
 		ad.monthly_count as mtd,
-		round(ad.monthly_count::float / nullif(ml.mtd_lag, 0) - 1.0, 4) as mom
+		round((ad.monthly_count / nullif(ml.mtd_lag, 0)::float) - 1.0, 4) as mom
 	from all_dates ad
 	join month_lag ml
 		on ad._year = ml._year
