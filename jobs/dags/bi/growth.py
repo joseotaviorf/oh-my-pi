@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
 from jobs.dags.util import environment as env
 from jobs.new_etl.growth import Growth
@@ -80,7 +80,7 @@ def get_sub_dag_operator(sub_dag_func, sub_dag_name, funnel):
 
 
 def get_python_operator(task_id, func_command, dag, op_kwargs=None):
-    return QuintoAndarPythonOperator(
+    return PythonOperator(
         dag=dag,
         task_id=task_id,
         python_callable=func_command,
