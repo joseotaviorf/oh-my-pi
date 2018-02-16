@@ -34,11 +34,10 @@ with all_dates as (
 	right join dim_date dd
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
-	where dd."date" <= current_date
-		and dc.dt_contract_start <= current_date
+	where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
 		and f.sk_contract_signed_date != -1
-		and dd."date" >= '2017-01-01'
+		and dd."date" >= '2017-01-01' and dd."date" < current_date
   order by date_part('year', dd."date"), date_part('month', dd."date"), date_part('week', dd."date"), date_part('day', dd."date")
 ),
 all_dates_last_week as (
@@ -57,14 +56,13 @@ all_dates_last_month as (
 	right join dim_date dd
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
-  where dd."date" <= current_date
-		and dc.dt_contract_start <= current_date
+  where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
 		and f.sk_contract_signed_date != -1
-		and dd."date" >= '2017-01-01'
+		and dd."date" >= '2017-01-01' and dd."date" < current_date
 		and date_part('year', dd."date") = date_part('year', add_months(current_date, -1))
   	and date_part('month', dd."date") = date_part('month', add_months(current_date, -1))
-  	and date_part('day', dd."date") <= date_part('day', current_date)
+  	and date_part('day', dd."date") < date_part('day', current_date)
   group by date_part('year', dd."date"), date_part('month', dd."date")
   order by date_part('year', dd."date"), date_part('month', dd."date")
 ),
@@ -80,14 +78,15 @@ all_dates_last_year as (
 	right join dim_date dd
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
-	where dd."date" <= current_date
-		and dc.dt_contract_start <= current_date
+	where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
 		and f.sk_contract_signed_date != -1
-		and dd."date" >= '2017-01-01'
-    and date_part('year', dd."date") = date_part('year', add_months(current_date, -12))
-  	and date_part('month', dd."date") = date_part('month', add_months(current_date, -12))
-  	and date_part('day', dd."date") <= date_part('day', add_months(current_date, -12))
+		and dd."date" >= '2017-01-01' and dd."date" < current_date
+	  and date_part('year', dd."date") = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', dd."date") = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', dd."date") < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', dd."date") < date_part('month', add_months(current_date, -12))
+  		  )
   group by date_part('year', dd."date")
   order by date_part('year', dd."date")
 ),

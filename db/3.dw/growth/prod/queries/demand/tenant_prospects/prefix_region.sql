@@ -40,7 +40,7 @@ with all_dates as (
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and f.sk_booking != -1
-  		and db.dt_created >= '2017-01-01'
+  		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -61,14 +61,14 @@ all_dates_last_month as (
 	join dim_booking db
   	on f.sk_booking = db.sk_booking
   		and f.sk_booking != -1
-  		and db.dt_created >= '2017-01-01'
+  		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', db.dt_created) <= date_part('day', current_date)
+  		and date_part('day', db.dt_created) < date_part('day', current_date)
  	group by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
   order by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
 ),
@@ -82,14 +82,16 @@ all_dates_last_year as (
   join dim_booking db
   	on f.sk_booking = db.sk_booking
   		and f.sk_booking != -1
-  		and db.dt_created >= '2017-01-01'
+  		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
-  where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
-  		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -12))
-  		and date_part('day', db.dt_created) <= date_part('day', add_months(current_date, -12))
+	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', db.dt_created) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', db.dt_created) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', db.dt_created) < date_part('month', add_months(current_date, -12))
+  		  )
 	group by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created)
 	order by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created)
 ),

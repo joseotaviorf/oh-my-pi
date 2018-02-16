@@ -48,7 +48,7 @@ all_dates_last_month as (
   )
     and date_part('year', dt_updated) = date_part('year', add_months(current_date, -1))
   	and date_part('month', dt_updated) = date_part('month', add_months(current_date, -1))
-  	and date_part('day', dt_updated) <= date_part('day', current_date)
+  	and date_part('day', dt_updated) < date_part('day', current_date)
   group by date_part('year', dt_updated), date_part('month', dt_updated)
 	order by date_part('year', dt_updated), date_part('month', dt_updated)
 ),
@@ -67,7 +67,7 @@ all_dates_last_year as (
   	  'Collections'
     )
     and date_part('year', dt_updated) = date_part('year', add_months(current_date, -12))
-  	and date_part('month', dt_updated) = date_part('month', add_months(current_date, -12))
+  	and date_part('month', dt_updated) <= date_part('month', add_months(current_date, -12))
   	and date_part('day', dt_updated) <= date_part('day', add_months(current_date, -12))
   group by date_part('year', dt_updated)
 	order by date_part('year', dt_updated)
