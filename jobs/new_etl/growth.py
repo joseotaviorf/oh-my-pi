@@ -53,8 +53,8 @@ class Growth(object):
 
     @logger
     def create_table(self, funnel, measure, filter, period):
-        prefix_file = '{}/growth/{}/{}/prefix_{}.sql'.format(DW_DIR, funnel, measure, filter)
-        suffix_file = '{}/growth/suffix_{}.sql'.format(DW_DIR, period)
+        prefix_file = Growth.__get_query_from_file_name('{}/growth/{}/{}/prefix_{}.sql'.format(DW_DIR, funnel, measure, filter))
+        suffix_file = Growth.__get_query_from_file_name('{}/growth/suffix_{}.sql'.format(DW_DIR, period))
 
         self.execute_command(
             'create table {}.{}_{}_{}\n{}'.format(Growth.SCHEMA, measure, filter, period, prefix_file + suffix_file))
