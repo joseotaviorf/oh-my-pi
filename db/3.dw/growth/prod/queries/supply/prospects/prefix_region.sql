@@ -62,10 +62,10 @@ all_dates as (
     _day,
     region,
     city,
-    max(daily_count) over (partition by _year, _month, _week, _day) as daily_count,
-    max(weekly_count) over (partition by _year, _week) as weekly_count,
-    max(monthly_count) over (partition by _year, _month) as monthly_count,
-    max(yearly_count) over (partition by _year) as yearly_count
+    max(daily_count) over (partition by region, _year, _month, _week, _day) as daily_count,
+    max(weekly_count) over (partition by region, _year, _week) as weekly_count,
+    max(monthly_count) over (partition by region, _year, _month) as monthly_count,
+    max(yearly_count) over (partition by region, _year) as yearly_count
   from all_dates_prev
 ),
 all_dates_last_week as (
