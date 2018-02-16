@@ -4,11 +4,11 @@ create table growth_staging.post_contract_ticket_full_resolution_time (
   _week integer,
   _month integer,
   _year integer,
-  daily_avg numeric,
-  weekly_avg numeric,
-  monthly_avg numeric,
-  yearly_avg numeric,
-  last_week_avg numeric,
-  last_month_avg numeric,
-  last_year_avg numeric
+  daily_avg double precision,
+  weekly_avg double precision,
+  monthly_avg double precision,
+  yearly_avg double precision,
+  last_week_avg double precision,
+  last_month_avg double precision,
+  last_year_avg double precision
 );
