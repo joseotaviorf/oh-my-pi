@@ -1,17 +1,18 @@
-from datetime import datetime, date
+from datetime import datetime
+
 from jobs.base.base_etl import BaseETL, EnumDb
-from dim_etl import DimensionETL
-from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
+
+from dim_etl import DimensionETL
 
 
 class BusinessDimensionETL(DimensionETL):
 
+    @logger
     def __init__(self, bucket, now):
-        self.bucket = bucket
-        self.now = now
-        self.athena = AthenaClient(bucket)
+        super(BusinessDimensionETL, self).__init__(bucket=bucket, now=now)
 
+    @logger
     def extract_query_dim_from_ebdb_to_ods(self, dim_name, command, table_name=None):
 
         if table_name is None:
@@ -36,6 +37,7 @@ class BusinessDimensionETL(DimensionETL):
         )
 
     # TODO: Make some of those parameters decorators
+    @logger
     def extract_table_dim_from_ebdb_to_ods(self, dim_name, table_name, add_timestamp=False, copy_to_clean=True):
         _logger.info("Start query: {}".format(self.now))
         if add_timestamp:
@@ -70,13 +72,10 @@ class BusinessDimensionETL(DimensionETL):
                 full_filename_dest='clean/ods/{0}/{0}.csv'.format(table_name)
             )
 
+    @logger
     def load_dim_from_ods_to_dw(self, dim_name, insert_dummy=True, is_fact=False, pre_command=None, post_command=None):
-        if is_fact:
-            table_name = 'vw_fact_{}'.format(dim_name)
-            table_name_dest = 'fact_{}'.format(dim_name)
-        else:
-            table_name = 'vw_dim_{}'.format(dim_name)
-            table_name_dest = 'dim_{}'.format(dim_name)
+        table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
+        table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
 
         if pre_command is not None:
             BaseETL.execute_command(
@@ -84,6 +83,7 @@ class BusinessDimensionETL(DimensionETL):
                 db_enum=EnumDb.BI_DW,
                 commit=True
             )
+
         BaseETL.move_table_to_dw(
             table_name=table_name,
             table_name_dest=table_name_dest,
@@ -93,12 +93,14 @@ class BusinessDimensionETL(DimensionETL):
             bucket_name='{}/clean/ods/{}'.format(self.bucket, dim_name),
             process_name=dim_name
         )
+
         if insert_dummy:
             BaseETL.execute_command(
                 command='insert into {} values (-1);'.format(table_name_dest),
                 db_enum=EnumDb.BI_DW,
                 commit=True
             )
+
         if post_command is not None:
             BaseETL.execute_command(
                 command=post_command,
@@ -107,6 +109,7 @@ class BusinessDimensionETL(DimensionETL):
             )
 
     # TODO: Migrate all business dimension etl from ODS to Datalake
+    @logger
     def load_athena_query_to_ods(self, dim_name, file_name, append=False):
         _logger.info("Reading from S3: {}".format(datetime.utcnow()))
         data_frame = self.athena.execute_file_query_and_return_dataframe(file_name)
