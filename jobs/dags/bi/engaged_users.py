@@ -41,9 +41,9 @@ def get_python_operator(task_id, func_command, op_kwargs=None):
     )
 
 
-all_task = get_python_operator('extract_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'all'})
-city_task = get_python_operator('extract_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'city'})
-region_task = get_python_operator('extract_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'region'})
+all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'all'})
+city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'city'})
+region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'region'})
 
 # must be sequential because of the appending operation
 all_task >> city_task >> region_task
