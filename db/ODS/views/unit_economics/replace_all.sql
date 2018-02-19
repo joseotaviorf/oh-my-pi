@@ -1252,11 +1252,15 @@ insurance_dates as (
 		id.dt_cash_flow,
 		coalesce(
 		case
-			when (id1.dt_cash_flow < '2017-05-21')
-			then id.rent * 0.0725
-			else id.rent * 0.045
+			when (id1.dt_cash_flow < '2017-05-21') then id.rent * 0.0725
+			when (id1.dt_cash_flow >= '2017-05-21' and id1.dt_cash_flow < '2018-02-01') then id.rent * 0.045
+			else id.rent * 0.01
 		end, 0
-		) as cardiff_amount,
+		) as insurance_fee,
+		case
+			when id1.dt_cash_flow < '2018-02-01' then 0
+			else id.rent * 0.012
+		end as default_fee,
 		case
 			when id.dt_cash_flow > now() then 1
 			else 0
@@ -1281,7 +1285,8 @@ select
 	max(sk_property)::bigint as sk_property,
 	bc.property_id,
 	bc.contract_id,
-	cardiff_amount::decimal(14,4) as vl_insurance_fee,
+	insurance_fee::decimal(14,4) as vl_insurance_fee,
+	default_fee::decimal(14,4) as vl_default_fee,
 	dt_cash_flow as dt_cash_flow,
 	flg_expected
 from
@@ -1289,11 +1294,12 @@ from
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
-where coalesce(cardiff_amount, 0) > 0
+where coalesce(insurance_fee, 0) > 0 or coalesce(default_fee, 0) > 0
 group by
 	bc.property_id,
 	dt_cash_flow,
 	vl_insurance_fee,
+	vl_default_fee,
 	bc.contract_id,
 	flg_expected
 ;
@@ -2312,6 +2318,7 @@ select
 	coalesce(i_fee.property_id, i_pis.property_id) as property_id,
 	coalesce(i_fee.dt_cash_flow, i_pis.dt_cash_flow) as dt_cash_flow,
 	coalesce(i_fee.vl_insurance_fee, 0) as vl_insurance_fee,
+	coalesce(i_fee.vl_default_fee, 0) as vl_default_fee,
 	coalesce(i_pis.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
 	coalesce(i_fee.flg_expected, 0) as flg_expected_insurance_fee,
 	coalesce(i_pis.flg_expected, 0) as flg_expected_sales_tax_pis_cofins
@@ -2334,6 +2341,7 @@ select
   coalesce(ops.vl_collection, 0) as vl_collection,
   coalesce(ops.vl_cs_post_sale, 0) as vl_cs_post_sale,
   coalesce(ops.vl_inspections, 0) as vl_inspections,
+  coalesce(ins.vl_default_fee, 0) as vl_default_fee,
   coalesce(ins.vl_insurance_fee, 0) as vl_insurance_fee,
   coalesce(ins.vl_st_pis_cofins, 0) as vl_st_pis_cofins,
   coalesce(ops.flg_expected_bo_offboarding, 0) as flg_expected_bo_offboarding,
@@ -3060,6 +3068,7 @@ with unit_economics as (
         sum(vl_bo_ongoing) as vl_bo_ongoing,
         sum(vl_bo_offboarding) as vl_bo_offboarding,
         sum(vl_inspections) as vl_inspections,
+        -sum(vl_default_fee) as vl_default_fee,
         -sum(vl_insurance_fee) as vl_insurance_fee,
         sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
         sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
@@ -3107,6 +3116,7 @@ with unit_economics as (
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
             0 as vl_inspections,
+            0 as vl_default_fee,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
@@ -3155,6 +3165,7 @@ with unit_economics as (
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
             0 as vl_inspections,
+            0 as vl_default_fee,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
@@ -3203,6 +3214,7 @@ with unit_economics as (
             vl_bo_ongoing as vl_bo_ongoing,
             vl_bo_offboarding as vl_bo_offboarding,
             vl_inspections as vl_inspections,
+            vl_default_fee as vl_default_fee,
             vl_insurance_fee as vl_insurance_fee,
             flg_expected_bo_offboarding as flg_expected_bo_offboarding,
             flg_expected_bo_onboarding as flg_expected_bo_onboarding,
@@ -3251,6 +3263,7 @@ with unit_economics as (
             0 as vl_bo_ongoing,
             0 as vl_bo_offboarding,
             0 as vl_inspections,
+            0 as vl_default_fee,
             0 as vl_insurance_fee,
             0 as flg_expected_bo_offboarding,
             0 as flg_expected_bo_onboarding,
@@ -3330,6 +3343,7 @@ final_version as (
     ue.flg_expected_bo_offboarding,
     ue.vl_inspections,
     ue.flg_expected_inspection,
+    ue.vl_default_fee,
     ue.vl_insurance_fee,
     ue.flg_expected_insurance_fee
   from unit_economics ue
@@ -3447,6 +3461,9 @@ fact_factor as (
                 filter (where fc.flg_expected_inspection = 1)
                     over (partition by fc.sk_property, fc.sk_contract rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
         fc.flg_expected_inspection,
+        coalesce(fc.vl_default_fee * (1 - sum(cf.loss_factor)
+                filter (where fc.vl_default_fee = 1)
+                    over (partition by fc.sk_property, sk_contract rows between unbounded preceding and current row)), fc.vl_default_fee) as vl_default_fee,
         coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_insurance_fee = 1)
                     over (partition by fc.sk_property, sk_contract rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
@@ -3498,6 +3515,7 @@ select
 	flg_expected_bo_offboarding,
 	vl_inspections,
 	flg_expected_inspection,
+	vl_default_fee,
 	vl_insurance_fee,
 	flg_expected_insurance_fee
 from fact_factor

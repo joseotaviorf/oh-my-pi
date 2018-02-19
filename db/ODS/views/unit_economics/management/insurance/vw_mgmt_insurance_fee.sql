@@ -58,11 +58,15 @@ insurance_dates as (
 		id.dt_cash_flow,
 		coalesce(
 		case
-			when (id1.dt_cash_flow < '2017-05-21')
-			then id.rent * 0.0725
-			else id.rent * 0.045
+			when (id1.dt_cash_flow < '2017-05-21') then id.rent * 0.0725
+			when (id1.dt_cash_flow >= '2017-05-21' and id1.dt_cash_flow < '2018-02-01') then id.rent * 0.045
+			else id.rent * 0.01
 		end, 0
-		) as cardiff_amount,
+		) as insurance_fee,
+		case
+			when id1.dt_cash_flow < '2018-02-01' then 0
+			else id.rent * 0.012
+		end as default_fee,
 		case
 			when id.dt_cash_flow > now() then 1
 			else 0
@@ -87,7 +91,8 @@ select
 	max(sk_property)::bigint as sk_property,
 	bc.property_id,
 	bc.contract_id,
-	cardiff_amount::decimal(14,4) as vl_insurance_fee,
+	insurance_fee::decimal(14,4) as vl_insurance_fee,
+	default_fee::decimal(14,4) as vl_default_fee,
 	dt_cash_flow as dt_cash_flow,
 	flg_expected
 from
@@ -95,11 +100,12 @@ from
 left join
 	insurance_dates i
 	on bc.contract_id = i.contract_id
-where coalesce(cardiff_amount, 0) > 0
+where coalesce(insurance_fee, 0) > 0 or coalesce(default_fee, 0) > 0
 group by
 	bc.property_id,
 	dt_cash_flow,
 	vl_insurance_fee,
+	vl_default_fee,
 	bc.contract_id,
 	flg_expected
 ;
