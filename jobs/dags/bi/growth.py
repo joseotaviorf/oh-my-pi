@@ -233,11 +233,9 @@ visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visi
 
 fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
 
-fact_task.set_upstream([leads_sub_dag, new_listings_sub_dag, opportunities_sub_dag, prospects_sub_dag,
-                        qualifieds_sub_dag, ongoing_contracts_sub_dag, engaged_users_sub_dag, employees_sub_dag,
-                        ticket_resolution_sub_dag, tickets_sub_dag, approved_by_insurer_sub_dag,
-                        documentation_sent_sub_dag, offerers_sub_dag, offerers_approved_sub_dag,
-                        offerers_sent_doc_sub_dag, offers_approved_sub_dag, offers_submitted_sub_dag,
-                        tenant_prospects_sub_dag, tenants_sub_dag, visitors_sub_dag, visits_booked_sub_dag,
-                        visits_completed_sub_dag]
-                       )
+leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
+    ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
+    tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
+    offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
+    offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
+    visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task
