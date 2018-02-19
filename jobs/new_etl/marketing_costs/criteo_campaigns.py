@@ -1,5 +1,5 @@
 import petl
-import pycriteo
+# import pycriteo
 import json
 import os
 from urllib import urlopen
@@ -14,7 +14,7 @@ class CriteoCampaigns(MarketingCampaigns):
         user = config['user']
         pwd = config['pwd']
         token = config['token']
-        self.client = pycriteo.Client(user, pwd, token)
+        # self.client = pycriteo.Client(user, pwd, token)
         # 90 is Criteo upper limit
         self.MAX_DELTA = 90 - 1
 

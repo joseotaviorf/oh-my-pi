@@ -133,8 +133,9 @@ def load_marketing_costs(dim_name, bucket, mkt_configs):
         facebook = FacebookCampaigns(mkt_configs['facebook'])
         table = facebook.extract_marketing_campaigns(date(2016, 11, 1))
     elif dim_name == 'criteo':
-        criteo = CriteoCampaigns(mkt_configs['criteo'])
-        table = criteo.extract_marketing_campaigns(date(2017, 1, 1))
+        table = None
+        # criteo = CriteoCampaigns(mkt_configs['criteo'])
+        # table = criteo.extract_marketing_campaigns(date(2017, 1, 1))
 
     if table is not None:
         BaseETL.bulk_insert(
