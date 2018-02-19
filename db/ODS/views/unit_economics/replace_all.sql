@@ -86,20 +86,18 @@ from files.costs_dre
 where "Value" != 0
 ;
 
-create or replace view unit_economics.vw_base_ticket_task as
+create view unit_economics.vw_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,
     case
-      when trim("name") ~* '(adm financeiro)|(cx p.s)'
+      when trim("name") ~* '(adm financeiro)|(adm casos)|(adm media..es)|(cx p.s)|(cx adm)'
         then 'Customer Support (post-sale)'
-      when trim("name") ~* '(comercial e afiliados)|(cx pr.)|(cx pr. missed chat)|(supporte)|(whatsapp)|(suporte$)'
+      when trim("name") ~* '(comercial e afiliados)|(cx pr.)|(cx pr. missed chat)|(supporte)|(whatsapp)|(suporte$)|(closing)|(cx an.)'
         then 'Customer Support (pre-sale)'
-      when trim("name") ~* '(adm casos)|(adm media..es)|(adm renova..o)|(adm rescis.o)'
-        then 'mediacoes'
-      when trim("name") ~* 'adm offboarding'
+      when trim("name") ~* '(adm offboarding)|(adm rescis.o)'
         then 'Back-Office (offboarding)'
-      when trim("name") ~* '(adm onboarding)|(ongoing)'
+      when trim("name") ~* '(adm onboarding)'
         then 'Back-Office (onboarding)'
       when trim("name") ~* 'collections'
         then 'Collection'
