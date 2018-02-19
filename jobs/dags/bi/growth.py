@@ -196,7 +196,7 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
                                              dag=local_dag,
                                              op_kwargs={'measure': sub_dag_name}
                                              )
-    consolidation_task.set_upstream([no_filter_tasks[3], city_tasks[3], region_tasks[3]])
+    consolidation_task.set_upstream(region_tasks)
     
     return local_dag
 
