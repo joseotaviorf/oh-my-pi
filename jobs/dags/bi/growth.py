@@ -85,7 +85,7 @@ def consolidate_employees_no_filters(measure):
     growth.execute_command(consolidation_query.format(measure))
 
 
-def get_sub_dag_operator(sub_dag_func, sub_dag_name, funnel):
+def get_sub_dag_operator(sub_dag_func, sub_dag_name, funnel=None):
     return SubDagOperator(
         subdag=sub_dag_func(MAIN_DAG_NAME, sub_dag_name, funnel, main_dag.start_date, main_dag.schedule_interval),
         task_id=sub_dag_name,
@@ -215,6 +215,29 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     return local_dag
 
 
+def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval):
+    local_dag = DAG(
+        '%s.%s' % (main_dag_name, sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date,
+    )
+
+    engaged_users_truncate_task = get_python_operator('truncate_table', truncate_engaged_users_table, local_dag)
+
+    engaged_users_all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, local_dag,
+                                                 op_kwargs={'filter': 'all'})
+    engaged_users_city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, local_dag,
+                                                  op_kwargs={'filter': 'city'})
+    engaged_users_region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query,
+                                                    local_dag,
+                                                    op_kwargs={'filter': 'region'})
+
+    # must be sequential because of the appending operation
+    engaged_users_truncate_task >> engaged_users_all_task >> engaged_users_city_task >> engaged_users_region_task
+
+    return local_dag
+
+
 # supply measures
 leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'leads', 'supply')
 new_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'new_listings', 'supply')
@@ -226,6 +249,11 @@ qualifieds_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'qualifieds
 ongoing_contracts_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'ongoing_contracts', 'closing')
 
 # top funnel measures
+
+# Amplitude engaged users
+amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_engaged_users,
+                                                             'amplitude_engaged_users_previous',
+                                                             'top_funnel')
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'engaged_users', 'top_funnel')
 employees_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, 'employees', 'top_funnel')
 ticket_resolution_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, 'ticket_resolution', 'top_funnel')
@@ -248,20 +276,8 @@ visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visi
 # fact
 fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
 
-# Amplitude engaged users
-engaged_users_truncate_task = get_python_operator('truncate_table', truncate_engaged_users_table, main_dag)
-
-engaged_users_all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, main_dag,
-                                             op_kwargs={'filter': 'all'})
-engaged_users_city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, main_dag,
-                                              op_kwargs={'filter': 'city'})
-engaged_users_region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query, main_dag,
-                                                op_kwargs={'filter': 'region'})
-
-# must be sequential because of the appending operation
-engaged_users_truncate_task >> engaged_users_all_task >> engaged_users_city_task >> engaged_users_region_task
-
-engaged_users_region_task >> engaged_users_sub_dag
+# flow
+amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 
 leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
     ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
