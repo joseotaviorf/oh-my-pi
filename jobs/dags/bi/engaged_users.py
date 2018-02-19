@@ -32,6 +32,11 @@ def materialize_engaged_users_table_query(**kwargs):
     engaged_users.append_to_table(_filter=_filter)
 
 
+@logger
+def truncate_table():
+    EngagedUsers.truncate_table()
+
+
 def get_python_operator(task_id, func_command, op_kwargs=None):
     return PythonOperator(
         dag=main_dag,
@@ -41,9 +46,13 @@ def get_python_operator(task_id, func_command, op_kwargs=None):
     )
 
 
+truncate_task = get_python_operator('truncate_table', truncate_table)
+
 all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'all'})
-city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'city'})
-region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query, op_kwargs={'filter': 'region'})
+city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query,
+                                op_kwargs={'filter': 'city'})
+region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query,
+                                  op_kwargs={'filter': 'region'})
 
 # must be sequential because of the appending operation
-all_task >> city_task >> region_task
+truncate_task >> all_task >> city_task >> region_task
