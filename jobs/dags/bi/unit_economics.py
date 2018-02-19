@@ -44,7 +44,7 @@ ticket_base_tbl = QuintoAndarPythonOperator(
     task_id='ticket_base_tbl',
     execution_timeout=timedelta(hours=3),
     python_callable=create_base_ticket_tbl,
-    op_kwargs={'bucket': bucket}
+    op_kwargs={'_bucket': bucket}
 )
 
 fact_property_economics = QuintoAndarPythonOperator(
