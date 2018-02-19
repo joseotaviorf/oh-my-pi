@@ -4,6 +4,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
 from jobs.dags.util import environment as env
+from jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from jobs.new_etl.growth import Growth
 from qa_python_utils.default_logger import logger
 
@@ -25,6 +26,19 @@ main_dag = DAG(
     schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
     max_active_runs=1
 )
+
+
+@logger
+def materialize_engaged_users_table_query(**kwargs):
+    _filter = kwargs['filter']
+
+    engaged_users = EngagedUsers(bucket)
+    engaged_users.append_to_table(_filter=_filter)
+
+
+@logger
+def truncate_engaged_users_table():
+    EngagedUsers.truncate_table()
 
 
 @logger
@@ -231,7 +245,23 @@ visitors_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visitors', '
 visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visits_booked', 'demand')
 visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visits_completed', 'demand')
 
+# fact
 fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
+
+# Amplitude engaged users
+engaged_users_truncate_task = get_python_operator('truncate_table', truncate_engaged_users_table, main_dag)
+
+engaged_users_all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, main_dag,
+                                             op_kwargs={'filter': 'all'})
+engaged_users_city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, main_dag,
+                                              op_kwargs={'filter': 'city'})
+engaged_users_region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query, main_dag,
+                                                op_kwargs={'filter': 'region'})
+
+# must be sequential because of the appending operation
+engaged_users_truncate_task >> engaged_users_all_task >> engaged_users_city_task >> engaged_users_region_task
+
+engaged_users_region_task >> engaged_users_sub_dag
 
 leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
     ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
