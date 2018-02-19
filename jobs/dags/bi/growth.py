@@ -188,15 +188,16 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     # region
     region_tasks = get_filter_tasks('region', funnel, local_dag, sub_dag_name)
 
+    for i in range(0, 4):
+        no_filter_tasks[i] >> city_tasks[i] >> region_tasks[i]
+
     consolidation_task = get_python_operator(task_id='consolidate',
                                              func_command=consolidate_with_filters,
                                              dag=local_dag,
                                              op_kwargs={'measure': sub_dag_name}
                                              )
-    consolidation_task.set_upstream([no_filter_tasks[0], no_filter_tasks[1], no_filter_tasks[2], no_filter_tasks[3],
-                                     city_tasks[0], city_tasks[1], city_tasks[2], city_tasks[3],
-                                     region_tasks[0], region_tasks[1], region_tasks[2], region_tasks[3]]
-                                    )
+    consolidation_task.set_upstream([no_filter_tasks[3], city_tasks[3], region_tasks[3]])
+    
     return local_dag
 
 
@@ -232,11 +233,18 @@ visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visi
 
 fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
 
-fact_task.set_upstream([leads_sub_dag, new_listings_sub_dag, opportunities_sub_dag, prospects_sub_dag,
-                        qualifieds_sub_dag, ongoing_contracts_sub_dag, engaged_users_sub_dag, employees_sub_dag,
-                        ticket_resolution_sub_dag, tickets_sub_dag, approved_by_insurer_sub_dag,
-                        documentation_sent_sub_dag, offerers_sub_dag, offerers_approved_sub_dag,
-                        offerers_sent_doc_sub_dag, offers_approved_sub_dag, offers_submitted_sub_dag,
-                        tenant_prospects_sub_dag, tenants_sub_dag, visitors_sub_dag, visits_booked_sub_dag,
-                        visits_completed_sub_dag]
-                       )
+# fact_task.set_upstream([leads_sub_dag, new_listings_sub_dag, opportunities_sub_dag, prospects_sub_dag,
+#                         qualifieds_sub_dag, ongoing_contracts_sub_dag, engaged_users_sub_dag, employees_sub_dag,
+#                         ticket_resolution_sub_dag, tickets_sub_dag, approved_by_insurer_sub_dag,
+#                         documentation_sent_sub_dag, offerers_sub_dag, offerers_approved_sub_dag,
+#                         offerers_sent_doc_sub_dag, offers_approved_sub_dag, offers_submitted_sub_dag,
+#                         tenant_prospects_sub_dag, tenants_sub_dag, visitors_sub_dag, visits_booked_sub_dag,
+#                         visits_completed_sub_dag]
+#                        )
+
+leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
+ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
+tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
+offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
+offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
+visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task
