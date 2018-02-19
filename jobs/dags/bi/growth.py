@@ -120,32 +120,32 @@ def get_no_filter_tasks(funnel, local_dag, sub_dag_name):
     return all_day_task, all_week_task, all_month_task, all_year_task
 
 
-def get_filter_tasks(filter, funnel, local_dag, sub_dag_name):
-    filter_day_task = get_python_operator(task_id='extract_{}_{}_day'.format(sub_dag_name, filter),
+def get_filter_tasks(_filter, funnel, local_dag, sub_dag_name):
+    filter_day_task = get_python_operator(task_id='extract_{}_{}_day'.format(sub_dag_name, _filter),
                                           func_command=materialize_growth_measure_table_query,
                                           dag=local_dag,
-                                          op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'city',
+                                          op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
                                                      'period': 'day'}
                                           )
 
-    filter_week_task = get_python_operator(task_id='extract_{}_{}_week'.format(sub_dag_name, filter),
+    filter_week_task = get_python_operator(task_id='extract_{}_{}_week'.format(sub_dag_name, _filter),
                                            func_command=materialize_growth_measure_table_query,
                                            dag=local_dag,
-                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'city',
+                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
                                                       'period': 'week'}
                                            )
 
-    filter_month_task = get_python_operator(task_id='extract_{}_{}_month'.format(sub_dag_name, filter),
+    filter_month_task = get_python_operator(task_id='extract_{}_{}_month'.format(sub_dag_name, _filter),
                                             func_command=materialize_growth_measure_table_query,
                                             dag=local_dag,
-                                            op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'city',
+                                            op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
                                                        'period': 'month'}
                                             )
 
-    filter_year_task = get_python_operator(task_id='extract_{}_{}_year'.format(sub_dag_name, filter),
+    filter_year_task = get_python_operator(task_id='extract_{}_{}_year'.format(sub_dag_name, _filter),
                                            func_command=materialize_growth_measure_table_query,
                                            dag=local_dag,
-                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'city',
+                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
                                                       'period': 'year'}
                                            )
 
@@ -197,7 +197,7 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
                                              op_kwargs={'measure': sub_dag_name}
                                              )
     consolidation_task.set_upstream(region_tasks)
-    
+
     return local_dag
 
 
@@ -233,18 +233,11 @@ visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, 'visi
 
 fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
 
-# fact_task.set_upstream([leads_sub_dag, new_listings_sub_dag, opportunities_sub_dag, prospects_sub_dag,
-#                         qualifieds_sub_dag, ongoing_contracts_sub_dag, engaged_users_sub_dag, employees_sub_dag,
-#                         ticket_resolution_sub_dag, tickets_sub_dag, approved_by_insurer_sub_dag,
-#                         documentation_sent_sub_dag, offerers_sub_dag, offerers_approved_sub_dag,
-#                         offerers_sent_doc_sub_dag, offers_approved_sub_dag, offers_submitted_sub_dag,
-#                         tenant_prospects_sub_dag, tenants_sub_dag, visitors_sub_dag, visits_booked_sub_dag,
-#                         visits_completed_sub_dag]
-#                        )
-
-leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
-ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
-tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
-offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
-offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
-visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task
+fact_task.set_upstream([leads_sub_dag, new_listings_sub_dag, opportunities_sub_dag, prospects_sub_dag,
+                        qualifieds_sub_dag, ongoing_contracts_sub_dag, engaged_users_sub_dag, employees_sub_dag,
+                        ticket_resolution_sub_dag, tickets_sub_dag, approved_by_insurer_sub_dag,
+                        documentation_sent_sub_dag, offerers_sub_dag, offerers_approved_sub_dag,
+                        offerers_sent_doc_sub_dag, offers_approved_sub_dag, offers_submitted_sub_dag,
+                        tenant_prospects_sub_dag, tenants_sub_dag, visitors_sub_dag, visits_booked_sub_dag,
+                        visits_completed_sub_dag]
+                       )
