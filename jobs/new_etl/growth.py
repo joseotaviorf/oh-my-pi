@@ -1,32 +1,28 @@
-import os
-
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
 from __init__ import DW_DIR
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-QUERIES_DIR = '{}/{}'.format(os.path.join(dir_path, DW_DIR), 'growth/prod/queries')
-
 
 class Growth(object):
     SCHEMA = 'growth'
+    QUERIES_DIR = '{}/{}'.format(DW_DIR, 'growth/prod/queries')
 
     @staticmethod
     @logger
     def get_measure_all_query():
-        return Growth.__get_query_from_file_name('{}/measure_all.sql'.format(QUERIES_DIR))
+        return Growth.__get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_measure_no_filters_query():
-        return Growth.__get_query_from_file_name('{}/measure_no_filters.sql'.format(QUERIES_DIR))
+        return Growth.__get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_employee_all_query():
-        return Growth.__get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(QUERIES_DIR))
+        return Growth.__get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
@@ -43,7 +39,7 @@ class Growth(object):
         self.drop_table('fact_table')
 
         BaseETL.execute_file_query(
-            filename='{}/{}.sql'.format(QUERIES_DIR, query_path),
+            filename='{}/{}.sql'.format(Growth.QUERIES_DIR, query_path),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
@@ -57,13 +53,14 @@ class Growth(object):
         )
 
     @logger
-    def create_table(self, funnel, measure, filter, period):
+    def create_table(self, funnel, measure, _filter, period):
         prefix_file = Growth.__get_query_from_file_name(
-            '{}/{}/{}/prefix_{}.sql'.format(QUERIES_DIR, funnel, measure, filter))
-        suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(QUERIES_DIR, period))
+            '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
+        suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
         self.execute_command(
-            'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, filter, period, prefix_file + suffix_file))
+            'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
+                                                     prefix_file + suffix_file))
 
     @logger
     def execute_command(self, query):
