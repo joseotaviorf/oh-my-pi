@@ -56,8 +56,8 @@ class EngagedUsers(object):
 
     @logger
     def append_to_table(self, _filter):
-        self.__append(filter=_filter, prefix=self.all_dates_query)
-        self.__append(filter=_filter, prefix=self.current_date_query)
+        self.__append(_filter=_filter, prefix=self.all_dates_query)
+        self.__append(_filter=_filter, prefix=self.current_date_query)
 
     @logger
     def __append(self, _filter, prefix):
