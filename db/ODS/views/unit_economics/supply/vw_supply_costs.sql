@@ -8,7 +8,10 @@ create or replace view unit_economics.vw_supply_costs as
 select
 	coalesce(vsmc.sk_property, vsoc.sk_property, vsacc.sk_property) as sk_property,
 	coalesce(vsmc.property_id, vsoc.property_id, vsacc.property_id) as property_id,
-	coalesce(vsmc.dt_cash_flow, vsoc.dt_cash_flow, vsacc.dt_cash_flow) as dt_cash_flow,
+	coalesce(
+    date_trunc('month', vsmc.dt_cash_flow)::date,
+    date_trunc('month', vsoc.dt_cash_flow)::date,
+    date_trunc('month', vsacc.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(vsmc.vl_affiliate_campaigns, 0) as vl_affiliate_campaigns,
 	coalesce(vsmc.vl_owner_campaigns, 0) as vl_owner_campaigns,
 	coalesce(vsoc.vl_photos, 0) as vl_photos,

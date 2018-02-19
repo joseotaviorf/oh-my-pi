@@ -8,7 +8,7 @@ create or replace view unit_economics.vw_liquidity_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_tenant_campaigns)::decimal(14,4) as vl_tenant_campaigns,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,

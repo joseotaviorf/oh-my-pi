@@ -3,7 +3,7 @@ create or replace view unit_economics.vw_mgmt_costs as
 select
   coalesce(ops.sk_property, ins.sk_property) as sk_property,
   coalesce(ops.property_id, ins.property_id) as property_id,
-  coalesce(ops.dt_cash_flow, ins.dt_cash_flow) as dt_cash_flow,
+  coalesce(date_trunc('month', ops.dt_cash_flow)::date, date_trunc('month', ins.dt_cash_flow)::date) as dt_cash_flow,
   coalesce(ops.vl_bo_offboarding, 0) as vl_bo_offboarding,
   coalesce(ops.vl_bo_onboarding, 0) as vl_bo_onboarding,
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
