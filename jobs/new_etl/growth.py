@@ -35,11 +35,11 @@ class Growth(object):
             return ''
 
     @logger
-    def load_fact(self, query_path):
+    def load_fact(self):
         self.drop_table('fact_table')
 
         BaseETL.execute_file_query(
-            filename='{}/{}.sql'.format(Growth.QUERIES_DIR, query_path),
+            filename='{}/public/queries/fact_growth.sql'.format(DW_DIR),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
