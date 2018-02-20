@@ -52,7 +52,7 @@ fact_property_economics = QuintoAndarPythonOperator(
     task_id='etl_fact_property_economics',
     execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False, 'schema_source': 'unit_economics'}
 )
 
 ticket_base_tbl >> fact_property_economics
