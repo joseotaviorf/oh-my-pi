@@ -5,11 +5,11 @@ from qa_python_utils.default_logger import _logger, logger
 
 class SortingHat(object):
     @logger
-    def extract_table_from_db(self, table_name):
+    def extract_table_from_db(self, columns, table_name):
         _logger.info('m=table_extraction_and_load, msg={} - from db'.format(table_name))
         return BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_sortinghat,
-            query='select * from "{}";'.format(table_name)
+            query='select {} from "{}";'.format(columns, table_name)
         )
 
     @logger

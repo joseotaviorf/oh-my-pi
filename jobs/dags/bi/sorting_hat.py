@@ -14,9 +14,10 @@ env.set_airflow_var_to_local_env('SORTINGHAT')
 @logger(exclude='kwargs')
 def extract_table(**kwargs):
     table_name = kwargs['table_name']
+    columns = '*' if 'columns' not in kwargs else kwargs['columns']
 
     sorting_hat = SortingHat()
-    table = sorting_hat.extract_table_from_db(table_name=table_name)
+    table = sorting_hat.extract_table_from_db(columns=columns, table_name=table_name)
     sorting_hat.load_table_to_s3(table_name=table_name,
                                  table=table,
                                  s3_bucket=env.get_environment('bi-datalake-s3-bucket')
@@ -33,7 +34,8 @@ dag = DAG(
     },
     start_date=datetime(2018, 1, 14, 0, 0, 0),
     schedule_interval='0 4 * * *',
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 # operators
@@ -41,7 +43,14 @@ PythonOperator(
     dag=dag,
     task_id='extract_proposal_table',
     python_callable=extract_table,
-    op_kwargs={'table_name': 'Proposal'}
+    op_kwargs={
+        'table_name': 'Proposal',
+        'columns': """id, imovel_id, analysis_date, "score_5A", "score_5A_best_subset", score_cardif,
+                    score_cardif_best_subset, status, replace("comment", '\n', ' ') as "comment",
+                    analyst_name, supervisor_name, rent_value, condo_value, iptu_value, created_at,
+                    updated_at, home_area, home_bathrooms, home_bedrooms, home_city, home_garages,
+                    home_region, home_suites, home_type, home_zipcode, drive_id"""
+    }
 )
 
 PythonOperator(
