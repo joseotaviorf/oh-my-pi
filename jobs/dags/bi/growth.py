@@ -184,7 +184,9 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
                                              dag=local_dag,
                                              op_kwargs={'measure': sub_dag_name}
                                              )
-    consolidation_task.set_upstream([no_filter_tasks[0], no_filter_tasks[1], no_filter_tasks[2], no_filter_tasks[3]])
+
+    no_filter_list = [no_filter_tasks[i] for i in range(0, 4)]
+    consolidation_task.set_upstream(no_filter_list[1:] if sub_dag_name == 'employees' else no_filter_list)
 
     return local_dag
 
