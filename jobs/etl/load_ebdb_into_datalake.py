@@ -48,22 +48,25 @@ class EBDBDatalake(object):
 
         _logger.info('m=move_to_datalake, msg=start query: {}'.format(now))
 
+        schema = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, schema_name, False)
+        schema = petl.todataframe(schema)
+
+        columns = []
+        for _, row in schema.iterrows():
+            if row.DATA_TYPE == 'bit':
+                columns.append('cast({} as unsigned)'.format(row.COLUMN_NAME))
+            elif row.DATA_TYPE == 'longblob':
+                columns.append('AsText({})'.format(row.COLUMN_NAME))
+            else:
+                columns.append('{}'.format(row.COLUMN_NAME))
+
         # get data from table
-        table = BaseETL.from_db_table(
-            db_enum=db,
-            table_name=table_name,
-            generator=True
-        ).addfield('dt_timestamp', now)
+        table = BaseETL.from_db_query(db, """select {} from {}""".format(', '.join(columns), table_name))
 
         _logger.info('m=move_to_datalake, msg=to ODS: {}'.format(now))
 
         table = BaseETL.decode_table(table, 'LATIN-1')  # decode table from LATIN-1
         table = petl.convertall(table, unicode)  # convert all fields to unicode
-
-        # get all columns declared as BIT because we have a bug converting BIT columns on mysql
-        bit_columns = petl.select(BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, schema_name, False),
-                                  lambda rec: rec.DATA_TYPE == 'bit')
-        table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
 
         # save table into datalake
         file_path = 'raw/{1}/{2}/{2}.csv'.format(bucket_datalake, schema_name, table_name)
