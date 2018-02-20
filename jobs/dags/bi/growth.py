@@ -49,7 +49,7 @@ def materialize_growth_measure_table_query(**kwargs):
     period = kwargs['period']
 
     growth = Growth()
-    growth.drop_table('{}_{}_{}'.format(measure, _filter, period))
+    growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
     growth.create_table(funnel, measure, _filter, period)
 
 
@@ -61,7 +61,7 @@ def load_fact_growth():
 @logger
 def consolidate_with_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_all_query()
     growth.execute_command(consolidation_query.format(measure))
@@ -70,7 +70,7 @@ def consolidate_with_filters(measure):
 @logger
 def consolidate_no_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_no_filters_query()
     growth.execute_command(consolidation_query.format(measure))
@@ -79,7 +79,7 @@ def consolidate_no_filters(measure):
 @logger
 def consolidate_employees_no_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_employee_all_query()
     growth.execute_command(consolidation_query.format(measure))

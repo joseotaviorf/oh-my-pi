@@ -37,7 +37,7 @@ class Growth(object):
 
     @logger
     def load_fact(self):
-        self.drop_table(Growth.FACT_TABLE_NAME)
+        self.drop_table(table_name=Growth.FACT_TABLE_NAME)
 
         BaseETL.execute_file_query(
             filename='{}/public/queries/{}.sql'.format(DW_DIR, Growth.FACT_TABLE_NAME),
@@ -46,9 +46,9 @@ class Growth(object):
         )
 
     @logger
-    def drop_table(self, table_name):
+    def drop_table(self, table_name, schema='public'):
         BaseETL.execute_command(
-            command='drop table if exists {}.{};'.format(Growth.SCHEMA, table_name),
+            command='drop table if exists {}.{};'.format(schema, table_name),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
