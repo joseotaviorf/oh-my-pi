@@ -154,4 +154,4 @@ def load_marketing_costs(dim_name, bucket, mkt_configs):
             full_filename_dest='clean/ods/{0}/{0}.csv'.format(table_name)
         )
     else:
-        _logger.error("Failure to load marketing costs mc={} dt={}".format(dim_name, table_name.utcnow()))
+        _logger.error("Failure to load marketing costs mc={}".format(dim_name))
