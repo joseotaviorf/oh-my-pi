@@ -103,12 +103,15 @@ def get_python_operator(task_id, func_command, dag, op_kwargs=None):
 
 
 def get_no_filter_tasks(funnel, local_dag, sub_dag_name):
-    all_day_task = get_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
-                                       func_command=materialize_growth_measure_table_query,
-                                       dag=local_dag,
-                                       op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                  'period': 'day'}
-                                       )
+    all_day_task = None
+
+    if sub_dag_name != 'employees':
+        all_day_task = get_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
+                                           func_command=materialize_growth_measure_table_query,
+                                           dag=local_dag,
+                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                      'period': 'day'}
+                                           )
 
     all_week_task = get_python_operator(task_id='extract_{}_all_week'.format(sub_dag_name),
                                         func_command=materialize_growth_measure_table_query,
