@@ -42,6 +42,7 @@ create table if not exists public.fact_property_economics (
     flg_expected_bo_offboarding int,
     vl_inspections double precision,
     flg_expected_inspection int,
+    vl_default_fee double precision,
     vl_insurance_fee double precision,
     flg_expected_insurance_fee int
 );
