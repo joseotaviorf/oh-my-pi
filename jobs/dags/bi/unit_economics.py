@@ -5,7 +5,10 @@ from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from jobs.base.base_etl import BaseETL, EnumDb
 from jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB',
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
