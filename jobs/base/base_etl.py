@@ -324,7 +324,6 @@ class BaseETL(object):
             process_name = table_name_dest
 
         filename = '{}.csv'.format(process_name)
-        print filename, data_table, bucket_name, encoding
         bucket_name, filename = cls.to_s3(filename, data_table, bucket_name, encoding=encoding)
         cls.bulk_insert_from_s3_to_dw(
             bucket_name=bucket_name,
