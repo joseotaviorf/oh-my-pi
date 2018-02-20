@@ -12,7 +12,7 @@ class SortingHat(object):
             query='select {} from "{}";'.format(columns, table_name)
         )
 
-    @logger
+    @logger(exclude='data_table')
     def load_table_to_s3(self, table_name, data_table, s3_bucket):
         _logger.info('m=table_extraction_and_load, msg={} - to s3'.format(table_name))
         BaseETL.to_s3(
