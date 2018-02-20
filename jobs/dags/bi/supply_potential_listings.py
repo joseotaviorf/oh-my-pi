@@ -9,7 +9,10 @@ from jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
 from jobs.new_etl.dim_utils import extract_query_dim_from_ebdb_to_ods, extract_table_dim_from_ebdb_to_ods, \
     load_dim_from_ods_to_dw, load_athena_query_to_ods, load_marketing_costs
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB',
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 criteo_config = env.get_airflow_env_var('criteo')
 google_config = env.get_airflow_env_var('ADWORDS_KEY')

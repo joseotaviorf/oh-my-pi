@@ -3,7 +3,7 @@ create or replace view unit_economics.vw_mgmt_ops_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
@@ -11,11 +11,11 @@ select
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
 	sum(vl_inspections)  as vl_inspections,
 	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
-    sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
-    sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
-    sum(flg_expected_collection) as flg_expected_collection,
-    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
-    sum(flg_expected_inspection)  as flg_expected_inspection
+  sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+  sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+  sum(flg_expected_collection) as flg_expected_collection,
+  sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+  sum(flg_expected_inspection)  as flg_expected_inspection
 from
 (
 	select

@@ -86,20 +86,18 @@ from files.costs_dre
 where "Value" != 0
 ;
 
-create or replace view unit_economics.vw_base_ticket_task as
+create view unit_economics.vw_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,
     case
-      when trim("name") ~* '(adm financeiro)|(cx p.s)'
+      when trim("name") ~* '(adm financeiro)|(adm casos)|(adm media..es)|(cx p.s)|(cx adm)'
         then 'Customer Support (post-sale)'
-      when trim("name") ~* '(comercial e afiliados)|(cx pr.)|(cx pr. missed chat)|(supporte)|(whatsapp)|(suporte$)'
+      when trim("name") ~* '(comercial e afiliados)|(cx pr.)|(cx pr. missed chat)|(supporte)|(whatsapp)|(suporte$)|(closing)|(cx an.)'
         then 'Customer Support (pre-sale)'
-      when trim("name") ~* '(adm casos)|(adm media..es)|(adm renova..o)|(adm rescis.o)'
-        then 'mediacoes'
-      when trim("name") ~* 'adm offboarding'
+      when trim("name") ~* '(adm offboarding)|(adm rescis.o)'
         then 'Back-Office (offboarding)'
-      when trim("name") ~* '(adm onboarding)|(ongoing)'
+      when trim("name") ~* '(adm onboarding)'
         then 'Back-Office (onboarding)'
       when trim("name") ~* 'collections'
         then 'Collection'
@@ -226,10 +224,10 @@ with cdre_inside_sales as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where dre_category = 'Inside Sales'
+    where dre_category in ('Inside Sales', 'Inside sales')
 ),
 filtered_properties as (
-   	select distinct
+	select distinct
 	    sk_property,
 	    property_id,
 	    min_version_time::date as listing_date
@@ -563,7 +561,10 @@ create or replace view unit_economics.vw_supply_costs as
 select
 	coalesce(vsmc.sk_property, vsoc.sk_property, vsacc.sk_property) as sk_property,
 	coalesce(vsmc.property_id, vsoc.property_id, vsacc.property_id) as property_id,
-	coalesce(vsmc.dt_cash_flow, vsoc.dt_cash_flow, vsacc.dt_cash_flow) as dt_cash_flow,
+	coalesce(
+    date_trunc('month', vsmc.dt_cash_flow)::date,
+    date_trunc('month', vsoc.dt_cash_flow)::date,
+    date_trunc('month', vsacc.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(vsmc.vl_affiliate_campaigns, 0) as vl_affiliate_campaigns,
 	coalesce(vsmc.vl_owner_campaigns, 0) as vl_owner_campaigns,
 	coalesce(vsoc.vl_photos, 0) as vl_photos,
@@ -935,7 +936,7 @@ create or replace view unit_economics.vw_net_revenue_revenues as
 select
 	coalesce(b_fee.sk_property, m_fee.sk_property) as sk_property,
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
-	coalesce(b_fee.dt_cash_flow, m_fee.dt_cash_flow) as dt_cash_flow,
+	coalesce(date_trunc('month', b_fee.dt_cash_flow)::date, date_trunc('month', m_fee.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
 	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
 	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
@@ -1059,7 +1060,7 @@ create or replace view unit_economics.vw_net_revenue_taxes as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
 	sum(vl_delay_fine) as vl_delay_fine,
@@ -1114,7 +1115,7 @@ create or replace view unit_economics.vw_net_revenue_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
@@ -2168,7 +2169,7 @@ create or replace view unit_economics.vw_mgmt_ops_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
 	sum(vl_bo_onboarding) as vl_bo_onboarding,
 	sum(vl_bo_ongoing) as vl_bo_ongoing,
@@ -2176,11 +2177,11 @@ select
 	sum(vl_cs_post_sale) as vl_cs_post_sale,
 	sum(vl_inspections)  as vl_inspections,
 	sum(flg_expected_bo_offboarding) as flg_expected_bo_offboarding,
-    sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
-    sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
-    sum(flg_expected_collection) as flg_expected_collection,
-    sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
-    sum(flg_expected_inspection)  as flg_expected_inspection
+  sum(flg_expected_bo_onboarding) as flg_expected_bo_onboarding,
+  sum(flg_expected_bo_ongoing) as flg_expected_bo_ongoing,
+  sum(flg_expected_collection) as flg_expected_collection,
+  sum(flg_expected_cs_post_sale) as flg_expected_cs_post_sale,
+  sum(flg_expected_inspection)  as flg_expected_inspection
 from
 (
 	select
@@ -2334,7 +2335,7 @@ create or replace view unit_economics.vw_mgmt_costs as
 select
   coalesce(ops.sk_property, ins.sk_property) as sk_property,
   coalesce(ops.property_id, ins.property_id) as property_id,
-  coalesce(ops.dt_cash_flow, ins.dt_cash_flow) as dt_cash_flow,
+  coalesce(date_trunc('month', ops.dt_cash_flow)::date, date_trunc('month', ins.dt_cash_flow)::date) as dt_cash_flow,
   coalesce(ops.vl_bo_offboarding, 0) as vl_bo_offboarding,
   coalesce(ops.vl_bo_onboarding, 0) as vl_bo_onboarding,
   coalesce(ops.vl_bo_ongoing, 0) as vl_bo_ongoing,
@@ -2929,7 +2930,7 @@ create or replace view unit_economics.vw_liquidity_ops_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
 	sum(vl_field_ops) as vl_field_ops
@@ -2972,7 +2973,7 @@ create or replace view unit_economics.vw_liquidity_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_tenant_campaigns)::decimal(14,4) as vl_tenant_campaigns,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
 	sum(vl_cs_pre_sale) as vl_cs_pre_sale,
@@ -3090,7 +3091,7 @@ with unit_economics as (
             sk_property,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
-            dt_cash_flow,
+            date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
             0 as vl_inside_sales,
@@ -3139,7 +3140,7 @@ with unit_economics as (
             sk_property,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
-            dt_cash_flow,
+            date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
             vl_owner_campaigns,
             vl_affiliate_campaigns,
             vl_inside_sales as vl_inside_sales,
@@ -3188,7 +3189,7 @@ with unit_economics as (
             sk_property,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
-            dt_cash_flow,
+            date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
             0 as vl_inside_sales,
@@ -3237,7 +3238,7 @@ with unit_economics as (
             sk_property,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
-            dt_cash_flow,
+            date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
             0 as vl_owner_campaigns,
             0 as vl_affiliate_campaigns,
             0 as vl_inside_sales,

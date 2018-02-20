@@ -9,7 +9,7 @@ create or replace view unit_economics.vw_net_revenue_costs as
 select
 	sk_property,
 	property_id,
-	dt_cash_flow,
+	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,

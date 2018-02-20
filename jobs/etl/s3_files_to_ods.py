@@ -21,40 +21,42 @@ if __name__ == '__main__':
 
             table_name = f[1]
 
-            exists = BaseETL.table_exists(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
-            if not exists:
-                BaseETL.create_table(
-                    conn=BaseETL.get_connection(db_enum=EnumDb.BI_ODS),
-                    table=table,
-                    tablename=table_name,
-                    schema=schema,
-                    sample=100000
+            if f[1] == 'costs_dre':
+
+                exists = BaseETL.table_exists(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
+                if not exists:
+                    BaseETL.create_table(
+                        conn=BaseETL.get_connection(db_enum=EnumDb.BI_ODS),
+                        table=table,
+                        tablename=table_name,
+                        schema=schema,
+                        sample=100000
+                    )
+
+                BaseETL.dataframe_to_ods(
+                    df=table,
+                    table_name='{}."{}"'.format(schema, table_name),
+                    append=False,
+                    encoding='utf-8'
                 )
 
-            BaseETL.dataframe_to_ods(
-                df=table,
-                table_name='{}."{}"'.format(schema, table_name),
-                append=False,
-                encoding='utf-8'
-            )
+                BaseETL.to_s3(
+                    filename=table_name,
+                    data_table=table,
+                    bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, table_name),
+                    encoding='utf8',
+                    tmp_dir='/tmp'
+                )
 
-            BaseETL.to_s3(
-                filename=table_name,
-                data_table=table,
-                bucket_folder_path='{}/raw/files/{}'.format(bucket_datalake, table_name),
-                encoding='utf8',
-                tmp_dir='/tmp'
-            )
-
-            # temp storing the same file on "clean" directory
-            # in the future, we will need to do some cleansing in data
-            BaseETL.to_s3(
-                filename=table_name,
-                data_table=table,
-                bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, table_name),
-                encoding='utf8',
-                tmp_dir='/tmp'
-            )
+                # temp storing the same file on "clean" directory
+                # in the future, we will need to do some cleansing in data
+                BaseETL.to_s3(
+                    filename=table_name,
+                    data_table=table,
+                    bucket_folder_path='{}/clean/files/{}'.format(bucket_datalake, table_name),
+                    encoding='utf8',
+                    tmp_dir='/tmp'
+                )
 
         except Exception as ex:
             log.error(ex)

@@ -5,7 +5,7 @@ with cdre_inside_sales as (
       dre_value,
       dre_date
     from unit_economics.vw_base_dre_costs
-    where dre_category = 'Inside Sales'
+    where dre_category in ('Inside Sales', 'Inside sales')
 ),
 filtered_properties as (
 	select distinct
