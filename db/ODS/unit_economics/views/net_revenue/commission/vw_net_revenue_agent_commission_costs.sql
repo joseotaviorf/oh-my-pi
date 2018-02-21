@@ -85,7 +85,7 @@ select
   ud.property_id,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission,
-  0 as flg_expected_agent_commission
+  1 as flg_expected_agent_commission
 from updated_dates ud
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ud.property_id

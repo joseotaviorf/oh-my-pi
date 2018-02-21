@@ -13,6 +13,6 @@ select
   property_id,
   vl_st_pis_cofins,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow,
-  0 as flg_expected_sales_tax_pis_cofins
+  1 as flg_expected_sales_tax_pis_cofins
 from pis_cofins
 ;

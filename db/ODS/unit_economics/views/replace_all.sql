@@ -700,7 +700,7 @@ select
   ud.property_id,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission,
-  0 as flg_expected_agent_commission
+  1 as flg_expected_agent_commission
 from updated_dates ud
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ud.property_id
@@ -794,6 +794,7 @@ with filtered_contracts as (
         id,
         init_date,
         package_value,
+        rent_value,
         coalesce(termination_date, expected_end_date)::date as end_date,
         date_trunc('month', dd.date)::date + interval '6 day' as date_range
     from
@@ -809,6 +810,7 @@ base_contract as (
 		base.*,
 		c.id as contract_id,
 		package_value,
+		rent_value,
 		date_trunc('month', c.init_date) as contract_init_date,
 		date_trunc('month', c.end_date) as contract_end_date,
 		c.date_range
@@ -821,18 +823,19 @@ base_contract as (
 ),
 incurred as (
     select
-    		row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
+    	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
         bc.contract_id,
         bc.contract_init_date,
         bc.contract_end_date,
         bc.package_value,
+        bc.rent_value,
         amount::decimal(14,4) as vl_management_fee,
         greatest(
         	landlord_due_date,
         	due_date,
-        	landlord_paid_date --,
+        	landlord_paid_date
         	) as dt_cash_flow,
         bc.date_range
     from
@@ -863,6 +866,7 @@ incurred_diff as (
         date_range,
         contract_end_date,
         contract_init_date,
+        rent_value,
         (extract(year from (contract_end_date - contract_init_date)) * 12
                 + extract(month from (contract_end_date - contract_init_date))
                 + (extract(days from (contract_end_date - contract_init_date)) / 30))::integer as date_diff
@@ -875,6 +879,7 @@ incurred_plus_dates as (
         vl_management_fee,
         dt_cash_flow,
         date_range,
+        rent_value,
         max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
     from incurred_diff
 ),
@@ -889,6 +894,7 @@ value_fill as (
             else dt_cash_flow
         end as dt_cash_flow,
         max_dt_cash_flow,
+        rent_value,
         gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
     from incurred_plus_dates
 ),
@@ -898,6 +904,8 @@ result as (
         property_id,
         dt_cash_flow,
         case
+            when dt_cash_flow > max_dt_cash_flow and dt_cash_flow >= '2018-02-01'
+                then coalesce(vl_management_fee, rent_value*0.08)
             when dt_cash_flow > max_dt_cash_flow
                 then coalesce(vl_management_fee, gf)
             else vl_management_fee
@@ -914,6 +922,7 @@ select
 from result
 where vl_management_fee != 0
 ;
+
 
 
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux as
@@ -1034,7 +1043,7 @@ select
   property_id,
   vl_st_iss,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow,
-  0 as flg_expected_sales_tax_iss
+  1 as flg_expected_sales_tax_iss
 from iss
 ;
 
@@ -1052,7 +1061,7 @@ select
   property_id,
   vl_st_pis_cofins,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow,
-  0 as flg_expected_sales_tax_pis_cofins
+  1 as flg_expected_sales_tax_pis_cofins
 from pis_cofins
 ;
 
