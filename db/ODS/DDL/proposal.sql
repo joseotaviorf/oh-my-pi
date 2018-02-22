@@ -23,6 +23,7 @@ CREATE TABLE public.proposal (
   "criadoEm" TIMESTAMP NULL,
   "atualizadoEm" TIMESTAMP null,
   "qtdeEnviosDocumentacaoInq" INTEGER NULL,
-  "primeiroEnvioDocInq" public.datetime
+  "primeiroEnvioDocInq" public.datetime,
+  credit_analysis_init_date public.datetime
 )
 WITH (oids = false);
