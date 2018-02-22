@@ -45,7 +45,7 @@ left join (
 		join UsuarioRevisionEntity u
 			on p_aud.REV = u.id
 		where p_aud.status = 'EmAnalise'
-			and p_aud.statusDocumentacaoInq = 'Aprovado'
+			and p_aud.statusDocumentacaoInq = 'AnaliseCardiff'
 			and p_aud.statusDocumentacaoInq_MOD = 1
 		group by p_aud.id
 	) aud_5a_analysis
