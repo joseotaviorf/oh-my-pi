@@ -11,9 +11,9 @@ select
 	coalesce(i_fee.flg_expected, 0) as flg_expected_insurance_fee,
 	coalesce(i_pis.flg_expected, 0) as flg_expected_sales_tax_pis_cofins
 from
-	unit_economics.vw_mgmt_insurance_fee i_fee
+	unit_economics.mgmt_insurance_fee i_fee
 full outer join
-	unit_economics.vw_mgmt_insurance_pis_cofins i_pis
+	unit_economics.mgmt_insurance_pis_cofins i_pis
 	on i_fee.sk_property = i_pis.sk_property
 	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
 ;

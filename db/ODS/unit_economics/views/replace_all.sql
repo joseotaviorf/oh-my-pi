@@ -301,8 +301,8 @@ select
   coalesce(vsopc.dt_cash_flow, vsoisc.dt_cash_flow) as dt_cash_flow,
   coalesce(vsopc.vl_photos, 0) as vl_photos,
   coalesce(vsoisc.vl_inside_sales, 0) as vl_inside_sales
-from unit_economics.vw_supply_ops_photos_costs vsopc
-full outer join unit_economics.vw_supply_ops_inside_sales_costs vsoisc
+from unit_economics.supply_ops_photos_costs vsopc
+full outer join unit_economics.supply_ops_inside_sales_costs vsoisc
   on vsoisc.sk_property = vsopc.sk_property
      and vsoisc.dt_cash_flow = vsopc.dt_cash_flow
 ;
@@ -517,9 +517,9 @@ select
 	coalesce(vl_affiliate_campaigns, 0) as vl_affiliate_campaigns,
 	coalesce(vl_owner_campaigns, 0) as vl_owner_campaigns
 from
-	unit_economics.vw_supply_mkt_affiliate_campaigns_costs affiliate
+	unit_economics.supply_mkt_affiliate_campaigns_costs affiliate
 full outer join
-	unit_economics.vw_supply_mkt_owner_campaigns_costs owner
+	unit_economics.supply_mkt_owner_campaigns_costs owner
 	on affiliate.sk_property = owner.sk_property
 	and affiliate.dt_cash_flow = owner.dt_cash_flow
 ;
@@ -571,11 +571,11 @@ select
 	coalesce(vsoc.vl_inside_sales, 0) as vl_inside_sales,
 	coalesce(vsacc.vl_affiliate_bonus, 0) as vl_affiliate_bonus
 from
-	unit_economics.vw_supply_mkt_costs vsmc
-full outer join unit_economics.vw_supply_ops_costs vsoc
+	unit_economics.supply_mkt_costs vsmc
+full outer join unit_economics.supply_ops_costs vsoc
   	on vsmc.sk_property = vsoc.sk_property
 	and vsmc.dt_cash_flow = vsoc.dt_cash_flow
-full outer join unit_economics.vw_supply_affiliate_bonus_costs vsacc
+full outer join unit_economics.supply_affiliate_bonus_costs vsacc
 	on vsacc.sk_property = coalesce(vsoc.sk_property, vsmc.sk_property)
 	and vsacc.dt_cash_flow = coalesce(vsoc.dt_cash_flow, vsmc.dt_cash_flow)
 ;
@@ -717,8 +717,8 @@ select
     coalesce(affiliate.flg_expected_affiliate_commission, 0) as flg_expected_affiliate_commission,
     coalesce(agent.flg_expected_agent_commission, 0) as flg_expected_agent_commission
 from
-    unit_economics.vw_net_revenue_affiliate_commission_costs affiliate
-full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
+    unit_economics.net_revenue_affiliate_commission_costs affiliate
+full outer join unit_economics.net_revenue_agent_commission_costs agent
   on affiliate.sk_property = agent.sk_property
      and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;
@@ -933,8 +933,8 @@ select
     coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
     coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee,
     coalesce(br.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee
-  from unit_economics.vw_net_revenue_revenues_brokerage_fee br
-  full outer join unit_economics.vw_net_revenue_revenues_mgmt_fee mg
+  from unit_economics.net_revenue_revenues_brokerage_fee br
+  full outer join unit_economics.net_revenue_revenues_mgmt_fee mg
     on br.sk_property = mg.sk_property
        and br.dt_cash_flow = mg.dt_cash_flow
   where br.vl_brokerage_fee > 0
@@ -951,9 +951,9 @@ select
 	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
 from
-	unit_economics.vw_net_revenue_revenues_brokerage_fee b_fee
+	unit_economics.net_revenue_revenues_brokerage_fee b_fee
 full outer join
-	unit_economics.vw_net_revenue_revenues_mgmt_fee m_fee
+	unit_economics.net_revenue_revenues_mgmt_fee m_fee
 	on b_fee.sk_property = m_fee.sk_property
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;
@@ -1036,7 +1036,7 @@ with iss as (
     property_id,
     0.05 * brokerage_plus_mgmt as vl_st_iss,
     dt_cash_flow + interval '1 month' as dt_cash_flow
-  from unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux
+  from unit_economics.net_revenue_revenues_brokerage_plus_mgmt_aux
 )
 select
   sk_property,
@@ -1054,7 +1054,7 @@ with pis_cofins as (
         property_id,
         0.0925 * brokerage_plus_mgmt as vl_st_pis_cofins,
         dt_cash_flow + interval '1 month' as dt_cash_flow
-    from unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux
+    from unit_economics.net_revenue_revenues_brokerage_plus_mgmt_aux
 )
 select
   sk_property,
@@ -1089,7 +1089,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_sales_tax_iss
+		unit_economics.net_revenue_taxes_sales_tax_iss
 	union all
 	select
 		sk_property,
@@ -1102,7 +1102,7 @@ from
 		flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins
+		unit_economics.net_revenue_taxes_sales_tax_pis_cofins
 	union all
 	select
 		sk_property,
@@ -1115,7 +1115,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_delay_fine
+		unit_economics.net_revenue_taxes_delay_fine
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -1132,13 +1132,13 @@ select
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
 	sum(vl_delay_fine) as vl_delay_fine,
-    sum(flg_expected_management_fee) as flg_expected_management_fee,
-    sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
-    sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
-    sum(flg_expected_agent_commission) as flg_expected_agent_commission,
-    sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
-    sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
-    sum(flg_expected_delay_fine) as flg_expected_delay_fine
+  sum(flg_expected_management_fee) as flg_expected_management_fee,
+  sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+  sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+  sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+  sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+  sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+  sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -1160,7 +1160,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_commission_costs
+		unit_economics.net_revenue_commission_costs
 	union all
 	select
 		sk_property,
@@ -1181,7 +1181,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_revenues
+		unit_economics.net_revenue_revenues
 	union all
 	select
 		sk_property,
@@ -1202,7 +1202,7 @@ from
 		flg_expected_sales_tax_pis_cofins,
 		flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes
+		unit_economics.net_revenue_taxes
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -2204,13 +2204,13 @@ from
 		0 as vl_cs_post_sale,
 		0 as vl_inspections,
 		flg_expected as flg_expected_bo_offboarding,
-        0 as flg_expected_bo_onboarding,
-        0 as flg_expected_bo_ongoing,
-        0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale,
-        0 as flg_expected_inspection
+    0 as flg_expected_bo_onboarding,
+    0 as flg_expected_bo_ongoing,
+    0 as flg_expected_collection,
+    0 as flg_expected_cs_post_sale,
+    0 as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_bo_offboarding_costs
+		unit_economics.mgmt_ops_bo_offboarding_costs
 	union all
 	select
 		sk_property,
@@ -2223,13 +2223,13 @@ from
 		0 as vl_cs_post_sale,
 		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        flg_expected_bo_onboarding as flg_expected_bo_onboarding,
-        0 as flg_expected_bo_ongoing,
-        0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale,
-        0 as flg_expected_inspection
+    flg_expected_bo_onboarding as flg_expected_bo_onboarding,
+    0 as flg_expected_bo_ongoing,
+    0 as flg_expected_collection,
+    0 as flg_expected_cs_post_sale,
+    0 as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_bo_onboarding_costs
+		unit_economics.mgmt_ops_bo_onboarding_costs
 	union all
 	select
 		sk_property,
@@ -2242,13 +2242,13 @@ from
 		0 as vl_cs_post_sale,
 		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        0 as flg_expected_bo_onboarding,
-        flg_expected_bo_ongoing as flg_expected_bo_ongoing,
-        0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale,
-        0 as flg_expected_inspection
+    0 as flg_expected_bo_onboarding,
+    flg_expected_bo_ongoing as flg_expected_bo_ongoing,
+    0 as flg_expected_collection,
+    0 as flg_expected_cs_post_sale,
+    0 as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_bo_ongoing_costs
+		unit_economics.mgmt_ops_bo_ongoing_costs
 	union all
 	select
 		sk_property,
@@ -2261,13 +2261,13 @@ from
 		0 as vl_cs_post_sale,
 		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        0 as flg_expected_bo_onboarding,
-        0 as flg_expected_bo_ongoing,
-        flg_expected_collection as flg_expected_collection,
-        0 as flg_expected_cs_post_sale,
-        0 as flg_expected_inspection
+    0 as flg_expected_bo_onboarding,
+    0 as flg_expected_bo_ongoing,
+    flg_expected_collection as flg_expected_collection,
+    0 as flg_expected_cs_post_sale,
+    0 as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_collection_costs
+		unit_economics.mgmt_ops_collection_costs
 	union all
 	select
 		sk_property,
@@ -2280,13 +2280,13 @@ from
 		vl_cs_post_sale,
 		0 as vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        0 as flg_expected_bo_onboarding,
-        0 as flg_expected_bo_ongoing,
-        0 as flg_expected_collection,
-        flg_expected_cs_post_sale as flg_expected_cs_post_sale,
-        0 as flg_expected_inspection
+    0 as flg_expected_bo_onboarding,
+    0 as flg_expected_bo_ongoing,
+    0 as flg_expected_collection,
+    flg_expected_cs_post_sale as flg_expected_cs_post_sale,
+    0 as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_cs_post_sale_costs
+		unit_economics.mgmt_ops_cs_post_sale_costs
 	union all
 	select
 		sk_property,
@@ -2299,13 +2299,13 @@ from
 		0 as vl_cs_post_sale,
 		vl_inspections,
 		0 as flg_expected_bo_offboarding,
-        0 as flg_expected_bo_onboarding,
-        0 as flg_expected_bo_ongoing,
-        0 as flg_expected_collection,
-        0 as flg_expected_cs_post_sale,
-        flg_expected_inspection as flg_expected_inspection
+    0 as flg_expected_bo_onboarding,
+    0 as flg_expected_bo_ongoing,
+    0 as flg_expected_collection,
+    0 as flg_expected_cs_post_sale,
+    flg_expected_inspection as flg_expected_inspection
 	from
-		unit_economics.vw_mgmt_ops_inspection_costs
+		unit_economics.mgmt_ops_inspection_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -2333,9 +2333,9 @@ select
 	coalesce(i_fee.flg_expected, 0) as flg_expected_insurance_fee,
 	coalesce(i_pis.flg_expected, 0) as flg_expected_sales_tax_pis_cofins
 from
-	unit_economics.vw_mgmt_insurance_fee i_fee
+	unit_economics.mgmt_insurance_fee i_fee
 full outer join
-	unit_economics.vw_mgmt_insurance_pis_cofins i_pis
+	unit_economics.mgmt_insurance_pis_cofins i_pis
 	on i_fee.sk_property = i_pis.sk_property
 	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
 ;
@@ -2363,9 +2363,9 @@ select
   coalesce(ins.flg_expected_insurance_fee, 0) as flg_expected_insurance_fee,
   coalesce(ins.flg_expected_sales_tax_pis_cofins, 0) as flg_expected_sales_tax_pis_cofins
 from
-	unit_economics.vw_mgmt_ops_costs ops
+	unit_economics.mgmt_ops_costs ops
 full outer join
-	unit_economics.vw_mgmt_insurance ins
+	unit_economics.mgmt_insurance ins
 	on ins.sk_property = ops.sk_property
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;
@@ -2670,7 +2670,7 @@ select
 	dt_cash_flow,
 	vl_tenant_campaigns
 from
-	unit_economics.vw_liquidity_mkt_tenant_campaigns_costs
+	unit_economics.liquidity_mkt_tenant_campaigns_costs
 ;
 
 create or replace view unit_economics.vw_liquidity_ops_bo_pre_sale_costs as
@@ -2953,7 +2953,7 @@ from
 		0 as vl_cs_pre_sale,
 		0 as vl_field_ops
 	from
-		unit_economics.vw_liquidity_ops_bo_pre_sale_costs
+		unit_economics.liquidity_ops_bo_pre_sale_costs
 	union all
 	select
 		sk_property,
@@ -2963,7 +2963,7 @@ from
 		vl_cs_pre_sale,
 		0 as vl_field_ops
 	from
-		unit_economics.vw_liquidity_ops_cs_pre_sale_costs
+		unit_economics.liquidity_ops_cs_pre_sale_costs
 	union all
 	select
 		sk_property,
@@ -2973,7 +2973,7 @@ from
 		0 as vl_cs_pre_sale,
 		vl_field_ops
 	from
-		unit_economics.vw_liquidity_ops_field_ops_costs
+		unit_economics.liquidity_ops_field_ops_costs
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -3002,7 +3002,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_mkt_costs
+			unit_economics.liquidity_mkt_costs
 		union all
 		select
 			sk_property,
@@ -3015,7 +3015,7 @@ from
 			vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_ab_agent_hours_costs
+			unit_economics.liquidity_ab_agent_hours_costs
 		union all
 		select
 			sk_property,
@@ -3028,7 +3028,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_ops_costs
+			unit_economics.liquidity_ops_costs
 		union all
 		select
 			sk_property,
@@ -3041,7 +3041,7 @@ from
 			0 as vl_agent_hours,
 			vl_lockbox
 		from
-			unit_economics.vw_liquidity_lockbox_costs
+			unit_economics.liquidity_lockbox_costs
 	) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
@@ -3143,7 +3143,7 @@ with unit_economics as (
             0 as flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_liquidity_costs
+            unit_economics.liquidity_costs
         union all
         select
             sk_property,
@@ -3192,7 +3192,7 @@ with unit_economics as (
             0 as flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_supply_costs
+            unit_economics.supply_costs
         union all
         select
             sk_property,
@@ -3241,7 +3241,7 @@ with unit_economics as (
             flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_mgmt_costs
+            unit_economics.mgmt_costs
         union all
         select
             sk_property,
@@ -3290,7 +3290,7 @@ with unit_economics as (
             flg_expected_sales_tax_pis_cofins as flg_expected_sales_tax_pis_cofins,
             flg_expected_delay_fine as flg_expected_delay_fine
         from
-            unit_economics.vw_net_revenue_costs
+            unit_economics.net_revenue_costs
     ) tbl
     group by sk_property, property_id, sk_cash_flow_date, dt_cash_flow
 ),
@@ -3483,7 +3483,7 @@ fact_factor as (
         on cf.months_after_signature = fc.months_diff
 )
 select
-    sk_property,
+  sk_property,
 	property_id,
 	sk_contract,
 	sk_cash_flow_date,

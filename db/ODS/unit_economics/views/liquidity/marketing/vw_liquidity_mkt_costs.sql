@@ -11,5 +11,5 @@ select
 	dt_cash_flow,
 	vl_tenant_campaigns
 from
-	unit_economics.vw_liquidity_mkt_tenant_campaigns_costs
+	unit_economics.liquidity_mkt_tenant_campaigns_costs
 ;

@@ -17,13 +17,13 @@ select
 	sum(vl_st_iss) as vl_st_iss,
 	sum(vl_st_pis_cofins) as vl_st_pis_cofins,
 	sum(vl_delay_fine) as vl_delay_fine,
-    sum(flg_expected_management_fee) as flg_expected_management_fee,
-    sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
-    sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
-    sum(flg_expected_agent_commission) as flg_expected_agent_commission,
-    sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
-    sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
-    sum(flg_expected_delay_fine) as flg_expected_delay_fine
+  sum(flg_expected_management_fee) as flg_expected_management_fee,
+  sum(flg_expected_brokerage_fee) as flg_expected_brokerage_fee,
+  sum(flg_expected_affiliate_commission) as flg_expected_affiliate_commission,
+  sum(flg_expected_agent_commission) as flg_expected_agent_commission,
+  sum(flg_expected_sales_tax_iss) as flg_expected_sales_tax_iss,
+  sum(flg_expected_sales_tax_pis_cofins) as flg_expected_sales_tax_pis_cofins,
+  sum(flg_expected_delay_fine) as flg_expected_delay_fine
 from
 (
 	select
@@ -45,7 +45,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_commission_costs
+		unit_economics.net_revenue_commission_costs
 	union all
 	select
 		sk_property,
@@ -66,7 +66,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_revenues
+		unit_economics.net_revenue_revenues
 	union all
 	select
 		sk_property,
@@ -87,7 +87,7 @@ from
 		flg_expected_sales_tax_pis_cofins,
 		flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes
+		unit_economics.net_revenue_taxes
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

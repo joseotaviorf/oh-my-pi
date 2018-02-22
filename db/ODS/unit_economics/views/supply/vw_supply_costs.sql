@@ -18,11 +18,11 @@ select
 	coalesce(vsoc.vl_inside_sales, 0) as vl_inside_sales,
 	coalesce(vsacc.vl_affiliate_bonus, 0) as vl_affiliate_bonus
 from
-	unit_economics.vw_supply_mkt_costs vsmc
-full outer join unit_economics.vw_supply_ops_costs vsoc
+	unit_economics.supply_mkt_costs vsmc
+full outer join unit_economics.supply_ops_costs vsoc
   	on vsmc.sk_property = vsoc.sk_property
 	and vsmc.dt_cash_flow = vsoc.dt_cash_flow
-full outer join unit_economics.vw_supply_affiliate_bonus_costs vsacc
+full outer join unit_economics.supply_affiliate_bonus_costs vsacc
 	on vsacc.sk_property = coalesce(vsoc.sk_property, vsmc.sk_property)
 	and vsacc.dt_cash_flow = coalesce(vsoc.dt_cash_flow, vsmc.dt_cash_flow)
 ;

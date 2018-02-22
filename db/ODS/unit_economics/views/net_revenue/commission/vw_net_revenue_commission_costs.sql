@@ -14,8 +14,8 @@ select
     coalesce(affiliate.flg_expected_affiliate_commission, 0) as flg_expected_affiliate_commission,
     coalesce(agent.flg_expected_agent_commission, 0) as flg_expected_agent_commission
 from
-    unit_economics.vw_net_revenue_affiliate_commission_costs affiliate
-full outer join unit_economics.vw_net_revenue_agent_commission_costs agent
+    unit_economics.net_revenue_affiliate_commission_costs affiliate
+full outer join unit_economics.net_revenue_agent_commission_costs agent
   on affiliate.sk_property = agent.sk_property
      and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;

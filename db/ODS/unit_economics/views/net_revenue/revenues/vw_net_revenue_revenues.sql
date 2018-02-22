@@ -15,9 +15,9 @@ select
 	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
 from
-	unit_economics.vw_net_revenue_revenues_brokerage_fee b_fee
+	unit_economics.net_revenue_revenues_brokerage_fee b_fee
 full outer join
-	unit_economics.vw_net_revenue_revenues_mgmt_fee m_fee
+	unit_economics.net_revenue_revenues_mgmt_fee m_fee
 	on b_fee.sk_property = m_fee.sk_property
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;

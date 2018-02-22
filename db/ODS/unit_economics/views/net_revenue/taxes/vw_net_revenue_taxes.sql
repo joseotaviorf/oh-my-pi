@@ -23,7 +23,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_sales_tax_iss
+		unit_economics.net_revenue_taxes_sales_tax_iss
 	union all
 	select
 		sk_property,
@@ -36,7 +36,7 @@ from
 		flg_expected_sales_tax_pis_cofins,
 		0 as flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins
+		unit_economics.net_revenue_taxes_sales_tax_pis_cofins
 	union all
 	select
 		sk_property,
@@ -49,7 +49,7 @@ from
 		0 as flg_expected_sales_tax_pis_cofins,
 		flg_expected_delay_fine
 	from
-		unit_economics.vw_net_revenue_taxes_delay_fine
+		unit_economics.net_revenue_taxes_delay_fine
 ) tbl
 group by sk_property, property_id, dt_cash_flow
 ;

@@ -22,9 +22,9 @@ select
   coalesce(ins.flg_expected_insurance_fee, 0) as flg_expected_insurance_fee,
   coalesce(ins.flg_expected_sales_tax_pis_cofins, 0) as flg_expected_sales_tax_pis_cofins
 from
-	unit_economics.vw_mgmt_ops_costs ops
+	unit_economics.mgmt_ops_costs ops
 full outer join
-	unit_economics.vw_mgmt_insurance ins
+	unit_economics.mgmt_insurance ins
 	on ins.sk_property = ops.sk_property
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;

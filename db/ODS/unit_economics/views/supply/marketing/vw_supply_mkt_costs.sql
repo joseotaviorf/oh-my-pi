@@ -14,9 +14,9 @@ select
 	coalesce(vl_affiliate_campaigns, 0) as vl_affiliate_campaigns,
 	coalesce(vl_owner_campaigns, 0) as vl_owner_campaigns
 from
-	unit_economics.vw_supply_mkt_affiliate_campaigns_costs affiliate
+	unit_economics.supply_mkt_affiliate_campaigns_costs affiliate
 full outer join
-	unit_economics.vw_supply_mkt_owner_campaigns_costs owner
+	unit_economics.supply_mkt_owner_campaigns_costs owner
 	on affiliate.sk_property = owner.sk_property
 	and affiliate.dt_cash_flow = owner.dt_cash_flow
 ;

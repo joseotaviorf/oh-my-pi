@@ -103,7 +103,7 @@ with unit_economics as (
             0 as flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_liquidity_costs
+            unit_economics.liquidity_costs
         union all
         select
             sk_property,
@@ -152,7 +152,7 @@ with unit_economics as (
             0 as flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_supply_costs
+            unit_economics.supply_costs
         union all
         select
             sk_property,
@@ -201,7 +201,7 @@ with unit_economics as (
             flg_expected_sales_tax_pis_cofins,
             0 as flg_expected_delay_fine
         from
-            unit_economics.vw_mgmt_costs
+            unit_economics.mgmt_costs
         union all
         select
             sk_property,
@@ -250,7 +250,7 @@ with unit_economics as (
             flg_expected_sales_tax_pis_cofins as flg_expected_sales_tax_pis_cofins,
             flg_expected_delay_fine as flg_expected_delay_fine
         from
-            unit_economics.vw_net_revenue_costs
+            unit_economics.net_revenue_costs
     ) tbl
     group by sk_property, property_id, sk_cash_flow_date, dt_cash_flow
 ),
@@ -443,7 +443,7 @@ fact_factor as (
         on cf.months_after_signature = fc.months_diff
 )
 select
-    sk_property,
+  sk_property,
 	property_id,
 	sk_contract,
 	sk_cash_flow_date,

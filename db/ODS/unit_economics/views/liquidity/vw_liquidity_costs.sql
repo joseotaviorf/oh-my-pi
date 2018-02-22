@@ -28,7 +28,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_mkt_costs
+			unit_economics.liquidity_mkt_costs
 		union all
 		select
 			sk_property,
@@ -41,7 +41,7 @@ from
 			vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_ab_agent_hours_costs
+			unit_economics.liquidity_ab_agent_hours_costs
 		union all
 		select
 			sk_property,
@@ -54,7 +54,7 @@ from
 			0 as vl_agent_hours,
 			0 as vl_lockbox
 		from
-			unit_economics.vw_liquidity_ops_costs
+			unit_economics.liquidity_ops_costs
 		union all
 		select
 			sk_property,
@@ -67,7 +67,7 @@ from
 			0 as vl_agent_hours,
 			vl_lockbox
 		from
-			unit_economics.vw_liquidity_lockbox_costs
+			unit_economics.liquidity_lockbox_costs
 	) tbl
 group by sk_property, property_id, dt_cash_flow
 ;
