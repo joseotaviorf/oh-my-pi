@@ -54,11 +54,11 @@ class EBDBDatalake(object):
         columns = []
         for _, row in schema.iterrows():
             if row.DATA_TYPE == 'bit':
-                columns.append('cast({} as unsigned)'.format(row.COLUMN_NAME))
+                columns.append("""cast(`{column}` as unsigned) as `{column}`""".format(column=row.COLUMN_NAME))
             elif row.DATA_TYPE == 'longblob':
-                columns.append('AsText({})'.format(row.COLUMN_NAME))
+                columns.append("""AsText(`{column}`) as `{column}`""".format(column=row.COLUMN_NAME))
             else:
-                columns.append('{}'.format(row.COLUMN_NAME))
+                columns.append("""`{}`""".format(row.COLUMN_NAME))
 
         # get data from table
         table = BaseETL.from_db_query(db, """select {} from {}""".format(', '.join(columns), table_name))
