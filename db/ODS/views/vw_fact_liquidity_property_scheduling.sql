@@ -181,7 +181,7 @@ and acs.version = p.version
 calculated_dates as (
     select
         f.*,
-        dof.dt_created as offer_date,
+        dof.dt_first_sent as offer_date,
         case
           when dof.status in ('Rejeitada', 'Aprovada')
               then dof.dt_updated
