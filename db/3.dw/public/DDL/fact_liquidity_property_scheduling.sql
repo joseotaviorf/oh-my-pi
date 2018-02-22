@@ -46,6 +46,7 @@ create table fact_liquidity_property_scheduling (
   vl_cost_closing_support numeric(14,4),
   vl_cost_classifieds numeric(14,4),
   dt_timestamp timestamp without time zone,
+  booking_to_visit numeric(14,4),
   offer_to_internal_analyis numeric(14,4),
   offer_to_credit_analysis_init_date numeric(14,4),
   credit_analysis_init_to_end numeric(14,4),
