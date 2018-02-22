@@ -1,8 +1,18 @@
 DROP VIEW IF EXISTS public.vw_dim_contacts_and_prospects;
-CREATE VIEW public.vw_dim_contacts_and_prospects
+CREATE or replace VIEW public.vw_dim_contacts_and_prospects
 AS
-
-SELECT
+with base_doorman as (
+	select
+		"Status" as status,
+		892700000 + "Cod Imóvel"::float::bigint as imovel_id
+	from
+		files.porteiros_legado
+	where
+		"Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')
+	and
+		"Cod Imóvel" is not null
+)
+select
   cap.cap_id as sk_cap_id,
   cap.lead_id,
   cap.anuncio_criado_em,
@@ -56,10 +66,13 @@ SELECT
   cap.usuario_que_indicou_id,
   cap.usuario_que_cadastrou_id,
   cap.self_service,
-  cap.attribution_type,
+  case
+  	when usuario_que_indicou_id=279289 then 'Doorman'
+  	when d.imovel_id is not null then 'Doorman'
+  	else cap.attribution_type
+  end::varchar(100) as attribution_type,
   cap.flow,
   now() as load_timestamp
-
 FROM
   public.contacts_and_prospects cap
 left join
@@ -78,3 +91,5 @@ left join
   on ip.id = cap.imovel_id and cap.imovel_id is not null
 left join lead_conversion cl
   on cl.imovel_id = cap.imovel_id and cap.imovel_id is not null
+left join base_doorman d
+	on cap.imovel_id = d.imovel_id
