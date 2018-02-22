@@ -8,6 +8,7 @@ from __init__ import DW_DIR
 class Growth(object):
     SCHEMA = 'growth'
     QUERIES_DIR = '{}/{}'.format(DW_DIR, 'growth/prod/queries')
+    FACT_TABLE_NAME = 'fact_growth'
 
     @staticmethod
     @logger
@@ -35,19 +36,19 @@ class Growth(object):
             return ''
 
     @logger
-    def load_fact(self, query_path):
-        self.drop_table('fact_table')
+    def load_fact(self):
+        self.drop_table(table_name=Growth.FACT_TABLE_NAME)
 
         BaseETL.execute_file_query(
-            filename='{}/{}.sql'.format(Growth.QUERIES_DIR, query_path),
+            filename='{}/public/queries/{}.sql'.format(DW_DIR, Growth.FACT_TABLE_NAME),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
 
     @logger
-    def drop_table(self, table_name):
+    def drop_table(self, table_name, schema='public'):
         BaseETL.execute_command(
-            command='drop table if exists {}.{};'.format(Growth.SCHEMA, table_name),
+            command='drop table if exists {}.{};'.format(schema, table_name),
             commit=True,
             db_enum=EnumDb.BI_DW
         )

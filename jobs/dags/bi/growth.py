@@ -49,7 +49,7 @@ def materialize_growth_measure_table_query(**kwargs):
     period = kwargs['period']
 
     growth = Growth()
-    growth.drop_table('{}_{}_{}'.format(measure, _filter, period))
+    growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
     growth.create_table(funnel, measure, _filter, period)
 
 
@@ -61,7 +61,7 @@ def load_fact_growth():
 @logger
 def consolidate_with_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_all_query()
     growth.execute_command(consolidation_query.format(measure))
@@ -70,7 +70,7 @@ def consolidate_with_filters(measure):
 @logger
 def consolidate_no_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_no_filters_query()
     growth.execute_command(consolidation_query.format(measure))
@@ -79,7 +79,7 @@ def consolidate_no_filters(measure):
 @logger
 def consolidate_employees_no_filters(measure):
     growth = Growth()
-    growth.drop_table(measure)
+    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_employee_all_query()
     growth.execute_command(consolidation_query.format(measure))
@@ -103,12 +103,15 @@ def get_python_operator(task_id, func_command, dag, op_kwargs=None):
 
 
 def get_no_filter_tasks(funnel, local_dag, sub_dag_name):
-    all_day_task = get_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
-                                       func_command=materialize_growth_measure_table_query,
-                                       dag=local_dag,
-                                       op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                  'period': 'day'}
-                                       )
+    all_day_task = None
+
+    if sub_dag_name != 'employees':
+        all_day_task = get_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
+                                           func_command=materialize_growth_measure_table_query,
+                                           dag=local_dag,
+                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                      'period': 'day'}
+                                           )
 
     all_week_task = get_python_operator(task_id='extract_{}_all_week'.format(sub_dag_name),
                                         func_command=materialize_growth_measure_table_query,
@@ -181,7 +184,9 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
                                              dag=local_dag,
                                              op_kwargs={'measure': sub_dag_name}
                                              )
-    consolidation_task.set_upstream([no_filter_tasks[0], no_filter_tasks[1], no_filter_tasks[2], no_filter_tasks[3]])
+
+    no_filter_list = [no_filter_tasks[i] for i in range(0, 4)]
+    consolidation_task.set_upstream(no_filter_list[1:] if sub_dag_name == 'employees' else no_filter_list)
 
     return local_dag
 

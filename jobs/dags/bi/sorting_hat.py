@@ -19,8 +19,8 @@ def extract_table(**kwargs):
     sorting_hat = SortingHat()
     table = sorting_hat.extract_table_from_db(columns=columns, table_name=table_name)
     sorting_hat.load_table_to_s3(table_name=table_name,
-                                 table=table,
-                                 s3_bucket=env.get_environment('bi-datalake-s3-bucket')
+                                 data_table=table,
+                                 s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket')
                                  )
 
 
