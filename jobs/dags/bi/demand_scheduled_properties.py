@@ -10,7 +10,7 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 biz_etl = BusinessDimensionETL(bucket, datetime.now())
 
 MAIN_DAG_NAME = 'bi-demand-scheduled-properties'
-MAIN_START_DATE = datetime(2018, 1, 1, 2, 0, 0)
+MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'
 
 # create main DAG definition
