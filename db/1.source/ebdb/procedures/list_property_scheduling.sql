@@ -17,109 +17,171 @@ BEGIN
 SET @rank=0;
 
 select
-  @rank := @rank+1 as id_property_scheduling,
-  i.id as id_imovel,
-  a.id as id_scheduling,
-  prop.id as id_owner,
-  ##
-  -1 as id_user_affiliate,
-  ##
-  dau.id as id_user_agent,
-  v.visitante_id as id_user_visitor,
-  dav.id as id_user_visit_agent,
-  v.id as id_visit,
-  vo_cr.isApp as visit_created_from_app,
-  vo_cr.nome as visit_created_type,
-  coalesce(vo_up.isApp, FALSE) as visit_last_updated_from_app,
-  coalesce(vo_up.nome, FALSE) as visit_last_updated_type,
-  fl.id as id_rental_flow,
-  n.id as id_negotiation,
-  n.criadoEm as dt_negotiation,
-  o.id as id_offer,
-  pp.id as id_pre_proposal,
-  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
-  c.id as id_contract,
-  c.dataRescisao as dt_contract_anullment
-  -- count(1)
-  -- *
-
-from
-  Imovel i
-
+  _all.id_property_scheduling,
+	_all.id_imovel,
+	_all.id_scheduling,
+	_all.id_owner,
+	_all.id_user_affiliate,
+	_all.id_user_agent,
+	_all.id_user_visitor,
+	_all.id_user_visit_agent,
+	_all.id_visit,
+	_all.visit_created_from_app,
+	_all.visit_created_type,
+	_all.visit_last_updated_from_app,
+	_all.visit_last_updated_type,
+	_all.id_rental_flow,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_negotiation) as id_negotiation,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_negotiation) as dt_negotiation,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_offer) as id_offer,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_pre_proposal) as id_pre_approval,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_contract) as id_contract,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_contract_anullment) as dt_contract_anullment
+from (
+	select
+	  @rank := @rank+1 as id_property_scheduling,
+	  i.id as id_imovel,
+	  a.id as id_scheduling,
+	  prop.id as id_owner,
+	  -1 as id_user_affiliate,
+	  dau.id as id_user_agent,
+	  v.visitante_id as id_user_visitor,
+	  dav.id as id_user_visit_agent,
+	  v.id as id_visit,
+	  vo_cr.isApp as visit_created_from_app,
+	  vo_cr.nome as visit_created_type,
+	  coalesce(vo_up.isApp, FALSE) as visit_last_updated_from_app,
+	  coalesce(vo_up.nome, FALSE) as visit_last_updated_type,
+	  fl.id as id_rental_flow,
+	  n.id as id_negotiation,
+	  n.criadoEm as dt_negotiation,
+	  abs(timestampdiff(minute, n.criadoEm, a.dataFupVisita)) as negotiation_minutes_diff,
+	  o.id as id_offer,
+	  pp.id as id_pre_proposal,
+	  abs(timestampdiff(minute, coalesce(o.criadoEm, pp.criadoEm), coalesce(a.dataFupVisita, a.atualizadoEm))) as offer_preproposal_minutes_diff,
+	  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
+	  c.id as id_contract,
+	  c.dataRescisao as dt_contract_anullment
+	from Imovel i
+	left join Usuario prop
+	  on prop.id = i.usuario_id
+	-- AGENDAMENTO
+	left join Agendamento a
+	  on a.imovel_id = i.id
+	  and a.tipo = 'Visita'
+	left join Usuario dau
+	  on dau.dadosAgente_id = a.agente_id
+	-- VISITA
+	left join Visita v
+	  on v.id = a.visita_id
+	left join VisitaOrigem vo_cr
+	  on vo_cr.id = v.origemCriacao_id
+	left join VisitaOrigem vo_up
+	  on vo_up.id = v.origemUltimaAtualizacao_id
+	left join Usuario dav
+	  on dav.dadosAgente_id = v.agente_id
+	-- FLUXOLOCACAO
+	left join FluxoLocacao fl
+	  on a.fluxoLocacao_id = fl.id
+	left join Negociacao n
+	  on n.imovel_id = fl.imovel_id
+	  and n.proponente_id = fl.cliente_id
+	-- PRE-PROPOSTA
+	left join PreProposta pp
+	  on pp.imovel_id = i.id
+	  and pp.usuario_id = fl.cliente_id
+	  and pp.ultimoUpdateEdicao > 0
+	-- OFFER
+	left join Offer o
+	  on o.house_id = i.id
+	    and o.client_id = fl.cliente_id
+	-- PROPOSTA
+	left join Proposta p1
+	  on p1.offer_id = o.id
+	left join Proposta p2
+	  on p2.preProposta_id = pp.id
+	left join Proposta p_n
+	  on p_n.negociacao_id = n.id
+	left join Proposta p_fl
+	  on p_fl.imovel_id = i.id
+	  and p_fl.proponente_id = fl.cliente_id
+	-- CONTRATO
+	left join
+	  Contrato c
+	  on c.proposta_id = coalesce(p1.id, p2.id, p_fl.id, p_n.id)
+	) _all
 left join
-  Usuario prop
-  on prop.id = i.usuario_id
-
--- AGENDAMENTO
+	(
+	select
+		 i.id as id_imovel,
+		 prop.id as id_owner,
+		 v.visitante_id as id_user_visitor,
+		 fl.id as id_rental_flow,
+		 min(abs(timestampdiff(minute, n.criadoEm, a.dataFupVisita))) as minutes_diff
+	from Imovel i
+	left join Usuario prop
+	  on prop.id = i.usuario_id
+	-- AGENDAMENTO
+	left join Agendamento a
+	  on a.imovel_id = i.id
+	  and a.tipo = 'Visita'
+	left join Usuario dau
+	  on dau.dadosAgente_id = a.agente_id
+	-- VISITA
+	left join Visita v
+	  on v.id = a.visita_id
+	-- FLUXOLOCACAO
+	left join FluxoLocacao fl
+	  on a.fluxoLocacao_id = fl.id
+	left join Negociacao n
+	  on n.imovel_id = fl.imovel_id
+	  and n.proponente_id = fl.cliente_id
+	group by i.id, prop.id, v.visitante_id, fl.id
+) negotiation
+	on _all.id_imovel = negotiation.id_imovel
+		and _all.id_owner = negotiation.id_owner
+		and _all.id_user_visitor = negotiation.id_user_visitor
+		and _all.id_rental_flow = negotiation.id_rental_flow
+		and _all.negotiation_minutes_diff = negotiation.minutes_diff
 left join
-  Agendamento a
-  on a.imovel_id = i.id
-  and a.tipo = 'Visita'
-
-left join
-  Usuario dau
-  on dau.dadosAgente_id = a.agente_id
-
--- VISITA
-left join
-  Visita v
-  on v.id = a.visita_id
-left join
-  VisitaOrigem vo_cr
-  on vo_cr.id = v.origemCriacao_id
-left join
-  VisitaOrigem vo_up
-  on vo_up.id = v.origemUltimaAtualizacao_id
-left join
-  Usuario dav
-  on dav.dadosAgente_id = v.agente_id
-
--- FLUXOLOCACAO
-left join
-  FluxoLocacao fl
-  on a.fluxoLocacao_id = fl.id
-
-left join
-  Negociacao n
-  on n.imovel_id = fl.imovel_id
-  and n.proponente_id = fl.cliente_id
-
--- PRE-PROPOSTA
-left join
-  PreProposta pp
-  on pp.imovel_id = i.id
-  and pp.usuario_id = fl.cliente_id
-  and pp.ultimoUpdateEdicao > 0
-
--- OFFER
-left join
-  Offer o
-  on o.house_id = i.id
-    and o.client_id = fl.cliente_id
-
--- PROPOSTA
-left join
-  Proposta p1
-  on p1.offer_id = o.id
-
-left join
-  Proposta p2
-  on p2.preProposta_id = pp.id
-
-left join
-  Proposta p_n
-  on p_n.negociacao_id = n.id
-
-left join
-  Proposta p_fl
-  on p_fl.imovel_id = i.id
-  and p_fl.proponente_id = fl.cliente_id
-
--- CONTRATO
-left join
-  Contrato c
-  on c.proposta_id =  coalesce(p1.id, p2.id, p_fl.id, p_n.id)
-  -- and c.status != 'Cancelado'
+	(
+	select
+		 i.id as id_imovel,
+		 prop.id as id_owner,
+		 v.visitante_id as id_user_visitor,
+		 fl.id as id_rental_flow,
+		 min(abs(timestampdiff(minute, coalesce(o.criadoEm, pp.criadoEm), coalesce(a.dataFupVisita, a.atualizadoEm)))) as minutes_diff
+	from Imovel i
+	left join Usuario prop
+	  on prop.id = i.usuario_id
+	-- AGENDAMENTO
+	left join Agendamento a
+	  on a.imovel_id = i.id
+	  and a.tipo = 'Visita'
+	left join Usuario dau
+	  on dau.dadosAgente_id = a.agente_id
+	-- VISITA
+	left join Visita v
+	  on v.id = a.visita_id
+	-- FLUXOLOCACAO
+	left join FluxoLocacao fl
+	  on a.fluxoLocacao_id = fl.id
+	-- PRE-PROPOSTA
+	left join PreProposta pp
+	  on pp.imovel_id = i.id
+	  and pp.usuario_id = fl.cliente_id
+	  and pp.ultimoUpdateEdicao > 0
+	-- OFFER
+	left join Offer o
+	  on o.house_id = i.id
+	    and o.client_id = fl.cliente_id
+	group by i.id, prop.id, v.visitante_id, fl.id
+) offer_preproposal
+	on _all.id_imovel = offer_preproposal.id_imovel
+		and _all.id_owner = offer_preproposal.id_owner
+		and _all.id_user_visitor = offer_preproposal.id_user_visitor
+		and _all.id_rental_flow = offer_preproposal.id_rental_flow
+		and _all.offer_preproposal_minutes_diff = offer_preproposal.minutes_diff
 
 union all
 
