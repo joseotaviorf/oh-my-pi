@@ -191,7 +191,7 @@ affiliate_payments = QuintoAndarPythonOperator(
     task_id='ODS_affiliate_payments',
     execution_timeout=timedelta(hours=3),
     python_callable=load_athena_file_query_to_ods,
-    op_kwargs={'dim_name': 'affiliate_payments', 'bucket': bucket, 'fname': 'affiliate_payments'}
+    op_kwargs={'table_name': 'affiliate_payments', 'bucket': bucket, 'fname': 'affiliate_payments'}
 )
 
 # Photo Job
