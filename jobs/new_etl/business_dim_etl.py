@@ -112,7 +112,7 @@ class BusinessDimensionETL(DimensionETL):
     # TODO: Migrate all business dimension etl from ODS to Datalake
     @logger
     def load_athena_file_query_to_ods(self, dim_name, file_name, append=False):
-        df = self.athena.execute_file_query_and_return_dataframe('{}/'.format(DATALAKE_DIR, file_name))
+        df = self.athena.execute_file_query_and_return_dataframe('{}/{}'.format(DATALAKE_DIR, file_name))
         self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=dim_name, append=append)
 
     @logger
