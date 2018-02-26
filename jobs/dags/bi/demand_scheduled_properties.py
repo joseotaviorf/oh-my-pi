@@ -182,7 +182,7 @@ def ods_sub_dag(sub_dag_name):
     )
 
     property_visit_information_task >> visits_task
-    offer_to_ods_task.set_upstream(offer_to_s3_task, topic_to_s3_task)
+    offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
     pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
 
     return local_dag
