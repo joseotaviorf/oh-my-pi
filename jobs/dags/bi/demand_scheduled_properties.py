@@ -171,14 +171,14 @@ def ods_sub_dag(sub_dag_name):
         task_id='ODS_rental_flow',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'rental_flow', 'table_name': 'FluxoLocacao'}
+        op_kwargs={'dim_name': 'rental_flow', 'table_name': 'FluxoLocacao', 'copy_to_clean': False}
     )
 
     BaseDAG.get_python_operator(
         task_id='ODS_region',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'agent_region', 'table_name': 'DadosAgente_Regiao'}
+        op_kwargs={'dim_name': 'agent_region', 'table_name': 'DadosAgente_Regiao', 'copy_to_clean': False}
     )
 
     property_visit_information_task >> visits_task
