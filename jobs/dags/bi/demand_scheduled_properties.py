@@ -5,7 +5,7 @@ from jobs.dags.util import environment as env
 from jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from jobs.new_etl.godfather import GodFather
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 biz_etl = BusinessDimensionETL(bucket, datetime.now())
@@ -35,7 +35,7 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
     biz_etl.extract_query_dim_from_ebdb_to_ods(
         dim_name=kwargs['dim_name'],
         command=kwargs['command'],
-        table_name=kwargs['table_name']
+        table_name=None if 'table_name' not in kwargs else kwargs['table_name']
     )
 
 
