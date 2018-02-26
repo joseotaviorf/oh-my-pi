@@ -6,41 +6,87 @@ select distinct
 	date_part('week', t.created_at)::integer as _week,
 	date_part('month', t.created_at)::integer as _month,
 	date_part('year', t.created_at)::integer as _year,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (where tm.full_resolution_time_in_minutes_business > 0 )
-		over (partition by t.created_at::date) as daily_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (where tm.full_resolution_time_in_minutes_business > 0 )
-		over (partition by date_part('week', t.created_at), date_part('year', t.created_at)) as weekly_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (where tm.full_resolution_time_in_minutes_business > 0 )
-		over (partition by date_part('month', t.created_at), date_part('year', t.created_at)) as monthly_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (where tm.full_resolution_time_in_minutes_business > 0 )
-		over (partition by date_part('year', t.created_at)) as yearly_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (
-			where tm.full_resolution_time_in_minutes_business > 0
+	100 * (
+	sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by t.created_at::date)::decimal(10,4)
+	/ count(1)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by t.created_at::date)
+	)::decimal(10,4) as daily_percentage,
+	100 * (
+	sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('week', t.created_at), date_part('year', t.created_at))::decimal(10,4)
+	/ count(1)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('week', t.created_at), date_part('year', t.created_at))
+	)::decimal(10,4) as weekly_percentage,
+	100 * (
+	sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('month', t.created_at), date_part('year', t.created_at))::decimal(10,4)
+	/ count(1)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('month', t.created_at), date_part('year', t.created_at))
+	)::decimal(10,4) as monthly_percentage,
+	100 * (
+	sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('year', t.created_at))::decimal(10,4)
+	/ count(1)
+		filter (where tm.full_resolution_time_in_minutes_calendar > 0 )
+		over (partition by date_part('year', t.created_at))
+	)::decimal(10,4) as yearly_percentage,
+	100 * (sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 week')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 week')::date)
   		and date_part('day', t.created_at) < date_part('day', (current_date - interval '1 week')::date)
-		) over () as last_week_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (
-			where tm.full_resolution_time_in_minutes_business > 0
+		)
+	over ()::decimal(10,4)  / count(1)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
+			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 week')::date)
+  		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 week')::date)
+  		and date_part('day', t.created_at) < date_part('day', (current_date - interval '1 week')::date)
+		)
+	over ())::decimal(10,4) as last_week_percentage,
+	100 * (sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 month')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 month')::date)
   		and date_part('day', t.created_at) < date_part('day', current_date)
-		) over () as last_month_avg,
-	avg(tm.full_resolution_time_in_minutes_business::decimal(10,4)/60)
-		filter (
-			where tm.full_resolution_time_in_minutes_business > 0
+		)
+	over ()::decimal(10,4)  / count(1)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
+			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 month')::date)
+  		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 month')::date)
+  		and date_part('day', t.created_at) < date_part('day', current_date)
+		)
+	over ())::decimal(10,4) as last_month_percentage,
+	100 * (sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '12 month')::date)
   		and ((date_part('month', t.created_at) = date_part('month', (current_date - interval '12 month')::date)
   		      and date_part('day', t.created_at) < date_part('day', (current_date - interval '12 month')::date))
   		  or date_part('month', t.created_at) < date_part('month', (current_date - interval '12 month')::date)
   		  )
-		) over () as last_year_avg
+		)
+	over ()::decimal(10,4)  / count(1)
+	filter (
+			where tm.full_resolution_time_in_minutes_calendar > 0
+			and date_part('year', t.created_at) = date_part('year', (current_date - interval '12 month')::date)
+  		and ((date_part('month', t.created_at) = date_part('month', (current_date - interval '12 month')::date)
+  		      and date_part('day', t.created_at) < date_part('day', (current_date - interval '12 month')::date))
+  		  or date_part('month', t.created_at) < date_part('month', (current_date - interval '12 month')::date)
+  		  )
+		)
+	over ())::decimal(10,4) as last_year_percentage
 from
 	zendesk.ticket t
 left join
@@ -53,22 +99,26 @@ left join
 	zendesk.ticket_metrics tm
 	on t.id = tm.ticket_id
 where g."name" in
-	(
-		'ADM Casos',
-		'ADM Mediações',
-		'ADM Offboarding',
-		'ADM Onboarding',
-		'ADM Renovação',
-		'ADM Rescisão',
-		'CX Administração',
-		'CX Pós',
-		'Casos Especiais',
-		'Collections',
-		'Crise',
-		'Payments Tasks',
-		'Vistoria'
-	)
-	and is_whatsapp = false
-	and t.status in ('closed', 'solved')
-	and t.created_at >= '2017-01-01'
-;
+(
+	'ADM Casos',
+	'ADM Mediações',
+	'ADM Offboarding',
+	'ADM Onboarding',
+	'ADM Renovação',
+	'ADM Rescisão',
+	'CX Administração',
+	'CX Pós',
+	'Casos Especiais',
+	'Collections',
+	'Crise',
+	'Payments Tasks',
+	'Vistoria'
+)
+and is_whatsapp = false
+and t.status in ('closed', 'solved')
+and t.created_at >= '2017-01-01'
+order by t.created_at::date
+
+
+
+
