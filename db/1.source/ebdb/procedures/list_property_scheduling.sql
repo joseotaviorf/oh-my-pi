@@ -35,6 +35,7 @@ select
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_negotiation) as dt_negotiation,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_offer) as id_offer,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_pre_proposal) as id_pre_approval,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_proposal) as id_proposal,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_contract) as id_contract,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_contract_anullment) as dt_contract_anullment
 from (
