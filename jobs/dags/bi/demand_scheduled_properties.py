@@ -3,8 +3,9 @@ from datetime import datetime
 from jobs.dags.bi.base_dag import BaseDAG
 from jobs.dags.util import environment as env
 from jobs.new_etl.business_dim_etl import BusinessDimensionETL
+from jobs.new_etl.godfather import GodFather
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 biz_etl = BusinessDimensionETL(bucket, datetime.now())
@@ -22,11 +23,19 @@ main_dag = BaseDAG.build_dag(
 )
 
 
+def godfather_to_s3(**kwargs):
+    GodFather.to_s3(bucket, kwargs['table_name'])
+
+
+def godfather_to_ods(**kwargs):
+    GodFather.to_ods(kwargs['table_name'])
+
+
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
     biz_etl.extract_query_dim_from_ebdb_to_ods(
         dim_name=kwargs['dim_name'],
         command=kwargs['command'],
-        table_name=kwargs['table_name']
+        table_name=None if 'table_name' not in kwargs else kwargs['table_name']
     )
 
 
@@ -78,28 +87,49 @@ def ods_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'negotiation', 'command': 'call ebdb.list_negociacao();'}
     )
 
-    BaseDAG.get_python_operator(
+    offer_to_s3_task = BaseDAG.get_python_operator(
+        task_id='offer_to_s3',
+        dag=local_dag,
+        func_command=godfather_to_s3,
+        op_kwargs={'table_name': 'offer'}
+    )
+
+    topic_to_s3_task = BaseDAG.get_python_operator(
+        task_id='offer_topic_to_s3',
+        dag=local_dag,
+        func_command=godfather_to_s3,
+        op_kwargs={'table_name': 'topic'}
+    )
+
+    offer_to_ods_task = BaseDAG.get_python_operator(
+        task_id='offer_to_ods',
+        dag=local_dag,
+        func_command=godfather_to_s3,
+        op_kwargs={'table_name': 'offer'}
+    )
+
+    pre_proposal_task = BaseDAG.get_python_operator(
         task_id='ODS_pre_proposal',
         dag=local_dag,
         func_command=extract_query_dim_from_ebdb_to_ods,
         op_kwargs={'dim_name': 'pre_proposal', 'command': 'call ebdb.list_preproposta();'}
     )
 
-    BaseDAG.get_python_operator(
+    pre_proposta_aud_task = BaseDAG.get_python_operator(
         task_id='ODS_pre_proposal_aud',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
         op_kwargs={'dim_name': 'pre_proposal_AUD', 'table_name': 'PreProposta_AUD', 'copy_to_clean': False}
     )
 
-    BaseDAG.get_python_operator(
+    condicao_proposta_task = BaseDAG.get_python_operator(
         task_id='ODS_condition',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
         op_kwargs={'dim_name': 'condition', 'table_name': 'CondicaoProposta', 'copy_to_clean': False}
     )
 
-    BaseDAG.get_python_operator(
+    pre_proposta_condicao_proposta_task = BaseDAG.get_python_operator(
         task_id='ODS_pre_proposal_condition',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
@@ -152,6 +182,8 @@ def ods_sub_dag(sub_dag_name):
     )
 
     property_visit_information_task >> visits_task
+    offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
+    pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
 
     return local_dag
 
