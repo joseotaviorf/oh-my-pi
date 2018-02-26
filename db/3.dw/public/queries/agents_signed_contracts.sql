@@ -1,6 +1,7 @@
 select distinct
 	liq.sk_contract_signed_date,
 	liq.sk_property,
+	liq.sk_contract,
 	agent.nome as agent_name,
 	sig."date" as dt_contract_signed,
 	c.contract_status,
@@ -9,8 +10,8 @@ select distinct
 		when substring(p.id for 4) = '8928' then concat('1',substring(p.id from 5))
 	end as short_id_property,
 	r.name as property_region,
-	(dense_rank() over (partition by liq.sk_contract order by liq.sk_user_agent asc) +
-	dense_rank() over (partition by liq.sk_contract order by liq.sk_user_agent desc) - 1) as number_of_agents_contract,
+	(dense_rank() over (partition by liq.sk_contract order by liq2.sk_user_agent asc) +
+	dense_rank() over (partition by liq.sk_contract order by liq2.sk_user_agent desc) - 1) as number_of_agents_contract,
 	c.renting_value,
 	visitor.nome as name_visitor,
 	case
@@ -20,6 +21,10 @@ select distinct
 	p.endereco
 from
 	public.fact_liquidity_property_scheduling liq
+left join
+	public.fact_liquidity_property_scheduling liq2
+	on liq2.sk_property = liq.sk_property
+	and liq2.sk_user_visitor = liq.sk_user_visitor
 left join
 	public.dim_contract c
 	on liq.sk_contract = c.sk_contract
@@ -31,20 +36,21 @@ left join
 	on liq.sk_user_visitor =  visitor.sk_user
 left join
 	public.dim_user agent
-	on liq.sk_user_agent =  agent.sk_user
+	on liq2.sk_user_agent =  agent.sk_user
 left join
 	public.dim_property p
-	on liq.sk_property = p.sk_property
+	on liq2.sk_property = p.sk_property
 left join
 	public.dim_region r
 	on r.sk_region = p.regiao_id
 left join
 	public.dim_booking b
-	on liq.sk_booking = b.sk_booking
+	on liq2.sk_booking = b.sk_booking
 left join
 	growth.agents_performance_ranking ranking
 	on ranking.agent_id = agent.sk_user
-	and extract(week from dt_ranking) = extract(week from current_date)-1
-	and extract(year from sig."date") = extract(year from (current_date - interval '1 week')::date)
-where sig."date" is not null
-and visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+	and extract(week from dt_ranking) = extract(week from sig."date")
+	and extract(year from dt_ranking) = extract(year from sig."date")
+where
+	sig."date" is not null
+	and visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
