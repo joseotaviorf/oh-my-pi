@@ -60,7 +60,7 @@ class BusinessDimensionETL(DimensionETL):
             table_name=dim_name,
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
-            append=True,
+            append=False,
             commit=True,
             bucket_name='{}/raw/ods/{}'.format(self.bucket, dim_name)
         )

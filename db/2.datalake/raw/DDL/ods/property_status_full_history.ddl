@@ -27,4 +27,7 @@ with serdeproperties (
   'quoteChar' = '\"'
 )
 location 's3://5a-datalake/raw/ods/property_status_full_history/'
+tblproperties (
+  'skip.header.line.count' = '1'
+)
 ;
