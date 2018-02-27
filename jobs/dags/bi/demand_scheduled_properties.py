@@ -50,7 +50,7 @@ def extract_table_dim_from_ebdb_to_ods(**kwargs):
 
 def load_athena_file_query_to_ods(**kwargs):
     biz_etl.load_athena_file_query_to_ods(
-        dim_name=kwargs['dim_name'],
+        table_name=kwargs['table_name'],
         file_name=kwargs['file_name'],
         append=False if 'append' not in kwargs else kwargs['append']
     )
@@ -58,7 +58,7 @@ def load_athena_file_query_to_ods(**kwargs):
 
 def load_athena_raw_query_to_ods(**kwargs):
     biz_etl.load_athena_raw_query_to_ods(
-        dim_name=kwargs['dim_name'],
+        table_name=kwargs['table_name'],
         query=kwargs['query'],
         append=False if 'append' not in kwargs else kwargs['append']
     )
@@ -177,7 +177,7 @@ def ods_sub_dag(sub_dag_name):
         task_id='ODS_property_visit_information',
         dag=local_dag,
         func_command=load_athena_file_query_to_ods,
-        op_kwargs={'dim_name': 'property_visit_information', 'append': True,
+        op_kwargs={'table_name': 'property_visit_information', 'append': True,
                    'file_name': 'property_visit_information.sql'}
     )
 
@@ -248,7 +248,7 @@ def dw_sub_dag(sub_dag_name):
         task_id='ODS_booking_media_sources',
         dag=local_dag,
         func_command=load_athena_file_query_to_ods,
-        op_kwargs={'dim_name': 'booking_media_sources', 'file_name': 'extract_booking_media_sources.sql'}
+        op_kwargs={'table_name': 'booking_media_sources', 'file_name': 'extract_booking_media_sources.sql'}
     )
 
     dim_booking_task = BaseDAG.get_python_operator(

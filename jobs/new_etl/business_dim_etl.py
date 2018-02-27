@@ -3,7 +3,7 @@ from datetime import datetime
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
-from __init__ import DATALAKE_DIR
+from __init__ import DATALAKE_QUERIES_DIR
 from dim_etl import DimensionETL
 
 
@@ -111,14 +111,14 @@ class BusinessDimensionETL(DimensionETL):
 
     # TODO: Migrate all business dimension etl from ODS to Datalake
     @logger
-    def load_athena_file_query_to_ods(self, dim_name, file_name, append=False):
-        df = self.athena.execute_file_query_and_return_dataframe('{}/'.format(DATALAKE_DIR, file_name))
-        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=dim_name, append=append)
+    def load_athena_file_query_to_ods(self, table_name, file_name, append=False):
+        df = self.athena.execute_file_query_and_return_dataframe('{}/{}'.format(DATALAKE_QUERIES_DIR, file_name))
+        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
 
     @logger
-    def load_athena_raw_query_to_ods(self, dim_name, query, append=False):
+    def load_athena_raw_query_to_ods(self, table_name, query, append=False):
         df = self.athena.execute_query_and_return_dataframe(query)
-        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=dim_name, append=append)
+        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
 
     @logger
     def __df_to_db(self, enum_db, df, table_name, append=False):
