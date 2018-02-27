@@ -31,9 +31,7 @@ with filt as (
             then rn != 1
           else true
         end
-
   union all
-
   select
     id,
 	status_time,
@@ -101,17 +99,18 @@ with filt as (
     ds.status = 'alugado'
     and r.id is not null
     as new_version_alugado,
-
     ds.status = 'alugado'
       and r.id is not null
       and lead(ds.status) over (partition by ds.id) = 'publicado'
     as new_version_pub_rent,
-
     status = 'publicado'
     and ( (lag(ds.status) over (partition by ds.id) = 'despublicado'
           and ds.status_time - lag(ds.status_time) over (partition by ds.id) >= interval '90 days')
           or
           dr_status = min_status
+          or
+          (lag(ds.status) over (partition by ds.id) = 'despublicado'
+          and lag(ds.status, 2) over (partition by ds.id) = 'alugado')
         )
     as new_version_publicado
   from
