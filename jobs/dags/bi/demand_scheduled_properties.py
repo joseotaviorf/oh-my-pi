@@ -231,10 +231,10 @@ def dw_sub_dag(sub_dag_name):
     )
 
     BaseDAG.get_python_operator(
-        task_id='DW_dim_pre_proposal',
+        task_id='DW_dim_offer',
         dag=local_dag,
         func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'pre_proposal'}
+        op_kwargs={'dim_name': 'offer'}
     )
 
     BaseDAG.get_python_operator(
