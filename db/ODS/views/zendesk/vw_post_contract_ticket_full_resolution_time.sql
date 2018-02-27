@@ -7,36 +7,36 @@ select distinct
 	date_part('month', t.created_at)::integer as _month,
 	date_part('year', t.created_at)::integer as _year,
 	(
-	coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
-		filter (where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved'))
+	coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved'))
 		over (partition by t.created_at::date)::decimal(10,4), 0)
 	/ nullif(count(1)
 		over (partition by t.created_at::date), 0)
 	)::decimal(10,4) as daily_percentage,
 	(
-	coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
-		filter (where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved'))
+	coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved'))
 		over (partition by date_part('week', t.created_at), date_part('year', t.created_at))::decimal(10,4), 0)
 	/ nullif(count(1)
 		over (partition by date_part('week', t.created_at), date_part('year', t.created_at)), 0)
 	)::decimal(10,4) as weekly_percentage,
 	(
-	coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
-		filter (where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved'))
+	coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved'))
 		over (partition by date_part('month', t.created_at), date_part('year', t.created_at))::decimal(10,4), 0)
 	/ nullif(count(1)
 		over (partition by date_part('month', t.created_at), date_part('year', t.created_at)), 0)
 	)::decimal(10,4) as monthly_percentage,
 	(
-	coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
-		filter (where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved'))
+	coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
+		filter (where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved'))
 		over (partition by date_part('year', t.created_at))::decimal(10,4), 0)
 	/ nullif(count(1)
 		over (partition by date_part('year', t.created_at)), 0)
 	)::decimal(10,4) as yearly_percentage,
-	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
 	filter (
-			where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved')
+			where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved')
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 week')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 week')::date)
   		and date_part('day', t.created_at) < date_part('day', (current_date - interval '1 week')::date)
@@ -48,9 +48,9 @@ select distinct
   		and date_part('day', t.created_at) < date_part('day', (current_date - interval '1 week')::date)
 		)
 	over (), 0))::decimal(10,4) as last_week_percentage,
-	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
 	filter (
-			where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved')
+			where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved')
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '1 month')::date)
   		and date_part('month', t.created_at) = date_part('month', (current_date - interval '1 month')::date)
   		and date_part('day', t.created_at) < date_part('day', current_date)
@@ -62,9 +62,9 @@ select distinct
   		and date_part('day', t.created_at) < date_part('day', current_date)
 		)
 	over (), 0))::decimal(10,4) as last_month_percentage,
-	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_calendar/60)<48 then 1 else 0 end)
+	(coalesce(sum(case when (tm.full_resolution_time_in_minutes_business/60)<22 then 1 else 0 end)
 	filter (
-			where tm.full_resolution_time_in_minutes_calendar > 0  and t.status in ('closed', 'solved')
+			where tm.full_resolution_time_in_minutes_business > 0  and t.status in ('closed', 'solved')
 			and date_part('year', t.created_at) = date_part('year', (current_date - interval '12 month')::date)
   		and ((date_part('month', t.created_at) = date_part('month', (current_date - interval '12 month')::date)
   		      and date_part('day', t.created_at) < date_part('day', (current_date - interval '12 month')::date))
