@@ -72,21 +72,22 @@ limits as (
 	group by greater_region, commission
 )
 select
-	c.agent_id as "Id Corretor",
-	c.agent_name as "Nome Corretor",
-	c.greater_region as "Região",
-	c.booked_visits as "# Bookings",
-	c.signed_contracts as "# Contracts",
-	c.visit_to_contract_ratio as "Conversão",
-	c.weekly_rank as "Ranking",
-	c.average_ratio as "Média Conversão",
-	c.top_percentile as "Top %",
-	c.yellow_flag as "Yellow Flag",
-	c.commission as "Faixa de Comissão",
-	gold.threshold as "Corte Gold",
-	silver.threshold as "Corte Silver",
-	round(c.average_ratio*1.5, 1) as "Corte Yellow Flag",
-	(current_date)::date as "Data do Ranking"
+  coalesce(to_char((current_date)::date,'YYYYMMDD')::integer, -1) as sk_date,
+	c.agent_id as agent_id,
+	c.agent_name as agent_name,
+	c.greater_region as greater_region,
+	c.booked_visits as bookings,
+	c.signed_contracts as contracts,
+	c.visit_to_contract_ratio as conversion,
+	c.weekly_rank as ranking,
+	c.average_ratio as average_conversion,
+	c.top_percentile as top_percentile,
+	c.yellow_flag as yellow_flag,
+	c.commission as commission,
+	gold.threshold as gold_threshold,
+	silver.threshold as silver_threshold,
+	round(c.average_ratio*1.5, 1) as yellow_flag_threshold,
+	(current_date)::date as dt_ranking
 from
 	commission c
 left join

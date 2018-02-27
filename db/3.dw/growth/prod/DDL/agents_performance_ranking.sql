@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS growth.agents_performance_ranking;
 CREATE TABLE growth.agents_performance_ranking (
+  sk_date int8,
 	agent_id int8,
 	agent_name varchar(255),
 	greater_region varchar(100),
