@@ -48,10 +48,18 @@ def extract_table_dim_from_ebdb_to_ods(**kwargs):
     )
 
 
-def load_athena_query_to_ods(**kwargs):
-    biz_etl.load_athena_query_to_ods(
+def load_athena_file_query_to_ods(**kwargs):
+    biz_etl.load_athena_file_query_to_ods(
         dim_name=kwargs['dim_name'],
         file_name=kwargs['file_name'],
+        append=False if 'append' not in kwargs else kwargs['append']
+    )
+
+
+def load_athena_raw_query_to_ods(**kwargs):
+    biz_etl.load_athena_raw_query_to_ods(
+        dim_name=kwargs['dim_name'],
+        query=kwargs['query'],
         append=False if 'append' not in kwargs else kwargs['append']
     )
 
@@ -104,8 +112,22 @@ def ods_sub_dag(sub_dag_name):
     offer_to_ods_task = BaseDAG.get_python_operator(
         task_id='offer_to_ods',
         dag=local_dag,
-        func_command=godfather_to_s3,
-        op_kwargs={'table_name': 'offer'}
+        func_command=load_athena_raw_query_to_ods,
+        op_kwargs={'table_name': 'offer', 'query': """
+                                                    select distinct
+                                                        eo.*,
+                                                        go.type,
+                                                        go.first_sent_at,
+                                                        go.last_sent_at,
+                                                        gt.type as topic_type
+                                                    from datalake_raw.ebdb_offer eo
+                                                    join datalake_raw.godfather_offer go
+                                                        on eo.godfatherid = go.id
+                                                    left join datalake_raw.godfather_topic gt
+                                                        on gt.offer_id = go.id
+                                                    ;
+                                                    """
+                   }
     )
 
     pre_proposal_task = BaseDAG.get_python_operator(
@@ -154,10 +176,9 @@ def ods_sub_dag(sub_dag_name):
     property_visit_information_task = BaseDAG.get_python_operator(
         task_id='ODS_property_visit_information',
         dag=local_dag,
-        func_command=load_athena_query_to_ods,
-        op_kwargs={'dim_name': 'property_visit_information',
-                   'append': True,
-                   'file_name': './db/2.datalake/queries/property_visit_information.sql'}
+        func_command=load_athena_file_query_to_ods,
+        op_kwargs={'dim_name': 'property_visit_information', 'append': True,
+                   'file_name': 'property_visit_information.sql'}
     )
 
     visits_task = BaseDAG.get_python_operator(
@@ -226,9 +247,8 @@ def dw_sub_dag(sub_dag_name):
     booking_media_sources_task = BaseDAG.get_python_operator(
         task_id='ODS_booking_media_sources',
         dag=local_dag,
-        func_command=load_athena_query_to_ods,
-        op_kwargs={'dim_name': 'booking_media_sources',
-                   'file_name': './db/2.datalake/queries/extract_booking_media_sources.sql'}
+        func_command=load_athena_file_query_to_ods,
+        op_kwargs={'dim_name': 'booking_media_sources', 'file_name': 'extract_booking_media_sources.sql'}
     )
 
     dim_booking_task = BaseDAG.get_python_operator(
