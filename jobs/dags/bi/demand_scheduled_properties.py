@@ -256,7 +256,7 @@ def dw_sub_dag(sub_dag_name):
         dag=local_dag,
         func_command=load_dim_from_ods_to_dw,
         op_kwargs={'dim_name': 'booking',
-                   'post_command': 'update dim_booking set visit_follow_up = null where visit_follow_up = ""'}
+                   'post_command': "update dim_booking set visit_follow_up = null where visit_follow_up = ''"}
     )
 
     BaseDAG.get_python_operator(
