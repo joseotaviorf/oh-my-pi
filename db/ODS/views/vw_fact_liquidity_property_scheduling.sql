@@ -189,6 +189,7 @@ calculated_dates as (
         end as internal_analysis_date,
         dof.dt_approved as offer_approved_date,
         dpr.dt_credit_analysis_init as credit_analysis_init_date,
+        dpr.dt_credit_analysis_end as credit_analysis_end_date,
         case
           when dpr.status in ('Rejeitada', 'Aprovada')
            then dpr.dt_updated
@@ -265,8 +266,8 @@ select
               date_part('hour', internal_analysis_date - offer_date)) / 24.0 as offer_to_internal_analyis,
   (date_part('day', credit_analysis_init_date - offer_approved_date) * 24 +
               date_part('hour', credit_analysis_init_date - offer_approved_date)) / 24.0 as offer_to_credit_analysis_init_date,
-  (date_part('day', credit_analysis_approved_date - credit_analysis_init_date) * 24 +
-              date_part('hour', credit_analysis_approved_date - credit_analysis_init_date)) / 24.0 as credit_analysis_init_to_end,
+  (date_part('day', coalesce(credit_analysis_end_date, credit_analysis_date)  - credit_analysis_init_date) * 24 +
+              date_part('hour', coalesce(credit_analysis_end_date, credit_analysis_date) - credit_analysis_init_date)) / 24.0 as credit_analysis_init_to_end,
   (date_part('day', contract_date - credit_analysis_approved_date) * 24 +
               date_part('hour', contract_date - credit_analysis_approved_date)) / 24.0 as credit_analysis_to_contract
 from calculated_dates

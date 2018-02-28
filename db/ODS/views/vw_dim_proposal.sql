@@ -23,7 +23,8 @@ SELECT
   "atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
   "primeiroEnvioDocInq" as dt_tenant_first_document_sent,
-  credit_analysis_init_date as dt_credit_analysis_init
+  credit_analysis_init_date as dt_credit_analysis_init,
+  credit_analysis_end_date as dt_credit_analysis_end
 FROM
   public.proposal ;
 
