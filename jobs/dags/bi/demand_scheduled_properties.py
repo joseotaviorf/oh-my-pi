@@ -12,7 +12,7 @@ biz_etl = BusinessDimensionETL(bucket, datetime.now())
 
 MAIN_DAG_NAME = 'bi-demand-scheduled-properties'
 MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '0 0 * * *'
+MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
 
 # create main DAG definition
 main_dag = BaseDAG.build_dag(
