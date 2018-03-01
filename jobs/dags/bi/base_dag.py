@@ -20,7 +20,7 @@ class BaseDAG(object):
                 'depends_on_past': depends_on_past
             },
             start_date=start_date,
-            schedule_interval=env.convert_to_utc_schedule(schedule_interval),
+            schedule_interval=schedule_interval,
             max_active_runs=1,
             catchup=catchup
         )
