@@ -251,6 +251,13 @@ def dw_sub_dag(sub_dag_name):
         op_kwargs={'table_name': 'booking_media_sources', 'file_name': 'extract_booking_media_sources.sql'}
     )
 
+    BaseDAG.get_python_operator(
+        task_id='ODS_listing_views',
+        dag=local_dag,
+        func_command=load_athena_file_query_to_ods,
+        op_kwargs={'table_name': 'listing_views', 'file_name': 'listing_views.sql'}
+    )
+
     dim_booking_task = BaseDAG.get_python_operator(
         task_id='DW_dim_booking',
         dag=local_dag,
