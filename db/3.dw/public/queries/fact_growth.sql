@@ -495,7 +495,7 @@ select
 	ytd,
 	mom,
 	yoy
-from growth.active_users
+from growth.amplitude_engaged_users
 
 union all
 

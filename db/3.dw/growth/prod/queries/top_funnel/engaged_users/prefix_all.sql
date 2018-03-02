@@ -10,7 +10,7 @@ with all_dates as (
     weekly_count,
     monthly_count,
     yearly_count
-  from growth.amplitude_active_users
+  from growth.amplitude_engaged_users
   where city = 'QuintoAndar'
     and region = 'QuintoAndar'
     and partial is false
@@ -23,7 +23,7 @@ all_dates_last_week as (
 	  region,
 	  city,
 	  weekly_count
-	from growth.amplitude_active_users
+	from growth.amplitude_engaged_users
   where city = 'QuintoAndar'
     and region = 'QuintoAndar'
     and partial is true
@@ -35,7 +35,7 @@ all_dates_last_month as (
 	  region,
 	  city,
 	  monthly_count
-	from growth.amplitude_active_users
+	from growth.amplitude_engaged_users
   where city = 'QuintoAndar'
     and region = 'QuintoAndar'
     and partial is true
@@ -46,7 +46,7 @@ all_dates_last_year as (
 	  region,
 	  city,
 	  yearly_count
-	from growth.amplitude_active_users
+	from growth.amplitude_engaged_users
   where city = 'QuintoAndar'
     and region = 'QuintoAndar'
     and partial is true
