@@ -26,7 +26,8 @@ main_dag = DAG(
     start_date=datetime(2018, 2, 15, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
     max_active_runs=1,
-    catchup=False
+    catchup=False,
+    orientation='TB'
 )
 
 growth = Growth()
