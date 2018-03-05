@@ -24,10 +24,10 @@ class GrowthPrediction(Growth):
             '{}/prefix_{}.sql'.format(GrowthPrediction.PREDICTION_QUERIES_DIR, _filter))
         prefix_file_formatted = prefix_file.format(
             funnel=funnel,
-            daily=placeholders['daily'],
-            weekly=placeholders['weekly'],
-            monthly=placeholders['monthly'],
-            yearly=placeholders['yearly']
+            daily_count=placeholders['daily'],
+            weekly_count=placeholders['weekly'],
+            monthly_count=placeholders['monthly'],
+            yearly_count=placeholders['yearly']
         )
         suffix_file = GrowthPrediction.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
