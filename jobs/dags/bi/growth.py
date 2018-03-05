@@ -60,6 +60,7 @@ def materialize_growth_measure_table_query(**kwargs):
 
 @logger
 def materialize_growth_measure_prediction_table_query(**kwargs):
+    funnel = kwargs['funnel']
     measure = kwargs['measure']
     _filter = kwargs['filter']
     period = kwargs['period']
@@ -69,7 +70,7 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
         table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
-    growth_prediction.create_table(measure, _filter, period, placeholders)
+    growth_prediction.create_table(funnel, measure, _filter, period, placeholders)
 
 
 @logger
@@ -346,4 +347,4 @@ ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticke
 tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
 offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
 offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
-visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> prediction_visits_booked_sub_dag
+visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task.set_downstream([prediction_visits_booked_sub_dag]
