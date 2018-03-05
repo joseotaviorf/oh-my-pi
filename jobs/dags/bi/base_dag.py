@@ -2,7 +2,6 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
-from jobs.dags.util import environment as env
 
 
 class BaseDAG(object):

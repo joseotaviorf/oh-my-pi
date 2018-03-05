@@ -7,7 +7,7 @@ from __init__ import QUERIES_DIR
 
 
 class EngagedUsers(object):
-    SCHEMA = 'growth'
+    SCHEMA = 'growth_staging'
     TABLE_NAME = 'amplitude_engaged_users'
 
     @logger

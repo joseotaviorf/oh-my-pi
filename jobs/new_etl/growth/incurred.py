@@ -2,7 +2,7 @@ from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
-from __init__ import DW_DIR
+from jobs.new_etl import DW_DIR
 
 
 class Growth(object):
