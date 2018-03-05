@@ -23,7 +23,7 @@ class GrowthPrediction(Growth):
             'm=create_table, funnel={}, measure={}, _filter={}, period={}, placeholders={}'.format(funnel, measure,
                                                                                                    _filter, period,
                                                                                                    placeholders))
-        prefix_file = Growth.__get_query_from_file_name(
+        prefix_file = self.__get_query_from_file_name(
             '{}/prefix_{}.sql'.format(GrowthPrediction.PREDICTION_QUERIES_DIR, _filter))
         prefix_file_formatted = prefix_file.format(
             funnel=funnel,
@@ -32,7 +32,7 @@ class GrowthPrediction(Growth):
             monthly_count=placeholders['monthly_count'],
             yearly_count=placeholders['yearly_count']
         )
-        suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
+        suffix_file = self.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
         self.execute_command(
             'create table {}.prediction_{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
