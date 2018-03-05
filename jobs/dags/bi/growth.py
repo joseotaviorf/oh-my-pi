@@ -105,7 +105,7 @@ def consolidate_employees_no_filters(measure):
     growth.execute_command(consolidation_query.format(measure))
 
 
-def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None, measure=None):
+def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None):
     return SubDagOperator(
         subdag=sub_dag_func(MAIN_DAG_NAME, sub_dag_name, funnel, main_dag.start_date, main_dag.schedule_interval,
                             materialize_func, placeholders),
@@ -334,8 +334,8 @@ prediction_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_fun
                                                         materialize_func=materialize_growth_measure_prediction_table_query,
                                                         sub_dag_name='prediction_visits_booked',
                                                         funnel='demand',
-                                                        placeholders=get_visits_booked_placeholders(),
-                                                        measure='visits_booked')
+                                                        placeholders=get_visits_booked_placeholders()
+                                                        )
 
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag

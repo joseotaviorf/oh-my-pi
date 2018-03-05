@@ -12,10 +12,10 @@ class GrowthPrediction(Growth):
     @logger
     def get_visits_booked_placeholders():
         return {
-            'daily': 'booking_created',
-            'weekly': 'booking_created_weekly_count',
-            'monthly': 'booking_created_monthly_count',
-            'yearly': 'booking_created_yearly_count'
+            'daily_count': 'booking_created',
+            'weekly_count': 'booking_created_weekly_count',
+            'monthly_count': 'booking_created_monthly_count',
+            'yearly_count': 'booking_created_yearly_count'
         }
 
     @logger
@@ -24,10 +24,10 @@ class GrowthPrediction(Growth):
             '{}/prefix_{}.sql'.format(GrowthPrediction.PREDICTION_QUERIES_DIR, _filter))
         prefix_file_formatted = prefix_file.format(
             funnel=funnel,
-            daily_count=placeholders['daily'],
-            weekly_count=placeholders['weekly'],
-            monthly_count=placeholders['monthly'],
-            yearly_count=placeholders['yearly']
+            daily_count=placeholders['daily_count'],
+            weekly_count=placeholders['weekly_count'],
+            monthly_count=placeholders['monthly_count'],
+            yearly_count=placeholders['yearly_count']
         )
         suffix_file = GrowthPrediction.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
