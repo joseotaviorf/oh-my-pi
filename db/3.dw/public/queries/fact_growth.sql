@@ -573,30 +573,30 @@ union all
 
 
 -- Predictions
-
-select
-	sk_date,
-	sk_week_start_date,
-	'visits_booked' as measure,
-	null as team,
-	_year,
-	_month,
-	_week,
-	_day,
-	region,
-	city,
-	daily_count,
-	prev_weekly_count,
-	weekly_count,
-	monthly_count,
-	yearly_count,
-	wow,
-	mtd,
-	ytd,
-	mom,
-	yoy,
-	1 as flg_predicted
-from growth.prediction_visits_booked
+--
+--select
+--	sk_date,
+--	sk_week_start_date,
+--	'visits_booked' as measure,
+--	null as team,
+--	_year,
+--	_month,
+--	_week,
+--	_day,
+--	region,
+--	city,
+--	daily_count,
+--	prev_weekly_count,
+--	weekly_count,
+--	monthly_count,
+--	yearly_count,
+--	wow,
+--	mtd,
+--	ytd,
+--	mom,
+--	yoy,
+--	1 as flg_predicted
+--from growth.prediction_visits_booked
 
 --union all
 --
