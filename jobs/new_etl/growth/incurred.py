@@ -26,8 +26,9 @@ class Growth(object):
         return Growth.__get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
-    @logger
     def __get_query_from_file_name(file_name):
+        _logger.info('m=__get_query_from_file_name, file_name={}'.format(file_name))
+
         try:
             with open(file_name) as f:
                 return f.read()
