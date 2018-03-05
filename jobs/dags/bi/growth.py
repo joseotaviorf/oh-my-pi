@@ -31,7 +31,6 @@ main_dag = DAG(
 )
 
 growth = Growth()
-growth_prediction = GrowthPrediction()
 
 
 @logger
@@ -66,11 +65,11 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
     period = kwargs['period']
     placeholders = kwargs['placeholders']
 
-    growth_prediction.drop_table(
+    GrowthPrediction.drop_table(
         table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
-    growth_prediction.create_table(funnel, measure, _filter, period, placeholders)
+    GrowthPrediction.create_table(funnel, measure, _filter, period, placeholders)
 
 
 @logger
