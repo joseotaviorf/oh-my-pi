@@ -569,7 +569,7 @@ select
 	0 as flg_predicted
 from growth.tickets
 
-union all
+--union all
 
 
 -- Predictions
