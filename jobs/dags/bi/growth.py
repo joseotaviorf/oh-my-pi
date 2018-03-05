@@ -347,4 +347,6 @@ ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticke
 tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
 offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
 offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
-visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task.set_downstream([prediction_visits_booked_sub_dag])
+visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task
+
+fact_task.set_downstream([prediction_visits_booked_sub_dag])
