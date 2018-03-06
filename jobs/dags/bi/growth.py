@@ -59,7 +59,7 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
     placeholders = kwargs['placeholders']
 
     GrowthPrediction.drop_table(
-        table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
+        table_name='{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
     GrowthPrediction.create_prediction_table(funnel, measure, _filter, period, placeholders)
