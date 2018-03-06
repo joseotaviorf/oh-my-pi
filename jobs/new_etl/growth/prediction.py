@@ -18,7 +18,58 @@ class GrowthPrediction(Growth):
             'yearly_count': 'booking_created_yearly_count'
         }
 
-    def create_prediction_table(self, funnel, measure, _filter, period, placeholders):
+    @staticmethod
+    @logger
+    def get_visits_completed_placeholders():
+        return {
+            'daily_count': 'effective_visit',
+            'weekly_count': 'effective_visit_weekly_count',
+            'monthly_count': 'effective_visit_monthly_count',
+            'yearly_count': 'effective_visit_yearly_count'
+        }
+
+    @staticmethod
+    @logger
+    def get_offers_submitted_placeholders():
+        return {
+            'daily_count': 'offer_first_sent',
+            'weekly_count': 'offer_first_sent_weekly_count',
+            'monthly_count': 'offer_first_sent_monthly_count',
+            'yearly_count': 'offer_first_sent_yearly_count'
+        }
+
+    @staticmethod
+    @logger
+    def get_offers_approved_placeholders():
+        return {
+            'daily_count': 'offer_approved',
+            'weekly_count': 'offer_approved_weekly_count',
+            'monthly_count': 'offer_approved_monthly_count',
+            'yearly_count': 'offer_approved_yearly_count'
+        }
+
+    @staticmethod
+    @logger
+    def get_documentation_sent_placeholders():
+        return {
+            'daily_count': 'tenant_first_document_sent',
+            'weekly_count': 'tenant_first_document_sent_weekly_count',
+            'monthly_count': 'tenant_first_document_sent_monthly_count',
+            'yearly_count': 'tenant_first_document_sent_yearly_count'
+        }
+
+    @staticmethod
+    @logger
+    def get_approved_by_insurer_placeholders():
+        return {
+            'daily_count': 'proposal_approved',
+            'weekly_count': 'proposal_approved_weekly_count',
+            'monthly_count': 'proposal_approved_monthly_count',
+            'yearly_count': 'proposal_approved_yearly_count'
+        }
+
+    @staticmethod
+    def create_prediction_table(funnel, measure, _filter, period, placeholders):
         _logger.info(
             'm=create_table, funnel={}, measure={}, _filter={}, period={}, placeholders={}'.format(funnel, measure,
                                                                                                    _filter, period,
@@ -39,3 +90,9 @@ class GrowthPrediction(Growth):
             'create table {}.{}_{}_{} as\n{}'.format(GrowthPrediction.SCHEMA, measure, _filter, period,
                                                      prefix_file_formatted + suffix_file)
         )
+
+    @staticmethod
+    @logger
+    def append_predictions_fact():
+        GrowthPrediction._execute_file_query(
+            '{}/public/queries/predictions_{}.sql'.format(GrowthPrediction.DW_DIR, GrowthPrediction.FACT_TABLE_NAME))

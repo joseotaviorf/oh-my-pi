@@ -24,9 +24,6 @@ main_dag = BaseDAG.build_dag(
     orientation='TB'
 )
 
-growth = Growth()
-growth_prediction = GrowthPrediction()
-
 
 @logger
 def materialize_engaged_users_table_query(**kwargs):
@@ -48,8 +45,8 @@ def materialize_growth_measure_table_query(**kwargs):
     _filter = kwargs['filter']
     period = kwargs['period']
 
-    growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
-    growth.create_table(funnel, measure, _filter, period)
+    Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
+    Growth.create_table(funnel, measure, _filter, period)
 
 
 def materialize_growth_measure_prediction_table_query(**kwargs):
@@ -61,11 +58,11 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
     period = kwargs['period']
     placeholders = kwargs['placeholders']
 
-    growth_prediction.drop_table(
+    GrowthPrediction.drop_table(
         table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
-    growth_prediction.create_prediction_table(funnel, measure, _filter, period, placeholders)
+    GrowthPrediction.create_prediction_table(funnel, measure, _filter, period, placeholders)
 
 
 @logger
@@ -74,13 +71,43 @@ def get_visits_booked_placeholders():
 
 
 @logger
+def get_visits_completed_placeholders():
+    return GrowthPrediction.get_visits_completed_placeholders()
+
+
+@logger
+def get_offers_submitted_placeholders():
+    return GrowthPrediction.get_offers_submitted_placeholders()
+
+
+@logger
+def get_offers_approved_placeholders():
+    return GrowthPrediction.get_offers_approved_placeholders()
+
+
+@logger
+def get_documentation_sent_placeholders():
+    return GrowthPrediction.get_documentation_sent_placeholders()
+
+
+@logger
+def get_approved_by_insurer_placeholders():
+    return GrowthPrediction.get_approved_by_insurer_placeholders()
+
+
+@logger
 def load_fact_growth():
     Growth().load_fact()
 
 
 @logger
+def append_predictions_fact_growth():
+    GrowthPrediction().append_predictions_fact()
+
+
+@logger
 def consolidate_with_filters(measure):
-    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
+    Growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_all_query()
     Growth.execute_command(consolidation_query.format(measure))
@@ -88,7 +115,7 @@ def consolidate_with_filters(measure):
 
 @logger
 def consolidate_no_filters(measure):
-    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
+    Growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_no_filters_query()
     Growth.execute_command(consolidation_query.format(measure))
@@ -96,7 +123,7 @@ def consolidate_no_filters(measure):
 
 @logger
 def consolidate_employees_no_filters(measure):
-    growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
+    Growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_employee_all_query()
     Growth.execute_command(consolidation_query.format(measure))
@@ -335,6 +362,44 @@ prediction_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_fun
                                                         placeholders=get_visits_booked_placeholders()
                                                         )
 
+prediction_visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                           materialize_func=materialize_growth_measure_prediction_table_query,
+                                                           sub_dag_name='prediction_visits_completed',
+                                                           funnel='demand',
+                                                           placeholders=get_visits_completed_placeholders()
+                                                           )
+
+prediction_offers_submitted_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                           materialize_func=materialize_growth_measure_prediction_table_query,
+                                                           sub_dag_name='prediction_offers_submitted',
+                                                           funnel='demand',
+                                                           placeholders=get_offers_submitted_placeholders()
+                                                           )
+
+prediction_offers_approved_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                          materialize_func=materialize_growth_measure_prediction_table_query,
+                                                          sub_dag_name='prediction_offers_approved',
+                                                          funnel='demand',
+                                                          placeholders=get_offers_approved_placeholders()
+                                                          )
+
+prediction_documentation_sent_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                             materialize_func=materialize_growth_measure_prediction_table_query,
+                                                             sub_dag_name='prediction_documentation_sent',
+                                                             funnel='demand',
+                                                             placeholders=get_documentation_sent_placeholders()
+                                                             )
+
+prediction_approved_by_insurer_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                              materialize_func=materialize_growth_measure_prediction_table_query,
+                                                              sub_dag_name='prediction_approved_by_insurer',
+                                                              funnel='demand',
+                                                              placeholders=get_approved_by_insurer_placeholders()
+                                                              )
+
+# fact append
+fact_append_task = get_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
+
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 
@@ -343,6 +408,6 @@ ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticke
 tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
 offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
 offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
-visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task
-
-fact_task.set_downstream([prediction_visits_booked_sub_dag])
+visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >> \
+prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >> \
+prediction_documentation_sent_sub_dag >> prediction_approved_by_insurer_sub_dag >> fact_append_task
