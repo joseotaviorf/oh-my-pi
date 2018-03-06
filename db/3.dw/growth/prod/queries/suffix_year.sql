@@ -70,10 +70,10 @@ select
 	(date_part('year', sk_week_start_date)::varchar
 		|| lpad(date_part('month', sk_week_start_date)::varchar, 2, '0')
 		|| lpad(date_part('day', sk_week_start_date)::varchar, 2, '0'))::integer as sk_week_start_date,
-	_year,
-	_month,
-	_week,
-	_day,
+	_year::int,
+	_month::int,
+	_week::int,
+	_day::int,
 	region,
 	city,
 	daily_count,
