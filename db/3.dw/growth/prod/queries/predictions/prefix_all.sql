@@ -7,9 +7,9 @@ with all_dates as (
     'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
     ({daily_count}::float)::int as daily_count,
-    ({weekly_count}::float)::int as weekly_count,
-    ({monthly_count}::float)::int as monthly_count,
-    ({yearly_count}::float)::int as yearly_count
+    max({weekly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date)), date_part('week', cast(cast("date" as timestamp) as date))) as weekly_count,
+    max({monthly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date)), date_part('month', cast(cast("date" as timestamp) as date))) as monthly_count,
+    max({yearly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date))) as yearly_count
   from datalake_raw.growth_{funnel}_prediction
   where city = 'all'
     and region = 'all'
@@ -23,7 +23,7 @@ all_dates_last_month as (
     date_part('month', cast(cast("date" as timestamp) as date))::int as _month,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-	  ({monthly_count}::float)::int as monthly_count
+    max({monthly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date)), date_part('month', cast(cast("date" as timestamp) as date))) as monthly_count
   from datalake_raw.growth_{funnel}_prediction
   where city = 'all'
     and region = 'all'
@@ -37,7 +37,7 @@ all_dates_last_year as (
 	 	date_part('year', cast(cast("date" as timestamp) as date))::int as _year,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	({yearly_count}::float)::int as yearly_count
+  	max({yearly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date))) as yearly_count
 	from datalake_raw.growth_{funnel}_prediction
   where city = 'all'
     and region = 'all'
