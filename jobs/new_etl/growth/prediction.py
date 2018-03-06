@@ -36,5 +36,6 @@ class GrowthPrediction(Growth):
             '{}/suffix_{}.sql'.format(GrowthPrediction.QUERIES_DIR, period))
 
         GrowthPrediction.execute_command(
-            'create table {}.prediction_{}_{}_{} as\n{}'.format(GrowthPrediction.SCHEMA, measure, _filter, period,
-                                                                prefix_file_formatted + suffix_file))
+            'create table {}.{}_{}_{} as\n{}'.format(GrowthPrediction.SCHEMA, measure, _filter, period,
+                                                     prefix_file_formatted + suffix_file)
+        )

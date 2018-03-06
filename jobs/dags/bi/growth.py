@@ -83,7 +83,7 @@ def consolidate_with_filters(measure):
     growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_all_query()
-    growth.execute_command(consolidation_query.format(measure))
+    Growth.execute_command(consolidation_query.format(measure))
 
 
 @logger
@@ -91,7 +91,7 @@ def consolidate_no_filters(measure):
     growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_measure_no_filters_query()
-    growth.execute_command(consolidation_query.format(measure))
+    Growth.execute_command(consolidation_query.format(measure))
 
 
 @logger
@@ -99,7 +99,7 @@ def consolidate_employees_no_filters(measure):
     growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
     consolidation_query = Growth.get_employee_all_query()
-    growth.execute_command(consolidation_query.format(measure))
+    Growth.execute_command(consolidation_query.format(measure))
 
 
 def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None):

@@ -57,12 +57,13 @@ class Growth(object):
             '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
         suffix_file = Growth._get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
-        self.execute_command(
+        Growth.execute_command(
             'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
                                                      prefix_file + suffix_file))
 
+    @staticmethod
     @logger
-    def execute_command(self, query):
+    def execute_command(query):
         BaseETL.execute_command(
             command=query,
             commit=True,
