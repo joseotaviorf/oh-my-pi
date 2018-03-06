@@ -1,8 +1,7 @@
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
-from qa_python_utils.default_logger import logger, _logger
-
 from jobs.new_etl import DW_DIR
+from qa_python_utils.default_logger import logger, _logger
 
 
 class Growth(object):
@@ -13,21 +12,20 @@ class Growth(object):
     @staticmethod
     @logger
     def get_measure_all_query():
-        return Growth.__get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_measure_no_filters_query():
-        return Growth.__get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_employee_all_query():
-        return Growth.__get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
-    @logger
-    def __get_query_from_file_name(file_name):
+    def _get_query_from_file_name(file_name):
         try:
             with open(file_name) as f:
                 return f.read()
@@ -55,9 +53,9 @@ class Growth(object):
 
     @logger
     def create_table(self, funnel, measure, _filter, period):
-        prefix_file = Growth.__get_query_from_file_name(
+        prefix_file = Growth._get_query_from_file_name(
             '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
-        suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
+        suffix_file = Growth._get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
         self.execute_command(
             'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
