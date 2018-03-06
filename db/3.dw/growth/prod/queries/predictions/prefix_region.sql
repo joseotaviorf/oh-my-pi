@@ -6,10 +6,10 @@ with all_dates as (
     date_part('day', cast(cast("date" as timestamp) as date))::int as _day,
 	  region,
     'QuintoAndar'::varchar as city,
-    {daily_count}::int as daily_count,
-    {weekly_count}::int as weekly_count,
-    {monthly_count}::int as monthly_count,
-    {yearly_count}::int as yearly_count
+    {daily_count}::float as daily_count,
+    {weekly_count}::float as weekly_count,
+    {monthly_count}::float as monthly_count,
+    {yearly_count}::float as yearly_count
   from datalake_raw.growth_{funnel}_prediction
   where city != 'all'
     and region = 'all'
@@ -23,7 +23,7 @@ all_dates_last_month as (
     date_part('month', cast(cast("date" as timestamp) as date))::int as _month,
 	  region,
 	  'QuintoAndar'::varchar as city,
-	  {monthly_count} as monthly_count
+	  {monthly_count}::float as monthly_count
   from datalake_raw.growth_{funnel}_prediction
   where city = 'all'
     and region != 'all'
@@ -37,7 +37,7 @@ all_dates_last_year as (
 	 	date_part('year', cast(cast("date" as timestamp) as date))::int as _year,
 	  region,
 	  'QuintoAndar'::varchar as city,
-  	{yearly_count}::int as yearly_count
+  	{yearly_count}::float as yearly_count
 	from datalake_raw.growth_{funnel}_prediction
   where city = 'all'
     and region != 'all'
