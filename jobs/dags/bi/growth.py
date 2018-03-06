@@ -8,7 +8,7 @@ from jobs.dags.util import environment as env
 from jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from jobs.new_etl.growth.incurred import Growth
 from jobs.new_etl.growth.prediction import GrowthPrediction
-from qa_python_utils.default_logger import logger
+from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -52,8 +52,9 @@ def materialize_growth_measure_table_query(**kwargs):
     growth.create_table(funnel, measure, _filter, period)
 
 
-@logger
 def materialize_growth_measure_prediction_table_query(**kwargs):
+    _logger.info('m=materialize_growth_measure_prediction_table_query, kwargs={}'.format(kwargs))
+
     funnel = kwargs['funnel']
     measure = kwargs['measure']
     _filter = kwargs['filter']
