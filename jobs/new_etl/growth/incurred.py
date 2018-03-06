@@ -61,8 +61,9 @@ class Growth(object):
             'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
                                                      prefix_file + suffix_file))
 
+    @staticmethod
     @logger
-    def execute_command(self, query):
+    def execute_command(query):
         BaseETL.execute_command(
             command=query,
             commit=True,
