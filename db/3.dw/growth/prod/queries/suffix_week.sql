@@ -44,7 +44,7 @@ partial_calc as (
 		city,
 		prev_weekly_count,
 		weekly_count,
-		round((weekly_count / prev_weekly_count::float) - 1.0, 4) as wow
+		round((weekly_count / nullif(prev_weekly_count, 0)::float) - 1.0, 4) as wow
 	from partial_calc_prev
 ),
 result as (
