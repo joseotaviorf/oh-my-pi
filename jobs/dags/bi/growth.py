@@ -65,7 +65,7 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
         table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
-    growth_prediction.create_table(funnel, measure, _filter, period, placeholders)
+    growth_prediction.create_prediction_table(funnel, measure, _filter, period, placeholders)
 
 
 @logger
