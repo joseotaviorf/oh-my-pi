@@ -3,6 +3,7 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
+from jobs.dags.bi.base_dag import BaseDAG
 from jobs.dags.util import environment as env
 from jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from jobs.new_etl.growth.incurred import Growth
@@ -15,22 +16,16 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MAIN_DAG_NAME = 'bi-growth'
 
 # create DAG definition
-main_dag = DAG(
+main_dag = BaseDAG.build_dag(
     dag_id=MAIN_DAG_NAME,
     description='ETL Pipeline for creating Growth Model inside the DW',
-    default_args={
-        'owner': 'Data Team',
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
     start_date=datetime(2018, 2, 15, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
-    max_active_runs=1,
-    catchup=False,
     orientation='TB'
 )
 
 growth = Growth()
+growth_prediction = GrowthPrediction()
 
 
 @logger
@@ -65,11 +60,11 @@ def materialize_growth_measure_prediction_table_query(**kwargs):
     period = kwargs['period']
     placeholders = kwargs['placeholders']
 
-    GrowthPrediction.drop_table(
+    growth_prediction.drop_table(
         table_name='prediction_{}_{}_{}'.format(measure, _filter, period),
         schema=GrowthPrediction.SCHEMA
     )
-    GrowthPrediction.create_table(funnel, measure, _filter, period, placeholders)
+    growth_prediction.create_table(funnel, measure, _filter, period, placeholders)
 
 
 @logger
@@ -244,7 +239,8 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     return local_dag
 
 
-def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func=None, placeholders=None):
+def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
+                               materialize_func=None, placeholders=None):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
