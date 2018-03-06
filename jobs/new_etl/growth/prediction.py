@@ -95,4 +95,4 @@ class GrowthPrediction(Growth):
     @logger
     def append_predictions_fact():
         GrowthPrediction._execute_file_query(
-            '{}/public/queries/predictions_{}.sql'.format(GrowthPrediction.DW_DIR, GrowthPrediction.FACT_TABLE_NAME))
+            '{}/public/queries/predictions_{}.sql'.format(DW_DIR, GrowthPrediction.FACT_TABLE_NAME))
