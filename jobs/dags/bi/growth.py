@@ -313,8 +313,7 @@ def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, s
 
     active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
 
-    active_users_all_task = get_python_operator('extract_all_data', materialize_active_users_table_query, local_dag,
-                                                op_kwargs={'filter': 'all'})
+    active_users_all_task = get_python_operator('extract_all_data', materialize_active_users_table_query, local_dag)
 
     # must be sequential because of the appending operation
     active_users_truncate_task >> active_users_all_task
