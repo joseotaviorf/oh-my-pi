@@ -60,8 +60,6 @@ CREATE TABLE dim_user (
   dadosfotografo_ativo integer DEFAULT NULL,
   dadosvendedor_inicio_contrato timestamp,
   dadosvendedor_nome_gerente varchar(255) DEFAULT NULL,
-  dadosafiliado_contador_planilha_leads integer DEFAULT NULL,
-  dadosafiliado_contratos_fechados integer DEFAULT NULL,
   dadosafiliado_indicacao_shorturl varchar(100) DEFAULT NULL,
   dadosafiliado_inicio_atuacao timestamp,
   dadosafiliado_ultim_calculo_comissao_indicado timestamp DEFAULT NULL,
