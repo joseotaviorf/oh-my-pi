@@ -62,8 +62,6 @@ BEGIN
     df.ativo+0 as dadosfotografo_ativo,
     dv.inicioContrato as dadosvendedor_inicio_contrato,
     g.nome as dadosvendedor_nome_gerente,
-    daf.contadorPlanilhaDeLeads as dadosafiliado_contador_planilha_leads,
-    daf.contratosFechados as dadosafiliado_contratos_fechados,
     daf.indicacaoShortUrl as dadosafiliado_indicacao_shorturl,
     coalesce(da2.inicioAtuacao, daf.inicioAtuacao) as dadosafiliado_inicio_atuacao,
     daf.ultimoCalculoComissaoIndicado as dadosafiliado_ultim_calculo_comissao_indicado,
