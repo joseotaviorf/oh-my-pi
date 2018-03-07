@@ -351,7 +351,7 @@ amplitude_active_users_previous_task = get_sub_dag_operator(sub_dag_func_active_
                                                             None,
                                                             'amplitude_active_users_previous',
                                                             'top_funnel')
-active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
+active_users_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
                                             'active_users', 'top_funnel')
 
 employees_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query, 'employees',
