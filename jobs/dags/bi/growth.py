@@ -5,6 +5,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
 from jobs.dags.bi.base_dag import BaseDAG
 from jobs.dags.util import environment as env
+from jobs.new_etl.amplitude.active_users import ActiveUsers
 from jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from jobs.new_etl.growth.incurred import Growth
 from jobs.new_etl.growth.prediction import GrowthPrediction
@@ -36,6 +37,17 @@ def materialize_engaged_users_table_query(**kwargs):
 @logger
 def truncate_engaged_users_table():
     EngagedUsers.truncate_table()
+
+
+@logger
+def materialize_active_users_table_query():
+    active_users = ActiveUsers(bucket)
+    active_users.append_to_table(_filter='all')
+
+
+@logger
+def truncate_active_users_table():
+    ActiveUsers.truncate_table()
 
 
 @logger
@@ -291,6 +303,25 @@ def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, 
     return local_dag
 
 
+def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
+                              materialize_func=None, placeholders=None):
+    local_dag = DAG(
+        '{}.{}'.format(main_dag_name, sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date,
+    )
+
+    active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
+
+    active_users_all_task = get_python_operator('extract_all_data', materialize_active_users_table_query, local_dag,
+                                                op_kwargs={'filter': 'all'})
+
+    # must be sequential because of the appending operation
+    active_users_truncate_task >> active_users_all_task
+
+    return local_dag
+
+
 # supply measures
 leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'leads',
                                      'supply')
@@ -316,6 +347,14 @@ amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_engage
                                                              'top_funnel')
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'engaged_users', 'top_funnel')
+# Amplitude active users
+amplitude_active_users_previous_task = get_sub_dag_operator(sub_dag_func_active_users,
+                                                            None,
+                                                            'amplitude_active_users_previous',
+                                                            'top_funnel')
+active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
+                                            'active_users', 'top_funnel')
+
 employees_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query, 'employees',
                                          'top_funnel')
 ticket_resolution_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
@@ -402,11 +441,12 @@ fact_append_task = get_python_operator('append_predictions_fact_growth', append_
 
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
+amplitude_active_users_previous_task >> active_users_sub_dag
 
 leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
-ongoing_contracts_sub_dag >> engaged_users_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> \
-tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> \
-offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
+ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> employees_sub_dag >> \
+ticket_resolution_sub_dag >> tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> \
+offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> \
 offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> \
 visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >> \
 prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >> \
