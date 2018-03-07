@@ -18,10 +18,10 @@ with all_events as (
       else -1
     end as house_id
   from datalake_clean.amplitude_events
-  where ((trim(app) = '170698' and trim(et) = 'listing_page_viewed' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
+  where ym >= '2017-01'
+    and ((trim(app) = '170698' and trim(et) = 'listing_page_viewed' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
       or (trim(app) = '157033' and trim(et) = 'Listing-View' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
       or (trim(app) = '160023' and trim(et) = 'Listing-Views_listing' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
       or (trim(app) = '156118' and trim(et) = 'Listing-View' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))
-    and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-01-01' as date)
     and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast(now() as date)
 ),
