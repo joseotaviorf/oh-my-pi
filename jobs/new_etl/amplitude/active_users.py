@@ -7,7 +7,7 @@ class ActiveUsers(GrowthUsers):
 
     @logger
     def __init__(self, s3_bucket):
-        super(ActiveUsers, self).__init__(measure='active', s3_bucket=s3_bucket)
+        super(ActiveUsers, self).__init__(measure='active_users', s3_bucket=s3_bucket)
 
     @staticmethod
     @logger(exclude='df')
