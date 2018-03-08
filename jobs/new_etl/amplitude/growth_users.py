@@ -13,15 +13,15 @@ class GrowthUsers(object):
     def __init__(self, measure, s3_bucket):
         self.athena_client = AthenaClient(s3_bucket)
 
-        self.all_dates_query = GrowthUsers.__get_query_from_file_name(
+        self.all_dates_query = GrowthUsers._get_query_from_file_name(
             '{}/{}/prefix_all_dates.sql'.format(QUERIES_DIR, measure))
-        self.current_date_query = GrowthUsers.__get_query_from_file_name(
+        self.current_date_query = GrowthUsers._get_query_from_file_name(
             '{}/{}/prefix_current_date.sql'.format(QUERIES_DIR, measure))
-        self.suffix_query = GrowthUsers.__get_query_from_file_name('{}/{}/suffix.sql'.format(QUERIES_DIR, measure))
+        self.suffix_query = GrowthUsers._get_query_from_file_name('{}/{}/suffix.sql'.format(QUERIES_DIR, measure))
 
     @staticmethod
     @logger
-    def __get_query_from_file_name(file_name):
+    def _get_query_from_file_name(file_name):
         try:
             with open(file_name) as f:
                 return f.read()
