@@ -14,12 +14,12 @@ class EngagedUsers(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        EngagedUsers.df_to_dw(df, EngagedUsers.TABLE_NAME)
+        GrowthUsers.df_to_dw(df, EngagedUsers.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        EngagedUsers.truncate_table(EngagedUsers.TABLE_NAME)
+        GrowthUsers.truncate_table(EngagedUsers.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
@@ -28,7 +28,7 @@ class EngagedUsers(GrowthUsers):
 
     @logger
     def __append(self, _filter, prefix):
-        middle_query = EngagedUsers._get_query_from_file_name(
+        middle_query = GrowthUsers._get_query_from_file_name(
             '{}/engaged_users/middle_{}.sql'.format(QUERIES_DIR, _filter))
 
         df = self.get_df(prefix=prefix,
