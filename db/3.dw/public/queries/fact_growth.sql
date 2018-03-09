@@ -548,6 +548,32 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
+	'owner_landing_views' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.owner_landing_views
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
 	'ticket_resolution' as measure,
 	null as team,
 	_year,
