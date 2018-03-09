@@ -3,6 +3,8 @@ select distinct
   _month,
   _week,
   _day,
+  region,
+  city,
   partial,
   dense_rank() over (partition by _year, _month, _week, _day  order by amplitude_id asc)
     + dense_rank() over (partition by _year, _month, _week, _day order by amplitude_id desc)
