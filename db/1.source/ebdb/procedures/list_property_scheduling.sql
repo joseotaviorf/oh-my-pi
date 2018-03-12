@@ -17,7 +17,7 @@ BEGIN
 SET @rank=0;
 
 select
-  _all.id_property_scheduling,
+	_all.id_property_scheduling,
 	_all.id_imovel,
 	_all.id_scheduling,
 	_all.id_owner,
@@ -34,7 +34,7 @@ select
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_negotiation) as id_negotiation,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_negotiation) as dt_negotiation,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_offer) as id_offer,
-	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_pre_proposal) as id_pre_approval,
+	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_pre_proposal) as id_pre_proposal,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_proposal) as id_proposal,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.id_contract) as id_contract,
 	if(coalesce(offer_preproposal.minutes_diff, negotiation.minutes_diff) is null, null, _all.dt_contract_anullment) as dt_contract_anullment
@@ -61,8 +61,8 @@ from (
 	  pp.id as id_pre_proposal,
 	  abs(timestampdiff(minute, coalesce(o.criadoEm, pp.criadoEm), coalesce(a.dataFupVisita, a.atualizadoEm))) as offer_preproposal_minutes_diff,
 	  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
-	  c.id as id_contract,
-	  c.dataRescisao as dt_contract_anullment
+	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.id) as id_contract,
+	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.dataRescisao) as dt_contract_anullment
 	from Imovel i
 	left join Usuario prop
 	  on prop.id = i.usuario_id
@@ -118,6 +118,7 @@ left join
 		 prop.id as id_owner,
 		 v.visitante_id as id_user_visitor,
 		 fl.id as id_rental_flow,
+		 a.id as booking_id,
 		 min(abs(timestampdiff(minute, n.criadoEm, a.dataFupVisita))) as minutes_diff
 	from Imovel i
 	left join Usuario prop
@@ -125,7 +126,9 @@ left join
 	-- AGENDAMENTO
 	left join Agendamento a
 	  on a.imovel_id = i.id
-	  and a.tipo = 'Visita'
+	  	and a.tipo = 'Visita'
+ 	  	and a.status = 'Realizado'
+			and a.fupVisita in ('VaiNegociar', 'VisitouSozinho', 'NaoGostou', 'Talvez')
 	left join Usuario dau
 	  on dau.dadosAgente_id = a.agente_id
 	-- VISITA
@@ -137,7 +140,7 @@ left join
 	left join Negociacao n
 	  on n.imovel_id = fl.imovel_id
 	  and n.proponente_id = fl.cliente_id
-	group by i.id, prop.id, v.visitante_id, fl.id
+	group by i.id, prop.id, v.visitante_id, fl.id, n.id
 ) negotiation
 	on _all.id_imovel = negotiation.id_imovel
 		and _all.id_owner = negotiation.id_owner
@@ -151,6 +154,7 @@ left join
 		 prop.id as id_owner,
 		 v.visitante_id as id_user_visitor,
 		 fl.id as id_rental_flow,
+		 a.id as booking_id,
 		 min(abs(timestampdiff(minute, coalesce(o.criadoEm, pp.criadoEm), coalesce(a.dataFupVisita, a.atualizadoEm)))) as minutes_diff
 	from Imovel i
 	left join Usuario prop
@@ -158,7 +162,9 @@ left join
 	-- AGENDAMENTO
 	left join Agendamento a
 	  on a.imovel_id = i.id
-	  and a.tipo = 'Visita'
+		  and a.tipo = 'Visita'
+ 		  and a.status = 'Realizado'
+			and a.fupVisita in ('VaiNegociar', 'VisitouSozinho', 'NaoGostou', 'Talvez')
 	left join Usuario dau
 	  on dau.dadosAgente_id = a.agente_id
 	-- VISITA
@@ -176,7 +182,7 @@ left join
 	left join Offer o
 	  on o.house_id = i.id
 	    and o.client_id = fl.cliente_id
-	group by i.id, prop.id, v.visitante_id, fl.id
+	group by i.id, prop.id, v.visitante_id, fl.id, coalesce(o.id, pp.id)
 ) offer_preproposal
 	on _all.id_imovel = offer_preproposal.id_imovel
 		and _all.id_owner = offer_preproposal.id_owner
