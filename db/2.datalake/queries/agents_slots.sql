@@ -30,7 +30,7 @@ with weekly_schedule as (
 ), specific_schedule as (
 	select distinct
 		agente_id as agent_id,
-		cast(nullif(trim(atualizadoem),'') as timestamp) as dt_update,
+		max(cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key)  as dt_update,
 		max_by(folga, cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key) as folga,
 		date_add('minute',15 * key, date_add('hour',8, cast(cast(nullif(trim("data"),'') as date) as timestamp))) as slot_dt,
 		key as slot_number,
@@ -121,21 +121,28 @@ with weekly_schedule as (
 	select
 		bs.agent_id,
 		bs.dt_update as last_weekly_update,
-		ss.dt_update as last_specific_update,
+		case
+			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then ss.dt_update
+			else null
+		end as last_specific_update,
 		bs.slot_dt,
 		bs.dow,
 		bs.slot_number,
-		bs.available_slot as weekly_slot,
 		case
 			when ss.folga = '1' and ss.available_slot <> bs.available_slot then '0'
 			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then ss.available_slot
 			else bs.available_slot
-		end as specific_slot,
+		end as available_slot,
 		case
 			when ss.folga = '1' and ss.available_slot <> bs.available_slot then 'day off'
 			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then 'specific'
 			else null
-		end as change_reason
+		end as last_change_reason,
+		case
+			when ss.folga = '1' and ss.available_slot <> bs.available_slot then true
+			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then true
+			else false
+		end as specific_update
 	from
 		base_schedule bs
 	left join
@@ -151,18 +158,22 @@ with weekly_schedule as (
 		sc.slot_dt,
 		sc.dow,
 		sc.slot_number,
-		sc.weekly_slot,
-		sc.specific_slot,
 		case
-			when specific_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
+			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
 			then '0'
-			else specific_slot
-		end as time_window_slot,
+			else available_slot
+		end as available_slot,
 		case
-			when specific_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
+			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
 			then '96 hours'
-			else sc.change_reason
-		end as change_reason
+			else sc.last_change_reason
+		end as last_change_reason,
+		specific_update,
+		case
+			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
+			then true
+			else false
+		end as time_window_update
 	from
 		specific_updates sc
 ), visits_updates as (
@@ -173,20 +184,24 @@ with weekly_schedule as (
 		tw.slot_dt,
 		tw.dow,
 		tw.slot_number,
-		tw.weekly_slot,
-		tw.specific_slot,
-		tw.time_window_slot,
 		case
 			when (v.agent_id is not null) then '1'
 			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
-			else tw.time_window_slot
-		end as agent_slot,
+			else tw.available_slot
+		end as available_slot,
 		(v.agent_id is not null) as has_visit,
 		case
-			when (v.agent_id is not null) and tw.time_window_slot = '0' then 'visit'
-			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.time_window_slot = '0' then 'visit'
-			else tw.change_reason
-		end as change_reason
+			when (v.agent_id is not null) and tw.available_slot = '0' then 'visit'
+			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then 'visit'
+			else tw.last_change_reason
+		end as last_change_reason,
+		specific_update,
+		time_window_update,
+		case
+			when (v.agent_id is not null) and tw.available_slot = '0' then true
+			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then true
+			else false
+		end as visit_update
 	from
 		time_window_updates tw
 	left join
@@ -227,7 +242,18 @@ with weekly_schedule as (
 	group by u.dadosagente_id, available_date
 )
 select
-	vu.*,
+	vu.agent_id,
+	vu.last_weekly_update,
+	vu.last_specific_update,
+	vu.slot_dt,
+	vu.dow,
+	vu.slot_number,
+	vu.available_slot,
+	vu.specific_update,
+	vu.time_window_update,
+	vu.visit_update,
+	vu.has_visit,
+	vu.last_change_reason,
 	ah.status as history_status,
 	case when pa._count > 0 then '1' else '0' end as planner_status
 from
@@ -239,5 +265,6 @@ left join
 left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
-	and pa.dt_active = date(slot_dt)
-order by slot_dt
+	and pa.dt_active = date(vu.slot_dt)
+where vu.slot_dt >= date('2017-01-01')
+order by vu.slot_dt

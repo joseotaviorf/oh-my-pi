@@ -1,15 +1,16 @@
-create table staging.agents_slots (
-	agent_id bigint,
+CREATE TABLE staging.agents_slots (
+	agent_id int8,
 	last_weekly_update timestamp,
 	last_specific_update timestamp,
 	slot_dt timestamp,
-	dow integer,
-	slot_number integer,
-	specific_slot integer,
-	time_window_slot integer,
-	agent_slot integer,
+	dow int4,
+	slot_number int4,
+	available_slot int4,
+	specific_update bool,
+	time_window_update bool,
+	visit_update bool,
 	has_visit bool,
-	change_reason varchar(100),
-	history_status integer,
-	planner_status integer
-)
+	last_change_reason varchar(100),
+	history_status int4,
+	planner_status int4
+) ;
