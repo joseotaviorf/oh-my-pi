@@ -116,6 +116,24 @@ class BusinessDimensionETL(DimensionETL):
         self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
 
     @logger
+    def materialize_view_ods(self, view_name, append=False):
+        table = BaseETL.from_db_query(
+            db_enum=EnumDb.QuintoAndar_ebdb,
+            query='select * from vw_{}'.format(view_name))
+
+        print("To ODS: {}".format(datetime.now()))
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name=view_name,
+            db_enum=EnumDb.BI_ODS,
+            encoding='UTF8',
+            append=append,
+            commit=True,
+            bucket_name='{}/raw/ods/{}'.format(self.bucket, view_name)
+        )
+
+    @logger
     def load_athena_raw_query_to_ods(self, table_name, query, append=False):
         df = self.athena.execute_query_and_return_dataframe(query)
         self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
