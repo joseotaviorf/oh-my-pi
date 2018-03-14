@@ -3482,10 +3482,10 @@ fact_factor as (
         on cf.months_after_signature = fc.months_diff
 )
 select
-  sk_property,
-	property_id,
-	sk_contract,
-	sk_cash_flow_date,
+  coalesce(sk_property,-1) as sk_property,
+	coalesce(property_id,-1) as property_id,
+	coalesce(sk_contract,-1) as sk_contract,
+	coalesce(sk_cash_flow_date,-1) as sk_cash_flow_date,
 	vl_owner_campaigns,
 	vl_affiliate_campaigns,
 	vl_inside_sales,
