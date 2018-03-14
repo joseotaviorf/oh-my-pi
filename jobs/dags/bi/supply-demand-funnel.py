@@ -414,18 +414,35 @@ def offer_sub_dag(sub_dag_name):
         dag=local_dag,
         func_command=load_athena_raw_query_to_ods,
         op_kwargs={'table_name': 'offer', 'query': """
-                                                        select distinct
-                                                            eo.*,
-                                                            go.type,
-                                                            go.first_sent_at,
-                                                            go.last_sent_at,
-                                                            gt.type as topic_type
-                                                        from datalake_raw.ebdb_offer eo
-                                                        join datalake_raw.godfather_offer go
-                                                            on eo.godfatherid = go.id
-                                                        left join datalake_raw.godfather_topic gt
-                                                            on gt.offer_id = go.id
-                                                        ;
+                                                    select distinct
+                                                      eo.id,
+                                                      eo.atualizadoem,
+                                                      eo.criadoem,
+                                                      eo.firestoreid,
+                                                      eo.godfatherid,
+                                                      eo.originalcondo,
+                                                      eo.originalhomeinsurance,
+                                                      eo.originaliptu,
+                                                      eo.originalrent,
+                                                      eo.rent,
+                                                      eo.status,
+                                                      eo.turn,
+                                                      eo.client_id,
+                                                      eo.house_id,
+                                                      eo.rentflow_id,
+                                                      eo.rejectionreason,
+                                                      eo.iteration,
+                                                      eo.expirationdate,
+                                                      go.type,
+                                                      go.first_sent_at,
+                                                      go.last_sent_at,
+                                                      gt.type as topic_type
+                                                    from datalake_raw.ebdb_offer eo
+                                                    join datalake_raw.godfather_offer go
+                                                      on eo.godfatherid = go.id
+                                                    left join datalake_raw.godfather_topic gt
+                                                      on gt.offer_id = go.id
+                                                    ;
                                                         """
                    }
     )
@@ -617,12 +634,12 @@ def marketing_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'google'}
     )
 
-    criteo = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_marketing_criteo_costs',
-        func_command=load_marketing_costs,
-        op_kwargs={'dim_name': 'criteo'}
-    )
+    # criteo = BaseDAG.get_quintoandar_python_operator(
+    #     dag=local_dag,
+    #     task_id='ODS_marketing_criteo_costs',
+    #     func_command=load_marketing_costs,
+    #     op_kwargs={'dim_name': 'criteo'}
+    # )
 
     dim_marketing_attribution = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
@@ -639,7 +656,7 @@ def marketing_sub_dag(sub_dag_name):
 
     facebook >> test_marketing
     adwords >> test_marketing
-    criteo >> test_marketing
+    # criteo >> test_marketing
     dim_marketing_attribution
 
     return local_dag
@@ -752,6 +769,7 @@ photo_job_dag >> ods_potential_listings
 region_dag >> ods_potential_listings
 user_dag >> ods_potential_listings
 property_dag >> ods_potential_listings
+marketing_dag >> ods_potential_listings
 
 booking_dag >> ods_property_scheduling
 visit_dag >> ods_property_scheduling
