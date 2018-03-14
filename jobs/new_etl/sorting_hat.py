@@ -9,6 +9,7 @@ class SortingHat(object):
         _logger.info('m=table_extraction_and_load, msg={} - from db'.format(table_name))
         return BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_sortinghat,
+            encoding='UTF8',
             query='select {} from "{}";'.format(columns, table_name)
         )
 

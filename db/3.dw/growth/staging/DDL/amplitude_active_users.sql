@@ -1,5 +1,5 @@
-drop table if exists growth.amplitude_engaged_users;
-create table growth.amplitude_engaged_users (
+drop table if exists growth_staging.amplitude_active_users;
+create table growth_staging.amplitude_active_users (
 	_year integer,
 	_month integer,
 	_week integer,

@@ -2,7 +2,6 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
-from jobs.dags.util import environment as env
 
 
 class BaseDAG(object):
@@ -10,7 +9,7 @@ class BaseDAG(object):
 
     @staticmethod
     def build_dag(dag_id, start_date, schedule_interval, description='', wait_for_downstream=False,
-                  depends_on_past=False, catchup=False):
+                  depends_on_past=False, catchup=False, orientation='LR'):
         return DAG(
             dag_id=dag_id,
             description=description,
@@ -22,7 +21,8 @@ class BaseDAG(object):
             start_date=start_date,
             schedule_interval=schedule_interval,
             max_active_runs=1,
-            catchup=catchup
+            catchup=catchup,
+            orientation=orientation
         )
 
     @staticmethod

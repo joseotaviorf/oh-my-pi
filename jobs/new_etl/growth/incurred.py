@@ -1,8 +1,7 @@
 from jobs.base.base_etl import BaseETL
 from jobs.base.enum_db import EnumDb
+from jobs.new_etl import DW_DIR
 from qa_python_utils.default_logger import logger, _logger
-
-from __init__ import DW_DIR
 
 
 class Growth(object):
@@ -13,21 +12,20 @@ class Growth(object):
     @staticmethod
     @logger
     def get_measure_all_query():
-        return Growth.__get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_measure_no_filters_query():
-        return Growth.__get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
     def get_employee_all_query():
-        return Growth.__get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
+        return Growth._get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
-    @logger
-    def __get_query_from_file_name(file_name):
+    def _get_query_from_file_name(file_name):
         try:
             with open(file_name) as f:
                 return f.read()
@@ -37,36 +35,43 @@ class Growth(object):
 
     @logger
     def load_fact(self):
-        self.drop_table(table_name=Growth.FACT_TABLE_NAME)
+        Growth.drop_table(table_name=Growth.FACT_TABLE_NAME)
+        Growth._execute_file_query('{}/public/queries/{}.sql'.format(DW_DIR, Growth.FACT_TABLE_NAME))
 
-        BaseETL.execute_file_query(
-            filename='{}/public/queries/{}.sql'.format(DW_DIR, Growth.FACT_TABLE_NAME),
-            commit=True,
-            db_enum=EnumDb.BI_DW
-        )
-
+    @staticmethod
     @logger
-    def drop_table(self, table_name, schema='public'):
+    def drop_table(table_name, schema='public'):
         BaseETL.execute_command(
             command='drop table if exists {}.{};'.format(schema, table_name),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
 
+    @staticmethod
     @logger
-    def create_table(self, funnel, measure, _filter, period):
-        prefix_file = Growth.__get_query_from_file_name(
+    def create_table(funnel, measure, _filter, period):
+        prefix_file = Growth._get_query_from_file_name(
             '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
-        suffix_file = Growth.__get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
+        suffix_file = Growth._get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
 
-        self.execute_command(
+        Growth.execute_command(
             'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
                                                      prefix_file + suffix_file))
 
+    @staticmethod
     @logger
-    def execute_command(self, query):
+    def execute_command(query):
         BaseETL.execute_command(
             command=query,
+            commit=True,
+            db_enum=EnumDb.BI_DW
+        )
+
+    @staticmethod
+    @logger
+    def _execute_file_query(file_name):
+        BaseETL.execute_file_query(
+            filename=file_name,
             commit=True,
             db_enum=EnumDb.BI_DW
         )
