@@ -49,7 +49,7 @@ create external table if not exists datalake_clean.ods_fact_liquidity_property_s
   booking_to_visit string,
   offer_to_internal_analyis string,
   offer_to_credit_analysis string,
-  credit_analysis_to_contract string
+  proposal_approved_to_contract_signed string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

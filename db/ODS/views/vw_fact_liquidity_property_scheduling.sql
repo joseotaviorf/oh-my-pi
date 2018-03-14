@@ -195,7 +195,7 @@ calculated_dates as (
            then dpr.dt_updated
           else null::timestamp
         end as credit_analysis_date,
-        dpr.dt_proposal_approved as credit_analysis_approved_date,
+        dpr.dt_proposal_approved as proposal_approved_date,
         case
           when dct.contract_status in ('Cancelado', 'Finalizado')
               then dct.dt_updated
@@ -268,7 +268,7 @@ select
               date_part('hour', credit_analysis_init_date - offer_approved_date)) / 24.0 as offer_to_credit_analysis_init_date,
   (date_part('day', coalesce(credit_analysis_end_date, credit_analysis_date)  - credit_analysis_init_date) * 24 +
               date_part('hour', coalesce(credit_analysis_end_date, credit_analysis_date) - credit_analysis_init_date)) / 24.0 as credit_analysis_init_to_end,
-  (date_part('day', contract_date - credit_analysis_approved_date) * 24 +
-              date_part('hour', contract_date - credit_analysis_approved_date)) / 24.0 as credit_analysis_to_contract
+  (date_part('day', contract_date - proposal_approved_date) * 24 +
+              date_part('hour', contract_date - proposal_approved_date)) / 24.0 as proposal_approved_to_contract_signed
 from calculated_dates
 ;
