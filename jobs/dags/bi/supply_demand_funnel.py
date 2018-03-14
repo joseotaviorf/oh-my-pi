@@ -680,7 +680,7 @@ fact_potential_listing = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply_CAC',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'fact_supply_potential_listings', 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'supply_potential_listings',  'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
