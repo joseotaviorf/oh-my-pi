@@ -223,6 +223,7 @@ select
       Offer o
       on o.house_id = i.id
         and o.client_id = fl.cliente_id
+        and o.expirationDate is not null
 
     left join
       Proposta p_fl
