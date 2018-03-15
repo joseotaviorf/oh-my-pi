@@ -687,7 +687,7 @@ fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
     task_id='DW_fact_liquidity_property_scheduling',
     dag=main_dag,
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'liquidity_property_scheduling', 'is_fact': True, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'liquidity_property_scheduling', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 # flow
