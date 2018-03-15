@@ -55,7 +55,7 @@ with weekly_schedule as (
 				disponivel19as20,disponivel19as20,disponivel19as20,disponivel19as20
 			]
 		) as t(key, value)
-), visits as (
+), ss_visits as (
 	select distinct
 		a.agente_id as agent_id,
 		date_add('minute',15 * cast(a.slotdia as integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') as date) as timestamp))) as slot_dt
@@ -69,6 +69,17 @@ with weekly_schedule as (
 		datalake_raw.ebdb_visitaorigem vo
 		on vo.id = aa.origemultimaatualizacao_id
 	where a.status='Realizado' and vo.nome in ('Inquilinos', 'SelfServiceWeb')
+), full_visits as (
+	select distinct
+		a.agente_id as agent_id,
+		date_add('minute',15 * cast(a.slotdia as integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') as date) as timestamp))) as slot_dt
+	from
+		datalake_raw.ebdb_agendamento a
+	left join
+		datalake_raw.ebdb_agendamento_aud aa
+		on aa.id = a.id
+		and aa.revtype='0'
+	where a.status='Realizado'
 ), base_time as (
 	select
     cast(date_column AS timestamp) as dt,
@@ -185,29 +196,39 @@ with weekly_schedule as (
 		tw.dow,
 		tw.slot_number,
 		case
-			when (v.agent_id is not null) then '1'
-			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
+			when (sv.agent_id is not null) then '1'
+			when lag((sv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
+			else tw.available_slot
+		end as ss_available_slot,
+		case
+			when (fv.agent_id is not null) then '1'
+			when lag((fv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
 			else tw.available_slot
 		end as available_slot,
-		(v.agent_id is not null) as has_visit,
+		(fv.agent_id is not null) as has_visit,
+		(sv.agent_id is not null) as self_service_visit,
 		case
-			when (v.agent_id is not null) and tw.available_slot = '0' then 'visit'
-			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then 'visit'
+			when (fv.agent_id is not null) and tw.available_slot = '0' then 'visit'
+			when lag((fv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then 'visit'
 			else tw.last_change_reason
 		end as last_change_reason,
 		specific_update,
 		time_window_update,
 		case
-			when (v.agent_id is not null) and tw.available_slot = '0' then true
-			when lag((v.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then true
+			when (fv.agent_id is not null) and tw.available_slot = '0' then true
+			when lag((fv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then true
 			else false
 		end as visit_update
 	from
 		time_window_updates tw
 	left join
-		visits v
-		on v.agent_id = tw.agent_id
-		and v.slot_dt = tw.slot_dt
+		ss_visits sv
+		on sv.agent_id = tw.agent_id
+		and sv.slot_dt = tw.slot_dt
+	left join
+		full_visits fv
+		on fv.agent_id = tw.agent_id
+		and fv.slot_dt = tw.slot_dt
 ), active_history_mod as (
 	select distinct
 		from_unixtime(cast(ure."timestamp" as bigint)/1000) as dt_status,
@@ -248,11 +269,13 @@ select
 	vu.slot_dt,
 	vu.dow,
 	vu.slot_number,
+	vu.ss_available_slot,
 	vu.available_slot,
 	vu.specific_update,
 	vu.time_window_update,
 	vu.visit_update,
 	vu.has_visit,
+	vu.self_service_visit,
 	vu.last_change_reason,
 	ah.status as history_status,
 	case when pa._count > 0 then '1' else '0' end as planner_status
