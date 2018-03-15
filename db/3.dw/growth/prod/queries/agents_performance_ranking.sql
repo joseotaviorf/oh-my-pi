@@ -1,11 +1,10 @@
-insert into growth.agents_performance_ranking
 with counts as (
 	select
 		sk_user_agent as agent_id,
 		u.nome as agent_name,
 		r.greater_region,
 		count(distinct(nullif(sk_visit,-1)))::decimal(10,4) as booked_visits,
-		count(distinct(nullif(sk_contract,-1)))::decimal(10,4) as signed_contracts,
+		count(distinct(nullif(c.sk_contract,-1)))::decimal(10,4) as signed_contracts,
 		count(distinct(nullif(sk_visit_date,-1))) as days_worked
 	from 
 		public.fact_liquidity_property_scheduling liq
@@ -21,11 +20,15 @@ with counts as (
 	left join 
 		public.dim_user u 
 		on u.sk_user = liq.sk_user_agent
+	left join 
+		public.dim_contract c 
+		on c.sk_contract = liq.sk_contract
+		and c.dt_signature::date < current_date
 	where 
 		sk_user_agent<>-1
 	and	dd."date" >= current_date - interval '6 weeks'
-	and dd."date" < current_date::date - interval '2 weeks'
-	and (sk_contract_signed_date <> -1 or sk_contract = -1)
+	and dd."date" < current_date - interval '2 weeks'
+	and (liq.sk_contract_signed_date <> -1 or liq.sk_contract = -1)
 	group by sk_user_agent, agent_name, r.greater_region
 ),
 ratios as (
@@ -87,7 +90,7 @@ select
 	gold.threshold as gold_threshold,
 	silver.threshold as silver_threshold,
 	round(c.average_ratio*1.5, 1) as yellow_flag_threshold,
-	(current_date)::date as dt_ranking
+	current_date as dt_ranking
 from
 	commission c
 left join
