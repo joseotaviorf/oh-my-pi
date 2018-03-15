@@ -24,6 +24,7 @@ select distinct
 	_all.id_user_affiliate,
 	_all.id_user_agent,
 	_all.id_user_visit_agent,
+	_all.id_user_visitor,
 	_all.id_visit,
 	_all.visit_created_from_app,
 	_all.visit_created_type,
@@ -33,9 +34,10 @@ select distinct
 	_all.id_negotiation,
 	_all.dt_negotiation,
 	_offer.id_offer,
-	if(coalesce(_offer.id_offer, _negotiation.id_negotiation) is null, null, id_proposal) as id_proposal,
-	if(coalesce(_offer.id_offer, _negotiation.id_negotiation) is null, null, id_contract) as id_contract,
-	if(coalesce(_offer.id_offer, _negotiation.id_negotiation) is null, null, dt_contract_anullment) as dt_contract_anullment
+	_offer.id_pre_proposal,
+	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, id_proposal) as id_proposal,
+	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, id_contract) as id_contract,
+	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, dt_contract_anullment) as dt_contract_anullment
 from (
 	select
 	  @rank := @rank+1 as id_property_scheduling,
@@ -54,7 +56,8 @@ from (
 	  fl.id as id_rental_flow,
 	  n.id as id_negotiation,
 	  n.criadoEm as dt_negotiation,
-	  coalesce(o.id, pp.id) as id_offer,
+	  o.id as id_offer,
+	  pp.id as id_pre_proposal,
 	  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
 	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.id) as id_contract,
 	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.dataRescisao) as dt_contract_anullment,
@@ -87,6 +90,7 @@ from (
 	left join Offer o
 	  on o.house_id = i.id
 	    and o.client_id = fl.cliente_id
+	    and o.expirationDate is not null
 	left join Proposta p1
 	  on p1.offer_id = o.id
 	left join Proposta p2
@@ -132,11 +136,13 @@ left join (
 	select
 		id_rental_flow,
 		id_offer,
+		id_pre_proposal,
 		min(minutes_diff) as min_minutes_diff
 	from (
 		select
 			fl.id as id_rental_flow,
-			coalesce(o.id, pp.id) as id_offer,
+			o.id as id_offer,
+			pp.id as id_pre_proposal,
 			timestampdiff(second, a.criadoEm, coalesce(o.criadoEm, pp.criadoEm)) as minutes_diff
 		from Imovel i
 		join Usuario prop
@@ -155,9 +161,10 @@ left join (
 		left join Offer o
 		  on o.house_id = i.id
 		    and o.client_id = fl.cliente_id
+		    and o.expirationDate is not null
 		where timestampdiff(second, a.criadoEm, coalesce(o.criadoEm, pp.criadoEm)) >= 0
 	) _int_table
-	group by id_rental_flow, id_offer
+	group by id_rental_flow, id_offer, id_pre_proposal
 ) _offer
 	on _all.id_rental_flow = _offer.id_rental_flow
 		and _all.minutes_diff = _offer.min_minutes_diff
