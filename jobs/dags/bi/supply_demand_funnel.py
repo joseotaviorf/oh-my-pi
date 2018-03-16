@@ -21,7 +21,7 @@ biz_etl = BusinessDimensionETL(bucket)
 mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
-MAIN_START_DATE = datetime(2018, 3, 16, 0, 0, 0)
+MAIN_START_DATE = datetime(2018, 3, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
 
 # create main DAG definition
