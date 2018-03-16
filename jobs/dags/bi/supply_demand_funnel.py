@@ -1,12 +1,12 @@
-from datetime import datetime, timedelta
 import json
-from jobs.dags.bi.base_dag import BaseDAG
-from jobs.dags.util import environment as env
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from jobs.new_etl.business_dim_etl import BusinessDimensionETL
-from jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
-from jobs.new_etl.godfather import GodFather
+from datetime import datetime
 
+from jobs.base.base_dag import BaseDAG
+from jobs.dags.bi.supply_demand_funnel.offer import OfferSubDag
+from jobs.dags.util import environment as env
+from jobs.new_etl.business_dim_etl import BusinessDimensionETL
+from jobs.new_etl.godfather import GodFather
+from jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -17,11 +17,11 @@ mkt_configs = dict()
 mkt_configs['criteo'] = json.loads(criteo_config)
 mkt_configs['facebook'] = json.loads(facebook_config)
 mkt_configs['google'] = google_config
-biz_etl = BusinessDimensionETL(bucket, datetime.now())
+biz_etl = BusinessDimensionETL(bucket)
 mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
-MAIN_START_DATE = datetime(2018, 3, 1, 0, 0, 0)
+MAIN_START_DATE = datetime(2018, 3, 16, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
 
 # create main DAG definition
@@ -114,17 +114,17 @@ def lead_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'lead', 'bucket': bucket, 'command': 'call ebdb.list_lead();'}
     )
 
-    dim_lead = QuintoAndarPythonOperator(
+    dim_lead = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='DW_dim_lead',
-        python_callable=load_dim_from_ods_to_dw,
+        func_command=load_dim_from_ods_to_dw,
         op_kwargs={'dim_name': 'lead', 'bucket': bucket}
     )
 
-    test_lead = QuintoAndarPythonOperator(
+    test_lead = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_lead',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     lead >> dim_lead >> test_lead
@@ -154,10 +154,10 @@ def cap_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'contacts_and_prospects', 'bucket': bucket}
     )
 
-    test_contacts_and_prospects = QuintoAndarPythonOperator(
+    test_contacts_and_prospects = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_contacts_and_prospects',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     contacts_and_prospects >> dim_contacts_and_prospects >> test_contacts_and_prospects
@@ -186,10 +186,10 @@ def photo_job_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'photo_job', 'bucket': bucket}
     )
 
-    test_photo_job = QuintoAndarPythonOperator(
+    test_photo_job = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_photo_job',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     photo_job >> dim_photo_job >> test_photo_job
@@ -228,10 +228,10 @@ def region_sub_dag(sub_dag_name):
                        datetime.now().strftime('%Y-%m-%d'))}
     )
 
-    test_region = QuintoAndarPythonOperator(
+    test_region = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_region',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     agent_region >> dim_region
@@ -263,10 +263,10 @@ def user_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'user', 'bucket': bucket}
     )
 
-    test_user = QuintoAndarPythonOperator(
+    test_user = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_user',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     user >> dim_user_task >> test_user
@@ -331,10 +331,10 @@ def property_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'property_status_over_period', 'bucket': bucket, 'insert_dummy': False}
     )
 
-    test_property = QuintoAndarPythonOperator(
+    test_property = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_property',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     listing_views
@@ -377,10 +377,10 @@ def visit_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'visit'}
     )
 
-    test_visits = QuintoAndarPythonOperator(
+    test_visits = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_visits',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     property_visit_information >> visits
@@ -391,112 +391,12 @@ def visit_sub_dag(sub_dag_name):
 
 
 def offer_sub_dag(sub_dag_name):
-    local_dag = BaseDAG.build_dag(
-        '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
+    return OfferSubDag(bucket).build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
+        start_date=MAIN_START_DATE
     )
-    offer_to_s3_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='offer_to_s3',
-        dag=local_dag,
-        func_command=godfather_to_s3,
-        op_kwargs={'table_name': 'offer'}
-    )
-
-    topic_to_s3_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='offer_topic_to_s3',
-        dag=local_dag,
-        func_command=godfather_to_s3,
-        op_kwargs={'table_name': 'topic'}
-    )
-
-    offer_to_ods_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='offer_to_ods',
-        dag=local_dag,
-        func_command=load_athena_raw_query_to_ods,
-        op_kwargs={'table_name': 'offer', 'query': """
-                                                    select distinct
-                                                      eo.id,
-                                                      eo.atualizadoem,
-                                                      eo.criadoem,
-                                                      eo.firestoreid,
-                                                      eo.godfatherid,
-                                                      eo.originalcondo,
-                                                      eo.originalhomeinsurance,
-                                                      eo.originaliptu,
-                                                      eo.originalrent,
-                                                      eo.rent,
-                                                      eo.status,
-                                                      eo.turn,
-                                                      eo.client_id,
-                                                      eo.house_id,
-                                                      eo.rentflow_id,
-                                                      eo.rejectionreason,
-                                                      eo.iteration,
-                                                      eo.expirationdate,
-                                                      go.type,
-                                                      go.first_sent_at,
-                                                      go.last_sent_at,
-                                                      gt.type as topic_type
-                                                    from datalake_raw.ebdb_offer eo
-                                                    join datalake_raw.godfather_offer go
-                                                      on eo.godfatherid = go.id
-                                                    left join datalake_raw.godfather_topic gt
-                                                      on gt.offer_id = go.id
-                                                    ;
-                                                        """
-                   }
-    )
-
-    pre_proposal_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_pre_proposal',
-        dag=local_dag,
-        func_command=extract_query_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'pre_proposal', 'command': 'call ebdb.list_preproposta();'}
-    )
-
-    pre_proposta_aud_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_pre_proposal_aud',
-        dag=local_dag,
-        func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'pre_proposal_AUD', 'table_name': 'PreProposta_AUD', 'copy_to_clean': False}
-    )
-
-    condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_condition',
-        dag=local_dag,
-        func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'condition', 'table_name': 'CondicaoProposta', 'copy_to_clean': False}
-    )
-
-    pre_proposta_condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_pre_proposal_condition',
-        dag=local_dag,
-        func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'pre_proposal_condition', 'table_name': 'PreProposta_CondicaoProposta',
-                   'copy_to_clean': False}
-    )
-
-    dim_offer_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='DW_dim_offer',
-        dag=local_dag,
-        func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'offer'}
-    )
-
-    test_offer = QuintoAndarPythonOperator(
-        dag=local_dag,
-        task_id='TEST_dim_offer',
-        python_callable=mock_run_dimension_tests
-    )
-
-    offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
-    pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
-    pre_proposta_condicao_proposta_task >> dim_offer_task
-    offer_to_ods_task >> dim_offer_task
-    dim_offer_task >> test_offer
-
-    return local_dag
 
 
 def proposal_sub_dag(sub_dag_name):
@@ -526,10 +426,10 @@ def proposal_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'proposal'}
     )
 
-    test_proposal = QuintoAndarPythonOperator(
+    test_proposal = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_proposal',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     proposal >> dim_proposal
@@ -560,10 +460,10 @@ def contract_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'contract'}
     )
 
-    test_contract = QuintoAndarPythonOperator(
+    test_contract = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_contract',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     contract >> dim_contract
@@ -601,10 +501,10 @@ def booking_sub_dag(sub_dag_name):
                    'post_command': "update dim_booking set visit_follow_up = null where visit_follow_up = ''"}
     )
 
-    test_booking = QuintoAndarPythonOperator(
+    test_booking = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_dim_booking',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     booking >> dim_booking_task
@@ -649,10 +549,10 @@ def marketing_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'marketing_attribution', 'bucket': bucket}
     )
 
-    test_marketing = QuintoAndarPythonOperator(
+    test_marketing = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_marketing',
-        python_callable=mock_run_dimension_tests
+        func_command=mock_run_dimension_tests
     )
 
     facebook >> test_marketing
@@ -674,14 +574,15 @@ ods_potential_listings = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply_potential_listings',
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'potential_listings',  'bucket': bucket, 'command': 'call ebdb.list_potential_listings(null);'}
+    op_kwargs={'dim_name': 'potential_listings', 'bucket': bucket,
+               'command': 'call ebdb.list_potential_listings(null);'}
 )
 
 fact_potential_listing = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply_CAC',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply_potential_listings',  'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'supply_potential_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
@@ -764,22 +665,10 @@ marketing_dag = BaseDAG.get_sub_dag_operator(
     sub_dag_name='Marketing'
 )
 
-lead_dag >> ods_potential_listings
-cap_dag >> ods_potential_listings
-photo_job_dag >> ods_potential_listings
-region_dag >> ods_potential_listings
-user_dag >> ods_potential_listings
-property_dag >> ods_potential_listings
-marketing_dag >> ods_potential_listings
-
-booking_dag >> ods_property_scheduling
-visit_dag >> ods_property_scheduling
-offer_dag >> ods_property_scheduling
-proposal_dag >> ods_property_scheduling
-contract_dag >> ods_property_scheduling
-region_dag >> ods_property_scheduling
-user_dag >> ods_property_scheduling
-property_dag >> ods_property_scheduling
+ods_potential_listings.set_upstream([lead_dag, cap_dag, photo_job_dag, region_dag, user_dag, property_dag,
+                                     marketing_dag])
+ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+                                      user_dag, property_dag])
 
 ods_potential_listings >> fact_potential_listing
 ods_property_scheduling >> fact_property_scheduling
