@@ -18,7 +18,7 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - find /var/www/airflow/dags -name \*.pyc -delete
+      - sudo find /var/www/airflow/dags -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       branch: [ forno ]
@@ -36,7 +36,7 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - find /var/www/airflow/dags -name \*.pyc -delete
+      - sudo find /var/www/airflow/dags -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       branch: [ master ]

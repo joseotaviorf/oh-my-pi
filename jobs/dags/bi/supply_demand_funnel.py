@@ -314,7 +314,7 @@ def property_sub_dag(sub_dag_name):
         dag=local_dag,
         task_id='ODS_property_listing',
         func_command=materialize_view_ods,
-        op_kwargs={'view_name': 'property_listing', 'append': True}
+        op_kwargs={'view_name': 'property_listing'}
     )
 
     dim_property = BaseDAG.get_quintoandar_python_operator(

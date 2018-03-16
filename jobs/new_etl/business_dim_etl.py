@@ -118,7 +118,7 @@ class BusinessDimensionETL(DimensionETL):
     @logger
     def materialize_view_ods(self, view_name, append=False):
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDb.BI_ODS,
             query='select * from vw_{}'.format(view_name))
 
         print("To ODS: {}".format(datetime.now()))
