@@ -10,7 +10,7 @@ from dim_etl import DimensionETL
 class BusinessDimensionETL(DimensionETL):
 
     @logger
-    def __init__(self, bucket, now):
+    def __init__(self, bucket, now=datetime.now()):
         super(BusinessDimensionETL, self).__init__(bucket=bucket, now=now)
 
     @logger
