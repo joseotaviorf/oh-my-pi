@@ -8,6 +8,7 @@ from qa_python_utils.default_logger import logger
 
 
 class OfferSubDag(object):
+    @logger
     def __init__(self, s3_bucket):
         self.s3_bucket = s3_bucket
         self.biz_etl = BusinessDimensionETL(s3_bucket)
@@ -39,101 +40,133 @@ class OfferSubDag(object):
 
         return local_dag
 
+    def __to_s3(self, **kwargs):
+        GodFather.to_s3(s3_bucket=self.s3_bucket, table_name=kwargs['table_name'])
+
+    def __extract_query_dim_from_ebdb_to_ods(self, **kwargs):
+        self.biz_etl.extract_query_dim_from_ebdb_to_ods(
+            dim_name=kwargs['dim_name'],
+            command=kwargs['command'],
+            table_name=None if 'table_name' not in kwargs else kwargs['table_name']
+        )
+
+    def __load_athena_raw_query_to_ods(self, **kwargs):
+        self.biz_etl.load_athena_raw_query_to_ods(
+            table_name=kwargs['table_name'],
+            query=kwargs['query'],
+            append=False if 'append' not in kwargs else kwargs['append']
+        )
+
+    def __load_dim_from_ods_to_dw(self, **kwargs):
+        self.biz_etl.load_dim_from_ods_to_dw(
+            dim_name=kwargs['dim_name'],
+            insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
+            is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
+            pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
+            post_command=None if 'post_command' not in kwargs else kwargs['post_command']
+        )
+
     @logger
     def __build_data_tasks(self, local_dag):
         offer_to_s3_task = BaseDAG.get_quintoandar_python_operator(
             task_id='offer_to_s3',
             dag=local_dag,
-            func_command=GodFather.to_s3(s3_bucket=self.s3_bucket, table_name='offer')
+            func_command=self.__to_s3,
+            op_kwargs={'table_name': 'offer'}
         )
+
         topic_to_s3_task = BaseDAG.get_quintoandar_python_operator(
             task_id='offer_topic_to_s3',
             dag=local_dag,
-            func_command=GodFather.to_s3(s3_bucket=self.s3_bucket, table_name='topic')
+            func_command=self.__to_s3,
+            op_kwargs={'table_name': 'topic'}
         )
+
         offer_to_ods_task = BaseDAG.get_quintoandar_python_operator(
             task_id='offer_to_ods',
             dag=local_dag,
-            func_command=self.biz_etl.load_athena_raw_query_to_ods(
-                table_name='offer',
-                query="""
-                                    select distinct
-                                      eo.id,
-                                      eo.atualizadoem,
-                                      eo.criadoem,
-                                      eo.firestoreid,
-                                      eo.godfatherid,
-                                      eo.originalcondo,
-                                      eo.originalhomeinsurance,
-                                      eo.originaliptu,
-                                      eo.originalrent,
-                                      eo.rent,
-                                      eo.status,
-                                      eo.turn,
-                                      eo.client_id,
-                                      eo.house_id,
-                                      eo.rentflow_id,
-                                      eo.rejectionreason,
-                                      eo.iteration,
-                                      eo.expirationdate,
-                                      go.type,
-                                      go.first_sent_at,
-                                      go.last_sent_at,
-                                      gt.type as topic_type
-                                    from datalake_raw.ebdb_offer eo
-                                    join datalake_raw.godfather_offer go
-                                      on eo.godfatherid = go.id
-                                    left join datalake_raw.godfather_topic gt
-                                      on gt.offer_id = go.id
-                                    ;
-                                """
-            )
+            func_command=self.__load_athena_raw_query_to_ods,
+            op_kwargs={'table_name': 'offer', 'query': """
+                                                        select distinct
+                                                          eo.id,
+                                                          eo.atualizadoem,
+                                                          eo.criadoem,
+                                                          eo.firestoreid,
+                                                          eo.godfatherid,
+                                                          eo.originalcondo,
+                                                          eo.originalhomeinsurance,
+                                                          eo.originaliptu,
+                                                          eo.originalrent,
+                                                          eo.rent,
+                                                          eo.status,
+                                                          eo.turn,
+                                                          eo.client_id,
+                                                          eo.house_id,
+                                                          eo.rentflow_id,
+                                                          eo.rejectionreason,
+                                                          eo.iteration,
+                                                          eo.expirationdate,
+                                                          go.type,
+                                                          go.first_sent_at,
+                                                          go.last_sent_at,
+                                                          gt.type as topic_type
+                                                        from datalake_raw.ebdb_offer eo
+                                                        join datalake_raw.godfather_offer go
+                                                          on eo.godfatherid = go.id
+                                                        left join datalake_raw.godfather_topic gt
+                                                          on gt.offer_id = go.id
+                                                        ;
+                                                        """
+                       }
         )
+
         pre_proposal_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal',
             dag=local_dag,
-            func_command=self.biz_etl.extract_query_dim_from_ebdb_to_ods(
-                dim_name='pre_proposal',
-                command='call ebdb.list_preproposta();'
-            )
+            func_command=self.__extract_query_dim_from_ebdb_to_ods,
+            op_kwargs={'dim_name': 'pre_proposal', 'command': 'call ebdb.list_preproposta();'}
+
         )
+
         pre_proposta_aud_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal_aud',
             dag=local_dag,
-            func_command=self.biz_etl.extract_query_dim_from_ebdb_to_ods(
-                dim_name='pre_proposal_AUD',
-                table_name='PreProposta_AUD',
-                copy_to_clean=False
-            )
+            func_command=self.__extract_query_dim_from_ebdb_to_ods,
+            op_kwargs={'dim_name': 'pre_proposal_AUD', 'table_name': 'PreProposta_AUD', 'copy_to_clean': False}
         )
+
         condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_condition',
             dag=local_dag,
-            func_command=self.biz_etl.extract_query_dim_from_ebdb_to_ods(
-                dim_name='condition',
-                table_name='CondicaoProposta',
-                copy_to_clean=False
-            )
+            func_command=self.__extract_query_dim_from_ebdb_to_ods,
+            op_kwargs={'dim_name': 'condition', 'table_name': 'CondicaoProposta', 'copy_to_clean': False}
         )
+
         pre_proposta_condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal_condition',
             dag=local_dag,
-            func_command=self.biz_etl.extract_query_dim_from_ebdb_to_ods(
-                dim_name='pre_proposal_condition',
-                table_name='PreProposta_CondicaoProposta',
-                copy_to_clean=False
-            )
+            func_command=self.__extract_query_dim_from_ebdb_to_ods,
+            op_kwargs={'dim_name': 'pre_proposal_condition', 'table_name': 'PreProposta_CondicaoProposta',
+                       'copy_to_clean': False}
         )
+
         dim_offer_task = BaseDAG.get_quintoandar_python_operator(
             task_id='DW_dim_offer',
             dag=local_dag,
-            func_command=self.biz_etl.load_dim_from_ods_to_dw(
-                dim_name='offer'
-            )
+            func_command=self.__load_dim_from_ods_to_dw,
+            op_kwargs={'dim_name': 'offer'}
         )
 
         return condicao_proposta_task, dim_offer_task, offer_to_ods_task, offer_to_s3_task, pre_proposal_task, \
                pre_proposta_aud_task, pre_proposta_condicao_proposta_task, topic_to_s3_task
+
+    @staticmethod
+    def __test_file_query(**kwargs):
+        BaseTest.test_file_query(
+            file_path=kwargs['file_path'],
+            enum_db=kwargs['enum_db'],
+            assertion=kwargs['assertion']
+        )
 
     @logger
     def __build_test_tasks(self, local_dag):
@@ -141,10 +174,9 @@ class OfferSubDag(object):
         test_status_task = BaseDAG.get_python_operator(
             dag=local_dag,
             task_id='TEST_dim_offer_status',
-            func_command=BaseTest.test_file_query(
-                file_path='{}/dim_offer_status.sql'.format(DW_TEST_QUERIES_DIR),
-                enum_db=EnumDb.BI_DW,
-                assertion=None)
+            func_command=OfferSubDag.__test_file_query,
+            op_kwargs={'file_path': '{}/dim_offer_status.sql'.format(DW_TEST_QUERIES_DIR), 'enum_db': EnumDb.BI_DW,
+                       'assertion': None}
         )
 
         return [test_status_task]
