@@ -723,7 +723,7 @@ user_dag = BaseDAG.get_sub_dag_operator(
 
 property_dag = BaseDAG.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=user_sub_dag,
+    sub_dag_func=property_sub_dag,
     sub_dag_name='Property'
 )
 
