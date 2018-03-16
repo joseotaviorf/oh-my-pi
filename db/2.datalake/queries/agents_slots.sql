@@ -1,12 +1,10 @@
-with weekly_schedule as (
-	select
+with weekly_schedule_prev as (
+	select distinct
 		cast(hsa.atualizadoem as timestamp) as dt_update,
 		agente_id as agent_id,
 		diadasemana as dow,
 		value as available_slot,
-		key as slot_number,
-		lead(cast(hsa.atualizadoem as timestamp)) over (partition by agente_id, diadasemana, key order by cast(hsa.atualizadoem as timestamp)) as dt_next_update,
-		lag(value) over (partition by agente_id, diadasemana, key order by cast(hsa.atualizadoem as timestamp)) as previous_status
+		key as slot_number
 	from
 		datalake_raw.ebdb_horariosemanalagente_aud hsa
 	cross join
@@ -27,6 +25,13 @@ with weekly_schedule as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
+), weekly_schedule as (
+	select
+		*,
+		lead(dt_update) over (partition by agent_id, dow, slot_number order by dt_update) as dt_next_update,
+		lag(available_slot) over (partition by agent_id, dow, slot_number order by dt_update) as previous_status
+	from
+		weekly_schedule_prev
 ), specific_schedule as (
 	select distinct
 		agente_id as agent_id,
