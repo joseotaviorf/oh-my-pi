@@ -7,6 +7,7 @@ from jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
 from jobs.new_etl.godfather import GodFather
 
+
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 criteo_config = env.get_airflow_env_var('criteo')
