@@ -5,7 +5,7 @@ from jobs.base.base_dag import BaseDAG
 
 MAIN_DAG_NAME = 'crawling-houses-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = timedelta(hours=18)
+MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
 
 def submit_olx():
