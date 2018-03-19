@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.base_ticket_task
   where property_id = -1
     and group_name = 'Back-Office (onboarding)'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.base_ticket_task tt
   where tt.group_name = 'Back-Office (onboarding)'
     and property_id != -1
 ),
@@ -124,6 +124,7 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+    and tt.property_id = cc.property_id
 ),
 result as (
     select
