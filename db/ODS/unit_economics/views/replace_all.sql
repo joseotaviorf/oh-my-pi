@@ -53,7 +53,7 @@ select
   status,
   min_version_time,
   coalesce(max_version_time, '2300-01-01')::date as max_version_time
-from public.vw_property_listing
+from public.property_listing
 ;
 
 create or replace view unit_economics.vw_base_contract_costs as
