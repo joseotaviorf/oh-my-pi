@@ -9,10 +9,26 @@ class GoogleCampaigns(MarketingCampaigns):
 
     def __init__(self, config):
         # Initialize appropriate service.
-        self.client = adwords.AdWordsClient.LoadFromString(config)
-        self.report_downloader = self.client.GetReportDownloader(version='v201708')
+        self.clients = []
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['sp_account']), 'account_name': 'QuintoAndar - Sao Paulo'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['display_account']), 'account_name': 'QuintoAndar - Display'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['broad_location_account']), 'account_name': 'QuintoAndar - Broad location + DSA'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['others_account']), 'account_name': 'QuintoAndar - Other Cities'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['rj_account']), 'account_name': 'QuintoAndar - Rio de Janeiro'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['institutional_account']), 'account_name': 'QuintoAndar - Institucional'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['universal_app_account'] ), 'account_name': 'QuintoAndar - Universal App Campaigns'})
 
     def extract_marketing_campaigns(self, dt):
+        table = petl.fromdicts([])
+        for client in self.clients:
+            table = petl.cat(table, self.extract_marketing_campaigns_from_client(client, dt))
+        return list(table)
+
+    def extract_marketing_campaigns_from_client(self, client, dt):
+        adwords_client = client['client']
+        account_name = client['account_name']
+        print account_name
+        report_downloader = adwords_client.GetReportDownloader(version='v201708')
         # Create report query.
         report_query = (
             """
@@ -35,7 +51,7 @@ class GoogleCampaigns(MarketingCampaigns):
             )
         )
 
-        report = self.report_downloader.DownloadReportAsStringWithAwql(
+        report = report_downloader.DownloadReportAsStringWithAwql(
             report_query,
             'CSV',
             skip_report_header=True,
@@ -61,5 +77,6 @@ class GoogleCampaigns(MarketingCampaigns):
             'campaign_area',
             lambda r: 'supply' if r['campaign'] in supply_campaigns else 'liquidity'
         )
+        table = petl.addfield(table, 'account_name', account_name)
 
-        return list(table)
+        return table

@@ -7,7 +7,8 @@ CREATE TABLE public.google_ads_campaigns (
 	impressions varchar(10) NOT NULL,
 	clicks varchar(10) NOT NULL,
 	cost varchar(30) NOT NULL,
-	campaign_area varchar(20) NULL
+	campaign_area varchar(20) NULL,
+	account_name varchar(255)
 )
 WITH (
 	OIDS=FALSE
