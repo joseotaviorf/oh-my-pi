@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from jobs.base.base_dag import BaseDAG
-from jobs.dags.bi.supply_demand_funnel.offer import OfferSubDag
+from jobs.dags.bi.supply_demand_funnel import offer_subdag
 from jobs.dags.util import environment as env
 from jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from jobs.new_etl.godfather import GodFather
@@ -391,7 +391,7 @@ def visit_sub_dag(sub_dag_name):
 
 
 def offer_sub_dag(sub_dag_name):
-    return OfferSubDag(bucket).build(
+    return offer_subdag.build(
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
