@@ -25,10 +25,8 @@ dag = BaseDAG.build_dag(
     schedule_interval=MAIN_SCHEDULE_INTERVAL
 )
 
-op = BaseDAG.get_quintoandar_python_operator(
+BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
     func_command=submit_zap
 )
-
-op
