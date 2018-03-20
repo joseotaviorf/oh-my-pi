@@ -2778,7 +2778,7 @@ filtered_properties as (
   select distinct
     fpp.sk_property,
     fpp.property_id,
-    cps.dre_date - interval '1 month' as dt
+    cps.dre_date as dt
   from filtered_properties_prev fpp
     join cdre_cs_pre_sale cps
       on cps.dre_date between date_trunc('month', fpp.min_version_time) + interval '1 month'
