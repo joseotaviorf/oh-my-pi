@@ -24,7 +24,6 @@ class MarketingDimensionETL(DimensionETL):
             table = self.facebook.extract_marketing_campaigns(date(2016, 11, 1))
         elif dim_name == 'criteo':
             table = self.criteo.extract_marketing_campaigns(date(2017, 1, 1))
-
         if table is not None:
             BaseETL.bulk_insert(
                 table=table,
