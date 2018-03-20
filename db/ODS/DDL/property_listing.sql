@@ -7,6 +7,9 @@ CREATE TABLE public.property_listing (
 	max_version_time timestamp NULL,
 	nr_renting integer null,
 	first_publication_date timestamp NULL,
+	start_version_category varchar null,
+	end_version_category varchar null,
+	is_last_version int8,
 	CONSTRAINT property_listing_pk PRIMARY KEY (id,"version")
 )
 WITH (
