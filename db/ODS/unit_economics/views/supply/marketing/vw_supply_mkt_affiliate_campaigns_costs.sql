@@ -32,9 +32,11 @@ facebook_monthly_affiliate_costs as
         account_name = 'Supply'
     and
         (
-            campaign_name like '%IA%'
-            or campaign_name like '%indica%'
-            or campaign_name like '%Indica%'
+            campaign_name like '%IA%' or
+            campaign_name like '%indica%' or
+            campaign_name like '%Indica%' or
+            campaign_name like '%affiliate%' or
+            campaign_name like '%doorman%'
         ) is true
     group by
         date_part('month', "date"::date),

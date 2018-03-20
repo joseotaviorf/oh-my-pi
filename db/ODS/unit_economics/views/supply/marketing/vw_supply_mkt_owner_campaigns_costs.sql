@@ -15,7 +15,8 @@ with google_monthly_owner_costs as (
 	where
 		(
 			campaign like '%proprietarios%' or
-			campaign like '%lp_quanto_cobrar%'
+			campaign like '%lp_quanto_cobrar%' or
+			campaign like '0.%'
 		)
 	group by
 		"day"::date
@@ -32,9 +33,11 @@ facebook_monthly_owner_costs as
         account_name = 'Supply'
     and
         (
-            campaign_name like '%IA%'
-            or campaign_name like '%indica%'
-            or campaign_name like '%Indica%'
+            campaign_name like '%IA%' or
+            campaign_name like '%indica%' or
+            campaign_name like '%Indica%' or
+            campaign_name like '%affiliate%' or
+            campaign_name like '%doorman%'
         ) is false
     group by
         "date"::date

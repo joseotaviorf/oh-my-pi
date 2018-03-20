@@ -24,7 +24,8 @@ google_daily_costs as (
 		(
 			campaign like '%proprietarios%' or
 			campaign like '%lp_quanto_cobrar%' or
-			campaign like '%indicaai%'
+			campaign like '%indicaai%' or
+			campaign like '0.%'
 		) is false
 	group by
 		"day"::date
