@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (pre-sale)'
   group by property_id, dt
@@ -22,7 +22,7 @@ calculated_qt as (
     tt.property_id,
     tt.dt,
     tt.qt
-  from unit_economics.vw_base_ticket_task tt
+  from unit_economics.base_ticket_task tt
   where tt.group_name = 'Customer Support (pre-sale)'
     and property_id != -1
 ),
@@ -47,7 +47,7 @@ filtered_properties as (
   select distinct
     fpp.sk_property,
     fpp.property_id,
-    cps.dre_date - interval '1 month' as dt
+    cps.dre_date as dt
   from filtered_properties_prev fpp
     join cdre_cs_pre_sale cps
       on cps.dre_date between date_trunc('month', fpp.min_version_time) + interval '1 month'
