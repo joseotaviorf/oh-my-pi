@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from jobs.dags.bi.crawlers import start_batch_job, STATES
 from qa_python_utils.default_logger import _logger
 from jobs.base.base_dag import BaseDAG
+from airflow.models import DAG
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -19,10 +20,16 @@ def submit_iw():
     _logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
 
 
-dag = BaseDAG.build_dag(
+dag = DAG(
     dag_id=MAIN_DAG_NAME,
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    max_active_runs=1
 )
 
 BaseDAG.get_quintoandar_python_operator(
