@@ -1396,7 +1396,11 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       co.dre_date as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
+      case
+        when sum(eg.qt) over (partition by co.dre_date) > 0
+        then coalesce(co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date)), 0)::double precision
+        else co.dre_value * eg.qt / (sum(eg.qt) over (partition by co.dre_date))::double precision
+      end as vl_bo_offboarding,
       (dre_value is null)::int as flg_expected
     from espec_gen eg
     join cdre_offboarding co
@@ -1424,6 +1428,7 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+    and tt.property_id = cc.property_id
 ),
 last_3_avg as (
 	select
@@ -1564,7 +1569,11 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       eg.dt as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision as vl_bo_onboarding
+      case
+        when sum(eg.qt) over (partition by eg.dt) > 0
+        then coalesce(co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt)), 0)::double precision
+        else co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision
+      end as vl_bo_onboarding
     from espec_gen eg
     left join cdre_onboarding co
       on co.dre_date = eg.dt
@@ -1588,6 +1597,7 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
+    and tt.property_id = cc.property_id
 ),
 result as (
     select

@@ -100,7 +100,11 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       eg.dt as dt_cash_flow,
-      co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision as vl_bo_onboarding
+      case
+        when sum(eg.qt) over (partition by eg.dt) > 0
+        then coalesce(co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt)), 0)::double precision
+        else co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision
+      end as vl_bo_onboarding
     from espec_gen eg
     left join cdre_onboarding co
       on co.dre_date = eg.dt
