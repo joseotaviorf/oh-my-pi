@@ -1,4 +1,3 @@
-drop view if exists public.vw_property_listing;
 create or replace view public.vw_property_listing as
 with filt as (
   select
@@ -8,7 +7,7 @@ with filt as (
 	row_number() over (partition by id order by status_time) as rn
 	from imovel_status_history
 	where status_history in ('despublicado', 'publicado', 'alugado', 'suspenso')
---	and id = 892781398
+--	and id = 892769994
 ), not_pub as (
   select
     filt.id,
@@ -122,19 +121,35 @@ with filt as (
 		case
 			when (start_first_pub and end_last_status) then status_time
 			when (start_first_pub) then status_time
-			else lag(status_time) over (partition by id order by status_time)
+			else lag(status_time) over w
 		end as min_version_time,
 		case
 			when end_last_status then null
 			else status_time
 		end as max_version_time,
-    start_first_pub,start_pub_after_rent,start_after_depub_90,start_after_depub_rent,end_pub_after_rent,end_depub_90,end_depub_rent,end_last_status,
+		case
+			when (lag(start_first_pub) over w or start_first_pub) then 'First Listing'
+			when lag(start_pub_after_rent) over w then 'Re-Listing'
+			when lag(start_after_depub_rent) over w then 'Re-Listing'
+			when start_pub_after_rent and end_last_status then 'Re-Listing'
+			when start_after_depub_rent and end_last_status then 'Re-Listing'
+			when lag(start_after_depub_90) over w then 'Recovered'
+			when start_after_depub_90 and end_last_status then 'Recovered'
+		end as start_version_category,
+		case
+			when end_last_status then null
+			when end_pub_after_rent or end_depub_rent then 'Rented'
+			when end_depub_90 then 'Depublished'
+		end as end_version_category,
+		case when end_last_status then 1 else 0 end as is_last_version,
+--    start_first_pub,start_pub_after_rent,start_after_depub_90,start_after_depub_rent,end_pub_after_rent,end_depub_90,end_depub_rent,end_last_status,
     (end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status) as _end
   from
     check_status
   where
     start_first_pub or start_pub_after_rent or start_after_depub_90 or start_after_depub_rent or
     end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status
+window w as (partition by id order by status_time)
 ), times as (
 	select
 		id,
@@ -144,6 +159,9 @@ with filt as (
 		max_version_time,
 		min(status_time) over w as first_publication_date,
 		sum(rent) over (partition by id order by status_time rows unbounded preceding) as nr_renting,
+		start_version_category,
+		end_version_category,
+		is_last_version,
 		_end
 	from
 		aux_times
@@ -154,12 +172,14 @@ with filt as (
 select
 	id,
 	status,
-	status_time,
 	rank() over (partition by id order by status_time) as version,
 	min_version_time,
 	max_version_time,
 	nr_renting,
-	first_publication_date
+	first_publication_date,
+	start_version_category,
+	end_version_category,
+	is_last_version
 from
 	times
 where _end is true

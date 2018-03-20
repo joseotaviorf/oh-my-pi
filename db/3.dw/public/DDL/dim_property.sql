@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS public.dim_property;
+--DROP TABLE IF EXISTS public.dim_property;
 CREATE TABLE public.dim_property (
   sk_property bigint NOT NULL,
   id BIGINT DEFAULT -1::bigint,
@@ -150,8 +150,8 @@ CREATE TABLE public.dim_property (
   time_listing_created_to_first_offer_submited NUMERIC(14,4),
   time_listing_created_to_first_refused_by_insurance NUMERIC(14,4),
   time_listing_created_to_first_visit_realized NUMERIC(14,4),
-  
-  nr_listing integer,   
+
+  nr_listing integer,
   nr_renting integer,
 
   info_visita_autorizacao_de_entrada integer,
@@ -169,7 +169,10 @@ CREATE TABLE public.dim_property (
 
   total_area INTEGER,
   construction_area INTEGER,
-  unpublished_reason VARCHAR(255)
+  unpublished_reason VARCHAR(255),
+  start_version_category varchar(255),
+  end_version_category varchar(255),
+  is_last_status INTEGER,
   
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;

@@ -9,6 +9,9 @@ with de_published_dates as (
         vpl.min_version_time, 
         vpl.max_version_time, 
         vpl.status as last_status_version,
+        vpl.start_version_category,
+        vpl.end_version_category,
+        vpl.is_last_version,
         ish.status_history, 
         max(ish.status_time) over (partition by ish.id, vpl.version) as de_publication_date
     from public.property_listing vpl
@@ -30,6 +33,9 @@ imovel_dates as
 	  ud.de_publication_date,
 	  pl.version as nr_listing,
 		pl.nr_renting::bigint,
+    pl.start_version_category,
+    pl.end_version_category,
+    pl.is_last_version,
 	  min(b."criadoEm") AS first_booking_date,
 
 	  min(b."criadoEm")
@@ -187,10 +193,13 @@ imovel_dates as
 		pl.version, 
 		pl.min_version_time, 
 		pl.max_version_time,
-	    pl.status,
-	    pl.min_version_time::date,
-	    pl.version,
+    pl.status,
+    pl.min_version_time::date,
+    pl.version,
 		pl.nr_renting,
+    pl.start_version_category,
+    pl.end_version_category,
+    pl.is_last_version,
 		ud.de_publication_date
 )
 SELECT 
@@ -361,7 +370,11 @@ SELECT
 
   i.area_total as total_area,
   i.area_terreno as contruction_area,
-  i.unpublished_reason as unpublished_reason
+  i.unpublished_reason as unpublished_reason,
+  imovel_dates.start_version_category,
+  imovel_dates.end_version_category,
+  imovel_dates.is_last_version
+
 
 from 
 	imovel i
