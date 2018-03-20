@@ -1783,7 +1783,6 @@ series as (
 		generate_series((max(dre.dre_date) + interval '1 month')::date,
 		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date
 	from cdre_collection dre
-	group by dre_value
 
 	union
 
