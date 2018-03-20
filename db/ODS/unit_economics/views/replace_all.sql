@@ -335,9 +335,11 @@ facebook_monthly_affiliate_costs as
         account_name = 'Supply'
     and
         (
-            campaign_name like '%IA%'
-            or campaign_name like '%indica%'
-            or campaign_name like '%Indica%'
+            campaign_name like '%IA%' or
+            campaign_name like '%indica%' or
+            campaign_name like '%Indica%' or
+            campaign_name like '%affiliate%' or
+            campaign_name like '%doorman%'
         ) is true
     group by
         date_part('month', "date"::date),
@@ -413,13 +415,14 @@ create or replace view unit_economics.vw_supply_mkt_owner_campaigns_costs as
 with google_monthly_owner_costs as (
 	select
 		"day"::date as dt_cost,
-		sum((cost::decimal(14,4)/1000000)::decimal(14,2)) as cost
+		sum((cost::DECIMAL(14,4)/1000000)::DECIMAL(14,2)) as cost
 	from
 		google_ads_campaigns
 	where
 		(
 			campaign like '%proprietarios%' or
-			campaign like '%lp_quanto_cobrar%'
+			campaign like '%lp_quanto_cobrar%' or
+			campaign like '0.%'
 		)
 	group by
 		"day"::date
@@ -429,16 +432,18 @@ facebook_monthly_owner_costs as
 (
 	select
         "date"::date as dt_cost,
-        sum(spend::decimal(14,4)) as cost
+        sum(spend::DECIMAL(14,4)) as cost
     from
         facebook_ads_campaigns
     where
         account_name = 'Supply'
     and
         (
-            campaign_name like '%IA%'
-            or campaign_name like '%indica%'
-            or campaign_name like '%Indica%'
+            campaign_name like '%IA%' or
+            campaign_name like '%indica%' or
+            campaign_name like '%Indica%' or
+            campaign_name like '%affiliate%' or
+            campaign_name like '%doorman%'
         ) is false
     group by
         "date"::date
@@ -2469,14 +2474,14 @@ create or replace view unit_economics.vw_liquidity_mkt_tenant_campaigns_costs as
 with criteo_daily_costs as (
 	select distinct
 		"dateTime"::date as dt_cost,
-		cost::decimal as cost
+		cost::DECIMAL as cost
 	from criteo_ads_campaigns
 ),
 -- Get Google Daily Costs
 google_daily_costs as (
 	select
 		"day"::date dt_cost,
-		sum((cost::decimal/1000000)::decimal) as cost
+		sum((cost::DECIMAL/1000000)::DECIMAL) as cost
 	from
 		google_ads_campaigns
 	where
@@ -2484,7 +2489,8 @@ google_daily_costs as (
 		(
 			campaign like '%proprietarios%' or
 			campaign like '%lp_quanto_cobrar%' or
-			campaign like '%indicaai%'
+			campaign like '%indicaai%' or
+			campaign like '0.%'
 		) is false
 	group by
 		"day"::date
@@ -2493,7 +2499,7 @@ google_daily_costs as (
 facebook_daily_costs as (
 	select
 	    "date"::date as dt_cost,
-	    sum(spend::decimal) as cost
+	    sum(spend::DECIMAL) as cost
 	from
 	    facebook_ads_campaigns
 	where
@@ -2505,7 +2511,7 @@ facebook_daily_costs as (
 rtbhouse_daily_costs as (
 	select
 		"Date"::date as dt_cost,
-		-sum(("Debit"::decimal(14,2))::decimal(14,2)) as cost
+		-sum(("Debit"::DECIMAL(14,2))::DECIMAL(14,2)) as cost
 	from
 		rtbhouse_ads_campaigns
 	where
@@ -2574,9 +2580,9 @@ select
 	pc.google,
 	pc.facebook,
 	pc.rtbhouse,
-	trim(replace("Total",',',''))::decimal(14,4)
+	trim(REPLACE("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date") as classifieds,
-	(pc.total + (trim(replace("Total",',',''))::decimal(14,4)
+	(pc.total + (trim(REPLACE("Total",',',''))::decimal(14,4)
 	/ f_get_days_in_month("Date"))) as total
 from
 	files.classified_costs class
