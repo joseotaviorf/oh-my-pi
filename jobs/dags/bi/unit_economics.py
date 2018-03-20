@@ -324,6 +324,13 @@ mgmt_ops_cs_post_sale_costs = QuintoAndarPythonOperator(
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_cs_post_sale_costs'}
 )
+mgmt_ops_inspection_costs = QuintoAndarPythonOperator(
+    dag=dag,
+    task_id='mgmt_ops_inspection_costs',
+    execution_timeout=timedelta(hours=3),
+    python_callable=materialize_view,
+    op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_inspection_costs'}
+)
 mgmt_costs = QuintoAndarPythonOperator(
     dag=dag,
     task_id='mgmt_costs',
@@ -356,6 +363,7 @@ base_ticket_task >> mgmt_ops_collection_costs
 base_ticket_task >> mgmt_ops_bo_offboarding_costs
 base_ticket_task >> mgmt_ops_bo_onboarding_costs
 base_ticket_task >> mgmt_ops_cs_post_sale_costs
+base_ticket_task >> mgmt_ops_inspection_costs
 
 # supply
 supply_ops_inside_sales_costs >> supply_ops_costs
@@ -383,7 +391,7 @@ net_revenue_revenues_brokerage_fee >> net_revenue_revenues_brokerage_plus_mgmt_a
 net_revenue_revenues_mgmt_fee >> net_revenue_revenues_brokerage_plus_mgmt_aux
 net_revenue_revenues_brokerage_plus_mgmt_aux >> net_revenue_revenues
 net_revenue_revenues_brokerage_plus_mgmt_aux >> net_revenue_taxes_sales_tax_iss
-net_revenue_revenues_brokerage_plus_mgmt_aux >>net_revenue_taxes_sales_tax_pis_cofins
+net_revenue_revenues_brokerage_plus_mgmt_aux >> net_revenue_taxes_sales_tax_pis_cofins
 net_revenue_taxes_sales_tax_iss >> net_revenue_taxes
 net_revenue_taxes_sales_tax_pis_cofins >> net_revenue_taxes
 net_revenue_taxes_delay_fine >> net_revenue_taxes
@@ -392,7 +400,6 @@ net_revenue_revenues >> net_revenue_costs
 net_revenue_commission_costs >> net_revenue_costs
 
 # management
-mgmt_insurance
 mgmt_insurance_fee >> mgmt_insurance
 mgmt_insurance_pis_cofins >> mgmt_insurance
 mgmt_ops_bo_offboarding_costs >> mgmt_ops_costs
@@ -400,14 +407,10 @@ mgmt_ops_bo_onboarding_costs >> mgmt_ops_costs
 mgmt_ops_bo_ongoing_costs >> mgmt_ops_costs
 mgmt_ops_collection_costs >> mgmt_ops_costs
 mgmt_ops_cs_post_sale_costs >> mgmt_ops_costs
+mgmt_ops_inspection_costs >> mgmt_ops_costs
 mgmt_ops_costs >> mgmt_costs
 mgmt_insurance >> mgmt_costs
-mgmt_costs
 
 # fact
-supply_costs >> fact_property_economics
-liquidity_costs >> fact_property_economics
-net_revenue_costs >> fact_property_economics
-mgmt_costs >> fact_property_economics
-
+fact_property_economics.set_upstream([supply_costs, liquidity_costs, net_revenue_costs, mgmt_costs])
 fact_property_economics >> load_fact
