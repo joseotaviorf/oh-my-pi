@@ -12,7 +12,7 @@ qt_nulls as (
     property_id,
     dt,
     sum(qt) as qt
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.base_ticket_task
   where property_id = -1
     and group_name = 'Customer Support (post-sale)'
   group by property_id, dt
@@ -23,7 +23,7 @@ calculated_qt as (
     dt,
     qt,
     avg(qt) over() as _avg
-  from unit_economics.vw_base_ticket_task
+  from unit_economics.base_ticket_task
   where group_name = 'Customer Support (post-sale)'
     and property_id != -1
 ),
@@ -131,12 +131,15 @@ tt_costs as (
       eg.property_id,
       eg.dt,
       cps.dre_date as dt_cash_flow,
-      cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_post_sale,
+      cps.dre_value * eg.qt / case
+        												when sum(eg.qt) over (partition by cps.dre_date) = 0
+        													then null
+        												else sum(eg.qt) over (partition by cps.dre_date)::double precision
+      											 end as vl_cs_post_sale,
       flg_expected_cs_post_sale
     from spec_gen eg
     join cdre_cs_post_sale_fc cps
-      on cps.dre_date = eg.dt + interval '1 month'
-    where eg.qt > 0
+      on cps.dre_date = eg.dt - interval '1 month'
 ),
 contract_costs as (
     select
@@ -146,8 +149,7 @@ contract_costs as (
       cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
     from filtered_contracts fc
     join cdre_cs_post_sale cps
-      on cps.dre_date = fc.dt
-    where fc.dt + interval '1 month' = cps.dre_date
+      on cps.dre_date = fc.dt - interval '1 month'
 ),
 full_costs as (
   select distinct
@@ -170,5 +172,5 @@ select
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
-    and fc.dt - interval '1 month' between vbpc.min_version_time and vbpc.max_version_time
+    and fc.dt - interval '1 month' between date_trunc('month', vbpc.min_version_time) and date_trunc('month', vbpc.max_version_time)
 ;
