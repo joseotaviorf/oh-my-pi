@@ -1911,7 +1911,7 @@ full_costs as (
       and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select distinct
-  vbpc.sk_property,
+  coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
   fc.property_id,
   fc.dt_cash_flow::date,
   fc.vl_collection,
@@ -1969,9 +1969,7 @@ series as (
 		generate_series((max(dre.dre_date) + interval '1 month')::date,
 		    (max(dre.dre_date) + interval '60 month')::date, interval '1 month') as dre_date
 	from cdre_cs_post_sale dre
-
 	union
-
 	select dre_value, dre_date
 	from cdre_cs_post_sale
 ),
@@ -2032,7 +2030,7 @@ spec_gen_prev as (
   from calculated cc
   full outer join gen_contracts gc
     on cc.property_id = gc.property_id
-        and gc.dt = cc.dt
+    	and gc.dt = cc.dt
 ),
 spec_gen as (
 	select distinct
@@ -2071,8 +2069,8 @@ contract_costs as (
       fc.dt,
       cps.dre_date as dt_cash_flow,
       cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
-    from filtered_contracts fc
-    join cdre_cs_post_sale cps
+    from unit_economics.test_filtered_contracts fc
+    join cdre_cs_post_sale_fc cps
       on cps.dre_date = fc.dt - interval '1 month'
 ),
 full_costs as (
@@ -2084,8 +2082,9 @@ full_costs as (
     coalesce(tt.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale
   from tt_costs tt
   full outer join contract_costs cc
-    on tt.property_id = cc.property_id and tt.dt = cc.dt
-        and tt.dt_cash_flow = cc.dt_cash_flow
+    on tt.property_id = cc.property_id
+    	and tt.dt = cc.dt
+      and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
   coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
