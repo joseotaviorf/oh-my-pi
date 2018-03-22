@@ -6,7 +6,10 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
 
+from jobs.dags.util import environment as env
 from jobs.etl.crawlers.crawler_leads import CrawlerLeads
+
+env.set_airflow_var_to_local_env('bi-datalake-s3-bucket', 'DATA_GOOGLE_API_KEY')
 
 
 def insert_leads(**kwargs):
@@ -48,12 +51,12 @@ def insert_leads(**kwargs):
         phones.phone_number.unique()).values
 
     # send leads not known
-    leads = leads[~leads.known]
+    leads = leads[~leads.known].sort_values(by='updated_on')
     if leads.empty:
         _logger.info(NO_LEADS_MSG)
         return None
 
-    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('olx'))
+    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
     return leads
 
@@ -65,7 +68,7 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 3, 25, 18, 0, 0),
+    start_date=datetime(2018, 3, 22, 20, 0, 0),
     schedule_interval='0 1 * * *',
     max_active_runs=1
 )

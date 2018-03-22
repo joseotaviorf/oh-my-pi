@@ -9,9 +9,13 @@ import boto3
 import requests
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger, logger
+from airflow.models import DAG
+from airflow.operators.python_operator import PythonOperator
 
 from jobs.dags.bi.crawlers import start_batch_job
 from jobs.etl.crawlers.crawler_leads import CrawlerLeads
+from jobs.dags.util import environment as env
+env.set_airflow_var_to_local_env('bi-datalake-s3-bucket', 'DATA_GOOGLE_API_KEY')
 
 GET_LOCATIONS = \
     """
@@ -161,5 +165,22 @@ def crawl_cpfs(**kwargs):
 
     return locations
 
+dag = DAG(
+    dag_id='crawling-cpfs',
+    default_args={
+        'owner': 'Data Team',
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=datetime(2018, 3, 25, 0, 0, 0),
+    schedule_interval='@once',
+    max_active_runs=1
+)
 
-_ = crawl_cpfs(**{'ws': 'vivareal', 'delta_days': 3, 'neighbourhood': 'Pinheiros'})
+# operators
+PythonOperator(
+    dag=dag,
+    task_id='crawl-cpfs',
+    python_callable=crawl_cpfs,
+    op_kwargs={'ws': 'vivareal', 'delta_days': 3}
+)
