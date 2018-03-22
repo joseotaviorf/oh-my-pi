@@ -87,7 +87,7 @@ class CrawlerLeads(object):
         return r
 
     @staticmethod
-    def _sanitize_text(s):
+    def sanitize_text(s):
         if s is not None:
             u = unidecode(unicode(s))
             return '-'.join(re.sub("[^\w]", " ", u).split()).lower()
@@ -107,7 +107,7 @@ class CrawlerLeads(object):
         )
         return partitions
 
-    def _get_last_crawling_date(self, ws):
+    def get_last_crawling_date(self, ws):
         partitions = self._get_crawling_dates()
         return partitions.loc[partitions.ws == ws, 'started_on'].max()
 
@@ -117,8 +117,8 @@ class CrawlerLeads(object):
 
         polygons = self.athena_client.execute_query_and_return_dataframe(q)
 
-        polygons.region = polygons.region.apply(self._sanitize_text)
-        polygons.city = polygons.city.apply(self._sanitize_text)
+        polygons.region = polygons.region.apply(self.sanitize_text)
+        polygons.city = polygons.city.apply(self.sanitize_text)
         polygons.poly = polygons.poly.apply(wkt.loads)
 
         self.polygons = polygons
@@ -130,7 +130,7 @@ class CrawlerLeads(object):
 
         leads = None
         if q:
-            last_date = datetime.strptime(self._get_last_crawling_date(ws), '%Y-%m-%d')
+            last_date = datetime.strptime(self.get_last_crawling_date(ws), '%Y-%m-%d')
             since = last_date - timedelta(days=delta_days)
 
             q = q.format(
@@ -147,16 +147,20 @@ class CrawlerLeads(object):
     def cleaning(self, leads):
         text_columns = ['type', 'advertiser_name', 'street', 'neighborhood', 'city', 'state']
         for c in text_columns:
-            leads[c] = leads[c].apply(self._sanitize_text)
+            if c in leads:
+                leads[c] = leads[c].apply(self.sanitize_text)
 
-        leads.cep = leads.cep.astype(str).str.zfill(8)
-        leads.type = leads.type.replace(self.map_types)
+        if 'cep' in leads:
+            leads.cep = leads.cep.astype(str).str.zfill(8)
+        if 'type' in leads:
+            leads.type = leads.type.replace(self.map_types)
 
         num_columns = ['rent', 'lat', 'lng']
         for c in num_columns:
-            if any([isinstance(v, basestring) for v in leads[c]]):
-                leads[c].replace({'': np.nan}, inplace=True)
-            leads[c] = leads[c].astype(float)
+            if c in leads:
+                if any([isinstance(v, basestring) for v in leads[c]]):
+                    leads[c].replace({'': np.nan}, inplace=True)
+                leads[c] = leads[c].astype(float)
 
         return leads
 
