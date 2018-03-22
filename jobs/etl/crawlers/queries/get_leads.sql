@@ -72,6 +72,6 @@ where
             )
         )
     )>= date '{since}'
-    and advertiser_type != 'b2c'
+    and (advertiser_type != 'b2c' or advertiser_type is null)
     and lower(state) in ('{states}')
 ;
