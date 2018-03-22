@@ -9,148 +9,154 @@ with de_published_dates as (
         vpl.min_version_time, 
         vpl.max_version_time, 
         vpl.status as last_status_version,
+        vpl.start_version_category,
+        vpl.end_version_category,
+        vpl.is_last_version,
         ish.status_history, 
         max(ish.status_time) over (partition by ish.id, vpl.version) as de_publication_date
-    from vw_property_listing vpl
+    from public.property_listing vpl
     left join imovel_status_history ish
         on ish.id = vpl.id
-          and ish.status_time between coalesce(vpl.min_version_time, '1900-01-01') 
+          and ish.status_time between coalesce(vpl.min_version_time, '1900-01-01')
                                   and coalesce(vpl.max_version_time, '2300-01-01')
           and ish.status_history = 'despublicado'
 ),
 imovel_dates as
 (
-	SELECT 
+	SELECT
 		im.id,
 	  pl.version,
 	  pl.min_version_time,
 	  pl.max_version_time,
-	  pl.status as last_status_version,
+	  pl.status::varchar(255) as last_status_version,
 	  pl.min_version_time::date as publication_date,
 	  ud.de_publication_date,
 	  pl.version as nr_listing,
-		pl.nr_renting,
+		pl.nr_renting::bigint,
+    pl.start_version_category,
+    pl.end_version_category,
+    pl.is_last_version,
 	  min(b."criadoEm") AS first_booking_date,
-	  
-	  min(b."criadoEm") 
+
+	  min(b."criadoEm")
 	  	filter (
-				where 
-					b."criadoEm" > COALESCE(pl.min_version_time,'2000-01-01 00:00:00'::timestamp) 
+				where
+					b."criadoEm" > COALESCE(pl.min_version_time,'2000-01-01 00:00:00'::timestamp)
 					AND b."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_booking_date,
-	        
-		min(b."criadoEm") 
+
+		min(b."criadoEm")
 			filter (
 				where b.status::text <> 'Canceled'
-			) 
+			)
 		as first_booking_confirmed_date,
-	       
-		min(b."criadoEm") 
+
+		min(b."criadoEm")
 			filter (
 				where	b.status::text <> 'Canceled'
-				and b."criadoEm" > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp) 
+				and b."criadoEm" > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp)
 				and b."criadoEm" <= coalesce(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_booking_confirmed_date,
-	        
+
 		min(v.dia) AS first_visit_date,
-	        
-		min(v.dia) 
+
+		min(v.dia)
 			filter (
-				where v.dia > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp) 
+				where v.dia > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp)
 				and v.dia <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		AS version_first_visit_date,
-	  
-		min(v.dia) 
+
+		min(v.dia)
 			filter (
 				where	b.status::text <> 'Canceled'
-			) 
+			)
 		AS first_visit_confirmed_date,
-	  
-		min(v.dia) 
+
+		min(v.dia)
 			filter (
 				where b.status::text <> 'Canceled'
-				and v.dia > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp) 
+				and v.dia > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp)
 				and v.dia <= coalesce(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_visit_confirmed_date,
-	        
+
 		min(pp."criadoEm"::timestamp) AS first_pre_proposal_date,
-	        
-		min(pp."criadoEm"::timestamp) 
+
+		min(pp."criadoEm"::timestamp)
 			filter (
-				where	 
-					pp."criadoEm"::timestamp > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+				where
+					pp."criadoEm"::timestamp > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 					and pp."criadoEm"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_pre_proposal_date,
-	        
-	 	min(p."criadoEm") 
+
+	 	min(p."criadoEm")
 	 		filter (
 	 			where p."statusDocumentacaoInq" = 'RecusadoCardiff'
- 			) 
+ 			)
  		as first_proposal_refused_by_insurance_date,
-	        
-    min(p."criadoEm") 
+
+    min(p."criadoEm")
     	filter (
-				where p."statusDocumentacaoInq"::text = 'RecusadoCardiff'::text 
-				and p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+				where p."statusDocumentacaoInq"::text = 'RecusadoCardiff'::text
+				and p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and p."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_proposal_refused_by_insurance_date,
-	        
+
     min(p."criadoEm") AS first_proposal_accepted_date,
-	        
-  	min(p."criadoEm") 
+
+  	min(p."criadoEm")
   		filter (
-				where p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+				where p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and p."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		as version_first_proposal_accepted_date,
-	        
+
     min(c."criadoEm") AS first_contract_date,
-	        
-  	min(c."criadoEm") 
+
+  	min(c."criadoEm")
 	  	filter (
-				where c."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+				where c."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and c."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		AS version_first_contract_date,
-	        
+
     min(c."dataAssinado") AS first_signed_contract_date,
-	        
-    min(c."dataAssinado") 
+
+    min(c."dataAssinado")
     	FILTER (
-    		where c."dataAssinado" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+    		where c."dataAssinado" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
     		AND c."dataAssinado" <= COALESCE(pl.max_version_time::timestamp, now())
-  		) 
+  		)
 		AS version_first_signed_contract_date,
-	        
+
     min(p."dataDocumentosEnviados"::timestamp) as first_document_sent_date,
-	        
-    min(p."dataDocumentosEnviados"::timestamp) 
+
+    min(p."dataDocumentosEnviados"::timestamp)
     	FILTER (
-				WHERE p."dataDocumentosEnviados"::timestamp >	COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+				WHERE p."dataDocumentosEnviados"::timestamp >	COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				AND p."dataDocumentosEnviados"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
-			) 
+			)
 		AS version_first_document_sent_date,
-	        
+
     max(p."dataDocumentosEnviados"::timestamp) as last_document_sent_date,
-	        
-    max(p."dataDocumentosEnviados"::timestamp) 
+
+    max(p."dataDocumentosEnviados"::timestamp)
     	FILTER (
-        WHERE p."dataDocumentosEnviados"::timestamp > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp) 
+        WHERE p."dataDocumentosEnviados"::timestamp > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 	    	AND p."dataDocumentosEnviados"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
   		)
 	  AS version_last_document_sent_date
-	
-	FROM 
+
+	FROM
 		imovel im
-	       
-	JOIN 
-		vw_property_listing pl 
+
+	JOIN
+		public.property_listing pl
 		ON pl.id = im.id
 	
 	LEFT JOIN 
@@ -187,10 +193,13 @@ imovel_dates as
 		pl.version, 
 		pl.min_version_time, 
 		pl.max_version_time,
-	    pl.status,
-	    pl.min_version_time::date,
-	    pl.version,
+    pl.status,
+    pl.min_version_time::date,
+    pl.version,
 		pl.nr_renting,
+    pl.start_version_category,
+    pl.end_version_category,
+    pl.is_last_version,
 		ud.de_publication_date
 )
 SELECT 
@@ -361,7 +370,11 @@ SELECT
 
   i.area_total as total_area,
   i.area_terreno as contruction_area,
-  i.unpublished_reason as unpublished_reason
+  i.unpublished_reason as unpublished_reason,
+  imovel_dates.start_version_category,
+  imovel_dates.end_version_category,
+  imovel_dates.is_last_version
+
 
 from 
 	imovel i

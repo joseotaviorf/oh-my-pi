@@ -3,13 +3,14 @@ from datetime import datetime
 from jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
+from __init__ import DATALAKE_QUERIES_DIR
 from dim_etl import DimensionETL
 
 
 class BusinessDimensionETL(DimensionETL):
 
     @logger
-    def __init__(self, bucket, now):
+    def __init__(self, bucket, now=datetime.now()):
         super(BusinessDimensionETL, self).__init__(bucket=bucket, now=now)
 
     @logger
@@ -60,7 +61,7 @@ class BusinessDimensionETL(DimensionETL):
             table_name=dim_name,
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
-            append=True,
+            append=False,
             commit=True,
             bucket_name='{}/raw/ods/{}'.format(self.bucket, dim_name)
         )
@@ -110,15 +111,40 @@ class BusinessDimensionETL(DimensionETL):
 
     # TODO: Migrate all business dimension etl from ODS to Datalake
     @logger
-    def load_athena_query_to_ods(self, dim_name, file_name, append=False):
-        _logger.info("Reading from S3: {}".format(datetime.utcnow()))
-        data_frame = self.athena.execute_file_query_and_return_dataframe(file_name)
+    def load_athena_file_query_to_ods(self, table_name, file_name, append=False):
+        df = self.athena.execute_file_query_and_return_dataframe('{}/{}'.format(DATALAKE_QUERIES_DIR, file_name))
+        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
 
-        _logger.info("START - To Staging: {}".format(datetime.utcnow()))
+    @logger
+    def materialize_view_ods(self, view_name, append=False):
+        table = BaseETL.from_db_query(
+            db_enum=EnumDb.BI_ODS,
+            query='select * from vw_{}'.format(view_name))
+
+        print("To ODS: {}".format(datetime.now()))
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name=view_name,
+            db_enum=EnumDb.BI_ODS,
+            encoding='UTF8',
+            append=append,
+            commit=True,
+            bucket_name='{}/raw/ods/{}'.format(self.bucket, view_name)
+        )
+
+    @logger
+    def load_athena_raw_query_to_ods(self, table_name, query, append=False):
+        df = self.athena.execute_query_and_return_dataframe(query)
+        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
+
+    @logger
+    def __df_to_db(self, enum_db, df, table_name, append=False):
+        _logger.info('m=__df_to_db, msg=sending data frame to db')
         BaseETL.dataframe_to_db(
-            enum_db=EnumDb.BI_ODS,
-            df=data_frame,
-            table_name=dim_name,
+            enum_db=enum_db,
+            df=df,
+            table_name=table_name,
             encoding='utf-8',
             append=append
         )

@@ -84,9 +84,9 @@ BEGIN
       o.qualified_date as qualified_date,
 
       case
-        when coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01'
+        when coalesce(f.dataCriacao, f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)  <='1900-01-01'
           then NULL
-        ELSE coalesce(f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
+        ELSE coalesce(f.dataCriacao, f.dataAgendamento, f.dataAceitoFotografo, f.dataUploadFotos)
       END as opportunity_date,
 
       FROM_UNIXTIME(ure.`timestamp`/1000) AS listing_publication_date,
@@ -446,12 +446,12 @@ BEGIN
     left join JobFotografo f
       on f.id = (
       select
-        max(id) -- min id
+        min(id)
       from
         JobFotografo j
       where
         j.imovel_id = o.imovel_id
-        and (j.dataCriacao <= FROM_UNIXTIME(ure.`timestamp`/1000) or FROM_UNIXTIME(ure.`timestamp`/1000) is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
+--        and (j.dataCriacao <= FROM_UNIXTIME(ure.`timestamp`/1000) or FROM_UNIXTIME(ure.`timestamp`/1000) is null) -- datacriacao < (if exists(datepublication) ((max(datepublication), tomorrow))
     )
 
     LEFT JOIN

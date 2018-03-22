@@ -1,5 +1,5 @@
-drop view if exists vw_property_status_over_period;
-create or replace view public.vw_property_status_over_period as
+drop view if exists vw_dim_property_status_over_period;
+create or replace view public.vw_dim_property_status_over_period as
 with dup as (
   select
     ((p.id || '00') || COALESCE(p.version, 1))::bigint AS sk_property,

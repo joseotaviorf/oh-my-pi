@@ -20,6 +20,8 @@ CREATE TABLE dim_proposal (
   dt_created TIMESTAMP,
   dt_updated TIMESTAMP,
   dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  dt_tenant_first_document_sent TIMESTAMP
+  dt_tenant_first_document_sent TIMESTAMP,
+  dt_credit_analysis_init TIMESTAMP,
+  dt_credit_analysis_end TIMESTAMP,
   CONSTRAINT dim_proposal_pkey PRIMARY KEY(sk_proposal)
 ) ;

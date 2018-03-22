@@ -62,7 +62,6 @@ BEGIN
     df.ativo as dadosFotogrtafoAtivo,
     dv.inicioContrato as dadosVendedorInicioContrato,
     g.nome as dadosVendedorNomeGerente,
-    daf.contadorPlanilhaDeLeads as dadosAfiliadoContadorPlanilhaDeLeads,
     daf.contratosFechados as dadosAfiliadoContratosFechados,
     daf.indicacaoShortUrl as dadosAfiliadoIndicacaoShortUrl,
     daf.inicioAtuacao as dadosAfiliadoInicioAtuacao,

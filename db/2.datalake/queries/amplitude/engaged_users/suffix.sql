@@ -31,8 +31,7 @@ group_count_houses_daily as (
     amplitude_id,
     city,
     region,
-    partial,
-    sum(house_id_count_daily)
+    partial
   from count_houses_prev
   group by _year, _month, _week, _day, amplitude_id, city, region, partial
   having sum(house_id_count_daily) >= 3
@@ -45,8 +44,7 @@ group_count_houses_weekly as (
     amplitude_id,
     city,
     region,
-    partial,
-    sum(house_id_count_weekly)
+    partial
   from count_houses_prev
   group by _year, _month, _week, amplitude_id, city, region, partial
   having sum(house_id_count_weekly) >= 3
@@ -58,8 +56,7 @@ group_count_houses_monthly as (
     amplitude_id,
     city,
     region,
-    partial,
-    sum(house_id_count_monthly)
+    partial
   from count_houses_prev
   group by _year, _month, amplitude_id, city, region, partial
   having sum(house_id_count_monthly) >= 3
@@ -70,8 +67,7 @@ group_count_houses_yearly as (
     amplitude_id,
     city,
     region,
-    partial,
-    sum(house_id_count_yearly)
+    partial
   from count_houses_prev
   group by _year, amplitude_id, city, region, partial
   having sum(house_id_count_yearly) >= 3

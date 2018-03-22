@@ -14,6 +14,7 @@ create table fact_growth (
 	mtd integer,
 	ytd integer,
 	mom numeric(14,4),
-	yoy numeric(14,4)
+	yoy numeric(14,4),
+	flg_predicted integer
 )
 ;
