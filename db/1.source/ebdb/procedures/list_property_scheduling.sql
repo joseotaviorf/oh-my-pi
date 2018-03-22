@@ -35,9 +35,9 @@ select distinct
 	_all.dt_negotiation,
 	_offer.id_offer,
 	_offer.id_pre_proposal,
-	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, id_proposal) as id_proposal,
-	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, id_contract) as id_contract,
-	if(coalesce(_offer.id_offer, _offer.id_pre_proposal, _negotiation.id_negotiation) is null, null, dt_contract_anullment) as dt_contract_anullment
+	id_proposal as id_proposal,
+	id_contract as id_contract,
+	dt_contract_anullment as dt_contract_anullment
 from (
 	select
 	  @rank := @rank+1 as id_property_scheduling,
@@ -59,8 +59,8 @@ from (
 	  o.id as id_offer,
 	  pp.id as id_pre_proposal,
 	  coalesce(p1.id, p2.id, p_n.id) as id_proposal,
-	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.id) as id_contract,
-	  if(coalesce(p1.id, p2.id, p_n.id) is null, null, c.dataRescisao) as dt_contract_anullment
+	  c.id as id_contract,
+	  c.dataRescisao as dt_contract_anullment
 	from Imovel i
 	left join Usuario prop
 	  on prop.id = i.usuario_id
