@@ -30,7 +30,7 @@ class CrawlerLeads(object):
     ORIGIN = 'Crawling'
 
     BUCKET = os.environ['bi-datalake-s3-bucket']
-    GOOGLE_MAPS_API_KEY = os.environ['crawler-gmaps-key']
+    GOOGLE_MAPS_API_KEY = os.environ['DATA_GOOGLE_API_KEY']
 
     HERE = os.path.dirname(os.path.realpath(__file__))
 
@@ -95,6 +95,9 @@ class CrawlerLeads(object):
         return None
 
     def _get_crawling_dates(self):
+        q = """msck repair table datalake_raw.crawlers"""
+        self.athena_client.execute_query_and_wait_for_results(q)
+
         q = """show partitions datalake_raw.crawlers"""
         partitions = self.athena_client.execute_txt_query_and_return_dataframe(q)
         pattern = re.compile(r'ws=(\D+)\/started_on=(\d{4}-\d{2}-\d{2})')
@@ -207,7 +210,7 @@ class CrawlerLeads(object):
         with open(os.path.join(self.HERE, 'queries/get_known_phones.sql'), 'r') as f:
             q = f.read()
         phone_list = "', '".join(
-            [re.sub('\+\d{2}|[(|)]', '', str(p))
+            [re.sub(r'\+\d{2}|[(|)]', '', str(p))
              for p in np.array([np.array(p) for p in leads.phones.apply(eval).values]).ravel()])
         since = datetime.today() - timedelta(days=delta_days)
         q = q.format(phone_list=phone_list, since=since.strftime('%Y-%m-%d'))
@@ -239,39 +242,3 @@ class CrawlerLeads(object):
         messages = [json.dumps(j) for j in to_send.reset_index(drop=True).to_dict('records')]
 
         BaseETL.publish_messages(messages=messages, queue_name=self.QUEUE)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--max', action='store', default=1, type=int, help='Max number of leads to be sent.')
-    parser.add_argument('--ws', action='store', default='olx', help='Website from where we get leads.')
-    parser.add_argument('--states', type=str, nargs='*', default=[], help='State or list of states to get leads.')
-    parser.add_argument(
-        '--since', action='store', default=2, type=int, help='Difference in days between crawled_on and updated_on')
-    args = parser.parse_args()
-
-    crawler_leads = CrawlerLeads()
-    leads = crawler_leads.leads(ws=args.ws, states=args.states, delta_days=args.since)
-    leads = crawler_leads.cleaning(leads)
-
-    # enrich lat and lng with ceps
-    info = crawler_leads.enrich(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
-    leads = leads.merge(info, how='left', left_on='cep', right_on='location')
-    leads.lat = leads.lat.combine_first(leads.glat)
-    leads.lng = leads.lng.combine_first(leads.glng)
-
-    # get to which region each lead belongs
-    leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
-
-    # filter out units outside our coverage area
-    leads = leads[(leads.regions > -1) & ((leads.type != 'casa') | leads.regions.isin(crawler_leads.house_allowed))]
-
-    # get known phones from last 6 months
-    phones = crawler_leads.check_known_phone(leads, delta_days=180)
-    leads['known'] = pd.Series(
-        np.array([np.array(p) for p in leads.phones.apply(eval).values]).ravel()).isin(
-        phones.phone_number.unique()).values
-
-    # send leads not known
-    crawler_leads.send_leads(leads[~leads.known], ws='olx')
