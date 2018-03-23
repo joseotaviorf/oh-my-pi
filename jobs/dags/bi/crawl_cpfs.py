@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import json
 import os
 import re
 from datetime import datetime, timedelta
@@ -7,15 +8,16 @@ from io import BytesIO
 
 import boto3
 import requests
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger, logger
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger, logger
 
 from jobs.dags.bi.crawlers import start_batch_job
-from jobs.etl.crawlers.crawler_leads import CrawlerLeads
 from jobs.dags.util import environment as env
-env.set_airflow_var_to_local_env('bi-datalake-s3-bucket', 'DATA_GOOGLE_API_KEY')
+from jobs.etl.crawlers.crawler_leads import CrawlerLeads
+
+env.set_airflow_var_to_local_env('bi-datalake-s3-bucket', 'DATA_GOOGLE_API_KEY', 'crawl_cpfs_params')
 
 GET_LOCATIONS = \
     """
@@ -119,7 +121,7 @@ def crawl_cpfs(**kwargs):
     if locations.empty:
         _logger.info(NO_LOCATIONS_MSG)
         return None
-
+    _logger.info('m=crawl_cpfs, got {} locations from crawlers'.format(len(locations)))
     locations = crawler_leads.cleaning(locations)
 
     # get to which region each lead belongs
@@ -141,11 +143,12 @@ def crawl_cpfs(**kwargs):
         if locations.empty:
             _logger.info(NO_LOCATIONS_MSG)
             return None
+    _logger.info('m=crawl_cpfs, {} locations after filtering regions'.format(len(locations)))
 
     locations = fillin(locations)
     locations = locations.drop_duplicates(subset=['street_name', 'street_number'])
 
-    _logger.info('m=crawl_cpfs, saving seed to job')
+    _logger.info('m=crawl_cpfs, saving seed with {} unique street_name and street_number'.format(len(locations)))
     sufix = '{}-{}-{}-{}.csv'.format(
         ws, last_date.strftime('%Y-%m-%d'), kwargs.get('delta_days', 3), neighbourhood or 'all')
     filename = 'raw/crawled_cpfs/source/' + sufix
@@ -165,6 +168,7 @@ def crawl_cpfs(**kwargs):
 
     return locations
 
+
 dag = DAG(
     dag_id='crawling-cpfs',
     default_args={
@@ -182,5 +186,5 @@ PythonOperator(
     dag=dag,
     task_id='crawl-cpfs',
     python_callable=crawl_cpfs,
-    op_kwargs={'ws': 'vivareal', 'delta_days': 3}
+    op_kwargs=json.loads(os.getenv('crawl_cpfs_params'))
 )
