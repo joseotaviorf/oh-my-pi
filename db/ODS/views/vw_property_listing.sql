@@ -7,7 +7,7 @@ with filt as (
 	row_number() over (partition by id order by status_time) as rn
 	from imovel_status_history
 	where status_history in ('despublicado', 'publicado', 'alugado', 'suspenso')
---	and id = 892769994
+--	and id = 892777905
 ), not_pub as (
   select
     filt.id,
@@ -101,10 +101,10 @@ with filt as (
     ds.status = 'publicado' and (lag(ds.status) over w = 'despublicado' and ds.status_time - lag(ds.status_time) over w >= interval '90 days') as start_after_depub_90,
     (ds.status = 'publicado' and (lag(ds.status) over w = 'despublicado' and lag(ds.status, 2) over w = 'alugado' and lag(r.id,2) over w is not null)) or
     (ds.status = 'publicado' and (lag(ds.status) over w = 'suspenso' and lag(ds.status, 2) over w = 'alugado' and lag(r.id,2) over w is not null)) as start_after_depub_rent,
-    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'publicado') or
-    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'suspenso') end_pub_after_rent, -- and lead(ds.status,2) over w = 'publicado') end_pub_after_rent,
+    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'publicado') end_pub_after_rent,
     ds.status = 'despublicado' and (lead(ds.status) over w = 'publicado' and lead(ds.status_time) over w - ds.status_time >= interval '90 days') as end_depub_90,
-    ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null as end_depub_rent,
+    (ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') or
+    (ds.status = 'suspenso' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') as end_depub_rent,
     (ds.rn = max(ds.rn) over (partition by ds.id)) as end_last_status
   from
     ish ds
@@ -114,7 +114,9 @@ with filt as (
     and closest = true
   window
   	w as (partition by ds.id order by ds.status_time)
-), aux_times as (
+)
+--select * from check_status order by status_time;
+, aux_times as (
   select distinct
     id,
     status,
@@ -161,7 +163,9 @@ with filt as (
     start_first_pub or start_pub_after_rent or start_after_depub_90 or start_after_depub_rent or
     end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status
 window w as (partition by id order by status_time)
-), times as (
+)
+--select * from aux_times;
+, times as (
 	select
 		id,
 		status,
@@ -197,4 +201,3 @@ from
 	times
 where _end is true
 ;
-
