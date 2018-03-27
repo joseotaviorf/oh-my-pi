@@ -129,33 +129,20 @@ where
 	"Date" is not null
 ),
 -- For each property expose the published days
-filtered_daily_status as  (
+property_daily_status as  (
 	select
 		base.sk_property,
 		id as property_id,
-		"date" as dt_status,
-		row_number()
-			over (partition by isfh.id, base."version" order by isfh.id, isfh."date") as rn
+		"date" as dt_status
 	from
 		imovel_status_full_history isfh
 	left join
 		unit_economics.vw_base_property_costs base
 		on base.property_id = isfh.id
-		where base.min_version_time <= isfh."date"
-		and base.max_version_time > isfh."date"
+	where base.min_version_time <= isfh."date"
+	and base.max_version_time > isfh."date"
 	and status_history = 'publicado'
---	and id=892772473
-),
--- For each property expose the published days
-property_daily_status as  (
-	select
-		sk_property,
-		property_id,
-		dt_status
-	from
-		filtered_daily_status
-	where
-		rn <= 365
+	and "date" < base.min_version_time + interval '1 year'
 ),
 -- Divide costs for published day
 daily_total as (

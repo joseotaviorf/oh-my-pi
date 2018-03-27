@@ -30,15 +30,14 @@ brokerage_fill as (
 		property_id,
 		bc.contract_id,
 		case
-			when i.landlord_status = 'paid'
-				then amount::decimal(14,4)
 			when i.contract_id is not null
-				then 0
-			when i.contract_id is null and bc.init_date >= '2017-01-01'
+				then amount::decimal(14,4)
+			when bc.init_date >= '2017-01-01'
 				then rent_value
 			else 0
 		end as vl_brokerage_fee,
 		init_date,
+		i.landlord_status,
 		greatest(
 			landlord_due_date,
 			due_date,
