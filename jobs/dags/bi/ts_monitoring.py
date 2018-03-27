@@ -11,10 +11,12 @@ import boto3
 import numpy as np
 import pandas as pd
 from airflow.models import DAG
+# from airflow.operators.quintoandar import QuintoAndarPythonOperator
+from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-from jobs.base.base_dag import BaseDAG
+# from jobs.base.base_dag import BaseDAG
 
 MAIN_DAG_NAME = 'compute-tsmonitoring-tables'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -470,7 +472,12 @@ def import_invoices(client):
     return df_payments
 
 
-def compute_performance_kpis(df_payments):
+def compute_performance_kpis(
+        **context
+        # df_payments
+):
+    df_payments = context['task_instance'].xcom_pull(task_ids='import_invoices')
+
     thresholds = [1, 30, 50, 60, 90, 120, 150]
     # for every contract we determine the date at which it first became bad for a given threshold
     df_performance_threshold = pd.DataFrame()
@@ -534,12 +541,19 @@ def compute_performance_kpis(df_payments):
 
 # Jonas tables
 
-def compute_originacao(df_proposta_ebdb,
-                       df_contrato_ebdb,
-                       df_proposal_sh,
-                       df_proponents_of_proposal,
-                       df_api_last
-                       ):
+def compute_originacao(
+        # df_proposta_ebdb,
+        # df_contrato_ebdb,
+        # df_proposal_sh,
+        # df_proponents_of_proposal,
+        # df_api_last,
+        **context
+):
+    df_proposta_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_proposata')
+    df_contrato_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_contrato')
+    df_proposal_sh = context['task_instance'].xcom_pull(task_ids='import_sortinghat_proposal')
+    df_proponents_of_proposal = context['task_instance'].xcom_pull(task_ids='import_sortinghat_proponent')
+    df_api_last = context['task_instance'].xcom_pull(task_ids='import_api')
     """
     for every proposal we give information related to the proposal, the last request sent to the api, the decision, etc
     """
@@ -716,9 +730,14 @@ def compute_originacao(df_proposta_ebdb,
     _logger.info('originacao table computed with success!')
 
 
-def compute_performance(df_contrato_ebdb,
-                        df_performance
-                        ):
+def compute_performance(
+        **context
+        # df_contrato_ebdb,
+        # df_performance
+):
+    df_contrato_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_contrato')
+    df_performance = context['task_instance'].xcom_pull(task_ids='compute_performance_kpis')
+
     # rename columns contrato
     columns_names_contrato_ebdb = {col: 'contrato_' + col for col in df_contrato_ebdb.columns}
     df_contrato_ebdb_prepared = df_contrato_ebdb.rename(columns=columns_names_contrato_ebdb)
@@ -792,30 +811,31 @@ def compute_performance(df_contrato_ebdb,
     _logger.info('performance table computed with success!')
 
 
-def compute_tsmonitoring_tables():
-    _logger.info('importing data')
-    df_proposta_ebdb = import_ebdb_proposata(client)
-    df_proposal_sh = import_sortinghat_proposal(client)
-    df_proponents_of_proposal = import_sortinghat_proponent(client)
-    df_api_last = import_api(client)
-    df_contrato_ebdb = import_ebdb_contrato(client)
-    df_payments = import_invoices(client)
+# def compute_tsmonitoring_tables():
+#     _logger.info('importing data')
+#     df_proposta_ebdb = import_ebdb_proposata(client)
+#     df_proposal_sh = import_sortinghat_proposal(client)
+#     df_proponents_of_proposal = import_sortinghat_proponent(client)
+#     df_api_last = import_api(client)
+#     df_contrato_ebdb = import_ebdb_contrato(client)
+#     df_payments = import_invoices(client)
+#
+#     _logger.info('computing performance kpis')
+#     df_performance = compute_performance_kpis(df_payments)
+#
+#     _logger.info('compute performance output')
+#     # computes the joined tables and writes them to s3. also writes queries to s3
+#     compute_performance(df_contrato_ebdb,
+#                         df_performance
+#                         )
+#     _logger.info('compute originacao output')
+#     compute_originacao(df_proposta_ebdb,
+#                        df_contrato_ebdb,
+#                        df_proposal_sh,
+#                        df_proponents_of_proposal,
+#                        df_api_last)
 
-    _logger.info('computing performance kpis')
-    df_performance = compute_performance_kpis(df_payments)
-
-    _logger.info('compute performance output')
-    # computes the joined tables and writes them to s3. also writes queries to s3
-    compute_performance(df_contrato_ebdb,
-                        df_performance
-                        )
-    _logger.info('compute originacao output')
-    compute_originacao(df_proposta_ebdb,
-                       df_contrato_ebdb,
-                       df_proposal_sh,
-                       df_proponents_of_proposal,
-                       df_api_last)
-
+### dag and operators
 
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
@@ -829,68 +849,61 @@ dag = DAG(
     max_active_runs=1
 )
 
-dag_import_ebdb_proposata = BaseDAG.get_quintoandar_python_operator(
+dag_import_ebdb_proposata = PythonOperator(
     dag=dag,
     task_id='import_ebdb_proposata',
     func_command=import_ebdb_proposata,
     op_kwargs={'client': client}
 )
-dag_import_sortinghat_proposal = BaseDAG.get_quintoandar_python_operator(
+dag_import_sortinghat_proposal = PythonOperator(
     dag=dag,
     task_id='import_sortinghat_proposal',
     func_command=import_sortinghat_proposal,
     op_kwargs={'client': client}
 )
-dag_import_sortinghat_proponent = BaseDAG.get_quintoandar_python_operator(
+dag_import_sortinghat_proponent = PythonOperator(
     dag=dag,
     task_id='import_sortinghat_proponent',
     func_command=import_sortinghat_proponent,
     op_kwargs={'client': client}
 )
-dag_import_api = BaseDAG.get_quintoandar_python_operator(
+dag_import_api = PythonOperator(
     dag=dag,
     task_id='import_api',
     func_command=import_api,
     op_kwargs={'client': client}
 )
-dag_import_ebdb_contrato = BaseDAG.get_quintoandar_python_operator(
+dag_import_ebdb_contrato = PythonOperator(
     dag=dag,
     task_id='import_ebdb_contrato',
     func_command=import_ebdb_contrato,
     op_kwargs={'client': client}
 )
-dag_import_invoices = BaseDAG.get_quintoandar_python_operator(
+dag_import_invoices = PythonOperator(
     dag=dag,
     task_id='import_invoices',
     func_command=import_invoices,
     op_kwargs={'client': client}
 )
 
-dag_compute_performance_kpis = BaseDAG.get_quintoandar_python_operator(
+dag_compute_performance_kpis = PythonOperator(
+    compute_performance_kpis,
+    provide_context=True,
     dag=dag,
-    task_id='compute_performance_kpis',
-    func_command=compute_performance_kpis,
-    op_kwargs={'df_payments': df_payments}
+    task_id='compute_performance_kpis'
 )
-dag_compute_performance = BaseDAG.get_quintoandar_python_operator(
+dag_compute_performance = PythonOperator(
+    compute_performance,
+    provide_context=True,
     dag=dag,
-    task_id='compute_performance',
-    func_command=compute_performance,
-    op_kwargs={'df_contrato_ebdb': df_payments,
-               'df_performance': df_performance
-               }
+    task_id='compute_performance'
 )
 
-dag_compute_originacao = BaseDAG.get_quintoandar_python_operator(
+dag_compute_originacao = PythonOperator(
+    compute_originacao,
+    provide_context=True,
     dag=dag,
-    task_id='compute_originacao',
-    func_command=compute_originacao,
-    op_kwargs={'df_proposta_ebdb': df_proposta_ebdb,
-               'df_contrato_ebdb': df_contrato_ebdb,
-               'df_proposal_sh': df_proposal_sh,
-               'df_proponents_of_proposal': df_proponents_of_proposal,
-               'df_api_last': df_api_last
-               }
+    task_id='compute_originacao'
 )
 
 # flow
