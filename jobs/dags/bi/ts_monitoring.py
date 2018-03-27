@@ -22,11 +22,7 @@ MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
 # global variables (api columns)
 today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
-# global col_string
-# global col_bool
-# global col_float
-# global variables_of_subset
-# global variables_of_property
+client = AthenaClient('5a-datalake')
 
 col_string = ['proposal_id_subset',
               'name',
@@ -797,8 +793,6 @@ def compute_performance(df_contrato_ebdb,
 
 
 def compute_tsmonitoring_tables():
-    client = AthenaClient('5a-datalake')
-
     _logger.info('importing data')
     df_proposta_ebdb = import_ebdb_proposata(client)
     df_proposal_sh = import_sortinghat_proposal(client)
@@ -835,8 +829,77 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.get_quintoandar_python_operator(
+dag_import_ebdb_proposata = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
-    task_id='tsmonitoring',
-    func_command=compute_tsmonitoring_tables
+    task_id='import_ebdb_proposata',
+    func_command=import_ebdb_proposata,
+    op_kwargs={'client': client}
 )
+dag_import_sortinghat_proposal = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='import_sortinghat_proposal',
+    func_command=import_sortinghat_proposal,
+    op_kwargs={'client': client}
+)
+dag_import_sortinghat_proponent = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='import_sortinghat_proponent',
+    func_command=import_sortinghat_proponent,
+    op_kwargs={'client': client}
+)
+dag_import_api = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='import_api',
+    func_command=import_api,
+    op_kwargs={'client': client}
+)
+dag_import_ebdb_contrato = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='import_ebdb_contrato',
+    func_command=import_ebdb_contrato,
+    op_kwargs={'client': client}
+)
+dag_import_invoices = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='import_invoices',
+    func_command=import_invoices,
+    op_kwargs={'client': client}
+)
+
+dag_compute_performance_kpis = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='compute_performance_kpis',
+    func_command=compute_performance_kpis,
+    op_kwargs={'df_payments': df_payments}
+)
+dag_compute_performance = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='compute_performance',
+    func_command=compute_performance,
+    op_kwargs={'df_contrato_ebdb': df_payments,
+               'df_performance': df_performance
+               }
+)
+
+dag_compute_originacao = BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='compute_originacao',
+    func_command=compute_originacao,
+    op_kwargs={'df_proposta_ebdb': df_proposta_ebdb,
+               'df_contrato_ebdb': df_contrato_ebdb,
+               'df_proposal_sh': df_proposal_sh,
+               'df_proponents_of_proposal': df_proponents_of_proposal,
+               'df_api_last': df_api_last
+               }
+)
+
+# flow
+
+dag_import_ebdb_proposata >> dag_compute_originacao
+dag_import_sortinghat_proposal >> dag_compute_originacao
+dag_import_sortinghat_proponent >> dag_compute_originacao
+dag_import_api >> dag_compute_originacao
+dag_import_ebdb_contrato >> dag_compute_originacao
+
+dag_import_ebdb_contrato >> dag_compute_performance
+dag_import_invoices >> dag_compute_performance_kpis >> dag_compute_performance
