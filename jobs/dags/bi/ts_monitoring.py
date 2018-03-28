@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Monitoring report
+# Monitoring report
+#
+# Original file is located at
+#     https://colab.research.google.com/drive/1BBX38O8SgnJ_nu25agplUKlR0cCk0AC4
 
-Original file is located at
-    https://colab.research.google.com/drive/1BBX38O8SgnJ_nu25agplUKlR0cCk0AC4
-"""
 import io
 from datetime import datetime, timedelta
 
@@ -11,20 +11,19 @@ import boto3
 import numpy as np
 import pandas as pd
 from airflow.models import DAG
-# from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from airflow.operators import PythonOperator
+from jobs.dags.util import environment as env
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-# from jobs.base.base_dag import BaseDAG
-
-MAIN_DAG_NAME = 'compute-tsmonitoring-tables'
+MAIN_DAG_NAME = 'tenantScreening-monitoring-tables'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 # global variables (api columns)
 today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
-client = AthenaClient('5a-datalake')
+client = AthenaClient(bucket)
 
 col_string = ['proposal_id_subset',
               'name',
@@ -188,7 +187,7 @@ def generate_queries(df):
 
 
 def write_to_s3(obj, filename):
-    """### write to s3"""
+    """write to s3"""
     s3 = boto3.resource('s3')
 
     if type(obj) == pd.DataFrame:
@@ -214,7 +213,7 @@ def create_sk_dates(df):
 
 # import functions
 
-def import_ebdb_proposata(client):
+def import_ebdb_proposta(client):
     # query made with akira and translated into presto
     sql_proposta_ebdb = '''
     select
@@ -350,11 +349,6 @@ def import_api(client):
     -- where source='prod' -- change to prod
     '''
     df_api = client.execute_query_and_return_dataframe(sql_api)
-
-    # what variables are we missing? (among the variables that are not null in the api)
-    # [col for col in df_api.loc[:, df_api.notnull().any(axis=0)].columns if
-    #  col not in col_string + col_float + variables_of_property + variables_of_subset + col_bool]
-
     df_api.loc[:, col_float + variables_of_subset + variables_of_property] = df_api.loc[:,
                                                                              col_float + variables_of_subset + variables_of_property].replace(
         to_replace='', value=np.nan).astype(float)
@@ -419,8 +413,7 @@ def import_ebdb_contrato(client):
                  'date_fim_previsto',
                  'date_rescisao_prevista']
     for date_col in date_cols:
-        df_contrato_ebdb.loc[:, date_col] = pd.to_datetime(df_contrato_ebdb[date_col], yearfirst=True,
-                                                           errors='coerce')  # format='%Y-%m-%d')
+        df_contrato_ebdb.loc[:, date_col] = pd.to_datetime(df_contrato_ebdb[date_col], yearfirst=True, errors='coerce')
 
     df_contrato_ebdb['ym_signature'] = pd.to_datetime(
         (df_contrato_ebdb['date_signature'].dt.strftime("%Y%m") + '01').where(
@@ -472,10 +465,7 @@ def import_invoices(client):
     return df_payments
 
 
-def compute_performance_kpis(
-        **context
-        # df_payments
-):
+def compute_performance_kpis(**context):
     df_payments = context['task_instance'].xcom_pull(task_ids='import_invoices')
 
     thresholds = [1, 30, 50, 60, 90, 120, 150]
@@ -541,23 +531,16 @@ def compute_performance_kpis(
 
 # Jonas tables
 
-def compute_originacao(
-        # df_proposta_ebdb,
-        # df_contrato_ebdb,
-        # df_proposal_sh,
-        # df_proponents_of_proposal,
-        # df_api_last,
-        **context
-):
-    df_proposta_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_proposata')
+def compute_originacao(**context):
+    df_proposta_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_proposta')
     df_contrato_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_contrato')
     df_proposal_sh = context['task_instance'].xcom_pull(task_ids='import_sortinghat_proposal')
     df_proponents_of_proposal = context['task_instance'].xcom_pull(task_ids='import_sortinghat_proponent')
     df_api_last = context['task_instance'].xcom_pull(task_ids='import_api')
-    """
-    for every proposal we give information related to the proposal, the last request sent to the api, the decision, etc
-    """
-    ###################### proposata of ebdb
+
+    # for every proposal we give information related to the proposal, the last request sent to the api, the decision, etc
+
+    # proposata of ebdb ################
 
     # managed by fairfax
     df_proposta_ebdb_prepared = df_proposta_ebdb[df_proposta_ebdb.Fairfax]  # select only fairfax propostas
@@ -588,7 +571,7 @@ def compute_originacao(
     output_originacao = df_proposta_ebdb_prepared.merge(df_contrato_ebdb_prepared, how='left', left_index=True,
                                                         right_index=True)
 
-    ###################### df_proposal in sortinghat
+    # df_proposal in sortinghat #####################
 
     # select columns
     columns_to_keep_sh = [
@@ -626,17 +609,17 @@ def compute_originacao(
     # merge
     output_originacao = output_originacao.merge(sh_proposal_prepared, how='left', left_index=True, right_index=True)
 
-    ###################### df proponent of sh
+    # df proponent of sh #####################
 
     # rename columns
     columns_names_sh_proponents = {col: 'sh_' + col for col in df_proponents_of_proposal.columns}
     sh_proponent_prepared = df_proponents_of_proposal.rename(columns=columns_names_sh_proponents)
 
-    ###################### merge
+    # merge #####################
     output_originacao = output_originacao.merge(sh_proponent_prepared, how='left', left_index=True, right_index=True)
 
-    ###################### constant columns
-    # #take only the scored  applications with the full set  of applicants.
+    # constant columns #####################
+    # take only the scored  applications with the full set  of applicants.
     df_api_last_big = df_api_last[df_api_last.full_subset == True]
     df_api_last_best = df_api_last[df_api_last.best_subset == True]
 
@@ -657,7 +640,7 @@ def compute_originacao(
     # merge
     output_originacao = output_originacao.merge(api_last_constant, how='left', left_index=True, right_index=True)
 
-    ###################### total subset of each proposal
+    # total subset of each proposal #####################
     # we want to include the value of the following columns for both the full and the best subset :
     # select columns
     relevant_api_cols_variable = variables_of_subset + [
@@ -681,7 +664,7 @@ def compute_originacao(
     # merge
     output_originacao = output_originacao.merge(api_last_big, how='left', left_index=True, right_index=True)
 
-    ###################### best subset of each proposal
+    # best subset of each proposal #####################
     api_last_best = df_api_last_best[['proposal_id'] + relevant_api_cols_variable]
 
     # rename columns
@@ -694,9 +677,9 @@ def compute_originacao(
     # merge
     output_originacao = output_originacao.merge(api_last_best, how='left', left_index=True, right_index=True)
 
-    ###################### new columns
+    # new columns #####################
 
-    ## custom columns of Jonas
+    # custom columns of Jonas
     output_originacao['api_decidido_no_fullset'] = np.nan
     output_originacao.loc[output_originacao.api_full_risk_level < 3, 'api_decidido_no_fullset'] = 1
     output_originacao.loc[output_originacao.api_full_risk_level >= 3, 'api_decidido_no_fullset'] = 0
@@ -705,14 +688,14 @@ def compute_originacao(
     output_originacao.loc[
         output_originacao.api_best_risk_level < output_originacao.api_full_risk_level, 'api_recomendacao_subset'] = 1
 
-    ###################### create sk_date for datetime types
+    # create sk_date for datetime types #####################
 
     for col, dtype in output_originacao.dtypes.iteritems():
         if str(dtype) == 'datetime64[ns]':
             output_originacao['sk_' + col] = output_originacao[col].dt.strftime('%Y%m%d').replace(
                 {'NaT': ''})  # sk date is a string in dim_date so we keep it as a string here too
 
-    """### formatting"""
+    # formatting ##
     # replace null values for float columns with 0
     for col, dtype in output_originacao.dtypes.iteritems():
         if str(dtype) in ['uint8', 'int64', 'float64']:
@@ -730,11 +713,7 @@ def compute_originacao(
     _logger.info('originacao table computed with success!')
 
 
-def compute_performance(
-        **context
-        # df_contrato_ebdb,
-        # df_performance
-):
+def compute_performance(**context):
     df_contrato_ebdb = context['task_instance'].xcom_pull(task_ids='import_ebdb_contrato')
     df_performance = context['task_instance'].xcom_pull(task_ids='compute_performance_kpis')
 
@@ -749,7 +728,7 @@ def compute_performance(
     # join
     output_performance = df_contrato_ebdb_prepared.merge(df_performance_prepared, how='left', left_index=True,
                                                          right_index=True)
-    """### new columns"""
+    # new columns ##
 
     # output_performance['days_contract_left'] =  (output_performance.dataassinado)
     output_performance['contrato_expected_total_contract_duration'] = (
@@ -794,7 +773,7 @@ def compute_performance(
     # create sk_date for datetime types
     output_performance = create_sk_dates(output_performance)
 
-    """### formatting"""
+    # formatting ##
     # replace null dates by '' and store as string
     dates_ever = [u'invoices_date_ever1', u'invoices_date_ever30', u'invoices_date_ever50', u'invoices_date_ever60',
                   u'invoices_date_ever90', u'invoices_date_ever120', u'invoices_date_ever150']
@@ -811,31 +790,7 @@ def compute_performance(
     _logger.info('performance table computed with success!')
 
 
-# def compute_tsmonitoring_tables():
-#     _logger.info('importing data')
-#     df_proposta_ebdb = import_ebdb_proposata(client)
-#     df_proposal_sh = import_sortinghat_proposal(client)
-#     df_proponents_of_proposal = import_sortinghat_proponent(client)
-#     df_api_last = import_api(client)
-#     df_contrato_ebdb = import_ebdb_contrato(client)
-#     df_payments = import_invoices(client)
-#
-#     _logger.info('computing performance kpis')
-#     df_performance = compute_performance_kpis(df_payments)
-#
-#     _logger.info('compute performance output')
-#     # computes the joined tables and writes them to s3. also writes queries to s3
-#     compute_performance(df_contrato_ebdb,
-#                         df_performance
-#                         )
-#     _logger.info('compute originacao output')
-#     compute_originacao(df_proposta_ebdb,
-#                        df_contrato_ebdb,
-#                        df_proposal_sh,
-#                        df_proponents_of_proposal,
-#                        df_api_last)
-
-### dag and operators
+# dag and operators
 
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
@@ -849,10 +804,10 @@ dag = DAG(
     max_active_runs=1
 )
 
-dag_import_ebdb_proposata = PythonOperator(
+dag_import_ebdb_proposta = PythonOperator(
     dag=dag,
-    task_id='import_ebdb_proposata',
-    func_command=import_ebdb_proposata,
+    task_id='import_ebdb_proposta',
+    func_command=import_ebdb_proposta,
     op_kwargs={'client': client}
 )
 dag_import_sortinghat_proposal = PythonOperator(
@@ -908,7 +863,7 @@ dag_compute_originacao = PythonOperator(
 
 # flow
 
-dag_import_ebdb_proposata >> dag_compute_originacao
+dag_import_ebdb_proposta >> dag_compute_originacao
 dag_import_sortinghat_proposal >> dag_compute_originacao
 dag_import_sortinghat_proponent >> dag_compute_originacao
 dag_import_api >> dag_compute_originacao
