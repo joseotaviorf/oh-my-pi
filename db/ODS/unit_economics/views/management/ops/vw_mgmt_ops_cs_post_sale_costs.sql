@@ -145,7 +145,7 @@ contract_costs as (
       fc.dt,
       cps.dre_date as dt_cash_flow,
       cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
-    from unit_economics.test_filtered_contracts fc
+    from filtered_contracts fc
     join cdre_cs_post_sale_fc cps
       on cps.dre_date = fc.dt - interval '1 month'
 ),
