@@ -978,7 +978,7 @@ filtered_fines as (
 		contract_id,
 		sum(fine) as fine,
 		paid_date
-	from invoice_fines
+	from invoice.fine
 	where fine > 0
 	group by
 		contract_id,
@@ -1799,7 +1799,7 @@ rent_delay as (
    tenant_due_date,
    tenant_paid_date,
    date_part('day', cast(tenant_paid_date as timestamp) - cast(tenant_due_date as timestamp)) as rent_delayed_days
-   from invoice
+   from invoice.report
   where trim("from") = 'Inquilino'
    and trim(item) = 'Aluguel'
    and tenant_due_date is not null
