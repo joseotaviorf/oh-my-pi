@@ -15,8 +15,8 @@ drop view if exists unit_economics.vw_net_revenue_commission_costs cascade;
 drop view if exists unit_economics.vw_net_revenue_revenues cascade;
 drop view if exists unit_economics.vw_net_revenue_revenues_brokerage_fee cascade;
 drop view if exists unit_economics.vw_net_revenue_revenues_mgmt_fee cascade;
+drop view if exists unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux;
 drop view if exists unit_economics.vw_net_revenue_agent_commission_costs cascade;
-drop view if exists unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux cascade;
 drop view if exists unit_economics.vw_net_revenue_taxes_sales_tax_iss cascade;
 drop view if exists unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins cascade;
 drop view if exists unit_economics.vw_net_revenue_taxes_delay_fine cascade;
@@ -735,7 +735,7 @@ select
 	vbpc.property_id,
 	vbcc.id as contract_id,
 	vbcc.init_date,
-	vbcc.rent_value,
+	vbcc.rent_value as vl_rent_value,
 	coalesce(vbcc.termination_date, vbcc.expected_end_date)::date as end_date
 from
 	unit_economics.vw_base_contract_costs vbcc
@@ -753,16 +753,16 @@ brokerage_fill as (
 		sk_property,
 		property_id,
 		bc.contract_id,
+		bc.vl_rent_value,
 		case
-			when i.landlord_status = 'paid'
-				then amount::decimal(14,4)
 			when i.contract_id is not null
-				then 0
-			when i.contract_id is null and bc.init_date >= '2017-01-01'
-				then rent_value
+				then amount::decimal(14,4)
+			when bc.init_date >= '2017-01-01'
+				then bc.vl_rent_value
 			else 0
 		end as vl_brokerage_fee,
 		init_date,
+		i.landlord_status,
 		greatest(
 			landlord_due_date,
 			due_date,
@@ -772,7 +772,7 @@ brokerage_fill as (
 	from
 		base_contract bc
 	left join
-		invoice i
+		invoice.report i
 		on bc.contract_id = i.contract_id
 	and
 		item = 'TaxaCorretagem'
@@ -785,6 +785,7 @@ select
 	sk_property,
 	property_id,
 	vl_brokerage_fee,
+	vl_rent_value,
 	dt_cash_flow,
 	0 as flg_expected_brokerage_fee
 from
@@ -799,7 +800,7 @@ with filtered_contracts as (
         id,
         init_date,
         package_value,
-        rent_value,
+        rent_value as vl_rent_value,
         coalesce(termination_date, expected_end_date)::date as end_date,
         date_trunc('month', dd.date)::date + interval '6 day' as date_range
     from
@@ -815,7 +816,7 @@ base_contract as (
 		base.*,
 		c.id as contract_id,
 		package_value,
-		rent_value,
+		vl_rent_value,
 		date_trunc('month', c.init_date) as contract_init_date,
 		date_trunc('month', c.end_date) as contract_end_date,
 		c.date_range
@@ -835,7 +836,7 @@ incurred as (
         bc.contract_init_date,
         bc.contract_end_date,
         bc.package_value,
-        bc.rent_value,
+        bc.vl_rent_value,
         amount::decimal(14,4) as vl_management_fee,
         greatest(
         	landlord_due_date,
@@ -846,7 +847,7 @@ incurred as (
     from
         base_contract bc
     left join
-        invoice i
+        invoice.report i
         on bc.contract_id = i.contract_id
             and date_trunc('month', greatest(landlord_due_date, due_date, landlord_paid_date)) = bc.date_range
             and item = 'TaxaAdministracao'
@@ -871,7 +872,7 @@ incurred_diff as (
         date_range,
         contract_end_date,
         contract_init_date,
-        rent_value,
+        vl_rent_value,
         (extract(year from (contract_end_date - contract_init_date)) * 12
                 + extract(month from (contract_end_date - contract_init_date))
                 + (extract(days from (contract_end_date - contract_init_date)) / 30))::integer as date_diff
@@ -884,7 +885,7 @@ incurred_plus_dates as (
         vl_management_fee,
         dt_cash_flow,
         date_range,
-        rent_value,
+        vl_rent_value,
         max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
     from incurred_diff
 ),
@@ -899,7 +900,7 @@ value_fill as (
             else dt_cash_flow
         end as dt_cash_flow,
         max_dt_cash_flow,
-        rent_value,
+        vl_rent_value,
         gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
     from incurred_plus_dates
 ),
@@ -908,9 +909,10 @@ result as (
         sk_property,
         property_id,
         dt_cash_flow,
+        vl_rent_value,
         case
             when dt_cash_flow > max_dt_cash_flow and dt_cash_flow >= '2018-02-01'
-                then coalesce(vl_management_fee, rent_value*0.08)
+                then coalesce(vl_management_fee, vl_rent_value*0.08)
             when dt_cash_flow > max_dt_cash_flow
                 then coalesce(vl_management_fee, gf)
             else vl_management_fee
@@ -922,6 +924,7 @@ select
     sk_property,
     property_id,
     vl_management_fee,
+    vl_rent_value,
     dt_cash_flow::date,
     flg_expected_management_fee::integer
 from result
@@ -929,29 +932,13 @@ where vl_management_fee != 0
 ;
 
 
-
-create or replace view unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux as
-select
-    coalesce(br.sk_property, mg.sk_property) as sk_property,
-    coalesce(br.property_id, mg.property_id) as property_id,
-    coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
-    coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
-    coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee,
-    coalesce(br.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee
-  from unit_economics.net_revenue_revenues_brokerage_fee br
-  full outer join unit_economics.net_revenue_revenues_mgmt_fee mg
-    on br.sk_property = mg.sk_property
-       and br.dt_cash_flow = mg.dt_cash_flow
-  where br.vl_brokerage_fee > 0
-    or mg.vl_management_fee > 0
-;
-
 create or replace view unit_economics.vw_net_revenue_revenues as
 select
 	coalesce(b_fee.sk_property, m_fee.sk_property) as sk_property,
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
 	coalesce(date_trunc('month', b_fee.dt_cash_flow)::date, date_trunc('month', m_fee.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
+	coalesce(m_fee.vl_rent_value, b_fee.vl_rent_value) as vl_rent_value,
 	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
 	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
@@ -1032,6 +1019,22 @@ from fines f
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = f.property_id
     and f.dt between vbpc.min_version_time and vbpc.max_version_time
+;
+
+create or replace view unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux as
+select
+    coalesce(br.sk_property, mg.sk_property) as sk_property,
+    coalesce(br.property_id, mg.property_id) as property_id,
+    coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
+    coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
+    coalesce(mg.flg_expected_management_fee, 0) as flg_expected_management_fee,
+    coalesce(br.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee
+  from unit_economics.net_revenue_revenues_brokerage_fee br
+  full outer join unit_economics.net_revenue_revenues_mgmt_fee mg
+    on br.sk_property = mg.sk_property
+       and br.dt_cash_flow = mg.dt_cash_flow
+  where br.vl_brokerage_fee > 0
+    or mg.vl_management_fee > 0
 ;
 
 create or replace view unit_economics.vw_net_revenue_taxes_sales_tax_iss as
@@ -1132,6 +1135,7 @@ select
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
 	sum(vl_management_fee) as vl_management_fee,
+	sum(vl_rent_value) as vl_rent_value,
 	sum(vl_brokerage_fee) as vl_brokerage_fee,
 	sum(vl_agent_commission) as vl_agent_commission,
 	sum(vl_st_iss) as vl_st_iss,
@@ -1152,6 +1156,7 @@ from
 		dt_cash_flow,
 		vl_affiliate_commission,
 		0 as vl_management_fee,
+		0 as vl_rent_value,
 		0 as vl_brokerage_fee,
 		vl_agent_commission,
 		0 as vl_st_iss,
@@ -1173,6 +1178,7 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		vl_management_fee,
+		vl_rent_value,
 		vl_brokerage_fee,
 		0 as vl_agent_commission,
 		0 as vl_st_iss,
@@ -1194,6 +1200,7 @@ from
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
 		0 as vl_management_fee,
+		0 as vl_rent_value,
 		0 as vl_brokerage_fee,
 		0 as vl_agent_commission,
 		vl_st_iss,
@@ -3086,6 +3093,7 @@ with unit_economics as (
         0 as vl_termination_fine,
         sum(vl_brokerage_fee) as vl_brokerage_fee,
         sum(vl_management_fee) as vl_management_fee,
+        sum(vl_rent_value) as vl_rent_value,
         sum(vl_cs_post_sale) as vl_cs_post_sale,
         sum(vl_collection) as vl_collection,
         sum(vl_bo_onboarding) as vl_bo_onboarding,
@@ -3134,6 +3142,7 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as vl_rent_value,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -3183,6 +3192,7 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as vl_rent_value,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -3232,6 +3242,7 @@ with unit_economics as (
             0 as vl_termination_fine,
             0 as vl_brokerage_fee,
             0 as vl_management_fee,
+            0 as vl_rent_value,
             vl_cs_post_sale as vl_cs_post_sale,
             vl_collection as vl_collection,
             vl_bo_onboarding as vl_bo_onboarding,
@@ -3281,6 +3292,7 @@ with unit_economics as (
             0 as vl_termination_fine,
             vl_brokerage_fee as vl_brokerage_fee,
             vl_management_fee as vl_management_fee,
+            vl_rent_value as vl_rent_value,
             0 as vl_cs_post_sale,
             0 as vl_collection,
             0 as vl_bo_onboarding,
@@ -3313,7 +3325,6 @@ contracts as (
 		id as sk_contract,
 		property_id,
 		signature_date as start_date,
-		rent_value,
 		case
 			when coalesce(termination_date, expected_end_date)::date > now()::date
 				then now()::date
@@ -3356,6 +3367,7 @@ final_version as (
     case when ue.dt_cash_flow >= current_date then 1 else 0 end as flg_expected_brokerage_fee,
     ue.vl_management_fee,
     case when ue.dt_cash_flow >= current_date then 1 else 0 end as flg_expected_management_fee,
+    vl_rent_value,
     ue.vl_cs_post_sale,
     case when ue.dt_cash_flow >= current_date then 1 else 0 end as flg_expected_cs_post_sale,
     ue.vl_collection,
@@ -3406,7 +3418,6 @@ before_loss_factor as (
 fact_contract as (
 	select
 		blf.*,
-		c."valorAluguel" as rent_value,
 		(date_part('year', blf.sk_date) - date_part('year', c."dataAssinado"::date)) * 12 +
 	              (date_part('month', blf.sk_date) - date_part('month', c."dataAssinado"::date)) as months_diff
 	from before_loss_factor blf
@@ -3416,7 +3427,6 @@ fact_contract as (
 fact_factor as (
     select
         fc.sk_property,
-        fc.rent_value,
         fc.property_id,
         fc.sk_contract,
         fc.sk_cash_flow_date,
@@ -3461,6 +3471,7 @@ fact_factor as (
                 filter (where fc.dt_cash_flow >= current_date)
                     over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
         fc.flg_expected_management_fee,
+        fc.vl_rent_value,
         coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
                     over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
@@ -3497,10 +3508,10 @@ fact_factor as (
         on cf.months_after_signature = fc.months_diff
 )
 select
-  coalesce(sk_property,-1) as sk_property,
-	coalesce(property_id,-1) as property_id,
-	coalesce(sk_contract,-1) as sk_contract,
-	coalesce(sk_cash_flow_date,-1) as sk_cash_flow_date,
+  sk_property,
+	property_id,
+	sk_contract,
+	sk_cash_flow_date,
 	vl_owner_campaigns,
 	vl_affiliate_campaigns,
 	vl_inside_sales,
@@ -3527,6 +3538,7 @@ select
 	flg_expected_brokerage_fee,
 	vl_management_fee,
 	flg_expected_management_fee,
+	vl_rent_value,
 	vl_cs_post_sale,
 	flg_expected_cs_post_sale,
 	vl_collection,
