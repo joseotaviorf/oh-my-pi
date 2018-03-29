@@ -12,9 +12,10 @@ import numpy as np
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
-from jobs.dags.util import environment as env
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
+
+from jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'tenantScreening-monitoring-tables'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -276,13 +277,15 @@ def import_sortinghat_proposal(client):
         'id': 'proposal_id',
         'analysis_date': 'date_analysis',
         'created_at': 'date_creation',
-        'updated_at': 'date_update'
+        'updated_at': 'date_update',
+        'process_date': 'date_processed'
     })
 
     # dates as datetime
     df_proposal_sh['date_analysis'] = pd.to_datetime(df_proposal_sh['date_analysis'])
     df_proposal_sh['date_creation'] = pd.to_datetime(df_proposal_sh['date_creation'])
     df_proposal_sh['date_update'] = pd.to_datetime(df_proposal_sh['date_update'])
+    df_proposal_sh['date_processed'] = pd.to_datetime(df_proposal_sh['date_processed'])
 
     # take the last proposal in sh in case the same proposal was sent there multiple times
     df_proposal_sh = df_proposal_sh.sort_values(['proposal_id', 'date_creation', 'date_update'],
@@ -576,6 +579,9 @@ def compute_originacao(**context):
     # select columns
     columns_to_keep_sh = [
         'date_analysis',
+        'date_processed',
+        'imovel_id',
+        'rejection_motive',
         'score_5a',
         'score_5a_best_subset',
         'score_cardif',
@@ -598,7 +604,10 @@ def compute_originacao(**context):
         'home_suites',
         'home_type',
         'home_zipcode',
-        'drive_id'
+        'home_insurance_value',
+        'drive_id',
+        'risk_level',
+        'risk_level_best_subset',
     ]
     sh_proposal_prepared = df_proposal_sh[columns_to_keep_sh]
 
