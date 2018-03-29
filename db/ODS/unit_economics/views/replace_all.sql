@@ -749,7 +749,7 @@ where (vbcc.termination_date is not null
   and vbcc.status in ('Ativo', 'Finalizado')
 ),
 brokerage_fill as (
-	select
+	select distinct
 		sk_property,
 		property_id,
 		bc.contract_id,
@@ -828,7 +828,7 @@ base_contract as (
 		and c.end_date between base.min_version_time and (base.max_version_time + interval '1 day')
 ),
 incurred as (
-    select
+    select distinct
     	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
@@ -1801,7 +1801,7 @@ cdre_collection_fc as (
   from series
 ),
 rent_delay as (
-  select
+  select distinct
    contract_id,
    tenant_due_date,
    tenant_paid_date,

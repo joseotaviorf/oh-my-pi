@@ -44,7 +44,7 @@ cdre_collection_fc as (
   from series
 ),
 rent_delay as (
-  select
+  select distinct
    contract_id,
    tenant_due_date,
    tenant_paid_date,

@@ -39,7 +39,7 @@ base_contract as (
 		and c.end_date between base.min_version_time and (base.max_version_time + interval '1 day')
 ),
 incurred as (
-    select
+    select distinct
     	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,

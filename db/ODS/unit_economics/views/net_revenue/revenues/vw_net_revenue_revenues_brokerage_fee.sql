@@ -25,7 +25,7 @@ where (vbcc.termination_date is not null
   and vbcc.status in ('Ativo', 'Finalizado')
 ),
 brokerage_fill as (
-	select
+	select distinct
 		sk_property,
 		property_id,
 		bc.contract_id,
