@@ -124,7 +124,7 @@ def __build_test_tasks(local_dag):
 
     test_dre_agents_commission = BaseDAG.get_python_operator(
         dag=local_dag,
-        task_id='TEST_DRE_inside_sales',
+        task_id='TEST_DRE_agents_commission',
         func_command=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
                    'enum_db': EnumDb.BI_ODS,
@@ -137,7 +137,7 @@ def __build_test_tasks(local_dag):
 
     test_dre_bo_pre_sale = BaseDAG.get_python_operator(
         dag=local_dag,
-        task_id='TEST_DRE_inside_sales',
+        task_id='TEST_DRE_bo_pre_sale',
         func_command=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
                    'enum_db': EnumDb.BI_ODS,
@@ -150,7 +150,7 @@ def __build_test_tasks(local_dag):
 
     test_dre_listing_photos = BaseDAG.get_python_operator(
         dag=local_dag,
-        task_id='TEST_DRE_inside_sales',
+        task_id='TEST_DRE_listing_photos',
         func_command=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
                    'enum_db': EnumDb.BI_ODS,
@@ -163,7 +163,7 @@ def __build_test_tasks(local_dag):
 
     test_dre_field_operations = BaseDAG.get_python_operator(
         dag=local_dag,
-        task_id='TEST_DRE_inside_sales',
+        task_id='TEST_DRE_field_ops',
         func_command=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
                    'enum_db': EnumDb.BI_ODS,
