@@ -48,7 +48,7 @@ contract_costs as (
 	  (dre_value is null)::int as flg_expected_inspection
 	from filtered_contracts fc
 	left join cdre_inspections ci
-	  on ci.dre_date = fc.dt + interval '1 month'
+	  on ci.dre_date = (fc.dt - interval '1 month')::date
 ),
 last_3_avg as (
 	select

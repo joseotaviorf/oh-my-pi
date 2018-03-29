@@ -99,7 +99,7 @@ tt_costs as (
     select
       eg.property_id,
       eg.dt,
-      eg.dt as dt_cash_flow,
+      (eg.dt - interval '1 month')::date as dt_cash_flow,
       case
         when sum(eg.qt) over (partition by eg.dt) > 0
         then coalesce(co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt)), 0)::double precision
@@ -107,17 +107,17 @@ tt_costs as (
       end as vl_bo_onboarding
     from espec_gen eg
     left join cdre_onboarding co
-      on co.dre_date = eg.dt
+      on co.dre_date = (eg.dt - interval '1 month')::date
 ),
 contract_costs as (
     select
       fc.dt,
       fc.property_id,
-      fc.dt as dt_cash_flow,
+      (fc.dt - interval '1 month')::date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by fc.dt))::double precision as vl_bo_onboarding
     from filtered_contracts fc
     left join cdre_onboarding co
-      on co.dre_date = fc.dt
+      on co.dre_date = (fc.dt - interval '1 month')::date
 ),
 full_costs as (
   select distinct
@@ -128,7 +128,7 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
-    and tt.property_id = cc.property_id
+    	and tt.property_id = cc.property_id
 ),
 result as (
     select
@@ -172,7 +172,7 @@ last_value_gap_fill as (
 select
     r.sk_property,
     r.property_id,
-    (r.dt_cash_flow - interval '1 month')::date as dt_cash_flow,
+    r.dt_cash_flow,
     r.flg_expected_bo_onboarding,
     lv.new_value as vl_bo_onboarding
 from result r

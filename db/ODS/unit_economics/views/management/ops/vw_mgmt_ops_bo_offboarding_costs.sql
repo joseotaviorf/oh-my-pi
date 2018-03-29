@@ -89,7 +89,7 @@ tt_costs as (
       (dre_value is null)::int as flg_expected
     from espec_gen eg
     join cdre_offboarding co
-      on co.dre_date = eg.dt + interval '1 month'
+      on co.dre_date = (eg.dt + interval '1 month')::date
 )
 ,
 contract_costs as (
@@ -101,7 +101,7 @@ contract_costs as (
       (dre_value is null)::int as flg_expected
     from filtered_contracts fc
     left join cdre_offboarding co
-      on co.dre_date = fc.dt + interval '1 month'
+      on co.dre_date = (fc.dt + interval '1 month')::date
 ),
 full_costs as (
   select distinct

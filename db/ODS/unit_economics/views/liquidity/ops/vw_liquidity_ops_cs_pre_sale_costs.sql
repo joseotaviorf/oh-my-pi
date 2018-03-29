@@ -106,7 +106,7 @@ tt_costs as (
       cps.dre_value * eg.qt / (sum(eg.qt) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from espec_gen eg
     join cdre_cs_pre_sale cps
-      on cps.dre_date = eg.dt + interval '1 month'
+      on cps.dre_date = (eg.dt + interval '1 month')::date
 ),
 property_costs as (
     select
@@ -117,7 +117,7 @@ property_costs as (
       cps.dre_value / (count(fp.property_id) over (partition by cps.dre_date))::double precision as vl_cs_pre_sale
     from filtered_properties fp
     join cdre_cs_pre_sale cps
-      on cps.dre_date = fp.dt
+      on cps.dre_date = fp.dt::date
 ),
 full_costs as (
   select distinct
