@@ -10,7 +10,7 @@ with cte_equal as (
 		on f.sk_cash_flow_date = to_char(dre."Month", 'YYYYMMDD')::int
 			and dre."Category" = '{dre_category}'
 )
-select distinct true
+select distinct false
 from cte_equal
 where _diff is true
 ;
