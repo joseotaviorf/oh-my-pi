@@ -24,7 +24,7 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date):
     return local_dag
 
 
-def __test_file_query(**kwargs):
+def __test_raw_query(**kwargs):
     cost_dre_query = BaseTest._get_query_from_file_name(
         file_path='{}/dre_value_check.sql'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR)
     )
@@ -46,7 +46,7 @@ def __build_test_tasks(local_dag):
     test_dre_onboarding = BaseDAG.get_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_onboarding',
-        func_command=__test_file_query,
+        func_command=__test_raw_query,
         op_kwargs={'file_path': '{}/dre_onboarding.sql'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR),
                    'enum_db': EnumDb.BI_ODS,
                    'assertion': None,
