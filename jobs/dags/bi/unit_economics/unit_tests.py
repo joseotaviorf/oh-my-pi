@@ -31,8 +31,7 @@ def __test_query(**kwargs):
     )
 
     _return = BaseTest.test_raw_query(
-        query=cost_dre_query.format(_column_value=kwargs['_column_value'], _table=kwargs['_table'],
-                                    dre_category=kwargs['dre_category']),
+        query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category']),
         enum_db=kwargs['enum_db'],
         blocking=kwargs['blocking'],
         assertion=kwargs['assertion']
