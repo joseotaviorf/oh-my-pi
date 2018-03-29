@@ -9,6 +9,7 @@ with cte_equal as (
 	join files.costs_dre dre
 		on f.sk_cash_flow_date = to_char(dre."Month", 'YYYYMMDD')::int
 			and dre."Category" = '{dre_category}'
+			and dre."Month" <= (now() - interval '2 month')::date
 )
 select distinct false
 from cte_equal
