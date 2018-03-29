@@ -31,7 +31,8 @@ def __test_query(**kwargs):
     )
 
     _return = BaseTest.test_raw_query(
-        query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category']),
+        query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category'],
+                                    unacceptable_diff=0.01 if 'unacceptable_diff' not in kwargs else kwargs['unacceptable_diff']),
         enum_db=kwargs['enum_db'],
         blocking=kwargs['blocking'],
         assertion=kwargs['assertion']
@@ -91,7 +92,8 @@ def __build_test_tasks(local_dag):
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Customer Support (post-sale)',
-                   '_column_value': 'vl_cs_post_sale'
+                   '_column_value': 'vl_cs_post_sale',
+                   'unacceptable_diff': 0.06
                    }
     )
 
@@ -117,20 +119,8 @@ def __build_test_tasks(local_dag):
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Collection',
-                   '_column_value': 'vl_collection'
-                   }
-    )
-
-    test_dre_agents_commission = BaseDAG.get_python_operator(
-        dag=local_dag,
-        task_id='TEST_DRE_agents_commission',
-        func_command=__test_query,
-        op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
-                   'assertion': None,
-                   'blocking': True,
-                   'dre_category': 'Agents Commission',
-                   '_column_value': 'vl_agent_commission'
+                   '_column_value': 'vl_collection',
+                   'unacceptable_diff': 0.04
                    }
     )
 

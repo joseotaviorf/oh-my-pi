@@ -1,10 +1,10 @@
 with cte_equal as (
 	select distinct
-		f.sk_cash_flow_date,
-		sum(f.{_column_value}) over (partition by f.sk_cash_flow_date)::numeric(14,1) as _sum,
-		dre."Value"::numeric(14,1),
-		sum(f.{_column_value}) over (partition by f.sk_cash_flow_date)::numeric(14,1) not between (dre."Value"-500)::numeric(14,1)
-																																									and (dre."Value"+500)::numeric(14,1) as _diff
+	  f.sk_cash_flow_date,
+		sum(f.{_column_value}) over (partition by f.sk_cash_flow_date)::int as calculated_sum,
+		dre."Value" as dre_value,
+		((dre."Value" / nullif(sum(f.{_column_value}) over (partition by f.sk_cash_flow_date)::float, 0)) - 1)::numeric(14,3) as _percentage,
+		abs(((dre."Value" / nullif(sum(f.{_column_value}) over (partition by f.sk_cash_flow_date)::float, 0)) - 1)::numeric(14,3)) >= 0.06 as _diff
 	from unit_economics.fact_property_economics f
 	join files.costs_dre dre
 		on f.sk_cash_flow_date = to_char(dre."Month", 'YYYYMMDD')::int
