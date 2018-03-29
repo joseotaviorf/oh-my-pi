@@ -1,16 +1,22 @@
-import os
 from datetime import datetime, timedelta
+
 from airflow.models import DAG
-from jobs.dags.util import environment as env
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from jobs.base.base_etl import BaseETL, EnumDb
+from jobs.dags.bi.__init__ import DEFAULT_DAG_OWNER
+from jobs.dags.util import environment as env
 from jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
+from jobs.dags.bi.unit_economics import unit_tests
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB',
-    'AWS_SECRET_ACCESS_KEY',
-    'AWS_ACCESS_KEY_ID',
-    'AWS_DEFAULT_REGION')
+                                 'AWS_SECRET_ACCESS_KEY',
+                                 'AWS_ACCESS_KEY_ID',
+                                 'AWS_DEFAULT_REGION')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+MAIN_DAG_NAME = 'bi-load-property-economics'
+MAIN_START_DATE = datetime(2018, 2, 17, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = '@daily'
 
 
 def materialize_view(_bucket, name):
@@ -30,16 +36,26 @@ def materialize_view(_bucket, name):
         bucket_name='{}/raw/ods/{}'.format(_bucket, name)
     )
 
+
+def unit_tests_sub_dag(sub_dag_name):
+    return unit_tests.build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+
 # create DAG definition
 dag = DAG(
-    dag_id='bi-load-property-economics',
+    dag_id=MAIN_DAG_NAME,
     default_args={
-        'owner': 'Data team',
+        'owner': DEFAULT_DAG_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 2, 17, 0, 0, 0),
-    schedule_interval='@daily',
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1
 )
 
@@ -352,7 +368,8 @@ load_fact = QuintoAndarPythonOperator(
     task_id='DW_fact_property_economics',
     execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False, 'schema_source': 'unit_economics'}
+    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False,
+               'schema_source': 'unit_economics'}
 )
 
 # Unit Economics Flow
