@@ -1653,7 +1653,7 @@ last_value_gap_fill as (
 select
     r.sk_property,
     r.property_id,
-    r.dt_cash_flow,
+    (r.dt_cash_flow - interval '1 month')::date as dt_cash_flow,
     r.flg_expected_bo_onboarding,
     lv.new_value as vl_bo_onboarding
 from result r
@@ -1703,7 +1703,7 @@ costs as (
       (dre_value is null)::int as flg_expected_bo_ongoing
     from filtered_contract fc
     left join cdre_ongoing co
-      on co.dre_date = fc.dt_cash_flow
+      on co.dre_date = fc.dt_cash_flow - interval '1 month'
 ),
 result as (
     select
@@ -1747,7 +1747,7 @@ last_value_gap_fill as (
 select
     r.sk_property,
     r.property_id,
-    r.dt_cash_flow,
+    (r.dt_cash_flow - interval '1 month')::date as dt_cash_flow,
     r.flg_expected_bo_ongoing,
     lv.new_value as vl_bo_ongoing
 from result r

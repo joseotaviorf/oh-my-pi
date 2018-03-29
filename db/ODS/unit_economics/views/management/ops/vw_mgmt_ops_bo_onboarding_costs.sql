@@ -172,7 +172,7 @@ last_value_gap_fill as (
 select
     r.sk_property,
     r.property_id,
-    r.dt_cash_flow,
+    (r.dt_cash_flow - interval '1 month')::date as dt_cash_flow,
     r.flg_expected_bo_onboarding,
     lv.new_value as vl_bo_onboarding
 from result r
