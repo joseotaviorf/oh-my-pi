@@ -164,5 +164,5 @@ def __build_test_tasks(local_dag):
     )
 
     return [test_dre_onboarding, test_dre_offboarding, test_dre_ongoing, test_dre_cs_post_sale, test_dre_inside_sales,
-            test_dre_collection, test_dre_agents_commission, test_dre_bo_pre_sale, test_dre_listing_photos,
+            test_dre_collection, test_dre_bo_pre_sale, test_dre_listing_photos,
             test_dre_field_operations]
