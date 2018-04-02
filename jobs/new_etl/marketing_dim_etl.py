@@ -21,7 +21,7 @@ class MarketingDimensionETL(DimensionETL):
         if dim_name == 'google':
             table = self.google.extract_marketing_campaigns(date(2016, 1, 1))
         elif dim_name == 'facebook':
-            table = self.facebook.extract_marketing_campaigns(date(2016, 11, 1))
+            table = self.facebook.extract_marketing_campaigns(date(2016, 1, 1))
         elif dim_name == 'criteo':
             table = self.criteo.extract_marketing_campaigns(date(2017, 1, 1))
         if table is not None:
