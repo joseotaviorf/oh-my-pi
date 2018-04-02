@@ -43,7 +43,14 @@ class FacebookCampaigns(MarketingCampaigns):
             params = {
                 'time_range': {'since': str(dt), 'until': str(dt)},
                 'level': 'campaign',
-                'limit': 1000
+                'limit': 1000,
+                'filtering': [{
+                    "field": "campaign.delivery_info",
+                    "operator": "IN",
+                    "value": ["active", "archived", "completed", "limited", "not_delivering", "not_published",
+                              "pending_review", "permanently_deleted", "recently_completed", "recently_rejected",
+                              "rejected", "scheduled", "inactive"]
+                }]
             }
 
             ret_campaigns = ret_account.get_insights(fields=fields, params=params)
