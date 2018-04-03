@@ -70,7 +70,7 @@ filtered_contracts as (
 ratio as (
   select distinct
     fc.dt,
-    qn.qt / count(fc.property_id) over (partition by fc.dt) as qt,
+    qn.qt / count(fc.property_id) over (partition by (fc.dt - interval '1 month')::date) as qt,
     fc.months_after_init
   from filtered_contracts fc
   left join qt_nulls qn
