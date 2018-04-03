@@ -93,7 +93,7 @@ def __build_test_tasks(local_dag):
                    'blocking': True,
                    'dre_category': 'Customer Support (post-sale)',
                    '_column_value': 'vl_cs_post_sale',
-                   'unacceptable_diff': 0.06
+                   'unacceptable_diff': 0.07
                    }
     )
 

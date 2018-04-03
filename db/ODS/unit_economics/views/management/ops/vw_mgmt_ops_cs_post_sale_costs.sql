@@ -58,7 +58,7 @@ cdre_cs_post_sale_fc as (
 filtered_contracts as (
   select distinct
     fcp.property_id,
-    cps.dre_date - interval '1 month' as dt,
+    cps.dre_date as dt,
     (date_part('year',  cps.dre_date) - date_part('year', start_date)) * 12 +
               (date_part('month',  cps.dre_date) - date_part('month', start_date)) as months_after_init
   from filtered_contracts_prev fcp
@@ -137,7 +137,7 @@ tt_costs as (
       flg_expected_cs_post_sale
     from spec_gen eg
     join cdre_cs_post_sale_fc cps
-      on cps.dre_date = (eg.dt - interval '1 month')::date
+      on cps.dre_date = (eg.dt + interval '1 month')::date
 ),
 contract_costs as (
     select
@@ -147,7 +147,7 @@ contract_costs as (
       cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
     from filtered_contracts fc
     join cdre_cs_post_sale_fc cps
-      on cps.dre_date = (fc.dt - interval '1 month')::date
+      on cps.dre_date = (fc.dt + interval '1 month')::date
 ),
 full_costs as (
   select distinct
@@ -171,5 +171,5 @@ select
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
-    and fc.dt - interval '1 month' between date_trunc('month', vbpc.min_version_time) and date_trunc('month', vbpc.max_version_time)
+    and fc.dt::date between date_trunc('month', vbpc.min_version_time)::date and date_trunc('month', vbpc.max_version_time)::date
 ;

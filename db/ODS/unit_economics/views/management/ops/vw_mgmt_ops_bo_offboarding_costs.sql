@@ -90,17 +90,16 @@ tt_costs as (
     from espec_gen eg
     join cdre_offboarding co
       on co.dre_date = (eg.dt + interval '1 month')::date
-)
-,
+),
 contract_costs as (
     select
       fc.property_id,
       fc.dt,
-      coalesce(co.dre_date, fc.dt) as dt_cash_flow,
+      co.dre_date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision as vl_bo_offboarding,
       (dre_value is null)::int as flg_expected
     from filtered_contracts fc
-    left join cdre_offboarding co
+    join cdre_offboarding co
       on co.dre_date = (fc.dt + interval '1 month')::date
 ),
 full_costs as (

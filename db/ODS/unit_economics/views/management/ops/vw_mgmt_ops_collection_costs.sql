@@ -135,7 +135,7 @@ tt_costs as (
       flg_expected_collection
     from spec_gen eg
     join cdre_collection_fc co
-      on co.dre_date = (eg.dt - interval '1 month')::date
+      on co.dre_date = (eg.dt + interval '1 month')::date
 ),
 contract_costs as (
     select distinct
@@ -145,7 +145,7 @@ contract_costs as (
       (co.dre_value / (count(fc.property_id) over (partition by co.dre_date))::double precision) as vl_collection
     from filtered_contracts fc
     join cdre_collection co
-      on co.dre_date = (date_trunc('month', fc.dt) - interval '1 month')::date
+      on co.dre_date = (date_trunc('month', fc.dt) + interval '1 month')::date
 ),
 full_costs as (
   select distinct

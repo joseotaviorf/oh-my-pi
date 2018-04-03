@@ -43,12 +43,12 @@ contract_costs as (
 	select
 	  fc.property_id,
 	  fc.dt,
-	  coalesce(ci.dre_date, fc.dt) as dt_cash_flow,
+	  ci.dre_date as dt_cash_flow,
 	  ci.dre_value / (count(fc.property_id) over (partition by ci.dre_date))::double precision as vl_inspections,
 	  (dre_value is null)::int as flg_expected_inspection
 	from filtered_contracts fc
-	left join cdre_inspections ci
-	  on ci.dre_date = (fc.dt - interval '1 month')::date
+	join cdre_inspections ci
+	  on ci.dre_date = (fc.dt + interval '1 month')::date
 ),
 last_3_avg as (
 	select

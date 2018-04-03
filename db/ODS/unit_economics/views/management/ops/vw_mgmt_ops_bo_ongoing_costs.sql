@@ -22,25 +22,23 @@ filtered_contract as (
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      (date_trunc('month', dd."date") - interval '1 month')::date as dt_cash_flow
+      date_trunc('month', dd."date")::date as dt_cash_flow
     from dim_date dd
     join filtered_contracts_prev fc
-        on date_trunc('month', dd."date") between date_trunc('month', fc.start_date) + interval '1 month'
-                        and date_trunc('month', fc.end_date) + interval '1 month'
+        on date_trunc('month', dd."date") between date_trunc('month', fc.start_date)
+                        and date_trunc('month', fc.end_date)
 ),
 costs as (
     select distinct
       fc.property_id,
       fc.start_date,
       fc.end_date,
-      (fc.dt_cash_flow - interval '1 month')::date as dt_cash_flow,
-      co.dre_value,
-      (count(fc.property_id) over (partition by fc.dt_cash_flow)),
+      co.dre_date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by fc.dt_cash_flow))::double precision as vl_bo_ongoing,
       (dre_value is null)::int as flg_expected_bo_ongoing
     from filtered_contract fc
-    left join cdre_ongoing co
-      on co.dre_date = (fc.dt_cash_flow - interval '1 month')::date
+    join cdre_ongoing co
+      on co.dre_date = (fc.dt_cash_flow + interval '1 month')::date
 ),
 result as (
     select
