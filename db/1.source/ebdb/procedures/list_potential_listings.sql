@@ -175,8 +175,9 @@ BEGIN
           cl.tipo as conversao_tipo,
           l.origem as lead_origem,
 
-          CASE WHEN cl.leadConvertido_id IS NOT NULL
-            THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000)) -- if there is a match with the table conversaolead, we can substitute the dataconversao by criadoEm in case dataconversao is missing
+          CASE
+            WHEN cl.leadConvertido_id IS NOT NULL THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000))
+            WHEN l.reason in ('ProprietarioRecusou', 'Exclusivo') THEN coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(lu.timestamp/1000))
           END as qualified_date,
 
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as created_date,
@@ -227,6 +228,14 @@ BEGIN
         LEFT JOIN
           Usuario u
           on u.id = i.usuario_id
+
+        LEFT JOIN
+          (select max(REV) as REV, id from Lead_AUD where status_MOD = 1 and status = 'Descartado' group by id) discard
+          on l.id = discard.id
+
+        LEFT JOIN
+          UsuarioRevisionEntity dure
+          on dure.id = discard.REV
 
         UNION
 
