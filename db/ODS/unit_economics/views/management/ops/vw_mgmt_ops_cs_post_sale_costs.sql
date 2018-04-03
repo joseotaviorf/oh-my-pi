@@ -74,7 +74,7 @@ ratio as (
     fc.months_after_init
   from filtered_contracts fc
   left join qt_nulls qn
-    on fc.dt = qn.dt
+    on (fc.dt - interval '1 month')::date = qn.dt
 ),
 gen_contracts as (
 	select distinct
@@ -85,7 +85,7 @@ gen_contracts as (
 		fc.months_after_init
 	from filtered_contracts fc
     left join ratio r
-  	    on fc.dt = r.dt
+  	    on (fc.dt - interval '1 month')::date = r.dt
 ),
 calculated as (
     select distinct
@@ -98,7 +98,7 @@ calculated as (
 spec_gen_prev as (
   select
     coalesce(cc.property_id, gc.property_id) as property_id,
-    coalesce(cc.dt, gc.dt) as dt,
+    coalesce((cc.dt + interval '1 month')::date, gc.dt) as dt,
     coalesce(cc.qt, 0) + coalesce(gc.qt, 0) as qt,
     coalesce(gc._avg, 0) + coalesce((gap_fill(cc._avg) over (partition by gc.property_id order by gc.dt)
                                         * (0.93 ^ gc.months_after_init)), 0) as _avg,
@@ -106,7 +106,7 @@ spec_gen_prev as (
   from calculated cc
   full outer join gen_contracts gc
     on cc.property_id = gc.property_id
-    	and gc.dt = cc.dt
+    	and gc.dt = (cc.dt + interval '1 month')::date
 ),
 spec_gen as (
 	select distinct
@@ -127,39 +127,35 @@ spec_gen as (
 tt_costs as (
     select distinct
       eg.property_id,
-      eg.dt,
       cps.dre_date as dt_cash_flow,
       cps.dre_value * eg.qt / case
-        												when sum(eg.qt) over (partition by cps.dre_date) = 0
+        												when sum(eg.qt) over (partition by (cps.dre_date - interval '1 month')::date) = 0
         													then null
-        												else sum(eg.qt) over (partition by cps.dre_date)::double precision
+        												else sum(eg.qt) over (partition by (cps.dre_date - interval '1 month')::date)::double precision
       											 end as vl_cs_post_sale,
       flg_expected_cs_post_sale
     from spec_gen eg
     join cdre_cs_post_sale_fc cps
-      on cps.dre_date = (eg.dt + interval '1 month')::date
+      on cps.dre_date = eg.dt
 ),
 contract_costs as (
     select
       fc.property_id,
-      fc.dt,
       cps.dre_date as dt_cash_flow,
-      cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_cs_post_sale
+      cps.dre_value / (count(fc.property_id) over (partition by (cps.dre_date - interval '1 month')::date))::double precision as vl_cs_post_sale
     from filtered_contracts fc
     join cdre_cs_post_sale_fc cps
-      on cps.dre_date = (fc.dt + interval '1 month')::date
+      on cps.dre_date = fc.dt
 ),
 full_costs as (
   select distinct
     coalesce(tt.property_id, cc.property_id) as property_id,
-    coalesce(tt.dt, cc.dt) as dt,
     coalesce(tt.dt_cash_flow, cc.dt_cash_flow) as dt_cash_flow,
     coalesce(tt.vl_cs_post_sale, cc.vl_cs_post_sale) as vl_cs_post_sale,
     coalesce(tt.flg_expected_cs_post_sale, 0) as flg_expected_cs_post_sale
   from tt_costs tt
   full outer join contract_costs cc
     on tt.property_id = cc.property_id
-    	and tt.dt = cc.dt
       and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
@@ -171,5 +167,5 @@ select
 from full_costs fc
 left join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = fc.property_id
-    and fc.dt::date between date_trunc('month', vbpc.min_version_time)::date and date_trunc('month', vbpc.max_version_time)::date
+    and (fc.dt_cash_flow - interval '1 month')::date between date_trunc('month', vbpc.min_version_time)::date and date_trunc('month', vbpc.max_version_time)::date
 ;

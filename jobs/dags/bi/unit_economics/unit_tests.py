@@ -32,7 +32,7 @@ def __test_query(**kwargs):
 
     _return = BaseTest.test_raw_query(
         query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category'],
-                                    unacceptable_diff=0.01 if 'unacceptable_diff' not in kwargs else kwargs['unacceptable_diff']),
+                                    unacceptable_diff=0.02 if 'unacceptable_diff' not in kwargs else kwargs['unacceptable_diff']),
         enum_db=kwargs['enum_db'],
         blocking=kwargs['blocking'],
         assertion=kwargs['assertion']
@@ -93,7 +93,7 @@ def __build_test_tasks(local_dag):
                    'blocking': True,
                    'dre_category': 'Customer Support (post-sale)',
                    '_column_value': 'vl_cs_post_sale',
-                   'unacceptable_diff': 0.07
+                   'unacceptable_diff': 0.08
                    }
     )
 

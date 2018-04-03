@@ -46,7 +46,7 @@ filtered_contracts_prev as (
 filtered_contracts as(
 	select distinct
 		fc.property_id,
-		coalesce(dre.dre_date, date_trunc('month', fc."to") + interval '1 month') as dt
+		date_trunc('month', fc."to") as dt
 	from filtered_contracts_prev fc
 	left join cdre_onboarding dre
 		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
