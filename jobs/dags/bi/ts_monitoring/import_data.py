@@ -25,7 +25,7 @@ def import_ebdb_proposta(client):
         from_unixtime(cast(r.timestamp as bigint)/1000) as date_start_of_analysis,
 
         p.statusDocumentacaoInq,
-        (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) >= date('2018-02-01') as Fairfax
+        (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) >= date('2018-02-01') as screened_by_5a
 
     from datalake_raw.ebdb_proposta p 
     join datalake_raw.ebdb_proposta_AUD a on a.id = p.id -- inner join by default
@@ -46,18 +46,9 @@ def import_ebdb_proposta(client):
                  'date_start_of_analysis',
                  ]
     for date_col in date_cols:
-        df_proposta_ebdb.loc[:, date_col] = pd.to_datetime(df_proposta_ebdb[date_col], yearfirst=True,
-                                                           errors='coerce')  # format='%Y-%m-%d')
-
-    df_proposta_ebdb['ym_date_agreement'] = pd.to_datetime(
-        (df_proposta_ebdb['date_agreement'].dt.strftime("%Y%m") + '01').where(
-            df_proposta_ebdb['date_agreement'].notnull(), other=np.nan))
-    df_proposta_ebdb['ym_date_approval_5a'] = pd.to_datetime(
-        (df_proposta_ebdb['date_approval_5a'].dt.strftime("%Y%m") + '01').where(
-            df_proposta_ebdb['date_approval_5a'].notnull(), other=np.nan))
-    df_proposta_ebdb['ym_date_start_of_analysis'] = pd.to_datetime(
-        (df_proposta_ebdb['date_start_of_analysis'].dt.strftime("%Y%m") + '01').where(
-            df_proposta_ebdb['date_start_of_analysis'].notnull(), other=np.nan))
+        df_proposta_ebdb.loc[:, date_col] = pd.to_datetime(df_proposta_ebdb[date_col],
+                                                           yearfirst=True,
+                                                           errors='coerce')
 
     return df_proposta_ebdb
 
@@ -233,7 +224,10 @@ def import_ebdb_contrato_aud(client):
     from datalake_raw.ebdb_contrato_aud ca
     join datalake_raw.ebdb_usuariorevisionentity r on ca.REV = r.id 
     join datalake_raw.ebdb_contrato c on c.id=ca.id
-    where ca.garantia='SeguroFairfax'
+    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the 
+    -- negociation was before feb
+    -- we need to remove this condition because it could be that we end up deciding a 
+    -- proposition where we initially 'promised' it would be covered by cardif
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
@@ -278,7 +272,10 @@ def import_ebdb_contrato(client):
       c.cidade,
       c.contractversion_id
     from datalake_raw.ebdb_contrato c
-    where garantia='SeguroFairfax'
+    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the 
+    -- negociation was before feb
+    -- we need to remove this condition because it could be that we end up deciding a 
+    -- proposition where we initially 'promised' it would be covered by cardif
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
@@ -290,10 +287,6 @@ def import_ebdb_contrato(client):
                  'date_rescisao_prevista']
     for date_col in date_cols:
         df_contrato_ebdb.loc[:, date_col] = pd.to_datetime(df_contrato_ebdb[date_col], yearfirst=True, errors='coerce')
-
-    df_contrato_ebdb['ym_signature'] = pd.to_datetime(
-        (df_contrato_ebdb['date_signature'].dt.strftime("%Y%m") + '01').where(
-            df_contrato_ebdb['date_signature'].notnull(), other=np.nan))
 
     df_contrato_ebdb = df_contrato_ebdb.set_index('contract_id')
 

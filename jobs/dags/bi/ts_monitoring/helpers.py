@@ -34,10 +34,11 @@ def write_to_s3(obj, filename):
     s3 = boto3.resource('s3')
 
     if type(obj) == pd.DataFrame:
+        obj = obj.copy()  # we don't want to alter the original object
         # we want to force all dates to be written in the format '%Y-%m-%d %H:%M:%S', so we convert them to string first
         for col, dtype in obj.dtypes.iteritems():
             if str(dtype) == 'datetime64[ns]':
-                obj[col] = obj[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+                obj[col] = obj[col].dt.strftime('%Y-%m-%d %H:%M:%S').replace(to_replace='NaT', value='')
 
         csv_buffer = io.BytesIO()
         obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=False)

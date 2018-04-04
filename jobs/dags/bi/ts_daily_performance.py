@@ -1,5 +1,5 @@
 """
-Performance table + feed historical perf
+Performance table
 this script computes the performance table for yesterday (end of day) and writes the result in S3
 """
 from datetime import datetime, timedelta
@@ -12,17 +12,17 @@ from qa_python_utils.default_logger import _logger
 
 from jobs.dags.util import environment as env
 from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices
+from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
 from ts_monitoring.processing import compute_performance_table, format_performance_table
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+#bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
 # from jobs.dags.util import environment as env
-# bucket = '5a-datalake'  # for testing without airflow
+bucket = '5a-datalake'  # for testing without airflow
 
 
 
@@ -37,38 +37,32 @@ def daily_performance():
 
     # query athena
     _logger.info('Querying athena')
+    df_proposta_ebdb = import_ebdb_proposta(client)  # only to know which ones were decided by us
     df_contrato_aud_ebdb = import_ebdb_contrato_aud(client)
     df_payments = import_invoices(client)
 
+    # select in payments and in contrato_aud only the proposals that were initially screened by us
+    proposals_screened_by_5a = df_proposta_ebdb[df_proposta_ebdb.screened_by_5a].index
+    df_contrato_aud_ebdb = df_contrato_aud_ebdb[df_contrato_aud_ebdb.proposal_id.isin(proposals_screened_by_5a)]
+    contracts_screened_by_5a = df_contrato_aud_ebdb.contract_id.unique()
+    df_payments = df_payments[df_payments.contract_id.isin(contracts_screened_by_5a)]
+
     # compute the the raw performance table:
     _logger.info('computing raw performance table')
-    performance_table_raw = compute_performance_table(df_contrato_aud_ebdb, df_payments, yesterday)
+    performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, yesterday)
 
-    # feed the normal performance table (day-1)
-    _logger.info('feeding the (normal) performance table')
-    performance_table = create_sk_dates(performance_table_raw)
+    # feed the performance table :
+    _logger.info('feed the performance folder in s3')
+    performance_table['date_computation'] = yesterday
+    performance_table = create_sk_dates(performance_table)
     performance_table = format_performance_table(performance_table)
+    write_to_s3(performance_table,
+                'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')
 
-    write_to_s3(performance_table, 'performance/performance.csv')
-
-    _logger.info('generating perfomance queries')
+    _logger.info('generating performance queries')
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
-
-    # feed the historical performance table :
-    _logger.info('feed the historical performance folder in s3')
-    historical_performance_table_raw = performance_table_raw.copy()
-    historical_performance_table_raw['date_computation'] = yesterday
-    historical_performance_table = create_sk_dates(historical_performance_table_raw)
-    historical_performance_table = format_performance_table(historical_performance_table)
-    write_to_s3(historical_performance_table,
-                'historical_performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')
-
-    _logger.info('generating historical perfomance queries')
-    athena_ddl, pbi_query = generate_queries(historical_performance_table, 'historical_performance')
-    write_to_s3(athena_ddl, 'queries/athena_historicalperformance_ddl.txt')
-    write_to_s3(pbi_query, 'queries/pbi_historicalperformance_query.txt')
 
 
 if __name__ == "__main__":

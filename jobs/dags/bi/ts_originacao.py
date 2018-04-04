@@ -10,7 +10,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries
+from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 from ts_monitoring.import_data import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
     import_api, import_ebdb_contrato
 from ts_monitoring.processing import compute_originacao_table, format_originacao_table
@@ -19,10 +19,10 @@ MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+#bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
-# bucket = '5a-datalake'#for testing without airflow
+bucket = '5a-datalake'#for testing without airflow
 # from jobs.dags.util import environment as env
 
 def originacao():
@@ -50,6 +50,7 @@ def originacao():
                                                  df_proponents_of_proposal,
                                                  df_api_last)
     _logger.info('Format and write originacao in s3')
+    output_originacao = create_sk_dates(output_originacao)
     output_originacao = format_originacao_table(output_originacao)
 
     write_to_s3(output_originacao, 'originacao/originacao.csv')

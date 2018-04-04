@@ -216,11 +216,6 @@ def format_performance_table(output_performance):
     :param output_performance: output of compute_performance (potentially modified afterwards)
     :return:formatted dataframe
     """
-    # replace null dates by '' and store as string
-    dates_ever = [u'invoices_date_ever1', u'invoices_date_ever30', u'invoices_date_ever50', u'invoices_date_ever60',
-                  u'invoices_date_ever90', u'invoices_date_ever120', u'invoices_date_ever150']
-
-    output_performance.loc[:, dates_ever] = output_performance.loc[:, dates_ever].astype(str).replace({'NaT': ''})
 
     output_performance = output_performance.reset_index()
 
@@ -242,8 +237,8 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
     """
     # proposata of ebdb ################
 
-    # managed by fairfax
-    df_proposta_ebdb_prepared = df_proposta_ebdb[df_proposta_ebdb.Fairfax]  # select only fairfax propostas
+    # we want to keep the propostas screened by 5a (those that went though sortinghat)
+    df_proposta_ebdb_prepared = df_proposta_ebdb[df_proposta_ebdb.screened_by_5a]
 
     # select columns
     columns_to_keep_proposta_ebdb = [
@@ -252,7 +247,7 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
         'date_agreement',
         'date_start_of_analysis',
         'statusdocumentacaoinq',
-        'Fairfax'
+        'screened_by_5a'
     ]
     df_proposta_ebdb_prepared = df_proposta_ebdb_prepared[columns_to_keep_proposta_ebdb]
 
@@ -400,13 +395,6 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
     output_originacao['api_recomendacao_subset'] = 0
     output_originacao.loc[
         output_originacao.api_best_risk_level < output_originacao.api_full_risk_level, 'api_recomendacao_subset'] = 1
-
-    # create sk_date for datetime types #####################
-
-    for col, dtype in output_originacao.dtypes.iteritems():
-        if str(dtype) == 'datetime64[ns]':
-            output_originacao['sk_' + col] = output_originacao[col].dt.strftime('%Y%m%d').replace(
-                {'NaT': ''})  # sk date is a string in dim_date so we keep it as a string here too
 
     return output_originacao
 
