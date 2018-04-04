@@ -97,6 +97,12 @@ def import_sortinghat_proposal(client):
     df_proposal_sh.loc[:, 'analyst_name'] = df_proposal_sh.analyst_name.replace({'': 'not assigned'})
     df_proposal_sh.loc[:, 'supervisor_name'] = df_proposal_sh.supervisor_name.replace({'': 'not assigned'})
 
+    # no rejection_motive => rejection_reason_unkown/not_rejected
+    df_proposal_sh.loc[(df_proposal_sh.status == 'REJECTED') & (
+        df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'rejection_reason_unkown'
+    df_proposal_sh.loc[(df_proposal_sh.status != 'REJECTED') & (
+        df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'not_rejected'
+
     col_string_to_float = [
         'score_5a',
         'score_5a_best_subset',
