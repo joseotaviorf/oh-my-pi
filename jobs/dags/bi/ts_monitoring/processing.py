@@ -261,7 +261,14 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
     df_proposta_ebdb_prepared = df_proposta_ebdb_prepared.rename(columns=columns_names_proposta_ebdb)
 
     # merge with contrato ebdb (only to get the contract id)
-    df_contrato_ebdb_prepared = df_contrato_ebdb.reset_index().set_index('proposal_id')[['contract_id']]
+    # there can be more than one contract per proposal
+    # in rare cases where it has to be rewritten for example and the first one is cancelled
+    # so we sort by status (take active if there is one) and by date (take the most recently signed)
+    df_contrato_ebdb_prepared = df_contrato_ebdb.reset_index().sort_values(
+        ['proposal_id', 'status', 'date_signature'],
+        ascending=[True, True, False])
+    df_contrato_ebdb_prepared = df_contrato_ebdb_prepared.groupby('proposal_id').agg(
+        {'contract_id': 'first'})
 
     # rename columns
     columns_names_ebdb_contrato = {'contract_id': 'contrato_contract_id'}

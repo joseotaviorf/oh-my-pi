@@ -18,15 +18,14 @@ MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
-
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')# comment for testing without airflow
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+# bucket = '5a-datalake'#for testing without airflow
 
 def originacao():
     """
     computes the originacao table as if we were at the end of D-1 and writes it in s3
     :return:
     """
-    #bucket = '5a-datalake'#for testing without airflow
     client = AthenaClient(bucket)
     today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
     yesterday = today - pd.to_timedelta(1, unit='days')

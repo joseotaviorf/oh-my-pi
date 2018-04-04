@@ -18,6 +18,7 @@ MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')# comment for testing without airflow
+# bucket = '5a-datalake'  # for testing without airflow
 
 
 def daily_performance():
@@ -25,7 +26,6 @@ def daily_performance():
     computes (and writes in s3) the performance table as if we were at the end of D-1
     :return:
     """
-    #bucket = '5a-datalake' #for testing without airflow
     client = AthenaClient(bucket)
     today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
     yesterday = today - pd.to_timedelta(1, unit='days')
@@ -64,6 +64,7 @@ def daily_performance():
     athena_ddl, pbi_query = generate_queries(historical_performance_table, 'historical_performance')
     write_to_s3(athena_ddl, 'queries/athena_historicalperformance_ddl.txt')
     write_to_s3(pbi_query, 'queries/pbi_historicalperformance_query.txt')
+
 
 if __name__ == "__main__":
     daily_performance()

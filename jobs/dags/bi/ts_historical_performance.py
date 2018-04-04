@@ -20,7 +20,8 @@ MAIN_DAG_NAME = 'tenantScreening-historical_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
-start_date = '20180307'  # todo : parameters of airflow?
+#bucket = '5a-datalake'  # for testing without airflow
+start_date = '20180208'  # todo : parameters of airflow?
 end_date = '20180401'
 
 
@@ -31,7 +32,6 @@ def historical_performance():
     NB : for each day we pretend to be at the end of that day.
     :return:
     """
-    # bucket = '5a-datalake'#for testing without airflow
     client = AthenaClient(bucket)
 
     # query athena
