@@ -19,9 +19,9 @@ from ts_monitoring.processing import compute_performance_table, format_performan
 MAIN_DAG_NAME = 'tenantScreening-historical_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')# comment for testing without airflow
-start_date
-end_date
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+start_date = '20180307'  # todo : parameters of airflow?
+end_date = '20180401'
 
 
 def historical_performance():
@@ -31,17 +31,15 @@ def historical_performance():
     NB : for each day we pretend to be at the end of that day.
     :return:
     """
-    #bucket = '5a-datalake'#for testing without airflow
+    # bucket = '5a-datalake'#for testing without airflow
     client = AthenaClient(bucket)
-    today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
-    yesterday = today - pd.to_timedelta(1, unit='days')
 
     # query athena
     df_contrato_aud_ebdb = import_ebdb_contrato_aud(client)
     df_payments = import_invoices(client)
 
     # compute the performance table for each date in date_range
-    date_range = pd.date_range(start=pd.to_datetime('20180307'), end=pd.to_datetime('20180401'))
+    date_range = pd.date_range(start=pd.to_datetime(start_date), end=pd.to_datetime(end_date))
     for date in date_range:
         _logger.info(date)
         performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, date)
