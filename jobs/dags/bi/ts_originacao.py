@@ -9,6 +9,7 @@ from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
+from jobs.dags.util import environment as env
 from ts_monitoring.helpers import write_to_s3, generate_queries
 from ts_monitoring.import_data import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
     import_api, import_ebdb_contrato
@@ -19,7 +20,10 @@ MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+
+
 # bucket = '5a-datalake'#for testing without airflow
+# from jobs.dags.util import environment as env
 
 def originacao():
     """
@@ -72,11 +76,8 @@ dag = DAG(
     max_active_runs=1
 )
 
-dag_daily_performance = PythonOperator(
+PythonOperator(
     dag=dag,
     task_id='originacao',
     func_command=originacao
 )
-# flow
-
-originacao  # >>

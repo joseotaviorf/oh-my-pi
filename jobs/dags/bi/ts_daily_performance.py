@@ -10,6 +10,7 @@ from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
+from jobs.dags.util import environment as env
 from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices
 from ts_monitoring.processing import compute_performance_table, format_performance_table
@@ -17,8 +18,12 @@ from ts_monitoring.processing import compute_performance_table, format_performan
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')# comment for testing without airflow
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+
+
+# from jobs.dags.util import environment as env
 # bucket = '5a-datalake'  # for testing without airflow
+
 
 
 def daily_performance():
@@ -83,11 +88,8 @@ dag = DAG(
     max_active_runs=1
 )
 
-dag_daily_performance = PythonOperator(
+PythonOperator(
     dag=dag,
     task_id='daily_performance',
     func_command=daily_performance
 )
-# flow
-
-daily_performance  # >>
