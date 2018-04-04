@@ -11,7 +11,7 @@ filtered_fines as (
 		contract_id,
 		sum(fine) as fine,
 		paid_date
-	from invoice_fines
+	from invoice.fine
 	where fine > 0
 	group by
 		contract_id,

@@ -11,6 +11,7 @@ select
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
 	coalesce(date_trunc('month', b_fee.dt_cash_flow)::date, date_trunc('month', m_fee.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
+	coalesce(m_fee.vl_rent_value, b_fee.vl_rent_value) as vl_rent_value,
 	coalesce(m_fee.flg_expected_management_fee, 0) as flg_expected_management_fee,
 	coalesce(b_fee.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee,
 	coalesce(b_fee.vl_brokerage_fee, 0) as vl_brokerage_fee
