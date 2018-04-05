@@ -7,12 +7,11 @@ class SortingHat(object):
     ODS_SCHEMA = 'sortinghat'
 
     @logger
-    def extract_table_from_db(self, columns, table_name):
-        _logger.info('m=table_extraction_and_load, msg={} - from db'.format(table_name))
+    def extract_table_from_db(self, query_file_path):
         return BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_sortinghat,
             encoding='UTF8',
-            query='select {} from "{}";'.format(columns, table_name)
+            query=BaseETL.get_query_from_file_name(query_file_path)
         )
 
     @logger(exclude='data_table')
