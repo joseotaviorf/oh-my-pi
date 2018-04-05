@@ -18,7 +18,8 @@ class ActiveUsers(GrowthUsers):
     @logger
     def truncate_table(period=None):
         GrowthUsers.truncate_table(
-            '{}_{}'.format(ActiveUsers.TABLE_NAME, period) if period is not None else ActiveUsers.TABLE_NAME_PREFIX)
+            '{}_{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
+                           period) if period is not None else ActiveUsers.TABLE_NAME_PREFIX)
 
     @logger
     def save_to_table(self, _filter, period):
