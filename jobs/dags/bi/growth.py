@@ -51,7 +51,7 @@ def truncate_engaged_users_table():
 def materialize_active_users_table_query(**kwargs):
     period = kwargs['period']
 
-    active_users = ActiveUsers(bucket, period=period)
+    active_users = ActiveUsers(bucket)
     active_users.save_to_table(_filter='all', period=period)
 
 
