@@ -21,6 +21,11 @@ class ActiveUsers(GrowthUsers):
             '{}_{}'.format(ActiveUsers.TABLE_NAME, period) if period is not None else ActiveUsers.TABLE_NAME_PREFIX)
 
     @logger
+    def save_to_table(self, _filter, period):
+        ActiveUsers.truncate_table(period)
+        self.append_to_table(_filter=_filter, period=period)
+
+    @logger
     def append_to_table(self, _filter, period):
         self.__append(_filter=_filter, period=period, prefix=self.all_dates_query)
         self.__append(_filter=_filter, period=period, prefix=self.current_date_query)
