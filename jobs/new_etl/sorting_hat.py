@@ -29,7 +29,8 @@ class SortingHat(object):
         BaseETL.to_db(
             db_enum=EnumDb.BI_ODS,
             data_table=data_table,
-            table_name='{}.{}'.format(SortingHat.ODS_SCHEMA, table_name),
+            schema=SortingHat.ODS_SCHEMA,
+            table_name=table_name,
             encoding='UTF8',
             append=False
         )
