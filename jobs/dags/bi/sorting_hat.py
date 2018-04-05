@@ -23,7 +23,8 @@ def extract_table(**kwargs):
                                  s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket')
                                  )
 
-    sorting_hat.load_table_to_ods(table_name=table_name, data_table=table)
+    if 'load_to_ods' in kwargs and kwargs['load_to_ods'] is True:
+        sorting_hat.load_table_to_ods(table_name=table_name.lower(), data_table=table)
 
 
 # dags
@@ -52,7 +53,8 @@ PythonOperator(
                     analyst_name, supervisor_name, rent_value, condo_value, iptu_value, created_at,
                     updated_at, home_area, home_bathrooms, home_bedrooms, home_city, home_garages,
                     home_region, home_suites, home_type, home_zipcode, drive_id, rejection_motive,
-                    home_insurance_value, risk_level, risk_level_best_subset, process_date"""
+                    home_insurance_value, risk_level, risk_level_best_subset, process_date""",
+        'load_to_ods': True
     }
 )
 
