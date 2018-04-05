@@ -17,14 +17,15 @@ class ActiveUsers(GrowthUsers):
 
     @staticmethod
     @logger
-    def truncate_table(period=None):
+    def truncate_table(_filter=None, period=None):
         GrowthUsers.truncate_table(
-            '{}_{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
-                           period) if period is not None else ActiveUsers.TABLE_NAME_PREFIX)
+            '{}{}{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
+                            '_{}'.format(_filter) if _filter is not None else '',
+                            '_{}'.format(period) if period is not None else ''))
 
     @logger
     def save_to_table(self, _filter, period):
-        ActiveUsers.truncate_table(period)
+        ActiveUsers.truncate_table(_filter=_filter, period=period)
         self.append_to_table(_filter=_filter, period=period)
 
     @logger
