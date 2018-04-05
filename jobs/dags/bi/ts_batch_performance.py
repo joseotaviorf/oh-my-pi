@@ -24,7 +24,7 @@ MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 bucket = '5a-datalake'  # for testing without airflow
 # from jobs.dags.util import environment as env
 start_date = '20180206'  # todo : parameters of airflow?
-end_date = '20180402'
+end_date = '20180208'
 
 
 def batch_performance():
