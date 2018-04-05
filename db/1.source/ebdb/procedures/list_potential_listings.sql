@@ -318,10 +318,10 @@ BEGIN
                 garantias,
                 Imovel_id
                 from Imovel_garantias_AUD
-                where garantias = 'SeguroFiancaCardiff'
+                where garantias in ('SeguroFiancaCardiff','SeguroFairfax')
                 group by Imovel_id) ig
             on i.id = ig.Imovel_id
-            and ig.garantias = 'SeguroFiancaCardiff'
+            and ig.garantias in ('SeguroFiancaCardiff','SeguroFairfax')
         left join
             UsuarioRevisionEntity ure
             on ig.REV = ure.id
