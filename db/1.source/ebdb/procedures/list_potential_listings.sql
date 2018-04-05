@@ -25,13 +25,12 @@ BEGIN
         r.opportunity_date,
         r.listing_publication_date) as lead_and_prospect_date,
     r.first_inside_sales_contact_date,
-    coalesce(
-        r.qualified_date,
-        r.opportunity_date,
-        r.listing_publication_date) as qualified_date,
-    coalesce(
-        r.opportunity_date,
-        r.listing_publication_date) as opportunity_date,
+    case
+    	when (r.lead_status = 'Descartado') and (coalesce(r.opportunity_date, r.listing_publication_date)) is null
+    	then null
+    	else coalesce(r.qualified_date, r.opportunity_date, r.listing_publication_date)
+    end as qualified_date,
+    coalesce(r.opportunity_date, r.listing_publication_date) as opportunity_date,
     r.listing_publication_date,
     r.contract_date,
     r.lead_id,
@@ -108,6 +107,7 @@ BEGIN
 
       ia.imovelAttribution as imovel_attribution,
       o.lead_tipo as lead_tipo,
+      o.lead_status,
 
       case
         when o.lead_tipo = 'Afiliado' and FROM_UNIXTIME(ure.`timestamp`/1000) is not null then 25 else 0
@@ -139,6 +139,7 @@ BEGIN
         tipoAdmin,
         n.conversao_tipo,
         n.lead_origem,
+        n.lead_status,
         case
         	when lead_flow=0 then min(n.prospect_date)
         	else NULL
@@ -174,6 +175,7 @@ BEGIN
           null as prospect_date,
           cl.tipo as conversao_tipo,
           l.origem as lead_origem,
+          l.status as lead_status,
 
           CASE
             WHEN cl.leadConvertido_id IS NOT NULL THEN coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(lu.timestamp/1000))
@@ -261,6 +263,7 @@ BEGIN
           i.dataCriacao as prospect_date, -- previously : dt_etapa_endereco
           cl.tipo as conversao_tipo,
           l.origem as lead_origem ,
+          l.status as lead_status,
           FROM_UNIXTIME(ure.`timestamp`/1000) as qualified_date, -- corrected above when we know the source of the lead (self service or organic inside sales)
           coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm, i.dataCriacao) as created_date,
           coalesce(l.atualizadoEm, i.atualizadoEm)  as updated_date,
@@ -362,30 +365,6 @@ BEGIN
     (
       SELECT
         `ipd`.`id` AS `id`,
-        `ipd`.`status` AS `status`,
-        `ipd`.`firstPublication` AS `firstPublication`,
-        `ipd`.`usuario_id` AS `usuario_id`,
-        `ipd`.`usuarioQueCadastrou_id` AS `usuarioQueCadastrou_id`,
-        `ipd`.`usuarioQueCadastrou_ativo` AS `usuarioQueCadastrou_ativo`,
-        `u2`.`nome` AS `quemCadastrou`,
-        `ipd`.`dataPublicado` AS `dataPublicado`,
-        `ipd`.`usuarioQuePublicou_id` AS `usuarioQuePublicou_id`,
-        `ipd`.`usuarioQuePublicou_ativo` AS `usuarioQuePublicou_ativo`,
-        `ipd`.`nome` AS `quemPublicou`,
-        `cl`.`id` AS `ConversaoLead_id`,
-        `cl`.`dataConversao` AS `dataConversao`,
-        `cl`.`tipo` AS `conversao_tipo`,
-        `cl`.`leadConvertido_id` AS `Lead_id`,
-        `l`.`tipo` AS `lead_tipo`,
-        `l`.`origem` AS `lead_origem`,
-        `cl`.`vendedor_id` AS `vendedor_id`,
-        `u`.`nome` AS `quemConverteu`,
-        `u`.`id` AS `quemConverteu_id`,
-        `dv`.`ativo` AS `quemConverteu_ativo`,
-        `l`.`captadoEm` AS `lead_captadoEm`,
-        `l`.`anuncioCriadoEm` AS `lead_anuncioCriadoEm`,
-        `l`.`criadoEm` AS `lead_criadoEm`,
-        `l`.`atualizadoEm` AS `lead_atualizadoEm`,
         (CASE
           WHEN ((`ipd`.`usuario_id` = `ipd`.`usuarioQueCadastrou_id`) AND (`u2`.`tipoAdmin` = 'Normal'))
             THEN 'Self-Service'
