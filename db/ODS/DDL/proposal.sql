@@ -7,7 +7,6 @@ CREATE TABLE public.proposal (
   motivacao VARCHAR(100),
   "propostaAluguel" DOUBLE PRECISION NULL,
   status VARCHAR(50) NULL,
-  "ticketID" INTEGER,
   "dataAprovacao" public.datetime,
   "inquilinoEnviouDocumentos" INTEGER NULL,
   "dataDocumentosEnviados" public.datetime,
