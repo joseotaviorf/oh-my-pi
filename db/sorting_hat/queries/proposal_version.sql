@@ -1,4 +1,20 @@
 select
+  home_area int,
+  home_bathrooms int,
+  home_bedrooms int,
+  home_city varchar,
+  home_garages int,
+  home_region varchar,
+  home_suites int,
+  home_type varchar,
+  home_zipcode varchar,
+  drive_id varchar,
+  rejection_motive varchar,
+  home_insurance_value numeric(14,4),
+  risk_level varchar,
+  risk_level_best_subset varchar,
+  process_date timestamp
+
 	id,
   proposal_id,
   imovel_id,

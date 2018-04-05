@@ -1,5 +1,5 @@
-drop table if exists sortinghat.proposal_version;
-create table sortinghat.proposal_version (
+drop table if exists sortinghat.proposalversion;
+create table sortinghat.proposalversion (
   id bigint not null,
   proposal_id bigint not null,
   imovel_id bigint,
@@ -17,6 +17,7 @@ create table sortinghat.proposal_version (
   iptu_value numeric(14,4),
   created_at timestamp,
   updated_at timestamp,
+  versioned_at timestamp,
   home_area int,
   home_bathrooms int,
   home_bedrooms int,
