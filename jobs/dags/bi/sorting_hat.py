@@ -7,7 +7,7 @@ from jobs.new_etl.sorting_hat import SortingHat
 from qa_python_utils.default_logger import logger
 
 # env vars
-env.set_airflow_var_to_local_env('SORTINGHAT')
+env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
 
 
 # functions
