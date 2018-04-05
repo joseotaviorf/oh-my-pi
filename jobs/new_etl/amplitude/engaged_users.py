@@ -33,6 +33,6 @@ class EngagedUsers(GrowthUsers):
 
         df = self.get_df(prefix=prefix,
                          middle=middle_query,
-                         suffix=self._get_suffix_query())
+                         suffix=self._get_suffix_query(''))
 
         EngagedUsers.df_to_dw(df=df)
