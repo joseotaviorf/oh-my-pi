@@ -23,6 +23,8 @@ def extract_table(**kwargs):
                                  s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket')
                                  )
 
+    sorting_hat.load_table_to_ods(table_name=table_name, data_table=table)
+
 
 # dags
 dag = DAG(

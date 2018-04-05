@@ -4,6 +4,8 @@ from qa_python_utils.default_logger import _logger, logger
 
 
 class SortingHat(object):
+    ODS_SCHEMA = 'sortinghat'
+
     @logger
     def extract_table_from_db(self, columns, table_name):
         _logger.info('m=table_extraction_and_load, msg={} - from db'.format(table_name))
@@ -20,4 +22,14 @@ class SortingHat(object):
             filename='{}.csv'.format(table_name),
             data_table=data_table,
             bucket_folder_path='{}/raw/sorting_hat/{}'.format(s3_bucket, table_name)
+        )
+
+    @logger(exclude='data_table')
+    def load_table_to_ods(self, table_name, data_table):
+        BaseETL.to_db(
+            db_enum=EnumDb.BI_ODS,
+            data_table=data_table,
+            table_name='{}.{}'.format(SortingHat.ODS_SCHEMA, table_name),
+            encoding='UTF8',
+            append=False
         )
