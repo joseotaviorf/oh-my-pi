@@ -52,7 +52,7 @@ def materialize_active_users_table_query(**kwargs):
     period = kwargs['period']
 
     active_users = ActiveUsers(bucket)
-    active_users.sabe_to_table(_filter='all', period=period)
+    active_users.save_to_table(_filter='all', period=period)
 
 
 # @logger
