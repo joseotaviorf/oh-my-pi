@@ -26,6 +26,6 @@ class OwnerLandingViews(GrowthUsers):
 
     @logger
     def __append(self, _filter, prefix):
-        df = self.get_df(prefix=prefix, suffix=self._get_suffix_query())
+        df = self.get_df(prefix=prefix, suffix=self._get_suffix_query(''))
         OwnerLandingViews.df_to_dw(df=df)
 

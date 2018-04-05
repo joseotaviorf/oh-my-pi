@@ -28,8 +28,8 @@ class ActiveUsers(GrowthUsers):
 
     @logger
     def append_to_table(self, _filter, period):
-        self.__append(_filter=_filter, period=period, prefix=self._get_all_dates_query(period=period))
-        self.__append(_filter=_filter, period=period, prefix=self._get_current_date_query(period=period))
+        self.__append(_filter=_filter, period=period, prefix=self._get_all_dates_query())
+        self.__append(_filter=_filter, period=period, prefix=self._get_current_date_query())
 
     @logger
     def __append(self, _filter, period, prefix):

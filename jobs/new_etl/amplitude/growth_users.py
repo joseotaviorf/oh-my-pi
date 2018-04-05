@@ -24,9 +24,8 @@ class GrowthUsers(object):
             '{}/{}/prefix_current_date.sql'.format(QUERIES_DIR, self.measure))
 
     @logger
-    def _get_suffix_query(self, period=''):
-        return BaseETL.get_query_from_file_name(
-            '{}/{}/suffix{}.sql'.format(QUERIES_DIR, self.measure, period if period != '' else '_{}'.format(period)))
+    def _get_suffix_query(self, period):
+        return BaseETL.get_query_from_file_name('{}/{}/suffix_{}.sql'.format(QUERIES_DIR, self.measure, period))
 
     @logger
     def get_df(self, prefix, middle, suffix):
