@@ -26,11 +26,11 @@ class SortingHat(object):
 
     @logger(exclude='data_table')
     def load_table_to_ods(self, table_name, data_table):
-        BaseETL.to_db(
+        BaseETL.bulk_insert(
+            table=data_table,
+            table_name='{}.{}'.format(SortingHat.ODS_SCHEMA, table_name),
             db_enum=EnumDb.BI_ODS,
-            data_table=data_table,
-            schema=SortingHat.ODS_SCHEMA,
-            table_name=table_name,
             encoding='UTF8',
-            append=False
+            append=False,
+            commit=True
         )
