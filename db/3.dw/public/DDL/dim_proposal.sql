@@ -15,7 +15,6 @@ CREATE TABLE dim_proposal (
   owner_contract_accepted INTEGER,
   status_doc_tenant VARCHAR(50),
   status_doc_owner VARCHAR(50),
-  id_pre_proposal INTEGER,
   tenant_document_sent_count integer,
   dt_created TIMESTAMP,
   dt_updated TIMESTAMP,

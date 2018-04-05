@@ -1,30 +1,30 @@
 drop view if exists vw_dim_proposal;
-create or replace view vw_dim_proposal
-as
-SELECT
-  id as sk_proposal,
-  id as id_proposal,
-  "dataProposta" as dt_proposal,
-  garantia as guarantee,
-  "propostaAluguel" as renting_proposal_value ,
-  status,
-  "dataAprovacao" as dt_proposal_approved,
-  "inquilinoEnviouDocumentos" as tenant_document_sent,
-  "dataDocumentosEnviados" as dt_tenant_document_sent,
-  "proprietarioEnviouDocumentos" as owner_document_sent,
-  "dataDocumentosProprietarioEnviados" as dt_owner_document_sent,
-  "inquilinoAceitouContrato" as tenant_contract_accepted,
-  "proprietarioAceitouContrato" as owner_contract_accepted,
-  "statusDocumentacaoInq" as status_doc_tenant,
-  "statusDocumentacaoProp" as status_doc_owner,
-  "preProposta_id" as id_pre_proposal,
-  "qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
-  "criadoEm" as dt_created,
-  "atualizadoEm" as dt_updated,
+create or replace view vw_dim_proposal as
+select
+  p.id as sk_proposal,
+  p.id as id_proposal,
+  p."dataProposta" as dt_proposal,
+  p.garantia as guarantee,
+  p."propostaAluguel" as renting_proposal_value ,
+  p.status,
+  p."dataAprovacao" as dt_proposal_approved,
+  p."inquilinoEnviouDocumentos" as tenant_document_sent,
+  p."dataDocumentosEnviados" as dt_tenant_document_sent,
+  p."proprietarioEnviouDocumentos" as owner_document_sent,
+  p."dataDocumentosProprietarioEnviados" as dt_owner_document_sent,
+  p."inquilinoAceitouContrato" as tenant_contract_accepted,
+  p."proprietarioAceitouContrato" as owner_contract_accepted,
+  p."statusDocumentacaoInq" as status_doc_tenant,
+  p."statusDocumentacaoProp" as status_doc_owner,
+  p."qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
+  p."criadoEm" as dt_created,
+  p."atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
-  "primeiroEnvioDocInq" as dt_tenant_first_document_sent,
-  credit_analysis_init_date as dt_credit_analysis_init,
-  credit_analysis_end_date as dt_credit_analysis_end
-FROM
-  public.proposal ;
+  p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
+  shp.created_at as dt_credit_analysis_init,
+  shp.process_date as dt_credit_analysis_end
+FROM proposal p
+left join sortinghat.proposal shp
+  on shp.id = p.id
+;
 
