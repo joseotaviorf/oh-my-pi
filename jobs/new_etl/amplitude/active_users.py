@@ -6,9 +6,8 @@ class ActiveUsers(GrowthUsers):
     TABLE_NAME_PREFIX = 'amplitude_active_users'
 
     @logger
-    def __init__(self, s3_bucket, period=''):
-        super(ActiveUsers, self).__init__(measure='active_users', s3_bucket=s3_bucket, period=period)
-        self.period = period
+    def __init__(self, s3_bucket):
+        super(ActiveUsers, self).__init__(measure='active_users', s3_bucket=s3_bucket)
 
     @staticmethod
     @logger(exclude='df')
