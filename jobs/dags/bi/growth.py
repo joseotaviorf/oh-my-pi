@@ -19,19 +19,19 @@ MAIN_DAG_NAME = 'bi-growth'
 
 # create DAG definition
 main_dag = DAG(
-            dag_id=MAIN_DAG_NAME,
-            description='ETL Pipeline for creating Growth Model inside the DW',
-            default_args={
-                'owner': BaseDAG.DEFAULT_OWNER,
-                'wait_for_downstream': False,
-                'depends_on_past': False
-            },
-            start_date=datetime(2018, 2, 15, 0, 0, 0),
-            schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
-            max_active_runs=1,
-            catchup=False,
-            orientation='TB'
-        )
+    dag_id=MAIN_DAG_NAME,
+    description='ETL Pipeline for creating Growth Model inside the DW',
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=datetime(2018, 2, 15, 0, 0, 0),
+    schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
+    max_active_runs=1,
+    catchup=False,
+    orientation='TB'
+)
 
 
 @logger
@@ -51,13 +51,13 @@ def truncate_engaged_users_table():
 def materialize_active_users_table_query(**kwargs):
     period = kwargs['period']
 
-    active_users = ActiveUsers(bucket)
+    active_users = ActiveUsers(bucket, period=period)
     active_users.save_to_table(_filter='all', period=period)
 
 
 # @logger
 # def truncate_active_users_table(**kwargs):
-    # ActiveUsers.truncate_table(None if 'period' not in kwargs else kwargs['period'])
+# ActiveUsers.truncate_table(None if 'period' not in kwargs else kwargs['period'])
 
 
 @logger
@@ -178,6 +178,7 @@ def get_python_operator(task_id, func_command, dag, op_kwargs=None):
         python_callable=func_command,
         op_kwargs=op_kwargs
     )
+
 
 def get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders=None):
     all_day_task = None
