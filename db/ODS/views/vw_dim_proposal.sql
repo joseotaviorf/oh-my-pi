@@ -23,7 +23,7 @@ select
   p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
   shp.created_at as dt_credit_analysis_init,
   shp.process_date as dt_credit_analysis_end
-FROM proposal p
+from proposal p
 left join sortinghat.proposal shp
   on shp.id = p.id
 ;
