@@ -14,10 +14,9 @@ env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
 @logger(exclude='kwargs')
 def extract_table(**kwargs):
     table_name = kwargs['table_name']
-    columns = '*' if 'columns' not in kwargs else kwargs['columns']
 
     sorting_hat = SortingHat()
-    table = sorting_hat.extract_table_from_db(columns=columns, table_name=table_name)
+    table = sorting_hat.extract_table_from_db(query_file_path=kwargs['query_file_path_suffix'])
     sorting_hat.load_table_to_s3(table_name=table_name,
                                  data_table=table,
                                  s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -48,12 +47,18 @@ PythonOperator(
     python_callable=extract_table,
     op_kwargs={
         'table_name': 'Proposal',
-        'columns': """id, imovel_id, analysis_date, "score_5A", "score_5A_best_subset", score_cardif,
-                    score_cardif_best_subset, status, replace("comment", '\n', ' ') as "comment",
-                    analyst_name, supervisor_name, rent_value, condo_value, iptu_value, created_at,
-                    updated_at, home_area, home_bathrooms, home_bedrooms, home_city, home_garages,
-                    home_region, home_suites, home_type, home_zipcode, drive_id, rejection_motive,
-                    home_insurance_value, risk_level, risk_level_best_subset, process_date""",
+        'query_file_path_suffix': 'proposal.sql',
+        'load_to_ods': True
+    }
+)
+
+PythonOperator(
+    dag=dag,
+    task_id='extract_proposal_version_table',
+    python_callable=extract_table,
+    op_kwargs={
+        'table_name': 'ProposalVersion',
+        'query_file_path_suffix': 'proposal_version.sql',
         'load_to_ods': True
     }
 )
@@ -62,5 +67,9 @@ PythonOperator(
     dag=dag,
     task_id='extract_proponent_table',
     python_callable=extract_table,
-    op_kwargs={'table_name': 'Proponent'}
+    op_kwargs={
+        'table_name': 'Proponent',
+        'query_file_path_suffix': 'proponent.sql'
+    }
 )
+
