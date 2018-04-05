@@ -228,6 +228,7 @@ def import_ebdb_contrato_aud(client):
     -- negociation was before feb
     -- we need to remove this condition because it could be that we end up deciding a 
     -- proposition where we initially 'promised' it would be covered by cardif
+    where c.proposta_id is not null and c.proposta_id!=''
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
@@ -276,6 +277,7 @@ def import_ebdb_contrato(client):
     -- negociation was before feb
     -- we need to remove this condition because it could be that we end up deciding a 
     -- proposition where we initially 'promised' it would be covered by cardif
+    where c.proposta_id is not null and c.proposta_id!=''
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
