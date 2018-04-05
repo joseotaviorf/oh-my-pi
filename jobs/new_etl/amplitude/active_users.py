@@ -6,8 +6,9 @@ class ActiveUsers(GrowthUsers):
     TABLE_NAME_PREFIX = 'amplitude_active_users'
 
     @logger
-    def __init__(self, s3_bucket):
-        super(ActiveUsers, self).__init__(measure='active_users', s3_bucket=s3_bucket)
+    def __init__(self, s3_bucket, period=''):
+        super(ActiveUsers, self).__init__(measure='active_users', s3_bucket=s3_bucket, period=period)
+        self.period = period
 
     @staticmethod
     @logger(exclude='df')
@@ -28,10 +29,10 @@ class ActiveUsers(GrowthUsers):
 
     @logger
     def append_to_table(self, _filter, period):
-        self.__append(_filter=_filter, period=period, prefix=self.all_dates_query)
-        self.__append(_filter=_filter, period=period, prefix=self.current_date_query)
+        self.__append(_filter=_filter, period=period, prefix=self._get_all_dates_query(period=period))
+        self.__append(_filter=_filter, period=period, prefix=self._get_current_date_query(period=period))
 
     @logger
     def __append(self, _filter, period, prefix):
-        df = self.get_df(prefix=prefix, suffix='{}_{}.sql'.format(self.suffix_query, period))
+        df = self.get_df(prefix=prefix, suffix=self._get_suffix_query(period=period))
         ActiveUsers.df_to_dw(df=df)
