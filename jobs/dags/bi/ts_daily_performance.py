@@ -57,7 +57,8 @@ def daily_performance():
     performance_table = create_sk_dates(performance_table)
     performance_table = format_performance_table(performance_table)
     write_to_s3(performance_table,
-                'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')
+                'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
+
 
     _logger.info('generating performance queries')
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')

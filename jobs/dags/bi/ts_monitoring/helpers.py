@@ -39,6 +39,11 @@ def write_to_s3(obj, filename):
         for col, dtype in obj.dtypes.iteritems():
             if str(dtype) == 'datetime64[ns]':
                 obj[col] = obj[col].dt.strftime('%Y-%m-%d %H:%M:%S').replace(to_replace='NaT', value='')
+            if str(dtype) in ['uint8', 'int64', 'float64']:  # convert float to string and null to blank strings
+                obj[col] = obj[col].astype(str).replace(to_replace='nan', value='')
+            if str(dtype) == 'bool':
+                obj[col] = obj[col].astype(
+                    str).str.upper()  # hopefully uppercase is automatically seen as boolean by PBI
 
         csv_buffer = io.BytesIO()
         obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=False)
@@ -84,28 +89,28 @@ def generate_queries(df, table_name):
             },
             {
                 'dtype': 'bool',  # written as True and False in csv
-                'athena_type': 'BOOLEAN',  # eg: api_fairfax boolean,
-                'pbi_query': '%s',
+                'athena_type': 'STRING',  # eg: api_fairfax boolean,
+                'pbi_query': "cast(if(%s = '', null, %s) as BOOLEAN) as %s",
             },
             {
                 'dtype': 'uint8',
-                'athena_type': 'INT',
-                'pbi_query': '%s',
+                'athena_type': 'STRING',
+                'pbi_query': "cast(if(%s = '', null, %s) as INTEGER) as %s",
             },
             {
                 'dtype': 'int64',
-                'athena_type': 'INT',
-                'pbi_query': '%s',
+                'athena_type': 'STRING',
+                'pbi_query': "cast(if(%s = '', null, %s) as INTEGER) as %s",
             },
             {
                 'dtype': 'float64',
-                'athena_type': 'FLOAT',
-                'pbi_query': '%s',
+                'athena_type': 'STRING',
+                'pbi_query': "cast(if(%s = '', null, %s) as DECIMAL) as %s",
             },
             {
                 'dtype': 'datetime64[ns]',  # written as 2018-02-05 12:47:55.647508 in csv
                 'athena_type': 'STRING',  # dates are in string columns in athena
-                'pbi_query': "cast(regexp_extract(%s, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)",
+                'pbi_query': "cast(regexp_extract(%s, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp) as %s",
             },
 
         ]
@@ -123,7 +128,7 @@ def generate_queries(df, table_name):
             pbi_query_cols += ',\n'
 
         athena_ddl_cols += (col + ' ' + df_converion.loc[str(dtype), 'athena_type'])
-        pbi_query_cols += (df_converion.loc[str(dtype), 'pbi_query'] % (col) + ' as ' + col)
+        pbi_query_cols += df_converion.loc[str(dtype), 'pbi_query'].replace('%s', col)
 
     # after the last column, simply go to the next line
     athena_ddl_cols += '\n'

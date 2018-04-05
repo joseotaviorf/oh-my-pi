@@ -405,10 +405,6 @@ def format_originacao_table(output_originacao):
     :param output_originacao: dataframe coming from compute_originacao
     :return: formatted table that can be written in s3
     """
-    # replace null values for float columns with 0
-    for col, dtype in output_originacao.dtypes.iteritems():
-        if str(dtype) in ['uint8', 'int64', 'float64']:
-            output_originacao.loc[:, col] = output_originacao.loc[:, col].fillna(0.0)
     # remove commas from comments
     output_originacao.loc[:, 'sh_comment'] = output_originacao.loc[:, 'sh_comment'].str.replace(pat=',', repl=' ')
     output_originacao = output_originacao.reset_index()
