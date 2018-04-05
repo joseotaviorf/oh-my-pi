@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger
 
 
 class ActiveUsers(GrowthUsers):
-    TABLE_NAME = 'amplitude_active_users'
+    TABLE_NAME_PREFIX = 'amplitude_active_users'
 
     @logger
     def __init__(self, s3_bucket):
@@ -11,21 +11,21 @@ class ActiveUsers(GrowthUsers):
 
     @staticmethod
     @logger(exclude='df')
-    def df_to_dw(df):
-        GrowthUsers.df_to_dw(df, ActiveUsers.TABLE_NAME)
+    def df_to_dw(df, period):
+        GrowthUsers.df_to_dw(df, '{}_{}'.format(ActiveUsers.TABLE_NAME, period))
 
     @staticmethod
     @logger
-    def truncate_table():
-        GrowthUsers.truncate_table(ActiveUsers.TABLE_NAME)
+    def truncate_table(period=None):
+        GrowthUsers.truncate_table(
+            '{}_{}'.format(ActiveUsers.TABLE_NAME, period) if period is not None else ActiveUsers.TABLE_NAME_PREFIX)
 
     @logger
-    def append_to_table(self, _filter):
-        self.__append(_filter=_filter, prefix=self.all_dates_query)
-        self.__append(_filter=_filter, prefix=self.current_date_query)
+    def append_to_table(self, _filter, period):
+        self.__append(_filter=_filter, period=period, prefix=self.all_dates_query)
+        self.__append(_filter=_filter, period=period, prefix=self.current_date_query)
 
     @logger
-    def __append(self, _filter, prefix):
-        df = self.get_df(prefix=prefix, suffix=self.suffix_query)
+    def __append(self, _filter, period, prefix):
+        df = self.get_df(prefix=prefix, suffix='{}_{}.sql'.format(self.suffix_query, period))
         ActiveUsers.df_to_dw(df=df)
-

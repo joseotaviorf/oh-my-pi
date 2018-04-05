@@ -18,13 +18,20 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MAIN_DAG_NAME = 'bi-growth'
 
 # create DAG definition
-main_dag = BaseDAG.build_dag(
-    dag_id=MAIN_DAG_NAME,
-    description='ETL Pipeline for creating Growth Model inside the DW',
-    start_date=datetime(2018, 2, 15, 0, 0, 0),
-    schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
-    orientation='TB'
-)
+main_dag = DAG(
+            dag_id=MAIN_DAG_NAME,
+            description='ETL Pipeline for creating Growth Model inside the DW',
+            default_args={
+                'owner': BaseDAG.DEFAULT_OWNER,
+                'wait_for_downstream': False,
+                'depends_on_past': False
+            },
+            start_date=datetime(2018, 2, 15, 0, 0, 0),
+            schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
+            max_active_runs=1,
+            catchup=False,
+            orientation='TB'
+        )
 
 
 @logger
@@ -41,9 +48,11 @@ def truncate_engaged_users_table():
 
 
 @logger
-def materialize_active_users_table_query():
+def materialize_active_users_table_query(**kwargs):
+    period = kwargs['period']
+
     active_users = ActiveUsers(bucket)
-    active_users.append_to_table(_filter='all')
+    active_users.append_to_table(_filter='all', period=period)
 
 
 @logger
@@ -325,10 +334,10 @@ def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, s
 
     active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
 
-    active_users_all_task = get_python_operator('extract_all_data', materialize_active_users_table_query, local_dag)
+    all_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_active_users_table_query)
 
     # must be sequential because of the appending operation
-    active_users_truncate_task >> active_users_all_task
+    active_users_truncate_task.set_downstream([all_tasks[0], all_tasks[1], all_tasks[2], all_tasks[3]])
 
     return local_dag
 
