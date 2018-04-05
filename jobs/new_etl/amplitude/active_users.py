@@ -11,8 +11,9 @@ class ActiveUsers(GrowthUsers):
 
     @staticmethod
     @logger(exclude='df')
-    def df_to_dw(df, period):
-        GrowthUsers.df_to_dw(df, '{}_{}'.format(ActiveUsers.TABLE_NAME, period))
+    def df_to_dw(df, period, _filter=None):
+        GrowthUsers.df_to_dw(df, '{}{}_{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
+                                                  '_{}'.format(_filter) if _filter is not None else '', period))
 
     @staticmethod
     @logger
@@ -34,4 +35,4 @@ class ActiveUsers(GrowthUsers):
     @logger
     def __append(self, _filter, period, prefix):
         df = self.get_df(prefix=prefix, suffix=self._get_suffix_query(period=period))
-        ActiveUsers.df_to_dw(df=df)
+        ActiveUsers.df_to_dw(df=df, period=period, filter=_filter)
