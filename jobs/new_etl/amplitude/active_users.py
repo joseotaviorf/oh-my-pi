@@ -36,4 +36,4 @@ class ActiveUsers(GrowthUsers):
     @logger
     def __append(self, _filter, period, prefix):
         df = self.get_df(prefix=prefix, suffix=self._get_suffix_query(period=period))
-        ActiveUsers.df_to_dw(df=df, period=period, filter=_filter)
+        ActiveUsers.df_to_dw(df=df, period=period, _filter=_filter)
