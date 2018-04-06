@@ -7,7 +7,7 @@ select
   score_cardif,
   score_cardif_best_subset,
   status,
-  replace("comment", '\n', ' ') as "comment",
+  regexp_replace("comment", '\n|\r', ' ') as "comment",
   analyst_name,
   supervisor_name,
   rent_value,
