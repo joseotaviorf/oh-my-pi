@@ -118,13 +118,13 @@ proposal_unit_tests_dag = BaseDAG.get_sub_dag_operator(
 
 proponent_unit_tests_dag = BaseDAG.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=proposal_unit_tests_sub_dag,
+    sub_dag_func=proponent_unit_tests_sub_dag,
     sub_dag_name='unit_tests'
 )
 
 proposalversion_unit_tests_dag = BaseDAG.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=proposal_unit_tests_sub_dag,
+    sub_dag_func=proposalversion_unit_tests_sub_dag,
     sub_dag_name='unit_tests'
 )
 
