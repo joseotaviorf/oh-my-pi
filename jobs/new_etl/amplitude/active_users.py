@@ -12,8 +12,9 @@ class ActiveUsers(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df, period, _filter=None):
-        GrowthUsers.df_to_dw(df, '{}{}_{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
-                                                  '_{}'.format(_filter) if _filter is not None else '', period))
+        GrowthUsers.df_to_dw(df=df, table_name='{}{}_{}'.format(ActiveUsers.TABLE_NAME_PREFIX,
+                                                                '_{}'.format(_filter) if _filter is not None else '',
+                                                                period))
 
     @staticmethod
     @logger
