@@ -4,6 +4,7 @@ from qa_python_utils.default_logger import _logger, logger
 from jobs.new_etl.__init__ import SORTINGHAT_QUERIES_DIR
 
 
+
 class SortingHat(object):
     ODS_SCHEMA = 'sortinghat'
 
