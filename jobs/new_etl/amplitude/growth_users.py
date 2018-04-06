@@ -20,7 +20,7 @@ class GrowthUsers(object):
 
     @logger
     def _get_current_date_query(self):
-        BaseETL.get_query_from_file_name(
+        return BaseETL.get_query_from_file_name(
             '{}/{}/prefix_current_date.sql'.format(QUERIES_DIR, self.measure))
 
     @logger
