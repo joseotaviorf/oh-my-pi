@@ -2,7 +2,7 @@ from jobs.base.base_dag import BaseDAG
 from jobs.base.base_etl import BaseETL
 from jobs.base.base_test import BaseTest
 from jobs.base.enum_db import EnumDb
-from jobs.dags.bi.__init__ import SORTINGHAT_TEST_QUERIES_DIR
+from jobs.dags.bi.sorting_hat.__init__ import SORTINGHAT_TEST_QUERIES_DIR
 from qa_python_utils.default_logger import logger, _logger
 
 COUNT_CHECK_SQL_SUFFIX = 'count_check.sql'
