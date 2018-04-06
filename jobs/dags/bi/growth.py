@@ -48,16 +48,14 @@ def truncate_engaged_users_table():
 
 
 @logger
-def materialize_active_users_table_query(**kwargs):
-    period = kwargs['period']
-
+def materialize_active_users_table_query():
     active_users = ActiveUsers(bucket)
-    active_users.save_to_table(_filter='all', period=period)
+    active_users.append_to_table(_filter='all')
 
 
-# @logger
-# def truncate_active_users_table(**kwargs):
-# ActiveUsers.truncate_table(None if 'period' not in kwargs else kwargs['period'])
+@logger
+def truncate_active_users_table():
+    ActiveUsers.truncate_table()
 
 
 @logger
@@ -324,22 +322,22 @@ def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, 
     return local_dag
 
 
-# def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
-#                               materialize_func=None, placeholders=None):
-#     local_dag = DAG(
-#         '{}.{}'.format(main_dag_name, sub_dag_name),
-#         schedule_interval=schedule_interval,
-#         start_date=start_date,
-#     )
-#
-#     active_users_truncate_task = get_python_operator('truncate_table_all_{}'.format(period), truncate_active_users_table, local_dag)
-#
-#     all_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_active_users_table_query)
-#
-#     # must be sequential because of the appending operation
-#     active_users_truncate_task.set_downstream([all_tasks[0], all_tasks[1], all_tasks[2], all_tasks[3]])
-#
-#     return local_dag
+def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
+                              materialize_func=None, placeholders=None):
+    local_dag = DAG(
+        '{}.{}'.format(main_dag_name, sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date,
+    )
+
+    active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
+
+    active_users_all_task = get_python_operator('extract_all_data', materialize_active_users_table_query, local_dag)
+
+    # must be sequential because of the appending operation
+    active_users_truncate_task >> active_users_all_task
+
+    return local_dag
 
 
 def sub_dag_func_owner_landing_views_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
@@ -388,8 +386,8 @@ amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_engage
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'engaged_users', 'top_funnel')
 # Amplitude active users
-amplitude_active_users_previous_task = get_sub_dag_operator(sub_dag_func_no_filters,
-                                                            materialize_active_users_table_query,
+amplitude_active_users_previous_task = get_sub_dag_operator(sub_dag_func_active_users,
+                                                            None,
                                                             'amplitude_active_users_previous',
                                                             'top_funnel')
 active_users_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
