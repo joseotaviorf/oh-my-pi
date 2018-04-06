@@ -31,6 +31,7 @@ CREATE TABLE unit_economics.fact_property_economics (
 	flg_expected_brokerage_fee int4,
 	vl_management_fee decimal(14,4),
 	flg_expected_management_fee int4,
+	vl_rent_value decimal(14,4),
 	vl_cs_post_sale decimal(14,4),
 	flg_expected_cs_post_sale int4,
 	vl_collection decimal(14,4),

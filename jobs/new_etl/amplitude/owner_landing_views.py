@@ -21,11 +21,11 @@ class OwnerLandingViews(GrowthUsers):
 
     @logger
     def append_to_table(self, _filter):
-        self.__append(_filter=_filter, prefix=self.all_dates_query)
-        self.__append(_filter=_filter, prefix=self.current_date_query)
+        self.__append(_filter=_filter, prefix=self._get_all_dates_query())
+        self.__append(_filter=_filter, prefix=self._get_current_date_query())
 
     @logger
     def __append(self, _filter, prefix):
-        df = self.get_df(prefix=prefix, suffix=self.suffix_query)
+        df = self.get_df(prefix=prefix, suffix=self._get_suffix_query(''))
         OwnerLandingViews.df_to_dw(df=df)
 

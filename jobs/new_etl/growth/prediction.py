@@ -1,5 +1,6 @@
 from jobs.new_etl import DW_DIR
 from jobs.new_etl.growth.incurred import Growth
+from jobs.base.base_etl import BaseETL
 from qa_python_utils.default_logger import logger, _logger
 
 
@@ -74,7 +75,7 @@ class GrowthPrediction(Growth):
             'm=create_table, funnel={}, measure={}, _filter={}, period={}, placeholders={}'.format(funnel, measure,
                                                                                                    _filter, period,
                                                                                                    placeholders))
-        prefix_file = GrowthPrediction._get_query_from_file_name(
+        prefix_file = BaseETL.get_query_from_file_name(
             '{}/prefix_{}.sql'.format(GrowthPrediction.PREDICTION_QUERIES_DIR, _filter))
         prefix_file_formatted = prefix_file.format(
             funnel=funnel,
@@ -83,7 +84,7 @@ class GrowthPrediction(Growth):
             monthly_count=placeholders['monthly_count'],
             yearly_count=placeholders['yearly_count']
         )
-        suffix_file = GrowthPrediction._get_query_from_file_name(
+        suffix_file = BaseETL.get_query_from_file_name(
             '{}/suffix_{}.sql'.format(GrowthPrediction.QUERIES_DIR, period))
 
         GrowthPrediction.execute_command(

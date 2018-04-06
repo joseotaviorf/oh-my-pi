@@ -28,4 +28,3 @@ class ActiveUsers(GrowthUsers):
     def __append(self, _filter, prefix):
         df = self.get_df(prefix=prefix, suffix=self.suffix_query)
         ActiveUsers.df_to_dw(df=df)
-

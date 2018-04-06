@@ -30,7 +30,7 @@ costs as (
       cis.dre_value / (count(fp.property_id) over (partition by cis.dre_date))::double precision as vl_inside_sales
     from filtered_properties fp
     join cdre_inside_sales cis
-      on cis.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
+      on cis.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
   sk_property,

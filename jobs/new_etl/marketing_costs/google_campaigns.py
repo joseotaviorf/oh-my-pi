@@ -28,7 +28,7 @@ class GoogleCampaigns(MarketingCampaigns):
         adwords_client = client['client']
         account_name = client['account_name']
         print account_name
-        report_downloader = adwords_client.GetReportDownloader(version='v201708')
+        report_downloader = adwords_client.GetReportDownloader(version='v201802')
         # Create report query.
         report_query = (
             """

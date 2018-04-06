@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS public.proposal;
 CREATE TABLE public.proposal (
   id INTEGER NOT NULL,
@@ -8,7 +7,6 @@ CREATE TABLE public.proposal (
   motivacao VARCHAR(100),
   "propostaAluguel" DOUBLE PRECISION NULL,
   status VARCHAR(50) NULL,
-  "ticketID" INTEGER,
   "dataAprovacao" public.datetime,
   "inquilinoEnviouDocumentos" INTEGER NULL,
   "dataDocumentosEnviados" public.datetime,
@@ -20,11 +18,10 @@ CREATE TABLE public.proposal (
   "statusDocumentacaoProp" VARCHAR(50) NULL,
   "fazerTermoAditivo" INTEGER NULL,
   "preProposta_id" INTEGER,
+  "offer_id" INTEGER,
   "criadoEm" TIMESTAMP NULL,
   "atualizadoEm" TIMESTAMP null,
   "qtdeEnviosDocumentacaoInq" INTEGER NULL,
-  "primeiroEnvioDocInq" public.datetime,
-  credit_analysis_init_date public.datetime,
-  credit_analysis_end_date public.datetime
+  "primeiroEnvioDocInq" public.datetime
 )
 WITH (oids = false);

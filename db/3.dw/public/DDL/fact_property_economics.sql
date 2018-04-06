@@ -30,6 +30,7 @@ create table if not exists public.fact_property_economics (
     flg_expected_brokerage_fee int,
     vl_management_fee double precision,
     flg_expected_management_fee int,
+    vl_rent_value double precision,
     vl_cs_post_sale double precision,
     flg_expected_cs_post_sale int,
     vl_collection double precision,

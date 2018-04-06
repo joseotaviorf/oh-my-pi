@@ -4,7 +4,7 @@ from jobs.base.base_etl import BaseETL, EnumDb
 from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils.default_logger import _logger
 
 
 class MarketingDimensionETL(DimensionETL):
@@ -21,9 +21,10 @@ class MarketingDimensionETL(DimensionETL):
         if dim_name == 'google':
             table = self.google.extract_marketing_campaigns(date(2016, 1, 1))
         elif dim_name == 'facebook':
-            table = self.facebook.extract_marketing_campaigns(date(2016, 11, 1))
+            table = self.facebook.extract_marketing_campaigns(date(2016, 1, 1))
         elif dim_name == 'criteo':
             table = self.criteo.extract_marketing_campaigns(date(2017, 1, 1))
+        _logger.info('m=load_marketing_costs, inserting into db')
         if table is not None:
             BaseETL.bulk_insert(
                 table=table,
@@ -34,6 +35,7 @@ class MarketingDimensionETL(DimensionETL):
                 commit=True,
                 bucket_name='{}/raw/ods/{}'.format(self.bucket, table_name)
             )
+            _logger.info('m=load_marketing_costs, putting to clean')
             BaseETL.copy_file_between_s3_buckets(
                 bucket_source=self.bucket,
                 bucket_destination=self.bucket,

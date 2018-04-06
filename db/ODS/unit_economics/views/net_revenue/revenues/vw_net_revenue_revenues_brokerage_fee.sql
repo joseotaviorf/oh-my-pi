@@ -11,7 +11,7 @@ select
 	vbpc.property_id,
 	vbcc.id as contract_id,
 	vbcc.init_date,
-	vbcc.rent_value,
+	vbcc.rent_value as vl_rent_value,
 	coalesce(vbcc.termination_date, vbcc.expected_end_date)::date as end_date
 from
 	unit_economics.vw_base_contract_costs vbcc
@@ -25,20 +25,20 @@ where (vbcc.termination_date is not null
   and vbcc.status in ('Ativo', 'Finalizado')
 ),
 brokerage_fill as (
-	select
+	select distinct
 		sk_property,
 		property_id,
 		bc.contract_id,
+		bc.vl_rent_value,
 		case
-			when i.landlord_status = 'paid'
-				then amount::decimal(14,4)
 			when i.contract_id is not null
-				then 0
-			when i.contract_id is null and bc.init_date >= '2017-01-01'
-				then rent_value
+				then amount::decimal(14,4)
+			when bc.init_date >= '2017-01-01'
+				then bc.vl_rent_value
 			else 0
 		end as vl_brokerage_fee,
 		init_date,
+		i.landlord_status,
 		greatest(
 			landlord_due_date,
 			due_date,
@@ -48,7 +48,7 @@ brokerage_fill as (
 	from
 		base_contract bc
 	left join
-		invoice i
+		invoice.report i
 		on bc.contract_id = i.contract_id
 	and
 		item = 'TaxaCorretagem'
@@ -61,6 +61,7 @@ select
 	sk_property,
 	property_id,
 	vl_brokerage_fee,
+	vl_rent_value,
 	dt_cash_flow,
 	0 as flg_expected_brokerage_fee
 from

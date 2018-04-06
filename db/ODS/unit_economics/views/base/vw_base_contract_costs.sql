@@ -15,7 +15,7 @@ select
 from contract
 where tipo = 'FullService'
     and status in ('Finalizado', 'Ativo')
-    and date_trunc('month', "dataAssinado") >= '2016-01-01'
-    and date_trunc('month', "dataEntrada") >= '2016-01-01'
-    and date_trunc('month', "dataInicio") >= '2016-01-01'
+    and date_trunc('month', "dataAssinado") >= '2015-12-01'
+    and date_trunc('month', "dataEntrada") >= '2015-12-01'
+    and date_trunc('month', "dataInicio") >= '2015-12-01'
 ;

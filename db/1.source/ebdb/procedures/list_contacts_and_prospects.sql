@@ -109,8 +109,10 @@ FROM
       WHEN l.tipo='Afiliado' AND l.origem='Form' THEN 'Affiliate Form'
       WHEN l.tipo='Afiliado' AND l.origem='Planilha' THEN 'Affiliate Spreadsheet'
       WHEN l.tipo='Afiliado' AND l.origem='Desconhecida' THEN 'Affiliate Unknown'
-      WHEN l.tipo='Marketing' AND l.origem='Facebook' THEN 'Facebook' -- facebook link that gives us his info, so we can contact him
+      WHEN l.tipo='Marketing' AND l.origem='Facebook' THEN 'Facebook'
+      WHEN l.tipo='OpenLink' THEN 'Direct Referral'
       WHEN l.origem='Landing' THEN 'Landing Page Leads'
+      WHEN l.origem='Reprocessado' THEN 'Reprocessed'
       ELSE 'Other' 
     END AS attribution_type,
 
