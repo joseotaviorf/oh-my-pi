@@ -2,12 +2,17 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from jobs.base.base_dag import BaseDAG
+from jobs.dags.bi.sorting_hat import unit_tests
 from jobs.dags.util import environment as env
 from jobs.new_etl.sorting_hat import SortingHat
 from qa_python_utils.default_logger import logger
 
 # env vars
 env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
+MAIN_DAG_NAME = 'bi-sorting-hat'
+MAIN_START_DATE = datetime(2018, 1, 14, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = '0 4 * * *'
 
 
 # functions
@@ -27,22 +32,53 @@ def extract_table(**kwargs):
 
 
 # dags
-dag = DAG(
-    dag_id='bi-sorting-hat',
+main_dag = DAG(
+    dag_id=MAIN_DAG_NAME,
     default_args={
-        'owner': 'Data Team',
+        'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 1, 14, 0, 0, 0),
-    schedule_interval='0 4 * * *',
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     catchup=False
 )
 
+
+def proposal_unit_tests_sub_dag(sub_dag_name):
+    return unit_tests.build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        entity='proposal'
+    )
+
+
+def proponent_unit_tests_sub_dag(sub_dag_name):
+    return unit_tests.build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        entity='proponent'
+    )
+
+
+def proposalversion_unit_tests_sub_dag(sub_dag_name):
+    return unit_tests.build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        entity='proposalversion'
+    )
+
+
 # operators
-PythonOperator(
-    dag=dag,
+proposal_task = PythonOperator(
+    dag=main_dag,
     task_id='extract_proposal_table',
     python_callable=extract_table,
     op_kwargs={
@@ -52,8 +88,8 @@ PythonOperator(
     }
 )
 
-PythonOperator(
-    dag=dag,
+proposalversion_task = PythonOperator(
+    dag=main_dag,
     task_id='extract_proposal_version_table',
     python_callable=extract_table,
     op_kwargs={
@@ -63,8 +99,8 @@ PythonOperator(
     }
 )
 
-PythonOperator(
-    dag=dag,
+proponent_task = PythonOperator(
+    dag=main_dag,
     task_id='extract_proponent_table',
     python_callable=extract_table,
     op_kwargs={
@@ -73,3 +109,26 @@ PythonOperator(
     }
 )
 
+# Unit tests
+proposal_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=proposal_unit_tests_sub_dag,
+    sub_dag_name='unit_tests'
+)
+
+proponent_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=proposal_unit_tests_sub_dag,
+    sub_dag_name='unit_tests'
+)
+
+proposalversion_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=proposal_unit_tests_sub_dag,
+    sub_dag_name='unit_tests'
+)
+
+# flow
+proposal_task >> proposal_unit_tests_dag
+proposalversion_task >> proposalversion_unit_tests_dag
+proponent_task >> proponent_unit_tests_dag

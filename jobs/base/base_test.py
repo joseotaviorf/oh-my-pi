@@ -1,5 +1,6 @@
 from base_etl import BaseETL
 from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils.aws.athena import AthenaClient
 
 
 class BaseTest(object):
@@ -26,13 +27,20 @@ class BaseTest(object):
 
     @staticmethod
     @logger
-    def __test_query(query, enum_db, assertion, blocking, encoding):
-        _return = BaseETL.from_db_query(
+    def get_query_result_for_comparison(query, enum_db, encoding='utf-8', from_athena=False):
+        if from_athena:
+            return AthenaClient('5a-datalake').execute_query_and_return_dataframe(query)
+
+        return BaseETL.from_db_query(
             db_enum=enum_db,
             query=query,
             encoding=encoding
         )
 
+    @staticmethod
+    @logger
+    def __test_query(query, enum_db, assertion, blocking, encoding):
+        _return = BaseTest.get_query_result_for_comparison(query, enum_db, encoding)
         if _return is not None and len(_return) == 1 and assertion is None:
             return True
 
