@@ -128,7 +128,7 @@ def import_sortinghat_proponent(client):
     df_proponent_sh['state'] = df_proponent_sh.state.replace({'': 'unknown'})
 
     # variables from the first proponent. todo check that it is the same as in ebdb
-    df_proponent_sh_first = df_proponent_sh.groupby('proposal_id').first()
+    df_proponent_sh_first = df_proponent_sh.sort_values('id', ascending=True).groupby('proposal_id').first()
     df_proponent_sh_first.columns = [col + '_first' for col in df_proponent_sh_first.columns]
 
     # dummies
