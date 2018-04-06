@@ -2,6 +2,8 @@ from jobs.base.base_dag import BaseDAG
 from jobs.base.base_etl import BaseETL
 from jobs.base.base_test import BaseTest
 from jobs.base.enum_db import EnumDb
+from jobs.dags.bi.__init__ import DATALAKE_RAW_TEST_QUERIES_DIR
+from jobs.dags.bi.__init__ import ODS_TEST_QUERIES_DIR
 from jobs.dags.bi.sorting_hat.__init__ import SORTINGHAT_TEST_QUERIES_DIR
 from qa_python_utils.default_logger import logger, _logger
 
@@ -68,7 +70,11 @@ def __build_test_tasks(local_dag, entity):
         dag=local_dag,
         task_id='TEST_{}_count'.format(entity),
         func_command=__test_count,
-        op_kwargs={'file_path': '{}/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX)}
+        op_kwargs={
+            'sh_file_path': '{}/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'dl_file_path': '{}/{}_{}'.format(DATALAKE_RAW_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'ods_file_path': '{}/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+        }
     )
 
     return test_entity_count
