@@ -19,10 +19,10 @@ MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
-#bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
-bucket = '5a-datalake'#for testing without airflow
+#bucket = '5a-datalake'#for testing without airflow
 # from jobs.dags.util import environment as env
 
 def originacao():
