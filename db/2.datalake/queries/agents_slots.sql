@@ -32,7 +32,7 @@ with weekly_schedule_prev as (
 		lag(available_slot) over (partition by agent_id, dow, slot_number order by dt_update) as previous_status
 	from
 		weekly_schedule_prev
-), specific_schedule as (
+), specific_schedule_full as (
 	select distinct
 		agente_id as agent_id,
 		max(cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key)  as dt_update,
@@ -60,7 +60,16 @@ with weekly_schedule_prev as (
 				disponivel19as20,disponivel19as20,disponivel19as20,disponivel19as20
 			]
 		) as t(key, value)
-), ss_visits as (
+),
+specific_schedule as (
+	select
+		*
+	from
+		specific_schedule_full
+	where cast(dt_update as timestamp) <= slot_dt
+)
+--select * from specific_schedule where agent_id='17' and date(slot_dt) = date('2017-11-08');
+, ss_visits as (
 	select distinct
 		a.agente_id as agent_id,
 		date_add('minute',15 * cast(a.slotdia as integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') as date) as timestamp))) as slot_dt
@@ -133,7 +142,9 @@ with weekly_schedule_prev as (
 	where
 		dd.dt is not null
 	order by su.dt_update, su.dow, su.slot_number
-), specific_updates as (
+)
+--select * from base_schedule where date(slot_dt) = date('2017-11-08');
+, specific_updates as (
 	select
 		bs.agent_id,
 		bs.dt_update as last_weekly_update,
@@ -166,7 +177,9 @@ with weekly_schedule_prev as (
 		on bs.agent_id = ss.agent_id
 		and bs.slot_dt = ss.slot_dt
 	order by bs.slot_dt
-), time_window_updates as (
+)
+--select * from specific_updates where date(slot_dt) = date('2017-11-08');
+, time_window_updates as (
 	select
 		sc.agent_id,
 		sc.last_weekly_update,
@@ -294,5 +307,4 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
-where vu.slot_dt >= date('2017-01-01')
 order by vu.slot_dt

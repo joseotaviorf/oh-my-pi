@@ -46,7 +46,7 @@ filtered_contracts_prev as (
 filtered_contracts as(
 	select distinct
 		fc.property_id,
-		coalesce(dre.dre_date, date_trunc('month', fc."to") + interval '1 month') as dt
+		date_trunc('month', fc."to") as dt
 	from filtered_contracts_prev fc
 	left join cdre_onboarding dre
 		on dre.dre_date between date_trunc('month', fc."from") + interval '1 month'
@@ -99,25 +99,25 @@ tt_costs as (
     select
       eg.property_id,
       eg.dt,
-      eg.dt as dt_cash_flow,
+      co.dre_date as dt_cash_flow,
       case
         when sum(eg.qt) over (partition by eg.dt) > 0
         then coalesce(co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt)), 0)::double precision
         else co.dre_value * eg.qt / (sum(eg.qt) over (partition by eg.dt))::double precision
       end as vl_bo_onboarding
     from espec_gen eg
-    left join cdre_onboarding co
-      on co.dre_date = eg.dt
+    join cdre_onboarding co
+      on co.dre_date = (eg.dt + interval '1 month')::date
 ),
 contract_costs as (
     select
       fc.dt,
       fc.property_id,
-      fc.dt as dt_cash_flow,
+      co.dre_date as dt_cash_flow,
       co.dre_value / (count(fc.property_id) over (partition by fc.dt))::double precision as vl_bo_onboarding
     from filtered_contracts fc
-    left join cdre_onboarding co
-      on co.dre_date = fc.dt
+    join cdre_onboarding co
+      on co.dre_date = (fc.dt + interval '1 month')::date
 ),
 full_costs as (
   select distinct
@@ -128,7 +128,7 @@ full_costs as (
   from tt_costs tt
   full outer join contract_costs cc
     on tt.dt_cash_flow = cc.dt_cash_flow
-    and tt.property_id = cc.property_id
+    	and tt.property_id = cc.property_id
 ),
 result as (
     select

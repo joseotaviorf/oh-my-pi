@@ -49,7 +49,8 @@ PythonOperator(
                     score_cardif_best_subset, status, replace("comment", '\n', ' ') as "comment",
                     analyst_name, supervisor_name, rent_value, condo_value, iptu_value, created_at,
                     updated_at, home_area, home_bathrooms, home_bedrooms, home_city, home_garages,
-                    home_region, home_suites, home_type, home_zipcode, drive_id"""
+                    home_region, home_suites, home_type, home_zipcode, drive_id, rejection_motive,
+                    home_insurance_value, risk_level, risk_level_best_subset, process_date"""
     }
 )
 

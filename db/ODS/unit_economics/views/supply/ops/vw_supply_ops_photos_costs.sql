@@ -24,7 +24,7 @@ costs as (
       cp.dre_value / (count(fp.property_id) over (partition by cp.dre_date))::double precision as vl_photos
     from filtered_properties fp
     join cdre_photos cp
-      on cp.dre_date = date_trunc('month', fp.listing_date) + interval '1 month'
+      on cp.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
   sk_property,

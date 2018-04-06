@@ -38,7 +38,7 @@ costs as (
       cps.dre_value / (count(fc.property_id) over (partition by cps.dre_date))::double precision as vl_bo_pre_sale
     from filtered_contracts fc
     join cdre_bo_pre_sale cps
-      on cps.dre_date = date_trunc('month', fc.created_date) + interval '1 month'
+      on cps.dre_date = (date_trunc('month', fc.created_date) + interval '1 month')::date
 )
 select
   sk_property,

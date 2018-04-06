@@ -7,7 +7,7 @@ with filt as (
 	row_number() over (partition by id order by status_time) as rn
 	from imovel_status_history
 	where status_history in ('despublicado', 'publicado', 'alugado', 'suspenso')
---	and id = 892769994
+--	and id = 892781620
 ), not_pub as (
   select
     filt.id,
@@ -43,7 +43,8 @@ with filt as (
 )
 , contract_dates as (
     select id, imovel_id, least("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as l,
-    greatest("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as g
+    greatest("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as g,
+    "dataRescisao" as dt_end
     from contract
     where tipo = 'FullService'
       and status in ('Finalizado', 'Ativo')
@@ -58,6 +59,7 @@ with filt as (
 		end as status_time,
 		c.g as contract_time,
 		c.id as contract_id,
+		c.dt_end,
 		abs(extract(epoch from (ish.status_time - g))/60)::int diff,
 		abs(extract(epoch from (ish.status_time - g))/60)::int = min(abs(extract(epoch from (ish.status_time - g))/60)::int) over (partition by ish.id, c.id) as closest,
 		abs(extract(epoch from (ish.status_time - g))/60)::int = min(abs(extract(epoch from (ish.status_time - g))/60)::int) over (partition by ish.id, status_time) as true_line
@@ -66,6 +68,7 @@ with filt as (
 	  on ish.id = c.imovel_id
 	where ish.status_history = 'alugado' and ish.truncatable is false
 )
+--select * from rent;
 , ish_rent as (
 	select * from aux_ish
 	union all
@@ -93,18 +96,25 @@ with filt as (
     ds.*,
     case
     	when ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null
+    	or ds.status = 'suspenso' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null
     	then lag(r.contract_id) over w
     	else r.contract_id
     end as contract_id,
+    case
+    	when ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null
+    	or ds.status = 'suspenso' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null
+    	then lag(r.dt_end) over w
+    	else r.dt_end
+    end as contract_end,
     ds.status = 'publicado' and rn_status = 1 as start_first_pub,
     ds.status = 'publicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null as start_pub_after_rent,
     ds.status = 'publicado' and (lag(ds.status) over w = 'despublicado' and ds.status_time - lag(ds.status_time) over w >= interval '90 days') as start_after_depub_90,
     (ds.status = 'publicado' and (lag(ds.status) over w = 'despublicado' and lag(ds.status, 2) over w = 'alugado' and lag(r.id,2) over w is not null)) or
     (ds.status = 'publicado' and (lag(ds.status) over w = 'suspenso' and lag(ds.status, 2) over w = 'alugado' and lag(r.id,2) over w is not null)) as start_after_depub_rent,
-    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'publicado') or
-    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'suspenso') end_pub_after_rent, -- and lead(ds.status,2) over w = 'publicado') end_pub_after_rent,
+    (ds.status = 'alugado' and r.id is not null and lead(ds.status) over w = 'publicado') end_pub_after_rent,
     ds.status = 'despublicado' and (lead(ds.status) over w = 'publicado' and lead(ds.status_time) over w - ds.status_time >= interval '90 days') as end_depub_90,
-    ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null as end_depub_rent,
+    (ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') or
+    (ds.status = 'suspenso' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') as end_depub_rent,
     (ds.rn = max(ds.rn) over (partition by ds.id)) as end_last_status
   from
     ish ds
@@ -114,12 +124,16 @@ with filt as (
     and closest = true
   window
   	w as (partition by ds.id order by ds.status_time)
-), aux_times as (
+)
+--select * from check_status order by status_time;
+, aux_times as (
   select distinct
     id,
     status,
     status_time,
     contract_id,
+    contract_end,
+    extract(day from status_time - lag(contract_end) over w) > 90 as recovered_after_rent,
     case
     	when (end_pub_after_rent or end_depub_rent) then 1
     	when (status = 'alugado' and end_last_status) then 1
@@ -153,7 +167,7 @@ with filt as (
 			when end_depub_90 then 'Depublished'
 		end as end_version_category,
 		case when end_last_status then 1 else 0 end as is_last_version,
---    start_first_pub,start_pub_after_rent,start_after_depub_90,start_after_depub_rent,end_pub_after_rent,end_depub_90,end_depub_rent,end_last_status,
+		end_last_status,
     (end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status) as _end
   from
     check_status
@@ -161,7 +175,8 @@ with filt as (
     start_first_pub or start_pub_after_rent or start_after_depub_90 or start_after_depub_rent or
     end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status
 window w as (partition by id order by status_time)
-), times as (
+)
+, times as (
 	select
 		id,
 		status,
@@ -170,7 +185,11 @@ window w as (partition by id order by status_time)
 		max_version_time,
 		min(status_time) over w as first_publication_date,
 		sum(rent) over (partition by id order by status_time rows unbounded preceding) as nr_renting,
-		start_version_category,
+		case
+			when lag(recovered_after_rent) over (partition by id order by status_time) then 'Recovered'
+			when recovered_after_rent and end_last_status then 'Recovered'
+			else start_version_category
+		end as start_version_category,
 		end_version_category,
 		is_last_version,
 		contract_id,
@@ -197,4 +216,3 @@ from
 	times
 where _end is true
 ;
-

@@ -11,7 +11,7 @@ with filtered_contracts as (
         id,
         init_date,
         package_value,
-        rent_value,
+        rent_value as vl_rent_value,
         coalesce(termination_date, expected_end_date)::date as end_date,
         date_trunc('month', dd.date)::date + interval '6 day' as date_range
     from
@@ -27,7 +27,7 @@ base_contract as (
 		base.*,
 		c.id as contract_id,
 		package_value,
-		rent_value,
+		vl_rent_value,
 		date_trunc('month', c.init_date) as contract_init_date,
 		date_trunc('month', c.end_date) as contract_end_date,
 		c.date_range
@@ -39,7 +39,7 @@ base_contract as (
 		and c.end_date between base.min_version_time and (base.max_version_time + interval '1 day')
 ),
 incurred as (
-    select
+    select distinct
     	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
         sk_property,
         property_id,
@@ -47,7 +47,7 @@ incurred as (
         bc.contract_init_date,
         bc.contract_end_date,
         bc.package_value,
-        bc.rent_value,
+        bc.vl_rent_value,
         amount::decimal(14,4) as vl_management_fee,
         greatest(
         	landlord_due_date,
@@ -58,7 +58,7 @@ incurred as (
     from
         base_contract bc
     left join
-        invoice i
+        invoice.report i
         on bc.contract_id = i.contract_id
             and date_trunc('month', greatest(landlord_due_date, due_date, landlord_paid_date)) = bc.date_range
             and item = 'TaxaAdministracao'
@@ -83,7 +83,7 @@ incurred_diff as (
         date_range,
         contract_end_date,
         contract_init_date,
-        rent_value,
+        vl_rent_value,
         (extract(year from (contract_end_date - contract_init_date)) * 12
                 + extract(month from (contract_end_date - contract_init_date))
                 + (extract(days from (contract_end_date - contract_init_date)) / 30))::integer as date_diff
@@ -96,7 +96,7 @@ incurred_plus_dates as (
         vl_management_fee,
         dt_cash_flow,
         date_range,
-        rent_value,
+        vl_rent_value,
         max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
     from incurred_diff
 ),
@@ -111,7 +111,7 @@ value_fill as (
             else dt_cash_flow
         end as dt_cash_flow,
         max_dt_cash_flow,
-        rent_value,
+        vl_rent_value,
         gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
     from incurred_plus_dates
 ),
@@ -120,9 +120,10 @@ result as (
         sk_property,
         property_id,
         dt_cash_flow,
+        vl_rent_value,
         case
             when dt_cash_flow > max_dt_cash_flow and dt_cash_flow >= '2018-02-01'
-                then coalesce(vl_management_fee, rent_value*0.08)
+                then coalesce(vl_management_fee, vl_rent_value*0.08)
             when dt_cash_flow > max_dt_cash_flow
                 then coalesce(vl_management_fee, gf)
             else vl_management_fee
@@ -134,6 +135,7 @@ select
     sk_property,
     property_id,
     vl_management_fee,
+    vl_rent_value,
     dt_cash_flow::date,
     flg_expected_management_fee::integer
 from result
