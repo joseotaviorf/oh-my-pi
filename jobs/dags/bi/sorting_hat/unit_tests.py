@@ -42,7 +42,7 @@ def __test_count(**kwargs):
     dl_return = BaseTest.get_query_result_for_comparison(
         query=dl_query,
         from_athena=True
-    )[1][0] if dl_query != '' else None
+    ).values[0][0] if dl_query != '' else None
 
     ods_return = BaseTest.get_query_result_for_comparison(
         query=ods_query,
