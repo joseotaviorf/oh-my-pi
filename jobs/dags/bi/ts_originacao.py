@@ -50,8 +50,8 @@ def originacao():
                                                  df_proponents_of_proposal,
                                                  df_api_last)
     _logger.info('Format and write originacao in s3')
-    output_originacao = create_sk_dates(output_originacao)
     output_originacao = format_originacao_table(output_originacao)
+    output_originacao = create_sk_dates(output_originacao)
 
     write_to_s3(output_originacao, 'originacao/originacao.csv')  # writes an object after internally changing a copy of the object to string
 

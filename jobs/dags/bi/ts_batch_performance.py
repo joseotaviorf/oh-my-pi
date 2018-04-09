@@ -54,8 +54,8 @@ def batch_performance():
         _logger.info(date)
         performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, date)
         performance_table['date_computation'] = date
-        performance_table = create_sk_dates(performance_table)
         performance_table = format_performance_table(performance_table)
+        performance_table = create_sk_dates(performance_table)
         write_to_s3(performance_table,
                     'performance/performance' + date.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
 
