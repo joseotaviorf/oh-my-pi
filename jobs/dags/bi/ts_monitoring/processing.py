@@ -219,6 +219,14 @@ def format_performance_table(output_performance):
 
     output_performance = output_performance.reset_index()
 
+    # sometimes these columns are null everywhere and pandas doesnt know they are dates, and the sk_date will not be created. so we force it:
+    force_date_format = [u'invoices_date_ever1', u'invoices_date_ever30',
+                         u'invoices_date_ever50', u'invoices_date_ever60',
+                         u'invoices_date_ever90', u'invoices_date_ever120',
+                         u'invoices_date_ever150']
+    for col in force_date_format:
+        output_performance.loc[:, col] = output_performance.loc[:, col].astype('datetime64[ns]')
+
     return output_performance
 
 
