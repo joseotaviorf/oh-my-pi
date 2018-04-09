@@ -190,9 +190,9 @@ calculated_dates as (
     end as credit_analysis_date,
     dpr.dt_proposal_approved as proposal_approved_date,
     case
-      when dct.contract_status in ('Cancelado', 'Finalizado')
-          then dct.dt_updated
-      else dct.dt_signature
+      when dct.contract_status in ('Ativo', 'Finalizado')
+          then dt_signature
+      else null::timestamp
     end as contract_date,
     dbo.dt_booking as visit_date,
     dbo.dt_created as booking_date
