@@ -37,7 +37,7 @@ class CrawlerLeads(CrawlerEntity):
         'complementary_info': 'infosExtras'
     }
 
-    INFOS_TO_SEND = ['captadoEm', 'tipo', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'lat', 'lng', 'valor',
+    INFOS_TO_SEND = ['captadoEm', 'tipo', 'origem', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'lat', 'lng', 'valor',
                      'nomeAnunciante', 'telefoneAnunciante', 'infosExtras']
 
     def __init__(self, s3_bucket, google_maps_api_key):
@@ -79,9 +79,10 @@ class CrawlerLeads(CrawlerEntity):
     def send_leads(self, leads, ws):
         leads['location'] = leads.apply(lambda row: (row.lat, row.lng), axis=1)
         info = self.enrich(leads.location.values, cep=False)
-
         gcolumns = info.columns[info.columns.str.startswith('g')]
         leads = leads.loc[:, ~leads.columns.isin(gcolumns)].merge(info, how='left', on='location')
+        leads.gcep = leads.gcep.replace({'00000nan': None}).combine_first(leads.cep)
+
         leads.phones = leads.phones.apply(lambda p: eval(p)[0])
 
         locale.setlocale(locale.LC_MONETARY, '')

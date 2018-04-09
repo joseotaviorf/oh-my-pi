@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow.models import DAG
 from jobs.base.base_dag import BaseDAG
+from jobs.base.base_etl import BaseETL
 from jobs.dags.bi.crawlers import start_batch_job, STATES
 from qa_python_utils.default_logger import _logger
 
@@ -12,7 +13,7 @@ MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
 
 def submit_olx():
     _logger.info('Starting job...')
-    r = start_batch_job(
+    r = BaseETL.start_batch_job(
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:8',

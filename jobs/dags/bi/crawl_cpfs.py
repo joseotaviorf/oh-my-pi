@@ -8,29 +8,40 @@ from airflow.operators.python_operator import PythonOperator
 from jobs.base.base_dag import BaseDAG
 from jobs.base.base_etl import BaseETL
 from jobs.dags.util import environment as env
-from jobs.etl.crawlers.crawler_leads import CrawlerCPFs
+from jobs.etl.crawlers.crawler_cpfs import CrawlerCPFs
 from qa_python_utils.default_logger import _logger, logger
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 crawl_cpfs_params = env.get_airflow_env_var('crawl_cpfs_params')
 
+NO_LOCATIONS_MSG = 'no locations to crawl'
 
-@logger(exclude='data')
+
+@logger
 def crawl_cpfs(**kwargs):
     ws = kwargs.get('ws', 'vivareal')
     neighbourhood = kwargs.get('neighbourhood')
 
     crawler_cpfs = CrawlerCPFs(s3_bucket=s3_bucket, google_maps_api_key=data_google_api_key)
     locations_raw = crawler_cpfs.get_locations(ws=ws, delta_days=kwargs.get('delta_days', 3))
-
-    if locations_raw is None:
-        return
+    if locations_raw.empty:
+        _logger.info('m=get_locations, msg={}'.format(NO_LOCATIONS_MSG))
+        return None
 
     _logger.info('m=crawl_cpfs, got {} locations from crawlers'.format(len(locations_raw)))
     locations_cleaned = crawler_cpfs.cleaning(locations_raw)
+
     locations_coverage = crawl_cpfs.check_locations_coverage(locations_cleaned)
+    if locations_coverage.empty:
+        _logger.info('m=crawl_cpfs, msg={}'.format(NO_LOCATIONS_MSG))
+        return None
+
     locations_regions = crawl_cpfs.check_neighborhoods(locations_coverage, neighbourhood)
+    if locations_regions.empty:
+        _logger.info('m=crawl_cpfs, msg={}'.format(NO_LOCATIONS_MSG))
+        return None
+
     _logger.info('m=crawl_cpfs, {} locations after filtering regions'.format(len(locations_regions)))
 
     locations = crawl_cpfs.fill_in(locations_regions)

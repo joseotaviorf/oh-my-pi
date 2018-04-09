@@ -9,23 +9,29 @@ from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
 
 from jobs.dags.util import environment as env
-from jobs.etl.crawlers.crawler_leads import CrawlerLeads
+from jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
 
-env.set_airflow_var_to_local_env('bi-datalake-s3-bucket', 'DATA_GOOGLE_API_KEY', 'insert_leads_params')
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
+insert_leads_params = env.get_airflow_env_var('insert_leads_params')
+
+NO_LEADS_MSG = 'There are no leads to insert.'
 
 
 def insert_leads(**kwargs):
-    NO_LEADS_MSG = 'There are no leads to insert.'
+    ws = kwargs.get('ws')
+    states = kwargs.get('states')
+    delta_days = kwargs.get('since')
 
-    crawler_leads = CrawlerLeads()
-    leads = crawler_leads.leads(
-        ws=kwargs.get('ws'),
-        states=kwargs.get('states'),
-        delta_days=kwargs.get('since'))
+    crawler_leads = CrawlerLeads(s3_bucket=s3_bucket, google_maps_api_key=data_google_api_key)
+    leads = crawler_leads.leads(ws=ws, states=states, delta_days=delta_days)
+
     if leads.empty:
         _logger.info(NO_LEADS_MSG)
         return None
-    _logger.info('m=crawl_cpfs, got {} leads from crawlers'.format(len(leads)))
+
+    _logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
+    _logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
 
     leads = crawler_leads.cleaning(leads)
     if leads.empty:
@@ -47,7 +53,7 @@ def insert_leads(**kwargs):
     if leads.empty:
         _logger.info(NO_LEADS_MSG)
         return None
-    _logger.info('m=crawl_cpfs, {} leads after filtering regions'.format(len(leads)))
+    _logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads)))
 
     # get known phones from last 3 months
     phones = crawler_leads.check_known_phone(leads, delta_days=90)
@@ -60,7 +66,8 @@ def insert_leads(**kwargs):
     if leads.empty:
         _logger.info(NO_LEADS_MSG)
         return None
-    _logger.info('m=crawl_cpfs, {} leads with new phone numbers'.format(len(leads)))
+
+    _logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads)))
 
     crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 

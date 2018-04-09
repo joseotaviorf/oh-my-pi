@@ -122,6 +122,42 @@ class CrawlerEntity(object):
 
         return -1
 
+    @logger(exclude='entity')
+    def enrich(self, entity, cep=True):
+        cols = ['location', 'gcep', 'glat', 'glng', 'gstreet', 'gstreet_number', 'gneighbourhood', 'gcity', 'gstate']
+        info = pd.DataFrame([], columns=cols)
+
+        loc = []
+        for l in entity:
+            r = self._get_address(cep=l) if cep else self._get_address(lat=l[0], lng=l[1])
+            if r:
+                s = pd.Series(index=cols)
+                loc.append(l)
+                s.glat = r[0].get('geometry', dict()).get('location', dict()).get('lat')
+                s.glng = r[0].get('geometry', dict()).get('location', dict()).get('lng')
+                for component in r[0].get('address_components', []):
+                    if 'postal_code' in component.get('types', []):
+                        s.gcep = component.get('short_name', '').replace('-', '')
+                    if 'route' in component.get('types', []):
+                        s.gstreet = component.get('short_name', '').replace('-', '')
+                    if 'street_number' in component.get('types', []):
+                        s.gstreet_number = component.get('short_name', '').replace('-', '')
+                    if 'sublocality_level_1' in component.get('types', []):
+                        s.gneighbourhood = component.get('short_name', '').replace('-', '')
+                    if 'administrative_area_level_2' in component.get('types', []):
+                        s.gcity = component.get('short_name', '').replace('-', '')
+                    if 'administrative_area_level_1' in component.get('types', []):
+                        s.gstate = component.get('short_name', '').replace('-', '')
+
+                info = info.append(s, ignore_index=True)
+
+        info.location = loc
+        info.gcep = info.gcep.astype(str).str.zfill(8)
+        if cep:
+            info.location = info.location.astype(int).astype(str).str.zfill(8)
+
+        return info
+
     @logger(exclude='data')
     def fill_in(self, data):
         street_pattern = re.compile(r'-(.*)-n-(\d+)|-(.*)')
