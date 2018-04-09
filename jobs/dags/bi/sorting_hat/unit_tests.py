@@ -39,19 +39,21 @@ def __test_count(**kwargs):
     sh_return = BaseTest.get_query_result_for_comparison(
         query=sh_query,
         enum_db=EnumDb.QuintoAndar_sortinghat
-    )
+    ) if sh_query != '' else None
 
     dl_return = BaseTest.get_query_result_for_comparison(
         query=dl_query,
         from_athena=True
-    )
+    ) if dl_query != '' else None
 
     ods_return = BaseTest.get_query_result_for_comparison(
         query=ods_query,
         enum_db=EnumDb.BI_ODS
-    )
+    ) if ods_query != '' else None
 
-    if sh_return != dl_return or sh_return != ods_return or dl_return != ods_return:
+    if (sh_return is not None and dl_return is not None and sh_return != dl_return) \
+            or (sh_return is not None and ods_return is not None and sh_return != ods_return) \
+            or (dl_return is not None and dl_return is not None and dl_return != ods_return):
         raise Exception
 
     _logger.info('m=__test_count, msg=counts are all equal')
