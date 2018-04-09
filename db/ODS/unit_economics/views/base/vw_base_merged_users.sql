@@ -1,5 +1,5 @@
-drop table if exists unit_economics.tbl_base_merged_users;
-create table unit_economics.tbl_base_merged_users as
+drop table if exists unit_economics.vw_base_merged_users;
+create table unit_economics.vw_base_merged_users as
 with comma as (
   select
     unnest(string_to_array(email, ',')) as email,
@@ -29,14 +29,11 @@ users_prev as (
   select distinct
     coalesce(uc.email, up.email, cp.email, pp.email) as email,
     coalesce(uc.telefone_principal, up.telefone_principal) as main_phone,
---    coalesce(uc.telefonesecundario, up.telefonesecundario) as secondary_phone,
     null as secondary_phone,
---    coalesce(uc.telefoneComercial, up.telefoneComercial) as commercial_phone,
     null as commercial_phone,
     cp.telefone as contract_phone,
     pp.telefone as proposal_phone,
     ec.imovel_id as contract_property_id,
---    ep.imovel_id as proposal_property_id
     null as proposal_property_id
   from contrato_pessoa cp
   left join contract ec
@@ -55,9 +52,7 @@ booking_aux as (
     select
         eu.email,
         eu.telefone_principal,
---        eu.telefonesecundario,
         null::varchar as telefonesecundario,
---        eu.telefonecomercial,
         null::varchar as telefonecomercial,
         eb.imovel_id
     from booking eb

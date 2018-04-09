@@ -30,17 +30,11 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date, entity):
 
 
 def __test_count(**kwargs):
-    sh_query = BaseETL.get_query_from_file_name(
-        file_path=kwargs['sh_file_path']
-    )
+    sh_query = BaseETL.get_query_from_file_name(kwargs['sh_file_path'])
 
-    dl_query = BaseETL.get_query_from_file_name(
-        file_path=kwargs['dl_file_path']
-    )
+    dl_query = BaseETL.get_query_from_file_name(kwargs['dl_file_path'])
 
-    ods_query = BaseETL.get_query_from_file_name(
-        file_path=kwargs['ods_file_path']
-    )
+    ods_query = BaseETL.get_query_from_file_name(kwargs['ods_file_path'])
 
     sh_return = BaseTest.get_query_result_for_comparison(
         query=sh_query,
