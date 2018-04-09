@@ -127,8 +127,19 @@ def import_sortinghat_proponent(client):
     df_proponent_sh['location_motive'] = df_proponent_sh.location_motive.replace({'': 'unknown'})
     df_proponent_sh['state'] = df_proponent_sh.state.replace({'': 'unknown'})
 
+    # rename
+    df_proponent_sh = df_proponent_sh.rename(columns={
+        'id': 'proponent_id',
+        'admission_date': 'date_admission',
+        'birthday': 'date_birth'
+    })
+
+    # dates as datetime
+    df_proponent_sh['date_admission'] = pd.to_datetime(df_proponent_sh['date_admission'], yearfirst=True, errors='coerce')
+    df_proponent_sh['date_birth'] = pd.to_datetime(df_proponent_sh['date_birth'], yearfirst=True, errors='coerce')
+
     # variables from the first proponent. todo check that it is the same as in ebdb
-    df_proponent_sh_first = df_proponent_sh.sort_values('id', ascending=True).groupby('proposal_id').first()
+    df_proponent_sh_first = df_proponent_sh.sort_values('proponent_id', ascending=True).groupby('proposal_id').first()
     df_proponent_sh_first.columns = [col + '_first' for col in df_proponent_sh_first.columns]
 
     # dummies
