@@ -43,7 +43,7 @@ def __test_count(**kwargs):
 
     dl_return = BaseTest.get_query_result_for_comparison(
         query=dl_query,
-        enum_db=kwargs['enum_db']
+        from_athena=True
     )
 
     ods_return = BaseTest.get_query_result_for_comparison(
