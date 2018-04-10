@@ -39,4 +39,7 @@ where
                 'Jardim São Paulo'
             )
         )
+        or(
+            c.nome = 'Belo Horizonte'
+        )
     )
