@@ -600,6 +600,13 @@ fact_potential_listing = BaseDAG.get_quintoandar_python_operator(
     op_kwargs={'dim_name': 'supply_potential_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
+fact_supply = BaseDAG.get_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='DW_Fact_Supply',
+    func_command=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
 fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_liquidity_property_scheduling',
@@ -686,5 +693,5 @@ ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposa
                                       user_dag, property_dag])
 
 ods_potential_listings >> fact_potential_listing
-ods_supply >> fact_potential_listing
+ods_supply >> fact_supply
 ods_property_scheduling >> fact_property_scheduling
