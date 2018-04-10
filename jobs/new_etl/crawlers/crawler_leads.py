@@ -6,10 +6,11 @@ import re
 from datetime import datetime, timedelta
 
 import numpy as np
+from qa_python_utils.default_logger import logger
+
 from jobs.base.base_etl import BaseETL
 from jobs.new_etl.__init__ import DATALAKE_QUERIES_DIR
 from jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
-from qa_python_utils.default_logger import logger
 
 
 class CrawlerLeads(CrawlerEntity):
@@ -37,8 +38,8 @@ class CrawlerLeads(CrawlerEntity):
         'complementary_info': 'infosExtras'
     }
 
-    INFOS_TO_SEND = ['captadoEm', 'tipo', 'origem', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'lat', 'lng', 'valor',
-                     'nomeAnunciante', 'telefoneAnunciante', 'infosExtras']
+    INFOS_TO_SEND = ['captadoEm', 'tipo', 'origem', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'lat', 'lng',
+                     'valor', 'nomeAnunciante', 'telefoneAnunciante', 'infosExtras']
 
     def __init__(self, s3_bucket, google_maps_api_key):
         super(CrawlerLeads, self).__init__(s3_bucket=s3_bucket, google_maps_api_key=google_maps_api_key)
@@ -83,7 +84,11 @@ class CrawlerLeads(CrawlerEntity):
         leads = leads.loc[:, ~leads.columns.isin(gcolumns)].merge(info, how='left', on='location')
         leads.gcep = leads.gcep.replace({'00000nan': None}).combine_first(leads.cep)
 
+        leads = leads.drop(labels=['cep'], axis=1)
+
         leads.phones = leads.phones.apply(lambda p: eval(p)[0])
+        leads = leads.drop_duplicates(subset=['phones'])
+        leads = leads[leads.phones.astype(str).str.len() >= 11]
 
         locale.setlocale(locale.LC_MONETARY, '')
         leads.rent = leads.rent.apply(lambda p: locale.currency(p) if not np.isnan(p) else None)
