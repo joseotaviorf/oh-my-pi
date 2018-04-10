@@ -1,0 +1,27 @@
+drop table public.fact_suppy;
+
+create table public.fact_supply (
+	id bigint NOT NULL,
+	lead_id integer,
+	conversao_id integer,
+	photo_job_id integer,
+	imovel_id bigint,
+	rep_id integer,
+	affiliate_id integer,
+	owner_id integer,
+	region_id integer,
+	photographer_id integer,
+	dt_lead timestamp without time zone,
+	dt_prospect timestamp without time zone,
+	dt_qualified timestamp without time zone,
+	dt_opportunity timestamp without time zone,
+	dt_first_listing timestamp without time zone,
+	flow character varying(255) DEFAULT NULL::character varying,
+	acquisition_method character varying(255) DEFAULT NULL::character varying,
+	acquisition_channel character varying(255) DEFAULT NULL::character varying,
+	lead_to_prospect_diff_minutes integer,
+	prospect_to_qualified_diff_minutes integer,
+	qualified_to_opportunity_diff_minutes integer,
+	opportunity_to_listing_diff_minutes integer,
+	lead_to_listing_diff_minutes integer
+)
