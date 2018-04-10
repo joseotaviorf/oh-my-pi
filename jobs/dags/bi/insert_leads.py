@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 
 import numpy as np
@@ -30,46 +29,53 @@ def insert_leads(**kwargs):
         _logger.info(NO_LEADS_MSG)
         return None
 
-    _logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
     _logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
+    _logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
-    leads = crawler_leads.cleaning(leads)
-    if leads.empty:
+    leads_cleaned = crawler_leads.cleaning(leads)
+    if leads_cleaned.empty:
         _logger.info(NO_LEADS_MSG)
         return None
-
-    # enrich lat and lng with ceps
-    info = crawler_leads.enrich(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
-    leads = leads.merge(info, how='left', left_on='cep', right_on='location')
-    leads.lat = leads.lat.combine_first(leads.glat)
-    leads.lng = leads.lng.combine_first(leads.glng)
-
-    # get to which region each lead belongs
-    leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
-
-    # filter out units outside our coverage area
-    leads = leads[
-        (leads.regions > -1) & ((~leads.type.str.contains('casa')) | leads.regions.isin(crawler_leads.house_allowed))]
-    if leads.empty:
-        _logger.info(NO_LEADS_MSG)
-        return None
-    _logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads)))
 
     # get known phones from last 3 months
-    phones = crawler_leads.check_known_phone(leads, delta_days=90)
-    leads['known'] = pd.Series(
-        np.array([np.array(p) for p in leads.phones.apply(eval).values]).ravel()).isin(
+    phones = crawler_leads.check_known_phone(leads_cleaned, delta_days=90)
+    leads_cleaned['known'] = pd.Series(
+        np.array([np.array(p) for p in leads_cleaned.phones.apply(eval).values]).ravel()).isin(
         phones.phone_number.unique()).values
 
     # send leads not known
-    leads = leads[~leads.known].sort_values(by='updated_on')
-    if leads.empty:
+    leads_filtered = leads_cleaned[~leads_cleaned.known].sort_values(by='updated_on')
+    if leads_filtered.empty:
         _logger.info(NO_LEADS_MSG)
         return None
 
-    _logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads)))
+    _logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads_filtered)))
+    _logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
 
-    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
+    # enrich lat and lng with ceps
+    info = crawler_leads.enrich(leads_filtered.query("""lat.isnull() or lng.isnull()""").cep.unique())
+    leads_enriched = leads_filtered.merge(info, how='left', left_on='cep', right_on='location')
+    leads_enriched.lat = leads_enriched.lat.combine_first(leads_enriched.glat)
+    leads_enriched.lng = leads_enriched.lng.combine_first(leads_enriched.glng)
+
+    # get to which region each lead belongs
+    leads_enriched['regions'] = leads_enriched.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
+
+    # filter out units outside our coverage area
+    leads_filtered = leads_enriched[
+        (leads_enriched.regions > -1) &
+        (
+                (~leads_enriched.type.str.contains('casa')) |
+                leads_enriched.regions.isin(crawler_leads.house_allowed)
+        )
+        ]
+    if leads_filtered.empty:
+        _logger.info(NO_LEADS_MSG)
+        return None
+    _logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads_filtered)))
+    _logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+
+    crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
     return leads
 
@@ -91,5 +97,5 @@ PythonOperator(
     dag=dag,
     task_id='insert-leads',
     python_callable=insert_leads,
-    op_kwargs=json.loads(os.getenv('insert_leads_params'))
+    op_kwargs=json.loads(insert_leads_params)
 )
