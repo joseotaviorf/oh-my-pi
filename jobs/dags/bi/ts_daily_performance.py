@@ -11,9 +11,9 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from ts_monitoring.processing import compute_performance_table, format_performance_table
+from jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
+from jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
+from jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)

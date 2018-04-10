@@ -10,10 +10,10 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
+from jobs.new_etl.ts_monitoring import compute_originacao_table, format_originacao_table
+from jobs.new_etl.ts_monitoring import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
     import_api, import_ebdb_contrato
-from ts_monitoring.processing import compute_originacao_table, format_originacao_table
+from jobs.new_etl.ts_monitoring import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
