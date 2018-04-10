@@ -7,13 +7,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
+from jobs.dags.util import environment as env
+from jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
+from jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
+from jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
-
-from jobs.dags.util import environment as env
-from jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
-from jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -57,8 +56,8 @@ def daily_performance():
     performance_table = create_sk_dates(performance_table)
     performance_table = format_performance_table(performance_table)
     write_to_s3(performance_table,
-                'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
-
+                'performance/performance' + yesterday.strftime(
+                    format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
 
     _logger.info('generating performance queries')
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
