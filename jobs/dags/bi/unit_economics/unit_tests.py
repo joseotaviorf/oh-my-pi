@@ -1,10 +1,12 @@
 from jobs.base.base_dag import BaseDAG
+from jobs.base.base_etl import BaseETL
 from jobs.base.base_test import BaseTest
 from jobs.base.enum_db import EnumDb
-from jobs.dags.bi.__init__ import UNIT_ECONOMICS_TEST_QUERIES_DIR
+from jobs.dags.bi.unit_economics.__init__ import UNIT_ECONOMICS_TEST_QUERIES_DIR
 from qa_python_utils.default_logger import logger, _logger
 
 DRE_VALUE_CHECK_SQL = 'dre_value_check.sql'
+
 
 @logger
 def __build_local_dag(sub_dag_name, dag_name, schedule_interval, start_date):
@@ -26,8 +28,8 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date):
 
 
 def __test_query(**kwargs):
-    cost_dre_query = BaseTest._get_query_from_file_name(
-        file_path='{}/dre_value_check.sql'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR)
+    cost_dre_query = BaseETL.get_query_from_file_name(
+        file_path=kwargs['file_path']
     )
 
     _return = BaseTest.test_raw_query(

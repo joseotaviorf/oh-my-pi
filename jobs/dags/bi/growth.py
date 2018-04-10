@@ -18,11 +18,18 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MAIN_DAG_NAME = 'bi-growth'
 
 # create DAG definition
-main_dag = BaseDAG.build_dag(
+main_dag = DAG(
     dag_id=MAIN_DAG_NAME,
     description='ETL Pipeline for creating Growth Model inside the DW',
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
     start_date=datetime(2018, 2, 15, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
+    max_active_runs=1,
+    catchup=False,
     orientation='TB'
 )
 

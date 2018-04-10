@@ -1,7 +1,7 @@
+from jobs.base.base_etl import BaseETL
+from jobs.new_etl.amplitude.__init__ import QUERIES_DIR
 from jobs.new_etl.amplitude.growth_users import GrowthUsers
 from qa_python_utils.default_logger import logger
-
-from __init__ import QUERIES_DIR
 
 
 class EngagedUsers(GrowthUsers):
@@ -28,7 +28,7 @@ class EngagedUsers(GrowthUsers):
 
     @logger
     def __append(self, _filter, prefix):
-        middle_query = GrowthUsers._get_query_from_file_name(
+        middle_query = BaseETL.get_query_from_file_name(
             '{}/engaged_users/middle_{}.sql'.format(QUERIES_DIR, _filter))
 
         df = self.get_df(prefix=prefix,

@@ -557,3 +557,12 @@ class BaseETL(object):
                 columns_table.pop(0)
 
         return columns_table
+
+    @classmethod
+    def get_query_from_file_name(cls, file_name):
+        try:
+            with open(file_name) as f:
+                return f.read()
+        except IOError:
+            print('m=get_query_from_file_name, file_name={}, msg=file not found'.format(file_name))
+            return ''
