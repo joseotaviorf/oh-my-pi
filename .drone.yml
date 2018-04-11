@@ -46,7 +46,7 @@ pipeline:
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
     source: "db jobs"
-    target: /var/www/airflow/dags/
+    target: /var/www/airflow/dags/bi
     args: '--force -vI'
     secrets: [ rsync_key ]
     when:
@@ -57,7 +57,7 @@ pipeline:
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: "db jobs"
-    target: /var/www/airflow/dags/
+    target: /var/www/airflow/dags/bi
     args: '--force -vI'
     secrets: [ rsync_key ]
     when:
