@@ -48,6 +48,7 @@ pipeline:
     source: "bietlejuice/*"
     target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
+    delete: true
     secrets: [ rsync_key ]
     when:
       branch: [ forno ]
@@ -59,6 +60,7 @@ pipeline:
     source: "bietlejuice/*"
     target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
+    delete: true
     secrets: [ rsync_key ]
     when:
       branch: [ master ]
