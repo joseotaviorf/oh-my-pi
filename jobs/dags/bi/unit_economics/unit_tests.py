@@ -28,9 +28,7 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date):
 
 
 def __test_query(**kwargs):
-    cost_dre_query = BaseETL.get_query_from_file_name(
-        file_path=kwargs['file_path']
-    )
+    cost_dre_query = BaseETL.get_query_from_file_name(kwargs['file_path'])
 
     _return = BaseTest.test_raw_query(
         query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category'],
