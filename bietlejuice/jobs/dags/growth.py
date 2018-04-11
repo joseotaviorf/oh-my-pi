@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
-from bietlejuice.jobs.dags.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
