@@ -90,7 +90,7 @@ class CrawlerLeads(CrawlerEntity):
         leads = leads.drop_duplicates(subset=['phones'])
         leads = leads[leads.phones.astype(str).str.len() >= 11]
 
-        locale.setlocale(locale.LC_MONETARY, '')
+        locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         leads.rent = leads.rent.apply(lambda p: locale.currency(p) if not np.isnan(p) else None)
 
         leads.gstreet_number = leads.gstreet_number.where(

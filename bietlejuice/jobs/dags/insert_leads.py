@@ -5,10 +5,11 @@ import numpy as np
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from qa_python_utils.default_logger import _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
-from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'crawling-houses-insert-leads'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -93,7 +94,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 # operators
