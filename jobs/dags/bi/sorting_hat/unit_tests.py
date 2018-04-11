@@ -31,27 +31,31 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date, entity):
 
 def __test_count(**kwargs):
     sh_query = BaseETL.get_query_from_file_name(kwargs['sh_file_path'])
-
     dl_query = BaseETL.get_query_from_file_name(kwargs['dl_file_path'])
-
     ods_query = BaseETL.get_query_from_file_name(kwargs['ods_file_path'])
 
     sh_return = BaseTest.get_query_result_for_comparison(
         query=sh_query,
         enum_db=EnumDb.QuintoAndar_sortinghat
-    )
+    )[1][0] if sh_query != '' else None
 
     dl_return = BaseTest.get_query_result_for_comparison(
         query=dl_query,
-        enum_db=kwargs['enum_db']
-    )
+        from_athena=True
+    ).values[0][0] if dl_query != '' else None
 
     ods_return = BaseTest.get_query_result_for_comparison(
         query=ods_query,
         enum_db=EnumDb.BI_ODS
-    )
+    )[1][0] if ods_query != '' else None
 
-    if sh_return != dl_return or sh_return != ods_return or dl_return != ods_return:
+    if (sh_return is not None and dl_return is not None and sh_return != dl_return) \
+            or (sh_return is not None and ods_return is not None and sh_return != ods_return) \
+            or (dl_return is not None and dl_return is not None and dl_return != ods_return):
+        _logger.warn(
+            'm=__test_count, sh_return={}, dl_return={}, ods_return={}, msg=counts are different'.format(sh_return,
+                                                                                                         dl_return,
+                                                                                                         ods_return))
         raise Exception
 
     _logger.info('m=__test_count, msg=counts are all equal')

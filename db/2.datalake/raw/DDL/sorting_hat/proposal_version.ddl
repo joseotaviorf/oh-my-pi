@@ -1,5 +1,5 @@
-drop table if exists datalake_raw.sortinghat_proposal_version;
-create external table datalake_raw.sortinghat_proposal_version (
+drop table if exists datalake_raw.sortinghat_proposalversion;
+create external table datalake_raw.sortinghat_proposalversion (
   id string,
   proposal_id string,
   imovel_id string,

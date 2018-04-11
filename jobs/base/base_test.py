@@ -17,7 +17,7 @@ class BaseTest(object):
 
     @staticmethod
     @logger
-    def get_query_result_for_comparison(query, enum_db, encoding='utf-8', from_athena=False):
+    def get_query_result_for_comparison(query, enum_db=None, encoding='utf-8', from_athena=False):
         if from_athena:
             return AthenaClient('5a-datalake').execute_query_and_return_dataframe(query)
 

@@ -585,11 +585,26 @@ ods_potential_listings = BaseDAG.get_quintoandar_python_operator(
                'command': 'call ebdb.list_potential_listings(null);'}
 )
 
+ods_supply = BaseDAG.get_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='ODS_supply',
+    func_command=extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'fact_supply', 'bucket': bucket,
+               'command': 'call ebdb.list_fact_supply(null);'}
+)
+
 fact_potential_listing = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply_CAC',
     func_command=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'supply_potential_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+fact_supply = BaseDAG.get_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='DW_Fact_Supply',
+    func_command=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
@@ -678,4 +693,5 @@ ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposa
                                       user_dag, property_dag])
 
 ods_potential_listings >> fact_potential_listing
+ods_supply >> fact_supply
 ods_property_scheduling >> fact_property_scheduling

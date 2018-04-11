@@ -365,6 +365,8 @@ leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_grow
                                      'supply')
 new_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                             'new_listings', 'supply')
+new_listings_landing_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
+                                            'new_listings_landing', 'supply')
 opportunities_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'opportunities', 'supply')
 prospects_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'prospects',
@@ -490,12 +492,12 @@ amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 
-leads_sub_dag >> new_listings_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> \
-ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >> \
-employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >> approved_by_insurer_sub_dag >> \
-documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> \
-offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> \
-visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
+leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> \
+qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> \
+owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >> \
+approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >> \
+offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >> \
+tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
 prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> \
 prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >> \
 prediction_approved_by_insurer_sub_dag >> fact_append_task

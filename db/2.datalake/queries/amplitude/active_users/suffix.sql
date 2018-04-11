@@ -55,5 +55,5 @@ join cte_month am
   on ad._year = am._year
     and ad._month = am._month
 join cte_year ay
-  on ad._year = am._year
+  on ad._year = ay._year
 ;
