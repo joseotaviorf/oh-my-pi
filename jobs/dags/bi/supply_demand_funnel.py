@@ -542,12 +542,12 @@ def marketing_sub_dag(sub_dag_name):
         op_kwargs={'dim_name': 'google'}
     )
 
-    # criteo = BaseDAG.get_quintoandar_python_operator(
-    #     dag=local_dag,
-    #     task_id='ODS_marketing_criteo_costs',
-    #     func_command=load_marketing_costs,
-    #     op_kwargs={'dim_name': 'criteo'}
-    # )
+    criteo = BaseDAG.get_quintoandar_python_operator(
+        dag=local_dag,
+        task_id='ODS_marketing_criteo_costs',
+        func_command=load_marketing_costs,
+        op_kwargs={'dim_name': 'criteo'}
+    )
 
     dim_marketing_attribution = BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
@@ -681,14 +681,13 @@ booking_dag = BaseDAG.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-marketing_dag = BaseDAG.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=marketing_sub_dag,
-    sub_dag_name='Marketing'
-)
+# marketing_dag = BaseDAG.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=marketing_sub_dag,
+#     sub_dag_name='Marketing'
+# )
 
-ods_potential_listings.set_upstream([lead_dag, cap_dag, photo_job_dag, region_dag, user_dag, property_dag,
-                                     marketing_dag])
+ods_potential_listings.set_upstream([lead_dag, cap_dag, photo_job_dag, region_dag, user_dag, property_dag])
 ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, property_dag])
 
