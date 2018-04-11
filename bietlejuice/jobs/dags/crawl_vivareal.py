@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'crawling-houses-vivareal'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = timedelta(days=3)
+MAIN_SCHEDULE_INTERVAL = '0 0 1/3 * *'
 
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 
@@ -40,7 +40,7 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
     max_active_runs=1
 )
 
