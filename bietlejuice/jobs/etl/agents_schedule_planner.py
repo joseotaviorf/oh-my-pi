@@ -21,7 +21,7 @@ from datetime import datetime
 
 import petl
 import requests
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 
 def get_agents_ids():

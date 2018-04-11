@@ -4,8 +4,8 @@ from airflow.models import DAG
 # from airflow.models import Variable
 # from airflow.operators.slack_operator import SlackAPIOperator
 from airflow.operators.python_operator import PythonOperator
-from jobs.dags.util import environment as env
-from jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
 from qa_python_utils.default_logger import logger
 
 

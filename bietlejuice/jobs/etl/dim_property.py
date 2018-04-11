@@ -1,4 +1,4 @@
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 import sys
 import os
 from datetime import datetime

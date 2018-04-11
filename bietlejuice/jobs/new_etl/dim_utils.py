@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import logger, _logger
 from qa_python_utils.aws.athena import AthenaClient
 from marketing_costs.google_campaigns import GoogleCampaigns

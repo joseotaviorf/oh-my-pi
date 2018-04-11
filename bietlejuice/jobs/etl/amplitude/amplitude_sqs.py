@@ -3,8 +3,8 @@ import sys
 import pytz
 from pytz import timezone
 from datetime import datetime
-from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log
-from jobs.wrappers.amplitude import amplitude_props_reader as props
+from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log
+from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'

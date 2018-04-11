@@ -8,9 +8,9 @@ from datetime import datetime, timedelta
 import numpy as np
 from qa_python_utils.default_logger import logger
 
-from jobs.base.base_etl import BaseETL
-from jobs.new_etl.__init__ import DATALAKE_QUERIES_DIR
-from jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
 
 
 class CrawlerLeads(CrawlerEntity):

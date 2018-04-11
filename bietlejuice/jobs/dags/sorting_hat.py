@@ -2,10 +2,10 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from jobs.base.base_dag import BaseDAG
-from jobs.dags.bi.sorting_hat import unit_tests
-from jobs.dags.util import environment as env
-from jobs.new_etl.sorting_hat import SortingHat
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags.sorting_hat import unit_tests
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.sorting_hat import SortingHat
 from qa_python_utils.default_logger import logger
 
 # env vars

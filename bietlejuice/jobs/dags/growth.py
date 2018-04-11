@@ -3,13 +3,13 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
-from jobs.dags.bi.base_dag import BaseDAG
-from jobs.dags.util import environment as env
-from jobs.new_etl.amplitude.active_users import ActiveUsers
-from jobs.new_etl.amplitude.engaged_users import EngagedUsers
-from jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews
-from jobs.new_etl.growth.incurred import Growth
-from jobs.new_etl.growth.prediction import GrowthPrediction
+from bietlejuice.jobs.dags.base_dag import BaseDAG
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
+from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
+from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews
+from bietlejuice.jobs.new_etl.growth.incurred import Growth
+from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
 from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')

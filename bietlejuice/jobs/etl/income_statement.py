@@ -1,10 +1,10 @@
 # -*- coding: latin1 -*-
 import sys
 import petl
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 import string
 from openpyxl import load_workbook
-from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
+from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 from pprint import pprint
 
 

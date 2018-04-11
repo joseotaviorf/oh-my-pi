@@ -1,6 +1,6 @@
 import pandas as pd
-from jobs.base.base_etl import BaseETL, EnumDb
-from jobs.wrappers.S3.S3_file_reader import S3FileReader
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
 from qa_python_utils.default_logger import logger, _logger
 
 

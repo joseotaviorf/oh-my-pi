@@ -3,11 +3,11 @@ from datetime import datetime
 from datetime import timedelta
 import petl
 from airflow.models import DAG
-from jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import environment as env
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from jobs.base.base_etl import BaseETL
-from jobs.base.base_etl import EnumDb
-from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.base_etl import EnumDb
+from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
 table_name = 'employee_base'
 env.set_airflow_var_to_local_env(

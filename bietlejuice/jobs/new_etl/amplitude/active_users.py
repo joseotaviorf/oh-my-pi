@@ -1,4 +1,4 @@
-from jobs.new_etl.amplitude.growth_users import GrowthUsers
+from bietlejuice.jobs.new_etl.amplitude.growth_users import GrowthUsers
 from qa_python_utils.default_logger import logger
 
 

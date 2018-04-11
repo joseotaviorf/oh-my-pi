@@ -2,7 +2,7 @@ import sys
 import os
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, '../../'))
-from jobs.base.base_etl import BaseETL, EnumDb, petl
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb, petl
 from datetime import datetime
 
 

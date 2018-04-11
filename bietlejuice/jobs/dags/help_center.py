@@ -2,8 +2,8 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from jobs.dags.util import environment as env
-from jobs.new_etl.help_center import HelpCenter
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.help_center import HelpCenter
 from qa_python_utils.default_logger import logger
 
 # env vars

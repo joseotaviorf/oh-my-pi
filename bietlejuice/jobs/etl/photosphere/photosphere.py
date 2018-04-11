@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']

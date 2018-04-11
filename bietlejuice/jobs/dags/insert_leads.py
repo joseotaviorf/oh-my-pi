@@ -7,8 +7,8 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
 
-from jobs.dags.util import environment as env
-from jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')

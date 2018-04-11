@@ -2,7 +2,7 @@ import io
 
 import petl
 import requests
-from jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.base_etl import BaseETL
 
 
 class AmplitudeExportApi(BaseETL):

@@ -1,9 +1,9 @@
-from jobs.base.base_dag import BaseDAG
-from jobs.base.base_test import BaseTest
-from jobs.base.enum_db import EnumDb
-from jobs.dags.bi.__init__ import DW_TEST_QUERIES_DIR
-from jobs.new_etl.business_dim_etl import BusinessDimensionETL
-from jobs.new_etl.godfather import GodFather
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags import DW_TEST_QUERIES_DIR
+from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
+from bietlejuice.jobs.new_etl.godfather import GodFather
 from qa_python_utils.default_logger import logger
 
 S3_BUCKET = '5a-datalake'

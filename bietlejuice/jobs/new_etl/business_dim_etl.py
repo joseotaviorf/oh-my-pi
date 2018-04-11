@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import logger, _logger
 
 from __init__ import DATALAKE_QUERIES_DIR

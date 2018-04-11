@@ -6,8 +6,8 @@ import googlemaps
 import numpy as np
 import pandas as pd
 import requests
-from jobs.base.base_etl import BaseETL
-from jobs.new_etl.__init__ import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 from shapely import wkt

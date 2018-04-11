@@ -3,8 +3,8 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from jobs.dags.util import environment as env
-from jobs.new_etl.asterisk_calls import Asterisk
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.asterisk_calls import Asterisk
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
 

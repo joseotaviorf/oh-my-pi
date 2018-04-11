@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 table_name = BaseETL.get_current_filename()

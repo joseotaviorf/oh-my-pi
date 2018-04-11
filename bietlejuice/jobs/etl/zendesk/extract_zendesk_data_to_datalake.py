@@ -5,8 +5,8 @@ from cStringIO import StringIO
 from datetime import datetime,timedelta
 
 import boto3
-from jobs.base.base_etl import BaseETL
-from jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.wrappers.Zendesk.zendesk_api import ZendeskAPI
 from qa_python_utils.aws.athena import AthenaClient
 
 

@@ -9,7 +9,7 @@ from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-from jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import environment as env
 from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 from ts_monitoring.import_data import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
     import_api, import_ebdb_contrato
@@ -23,7 +23,7 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing
 
 
 #bucket = '5a-datalake'#for testing without airflow
-# from jobs.dags.util import environment as env
+# from bietlejuice.jobs.dags.util import environment as env
 
 def originacao():
     """

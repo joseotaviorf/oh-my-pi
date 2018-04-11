@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from jobs.base.base_etl import BaseETL, EnumDb
-from jobs.dags.util import environment as env
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.dags.util import environment as env
 from airflow.models import DAG
 from qa_python_utils.default_logger import _logger
 from qa_python_utils.aws.athena import AthenaClient
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
+from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

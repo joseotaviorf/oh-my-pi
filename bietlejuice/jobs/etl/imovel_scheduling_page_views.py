@@ -2,8 +2,8 @@ import sys
 import os
 import petl
 from datetime import date, datetime, timedelta
-from jobs.base.base_ga import BaseGA
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_ga import BaseGA
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 class GAScheduleView(BaseGA):
 

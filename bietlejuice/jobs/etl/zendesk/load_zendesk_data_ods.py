@@ -3,8 +3,8 @@ import sys
 from datetime import datetime
 
 import boto3
-from jobs.base.base_etl import BaseETL
-from jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 # TODO: DELETE THIS CLASS AFTER EXTRACT_ZENDESK_JOB WAS TESTED AND OK!

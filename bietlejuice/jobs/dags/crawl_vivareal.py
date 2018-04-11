@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
-from jobs.base.base_dag import BaseDAG
-from jobs.base.base_etl import BaseETL
-from jobs.dags.bi.crawlers import start_batch_job, STATES
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags.crawlers import start_batch_job, STATES
 from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'crawling-houses-vivareal'

@@ -5,7 +5,7 @@ from io import BytesIO
 import boto3
 import pandas as pd
 import petl
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 

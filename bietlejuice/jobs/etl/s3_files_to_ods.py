@@ -3,8 +3,8 @@ import os
 import sys
 
 import pandas as pd
-from jobs.base.base_etl import BaseETL, EnumDb
-from jobs.wrappers.S3.S3_file_reader import S3FileReader
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
 
 if __name__ == '__main__':
     args = sys.argv

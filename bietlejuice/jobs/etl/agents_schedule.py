@@ -1,7 +1,7 @@
 import datetime
 import petl
-from jobs.base.base_etl import BaseETL, EnumDb
-from jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 import os
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']

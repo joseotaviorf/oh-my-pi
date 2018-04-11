@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
 
-from jobs.base.base_dag import BaseDAG
-from jobs.dags.bi.supply_demand_funnel import offer_subdag
-from jobs.dags.util import environment as env
-from jobs.new_etl.business_dim_etl import BusinessDimensionETL
-from jobs.new_etl.godfather import GodFather
-from jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags.supply_demand_funnel import offer_subdag
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
+from bietlejuice.jobs.new_etl.godfather import GodFather
+from bietlejuice.jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')

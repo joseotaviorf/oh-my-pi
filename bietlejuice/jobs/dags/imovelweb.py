@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from jobs.dags.bi.crawlers import start_batch_job, STATES
+from bietlejuice.jobs.dags.crawlers import start_batch_job, STATES
 from qa_python_utils.default_logger import _logger
-from jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from airflow.models import DAG
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'

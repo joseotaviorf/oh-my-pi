@@ -1,5 +1,5 @@
-from jobs.base.base_etl import BaseETL
-from jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
 import sys
 import os
 from datetime import datetime

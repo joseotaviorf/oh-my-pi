@@ -6,7 +6,7 @@ from datetime import datetime
 
 import boto3
 import pandas as pd
-from jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.base_etl import BaseETL
 from openpyxl import load_workbook
 from qa_python_utils.default_logger import logger, _logger
 

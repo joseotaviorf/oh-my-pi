@@ -1,6 +1,6 @@
-from jobs.base.base_etl import BaseETL
-from jobs.new_etl.amplitude.__init__ import QUERIES_DIR
-from jobs.new_etl.amplitude.growth_users import GrowthUsers
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl.amplitude import QUERIES_DIR
+from bietlejuice.jobs.new_etl.amplitude.growth_users import GrowthUsers
 from qa_python_utils.default_logger import logger
 
 

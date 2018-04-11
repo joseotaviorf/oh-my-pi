@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import date
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns

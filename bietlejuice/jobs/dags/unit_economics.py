@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from jobs.base.base_dag import BaseDAG
-from jobs.base.base_etl import BaseETL, EnumDb
-from jobs.dags.bi.__init__ import DEFAULT_DAG_OWNER
-from jobs.dags.bi.unit_economics import unit_tests
-from jobs.dags.util import environment as env
-from jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
+from bietlejuice.jobs.dags.unit_economics import unit_tests
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB',
                                  'AWS_SECRET_ACCESS_KEY',

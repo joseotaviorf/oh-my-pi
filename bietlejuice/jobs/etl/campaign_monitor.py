@@ -13,7 +13,7 @@ import boto3
 import pandas as pd
 # createsend==4.2.1
 from createsend import CreateSend, Client, Transactional, Campaign
-from jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.base_etl import BaseETL
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 

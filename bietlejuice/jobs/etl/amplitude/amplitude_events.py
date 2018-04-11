@@ -6,9 +6,9 @@ import json
 import gzip
 import pytz
 from datetime import datetime, timedelta
-from jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
-from jobs.wrappers.amplitude import amplitude_props_reader as props
-from jobs.base.base_etl import BaseETL, log, EnumDb
+from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
+from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+from bietlejuice.jobs.base.base_etl import BaseETL, log, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'

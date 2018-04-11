@@ -1,6 +1,6 @@
-from jobs.new_etl import DW_DIR
-from jobs.new_etl.growth.incurred import Growth
-from jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DW_DIR
+from bietlejuice.jobs.new_etl.growth.incurred import Growth
+from bietlejuice.jobs.base.base_etl import BaseETL
 from qa_python_utils.default_logger import logger, _logger
 
 

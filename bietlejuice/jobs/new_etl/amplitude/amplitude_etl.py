@@ -4,8 +4,8 @@ import re
 import fastparquet
 import pandas as pd
 import s3fs
-from jobs.base.base_etl import BaseETL
-from jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 

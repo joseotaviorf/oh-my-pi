@@ -1,4 +1,4 @@
-from jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 BaseETL.move_table_to_dw('dim_date', EnumDb.BI_ODS, EnumDb.BI_DW, append=False)
 print ('Dim Date Loaded!')

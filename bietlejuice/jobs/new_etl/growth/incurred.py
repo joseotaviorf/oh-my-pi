@@ -1,6 +1,6 @@
-from jobs.base.base_etl import BaseETL
-from jobs.base.enum_db import EnumDb
-from jobs.new_etl import DW_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.new_etl import DW_DIR
 from qa_python_utils.default_logger import logger
 
 
