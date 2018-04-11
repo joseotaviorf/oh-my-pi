@@ -9,7 +9,7 @@ import sys
 import zipfile
 from decimal import Decimal
 from logging import info as log
-
+from io import BytesIO
 import boto3
 import petl
 from petl.io.db import create_table
@@ -566,3 +566,41 @@ class BaseETL(object):
         except IOError:
             print('m=get_query_from_file_name, file_name={}, msg=file not found'.format(file_name))
             return ''
+
+    @classmethod
+    def csv_to_s3(cls, data, bucket, filename):
+        csv_buffer = BytesIO()
+        data.to_csv(csv_buffer, index=False, encoding='utf8')
+        s3 = boto3.resource('s3')
+        s3.Bucket(bucket).put_object(
+            Body=csv_buffer.getvalue(),
+            Key=filename
+        )
+
+    @classmethod
+    def start_batch_job(cls, job_name, job_queue, job_definition, command=None, vcpus=4, memory=4096):
+        batch = boto3.client('batch')
+
+        if command is None or not isinstance(command, list):
+            return {'status': 'WRONG_PARAMS', 'jobId': None, 'jobName': None}
+
+        try:
+            r = batch.submit_job(
+                jobName=job_name,
+                jobQueue=job_queue,
+                jobDefinition=job_definition,
+                containerOverrides={
+                    'vcpus': vcpus,
+                    'memory': memory,
+                    'command': command
+                },
+                retryStrategy={
+                    'attempts': 1
+                }
+            )
+
+            r.update({'status': 'SUBMITTED'})
+            return r
+
+        except Exception:
+            return {'status': 'ERROR', 'jobId': None, 'jobName': None}
