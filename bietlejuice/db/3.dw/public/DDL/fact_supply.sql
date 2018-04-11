@@ -1,4 +1,4 @@
-drop table public.fact_suppy;
+drop table public.fact_supply;
 
 create table public.fact_supply (
 	ods_id bigint NOT NULL,
@@ -23,5 +23,15 @@ create table public.fact_supply (
 	prospect_to_qualified_diff_minutes integer,
 	qualified_to_opportunity_diff_minutes integer,
 	opportunity_to_listing_diff_minutes integer,
-	lead_to_listing_diff_minutes integer
+	lead_to_listing_diff_minutes integer,
+	lead_to_prospect_diff_hours decimal(10,1),
+	prospect_to_qualified_diff_hours decimal(10,1),
+	qualified_to_opportunity_diff_hours decimal(10,1),
+	opportunity_to_listing_diff_hours decimal(10,1),
+	lead_to_listing_diff_hours decimal(10,1),
+	lead_to_prospect_diff_days decimal(10,1),
+	prospect_to_qualified_diff_days decimal(10,1),
+	qualified_to_opportunity_diff_days decimal(10,1),
+	opportunity_to_listing_diff_days decimal(10,1),
+	lead_to_listing_diff_days decimal(10,1)
 )

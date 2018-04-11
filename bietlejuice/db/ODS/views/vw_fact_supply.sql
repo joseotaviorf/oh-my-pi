@@ -47,7 +47,17 @@ select
 	f.prospect_to_qualified_diff_minutes,
 	f.qualified_to_opportunity_diff_minutes,
 	f.opportunity_to_listing_diff_minutes,
-	f.lead_to_listing_diff_minutes
+	f.lead_to_listing_diff_minutes,
+	f.lead_to_prospect_diff_hours,
+	f.prospect_to_qualified_diff_hours,
+	f.qualified_to_opportunity_diff_hours,
+	f.opportunity_to_listing_diff_hours,
+	f.lead_to_listing_diff_hours,
+	f.lead_to_prospect_diff_days,
+	f.prospect_to_qualified_diff_days,
+	f.qualified_to_opportunity_diff_days,
+	f.opportunity_to_listing_diff_days,
+	f.lead_to_listing_diff_days
 from
 	fact_supply f
 left join base_doorman d

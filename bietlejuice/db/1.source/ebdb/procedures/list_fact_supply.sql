@@ -9,7 +9,17 @@ select
   TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified) as prospect_to_qualified_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity) as qualified_to_opportunity_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing) as opportunity_to_listing_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing) as lead_to_listing_diff_minutes
+  TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing) as lead_to_listing_diff_minutes,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/60,1) as lead_to_prospect_diff_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/60,1) as prospect_to_qualified_diff_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/60,1) as qualified_to_opportunity_diff_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/60,1) as opportunity_to_listing_diff_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/60,1) as lead_to_listing_diff_hours,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/1440,1) as lead_to_prospect_diff_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/1440,1) as prospect_to_qualified_diff_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days
 from
 (
 	select
