@@ -5,10 +5,14 @@ import numpy as np
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from qa_python_utils.default_logger import _logger
-
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
+from qa_python_utils.default_logger import _logger
+
+MAIN_DAG_NAME = 'crawling-houses-insert-leads'
+MAIN_START_DATE = datetime(2018, 3, 20)
+MAIN_SCHEDULE_INTERVAL = '0 9 1/1 * *'
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
@@ -81,14 +85,14 @@ def insert_leads(**kwargs):
 
 
 dag = DAG(
-    dag_id='crawling-houses-insert-leads',
+    dag_id=MAIN_DAG_NAME,
     default_args={
-        'owner': 'Data Team',
+        'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 3, 25, 20, 0, 0),
-    schedule_interval='0 1 * * *',
+    start_date=MAIN_START_DATE,
+    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
     max_active_runs=1
 )
 
