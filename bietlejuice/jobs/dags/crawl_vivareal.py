@@ -1,12 +1,11 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'crawling-houses-vivareal'
 MAIN_START_DATE = datetime(2018, 3, 20)
