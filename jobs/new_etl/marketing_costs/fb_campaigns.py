@@ -39,7 +39,8 @@ class FacebookCampaigns(MarketingCampaigns):
         ]
 
         insights = []
-        dt_end = dt_start + timedelta(days=5)
+        # dt_end = dt_start + timedelta(days=3)
+        dt_end = dt_start
         while dt_end <= date.today():
             _logger.info('m=extract_marketing_campaigns, dt_start={}, dt_end={}'.format(dt_start, dt_end))
             params = {
@@ -106,10 +107,10 @@ class FacebookCampaigns(MarketingCampaigns):
             for s in supply_campaigns:
                 insights.append(s)
 
-            dt_start = dt_start + timedelta(days=6)
-            dt_end = dt_start + timedelta(days=5)
-            if (dt_end >= date.today()) and (dt_start < date.today()):
-                dt_end = date.today()
+            # dt_start = dt_start + timedelta(days=4)
+            # dt_end = dt_start + timedelta(days=3)
+            # if (dt_end >= date.today()) and (dt_start < date.today()):
+            #     dt_end = date.today()
 
         table = petl.fromdicts(insights)
         table = table.rename('date_start', 'date')
