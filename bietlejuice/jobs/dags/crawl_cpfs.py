@@ -8,7 +8,7 @@ from airflow.operators.python_operator import PythonOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.etl.crawlers.crawler_cpfs import CrawlerCPFs
+from bietlejuice.jobs.new_etl.crawlers.crawler_cpfs import CrawlerCPFs
 from qa_python_utils.default_logger import _logger, logger
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
