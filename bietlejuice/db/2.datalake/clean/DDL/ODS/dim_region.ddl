@@ -22,7 +22,7 @@ with serdeproperties (
   'separatorChar' = ',',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/clean/ods/dim_region'
+location 's3://5a-datalake/clean/ods/region'
 tblproperties (
   'skip.header.line.count' = '1'
 )
