@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 athena = AthenaClient('5a-datalake')
-file_name = './db/2.datalake/queries/crm/list_tasks.sql'
+file_name = './bietlejuice/db/2.datalake/queries/crm/list_tasks.sql'
 
 if len(sys.argv) < 3:
     raise Exception('Missing Parameters')

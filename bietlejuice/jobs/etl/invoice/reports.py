@@ -56,7 +56,7 @@ class Report(Invoice):
 
     @logger
     def prepare_and_transform_data(self):
-        file_query = './db/2.datalake/queries/invoice/report_raw_transform.sql'
+        file_query = './bietlejuice/db/2.datalake/queries/invoice/report_raw_transform.sql'
         with open(file_query) as f:
             q = f.read()
 
@@ -105,7 +105,7 @@ class Report(Invoice):
 
     @logger
     def prepare_and_load_into_ods(self):
-        file_query = './db/2.datalake/queries/invoice/report_clean_load_ods.sql'
+        file_query = './bietlejuice/db/2.datalake/queries/invoice/report_clean_load_ods.sql'
         with open(file_query) as f:
             q = f.read()
 

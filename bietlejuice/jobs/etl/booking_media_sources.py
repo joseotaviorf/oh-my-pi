@@ -21,7 +21,7 @@ table_list = [
 for t in table_list:
     athena.msck_repair_table(database, t)
 
-file_name = './db/2.datalake/queries/extract_booking_media_sources.sql'
+file_name = './bietlejuice/db/2.datalake/queries/extract_booking_media_sources.sql'
 
 print("Reading from S3: {}".format(datetime.now()))
 

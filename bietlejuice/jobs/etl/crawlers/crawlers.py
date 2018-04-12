@@ -98,10 +98,10 @@ class Crawlers(object):
             table_name='crawlers'
         )
 
-        query_crawlers = './db/2.datalake/queries/crawlers/transform_raw.sql'
+        query_crawlers = './bietlejuice/db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
         
-        neighs_cities_query = './db/2.datalake/queries/crawlers/neighs_cities.sql'
+        neighs_cities_query = './bietlejuice/db/2.datalake/queries/crawlers/neighs_cities.sql'
         df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
         
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
