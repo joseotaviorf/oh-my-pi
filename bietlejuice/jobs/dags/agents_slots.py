@@ -9,7 +9,7 @@ from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-QUERIES_DIR = os.path.join(dir_path, '../../../db/2.datalake/queries')
+QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
 env.set_airflow_var_to_local_env(
     'BI_DW',
     'AWS_ACCESS_KEY_ID',
