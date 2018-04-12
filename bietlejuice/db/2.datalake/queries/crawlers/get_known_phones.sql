@@ -1,41 +1,41 @@
-select
-    telefoneanunciante as phone_number,
-    nomeanunciante as advertiser_name,
-    tipo as type,
-    status,
-    reason,
-    origem as origin,
-    date(if(criadoem != '', substr(criadoem, 1, 10))) as created_date
-from
-    datalake_raw.ebdb_lead
-where
-    regexp_extract(telefoneanunciante, '(\+\d\d)?(\d+)', 2) in ('{phone_list}')
-    and date(if(criadoem != '', substr(criadoem, 1, 10))) >= date '{since}'
-union all
-select
-    telefoneanunciantedois as phone_number,
-    nomeanunciante as advertiser_name,
-    tipo as type,
-    status,
-    reason,
-    origem as origin,
-    date(if(criadoem != '', substr(criadoem, 1, 10))) as created_date
-from
-    datalake_raw.ebdb_lead
-where
-    regexp_extract(telefoneanunciantedois, '(\+\d\d)?(\d+)', 2) in ('{phone_list}')
-    and date(if(criadoem != '', substr(criadoem, 1, 10))) >= date '{since}'
-union all
-select
-    telefoneanunciantetres as phone_number,
-    nomeanunciante as advertiser_name,
-    tipo as type,
-    status,
-    reason,
-    origem as origin,
-    date(if(criadoem != '', substr(criadoem, 1, 10))) as created_date
-from
-    datalake_raw.ebdb_lead
-where
-    regexp_extract(telefoneanunciantetres, '(\+\d\d)?(\d+)', 2) in ('{phone_list}')
-    and date(if(criadoem != '', substr(criadoem, 1, 10))) >= date '{since}'
+select * from (
+    select
+        telefoneAnunciante as phone_number,
+        nomeAnunciante as advertiser_name,
+        tipo as type,
+        status,
+        reason,
+        origem as origin,
+        date(criadoEm) as created_date
+    from
+        ebdb.Lead
+    where
+        criadoEm >= date '{since}'
+    union all
+    select
+        telefoneAnuncianteDois as phone_number,
+        nomeAnunciante as advertiser_name,
+        tipo as type,
+        status,
+        reason,
+        origem as origin,
+        date(criadoEm) as created_date
+    from
+        ebdb.Lead
+    where
+        criadoEm >= date '{since}'
+    union all
+    select
+        telefoneAnuncianteTres as phone_number,
+        nomeAnunciante as advertiser_name,
+        tipo as type,
+        status,
+        reason,
+        origem as origin,
+        date(criadoEm) as created_date
+    from
+        ebdb.Lead
+    where
+        criadoEm >= date '{since}'
+) t
+where phone_number is not null and phone_number != ''

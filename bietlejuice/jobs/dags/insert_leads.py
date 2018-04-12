@@ -1,8 +1,6 @@
 import json
 from datetime import datetime
 
-import numpy as np
-import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
@@ -42,13 +40,12 @@ def insert_leads(**kwargs):
         _logger.info(NO_LEADS_MSG)
         return None
 
-    # get known phones from last 3 months
-    phones = crawler_leads.check_known_phone(leads_cleaned, delta_days=90)
-    leads_cleaned['known'] = pd.Series(
-        np.array([np.array(p) for p in leads_cleaned.phones.apply(eval).values]).ravel()).isin(
-        phones.phone_number.unique()).values
+    phones = crawler_leads.check_known_phone(90)
+    regex_phone = r'(?P<code>\+\d{2})?(?P<number>\d+)'
+    phones.phone_number = phones.phone_number.str.extract(regex_phone, expand=False).number
 
-    # send leads not known
+    leads_cleaned['phone_number'] = leads_cleaned.phones.apply(lambda p: eval(p)[0]).astype(str)
+    leads_cleaned['known'] = leads_cleaned.phone_number.isin(phones.phone_number)
     leads_filtered = leads_cleaned[~leads_cleaned.known].sort_values(by='updated_on')
     if leads_filtered.empty:
         _logger.info(NO_LEADS_MSG)
@@ -62,6 +59,7 @@ def insert_leads(**kwargs):
     leads_enriched = leads_filtered.merge(info, how='left', left_on='cep', right_on='location')
     leads_enriched.lat = leads_enriched.lat.combine_first(leads_enriched.glat)
     leads_enriched.lng = leads_enriched.lng.combine_first(leads_enriched.glng)
+    leads_enriched = leads_enriched.dropna(subset=['lat', 'lng'])
 
     # get to which region each lead belongs
     leads_enriched['regions'] = leads_enriched.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
