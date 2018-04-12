@@ -2,13 +2,14 @@
 
 import json
 import locale
-import re
 from datetime import datetime, timedelta
 
 import numpy as np
+import petl
 from qa_python_utils.default_logger import logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
 
@@ -30,7 +31,7 @@ class CrawlerLeads(CrawlerEntity):
         'gcity': 'cidade',
         'advertiser_name': 'nomeAnunciante',
         'gstreet_number': 'numero',
-        'phones': 'telefoneAnunciante',
+        'phone_number': 'telefoneAnunciante',
         'gneighbourhood': 'bairro',
         'gstreet': 'endereco',
         'rent': 'valor',
@@ -62,18 +63,14 @@ class CrawlerLeads(CrawlerEntity):
 
         return self.athena_client.execute_query_and_return_dataframe(q)
 
-    @logger(exclude='leads')
-    def check_known_phone(self, leads, delta_days):
+    @logger
+    def check_known_phone(self, delta_days):
         q = BaseETL.get_query_from_file_name('{}/crawlers/get_known_phones.sql'.format(DATALAKE_QUERIES_DIR))
 
-        phone_list = "', '".join(
-            [re.sub(r'\+\d{2}|[(|)]', '', str(p))
-             for p in np.array([np.array(p) for p in leads.phones.apply(eval).values]).ravel()])
         since = datetime.today() - timedelta(days=delta_days)
-        q = q.format(phone_list=phone_list, since=since.strftime('%Y-%m-%d'))
+        q = q.format(since=since.strftime('%Y-%m-%d'))
 
-        phones = self.athena_client.execute_query_and_return_dataframe(q)
-        phones.phone_number = phones.phone_number.astype(str).str.slice(2)
+        phones = petl.todataframe(BaseETL.from_db_query(db_enum=EnumDb.QuintoAndar_ebdb, query=q))
         return phones.sort_values(by=['created_date'], ascending=False).drop_duplicates(subset=['phone_number'])
 
     @logger(exclude='leads')
@@ -86,9 +83,8 @@ class CrawlerLeads(CrawlerEntity):
 
         leads = leads.drop(labels=['cep'], axis=1)
 
-        leads.phones = leads.phones.apply(lambda p: eval(p)[0])
-        leads = leads.drop_duplicates(subset=['phones'])
-        leads = leads[leads.phones.astype(str).str.len() >= 11]
+        leads = leads.drop_duplicates(subset=['phone_number'])
+        leads = leads[leads.phone_number.str.len() >= 11]
 
         locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         leads.rent = leads.rent.apply(lambda p: locale.currency(p) if not np.isnan(p) else None)
