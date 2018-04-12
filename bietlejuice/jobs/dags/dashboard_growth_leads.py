@@ -334,7 +334,7 @@ def push_leads(endpoint):
 dag = BaseDAG.build_dag(
     dag_id='bi-dashboard-growth-leads',
     description='Feeder to PowerBI Real time lead dashboard',
-    start_date=datetime(2018, 4, 14, 15, 0, 0),
+    start_date=datetime(2018, 4, 12, 14, 15, 0),
     schedule_interval=env.convert_to_utc_schedule('0/5 * * * *')
 )
 
