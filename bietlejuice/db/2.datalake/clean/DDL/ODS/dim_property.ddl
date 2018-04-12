@@ -163,14 +163,17 @@ create external table if not exists datalake_clean.ods_dim_property (
   property_v3 string,
   total_area string,
   construction_area string,
-  unpublished_reason string
+  unpublished_reason string,
+  start_version_category string,
+  end_version_category string,
+  is_last_version string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ',',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/clean/ods/dim_property'
+location 's3://5a-datalake/clean/ods/property'
 tblproperties (
   'skip.header.line.count' = '1'
 )
