@@ -80,7 +80,7 @@ def insert_leads(**kwargs):
 
     crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
-    return leads
+    return None
 
 
 dag = DAG(
