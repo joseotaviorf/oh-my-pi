@@ -45,7 +45,6 @@ class CrawlerLeads(CrawlerEntity):
 
     def __init__(self, s3_bucket, google_maps_api_key):
         super(CrawlerLeads, self).__init__(s3_bucket=s3_bucket, google_maps_api_key=google_maps_api_key)
-        env.set_airflow_var_to_local_env('EBDB')
 
     @logger
     def leads(self, ws, states, delta_days):
