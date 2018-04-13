@@ -13,6 +13,8 @@ MAIN_DAG_NAME = 'crawling-houses-insert-leads'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '0 9 1/1 * *'
 
+env.set_airflow_var_to_local_env('EBDB')
+
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 insert_leads_params = env.get_airflow_env_var('insert_leads_params')
@@ -79,8 +81,6 @@ def insert_leads(**kwargs):
     _logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
 
     crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
-
-    return leads
 
 
 dag = DAG(

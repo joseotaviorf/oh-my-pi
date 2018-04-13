@@ -10,6 +10,7 @@ from qa_python_utils.default_logger import logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
 
