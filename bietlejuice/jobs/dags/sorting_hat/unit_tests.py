@@ -51,7 +51,7 @@ def __test_count(**kwargs):
 
     if (sh_return is not None and dl_return is not None and sh_return != dl_return) \
             or (sh_return is not None and ods_return is not None and sh_return != ods_return) \
-            or (dl_return is not None and dl_return is not None and dl_return != ods_return):
+            or (dl_return is not None and ods_return is not None and dl_return != ods_return):
         _logger.warn(
             'm=__test_count, sh_return={}, dl_return={}, ods_return={}, msg=counts are different'.format(sh_return,
                                                                                                          dl_return,
