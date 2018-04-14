@@ -117,8 +117,6 @@ class Funnel:
                 deduplication_col_predictor_step = row_predictor_step.deduplication_col
 
                 for weekday in range(0, 7):
-                    if predictor_step=='dt_booking_created' and weekday==1 and step=='dt_booking_created_notrescheduled':
-                        x=0
                     # take the train df, select the lines where the predictor step happened,
                     # and it happened on that day of the week
                     # and it happened more than q_t days ago
@@ -157,10 +155,7 @@ class Funnel:
                                                           'threshold_date': threshold_date,
                                                           },
                                                          ignore_index=True)
-                    x=0
         self.distribs = self.distribs.set_index(['predictor_step', 'weekday', 'step'])
-        print self.distribs.loc[('dt_booking_created', 1.0, 'dt_booking_created_notrescheduled')]
-        x=0
 
     def get_prior_knowledge_distrib(self, distrib, min_days_to_next_event=None):
         """function to compute the distributions with knowledge of number of idle days.
@@ -174,10 +169,12 @@ class Funnel:
         return prior_knowledge_distrib
 
     def __compute_predictors(self):
-        """create a dataframe with a column for each step that we need to predict
+        """
+        create a dataframe with a column for each step that we need to predict
         the predictor df contains, for each step to be predicted,
         the number of lines in the predictor step when we ignore steps between the
-        predictor step and the step to be predicted"""
+        predictor step and the step to be predicted
+        """
 
         self.predictor_df = pd.DataFrame()  # index=range_recent_day.tolist()+range_pred_day.tolist())
 
@@ -194,10 +191,8 @@ class Funnel:
                 # !! at the time of begin_pred !!
                 # and count them by predictor_step_date
                 sel = self.recent_df[self.recent_df[predictor_step].notnull() &  # have perfomed predictor step
-                                     (self.recent_df[
-                                          predictor_step] < self.begin_pred) &  # have performed it before at the time of the prediction
-                                     (self.recent_df[
-                                          'last_step_order'] < step_order)]  # have not preformed the step to be predicted or any step further
+                                     (self.recent_df[predictor_step] < self.begin_pred) &  # have performed it before at the time of the prediction
+                                     (self.recent_df['last_step_order'] < step_order)]  # have not preformed the step to be predicted or any step further
 
                 col = sel.groupby(pd.to_datetime(self.recent_df[predictor_step].dt.date)).size()
                 col = col.rename(step)
@@ -205,7 +200,8 @@ class Funnel:
 
                 df_col = pd.DataFrame(col)
 
-                # if a region has no predictors regardless of the step (nothing happened recently that can lead to another event), this region will not appear in the dataframe of predictors
+                # if a region has no predictors regardless of the step (nothing happened recently
+                # that can lead to another event), this region will not appear in the dataframe of predictors
                 self.predictor_df = pd.concat([self.predictor_df, df_col],
                                               axis=1)  # we are adding columns corresponding to the different steps
 
@@ -256,7 +252,7 @@ class Funnel:
         for every date in range_pred_date
 
         IF:
-        a prediction was able to be made for the region AND
+        a prediction was able to be made for the region AND (condition outside this function)
         a predictor was able to be made for the region
         """
 
@@ -268,11 +264,11 @@ class Funnel:
         self.__add_last_step_date_and_name()  # transforms recent_df
         self.__compute_predictors()  # computes self.predictor_df
 
+        # we don't include the first step of hte process because it is being predicted,
+        # and we will concatenate it with the rest
         kpi_pred = pd.DataFrame(index=self.range_recent_day.tolist() + self.range_pred_day.tolist(),
-                                columns=self.steps.index[
-                                        1:].tolist())  # we don't include the first step of hte process because it is being predicted, and we will concatenate it with the rest
+                                columns=self.steps.index[1:].tolist())
         kpi_pred = pd.concat([kpi_pred, self.ts_pred], axis=1)  # include the first step that is already predicted
-        # print kpi_pred.head()
         kpi_pred = kpi_pred[self.steps.index.tolist()]  # reorder the steps (first one first)
         kpi_pred = kpi_pred.fillna(0.0)
 
@@ -288,10 +284,9 @@ class Funnel:
                 for predictor_step_date in final_predictor[
                             final_predictor > 0].index:  # the dates for which the predictor of step is positive
                     weekday = predictor_step_date.weekday()
-                    min_days_to_next_event = (self.begin_pred - predictor_step_date) / pd.to_timedelta(1,
-                                                                                                       unit='days')  # we know that the applications made at this date stayed idle at least until the morning of begin_pred. no event can be predicted backwards before begin_pred
-                    if predictor_step == 'dt_booking_created' and weekday == 1 and step == 'dt_booking_created_notrescheduled':
-                        x=0
+                    # we know that the applications made at this date stayed idle at least until
+                    # the morning of begin_pred. no event can be predicted backwards before begin_pred
+                    min_days_to_next_event = (self.begin_pred - predictor_step_date) / pd.to_timedelta(1,unit='days')
                     distrib = self.distribs.loc[(predictor_step, float(weekday), step), 'distrib']
                     samples = self.distribs.loc[(predictor_step, float(weekday), step), 'samples']
                     if samples < self.min_samples and self.default_distribs is not None:

@@ -33,7 +33,7 @@ class Ts_predictor:
         self.end_pred = end_pred
         self.range_pred_day = range_pred_day
         self.range_pred_week = range_pred_week
-        self.daily_past = ts  # todo : unless there is a flag saying it is weekly data
+        self.daily_past = ts
         self.own_yearly_seasonality = None
 
         # transform the series into a series with a datetime index
@@ -41,9 +41,10 @@ class Ts_predictor:
 
         # make sure there are no gaps: (for things like rolling std that are based on int not days)
         self.begin_ts = pd.to_datetime(self.daily_past.index.min())
-        self.end_ts = self.begin_pred - -pd.to_timedelta(1, unit='days')  # pd.to_datetime(self.daily_past.index.max())
+        self.end_ts = self.begin_pred - pd.to_timedelta(1, unit='days')  # pd.to_datetime(self.daily_past.index.max())
         self.daily_past = pd.concat(
-            [pd.DataFrame(index=pd.date_range(self.begin_ts, self.end_ts, freq='D', closed=None)), self.daily_past],
+            [pd.DataFrame(index=pd.date_range(self.begin_ts, self.end_ts, freq='D', closed=None)),
+             self.daily_past],
             axis=1).fillna(0.0).iloc[:, 0]
 
         # cut the end of the series : make sure to cut the series before begin_pred
@@ -123,8 +124,7 @@ class Ts_predictor:
         # - shift of (one year*2/3 + 2 years*1/3) to remove the seasonality within the year
         ys = pd.DataFrame(ratio_ts)
         ys = ys[ys.index > pd.to_datetime('2016-01-01')]  # ignore turbulent years
-        ys['datemonth'] = pd.to_datetime(
-            (2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
+        ys['datemonth'] = pd.to_datetime((2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
         ys = ys[ys.iloc[:, 0].notnull()]
         ysm = ys.groupby('datemonth').mean().iloc[:, 0]
         self.yearly_seasonality = ysm.rolling(7, min_periods=1, center=True).mean()
@@ -146,8 +146,7 @@ class Ts_predictor:
         # todo : if not, use the overall yearly seasonality
         if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22 + rolavg_duration, unit='days'),
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
-                                 freq='D', closed=None)).issubset(
-            set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
+                                 freq='D', closed=None)).issubset(set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
             if self.default_yearly_seasonality is not None:
                 print 'not enough data to compute the yearly seasonality of region. Computing using the default.'
                 self.yearly_seasonality = self.default_yearly_seasonality
@@ -166,12 +165,15 @@ class Ts_predictor:
         return ts_noYseasonality
 
     def remove_yearly_seasonality_undo(self, ts):  # series we want to add the yearly seasonality to
-        # add back the yearly seasonality
-        seasonality_factor_year_pred = self.yearly_seasonality[self.range_pred_day.to_series().dt.strftime('%m-%d')]
-        seasonality_factor_year_pred.index = self.range_pred_day
-        ts_withYseasonality = seasonality_factor_year_pred * ts
+        if self.model_yearly_seasonality == True:
+            # add back the yearly seasonality
+            seasonality_factor_year_pred = self.yearly_seasonality[self.range_pred_day.to_series().dt.strftime('%m-%d')]
+            seasonality_factor_year_pred.index = self.range_pred_day
+            ts_withYseasonality = seasonality_factor_year_pred * ts
 
-        return ts_withYseasonality
+            return ts_withYseasonality
+        else:
+            return ts
 
     def remove_trend_do(self, ts, rolavg_duration=120):  # series you want to remove the trend from
         # compute rolling avg without yearly seasonality, remove it to make the series stationary
@@ -404,21 +406,21 @@ class Ts_predictor:
 
         return ts
 
-    def print_steps(self):
-        for var, var_undone in [('daily_past', self.steps_prediction.output_name_undo.iloc[0])] + zip(
-                self.steps_prediction.output_name_do.iloc[:-1], self.steps_prediction.output_name_undo.iloc[1:]):
-            fig = plt.figure(figsize=(10, 5))
-            ax = fig.add_subplot(111)
-            ax.set_title(var)
-
-            ts_past = self.intermediary_results[var]
-            ax.plot(ts_past.index, ts_past)
-
-            if var_undone in self.intermediary_results.keys():
-                ts_pred = self.intermediary_results[var_undone]
-                ax.plot(ts_pred.index, ts_pred)
-
-            ax.set_xlim(left=pd.to_datetime('2015-08-01'), right='2018-06-01')
-
-            ax.legend()
-            fig.show()
+    # def print_steps(self):
+    #     for var, var_undone in [('daily_past', self.steps_prediction.output_name_undo.iloc[0])] + zip(
+    #             self.steps_prediction.output_name_do.iloc[:-1], self.steps_prediction.output_name_undo.iloc[1:]):
+    #         fig = plt.figure(figsize=(10, 5))
+    #         ax = fig.add_subplot(111)
+    #         ax.set_title(var)
+    #
+    #         ts_past = self.intermediary_results[var]
+    #         ax.plot(ts_past.index, ts_past)
+    #
+    #         if var_undone in self.intermediary_results.keys():
+    #             ts_pred = self.intermediary_results[var_undone]
+    #             ax.plot(ts_pred.index, ts_pred)
+    #
+    #         ax.set_xlim(left=pd.to_datetime('2015-08-01'), right='2018-06-01')
+    #
+    #         ax.legend()
+    #         fig.show()

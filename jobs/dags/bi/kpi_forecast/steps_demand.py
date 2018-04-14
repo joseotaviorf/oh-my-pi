@@ -1,5 +1,5 @@
 import pandas as pd
-steps_demand = pd.DataFrame([{'step': 'dt_booking_created',
+steps = pd.DataFrame([{'step': 'dt_booking_created',
                               'deduplication_col': 'id_booking',
                               'order': 1,
                               'predict_with': None},
@@ -42,4 +42,4 @@ steps_demand = pd.DataFrame([{'step': 'dt_booking_created',
                               'predict_with': 'dt_proposal_approved'},
                              ])
 
-steps_demand = steps_demand.set_index('step')
+steps = steps.set_index('step')
