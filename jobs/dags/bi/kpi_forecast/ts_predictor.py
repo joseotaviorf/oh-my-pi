@@ -259,6 +259,8 @@ class Ts_predictor:
         self.intermediary_results['daily_past'] = ts
         self.default_yearly_seasonality = default_yearly_seasonality
         self.intermediary_results_stack = []
+        self.model_yearly_seasonality = model_weekly_seasonality
+        self.model_weekly_seasonality = model_weekly_seasonality
 
         self.steps_prediction = pd.DataFrame([
             {

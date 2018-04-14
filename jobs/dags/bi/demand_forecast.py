@@ -48,7 +48,8 @@ def load_fact(begin_pred):
     # fact = preprocessor_demand.preprocess(fact)
     # fact.to_pickle('fact')
     fact = pd.read_pickle('fact')
-    write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
+    print '2'
+    #write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
     # df_demand2.to_pickle('df_demand2')
     # df_demand2 = pd.read_pickle('df_demand2')
     # df_demand3 = pd.read_pickle('df_demand3') #10% of lines
@@ -144,14 +145,15 @@ def predict_next_steps(fact_past_bookings, ts_first_step_pred, default_distribs)
 
 
 def compute_all_predictions(fact_past_bookings):
+    print '3'
     # for every all>city>region, go down the hierarchy of folders, taking default parameters if they exist
     # make the prediction for that region, write it in the folder as pickle
 
     # for each combination of city, region : make predictions for bookings and for rest of funnel.
     # sort regions by number of lines, so we will always handle big geographies first and have default parameters available
 
-    write_to_s3(fact_past_bookings, '%s/fact_past_bookings' %(begin_pred.strftime("%Y-%m-%d")))
-
+    #write_to_s3(fact_past_bookings, '%s/fact_past_bookings' %(begin_pred.strftime("%Y-%m-%d")))
+    print '4'
     geo_levels = fact_past_bookings.groupby('region_code').agg({'city_name':'first'}).reset_index()
     geo_levels.columns = ['region', 'city']
     cities = [city for city in geo_levels.city.unique().tolist() if city!='NONE']
@@ -214,5 +216,6 @@ def compute_all_predictions(fact_past_bookings):
 
 
 if __name__ == "__main__":
+    print '1'
     fact_past_bookings = load_fact(begin_pred)
-    #compute_all_predictions(fact_past_bookings)
+    compute_all_predictions(fact_past_bookings)
