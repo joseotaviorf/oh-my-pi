@@ -708,3 +708,4 @@ ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposa
 ods_potential_listings >> fact_potential_listing
 ods_supply >> fact_supply
 ods_property_scheduling >> fact_property_scheduling
+ods_house_rental_flow >> fact_demand
