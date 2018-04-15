@@ -577,6 +577,13 @@ ods_property_scheduling = BaseDAG.get_quintoandar_python_operator(
     op_kwargs={'dim_name': 'property_scheduling', 'command': 'call ebdb.list_property_scheduling();'}
 )
 
+ods_house_rental_flow = BaseDAG.get_quintoandar_python_operator(
+    task_id='ODS_house_rental_flow',
+    dag=main_dag,
+    func_command=extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'dim_name': 'house_rental_flow', 'command': 'call ebdb.list_house_rental_flow();'}
+)
+
 ods_potential_listings = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply_potential_listings',
@@ -612,6 +619,13 @@ fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
     task_id='DW_fact_liquidity_property_scheduling',
     func_command=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'liquidity_property_scheduling', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+fact_demand = BaseDAG.get_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_demand',
+    func_command=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 # flow
