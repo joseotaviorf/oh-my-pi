@@ -45,7 +45,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join Agendamento a
 		on fl.imovel_id = a.imovel_id
@@ -147,7 +147,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join (
 		select
@@ -215,7 +215,7 @@ from (
 	  on p.offer_id = _offer.o_id
 	left join Contrato c
 	  on c.proposta_id = p.id
-	union all
+	union
 	-- PreProposta
 	select
 		i.id as id_house,
@@ -236,7 +236,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join Agendamento a
 		on fl.imovel_id = a.imovel_id
@@ -338,7 +338,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join (
 		select
@@ -406,7 +406,7 @@ from (
 	  on p.preProposta_id = _pre_proposal.pp_id
 	left join Contrato c
 	  on c.proposta_id = p.id
-	union all
+	union
 	-- Negociacao
 	select
 		i.id as id_house,
@@ -427,7 +427,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join Agendamento a
 		on fl.imovel_id = a.imovel_id
@@ -527,7 +527,7 @@ from (
 	  p.id as id_proposal,
 	  c.id as id_contract
 	from Imovel i
-	left join FluxoLocacao fl
+	join FluxoLocacao fl
 		on i.id = fl.imovel_id
 	left join (
 		select
@@ -593,7 +593,7 @@ from (
 	  on p.negociacao_id = _negotiation.n_id
 	left join Contrato c
 	  on c.proposta_id = p.id
-	union all
+	union
 	-- Old Data Proposta
 	select
 		i.id as id_house,
@@ -624,7 +624,7 @@ from (
 	where p.offer_id is null
 		and p.preProposta_id is null
 		and p.negociacao_id is null
-	union all
+	union
 	-- Old Data Contrato
 	select
 		i.id as id_house,
