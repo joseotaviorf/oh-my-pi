@@ -3,7 +3,7 @@ create view vw_fact_demand as
 with _fact as (
 	select
 		hrf.id_house_rental_flow as ods_id,
-		coalesce((hrf.id_house || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_property,
+		coalesce((hrf.id_house || lpad(coalesce(p."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house,
 	  coalesce(i.regiao_id, -1)as sk_region,
 	  coalesce(hrf.id_rental_flow, -1) as sk_rental_flow,
 	  coalesce(hrf.id_booking, -1) as sk_booking,
@@ -74,7 +74,7 @@ calculated_dates as (
 )
 select
   ods_id,
-  sk_property,
+  sk_house,
   sk_region,
   sk_rental_flow,
   sk_booking,
