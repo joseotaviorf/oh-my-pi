@@ -1,7 +1,7 @@
 drop table if exists fact_demand;
 create table fact_demand (
   ods_id bigint,
-  sk_property bigint,
+  sk_house bigint,
   sk_region bigint,
   sk_rental_flow integer,
   sk_booking integer,
