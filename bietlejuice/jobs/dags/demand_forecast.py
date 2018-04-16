@@ -1,14 +1,14 @@
 import pandas as pd
 
-from kpi_forecast.funnel import Funnel
-from kpi_forecast.helpers import get_geo_levels, get_count, write_to_s3
-from kpi_forecast.preprocessor import Preprocessor
-from kpi_forecast.steps_demand import steps
-from kpi_forecast.ts_predictor import Ts_predictor
+from bietlejuice.jobs.new_etl.kpi_forecast.funnel import Funnel
+from bietlejuice.jobs.new_etl.kpi_forecast.helpers import get_geo_levels, get_count, write_to_s3
+from bietlejuice.jobs.new_etl.kpi_forecast.preprocessor import Preprocessor
+from bietlejuice.jobs.new_etl.kpi_forecast.steps_demand import steps
+from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
 
-from base_etl import BaseETL
-from enum_db import EnumDb
-from kpi_forecast.query_demand import query_demand
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
 import petl
 
 # parameters of the script
@@ -36,23 +36,23 @@ range_training_day = pd.date_range(begin_pred - pd.to_timedelta(n_training_days,
 
 
 def load_fact(begin_pred):
-    # table_demand = BaseETL.from_db_query(
-    #         db_enum=EnumDb.BI_DW,
-    #         query=query_demand
-    #     )
-    # df_demand = petl.todataframe(table_demand);
-    # df_demand.to_pickle('df_demand')
+    table_demand = BaseETL.from_db_query(
+            db_enum=EnumDb.BI_DW,
+            query=query_demand
+        )
+    df_demand = petl.todataframe(table_demand);
+    df_demand.to_pickle('df_demand')
     # fact = pd.read_pickle('df_demand')
 
-    # preprocessor_demand = Preprocessor(steps)
-    # fact = preprocessor_demand.preprocess(fact)
-    # fact.to_pickle('fact')
-    fact = pd.read_pickle('fact')
-    # write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
+    preprocessor_demand = Preprocessor(steps)
+    fact = preprocessor_demand.preprocess(fact)
+    fact.to_pickle('fact')
+    # fact = pd.read_pickle('fact')
+    write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
 
     # split df_demand into past and future bookings (putting ourselves at the beginning of begin_pred)
     fact_past_bookings = fact[(fact[steps.index[0]] < begin_pred)]
-    # write_to_s3(fact_past_bookings, '%s/fact_past_bookings' % (begin_pred.strftime("%Y-%m-%d")))
+    write_to_s3(fact_past_bookings, '%s/fact_past_bookings' % (begin_pred.strftime("%Y-%m-%d")))
     return fact_past_bookings
 
 
