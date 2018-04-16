@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', dd."date") order by f.sk_contract desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	left join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	right join dim_date dd
@@ -62,7 +62,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	left join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	right join dim_date dd
@@ -88,7 +88,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as yearly_count
-  from fact_liquidity_property_scheduling f
+  from fact_demand f
 	left join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	right join dim_date dd
