@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', dp.dt_tenant_first_document_sent) order by dp.sk_proposal desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -57,7 +57,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dp.sk_proposal) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -78,7 +78,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dp.sk_proposal) as yearly_count
-  from fact_liquidity_property_scheduling f
+  from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date

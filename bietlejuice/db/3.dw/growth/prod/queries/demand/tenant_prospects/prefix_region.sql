@@ -10,33 +10,33 @@ with all_dates as (
                                     date_part('year', db.dt_created),
     																date_part('month', db.dt_created),
     																date_part('week', db.dt_created),
-    																date_part('day', db.dt_created) order by f.sk_user_visitor asc)
+    																date_part('day', db.dt_created) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', db.dt_created),
     																		date_part('month', db.dt_created),
     																		date_part('week', db.dt_created),
-    																		date_part('day', db.dt_created) order by f.sk_user_visitor desc)
+    																		date_part('day', db.dt_created) order by f.sk_client desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', db.dt_created),
-    																date_part('week', db.dt_created) order by f.sk_user_visitor asc)
+    																date_part('week', db.dt_created) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', db.dt_created),
-    																		date_part('week', db.dt_created) order by f.sk_user_visitor desc)
+    																		date_part('week', db.dt_created) order by f.sk_client desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', db.dt_created),
-    																date_part('month', db.dt_created) order by f.sk_user_visitor asc)
+    																date_part('month', db.dt_created) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', db.dt_created),
-    																		date_part('month', db.dt_created) order by f.sk_user_visitor desc)
+    																		date_part('month', db.dt_created) order by f.sk_client desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', db.dt_created) order by f.sk_user_visitor asc)
+                                    date_part('year', db.dt_created) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', db.dt_created) order by f.sk_user_visitor desc)
+    	                                  date_part('year', db.dt_created) order by f.sk_client desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and f.sk_booking != -1
@@ -56,8 +56,8 @@ all_dates_last_month as (
     date_part('month', db.dt_created) as _month,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    count(distinct f.sk_user_visitor) as monthly_count
-	from fact_liquidity_property_scheduling f
+    count(distinct f.sk_client) as monthly_count
+	from fact_demand f
 	join dim_booking db
   	on f.sk_booking = db.sk_booking
   		and f.sk_booking != -1
@@ -77,8 +77,8 @@ all_dates_last_year as (
 		date_part('year', db.dt_created) as _year,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    count(distinct f.sk_user_visitor) as yearly_count
-  from fact_liquidity_property_scheduling f
+    count(distinct f.sk_client) as yearly_count
+  from fact_demand f
   join dim_booking db
   	on f.sk_booking = db.sk_booking
   		and f.sk_booking != -1

@@ -7,7 +7,7 @@ with counts as (
 		count(distinct(nullif(c.sk_contract,-1)))::decimal(10,4) as signed_contracts,
 		count(distinct(nullif(sk_visit_date,-1))) as days_worked
 	from 
-		public.fact_liquidity_property_scheduling liq
+		public.fact_demand liq
 	left join 
 		public.dim_date dd 
 		on dd.sk_date = liq.sk_visit_date

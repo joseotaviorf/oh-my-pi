@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', dof.dt_approved) order by dof.sk_offer desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date
@@ -57,7 +57,7 @@ all_dates_last_month as (
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dof.sk_offer) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date
@@ -78,7 +78,7 @@ all_dates_last_year as (
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dof.sk_offer) as yearly_count
-  from fact_liquidity_property_scheduling f
+  from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_approved >= '2017-01-01' and dof.dt_approved < current_date

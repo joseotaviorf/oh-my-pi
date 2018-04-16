@@ -10,33 +10,33 @@ with all_dates as (
                                     date_part('year', dof.dt_first_sent),
     																date_part('month', dof.dt_first_sent),
     																date_part('week', dof.dt_first_sent),
-    																date_part('day', dof.dt_first_sent) order by f.sk_user_visitor asc)
+    																date_part('day', dof.dt_first_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', dof.dt_first_sent),
     																		date_part('month', dof.dt_first_sent),
     																		date_part('week', dof.dt_first_sent),
-    																		date_part('day', dof.dt_first_sent) order by f.sk_user_visitor desc)
+    																		date_part('day', dof.dt_first_sent) order by f.sk_client desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', dof.dt_first_sent),
-    																date_part('week', dof.dt_first_sent) order by f.sk_user_visitor asc)
+    																date_part('week', dof.dt_first_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', dof.dt_first_sent),
-    																		date_part('week', dof.dt_first_sent) order by f.sk_user_visitor desc)
+    																		date_part('week', dof.dt_first_sent) order by f.sk_client desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', dof.dt_first_sent),
-    																date_part('month', dof.dt_first_sent) order by f.sk_user_visitor asc)
+    																date_part('month', dof.dt_first_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', dof.dt_first_sent),
-    																		date_part('month', dof.dt_first_sent) order by f.sk_user_visitor desc)
+    																		date_part('month', dof.dt_first_sent) order by f.sk_client desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', dof.dt_first_sent) order by f.sk_user_visitor asc)
+                                    date_part('year', dof.dt_first_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', dof.dt_first_sent) order by f.sk_user_visitor desc)
+    	                                  date_part('year', dof.dt_first_sent) order by f.sk_client desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
@@ -57,8 +57,8 @@ all_dates_last_month as (
     date_part('month', dof.dt_first_sent) as _month,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    count(distinct f.sk_user_visitor) as monthly_count
-	from fact_liquidity_property_scheduling f
+    count(distinct f.sk_client) as monthly_count
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
@@ -79,8 +79,8 @@ all_dates_last_year as (
 		date_part('year', dof.dt_first_sent) as _year,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    count(distinct f.sk_user_visitor) as yearly_count
-  from fact_liquidity_property_scheduling f
+    count(distinct f.sk_client) as yearly_count
+  from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.offer_submitted is true
