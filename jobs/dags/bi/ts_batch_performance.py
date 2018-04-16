@@ -12,19 +12,19 @@ from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-from jobs.dags.util import environment as env
-from jobs.new_etl.ts_monitoring import compute_performance_table, format_performance_table
-from jobs.new_etl.ts_monitoring import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from jobs.new_etl.ts_monitoring import write_to_s3, generate_queries, create_sk_dates
+# from jobs.dags.util import environment as env
+from jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
+from jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
+from jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-batch_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
-#bucket = '5a-datalake'  # for testing without airflow
+#bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+bucket = '5a-datalake'  # for testing without airflow
 # from jobs.dags.util import environment as env
-start_date = '20180209'  # todo : parameters of airflow?
-end_date = '20180405'
+start_date = '20180409'  # todo : parameters of airflow?
+end_date = '20180415'
 
 
 def batch_performance():
