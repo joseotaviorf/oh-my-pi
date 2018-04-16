@@ -6,10 +6,10 @@ from kpi_forecast.preprocessor import Preprocessor
 from kpi_forecast.steps_demand import steps
 from kpi_forecast.ts_predictor import Ts_predictor
 
-# from base_etl import BaseETL
-# from enum_db import EnumDb
-# from kpi_forecast.query_demand import query_demand
-# import petl
+from base_etl import BaseETL
+from enum_db import EnumDb
+from kpi_forecast.query_demand import query_demand
+import petl
 
 # parameters of the script
 begin_pred = pd.Timestamp('2018-01-15')  # must be a monday #todo : why?
@@ -43,21 +43,16 @@ def load_fact(begin_pred):
     # df_demand = petl.todataframe(table_demand);
     # df_demand.to_pickle('df_demand')
     # fact = pd.read_pickle('df_demand')
-    #
+
     # preprocessor_demand = Preprocessor(steps)
     # fact = preprocessor_demand.preprocess(fact)
     # fact.to_pickle('fact')
     fact = pd.read_pickle('fact')
-    print '2'
-    #write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
-    # df_demand2.to_pickle('df_demand2')
-    # df_demand2 = pd.read_pickle('df_demand2')
-    # df_demand3 = pd.read_pickle('df_demand3') #10% of lines
-
-    # kpis = preprocessor_demand.get_kpis(df_demand2, regions_demand)
+    # write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
 
     # split df_demand into past and future bookings (putting ourselves at the beginning of begin_pred)
     fact_past_bookings = fact[(fact[steps.index[0]] < begin_pred)]
+    # write_to_s3(fact_past_bookings, '%s/fact_past_bookings' % (begin_pred.strftime("%Y-%m-%d")))
     return fact_past_bookings
 
 
@@ -145,15 +140,12 @@ def predict_next_steps(fact_past_bookings, ts_first_step_pred, default_distribs)
 
 
 def compute_all_predictions(fact_past_bookings):
-    print '3'
     # for every all>city>region, go down the hierarchy of folders, taking default parameters if they exist
     # make the prediction for that region, write it in the folder as pickle
 
     # for each combination of city, region : make predictions for bookings and for rest of funnel.
     # sort regions by number of lines, so we will always handle big geographies first and have default parameters available
 
-    #write_to_s3(fact_past_bookings, '%s/fact_past_bookings' %(begin_pred.strftime("%Y-%m-%d")))
-    print '4'
     geo_levels = fact_past_bookings.groupby('region_code').agg({'city_name':'first'}).reset_index()
     geo_levels.columns = ['region', 'city']
     cities = [city for city in geo_levels.city.unique().tolist() if city!='NONE']
@@ -216,6 +208,5 @@ def compute_all_predictions(fact_past_bookings):
 
 
 if __name__ == "__main__":
-    print '1'
     fact_past_bookings = load_fact(begin_pred)
     compute_all_predictions(fact_past_bookings)

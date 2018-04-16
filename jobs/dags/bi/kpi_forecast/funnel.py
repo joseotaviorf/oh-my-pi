@@ -77,8 +77,8 @@ class Funnel:
                     step_duration_deduplicated = step_duration_deduplicated[step_duration_deduplicated.notnull()]
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(step_duration_deduplicated.quantile(q=.95).days, unit='days')
                 else:
-                    print 'no durations for step ' + step
-                    self.steps.loc[step, 'q_threshold'] = np.nan
+                    print 'no durations for step ' + step + '. using default of 10'
+                    self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(10, unit='days')
 
 
     def display_step_thresholds(self):

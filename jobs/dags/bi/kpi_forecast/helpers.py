@@ -25,34 +25,14 @@ def get_count(df, steps, step):
     daily.index = pd.DatetimeIndex(daily.index).rename('index')
     daily = daily.rename(step)
 
-    return daily  # return a series
-
-# def get_all_counts(self, df):
-#     all_counts = pd.DataFrame
-#     for step in self.steps.index().tolist():
-#         all_counts = pd.concat([all_counts, self.get_count(df, step)], axis=1)
-#
-#     return all_counts
+    return daily
 
 def daily_to_weekly(ts):
     return ts.resample('W-MON', closed='left', label='left').sum()
 
 def get_geo_levels(df):
-    # individual regions
     geo_levels = df.groupby(['city_name', 'region_code']).size().reset_index()
     geo_levels.columns = ['city', 'region', 'cnt']
-
-    # # cities
-    # cities = df.groupby(['city_name']).size().reset_index()
-    # cities.columns = ['city', 'cnt']
-    # cities['region'] = 'all'
-    # cities = cities[['city', 'region', 'cnt']]
-    # geo_levels = pd.concat([regions, cities])
-
-    # # all of quintoandar
-    # geo_levels = regions.append({'city': 'all',
-    #                           'region': 'all',
-    #                           'cnt': df.shape[0]}, ignore_index=True)
     return geo_levels
 
 def get_kpis(df, regions, steps):
