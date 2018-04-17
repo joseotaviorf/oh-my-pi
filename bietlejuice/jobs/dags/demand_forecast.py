@@ -51,7 +51,7 @@ def load_fact(begin_pred):
     write_to_s3(fact, '%s/fact' % (begin_pred.strftime("%Y-%m-%d")))
 
     #shortcut :
-    # fact = pd.read_pickle('fact_preprocessed')
+    #fact = pd.read_pickle('fact_preprocessed')
 
     # split df_demand into past and future bookings (putting ourselves at the beginning of begin_pred)
     fact_past_bookings = fact[(fact[steps.index[0]] < begin_pred)]
