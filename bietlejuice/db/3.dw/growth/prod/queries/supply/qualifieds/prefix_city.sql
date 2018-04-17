@@ -10,37 +10,37 @@ with all_dates_prev as (
                                     date_part('year', f.dt_qualified),
     																date_part('month', f.dt_qualified),
     																date_part('week', f.dt_qualified),
-    																date_part('day', f.dt_qualified) order by f.cap_id asc)
+    																date_part('day', f.dt_qualified) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_qualified),
     																		date_part('month', f.dt_qualified),
     																		date_part('week', f.dt_qualified),
-    																		date_part('day', f.dt_qualified) order by f.cap_id desc)
+    																		date_part('day', f.dt_qualified) order by f.sk_lead desc)
 			- 1 as daily_count,
     rank() over (partition by coalesce(dr.city_name, ''),
                                     date_part('year', f.dt_qualified),
-    																date_part('week', f.dt_qualified) order by f.cap_id asc)
+    																date_part('week', f.dt_qualified) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_qualified),
-    																		date_part('week', f.dt_qualified) order by f.cap_id desc)
+    																		date_part('week', f.dt_qualified) order by f.sk_lead desc)
 			- 1 as weekly_count,
     rank() over (partition by coalesce(dr.city_name, ''),
                                     date_part('year', f.dt_qualified),
-    																date_part('month', f.dt_qualified) order by f.cap_id asc)
+    																date_part('month', f.dt_qualified) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_qualified),
-    																		date_part('month', f.dt_qualified) order by f.cap_id desc)
+    																		date_part('month', f.dt_qualified) order by f.sk_lead desc)
 			- 1 as monthly_count,
     rank() over (partition by coalesce(dr.city_name, ''),
-                                    date_part('year', f.dt_qualified) order by f.cap_id asc)
+                                    date_part('year', f.dt_qualified) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  date_part('year', f.dt_qualified) order by f.cap_id desc)
+    	                                  date_part('year', f.dt_qualified) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
-	join dim_contacts_and_prospects cap
-		on f.cap_id = cap.sk_cap_id
+	join dim_lead dl
+		on f.sk_lead = dl.sk_lead
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date
-		  and f.cap_id != -1
+		  and f.sk_lead != -1
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -72,10 +72,10 @@ all_dates_last_month as (
     coalesce(dr.city_name, '') as city,
     count(f.dt_qualified) as monthly_count
 	from fact_supply f
-	join dim_contacts_and_prospects cap
-		on f.cap_id = cap.sk_cap_id
+	join dim_lead dl
+		on f.sk_lead = dl.sk_lead
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date
-		  and f.cap_id != -1
+		  and f.sk_lead != -1
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -93,10 +93,10 @@ all_dates_last_year as (
     coalesce(dr.city_name, '') as city,
     count(f.dt_qualified) as yearly_count
   from fact_supply f
-	join dim_contacts_and_prospects cap
-		on f.cap_id = cap.sk_cap_id
+	join dim_lead dl
+		on f.sk_lead = dl.sk_lead
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date
-		  and f.cap_id != -1
+		  and f.sk_lead != -1
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
