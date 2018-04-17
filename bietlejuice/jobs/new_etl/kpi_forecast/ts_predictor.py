@@ -1,6 +1,5 @@
 import pandas as pd
 from collections import deque
-import matplotlib as plt
 from statsmodels.tsa.arima_model import ARIMA
 import numpy as np
 
@@ -215,6 +214,9 @@ class Ts_predictor:
         except np.linalg.linalg.LinAlgError:
             print 'fit did not converge'
             return None
+        except ValueError:
+            print 'value error. probably not enough degrees of freedom to converge'
+            return None
         else:
             ts_pred = model.predict(results_AR.params, start=self.begin_pred, end=self.end_pred, dynamic=False)
             weekly_ts_pred = pd.Series(ts_pred, index=self.range_pred_week)
@@ -222,25 +224,7 @@ class Ts_predictor:
             ts_pred = weekly_ts_pred.resample('D').ffill()[self.range_pred_day].ffill() / 7
             return ts_pred
 
-    def plot_ts(self, ts, ax=None, title='', std=False):
-
-        if std is True:
-            ts = pd.rolling_std(ts, window=30)
-
-        if ax is None:
-            fig = plt.figure(figsize=(10, 5))
-            ax = fig.add_subplot(111)
-            ax.set_title(title)
-
-            ax.plot(ts.index, ts)
-
-            ax.legend()
-            fig.show()
-
     def predict(self,
-                ax=None,
-                ax_log=None,
-                ax_notrend=None,
                 model_weekly_seasonality=True,
                 model_yearly_seasonality=True,
                 default_yearly_seasonality=None,
@@ -407,22 +391,3 @@ class Ts_predictor:
             if plot == True: self.plot_ts(ts, title=row.output_name_undo)
 
         return ts
-
-    # def print_steps(self):
-    #     for var, var_undone in [('daily_past', self.steps_prediction.output_name_undo.iloc[0])] + zip(
-    #             self.steps_prediction.output_name_do.iloc[:-1], self.steps_prediction.output_name_undo.iloc[1:]):
-    #         fig = plt.figure(figsize=(10, 5))
-    #         ax = fig.add_subplot(111)
-    #         ax.set_title(var)
-    #
-    #         ts_past = self.intermediary_results[var]
-    #         ax.plot(ts_past.index, ts_past)
-    #
-    #         if var_undone in self.intermediary_results.keys():
-    #             ts_pred = self.intermediary_results[var_undone]
-    #             ax.plot(ts_pred.index, ts_pred)
-    #
-    #         ax.set_xlim(left=pd.to_datetime('2015-08-01'), right='2018-06-01')
-    #
-    #         ax.legend()
-    #         fig.show()

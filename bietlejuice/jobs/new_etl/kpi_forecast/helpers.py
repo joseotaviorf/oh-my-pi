@@ -1,10 +1,24 @@
 import pandas as pd
 import boto3
 import io
+import botocore
+
+
+s3 = boto3.resource('s3')
+def get_file_from_s3(file_name_s3, file_name_local):
+    bucket = '5a-data-science'
+    try:
+        s3.Bucket(bucket).download_file(file_name_s3, file_name_local)
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            return False
+        else:
+            raise
+    return True
 
 def write_to_s3(obj, filename):
     """write dataframe obj to s3 (in the ts/monitoring directory)"""
-    if type(obj)== pd.DataFrame:
+    if (type(obj)== pd.DataFrame) or (type(obj) == pd.Series):
         s3 = boto3.resource('s3')
         obj = obj.copy()  # we don't want to alter the original object
         csv_buffer = io.BytesIO()
@@ -29,11 +43,6 @@ def get_count(df, steps, step):
 
 def daily_to_weekly(ts):
     return ts.resample('W-MON', closed='left', label='left').sum()
-
-def get_geo_levels(df):
-    geo_levels = df.groupby(['city_name', 'region_code']).size().reset_index()
-    geo_levels.columns = ['city', 'region', 'cnt']
-    return geo_levels
 
 def get_kpis(df, regions, steps):
     """not up to date"""
