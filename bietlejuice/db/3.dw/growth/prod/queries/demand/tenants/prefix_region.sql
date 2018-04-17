@@ -42,7 +42,7 @@ with all_dates as (
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.long_region_name, ''), date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
@@ -63,7 +63,7 @@ all_dates_last_month as (
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
 	join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -1))
@@ -84,7 +84,7 @@ all_dates_last_year as (
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
   join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -12))

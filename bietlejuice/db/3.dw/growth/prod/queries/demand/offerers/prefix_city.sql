@@ -43,7 +43,7 @@ with all_dates as (
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', dof.dt_first_sent), date_part('month', dof.dt_first_sent), date_part('week', dof.dt_first_sent), date_part('day', dof.dt_first_sent)
@@ -65,7 +65,7 @@ all_dates_last_month as (
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
 	join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -1))
@@ -87,7 +87,7 @@ all_dates_last_year as (
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != - 1
   join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -12))

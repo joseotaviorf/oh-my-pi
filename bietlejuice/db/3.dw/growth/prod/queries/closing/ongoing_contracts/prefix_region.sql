@@ -43,7 +43,7 @@ with all_dates as (
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dc.dt_contract_start < current_date
@@ -69,7 +69,7 @@ all_dates_last_month as (
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dc.dt_contract_start < current_date
@@ -95,7 +95,7 @@ all_dates_last_year as (
 		on dc.dt_contract_start <= dd."date"
 			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   where dc.dt_contract_start < current_date

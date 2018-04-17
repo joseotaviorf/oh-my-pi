@@ -42,7 +42,7 @@ with all_dates as (
 			and f.sk_booking != -1
   		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
@@ -63,7 +63,7 @@ all_dates_last_month as (
   		and f.sk_booking != -1
   		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 	join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
@@ -84,7 +84,7 @@ all_dates_last_year as (
   		and f.sk_booking != -1
   		and db.dt_created >= '2017-01-01' and db.dt_created < current_date
   join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
