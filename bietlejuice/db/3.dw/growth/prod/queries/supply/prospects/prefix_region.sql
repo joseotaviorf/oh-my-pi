@@ -10,35 +10,35 @@ with all_dates_prev as (
                                     date_part('year', f.dt_lead_and_prospect),
     																date_part('month', f.dt_lead_and_prospect),
     																date_part('week', f.dt_lead_and_prospect),
-    																date_part('day', f.dt_lead_and_prospect) order by f.cap_id asc)
+    																date_part('day', f.dt_lead_and_prospect) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
     																		date_part('month', f.dt_lead_and_prospect),
     																		date_part('week', f.dt_lead_and_prospect),
-    																		date_part('day', f.dt_lead_and_prospect) order by f.cap_id desc)
+    																		date_part('day', f.dt_lead_and_prospect) order by f.sk_lead desc)
 			- 1 as daily_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', f.dt_lead_and_prospect),
-    																date_part('week', f.dt_lead_and_prospect) order by f.cap_id asc)
+    																date_part('week', f.dt_lead_and_prospect) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
-    																		date_part('week', f.dt_lead_and_prospect) order by f.cap_id desc)
+    																		date_part('week', f.dt_lead_and_prospect) order by f.sk_lead desc)
 			- 1 as weekly_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
                                     date_part('year', f.dt_lead_and_prospect),
-    																date_part('month', f.dt_lead_and_prospect) order by f.cap_id asc)
+    																date_part('month', f.dt_lead_and_prospect) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect),
-    																		date_part('month', f.dt_lead_and_prospect) order by f.cap_id desc)
+    																		date_part('month', f.dt_lead_and_prospect) order by f.sk_lead desc)
 			- 1 as monthly_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', f.dt_lead_and_prospect) order by f.cap_id asc)
+                                    date_part('year', f.dt_lead_and_prospect) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', f.dt_lead_and_prospect) order by f.cap_id desc)
+    	                                  date_part('year', f.dt_lead_and_prospect) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
 	join dim_contacts_and_prospects cp
-	  on f.cap_id = cp.sk_cap_id
+	  on f.sk_lead = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
 	  		and cp.self_service is false
@@ -46,8 +46,8 @@ with all_dates_prev as (
 	  	or (cp.self_service is true and f.dt_prospect is not null)
 	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01' and f.dt_lead_and_prospect < current_date
-	  	and f.cap_id != -1
-	  	and f.cap_id != -1
+	  	and f.sk_lead != -1
+	  	and f.sk_lead != -1
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -80,7 +80,7 @@ all_dates_last_month as (
     count(f.dt_lead_and_prospect) as monthly_count
 	from fact_supply f
 	join dim_contacts_and_prospects cp
-	  on f.cap_id = cp.sk_cap_id
+	  on f.sk_lead = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
 	  		and cp.self_service is false
@@ -88,7 +88,7 @@ all_dates_last_month as (
 	  	or (cp.self_service is true and f.dt_prospect is not null)
 	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01' and f.dt_lead_and_prospect < current_date
-	  	and f.cap_id != -1
+	  	and f.sk_lead != -1
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -107,7 +107,7 @@ all_dates_last_year as (
     count(f.dt_lead_and_prospect) as yearly_count
   from fact_supply f
 	join dim_contacts_and_prospects cp
-	  on f.cap_id = cp.sk_cap_id
+	  on f.sk_lead = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
 	  		and cp.automatically_discarded is true)
 	  		and cp.self_service is false
@@ -115,7 +115,7 @@ all_dates_last_year as (
 	  	or (cp.self_service is true and f.dt_prospect is not null)
 	  	)
 	  	and f.dt_lead_and_prospect >= '2017-01-01' and f.dt_lead_and_prospect < current_date
-	  	and f.cap_id != -1
+	  	and f.sk_lead != -1
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
