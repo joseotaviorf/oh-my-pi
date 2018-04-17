@@ -173,6 +173,9 @@ CREATE TABLE public.dim_property (
   start_version_category varchar(255),
   end_version_category varchar(255),
   is_last_status INTEGER,
+  f.lead_to_listing_diff_minutes INTEGER,
+  f.lead_to_listing_diff_hours decimal(10,1),
+  f.lead_to_listing_diff_days decimal(10,1),
   
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
