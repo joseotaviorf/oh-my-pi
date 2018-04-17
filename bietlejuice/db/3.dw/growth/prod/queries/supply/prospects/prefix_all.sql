@@ -29,16 +29,16 @@ with all_dates_prev as (
     	+ rank() over (partition by date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
-	join dim_contacts_and_prospects cp
-	  on f.sk_lead = cp.sk_cap_id
-				and ((not(cp.status = 'Descartado'
-	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false
-	  		and f.dt_lead is not null)
-	  	or (cp.self_service is true and f.dt_prospect is not null)
+	join dim_lead dl
+	  on f.sk_lead = dl.sk_lead
+				and ((not(dl.status = 'Descartado'
+	  		and dl.automatically_discarded is true)
+	  		and f.acquisition_method = 'Self-Service'
+	  	  )
+	  	or f.acquisition_method = 'Non-Self Service'
 	  	)
 	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_lead != -1
+	  	and f.sk_prospect_date != -1
   order by date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('month', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('week', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('day', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD'))
 ),
 all_dates as (
@@ -66,16 +66,16 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as city,
   	count(to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) as monthly_count
 	from fact_supply f
-	join dim_contacts_and_prospects cp
-	  on f.sk_lead = cp.sk_cap_id
-				and ((not(cp.status = 'Descartado'
-	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false
-	  		and f.dt_lead is not null)
-	  	or (cp.self_service is true and f.dt_prospect is not null)
+	join dim_lead dl
+	  on f.sk_lead = dl.sk_lead
+				and ((not(dl.status = 'Descartado'
+	  		and dl.automatically_discarded is true)
+	  		and f.acquisition_method = 'Self-Service'
+	  	  )
+	  	or f.acquisition_method = 'Non-Self Service'
 	  	)
 	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_lead != -1
+	  	and f.sk_prospect_date != -1
   where date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) = date_part('year', add_months(current_date, -1))
   		and date_part('month', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) = date_part('month', add_months(current_date, -1))
   		and date_part('day', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) < date_part('day', current_date)
@@ -89,16 +89,16 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as city,
   	count(to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) as yearly_count
 	from fact_supply f
-	join dim_contacts_and_prospects cp
-	  on f.sk_lead = cp.sk_cap_id
-				and ((not(cp.status = 'Descartado'
-	  		and cp.automatically_discarded is true)
-	  		and cp.self_service is false
-	  		and f.dt_lead is not null)
-	  	or (cp.self_service is true and f.dt_prospect is not null)
+	join dim_lead dl
+	  on f.sk_lead = dl.sk_lead
+				and ((not(dl.status = 'Descartado'
+	  		and dl.automatically_discarded is true)
+	  		and f.acquisition_method = 'Self-Service'
+	  	  )
+	  	or f.acquisition_method = 'Non-Self Service'
 	  	)
 	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_lead != -1
+	  	and f.sk_prospect_date != -1
 	where date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) < date_part('day', add_months(current_date, -12)))
