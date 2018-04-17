@@ -48,7 +48,7 @@ with all_dates as (
 		on dpr.regiao_id = dr.id
 	where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
-		and f.sk_contract_signed_date != -1
+		and dc.dt_signature is not null
 		and dd."date" >= '2017-01-01' and dd."date" < current_date
   order by coalesce(dr.city_name, ''), date_part('year', dd."date"), date_part('month', dd."date"), date_part('week', dd."date"), date_part('day', dd."date")
 ),
@@ -74,7 +74,7 @@ all_dates_last_month as (
 		on dpr.regiao_id = dr.id
 	where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
-		and f.sk_contract_signed_date != -1
+		and dc.dt_signature is not null
 		and dd."date" >= '2017-01-01' and dd."date" < current_date
 		and date_part('year', dd."date") = date_part('year', add_months(current_date, -1))
     and date_part('month', dd."date") = date_part('month', add_months(current_date, -1))
@@ -100,7 +100,7 @@ all_dates_last_year as (
   	on dpr.regiao_id = dr.id
 	where dc.dt_contract_start < current_date
 		and dc.contract_status != 'Cancelado'
-		and f.sk_contract_signed_date != -1
+		and dc.dt_signature is not null
 		and dd."date" >= '2017-01-01' and dd."date" < current_date
     and date_part('year', dd."date") = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dd."date") = date_part('month', add_months(current_date, -12))
