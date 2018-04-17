@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dc.dt_signature) order by dc.id_contract asc)
     	+ dense_rank() over (partition by date_part('year', dc.dt_signature) order by dc.id_contract desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
@@ -45,7 +45,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dc.id_contract) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
@@ -62,7 +62,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dc.id_contract) as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date

@@ -36,13 +36,13 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', dc.dt_signature) order by dc.id_contract desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', dc.dt_signature), date_part('month', dc.dt_signature), date_part('week', dc.dt_signature), date_part('day', dc.dt_signature)
@@ -57,13 +57,13 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dc.id_contract) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
 	join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -1))
@@ -78,13 +78,13 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dc.id_contract) as yearly_count
-  from fact_liquidity_property_scheduling f
+  from fact_demand f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_signature >= '2017-01-01' and dc.dt_signature < current_date
 			and f.sk_contract != -1
   join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', dc.dt_signature) = date_part('year', add_months(current_date, -12))

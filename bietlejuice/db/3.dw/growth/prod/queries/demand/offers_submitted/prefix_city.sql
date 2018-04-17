@@ -36,13 +36,13 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', dof.dt_first_sent) order by dof.sk_offer desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != -1
 	join dim_property dpr
-		on f.sk_property = dpr.sk_property
+		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', dof.dt_first_sent), date_part('month', dof.dt_first_sent), date_part('week', dof.dt_first_sent), date_part('day', dof.dt_first_sent)
@@ -57,13 +57,13 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dof.sk_offer) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != -1
 	join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -1))
@@ -78,13 +78,13 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dof.sk_offer) as yearly_count
-  from fact_liquidity_property_scheduling f
+  from fact_demand f
 	join dim_offer dof
 		on f.sk_offer = dof.sk_offer
 			and dof.dt_first_sent >= '2017-01-01' and dof.dt_first_sent < current_date
 			and f.sk_offer != -1
   join dim_property dpr
-  	on f.sk_property = dpr.sk_property
+  	on f.sk_house = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_first_sent) = date_part('year', add_months(current_date, -12))
