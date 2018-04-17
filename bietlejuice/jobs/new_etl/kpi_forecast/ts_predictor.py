@@ -1,7 +1,8 @@
-import pandas as pd
 from collections import deque
-from statsmodels.tsa.arima_model import ARIMA
+
 import numpy as np
+import pandas as pd
+from statsmodels.tsa.arima_model import ARIMA
 
 
 class Ts_predictor:
@@ -95,7 +96,7 @@ class Ts_predictor:
         # todo : remove specific step:
         ratio7_ts_2y_positive = ratio7_ts.loc[
             (ratio7_ts.index >= pd.Timestamp('1/1/2016')) & (ratio7_ts.index < self.begin_pred) & (
-            ratio7_ts > 0).values]
+                ratio7_ts > 0).values]
 
         self.weekly_seasonality = ratio7_ts_2y_positive.groupby(
             ratio7_ts_2y_positive.index.to_series().dt.weekday).mean()  # should be close to 1 on average
@@ -123,7 +124,8 @@ class Ts_predictor:
         # - shift of (one year*2/3 + 2 years*1/3) to remove the seasonality within the year
         ys = pd.DataFrame(ratio_ts)
         ys = ys[ys.index > pd.to_datetime('2016-01-01')]  # ignore turbulent years
-        ys['datemonth'] = pd.to_datetime((2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
+        ys['datemonth'] = pd.to_datetime(
+            (2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
         ys = ys[ys.iloc[:, 0].notnull()]
         ysm = ys.groupby('datemonth').mean().iloc[:, 0]
         self.yearly_seasonality = ysm.rolling(7, min_periods=1, center=True).mean()
@@ -145,7 +147,8 @@ class Ts_predictor:
         # todo : if not, use the overall yearly seasonality
         if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22 + rolavg_duration, unit='days'),
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
-                                 freq='D', closed=None)).issubset(set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
+                                 freq='D', closed=None)).issubset(
+            set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
             if self.default_yearly_seasonality is not None:
                 print 'not enough data to compute the yearly seasonality of region. Computing using the default.'
                 self.yearly_seasonality = self.default_yearly_seasonality

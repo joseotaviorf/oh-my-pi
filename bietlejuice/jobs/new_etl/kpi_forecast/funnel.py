@@ -1,6 +1,7 @@
-import pandas as pd
 import matplotlib as plt
 import numpy as np
+import pandas as pd
+
 
 class Funnel:
     """
@@ -10,7 +11,8 @@ class Funnel:
 
     def __init__(self,
                  steps,  # deduplication_col	order	predict_with	step	q_threshold
-                 train_df,  # we do not to give any info about the future away. contains lines at most n_training_days old, up to today
+                 train_df,
+                 # we do not to give any info about the future away. contains lines at most n_training_days old, up to today
                  begin_pred,
                  end_pred,
                  range_recent_day,
@@ -51,7 +53,7 @@ class Funnel:
         # we want to determine the time-to-next-step
         # based on processes that have started between 14 days ago and two months before that.
         analysis_df = self.train_df[
-            (self.train_df[self.steps.index[0]] < (self.begin_pred - pd.to_timedelta(14, unit='days'))) & #needed ?
+            (self.train_df[self.steps.index[0]] < (self.begin_pred - pd.to_timedelta(14, unit='days'))) &  # needed ?
             (self.train_df[self.steps.index[0]] >= (self.begin_pred - pd.to_timedelta(14 + 60, unit='days')))].copy()
 
         self.steps['q_threshold'] = np.nan
@@ -71,15 +73,15 @@ class Funnel:
                     analysis_df[predictor_step].notnull() &
                     analysis_df[step].notnull() &
                     (~analysis_df.duplicated(subset=[deduplication_col_step]))
-                ] #we need step and predictor step to be not null to be able to define a duration
-                if t.shape[0]>0:
+                    ]  # we need step and predictor step to be not null to be able to define a duration
+                if t.shape[0] > 0:
                     step_duration_deduplicated = t[step].dt.date - t[predictor_step].dt.date
                     step_duration_deduplicated = step_duration_deduplicated[step_duration_deduplicated.notnull()]
-                    self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(step_duration_deduplicated.quantile(q=.95).days, unit='days')
+                    self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(
+                        step_duration_deduplicated.quantile(q=.95).days, unit='days')
                 else:
                     print 'no durations for step ' + step + '. using default of 10'
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(10, unit='days')
-
 
     def display_step_thresholds(self):
         """display the histogram of the time between a step and its predictor"""
@@ -191,8 +193,10 @@ class Funnel:
                 # !! at the time of begin_pred !!
                 # and count them by predictor_step_date
                 sel = self.recent_df[self.recent_df[predictor_step].notnull() &  # have perfomed predictor step
-                                     (self.recent_df[predictor_step] < self.begin_pred) &  # have performed it before at the time of the prediction
-                                     (self.recent_df['last_step_order'] < step_order)]  # have not preformed the step to be predicted or any step further
+                                     (self.recent_df[
+                                          predictor_step] < self.begin_pred) &  # have performed it before at the time of the prediction
+                                     (self.recent_df[
+                                          'last_step_order'] < step_order)]  # have not preformed the step to be predicted or any step further
 
                 col = sel.groupby(pd.to_datetime(self.recent_df[predictor_step].dt.date)).size()
                 col = col.rename(step)
@@ -286,7 +290,7 @@ class Funnel:
                     weekday = predictor_step_date.weekday()
                     # we know that the applications made at this date stayed idle at least until
                     # the morning of begin_pred. no event can be predicted backwards before begin_pred
-                    min_days_to_next_event = (self.begin_pred - predictor_step_date) / pd.to_timedelta(1,unit='days')
+                    min_days_to_next_event = (self.begin_pred - predictor_step_date) / pd.to_timedelta(1, unit='days')
                     distrib = self.distribs.loc[(predictor_step, float(weekday), step), 'distrib']
                     samples = self.distribs.loc[(predictor_step, float(weekday), step), 'samples']
                     if samples < self.min_samples and self.default_distribs is not None:

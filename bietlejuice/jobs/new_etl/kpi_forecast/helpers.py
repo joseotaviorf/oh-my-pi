@@ -1,8 +1,8 @@
-import pandas as pd
-import boto3
 import io
-import botocore
 
+import boto3
+import botocore
+import pandas as pd
 
 s3 = boto3.resource('s3')
 def get_file_from_s3(file_name_s3, file_name_local):
