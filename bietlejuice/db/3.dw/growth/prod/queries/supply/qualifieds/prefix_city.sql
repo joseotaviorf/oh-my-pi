@@ -36,7 +36,7 @@ with all_dates_prev as (
     	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_qualified) order by f.cap_id desc)
 			- 1 as yearly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date
@@ -71,7 +71,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.dt_qualified) as monthly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date
@@ -92,7 +92,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.dt_qualified) as yearly_count
-  from fact_supply_potential_listings f
+  from fact_supply f
 	join dim_contacts_and_prospects cap
 		on f.cap_id = cap.sk_cap_id
 		  and f.dt_qualified >= '2017-01-01' and f.dt_qualified < current_date

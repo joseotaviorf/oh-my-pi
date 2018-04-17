@@ -36,7 +36,7 @@ with all_dates_prev as (
     	+ rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', f.dt_lead_and_prospect) order by f.cap_id desc)
 			- 1 as yearly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
@@ -77,7 +77,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.dt_lead_and_prospect) as monthly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
@@ -104,7 +104,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.dt_lead_and_prospect) as yearly_count
-  from fact_supply_potential_listings f
+  from fact_supply f
 	join dim_contacts_and_prospects cp
 	  on f.cap_id = cp.sk_cap_id
 				and ((not(cp.status = 'Descartado'
