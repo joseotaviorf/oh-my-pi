@@ -37,20 +37,11 @@ with all_dates_prev as (
     	                                  date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
-	join dim_lead dl
-	  on f.sk_lead = dl.sk_lead
-				and ((not(dl.status = 'Descartado'
-	  		and dl.automatically_discarded is true)
-	  		and f.acquisition_method = 'Self-Service'
-	  	  )
-	  	or f.acquisition_method = 'Non-Self Service'
-	  	)
-	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_prospect_date != -1
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
+	where to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
   order by coalesce(dr.city_name, ''), date_part('year', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('month', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('week', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')), date_part('day', to_date(f.sk_prospect_date::varchar, 'YYYYMMDD'))
 ),
 all_dates as (
@@ -78,16 +69,6 @@ all_dates_last_month as (
     coalesce(dr.city_name, '') as city,
     count(to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) as monthly_count
 	from fact_supply f
-	join dim_lead dl
-	  on f.sk_lead = dl.sk_lead
-				and ((not(dl.status = 'Descartado'
-	  		and dl.automatically_discarded is true)
-	  		and f.acquisition_method = 'Self-Service'
-	  	  )
-	  	or f.acquisition_method = 'Non-Self Service'
-	  	)
-	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_prospect_date != -1
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
 	left join dim_region dr
@@ -105,16 +86,6 @@ all_dates_last_year as (
     coalesce(dr.city_name, '') as city,
     count(to_date(f.sk_prospect_date::varchar, 'YYYYMMDD')) as yearly_count
   from fact_supply f
-	join dim_lead dl
-	  on f.sk_lead = dl.sk_lead
-				and ((not(dl.status = 'Descartado'
-	  		and dl.automatically_discarded is true)
-	  		and f.acquisition_method = 'Self-Service'
-	  	  )
-	  	or f.acquisition_method = 'Non-Self Service'
-	  	)
-	  	and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_prospect_date::varchar, 'YYYYMMDD') < current_date
-	  	and f.sk_prospect_date != -1
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
