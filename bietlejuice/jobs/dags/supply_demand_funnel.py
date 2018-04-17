@@ -578,10 +578,10 @@ ods_property_scheduling = BaseDAG.get_quintoandar_python_operator(
 )
 
 ods_house_rental_flow = BaseDAG.get_quintoandar_python_operator(
-    task_id='ODS_house_rental_flow',
+    task_id='ODS_house_rent_flow',
     dag=main_dag,
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'house_rental_flow', 'command': 'call ebdb.list_house_rental_flow();'}
+    op_kwargs={'dim_name': 'house_rent_flow', 'command': 'call ebdb.list_house_rent_flow();'}
 )
 
 ods_potential_listings = BaseDAG.get_quintoandar_python_operator(
