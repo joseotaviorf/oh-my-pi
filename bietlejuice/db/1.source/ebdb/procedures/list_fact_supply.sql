@@ -16,6 +16,7 @@ select
 	photographer_id,
 	dt_lead,
 	dt_prospect,
+	dt_first_inside_sales_contact,
 	dt_conversion, -- for inside sales analysis
 	dt_qualified,
 	dt_opportunity,
@@ -46,16 +47,22 @@ select
 	end as funnel_step,
 	TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect) as lead_to_prospect_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified) as prospect_to_qualified_diff_minutes,
+	TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact) as lead_to_first_inside_sales_contact_diff_minutes,
+  TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact) as prospect_to_first_inside_sales_contact_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity) as qualified_to_opportunity_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing) as opportunity_to_listing_diff_minutes,
   TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing) as lead_to_listing_diff_minutes,
 	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/60,1) as lead_to_prospect_diff_hours,
   round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/60,1) as prospect_to_qualified_diff_hours,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/60,1) as lead_to_first_inside_sales_contact_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/60,1) as prospect_to_first_inside_sales_contact_diff_hours,
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/60,1) as qualified_to_opportunity_diff_hours,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/60,1) as opportunity_to_listing_diff_hours,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/60,1) as lead_to_listing_diff_hours,
 	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/1440,1) as lead_to_prospect_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/1440,1) as prospect_to_qualified_diff_days,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/1440,1) as lead_to_first_inside_sales_contact_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/1440,1) as prospect_to_first_inside_sales_contact_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days
@@ -107,6 +114,7 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
+			null as dt_first_inside_sales_contact,
 			null as dt_conversion,
 			from_unixtime(ure.timestamp/1000) as dt_qualified,
 			case
@@ -165,13 +173,18 @@ from
 				when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
 				else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
 			end as dt_prospect,
+			case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
+		    when cl.leadConvertido_id is not null
+		    	then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
+		    else coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
+		  end as dt_first_inside_sales_contact,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
 			case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
 		    when cl.leadConvertido_id is not null
 		    	then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
 		    when l.reason in ('ProprietarioRecusou', 'Exclusivo')
 		    	then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
-		  end as qualified_date,
+		  end as dt_qualified,
 			'Lead Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			case
@@ -256,6 +269,7 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
+			null as dt_first_inside_sales_contact,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
 			from_unixtime(ure.timestamp/1000) as dt_qualified,
 			'Organic Flow' as flow,
