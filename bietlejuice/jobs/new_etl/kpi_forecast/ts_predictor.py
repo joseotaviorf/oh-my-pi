@@ -118,23 +118,26 @@ class Ts_predictor:
         return ts_withweeklyseasonality
 
     def remove_yearly_seasonality_do(self, ts, rolavg_duration=120):
-        # find the yearly seasonality (based on last 2 years, with centered rolling mean)
-        self.rolavg_ts = ts.rolling(rolavg_duration, center=True).mean()
-        ratio_ts = ts / self.rolavg_ts  # should be close to 1 on average, but isnt
-        # - shift of (one year*2/3 + 2 years*1/3) to remove the seasonality within the year
-        ys = pd.DataFrame(ratio_ts)
-        ys = ys[ys.index > pd.to_datetime('2016-01-01')]  # ignore turbulent years
-        ys['datemonth'] = pd.to_datetime(
-            (2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
-        ys = ys[ys.iloc[:, 0].notnull()]
-        ysm = ys.groupby('datemonth').mean().iloc[:, 0]
-        self.yearly_seasonality = ysm.rolling(7, min_periods=1, center=True).mean()
-        self.yearly_seasonality.index = self.yearly_seasonality.index.to_series().dt.strftime('%m-%d')
-
-        #     ### always use the default (test)
-        #     if self.default_yearly_seasonality is not None :
-        #       print 'always using the default because it exists.'
-        #       self.yearly_seasonality = self.default_yearly_seasonality
+        # if there is a default, use it:
+        if self.default_yearly_seasonality is not None:
+            #print 'not enough data to compute the yearly seasonality of region. Computing using the default.'
+            print 'Always computing using the default yearly seasonality.'
+            self.yearly_seasonality = self.default_yearly_seasonality
+            self.own_yearly_seasonality = None
+        else: #compute own yearly seasonality
+            # find the yearly seasonality (based on last 2 years, with centered rolling mean)
+            self.rolavg_ts = ts.rolling(rolavg_duration, center=True).mean()
+            ratio_ts = ts / self.rolavg_ts  # should be close to 1 on average, but isnt
+            # - shift of (one year*2/3 + 2 years*1/3) to remove the seasonality within the year
+            ys = pd.DataFrame(ratio_ts)
+            ys = ys[ys.index > pd.to_datetime('2016-01-01')]  # ignore turbulent years
+            ys['datemonth'] = pd.to_datetime(
+                (2016 * 10000 + ys.index.to_series().dt.month * 100 + ys.index.to_series().dt.day).astype(str))
+            ys = ys[ys.iloc[:, 0].notnull()]
+            ysm = ys.groupby('datemonth').mean().iloc[:, 0]
+            self.yearly_seasonality = ysm.rolling(7, min_periods=1, center=True).mean()
+            self.yearly_seasonality.index = self.yearly_seasonality.index.to_series().dt.strftime('%m-%d')
+            self.own_yearly_seasonality = self.yearly_seasonality
 
         # remove the yearly seasonality
         seasonality_factor_year = self.yearly_seasonality[ts.index.to_series().dt.strftime('%m-%d')].ffill(
@@ -144,26 +147,14 @@ class Ts_predictor:
 
         # check if the last three weeks + rolavg_duration before begin_pred are part of the series.
         # if not, it means we didn't have enough data to compute it :
-        # if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22 + rolavg_duration, unit='days'),
-        #                          self.begin_pred - pd.to_timedelta(1, unit='days'),
-        #                          freq='D', closed=None)).issubset(
-        #     set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
-        if self.default_yearly_seasonality is not None:
-            #print 'not enough data to compute the yearly seasonality of region. Computing using the default.'
-            print 'Always computing using the default yearly seasonality.'
-            self.yearly_seasonality = self.default_yearly_seasonality
-            self.own_yearly_seasonality = None
-            # remove the yearly seasonality (repeating a few lines from above)
-            seasonality_factor_year = self.yearly_seasonality[ts.index.to_series().dt.strftime('%m-%d')].ffill(
-                limit=3).bfill(limit=3)  # we allow a limited number of missing values
-            seasonality_factor_year.index = ts.index
-            ts_noYseasonality = ts.divide(seasonality_factor_year)
-        else:
-            print 'not enough data to compute the yearly seasonality of region and no default. Computing without'
+        if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22 + rolavg_duration, unit='days'),
+                                 self.begin_pred - pd.to_timedelta(1, unit='days'),
+                                 freq='D', closed=None)).issubset(
+            set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
+            print 'not enough data to compute/use the yearly seasonality. Computing without'
             self.model_yearly_seasonality = False
             ts_noYseasonality = ts
-        # else:
-        #     self.own_yearly_seasonality = self.yearly_seasonality
+
         return ts_noYseasonality
 
     def remove_yearly_seasonality_undo(self, ts):  # series we want to add the yearly seasonality to
