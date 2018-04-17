@@ -69,7 +69,7 @@ def get_default_parameters(city, region):
         pass
 
     elif region == 'all':
-        # city level. only possible default is the global level. try to find yearly and weekly seasonality
+        # city level. only possible default is the global level
         if get_file_from_s3('KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d")),
                             'global_default_yearly_seasonality.p'):
             default_yearly_seasonality = pd.read_pickle('global_default_yearly_seasonality.p')
@@ -80,10 +80,10 @@ def get_default_parameters(city, region):
 
     else:
         #region level. default is city level, if not available then use the global level
-        if get_file_from_s3('KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d"),city),
-                            'city_default_yearly_seasonality.p'):
-            default_yearly_seasonality = pd.read_pickle('city_default_yearly_seasonality.p')
-        elif get_file_from_s3('KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d")),
+        # if get_file_from_s3('KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d"),city),
+        #                     'city_default_yearly_seasonality.p'):
+        #     default_yearly_seasonality = pd.read_pickle('city_default_yearly_seasonality.p')
+        if get_file_from_s3('KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d")),
                               'global_default_yearly_seasonality.p'):
             default_yearly_seasonality = pd.read_pickle('global_default_yearly_seasonality.p')
 
