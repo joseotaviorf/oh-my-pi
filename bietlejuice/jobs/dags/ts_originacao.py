@@ -86,5 +86,5 @@ dag = DAG(
 PythonOperator(
     dag=dag,
     task_id='originacao',
-    func_command=originacao
+    python_callable=originacao
 )
