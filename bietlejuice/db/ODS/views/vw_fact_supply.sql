@@ -101,17 +101,17 @@ select
 	coalesce(to_char(f.dt_opportunity::date,'YYYYMMDD')::integer, -1) as sk_opportunity_date,
 	coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
 	case
-		when d.imovel_id is not null
+		when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 		then 'Lead Flow'
 		else f.flow
 	end as flow,
 	case
-		when d.imovel_id is not null
+		when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 		then 'Non-Self Service'
 		else f.acquisition_method
 	end as acquisition_method,
 	case
-		when d.imovel_id is not null
+		when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 		then 'Doorman'
 		else f.acquisition_channel
 	end as acquisition_channel,

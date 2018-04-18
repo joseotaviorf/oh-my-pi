@@ -85,6 +85,7 @@ from
 		photographer.id as photographer_id,
 		base.dt_lead,
 		base.dt_prospect,
+		base.dt_first_inside_sales_contact,
 		base.dt_conversion,
 		case
 			when (base.lead_status = 'Descartado' and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null)
@@ -173,11 +174,7 @@ from
 				when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
 				else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
 			end as dt_prospect,
-			case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
-		    when cl.leadConvertido_id is not null
-		    	then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
-		    else coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
-		  end as dt_first_inside_sales_contact,
+			isc.dt dt_first_inside_sales_contact,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
 			case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
 		    when cl.leadConvertido_id is not null
@@ -188,7 +185,7 @@ from
 			'Lead Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			case
-				when uda.id = 279289 then 'Doorman'
+				when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
 		    when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
 		    when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
 		    when l.tipo = 'Afiliado' and l.origem = 'Planilha' then 'Affiliate Spreadsheet'
@@ -247,6 +244,24 @@ from
 		left join
 		 	(select max(REV) as REV, id from Lead_AUD group by id) has_aud
 		 	on has_aud.id = l.id
+		left join
+			(
+				select
+					la.id,
+					min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
+				from
+					Lead_AUD la
+				left join
+					UsuarioRevisionEntity ure
+					on ure.id = la.REV
+				left join
+					Usuario u
+					on u.id = ure.usuario_id
+				where
+					(u.dadosVendedor_id is not null)
+				group by la.id
+			) isc
+			on isc.id = l.id
 		left join
 		  DadosAfiliado da
 		  on da.id = l.afiliadoQueIndicou_id
