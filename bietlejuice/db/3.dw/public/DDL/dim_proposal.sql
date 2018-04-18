@@ -22,5 +22,6 @@ CREATE TABLE dim_proposal (
   dt_tenant_first_document_sent TIMESTAMP,
   dt_credit_analysis_init TIMESTAMP,
   dt_credit_analysis_end TIMESTAMP,
+  status_sortinghat VARCHAR(50)
   CONSTRAINT dim_proposal_pkey PRIMARY KEY(sk_proposal)
 ) ;

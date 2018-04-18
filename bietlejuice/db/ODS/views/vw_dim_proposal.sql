@@ -98,7 +98,8 @@ select
   now()::timestamp as dt_timestamp,
   p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
   shp.first_analysis_date as dt_credit_analysis_init,
-  shp.process_date as dt_credit_analysis_end
+  shp.process_date as dt_credit_analysis_end,
+  shp.status as status_sortinghat
 from proposal p
 left join sortinghat_prop shp
   on shp.id = p.id
