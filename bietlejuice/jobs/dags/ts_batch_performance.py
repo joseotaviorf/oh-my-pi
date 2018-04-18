@@ -13,18 +13,20 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from ts_monitoring.processing import compute_performance_table, format_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-batch_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
-#bucket = '5a-datalake'  # for testing without airflow
-# from bietlejuice.jobs.dags.util import environment as env
-start_date = '20180209'  # todo : parameters of airflow?
-end_date = '20180405'
+MAIN_SCHEDULE_INTERVAL = '@once'
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
+end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')# comment for testing without airflow
+# bucket = '5a-datalake'  # for testing without airflow
+
+# start_date = '20180409'  # todo : parameters of airflow?
+# end_date = '20180415'
 
 
 def batch_performance():
@@ -65,8 +67,8 @@ def batch_performance():
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
 
 
-if __name__ == "__main__":
-    batch_performance()
+# if __name__ == "__main__":
+#     batch_performance()
 
 # DAG
 
@@ -79,7 +81,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 PythonOperator(
