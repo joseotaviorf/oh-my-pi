@@ -17,7 +17,7 @@ from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performanc
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
+MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
