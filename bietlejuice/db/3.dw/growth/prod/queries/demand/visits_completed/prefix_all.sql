@@ -1,0 +1,80 @@
+with all_dates as (
+  select distinct
+    date_part('year', db.dt_scheduling) as _year,
+    date_part('month', db.dt_scheduling) as _month,
+    date_part('week', db.dt_scheduling) as _week,
+    date_part('day', db.dt_scheduling) as _day,
+    'QuintoAndar'::varchar as region,
+    'QuintoAndar'::varchar as city,
+    dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																date_part('month', db.dt_scheduling),
+    																date_part('week', db.dt_scheduling),
+    																date_part('day', db.dt_scheduling) order by db.id_booking asc)
+    	+ dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																		date_part('month', db.dt_scheduling),
+    																		date_part('week', db.dt_scheduling),
+    																		date_part('day', db.dt_scheduling) order by db.id_booking desc)
+			- 1 as daily_count,
+    dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																date_part('week', db.dt_scheduling) order by db.id_booking asc)
+    	+ dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																		date_part('week', db.dt_scheduling) order by db.id_booking desc)
+			- 1 as weekly_count,
+    dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																date_part('month', db.dt_scheduling) order by db.id_booking asc)
+    	+ dense_rank() over (partition by date_part('year', db.dt_scheduling),
+    																		date_part('month', db.dt_scheduling) order by db.id_booking desc)
+			- 1 as monthly_count,
+    dense_rank() over (partition by date_part('year', db.dt_scheduling) order by db.id_booking asc)
+    	+ dense_rank() over (partition by date_part('year', db.dt_scheduling) order by db.id_booking desc)
+			- 1 as yearly_count
+	from fact_demand f
+	join dim_booking db
+		on f.sk_booking = db.sk_booking
+			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
+			and f.sk_booking != -1
+  order by date_part('year', db.dt_scheduling), date_part('month', db.dt_scheduling), date_part('week', db.dt_scheduling), date_part('day', db.dt_scheduling)
+),
+all_dates_last_week as (
+	select 1
+),
+all_dates_last_month as (
+	select
+	 	date_part('year', db.dt_scheduling) as _year,
+	  date_part('month', db.dt_scheduling) as _month,
+	  'QuintoAndar'::varchar as region,
+	  'QuintoAndar'::varchar as city,
+  	count(distinct db.id_booking) as monthly_count
+	from fact_demand f
+	join dim_booking db
+		on f.sk_booking = db.sk_booking
+			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
+			and f.sk_booking != -1
+  where date_part('year', db.dt_scheduling) = date_part('year', add_months(current_date, -1))
+  		and date_part('month', db.dt_scheduling) = date_part('month', add_months(current_date, -1))
+  		and date_part('day', db.dt_scheduling) < date_part('day', current_date)
+  group by date_part('year', db.dt_scheduling), date_part('month', db.dt_scheduling)
+  order by date_part('year', db.dt_scheduling), date_part('month', db.dt_scheduling)
+),
+all_dates_last_year as (
+	select
+	 	date_part('year', db.dt_scheduling) as _year,
+	  'QuintoAndar'::varchar as region,
+	  'QuintoAndar'::varchar as city,
+  	count(distinct db.id_booking) as yearly_count
+	from fact_demand f
+	join dim_booking db
+		on f.sk_booking = db.sk_booking
+			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
+			and f.sk_booking != -1
+	where date_part('year', db.dt_scheduling) = date_part('year', add_months(current_date, -12))
+  		and ((date_part('month', db.dt_scheduling) = date_part('month', add_months(current_date, -12))
+  		      and date_part('day', db.dt_scheduling) < date_part('day', add_months(current_date, -12)))
+  		  or date_part('month', db.dt_scheduling) < date_part('month', add_months(current_date, -12))
+  		  )
+  group by date_part('year', db.dt_scheduling)
+  order by date_part('year', db.dt_scheduling)
+),

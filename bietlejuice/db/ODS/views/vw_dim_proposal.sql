@@ -1,0 +1,106 @@
+drop view if exists vw_dim_proposal;
+create or replace view vw_dim_proposal as
+with sortinghat_prop_prev as (
+	select
+		p.id,
+		p.imovel_id,
+		p.analysis_date,
+		p.score_5a,
+		p.score_5a_best_subset,
+		p.score_cardif,
+	  p.score_cardif_best_subset,
+	  p.status,
+	  p."comment",
+	  p.analyst_name,
+	  p.supervisor_name,
+	  p.rent_value,
+	  p.condo_value,
+	  p.iptu_value,
+	  p.created_at,
+	  p.updated_at,
+	  p.home_area,
+	  p.home_bathrooms,
+	  p.home_bedrooms,
+	  p.home_city,
+	  p.home_garages,
+	  p.home_region,
+	  p.home_suites,
+	  p.home_type,
+	  p.home_zipcode,
+	  p.drive_id,
+	  p.rejection_motive,
+	  p.home_insurance_value,
+	  p.risk_level,
+	  p.risk_level_best_subset,
+	  p.process_date,
+	  pv.analysis_date as version_analysis_date,
+		row_number() over (partition by p.id order by pv.id) as rn
+	from sortinghat.proposal p
+	left join sortinghat.proposalversion pv
+		on p.id = pv.proposal_id
+),
+sortinghat_prop as (
+  select
+  	id,
+  	imovel_id,
+  	analysis_date,
+  	score_5a,
+  	score_5a_best_subset,
+  	score_cardif,
+    score_cardif_best_subset,
+    status,
+    "comment",
+    analyst_name,
+    supervisor_name,
+    rent_value,
+    condo_value,
+    iptu_value,
+    created_at,
+    updated_at,
+    home_area,
+    home_bathrooms,
+    home_bedrooms,
+    home_city,
+    home_garages,
+    home_region,
+    home_suites,
+    home_type,
+    home_zipcode,
+    drive_id,
+    rejection_motive,
+    home_insurance_value,
+    risk_level,
+    risk_level_best_subset,
+    process_date,
+    coalesce(version_analysis_date, analysis_date) as first_analysis_date
+  from sortinghat_prop_prev
+  where rn = 1
+)
+select
+  p.id as sk_proposal,
+  p.id as id_proposal,
+  p."dataProposta" as dt_proposal,
+  p.garantia as guarantee,
+  p."propostaAluguel" as renting_proposal_value ,
+  p.status,
+  p."dataAprovacao" as dt_proposal_approved,
+  p."inquilinoEnviouDocumentos" as tenant_document_sent,
+  p."dataDocumentosEnviados" as dt_tenant_document_sent,
+  p."proprietarioEnviouDocumentos" as owner_document_sent,
+  p."dataDocumentosProprietarioEnviados" as dt_owner_document_sent,
+  p."inquilinoAceitouContrato" as tenant_contract_accepted,
+  p."proprietarioAceitouContrato" as owner_contract_accepted,
+  p."statusDocumentacaoInq" as status_doc_tenant,
+  p."statusDocumentacaoProp" as status_doc_owner,
+  p."qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
+  p."criadoEm" as dt_created,
+  p."atualizadoEm" as dt_updated,
+  now()::timestamp as dt_timestamp,
+  p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
+  shp.first_analysis_date as dt_credit_analysis_init,
+  shp.process_date as dt_credit_analysis_end,
+  shp.status as status_sortinghat
+from proposal p
+left join sortinghat_prop shp
+  on shp.id = p.id
+;

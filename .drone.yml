@@ -18,7 +18,7 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags -name \*.pyc -delete
+      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       branch: [ forno ]
@@ -36,7 +36,7 @@ pipeline:
       - cd /var/www/airflow/
       - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags -name \*.pyc -delete
+      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       branch: [ master ]
@@ -45,9 +45,10 @@ pipeline:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
-    source: "db jobs"
-    target: /var/www/airflow/dags/
+    source: "bietlejuice/*"
+    target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
+    delete: true
     secrets: [ rsync_key ]
     when:
       branch: [ forno ]
@@ -56,9 +57,10 @@ pipeline:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
-    source: "db jobs"
-    target: /var/www/airflow/dags/
+    source: "bietlejuice/*"
+    target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
+    delete: true
     secrets: [ rsync_key ]
     when:
       branch: [ master ]
