@@ -87,5 +87,5 @@ dag = DAG(
 PythonOperator(
     dag=dag,
     task_id='daily_performance',
-    func_command=daily_performance
+    python_callable=daily_performance
 )
