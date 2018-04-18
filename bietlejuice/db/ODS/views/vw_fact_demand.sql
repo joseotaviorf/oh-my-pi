@@ -4,7 +4,7 @@ with _fact as (
 	select
 		hrf.id_house_rent_flow as ods_id,
 		coalesce((hrf.id_house || lpad(coalesce(pl."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house,
-		coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing,
+		coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
 	  coalesce(i.regiao_id, -1) as sk_region,
 	  coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
 	  coalesce(hrf.id_booking, -1) as sk_booking,
@@ -104,7 +104,7 @@ with _fact as (
 select
   ods_id,
 	sk_house,
-	sk_house_first_listing,
+	sk_house_first_listing_date,
 	sk_region,
 	sk_rent_flow,
 	sk_booking,

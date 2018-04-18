@@ -23,7 +23,7 @@ select
   visit_last_updated_from_app,
   visit_last_updated_type,
   id_rent_flow,
-  dt_rent_flow_created
+  dt_rent_flow_created,
   id_offer,
   dt_offer_approved,
   id_pre_proposal,
@@ -54,6 +54,7 @@ from (
 	  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
 	  coalesce(vo_up.nome, false) as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  _offer.o_id as id_offer,
 	  case
       when _offer.o_status = 'Aprovada'
@@ -180,6 +181,7 @@ from (
 	  null as visit_last_updated_from_app,
 	  null as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  _offer.o_id as id_offer,
 	  case
       when _offer.o_status = 'Aprovada'
@@ -293,6 +295,7 @@ from (
 	  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
 	  coalesce(vo_up.nome, false) as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  _pre_proposal.pp_id as id_pre_proposal,
@@ -415,6 +418,7 @@ from (
 	  null as visit_last_updated_from_app,
 	  null as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  _pre_proposal.pp_id as id_pre_proposal,
@@ -524,6 +528,7 @@ from (
 	  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
 	  coalesce(vo_up.nome, false) as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  null as id_pre_proposal,
@@ -634,6 +639,7 @@ from (
 	  null as visit_last_updated_from_app,
 	  null as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  null as id_pre_proposal,
@@ -731,6 +737,7 @@ from (
 	  null as visit_last_updated_from_app,
 	  null as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  null as id_pre_proposal,
@@ -772,6 +779,7 @@ from (
 	  null as visit_last_updated_from_app,
 	  null as visit_last_updated_type,
 	  fl.id as id_rent_flow,
+	  fl.criadoEm as dt_rent_flow_created,
 	  null as id_offer,
 	  null as dt_offer_approved,
 	  null as id_pre_proposal,
