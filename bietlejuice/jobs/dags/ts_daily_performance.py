@@ -11,9 +11,9 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from ts_monitoring.processing import compute_performance_table, format_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -66,8 +66,8 @@ def daily_performance():
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
 
 
-if __name__ == "__main__":
-    daily_performance()
+# if __name__ == "__main__":
+#     daily_performance()
 
 # DAG
 
@@ -80,7 +80,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 PythonOperator(

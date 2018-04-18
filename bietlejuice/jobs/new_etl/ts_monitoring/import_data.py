@@ -169,7 +169,7 @@ def import_api(client):
     """
     sql_api = '''
     select *, cardinality(name) as n_applicants from datalake_raw.tenant_screening_processed
-    -- where source='prod' -- change to prod
+    -- where source='prod' -- done in code
     '''
     df_api = client.execute_query_and_return_dataframe(sql_api)
     df_api.loc[:, col_float + variables_of_subset + variables_of_property] = df_api.loc[:,
@@ -223,10 +223,10 @@ def import_ebdb_contrato_aud(client):
       c.criadoem as date_creation, -- creation of the line in the table
       ca.dataassinado as date_signature, -- signature of the contract
       ca.datainicio as date_beginning, -- date the tenant can move in and we start to charge
-      ca.datafimcontratoprevisto date_fim_previsto, -- normal date of end of contract. 
+      ca.datafimcontratoprevisto as date_fim_previsto, -- normal date of end of contract. 
       -- (continued) always signature + 30m unless 2nd signature
-      ca.datarescisaoprevista date_rescisao_prevista, -- date in the future at which the contract will be stopped
-      ca.datarescisao date_rescisao, -- end of the contract that has already ended
+      ca.datarescisaoprevista as date_rescisao_prevista, -- date in the future at which the contract will be stopped
+      ca.datarescisao as date_rescisao, -- end of the contract that has already ended
       ca.diamescobranca,
       ca.garantia,
       ca.valoraluguel,
