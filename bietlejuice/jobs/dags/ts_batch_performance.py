@@ -88,5 +88,5 @@ dag = DAG(
 PythonOperator(
     dag=dag,
     task_id='batch_performance',
-    func_command=batch_performance
+    python_callable=batch_performance
 )
