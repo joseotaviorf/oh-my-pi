@@ -139,39 +139,6 @@ def lead_sub_dag(sub_dag_name):
     return local_dag
 
 
-def cap_sub_dag(sub_dag_name):
-    local_dag = BaseDAG.build_dag(
-        '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )
-
-    contacts_and_prospects = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_contacts_and_prospects',
-        func_command=extract_query_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'contacts_and_prospects', 'bucket': bucket,
-                   'command': 'call ebdb.list_contacts_and_prospects();'}
-    )
-
-    dim_contacts_and_prospects = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='DW_contacts_and_prospects',
-        func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'contacts_and_prospects', 'bucket': bucket}
-    )
-
-    test_contacts_and_prospects = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='TEST_dim_contacts_and_prospects',
-        func_command=mock_run_dimension_tests
-    )
-
-    contacts_and_prospects >> dim_contacts_and_prospects >> test_contacts_and_prospects
-
-    return local_dag
-
-
 def photo_job_sub_dag(sub_dag_name):
     local_dag = BaseDAG.build_dag(
         '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
@@ -620,12 +587,6 @@ lead_dag = BaseDAG.get_sub_dag_operator(
     sub_dag_name='Lead'
 )
 
-cap_dag = BaseDAG.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=cap_sub_dag,
-    sub_dag_name='CAP'
-)
-
 photo_job_dag = BaseDAG.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=photo_job_sub_dag,
@@ -686,7 +647,7 @@ booking_dag = BaseDAG.get_sub_dag_operator(
 #     sub_dag_name='Marketing'
 # )
 
-ods_supply.set_upstream([lead_dag, cap_dag, photo_job_dag, region_dag, user_dag, property_dag])
+ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, property_dag])
 ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, property_dag])
 
