@@ -9,26 +9,26 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
     																date_part('month', dp.dt_tenant_first_document_sent),
     																date_part('week', dp.dt_tenant_first_document_sent),
-    																date_part('day', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor asc)
+    																date_part('day', dp.dt_tenant_first_document_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
     																		date_part('month', dp.dt_tenant_first_document_sent),
     																		date_part('week', dp.dt_tenant_first_document_sent),
-    																		date_part('day', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor desc)
+    																		date_part('day', dp.dt_tenant_first_document_sent) order by f.sk_client desc)
 			- 1 as daily_count,
     dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
-    																date_part('week', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor asc)
+    																date_part('week', dp.dt_tenant_first_document_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
-    																		date_part('week', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor desc)
+    																		date_part('week', dp.dt_tenant_first_document_sent) order by f.sk_client desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
-    																date_part('month', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor asc)
+    																date_part('month', dp.dt_tenant_first_document_sent) order by f.sk_client asc)
     	+ dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent),
-    																		date_part('month', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor desc)
+    																		date_part('month', dp.dt_tenant_first_document_sent) order by f.sk_client desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor asc)
-    	+ dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent) order by f.sk_user_visitor desc)
+    dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent) order by f.sk_client asc)
+    	+ dense_rank() over (partition by date_part('year', dp.dt_tenant_first_document_sent) order by f.sk_client desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -44,8 +44,8 @@ all_dates_last_month as (
 	  date_part('month', dp.dt_tenant_first_document_sent) as _month,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_user_visitor) as monthly_count
-	from fact_liquidity_property_scheduling f
+  	count(distinct f.sk_client) as monthly_count
+	from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -61,8 +61,8 @@ all_dates_last_year as (
 	 	date_part('year', dp.dt_tenant_first_document_sent) as _year,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_user_visitor) as yearly_count
-	from fact_liquidity_property_scheduling f
+  	count(distinct f.sk_client) as yearly_count
+	from fact_demand f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date

@@ -231,7 +231,7 @@ def format_performance_table(output_performance):
 
 
 def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh, df_proponents_of_proposal,
-                             df_api_last):  # **context):
+                             df_api_last):
     """
     computes the originacao table as it was at the end of yesterday.
     the originacao table provides, for every proposal, information related to the proposal, to the last request sent to the api, to the decision made, etc

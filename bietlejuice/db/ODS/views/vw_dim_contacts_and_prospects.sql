@@ -67,8 +67,8 @@ select
   cap.usuario_que_cadastrou_id,
   cap.self_service,
   case
-  	when usuario_que_indicou_id=279289 then 'Doorman'
-  	when d.imovel_id is not null then 'Doorman'
+  	when usuario_que_indicou_id=279289 and attribution_type <> 'Reprocessed' then 'Doorman'
+  	when d.imovel_id is not null and attribution_type <> 'Reprocessed'  then 'Doorman'
   	else cap.attribution_type
   end::varchar(100) as attribution_type,
   cap.flow,

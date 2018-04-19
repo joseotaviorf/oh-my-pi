@@ -1,18 +1,17 @@
 drop view if exists public.vw_dim_property;
-create or replace view public.vw_dim_property
-as
 
-with de_published_dates as ( 
-    select distinct 
-        vpl.id, 
-        vpl.version, 
-        vpl.min_version_time, 
-        vpl.max_version_time, 
+create or replace view public.vw_dim_property as
+with de_published_dates as (
+    select distinct
+        vpl.id,
+        vpl.version,
+        vpl.min_version_time,
+        vpl.max_version_time,
         vpl.status as last_status_version,
         vpl.start_version_category,
         vpl.end_version_category,
         vpl.is_last_version,
-        ish.status_history, 
+        ish.status_history,
         max(ish.status_time) over (partition by ish.id, vpl.version) as de_publication_date
     from public.property_listing vpl
     left join imovel_status_history ish
@@ -37,7 +36,6 @@ imovel_dates as
     pl.end_version_category,
     pl.is_last_version,
 	  min(b."criadoEm") AS first_booking_date,
-
 	  min(b."criadoEm")
 	  	filter (
 				where
@@ -45,13 +43,11 @@ imovel_dates as
 					AND b."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		as version_first_booking_date,
-
 		min(b."criadoEm")
 			filter (
 				where b.status::text <> 'Canceled'
 			)
 		as first_booking_confirmed_date,
-
 		min(b."criadoEm")
 			filter (
 				where	b.status::text <> 'Canceled'
@@ -59,22 +55,18 @@ imovel_dates as
 				and b."criadoEm" <= coalesce(pl.max_version_time::timestamp, now())
 			)
 		as version_first_booking_confirmed_date,
-
 		min(v.dia) AS first_visit_date,
-
 		min(v.dia)
 			filter (
 				where v.dia > coalesce(pl.min_version_time,'2000-01-01 00:00:00'::timestamp)
 				and v.dia <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		AS version_first_visit_date,
-
 		min(v.dia)
 			filter (
 				where	b.status::text <> 'Canceled'
 			)
 		AS first_visit_confirmed_date,
-
 		min(v.dia)
 			filter (
 				where b.status::text <> 'Canceled'
@@ -82,9 +74,7 @@ imovel_dates as
 				and v.dia <= coalesce(pl.max_version_time::timestamp, now())
 			)
 		as version_first_visit_confirmed_date,
-
 		min(pp."criadoEm"::timestamp) AS first_pre_proposal_date,
-
 		min(pp."criadoEm"::timestamp)
 			filter (
 				where
@@ -92,13 +82,11 @@ imovel_dates as
 					and pp."criadoEm"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		as version_first_pre_proposal_date,
-
 	 	min(p."criadoEm")
 	 		filter (
 	 			where p."statusDocumentacaoInq" = 'RecusadoCardiff'
  			)
  		as first_proposal_refused_by_insurance_date,
-
     min(p."criadoEm")
     	filter (
 				where p."statusDocumentacaoInq"::text = 'RecusadoCardiff'::text
@@ -106,92 +94,72 @@ imovel_dates as
 				and p."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		as version_first_proposal_refused_by_insurance_date,
-
     min(p."criadoEm") AS first_proposal_accepted_date,
-
   	min(p."criadoEm")
   		filter (
 				where p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and p."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		as version_first_proposal_accepted_date,
-
     min(c."criadoEm") AS first_contract_date,
-
   	min(c."criadoEm")
 	  	filter (
 				where c."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and c."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		AS version_first_contract_date,
-
     min(c."dataAssinado") AS first_signed_contract_date,
-
     min(c."dataAssinado")
     	FILTER (
     		where c."dataAssinado" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
     		AND c."dataAssinado" <= COALESCE(pl.max_version_time::timestamp, now())
   		)
 		AS version_first_signed_contract_date,
-
     min(p."dataDocumentosEnviados"::timestamp) as first_document_sent_date,
-
     min(p."dataDocumentosEnviados"::timestamp)
     	FILTER (
 				WHERE p."dataDocumentosEnviados"::timestamp >	COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				AND p."dataDocumentosEnviados"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
 			)
 		AS version_first_document_sent_date,
-
     max(p."dataDocumentosEnviados"::timestamp) as last_document_sent_date,
-
     max(p."dataDocumentosEnviados"::timestamp)
     	FILTER (
         WHERE p."dataDocumentosEnviados"::timestamp > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 	    	AND p."dataDocumentosEnviados"::timestamp <= COALESCE(pl.max_version_time::timestamp, now())
   		)
 	  AS version_last_document_sent_date
-
 	FROM
 		imovel im
-
 	JOIN
 		public.property_listing pl
 		ON pl.id = im.id
-	
-	LEFT JOIN 
-		booking b 
+	LEFT JOIN
+		booking b
 		ON b.imovel_id = im.id
-	         
-	LEFT JOIN 
-		visit v 
+	LEFT JOIN
+		visit v
 		ON v.id = b.visita_id
-	
-	LEFT JOIN 
-		rental_flow fl 
+	LEFT JOIN
+		rental_flow fl
 		ON fl.id = b."fluxoLocacao_id"
-	         
-	LEFT JOIN 	
-		pre_proposal pp 
+	LEFT JOIN
+		pre_proposal pp
 		ON fl.imovel_id = pp.imovel_id
-	
-	LEFT JOIN 
+	LEFT JOIN
 		proposal p
 		ON p."preProposta_id" = pp.id
-	
-	LEFT JOIN 
-		contract c 
+	LEFT JOIN
+		contract c
 		ON c.proposta_id = p.id
-
 	LEFT JOIN
 	    de_published_dates ud
 	    ON ud.id = pl.id
 	      AND ud.version = pl.version
-		
-	GROUP BY 
-		im.id, 
-		pl.version, 
-		pl.min_version_time, 
+	GROUP BY
+		im.id,
+		pl.version,
+		pl.min_version_time,
 		pl.max_version_time,
     pl.status,
     pl.min_version_time::date,
@@ -202,7 +170,7 @@ imovel_dates as
     pl.is_last_version,
 		ud.de_publication_date
 )
-SELECT 
+SELECT
 	((i.id || '00') || COALESCE(imovel_dates.version, 1))::bigint AS sk_property,
   i.id,
   imovel_dates.version,
@@ -345,7 +313,6 @@ SELECT
   imovel_dates.version_first_signed_contract_date,
   imovel_dates.version_first_document_sent_date,
   imovel_dates.version_last_document_sent_date,
-  
   date_part('epoch', imovel_dates.first_booking_confirmed_date - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_booking_realized,
   date_part('epoch', imovel_dates.first_signed_contract_date - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_contract_signed,
   date_part('epoch', imovel_dates.first_document_sent_date - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_documentation_sent,
@@ -353,7 +320,6 @@ SELECT
   date_part('epoch', imovel_dates.first_pre_proposal_date - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_offer_submited,
   date_part('epoch', imovel_dates.first_proposal_accepted_date - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_refuse_by_security,
   date_part('epoch', imovel_dates.first_visit_date::timestamp - COALESCE(h.dt_first_publication, i.first_publication)) / 86400 AS time_listing_created_to_first_visit_realized,
-  
   coalesce(imovel_dates.nr_listing, 0) as nr_listing,
   coalesce(imovel_dates.nr_renting, 0) as nr_renting,
   i.info_visita_autorizacao_de_entrada,
@@ -365,21 +331,19 @@ SELECT
   i.atualizado_em,
   now() AS load_timestamp,
   i.usuario_que_cadastrou_id,
-  
   i.imovel_v3 as property_v3,
-
   i.area_total as total_area,
   i.area_terreno as contruction_area,
   i.unpublished_reason as unpublished_reason,
   imovel_dates.start_version_category,
   imovel_dates.end_version_category,
-  imovel_dates.is_last_version
-
-
-from 
+  imovel_dates.is_last_version,
+  f.lead_to_listing_diff_minutes,
+  f.lead_to_listing_diff_hours,
+  f.lead_to_listing_diff_days
+from
 	imovel i
-     
-left join 
+left join
 	(
 	  select
 	  	a.id,
@@ -387,9 +351,11 @@ left join
 	  from imovel_status_history a
 	  where a.published = 1
 	  group by a.id
-	) h 
+	) h
 	ON h.id = i.id
-    
-left join 
-	imovel_dates 
-	ON imovel_dates.id = i.id;
+left join
+	imovel_dates
+	ON imovel_dates.id = i.id
+left join
+	fact_supply f
+	on f.imovel_id = i.id

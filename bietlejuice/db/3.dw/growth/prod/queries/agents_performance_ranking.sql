@@ -1,34 +1,35 @@
+insert into growth.agents_performance_ranking
 with counts as (
 	select
 		sk_user_agent as agent_id,
 		u.nome as agent_name,
 		r.greater_region,
-		count(distinct(nullif(sk_visit,-1)))::decimal(10,4) as booked_visits,
+		count(distinct(nullif(liq.sk_visit,-1)))::decimal(10,4) as booked_visits,
 		count(distinct(nullif(c.sk_contract,-1)))::decimal(10,4) as signed_contracts,
-		count(distinct(nullif(sk_visit_date,-1))) as days_worked
-	from 
-		public.fact_liquidity_property_scheduling liq
-	left join 
-		public.dim_date dd 
-		on dd.sk_date = liq.sk_visit_date
-	left join 
-		public.dim_property p 
-		on p.sk_property = liq.sk_property
-	left join 
-		public.dim_region r 
+		count(distinct(nullif(v.day_visit,-1))) as days_worked
+	from
+		public.fact_demand liq
+	left join
+		public.dim_visit v
+		on v.sk_visit = liq.sk_visit
+	left join
+		public.dim_property p
+		on p.sk_property = liq.sk_house
+	left join
+		public.dim_region r
 		on r.sk_region = p.regiao_id
-	left join 
-		public.dim_user u 
+	left join
+		public.dim_user u
 		on u.sk_user = liq.sk_user_agent
-	left join 
-		public.dim_contract c 
+	left join
+		public.dim_contract c
 		on c.sk_contract = liq.sk_contract
 		and c.dt_signature::date < current_date
-	where 
+	where
 		sk_user_agent<>-1
-	and	dd."date" >= current_date - interval '6 weeks'
-	and dd."date" < current_date - interval '2 weeks'
-	and (liq.sk_contract_signed_date <> -1 or liq.sk_contract = -1)
+	and	v.day_visit >= current_date - interval '6 weeks'
+	and v.day_visit < current_date - interval '2 weeks'
+	and (c.dt_signature::date is not null or liq.sk_contract = -1)
 	group by sk_user_agent, agent_name, r.greater_region
 ),
 ratios as (
@@ -75,7 +76,7 @@ limits as (
 	group by greater_region, commission
 )
 select
-  coalesce(to_char((current_date)::date,'YYYYMMDD')::integer, -1) as sk_date,
+  coalesce(to_char(current_date,'YYYYMMDD')::integer, -1) as sk_date,
 	c.agent_id as agent_id,
 	c.agent_name as agent_name,
 	c.greater_region as greater_region,

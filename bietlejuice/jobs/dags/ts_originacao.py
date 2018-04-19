@@ -10,20 +10,24 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from ts_monitoring.import_data import import_ebdb_proposta, import_sortinghat_proposal, import_sortinghat_proponent, \
-    import_api, import_ebdb_contrato
-from ts_monitoring.processing import compute_originacao_table, format_originacao_table
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_originacao_table, format_originacao_table
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import \
+    import_ebdb_proposta, \
+    import_sortinghat_proposal, \
+    import_sortinghat_proponent, \
+    import_api, \
+    import_ebdb_contrato
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
 
 MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = timedelta(days=1)
+MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
-#bucket = '5a-datalake'#for testing without airflow
-# from bietlejuice.jobs.dags.util import environment as env
+# bucket = '5a-datalake'#for testing without airflow
+# from jobs.dags.util import environment as env
 
 def originacao():
     """
@@ -61,8 +65,8 @@ def originacao():
     write_to_s3(pbi_query, 'queries/pbi_originacao_query.txt')
 
 
-if __name__ == "__main__":
-    originacao()
+# if __name__ == "__main__":
+#     originacao()
 
 # DAG
 
@@ -75,11 +79,12 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 PythonOperator(
     dag=dag,
     task_id='originacao',
-    func_command=originacao
+    python_callable=originacao
 )

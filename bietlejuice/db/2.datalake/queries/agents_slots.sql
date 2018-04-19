@@ -32,7 +32,7 @@ with weekly_schedule_prev as (
 		lag(available_slot) over (partition by agent_id, dow, slot_number order by dt_update) as previous_status
 	from
 		weekly_schedule_prev
-), specific_schedule_full as (
+), specific_schedule as (
 	select distinct
 		agente_id as agent_id,
 		max(cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key)  as dt_update,
@@ -60,16 +60,7 @@ with weekly_schedule_prev as (
 				disponivel19as20,disponivel19as20,disponivel19as20,disponivel19as20
 			]
 		) as t(key, value)
-),
-specific_schedule as (
-	select
-		*
-	from
-		specific_schedule_full
-	where cast(dt_update as timestamp) <= slot_dt
-)
---select * from specific_schedule where agent_id='17' and date(slot_dt) = date('2017-11-08');
-, ss_visits as (
+), ss_visits as (
 	select distinct
 		a.agente_id as agent_id,
 		date_add('minute',15 * cast(a.slotdia as integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') as date) as timestamp))) as slot_dt
@@ -107,23 +98,21 @@ specific_schedule as (
 	    unnest(date_array) as t2(date_column)
 	where
 		hour(cast(date_column AS timestamp)) between 7 and 21
-		and cast(date_column AS timestamp) >= cast('2017-01-01' AS timestamp)
+		and cast(date_column AS timestamp) >= cast('2015-01-01' AS timestamp)
 ), schedule_versions as (
 	select
 		agent_id,
 		dt_update,
 		cast(dow as bigint) as dow,
 		available_slot,
-		case when dt_next_update = max(dt_next_update) over ( partition by agent_id, dow, slot_number, coalesce((previous_status <> available_slot), true))
-			then null
-			else dt_next_update
-		end as dt_next_update,
+		lead(dt_update) over ( partition by agent_id, dow, slot_number order by dt_update) as dt_next_update,
 		slot_number
 	from
 		weekly_schedule
 	where
 		coalesce((previous_status <> available_slot), true) = true
-), base_schedule as (
+)
+, base_schedule as (
 	select
 		agent_id,
 		su.dt_update,
@@ -141,9 +130,11 @@ specific_schedule as (
 		and dd.dow = su.dow
 	where
 		dd.dt is not null
+--		and	agent_id = '506'
 	order by su.dt_update, su.dow, su.slot_number
 )
---select * from base_schedule where date(slot_dt) = date('2017-11-08');
+--select * from schedule_versions where agent_id = '158' and dow = 2 and slot_number = 2
+--select count(slot_dt), date(slot_dt),dow from base_schedule group by date(slot_dt),dow
 , specific_updates as (
 	select
 		bs.agent_id,
@@ -155,6 +146,7 @@ specific_schedule as (
 		bs.slot_dt,
 		bs.dow,
 		bs.slot_number,
+		bs.available_slot as original_slot,
 		case
 			when ss.folga = '1' and ss.available_slot <> bs.available_slot then '0'
 			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then ss.available_slot
@@ -177,9 +169,7 @@ specific_schedule as (
 		on bs.agent_id = ss.agent_id
 		and bs.slot_dt = ss.slot_dt
 	order by bs.slot_dt
-)
---select * from specific_updates where date(slot_dt) = date('2017-11-08');
-, time_window_updates as (
+), time_window_updates as (
 	select
 		sc.agent_id,
 		sc.last_weekly_update,
@@ -187,6 +177,8 @@ specific_schedule as (
 		sc.slot_dt,
 		sc.dow,
 		sc.slot_number,
+		sc.original_slot,
+		sc.available_slot as specific_slot,
 		case
 			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
 			then '0'
@@ -205,7 +197,8 @@ specific_schedule as (
 		end as time_window_update
 	from
 		specific_updates sc
-), visits_updates as (
+)
+, visits_updates as (
 	select
 		tw.agent_id,
 		tw.last_weekly_update,
@@ -213,6 +206,9 @@ specific_schedule as (
 		tw.slot_dt,
 		tw.dow,
 		tw.slot_number,
+		tw.original_slot,
+		tw.specific_slot,
+		tw.available_slot as time_slot,
 		case
 			when (sv.agent_id is not null) then '1'
 			when lag((sv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
@@ -247,7 +243,10 @@ specific_schedule as (
 		full_visits fv
 		on fv.agent_id = tw.agent_id
 		and fv.slot_dt = tw.slot_dt
-), active_history_mod as (
+)
+--select * from visits_updates where slot_dt >= cast('2018-03-01' as timestamp) and slot_dt < cast('2018-04-01' as timestamp)
+--select sum(cast(original_slot as integer)),sum(cast(available_slot as integer)) from visits_updates where slot_dt >= cast('2018-03-01' as timestamp) and slot_dt < cast('2018-04-01' as timestamp)
+, active_history_mod as (
 	select distinct
 		from_unixtime(cast(ure."timestamp" as bigint)/1000) as dt_status,
 		coalesce(lag(ativo) over (partition by da.id order by rev)<>ativo,true) as status_mod,
@@ -277,9 +276,9 @@ specific_schedule as (
 	left join
 		datalake_raw.ebdb_usuario u
 		on u.id = a.agent_user_id
-	where cast(available_date as date) >= date('2017-07-01')
+--	where cast(available_date as date) >= date('2017-07-01')
 	group by u.dadosagente_id, available_date
-)
+), total as (
 select
 	vu.agent_id,
 	vu.last_weekly_update,
@@ -307,4 +306,39 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
+--where vu.slot_dt >= date('2018-03-01 ') and vu.slot_dt < date('2018-04-01')
 order by vu.slot_dt
+)
+select * from total
+--,
+--endd as (
+--select
+--	u.id as user_id,
+--	u.nome,
+--	case when planner_status = '' then null else planner_status end as planner_status,
+--	case when history_status = '' then null else history_status end as history_status,
+--	date(slot_dt) as "date",
+--	sum(cast(available_slot as integer)) as available_hours,
+--	date(slot_dt) as "data visita",
+--	case when date(slot_dt) >= current_date then 'Open Schedule' else 'Realized Schedule' end as "realizedSchedule"
+--from
+--	total t
+--left join
+--	datalake_raw.ebdb_usuario u
+--	on u.dadosagente_id = t.agent_id
+--left join
+--	datalake_raw.ebdb_dadosagente da
+--	on da.id = t.agent_id
+--group by u.nome, date(slot_dt), date(slot_dt),
+--case when date(slot_dt) >= current_date then 'Open Schedule' else 'Realized Schedule' end,
+--case when history_status = '' then null else history_status end,
+--case when planner_status = '' then null else planner_status end,
+--u.id, planner_status, history_status
+--)
+--select
+--	*,
+--	sum(cast(coalesce(planner_status,'0') as integer) + cast(coalesce(history_status,'1') as integer)) over (partition by user_id) as ativo
+--from
+--	endd
+
+

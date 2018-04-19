@@ -32,5 +32,7 @@ CREATE TABLE zendesk.ticket (
 	is_whatsapp bool NULL,
 	closed_by_merge bool NULL,
 	is_automatic bool NULL,
+	missed_chat bool NULL,
+	offline_msg bool NULL,
 	CONSTRAINT ticket_pkey PRIMARY KEY (id)
 );

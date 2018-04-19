@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dp.publication_date) order by dp.sk_property asc)
     	+ dense_rank() over (partition by date_part('year', dp.publication_date) order by dp.sk_property desc)
 			- 1 as yearly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_property dp
 		on f.sk_property = dp.sk_property
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
@@ -45,7 +45,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dp.sk_property) as monthly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_property dp
 		on f.sk_property = dp.sk_property
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
@@ -62,7 +62,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dp.sk_property) as yearly_count
-	from fact_supply_potential_listings f
+	from fact_supply f
 	join dim_property dp
 		on f.sk_property = dp.sk_property
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date

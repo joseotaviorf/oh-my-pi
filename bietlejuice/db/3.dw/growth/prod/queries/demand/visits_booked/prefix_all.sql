@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', db.dt_created) order by db.id_booking asc)
     	+ dense_rank() over (partition by date_part('year', db.dt_created) order by db.id_booking desc)
 			- 1 as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
@@ -46,7 +46,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct db.id_booking) as monthly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
@@ -64,7 +64,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct db.id_booking) as yearly_count
-	from fact_liquidity_property_scheduling f
+	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.reason_category != 'Reschedule'
