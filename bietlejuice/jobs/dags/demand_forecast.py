@@ -20,7 +20,7 @@ bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for 
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 30 3 ? * 2' # At 03:30:00am, on every Monday, every month
+MAIN_SCHEDULE_INTERVAL = '30 3 * * 1' # At 03:30:00am, on every Monday, every month
 
 # parameters of the script
 begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days') #last monday # must be a monday pandas timestamp
