@@ -389,6 +389,8 @@ class ZendeskDataToODS(object):
             is_whatsapp = False
             is_automatic = False
             closed_by_merge = False
+            missed_chat = False
+            offline_msg = False
 
             delete_via_command = " delete from {}.via where object_id = '{}' ".format(self.ods_schema, t['id'])
             self.__execute_command(command=delete_via_command)
@@ -483,6 +485,11 @@ class ZendeskDataToODS(object):
                         closed_by_merge = True
                     if value == 'zapdesk_disparo5a':
                         is_automatic = True
+                    if (value == 'zopim_offline_message' or value == 'zapdesk_offline'):
+                        offline_msg = True
+                    if value == 'zopim_chat_missed':
+                        missed_chat = True
+
 
             if t['collaborator_ids'] and len(t['collaborator_ids']) > 0:
                 delete_collaborator_ids_command = " delete from {}.object_collaborators where object_id = '{}' ".format(
@@ -501,12 +508,12 @@ class ZendeskDataToODS(object):
                                     " organization_id, group_id, forum_topic_id, problem_id, has_incidents," \
                                     " via_id,  ticket_form_id, brand_id, allow_channelback, is_public, created_at, " \
                                     " updated_at, due_at, followup_ids, sharing_agreement_ids, satisfaction_rating_score, " \
-                                    " satisfaction_rating_comment, is_whatsapp, closed_by_merge, is_automatic) " \
+                                    " satisfaction_rating_comment, is_whatsapp, closed_by_merge, is_automatic, missed_chat, offline_msg) " \
                                     " values ('{}', '{}', '{}', '{}','{}','{}'," \
                                     " '{}','{}','{}','{}',{},{},{}," \
                                     " '{}','{}','{}','{}',{}," \
                                     " {},'{}','{}'," \
-                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}', {}, {}, {}) " \
+                                    " {},{},'{}','{}','{}','{}','{}', '{}', '{}', {}, {}, {}, {}, {}) " \
                                     " on conflict (id) do update set " \
                                     " url = excluded.url, external_id = excluded.external_id,\"type\" = excluded.\"type\", " \
                                     "subject = excluded.subject, raw_subject = excluded.raw_subject," \
@@ -525,7 +532,8 @@ class ZendeskDataToODS(object):
                                     " satisfaction_rating_score = excluded.satisfaction_rating_score, " \
                                     " satisfaction_rating_comment = excluded.satisfaction_rating_comment, " \
                                     " is_whatsapp = excluded.is_whatsapp, "\
-                                    "closed_by_merge = excluded.closed_by_merge, is_automatic = excluded.is_automatic"\
+                                    "closed_by_merge = excluded.closed_by_merge, is_automatic = excluded.is_automatic, " \
+                                    "missed_chat = excluded.missed_chat, offline_msg = excluded.offline_msg"\
                 .format(
                 self.ods_schema,
                 t['id'],
@@ -569,7 +577,9 @@ class ZendeskDataToODS(object):
                     else BaseETL.coalesce(ZendeskDataToODS.__format_string(t['satisfaction_rating']['comment'])),
                 is_whatsapp,
                 closed_by_merge,
-                is_automatic
+                is_automatic,
+                missed_chat,
+                offline_msg
             )
 
             self.__execute_command(command=upsert_ticket_command)
