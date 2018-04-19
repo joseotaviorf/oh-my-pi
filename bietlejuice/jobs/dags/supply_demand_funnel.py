@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -6,26 +5,10 @@ from bietlejuice.jobs.dags.supply_demand_funnel import offer_subdag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from bietlejuice.jobs.new_etl.godfather import GodFather
-from bietlejuice.jobs.new_etl.marketing_dim_etl import MarketingDimensionETL
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-criteo_config = env.get_airflow_env_var('criteo')
-google_config = dict()
-google_config['sp_account'] = env.get_airflow_env_var('SP_ADWORDS_KEY')
-google_config['display_account'] = env.get_airflow_env_var('DISPLAY_ADWORDS_KEY')
-google_config['broad_location_account'] = env.get_airflow_env_var('BROAD_LOCATION_DSA_ADWORDS_KEY')
-google_config['others_account'] = env.get_airflow_env_var('OTHER_CITIES_ADWORDS_KEY')
-google_config['rj_account'] = env.get_airflow_env_var('RJ_ADWORDS_KEY')
-google_config['institutional_account'] = env.get_airflow_env_var('INSTITUCIONAL_ADWORDS_KEY')
-google_config['universal_app_account'] = env.get_airflow_env_var('UAC_ADWORDS_KEY')
-facebook_config = env.get_airflow_env_var('FACEBOOK_KEY')
-mkt_configs = dict()
-mkt_configs['criteo'] = json.loads(criteo_config)
-mkt_configs['facebook'] = json.loads(facebook_config)
-mkt_configs['google'] = google_config
 biz_etl = BusinessDimensionETL(bucket)
-mkt_etl = MarketingDimensionETL(bucket, mkt_configs)
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 3, 1, 0, 0, 0)
@@ -88,12 +71,6 @@ def load_dim_from_ods_to_dw(**kwargs):
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
         post_command=None if 'post_command' not in kwargs else kwargs['post_command']
-    )
-
-
-def load_marketing_costs(**kwargs):
-    mkt_etl.load_marketing_costs(
-        dim_name=kwargs['dim_name']
     )
 
 
@@ -488,55 +465,6 @@ def booking_sub_dag(sub_dag_name):
     return local_dag
 
 
-def marketing_sub_dag(sub_dag_name):
-    local_dag = BaseDAG.build_dag(
-        '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )
-
-    facebook = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_marketing_facebook_ads_costs',
-        func_command=load_marketing_costs,
-        op_kwargs={'dim_name': 'facebook'}
-    )
-
-    adwords = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_marketing_google_adwords_costs',
-        func_command=load_marketing_costs,
-        op_kwargs={'dim_name': 'google'}
-    )
-
-    criteo = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_marketing_criteo_costs',
-        func_command=load_marketing_costs,
-        op_kwargs={'dim_name': 'criteo'}
-    )
-
-    dim_marketing_attribution = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='DW_dim_marketing_attribution',
-        func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'marketing_attribution', 'bucket': bucket}
-    )
-
-    test_marketing = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='TEST_marketing',
-        func_command=mock_run_dimension_tests
-    )
-
-    facebook >> test_marketing
-    adwords >> test_marketing
-    # criteo >> test_marketing
-    dim_marketing_attribution
-
-    return local_dag
-
-
 ods_property_scheduling = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_liquidity_property_scheduling',
     dag=main_dag,
@@ -640,12 +568,6 @@ booking_dag = BaseDAG.get_sub_dag_operator(
     sub_dag_func=booking_sub_dag,
     sub_dag_name='Booking'
 )
-
-# marketing_dag = BaseDAG.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=marketing_sub_dag,
-#     sub_dag_name='Marketing'
-# )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, property_dag])
 ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
