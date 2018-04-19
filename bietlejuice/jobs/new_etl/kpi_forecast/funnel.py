@@ -1,6 +1,6 @@
-import matplotlib as plt
 import numpy as np
 import pandas as pd
+from qa_python_utils.default_logger import _logger
 
 
 class Funnel:
@@ -34,7 +34,6 @@ class Funnel:
 
         # setup
         self.__find_step_thresholds()
-        # self.display_step_thresholds()
         self.__compute_distribs()
 
     def __find_step_thresholds(self):
@@ -80,27 +79,8 @@ class Funnel:
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(
                         step_duration_deduplicated.quantile(q=.95).days, unit='days')
                 else:
-                    print 'no durations for step ' + step + '. using default of 10'
+                    _logger.info('no durations for step ' + step + '. using default of 10')
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(10, unit='days')
-
-    def display_step_thresholds(self):
-        """display the histogram of the time between a step and its predictor"""
-        fig = plt.figure(figsize=(10, 5))
-        ax = fig.add_subplot(111)
-        ax.set_title('histogram of time between steps, with 95percentile mark')
-
-        for step in self.process_duration.columns:
-            predictor_step = self.steps.loc[step].predict_with
-            nonnull_process_duration = self.process_duration.loc[self.process_duration[step].notnull(), step]
-            a = ax.hist(nonnull_process_duration[(nonnull_process_duration.dt.days < 30) &
-                                                 (nonnull_process_duration.dt.days > -10)].dt.days,
-                        label=predictor_step + ' to ' + step, normed=True,
-                        bins=20,
-                        alpha=0.5)
-            ax.axvline(self.steps.loc[step, 'q_threshold'].days, ls='--', alpha=0.4, color=a[-1][0].get_facecolor())
-
-        ax.legend()
-        fig.show()
 
     def __compute_distribs(self):
         """computes conversion distribution between step and step +1"""

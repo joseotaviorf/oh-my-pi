@@ -2,6 +2,7 @@ from collections import deque
 
 import numpy as np
 import pandas as pd
+from qa_python_utils.default_logger import _logger
 from statsmodels.tsa.arima_model import ARIMA
 
 
@@ -102,7 +103,7 @@ class Ts_predictor:
             ratio7_ts_2y_positive.index.to_series().dt.weekday).mean()  # should be close to 1 on average
         self.weekly_seasonality = self.weekly_seasonality / self.weekly_seasonality.sum() * 7  # the sum of a normal week should be 7, not 7.02
         if self.weekly_seasonality[self.weekly_seasonality.notnull()].shape[0] < 7:
-            print 'Not enough data to compute weekly seasonality'
+            _logger.info('Not enough data to compute weekly seasonality')
             return None
 
         # correct all the days by their weekly seasonality. if 80% of normal, divide by 0.8 (hypothesis weekly and yearly seasonality are independent)
@@ -120,8 +121,8 @@ class Ts_predictor:
     def remove_yearly_seasonality_do(self, ts, rolavg_duration=120):
         # if there is a default, use it:
         if self.default_yearly_seasonality is not None:
-            #print 'not enough data to compute the yearly seasonality of region. Computing using the default.'
-            print 'Always computing using the default yearly seasonality.'
+            #_logger.info('not enough data to compute the yearly seasonality of region. Computing using the default.')
+            #_logger.info('Always computing using the default yearly seasonality.')
             self.yearly_seasonality = self.default_yearly_seasonality
             self.own_yearly_seasonality = None
         else: #compute own yearly seasonality
@@ -151,7 +152,7 @@ class Ts_predictor:
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
                                  freq='D', closed=None)).issubset(
             set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
-            print 'not enough data to compute/use the yearly seasonality. Computing without'
+            _logger.info('not enough data to compute/use the yearly seasonality. Computing without')
             self.model_yearly_seasonality = False
             ts_noYseasonality = ts
 
@@ -175,7 +176,7 @@ class Ts_predictor:
         if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22, unit='days'),
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
                                  freq='D', closed=None)).issubset(set(rolavg_ts[rolavg_ts.notnull()].index)):
-            print 'not enough data to make the region stationary.'
+            _logger.info('not enough data to make the region stationary.')
             return None
         ts_notrend = ts - rolavg_ts
         return ts_notrend
@@ -195,21 +196,21 @@ class Ts_predictor:
 
     def predict_stationary_series_by_week(self, ts):
         # group the remaining TS by week
-        ##keep only notnull
+        # keep only notnull
         ts = ts[pd.notnull(ts)]
         weekly_ts = ts.resample('W-MON', closed='left', label='left').sum()
 
-        ##########modeling
+        # modeling
         # create model based on last 3 weeks (this data does not contain yearly patterns) to predict the next one
         ts = weekly_ts
         model = ARIMA(ts, order=(3, 0, 0))
         try:
             results_AR = model.fit(disp=-1)
         except np.linalg.linalg.LinAlgError:
-            print 'fit did not converge'
+            _logger.info('fit did not converge')
             return None
         except ValueError:
-            print 'value error. probably not enough degrees of freedom to converge'
+            _logger.info('value error. probably not enough degrees of freedom to converge')
             return None
         else:
             ts_pred = model.predict(results_AR.params, start=self.begin_pred, end=self.end_pred, dynamic=False)
@@ -225,8 +226,9 @@ class Ts_predictor:
                 plot=False,
                 rolavg_duration=90,
                 ):
-
-        """returns the prediction over range_pred_day"""
+        """
+        returns the prediction over range_pred_day
+        """
         # note: variables ending in _pred are defined over range_pred_day
 
         do_queue = deque()  # [] #append, popleft
@@ -338,20 +340,13 @@ class Ts_predictor:
         # executing queue (do) and then stack (undo)
         while do_queue:
             row = do_queue.popleft()
-            #       print '--------------' + row.step_name
-
-            # create arguments for the function:
-            #      feedback_dict = {}
-            #       for n in row.feedback_do:
-            #         feedback_dict[n]=self.intermediary_results[n]
             kwargs_dict = row.arguments_do  # dict(row.arguments_do.items() + feedback_dict.items())
 
             # call function
             ts = row.step_function_do(ts, **kwargs_dict)
-            # print row.step_function_do.__name__
 
             if ts is None:  # function did not return anything, there is an error
-                print row.error_do
+                _logger.info(row.error_do)
                 return None
             self.intermediary_results[row.output_name_do] = ts
             self.intermediary_results_stack.append(
@@ -370,16 +365,13 @@ class Ts_predictor:
                 feedback_dict = {'result_last_do': result_last_do}
             else:
                 feedback_dict = {}
-            # nargs = len(row.feedback_undo)
-            #       for argname, valuename in zip(row.step_function_undo.__code__.co_varnames[2:2+nargs], row.feedback_undo):
-            #         feedback_dict[argname]=self.intermediary_results[valuename]
             kwargs_dict = dict(row.arguments_undo.items() + feedback_dict.items())
 
             # call function
             ts = row.step_function_undo(ts, **kwargs_dict)
 
             if ts is None:
-                print row.error_undo
+                _logger.info(row.error_undo)
                 return None
             self.intermediary_results[row.output_name_undo] = ts
             if plot == True: self.plot_ts(ts, title=row.output_name_undo)
