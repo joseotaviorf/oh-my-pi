@@ -12,6 +12,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
 now = datetime.now()
 
+
 def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None):
     if table_name is None:
         table_name = dim_name
@@ -71,10 +72,10 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         )
 
 
-def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, pre_command=None, post_command=None,
+def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, pre_command=None, post_command=None,
                             schema_source='public', schema_dest='public'):
-    table_name = 'vw_{}'.format(dim_name)
-    table_name_dest = '{}'.format(dim_name)
+    table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
+    table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
 
     if pre_command is not None:
         BaseETL.execute_command(
