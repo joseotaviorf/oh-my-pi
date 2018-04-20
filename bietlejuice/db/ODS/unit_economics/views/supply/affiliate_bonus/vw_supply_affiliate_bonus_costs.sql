@@ -11,13 +11,13 @@ with affiliate_filtered_base as (
 	from
 		unit_economics.vw_base_property_costs base
 	left join
-		potential_listings pl
-		on pl.property_id = base.property_id
+		fact_supply f
+		on f.imovel_id = base.property_id
 	left join
 		lead l
-		on pl.lead_id = l.id
+		on f.lead_id = l.id
 	where
-		pl.lead_id is not null
+		f.lead_id is not null
 		and l.usuario_que_indicou_id is not null
 		and l.tipo='Afiliado'
 )
