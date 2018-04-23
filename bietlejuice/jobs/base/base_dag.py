@@ -56,10 +56,11 @@ class BaseDAG(object):
         return local_dag
 
     @staticmethod
-    def get_quintoandar_python_operator(task_id, func_command, dag, op_kwargs=None):
+    def get_quintoandar_python_operator(task_id, func_command, dag, op_kwargs=None, provide_context=False):
         return QuintoAndarPythonOperator(
             dag=dag,
             task_id=task_id,
+            provide_context=provide_context,
             python_callable=func_command,
             op_kwargs=op_kwargs
         )
