@@ -27,7 +27,11 @@ create external table datalake_raw.growth_demand_prediction (
   offer_approved_weekly_count string,
   tenant_first_document_sent_weekly_count string,
   proposal_approved_weekly_count string,
-  dt_timestamp string
+  dt_timestamp string,
+  region_code string,
+  signature_notcancelled_yearly_count	string,
+  signature_notcancelled_monthly_count string,
+  signature_notcancelled_weekly_count string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
