@@ -21,7 +21,7 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 1, 1, 0, 0, 0),
+    start_date=datetime(2018, 2, 6, 0, 0, 0),
     schedule_interval='@hourly',
     max_active_runs=1
 )
