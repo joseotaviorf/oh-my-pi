@@ -29,6 +29,7 @@ create external table datalake_raw.growth_demand_prediction (
   proposal_approved_weekly_count string,
   dt_timestamp string,
   region_code string,
+  signature_notcancelled string,
   signature_notcancelled_yearly_count	string,
   signature_notcancelled_monthly_count string,
   signature_notcancelled_weekly_count string
