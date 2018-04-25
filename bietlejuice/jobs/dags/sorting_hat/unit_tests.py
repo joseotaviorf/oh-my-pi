@@ -49,15 +49,7 @@ def __test_count(**kwargs):
         enum_db=EnumDb.BI_ODS
     )[1][0] if ods_query != '' else None
 
-    if (sh_return is not None and dl_return is not None and sh_return != dl_return) \
-            or (sh_return is not None and ods_return is not None and sh_return != ods_return) \
-            or (dl_return is not None and ods_return is not None and dl_return != ods_return):
-        _logger.warn(
-            'm=__test_count, sh_return={}, dl_return={}, ods_return={}, msg=counts are different'.format(sh_return,
-                                                                                                         dl_return,
-                                                                                                         ods_return))
-        raise Exception
-
+    BaseTest.compare_sources(kwargs['unacceptable_diff'], sh_return, dl_return, ods_return)
     _logger.info('m=__test_count, msg=counts are all equal')
 
 
@@ -72,6 +64,7 @@ def __build_test_tasks(local_dag, entity):
             'sh_file_path': '{}/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'dl_file_path': '{}/{}_{}'.format(DATALAKE_RAW_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'ods_file_path': '{}/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'unacceptable_diff': .0
         }
     )
 
