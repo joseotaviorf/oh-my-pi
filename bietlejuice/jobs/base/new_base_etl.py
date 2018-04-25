@@ -131,6 +131,11 @@ def load_dim_from_ods_to_staging(dim_name, insert_dummy=True, is_fact=False, pre
             commit=True
         )
     BaseETL.execute_command(
+        command='truncate {}.{}'.format(schema_dest, table_name_dest),
+        db_enum=EnumDb.BI_ODS,
+        commit=True
+    )
+    BaseETL.execute_command(
         command='insert into {}.{} select * from {}.{}'.format(schema_dest, table_name_dest, schema_source, table_name),
         db_enum=EnumDb.BI_ODS,
         commit=True
