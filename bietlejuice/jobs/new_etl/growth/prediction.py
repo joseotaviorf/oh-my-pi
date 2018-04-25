@@ -70,6 +70,16 @@ class GrowthPrediction(Growth):
         }
 
     @staticmethod
+    @logger
+    def get_tenants_placeholders():
+        return {
+            'daily_count': 'signature_notcancelled',
+            'weekly_count': 'signature_notcancelled_weekly_count',
+            'monthly_count': 'signature_notcancelled_monthly_count',
+            'yearly_count': 'signature_notcancelled_yearly_count'
+        }
+
+    @staticmethod
     def create_prediction_table(funnel, measure, _filter, period, placeholders):
         _logger.info(
             'm=create_table, funnel={}, measure={}, _filter={}, period={}, placeholders={}'.format(funnel, measure,

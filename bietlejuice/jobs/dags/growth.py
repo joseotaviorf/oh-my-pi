@@ -3,6 +3,8 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
+from qa_python_utils.default_logger import logger, _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
@@ -10,7 +12,6 @@ from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
-from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -124,6 +125,11 @@ def get_documentation_sent_placeholders():
 @logger
 def get_approved_by_insurer_placeholders():
     return GrowthPrediction.get_approved_by_insurer_placeholders()
+
+
+@logger
+def get_tenants_placeholders():
+    return GrowthPrediction.get_tenants_placeholders()
 
 
 @logger
@@ -257,7 +263,8 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
     no_filter_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders)
 
     consolidation_task = get_python_operator(task_id='consolidate',
-                                             func_command=consolidate_no_filters if sub_dag_name != 'employees' else consolidate_employees_no_filters,
+                                             func_command=consolidate_no_filters if sub_dag_name != 'employees' else
+                                             consolidate_employees_no_filters,
                                              dag=local_dag,
                                              op_kwargs={'measure': sub_dag_name}
                                              )
@@ -366,7 +373,7 @@ leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_grow
 new_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                             'new_listings', 'supply')
 new_listings_landing_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
-                                            'new_listings_landing', 'supply')
+                                                    'new_listings_landing', 'supply')
 opportunities_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'opportunities', 'supply')
 prospects_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'prospects',
@@ -484,6 +491,13 @@ prediction_approved_by_insurer_sub_dag = get_sub_dag_operator(sub_dag_func=sub_d
                                                               placeholders=get_approved_by_insurer_placeholders()
                                                               )
 
+prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
+                                                  materialize_func=materialize_growth_measure_prediction_table_query,
+                                                  sub_dag_name='prediction_tenants',
+                                                  funnel='demand',
+                                                  placeholders=get_tenants_placeholders()
+                                                  )
+
 # fact append
 fact_append_task = get_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
 
@@ -500,4 +514,4 @@ offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag
 tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
 prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> \
 prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >> \
-prediction_approved_by_insurer_sub_dag >> fact_append_task
+prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task

@@ -97,8 +97,8 @@ select
   p."atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
   p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
-  shp.first_analysis_date as dt_credit_analysis_init,
-  shp.process_date as dt_credit_analysis_end,
+  coalesce(shp.first_analysis_date, p.credit_analysis_init_date) as dt_credit_analysis_init,
+  coalesce(shp.process_date, p.credit_analysis_end_date) as dt_credit_analysis_end,
   shp.status as status_sortinghat
 from proposal p
 left join sortinghat_prop shp
