@@ -19,11 +19,11 @@ class LeadSubDag(BaseSubDag):
     def build(self):
         lead_dag = self.__build_local_dag()
 
-        lead, dim_lead = self.__build_data_tasks(lead_dag)
+        lead, dim_lead, load_lead = self.__build_data_tasks(lead_dag)
 
         test_count = self.__build_tests_tasks(lead_dag)
 
-        lead >> dim_lead >> test_count
+        lead >> dim_lead >> test_count >> load_lead
 
         return lead_dag
 
@@ -49,12 +49,19 @@ class LeadSubDag(BaseSubDag):
 
         dim_lead = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
+            task_id='STAGING_dim_lead',
+            func_command=utils.load_dim_from_ods_to_staging,
+            op_kwargs={'dim_name': 'lead'}
+        )
+
+        load_lead = BaseDAG.get_quintoandar_python_operator(
+            dag=dag,
             task_id='DW_dim_lead',
-            func_command=utils.load_dim_from_ods_to_dw,
+            func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={'dim_name': 'lead', 'bucket': self.bucket}
         )
 
-        return lead, dim_lead
+        return lead, dim_lead, load_lead
 
     @logger
     def __build_tests_tasks(self, dag):
