@@ -3,6 +3,7 @@ from datetime import datetime
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel import offer_subdag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJobSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from bietlejuice.jobs.new_etl.godfather import GodFather
@@ -98,35 +99,14 @@ def lead_sub_dag(sub_dag_name):
 
 
 def photo_job_sub_dag(sub_dag_name):
-    local_dag = BaseDAG.build_dag(
-        '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
+    sub_dag = PhotoJobSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
+        start_date=MAIN_START_DATE
     )
-
-    photo_job = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='ODS_photo_job',
-        func_command=extract_query_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'photo_job', 'bucket': bucket, 'command': 'call ebdb.list_photo_job();'}
-    )
-
-    dim_photo_job = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='DW_dim_photo_job',
-        func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'photo_job', 'bucket': bucket}
-    )
-
-    test_photo_job = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='TEST_dim_photo_job',
-        func_command=mock_run_dimension_tests
-    )
-
-    photo_job >> dim_photo_job >> test_photo_job
-
-    return local_dag
+    return sub_dag.build()
 
 
 def region_sub_dag(sub_dag_name):
