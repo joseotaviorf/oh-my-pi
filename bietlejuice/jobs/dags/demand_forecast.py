@@ -16,7 +16,7 @@ from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
 from qa_python_utils.default_logger import _logger
 from bietlejuice.jobs.dags.util import environment as env
 bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
-#bucket_ds = '5a-data-science'
+# bucket_ds = '5a-data-science'
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -24,6 +24,7 @@ MAIN_SCHEDULE_INTERVAL = '30 3 * * 1' # At 03:30:00am, on every Monday, every mo
 
 # parameters of the script
 begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days') #last monday # must be a monday pandas timestamp
+_logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
 n_training_days = 63  # hard limit on the days we do not want to consider for creating distributions
 n_recent_days = 21
@@ -197,7 +198,7 @@ def compute_all_predictions(fact_past_bookings):
     city = 'all'
     region = 'all'
     _logger.info(city + ' ' + region)
-    fact_regional = fact_past_bookings
+    fact_regional = fact_past_bookings.copy()
     default_yearly_seasonality, default_distribs = get_default_parameters(city, region)  # [None, None]
     bookings_pred, own_yearly_seasonality = predict_bookings(fact_regional, default_yearly_seasonality)
     write_to_s3(bucket_ds,
@@ -439,8 +440,11 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
 
 
 def demand_forecast():
+    _logger.info('loading fact')
     fact_past_bookings = load_fact(begin_pred)
+    _logger.info('computing predictions for all regions')
     geo_levels, cities, regions = compute_all_predictions(fact_past_bookings)  # writes in s3 (pickles)
+    _logger.info('writing predictions to csv')
     forecast_to_csv(fact_past_bookings, geo_levels, cities, regions)  # reads in s3, formats, writes csv in s3
 
 

@@ -29,11 +29,11 @@ def write_to_s3(bucket, obj, filename, csv=True, pickle=False):
         if csv is True:
             csv_buffer = io.BytesIO()
             obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=True)
-            # s3.Object(bucket, 'KPI_predictor/' + filename + '.csv').put(Body=csv_buffer.getvalue())
+            s3.Object(bucket, 'KPI_predictor/' + filename + '.csv').put(Body=csv_buffer.getvalue())
         if pickle is True:
             pickle_buffer = io.BytesIO()
             obj.to_pickle(pickle_buffer)
-            # s3.Object(bucket, 'KPI_predictor/' + filename + '.p').put(Body=pickle_buffer.getvalue())
+            s3.Object(bucket, 'KPI_predictor/' + filename + '.p').put(Body=pickle_buffer.getvalue())
 
 
 def get_prediction(city, region, begin_pred):
