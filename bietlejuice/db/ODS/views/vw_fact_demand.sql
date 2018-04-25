@@ -24,7 +24,7 @@ with _fact as (
 	  hrf.dt_client_sign_up,
 	  coalesce(hrf.id_visit, -1) as sk_visit,
 	  coalesce(hrf.id_negotiation, -1) as sk_negotiation,
-	  vdo.sk_offer,
+	  coalesce(vdo.sk_offer, -1) as sk_offer,
 	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
 	  vdo.dt_first_sent as dt_offer_submitted,
 	  coalesce(to_char(vdo.dt_approved, 'YYYYMMDD')::integer, -1) as sk_offer_approved_date,
