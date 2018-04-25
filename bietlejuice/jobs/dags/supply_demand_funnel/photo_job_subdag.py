@@ -1,7 +1,7 @@
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl import dim_utils as utils
+import bietlejuice.jobs.base.new_base_etl as utils
 from qa_python_utils.default_logger import logger
 
 
