@@ -49,7 +49,7 @@ def __test_count(**kwargs):
         enum_db=EnumDb.BI_ODS
     )[1][0] if ods_query != '' else None
 
-    BaseTest.compare_sources(kwargs['unacceptable_diff'], sh_return, dl_return, ods_return)
+    BaseTest.compare_sources(kwargs['acceptable_diff'], sh_return, dl_return, ods_return)
     _logger.info('m=__test_count, msg=counts are all equal')
 
 
@@ -64,7 +64,7 @@ def __build_test_tasks(local_dag, entity):
             'sh_file_path': '{}/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'dl_file_path': '{}/{}_{}'.format(DATALAKE_RAW_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'ods_file_path': '{}/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
-            'unacceptable_diff': .0
+            'acceptable_diff': .0
         }
     )
 
