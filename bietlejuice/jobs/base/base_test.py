@@ -1,6 +1,7 @@
 from base_etl import BaseETL
-from qa_python_utils.default_logger import logger
+from qa_python_utils.default_logger import logger, _logger
 from qa_python_utils.aws.athena import AthenaClient
+from itertools import combinations
 
 
 class BaseTest(object):
