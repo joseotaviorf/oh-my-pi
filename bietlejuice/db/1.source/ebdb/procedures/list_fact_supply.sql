@@ -168,7 +168,7 @@ from
 			i.usuarioQueCadastrou_id as rep_id,
 			uda.id as affiliate_id,
 			i.usuario_id as owner_id,
-			i.regiao_id as region_id,
+			coalesce(i.regiao_id, pr.regiao_id) as region_id,
 			coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as dt_lead,
 			case
 				when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
@@ -271,6 +271,28 @@ from
 		left join
 			Lead old_lead
 			on old_lead.id = l.old_id
+		left join -- trying to find regions for leads using lat lng with the region polygons
+			(
+				SELECT
+					p.*,
+					r.cidadeNome as cidade
+				FROM PoligonoRegiao p
+				left join (
+										select
+											max(pr.id) as id
+										from PoligonoRegiao pr
+										left join MapRegiao mr on pr.regiao_id = mr.id
+										where mr.id is not null
+										group by poligono
+									) latest on latest.id = p.id
+				left join MapRegiao r on r.id = p.regiao_id
+				where latest.id is not null
+			) pr
+			on pr.cidade = l.cidade -- to avoid too much processing
+			and ST_Contains(
+						ST_GeometryFromText(ST_AsText(pr.poligono)),
+						ST_GeometryFromText(concat('Point(',coalesce(i.lng,l.lng),' ',coalesce(i.lat,l.lat),')'))
+					) = 1
 	union all
 		select
 			i.id as imovel_id,
