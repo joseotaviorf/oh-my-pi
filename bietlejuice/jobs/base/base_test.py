@@ -44,6 +44,6 @@ class BaseTest(object):
     @logger
     def compare_sources(acceptable_diff, *sources):
         for x, y in combinations(filter(None, sources), 2):
-            if abs((x / float(y)) - 1) >= acceptable_diff:
+            if abs((x / float(y)) - 1) > acceptable_diff:
                 _logger.warn('m=compare_sources, msg=sources are different')
                 raise Exception
