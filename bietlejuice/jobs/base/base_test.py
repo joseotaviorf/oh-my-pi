@@ -47,3 +47,23 @@ class BaseTest(object):
             if abs((x / float(y)) - 1) > acceptable_diff:
                 _logger.warn('m=compare_sources, msg=sources are different')
                 raise Exception
+
+    @staticmethod
+    @logger
+    def check_for_duplicates(schema, table, key, enum_db):
+        output = BaseTest.get_query_result_for_comparison(
+            query='select {0}, count(1) from {1}.{2} group by {0} having count(1)>1'.format(key, schema, table),
+            enum_db=enum_db
+        )
+        # returns true if has more rows besides the header
+        return len(output) > 1
+
+    @staticmethod
+    @logger
+    def check_for_emptiness(schema, table, enum_db):
+        output = BaseTest.get_query_result_for_comparison(
+            query='select count(1) from {}.{}'.format(schema, table),
+            enum_db=enum_db
+        )
+        # returns true if has more rows besides the header
+        return output[1][0] == 0

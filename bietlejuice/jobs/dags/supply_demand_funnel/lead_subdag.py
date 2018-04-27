@@ -1,8 +1,9 @@
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.enum_db import EnumDb
 from bietlejuice.jobs.base.base_test import BaseTest
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from qa_python_utils.default_logger import logger
+from qa_python_utils.default_logger import logger, _logger
 
 
 class LeadSubDag(BaseSubDag):
@@ -21,9 +22,9 @@ class LeadSubDag(BaseSubDag):
 
         lead, dim_lead, load_lead = self.__build_data_tasks(lead_dag)
 
-        test_count = self.__build_tests_tasks(lead_dag)
+        duplicate_lead, empty_lead = self.__build_tests_tasks(lead_dag)
 
-        lead >> dim_lead >> test_count >> load_lead
+        lead >> dim_lead >> empty_lead >> duplicate_lead >> load_lead
 
         return lead_dag
 
@@ -66,14 +67,39 @@ class LeadSubDag(BaseSubDag):
     @logger
     def __build_tests_tasks(self, dag):
 
-        test_lead = BaseDAG.get_quintoandar_python_operator(
+        duplicate_lead = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='TEST_dim_lead',
-            func_command=self.__test_lead_count
+            task_id='TEST_duplicates_dim_lead',
+            func_command=self.__test_duplicates
         )
 
-        return test_lead
+        empty_lead = BaseDAG.get_quintoandar_python_operator(
+            dag=dag,
+            task_id='TEST_emptiness_dim_lead',
+            func_command=self.__test_duplicates
+        )
+
+        return duplicate_lead, empty_lead
 
     @staticmethod
-    def __test_lead_count():
-        pass
+    def __test_duplicates():
+
+        if BaseTest.check_for_duplicates(
+                schema='staging',
+                table='dim_lead',
+                key='sk_lead',
+                enum_db=EnumDb.BI_ODS):
+            raise Exception
+
+        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_lead'))
+
+    @staticmethod
+    def __test_emptiness():
+
+        if BaseTest.check_for_emptiness(
+                schema='staging',
+                table='dim_lead',
+                enum_db=EnumDb.BI_ODS):
+            raise Exception
+
+        _logger.info('m=test_emptiness {} not empty'.format('dim_lead'))
