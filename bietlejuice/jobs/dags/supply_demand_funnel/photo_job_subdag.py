@@ -18,15 +18,15 @@ class PhotoJobSubDag(BaseSubDag):
 
     @logger
     def build(self):
-        lead_dag = self.__build_local_dag()
+        photo_job_dag = self.__build_local_dag()
 
-        photo_job, dim_photo_job, load_photo_job = self.__build_data_tasks(lead_dag)
+        photo_job, dim_photo_job, load_photo_job = self.__build_data_tasks(photo_job_dag)
 
-        test_photo_job = self.__build_tests_tasks(lead_dag)
+        test_photo_job = self.__build_tests_tasks(photo_job_dag)
 
         photo_job >> dim_photo_job >> test_photo_job
 
-        return lead_dag
+        return photo_job_dag
 
     @logger
     def __build_local_dag(self):
@@ -67,19 +67,19 @@ class PhotoJobSubDag(BaseSubDag):
     @logger
     def __build_tests_tasks(self, dag):
 
-        duplicate_lead = BaseDAG.get_quintoandar_python_operator(
+        duplicate_photo_job = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_duplicates_dim_photo_job',
             func_command=self.__test_duplicates
         )
 
-        empty_lead = BaseDAG.get_quintoandar_python_operator(
+        empty_photo_job = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_emptiness_dim_photo_job',
             func_command=self.__test_duplicates
         )
 
-        return duplicate_lead, empty_lead
+        return duplicate_photo_job, empty_photo_job
 
     @staticmethod
     def __test_duplicates():

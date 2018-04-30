@@ -19,18 +19,18 @@ class RegionSubDag(BaseSubDag):
 
     @logger
     def build(self):
-        lead_dag = self.__build_local_dag()
+        region_dag = self.__build_local_dag()
 
-        agent_region, region, dim_region, load_region = self.__build_data_tasks(lead_dag)
+        agent_region, region, dim_region, load_region = self.__build_data_tasks(region_dag)
 
-        duplicate_region, empty_region = self.__build_tests_tasks(lead_dag)
+        duplicate_region, empty_region = self.__build_tests_tasks(region_dag)
 
         agent_region >> dim_region
         region >> dim_region
         dim_region >> empty_region
         empty_region >> duplicate_region >> load_region
 
-        return lead_dag
+        return region_dag
 
     @logger
     def __build_local_dag(self):
