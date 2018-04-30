@@ -6,6 +6,7 @@ with _fact as (
 		coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house,
 		coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
 		coalesce(to_char(vdh.min_version_time, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
+		vdh.min_version_time as dt_house_listing,
 		coalesce(to_char(vdh.de_publication_date, 'YYYYMMDD')::integer, -1) as sk_house_de_publication_date,
 		coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_first_offer_submitted_date,
 	  coalesce(vdh.regiao_id, -1) as sk_region,
@@ -20,9 +21,10 @@ with _fact as (
 	  coalesce(to_char(hrf.dt_agent_sign_up, 'YYYYMMDD')::integer, -1) as sk_agent_sign_up_date,
 	  coalesce(hrf.id_client, -1) as sk_client,
 	  coalesce(to_char(hrf.dt_client_sign_up, 'YYYYMMDD')::integer, -1) as sk_client_sign_up_date,
+	  hrf.dt_client_sign_up,
 	  coalesce(hrf.id_visit, -1) as sk_visit,
 	  coalesce(hrf.id_negotiation, -1) as sk_negotiation,
-	  vdo.sk_offer,
+	  coalesce(vdo.sk_offer, -1) as sk_offer,
 	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
 	  vdo.dt_first_sent as dt_offer_submitted,
 	  coalesce(to_char(vdo.dt_approved, 'YYYYMMDD')::integer, -1) as sk_offer_approved_date,
@@ -44,7 +46,9 @@ with _fact as (
     end as dt_credit_analysis, -- old credit analysis date
 	  coalesce(hrf.id_contract, -1) as sk_contract,
 	  coalesce(to_char(hrf.dt_contract_created, 'YYYYMMDD')::integer, -1) as sk_contract_created_date,
+	  hrf.dt_contract_created,
 	  coalesce(to_char(hrf.dt_contract_signed, 'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
+	  hrf.dt_contract_signed,
 	  coalesce(to_char(hrf.dt_annulment, 'YYYYMMDD')::integer, -1) as sk_contract_annulment_date,
 	  case
       when c.status in ('Ativo', 'Finalizado')
@@ -56,12 +60,12 @@ with _fact as (
     coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_end_date,
     vdp.dt_credit_analysis_end,
     case
-      when vdp.status_sortinghat = 'APPROVED'
+      when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
         then coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1)
       else -1
     end as sk_credit_analysis_approved_date,
     case
-      when vdp.status_sortinghat = 'APPROVED'
+      when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
         then vdp.dt_credit_analysis_end
       else null::timestamp
     end as dt_credit_analysis_approved,
@@ -127,16 +131,51 @@ select
   visit_created_type,
   visit_last_updated_from_app,
   visit_last_updated_type,
-  (date_part('day', dt_visit - dt_booking_created) * 24 +
-    date_part('hour', dt_visit - dt_booking_created)) / 24.0 as booking_to_visit,
-  (date_part('day', dt_internal_analysis - dt_offer_submitted) * 24 +
-    date_part('hour', dt_internal_analysis - dt_offer_submitted)) / 24.0 as offer_to_internal_analyis,
-  (date_part('day', dt_credit_analysis_init - dt_offer_approved) * 24 +
-    date_part('hour', dt_credit_analysis_init - dt_offer_approved)) / 24.0 as offer_to_credit_analysis_init_date,
-  (date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 24 +
-    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 24.0 as credit_analysis_init_to_end,
-  (date_part('day', dt_contract - dt_proposal_approved) * 24 +
-    date_part('hour', dt_contract - dt_proposal_approved)) / 24.0 as proposal_approved_to_contract_signed,
+  ((date_part('day', dt_visit - dt_booking_created) * 1440 +
+    date_part('hour', dt_visit - dt_booking_created) * 60 +
+		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as booking_to_visit,
+  ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
+    date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
+		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as offer_submitted_to_internal_analyis,
+  ((date_part('day', dt_tenant_first_document_sent - dt_offer_approved) * 1440 +
+    date_part('hour', dt_tenant_first_document_sent - dt_offer_approved) * 60 +
+		date_part('minute', dt_tenant_first_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as offer_approved_to_doc_first_sent,
+  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_document_sent) * 1440 +
+    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_document_sent) * 60 +
+		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_document_sent)) / 1440.)::numeric(14,2) as doc_first_sent_to_credit_processed,
+  ((date_part('day', dt_credit_analysis_init - dt_tenant_first_document_sent) * 1440 +
+    date_part('hour', dt_credit_analysis_init - dt_tenant_first_document_sent) * 60 +
+		date_part('minute', dt_credit_analysis_init - dt_tenant_first_document_sent)) / 1440.)::numeric(14,2) as doc_first_sent_to_doc_completed,
+  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
+    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
+		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as doc_completed_to_credit_processed,
+  ((date_part('day', dt_contract_created - dt_credit_analysis_approved) * 1440 +
+    date_part('hour', dt_contract_created - dt_credit_analysis_approved) * 60 +
+		date_part('minute', dt_contract_created - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as credit_approved_to_contract_created,
+  ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
+    date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
+		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as credit_approved_to_contract_signed,
+  ((date_part('day', dt_contract_signed - dt_contract_created) * 1440 +
+    date_part('hour', dt_contract_signed - dt_contract_created) * 60 +
+		date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as contract_created_to_contract_signed,
+	date_part('day', dt_contract_signed - dt_booking_created)::integer as days_booking_to_contract_signed,
+	date_part('day', dt_visit - dt_booking_created)::integer as days_booking_to_visit,
+	date_part('day', dt_visit - dt_client_sign_up)::integer as days_user_creation_to_visit,
+	date_part('day', dt_contract_signed - dt_visit)::integer as days_visit_to_contract_signed,
+	date_part('day', dt_offer_submitted - dt_visit)::integer as days_visit_to_offer_submitted,
+	date_part('day', dt_offer_submitted - dt_booking_created)::integer as days_booking_created_to_offer_submitted,
+	date_part('day', dt_credit_analysis_approved - dt_tenant_first_document_sent)::integer as days_tenant_doc_sent_to_insurance_approval,
+	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_insurance_approval_to_contract_signed,
+	date_part('day', dt_tenant_first_document_sent - dt_offer_approved)::integer as days_offer_approved_to_tenant_doc_sent,
+	date_part('day', dt_offer_approved - dt_offer_submitted)::integer as days_offer_submitted_to_offer_approved,
+	date_part('day', dt_credit_analysis_init - dt_offer_approved)::integer as days_offer_approved_to_credit_init,
+	date_part('day', dt_contract_signed - dt_offer_submitted)::integer as days_offer_submitted_to_contract_signed,
+	date_part('day', dt_credit_analysis_approved - dt_credit_analysis_init)::integer as days_tenant_doc_completed_to_credit_approved,
+	date_part('day', dt_credit_analysis_init - dt_tenant_first_document_sent)::integer as days_tenant_doc_sent_to_doc_completed,
+	date_part('day', dt_contract_created - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_created,
+	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_signed,
+	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
+	date_part('day', dt_contract_signed - dt_house_listing)::integer as days_house_listing_to_contract_signed,
   dt_timestamp
 from _fact
 ;

@@ -127,16 +127,15 @@ class AmplitudeEventsETL(BaseETL):
 
             self.s3.Bucket('5a-datalake').put_object(Body=gz_body.getvalue(), Key=file_name)
 
-    def run_source_to_sns(self, topic_arn, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
-        if not topic_arn:
-            raise Exception("Param: topic_arn can't be None!")
+    def run_source_to_sns(self, start_date=None, end_date=None, td=timedelta(hours=1), **kwargs):
+        # if not topic_arn:
+        #     raise Exception("Param: topic_arn can't be None!")
 
         d = os.path.dirname(os.path.realpath(__file__))
         print('CurDir: ' + d)
         print('Kwargs: ' + unicode(kwargs))
         print('Start Date: {}'.format(start_date))
         print('End Date: {}'.format(end_date))
-        sys.stdout.flush()
 
         start, end = self.check_dates(start_date, end_date, td, kwargs)
 
@@ -151,9 +150,8 @@ class AmplitudeEventsETL(BaseETL):
                     events = a.get_json_from_zipfile(f)
                     g_events, app = self.group_events(events)
                     self.dump_events_to_s3(g_events, app, start_date)
-                    count = a.publish_notifications(events, topic_arn=topic_arn)
-                    print('{} messages were published in SNS!'.format(count))
-                    sys.stdout.flush()
+                    # count = a.publish_notifications(events, topic_arn=topic_arn)
+                    # print('{} messages were published in SNS!'.format(count))
 
     @classmethod
     def check_dates(cls, start_date, end_date, td, kwargs):

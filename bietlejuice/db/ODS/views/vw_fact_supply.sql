@@ -63,14 +63,25 @@ with base_address as (
 	left join (select * from row_merging where true_pl = true) m2
 		on m1.rn = m2.rn
 		and m1.id <> m2.id
-), base_supply as (
-	select
-		sup.*,
-		r.funnel_drop_reason
-	from
-		fact_supply sup
-	left join reasons r
-	 on r.id = sup.id
+), base_supply as ( -- add reasons and deduplicate facebook
+  select
+    a.*,
+    r.funnel_drop_reason
+  from
+  (
+      select
+        sup.*,
+        case when l.external_id is not null
+            then dense_rank() over (partition by l.external_id order by l.id)
+            else 1
+        end as ext_id
+      from
+        fact_supply sup
+      left join public.lead l on l.id = sup.lead_id
+  ) a
+  left join reasons r
+   on r.id = a.id
+  where a.ext_id = 1
 ), base_doorman as (
 	select
 		"Status" as status,

@@ -11,8 +11,8 @@ with all_dates as (
     max({monthly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date)), date_part('month', cast(cast("date" as timestamp) as date))) as monthly_count,
     max({yearly_count}::float::int) over (partition by date_part('year', cast(cast("date" as timestamp) as date))) as yearly_count
   from datalake_raw.growth_{funnel}_prediction
-  where city != 'all'
-    and region = 'all'
+  where city = 'all'
+    and region != 'all'
 ),
 all_dates_last_week as (
 	select 1

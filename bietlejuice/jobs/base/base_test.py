@@ -1,6 +1,7 @@
 from base_etl import BaseETL
-from qa_python_utils.default_logger import logger
+from qa_python_utils.default_logger import logger, _logger
 from qa_python_utils.aws.athena import AthenaClient
+from itertools import combinations
 
 
 class BaseTest(object):
@@ -38,3 +39,31 @@ class BaseTest(object):
             raise Exception
 
         return _return[1] == assertion
+
+    @staticmethod
+    @logger
+    def compare_sources(acceptable_diff, *sources):
+        for x, y in combinations(filter(None, sources), 2):
+            if abs((x / float(y)) - 1) > acceptable_diff:
+                _logger.warn('m=compare_sources, msg=sources are different')
+                raise Exception
+
+    @staticmethod
+    @logger
+    def check_for_duplicates(schema, table, key, enum_db):
+        output = BaseTest.get_query_result_for_comparison(
+            query='select {0}, count(1) from {1}.{2} group by {0} having count(1)>1'.format(key, schema, table),
+            enum_db=enum_db
+        )
+        # returns true if has more rows besides the header
+        return len(output) > 1
+
+    @staticmethod
+    @logger
+    def check_for_emptiness(schema, table, enum_db):
+        output = BaseTest.get_query_result_for_comparison(
+            query='select count(1) from {}.{}'.format(schema, table),
+            enum_db=enum_db
+        )
+        # returns true if has more rows besides the header
+        return output[1][0] == 0
