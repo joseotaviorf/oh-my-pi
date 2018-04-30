@@ -52,7 +52,7 @@ class PhotoJobSubDag(BaseSubDag):
             dag=dag,
             task_id='STAGING_dim_photo_job',
             func_command=utils.load_dim_from_ods_to_staging,
-            op_kwargs={'dim_name': 'photo_job', 'bucket': self.bucket}
+            op_kwargs={'dim_name': 'photo_job'}
         )
 
         load_photo_job = BaseDAG.get_quintoandar_python_operator(
