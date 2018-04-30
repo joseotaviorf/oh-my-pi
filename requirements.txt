@@ -60,3 +60,4 @@ xmltodict==0.10.2
 googlemaps==2.5.1
 shapely==1.6.4.post1
 unidecode==1.0.22
+statsmodels==0.8.0
