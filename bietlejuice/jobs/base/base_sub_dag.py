@@ -33,17 +33,18 @@ class BaseSubDag(object):
 
         return local_dag
 
+    @staticmethod
     @logger(exclude='dag')
-    def get_sub_dag_operator(self, dag, sub_dag_func):
+    def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func):
         """
-        Gets the corresponding subdag operator
+        Gets the corresponding subdag operator statically
         :param dag: the main dag which will contain the subdag
         :param sub_dag_func: the method for building the subdag
         :return: the new subdag operator
         """
         return SubDagOperator(
-            subdag=sub_dag_func(self.sub_dag_name),
-            task_id=self.sub_dag_name,
+            subdag=sub_dag_func(sub_dag_name),
+            task_id=sub_dag_name,
             dag=dag,
         )
 
