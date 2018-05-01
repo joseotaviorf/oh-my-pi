@@ -23,6 +23,7 @@ class ContractSubDag(BaseSubDag):
             ]
         )
 
+
     @staticmethod
     def __test_duplicates():
         BaseTest.check_for_duplicates(
@@ -43,7 +44,7 @@ class ContractSubDag(BaseSubDag):
     @staticmethod
     def __test_counts():
         BaseTest.are_counts_equal({
-            'acceptable_diffs': .0,
+            'acceptable_diff': 0.0,
             'sources': [
                 {
                     'file_path': '{}/dim_contract_count_check.sql'.format(ODS_STAGING_TEST_QUERIES_DIR),
