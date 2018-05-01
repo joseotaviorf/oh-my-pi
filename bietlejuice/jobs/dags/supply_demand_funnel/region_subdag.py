@@ -1,10 +1,12 @@
 from datetime import datetime
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.base.base_test import BaseTest
+
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 class RegionSubDag(BaseSubDag):
@@ -39,12 +41,11 @@ class RegionSubDag(BaseSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-
         agent_region = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
             func_command=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'agent_region', 'bucket': self.bucket,  'table_name': 'DadosAgente_Regiao',
+            op_kwargs={'dim_name': 'agent_region', 'bucket': self.bucket, 'table_name': 'DadosAgente_Regiao',
                        'copy_to_clean': False}
         )
 
@@ -76,7 +77,6 @@ class RegionSubDag(BaseSubDag):
 
     @logger
     def __local_build_tests_tasks(self, dag):
-
         duplicate_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_duplicates_dim_region',
@@ -93,23 +93,17 @@ class RegionSubDag(BaseSubDag):
 
     @staticmethod
     def __test_duplicates():
-
-        if BaseTest.contains_duplicates(
-                schema='staging',
-                table='dim_region',
-                key='sk_region',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_region'))
+        BaseTest.check_for_duplicates(
+            schema='staging',
+            table='dim_region',
+            key='sk_region',
+            enum_db=EnumDb.BI_ODS
+        )
 
     @staticmethod
     def __test_emptiness():
-
-        if BaseTest.is_empty(
-                schema='staging',
-                table='dim_region',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_emptiness {} not empty'.format('dim_region'))
+        BaseTest.check_for_emptiness(
+            schema='staging',
+            table='dim_region',
+            enum_db=EnumDb.BI_ODS
+        )

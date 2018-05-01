@@ -127,6 +127,12 @@ class BaseSubDag(object):
 
     @logger
     def __build_tests_tasks(self, dag, tests):
+        """
+        Builds all the test tasks for a specific dag/subdag
+        :param dag: the dag which the tasks will be in
+        :param tests: list of test tuples to be built (ex: ('test_task_id_suffix', test_method))
+        :return: the test tasks for the corresponding dag
+        """
         tests_tasks = []
         for _test in tests:
             test_task = BaseDAG.get_quintoandar_python_operator(

@@ -1,9 +1,10 @@
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 class PhotoJobSubDag(BaseSubDag):
@@ -35,7 +36,6 @@ class PhotoJobSubDag(BaseSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-
         photo_job = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_photo_job',
@@ -61,7 +61,6 @@ class PhotoJobSubDag(BaseSubDag):
 
     @logger
     def __local_build_tests_tasks(self, dag):
-
         duplicate_photo_job = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_duplicates_dim_photo_job',
@@ -78,23 +77,17 @@ class PhotoJobSubDag(BaseSubDag):
 
     @staticmethod
     def __test_duplicates():
-
-        if BaseTest.contains_duplicates(
-                schema='staging',
-                table='dim_photo_job',
-                key='sk_photo_job',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_photo_job'))
+        BaseTest.check_for_duplicates(
+            schema='staging',
+            table='dim_photo_job',
+            key='sk_photo_job',
+            enum_db=EnumDb.BI_ODS
+        )
 
     @staticmethod
     def __test_emptiness():
-
-        if BaseTest.is_empty(
-                schema='staging',
-                table='dim_photo_job',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_emptiness {} not empty'.format('dim_photo_job'))
+        BaseTest.check_for_emptiness(
+            schema='staging',
+            table='dim_photo_job',
+            enum_db=EnumDb.BI_ODS
+        )
