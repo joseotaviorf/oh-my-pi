@@ -51,7 +51,8 @@ class ContractSubDag(BaseSubDag):
                 },
                 {
                     'file_path': '{}/contrato_count_check.sql'.format(EBDB_TEST_QUERIES_DIR),
-                    'enum_db': EnumDb.QuintoAndar_ebdb
+                    'enum_db': EnumDb.QuintoAndar_ebdb,
+                    'encoding': 'LATIN1'
                 }
             ]
         })
