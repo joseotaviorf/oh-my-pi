@@ -9,12 +9,7 @@ from qa_python_utils.default_logger import logger, _logger
 class UserSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(UserSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
@@ -22,7 +17,7 @@ class UserSubDag(BaseSubDag):
 
         user, dim_user, load_user = self.__build_data_tasks(user_dag)
 
-        duplicate_user, empty_user = self.__build_tests_tasks(user_dag)
+        duplicate_user, empty_user = self.__local_build_tests_tasks(user_dag)
 
         user >> dim_user >> empty_user >> duplicate_user >> load_user
 
@@ -66,7 +61,7 @@ class UserSubDag(BaseSubDag):
         return user, dim_user, load_user
 
     @logger
-    def __build_tests_tasks(self, dag):
+    def __local_build_tests_tasks(self, dag):
 
         duplicate_user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
@@ -85,7 +80,7 @@ class UserSubDag(BaseSubDag):
     @staticmethod
     def __test_duplicates():
 
-        if BaseTest.check_for_duplicates(
+        if BaseTest.contains_duplicates(
                 schema='staging',
                 table='dim_user',
                 key='sk_user',
@@ -97,7 +92,7 @@ class UserSubDag(BaseSubDag):
     @staticmethod
     def __test_emptiness():
 
-        if BaseTest.check_for_emptiness(
+        if BaseTest.is_empty(
                 schema='staging',
                 table='dim_user',
                 enum_db=EnumDb.BI_ODS):

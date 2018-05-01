@@ -50,7 +50,7 @@ class BaseTest(object):
 
     @staticmethod
     @logger
-    def check_for_duplicates(schema, table, key, enum_db):
+    def contains_duplicates(schema, table, key, enum_db):
         output = BaseTest.get_query_result_for_comparison(
             query='select {0}, count(1) from {1}.{2} group by {0} having count(1)>1'.format(key, schema, table),
             enum_db=enum_db
@@ -60,7 +60,7 @@ class BaseTest(object):
 
     @staticmethod
     @logger
-    def check_for_emptiness(schema, table, enum_db):
+    def is_empty(schema, table, enum_db):
         output = BaseTest.get_query_result_for_comparison(
             query='select count(1) from {}.{}'.format(schema, table),
             enum_db=enum_db

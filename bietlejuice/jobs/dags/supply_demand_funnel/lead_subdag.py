@@ -9,12 +9,7 @@ from qa_python_utils.default_logger import logger, _logger
 class LeadSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(LeadSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
@@ -22,7 +17,7 @@ class LeadSubDag(BaseSubDag):
 
         lead, dim_lead, load_lead = self.__build_data_tasks(lead_dag)
 
-        duplicate_lead, empty_lead = self.__build_tests_tasks(lead_dag)
+        duplicate_lead, empty_lead = self.__local_build_tests_tasks(lead_dag)
 
         lead >> dim_lead >> empty_lead >> duplicate_lead >> load_lead
 
@@ -65,7 +60,7 @@ class LeadSubDag(BaseSubDag):
         return lead, dim_lead, load_lead
 
     @logger
-    def __build_tests_tasks(self, dag):
+    def __local_build_tests_tasks(self, dag):
 
         duplicate_lead = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
@@ -84,7 +79,7 @@ class LeadSubDag(BaseSubDag):
     @staticmethod
     def __test_duplicates():
 
-        if BaseTest.check_for_duplicates(
+        if BaseTest.contains_duplicates(
                 schema='staging',
                 table='dim_lead',
                 key='sk_lead',
@@ -96,7 +91,7 @@ class LeadSubDag(BaseSubDag):
     @staticmethod
     def __test_emptiness():
 
-        if BaseTest.check_for_emptiness(
+        if BaseTest.is_empty(
                 schema='staging',
                 table='dim_lead',
                 enum_db=EnumDb.BI_ODS):

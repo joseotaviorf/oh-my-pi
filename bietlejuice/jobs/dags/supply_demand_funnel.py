@@ -2,10 +2,10 @@ from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel import offer_subdag
+from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJobSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
 from bietlejuice.jobs.new_etl.godfather import GodFather
@@ -321,36 +321,15 @@ def proposal_sub_dag(sub_dag_name):
 
 
 def contract_sub_dag(sub_dag_name):
-    local_dag = BaseDAG.build_dag(
-        '{}.{}'.format(MAIN_DAG_NAME, sub_dag_name),
+    sub_dag = ContractSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
+        start_date=MAIN_START_DATE
     )
 
-    contract = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_contract',
-        dag=local_dag,
-        func_command=extract_query_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'contract', 'command': 'call ebdb.list_contrato();'}
-    )
-
-    dim_contract = BaseDAG.get_quintoandar_python_operator(
-        task_id='DW_dim_contract',
-        dag=local_dag,
-        func_command=load_dim_from_ods_to_dw,
-        op_kwargs={'dim_name': 'contract'}
-    )
-
-    test_contract = BaseDAG.get_quintoandar_python_operator(
-        dag=local_dag,
-        task_id='TEST_dim_contract',
-        func_command=mock_run_dimension_tests
-    )
-
-    contract >> dim_contract
-    dim_contract >> test_contract
-
-    return local_dag
+    return sub_dag.build_with_tests()
 
 
 def booking_sub_dag(sub_dag_name):

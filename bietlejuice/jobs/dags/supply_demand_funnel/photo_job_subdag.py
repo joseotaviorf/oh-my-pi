@@ -9,12 +9,7 @@ from qa_python_utils.default_logger import logger, _logger
 class PhotoJobSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(PhotoJobSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
@@ -22,7 +17,7 @@ class PhotoJobSubDag(BaseSubDag):
 
         photo_job, dim_photo_job, load_photo_job = self.__build_data_tasks(photo_job_dag)
 
-        test_photo_job = self.__build_tests_tasks(photo_job_dag)
+        test_photo_job = self.__local_build_tests_tasks(photo_job_dag)
 
         photo_job >> dim_photo_job >> test_photo_job
 
@@ -65,7 +60,7 @@ class PhotoJobSubDag(BaseSubDag):
         return photo_job, dim_photo_job, load_photo_job
 
     @logger
-    def __build_tests_tasks(self, dag):
+    def __local_build_tests_tasks(self, dag):
 
         duplicate_photo_job = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
@@ -84,7 +79,7 @@ class PhotoJobSubDag(BaseSubDag):
     @staticmethod
     def __test_duplicates():
 
-        if BaseTest.check_for_duplicates(
+        if BaseTest.contains_duplicates(
                 schema='staging',
                 table='dim_photo_job',
                 key='sk_photo_job',
@@ -96,7 +91,7 @@ class PhotoJobSubDag(BaseSubDag):
     @staticmethod
     def __test_emptiness():
 
-        if BaseTest.check_for_emptiness(
+        if BaseTest.is_empty(
                 schema='staging',
                 table='dim_photo_job',
                 enum_db=EnumDb.BI_ODS):
