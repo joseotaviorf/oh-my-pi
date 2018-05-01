@@ -178,11 +178,11 @@ def property_sub_dag(sub_dag_name):
         op_kwargs={'table_name': 'affiliate_payments', 'file_name': 'affiliate_payments.sql'}
     )
 
-    rental_flow = BaseDAG.get_quintoandar_python_operator(
-        task_id='ODS_rental_flow',
+    rent_flow = BaseDAG.get_quintoandar_python_operator(
+        task_id='ODS_rent_flow',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'rental_flow', 'table_name': 'FluxoLocacao', 'copy_to_clean': False}
+        op_kwargs={'dim_name': 'rent_flow', 'table_name': 'FluxoLocacao', 'copy_to_clean': False}
     )
 
     listing_views = BaseDAG.get_quintoandar_python_operator(
@@ -220,7 +220,7 @@ def property_sub_dag(sub_dag_name):
     )
 
     listing_views
-    rental_flow >> dim_property
+    rent_flow >> dim_property
     affiliate >> property_task
     property_task >> dim_property
     property_listing >> dim_property
@@ -375,14 +375,7 @@ def booking_sub_dag(sub_dag_name):
     return local_dag
 
 
-ods_property_scheduling = BaseDAG.get_quintoandar_python_operator(
-    task_id='ODS_liquidity_property_scheduling',
-    dag=main_dag,
-    func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'property_scheduling', 'command': 'call ebdb.list_property_scheduling();'}
-)
-
-ods_house_rental_flow = BaseDAG.get_quintoandar_python_operator(
+ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
     func_command=extract_query_dim_from_ebdb_to_ods,
@@ -402,13 +395,6 @@ fact_supply = BaseDAG.get_quintoandar_python_operator(
     task_id='DW_Fact_Supply',
     func_command=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-)
-
-fact_property_scheduling = BaseDAG.get_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='DW_fact_liquidity_property_scheduling',
-    func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'liquidity_property_scheduling', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_demand = BaseDAG.get_quintoandar_python_operator(
@@ -480,9 +466,8 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, property_dag])
-ods_property_scheduling.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+ods_house_rent_flow.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, property_dag])
 
 ods_supply >> fact_supply
-ods_property_scheduling >> fact_property_scheduling
-ods_house_rental_flow >> fact_demand
+ods_house_rent_flow >> fact_demand
