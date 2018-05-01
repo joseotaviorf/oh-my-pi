@@ -86,8 +86,9 @@ class BaseTest(object):
         _logger.info('m=is_empty, msg={} is not empty'.format(table))
 
     @staticmethod
-    @logger
     def are_counts_equal(_dict):
+        _logger.info('m=are_counts_equal, _dict={}'.format(_dict))
+
         comparison_list = []
         for source in _dict['sources']:
             _query = BaseETL.get_query_from_file_name(source['file_path'])
