@@ -2,7 +2,8 @@
 
 Airflow implementation and DAGs.
 
-### Installation
+### Post-clone
+#### Git hooks
 
 ```
 cd ${bi-etl-ejuice clone dir}/.git/hooks
