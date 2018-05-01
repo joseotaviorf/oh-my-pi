@@ -20,12 +20,11 @@ create table house_rent_flow (
   dt_rent_flow_created timestamp,
   id_offer integer,
   id_pre_proposal integer,
-  id_negotiation integer,
   id_proposal integer,
   dt_proposal_approved timestamp,
   id_contract integer,
   dt_contract_created timestamp,
   dt_contract_signed timestamp,
-  dt_annulment timestamp
+  dt_contract_annulment timestamp
 )
 ;

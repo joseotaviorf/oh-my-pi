@@ -1,7 +1,6 @@
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from airflow.operators.subdag_operator import SubDagOperator
 
 
 class BaseDAG(object):
@@ -26,14 +25,6 @@ class BaseDAG(object):
         )
 
     @staticmethod
-    def get_sub_dag_operator(dag, sub_dag_func, sub_dag_name):
-        return SubDagOperator(
-            subdag=sub_dag_func(sub_dag_name),
-            task_id=sub_dag_name,
-            dag=dag,
-        )
-
-    @staticmethod
     def get_python_operator(task_id, func_command, dag, op_kwargs=None):
         return PythonOperator(
             dag=dag,
@@ -41,19 +32,6 @@ class BaseDAG(object):
             python_callable=func_command,
             op_kwargs=op_kwargs
         )
-
-    @staticmethod
-    def get_sub_dag(main_dag_name, sub_dag_name, schedule_interval, start_date, core_func):
-        local_dag = BaseDAG.build_dag(
-            '{}.{}'.format(main_dag_name, sub_dag_name),
-            schedule_interval=schedule_interval,
-            start_date=start_date,
-        )
-
-        # injection of the core func code
-        core_func(local_dag)
-
-        return local_dag
 
     @staticmethod
     def get_quintoandar_python_operator(task_id, func_command, dag, op_kwargs=None, provide_context=False):

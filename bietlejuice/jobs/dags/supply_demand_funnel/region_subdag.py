@@ -1,36 +1,33 @@
 from datetime import datetime
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.base.base_test import BaseTest
+
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 class RegionSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(RegionSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
-        lead_dag = self.__build_local_dag()
+        region_dag = self.__build_local_dag()
 
-        agent_region, region, dim_region, load_region = self.__build_data_tasks(lead_dag)
+        agent_region, region, dim_region, load_region = self.__build_data_tasks(region_dag)
 
-        duplicate_region, empty_region = self.__build_tests_tasks(lead_dag)
+        duplicate_region, empty_region = self.__local_build_tests_tasks(region_dag)
 
         agent_region >> dim_region
         region >> dim_region
         dim_region >> empty_region
         empty_region >> duplicate_region >> load_region
 
-        return lead_dag
+        return region_dag
 
     @logger
     def __build_local_dag(self):
@@ -44,12 +41,11 @@ class RegionSubDag(BaseSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-
         agent_region = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
             func_command=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'agent_region', 'bucket': self.bucket,  'table_name': 'DadosAgente_Regiao',
+            op_kwargs={'dim_name': 'agent_region', 'bucket': self.bucket, 'table_name': 'DadosAgente_Regiao',
                        'copy_to_clean': False}
         )
 
@@ -80,8 +76,7 @@ class RegionSubDag(BaseSubDag):
         return agent_region, region, dim_region, load_region
 
     @logger
-    def __build_tests_tasks(self, dag):
-
+    def __local_build_tests_tasks(self, dag):
         duplicate_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_duplicates_dim_region',
@@ -98,23 +93,17 @@ class RegionSubDag(BaseSubDag):
 
     @staticmethod
     def __test_duplicates():
-
-        if BaseTest.check_for_duplicates(
-                schema='staging',
-                table='dim_region',
-                key='sk_region',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_region'))
+        BaseTest.check_for_duplicates(
+            schema='staging',
+            table='dim_region',
+            key='sk_region',
+            enum_db=EnumDb.BI_ODS
+        )
 
     @staticmethod
     def __test_emptiness():
-
-        if BaseTest.check_for_emptiness(
-                schema='staging',
-                table='dim_region',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_emptiness {} not empty'.format('dim_region'))
+        BaseTest.check_for_emptiness(
+            schema='staging',
+            table='dim_region',
+            enum_db=EnumDb.BI_ODS
+        )

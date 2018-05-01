@@ -17,7 +17,6 @@ create table fact_demand (
 	sk_client integer,
 	sk_client_sign_up_date integer,
 	sk_visit integer,
-	sk_negotiation integer,
 	sk_offer integer,
 	sk_offer_submitted_date integer,
 	sk_offer_approved_date integer,

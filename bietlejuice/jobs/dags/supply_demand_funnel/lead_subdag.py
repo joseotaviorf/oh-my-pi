@@ -1,20 +1,16 @@
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.base.base_test import BaseTest
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 class LeadSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(LeadSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
@@ -22,7 +18,7 @@ class LeadSubDag(BaseSubDag):
 
         lead, dim_lead, load_lead = self.__build_data_tasks(lead_dag)
 
-        duplicate_lead, empty_lead = self.__build_tests_tasks(lead_dag)
+        duplicate_lead, empty_lead = self.__local_build_tests_tasks(lead_dag)
 
         lead >> dim_lead >> empty_lead >> duplicate_lead >> load_lead
 
@@ -40,7 +36,6 @@ class LeadSubDag(BaseSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-
         lead = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_lead',
@@ -65,8 +60,7 @@ class LeadSubDag(BaseSubDag):
         return lead, dim_lead, load_lead
 
     @logger
-    def __build_tests_tasks(self, dag):
-
+    def __local_build_tests_tasks(self, dag):
         duplicate_lead = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='TEST_duplicates_dim_lead',
@@ -83,23 +77,17 @@ class LeadSubDag(BaseSubDag):
 
     @staticmethod
     def __test_duplicates():
-
-        if BaseTest.check_for_duplicates(
-                schema='staging',
-                table='dim_lead',
-                key='sk_lead',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_lead'))
+        BaseTest.check_for_duplicates(
+            schema='staging',
+            table='dim_lead',
+            key='sk_lead',
+            enum_db=EnumDb.BI_ODS
+        )
 
     @staticmethod
     def __test_emptiness():
-
-        if BaseTest.check_for_emptiness(
-                schema='staging',
-                table='dim_lead',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_emptiness {} not empty'.format('dim_lead'))
+        BaseTest.check_for_emptiness(
+            schema='staging',
+            table='dim_lead',
+            enum_db=EnumDb.BI_ODS
+        )
