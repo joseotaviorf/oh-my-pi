@@ -40,6 +40,7 @@ class ContractSubDag(BaseSubDag):
             enum_db=EnumDb.BI_ODS
         )
 
+
     @staticmethod
     def __test_counts():
         BaseTest.are_counts_equal({
