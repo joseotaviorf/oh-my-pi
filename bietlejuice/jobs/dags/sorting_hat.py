@@ -3,6 +3,7 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.sorting_hat import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.sorting_hat import SortingHat
@@ -110,19 +111,19 @@ proponent_task = PythonOperator(
 )
 
 # Unit tests
-proposal_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=proposal_unit_tests_sub_dag,
     sub_dag_name='proposal_unit_tests'
 )
 
-proponent_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=proponent_unit_tests_sub_dag,
     sub_dag_name='proponent_unit_tests'
 )
 
-proposalversion_unit_tests_dag = BaseDAG.get_sub_dag_operator(
+proposalversion_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=proposalversion_unit_tests_sub_dag,
     sub_dag_name='proposalversion_unit_tests'
