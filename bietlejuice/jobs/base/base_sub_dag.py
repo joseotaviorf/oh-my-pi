@@ -79,6 +79,7 @@ class BaseSubDag(object):
 
         # flow
         entity >> staging_dim_entity
+        staging_dim_entity.set_downstream(tests_tasks)
         load_entity.set_upstream(tests_tasks)
 
         return entity_dag
