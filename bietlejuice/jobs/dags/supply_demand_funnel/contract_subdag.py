@@ -47,7 +47,7 @@ class ContractSubDag(BaseSubDag):
             'sources': [
                 {
                     'file_path': '{}/dim_contract_count_check.sql'.format(ODS_STAGING_TEST_QUERIES_DIR),
-                    'enum_db': EnumDb.BI_Staging
+                    'enum_db': EnumDb.BI_ODS
                 },
                 {
                     'file_path': '{}/contrato_count_check.sql'.format(EBDB_TEST_QUERIES_DIR),
