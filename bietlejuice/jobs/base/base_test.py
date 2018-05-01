@@ -95,6 +95,7 @@ class BaseTest(object):
             query_result = BaseTest.get_query_result_for_comparison(
                 query=_query,
                 enum_db=source['enum_db'],
+                encoding=source['encoding'] if 'encoding' in source else 'utf-8',
                 from_athena=source['from_athena'] if 'from_athena' in source else False
             )
 
