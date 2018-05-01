@@ -19,7 +19,7 @@ class ContractSubDag(BaseSubDag):
             tests=[
                 ('duplicates_dim_contract', ContractSubDag.__test_duplicates),
                 ('emptiness_dim_contract', ContractSubDag.__test_emptiness),
-                ('counts_dim_contract', ContractSubDag.__test_counts())
+                ('counts_dim_contract', ContractSubDag.__test_counts)
             ]
         )
 
