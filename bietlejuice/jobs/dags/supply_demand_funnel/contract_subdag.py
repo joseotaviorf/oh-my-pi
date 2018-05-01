@@ -23,7 +23,6 @@ class ContractSubDag(BaseSubDag):
             ]
         )
 
-
     @staticmethod
     def __test_duplicates():
         BaseTest.check_for_duplicates(
