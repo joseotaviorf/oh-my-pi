@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel import offer_subdag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
@@ -418,61 +419,61 @@ fact_demand = BaseDAG.get_quintoandar_python_operator(
 )
 
 # flow
-lead_dag = BaseDAG.get_sub_dag_operator(
+lead_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=lead_sub_dag,
     sub_dag_name='Lead'
 )
 
-photo_job_dag = BaseDAG.get_sub_dag_operator(
+photo_job_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=photo_job_sub_dag,
     sub_dag_name='PhotoJob'
 )
 
-region_dag = BaseDAG.get_sub_dag_operator(
+region_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=region_sub_dag,
     sub_dag_name='Region'
 )
 
-user_dag = BaseDAG.get_sub_dag_operator(
+user_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=user_sub_dag,
     sub_dag_name='User'
 )
 
-property_dag = BaseDAG.get_sub_dag_operator(
+property_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=property_sub_dag,
     sub_dag_name='Property'
 )
 
-visit_dag = BaseDAG.get_sub_dag_operator(
+visit_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=visit_sub_dag,
     sub_dag_name='Visit'
 )
 
-offer_dag = BaseDAG.get_sub_dag_operator(
+offer_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=offer_sub_dag,
     sub_dag_name='Offer'
 )
 
-proposal_dag = BaseDAG.get_sub_dag_operator(
+proposal_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=proposal_sub_dag,
     sub_dag_name='Proposal'
 )
 
-contract_dag = BaseDAG.get_sub_dag_operator(
+contract_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=contract_sub_dag,
     sub_dag_name='Contract'
 )
 
-booking_dag = BaseDAG.get_sub_dag_operator(
+booking_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=booking_sub_dag,
     sub_dag_name='Booking'

@@ -34,7 +34,7 @@ class BaseSubDag(object):
         return local_dag
 
     @logger(exclude='dag')
-    def _get_sub_dag_operator(self, dag, sub_dag_func):
+    def get_sub_dag_operator(self, dag, sub_dag_func):
         """
         Gets the corresponding subdag operator
         :param dag: the main dag which will contain the subdag
