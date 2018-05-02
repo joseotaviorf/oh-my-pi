@@ -7,9 +7,9 @@ pipeline:
 
   flake8-web:
     image: python:2.7.12
-      commands:
-        - pip install -q flake8
-        - flake8 .
+    commands:
+      - pip install -q flake8
+      - flake8 .
 
   install-forno:
     image: drillster/drone-rsync
