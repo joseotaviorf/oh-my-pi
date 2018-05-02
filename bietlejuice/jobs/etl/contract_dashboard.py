@@ -1,15 +1,16 @@
-import petl
 import json
 import os
 import sys
+from datetime import datetime, timedelta
+
+import petl
 import requests
+from pymongo import MongoClient
+from pytz import UTC, timezone
+from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-from pymongo import MongoClient
-from datetime import datetime, timedelta
-from pytz import UTC, timezone
-from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
 run_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
@@ -50,10 +51,10 @@ class ContractDashboard(object):
         client = MongoClient(self.mongodb_uri)
         db = client.tasks
         for row in db.tasks.find({
-                                    "realizadaEm": {"$gte": self.fetch_dt},
-                                    "type": "FollowUpAssinaturas",
-                                    "metadata.imovelId": {"$in": imovel_id_list}
-                                }):
+            "realizadaEm": {"$gte": self.fetch_dt},
+            "type": "FollowUpAssinaturas",
+            "metadata.imovelId": {"$in": imovel_id_list}
+        }):
             task = list()
             task.append(row['metadata']['imovelId'])
             task.append(row['assigneeId'])
@@ -68,12 +69,12 @@ class ContractDashboard(object):
         table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
             query='''
-            select 
+            select
                 imovel_id, dataAssinado
-            from Contrato 
-            where 
+            from Contrato
+            where
                 CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo') >= CONVERT_TZ('{0}','UTC','America/Sao_Paulo')
-            AND 
+            AND
                 CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo') <= CONVERT_TZ('{1}','UTC','America/Sao_Paulo')
             and status IN ('Ativo', 'Finalizado')'''.format(self.fetch_dt, self.exec_time))
         return table
@@ -91,18 +92,18 @@ class ContractDashboard(object):
         # We don't convert dataAssinado to BR timezone because we are querying with UTC
         table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
-            query='''select 
+            query='''select
                         count(imovel_id) as total
                         from Contrato
-                    where 
+                    where
                         year(
                             DATE(CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo'))
                         ) = year(DATE(CONVERT_TZ('{0}','UTC','America/Sao_Paulo')))
-                    and 
+                    and
                         month(
                             DATE(CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo'))
                         ) = month(DATE(CONVERT_TZ('{0}','UTC','America/Sao_Paulo')))
-                    and 
+                    and
                         DATE(
                             CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo')
                         ) <= DATE(CONVERT_TZ('{0}','UTC','America/Sao_Paulo'))
@@ -114,7 +115,7 @@ class ContractDashboard(object):
         # We don't convert dataAssinado to BR timezone because we are querying with UTC
         table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
-            query='''select 
+            query='''select
                             count(imovel_id) as total
                             from Contrato
                         where
@@ -157,10 +158,10 @@ class ContractDashboard(object):
             sign_tasks = petl.leftjoin(sign_tasks, assignee_names, key='agent_id')
 
             signed_contracts = petl.leftjoin(
-                                    signed_contracts,
-                                    sign_tasks,
-                                    key='imovel_id'
-                                )
+                signed_contracts,
+                sign_tasks,
+                key='imovel_id'
+            )
             return petl.todataframe(signed_contracts)
         else:
             return None

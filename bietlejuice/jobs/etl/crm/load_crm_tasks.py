@@ -40,4 +40,3 @@ BaseETL.dataframe_to_db(
     append=True
 )
 logging.info("END - To ODS: {}".format(datetime.utcnow()))
-

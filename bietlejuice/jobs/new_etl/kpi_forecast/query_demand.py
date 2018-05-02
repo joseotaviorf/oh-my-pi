@@ -1,7 +1,7 @@
-query_demand = """select 
+query_demand = """select
 f.sk_rent_flow,
 f.sk_house, -- sk_property,
-f.sk_booking, 
+f.sk_booking,
 f.sk_owner,
 -- f.sk_user_affiliate,
 f.sk_user_agent,
@@ -23,7 +23,7 @@ f.sk_contract,
 -- f.sk_user_agent_date -- meaning?
 
 -- booking --
--- db.id_booking, 
+-- db.id_booking,
 db.visit_follow_up,
 --db.visit_type? ...
 db.dt_created as dt_booking_created,
@@ -58,8 +58,8 @@ left join dim_proposal dp on f.sk_proposal = dp.sk_proposal
 left join dim_contract dc on f.sk_contract = dc.sk_contract
 left join dim_region dr on f.sk_region = dr.sk_region
 
--- when a booking is cancelled AND rescheduled we want to count the new scheduling only. 
+-- when a booking is cancelled AND rescheduled we want to count the new scheduling only.
 -- the status of the first one will be cancelled and the reason will be 'rescheduling'
-where db.reason_category != 'Reschedule' 
+where db.reason_category != 'Reschedule'
 
 ;"""

@@ -1,9 +1,8 @@
 import logging
-from datetime import datetime
-from qa_python_utils.aws.athena import AthenaClient
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
 import sys
+from datetime import datetime
+
+from qa_python_utils.aws.athena import AthenaClient
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)

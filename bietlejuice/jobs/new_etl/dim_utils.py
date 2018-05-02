@@ -1,12 +1,12 @@
-from datetime import datetime, date
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from qa_python_utils.default_logger import logger, _logger
-from qa_python_utils.aws.athena import AthenaClient
-from marketing_costs.google_campaigns import GoogleCampaigns
-from marketing_costs.fb_campaigns import FacebookCampaigns
-from marketing_costs.criteo_campaigns import CriteoCampaigns
-from qa_python_utils.aws.athena import AthenaClient
 import os
+from datetime import datetime, date
+
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from marketing_costs.fb_campaigns import FacebookCampaigns
+from marketing_costs.google_campaigns import GoogleCampaigns
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')

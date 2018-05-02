@@ -1,8 +1,4 @@
 # encoding: utf-8
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 import json
 import os
@@ -14,10 +10,13 @@ import pandas as pd
 import petl
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-from qa_python_utils.default_logger import logger, _logger
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 args = sys.argv
 help_center = json.loads(os.environ['help-center'])
@@ -130,13 +129,13 @@ class HelpCenter(object):
                         up.name,
                         up.id,
                         (
-                         '' || 
+                         '' ||
                             case
                               when p.id is not null and trim(p.id) != ''
                                 then ',landlord'
                               else ''
                             end
-                            || 
+                            ||
                             case
                               when ec_id is not null and trim(ec_id) != '' and trim(pp_type) = 'Inquilino'
                                 then ',tenant_with_contract'
@@ -165,7 +164,7 @@ class HelpCenter(object):
                             ||
                             case
                               when trim(up.tipoadmin) in ('Admin','Sudo','Contratos','Financeiro','AtendimentoParceiros')
-                                and trim(up.bloqueado) = 'false' 
+                                and trim(up.bloqueado) = 'false'
                                 then ',admin'
                               else ''
                             end
@@ -177,7 +176,7 @@ class HelpCenter(object):
                             end
                             ||
                             case
-                              when ad.id is not null and trim(ad.id) != '' 
+                              when ad.id is not null and trim(ad.id) != ''
                                 then ',affiliate'
                               else ''
                             end
@@ -203,17 +202,17 @@ class HelpCenter(object):
                          ''
                         ) as roles
                       from users_prev up
-                      left join datalake_clean.ebdb_property p 
+                      left join datalake_clean.ebdb_property p
                         on p.usuario_id = up.id
                             and p.status != 'excluido'
-                      left join datalake_clean.ebdb_photographer_data pd 
+                      left join datalake_clean.ebdb_photographer_data pd
                         on pd.id = up.dadosfotografo_id
                           and pd.ativo = 'true'
-                      left join datalake_clean.ebdb_affiliate_data ad 
+                      left join datalake_clean.ebdb_affiliate_data ad
                         on ad.id = up.dadosafiliado_id
                           and ad.ativo = 'true'
-                      left join datalake_clean.ebdb_seller_data sd 
-                        on sd.id = up.dadosvendedor_id 
+                      left join datalake_clean.ebdb_seller_data sd
+                        on sd.id = up.dadosvendedor_id
                           and sd.ativo = 'true'
                       left join datalake_clean.ebdb_agent_data_type dat
                         on dat.dadosagente_id = up.dadosagente_id
@@ -227,10 +226,10 @@ class HelpCenter(object):
                         trim(us.email) as email,
                         trim(us.name) as "name",
                         us.roles as roles,
-                        coalesce(us.main_phone, '') 
-                         || ',' || coalesce(us.secondary_phone, '') 
-                         || ',' || coalesce(us.commercial_phone, '') 
-                         || ',' || coalesce(us.contract_phone, '') 
+                        coalesce(us.main_phone, '')
+                         || ',' || coalesce(us.secondary_phone, '')
+                         || ',' || coalesce(us.commercial_phone, '')
+                         || ',' || coalesce(us.contract_phone, '')
                          || ',' || coalesce(us.proposal_phone, '')
                         as phones,
                         mu.amplitude_id as amplitude_id,

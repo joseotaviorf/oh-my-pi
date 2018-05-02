@@ -50,12 +50,13 @@ class Ts_predictor:
 
         # cut the end of the series : make sure to cut the series before begin_pred
         # cut the beginning of the series :
-        ##find the last date at which the bookings were null for one week.
-        ##the end of that week is the beginning of the period we consider to make predictions
-        ##if this date does not exit, we do not need to cut the series
+        # find the last date at which the bookings were null for one week.
+        # the end of that week is the beginning of the period we consider to make predictions
+        # if this date does not exit, we do not need to cut the series
         rolling_daily = self.daily_past.rolling(7).sum()
         begin_ts_candidate = pd.to_datetime(rolling_daily[rolling_daily == 0].index.max())
-        if pd.notnull(begin_ts_candidate): self.begin_ts = begin_ts_candidate
+        if pd.notnull(begin_ts_candidate):
+            self.begin_ts = begin_ts_candidate
         # self.end_ts = min(self.end_ts, self.begin_pred-pd.to_timedelta(1,unit='days'))
         self.daily_past = self.daily_past.loc[pd.date_range(self.begin_ts, self.end_ts, freq='D', closed=None)]
 
@@ -90,24 +91,27 @@ class Ts_predictor:
 
     def remove_weekly_seasonality_do(self, ts):
         # find the weekly seasonality: dailylog/dailylog7drollingavg, groupby weekday/sum
-        rolavg7_ts = self.rolling_mean_until_yesterday(ts,
-                                                       days=7)  # for each day the average of the last 7 days, not including this day
+        # for each day the average of the last 7 days, not including this day
+        rolavg7_ts = self.rolling_mean_until_yesterday(ts, days=7)
         ratio7_ts = ts / rolavg7_ts  # should be close to 1 on average
 
         # todo : remove specific step:
         ratio7_ts_2y_positive = ratio7_ts.loc[
-            (ratio7_ts.index >= pd.Timestamp('1/1/2016')) & (ratio7_ts.index < self.begin_pred) & (
-                ratio7_ts > 0).values]
+            (ratio7_ts.index >= pd.Timestamp('1/1/2016')) & (ratio7_ts.index < self.begin_pred) &
+            (ratio7_ts > 0).values]
 
         self.weekly_seasonality = ratio7_ts_2y_positive.groupby(
             ratio7_ts_2y_positive.index.to_series().dt.weekday).mean()  # should be close to 1 on average
-        self.weekly_seasonality = self.weekly_seasonality / self.weekly_seasonality.sum() * 7  # the sum of a normal week should be 7, not 7.02
+
+        # the sum of a normal week should be 7, not 7.02
+        self.weekly_seasonality = self.weekly_seasonality / self.weekly_seasonality.sum() * 7
         if self.weekly_seasonality[self.weekly_seasonality.notnull()].shape[0] < 7:
             _logger.info('Not enough data to compute weekly seasonality')
             return None
 
-        # correct all the days by their weekly seasonality. if 80% of normal, divide by 0.8 (hypothesis weekly and yearly seasonality are independent)
-        seasonality_factor_week = self.weekly_seasonality.loc[ts.index.to_series().dt.weekday]  ###new
+        # correct all the days by their weekly seasonality. if 80% of normal,
+        # divide by 0.8 (hypothesis weekly and yearly seasonality are independent)
+        seasonality_factor_week = self.weekly_seasonality.loc[ts.index.to_series().dt.weekday]  # new
         seasonality_factor_week.index = ts.index
         ts_no7dseasonality = ts.divide(seasonality_factor_week)
         return ts_no7dseasonality
@@ -121,11 +125,11 @@ class Ts_predictor:
     def remove_yearly_seasonality_do(self, ts, rolavg_duration=120):
         # if there is a default, use it:
         if self.default_yearly_seasonality is not None:
-            #_logger.info('not enough data to compute the yearly seasonality of region. Computing using the default.')
-            #_logger.info('Always computing using the default yearly seasonality.')
+            # _logger.info('not enough data to compute the yearly seasonality of region. Computing using the default.')
+            # _logger.info('Always computing using the default yearly seasonality.')
             self.yearly_seasonality = self.default_yearly_seasonality
             self.own_yearly_seasonality = None
-        else: #compute own yearly seasonality
+        else:  # compute own yearly seasonality
             # find the yearly seasonality (based on last 2 years, with centered rolling mean)
             self.rolavg_ts = ts.rolling(rolavg_duration, center=True).mean()
             ratio_ts = ts / self.rolavg_ts  # should be close to 1 on average, but isnt
@@ -150,8 +154,8 @@ class Ts_predictor:
         # if not, it means we didn't have enough data to compute it :
         if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22 + rolavg_duration, unit='days'),
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
-                                 freq='D', closed=None)).issubset(
-            set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
+                                 freq='D', closed=None)
+                   ).issubset(set(ts_noYseasonality[ts_noYseasonality.notnull()].index)):
             _logger.info('not enough data to compute/use the yearly seasonality. Computing without')
             self.model_yearly_seasonality = False
             ts_noYseasonality = ts
@@ -159,7 +163,7 @@ class Ts_predictor:
         return ts_noYseasonality
 
     def remove_yearly_seasonality_undo(self, ts):  # series we want to add the yearly seasonality to
-        if self.model_yearly_seasonality == True:
+        if self.model_yearly_seasonality:
             # add back the yearly seasonality
             seasonality_factor_year_pred = self.yearly_seasonality[self.range_pred_day.to_series().dt.strftime('%m-%d')]
             seasonality_factor_year_pred.index = self.range_pred_day
@@ -172,7 +176,9 @@ class Ts_predictor:
     def remove_trend_do(self, ts, rolavg_duration=120):  # series you want to remove the trend from
         # compute rolling avg without yearly seasonality, remove it to make the series stationary
         rolavg_ts = self.rolling_mean_until_yesterday(ts, days=rolavg_duration)
-        # if the last three weeks (model for prediction based on 3 weeks) are not part of the rolling average timeseries, it means there was not enough data to compute it
+        # if the last three weeks (model for prediction based on 3 weeks) are not
+        # part of the rolling average timeseries, it means there was not enough
+        # data to compute it
         if not set(pd.date_range(self.begin_pred - pd.to_timedelta(22, unit='days'),
                                  self.begin_pred - pd.to_timedelta(1, unit='days'),
                                  freq='D', closed=None)).issubset(set(rolavg_ts[rolavg_ts.notnull()].index)):
@@ -185,7 +191,8 @@ class Ts_predictor:
                           notrend_ts_pred,  # - the time series we want to add the rolling average to
                           result_last_do,  # -the series for the past, with its trend
                           rolavg_duration=120):
-        # for every day that we want to predict, take the predicted "notrend" value and add the rolling average 120 until the day before
+        # for every day that we want to predict, take the predicted "notrend"
+        # value and add the rolling average 120 until the day before
         ts_pred = result_last_do.copy()
         for d in self.range_pred_day:
             rolavg_ts_pred_d = ts_pred[
@@ -330,7 +337,7 @@ class Ts_predictor:
         ])
 
         # keep only the steps that we are going to perform
-        self.steps_prediction = self.steps_prediction[self.steps_prediction.condition == True]
+        self.steps_prediction = self.steps_prediction[self.steps_prediction.condition]
 
         # creating stack and queue
         for step_name, row in self.steps_prediction.iterrows():
@@ -349,18 +356,22 @@ class Ts_predictor:
                 _logger.info(row.error_do)
                 return None
             self.intermediary_results[row.output_name_do] = ts
-            self.intermediary_results_stack.append(
-                ts)  # we will pop each time we do an 'undo' step to get on the intermediary result of the previous 'do' step
-            if plot == True: self.plot_ts(ts, title=row.output_name_do)
+            # we will pop each time we do an 'undo' step to get on the intermediary result of the previous 'do' step
+            self.intermediary_results_stack.append(ts)
+            if plot:
+                self.plot_ts(ts, title=row.output_name_do)
 
-        self.intermediary_results_stack.pop()  # remove the last intermediary result so that the top of the stack is the result outputted by the last undone step
+        # remove the last intermediary result so that the top of the stack is the
+        # result outputted by the last undone step
+        self.intermediary_results_stack.pop()
 
         while undo_stack:
             row = undo_stack.pop()
             # print row.output_name_undo
             # create arguments for the function
             # if there is a results to be removed, remove it and memorize to pass as parameter if needed
-            if self.intermediary_results_stack: result_last_do = self.intermediary_results_stack.pop()
+            if self.intermediary_results_stack:
+                result_last_do = self.intermediary_results_stack.pop()
             if row.feedback_undo:
                 feedback_dict = {'result_last_do': result_last_do}
             else:
@@ -374,6 +385,7 @@ class Ts_predictor:
                 _logger.info(row.error_undo)
                 return None
             self.intermediary_results[row.output_name_undo] = ts
-            if plot == True: self.plot_ts(ts, title=row.output_name_undo)
+            if plot:
+                self.plot_ts(ts, title=row.output_name_undo)
 
         return ts

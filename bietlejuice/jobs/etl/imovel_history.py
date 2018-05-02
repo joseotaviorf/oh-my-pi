@@ -1,7 +1,8 @@
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from datetime import datetime
+
 import petl
-import os
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 table_name = 'imovel_status_history'
 
@@ -51,8 +52,8 @@ BaseETL.bulk_insert(
     commit=True
 )
 
-### LOAD ####
-#create connection
+# LOAD
+# create connection
 conn = BaseETL.get_connection(db_enum=EnumDb.BI_ODS, encoding='UTF-8')
 
 # delete repeated ids
@@ -60,12 +61,11 @@ q_del = 'delete from {} where id in {}'.format(
     table_name,
     list(petl.aggregate(imoveis, 'id')['id'])
 ).replace(
-    '[','('
+    '[', '('
 ).replace(
-    ']',')'
+    ']', ')'
 )
 BaseETL.execute_command(command=q_del, conn=conn, commit=False)
-
 
 # load into ods/datalake (in same transaction)
 BaseETL.execute_command(

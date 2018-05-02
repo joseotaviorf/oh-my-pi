@@ -1,9 +1,11 @@
-import os
 import json
-import pymysql
+import os
+
 import psycopg2
 import psycopg2.extensions
-from enum_db import EnumDb, EnumDbType
+import pymysql
+
+from enum_db import EnumDbType
 
 
 class DBFactory(object):

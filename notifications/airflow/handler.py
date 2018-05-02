@@ -4,14 +4,13 @@ import sys
 from base64 import b64decode
 from datetime import datetime
 
+import boto3
+import mysql.connector
+import requests
 from dateutil.relativedelta import relativedelta
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, 'vendor'))
-
-import requests
-import mysql.connector
-import boto3
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -33,11 +32,8 @@ def failed_jobs(event, context):
         dag_id = failed_job[1]
         url = 'http://capiroto.quintoandar.com.br/admin/airflow/graph?root=&dag_id={}'.format(dag_id)
 
-        texts += '\n-- *{}* --\ntask_id: {}\ndag_id: {}\nexecution_date: {}\n<{}|go to airflow>\n'.format(index,
-                                                                                                          task_id,
-                                                                                                          dag_id,
-                                                                                                          execution_date,
-                                                                                                          url)
+        texts += '\n-- *{}* --\ntask_id: {}\ndag_id: {}\nexecution_date: {}\n<{}|go to airflow>\n'.format(
+            index, task_id, dag_id, execution_date, url)
 
     response = requests.post(url='https://hooks.slack.com/services/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',
                              json={'text': texts})
