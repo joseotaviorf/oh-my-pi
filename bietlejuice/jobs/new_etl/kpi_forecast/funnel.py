@@ -72,11 +72,11 @@ class Funnel:
                 self.process_duration[step] = analysis_df[step].dt.date - analysis_df[predictor_step].dt.date
 
                 # we deduplicate analysis df for deduplication_col_step since we do not want to double count them
+                # we need step and predictor step to be not null to be able to define a duration
                 t = analysis_df[
                     analysis_df[predictor_step].notnull() &
                     analysis_df[step].notnull() &
-                    (~analysis_df.duplicated(subset=[deduplication_col_step]))
-                ]  # we need step and predictor step to be not null to be able to define a duration
+                    (~analysis_df.duplicated(subset=[deduplication_col_step]))]
                 if t.shape[0] > 0:
                     step_duration_deduplicated = t[step].dt.date - t[predictor_step].dt.date
                     step_duration_deduplicated = step_duration_deduplicated[step_duration_deduplicated.notnull()]
@@ -178,11 +178,12 @@ class Funnel:
                 # find the lines in recent_df that have performed predictor_step but not step,
                 # !! at the time of begin_pred !!
                 # and count them by predictor_step_date
-                sel = self.recent_df[self.recent_df[predictor_step].notnull() &  # have perfomed predictor step
-                                     (self.recent_df[
-                                         predictor_step] < self.begin_pred) &  # have performed it before at the time of the prediction
-                                     (self.recent_df[
-                                         'last_step_order'] < step_order)]  # have not preformed the step to be predicted or any step further
+                # have perfomed predictor step
+                # have performed it before at the time of the prediction
+                # have not preformed the step to be predicted or any step further
+                sel = self.recent_df[self.recent_df[predictor_step].notnull() &
+                                     (self.recent_df[predictor_step] < self.begin_pred) &
+                                     (self.recent_df['last_step_order'] < step_order)]
 
                 col = sel.groupby(pd.to_datetime(self.recent_df[predictor_step].dt.date)).size()
                 col = col.rename(step)
@@ -205,15 +206,14 @@ class Funnel:
 
         # The last step performed -- before the date begin pred !! --
 
-        for step in self.steps.index[
-                ::-1]:  # go in reverse order. where there is no last step yet and step is not null, last_step = step
-
+        # go in reverse order. where there is no last step yet and step is not null, last_step = step
+        for step in self.steps.index[::-1]:
             # if there is no last step and step is not null and step>begin_pred => the
             # date of the last step is the date of the step
+            # date of the step for the lines for which it is the last step
             self.recent_df.loc[self.recent_df['last_step_name'].isnull() &
                                (self.recent_df[step] < self.begin_pred), 'last_step_date'] = self.recent_df.loc[
-                self.recent_df['last_step_name'].isnull() & (self.recent_df[
-                    step] < self.begin_pred), step].dt.date  # date of the step for the lines for which it is the last step
+                self.recent_df['last_step_name'].isnull() & (self.recent_df[step] < self.begin_pred), step].dt.date
             # the order is the order of the last step
             self.recent_df.loc[self.recent_df['last_step_name'].isnull() &
                                (self.recent_df[step] < self.begin_pred), 'last_step_order'] = self.steps.loc[step].order
@@ -269,11 +269,10 @@ class Funnel:
             if predictor_step is not None:  # has to be predicted
                 # create a temporary series that will host the number of applications per day
                 final_predictor = pd.concat([kpi_pred.loc[:, predictor_step],
-                                             self.predictor_df.loc[:, step]], axis=1).sum(
-                    axis=1)  # .reset_index(level=0,drop=True)
+                                             self.predictor_df.loc[:, step]], axis=1).sum(axis=1)
 
-                for predictor_step_date in final_predictor[
-                        final_predictor > 0].index:  # the dates for which the predictor of step is positive
+                # the dates for which the predictor of step is positive
+                for predictor_step_date in final_predictor[final_predictor > 0].index:
                     weekday = predictor_step_date.weekday()
                     # we know that the applications made at this date stayed idle at least until
                     # the morning of begin_pred. no event can be predicted backwards before begin_pred
@@ -286,10 +285,9 @@ class Funnel:
                     distrib = self.get_prior_knowledge_distrib(distrib, min_days_to_next_event)
                     for delay, conv in distrib.iteritems():
                         if predictor_step_date + delay in kpi_pred.index:
-                            kpi_pred.loc[predictor_step_date + delay, step] = kpi_pred.loc[
-                                predictor_step_date + delay, step] + \
-                                final_predictor[
-                                predictor_step_date] * conv
+                            kpi_pred.loc[predictor_step_date + delay, step] = \
+                                kpi_pred.loc[predictor_step_date + delay, step] + \
+                                final_predictor[predictor_step_date] * conv
 
         kpi_pred = kpi_pred.loc[self.range_pred_day.tolist(), :]
         kpi_pred.index.set_names(['date'], inplace=True)

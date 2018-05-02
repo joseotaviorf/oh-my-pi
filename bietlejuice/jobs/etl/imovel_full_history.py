@@ -1,6 +1,6 @@
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 import sys
-import os
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 count_ids = BaseETL.from_db_query(
     db_enum=EnumDb.BI_ODS,
@@ -40,7 +40,6 @@ while offset <= count_ids:
 
 print ('END')
 sys.stdout.flush()
-
 
 # move to lake
 BaseETL.dump_ODS_to_datalake(table_name=table_name, filename='property_status_full_history')

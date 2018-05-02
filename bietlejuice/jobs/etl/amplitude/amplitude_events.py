@@ -1,15 +1,15 @@
-import os
-import io
-import sys
-import boto3
-import json
 import gzip
-import pytz
+import io
+import json
+import os
+import sys
 from datetime import datetime, timedelta
-from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
-from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+
+import boto3
+
 from bietlejuice.jobs.base.base_etl import BaseETL, log, EnumDb
-from qa_python_utils.aws.athena import AthenaClient
+from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -175,6 +175,8 @@ class AmplitudeEventsETL(BaseETL):
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
+
+
 #     return dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(LOCAL_TZ))
 
 

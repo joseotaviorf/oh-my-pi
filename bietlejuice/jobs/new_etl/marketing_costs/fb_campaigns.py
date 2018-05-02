@@ -1,11 +1,13 @@
 import traceback
+from datetime import date
+
 import petl
-from datetime import datetime, date, timedelta
 from facebookads import FacebookAdsApi
 from facebookads.adobjects.adaccount import AdAccount
 from facebookads.adobjects.adsinsights import AdsInsights as Insights
-from marketing_campaigns import MarketingCampaigns
 from qa_python_utils.default_logger import _logger
+
+from marketing_campaigns import MarketingCampaigns
 
 
 class FacebookCampaigns(MarketingCampaigns):

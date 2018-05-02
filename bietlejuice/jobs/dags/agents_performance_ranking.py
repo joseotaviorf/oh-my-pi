@@ -1,10 +1,11 @@
+import os
 from datetime import datetime, timedelta
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from bietlejuice.jobs.dags.util import environment as env
+
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
-import os
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.dags.util import environment as env
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 PROD_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/prod/queries')

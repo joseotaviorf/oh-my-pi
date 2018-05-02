@@ -1,8 +1,6 @@
-from zenpy import Zenpy
-import requests
-import time as t
-import datetime
 import pandas as pd
+import requests
+from zenpy import Zenpy
 
 
 def get_zendek_client(client_id, client_secret):
@@ -84,17 +82,17 @@ def get_chat_client(client_id, client_secret, auth_token, name='Data Team - Conf
 #                 )
 #             )
 #     t.sleep(30)
-    # with BaseETL.open_gzip_fp() as fp:
-    #     for c in chats:
-    #         BaseETL.write_json_in_fp(c.to_dict(), fp)
-    #     gz = fp.fileobj
-    #
-    # file_path = 'chat/{}.gz'.format(datetime.datetime.now().strftime('%Y%m%d-%H.%M.%S'))
-    # BaseETL.obj_to_s3(
-    #     obj_io=gz,
-    #     bucket='bi-etl-ejuice-tmpfiles',
-    #     file_path=file_path
-    # )
+# with BaseETL.open_gzip_fp() as fp:
+#     for c in chats:
+#         BaseETL.write_json_in_fp(c.to_dict(), fp)
+#     gz = fp.fileobj
+#
+# file_path = 'chat/{}.gz'.format(datetime.datetime.now().strftime('%Y%m%d-%H.%M.%S'))
+# BaseETL.obj_to_s3(
+#     obj_io=gz,
+#     bucket='bi-etl-ejuice-tmpfiles',
+#     file_path=file_path
+# )
 
 
 zen_client = get_zendek_client('data_team', 'f598a6a42fae15afbfcb9304e8edea3ec15d898d757a004ab36a0a76b6fc8b98')

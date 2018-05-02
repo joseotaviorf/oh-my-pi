@@ -1,9 +1,10 @@
 import sys
-import petl
 from datetime import datetime, timedelta
-from bietlejuice.jobs.base.base_ga import BaseGA
+
+import petl
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-import os
+from bietlejuice.jobs.base.base_ga import BaseGA
 
 
 class GAPageBasedKPIs(BaseGA):

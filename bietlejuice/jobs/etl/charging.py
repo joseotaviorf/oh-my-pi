@@ -1,9 +1,8 @@
+import os
+import sys
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-import sys
-import os
-from datetime import datetime
-
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -39,7 +38,6 @@ t = BaseETL.from_db_query(
     from
       Cobranca
     """)
-
 
 BaseETL.bulk_insert(
     table=t,

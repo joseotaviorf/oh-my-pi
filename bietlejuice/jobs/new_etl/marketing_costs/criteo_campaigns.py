@@ -1,10 +1,9 @@
-import petl
-# import pycriteo
-import json
-import os
+from datetime import date, timedelta
 from urllib import urlopen
 from xml.etree import ElementTree
-from datetime import date, timedelta
+
+import petl
+
 from marketing_campaigns import MarketingCampaigns
 
 

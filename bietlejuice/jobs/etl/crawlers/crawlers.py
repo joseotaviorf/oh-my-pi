@@ -5,9 +5,10 @@ from collections import OrderedDict
 from datetime import datetime
 
 import requests
+from qa_python_utils.aws.athena import AthenaClient
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-from qa_python_utils.aws.athena import AthenaClient
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -83,9 +84,9 @@ class Crawlers(object):
 
             if new_neighborhood and new_city:
                 df_crawlers.loc[
-                    (df_crawlers.cep == row[1].cep) | (
-                        (df_crawlers.lat == row[1].lat) & (df_crawlers.lng == row[1].lng)), [
-                        'neighborhood', 'city']] = [new_neighborhood, new_city]
+                    (df_crawlers.cep == row[1].cep) |
+                    ((df_crawlers.lat == row[1].lat) & (df_crawlers.lng == row[1].lng)), ['neighborhood', 'city']] = \
+                    [new_neighborhood, new_city]
                 count_real += 1
 
         _logger.info('m=fill_neighs_cities_from_google, count_full={}, count_real={}'.format(count_full, count_real))

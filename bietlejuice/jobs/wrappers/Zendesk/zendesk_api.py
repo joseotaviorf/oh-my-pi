@@ -1,8 +1,8 @@
 import logging
-import requests
-import json
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+import requests
 from zenpy import Zenpy
 
 
@@ -177,7 +177,8 @@ class ZendeskAPI(object):
                     updated_at = int(datetime.strptime(item.get(key_timestamp), '%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get(key_timestamp) or self.start_time <= updated_at <= self.end_time:
                         response.append(item)
-                if (r.get('end_time') and r.get('end_time') <= self.end_time) or r.get('next_page') or r.get('next_url'):
+                if (r.get('end_time') and r.get('end_time') <= self.end_time) or r.get('next_page') or r.get(
+                        'next_url'):
                     result.handle_pagination()
                 else:
                     return response
@@ -189,7 +190,6 @@ class ZendeskAPI(object):
 
     def get_data(self):
         result = None
-        partition = None
         if self.object_type == 'tickets':
             result = self.__get_tickets_data()
         elif self.object_type == 'users':

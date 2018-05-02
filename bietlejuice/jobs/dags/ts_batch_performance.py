@@ -4,7 +4,7 @@ todo get start and end by parameter of the script
 the end date should not be past the date where the invoices and contracts have been updated
 first ever computable date : 20180206
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
@@ -13,9 +13,14 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
 
 MAIN_DAG_NAME = 'tenantScreening-batch_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -23,6 +28,8 @@ MAIN_SCHEDULE_INTERVAL = '@once'
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
 end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')  # comment for testing without airflow
+
+
 # bucket = '5a-datalake'  # for testing without airflow
 
 # start_date = '20180409'  # todo : parameters of airflow?

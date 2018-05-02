@@ -13,9 +13,10 @@ import boto3
 import pandas as pd
 # createsend==4.2.1
 from createsend import CreateSend, Client, Transactional, Campaign
-from bietlejuice.jobs.base.base_etl import BaseETL
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
+
+from bietlejuice.jobs.base.base_etl import BaseETL
 
 args = sys.argv
 today_tmsp = datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S")

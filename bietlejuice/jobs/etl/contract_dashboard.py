@@ -1,15 +1,16 @@
-import petl
 import json
 import os
 import sys
+from datetime import datetime, timedelta
+
+import petl
 import requests
+from pymongo import MongoClient
+from pytz import UTC, timezone
+from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-from pymongo import MongoClient
-from datetime import datetime, timedelta
-from pytz import UTC, timezone
-from qa_python_utils.default_logger import logger, _logger
 
 args = sys.argv
 run_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')

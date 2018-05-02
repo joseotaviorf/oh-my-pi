@@ -8,14 +8,15 @@ import re
 import sys
 import zipfile
 from decimal import Decimal
-from logging import info as log
 from io import BytesIO
+from logging import info as log
+
 import boto3
 import petl
 from petl.io.db import create_table
 
 from db_factory import DBFactory
-from enum_db import EnumDb, EnumDbType
+from enum_db import EnumDb
 
 
 class BaseETL(object):
@@ -130,8 +131,7 @@ class BaseETL(object):
             conn = cls.get_connection(db_enum=db_enum, encoding=encoding)
 
         log('Loading {} on {} - Number of rows:{}. {}'.format(
-            table_name, db_enum, len(data_table), datetime.datetime.now())
-            )
+            table_name, db_enum, len(data_table), datetime.datetime.now()))
         if append and not create:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:

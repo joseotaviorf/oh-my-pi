@@ -1,9 +1,8 @@
-import sys
 import os
-import petl
 from datetime import date, datetime, timedelta
-from bietlejuice.jobs.base.base_ga import BaseGA
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_ga import BaseGA
 
 
 class GAScheduleView(BaseGA):
@@ -172,7 +171,6 @@ def load_data():
 
 
 if __name__ == "__main__":
-
     print('START - {}'.format(datetime.now()))
 
     load_data()

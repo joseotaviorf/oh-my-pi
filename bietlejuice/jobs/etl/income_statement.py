@@ -1,11 +1,12 @@
 # -*- coding: latin1 -*-
-import sys
-import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 import string
+import sys
+
+import petl
 from openpyxl import load_workbook
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
-from pprint import pprint
 
 
 def dowload_income_statement_workbook(file_name, file_path_destination='/tmp'):
@@ -51,6 +52,7 @@ def get_values_from_income_statement_workbook(sheet, cell_search_value, referenc
 if __name__ == '__main__':
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
+
     args = sys.argv
     if len(args) > 1:
         start = args[1]
