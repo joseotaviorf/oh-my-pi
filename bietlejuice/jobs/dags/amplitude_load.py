@@ -14,6 +14,7 @@ def load_amplitude(**kwargs):
     a = AmplitudeEventsETL()
     a.run_source_to_sns(start_date=prev_exec_date, end_date=exec_date)
 
+
 dag = DAG(
     dag_id='bi-amplitude-load',
     default_args={

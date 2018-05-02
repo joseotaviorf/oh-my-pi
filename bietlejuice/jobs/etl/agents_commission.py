@@ -40,8 +40,9 @@ class AgentsFinanceData(object):
         summary_worksheet = self.workbook.get_sheet_by_name(summary)
 
         # FIXME: fix s3 read
-        file_obj = self.s3_client.get_object(Bucket='5a-datalake',
-                                             Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores-2017.V2.xlsm')
+        file_obj = self.s3_client.get_object(
+            Bucket='5a-datalake',
+            Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores-2017.V2.xlsm')
 
         df_summary_values = pd.read_excel(file_obj['Body'], sheetname='Resumo')
         df_commissions = df_summary_values[df_summary_values.Item == u'4 Comissão']
@@ -136,8 +137,9 @@ class AgentsFinanceData(object):
             *Warning*: delete old data before executing this method, otherwise duplicated data will appear
         """
         # FIXME: fix s3 read
-        file_obj = self.s3_client.get_object(Bucket='5a-datalake',
-                                             Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores-2017.V2.xlsm')
+        file_obj = self.s3_client.get_object(
+            Bucket='5a-datalake',
+            Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores-2017.V2.xlsm')
 
         df_contract_values = pd.read_excel(file_obj['Body'], sheetname='Contratos')
         df_contract_values = df_contract_values.astype(object).where(pd.notnull(df_contract_values), None)
@@ -179,8 +181,9 @@ class AgentsFinanceData(object):
             *Warning*: delete old data before executing this method, otherwise duplicated data will appear
         """
         # FIXME: fix s3 read
-        file_obj = self.s3_client.get_object(Bucket='5a-datalake',
-                                             Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores.xlsm')
+        file_obj = self.s3_client.get_object(
+            Bucket='5a-datalake',
+            Key='raw/files/agent_commissions/Horas e comissões - Consolidado Corretores.xlsm')
 
         df_contract_values = pd.read_excel(file_obj['Body'], sheetname='Contratos')
         df_contract_values = df_contract_values.astype(object).where(pd.notnull(df_contract_values), None)

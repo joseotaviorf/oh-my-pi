@@ -85,6 +85,7 @@ class Asterisk(object):
         _logger.info('m=delete_asterisk_messages, msg=purging queue')
         self.sqs.purge_queue(QueueUrl=url)
 
+
 if __name__ == '__main__':
     asterisk = Asterisk(execution_time)
     if args[1] == 'survey':

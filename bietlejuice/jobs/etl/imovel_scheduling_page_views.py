@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from bietlejuice.jobs.base.base_ga import BaseGA
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
+
 class GAScheduleView(BaseGA):
 
     def __init__(self, account_name, property_name, profile_name):
@@ -22,6 +23,7 @@ class GAScheduleView(BaseGA):
                 "samplingLevel": "HIGHER_PRECISION",
             }
         )
+
 
 class GASlotViewInScheduleViewD0D1(BaseGA):
 
@@ -41,12 +43,14 @@ class GASlotViewInScheduleViewD0D1(BaseGA):
             }
         )
 
+
 def addViewsToMap(imovelId, slotNum, sumSeenSlots, views, map):
     if sumSeenSlots >= slotNum:
-        if not imovelId in map:
+        if imovelId not in map:
             map[imovelId] = views
         else:
             map[imovelId] += views
+
 
 def load_data():
     ga = GAScheduleView(
@@ -61,7 +65,7 @@ def load_data():
         '1- Prod (Tracking GTM)'
     )
 
-    dateRange = 6 # days
+    dateRange = 6  # days
     start_date = str(dateRange) + "daysAgo"
     end_date = "today"
     start_date_query = str(date.today() - timedelta(days=dateRange))
@@ -108,9 +112,8 @@ def load_data():
             addViewsToMap(imovelId, 9, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_09PlusSlots)
             addViewsToMap(imovelId, 11, slotNumberD0 + slotNumberD1, views, mapImovelIdViewsD0D1_11PlusSlots)
 
-
-    placeholders=','.join(['%s']*len(imovelIds))
-    query="""
+    placeholders = ','.join(['%s'] * len(imovelIds))
+    query = """
             SELECT t.nomeCidade,t.nomeRegiao,t.nomeBairro,t.imovelId,count(*)
             FROM (
                 SELECT r3.nome as nomeCidade,
@@ -126,35 +129,34 @@ def load_data():
             LEFT JOIN Agendamento a on (t.imovelId = a.imovel_id)
             WHERE a.criadoEm BETWEEN '%s' AND '%s'
             GROUP BY t.nomeCidade,t.nomeRegiao,t.nomeBairro,t.imovelId
-            """ % (placeholders,start_date_query,end_date_query)
+            """ % (placeholders, start_date_query, end_date_query)
 
-    db = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb,encoding='UTF8')
+    db = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb, encoding='UTF8')
     cursor = db.cursor()
-    cursor.execute(query,imovelIds)
+    cursor.execute(query, imovelIds)
 
-    finalData = [["Date Start","Date End","Cidade", "Regiao",
-                  "Bairro","Imovel Id","Views","Agendamentos",
-                  "Views com 1+ slots em d0 e d1","Views com 3+ slots em d0 e d1",
-                  "Views com 5+ slots em d0 e d1","Views com 7+ slots em d0 e d1",
-                  "Views com 9+ slots em d0 e d1","Views com 11+ slots em d0 e d1"]]
+    finalData = [["Date Start", "Date End", "Cidade", "Regiao",
+                  "Bairro", "Imovel Id", "Views", "Agendamentos",
+                  "Views com 1+ slots em d0 e d1", "Views com 3+ slots em d0 e d1",
+                  "Views com 5+ slots em d0 e d1", "Views com 7+ slots em d0 e d1",
+                  "Views com 9+ slots em d0 e d1", "Views com 11+ slots em d0 e d1"]]
 
     for row in cursor.fetchall():
-        finalData.append([start_date_query,end_date_query,
+        finalData.append([start_date_query, end_date_query,
                           row[0].decode('utf-8'),
                           row[1].decode('utf-8'),
                           row[2].decode('utf-8'),
                           row[3],
                           mapImovelIdViews[str(row[3])],
                           row[4],
-                          mapImovelIdViewsD0D1_01PlusSlots.get(str(row[3]),0),
-                          mapImovelIdViewsD0D1_03PlusSlots.get(str(row[3]),0),
-                          mapImovelIdViewsD0D1_05PlusSlots.get(str(row[3]),0),
-                          mapImovelIdViewsD0D1_07PlusSlots.get(str(row[3]),0),
-                          mapImovelIdViewsD0D1_09PlusSlots.get(str(row[3]),0),
-                          mapImovelIdViewsD0D1_11PlusSlots.get(str(row[3]),0)])
+                          mapImovelIdViewsD0D1_01PlusSlots.get(str(row[3]), 0),
+                          mapImovelIdViewsD0D1_03PlusSlots.get(str(row[3]), 0),
+                          mapImovelIdViewsD0D1_05PlusSlots.get(str(row[3]), 0),
+                          mapImovelIdViewsD0D1_07PlusSlots.get(str(row[3]), 0),
+                          mapImovelIdViewsD0D1_09PlusSlots.get(str(row[3]), 0),
+                          mapImovelIdViewsD0D1_11PlusSlots.get(str(row[3]), 0)])
 
     db.close()
-
 
     process_name = 'imovel_scheduling_page_views'
     bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -167,6 +169,7 @@ def load_data():
         commit=True,
         bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)
     )
+
 
 if __name__ == "__main__":
 

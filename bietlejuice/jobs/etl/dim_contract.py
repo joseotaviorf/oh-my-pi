@@ -6,7 +6,7 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('dim_','')
+process_name = BaseETL.get_current_filename().replace('dim_', '')
 
 if len(args) > 1:
     if args[1] == 'ODS':

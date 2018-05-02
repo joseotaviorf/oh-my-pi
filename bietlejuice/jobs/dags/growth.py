@@ -449,47 +449,47 @@ fact_task = get_python_operator('load_fact_growth', load_fact_growth, main_dag)
 # predictions
 
 # demand measures
-prediction_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                        materialize_func=materialize_growth_measure_prediction_table_query,
-                                                        sub_dag_name='prediction_visits_booked',
-                                                        funnel='demand',
-                                                        placeholders=get_visits_booked_placeholders()
-                                                        )
+prediction_visits_booked_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_visits_booked',
+    funnel='demand',
+    placeholders=get_visits_booked_placeholders())
 
-prediction_visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                           materialize_func=materialize_growth_measure_prediction_table_query,
-                                                           sub_dag_name='prediction_visits_completed',
-                                                           funnel='demand',
-                                                           placeholders=get_visits_completed_placeholders()
-                                                           )
+prediction_visits_completed_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_visits_completed',
+    funnel='demand',
+    placeholders=get_visits_completed_placeholders())
 
-prediction_offers_submitted_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                           materialize_func=materialize_growth_measure_prediction_table_query,
-                                                           sub_dag_name='prediction_offers_submitted',
-                                                           funnel='demand',
-                                                           placeholders=get_offers_submitted_placeholders()
-                                                           )
+prediction_offers_submitted_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_offers_submitted',
+    funnel='demand',
+    placeholders=get_offers_submitted_placeholders())
 
-prediction_offers_approved_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                          materialize_func=materialize_growth_measure_prediction_table_query,
-                                                          sub_dag_name='prediction_offers_approved',
-                                                          funnel='demand',
-                                                          placeholders=get_offers_approved_placeholders()
-                                                          )
+prediction_offers_approved_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_offers_approved',
+    funnel='demand',
+    placeholders=get_offers_approved_placeholders())
 
-prediction_documentation_sent_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                             materialize_func=materialize_growth_measure_prediction_table_query,
-                                                             sub_dag_name='prediction_documentation_sent',
-                                                             funnel='demand',
-                                                             placeholders=get_documentation_sent_placeholders()
-                                                             )
+prediction_documentation_sent_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_documentation_sent',
+    funnel='demand',
+    placeholders=get_documentation_sent_placeholders())
 
-prediction_approved_by_insurer_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
-                                                              materialize_func=materialize_growth_measure_prediction_table_query,
-                                                              sub_dag_name='prediction_approved_by_insurer',
-                                                              funnel='demand',
-                                                              placeholders=get_approved_by_insurer_placeholders()
-                                                              )
+prediction_approved_by_insurer_sub_dag = get_sub_dag_operator(
+    sub_dag_func=sub_dag_func_with_filters,
+    materialize_func=materialize_growth_measure_prediction_table_query,
+    sub_dag_name='prediction_approved_by_insurer',
+    funnel='demand',
+    placeholders=get_approved_by_insurer_placeholders())
 
 prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with_filters,
                                                   materialize_func=materialize_growth_measure_prediction_table_query,
@@ -507,11 +507,11 @@ amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 
 leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> \
-qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> \
-owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >> \
-approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >> \
-offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >> \
-tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
-prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> \
-prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >> \
-prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task
+    qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> \
+    owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >> \
+    approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >> \
+    offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >> \
+    tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
+    prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> \
+    prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >> \
+    prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task

@@ -38,7 +38,9 @@ class ZendeskAPI(object):
             'scope': 'read',
         }
 
-        response_zen = requests.post("https://{}.zendesk.com/oauth/tokens".format(subdomain), data=payload_zendesk).json()
+        response_zen = requests.post(
+            "https://{}.zendesk.com/oauth/tokens".format(subdomain),
+            data=payload_zendesk).json()
         creds_zen = {
             "subdomain": "quintoandar",
             "oauth_token": response_zen.get('access_token')
@@ -108,7 +110,7 @@ class ZendeskAPI(object):
         ids = []
         for item in result_search:
             ids.append(item['id'])
-            if len(ids) == batch_limit or result_search[-1] == item: # batch limit or last item
+            if len(ids) == batch_limit or result_search[-1] == item:  # batch limit or last item
                 str_ids = ','.join(ids)
                 url_request = URL.format(str_ids)
                 logging.info('m=__get_chat (id: {}), init'.format(str_ids))
@@ -170,9 +172,9 @@ class ZendeskAPI(object):
                 items = r.get(self.object_type) or r.get('results')
                 if not items:
                     return None
-                
+
                 for item in items:
-                    updated_at = int(datetime.strptime(item.get(key_timestamp),'%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
+                    updated_at = int(datetime.strptime(item.get(key_timestamp), '%Y-%m-%dT%H:%M:%SZ').strftime('%s'))
                     if not incremental or not item.get(key_timestamp) or self.start_time <= updated_at <= self.end_time:
                         response.append(item)
                 if (r.get('end_time') and r.get('end_time') <= self.end_time) or r.get('next_page') or r.get('next_url'):

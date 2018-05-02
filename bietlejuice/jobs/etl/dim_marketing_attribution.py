@@ -6,14 +6,14 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('dim_','')
+process_name = BaseETL.get_current_filename().replace('dim_', '')
 
 if len(args) > 1:
     if args[1] == 'ODS':
 
         print("Start query: {}".format(datetime.now()))
 
-        table =  BaseETL.from_db_query(
+        table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
             query='call ebdb.list_marketing_attribution();')
 

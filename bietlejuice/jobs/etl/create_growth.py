@@ -1,11 +1,11 @@
 import os
 import sys
 
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../'))
 
 measures = {
     'closing': [
@@ -33,7 +33,6 @@ measures = {
         'qualifieds'
     ]
 }
-
 
 filters = [
     'all',
@@ -64,8 +63,10 @@ for funnel in measures:
     for m in measures[funnel]:
         for f in filters:
             for p in period:
-                prefix_file = '../../db/3.dw/public/queries/growth/new/{}/{}/{}/{}_prefix_beginning.sql'.format(funnel, m, f, p)
-                prefix_middle_file = '../../db/3.dw/public/queries/growth/new/{}/{}/{}/{}_prefix_middle.sql'.format(funnel, m, f, p)
+                prefix_file = '../../db/3.dw/public/queries/growth/new/{}/{}/{}/{}_prefix_beginning.sql'.format(
+                    funnel, m, f, p)
+                prefix_middle_file = '../../db/3.dw/public/queries/growth/new/{}/{}/{}/{}_prefix_middle.sql'.format(
+                    funnel, m, f, p)
                 suffix_middle_file = '../../db/3.dw/public/queries/growth/new/{}_middle_suffix.sql'.format(p)
                 suffix_file = '../../db/3.dw/public/queries/growth/new/{}_suffix.sql'.format(p)
 
@@ -74,7 +75,8 @@ for funnel in measures:
                 suffix_middle = get_query_from_file_name(suffix_middle_file) if p != 'day' else ''
                 suffix = get_query_from_file_name(suffix_file)
 
-                query = 'create table growth.{}_{}_{} as\n'.format(m, f, p) + prefix + suffix_middle + prefix_middle + suffix
+                query = 'create table growth.{}_{}_{} as\n'.format(
+                    m, f, p) + prefix + suffix_middle + prefix_middle + suffix
                 print query
 
                 print '\nDropping table growth.{}_{}_{}\n'.format(m, f, p)

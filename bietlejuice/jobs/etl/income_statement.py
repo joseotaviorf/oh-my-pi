@@ -13,7 +13,7 @@ def dowload_income_statement_workbook(file_name, file_path_destination='/tmp'):
 
 
 def get_inside_sales_workbook(file_name, file_path='/tmp', data_only=True):
-    file_name='{}/{}'.format(file_path, file_name)
+    file_name = '{}/{}'.format(file_path, file_name)
     return load_workbook(filename=file_name, data_only=data_only)
 
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
     args = sys.argv
-    if len(args)>1:
+    if len(args) > 1:
         start = args[1]
         end = args[2] if len(args) > 2 else args[1]
 

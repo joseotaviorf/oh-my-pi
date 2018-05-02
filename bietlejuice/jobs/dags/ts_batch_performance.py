@@ -22,7 +22,7 @@ MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '@once'
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
-end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')# comment for testing without airflow
+end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')  # comment for testing without airflow
 # bucket = '5a-datalake'  # for testing without airflow
 
 # start_date = '20180409'  # todo : parameters of airflow?
@@ -40,7 +40,7 @@ def batch_performance():
 
     # query athena
     _logger.info('Querying athena')
-    df_proposta_ebdb = import_ebdb_proposta(client)	# only to know which ones were decided by us
+    df_proposta_ebdb = import_ebdb_proposta(client)  # only to know which ones were decided by us
     df_contrato_aud_ebdb = import_ebdb_contrato_aud(client)
     df_payments = import_invoices(client)
 
@@ -58,9 +58,8 @@ def batch_performance():
         performance_table['date_computation'] = date
         performance_table = format_performance_table(performance_table)
         performance_table = create_sk_dates(performance_table)
-        write_to_s3(performance_table,
-                    'performance/performance' + date.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
-
+        write_to_s3(performance_table, 'performance/performance' + date.strftime(format='%Y%m%d') +
+                    '.csv')  # writes an object after internally changing a copy of the object to string
 
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')

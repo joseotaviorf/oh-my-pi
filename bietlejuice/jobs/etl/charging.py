@@ -7,7 +7,7 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('dim_','')
+process_name = BaseETL.get_current_filename().replace('dim_', '')
 
 t = BaseETL.from_db_query(
     db_enum=EnumDb.QuintoAndar_ebdb,
@@ -36,7 +36,7 @@ t = BaseETL.from_db_query(
       ,dataAutoEnvioDemonstrativoProp
       ,linhaDigitavel
       ,dataEnvioSmsLembrete
-    from 
+    from
       Cobranca
     """)
 

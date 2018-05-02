@@ -61,7 +61,7 @@ def __get_leads():
             from
             (
                 select
-                    case 
+                    case
                         when coalesce(i.cidade, l.cidade) in ('Belo Horizonte', 'Nova Lima') then 'bh'
                         when coalesce(i.cidade, l.cidade) in ('Brasília') then 'bsb'
                         when coalesce(i.cidade, l.cidade) in ('Goiânia') then 'go'
@@ -299,16 +299,16 @@ def __get_leads():
                 left join
                     Imovel i
                     on i.id = base.imovel_id
-                left join 
-                    Lead l 
+                left join
+                    Lead l
                     on l.id = base.lead_id
             ) tbl
-            where 
+            where
             (
-                date(dt_lead) = current_date or 
-                date(dt_prospect) = current_date or 
-                date(dt_opportunity) = current_date or 
-                date(dt_first_listing) = current_date 
+                date(dt_lead) = current_date or
+                date(dt_prospect) = current_date or
+                date(dt_opportunity) = current_date or
+                date(dt_first_listing) = current_date
             )
             ''')
     return table
@@ -329,6 +329,7 @@ def push_leads(endpoint):
 
     resp = requests.post(endpoint, json.dumps(output), timeout=30)
     _logger.info('push_leads {}'.format(resp.content))
+
 
 # create DAG definition
 dag = BaseDAG.build_dag(

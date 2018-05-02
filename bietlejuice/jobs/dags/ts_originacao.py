@@ -57,8 +57,8 @@ def originacao():
     output_originacao = format_originacao_table(output_originacao)
     output_originacao = create_sk_dates(output_originacao)
 
-    write_to_s3(output_originacao, 'originacao/originacao.csv')  # writes an object after internally changing a copy of the object to string
-
+    # writes an object after internally changing a copy of the object to string
+    write_to_s3(output_originacao, 'originacao/originacao.csv')
 
     athena_ddl, pbi_query = generate_queries(output_originacao, 'originacao')
     write_to_s3(athena_ddl, 'queries/athena_originacao_ddl.txt')

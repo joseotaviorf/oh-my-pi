@@ -467,7 +467,7 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, property_dag])
 ods_house_rent_flow.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                      user_dag, property_dag])
+                                  user_dag, property_dag])
 
 ods_supply >> fact_supply
 ods_house_rent_flow >> fact_demand

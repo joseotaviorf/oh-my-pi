@@ -22,9 +22,8 @@ class GoogleDriveApi(object):
     @classmethod
     def convert_mime_type(cls, mime_type):
         mime_dict = {
-            'application/vnd.google-apps.spreadsheet' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.google-apps.document' : 'vnd.openxmlformats - officedocument.wordprocessingml.document'
-        }
+            'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.google-apps.document': 'vnd.openxmlformats - officedocument.wordprocessingml.document'}
         return mime_dict.get(mime_type, None)
 
     def list_filenames(self):

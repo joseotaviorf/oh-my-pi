@@ -20,10 +20,11 @@ bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for 
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '30 3 * * 1' # At 03:30:00am, on every Monday, every month
+MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every month
 
 # parameters of the script
-begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days') #last monday # must be a monday pandas timestamp
+begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(),
+                                                            unit='days')  # last monday # must be a monday pandas timestamp
 _logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
 n_training_days = 63  # hard limit on the days we do not want to consider for creating distributions
@@ -52,7 +53,7 @@ def load_fact(begin_pred):
         db_enum=EnumDb.BI_DW,
         query=query_demand
     )
-    fact = petl.todataframe(table_demand);
+    fact = petl.todataframe(table_demand)
 
     preprocessor_demand = Preprocessor(steps)
     fact = preprocessor_demand.preprocess(fact)
@@ -79,9 +80,11 @@ def get_default_parameters(city, region):
 
     elif region == 'all':
         # city level. only possible default is the global level
-        if get_file_from_s3(bucket_ds,
-                            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' % (begin_pred.strftime("%Y-%m-%d")),
-                            'global_default_yearly_seasonality.p'):
+        if get_file_from_s3(
+            bucket_ds,
+            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' %
+            (begin_pred.strftime("%Y-%m-%d")),
+                'global_default_yearly_seasonality.p'):
             default_yearly_seasonality = pd.read_pickle('global_default_yearly_seasonality.p')
 
         if get_file_from_s3(bucket_ds,
@@ -94,9 +97,11 @@ def get_default_parameters(city, region):
         # if get_file_from_s3(bucket_ds,'KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d"),city),
         #                     'city_default_yearly_seasonality.p'):
         #     default_yearly_seasonality = pd.read_pickle('city_default_yearly_seasonality.p')
-        if get_file_from_s3(bucket_ds,
-                            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' % (begin_pred.strftime("%Y-%m-%d")),
-                            'global_default_yearly_seasonality.p'):
+        if get_file_from_s3(
+            bucket_ds,
+            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' %
+            (begin_pred.strftime("%Y-%m-%d")),
+                'global_default_yearly_seasonality.p'):
             default_yearly_seasonality = pd.read_pickle('global_default_yearly_seasonality.p')
 
         if get_file_from_s3(bucket_ds,
@@ -137,7 +142,7 @@ def predict_bookings(fact_past_bookings, default_yearly_seasonality):
     predictor.own_yearly_seasonality : None in case it uses the default or faillure
     """
 
-    ### Predict bookings
+    # Predict bookings
     # contains first step regions that have data in the past #defined over beginning-begin_pred -1
     ts_first_step = get_count(fact_past_bookings, steps, steps.index[0])
     predictor = Ts_predictor(ts_first_step,
@@ -298,7 +303,8 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     # monthly counts before deleting the dates from the past
     kpi_past_demand = get_kpis(fact_past_bookings, steps, geo_levels, cities, regions)
     # we should remove from this dataframe the dates that are in the future (including begin_pred)
-    kpi_past_demand = kpi_past_demand.loc[(slice(None), slice(None), pd.date_range(start='20130101', end=begin_pred - pd.to_timedelta(1, unit='days'))), :]
+    kpi_past_demand = kpi_past_demand.loc[(slice(None), slice(None), pd.date_range(
+        start='20130101', end=begin_pred - pd.to_timedelta(1, unit='days'))), :]
 
     # get kpis of the prediction.
     # these kpis include both the predicted bookings, the next steps that those
@@ -390,7 +396,7 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
         db_enum=EnumDb.BI_DW,
         query=long_region_name_query
     )
-    df_long_region_name = petl.todataframe(table_long_region_name);
+    df_long_region_name = petl.todataframe(table_long_region_name)
     df_long_region_name = df_long_region_name[
         df_long_region_name.region_code.notnull() & (df_long_region_name.region_code != '')]
     df_long_region_name = df_long_region_name.append({'region_code': 'all', 'long_region_name': 'all'},

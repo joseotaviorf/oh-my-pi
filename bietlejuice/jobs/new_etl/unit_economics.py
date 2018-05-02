@@ -44,10 +44,10 @@ def load_fact_unit_economics():
     liquidity_path = '{}/{}'.format(QUERIES_DIR, 'liquidity')
     operators = load_dependent_views(liquidity_path, 'liquidity')
     for subtree in operators:
-        if len(subtree) > 1 and type(subtree) == list:
+        if len(subtree) > 1 and isinstance(subtree, list):
             for dependency in subtree[:-1]:
                 print '{} depends on {}'.format(dependency, subtree[-1])
-        elif type(subtree) == list:
+        elif isinstance(subtree, list):
             print '{} depends on {}'.format(subtree[0], 'liquidity')
         else:
             print '{} is the end of {}'.format(subtree, 'liquidity')
@@ -58,5 +58,6 @@ def load_fact_unit_economics():
     # management
     # net_revenue
     pass
+
 
 load_fact_unit_economics()

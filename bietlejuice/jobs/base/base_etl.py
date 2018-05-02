@@ -40,7 +40,7 @@ class BaseETL(object):
         for line in table:
             line_r = []
             for i in line:
-                if type(i) is str or type(i) is unicode:
+                if isinstance(i, str) or isinstance(i, unicode):
                     i = i.decode(encoding)
                 line_r.append(i)
             table_r.append(line_r)
@@ -131,7 +131,7 @@ class BaseETL(object):
 
         log('Loading {} on {} - Number of rows:{}. {}'.format(
             table_name, db_enum, len(data_table), datetime.datetime.now())
-        )
+            )
         if append and not create:
             petl.appenddb(table=data_table, dbo=conn, tablename=table_name, schema=schema, commit=commit)
         else:
@@ -212,7 +212,7 @@ class BaseETL(object):
     @staticmethod
     def coalesce(value, ret=None):
         if not ret:
-            ret='null'
+            ret = 'null'
         return ret if value is None else value
 
     @staticmethod
@@ -251,12 +251,12 @@ class BaseETL(object):
     def from_db_table(cls, db_enum, table_name, encoding='LATIN1',
                       server_cursor_postgres=None, generator=False, convert_bit_mysql=True):
         table = cls.from_db_query(db_enum=db_enum, query='SELECT * FROM {}'.format(table_name),
-                                 encoding=encoding, server_cursor_postgres=server_cursor_postgres, generator=generator)
+                                  encoding=encoding, server_cursor_postgres=server_cursor_postgres, generator=generator)
         if convert_bit_mysql:
             # get all columns declared as BIT because we have a bug converting BIT columns on mysql
             types = BaseETL.get_columns_schema(db_enum, table_name, None, False)
             if types:
-                bit_columns = petl.select(types,lambda rec: rec.DATA_TYPE == 'bit')
+                bit_columns = petl.select(types, lambda rec: rec.DATA_TYPE == 'bit')
                 table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
 
         return table
@@ -380,7 +380,8 @@ class BaseETL(object):
                                     encoding='LATIN1', append=True, commit=True):
         with codecs.open(filename=csv_filepath, encoding=encoding) as f:
             bucket_folder_path, filename = cls.file_to_s3(filename=csv_filepath, dir_path='')
-            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum, table_name, append, commit, encoding, f)
+            cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum,
+                                          table_name, append, commit, encoding, f)
 
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
@@ -537,14 +538,14 @@ class BaseETL(object):
     def get_columns_schema(cls, db_enum, table_name, schema_name=None, skip_header=True):
         columns_table = None
 
-        if db_enum==EnumDb.QuintoAndar_ebdb:
+        if db_enum == EnumDb.QuintoAndar_ebdb:
             query = """
-                select 
+                select
                     COLUMN_NAME,
                     DATA_TYPE
                 from information_schema.COLUMNS
-                where 
-                    TABLE_NAME = '{}'                    
+                where
+                    TABLE_NAME = '{}'
                 """.format(table_name)
             if schema_name:
                 query += " and TABLE_SCHEMA = '{}'".format(schema_name)

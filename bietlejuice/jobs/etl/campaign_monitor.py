@@ -118,8 +118,8 @@ class CampaignMonitor(object):
                 json_messages.append(details_json)
 
             _logger.info(
-                'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key,
-                                                                                                           last_message))
+                'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(
+                    key, last_message))
             self.save_json_messages_to_s3(json_messages, key, last_message)
             count += 1
 

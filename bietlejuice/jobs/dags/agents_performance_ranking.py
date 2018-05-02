@@ -31,6 +31,7 @@ def load_agents_performance_ranking(dim_name, query_dir, filename=None):
         db_enum=EnumDb.BI_DW
     )
 
+
 # create DAG definition
 dag = DAG(
     dag_id='bi-agents-ranking',

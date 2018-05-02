@@ -109,14 +109,14 @@ def load_dw():
         enum_db_dest=EnumDb.BI_DW,
         append=True,
         encoding='UTF8'
-        #,server_cursor='ga_page_based_kpis_cursor'
+        # ,server_cursor='ga_page_based_kpis_cursor'
     )
     BaseETL.execute_command(
         command="update ga_kpis set processed_date = '{}' where processed_date is null".format(now),
         db_enum=EnumDb.BI_ODS,
         commit=True
     )
-    #criar dump
+    # criar dump
 
 
 if __name__ == "__main__":

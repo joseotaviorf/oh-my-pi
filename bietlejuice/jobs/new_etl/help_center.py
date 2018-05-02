@@ -116,7 +116,7 @@ class HelpCenter(object):
                         up.name,
                         up.id,
                         (
-                         '' || 
+                         '' ||
                             case
                               when p.id is not null
                                 then 'proprietario'
@@ -125,7 +125,7 @@ class HelpCenter(object):
                             ||
                             case
                               when up.tipoadmin in ('Admin','Sudo','Contratos','Financeiro','AtendimentoParceiros')
-                                and up.bloqueado = 'false' 
+                                and up.bloqueado = 'false'
                                 then ',admin'
                               else ''
                             end
@@ -163,17 +163,17 @@ class HelpCenter(object):
                          ''
                         ) as roles
                       from users_prev up
-                      left join datalake_clean.ebdb_property p 
+                      left join datalake_clean.ebdb_property p
                         on p.usuario_id = up.id
                             and p.status != 'excluido'
-                      left join datalake_clean.ebdb_photographer_data pd 
+                      left join datalake_clean.ebdb_photographer_data pd
                         on pd.id = up.dadosfotografo_id
                           and pd.ativo = 'true'
-                      left join datalake_clean.ebdb_affiliate_data ad 
+                      left join datalake_clean.ebdb_affiliate_data ad
                         on ad.id = up.dadosafiliado_id
                           and ad.ativo = 'true'
-                      left join datalake_clean.ebdb_seller_data sd 
-                        on sd.id = up.dadosvendedor_id 
+                      left join datalake_clean.ebdb_seller_data sd
+                        on sd.id = up.dadosvendedor_id
                           and sd.ativo = 'true'
                     ),
                     all_info as (
@@ -182,10 +182,10 @@ class HelpCenter(object):
                         trim(us.email) as email,
                         trim(us.name) as "name",
                         us.roles as roles,
-                        coalesce(us.main_phone, '') 
-                         || ',' || coalesce(us.secondary_phone, '') 
-                         || ',' || coalesce(us.commercial_phone, '') 
-                         || ',' || coalesce(us.contract_phone, '') 
+                        coalesce(us.main_phone, '')
+                         || ',' || coalesce(us.secondary_phone, '')
+                         || ',' || coalesce(us.commercial_phone, '')
+                         || ',' || coalesce(us.contract_phone, '')
                          || ',' || coalesce(us.proposal_phone, '')
                         as phones,
                         mu.amplitude_id as amplitude_id,

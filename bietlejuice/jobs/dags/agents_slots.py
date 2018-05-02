@@ -34,6 +34,7 @@ def load_agents_slots(query_dir, filename=None):
         append=False
     )
 
+
 # create DAG definition
 dag = DAG(
     dag_id='bi-agents-slots',

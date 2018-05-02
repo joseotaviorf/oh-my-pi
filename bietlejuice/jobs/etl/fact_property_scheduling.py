@@ -6,7 +6,7 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('fact_','')
+process_name = BaseETL.get_current_filename().replace('fact_', '')
 
 if len(args) > 1:
     if args[1] == 'ODS':
@@ -35,11 +35,11 @@ if len(args) > 1:
         BaseETL.execute_command(
             command="""
                 truncate table property_listing;
-                insert into 
+                insert into
                     property_listing
-                select 
-                    *  
-                from 
+                select
+                    *
+                from
                     vw_property_listing
                 ;
             """,

@@ -29,7 +29,7 @@ def execute(queue_name, start_date=None, end_date=None, td=None, **kwargs):
         log('Param End String: {}'.format(end))
 
         for key in props.get_keys():
-            a = AmplitudeExportApi(key['app_key'],key['secret_key'])
+            a = AmplitudeExportApi(key['app_key'], key['secret_key'])
             f = a.get_files_from_extract_api(start, end)
             if f:
                 events = a.get_json_from_zipfile(f)
