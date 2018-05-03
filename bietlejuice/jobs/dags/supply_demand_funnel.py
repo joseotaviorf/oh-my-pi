@@ -9,7 +9,6 @@ from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJob
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.business_dim_etl import BusinessDimensionETL
-from bietlejuice.jobs.new_etl.godfather import GodFather
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -26,14 +25,6 @@ main_dag = BaseDAG.build_dag(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL
 )
-
-
-def godfather_to_s3(**kwargs):
-    GodFather.to_s3(bucket, kwargs['table_name'])
-
-
-def godfather_to_ods(**kwargs):
-    GodFather.to_ods(kwargs['table_name'])
 
 
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
@@ -182,7 +173,7 @@ def property_sub_dag(sub_dag_name):
         task_id='ODS_rent_flow',
         dag=local_dag,
         func_command=extract_table_dim_from_ebdb_to_ods,
-        op_kwargs={'dim_name': 'rent_flow', 'table_name': 'FluxoLocacao', 'copy_to_clean': False}
+        op_kwargs={'dim_name': 'rental_flow', 'table_name': 'FluxoLocacao', 'copy_to_clean': False}
     )
 
     listing_views = BaseDAG.get_quintoandar_python_operator(
