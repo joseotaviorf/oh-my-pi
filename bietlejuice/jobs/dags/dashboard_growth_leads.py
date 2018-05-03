@@ -1,14 +1,16 @@
 # -*- coding: latin-1 -*-
 
 import json
+
 import requests
-from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
 from datetime import datetime
 from pytz import UTC, timezone
-from qa_python_utils.default_logger import _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.default_logger import _logger
 
 env.set_airflow_var_to_local_env('EBDB')
 endpoint = env.get_airflow_env_var('LEADS_ENDPOINT')

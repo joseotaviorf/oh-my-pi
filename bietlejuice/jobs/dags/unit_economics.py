@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
-
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from datetime import datetime, timedelta
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
 from bietlejuice.jobs.dags.unit_economics import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
