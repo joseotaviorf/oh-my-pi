@@ -17,6 +17,7 @@ from qa_python_utils.default_logger import _logger
 from bietlejuice.jobs.dags.util import environment as env
 bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
 # bucket_ds = '5a-data-science'
+env.set_airflow_var_to_local_env('BI_DW')
 
 MAIN_DAG_NAME = 'bi-demand-forecast'
 MAIN_START_DATE = datetime(2018, 3, 20)
