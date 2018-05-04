@@ -2,6 +2,14 @@
 
 Airflow implementation and DAGs.
 
+### Post-clone
+#### Git hooks
+
+```
+cd ${bi-etl-ejuice clone dir}/.git/hooks
+ln -s ../../hooks/pre-commit pre-commit
+```
+
 ### Airflow
 
 Deployment configuration is available within the [terraform](terraform) folder. The new production server is accessible at https://airflow.quintoandar.com.br.

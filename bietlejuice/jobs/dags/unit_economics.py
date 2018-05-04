@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
 from bietlejuice.jobs.dags.unit_economics import unit_tests
@@ -374,7 +374,7 @@ load_fact = QuintoAndarPythonOperator(
 )
 
 # Unit tests
-unit_tests_dag = BaseDAG.get_sub_dag_operator(
+unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=unit_tests_sub_dag,
     sub_dag_name='unit_tests'

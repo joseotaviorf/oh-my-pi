@@ -1,32 +1,28 @@
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.base.base_test import BaseTest
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
-class LeadSubDag(BaseSubDag):
+class UserSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        self.sub_dag_name = sub_dag_name
-        self.dag_name = dag_name
-        self.schedule_interval = schedule_interval
-        self.start_date = start_date
-
-        self.bucket = bucket
+        super(UserSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
 
     @logger
     def build(self):
-        lead_dag = self.__build_local_dag()
+        user_dag = self.__build_local_dag()
 
-        lead, dim_lead, load_lead = self.__build_data_tasks(lead_dag)
+        user, dim_user, load_user = self.__build_data_tasks(user_dag)
 
-        duplicate_lead, empty_lead = self.__build_tests_tasks(lead_dag)
+        duplicate_user, empty_user = self.__local_build_tests_tasks(user_dag)
 
-        lead >> dim_lead >> empty_lead >> duplicate_lead >> load_lead
+        user >> dim_user >> empty_user >> duplicate_user >> load_user
 
-        return lead_dag
+        return user_dag
 
     @logger
     def __build_local_dag(self):
@@ -40,66 +36,59 @@ class LeadSubDag(BaseSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-
-        lead = BaseDAG.get_quintoandar_python_operator(
+        user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='ODS_lead',
+            task_id='ODS_user',
             func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'lead', 'bucket': self.bucket, 'command': 'call ebdb.list_lead();'}
+            op_kwargs={'dim_name': 'user', 'table_name': 'usuario', 'bucket': self.bucket,
+                       'command': 'call ebdb.list_usuario();'}
         )
 
-        dim_lead = BaseDAG.get_quintoandar_python_operator(
+        dim_user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='STAGING_dim_lead',
+            task_id='STAGING_dim_user',
             func_command=utils.load_dim_from_ods_to_staging,
-            op_kwargs={'dim_name': 'lead'}
+            op_kwargs={'dim_name': 'user'}
         )
 
-        load_lead = BaseDAG.get_quintoandar_python_operator(
+        load_user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='DW_dim_lead',
+            task_id='DW_dim_user',
             func_command=utils.load_dim_from_staging_to_dw,
-            op_kwargs={'dim_name': 'lead', 'bucket': self.bucket}
+            op_kwargs={'dim_name': 'user', 'bucket': self.bucket}
         )
 
-        return lead, dim_lead, load_lead
+        return user, dim_user, load_user
 
     @logger
-    def __build_tests_tasks(self, dag):
-
-        duplicate_lead = BaseDAG.get_quintoandar_python_operator(
+    def __local_build_tests_tasks(self, dag):
+        duplicate_user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='TEST_duplicates_dim_lead',
+            task_id='TEST_duplicates_dim_user',
             func_command=self.__test_duplicates
         )
 
-        empty_lead = BaseDAG.get_quintoandar_python_operator(
+        empty_user = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            task_id='TEST_emptiness_dim_lead',
+            task_id='TEST_emptiness_dim_user',
             func_command=self.__test_duplicates
         )
 
-        return duplicate_lead, empty_lead
+        return duplicate_user, empty_user
 
     @staticmethod
     def __test_duplicates():
-
-        if BaseTest.check_for_duplicates(
-                schema='staging',
-                table='dim_lead',
-                key='sk_lead',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_duplicates {} free from duplicates'.format('dim_lead'))
+        BaseTest.check_for_duplicates(
+            schema='staging',
+            table='dim_user',
+            key='sk_user',
+            enum_db=EnumDb.BI_ODS
+        )
 
     @staticmethod
     def __test_emptiness():
-
-        if BaseTest.check_for_emptiness(
-                schema='staging',
-                table='dim_lead',
-                enum_db=EnumDb.BI_ODS):
-            raise Exception
-
-        _logger.info('m=test_emptiness {} not empty'.format('dim_lead'))
+        BaseTest.check_for_emptiness(
+            schema='staging',
+            table='dim_user',
+            enum_db=EnumDb.BI_ODS
+        )

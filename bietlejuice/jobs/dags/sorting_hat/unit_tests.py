@@ -49,7 +49,7 @@ def __test_count(**kwargs):
         enum_db=EnumDb.BI_ODS
     )[1][0] if ods_query != '' else None
 
-    BaseTest.compare_sources(kwargs['acceptable_diff'], sh_return, dl_return, ods_return)
+    BaseTest.compare_sources(kwargs['acceptable_diff'], [sh_return, dl_return, ods_return])
     _logger.info('m=__test_count, msg=counts are all equal')
 
 
