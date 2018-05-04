@@ -1,0 +1,108 @@
+from qa_python_utils.default_logger import logger
+
+import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+
+
+class VisitSubDag(DimSubDag):
+
+    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
+        super(VisitSubDag, self).__init__(
+            bucket=bucket,
+            sub_dag_name=sub_dag_name,
+            dag_name=dag_name,
+            schedule_interval=schedule_interval,
+            start_date=start_date,
+            ebdb_table_name='visita',
+            ods_stg_table_name='visit'
+        )
+
+    @logger
+    def build_visit_with_tests(self):
+        visit_dag = self._build_local_dag()
+
+        visits, property_visit_information, dim_visits = self.__build_data_tasks(visit_dag)
+
+        tests_tasks = self._build_tests_tasks(visit_dag)
+
+        property_visit_information >> visits
+        visits.set_downstream(tests_tasks)
+        dim_visits.set_upstream(tests_tasks)
+
+        return visit_dag
+
+    @logger
+    def __build_data_tasks(self, dag):
+        visits = BaseDAG.get_quintoandar_python_operator(
+            task_id='ODS_visits',
+            dag=dag,
+            func_command=VisitSubDag.extract_query_dim_from_ebdb_to_ods,
+            op_kwargs={
+                'dim_name': 'visit',
+                'command': 'call ebdb.list_visita();'
+            }
+        )
+
+        property_visit_information = BaseDAG.get_quintoandar_python_operator(
+            task_id='ODS_property_visit_information',
+            dag=dag,
+            func_command=VisitSubDag.load_athena_file_query_to_ods,
+            op_kwargs={
+                'table_name': 'property_visit_information',
+                'append': True,
+                'file_name': 'property_visit_information.sql'
+            }
+        )
+
+        dim_visits = BaseDAG.get_quintoandar_python_operator(
+            task_id='DW_dim_visits',
+            dag=dag,
+            func_command=VisitSubDag.load_dim_from_ods_to_dw,
+            op_kwargs={
+                'dim_name': 'visit'
+            }
+        )
+
+        return visits, property_visit_information, dim_visits
+
+    @staticmethod
+    def load_athena_file_query_to_ods(**kwargs):
+        utils.load_athena_file_query_to_ods(
+            table_name=kwargs['table_name'],
+            file_name=kwargs['file_name'],
+            bucket=DimSubDag.S3_BUCKET
+        )
+
+    @staticmethod
+    def materialize_view_ods(**kwargs):
+        utils.materialize_view_ods(
+            view_name=kwargs['view_name'],
+            bucket=DimSubDag.S3_BUCKET
+        )
+
+    @staticmethod
+    def load_dim_from_ods_to_dw(**kwargs):
+        utils.load_dim_from_ods_to_dw(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET,
+            insert_dummy=kwargs['insert_dummy'] if 'insert_dummy' in kwargs else True
+        )
+
+    @staticmethod
+    def extract_table_dim_from_ebdb_to_ods(**kwargs):
+        utils.extract_table_dim_from_ebdb_to_ods(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET,
+            table_name=kwargs['table_name'],
+            copy_to_clean=kwargs['copy_to_clean']
+        )
+
+    @staticmethod
+    def extract_query_dim_from_ebdb_to_ods(**kwargs):
+        utils.extract_query_dim_from_ebdb_to_ods(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET,
+            command=kwargs['command'],
+            table_name=kwargs['table_name']
+        )
