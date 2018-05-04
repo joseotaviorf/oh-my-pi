@@ -75,7 +75,7 @@ class BaseSubDag(object):
         entity_dag = self._build_local_dag()
         entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity, source_command)
 
-        tests_tasks = self.__build_tests_tasks(entity_dag, tests)
+        tests_tasks = self._build_tests_tasks(entity_dag, tests)
 
         # flow
         entity >> staging_dim_entity
@@ -126,7 +126,7 @@ class BaseSubDag(object):
         return entity_task, staging_dim_entity_task, load_entity_task
 
     @logger
-    def __build_tests_tasks(self, dag, tests):
+    def _build_tests_tasks(self, dag, tests):
         """
         Builds all the test tasks for a specific dag/subdag
         :param dag: the dag which the tasks will be in
