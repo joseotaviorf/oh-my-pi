@@ -4,106 +4,103 @@ from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 
-class RegionSubDag(BaseSubDag):
+class RegionSubDag(DimSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        super(RegionSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
+        super(RegionSubDag, self).__init__(
+            bucket=bucket,
+            sub_dag_name=sub_dag_name,
+            dag_name=dag_name,
+            schedule_interval=schedule_interval,
+            start_date=start_date,
+            ebdb_table_name='regiao',
+            ods_stg_table_name='region'
+        )
 
     @logger
-    def build(self):
-        region_dag = self.__build_local_dag()
+    def build_region_with_tests(self):
+        region_dag = self._build_local_dag()
 
         agent_region, region, dim_region, load_region = self.__build_data_tasks(region_dag)
 
-        duplicate_region, empty_region = self.__local_build_tests_tasks(region_dag)
+        tests_tasks = self._build_tests_tasks(region_dag)
 
-        agent_region >> dim_region
-        region >> dim_region
-        dim_region >> empty_region
-        empty_region >> duplicate_region >> load_region
+        dim_region.set_upstream([agent_region, region])
+        dim_region.set_downstream(tests_tasks)
+        load_region.set_upstream(tests_tasks)
 
         return region_dag
-
-    @logger
-    def __build_local_dag(self):
-        local_dag = BaseDAG.build_dag(
-            '{}.{}'.format(self.dag_name, self.sub_dag_name),
-            schedule_interval=self.schedule_interval,
-            start_date=self.start_date,
-        )
-
-        return local_dag
 
     @logger
     def __build_data_tasks(self, dag):
         agent_region = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'agent_region', 'bucket': self.bucket, 'table_name': 'DadosAgente_Regiao',
-                       'copy_to_clean': False}
+            func_command=RegionSubDag.extract_table_dim_from_ebdb_to_ods,
+            op_kwargs={
+                'dim_name': 'agent_region',
+                'table_name': 'DadosAgente_Regiao',
+                'copy_to_clean': False
+            }
         )
 
         region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_region',
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'region', 'bucket': self.bucket, 'table_name': 'MapRegiao', 'add_timestamp': True,
-                       'copy_to_clean': False}
+            func_command=RegionSubDag.extract_table_dim_from_ebdb_to_ods,
+            op_kwargs={
+                'dim_name': 'region',
+                'table_name': 'MapRegiao',
+                'add_timestamp': True,
+                'copy_to_clean': False
+            }
         )
 
         dim_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_region',
-            func_command=utils.load_dim_from_ods_to_staging,
-            op_kwargs={'dim_name': 'region',
-                       'post_command': "update staging.dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
-                           datetime.now().strftime('%Y-%m-%d'))}
+            func_command=RegionSubDag.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'region',
+                'post_command': "update staging.dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
+            }
         )
 
         load_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_region',
-            func_command=utils.load_dim_from_staging_to_dw,
-            op_kwargs={'dim_name': 'region', 'bucket': self.bucket}
+            func_command=RegionSubDag.load_dim_from_staging_to_dw,
+            op_kwargs={
+                'dim_name': 'region'
+            }
         )
 
         return agent_region, region, dim_region, load_region
 
-    @logger
-    def __local_build_tests_tasks(self, dag):
-        duplicate_region = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='TEST_duplicates_dim_region',
-            func_command=self.__test_duplicates
-        )
-
-        empty_region = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='TEST_emptiness_dim_region',
-            func_command=self.__test_duplicates
-        )
-
-        return duplicate_region, empty_region
-
     @staticmethod
-    def __test_duplicates():
-        BaseTest.check_for_duplicates(
-            schema='staging',
-            table='dim_region',
-            key='sk_region',
-            enum_db=EnumDb.BI_ODS
+    def extract_table_dim_from_ebdb_to_ods(**kwargs):
+        utils.extract_table_dim_from_ebdb_to_ods(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET,
+            table_name=kwargs['table_name'],
+            add_timestamp=kwargs['add_timestamp'] if 'add_timestamp' in kwargs else False,
+            copy_to_clean=kwargs['copy_to_clean']
         )
 
     @staticmethod
-    def __test_emptiness():
-        BaseTest.check_for_emptiness(
-            schema='staging',
-            table='dim_region',
-            enum_db=EnumDb.BI_ODS
+    def load_dim_from_ods_to_staging(**kwargs):
+        utils.load_dim_from_ods_to_staging(
+            dim_name=kwargs['dim_name'],
+            post_command=kwargs['post_command']
+        )
+
+    @staticmethod
+    def load_dim_from_staging_to_dw(**kwargs):
+        utils.load_dim_from_staging_to_dw(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET
         )
