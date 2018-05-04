@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
+
 from qa_python_utils.aws.athena import AthenaClient
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
 
@@ -30,14 +32,14 @@ data_frame = athena.execute_file_query_and_return_dataframe(file_name)
 print("To ODS: {}".format(datetime.now()))
 
 BaseETL.execute_command(
-            command="""truncate {};""".format(process_name),
-            db_enum=EnumDb.BI_ODS,
-            encoding='utf-8',
-            commit=True
-        )
+    command="""truncate {};""".format(process_name),
+    db_enum=EnumDb.BI_ODS,
+    encoding='utf-8',
+    commit=True
+)
 
 BaseETL.dataframe_to_ods(
-            df=data_frame,
-            table_name=process_name,
-            encoding='utf-8'
-        )
+    df=data_frame,
+    table_name=process_name,
+    encoding='utf-8'
+)

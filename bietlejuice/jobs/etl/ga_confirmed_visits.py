@@ -1,8 +1,9 @@
 # -*- coding: latin1 -*-
 import sys
 from datetime import datetime, timedelta
-from bietlejuice.jobs.base.base_ga import BaseGA
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_ga import BaseGA
 
 
 class GAConfirmedVisits(BaseGA):
@@ -111,6 +112,7 @@ def load_dw():
     )
 
     # criar dump
+
 
 if __name__ == "__main__":
     args = sys.argv

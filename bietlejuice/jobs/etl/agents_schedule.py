@@ -1,19 +1,21 @@
 import datetime
+import os
+
 import petl
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
-import os
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename()
+
 
 def get_list_descredenciados():
     AGENT_ID_COLUMN = 2
     DATE_COLUMN = 1
     agentes = BaseETL.from_db_query(
         EnumDb.QuintoAndar_ebdb,
-        query=
-        """
+        query="""
             select
               u.dadosAgente_id,
               u.email
@@ -34,7 +36,7 @@ def get_list_descredenciados():
     d = {}
     if file_name and file_path_destination:
         file_name = '{}/{}'.format(file_path_destination, file_name)
-        desc = petl.fromxlsx(filename=file_name, sheet='Descredenciados').cut('Emails','Data do descredenciamento')
+        desc = petl.fromxlsx(filename=file_name, sheet='Descredenciados').cut('Emails', 'Data do descredenciamento')
         table_desc = petl.join(left=desc, right=agentes, lkey='Emails', rkey='email')[1:]
 
         for line in table_desc:

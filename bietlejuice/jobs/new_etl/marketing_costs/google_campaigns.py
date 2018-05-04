@@ -10,13 +10,20 @@ class GoogleCampaigns(MarketingCampaigns):
     def __init__(self, config):
         # Initialize appropriate service.
         self.clients = []
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['sp_account']), 'account_name': 'QuintoAndar - Sao Paulo'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['display_account']), 'account_name': 'QuintoAndar - Display'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['broad_location_account']), 'account_name': 'QuintoAndar - Broad location + DSA'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['others_account']), 'account_name': 'QuintoAndar - Other Cities'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['rj_account']), 'account_name': 'QuintoAndar - Rio de Janeiro'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['institutional_account']), 'account_name': 'QuintoAndar - Institucional'})
-        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(config['universal_app_account'] ), 'account_name': 'QuintoAndar - Universal App Campaigns'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['sp_account']), 'account_name': 'QuintoAndar - Sao Paulo'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['display_account']), 'account_name': 'QuintoAndar - Display'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['broad_location_account']), 'account_name': 'QuintoAndar - Broad location + DSA'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['others_account']), 'account_name': 'QuintoAndar - Other Cities'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['rj_account']), 'account_name': 'QuintoAndar - Rio de Janeiro'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['institutional_account']), 'account_name': 'QuintoAndar - Institucional'})
+        self.clients.append({'client': adwords.AdWordsClient.LoadFromString(
+            config['universal_app_account']), 'account_name': 'QuintoAndar - Universal App Campaigns'})
 
     def extract_marketing_campaigns(self, dt):
         table = petl.fromdicts([])

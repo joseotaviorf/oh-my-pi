@@ -1,4 +1,5 @@
-import requests, re
+import requests
+import re
 from time import sleep
 from datetime import datetime, timedelta
 
@@ -8,7 +9,7 @@ s = requests.Session()
 url_login = 'http://capiroto.quintoandar.com.br/admin/airflow/login'
 r = s.get(url_login)
 csrf = re.search('_csrf.*value=\"(.*)\"', r.text).groups()[0]
-cred = { 'username': 'felipe.tancredo', 'password':'5@123', '_csrf_token':csrf }
+cred = {'username': 'felipe.tancredo', 'password': '5@123', '_csrf_token': csrf}
 
 response_login = s.post(url=url_login, data=cred)
 

@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 
 from helpers import find_best_subset
-from variables import *
+from variables import col_float
+from variables import variables_of_property
+from variables import variables_of_subset
 
 
 def import_ebdb_proposta(client):
@@ -19,7 +21,7 @@ def import_ebdb_proposta(client):
 
       -- dates
         p.dataaprovacao as date_approval_5a,
-        p.dataproposta as date_agreement, -- date the agreement is reached. 
+        p.dataproposta as date_agreement, -- date the agreement is reached.
         -- (continued) the offer is accepted. documentation is not yet sent. exactly the same as criadoem in proposta
       -- p.dataparamudanca as date_mudanca, -- is always null. ignore
         from_unixtime(cast(r.timestamp as bigint)/1000) as date_start_of_analysis,
@@ -27,12 +29,12 @@ def import_ebdb_proposta(client):
         p.statusDocumentacaoInq,
         (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) >= date('2018-02-01') as screened_by_5a
 
-    from datalake_raw.ebdb_proposta p 
+    from datalake_raw.ebdb_proposta p
     join datalake_raw.ebdb_proposta_AUD a on a.id = p.id -- inner join by default
-    join datalake_raw.ebdb_usuariorevisionentity r on a.REV = r.id 
-    where 
-        a.statusDocumentacaoInq_MOD = '1' and 
-        a.statusDocumentacaoInq = 'AnaliseCardiff' 
+    join datalake_raw.ebdb_usuariorevisionentity r on a.REV = r.id
+    where
+        a.statusDocumentacaoInq_MOD = '1' and
+        a.statusDocumentacaoInq = 'AnaliseCardiff'
     '''
 
     df_proposta_ebdb = client.execute_query_and_return_dataframe(sql_proposta_ebdb)
@@ -41,10 +43,7 @@ def import_ebdb_proposta(client):
     df_proposta_ebdb = df_proposta_ebdb.sort_values('date_start_of_analysis', ascending=False).groupby(
         'proposal_id').first()
 
-    date_cols = ['date_agreement',
-                 'date_approval_5a',
-                 'date_start_of_analysis',
-                 ]
+    date_cols = ['date_agreement', 'date_approval_5a', 'date_start_of_analysis']
     for date_col in date_cols:
         df_proposta_ebdb.loc[:, date_col] = pd.to_datetime(df_proposta_ebdb[date_col],
                                                            yearfirst=True,
@@ -89,10 +88,10 @@ def import_sortinghat_proposal(client):
     df_proposal_sh.loc[:, 'supervisor_name'] = df_proposal_sh.supervisor_name.replace({'': 'not assigned'})
 
     # no rejection_motive => rejection_reason_unkown/not_rejected
-    df_proposal_sh.loc[(df_proposal_sh.status == 'REJECTED') & (
-        df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'rejection_reason_unkown'
-    df_proposal_sh.loc[(df_proposal_sh.status != 'REJECTED') & (
-        df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'not_rejected'
+    df_proposal_sh.loc[(df_proposal_sh.status == 'REJECTED') &
+                       (df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'rejection_reason_unkown'
+    df_proposal_sh.loc[(df_proposal_sh.status != 'REJECTED') &
+                       (df_proposal_sh.rejection_motive == ''), 'rejection_motive'] = 'not_rejected'
 
     col_string_to_float = [
         'score_5a',
@@ -113,7 +112,7 @@ def import_sortinghat_proponent(client):
     :return:dataframe
     """
     sql_proponent_sh = '''
-        SELECT 
+        SELECT
         *
         FROM datalake_raw.sortinghat_proponent proponent
         '''
@@ -135,7 +134,8 @@ def import_sortinghat_proponent(client):
     })
 
     # dates as datetime
-    df_proponent_sh['date_admission'] = pd.to_datetime(df_proponent_sh['date_admission'], yearfirst=True, errors='coerce')
+    df_proponent_sh['date_admission'] = pd.to_datetime(
+        df_proponent_sh['date_admission'], yearfirst=True, errors='coerce')
     df_proponent_sh['date_birth'] = pd.to_datetime(df_proponent_sh['date_birth'], yearfirst=True, errors='coerce')
 
     # variables from the first proponent. todo check that it is the same as in ebdb
@@ -172,10 +172,9 @@ def import_api(client):
     -- where source='prod' -- done in code
     '''
     df_api = client.execute_query_and_return_dataframe(sql_api)
-    df_api.loc[:, col_float + variables_of_subset + variables_of_property] = df_api.loc[:,
-                                                                             col_float + variables_of_subset +
-                                                                             variables_of_property].replace(
-        to_replace='', value=np.nan).astype(float)
+    df_api.loc[:, col_float + variables_of_subset + variables_of_property] = \
+        df_api.loc[:, col_float + variables_of_subset + variables_of_property].replace(
+            to_replace='', value=np.nan).astype(float)
 
     # take only production data
     df_api = df_api[df_api.source == 'prod']
@@ -214,8 +213,8 @@ def import_ebdb_contrato_aud(client):
     """
     # query made with akira and translated into presto
     sql_contrato_ebdb = '''
-    select 
-      (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) as date_change, 
+    select
+      (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) as date_change,
       ca.id as contract_id,
       c.proposta_id as proposal_id,
       ca.imovel_id,
@@ -223,7 +222,7 @@ def import_ebdb_contrato_aud(client):
       c.criadoem as date_creation, -- creation of the line in the table
       ca.dataassinado as date_signature, -- signature of the contract
       ca.datainicio as date_beginning, -- date the tenant can move in and we start to charge
-      ca.datafimcontratoprevisto as date_fim_previsto, -- normal date of end of contract. 
+      ca.datafimcontratoprevisto as date_fim_previsto, -- normal date of end of contract.
       -- (continued) always signature + 30m unless 2nd signature
       ca.datarescisaoprevista as date_rescisao_prevista, -- date in the future at which the contract will be stopped
       ca.datarescisao as date_rescisao, -- end of the contract that has already ended
@@ -233,11 +232,11 @@ def import_ebdb_contrato_aud(client):
       c.cidade,
       ca.contractversion_id
     from datalake_raw.ebdb_contrato_aud ca
-    join datalake_raw.ebdb_usuariorevisionentity r on ca.REV = r.id 
+    join datalake_raw.ebdb_usuariorevisionentity r on ca.REV = r.id
     join datalake_raw.ebdb_contrato c on c.id=ca.id
-    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the 
+    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the
     -- negociation was before feb
-    -- we need to remove this condition because it could be that we end up deciding a 
+    -- we need to remove this condition because it could be that we end up deciding a
     -- proposition where we initially 'promised' it would be covered by cardif
     where c.proposta_id is not null and c.proposta_id!=''
     '''
@@ -266,7 +265,7 @@ def import_ebdb_contrato(client):
     """
     # query made with akira and translated into presto
     sql_contrato_ebdb = '''
-    select 
+    select
       c.id as contract_id,
       c.proposta_id as proposal_id,
       c.imovel_id,
@@ -274,7 +273,7 @@ def import_ebdb_contrato(client):
       c.criadoem as date_creation, -- creation of the line in the table
       c.dataassinado as date_signature, -- signature of the contract
       c.datainicio as date_beginning, -- date the tenant can move in and we start to charge
-      c.datafimcontratoprevisto date_fim_previsto, -- normal date of end of contract. 
+      c.datafimcontratoprevisto date_fim_previsto, -- normal date of end of contract.
       -- (continued) always signature + 30m unless 2nd signature
       c.datarescisaoprevista date_rescisao_prevista, -- date in the future at which the contract will be stopped
       c.datarescisao date_rescisao, -- end of the contract that has already ended
@@ -284,9 +283,9 @@ def import_ebdb_contrato(client):
       c.cidade,
       c.contractversion_id
     from datalake_raw.ebdb_contrato c
-    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the 
+    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the
     -- negociation was before feb
-    -- we need to remove this condition because it could be that we end up deciding a 
+    -- we need to remove this condition because it could be that we end up deciding a
     -- proposition where we initially 'promised' it would be covered by cardif
     where c.proposta_id is not null and c.proposta_id!=''
     '''
@@ -317,14 +316,14 @@ def import_invoices(client):
       i.contract_id,
       i.amount,
       trim(i.year_month) as year_month,
-      date(trim(i.tenant_due_date)) as tenant_due_date, 
+      date(trim(i.tenant_due_date)) as tenant_due_date,
       date(trim(i.tenant_paid_date)) as tenant_paid_date,
       trim(i.tenant_status) as tenant_status
-    from datalake_clean.invoice i 
-    where 
-      trim("from")='Inquilino' 
-      and trim("to")='Contrato' 
-      and trim(item)='Aluguel' 
+    from datalake_clean.invoice i
+    where
+      trim("from")='Inquilino'
+      and trim("to")='Contrato'
+      and trim(item)='Aluguel'
       and tenant_status in ('open', 'paid')
     '''  # todo understand the col 'blocked' and let someone review the query
     df_payments = client.execute_query_and_return_dataframe(sql_payments)

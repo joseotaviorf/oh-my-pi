@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from variables import *
+from variables import variables_of_property
+from variables import variables_of_subset
 
 today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
 
@@ -104,14 +105,14 @@ def compute_performance_kpis(df_payments):  # , **context):
             # the goal is to determine the date at which the contract became bad according to the threshold t
             # we need to take the minimum date between:
             # - due date + t, for paid invoices that have a delay>=t
-            candidates_all = (
-                contract.loc[contract.delay >= t, 'tenant_due_date'] + pd.to_timedelta(t, unit='d')).tolist()
+            candidates_all = (contract.loc[contract.delay >= t, 'tenant_due_date'] +
+                              pd.to_timedelta(t, unit='d')).tolist()
             thres_date = min(candidates_all) if len(candidates_all) > 0 else np.nan
 
             # determine if there are any unpaid invoices for more than t days
-            candidates_unpaid = (
-                contract.loc[contract.tenant_status_is_open & (contract.delay >= t), 'tenant_due_date'] \
-                + pd.to_timedelta(t, unit='d')).tolist()
+            candidates_unpaid = \
+                (contract.loc[contract.tenant_status_is_open & (contract.delay >= t), 'tenant_due_date'] +
+                 pd.to_timedelta(t, unit='d')).tolist()
             # the current status is over t if there is any open invoice with delay above t
             over_t = (len(candidates_unpaid) > 0)
 
@@ -166,12 +167,10 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
     # new columns ##
 
     # output_performance['days_contract_left'] =  (output_performance.dataassinado)
-    output_performance['contrato_expected_total_contract_duration'] = (
-        (
-            output_performance.contrato_planned_end_contract - output_performance.contrato_date_signature) / pd.to_timedelta(
-            1,
-            unit='days')).fillna(
-        915.0)  # 915 is 30 months
+    output_performance['contrato_expected_total_contract_duration'] = \
+        ((output_performance.contrato_planned_end_contract -
+          output_performance.contrato_date_signature) /
+         pd.to_timedelta(1, unit='days')).fillna(915.0)  # 915 is 30 months
 
     cols_to_zero = [
         u'invoices_last_invoice_dpd',
@@ -194,19 +193,18 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
         u'invoices_over150'
     ]
 
-    output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(
-        0)  # astype(str).replace({'NaT':''})
+    output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(0)
 
-    output_performance['contrato_approx_n_invoices_expected'] = (
-        output_performance['contrato_expected_total_contract_duration'] / 30.5).round()
+    output_performance['contrato_approx_n_invoices_expected'] = \
+        (output_performance['contrato_expected_total_contract_duration'] / 30.5).round()
 
-    output_performance['approx_sum_rent_future_to_issue'] = (
-                                                                output_performance.contrato_approx_n_invoices_expected - \
-                                                                output_performance.invoices_n_issued_invoices) * \
-                                                            output_performance.contrato_valoraluguel
+    output_performance['approx_sum_rent_future_to_issue'] = \
+        (output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_issued_invoices) * \
+        output_performance.contrato_valoraluguel
 
-    output_performance['approx_sum_rent_future_to_pay'] = (
-                                                              output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_paid_invoices) * output_performance.contrato_valoraluguel
+    output_performance['approx_sum_rent_future_to_pay'] = \
+        (output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_paid_invoices) * \
+        output_performance.contrato_valoraluguel
     return output_performance
 
 
@@ -219,7 +217,8 @@ def format_performance_table(output_performance):
 
     output_performance = output_performance.reset_index()
 
-    # sometimes these columns are null everywhere and pandas doesnt know they are dates, and the sk_date will not be created. so we force it:
+    # sometimes these columns are null everywhere and pandas doesnt know they
+    # are dates, and the sk_date will not be created. so we force it:
     force_date_format = [u'invoices_date_ever1', u'invoices_date_ever30',
                          u'invoices_date_ever50', u'invoices_date_ever60',
                          u'invoices_date_ever90', u'invoices_date_ever120',
@@ -336,8 +335,8 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
 
     # constant columns #####################
     # take only the scored  applications with the full set  of applicants.
-    df_api_last_big = df_api_last[df_api_last.full_subset == True]
-    df_api_last_best = df_api_last[df_api_last.best_subset == True]
+    df_api_last_big = df_api_last[df_api_last.full_subset]
+    df_api_last_best = df_api_last[df_api_last.best_subset]
 
     # select columns
     relevant_api_cols_constant = variables_of_property + [

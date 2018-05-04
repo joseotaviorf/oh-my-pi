@@ -22,7 +22,7 @@ def get_file_from_s3(bucket, file_name_s3, file_name_local):
 
 def write_to_s3(bucket, obj, filename, csv=True, pickle=False):
     """write dataframe obj to s3 (in the ts/monitoring directory)"""
-    if (type(obj) == pd.DataFrame) or (type(obj) == pd.Series):
+    if (isinstance(obj, pd.DataFrame)) or (isinstance(obj, pd.Series)):
 
         s3 = boto3.resource('s3')
         obj = obj.copy()  # we don't want to alter the original object

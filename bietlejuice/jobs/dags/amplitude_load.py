@@ -1,5 +1,6 @@
-from datetime import datetime
 from airflow.models import DAG
+from datetime import datetime
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsETL
 
@@ -13,6 +14,7 @@ def load_amplitude(**kwargs):
     prev_exec_date = kwargs['prev_execution_date']
     a = AmplitudeEventsETL()
     a.run_source_to_sns(start_date=prev_exec_date, end_date=exec_date)
+
 
 dag = DAG(
     dag_id='bi-amplitude-load',

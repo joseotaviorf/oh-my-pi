@@ -1,9 +1,9 @@
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils.default_logger import logger
 
 from __init__ import QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDb
 
 
 class GrowthUsers(object):

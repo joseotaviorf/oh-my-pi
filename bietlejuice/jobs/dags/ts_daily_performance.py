@@ -2,7 +2,7 @@
 Performance table
 this script computes the performance table for yesterday (end of day) and writes the result in S3
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
@@ -11,9 +11,14 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, import_ebdb_proposta
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -23,7 +28,6 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing
 
 # from bietlejuice.jobs.dags.util import environment as env
 # bucket = '5a-datalake'  # for testing without airflow
-
 
 
 def daily_performance():
@@ -56,9 +60,8 @@ def daily_performance():
     performance_table['date_computation'] = yesterday
     performance_table = create_sk_dates(performance_table)
     performance_table = format_performance_table(performance_table)
-    write_to_s3(performance_table,
-                'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
-
+    write_to_s3(performance_table, 'performance/performance' + yesterday.strftime(format='%Y%m%d') +
+                '.csv')  # writes an object after internally changing a copy of the object to string
 
     _logger.info('generating performance queries')
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')

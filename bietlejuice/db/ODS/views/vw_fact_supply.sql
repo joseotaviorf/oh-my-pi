@@ -24,7 +24,7 @@ with base_address as (
 			when sup.dt_qualified is not null then 'qualified'
 			when sup.dt_prospect is not null then 'prospect'
 			when sup.dt_lead is not null then 'lead'
-		end as last_step,
+		end::varchar(255) as last_step,
 		case
 			when max(dt_first_listing) over (partition by base_address.rn) is not null
 				then coalesce((dt_first_listing = max(dt_first_listing) over (partition by base_address.rn)), false)
@@ -49,13 +49,14 @@ with base_address as (
 ), reasons as (
 	select
 		m1.id,
+		m1.last_step,
 		case
 			when m1.acquisition_channel = 'Owner App' and m2.acquisition_channel <> 'Owner App'
 			then 'AbandonedSelfService'
 			when m1.last_step = 'qualified' and m2.id is not null then 'UnfinishedFlow'
 			when m1.last_step = 'prospect' and m2.id is not null then 'UnfinishedForm'
 			when m1.last_step = 'opportunity' then 'UnfinishedPhotoFlow'
-			when m1.last_step = 'listing' then 'DuplicatedFlow'
+			when m1.last_step = 'listing' and m2.id is not null then 'DuplicatedFlow'
 			else null
 		end as funnel_drop_reason
 	from
@@ -66,6 +67,7 @@ with base_address as (
 ), base_supply as ( -- add reasons and deduplicate facebook
   select
     a.*,
+    r.last_step,
     r.funnel_drop_reason
   from
   (
@@ -126,8 +128,8 @@ select
 		then 'Doorman'
 		else f.acquisition_channel
 	end as acquisition_channel,
-	f.funnel_step,
-	f.funnel_drop_reason,
+	f.last_step as funnel_step,
+	coalesce(f.funnel_drop_reason, f.funnel_step) as funnel_drop_reason,
 	f.lead_to_prospect_diff_minutes,
 	f.prospect_to_qualified_diff_minutes,
 	f.lead_to_first_inside_sales_contact_diff_minutes,

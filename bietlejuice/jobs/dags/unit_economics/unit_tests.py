@@ -31,12 +31,13 @@ def __test_query(**kwargs):
     cost_dre_query = BaseETL.get_query_from_file_name(kwargs['file_path'])
 
     _return = BaseTest.test_raw_query(
-        query=cost_dre_query.format(_column_value=kwargs['_column_value'], dre_category=kwargs['dre_category'],
-                                    unacceptable_diff=0.02 if 'unacceptable_diff' not in kwargs else kwargs['unacceptable_diff']),
+        query=cost_dre_query.format(
+            _column_value=kwargs['_column_value'],
+            dre_category=kwargs['dre_category'],
+            unacceptable_diff=0.02 if 'unacceptable_diff' not in kwargs else kwargs['unacceptable_diff']),
         enum_db=kwargs['enum_db'],
         blocking=kwargs['blocking'],
-        assertion=kwargs['assertion']
-    )
+        assertion=kwargs['assertion'])
 
     _logger.info('m=__test_file_query, _return={}'.format(_return))
 

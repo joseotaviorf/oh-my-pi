@@ -1,12 +1,12 @@
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb, petl
-import sys
 import os
+import sys
 from datetime import datetime
 
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('dim_','')
+process_name = BaseETL.get_current_filename().replace('dim_', '')
 now = datetime.now()
 
 if len(args) > 1:
