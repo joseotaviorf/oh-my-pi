@@ -70,10 +70,10 @@ def insert_leads(**kwargs):
     leads_filtered = leads_enriched[
         (leads_enriched.regions > -1) &
         (
-                (~leads_enriched.type.str.contains('casa')) |
-                leads_enriched.regions.isin(crawler_leads.house_allowed)
+            (~leads_enriched.type.str.contains('casa')) |
+            leads_enriched.regions.isin(crawler_leads.house_allowed)
         )
-        ]
+    ]
     if leads_filtered.empty:
         _logger.info(NO_LEADS_MSG)
         return None

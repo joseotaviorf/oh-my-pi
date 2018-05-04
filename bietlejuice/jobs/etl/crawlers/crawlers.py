@@ -5,9 +5,10 @@ from collections import OrderedDict
 from datetime import datetime
 
 import requests
+from qa_python_utils.aws.athena import AthenaClient
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
-from qa_python_utils.aws.athena import AthenaClient
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -83,9 +84,9 @@ class Crawlers(object):
 
             if new_neighborhood and new_city:
                 df_crawlers.loc[
-                    (df_crawlers.cep == row[1].cep) | (
-                        (df_crawlers.lat == row[1].lat) & (df_crawlers.lng == row[1].lng)), [
-                        'neighborhood', 'city']] = [new_neighborhood, new_city]
+                    (df_crawlers.cep == row[1].cep) |
+                    ((df_crawlers.lat == row[1].lat) & (df_crawlers.lng == row[1].lng)), ['neighborhood', 'city']] = \
+                    [new_neighborhood, new_city]
                 count_real += 1
 
         _logger.info('m=fill_neighs_cities_from_google, count_full={}, count_real={}'.format(count_full, count_real))
@@ -100,10 +101,10 @@ class Crawlers(object):
 
         query_crawlers = './bietlejuice/db/2.datalake/queries/crawlers/transform_raw.sql'
         df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
-        
+
         neighs_cities_query = './bietlejuice/db/2.datalake/queries/crawlers/neighs_cities.sql'
         df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
-        
+
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
         self.athena_client.create_parquet_from_df(
             key='clean/{0}/started_on={1}/{0}.parq'.format('external_property', today),
@@ -185,7 +186,7 @@ class Crawlers(object):
                 ('crawl_timestamp', float)
             ])
         )
-        
+
         self.athena_client.msck_repair_table(
             database='datalake_clean',
             table_name='external_property'
@@ -247,9 +248,9 @@ class Crawlers(object):
                         select dep.id
                         from dim_external_property dep
                         join datalake_clean.external_property cr
-                        on cr.id = dep.id 
-                          and cr.website = dep.source 
-                          and cr.business = dep.business 
+                        on cr.id = dep.id
+                          and cr.website = dep.source
+                          and cr.business = dep.business
                           and cr.type = dep.type
                           and (coalesce(cr.primary_phone_number, '') = coalesce(dep.primary_phone_number, ''))
                           and (coalesce(cr.secondary_phone_number, '') = coalesce(dep.secondary_phone_number, ''))
@@ -374,7 +375,7 @@ class Crawlers(object):
 
     def load_fact_market_index(self):
         _logger.info('m=load_fact_market_index, msg=deleting data at {}'.format(today))
-        query_clean = """delete from fact_market_index 
+        query_clean = """delete from fact_market_index
                           where sk_snapshot_date = replace('{0}', '-', '')::integer""".format(today)
         BaseETL.execute_command(
             command=query_clean,

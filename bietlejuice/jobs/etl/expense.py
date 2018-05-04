@@ -7,7 +7,7 @@ from datetime import datetime
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
-process_name = BaseETL.get_current_filename().replace('dim_','')
+process_name = BaseETL.get_current_filename().replace('dim_', '')
 
 table = BaseETL.from_db_query(
     db_enum=EnumDb.QuintoAndar_ebdb,
@@ -24,7 +24,7 @@ table = BaseETL.from_db_query(
       descricao ,
       automatica+0 as automatica,
       atualizadoEm ,
-      criadoEm 
+      criadoEm
     from
       Despesa
   """)

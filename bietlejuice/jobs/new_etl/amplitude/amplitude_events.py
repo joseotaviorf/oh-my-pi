@@ -99,7 +99,7 @@ class AmplitudeEventsETL(BaseETL):
         return events, str(json.loads(e)['app'])
 
     def dump_events_to_s3(self, g_events, app, start):
-        if type(start) is str:
+        if isinstance(start, str):
             start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
 
         # old job

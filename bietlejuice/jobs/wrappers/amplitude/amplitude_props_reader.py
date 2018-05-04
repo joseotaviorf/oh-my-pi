@@ -4,7 +4,7 @@ import os
 def get_keys(file_path=os.path.dirname(os.path.realpath(__file__))):
     keys = []
     filename = file_path + '/amplitude.apps.properties'
-    print('Properties File: '+ filename)
+    print('Properties File: ' + filename)
     with open(filename, 'r') as f:
         lines = f.readlines()
         for l in lines:

@@ -22,12 +22,12 @@ def __build_local_dag(sub_dag_name, dag_name, schedule_interval, start_date):
 @logger
 def build(sub_dag_name, dag_name, schedule_interval, start_date):
     """ Main method for building the entire Subdag """
-    
+
     local_dag = __build_local_dag(sub_dag_name, dag_name, schedule_interval, start_date)
 
     offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task, \
-    condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task = __build_data_tasks(
-        local_dag)
+        condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task = __build_data_tasks(
+            local_dag)
 
     tests = __build_test_tasks(local_dag)
 
@@ -171,7 +171,7 @@ def __build_data_tasks(local_dag):
     )
 
     return offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task, \
-           condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task
+        condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task
 
 
 def __test_file_query(**kwargs):

@@ -52,4 +52,3 @@ location = """s3://5a-amplitude-events/app=156118/event_type=Map-Price_flag_clic
 
 athena.create_athena_table(database=database, table_name=table_name, partitions=partition, schema=schema,
                            serde_options=serde_options, location=location)
-

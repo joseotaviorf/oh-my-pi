@@ -93,7 +93,7 @@ class EBDBDatalake(object):
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe("""
                   select * from datalake_raw.ebdb_{}""".format(table_info['original_name'])
-                                                                       )
+            )
 
             self.athena_client.create_parquet_from_df(
                 key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),
@@ -108,14 +108,14 @@ class EBDBDatalake(object):
         conversions_table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
             query="""
-                select 
+                select
                     distinct	DATA_TYPE,
-                    case  
+                    case
                         when DATA_TYPE in ('bigint', 'smallint', 'double', 'timestamp', 'int') then DATA_TYPE
                         when DATA_TYPE in ('datetime', 'time') then 'timestamp'
                         when DATA_TYPE in ('bit', 'tinyint') then 'smallint'
                         when DATA_TYPE in ('float', 'decimal', 'numeric') then 'double'
-                        else 'string' 
+                        else 'string'
                     end as ret
                 from information_schema.COLUMNS
             """
@@ -149,7 +149,7 @@ class EBDBDatalake(object):
         select TABLE_NAME
         from information_schema.TABLES
         where TABLE_SCHEMA = '{}'
-        and TABLE_TYPE = 'BASE TABLE'    
+        and TABLE_TYPE = 'BASE TABLE'
     """.format(schema_name)
         table_names = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,

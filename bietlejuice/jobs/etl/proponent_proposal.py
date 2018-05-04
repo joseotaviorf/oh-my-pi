@@ -1,10 +1,11 @@
-import sys
 import os
-here = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(here, '../../'))
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb, petl
+import sys
 from datetime import datetime
 
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+
+here = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(here, '../../'))
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']

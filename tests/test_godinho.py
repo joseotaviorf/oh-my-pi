@@ -72,9 +72,10 @@ if __name__ == '__main__':
             city = 'spo' if line[0].startswith('S') else 'cps'
             region = line[1]
             users = line[2]
-            audience = create_audience(parent_act_id='act_994644903935458', name='{}_cf_{}_{}'.format(dt.strftime('%Y%m%d'), city, region))
+            audience = create_audience(
+                parent_act_id='act_994644903935458',
+                name='{}_cf_{}_{}'.format(
+                    dt.strftime('%Y%m%d'),
+                    city,
+                    region))
             audience.add_users(CustomAudience.Schema.email_hash, users)
-
-
-
-

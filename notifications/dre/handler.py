@@ -2,15 +2,15 @@ import json
 import os
 import sys
 from base64 import b64decode
+from datetime import datetime
+
+import boto3
+import dateutil.relativedelta
+import psycopg2
+import requests
 
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, 'vendor'))
-
-import requests
-import psycopg2
-import boto3
-from datetime import datetime
-import dateutil.relativedelta
 
 
 def dre_costs_last_update_date(event, context):

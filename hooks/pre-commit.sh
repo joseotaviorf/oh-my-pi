@@ -9,7 +9,7 @@ import subprocess
 import sys
 import tempfile
 
-ignore_codes = ['E501']
+ignore_codes = ['E501', 'E741', 'F811', 'F841', 'C901']
 
 def system(*args, **kwargs):
     kwargs.setdefault('stdout', subprocess.PIPE)
@@ -20,7 +20,7 @@ def system(*args, **kwargs):
 
 def main():
     modified = re.compile('^[AM]+\s+(?P<name>.*\.py$)', re.MULTILINE)
-    files = system('git', 'status', '--porcelain').decode("utf-8")
+    files = system('git', 'status', '--porcelain').decode('utf-8')
     files = modified.findall(files)
 
     tempdir = tempfile.mkdtemp()

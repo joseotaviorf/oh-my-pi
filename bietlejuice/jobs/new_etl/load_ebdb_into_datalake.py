@@ -35,8 +35,13 @@ class EBDBDatalake(object):
         table = petl.convertall(table, unicode)  # convert all fields to unicode
 
         # get all columns declared as BIT because we have a bug converting BIT columns on mysql
-        bit_columns = petl.select(BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, self.schema_name, False),
-                                  lambda rec: rec.DATA_TYPE == 'bit')
+        bit_columns = petl.select(
+            BaseETL.get_columns_schema(
+                EnumDb.QuintoAndar_ebdb,
+                table_name,
+                self.schema_name,
+                False),
+            lambda rec: rec.DATA_TYPE == 'bit')
         table = petl.convert(table, tuple(bit_columns['COLUMN_NAME']), {u'\x00': u'0', u'\x01': u'1'})
 
         # save table into datalake
@@ -64,7 +69,7 @@ class EBDBDatalake(object):
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe("""
                   select * from datalake_raw.ebdb_{}""".format(table_info['original_name'])
-                                                                       )
+            )
 
             self.athena_client.create_parquet_from_df(
                 key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),
@@ -79,14 +84,14 @@ class EBDBDatalake(object):
         conversions_table = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
             query="""
-                select 
+                select
                     distinct	DATA_TYPE,
-                    case  
+                    case
                         when DATA_TYPE in ('bigint', 'smallint', 'double', 'timestamp', 'int') then DATA_TYPE
                         when DATA_TYPE in ('datetime', 'time') then 'timestamp'
                         when DATA_TYPE in ('bit', 'tinyint') then 'smallint'
                         when DATA_TYPE in ('float', 'decimal', 'numeric') then 'double'
-                        else 'string' 
+                        else 'string'
                     end as ret
                 from information_schema.COLUMNS
             """
@@ -120,7 +125,7 @@ class EBDBDatalake(object):
         select TABLE_NAME
         from information_schema.TABLES
         where TABLE_SCHEMA = '{}'
-        and TABLE_TYPE = 'BASE TABLE'    
+        and TABLE_TYPE = 'BASE TABLE'
     """.format(self.schema_name)
         table_names = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
@@ -129,4 +134,3 @@ class EBDBDatalake(object):
         if skip_header:
             table_names.pop(0)  # remove header
         return table_names
-
