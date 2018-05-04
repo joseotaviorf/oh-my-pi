@@ -18,7 +18,7 @@ from bietlejuice.jobs.dags.util import environment as env
 bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
 # bucket_ds = '5a-data-science'
 
-MAIN_DAG_NAME = 'tenantScreening-performance'
+MAIN_DAG_NAME = 'bi-demand-forecast'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every month
 
