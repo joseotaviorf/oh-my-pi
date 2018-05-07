@@ -27,6 +27,17 @@ class DimSubDag(BaseSubDag):
             ]
         )
 
+    @logger
+    def build_tests_tasks(self, dag):
+        return self._build_tests_tasks(
+            dag=dag,
+            tests=[
+                ('duplicates_dim_{}'.format(self.ods_stg_table_name), self.__test_duplicates),
+                ('emptiness_dim_{}'.format(self.ods_stg_table_name), self.__test_emptiness),
+                ('counts_dim_{}'.format(self.ods_stg_table_name), self.__test_counts)
+            ]
+        )
+
     def __test_duplicates(self):
         BaseTest.check_for_duplicates(
             schema='staging',
