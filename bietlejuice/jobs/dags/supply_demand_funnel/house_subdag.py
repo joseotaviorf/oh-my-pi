@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -22,15 +24,16 @@ class HouseSubDag(DimSubDag):
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        property_task, affiliate, rent_flow, listing_views, property_listing, dim_property, dim_status_over_period = \
-            self.__build_data_tasks(
-                house_dag)
+        (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task, dim_property,
+         dim_status_over_period) = self.__build_data_tasks(house_dag)
 
-        tests_tasks = self._build_tests_tasks(house_dag)
+        tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> property_task
-        tests_tasks.set_upstream([rent_flow, property_listing, property_task])
-        dim_status_over_period.set_upstream(tests_tasks)
+        staging_dim_property_task.set_upstream([rent_flow, property_listing, property_task])
+        staging_dim_property_task.set_downstream(tests_tasks)
+        dim_property.set_upstream(tests_tasks)
+        dim_property >> dim_status_over_period
 
         return house_dag
 
@@ -87,6 +90,17 @@ class HouseSubDag(DimSubDag):
             }
         )
 
+        staging_dim_property_task = BaseDAG.get_quintoandar_python_operator(
+            dag=dag,
+            task_id='STAGING_dim_property',
+            func_command=HouseSubDag.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'property',
+                'post_command': "update staging.dim_property set dt_timestamp = '{}' where sk_property = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
+            }
+        )
+
         dim_property = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_property',
@@ -106,8 +120,8 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, listing_views, property_listing, dim_property,
-                dim_status_over_period)
+        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task,
+                dim_property, dim_status_over_period)
 
     @staticmethod
     def load_dim_from_staging_to_dw(**kwargs):
@@ -155,4 +169,11 @@ class HouseSubDag(DimSubDag):
             bucket=DimSubDag.S3_BUCKET,
             command=kwargs['command'],
             table_name=kwargs['table_name']
+        )
+
+    @staticmethod
+    def load_dim_from_ods_to_staging(**kwargs):
+        utils.load_dim_from_ods_to_staging(
+            dim_name=kwargs['dim_name'],
+            post_command=kwargs['post_command']
         )

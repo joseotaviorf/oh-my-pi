@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -26,15 +28,15 @@ class OfferSubDag(DimSubDag):
         region_dag = self._build_local_dag()
 
         (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
-         condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task) = self.__build_data_tasks(
-            region_dag)
+         condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task,
+         dim_offer_task) = self.__build_data_tasks(region_dag)
 
-        tests_tasks = self._build_tests_tasks(region_dag)
+        tests_tasks = self.build_tests_tasks(region_dag)
 
         offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
         pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
-        offer_to_ods_task.set_downstream(tests_tasks)
-        pre_proposta_condicao_proposta_task.set_downstream(tests_tasks)
+        staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_condicao_proposta_task])
+        staging_dim_offer_task.set_downstream(tests_tasks)
         dim_offer_task.set_upstream(tests_tasks)
 
         return region_dag
@@ -119,6 +121,17 @@ class OfferSubDag(DimSubDag):
             }
         )
 
+        staging_dim_offer_task = BaseDAG.get_quintoandar_python_operator(
+            dag=dag,
+            task_id='STAGING_dim_offer',
+            func_command=OfferSubDag.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'offer',
+                'post_command': "update staging.dim_offer set dt_timestamp = '{}' where sk_offer = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
+            }
+        )
+
         dim_offer_task = BaseDAG.get_quintoandar_python_operator(
             task_id='DW_dim_offer',
             dag=dag,
@@ -129,7 +142,7 @@ class OfferSubDag(DimSubDag):
         )
 
         return (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
-                condicao_proposta_task, pre_proposta_condicao_proposta_task, dim_offer_task)
+                condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task, dim_offer_task)
 
     @staticmethod
     def load_dim_from_staging_to_dw(**kwargs):
@@ -161,4 +174,11 @@ class OfferSubDag(DimSubDag):
             bucket=DimSubDag.S3_BUCKET,
             table_name=kwargs['table_name'],
             copy_to_clean=kwargs['copy_to_clean']
+        )
+
+    @staticmethod
+    def load_dim_from_ods_to_staging(**kwargs):
+        utils.load_dim_from_ods_to_staging(
+            dim_name=kwargs['dim_name'],
+            post_command=kwargs['post_command']
         )

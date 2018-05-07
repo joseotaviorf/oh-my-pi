@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -22,12 +24,14 @@ class BookingSubDag(DimSubDag):
     def build_booking_with_tests(self):
         booking_dag = self._build_local_dag()
 
-        bookings, property_booking_information, dim_bookings = self.__build_data_tasks(booking_dag)
+        bookings, property_booking_information, staging_dim_booking_task, dim_bookings = self.__build_data_tasks(
+            booking_dag)
 
-        tests_tasks = self._build_tests_tasks(booking_dag)
+        tests_tasks = self.build_tests_tasks(booking_dag)
 
         property_booking_information >> bookings
-        bookings.set_downstream(tests_tasks)
+        bookings >> staging_dim_booking_task
+        staging_dim_booking_task.set_downstream(tests_tasks)
         dim_bookings.set_upstream(tests_tasks)
 
         return booking_dag
@@ -54,6 +58,17 @@ class BookingSubDag(DimSubDag):
             }
         )
 
+        staging_dim_booking_task = BaseDAG.get_quintoandar_python_operator(
+            dag=dag,
+            task_id='STAGING_dim_booking',
+            func_command=BookingSubDag.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'booking',
+                'post_command': "update staging.dim_booking set dt_timestamp = '{}' where sk_booking = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
+            }
+        )
+
         dim_booking_task = BaseDAG.get_quintoandar_python_operator(
             task_id='DW_dim_booking',
             dag=dag,
@@ -63,7 +78,7 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        return booking, booking_media_sources_task, dim_booking_task
+        return booking, booking_media_sources_task, staging_dim_booking_task, dim_booking_task
 
     @staticmethod
     def load_athena_file_query_to_ods(**kwargs):
@@ -86,4 +101,11 @@ class BookingSubDag(DimSubDag):
             dim_name=kwargs['dim_name'],
             bucket=DimSubDag.S3_BUCKET,
             command=kwargs['command']
+        )
+
+    @staticmethod
+    def load_dim_from_ods_to_staging(**kwargs):
+        utils.load_dim_from_ods_to_staging(
+            dim_name=kwargs['dim_name'],
+            post_command=kwargs['post_command']
         )

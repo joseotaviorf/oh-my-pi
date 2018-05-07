@@ -18,4 +18,4 @@ class UserSubDag(DimSubDag):
 
     @logger
     def build_user_with_tests(self):
-        return self._build_with_tests(source_command='call ebdb.list_usuario();')
+        return self.build_with_tests(source_command='call ebdb.list_usuario();')

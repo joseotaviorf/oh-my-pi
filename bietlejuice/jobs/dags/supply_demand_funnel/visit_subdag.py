@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -22,13 +24,14 @@ class VisitSubDag(DimSubDag):
     def build_visit_with_tests(self):
         visit_dag = self._build_local_dag()
 
-        visits, property_visit_information, dim_visits = self.__build_data_tasks(visit_dag)
+        visits, property_visit_information, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
 
-        tests_tasks = self._build_tests_tasks(visit_dag)
+        tests_tasks = self.build_tests_tasks(visit_dag)
 
         property_visit_information >> visits
-        visits.set_downstream(tests_tasks)
-        dim_visits.set_upstream(tests_tasks)
+        visits >> staging_dim_visit_task
+        staging_dim_visit_task.set_downstream(tests_tasks)
+        dim_visit.set_upstream(tests_tasks)
 
         return visit_dag
 
@@ -55,16 +58,27 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        dim_visits = BaseDAG.get_quintoandar_python_operator(
-            task_id='DW_dim_visits',
+        staging_dim_visit_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
-            func_command=VisitSubDag.load_dim_from_ods_to_dw,
+            task_id='STAGING_dim_visit',
+            func_command=VisitSubDag.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'visit',
+                'post_command': "update staging.dim_visit set dt_timestamp = '{}' where sk_visit = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
+            }
+        )
+
+        dim_visit = BaseDAG.get_quintoandar_python_operator(
+            task_id='DW_dim_visit',
+            dag=dag,
+            func_command=VisitSubDag.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'visit'
             }
         )
 
-        return visits, property_visit_information, dim_visits
+        return visits, property_visit_information, staging_dim_visit_task, dim_visit
 
     @staticmethod
     def load_athena_file_query_to_ods(**kwargs):
@@ -105,4 +119,18 @@ class VisitSubDag(DimSubDag):
             bucket=DimSubDag.S3_BUCKET,
             command=kwargs['command'],
             table_name=kwargs['table_name']
+        )
+
+    @staticmethod
+    def load_dim_from_staging_to_dw(**kwargs):
+        utils.load_dim_from_staging_to_dw(
+            dim_name=kwargs['dim_name'],
+            bucket=DimSubDag.S3_BUCKET,
+        )
+
+    @staticmethod
+    def load_dim_from_ods_to_staging(**kwargs):
+        utils.load_dim_from_ods_to_staging(
+            dim_name=kwargs['dim_name'],
+            post_command=kwargs['post_command']
         )
