@@ -1,5 +1,6 @@
-from datetime import datetime
 from airflow.models import DAG
+from datetime import datetime
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsETL
 

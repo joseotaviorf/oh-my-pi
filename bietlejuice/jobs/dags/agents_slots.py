@@ -1,13 +1,13 @@
 import os
-from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
