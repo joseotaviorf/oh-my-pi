@@ -18,4 +18,4 @@ class LeadSubDag(DimSubDag):
 
     @logger
     def build_lead_with_tests(self):
-        return self._build_with_tests(source_command='call ebdb.list_lead();')
+        return self.build_with_tests(source_command='call ebdb.list_lead();')

@@ -18,4 +18,4 @@ class ContractSubDag(DimSubDag):
 
     @logger
     def build_contract_with_tests(self):
-        return self._build_with_tests(source_command='call ebdb.list_contrato();')
+        return self.build_with_tests(source_command='call ebdb.list_contrato();')

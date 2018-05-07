@@ -18,4 +18,4 @@ class PhotoJobSubDag(DimSubDag):
 
     @logger
     def build_photo_job_with_tests(self):
-        return self._build_with_tests(source_command='call ebdb.list_photo_job();')
+        return self.build_with_tests(source_command='call ebdb.list_photo_job();')

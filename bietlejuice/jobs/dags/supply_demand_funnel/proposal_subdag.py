@@ -18,4 +18,4 @@ class ProposalSubDag(DimSubDag):
 
     @logger
     def build_proposal_with_tests(self):
-        return self._build_with_tests(source_command='call ebdb.list_proposta();')
+        return self.build_with_tests(source_command='call ebdb.list_proposta();')

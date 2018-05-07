@@ -26,7 +26,7 @@ class RegionSubDag(DimSubDag):
 
         agent_region, region, dim_region, load_region = self.__build_data_tasks(region_dag)
 
-        tests_tasks = self._build_tests_tasks(region_dag)
+        tests_tasks = self.build_tests_tasks(region_dag)
 
         dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
