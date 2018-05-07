@@ -65,7 +65,8 @@ select
   round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/1440,1) as prospect_to_first_inside_sales_contact_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days
+  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days,
+  exclusivity+0 as exclusivity
 from
 (
 	select
@@ -96,7 +97,8 @@ from
 		i.firstPublication as dt_first_listing,
 		base.flow,
 		base.acquisition_method,
-		base.acquisition_channel
+		base.acquisition_channel,
+		(sc.id is not null and optedOutAt is null) as exclusivity
 	from
 	(
 		select
@@ -117,7 +119,11 @@ from
 			i.dataCriacao as dt_prospect,
 			null as dt_first_inside_sales_contact,
 			null as dt_conversion,
-			from_unixtime(ure.timestamp/1000) as dt_qualified,
+			case
+				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				then from_unixtime(ure.timestamp/1000)
+				else i.dataCriacao
+			end as dt_qualified,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self Service Flow'
@@ -306,9 +312,9 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
-			null as dt_first_inside_sales_contact,
+			coalesce(cl.dataConversao, cl.criadoEm) as dt_first_inside_sales_contact,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
-			from_unixtime(ure.timestamp/1000) as dt_qualified,
+			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			'Inside Sales' as acquisition_channel
@@ -320,22 +326,6 @@ from
 		left join
 			Usuario u
 			on u.id = i.usuarioQueCadastrou_id
-		left join
-		 	(
-		 		select
-		      min(REV) as REV,
-		      garantias,
-		      Imovel_id
-		    from
-		    	Imovel_garantias_AUD
-		    where garantias in ('SeguroFiancaCardiff','SeguroFairfax')
-		    group by Imovel_id
-		  ) ig
-		  on i.id = ig.Imovel_id
-		  and ig.garantias in ('SeguroFiancaCardiff','SeguroFairfax')
-		left join
-		  UsuarioRevisionEntity ure
-		  on ig.REV = ure.id
 		where leadConvertido_id is null
 	) base
 	left join
@@ -356,6 +346,12 @@ from
 	left join
 		Imovel i
 		on i.id = base.imovel_id
+	left join
+		(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
+		on maxsc.imovel_id = i.id
+	left join
+		SpecialCondition sc
+		on sc.id = maxsc.id
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;
 END
