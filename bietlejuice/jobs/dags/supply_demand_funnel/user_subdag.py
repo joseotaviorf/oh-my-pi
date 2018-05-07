@@ -1,94 +1,21 @@
 from qa_python_utils.default_logger import logger
 
-import bietlejuice.jobs.base.new_base_etl as utils
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 
-class UserSubDag(BaseSubDag):
+class UserSubDag(DimSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        super(UserSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
+        super(UserSubDag, self).__init__(
+            bucket=bucket,
+            sub_dag_name=sub_dag_name,
+            dag_name=dag_name,
+            schedule_interval=schedule_interval,
+            start_date=start_date,
+            ebdb_table_name='usuario',
+            ods_stg_table_name='user'
+        )
 
     @logger
-    def build(self):
-        user_dag = self.__build_local_dag()
-
-        user, dim_user, load_user = self.__build_data_tasks(user_dag)
-
-        duplicate_user, empty_user = self.__local_build_tests_tasks(user_dag)
-
-        user >> dim_user >> empty_user >> duplicate_user >> load_user
-
-        return user_dag
-
-    @logger
-    def __build_local_dag(self):
-        local_dag = BaseDAG.build_dag(
-            '{}.{}'.format(self.dag_name, self.sub_dag_name),
-            schedule_interval=self.schedule_interval,
-            start_date=self.start_date,
-        )
-
-        return local_dag
-
-    @logger
-    def __build_data_tasks(self, dag):
-        user = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='ODS_user',
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={'dim_name': 'user', 'table_name': 'usuario', 'bucket': self.bucket,
-                       'command': 'call ebdb.list_usuario();'}
-        )
-
-        dim_user = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='STAGING_dim_user',
-            func_command=utils.load_dim_from_ods_to_staging,
-            op_kwargs={'dim_name': 'user'}
-        )
-
-        load_user = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='DW_dim_user',
-            func_command=utils.load_dim_from_staging_to_dw,
-            op_kwargs={'dim_name': 'user', 'bucket': self.bucket}
-        )
-
-        return user, dim_user, load_user
-
-    @logger
-    def __local_build_tests_tasks(self, dag):
-        duplicate_user = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='TEST_duplicates_dim_user',
-            func_command=self.__test_duplicates
-        )
-
-        empty_user = BaseDAG.get_quintoandar_python_operator(
-            dag=dag,
-            task_id='TEST_emptiness_dim_user',
-            func_command=self.__test_duplicates
-        )
-
-        return duplicate_user, empty_user
-
-    @staticmethod
-    def __test_duplicates():
-        BaseTest.check_for_duplicates(
-            schema='staging',
-            table='dim_user',
-            key='sk_user',
-            enum_db=EnumDb.BI_ODS
-        )
-
-    @staticmethod
-    def __test_emptiness():
-        BaseTest.check_for_emptiness(
-            schema='staging',
-            table='dim_user',
-            enum_db=EnumDb.BI_ODS
-        )
+    def build_user_with_tests(self):
+        return self.build_with_tests(source_command='call ebdb.list_usuario();')
