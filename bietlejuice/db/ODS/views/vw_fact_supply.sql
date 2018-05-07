@@ -150,7 +150,8 @@ select
 	f.prospect_to_first_inside_sales_contact_diff_days,
 	f.qualified_to_opportunity_diff_days,
 	f.opportunity_to_listing_diff_days,
-	f.lead_to_listing_diff_days
+	f.lead_to_listing_diff_days,
+	f.exclusivity
 from
 	base_supply f
 left join base_doorman d
