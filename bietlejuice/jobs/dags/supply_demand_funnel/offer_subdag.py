@@ -37,6 +37,7 @@ class OfferSubDag(DimSubDag):
         staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_condicao_proposta_task])
         # staging_dim_offer_task.set_downstream(tests_tasks)
         # dim_offer_task.set_upstream(tests_tasks)
+        staging_dim_offer_task >> dim_offer_task
 
         return offer_dag
 
