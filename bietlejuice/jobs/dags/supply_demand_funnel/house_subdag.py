@@ -100,9 +100,7 @@ class HouseSubDag(DimSubDag):
             task_id='STAGING_dim_property',
             func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'property',
-                'post_command': "update staging.dim_property set dt_timestamp = '{}' where sk_property = -1;".format(
-                    datetime.now().strftime('%Y-%m-%d'))
+                'dim_name': 'property'
             }
         )
 
