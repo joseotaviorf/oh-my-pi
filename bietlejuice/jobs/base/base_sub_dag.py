@@ -100,8 +100,7 @@ class BaseSubDag(object):
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket,
-                'command': source_command,
-                'table_name': self.ebdb_table_name
+                'command': source_command
             }
         )
 
