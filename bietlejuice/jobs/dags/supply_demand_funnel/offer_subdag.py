@@ -82,7 +82,8 @@ class OfferSubDag(DimSubDag):
             func_command=utils.extract_query_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal',
-                'command': 'call ebdb.list_preproposta();'
+                'command': 'call ebdb.list_preproposta();',
+                'bucket': DimSubDag.S3_BUCKET
             }
 
         )

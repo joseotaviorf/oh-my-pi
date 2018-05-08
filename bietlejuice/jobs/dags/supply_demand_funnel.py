@@ -179,7 +179,7 @@ ods_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'fact_supply', 'bucket': bucket,
+    op_kwargs={'dim_name': 'fact_supply',
                'command': 'call ebdb.list_fact_supply(null);'}
 )
 

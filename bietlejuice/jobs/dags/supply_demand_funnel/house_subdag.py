@@ -46,7 +46,8 @@ class HouseSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'property',
                 'command': 'call ebdb.list_imovel();',
-                'table_name': 'imovel'
+                'table_name': 'imovel',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
