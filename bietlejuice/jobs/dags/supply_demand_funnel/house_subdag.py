@@ -90,7 +90,8 @@ class HouseSubDag(DimSubDag):
             task_id='ODS_property_listing',
             func_command=utils.materialize_view_ods,
             op_kwargs={
-                'view_name': 'property_listing'
+                'view_name': 'property_listing',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
