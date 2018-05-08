@@ -68,11 +68,11 @@ class OfferSubDag(DimSubDag):
         offer_to_ods_task = BaseDAG.get_quintoandar_python_operator(
             task_id='offer_to_ods',
             dag=dag,
-            func_command=OfferSubDag.load_athena_query_to_ods,
+            func_command=utils.load_athena_query_to_ods,
             op_kwargs={
                 'dim_name': 'offer',
                 'bucket': OfferSubDag.S3_BUCKET,
-                'fname': '{}/offer.sql'.format(DATALAKE_QUERIES_DIR)
+                'fname': '{}/offer'.format(DATALAKE_QUERIES_DIR)
             }
 
         )
@@ -80,7 +80,7 @@ class OfferSubDag(DimSubDag):
         pre_proposal_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal',
             dag=dag,
-            func_command=OfferSubDag.extract_query_dim_from_ebdb_to_ods,
+            func_command=utils.extract_query_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal',
                 'command': 'call ebdb.list_preproposta();'
@@ -91,7 +91,7 @@ class OfferSubDag(DimSubDag):
         pre_proposta_aud_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal_aud',
             dag=dag,
-            func_command=OfferSubDag.extract_table_dim_from_ebdb_to_ods,
+            func_command=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal_AUD',
                 'table_name': 'PreProposta_AUD',
@@ -102,7 +102,7 @@ class OfferSubDag(DimSubDag):
         condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_condition',
             dag=dag,
-            func_command=OfferSubDag.extract_table_dim_from_ebdb_to_ods,
+            func_command=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'condition',
                 'table_name': 'CondicaoProposta',
@@ -113,7 +113,7 @@ class OfferSubDag(DimSubDag):
         pre_proposta_condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal_condition',
             dag=dag,
-            func_command=OfferSubDag.extract_table_dim_from_ebdb_to_ods,
+            func_command=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal_condition',
                 'table_name': 'PreProposta_CondicaoProposta',
@@ -124,7 +124,7 @@ class OfferSubDag(DimSubDag):
         staging_dim_offer_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_offer',
-            func_command=OfferSubDag.load_dim_from_ods_to_staging,
+            func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'offer',
                 'post_command': "update staging.dim_offer set dt_timestamp = '{}' where sk_offer = -1;".format(
@@ -135,7 +135,7 @@ class OfferSubDag(DimSubDag):
         dim_offer_task = BaseDAG.get_quintoandar_python_operator(
             task_id='DW_dim_offer',
             dag=dag,
-            func_command=OfferSubDag.load_dim_from_staging_to_dw,
+            func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'offer'
             }
@@ -143,42 +143,3 @@ class OfferSubDag(DimSubDag):
 
         return (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
                 condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task, dim_offer_task)
-
-    @staticmethod
-    def load_dim_from_staging_to_dw(**kwargs):
-        utils.load_dim_from_staging_to_dw(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-        )
-
-    @staticmethod
-    def load_athena_query_to_ods(**kwargs):
-        utils.load_athena_query_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            fname=kwargs['fname']
-        )
-
-    @staticmethod
-    def extract_query_dim_from_ebdb_to_ods(**kwargs):
-        utils.extract_query_dim_from_ebdb_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            command=kwargs['command']
-        )
-
-    @staticmethod
-    def extract_table_dim_from_ebdb_to_ods(**kwargs):
-        utils.extract_table_dim_from_ebdb_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            table_name=kwargs['table_name'],
-            copy_to_clean=kwargs['copy_to_clean']
-        )
-
-    @staticmethod
-    def load_dim_from_ods_to_staging(**kwargs):
-        utils.load_dim_from_ods_to_staging(
-            dim_name=kwargs['dim_name'],
-            post_command=kwargs['post_command']
-        )
