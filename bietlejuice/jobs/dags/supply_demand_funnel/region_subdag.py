@@ -43,7 +43,8 @@ class RegionSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'agent_region',
                 'table_name': 'DadosAgente_Regiao',
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
@@ -55,7 +56,8 @@ class RegionSubDag(DimSubDag):
                 'dim_name': 'region',
                 'table_name': 'MapRegiao',
                 'add_timestamp': True,
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

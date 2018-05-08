@@ -95,7 +95,8 @@ class OfferSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'pre_proposal_AUD',
                 'table_name': 'PreProposta_AUD',
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
@@ -106,7 +107,8 @@ class OfferSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'condition',
                 'table_name': 'CondicaoProposta',
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
@@ -117,7 +119,8 @@ class OfferSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'pre_proposal_condition',
                 'table_name': 'PreProposta_CondicaoProposta',
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

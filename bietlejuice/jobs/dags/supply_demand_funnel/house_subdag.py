@@ -69,7 +69,8 @@ class HouseSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'rental_flow',
                 'table_name': 'FluxoLocacao',
-                'copy_to_clean': False
+                'copy_to_clean': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
