@@ -39,7 +39,7 @@ class RegionSubDag(DimSubDag):
         agent_region = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
-            func_command=RegionSubDag.extract_table_dim_from_ebdb_to_ods,
+            func_command=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'agent_region',
                 'table_name': 'DadosAgente_Regiao',
@@ -50,7 +50,7 @@ class RegionSubDag(DimSubDag):
         region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_region',
-            func_command=RegionSubDag.extract_table_dim_from_ebdb_to_ods,
+            func_command=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'region',
                 'table_name': 'MapRegiao',
@@ -62,7 +62,7 @@ class RegionSubDag(DimSubDag):
         dim_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_region',
-            func_command=RegionSubDag.load_dim_from_ods_to_staging,
+            func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'region',
                 'post_command': "update staging.dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
@@ -73,34 +73,10 @@ class RegionSubDag(DimSubDag):
         load_region = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_region',
-            func_command=RegionSubDag.load_dim_from_staging_to_dw,
+            func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'region'
             }
         )
 
         return agent_region, region, dim_region, load_region
-
-    @staticmethod
-    def extract_table_dim_from_ebdb_to_ods(**kwargs):
-        utils.extract_table_dim_from_ebdb_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            table_name=kwargs['table_name'],
-            add_timestamp=kwargs['add_timestamp'] if 'add_timestamp' in kwargs else False,
-            copy_to_clean=kwargs['copy_to_clean']
-        )
-
-    @staticmethod
-    def load_dim_from_ods_to_staging(**kwargs):
-        utils.load_dim_from_ods_to_staging(
-            dim_name=kwargs['dim_name'],
-            post_command=kwargs['post_command']
-        )
-
-    @staticmethod
-    def load_dim_from_staging_to_dw(**kwargs):
-        utils.load_dim_from_staging_to_dw(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET
-        )

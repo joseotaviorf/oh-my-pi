@@ -40,7 +40,7 @@ class VisitSubDag(DimSubDag):
         visits = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_visits',
             dag=dag,
-            func_command=VisitSubDag.extract_query_dim_from_ebdb_to_ods,
+            func_command=utils.extract_query_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'visit',
                 'command': 'call ebdb.list_visita();'
@@ -50,7 +50,7 @@ class VisitSubDag(DimSubDag):
         property_visit_information = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_property_visit_information',
             dag=dag,
-            func_command=VisitSubDag.load_athena_file_query_to_ods,
+            func_command=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'property_visit_information',
                 'append': True,
@@ -61,7 +61,7 @@ class VisitSubDag(DimSubDag):
         staging_dim_visit_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_visit',
-            func_command=VisitSubDag.load_dim_from_ods_to_staging,
+            func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'visit',
                 'post_command': "update staging.dim_visit set dt_timestamp = '{}' where sk_visit = -1;".format(
@@ -72,65 +72,10 @@ class VisitSubDag(DimSubDag):
         dim_visit = BaseDAG.get_quintoandar_python_operator(
             task_id='DW_dim_visit',
             dag=dag,
-            func_command=VisitSubDag.load_dim_from_staging_to_dw,
+            func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'visit'
             }
         )
 
         return visits, property_visit_information, staging_dim_visit_task, dim_visit
-
-    @staticmethod
-    def load_athena_file_query_to_ods(**kwargs):
-        utils.load_athena_file_query_to_ods(
-            table_name=kwargs['table_name'],
-            file_name=kwargs['file_name'],
-            bucket=DimSubDag.S3_BUCKET
-        )
-
-    @staticmethod
-    def materialize_view_ods(**kwargs):
-        utils.materialize_view_ods(
-            view_name=kwargs['view_name'],
-            bucket=DimSubDag.S3_BUCKET
-        )
-
-    @staticmethod
-    def load_dim_from_ods_to_dw(**kwargs):
-        utils.load_dim_from_ods_to_dw(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            insert_dummy=kwargs['insert_dummy'] if 'insert_dummy' in kwargs else True
-        )
-
-    @staticmethod
-    def extract_table_dim_from_ebdb_to_ods(**kwargs):
-        utils.extract_table_dim_from_ebdb_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            table_name=kwargs['table_name'],
-            copy_to_clean=kwargs['copy_to_clean']
-        )
-
-    @staticmethod
-    def extract_query_dim_from_ebdb_to_ods(**kwargs):
-        utils.extract_query_dim_from_ebdb_to_ods(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-            command=kwargs['command'],
-            table_name=kwargs['table_name']
-        )
-
-    @staticmethod
-    def load_dim_from_staging_to_dw(**kwargs):
-        utils.load_dim_from_staging_to_dw(
-            dim_name=kwargs['dim_name'],
-            bucket=DimSubDag.S3_BUCKET,
-        )
-
-    @staticmethod
-    def load_dim_from_ods_to_staging(**kwargs):
-        utils.load_dim_from_ods_to_staging(
-            dim_name=kwargs['dim_name'],
-            post_command=kwargs['post_command']
-        )
