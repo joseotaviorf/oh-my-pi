@@ -14,7 +14,7 @@ class HouseSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='imovel',
+            ebdb_table_name='Imovel',
             ods_stg_table_name='property'
         )
 
