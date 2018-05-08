@@ -65,10 +65,10 @@ class BaseTest(object):
 
         # returns true if has more rows besides the header
         if len(output) > 1:
-            _logger.error('m=__test_duplicates, msg={} has duplicates'.format(table))
+            _logger.error('m=check_for_duplicates, msg={} has duplicates'.format(table))
             raise Exception
 
-        _logger.info('m=__test_duplicates, msg={} is free from duplicates'.format(table))
+        _logger.info('m=check_for_duplicates, msg={} is free from duplicates'.format(table))
 
     @staticmethod
     @logger
@@ -91,7 +91,7 @@ class BaseTest(object):
 
         comparison_list = []
         for source in _dict['sources']:
-            _query = BaseETL.get_query_from_file_name(source['file_path'])
+            _query = BaseTest.__get_query(source)
             query_result = BaseTest.get_query_result_for_comparison(
                 query=_query,
                 enum_db=source['enum_db'],
@@ -108,3 +108,9 @@ class BaseTest(object):
 
         BaseTest.compare_sources(_dict['acceptable_diff'], comparison_list)
         _logger.info('m=__test_count, msg=counts are all equal')
+
+    @staticmethod
+    def __get_query(source):
+        return BaseETL.get_query_from_file_name(
+            source['file_path']) if 'file_path' in source else \
+            'select count(*) from {}.{}'.format(source['schema'], source['table_name'])

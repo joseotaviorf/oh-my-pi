@@ -16,25 +16,27 @@ class DimSubDag(BaseSubDag):
         self.ods_stg_table_name = ods_stg_table_name
 
     @logger
-    def build_with_tests(self, source_command):
+    def build_with_tests(self, source_command, from_file_query=False):
         return self._build_with_tests(
             entity=self.ods_stg_table_name,
             source_command=source_command,
             tests=[
                 ('duplicates_dim_{}'.format(self.ods_stg_table_name), self.__test_duplicates),
                 ('emptiness_dim_{}'.format(self.ods_stg_table_name), self.__test_emptiness),
-                ('counts_dim_{}'.format(self.ods_stg_table_name), self.__test_counts)
+                ('counts_dim_{}'.format(self.ods_stg_table_name),
+                 self.__test_counts_from_raw_query if from_file_query is False else self.__test_counts_from_file_query)
             ]
         )
 
     @logger
-    def build_tests_tasks(self, dag):
+    def build_tests_tasks(self, dag, from_file_query=False):
         return self._build_tests_tasks(
             dag=dag,
             tests=[
                 ('duplicates_dim_{}'.format(self.ods_stg_table_name), self.__test_duplicates),
                 ('emptiness_dim_{}'.format(self.ods_stg_table_name), self.__test_emptiness),
-                ('counts_dim_{}'.format(self.ods_stg_table_name), self.__test_counts)
+                ('counts_dim_{}'.format(self.ods_stg_table_name),
+                 self.__test_counts_from_raw_query if from_file_query is False else self.__test_counts_from_file_query)
             ]
         )
 
@@ -53,17 +55,35 @@ class DimSubDag(BaseSubDag):
             enum_db=EnumDb.BI_ODS
         )
 
-    def __test_counts(self):
+    def __test_counts_from_file_query(self):
         BaseTest.are_counts_equal({
             'acceptable_diff': .0,
             'sources': [
                 {
-                    'file_path': '{}/dim_{}_count_check.sql'.format(ODS_STAGING_TEST_QUERIES_DIR,
-                                                                    self.ods_stg_table_name),
+                    'schema': 'staging',
+                    'table_name': self.ods_stg_table_name,
                     'enum_db': EnumDb.BI_ODS
                 },
                 {
                     'file_path': '{}/{}_count_check.sql'.format(EBDB_TEST_QUERIES_DIR, self.ebdb_table_name),
+                    'enum_db': EnumDb.QuintoAndar_ebdb,
+                    'encoding': 'LATIN1'
+                }
+            ]
+        })
+
+    def __test_counts_from_raw_query(self):
+        BaseTest.are_counts_equal({
+            'acceptable_diff': .0,
+            'sources': [
+                {
+                    'schema': 'staging',
+                    'table_name': self.ods_stg_table_name,
+                    'enum_db': EnumDb.BI_ODS
+                },
+                {
+                    'schema': 'ebdb',
+                    'table_name': self.ebdb_table_name,
                     'enum_db': EnumDb.QuintoAndar_ebdb,
                     'encoding': 'LATIN1'
                 }
