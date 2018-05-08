@@ -6,8 +6,7 @@ Airflow implementation and DAGs.
 #### Git hooks
 
 ```
-cd ${bi-etl-ejuice clone dir}/.git/hooks
-ln -s ../../hooks/pre-commit pre-commit
+pip install --upgrade flake8 && flake8 --install-hook git && git config --bool flake8.strict true
 ```
 
 ### Airflow
