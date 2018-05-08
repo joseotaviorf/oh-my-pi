@@ -107,7 +107,8 @@ class HouseSubDag(DimSubDag):
             task_id='DW_dim_property',
             func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'property'
+                'dim_name': 'property',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
