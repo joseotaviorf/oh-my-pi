@@ -120,7 +120,8 @@ class HouseSubDag(DimSubDag):
             func_command=utils.load_dim_from_ods_to_dw,
             op_kwargs={
                 'dim_name': 'property_status_over_period',
-                'insert_dummy': False
+                'insert_dummy': False,
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

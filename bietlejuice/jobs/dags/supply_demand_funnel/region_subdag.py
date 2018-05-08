@@ -77,7 +77,8 @@ class RegionSubDag(DimSubDag):
             task_id='DW_dim_region',
             func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'region'
+                'dim_name': 'region',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

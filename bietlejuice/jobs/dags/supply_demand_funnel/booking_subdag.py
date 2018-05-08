@@ -76,7 +76,8 @@ class BookingSubDag(DimSubDag):
             dag=dag,
             func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'booking'
+                'dim_name': 'booking',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

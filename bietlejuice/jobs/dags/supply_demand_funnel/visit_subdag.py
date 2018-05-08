@@ -76,7 +76,8 @@ class VisitSubDag(DimSubDag):
             dag=dag,
             func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'visit'
+                'dim_name': 'visit',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

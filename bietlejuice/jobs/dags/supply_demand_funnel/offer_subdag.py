@@ -140,7 +140,8 @@ class OfferSubDag(DimSubDag):
             dag=dag,
             func_command=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'offer'
+                'dim_name': 'offer',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
