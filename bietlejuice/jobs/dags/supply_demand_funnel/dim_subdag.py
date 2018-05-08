@@ -11,7 +11,7 @@ class DimSubDag(BaseSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name,
                  ods_stg_table_name):
-        super(DimSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
+        super(DimSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name)
         self.ebdb_table_name = ebdb_table_name
         self.ods_stg_table_name = ods_stg_table_name
 

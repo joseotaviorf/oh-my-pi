@@ -11,12 +11,12 @@ class BaseSubDag(object):
     """
 
     @logger
-    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
+    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name=None):
         self.sub_dag_name = sub_dag_name
         self.dag_name = dag_name
         self.schedule_interval = schedule_interval
         self.start_date = start_date
-
+        self.ebdb_table_name = ebdb_table_name
         self.bucket = bucket
 
     @logger
@@ -100,7 +100,8 @@ class BaseSubDag(object):
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket,
-                'command': source_command
+                'command': source_command,
+                'table_name': self.ebdb_table_name
             }
         )
 
