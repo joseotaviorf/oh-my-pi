@@ -18,27 +18,27 @@ class OfferSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='regiao',
-            ods_stg_table_name='region'
+            ebdb_table_name='offer',
+            ods_stg_table_name='offer'
         )
 
     @logger
     def build_offer_with_tests(self):
-        region_dag = self._build_local_dag()
+        offer_dag = self._build_local_dag()
 
         (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
          condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task,
-         dim_offer_task) = self.__build_data_tasks(region_dag)
+         dim_offer_task) = self.__build_data_tasks(offer_dag)
 
-        tests_tasks = self.build_tests_tasks(region_dag)
+        # tests_tasks = self.build_tests_tasks(offer_dag)
 
         offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
         pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
         staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_condicao_proposta_task])
-        staging_dim_offer_task.set_downstream(tests_tasks)
-        dim_offer_task.set_upstream(tests_tasks)
+        # staging_dim_offer_task.set_downstream(tests_tasks)
+        # dim_offer_task.set_upstream(tests_tasks)
 
-        return region_dag
+        return offer_dag
 
     @staticmethod
     def __to_s3(**kwargs):
