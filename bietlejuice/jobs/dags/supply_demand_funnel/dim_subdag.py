@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.dags import EBDB_TEST_QUERIES_DIR, ODS_STAGING_TEST_QUERIES_DIR
+from bietlejuice.jobs.dags import EBDB_TEST_QUERIES_DIR
 
 
 class DimSubDag(BaseSubDag):
