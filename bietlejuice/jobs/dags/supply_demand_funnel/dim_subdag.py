@@ -61,7 +61,7 @@ class DimSubDag(BaseSubDag):
             'sources': [
                 {
                     'schema': 'staging',
-                    'table_name': self.ods_stg_table_name,
+                    'table_name': 'dim_{}'.format(self.ods_stg_table_name),
                     'enum_db': EnumDb.BI_ODS
                 },
                 {
@@ -78,7 +78,7 @@ class DimSubDag(BaseSubDag):
             'sources': [
                 {
                     'schema': 'staging',
-                    'table_name': self.ods_stg_table_name,
+                    'table_name': 'dim_{}'.format(self.ods_stg_table_name),
                     'enum_db': EnumDb.BI_ODS
                 },
                 {
