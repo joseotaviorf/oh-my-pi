@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
