@@ -54,7 +54,8 @@ class BookingSubDag(DimSubDag):
             func_command=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'booking_media_sources',
-                'file_name': 'extract_booking_media_sources.sql'
+                'file_name': 'extract_booking_media_sources.sql',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

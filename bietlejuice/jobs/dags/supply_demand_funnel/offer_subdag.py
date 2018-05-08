@@ -71,7 +71,7 @@ class OfferSubDag(DimSubDag):
             func_command=utils.load_athena_query_to_ods,
             op_kwargs={
                 'dim_name': 'offer',
-                'bucket': OfferSubDag.S3_BUCKET,
+                'bucket': DimSubDag.S3_BUCKET,
                 'fname': '{}/offer'.format(DATALAKE_QUERIES_DIR)
             }
 

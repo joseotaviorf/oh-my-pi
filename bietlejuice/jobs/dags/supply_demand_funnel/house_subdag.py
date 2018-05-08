@@ -56,7 +56,8 @@ class HouseSubDag(DimSubDag):
             func_command=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'affiliate_payments',
-                'file_name': 'affiliate_payments.sql'
+                'file_name': 'affiliate_payments.sql',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
@@ -77,7 +78,8 @@ class HouseSubDag(DimSubDag):
             func_command=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'listing_views',
-                'file_name': 'listing_views.sql'
+                'file_name': 'listing_views.sql',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 

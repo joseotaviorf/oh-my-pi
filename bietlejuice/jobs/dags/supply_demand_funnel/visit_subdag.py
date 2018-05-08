@@ -54,7 +54,8 @@ class VisitSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'property_visit_information',
                 'append': True,
-                'file_name': 'property_visit_information.sql'
+                'file_name': 'property_visit_information.sql',
+                'bucket': DimSubDag.S3_BUCKET
             }
         )
 
