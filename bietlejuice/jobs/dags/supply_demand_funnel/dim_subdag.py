@@ -57,7 +57,7 @@ class DimSubDag(BaseSubDag):
 
     def __test_counts_from_file_query(self):
         BaseTest.are_counts_equal({
-            'acceptable_diff': 1.0,
+            'acceptable_diff': .5,
             'sources': [
                 {
                     'schema': 'staging',
