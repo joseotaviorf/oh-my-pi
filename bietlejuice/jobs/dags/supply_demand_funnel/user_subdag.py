@@ -13,9 +13,12 @@ class UserSubDag(DimSubDag):
             schedule_interval=schedule_interval,
             start_date=start_date,
             ebdb_table_name='Usuario',
-            ods_stg_table_name='usuario'
+            ods_stg_table_name='user'
         )
 
     @logger
     def build_user_with_tests(self):
-        return self.build_with_tests(source_command='call ebdb.list_usuario();')
+        return self.build_with_tests(
+            source_command='call ebdb.list_usuario();',
+            table_name='usuario'
+        )
