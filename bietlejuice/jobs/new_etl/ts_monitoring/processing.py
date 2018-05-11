@@ -3,6 +3,13 @@ import pandas as pd
 
 from variables import *
 
+from itertools import tee, izip
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
+
 today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
 
 
@@ -74,8 +81,7 @@ def compute_performance_kpis(df_payments):  # , **context):
     """
     # df_payments = context['task_instance'].xcom_pull(task_ids='import_invoices')
 
-    thresholds = [0, 15, 30, 60, 90, 120, 150, 180]
-    # for every contract we determine how many invoices are in each bin (threshold being the lower end of the
+    thresholds = [0, 30, 60, 90, 120, 150, 180]
     # for every contract we determine the date at which it first became bad for a given threshold
     df_performance_threshold = pd.DataFrame()
     df_performance_kpis = pd.DataFrame()
@@ -128,16 +134,22 @@ def compute_performance_kpis(df_payments):  # , **context):
     df_performance_kpis = df_performance_kpis.set_index('contract_id')
 
     df_performance_ever = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='date_ever')
-    df_performance_ever.columns = ['date_ever' + str(t) for t in thresholds]
+    df_performance_ever.columns = ['date_ever' + str(t+1) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_ever, left_index=True, right_index=True)
 
     df_performance_over = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='status_over')
-    df_performance_over.columns = ['over' + str(t) for t in thresholds]
+    df_performance_over.columns = ['over' + str(t+1) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_over, left_index=True, right_index=True)
 
     df_performance_nover = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='ninvoices_above')
-    df_performance_nover.columns = ['nover' + str(t) for t in thresholds]
+    df_performance_nover.columns = ['nover_or_equal' + str(t+1) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_nover, left_index=True, right_index=True)
+
+    df_performance_nbetween = pd.DataFrame(index=df_performance_nover.index)
+    for tlow, thigh in pairwise(thresholds):
+        df_performance_nbetween['%dto%d'%(tlow+1,thigh)] = df_performance_nover['nover_or_equal%d'%(tlow+1)] - df_performance_nover['nover_or_equal%d'%(thigh+1)]
+    df_performance_kpis = df_performance_kpis.merge(df_performance_nbetween, left_index=True, right_index=True)
+    print df_performance_nbetween.columns
 
     return df_performance_kpis
 
@@ -191,15 +203,21 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
         u'invoices_sum_rent_issued',
         u'invoices_sum_rent_paid',
         u'invoices_sum_rent_unpaid',
-        u'invoices_over1',
-        u'invoices_over30',
-        u'invoices_over50',
-        u'invoices_over60',
-        u'invoices_over90',
-        u'invoices_over120',
-        u'invoices_over150'
+        u'invoices_nover_or_equal1',
+        u'invoices_nover_or_equal31',
+        u'invoices_nover_or_equal61',
+        u'invoices_nover_or_equal91',
+        u'invoices_nover_or_equal121',
+        u'invoices_nover_or_equal151',
+        u'invoices_nover_or_equal181',
+        u'invoices_1to30',
+        u'invoices_31to60',
+        u'invoices_61to90',
+        u'invoices_91to120',
+        u'invoices_121to150',
+        u'invoices_151to180',
     ]
-
+    print output_performance.columns
     output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(
         0)  # astype(str).replace({'NaT':''})
 
@@ -226,10 +244,9 @@ def format_performance_table(output_performance):
     output_performance = output_performance.reset_index()
 
     # sometimes these columns are null everywhere and pandas doesnt know they are dates, and the sk_date will not be created. so we force it:
-    force_date_format = [u'invoices_date_ever1', u'invoices_date_ever30',
-                         u'invoices_date_ever50', u'invoices_date_ever60',
-                         u'invoices_date_ever90', u'invoices_date_ever120',
-                         u'invoices_date_ever150']
+    force_date_format = [u'invoices_date_ever1', u'invoices_date_ever31', u'invoices_date_ever61',
+                         u'invoices_date_ever91', u'invoices_date_ever121', u'invoices_date_ever151',
+                         u'invoices_date_ever181']
     for col in force_date_format:
         output_performance.loc[:, col] = output_performance.loc[:, col].astype('datetime64[ns]')
 
