@@ -74,7 +74,8 @@ def compute_performance_kpis(df_payments):  # , **context):
     """
     # df_payments = context['task_instance'].xcom_pull(task_ids='import_invoices')
 
-    thresholds = [1, 30, 50, 60, 90, 120, 150]
+    thresholds = [0, 15, 30, 60, 90, 120, 150, 180]
+    # for every contract we determine how many invoices are in each bin (threshold being the lower end of the
     # for every contract we determine the date at which it first became bad for a given threshold
     df_performance_threshold = pd.DataFrame()
     df_performance_kpis = pd.DataFrame()
@@ -108,9 +109,9 @@ def compute_performance_kpis(df_payments):  # , **context):
                 contract.loc[contract.delay >= t, 'tenant_due_date'] + pd.to_timedelta(t, unit='d')).tolist()
             thres_date = min(candidates_all) if len(candidates_all) > 0 else np.nan
 
-            # determine if there are any unpaid invoices for more than t days
+            # determine if there are any unpaid invoices for strictly more than t days
             candidates_unpaid = (
-                contract.loc[contract.tenant_status_is_open & (contract.delay >= t), 'tenant_due_date'] \
+                contract.loc[contract.tenant_status_is_open & (contract.delay > t), 'tenant_due_date'] \
                 + pd.to_timedelta(t, unit='d')).tolist()
             # the current status is over t if there is any open invoice with delay above t
             over_t = (len(candidates_unpaid) > 0)
@@ -120,7 +121,8 @@ def compute_performance_kpis(df_payments):  # , **context):
                 'contract_id': cid,
                 'threshold': t,
                 'date_ever': thres_date,
-                'status_over': over_t
+                'status_over': over_t,
+                'ninvoices_above': len(candidates_unpaid)
             }, ignore_index=True)
 
     df_performance_kpis = df_performance_kpis.set_index('contract_id')
@@ -132,6 +134,10 @@ def compute_performance_kpis(df_payments):  # , **context):
     df_performance_over = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='status_over')
     df_performance_over.columns = ['over' + str(t) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_over, left_index=True, right_index=True)
+
+    df_performance_nover = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='ninvoices_above')
+    df_performance_nover.columns = ['nover' + str(t) for t in thresholds]
+    df_performance_kpis = df_performance_kpis.merge(df_performance_nover, left_index=True, right_index=True)
 
     return df_performance_kpis
 
