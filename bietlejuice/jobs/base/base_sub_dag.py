@@ -64,7 +64,7 @@ class BaseSubDag(object):
         return entity_dag
 
     @logger
-    def _build_with_tests(self, entity, source_command, tests):
+    def _build_with_tests(self, entity, source_command, tests, table_name=None):
         """
         Method for calling the entity subdag with its etl and tests tasks and building the entire flow
         :param entity: name of the entity that composes the subdag
@@ -73,7 +73,7 @@ class BaseSubDag(object):
         :return: the entity dag
         """
         entity_dag = self._build_local_dag()
-        entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity, source_command)
+        entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity, source_command, table_name)
 
         tests_tasks = self._build_tests_tasks(entity_dag, tests)
 
@@ -85,7 +85,7 @@ class BaseSubDag(object):
         return entity_dag
 
     @logger
-    def _build_data_tasks(self, dag, entity, source_command):
+    def _build_data_tasks(self, dag, entity, source_command, table_name=None):
         """
         Method for building all the main tasks for the etl step
         :param dag: the dag which the tasks will be in
@@ -100,7 +100,8 @@ class BaseSubDag(object):
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket,
-                'command': source_command
+                'command': source_command,
+                'table_name': table_name
             }
         )
 
