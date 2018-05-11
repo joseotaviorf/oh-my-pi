@@ -124,7 +124,7 @@ select
 					select
 						o_id,
 						created_at,
-						min(_diff) as min_diff
+						if(min(_diff) < 0, max(_diff), min(_diff)) as min_diff
 					from (
 						select
 							o.id as o_id,
@@ -252,7 +252,7 @@ select
 					select
 						pp_id,
 						created_at,
-						min(_diff) as min_diff
+						if(min(_diff) < 0, max(_diff), min(_diff)) as min_diff
 					from (
 						select
 							pp.id as pp_id,
