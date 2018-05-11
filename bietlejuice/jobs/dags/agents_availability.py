@@ -22,7 +22,8 @@ def read_query(file_name):
 @logger
 def delete_old_entries(entity, execution_date):
     BaseETL.execute_command(
-        command="delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity, execution_date),
+        command="delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity,
+                                                                                   execution_date.strftime('%Y-%m-%d')),
         db_enum=EnumDb.BI_DW,
         commit=True
     )
