@@ -22,8 +22,7 @@ def read_query(file_name):
 @logger
 def delete_old_entries(entity, execution_date):
     BaseETL.execute_command(
-        command="delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity,
-                                                                                   execution_date.strftime('%Y-%m-%d')),
+        command="delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity, execution_date),
         db_enum=EnumDb.BI_DW,
         commit=True
     )
@@ -36,7 +35,7 @@ def load_agents_slots(**kwargs):
     _logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
     query = read_query(file_name)
 
-    execution_date = kwargs['execution_date']
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     data_frame = athena.execute_query_and_return_dataframe(query, execution_date)
 
     delete_old_entries(entity, execution_date)
@@ -54,7 +53,7 @@ def load_agents_slots(**kwargs):
 def load_agents_scheduling(**kwargs):
     entity = 'agents_scheduling'
     query = read_query('{}/{}.sql'.format(DW_STAGING_QUERIES_DIR, entity))
-    execution_date = kwargs['execution_date']
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
         db_enum=EnumDb.BI_DW,
