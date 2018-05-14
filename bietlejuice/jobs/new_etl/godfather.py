@@ -11,7 +11,8 @@ class GodFather(object):
     def __get_table(table_name):
         return BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_godfather,
-            query='select * from {}.{};'.format(GodFather.SCHEMA, table_name)
+            query='select * from {}.{};'.format(GodFather.SCHEMA, table_name),
+            encoding='utf-8'
         )
 
     @staticmethod
