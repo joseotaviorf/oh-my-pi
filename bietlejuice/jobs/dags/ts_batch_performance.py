@@ -20,13 +20,13 @@ from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate
 MAIN_DAG_NAME = 'tenantScreening-batch_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '@once'
-# bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-# start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
-# end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')# comment for testing without airflow
-bucket = '5a-datalake'  # for testing without airflow
-#
-start_date = '20180207'  # todo : parameters of airflow?
-end_date = '20180510'
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
+end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')# comment for testing without airflow
+# bucket = '5a-datalake'  # for testing without airflow
+
+# start_date = '20180206'  # todo : parameters of airflow?
+# end_date = '20180512'
 
 
 def batch_performance():
@@ -56,6 +56,7 @@ def batch_performance():
         _logger.info(date)
         performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, date)
         performance_table['date_computation'] = date
+        performance_table['date_computation_30d_ago'] = date - pd.to_timedelta(30, unit='days')
         performance_table = format_performance_table(performance_table)
         performance_table = create_sk_dates(performance_table)
         write_to_s3(performance_table,
@@ -67,8 +68,8 @@ def batch_performance():
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
 
 
-if __name__ == "__main__":
-    batch_performance()
+# if __name__ == "__main__":
+#     batch_performance()
 
 # DAG
 
