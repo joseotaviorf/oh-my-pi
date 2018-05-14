@@ -11,6 +11,7 @@ def load_amplitude(**kwargs):
     a = AmplitudeEventsETL()
     a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
 
+
 dag = DAG(
     dag_id='bi-amplitude-load',
     default_args={

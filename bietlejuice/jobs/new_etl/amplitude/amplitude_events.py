@@ -3,7 +3,7 @@ import logging
 import zipfile
 
 import boto3
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
@@ -51,7 +51,7 @@ class AmplitudeEventsETL(BaseETL):
                     with zipfile.ZipFile(f, 'r') as zfile:
                         for name in zfile.namelist():
                             hourly_gz = io.BytesIO(zfile.read(name))
-                            hour = name.split('#')[0].split('_')[-1] # extract the hour from the file name
+                            hour = name.split('#')[0].split('_')[-1]  # extract the hour from the file name
                             self.dump_events_to_s3(hourly_gz, key['app'], start_date, hour)
                             _logger.info('dt={} m=extract_from_api_to_s3, object sent name={} app={} hour={}'.format(
                                 datetime.now(), name, key['app'], hour))
@@ -59,7 +59,6 @@ class AmplitudeEventsETL(BaseETL):
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
-
 
 # if __name__ == '__main__':
 #     _logger.info('m=main debug, started program')
