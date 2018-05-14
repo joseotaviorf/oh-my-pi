@@ -18,11 +18,11 @@ from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performanc
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+# bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
 
 # from bietlejuice.jobs.dags.util import environment as env
-# bucket = '5a-datalake'  # for testing without airflow
+bucket = '5a-datalake'  # for testing without airflow
 
 
 
@@ -54,6 +54,7 @@ def daily_performance():
     # feed the performance table :
     _logger.info('feed the performance folder in s3')
     performance_table['date_computation'] = yesterday
+    performance_table['date_computation_30d_ago'] = yesterday - pd.to_timedelta(30, unit='days')
     performance_table = create_sk_dates(performance_table)
     performance_table = format_performance_table(performance_table)
     write_to_s3(performance_table,
@@ -66,8 +67,8 @@ def daily_performance():
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
 
 
-# if __name__ == "__main__":
-#     daily_performance()
+if __name__ == "__main__":
+    daily_performance()
 
 # DAG
 

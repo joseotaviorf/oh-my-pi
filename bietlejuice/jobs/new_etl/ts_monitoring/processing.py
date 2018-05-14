@@ -36,8 +36,7 @@ def preprocess_contracts(df_contrato_aud_ebdb, date):
         axis=1).min(axis=1)
 
     df_contrato_ebdb['dob'] = ((pd.concat([date - pd.to_datetime(df_contrato_ebdb.date_signature.dt.date),
-                                           df_contrato_ebdb.planned_end_contract - pd.to_datetime(
-                                               df_contrato_ebdb.date_signature.dt.date)],
+                                           pd.to_datetime(df_contrato_ebdb.planned_end_contract) - pd.to_datetime(df_contrato_ebdb.date_signature.dt.date)],
                                           axis=1).min(axis=1)) / pd.to_timedelta(1, unit='days')).fillna(
         0.0)  # if never signed we put 0
 
@@ -149,7 +148,6 @@ def compute_performance_kpis(df_payments):  # , **context):
     for tlow, thigh in pairwise(thresholds):
         df_performance_nbetween['%dto%d'%(tlow+1,thigh)] = df_performance_nover['nover_or_equal%d'%(tlow+1)] - df_performance_nover['nover_or_equal%d'%(thigh+1)]
     df_performance_kpis = df_performance_kpis.merge(df_performance_nbetween, left_index=True, right_index=True)
-    print df_performance_nbetween.columns
 
     return df_performance_kpis
 
@@ -185,11 +183,7 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
 
     # output_performance['days_contract_left'] =  (output_performance.dataassinado)
     output_performance['contrato_expected_total_contract_duration'] = (
-        (
-            output_performance.contrato_planned_end_contract - output_performance.contrato_date_signature) / pd.to_timedelta(
-            1,
-            unit='days')).fillna(
-        915.0)  # 915 is 30 months
+        (pd.to_datetime(output_performance.contrato_planned_end_contract) - output_performance.contrato_date_signature) / pd.to_timedelta(1,unit='days')).fillna(915.0)  # 915 is 30 months
 
     cols_to_zero = [
         u'invoices_last_invoice_dpd',
@@ -217,7 +211,6 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
         u'invoices_121to150',
         u'invoices_151to180',
     ]
-    print output_performance.columns
     output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(
         0)  # astype(str).replace({'NaT':''})
 
