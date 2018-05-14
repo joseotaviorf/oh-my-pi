@@ -1,10 +1,12 @@
 import os
 import sys
+from datetime import datetime
+
 import pytz
 from pytz import timezone
-from datetime import datetime
-from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log
+
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi, log
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -29,7 +31,7 @@ def execute(queue_name, start_date=None, end_date=None, td=None, **kwargs):
         log('Param End String: {}'.format(end))
 
         for key in props.get_keys():
-            a = AmplitudeExportApi(key['app_key'],key['secret_key'])
+            a = AmplitudeExportApi(key['app_key'], key['secret_key'])
             f = a.get_files_from_extract_api(start, end)
             if f:
                 events = a.get_json_from_zipfile(f)

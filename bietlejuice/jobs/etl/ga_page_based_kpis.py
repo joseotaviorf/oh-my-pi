@@ -1,9 +1,11 @@
 import sys
-import petl
 from datetime import datetime, timedelta
-from bietlejuice.jobs.base.base_ga import BaseGA
+
+import petl
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-import os
+from bietlejuice.jobs.base.base_ga import BaseGA
+
 
 class GAPageBasedKPIs(BaseGA):
 
@@ -114,7 +116,7 @@ def load_dw():
         enum_db_dest=EnumDb.BI_DW,
         append=True,
         encoding='UTF8'
-        #,server_cursor='ga_page_based_kpis_cursor'
+        # ,server_cursor='ga_page_based_kpis_cursor'
     )
     BaseETL.execute_command(
         command="update ga_page_based_kpis set processed_date = '{}' where processed_date is null".format(now),

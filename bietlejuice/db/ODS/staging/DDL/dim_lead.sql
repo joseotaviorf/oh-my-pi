@@ -1,5 +1,5 @@
-drop table if exists dim_lead;
-CREATE TABLE public.dim_lead (
+drop table if exists staging.dim_lead;
+CREATE TABLE staging.dim_lead (
   sk_lead BIGINT PRIMARY KEY,
   id BIGINT,
   anuncio_criado_em DATE,

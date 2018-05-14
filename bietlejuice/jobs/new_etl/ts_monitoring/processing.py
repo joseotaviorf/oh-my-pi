@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from variables import *
+from variables import variables_of_property
+from variables import variables_of_subset
 
 from itertools import tee, izip
 def pairwise(iterable):
@@ -110,8 +111,8 @@ def compute_performance_kpis(df_payments):  # , **context):
             # the goal is to determine the date at which the contract became bad according to the threshold t
             # we need to take the minimum date between:
             # - due date + t, for paid invoices that have a delay>=t
-            candidates_all = (
-                contract.loc[contract.delay >= t, 'tenant_due_date'] + pd.to_timedelta(t, unit='d')).tolist()
+            candidates_all = (contract.loc[contract.delay >= t, 'tenant_due_date'] +
+                              pd.to_timedelta(t, unit='d')).tolist()
             thres_date = min(candidates_all) if len(candidates_all) > 0 else np.nan
 
             # determine if there are any unpaid invoices for strictly more than t days
@@ -214,16 +215,16 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
     output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(
         0)  # astype(str).replace({'NaT':''})
 
-    output_performance['contrato_approx_n_invoices_expected'] = (
-        output_performance['contrato_expected_total_contract_duration'] / 30.5).round()
+    output_performance['contrato_approx_n_invoices_expected'] = \
+        (output_performance['contrato_expected_total_contract_duration'] / 30.5).round()
 
-    output_performance['approx_sum_rent_future_to_issue'] = (
-                                                                output_performance.contrato_approx_n_invoices_expected - \
-                                                                output_performance.invoices_n_issued_invoices) * \
-                                                            output_performance.contrato_valoraluguel
+    output_performance['approx_sum_rent_future_to_issue'] = \
+        (output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_issued_invoices) * \
+        output_performance.contrato_valoraluguel
 
-    output_performance['approx_sum_rent_future_to_pay'] = (
-                                                              output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_paid_invoices) * output_performance.contrato_valoraluguel
+    output_performance['approx_sum_rent_future_to_pay'] = \
+        (output_performance.contrato_approx_n_invoices_expected - output_performance.invoices_n_paid_invoices) * \
+        output_performance.contrato_valoraluguel
     return output_performance
 
 
@@ -352,8 +353,8 @@ def compute_originacao_table(df_proposta_ebdb, df_contrato_ebdb, df_proposal_sh,
 
     # constant columns #####################
     # take only the scored  applications with the full set  of applicants.
-    df_api_last_big = df_api_last[df_api_last.full_subset == True]
-    df_api_last_best = df_api_last[df_api_last.best_subset == True]
+    df_api_last_big = df_api_last[df_api_last.full_subset]
+    df_api_last_best = df_api_last[df_api_last.best_subset]
 
     # select columns
     relevant_api_cols_constant = variables_of_property + [

@@ -50,9 +50,9 @@ class FacebookCampaigns(object):
                 if dt < date(2016, 3, 1):  # regra para pegar ads na conta de social somente ate dez/2016
                     try:
                         if c['campaign_name']:
-                            if c['campaign_name'].startswith('Publica') :
+                            if c['campaign_name'].startswith('Publica'):
                                 c['account_name'] = 'Social'
-                    except:
+                    except BaseException:
                         pass
                 insights.append(c)
 
@@ -63,7 +63,7 @@ class FacebookCampaigns(object):
                         if c['campaign_name']:
                             if c['campaign_name'].startswith('Publica'):
                                 c['account_name'] = 'Social'
-                    except:
+                    except BaseException:
                         pass
                 insights.append(c)
 
@@ -80,7 +80,7 @@ class FacebookCampaigns(object):
                                     c['account_name'] = 'Supply'
 
                             insights.append(c)
-                    except:
+                    except BaseException:
                         pass
                 else:
                     insights.append(c)
@@ -96,4 +96,3 @@ class FacebookCampaigns(object):
         table = table.cut('campaign_name', 'date', 'campaign_id', 'spend', 'account_name')
 
         return list(table)
-

@@ -1,12 +1,13 @@
-import os
 from datetime import datetime
 from datetime import timedelta
+
 import petl
 from airflow.models import DAG
-from bietlejuice.jobs.dags.util import environment as env
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_etl import EnumDb
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
 table_name = 'employee_base'
@@ -37,9 +38,9 @@ def extract_transform_employee_data():
     table = []
     if file_name and file_path_destination:
         file_name = '{}/{}'.format(file_path_destination, file_name)
-        sheet = petl\
+        sheet = petl \
             .fromxlsx(filename=file_name,
-                      sheet='QuintoAndar')\
+                      sheet='QuintoAndar') \
             .cut(['Nome', 'Centro de custo'])
         # Transform
         # added date for traceability

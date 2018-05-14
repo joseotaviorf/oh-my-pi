@@ -1,8 +1,9 @@
 import json
-from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from datetime import datetime
+
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.asterisk_calls import Asterisk
 

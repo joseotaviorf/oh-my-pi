@@ -2,6 +2,13 @@
 
 Airflow implementation and DAGs.
 
+### Post-clone
+#### Git hooks
+
+```
+pip install --upgrade flake8 && flake8 --install-hook git && git config --bool flake8.strict true
+```
+
 ### Airflow
 
 Deployment configuration is available within the [terraform](terraform) folder. The new production server is accessible at https://airflow.quintoandar.com.br.

@@ -37,6 +37,7 @@ def load_zendesk_table_to_datalake(table_name, raw_columns):
     )
     _logger.info('m=load_zendesk_table_to_dw, msg=saved {} to dw'.format(table_name))
 
+
 if __name__ == '__main__':
     if args[1] == 'tickets':
         columns = [

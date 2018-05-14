@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from cStringIO import StringIO
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 import boto3
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -50,12 +50,12 @@ class ExtractZendeskDataToDatalake(object):
         if not result:
             print('No data - {}'.format(self.human_readable_start_time))
             return
-        
-        if json.loads(str(self.output_gzip).lower()): # convert str to bool
+
+        if json.loads(str(self.output_gzip).lower()):  # convert str to bool
             handle = None
             with BaseETL.open_gzip_fp('wb') as fp:
                 for item in result:
-                    i = item if type(item) is dict else item.to_dict()
+                    i = item if isinstance(item, dict) else item.to_dict()
                     BaseETL.write_json_in_fp(json.dumps(i), fp)
                 handle = fp.fileobj
             r = self.save_data_to_s3(handle=handle, partition=partition, table_name=table_name, extension_file='gz')

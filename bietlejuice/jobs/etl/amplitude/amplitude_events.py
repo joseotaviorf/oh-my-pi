@@ -1,15 +1,15 @@
-import os
-import io
-import sys
-import boto3
-import json
 import gzip
-import pytz
+import io
+import json
+import os
+import sys
 from datetime import datetime, timedelta
-from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
-from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+
+import boto3
+
 from bietlejuice.jobs.base.base_etl import BaseETL, log, EnumDb
-from qa_python_utils.aws.athena import AthenaClient
+from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
+from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -51,7 +51,7 @@ class AmplitudeEventsETL(BaseETL):
             else:
                 for message in msgs:
                     m = self.get_message_content(message)
-                    table_insert = self.__append(m, table_insert) # db_enum, table_name, conn)
+                    table_insert = self.__append(m, table_insert)  # db_enum, table_name, conn)
                     messages_to_delete.append(message)
                     if len(table_insert) > batch_size:
                         self._insert_messages(db_enum, table_insert, table_name)
@@ -100,7 +100,7 @@ class AmplitudeEventsETL(BaseETL):
         return events, str(json.loads(e)['app'])
 
     def dump_events_to_s3(self, g_events, app, start):
-        if type(start) is str:
+        if isinstance(start, str):
             start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
 
         # old job
@@ -175,6 +175,8 @@ class AmplitudeEventsETL(BaseETL):
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
+
+
 #     return dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(LOCAL_TZ))
 
 
@@ -205,7 +207,7 @@ if __name__ == '__main__':
         )
 
     elif args[1] == 'load_schedule_visit':
-        table_name='booked_visit'
+        table_name = 'booked_visit'
         # BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=table_name)
         vw = BaseETL.from_db_table(
             db_enum=EnumDb.BI_ODS,

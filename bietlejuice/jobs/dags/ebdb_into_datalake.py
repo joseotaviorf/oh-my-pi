@@ -1,8 +1,10 @@
-from datetime import datetime, timedelta
 import json
+from datetime import datetime, timedelta
+
 from airflow.models import DAG
-from bietlejuice.jobs.dags.util import environment as env
 from airflow.operators.python_operator import PythonOperator
+
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.load_ebdb_into_datalake import EBDBDatalake
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
@@ -57,20 +59,15 @@ move_to_clean = PythonOperator(
     python_callable=transform_to_clean
 )
 
-
 with DAG(
-    dag_id='bi-elt-ebdb-to-datalake',
-    default_args={
-        'owner': owner,
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
-    start_date=datetime(2018, 1, 1, 0, 0, 0),
-    schedule_interval=timedelta(hours=8),
-    max_active_runs=1
-) as dag: (
-    dag
-    >> move
-    >> create_raw
-    >> move_to_clean
-)
+        dag_id='bi-elt-ebdb-to-datalake',
+        default_args={
+            'owner': owner,
+            'wait_for_downstream': False,
+            'depends_on_past': False
+        },
+        start_date=datetime(2018, 1, 1, 0, 0, 0),
+        schedule_interval=timedelta(hours=8),
+        max_active_runs=1
+) as dag:
+    dag >> move >> create_raw >> move_to_clean
