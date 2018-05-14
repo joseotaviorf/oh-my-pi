@@ -7,5 +7,6 @@ DATALAKE_RAW_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/raw/
 DATALAKE_QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
 ODS_STAGING_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/ODS/staging/queries/tests')
 EBDB_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/tests')
+DW_STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/staging/queries')
 
 DEFAULT_DAG_OWNER = 'Data Team'
