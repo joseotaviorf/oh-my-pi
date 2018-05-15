@@ -9,9 +9,6 @@ from datetime import datetime
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
-
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
@@ -21,6 +18,8 @@ from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_propo
 from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
 from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
 from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'tenantScreening-batch_performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -29,11 +28,10 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
 end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')  # comment for testing without airflow
 
-
 # bucket = '5a-datalake'  # for testing without airflow
 
-# start_date = '20180409'  # todo : parameters of airflow?
-# end_date = '20180415'
+# start_date = '20180206'  # todo : parameters of airflow?
+# end_date = '20180512'
 
 
 def batch_performance():
@@ -63,10 +61,11 @@ def batch_performance():
         _logger.info(date)
         performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, date)
         performance_table['date_computation'] = date
+        performance_table['date_computation_30d_ago'] = date - pd.to_timedelta(30, unit='days')
         performance_table = format_performance_table(performance_table)
         performance_table = create_sk_dates(performance_table)
-        write_to_s3(performance_table, 'performance/performance' + date.strftime(format='%Y%m%d') +
-                    '.csv')  # writes an object after internally changing a copy of the object to string
+        # writes an object after internally changing a copy of the object to string
+        write_to_s3(performance_table, 'performance/performance' + date.strftime(format='%Y%m%d') + '.csv')
 
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')
