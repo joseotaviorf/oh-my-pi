@@ -205,15 +205,15 @@ class ZendeskDataToODS(object):
                                             " content_url = excluded.content_url, content_type = excluded.content_type, " \
                                             " \"size\" = excluded.size, inline = excluded.inline, " \
                                             " thumbnail_url = excluded.thumbnail_url returning id ".format(
-                    self.ods_schema,
-                    u['id'],
-                    BaseETL.coalesce(None if not file_name else file_name.encode('utf-8')),
-                    BaseETL.coalesce(ZendeskDataToODS.__format_string(user_photo['content_url'])),
-                    BaseETL.coalesce(user_photo['content_type']),
-                    BaseETL.coalesce(user_photo['size']),
-                    BaseETL.coalesce(user_photo['inline']),
-                    BaseETL.coalesce(ZendeskDataToODS.__format_string(thumbnail_url))
-                )
+                                                self.ods_schema,
+                                                u['id'],
+                                                BaseETL.coalesce(None if not file_name else file_name.encode('utf-8')),
+                                                BaseETL.coalesce(ZendeskDataToODS.__format_string(user_photo['content_url'])),
+                                                BaseETL.coalesce(user_photo['content_type']),
+                                                BaseETL.coalesce(user_photo['size']),
+                                                BaseETL.coalesce(user_photo['inline']),
+                                                BaseETL.coalesce(ZendeskDataToODS.__format_string(thumbnail_url))
+                                            )
 
                 photo_id = self.__execute_command(command=upsert_user_photo_command, return_value=True)
 
@@ -345,36 +345,36 @@ class ZendeskDataToODS(object):
                                             " reply_time_in_minutes_calendar = excluded.reply_time_in_minutes_calendar, " \
                                             " reply_time_in_minutes_business = excluded.reply_time_in_minutes_business, " \
                                             " created_at = excluded.created_at, updated_at = excluded.updated_at".format(
-                self.ods_schema,
-                tm['id'],
-                tm['ticket_id'],
-                BaseETL.coalesce(tm['url']),
-                BaseETL.coalesce(tm['group_stations']),
-                BaseETL.coalesce(tm['assignee_stations']),
-                BaseETL.coalesce(tm['reopens']),
-                BaseETL.coalesce(tm['replies']),
-                BaseETL.format_date(tm['assignee_updated_at']),
-                BaseETL.format_date(tm['requester_updated_at']),
-                BaseETL.format_date(tm['status_updated_at']),
-                BaseETL.format_date(tm['initially_assigned_at']),
-                BaseETL.format_date(tm['assigned_at']),
-                BaseETL.format_date(tm['solved_at']),
-                BaseETL.format_date(tm['latest_comment_added_at']),
-                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['business']),
-                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['business']),
-                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['business']),
-                BaseETL.coalesce(tm['on_hold_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['on_hold_time_in_minutes']['business']),
-                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['business']),
-                BaseETL.coalesce(tm['reply_time_in_minutes']['calendar']),
-                BaseETL.coalesce(tm['reply_time_in_minutes']['business']),
-                BaseETL.format_date(tm['created_at']),
-                BaseETL.format_date(tm['updated_at'])
-            )
+                                                self.ods_schema,
+                                                tm['id'],
+                                                tm['ticket_id'],
+                                                BaseETL.coalesce(tm['url']),
+                                                BaseETL.coalesce(tm['group_stations']),
+                                                BaseETL.coalesce(tm['assignee_stations']),
+                                                BaseETL.coalesce(tm['reopens']),
+                                                BaseETL.coalesce(tm['replies']),
+                                                BaseETL.format_date(tm['assignee_updated_at']),
+                                                BaseETL.format_date(tm['requester_updated_at']),
+                                                BaseETL.format_date(tm['status_updated_at']),
+                                                BaseETL.format_date(tm['initially_assigned_at']),
+                                                BaseETL.format_date(tm['assigned_at']),
+                                                BaseETL.format_date(tm['solved_at']),
+                                                BaseETL.format_date(tm['latest_comment_added_at']),
+                                                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['first_resolution_time_in_minutes']['business']),
+                                                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['agent_wait_time_in_minutes']['business']),
+                                                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['requester_wait_time_in_minutes']['business']),
+                                                BaseETL.coalesce(tm['on_hold_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['on_hold_time_in_minutes']['business']),
+                                                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['full_resolution_time_in_minutes']['business']),
+                                                BaseETL.coalesce(tm['reply_time_in_minutes']['calendar']),
+                                                BaseETL.coalesce(tm['reply_time_in_minutes']['business']),
+                                                BaseETL.format_date(tm['created_at']),
+                                                BaseETL.format_date(tm['updated_at'])
+                                            )
 
             self.__execute_command(command=upsert_ticket_metrics_command)
 
@@ -398,7 +398,7 @@ class ZendeskDataToODS(object):
             upsert_via_command = " insert into {}.via (channel, object_id) values ('{}','{}') " \
                                  " on conflict (object_id) do update set channel = excluded.channel, " \
                                  " object_id = excluded.object_id returning id ".format(
-                self.ods_schema, t['via']['channel'], t['id'])
+                                     self.ods_schema, t['via']['channel'], t['id'])
 
             via_id = self.__execute_command(command=upsert_via_command, return_value=True)
 
@@ -490,7 +490,6 @@ class ZendeskDataToODS(object):
                     if value == 'zopim_chat_missed':
                         missed_chat = True
 
-
             if t['collaborator_ids'] and len(t['collaborator_ids']) > 0:
                 delete_collaborator_ids_command = " delete from {}.object_collaborators where object_id = '{}' ".format(
                     self.ods_schema,
@@ -535,52 +534,52 @@ class ZendeskDataToODS(object):
                                     "closed_by_merge = excluded.closed_by_merge, is_automatic = excluded.is_automatic, " \
                                     "missed_chat = excluded.missed_chat, offline_msg = excluded.offline_msg"\
                 .format(
-                self.ods_schema,
-                t['id'],
-                BaseETL.coalesce(t['url']),
-                BaseETL.coalesce(t['external_id']),
-                BaseETL.coalesce(t['type']),
-                BaseETL.coalesce(ZendeskDataToODS.__format_string(t['subject'])),
-                BaseETL.coalesce(ZendeskDataToODS.__format_string(t['raw_subject'])),
-                BaseETL.coalesce(None if not t['description'] else
-                                 ZendeskDataToODS.__format_string(
+                    self.ods_schema,
+                    t['id'],
+                    BaseETL.coalesce(t['url']),
+                    BaseETL.coalesce(t['external_id']),
+                    BaseETL.coalesce(t['type']),
+                    BaseETL.coalesce(ZendeskDataToODS.__format_string(t['subject'])),
+                    BaseETL.coalesce(ZendeskDataToODS.__format_string(t['raw_subject'])),
+                    BaseETL.coalesce(None if not t['description'] else
+                                     ZendeskDataToODS.__format_string(
                                      str(t['description'].encode('utf-8')).decode('utf-8').replace(u'\u0000', u'')
-                                 )
-                                 ),
-                BaseETL.coalesce(t['priority']),
-                BaseETL.coalesce(t['status']),
-                BaseETL.coalesce(t['recipient']),
-                BaseETL.coalesce(t['requester_id']),
-                BaseETL.coalesce(t['submitter_id']),
-                BaseETL.coalesce(t['assignee_id']),
-                BaseETL.coalesce(t['organization_id']),
-                BaseETL.coalesce(t['group_id']),
-                BaseETL.coalesce(t['forum_topic_id']),
-                BaseETL.coalesce(t['problem_id']),
-                BaseETL.coalesce(t['has_incidents']),
-                BaseETL.coalesce(via_id),
-                ZendeskDataToODS.__check_existence(field='ticket_form_id', dict_var=t),
-                BaseETL.coalesce(t['brand_id']),
-                BaseETL.coalesce(t['allow_channelback']),
-                BaseETL.coalesce(t['is_public']),
-                BaseETL.format_date(t['created_at']),
-                BaseETL.format_date(t['updated_at']),
-                BaseETL.format_date(t['due_at']),
-                str(ZendeskDataToODS.__check_existence(
-                    field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
-                str(ZendeskDataToODS.__check_existence(
-                    field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
-                'null' if ZendeskDataToODS.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null' \
+                                     )
+                                     ),
+                    BaseETL.coalesce(t['priority']),
+                    BaseETL.coalesce(t['status']),
+                    BaseETL.coalesce(t['recipient']),
+                    BaseETL.coalesce(t['requester_id']),
+                    BaseETL.coalesce(t['submitter_id']),
+                    BaseETL.coalesce(t['assignee_id']),
+                    BaseETL.coalesce(t['organization_id']),
+                    BaseETL.coalesce(t['group_id']),
+                    BaseETL.coalesce(t['forum_topic_id']),
+                    BaseETL.coalesce(t['problem_id']),
+                    BaseETL.coalesce(t['has_incidents']),
+                    BaseETL.coalesce(via_id),
+                    ZendeskDataToODS.__check_existence(field='ticket_form_id', dict_var=t),
+                    BaseETL.coalesce(t['brand_id']),
+                    BaseETL.coalesce(t['allow_channelback']),
+                    BaseETL.coalesce(t['is_public']),
+                    BaseETL.format_date(t['created_at']),
+                    BaseETL.format_date(t['updated_at']),
+                    BaseETL.format_date(t['due_at']),
+                    str(ZendeskDataToODS.__check_existence(
+                        field='followup_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
+                    str(ZendeskDataToODS.__check_existence(
+                        field='sharing_agreement_ids', dict_var=t)).replace('[', '{').replace(']', '}'),
+                    'null' if ZendeskDataToODS.__check_existence(field='score', dict_var=t['satisfaction_rating']) == 'null'
                     else BaseETL.coalesce(t['satisfaction_rating']['score']),
-                'null' if ZendeskDataToODS.__check_existence(field='comment',
-                                                             dict_var=t['satisfaction_rating']) == 'null' \
+                    'null' if ZendeskDataToODS.__check_existence(field='comment',
+                                                                 dict_var=t['satisfaction_rating']) == 'null'
                     else BaseETL.coalesce(ZendeskDataToODS.__format_string(t['satisfaction_rating']['comment'])),
-                is_whatsapp,
-                closed_by_merge,
-                is_automatic,
-                missed_chat,
-                offline_msg
-            )
+                    is_whatsapp,
+                    closed_by_merge,
+                    is_automatic,
+                    missed_chat,
+                    offline_msg
+                )
 
             self.__execute_command(command=upsert_ticket_command)
 
@@ -588,6 +587,7 @@ class ZendeskDataToODS(object):
 
     def upsert_ticket_fields_type(self, ticket_fields):
         pass
+
 
 if __name__ == '__main__':
     args = sys.argv

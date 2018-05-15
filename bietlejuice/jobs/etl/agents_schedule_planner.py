@@ -21,6 +21,7 @@ from datetime import datetime
 
 import petl
 import requests
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 

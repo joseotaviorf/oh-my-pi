@@ -10,10 +10,14 @@ import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud, import_invoices, \
-    import_ebdb_proposta
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table, format_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
+from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
@@ -61,9 +65,8 @@ def batch_performance():
         performance_table['date_computation_30d_ago'] = date - pd.to_timedelta(30, unit='days')
         performance_table = format_performance_table(performance_table)
         performance_table = create_sk_dates(performance_table)
-        write_to_s3(performance_table,
-                    'performance/performance' + date.strftime(
-                        format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
+        # writes an object after internally changing a copy of the object to string
+        write_to_s3(performance_table, 'performance/performance' + date.strftime(format='%Y%m%d') + '.csv')
 
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')

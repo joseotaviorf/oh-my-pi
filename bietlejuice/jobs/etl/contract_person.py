@@ -1,8 +1,8 @@
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb, petl
-from datetime import datetime
-import sys
 import os
+import sys
+from datetime import datetime
 
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']

@@ -23,7 +23,6 @@ with _fact as (
 	  coalesce(to_char(hrf.dt_client_sign_up, 'YYYYMMDD')::integer, -1) as sk_client_sign_up_date,
 	  hrf.dt_client_sign_up,
 	  coalesce(hrf.id_visit, -1) as sk_visit,
-	  coalesce(hrf.id_negotiation, -1) as sk_negotiation,
 	  coalesce(vdo.sk_offer, -1) as sk_offer,
 	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
 	  vdo.dt_first_sent as dt_offer_submitted,
@@ -49,7 +48,7 @@ with _fact as (
 	  hrf.dt_contract_created,
 	  coalesce(to_char(hrf.dt_contract_signed, 'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
 	  hrf.dt_contract_signed,
-	  coalesce(to_char(hrf.dt_annulment, 'YYYYMMDD')::integer, -1) as sk_contract_annulment_date,
+	  coalesce(to_char(hrf.dt_contract_annulment, 'YYYYMMDD')::integer, -1) as sk_contract_annulment_date,
 	  case
       when c.status in ('Ativo', 'Finalizado')
           then "dataAssinado"
@@ -113,7 +112,6 @@ select
   sk_client,
   sk_client_sign_up_date,
   sk_visit,
-  sk_negotiation,
   sk_offer,
   sk_offer_submitted_date,
   sk_offer_approved_date,

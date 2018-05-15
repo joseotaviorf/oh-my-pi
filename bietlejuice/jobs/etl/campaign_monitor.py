@@ -13,9 +13,10 @@ import boto3
 import pandas as pd
 # createsend==4.2.1
 from createsend import CreateSend, Client, Transactional, Campaign
-from bietlejuice.jobs.base.base_etl import BaseETL
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
+
+from bietlejuice.jobs.base.base_etl import BaseETL
 
 args = sys.argv
 today_tmsp = datetime.strptime(args[2], "%Y-%m-%d %H:%M:%S")
@@ -118,8 +119,8 @@ class CampaignMonitor(object):
                 json_messages.append(details_json)
 
             _logger.info(
-                'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(key,
-                                                                                                           last_message))
+                'm=request_project_transactional_data, key={}, last_message={}, msg=saving into s3'.format(
+                    key, last_message))
             self.save_json_messages_to_s3(json_messages, key, last_message)
             count += 1
 

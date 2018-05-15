@@ -33,7 +33,7 @@ def write_to_s3(obj, filename):
     """
     s3 = boto3.resource('s3')
 
-    if type(obj) == pd.DataFrame:
+    if isinstance(obj, pd.DataFrame):
         obj = obj.copy()  # we don't want to alter the original object
         # we want to force all dates to be written in the format '%Y-%m-%d %H:%M:%S', so we convert them to string first
         for col, dtype in obj.dtypes.iteritems():
@@ -50,7 +50,7 @@ def write_to_s3(obj, filename):
         s3.Object('5a-datalake', 'clean/tenant_screening/monitoring/' + filename).put(
             Body=csv_buffer.getvalue())
 
-    if type(obj) == str:
+    if isinstance(obj, str):
         txt_buffer = io.BytesIO(obj)
         s3.Object('5a-datalake', 'clean/tenant_screening/monitoring/' + filename).put(
             Body=txt_buffer.getvalue())
@@ -137,19 +137,19 @@ def generate_queries(df, table_name):
     athena_ddl_begin = 'CREATE EXTERNAL TABLE tenantscreening_monitoring_%s(' % table_name  # eg: originacao
     athena_ddl_end = """
     )
-    ROW FORMAT SERDE 
-      'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
-    WITH SERDEPROPERTIES ( 
-      'quoteChar'='\"', 
-      'separatorChar'=',') 
-    STORED AS INPUTFORMAT 
-      'org.apache.hadoop.mapred.TextInputFormat' 
-    OUTPUTFORMAT 
+    ROW FORMAT SERDE
+      'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+    WITH SERDEPROPERTIES (
+      'quoteChar'='\"',
+      'separatorChar'=',')
+    STORED AS INPUTFORMAT
+      'org.apache.hadoop.mapred.TextInputFormat'
+    OUTPUTFORMAT
       'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
     LOCATION
       's3://5a-datalake/clean/tenant_screening/monitoring/%s'
     TBLPROPERTIES (
-      'skip.header.line.count'='1', 
+      'skip.header.line.count'='1',
       'transient_lastDdlTime'='1522344718')
       """ % table_name
 

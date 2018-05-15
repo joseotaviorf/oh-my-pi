@@ -67,11 +67,11 @@ class SchemaValidator(object):
                 err_validator_value = json.dumps(error.validator_value)
                 err_instance = json.dumps(error.instance)
             else:
-                if type(error.validator_value) == list:
+                if isinstance(error.validator_value, list):
                     for field in error.validator_value:
                         err_validator_value = err_validator_value + ', ' + str(
                             field) if err_validator_value != '' else str(field)
-                elif type(error.validator_value) == unicode:
+                elif isinstance(error.validator_value, unicode):
                     err_validator_value = str(error.validator_value)
                 else:
                     err_validator_value = json.dumps(error.validator_value)
@@ -80,7 +80,7 @@ class SchemaValidator(object):
                 if type(error.instance) in (dict, list):
                     for field, value in error.instance.iteritems():
                         err_instance = err_instance + ', ' + str(field) if err_instance != '' else str(field)
-                elif type(error.instance) == unicode:
+                elif isinstance(error.instance, unicode):
                     err_instance = str(error.instance)
                 else:
                     err_instance = json.dumps(error.instance)
@@ -95,9 +95,7 @@ class SchemaValidator(object):
                     app_id, event_type, uuid, server_upload_time, platform,
                     validation_time, err_path, err_validator,
                     err_validator_value, err_instance, err_detail,
-                    'validated with errors' if err_detail != ''
-                                               or err_instance != ''
-                                               or err_validator_value != ''
+                    'validated with errors' if err_detail != '' or err_instance != '' or err_validator_value != ''
                     else 'skipped'
                 ]
             )

@@ -44,6 +44,7 @@ def load_ticket_growth_data():
     # Select Grouped categories by Date and insert Counts in Growth Model
     pass
 
+
 # create DAG definition
 dag = DAG(
     dag_id='bi-growth-tickets',

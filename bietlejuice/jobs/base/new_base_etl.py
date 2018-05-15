@@ -1,9 +1,10 @@
-from datetime import datetime, date
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from qa_python_utils.default_logger import logger, _logger
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.aws.athena import AthenaClient
 import os
+from datetime import datetime
+
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
@@ -165,4 +166,39 @@ def load_dim_from_staging_to_dw(dim_name, bucket, is_fact=False, schema_source='
         append=False,
         bucket_name='{}/clean/ods/{}'.format(bucket, dim_name),
         process_name=dim_name
+    )
+
+
+def materialize_view_ods(view_name, bucket, append=False):
+    table = BaseETL.from_db_query(
+        db_enum=EnumDb.BI_ODS,
+        query='select * from vw_{}'.format(view_name))
+
+    print("To ODS: {}".format(datetime.now()))
+
+    BaseETL.bulk_insert(
+        table=table,
+        table_name=view_name,
+        db_enum=EnumDb.BI_ODS,
+        encoding='UTF8',
+        append=append,
+        commit=True,
+        bucket_name='{}/raw/ods/{}'.format(bucket, view_name)
+    )
+
+
+def load_athena_file_query_to_ods(table_name, file_name, bucket, append=False):
+    athena = AthenaClient(bucket)
+    df = athena.execute_file_query_and_return_dataframe('{}/{}'.format(QUERIES_DIR, file_name))
+    __df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
+
+
+def __df_to_db(enum_db, df, table_name, append=False):
+    _logger.info('m=__df_to_db, msg=sending data frame to db')
+    BaseETL.dataframe_to_db(
+        enum_db=enum_db,
+        df=df,
+        table_name=table_name,
+        encoding='utf-8',
+        append=append
     )

@@ -337,10 +337,7 @@ SELECT
   i.unpublished_reason as unpublished_reason,
   imovel_dates.start_version_category,
   imovel_dates.end_version_category,
-  imovel_dates.is_last_version,
-  f.lead_to_listing_diff_minutes,
-  f.lead_to_listing_diff_hours,
-  f.lead_to_listing_diff_days
+  imovel_dates.is_last_version
 from
 	imovel i
 left join
@@ -356,6 +353,3 @@ left join
 left join
 	imovel_dates
 	ON imovel_dates.id = i.id
-left join
-	fact_supply f
-	on f.imovel_id = i.id

@@ -40,7 +40,7 @@ class GA_API(object):
         print("no %s in " % name, [item["name"] for item in container["items"]])
         return None
 
-    def get_query(self, max_results=5000, include_header = True, **params):
+    def get_query(self, max_results=5000, include_header=True, **params):
         all_rows = []
         start_index = 1
         header = None

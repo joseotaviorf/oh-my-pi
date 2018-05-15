@@ -1,7 +1,7 @@
 """
 Originacao Table
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
@@ -10,14 +10,13 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_originacao_table, format_originacao_table
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import \
-    import_ebdb_proposta, \
-    import_sortinghat_proposal, \
-    import_sortinghat_proponent, \
-    import_api, \
-    import_ebdb_contrato
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_api
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_sortinghat_proponent
+from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_sortinghat_proposal
+from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_originacao_table, format_originacao_table
 
 MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -57,8 +56,8 @@ def originacao():
     output_originacao = format_originacao_table(output_originacao)
     output_originacao = create_sk_dates(output_originacao)
 
-    write_to_s3(output_originacao, 'originacao/originacao.csv')  # writes an object after internally changing a copy of the object to string
-
+    # writes an object after internally changing a copy of the object to string
+    write_to_s3(output_originacao, 'originacao/originacao.csv')
 
     athena_ddl, pbi_query = generate_queries(output_originacao, 'originacao')
     write_to_s3(athena_ddl, 'queries/athena_originacao_ddl.txt')

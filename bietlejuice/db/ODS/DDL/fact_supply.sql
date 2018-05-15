@@ -42,5 +42,6 @@ create table public.fact_supply (
 	prospect_to_first_inside_sales_contact_diff_days decimal(10,1),
 	qualified_to_opportunity_diff_days decimal(10,1),
 	opportunity_to_listing_diff_days decimal(10,1),
-	lead_to_listing_diff_days decimal(10,1)
+	lead_to_listing_diff_days decimal(10,1),
+	exclusivity smallint
 )

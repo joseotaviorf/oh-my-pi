@@ -28,4 +28,3 @@ class OwnerLandingViews(GrowthUsers):
     def __append(self, _filter, prefix):
         df = self.get_df(prefix=prefix, suffix=self.suffix_query)
         OwnerLandingViews.df_to_dw(df=df)
-
