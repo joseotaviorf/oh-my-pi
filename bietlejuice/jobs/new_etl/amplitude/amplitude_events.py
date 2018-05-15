@@ -23,14 +23,14 @@ class AmplitudeEventsETL(BaseETL):
         super(AmplitudeEventsETL, self).__init__(*args, **kwargs)
         self.s3 = boto3.resource('s3')
 
-    def dump_events_to_s3(self, f, app, start, hour):
+    def dump_events_to_s3(self, f, app, start, hour, extra):
         if isinstance(start, str):
             start = datetime.strptime(start, DEFAULT_DATETIME_FORMAT)
         if isinstance(start, datetime):
             start = start.date()
 
         date_partition = 'dt={}'.format(str(start))
-        file_name = 'raw/amplitude/events/{}/{}_{}_{}.json.gz'.format(date_partition, app, str(start), hour)
+        file_name = 'raw/amplitude/events/{}/{}_{}_{}_{}.json.gz'.format(date_partition, app, str(start), hour, extra)
         _logger.info('m=dump_events_to_s3, pushing file to s3 bucket={} filename={}'.format('5a-datalake', file_name))
         self.s3.Bucket('5a-datalake').put_object(Body=f.getvalue(), Key=file_name)
 
@@ -52,9 +52,10 @@ class AmplitudeEventsETL(BaseETL):
                         for name in zfile.namelist():
                             hourly_gz = io.BytesIO(zfile.read(name))
                             hour = name.split('#')[0].split('_')[-1]  # extract the hour from the file name
-                            self.dump_events_to_s3(hourly_gz, key['app'], start_date, hour)
-                            _logger.info('dt={} m=extract_from_api_to_s3, object sent name={} app={} hour={}'.format(
-                                datetime.now(), name, key['app'], hour))
+                            extra = name.split('#')[1].split('.')[0]  # putting the extra on the name for deduplication
+                            self.dump_events_to_s3(hourly_gz, key['app'], start_date, hour, extra)
+                            _logger.info('dt={} m=extract_from_api_to_s3, object sent name={} app={} hour={} extra={}'.
+                                         format(datetime.now(), name, key['app'], hour, extra))
 
 
 def convert_date(date_str):
@@ -62,7 +63,7 @@ def convert_date(date_str):
 
 # if __name__ == '__main__':
 #     _logger.info('m=main debug, started program')
-#     start_date = datetime(2017, 10, 1)
+#     start_date = datetime(2018, 5, 1)
 #     end_date = (start_date + timedelta(hours=23))
 #
 #     a = AmplitudeEventsETL()
