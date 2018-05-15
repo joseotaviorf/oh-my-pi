@@ -191,7 +191,8 @@ select -- count(1)
 		when ure.motivo is null
 			then 'UNKNOWN_NULL_VALUE'
 		else 'OTHER'
-	end as unpublished_reason
+	end as unpublished_reason,
+	(sc.id is not null and optedOutAt is null)+0 as exclusivity
 from
   Imovel i
 left join
@@ -267,6 +268,12 @@ left join
 left join
 	UsuarioRevisionEntity ure
 	on ia_max.REV = ure.id
+left join
+	(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
+	on maxsc.imovel_id = i.id
+left join
+	SpecialCondition sc
+	on sc.id = maxsc.id
 ;
 
 end
