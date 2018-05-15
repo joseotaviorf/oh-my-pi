@@ -24,7 +24,6 @@ MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
-
 # bucket = '5a-datalake'  # for testing without airflow
 
 
@@ -66,6 +65,7 @@ def daily_performance():
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
+
 
 # if __name__ == "__main__":
 #     daily_performance()

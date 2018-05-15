@@ -28,7 +28,6 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
 end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')  # comment for testing without airflow
 
-
 # bucket = '5a-datalake'  # for testing without airflow
 
 # start_date = '20180206'  # todo : parameters of airflow?
