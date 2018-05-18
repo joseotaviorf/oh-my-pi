@@ -12,21 +12,8 @@ def load_amplitude(**kwargs):
     a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
 
 
-dag_past = DAG(
-    dag_id='bi-amplitude-load-PAST',
-    default_args={
-        'owner': 'Data Team',
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
-    start_date=datetime(2017, 10, 1, 0, 0, 0),
-    end_date=datetime(2018, 2, 6, 0, 0, 0),
-    schedule_interval='@daily',
-    max_active_runs=3
-)
-
 dag = DAG(
-    dag_id='bi-amplitude-load',
+    dag_id='bi-amplitude-load-events',
     default_args={
         'owner': 'Data Team',
         'wait_for_downstream': False,
@@ -42,6 +29,19 @@ load_events_data_to_clean_task = BaseDAG.get_quintoandar_python_operator(
     task_id='load_events_data_to_clean',
     provide_context=True,
     func_command=load_amplitude
+)
+
+dag_past = DAG(
+    dag_id='bi-amplitude-load-events-PAST',
+    default_args={
+        'owner': 'Data Team',
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=datetime(2017, 10, 1, 0, 0, 0),
+    end_date=datetime(2018, 2, 6, 0, 0, 0),
+    schedule_interval='@daily',
+    max_active_runs=3
 )
 
 load_events_data_to_clean_task_past = BaseDAG.get_quintoandar_python_operator(

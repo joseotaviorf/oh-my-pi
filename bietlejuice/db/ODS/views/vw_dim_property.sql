@@ -337,7 +337,8 @@ SELECT
   i.unpublished_reason as unpublished_reason,
   imovel_dates.start_version_category,
   imovel_dates.end_version_category,
-  imovel_dates.is_last_version
+  imovel_dates.is_last_version,
+  i.exclusivity
 from
 	imovel i
 left join
