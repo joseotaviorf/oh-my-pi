@@ -12,7 +12,7 @@ class ActiveUsers(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers.df_to_dw(df, ActiveUsers.TABLE_NAME)
+        GrowthUsers._df_to_dw(df, ActiveUsers.TABLE_NAME)
 
     @staticmethod
     @logger
