@@ -423,7 +423,8 @@ ongoing_contracts_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, mate
 amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
                                                              None,
                                                              'amplitude_engaged_users_previous',
-                                                             'top_funnel')
+                                                             'top_funnel',
+                                                             truncate_engaged_users_table)
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'engaged_users', 'top_funnel', truncate_engaged_users_table)
 
@@ -431,7 +432,7 @@ engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, material
 amplitude_schedule_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
                                                                    None,
                                                                    'amplitude_schedule_page_views_previous',
-                                                                   'top_funnel')
+                                                                   'top_funnel', truncate_schedule_page_views_table)
 schedule_page_views_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                                    'schedule_page_views', 'top_funnel',
                                                    truncate_schedule_page_views_table)
