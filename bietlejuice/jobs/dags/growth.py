@@ -271,7 +271,7 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     # all
@@ -295,7 +295,7 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     # all
@@ -325,7 +325,7 @@ def sub_dag_func_amplitude(main_dag_name, sub_dag_name, funnel, start_date, sche
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     truncate_task = get_python_operator(
@@ -366,7 +366,7 @@ def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, s
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
@@ -384,7 +384,7 @@ def sub_dag_func_owner_landing_views_users(main_dag_name, sub_dag_name, funnel, 
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     owner_landing_views_truncate_task = get_python_operator('truncate_table', truncate_owner_landing_views_table,
@@ -421,7 +421,7 @@ ongoing_contracts_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, mate
 
 # Amplitude engaged users
 amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
-                                                             None,
+                                                             materialize_engaged_users_table_query,
                                                              'amplitude_engaged_users_previous',
                                                              'top_funnel', None,
                                                              truncate_engaged_users_table)
@@ -430,7 +430,7 @@ engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, material
 
 # Amplitude schedule page views
 amplitude_schedule_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
-                                                                   None,
+                                                                   materialize_schedule_page_views_table_query,
                                                                    'amplitude_schedule_page_views_previous',
                                                                    'top_funnel', None,
                                                                    truncate_schedule_page_views_table)
