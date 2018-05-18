@@ -33,7 +33,7 @@ class GrowthUsers(object):
 
     @staticmethod
     @logger(exclude='df')
-    def df_to_dw(df, table_name):
+    def _df_to_dw(df, table_name):
         BaseETL.dataframe_to_db(
             df=df,
             table_name='{}.{}'.format(GrowthUsers.SCHEMA, table_name),
@@ -44,7 +44,7 @@ class GrowthUsers(object):
 
     @staticmethod
     @logger
-    def truncate_table(table_name):
+    def _truncate_table(table_name):
         BaseETL.execute_command(
             command='truncate table {}.{};'.format(GrowthUsers.SCHEMA, table_name),
             commit=True,
