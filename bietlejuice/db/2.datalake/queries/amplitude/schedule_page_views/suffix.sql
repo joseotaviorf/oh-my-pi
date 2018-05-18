@@ -30,10 +30,10 @@ select
   region,
   city,
   partial,
-  sum(daily_count) as daily_count,
-  sum(weekly_count) as weekly_count,
-  sum(monthly_count) as monthly_count,
-  sum(yearly_count) as yearly_count
+  sum(house_id_count_daily) as daily_count,
+  sum(house_id_count_weekly) as weekly_count,
+  sum(house_id_count_monthly) as monthly_count,
+  sum(house_id_count_yearly) as yearly_count
 from count_houses_prev
 group by 1, 2, 3, 4, 5, 6, 7
 ;
