@@ -11,7 +11,7 @@ with all_dates as (
     monthly_count,
     yearly_count
   from growth_staging.amplitude_schedule_page_views
-  where city = 'QuintoAndar'
+  where (city is null or city != 'QuintoAndar')
     and region = 'QuintoAndar'
     and partial is false
 ),
@@ -24,7 +24,7 @@ all_dates_last_week as (
 	  city,
 	  weekly_count
 	from growth_staging.amplitude_schedule_page_views
-  where city = 'QuintoAndar'
+  where (city is null or city != 'QuintoAndar')
     and region = 'QuintoAndar'
     and partial is true
 ),
@@ -36,7 +36,7 @@ all_dates_last_month as (
 	  city,
 	  monthly_count
 	from growth_staging.amplitude_schedule_page_views
-  where city = 'QuintoAndar'
+  where (city is null or city != 'QuintoAndar')
     and region = 'QuintoAndar'
     and partial is true
 ),
@@ -47,7 +47,7 @@ all_dates_last_year as (
 	  city,
 	  yearly_count
 	from growth_staging.amplitude_schedule_page_views
-  where city = 'QuintoAndar'
+  where (city is null or city != 'QuintoAndar')
     and region = 'QuintoAndar'
     and partial is true
 ),
