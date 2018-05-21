@@ -4,8 +4,7 @@ listings as (
     ae._month,
     ae._week,
     ae._day,
-    ae.amplitude_id,
-    ae.house_id,
+    ae.uuid,
     'QuintoAndar' as region,
     trim(dr.city_name) as city,
     ae.partial
@@ -14,4 +13,4 @@ listings as (
     on ae.house_id = cast(ei.id as integer)
   left join datalake_clean.ods_dim_region dr
     on trim(ei.regiao_id) = cast(dr.id as varchar)
-),
+)

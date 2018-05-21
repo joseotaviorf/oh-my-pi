@@ -12,7 +12,7 @@ class GrowthUsers(object):
     @logger
     def __init__(self, measure, s3_bucket):
         self.athena_client = AthenaClient(s3_bucket)
-
+        self.measure = measure
         self.all_dates_query = BaseETL.get_query_from_file_name(
             '{}/{}/prefix_all_dates.sql'.format(QUERIES_DIR, measure))
         self.current_date_query = BaseETL.get_query_from_file_name(
