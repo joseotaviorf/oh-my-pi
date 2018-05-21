@@ -4,10 +4,10 @@ listings as (
     _month,
     _week,
     _day,
-    amplitude_id,
+    uuid,
     house_id,
     'QuintoAndar' as region,
     'QuintoAndar' as city,
     partial
   from all_events
-),
+)
