@@ -5,7 +5,6 @@ listings as (
     _week,
     _day,
     uuid,
-    house_id,
     'QuintoAndar' as region,
     'QuintoAndar' as city,
     partial

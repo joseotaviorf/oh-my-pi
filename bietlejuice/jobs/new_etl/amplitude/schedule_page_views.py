@@ -29,7 +29,7 @@ class SchedulePageViews(GrowthUsers):
     @logger
     def __append(self, _filter, prefix):
         middle_query = BaseETL.get_query_from_file_name(
-            '{}/engaged_users/middle_{}.sql'.format(QUERIES_DIR, _filter))
+            '{}/{}/middle_{}.sql'.format(QUERIES_DIR, self.measure, _filter))
 
         df = self.get_df(prefix=prefix,
                          middle=middle_query,

@@ -5,7 +5,6 @@ listings as (
     ae._week,
     ae._day,
     ae.uuid,
-    ae.house_id,
     trim(dr.long_region_name) as region,
     'QuintoAndar' as city,
     ae.partial
