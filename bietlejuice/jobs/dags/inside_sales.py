@@ -1,3 +1,5 @@
+import locale
+
 import pandas as pd
 from datetime import datetime, timedelta
 from pymongo import MongoClient
@@ -18,19 +20,40 @@ MAIN_SCHEDULE_INTERVAL = '0 4 * * *'
 
 
 def parse_dt(dt):
-    return (datetime.strptime(dt[:19], '%Y-%m-%dT%H:%M:%S') +
-            timedelta(hours=int(dt[20:22]), minutes=int(dt[23:])) * (-1 if dt[19] == '+' else 1))
+    fmt1 = '%Y-%m-%dT%H:%M:%S'
+    fmt2 = '%b %d %Y %H:%M:%S'
+
+    _dt = None
+    try:
+        _dt = (datetime.strptime(dt[:19], fmt1) +
+               timedelta(hours=int(dt[20:22]), minutes=int(dt[23:])) * (-1 if dt[19] == '+' else 1))
+        return _dt
+    except ValueError:
+        _dt = None
+
+    try:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+        _dt = (datetime.strptime(dt[4:24], fmt2) +
+               timedelta(hours=int(dt[29:31]), minutes=int(dt[31:])) * (-1 if dt[28] == '+' else 1))
+        locale.setlocale(locale.LC_ALL, '')
+        return _dt
+    except ValueError as e:
+        _logger.error('m=parse_dt, msg=bad date dt={} type={} 1={} 2={} 3={} e={}'.format(dt, type(dt), dt[:28],
+                                                                                          dt[29:31], dt[31:], e))
+        return None
 
 
 def cap_dt(dt):
-    if dt >= datetime.utcnow():
-        return datetime.utcnow()
-    else:
-        return dt
+    if dt is not None:
+        if dt >= datetime.utcnow():
+            return datetime.utcnow()
+        else:
+            return dt
+    return None
 
 
-def extract_conversion_tasks(uri, dt=None):
-    client = MongoClient(uri)
+def extract_conversion_tasks(_uri, dt=None):
+    client = MongoClient(_uri)
     db = client.tasks
     conversion_columns = ['task_id', 'task_status', 'rep_id', 'lead_id', 'number_of_reschedules',
                           'total_reschedule_time_hours', 'dt_created', 'dt_closed']
@@ -85,7 +108,10 @@ def extract_conversion_tasks(uri, dt=None):
 
             if action['type'] == 'SNOOZE':
                 number_of_reschedules += 1
-                total_reschedule_time_hours += round((cap_dt(parse_dt(_metadata)) - _date).total_seconds() / 3600., 2)
+                if cap_dt(parse_dt(_metadata)) is not None:
+                    total_reschedule_time_hours += round((cap_dt(parse_dt(_metadata)) - _date).total_seconds() / 3600.,
+                                                         2)
+
         task = {
             "task_id": task_id,
             "task_status": task_status,
@@ -105,7 +131,7 @@ def extract_conversion_tasks(uri, dt=None):
 
 
 def load_conversion_tasks(_uri, table_name, schema_name='crm'):
-    df = extract_conversion_tasks(uri=_uri)
+    df = extract_conversion_tasks(_uri=_uri)
     _logger.info('m=load_conversion_tasks, msg=start saving to db')
     BaseETL.dataframe_to_db(df=df, enum_db=EnumDb.BI_ODS, table_name='{}.{}'.format(schema_name, table_name),
                             encoding='utf-8', append=False)
