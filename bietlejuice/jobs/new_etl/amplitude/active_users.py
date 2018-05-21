@@ -12,12 +12,12 @@ class ActiveUsers(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers.df_to_dw(df, ActiveUsers.TABLE_NAME)
+        GrowthUsers._df_to_dw(df, ActiveUsers.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers.truncate_table(ActiveUsers.TABLE_NAME)
+        GrowthUsers._truncate_table(ActiveUsers.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
