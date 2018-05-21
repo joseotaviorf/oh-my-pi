@@ -1,5 +1,5 @@
 listings as (
-  select
+  select distinct -- because of house versioning
     ae._year,
     ae._month,
     ae._week,
