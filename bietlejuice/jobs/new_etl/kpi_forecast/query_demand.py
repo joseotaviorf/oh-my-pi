@@ -1,8 +1,10 @@
 query_demand = """select
+dpt.id as sk_house , -- f.sk_house, -- sk_property,
+dpt.min_version_time as dt_publication,
 f.sk_rent_flow,
-f.sk_house, -- sk_property,
 f.sk_booking,
 f.sk_owner,
+f.sk_client,
 -- f.sk_user_affiliate,
 f.sk_user_agent,
 -- f.sk_user_visitor,
@@ -40,6 +42,7 @@ dp.dt_created as dt_proposal_created,
 dp.dt_proposal_approved,
 -- dp.status as proposal_status, -- needed ? not needed
 dp.dt_tenant_first_document_sent, --correct field? why first? the date he sent his docs for the first time
+dp.dt_credit_analysis_init,
 
 -- contract --
 dc.dt_created as dt_contract_created,
@@ -51,7 +54,8 @@ db.reason_category,
 dr.region_code,
 dr.city_name
 
-from fact_demand f
+from dim_property dpt
+left join fact_demand f on dpt.sk_property = f.sk_house
 left join dim_booking db on f.sk_booking = db.sk_booking
 left join dim_offer dof on f.sk_offer = dof.sk_offer
 left join dim_proposal dp on f.sk_proposal = dp.sk_proposal
