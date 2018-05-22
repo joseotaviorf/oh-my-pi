@@ -134,6 +134,7 @@ CREATE TABLE public.imovel (
   imovel_v3 INTEGER,
   area_total INTEGER,
   area_terreno INTEGER,
-  unpublished_reason VARCHAR(255)
+  unpublished_reason VARCHAR(255),
+	exclusivity smallint
 )
 WITH (oids = false);

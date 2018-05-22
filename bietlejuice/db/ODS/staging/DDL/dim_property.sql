@@ -173,6 +173,6 @@ CREATE TABLE public.staging.dim_property (
   start_version_category varchar(255),
   end_version_category varchar(255),
   is_last_status INTEGER,
-  
+	exclusivity smallint,
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;

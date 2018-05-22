@@ -278,7 +278,7 @@ with weekly_schedule_prev as (
 		on u.id = a.agent_user_id
 --	where cast(available_date as date) >= date('2017-07-01')
 	group by u.dadosagente_id, available_date
-), total as (
+)
 select
 	vu.agent_id,
 	vu.last_weekly_update,
@@ -306,39 +306,6 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
---where vu.slot_dt >= date('2018-03-01 ') and vu.slot_dt < date('2018-04-01')
+where date(vu.slot_dt) = date('{}')
 order by vu.slot_dt
-)
-select * from total
---,
---endd as (
---select
---	u.id as user_id,
---	u.nome,
---	case when planner_status = '' then null else planner_status end as planner_status,
---	case when history_status = '' then null else history_status end as history_status,
---	date(slot_dt) as "date",
---	sum(cast(available_slot as integer)) as available_hours,
---	date(slot_dt) as "data visita",
---	case when date(slot_dt) >= current_date then 'Open Schedule' else 'Realized Schedule' end as "realizedSchedule"
---from
---	total t
---left join
---	datalake_raw.ebdb_usuario u
---	on u.dadosagente_id = t.agent_id
---left join
---	datalake_raw.ebdb_dadosagente da
---	on da.id = t.agent_id
---group by u.nome, date(slot_dt), date(slot_dt),
---case when date(slot_dt) >= current_date then 'Open Schedule' else 'Realized Schedule' end,
---case when history_status = '' then null else history_status end,
---case when planner_status = '' then null else planner_status end,
---u.id, planner_status, history_status
---)
---select
---	*,
---	sum(cast(coalesce(planner_status,'0') as integer) + cast(coalesce(history_status,'1') as integer)) over (partition by user_id) as ativo
---from
---	endd
-
-
+;

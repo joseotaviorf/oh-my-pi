@@ -10,6 +10,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews
+from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
 
@@ -46,6 +47,19 @@ def materialize_engaged_users_table_query(**kwargs):
 @logger
 def truncate_engaged_users_table():
     EngagedUsers.truncate_table()
+
+
+@logger
+def materialize_schedule_page_views_table_query(**kwargs):
+    _filter = kwargs['filter']
+
+    schedule_page_views = SchedulePageViews(bucket)
+    schedule_page_views.append_to_table(_filter=_filter)
+
+
+@logger
+def truncate_schedule_page_views_table():
+    SchedulePageViews.truncate_table()
 
 
 @logger
@@ -166,10 +180,11 @@ def consolidate_employees_no_filters(measure):
     Growth.execute_command(consolidation_query.format(measure))
 
 
-def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None):
+def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None,
+                         truncate_func=None):
     return SubDagOperator(
         subdag=sub_dag_func(MAIN_DAG_NAME, sub_dag_name, funnel, main_dag.start_date, main_dag.schedule_interval,
-                            materialize_func, placeholders),
+                            materialize_func, placeholders, truncate_func),
         task_id=sub_dag_name,
         dag=main_dag,
     )
@@ -252,11 +267,11 @@ def get_filter_tasks(_filter, funnel, local_dag, sub_dag_name, materialize_func,
 
 
 def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
-                            placeholders=None):
+                            placeholders, truncate_func):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     # all
@@ -276,11 +291,11 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
 
 
 def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
-                              placeholders):
+                              placeholders, truncate_func):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     # all
@@ -305,36 +320,53 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     return local_dag
 
 
-def sub_dag_func_engaged_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
-                               materialize_func=None, placeholders=None):
+def sub_dag_func_amplitude(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
+                           materialize_func, placeholders, truncate_func):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
-    engaged_users_truncate_task = get_python_operator('truncate_table', truncate_engaged_users_table, local_dag)
+    truncate_task = get_python_operator(
+        'truncate_table',
+        truncate_func,
+        local_dag
+    )
 
-    engaged_users_all_task = get_python_operator('extract_all_data', materialize_engaged_users_table_query, local_dag,
-                                                 op_kwargs={'filter': 'all'})
-    engaged_users_city_task = get_python_operator('extract_city_data', materialize_engaged_users_table_query, local_dag,
-                                                  op_kwargs={'filter': 'city'})
-    engaged_users_region_task = get_python_operator('extract_region_data', materialize_engaged_users_table_query,
-                                                    local_dag,
-                                                    op_kwargs={'filter': 'region'})
+    all_task = get_python_operator(
+        'extract_all_data',
+        materialize_func,
+        local_dag,
+        op_kwargs={'filter': 'all'}
+    )
+
+    city_task = get_python_operator(
+        'extract_city_data',
+        materialize_func,
+        local_dag,
+        op_kwargs={'filter': 'city'}
+    )
+
+    region_task = get_python_operator(
+        'extract_region_data',
+        materialize_func,
+        local_dag,
+        op_kwargs={'filter': 'region'}
+    )
 
     # must be sequential because of the appending operation
-    engaged_users_truncate_task >> engaged_users_all_task >> engaged_users_city_task >> engaged_users_region_task
+    truncate_task >> all_task >> city_task >> region_task
 
     return local_dag
 
 
 def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
-                              materialize_func=None, placeholders=None):
+                              materialize_func, placeholders, truncate_func):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     active_users_truncate_task = get_python_operator('truncate_table', truncate_active_users_table, local_dag)
@@ -348,11 +380,11 @@ def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, s
 
 
 def sub_dag_func_owner_landing_views_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
-                                           materialize_func=None, placeholders=None):
+                                           materialize_func, placeholders, truncate_func):
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
-        start_date=start_date,
+        start_date=start_date
     )
 
     owner_landing_views_truncate_task = get_python_operator('truncate_table', truncate_owner_landing_views_table,
@@ -388,12 +420,24 @@ ongoing_contracts_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, mate
 # top funnel measures
 
 # Amplitude engaged users
-amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_engaged_users,
-                                                             None,
+amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
+                                                             materialize_engaged_users_table_query,
                                                              'amplitude_engaged_users_previous',
-                                                             'top_funnel')
+                                                             'top_funnel', None,
+                                                             truncate_engaged_users_table)
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
-                                             'engaged_users', 'top_funnel')
+                                             'engaged_users', 'top_funnel', None, truncate_engaged_users_table)
+
+# Amplitude schedule page views
+amplitude_schedule_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
+                                                                   materialize_schedule_page_views_table_query,
+                                                                   'amplitude_schedule_page_views_previous',
+                                                                   'top_funnel', None,
+                                                                   truncate_schedule_page_views_table)
+schedule_page_views_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
+                                                   'schedule_page_views', 'top_funnel', None,
+                                                   truncate_schedule_page_views_table)
+
 # Amplitude active users
 amplitude_active_users_previous_task = get_sub_dag_operator(sub_dag_func_active_users,
                                                             None,
@@ -503,15 +547,17 @@ fact_append_task = get_python_operator('append_predictions_fact_growth', append_
 
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
+amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 
-leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >> \
-    qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> active_users_sub_dag >> \
-    owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >> \
-    approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >> \
-    offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >> \
-    tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >> \
-    prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> \
-    prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >> \
-    prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task
+(leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >>
+ qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> schedule_page_views_sub_dag >>
+ active_users_sub_dag >> owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >>
+ tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >>
+ offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >>
+ tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >>
+ visits_completed_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >>
+ prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >>
+ prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task
+ )
