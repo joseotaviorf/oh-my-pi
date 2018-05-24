@@ -3,14 +3,14 @@ from datetime import datetime
 import dateutil.parser as parser
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
 
-
-# from bietlejuice.jobs.new_etl.mailchimp.mailchimp_etl import MailchimpETL
 
 def load_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
-    # mc = MailchimpETL(key=MAILCHIMP_KEY)
-    # mc.extract_and_load_mailchimp(file_type, start_date=prev_exec_date, end_date=exec_date)
+    ar = Agent_Region()
+    data = ar.get_agent_region()
+    ar.move_data_to_ods(data, 'agent_region_hist')
 
 
 dag = DAG(
@@ -36,6 +36,10 @@ load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
 
 if __name__ == '__main__':
     execution_date = parser.parse('2018-04-06 00:00:00')
+    ar = Agent_Region()
+    data = ar.get_agent_region()
+    ar.move_data_to_ods(data, 'agent_region_hist')
+    print(data)
     # file_type = 'members'
     # mc = MailchimpETL(key=MAILCHIMP_KEY)
     # prev_exec_date = parser.parse('2018-04-06 00:00:00')

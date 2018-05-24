@@ -2,7 +2,7 @@ SELECT
 	f.DadosAgente_id,
 	f.regiao_id,
 	COALESCE((SELECT h.dt
-	FROM vAgente_Regiao_Hist h
+	FROM v_Agente_Regiao_Hist h
 	WHERE h.DadosAgente_id = f.DadosAgente_id
 		AND h.regiao_id = f.regiao_id
 		AND h.dt_start < f.dt_end

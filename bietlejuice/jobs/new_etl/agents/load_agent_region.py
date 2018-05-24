@@ -1,21 +1,49 @@
+from datetime import datetime
 from io import BytesIO
 
 import boto3
 import pandas as pd
 import petl
+from __init__ import QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 
-class EBDBDatalake(object):
-    def __init__(self, schema_name, bucket_datalake):
-        self.schema_name = schema_name
-        self.bucket_datalake = bucket_datalake
+class Agent_Region(object):
+    def __init__(self):
+        self.schema_name = ''
+        self.bucket_datalake = '5a-datalake'
         self.s3_client = boto3.resource('s3')
-        self.athena_client = AthenaClient(bucket_datalake)
+        self.athena_client = AthenaClient(self.bucket_datalake)
 
-    @logger
+    def __format_query_filename(self, filename):
+        return '{}/{}.sql'.format(QUERIES_DIR, filename)
+
+    def get_agent_region(self):
+        filename = self.__format_query_filename('etl_agent_region')
+        with open(filename) as f:
+            raw_query = f.read()
+
+        agent_region_data = BaseETL.from_db_query(
+            db_enum=EnumDb.QuintoAndar_ebdb,
+            query=raw_query
+        )
+
+        return agent_region_data
+
+    def move_data_to_ods(self, data, table_name):
+        _logger.info("To ODS: {}".format(datetime.now()))
+        table = BaseETL.decode_table(data, 'LATIN-1')
+        BaseETL.bulk_insert(
+            table=table,
+            table_name=table_name,
+            db_enum=EnumDb.BI_ODS,
+            encoding='UTF8',
+            append=False,
+            commit=True,
+            bucket_name='{}/raw/ods/{}'.format(self.bucket_datalake, table_name))
+
     def move_to_datalake(self, table_name):
         now = BaseETL.now()
         db = EnumDb.QuintoAndar_ebdb
@@ -117,19 +145,3 @@ class EBDBDatalake(object):
         command += ddl_suffix.format(self.bucket_datalake, self.schema_name, table_name)
 
         self.athena_client.execute_query_and_wait_for_results(command)
-
-    @logger
-    def get_table_names(self, skip_header=True):
-        sql_tables = """
-        select TABLE_NAME
-        from information_schema.TABLES
-        where TABLE_SCHEMA = '{}'
-        and TABLE_TYPE = 'BASE TABLE'
-    """.format(self.schema_name)
-        table_names = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
-            query=sql_tables
-        )
-        if skip_header:
-            table_names.pop(0)  # remove header
-        return table_names
