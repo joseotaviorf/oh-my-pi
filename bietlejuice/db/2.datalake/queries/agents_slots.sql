@@ -73,7 +73,9 @@ with weekly_schedule_prev as (
 	left join
 		datalake_raw.ebdb_visitaorigem vo
 		on vo.id = aa.origemultimaatualizacao_id
-	where a.status='Realizado' and vo.nome in ('Inquilinos', 'SelfServiceWeb')
+	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
+	  and a.tipo = 'Visita'
+	  and vo.nome in ('Inquilinos', 'SelfServiceWeb')
 ), full_visits as (
 	select distinct
 		a.agente_id as agent_id,
@@ -84,7 +86,8 @@ with weekly_schedule_prev as (
 		datalake_raw.ebdb_agendamento_aud aa
 		on aa.id = a.id
 		and aa.revtype='0'
-	where a.status='Realizado'
+	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
+	  and a.tipo = 'Visita'
 ), base_time as (
 	select
     cast(date_column AS timestamp) as dt,
