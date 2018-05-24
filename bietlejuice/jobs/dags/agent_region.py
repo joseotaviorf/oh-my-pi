@@ -1,71 +1,56 @@
-import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
+import dateutil.parser as parser
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
-from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.load_ebdb_into_datalake import EBDBDatalake
-
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-config_json = json.loads(env.get_airflow_env_var('ebdb_to_datalake'))
-owner = 'Data Team'
-
-ebdb_datalake = EBDBDatalake(config_json['schema_name'], bucket)
-table_names = ebdb_datalake.get_table_names()
+from bietlejuice.jobs.base.base_dag import BaseDAG
 
 
-def move_ebdb_to_datalake():
-    for table_name in table_names:
-        ebdb_datalake.move_to_datalake(table_name[0])
+# from bietlejuice.jobs.new_etl.mailchimp.mailchimp_etl import MailchimpETL
+
+def load_agent_region(**kwargs):
+    exec_date = kwargs['execution_date']
+    # mc = MailchimpETL(key=MAILCHIMP_KEY)
+    # mc.extract_and_load_mailchimp(file_type, start_date=prev_exec_date, end_date=exec_date)
 
 
-def create_raw_external_tables():
-    # conversions = ebdb_datalake.get_type_conversion_dict()
-    ddl_suffix = """) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-                                 with serdeproperties (
-                                   'separatorChar' = ',',
-                                   'quoteChar' = '\"'
-                                 )
-                                stored as textfile
-                                location 's3://{}/raw/{}/{}/'"""
-    for table_name in table_names:
-        ebdb_datalake.create_external_table(table_name[0], ddl_suffix)
-
-
-def transform_to_clean():
-    ddl_suffix = """) stored as parquet
-                                location 's3://{}/clean/{}/{}/'"""
-    ebdb_datalake.transform_tables_to_clean(config_json['clean_table_infos'], ddl_suffix)
-
-
-move = PythonOperator(
-    task_id='move_ebdb_to_datalake',
-    owner=owner,
-    python_callable=move_ebdb_to_datalake
+dag = DAG(
+    dag_id='bi-ebdb-load-agent_region',
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=datetime(2018, 5, 23, 0, 0, 0),
+    schedule_interval='@once',
+    max_active_runs=1
 )
 
-create_raw = PythonOperator(
-    task_id='create_raw_external_tables',
-    owner=owner,
-    python_callable=create_raw_external_tables
+# Get EBDB data of Agent_Region and dumps into ODS
+load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='load_agent_region_to_ods',
+    provide_context=True,
+    func_command=load_agent_region
+    # , op_kwargs={'file_type': 'campaigns'}
 )
 
-move_to_clean = PythonOperator(
-    task_id='transform_to_clean',
-    owner=owner,
-    python_callable=transform_to_clean
-)
-
-with DAG(
-        dag_id='bi-elt-ebdb-to-datalake',
-        default_args={
-            'owner': owner,
-            'wait_for_downstream': False,
-            'depends_on_past': False
-        },
-        start_date=datetime(2018, 1, 1, 0, 0, 0),
-        schedule_interval=timedelta(hours=8),
-        max_active_runs=1
-) as dag:
-    dag >> move >> create_raw >> move_to_clean
+if __name__ == '__main__':
+    execution_date = parser.parse('2018-04-06 00:00:00')
+    # file_type = 'members'
+    # mc = MailchimpETL(key=MAILCHIMP_KEY)
+    # prev_exec_date = parser.parse('2018-04-06 00:00:00')
+    #
+    # mc.extract_and_load_mailchimp_subitems(file_type, prev_exec_date)
+    #
+    # print('CREATING DF')
+    # df_raw = mc.get_all_columns(file_type, execution_date)
+    # print('GOT DF')
+    #
+    # print('CREATING PARQUETS')
+    # if df_raw.empty:
+    #     _logger.warn('m=__main__, msg=empty dataframe')
+    # else:
+    #     mc.create_parquets(df_raw, file_type, execution_date)
+    # print('CREATED PARQUETS')
+    #
+    # print('FINISHED')
