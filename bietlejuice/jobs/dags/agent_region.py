@@ -3,7 +3,10 @@ from datetime import datetime
 import dateutil.parser as parser
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
+
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB')
 
 
 def load_agent_region(**kwargs):
@@ -30,8 +33,8 @@ load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
     dag=dag,
     task_id='load_agent_region_to_ods',
     provide_context=True,
-    func_command=load_agent_region
-    # , op_kwargs={'file_type': 'campaigns'}
+    func_command=load_agent_region,
+    op_kwargs=None
 )
 
 if __name__ == '__main__':
@@ -40,21 +43,3 @@ if __name__ == '__main__':
     data = ar.get_agent_region()
     ar.move_data_to_ods(data, 'agent_region_hist')
     print(data)
-    # file_type = 'members'
-    # mc = MailchimpETL(key=MAILCHIMP_KEY)
-    # prev_exec_date = parser.parse('2018-04-06 00:00:00')
-    #
-    # mc.extract_and_load_mailchimp_subitems(file_type, prev_exec_date)
-    #
-    # print('CREATING DF')
-    # df_raw = mc.get_all_columns(file_type, execution_date)
-    # print('GOT DF')
-    #
-    # print('CREATING PARQUETS')
-    # if df_raw.empty:
-    #     _logger.warn('m=__main__, msg=empty dataframe')
-    # else:
-    #     mc.create_parquets(df_raw, file_type, execution_date)
-    # print('CREATED PARQUETS')
-    #
-    # print('FINISHED')
