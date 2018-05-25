@@ -167,9 +167,7 @@ create external table if not exists datalake_clean.ods_dim_property (
   start_version_category string,
   end_version_category string,
   is_last_status string,
-  lead_to_listing_diff_minutes string,
-  lead_to_listing_diff_hours string,
-  lead_to_listing_diff_days string
+  exclusivity string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

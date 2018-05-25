@@ -34,5 +34,5 @@ create table public.photo_job (
 	user_cancel_name varchar(255),
 	user_cancel_email varchar(255),
 	user_cancel_type varchar(255),
-	user_cancel_id bigint,
+	rep_id bigint
 )
