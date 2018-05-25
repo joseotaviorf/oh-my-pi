@@ -310,5 +310,6 @@ left join
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
 where date(vu.slot_dt) = date('{}')
+   and ah.status = '1'
 order by vu.slot_dt
 ;
