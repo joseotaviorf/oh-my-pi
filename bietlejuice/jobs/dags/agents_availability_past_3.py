@@ -82,8 +82,8 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2017, 5, 11, 0, 0, 0),
-    end_date=datetime(2018, 5, 11, 0, 0, 0),
+    start_date=datetime(2017, 1, 1, 0, 0, 0),
+    end_date=datetime(2017, 5, 10, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('30 4 * * *'),
     max_active_runs=1
 )
