@@ -15,7 +15,33 @@ class Agent_Region(object):
     def __format_query_filename(self, filename):
         return '{}/{}.sql'.format(QUERIES_DIR, filename)
 
-    def get_agent_region(self):
+    def get_agent_region(self, f_name, dt=None):
+        filename = self.__format_query_filename(f_name)
+        with open(filename) as f:
+            raw_query = f.read()
+
+        if dt is not None:
+            raw_query = raw_query.format(str(dt))
+
+        agent_region_data = BaseETL.from_db_query(
+            db_enum=EnumDb.QuintoAndar_ebdb,
+            query=raw_query
+        )
+
+        return agent_region_data
+
+    def clean_agent_region(self, schema, table):
+        filename = "TRUNCATE TABLE {}.{}"
+        raw_query = filename.format(schema, table)
+
+        BaseETL.execute_command(
+            db_enum=EnumDb.BI_ODS,
+            encoding='UTF8',  # conn=conn,
+            command=raw_query,
+            commit=True
+        )
+
+    def get_agent_region_daily(self):
         filename = self.__format_query_filename('etl_agent_region')
         with open(filename) as f:
             raw_query = f.read()
@@ -38,6 +64,9 @@ class Agent_Region(object):
             append=False,
             commit=True,
             bucket_name='{}/raw/ods/{}'.format(self.bucket_datalake, table_name))
+
+    def process_new_rows(self, data):
+        print('oi')
 
     # def move_to_datalake(self, table_name):
     #     now = BaseETL.now()

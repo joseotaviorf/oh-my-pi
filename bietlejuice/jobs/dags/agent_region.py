@@ -1,19 +1,23 @@
 from datetime import datetime
 
-import dateutil.parser as parser
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB')
+env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'ENV_EBDB')
 
 
 def load_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    data = ar.get_agent_region()
+    data = ar.get_agent_region(f_name='etl_agent_region', dt=exec_date)
     ar.move_data_to_ods(data, 'agent_region_hist')
+
+
+def clean_agent_region(**kwargs):
+    ar = Agent_Region()
+    ar.clean_agent_region(schema='public', table='agent_region_hist')
 
 
 dag = DAG(
@@ -37,9 +41,21 @@ load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
     op_kwargs=None
 )
 
+clean_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='clean_agent_region_to_ods',
+    provide_context=True,
+    func_command=clean_agent_region,
+    op_kwargs=None
+)
+
+clean_agent_region_to_ods >> load_agent_region_to_ods
+
 if __name__ == '__main__':
-    execution_date = parser.parse('2018-04-06 00:00:00')
+    # exec_date = parser.parse('2018-04-06 00:00:00')
+    # ar = Agent_Region()
+    # data = ar.get_agent_region(f_name='etl_agent_region', dt=exec_date)
+    # ar.move_data_to_ods(data, 'agent_region_hist')
+    # print(data)
     ar = Agent_Region()
-    data = ar.get_agent_region()
-    ar.move_data_to_ods(data, 'agent_region_hist')
-    print(data)
+    ar.clean_agent_region(schema='public', table='agent_region_hist')
