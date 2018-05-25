@@ -75,7 +75,7 @@ def load_agents_scheduling(**kwargs):
 
 # create DAG definition
 dag = DAG(
-    dag_id='bi-agents-availability-PAST2',
+    dag_id='bi-agents-availability-PAST3',
     description='Task to load agents slots availability and scheduling',
     default_args={
         'owner': 'Data Team',
