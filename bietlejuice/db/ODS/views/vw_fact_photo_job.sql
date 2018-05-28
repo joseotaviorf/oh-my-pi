@@ -14,6 +14,7 @@ select
 	coalesce(i.regiao_id, -1) as sk_region,
 	coalesce(j1.user_cancel_id, -1) as sk_user_cancel,
 	coalesce(j1.photographer_id, -1) as sk_user_photographer,
+	coalesce(j1.rep_id, -1) as sk_user_rep,
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
@@ -38,7 +39,8 @@ select
 	j1.photographer_contract_type,
 	j1.job_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
-	(j2 is not null) rescheduled
+	(j2.id is not null) as rescheduled,
+	j1.user_cancel_type
 from
 	base_jobs j1
 left join
