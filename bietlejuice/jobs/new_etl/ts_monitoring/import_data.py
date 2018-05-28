@@ -97,7 +97,9 @@ def import_sortinghat_proposal(client):
         'score_5a',
         'score_5a_best_subset',
         'score_cardif',
-        'score_cardif_best_subset']
+        'score_cardif_best_subset',
+        'home_area'
+    ]
     df_proposal_sh.loc[:, col_string_to_float] = df_proposal_sh.loc[:, col_string_to_float].replace(
         to_replace='',
         value=np.nan).astype(float)
