@@ -2,6 +2,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import EnumDb
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
 
@@ -11,7 +12,7 @@ env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'ENV_EBDB')
 def load_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    data = ar.get_agent_region(f_name='etl_agent_region', dt=exec_date)
+    data = ar.get_agent_region(f_name='etl_agent_region', dt=exec_date, db_enum=EnumDb.QuintoAndar_ebdb)
     ar.move_data_to_ods(data, 'agent_region_hist')
 
 
