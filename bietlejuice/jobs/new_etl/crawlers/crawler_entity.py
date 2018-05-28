@@ -6,13 +6,15 @@ import googlemaps
 import numpy as np
 import pandas as pd
 import requests
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import logger, _logger
 from shapely import wkt
 from shapely.geometry import Point
 from unidecode import unidecode
+
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 
 class CrawlerEntity(object):
@@ -209,7 +211,7 @@ class CrawlerEntity(object):
 
     @logger
     def start_batch_job(self, job_name, job_queue, job_definition, exec_command):
-        r = BaseETL.start_batch_job(
+        r = BatchClient().start_batch_job(
             job_name=job_name,
             job_queue=job_queue,
             job_definition=job_definition,
