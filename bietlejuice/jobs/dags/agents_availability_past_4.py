@@ -75,7 +75,7 @@ def load_agents_scheduling(**kwargs):
 
 # create DAG definition
 dag = DAG(
-    dag_id='bi-agents-availability-PAST2',
+    dag_id='bi-agents-availability-PAST4',
     description='Task to load agents slots availability and scheduling',
     default_args={
         'owner': 'Data Team',
@@ -83,7 +83,7 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=datetime(2017, 5, 11, 0, 0, 0),
-    end_date=datetime(2018, 5, 11, 0, 0, 0),
+    end_date=datetime(2018, 5, 9, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('30 4 * * *'),
     max_active_runs=1
 )
