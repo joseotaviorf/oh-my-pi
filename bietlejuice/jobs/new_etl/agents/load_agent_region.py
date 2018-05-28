@@ -101,3 +101,18 @@ class Agent_Region(object):
                     commit=True,
                     db_enum=enumdb
                 )
+
+    def get_group_regions(self, f_name, db_enum, dt=None):
+        filename = self.__format_query_filename(f_name, db_enum)
+        with open(filename) as f:
+            raw_query = f.read()
+
+        if dt is not None:
+            raw_query = raw_query.format(str(dt), str(dt))
+
+        agent_region_data = BaseETL.from_db_query(
+            db_enum=db_enum,
+            query=raw_query
+        )
+
+        return agent_region_data
