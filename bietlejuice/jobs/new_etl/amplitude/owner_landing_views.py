@@ -12,12 +12,12 @@ class OwnerLandingViews(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers.df_to_dw(df, OwnerLandingViews.TABLE_NAME)
+        GrowthUsers._df_to_dw(df, OwnerLandingViews.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers.truncate_table(OwnerLandingViews.TABLE_NAME)
+        GrowthUsers._truncate_table(OwnerLandingViews.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):

@@ -1,8 +1,9 @@
 DROP TABLE IF EXISTS public.dim_photo_job;
 create table public.dim_photo_job (
-    sk_photo_job bigint,
+  sk_photo_job bigint,
 	id bigint,
 	imovel_id bigint,
+	rep_id bigint,
 	job_status varchar(255),
 	creation_origin varchar(20),
 	flexible_schedule int,
@@ -33,5 +34,7 @@ create table public.dim_photo_job (
 	user_cancel_dt datetime,
 	user_cancel_id bigint,
 	user_cancel_name varchar(255),
-	user_cancel_email varchar(255)
+	user_cancel_email varchar(255),
+	user_cancel_type varchar(255),
+	rescheduled boolean
 )

@@ -12,7 +12,7 @@ class GrowthUsers(object):
     @logger
     def __init__(self, measure, s3_bucket):
         self.athena_client = AthenaClient(s3_bucket)
-
+        self.measure = measure
         self.all_dates_query = BaseETL.get_query_from_file_name(
             '{}/{}/prefix_all_dates.sql'.format(QUERIES_DIR, measure))
         self.current_date_query = BaseETL.get_query_from_file_name(
@@ -33,7 +33,7 @@ class GrowthUsers(object):
 
     @staticmethod
     @logger(exclude='df')
-    def df_to_dw(df, table_name):
+    def _df_to_dw(df, table_name):
         BaseETL.dataframe_to_db(
             df=df,
             table_name='{}.{}'.format(GrowthUsers.SCHEMA, table_name),
@@ -44,7 +44,7 @@ class GrowthUsers(object):
 
     @staticmethod
     @logger
-    def truncate_table(table_name):
+    def _truncate_table(table_name):
         BaseETL.execute_command(
             command='truncate table {}.{};'.format(GrowthUsers.SCHEMA, table_name),
             commit=True,

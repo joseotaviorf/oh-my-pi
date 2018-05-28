@@ -18,6 +18,6 @@ def get_keys(file_path=os.path.dirname(os.path.realpath(__file__))):
                     if k:
                         app_key = k[0]
                         secret_key = k[1]
-                        keys.append({'app_key': app_key, 'secret_key': secret_key})
+                        keys.append({'app': appid_keys[0], 'app_key': app_key, 'secret_key': secret_key})
 
     return keys
