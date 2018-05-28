@@ -4,6 +4,7 @@ with _fact as (
 	select
 		hrf.id_house_rent_flow as ods_id,
 		coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house,
+		hrf.id_house,
 		coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
 		coalesce(to_char(vdh.min_version_time, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
 		vdh.min_version_time as dt_house_listing,
@@ -114,6 +115,7 @@ select
   sk_visit,
   sk_offer,
   sk_offer_submitted_date,
+  min(sk_offer_submitted_date) filter (where sk_offer_submitted_date != -1) over (partition by id_house) as sk_min_offer_submitted_date,
   sk_offer_approved_date,
   sk_proposal,
   sk_proposal_approved_date,

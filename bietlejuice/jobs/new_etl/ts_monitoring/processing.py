@@ -1,8 +1,17 @@
+from itertools import tee, izip
+
 import numpy as np
 import pandas as pd
-
 from variables import variables_of_property
 from variables import variables_of_subset
+
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
+
 
 today = pd.Timestamp(pd.Timestamp.today(tz='Brazil/East').date())
 
@@ -30,7 +39,7 @@ def preprocess_contracts(df_contrato_aud_ebdb, date):
         axis=1).min(axis=1)
 
     df_contrato_ebdb['dob'] = ((pd.concat([date - pd.to_datetime(df_contrato_ebdb.date_signature.dt.date),
-                                           df_contrato_ebdb.planned_end_contract - pd.to_datetime(
+                                           pd.to_datetime(df_contrato_ebdb.planned_end_contract) - pd.to_datetime(
                                                df_contrato_ebdb.date_signature.dt.date)],
                                           axis=1).min(axis=1)) / pd.to_timedelta(1, unit='days')).fillna(
         0.0)  # if never signed we put 0
@@ -75,7 +84,7 @@ def compute_performance_kpis(df_payments):  # , **context):
     """
     # df_payments = context['task_instance'].xcom_pull(task_ids='import_invoices')
 
-    thresholds = [1, 30, 50, 60, 90, 120, 150]
+    thresholds = [0, 30, 60, 90, 120, 150, 180]
     # for every contract we determine the date at which it first became bad for a given threshold
     df_performance_threshold = pd.DataFrame()
     df_performance_kpis = pd.DataFrame()
@@ -109,10 +118,10 @@ def compute_performance_kpis(df_payments):  # , **context):
                               pd.to_timedelta(t, unit='d')).tolist()
             thres_date = min(candidates_all) if len(candidates_all) > 0 else np.nan
 
-            # determine if there are any unpaid invoices for more than t days
-            candidates_unpaid = \
-                (contract.loc[contract.tenant_status_is_open & (contract.delay >= t), 'tenant_due_date'] +
-                 pd.to_timedelta(t, unit='d')).tolist()
+            # determine if there are any unpaid invoices for strictly more than t days
+            candidates_unpaid = (
+                contract.loc[contract.tenant_status_is_open & (contract.delay > t), 'tenant_due_date'] +
+                pd.to_timedelta(t, unit='d')).tolist()
             # the current status is over t if there is any open invoice with delay above t
             over_t = (len(candidates_unpaid) > 0)
 
@@ -121,18 +130,29 @@ def compute_performance_kpis(df_payments):  # , **context):
                 'contract_id': cid,
                 'threshold': t,
                 'date_ever': thres_date,
-                'status_over': over_t
+                'status_over': over_t,
+                'ninvoices_above': len(candidates_unpaid)
             }, ignore_index=True)
 
     df_performance_kpis = df_performance_kpis.set_index('contract_id')
 
     df_performance_ever = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='date_ever')
-    df_performance_ever.columns = ['date_ever' + str(t) for t in thresholds]
+    df_performance_ever.columns = ['date_ever' + str(t + 1) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_ever, left_index=True, right_index=True)
 
     df_performance_over = df_performance_threshold.pivot(index='contract_id', columns='threshold', values='status_over')
-    df_performance_over.columns = ['over' + str(t) for t in thresholds]
+    df_performance_over.columns = ['over' + str(t + 1) for t in thresholds]
     df_performance_kpis = df_performance_kpis.merge(df_performance_over, left_index=True, right_index=True)
+
+    df_performance_nover = df_performance_threshold.pivot(index='contract_id', columns='threshold',
+                                                          values='ninvoices_above')
+    df_performance_nover.columns = ['nover_or_equal' + str(t + 1) for t in thresholds]
+    df_performance_kpis = df_performance_kpis.merge(df_performance_nover, left_index=True, right_index=True)
+
+    df_performance_nbetween = pd.DataFrame(index=df_performance_nover.index)
+    for tlow, thigh in pairwise(thresholds):
+        df_performance_nbetween['%dto%d' % (tlow + 1, thigh)] = df_performance_nover['nover_or_equal%d' % (tlow + 1)] - df_performance_nover['nover_or_equal%d' % (thigh + 1)]
+    df_performance_kpis = df_performance_kpis.merge(df_performance_nbetween, left_index=True, right_index=True)
 
     return df_performance_kpis
 
@@ -167,10 +187,10 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
     # new columns ##
 
     # output_performance['days_contract_left'] =  (output_performance.dataassinado)
-    output_performance['contrato_expected_total_contract_duration'] = \
-        ((output_performance.contrato_planned_end_contract -
-          output_performance.contrato_date_signature) /
-         pd.to_timedelta(1, unit='days')).fillna(915.0)  # 915 is 30 months
+    output_performance['contrato_expected_total_contract_duration'] = (
+        (pd.to_datetime(
+            output_performance.contrato_planned_end_contract) - output_performance.contrato_date_signature) / pd.to_timedelta(
+            1, unit='days')).fillna(915.0)  # 915 is 30 months
 
     cols_to_zero = [
         u'invoices_last_invoice_dpd',
@@ -184,16 +204,22 @@ def compute_performance_table(df_contrato_aud_ebdb, df_payments, date):
         u'invoices_sum_rent_issued',
         u'invoices_sum_rent_paid',
         u'invoices_sum_rent_unpaid',
-        u'invoices_over1',
-        u'invoices_over30',
-        u'invoices_over50',
-        u'invoices_over60',
-        u'invoices_over90',
-        u'invoices_over120',
-        u'invoices_over150'
+        u'invoices_nover_or_equal1',
+        u'invoices_nover_or_equal31',
+        u'invoices_nover_or_equal61',
+        u'invoices_nover_or_equal91',
+        u'invoices_nover_or_equal121',
+        u'invoices_nover_or_equal151',
+        u'invoices_nover_or_equal181',
+        u'invoices_1to30',
+        u'invoices_31to60',
+        u'invoices_61to90',
+        u'invoices_91to120',
+        u'invoices_121to150',
+        u'invoices_151to180',
     ]
-
-    output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(0)
+    output_performance.loc[:, cols_to_zero] = output_performance.loc[:, cols_to_zero].fillna(
+        0)  # astype(str).replace({'NaT':''})
 
     output_performance['contrato_approx_n_invoices_expected'] = \
         (output_performance['contrato_expected_total_contract_duration'] / 30.5).round()
@@ -217,12 +243,10 @@ def format_performance_table(output_performance):
 
     output_performance = output_performance.reset_index()
 
-    # sometimes these columns are null everywhere and pandas doesnt know they
-    # are dates, and the sk_date will not be created. so we force it:
-    force_date_format = [u'invoices_date_ever1', u'invoices_date_ever30',
-                         u'invoices_date_ever50', u'invoices_date_ever60',
-                         u'invoices_date_ever90', u'invoices_date_ever120',
-                         u'invoices_date_ever150']
+    # sometimes these columns are null everywhere and pandas doesnt know they are dates, and the sk_date will not be created. so we force it:
+    force_date_format = [u'invoices_date_ever1', u'invoices_date_ever31', u'invoices_date_ever61',
+                         u'invoices_date_ever91', u'invoices_date_ever121', u'invoices_date_ever151',
+                         u'invoices_date_ever181']
     for col in force_date_format:
         output_performance.loc[:, col] = output_performance.loc[:, col].astype('datetime64[ns]')
 
