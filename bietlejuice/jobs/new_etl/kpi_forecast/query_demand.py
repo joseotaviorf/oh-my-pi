@@ -1,5 +1,5 @@
 query_demand = """select
-dpt.id as sk_house , -- f.sk_house, -- sk_property,
+dpt.sk_property as sk_house,
 dpt.min_version_time as dt_publication,
 f.sk_rent_flow,
 f.sk_booking,
