@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS agent_region_group;
-CREATE TABLE agent_region_group (
+DROP TABLE IF EXISTS staging.agent_region_group;
+CREATE TABLE staging.agent_region_group (
   "dt" date not null,
   "dadosagente_id" bigint NOT NULL,
   "regioes" VARCHAR NOT NULL,

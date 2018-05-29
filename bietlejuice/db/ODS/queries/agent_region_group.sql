@@ -19,6 +19,7 @@ ORDER BY 2, 4 -- SPO 07, SPO 02 para o #6
 	i_full.dadosagente_id,
 	-- i.regiao_id,
 	i_full."Nossa nomenclatura",
+	count(i_full."Nossa nomenclatura") as times,
 	rank() over (partition by i_full.dadosagente_id order by count(i_full."Nossa nomenclatura") DESC, i_full."Nossa nomenclatura" asc) ranking
 from i_full
 	group by
@@ -29,7 +30,15 @@ select
 	g.dt,
 	g.dadosagente_id,
 	list.regions,
-	g."Nossa nomenclatura" as area
+	g."Nossa nomenclatura" as area,
+	(
+	select r2."Nossa nomenclatura"
+		from i_group r2
+	where r2.dadosagente_id = g.dadosagente_id
+			and r2.dt = g.dt
+			and r2.ranking = 2
+			and r2.times = g.times
+	 ) as secondary_area
 from i_group g
 left join
 	(select

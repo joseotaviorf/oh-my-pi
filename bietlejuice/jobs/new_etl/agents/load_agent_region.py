@@ -2,7 +2,7 @@ from datetime import datetime
 
 import boto3
 import petl
-from __init__ import QUERIES_DIR, ODS_QUERIES_DIR
+from __init__ import QUERIES_DIR, ODS_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import _logger
 
@@ -18,6 +18,8 @@ class Agent_Region(object):
             dir = QUERIES_DIR
         elif db_enum == EnumDb.BI_ODS:
             dir = ODS_QUERIES_DIR
+        elif db_enum == EnumDb.BI_DW:
+            dir = DW_QUERIES_DIR
         return '{}/{}.sql'.format(dir, filename)
 
     def get_agent_region(self, f_name, db_enum, dt=None):
@@ -35,12 +37,12 @@ class Agent_Region(object):
 
         return agent_region_data
 
-    def clean_agent_region(self, schema, table):
+    def clean_agent_region(self, schema, table, enumdb):
         filename = "TRUNCATE TABLE {}.{}"
         raw_query = filename.format(schema, table)
 
         BaseETL.execute_command(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=enumdb,
             encoding='UTF8',  # conn=conn,
             command=raw_query,
             commit=True
@@ -116,3 +118,38 @@ class Agent_Region(object):
         )
 
         return agent_region_data
+
+    def move_table_to_dw(self):
+        BaseETL.move_table_to_dw(
+            table_name='agent_region_group',
+            table_name_dest='staging.agent_region_group',
+            enum_db_source=EnumDb.BI_ODS,
+            enum_db_dest=EnumDb.BI_DW,
+            append=False,
+            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, 'agent_region_group')
+        )
+
+    def create_dim_dw(self, dim_name):
+        print("Start query to create {}: {}".format(dim_name, datetime.now()))
+
+        filename = self.__format_query_filename(dim_name, EnumDb.BI_DW)
+        with open(filename) as f:
+            raw_query = f.read()
+
+        table = BaseETL.from_db_query(
+            db_enum=EnumDb.BI_DW,
+            query=raw_query)
+
+        print("To DW: {}".format(datetime.now()))
+
+        table = BaseETL.decode_table(table, 'LATIN-1')
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name=dim_name,
+            db_enum=EnumDb.BI_DW,
+            encoding='UTF8',
+            append=False,
+            commit=True,
+            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, dim_name)
+        )
