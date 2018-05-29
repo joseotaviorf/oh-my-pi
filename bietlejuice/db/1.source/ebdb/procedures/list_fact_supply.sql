@@ -358,7 +358,7 @@ from
 		left join
 			Usuario u
 			on u.id = i.usuarioQueCadastrou_id
-		where leadConvertido_id is null and cl.dataConversao >= '2018-05-01'
+		where leadConvertido_id is null
 	) base
 	left join
 		(select imovel_id, min(id) as id from JobFotografo group by imovel_id) first_job
