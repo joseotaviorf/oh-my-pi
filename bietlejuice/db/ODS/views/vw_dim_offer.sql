@@ -5,17 +5,14 @@ with pp_aud as (
 		p.id,
 		max(p."atualizadoEm") over w as last_updated_date,
 		max(a."expirationDate") over w as expiration_date,
-
 		max(a.aluguel)
 			filter(where a.edicao = 'EdicaoInquilino' and "aluguel_MOD" = 1)
 			over w
 		as last_rent_value_tenant,
-
 		coalesce(
-			min(a.aluguel)  filter(where a.edicao = 'EdicaoProprietario' and "aluguel_MOD" = 1) over w
-			,min(a."aluguelOriginal") over w
+			min(a.aluguel)  filter(where a.edicao = 'EdicaoProprietario' and "aluguel_MOD" = 1) over w,
+			min(a."aluguelOriginal") over w
 		)	as last_rent_value_landlord,
-
 		max(a.aluguel)
 			filter(where a.edicao = 'EdicaoInquilino' and "aluguel_MOD" = 1) over w
 		+	max(a."condominioOriginal") over w
@@ -75,11 +72,7 @@ new_offer as (
         rent as renting_value,
         original_rent as renting_original_value,
         original_condo as condo_original_value,
-        case
-            when status = 'Aprovada'
-                then atualizado_em
-            else null
-        end as dt_approved,
+        approved_date as dt_approved,
         turn as editing,
         status,
         client_id as user_id,
