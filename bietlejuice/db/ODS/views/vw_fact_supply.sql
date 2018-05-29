@@ -51,7 +51,7 @@ with base_address as (
 		m1.id,
 		m1.last_step,
 		case
-			when m1.acquisition_channel = 'Owner App' and m2.acquisition_channel <> 'Owner App'
+			when m1.acquisition_channel = 'Organic Owner App' and m2.acquisition_channel <> 'Organic Owner App'
 			then 'AbandonedSelfService'
 			when m1.last_step = 'qualified' and m2.id is not null then 'UnfinishedFlow'
 			when m1.last_step = 'prospect' and m2.id is not null then 'UnfinishedForm'
@@ -128,6 +128,11 @@ select
 		then 'Doorman'
 		else f.acquisition_channel
 	end as acquisition_channel,
+	case
+		when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+		then 'Doorman'
+		else f.acquisition_source
+	end as acquisition_source,
 	f.last_step as funnel_step,
 	coalesce(f.funnel_drop_reason, f.funnel_step) as funnel_drop_reason,
 	f.lead_to_prospect_diff_minutes,

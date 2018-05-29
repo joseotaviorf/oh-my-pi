@@ -21,6 +21,7 @@ create table public.fact_supply (
 	flow varchar(255),
 	acquisition_method varchar(255),
 	acquisition_channel varchar(255),
+	acquisition_source varchar(255),
 	funnel_step varchar(255),
 	funnel_drop_reason varchar(255),
 	lead_to_prospect_diff_minutes integer,
