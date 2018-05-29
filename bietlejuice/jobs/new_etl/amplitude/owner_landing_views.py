@@ -40,12 +40,12 @@ class OwnerLandingViewsBV(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers._df_to_dw(df, OwnerLandingViews.TABLE_NAME)
+        GrowthUsers._df_to_dw(df, OwnerLandingViewsBV.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers._truncate_table(OwnerLandingViews.TABLE_NAME)
+        GrowthUsers._truncate_table(OwnerLandingViewsBV.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
@@ -55,4 +55,4 @@ class OwnerLandingViewsBV(GrowthUsers):
     @logger
     def __append(self, _filter, prefix):
         df = self.get_df(prefix=prefix, suffix=self.suffix_query)
-        OwnerLandingViews.df_to_dw(df=df)
+        OwnerLandingViewsBV.df_to_dw(df=df)
