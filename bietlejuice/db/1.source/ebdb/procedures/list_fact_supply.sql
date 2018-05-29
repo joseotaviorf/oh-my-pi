@@ -24,6 +24,7 @@ select
 	flow,
 	acquisition_method,
 	acquisition_channel,
+	acquisition_source,
 	case
 		when (dt_first_listing is not null) then 'Listed'
 		when (dt_opportunity is not null and dt_first_listing is null) and photo_job_status in ('FotosTiradas','Completado', 'NaoListado') then 'NotListedYet'
@@ -99,7 +100,10 @@ from
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
-		(sc.id is not null and optedOutAt is null) as exclusivity
+		base.acquisition_source,
+		(sc.id is not null and optedOutAt is null) as exclusivity,
+		l.cidade,
+		l.bairro
 	from
 	(
 		select
@@ -137,9 +141,14 @@ from
 			end as acquisition_method,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				then 'Organic Owner App'
+				else 'Admin'
+			end as acquisition_channel,
+			case
+				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Owner App'
 				else 'Admin'
-			end as acquisition_channel
+			end as acquisition_source
 		from
 			Imovel i
 		left join
@@ -189,8 +198,14 @@ from
 		    when l.reason in ('ProprietarioRecusou', 'Exclusivo')
 		    	then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
 		  end as dt_qualified,
-			'Lead Flow' as flow,
-			'Non-Self Service' as acquisition_method,
+			case
+				when l.origem = 'OwnerPWA' then 'Self Service Flow'
+				else 'Lead Flow'
+			end as flow,
+			case
+				when l.origem = 'OwnerPWA' then 'Self-Service'
+				else 'Non-Self Service'
+			end as acquisition_method,
 			case
 				when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
 		    when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
@@ -204,8 +219,23 @@ from
 		    when l.origem = 'Reprocessado' and old_lead.origem = 'Landing' then 'Reprocessed Landing'
 		    when l.origem = 'Reprocessado' and old_lead.tipo = 'Afiliado' then 'Reprocessed Affiliate'
 		    when l.origem = 'Reprocessado' then 'Reprocessed Others'
+		    when l.origem = 'OwnerPWA' and l.tipo = 'BrokenOpenLink' then 'Direct Referral'
+		    when l.origem = 'OwnerPWA' and l.tipo = 'LandingMarketing' then 'Landing Owner App'
+		    when l.origem = 'OwnerPWA' and l.tipo = 'LandingOpenLink' then 'Direct Referral'
+		    when l.origem = 'OwnerPWA' and l.tipo = 'Organic' then 'Owner App'
 		    else 'Other'
-		  end as acquisition_channel
+		  end as acquisition_channel,
+			case
+				when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
+		    when l.origem = 'Reprocessado' then 'Reprocessed'
+		    when l.tipo = 'Afiliado' then 'Affiliate'
+		    when l.tipo = 'OpenLink' then 'Affiliate'
+		    when l.origem = 'Facebook' then 'Facebook'
+		    when l.origem = 'Landing' then 'Landing Page Leads' -- BrokenOpenLink goes here also
+		    when l.origem = 'Crawling' then 'Crawling'
+		    when l.origem = 'OwnerPWA' then 'Owner App'
+		    else 'Other'
+		  end as acquisition_source
 		from
 			(
 				select
@@ -225,15 +255,15 @@ from
 			on i.id = cl.imovel_id
 		left join
 			(
-        select
-          a.id,
-          min(a.REV) as REV
-        from
-          Lead_AUD a
-        where ((a.processado = 1 and a.processado_MOD = 1) or (a.status_MOD = 1 and a.status != 'Novo'))
-          and coalesce(a.automaticallyDiscarded, 0) = 0
-        group by a.id
-      ) first_update
+		    select
+		      a.id,
+		      min(a.REV) as REV
+		    from
+		      Lead_AUD a
+		    where ((a.processado = 1 and a.processado_MOD = 1) or (a.status_MOD = 1 and a.status != 'Novo'))
+		      and coalesce(a.automaticallyDiscarded, 0) = 0
+		    group by a.id
+		  ) first_update
 			on first_update.id = l.id
 		left join
 		  Lead_AUD la
@@ -318,7 +348,8 @@ from
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
-			'Inside Sales' as acquisition_channel
+			'Inside Sales' as acquisition_channel,
+			'Admin' as acquisition_source
 		from
 			ConversaoLead cl
 		left join
@@ -327,7 +358,7 @@ from
 		left join
 			Usuario u
 			on u.id = i.usuarioQueCadastrou_id
-		where leadConvertido_id is null
+		where leadConvertido_id is null and cl.dataConversao >= '2018-05-01'
 	) base
 	left join
 		(select imovel_id, min(id) as id from JobFotografo group by imovel_id) first_job
@@ -353,6 +384,9 @@ from
 	left join
 		SpecialCondition sc
 		on sc.id = maxsc.id
+	left join
+		Lead l
+		on l.id = base.lead_id
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;
 END
