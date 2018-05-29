@@ -158,6 +158,32 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
+	'new_listings_landing_bv' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.new_listings_landing_bv
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
 	'tenant_prospects' as measure,
 	null as team,
 	_year,
