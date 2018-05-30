@@ -153,3 +153,30 @@ class Agent_Region(object):
             commit=True,
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, dim_name)
         )
+
+    def create_fact_dw(self, fact_name, dt):
+        print("Start query to create {}: {}".format(fact_name, datetime.now()))
+
+        filename = self.__format_query_filename(fact_name, EnumDb.BI_DW)
+        with open(filename) as f:
+            raw_query = f.read()
+
+        raw_query = raw_query.format(str(dt))
+
+        table = BaseETL.from_db_query(
+            db_enum=EnumDb.BI_DW,
+            query=raw_query)
+
+        print("To DW: {}".format(datetime.now()))
+
+        table = BaseETL.decode_table(table, 'LATIN-1')
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name=fact_name,
+            db_enum=EnumDb.BI_DW,
+            encoding='UTF8',
+            append=True,
+            commit=True,
+            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, fact_name)
+        )

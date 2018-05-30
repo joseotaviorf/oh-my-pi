@@ -12,7 +12,7 @@ SELECT
 	), TIMESTAMP('2009-12-31 00:00:00')) as dt_start,
 	TIMESTAMP(f.dt_end) as dt_end,
 	f.revtype,
-	f.dt
+	TIMESTAMP('2009-12-31 00:00:00') as dt
 FROM
 (SELECT * FROM v_Agente_Regiao_Current
 UNION ALL

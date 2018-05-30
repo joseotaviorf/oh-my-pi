@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import dateutil.parser as parser
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb
@@ -32,8 +33,7 @@ def create_dim_agent_region_dw(**kwargs):
 def create_fact_agent_availability(**kwargs):
     exec_date = kwargs['prev_execution_date']
     ar = Agent_Region()
-    ar.clean_agent_region(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
-    ar.create_dim_dw('dim_agent_region')
+    ar.create_fact_dw('fact_agent', exec_date)
 
 
 dag = DAG(
@@ -43,7 +43,7 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 5, 20, 0, 0, 0),
+    start_date=datetime(2018, 5, 20, 1, 0, 0),
     schedule_interval='@daily',
     max_active_runs=1
 )
@@ -89,10 +89,9 @@ load_group_agent_region_dw >> create_dim_agent_region_dw
 create_dim_agent_region_dw >> create_fact_agent_availability
 
 if __name__ == '__main__':
-    # exec_date = parser.parse('2018-05-28 00:00:00')
+    exec_date = parser.parse('2018-05-28 00:00:00')
     # ar = Agent_Region()
     # group_data = ar.get_group_regions(f_name='agent_region_group', db_enum=EnumDb.BI_ODS, dt=exec_date)
     # ar.move_data_to_ods(data=group_data, table_name='agent_region_group')
     ar = Agent_Region()
-    ar.clean_agent_region(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
-    ar.create_dim_dw('dim_agent_region')
+    ar.create_fact_dw('fact_agent', exec_date)
