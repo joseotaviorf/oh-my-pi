@@ -11,21 +11,45 @@ LEFT join
 	files.aux_regiao aux ON aux.id = t_out.regiao_id
 WHERE
 	TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') BETWEEN dt_start AND dt_end
-ORDER BY 2, 4 -- SPO 07, SPO 02 para o #6
+	and TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
+ORDER BY 2, 4
+)
+, i_union as
+(
+select
+	*
+ from i_full
+union all
+select distinct
+	ag.available_date as dt,
+	us.dados_agente_id as dadosagente_id,
+	region_id as regiao_id,
+	aux."Nossa nomenclatura"
+from
+	public.agents_schedule ag
+left join public.usuario us
+	on us.id = ag.agent_user_id
+left join files.aux_regiao aux
+	ON aux.id = ag.region_id
+where
+	ag.region_id is not null
+	and us.dados_agente_id is not null
+	and	ag.available_date = date(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))
+	and date(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS')) <= date(TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))  -- limit date, where aud started to be implemented
 )
 , i_group as
 (select
-	i_full.dt,
-	i_full.dadosagente_id,
+	i_union.dt,
+	i_union.dadosagente_id,
 	-- i.regiao_id,
-	i_full."Nossa nomenclatura",
-	count(i_full."Nossa nomenclatura") as times,
-	rank() over (partition by i_full.dadosagente_id order by count(i_full."Nossa nomenclatura") DESC, i_full."Nossa nomenclatura" asc) ranking
-from i_full
+	i_union."Nossa nomenclatura",
+	count(i_union."Nossa nomenclatura") as times,
+	rank() over (partition by i_union.dadosagente_id order by count(i_union."Nossa nomenclatura") DESC, i_union."Nossa nomenclatura" asc) ranking
+from i_union
 	group by
-	i_full.dt,
-	i_full.dadosagente_id,
-	i_full."Nossa nomenclatura")
+	i_union.dt,
+	i_union.dadosagente_id,
+	i_union."Nossa nomenclatura")
 select
 	g.dt,
 	g.dadosagente_id,
@@ -46,7 +70,7 @@ left join
 		arh.dadosagente_id,
 	    array_agg(arh.regiao_id order by arh.regiao_id) as regions
 	 from
-	 	i_full arh
+	 	i_union arh
 	 group by
 	 	arh.dt,
 		arh.dadosagente_id
