@@ -37,7 +37,7 @@ class Agent_Region(object):
 
         return agent_region_data
 
-    def clean_agent_region(self, schema, table, enumdb):
+    def clean_agent_dim(self, schema, table, enumdb):
         filename = "TRUNCATE TABLE {}.{}"
         raw_query = filename.format(schema, table)
 
@@ -119,10 +119,10 @@ class Agent_Region(object):
 
         return agent_region_data
 
-    def move_table_to_dw(self):
+    def move_table_to_dw(self, table_s, table_d):
         BaseETL.move_table_to_dw(
-            table_name='agent_region_group',
-            table_name_dest='staging.agent_region_group',
+            table_name=table_s,
+            table_name_dest=table_d,
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False,
@@ -180,3 +180,12 @@ class Agent_Region(object):
             commit=True,
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, fact_name)
         )
+
+    def get_agent_reviews(self, f_name, db_enum):
+
+        agent_reviews_data = BaseETL.from_db_query(
+            db_enum=db_enum,
+            query='call ebdb.list_{}();'.format(f_name)
+        )
+
+        return agent_reviews_data

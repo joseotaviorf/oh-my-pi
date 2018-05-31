@@ -20,13 +20,13 @@ def group_agent_region(**kwargs):
 def load_group_agent_region_dw(**kwargs):
     exec_date = kwargs['prev_execution_date']
     ar = Agent_Region()
-    ar.move_table_to_dw()
+    ar.move_table_to_dw(table_s='agent_region_group', table_d='staging.agent_region_group')
 
 
 def create_dim_agent_region_dw(**kwargs):
     exec_date = kwargs['prev_execution_date']
     ar = Agent_Region()
-    ar.clean_agent_region(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
+    ar.clean_agent_dim(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
     ar.create_dim_dw('dim_agent_region')
 
 
@@ -34,6 +34,21 @@ def create_fact_agent_availability(**kwargs):
     exec_date = kwargs['prev_execution_date']
     ar = Agent_Region()
     ar.create_fact_dw('fact_agent', exec_date)
+
+
+def create_dim_agent_review(**kwargs):
+    exec_date = kwargs['prev_execution_date']
+    ar = Agent_Region()
+    ar.clean_agent_dim(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
+    rev_data = ar.get_agent_reviews(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb)
+    ar.move_data_to_ods(data=rev_data, table_name='agent_review')
+
+
+def load_dim_agent_review_dw(**kwargs):
+    exec_date = kwargs['prev_execution_date']
+    ar = Agent_Region()
+    ar.clean_agent_dim(schema='public', table='public.dim_agent_review', enumdb=EnumDb.BI_DW)
+    ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
 
 
 dag = DAG(
@@ -84,9 +99,28 @@ create_fact_agent_availability = BaseDAG.get_python_operator(  # BaseDAG.get_qui
     op_kwargs=None
 )
 
+# Creates dim_agent_review in ODS
+create_dim_agent_review = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='create_dim_agent_review',
+    provide_context=True,
+    func_command=create_dim_agent_review,
+    op_kwargs=None
+)
+
+# Moves dim_agent_review from ODS to DW
+load_dim_agent_review_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='load_dim_agent_review_dw',
+    provide_context=True,
+    func_command=load_dim_agent_review_dw,
+    op_kwargs=None
+)
+
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
 create_dim_agent_region_dw >> create_fact_agent_availability
+create_dim_agent_review >> load_dim_agent_review_dw
 
 if __name__ == '__main__':
     exec_date = parser.parse('2018-05-28 00:00:00')
@@ -94,4 +128,5 @@ if __name__ == '__main__':
     # group_data = ar.get_group_regions(f_name='agent_region_group', db_enum=EnumDb.BI_ODS, dt=exec_date)
     # ar.move_data_to_ods(data=group_data, table_name='agent_region_group')
     ar = Agent_Region()
-    ar.create_fact_dw('fact_agent', exec_date)
+    ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
+    ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
