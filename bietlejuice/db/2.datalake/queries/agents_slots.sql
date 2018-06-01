@@ -290,6 +290,7 @@ select
 	vu.dow,
 	vu.slot_number,
 	vu.ss_available_slot,
+	vu.specific_slot,
 	vu.available_slot,
 	vu.specific_update,
 	vu.time_window_update,
