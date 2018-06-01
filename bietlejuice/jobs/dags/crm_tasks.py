@@ -132,7 +132,7 @@ def extract_lead_tasks(_uri, dt=None):
     return df.loc[:, conversion_columns]
 
 
-def extract_manual_tasks(_uri, dt=datetime(2018, 05, 30)):
+def extract_manual_tasks(_uri, dt=None):
     client = MongoClient(_uri)
     db = client.tasks
     conversion_columns = ['id_task', 'id_task_opener', 'id_assignee', 'id_workgroup', 'task_done', 'description',
