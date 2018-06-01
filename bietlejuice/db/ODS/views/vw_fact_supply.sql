@@ -96,4 +96,4 @@ left join base_doorman d
 left join
 	base_tasks bt
 	on bt.lead_id = f.lead_id
-where bt.rn = 1
+	and bt.rn = 1
