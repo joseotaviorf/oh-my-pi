@@ -43,10 +43,13 @@ def crawl_cpfs(**kwargs):
 
     _logger.info('m=crawl_cpfs, {} locations after filtering regions'.format(len(locations_coverage)))
 
-    locations = crawler_cpfs.fill_in(locations_coverage, limit, debug=True)
+    locations = crawler_cpfs.fill_in(locations_coverage, limit)
+    if locations.empty:
+        _logger.info('m=crawl_cpfs, msg={}'.format(NO_LOCATIONS_MSG))
+        return None
+
     locations_unique = locations.groupby(['street_name', 'street_number']).size().reset_index()
     locations_unique.columns = ['street_name', 'street_number', 'n_listings']
-
     _logger.info('m=crawl_cpfs, saving seed with {} unique street_name and street_number'.format(len(locations_unique)))
 
     last_date = crawler_cpfs.get_last_crawling_date(ws)
