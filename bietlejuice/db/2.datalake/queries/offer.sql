@@ -1,4 +1,4 @@
-with approved_date as (
+with analysis_date as (
   select
     oa.id,
     min(cast(from_unixtime(cast(ure.timestamp as double) / 1000) as timestamp)) as _date
@@ -6,13 +6,13 @@ with approved_date as (
   join datalake_raw.ebdb_usuariorevisionentity ure
     on oa.rev = ure.id
   where oa.status_MOD = '1'
-    and oa.status = 'Aprovada'
+    and oa.status in ('Aprovada', 'Rejeitada')
   group by 1
 )
 select distinct
   eo.id,
   eo.atualizadoem,
-  ad._date as approved_date,
+  ad._date as analysis_date,
   eo.criadoem,
   eo.firestoreid,
   eo.godfatherid,
@@ -38,6 +38,6 @@ join datalake_raw.godfather_offer go
   on eo.godfatherid = go.id
 left join datalake_raw.godfather_topic gt
   on gt.offer_id = go.id
-left join approved_date ad
+left join analysis_date ad
   on ad.id = eo.id
 ;
