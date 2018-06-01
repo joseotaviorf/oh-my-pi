@@ -80,7 +80,7 @@ def extract_lead_tasks(_uri, dt=None):
     count = 0
     _logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
     _logger.info('m=extract_conversion_tasks, msg=listing tasks')
-    for row in db.tasks.find(_filter, projection).batch_size(200).limit(1000):
+    for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
             _logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
@@ -164,7 +164,7 @@ def extract_manual_tasks(_uri, dt=None):
     count = 0
     _logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
     _logger.info('m=extract_conversion_tasks, msg=listing tasks')
-    for row in db.tasks.find(_filter, projection).batch_size(200).limit(1000):
+    for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
             _logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
