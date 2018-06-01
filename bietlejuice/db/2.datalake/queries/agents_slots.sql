@@ -299,7 +299,7 @@ select
 	vu.last_change_reason,
 	ah.status as history_status,
 	case when pa._count > 0 then '1' else '0' end as planner_status,
-	vu.specific_slot,
+	vu.specific_slot
 from
 	visits_updates vu
 left join
