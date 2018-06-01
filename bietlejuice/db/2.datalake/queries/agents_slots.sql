@@ -290,7 +290,6 @@ select
 	vu.dow,
 	vu.slot_number,
 	vu.ss_available_slot,
-	vu.specific_slot,
 	vu.available_slot,
 	vu.specific_update,
 	vu.time_window_update,
@@ -299,7 +298,8 @@ select
 	vu.self_service_visit,
 	vu.last_change_reason,
 	ah.status as history_status,
-	case when pa._count > 0 then '1' else '0' end as planner_status
+	case when pa._count > 0 then '1' else '0' end as planner_status,
+	vu.specific_slot,
 from
 	visits_updates vu
 left join
