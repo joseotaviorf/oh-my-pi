@@ -4,15 +4,15 @@ steps = pd.DataFrame([{'step': 'dt_booking_created',
                        'order': 1,
                        'predict_with': None},
 
-                      # {'step': 'dt_booking_created_notrescheduled',
-                      #  'deduplication_col': 'id_booking',
-                      #  'order': 2,
-                      #  'predict_with': 'dt_booking_created'},
+                      {'step': 'dt_booking_created_notrescheduled',
+                       'deduplication_col': 'sk_booking',
+                       'order': 2,
+                       'predict_with': 'dt_booking_created'},
 
                       {'step': 'dt_effective_visit',
                        'deduplication_col': 'sk_booking',
                        'order': 3,
-                       'predict_with': 'dt_booking_created'},
+                       'predict_with': 'dt_booking_created_notrescheduled'},
                       # only not rescheduled bookings can create an effective visit
 
                       {'step': 'dt_offer_first_sent',

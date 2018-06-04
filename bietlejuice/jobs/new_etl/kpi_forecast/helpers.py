@@ -1,8 +1,9 @@
 import io
-
+import gzip
 import boto3
 import botocore
 import pandas as pd
+import pickle
 from qa_python_utils.default_logger import _logger
 
 s3 = boto3.resource('s3')
@@ -20,40 +21,48 @@ def get_file_from_s3(bucket, file_name_s3, file_name_local):
     return True
 
 
-def write_to_s3(bucket, obj, filename, csv=True, pickle=False):
+def write_to_s3(bucket, obj, filename, to_csv=True, to_pickle=False):
     """write dataframe obj to s3 (in the ts/monitoring directory)"""
     if (isinstance(obj, pd.DataFrame)) or (isinstance(obj, pd.Series)):
 
         s3 = boto3.resource('s3')
         obj = obj.copy()  # we don't want to alter the original object
-        if csv is True:
+        if to_csv is True:
             csv_buffer = io.BytesIO()
             obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=True)
             s3.Object(bucket, 'KPI_predictor/' + filename + '.csv').put(Body=csv_buffer.getvalue())
-        if pickle is True:
-            pickle_buffer = io.BytesIO()
-            obj.to_pickle(pickle_buffer)
-            s3.Object(bucket, 'KPI_predictor/' + filename + '.p').put(Body=pickle_buffer.getvalue())
+        if to_pickle is True:
+            # pickle_buffer = io.BytesIO()
+            # obj.to_pickle(pickle_buffer)
+            # file = io.BytesIO()
+            # with gzip.GzipFile(fileobj=file, mode='w') as fp:
+            #     fp.write(pickle_buffer.getvalue())
+            # s3.Object(bucket, 'KPI_predictor/' + filename + '.gzip').put(
+            #     Body=file.getvalue())
+
+            file = io.BytesIO()
+            with gzip.GzipFile(fileobj=file, mode='w') as fp:
+                fp.write(pickle.dumps(obj))
+            s3.Object(bucket, 'KPI_predictor/' + filename + '.test.gzip').put(
+                Body=file.getvalue())
 
 
 def get_prediction(city, region, begin_pred):
     begin_pred_string = begin_pred.strftime(format='%Y-%m-%d')
     flag = get_file_from_s3('5a-data-science',
                             'KPI_predictor/monitoring/%s/%s/%s/kpis_prediction.p' % (begin_pred_string, city, region),
-                            'kpis_prediction.p')
+                            'kpis_prediction.gz')
     if flag is False:  # error getting the file
         return None
     else:
-        kpis_prediction = pd.read_pickle('kpis_prediction.p')
+        kpis_prediction = pd.read_pickle('kpis_prediction.gz', compression='gzip')
         return kpis_prediction
 
 
 def get_count(df, steps, step):
     """returns a series with the number of steps on each day. days with no steps are not included"""
-
     deduplication_col_step = steps.loc[step, 'deduplication_col']
     df_dedup = df.drop_duplicates(deduplication_col_step)  # returns a copy
-
     daily = df_dedup.groupby(df_dedup[step].dt.date).count().iloc[:, 0]
     daily.index = pd.DatetimeIndex(daily.index).rename('index')
     daily = daily.rename(step)

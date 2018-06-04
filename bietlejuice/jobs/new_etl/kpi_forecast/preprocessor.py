@@ -12,6 +12,8 @@ class Preprocessor():
         df.loc[df.city_name.isnull(), 'city_name'] = 'NONE'
 
         # define steps of the process
+        df.loc[:, 'dt_booking_created_notrescheduled'] = df['dt_booking_created'].where(
+            df.reason_category != 'Reschedule')  # source ribaldo
         df.loc[:, 'dt_effective_visit'] = df['dt_booking_scheduling'].where(
             df.visit_follow_up.isin(['VaiNegociar', 'Talvez', 'VisitouSozinho']))  # source ribaldo
         df.loc[:, 'dt_signature_notcancelled'] = df['dt_contract_signature'].where(

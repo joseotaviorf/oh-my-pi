@@ -28,6 +28,8 @@ db.visit_follow_up,
 --db.visit_type? ...
 db.dt_created as dt_booking_created,
 db.dt_scheduling as dt_booking_scheduling,
+db.reason_category, -- we include reason_category to be able to correctly
+-- count the number of bookings (exclude 'Reschedule')
 
 -- offer --
 -- dof.dt_created as dt_offer_created,
@@ -45,7 +47,6 @@ dp.dt_tenant_first_document_sent, --correct field? why first? the date he sent h
 dc.dt_created as dt_contract_created,
 dc.dt_signature as dt_contract_signature,
 dc.contract_status,
-db.reason_category,
 
 -- region --
 dr.region_code,
@@ -60,6 +61,6 @@ left join dim_region dr on f.sk_region = dr.sk_region
 
 -- when a booking is cancelled AND rescheduled we want to count the new scheduling only.
 -- the status of the first one will be cancelled and the reason will be 'rescheduling'
-where db.reason_category != 'Reschedule'
+-- where db.reason_category != 'Reschedule'
 
 ;"""
