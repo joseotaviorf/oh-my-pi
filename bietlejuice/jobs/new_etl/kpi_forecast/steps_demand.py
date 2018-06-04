@@ -31,14 +31,19 @@ steps = pd.DataFrame([{'step': 'dt_booking_created',
                        'order': 6,
                        'predict_with': 'dt_offer_approved'},
 
-                      {'step': 'dt_proposal_approved',
+                      {'step': 'dt_credit_analysis_init',
                        'deduplication_col': 'sk_proposal',
                        'order': 7,
+                       'predict_with': 'dt_tenant_first_document_sent'},
+
+                      {'step': 'dt_proposal_approved',
+                       'deduplication_col': 'sk_proposal',
+                       'order': 8,
                        'predict_with': 'dt_offer_approved'},  #
 
                       {'step': 'dt_signature_notcancelled',
                        'deduplication_col': 'sk_contract',
-                       'order': 8,
+                       'order': 9,
                        'predict_with': 'dt_proposal_approved'},
                       ])
 

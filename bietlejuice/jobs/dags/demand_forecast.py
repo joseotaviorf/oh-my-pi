@@ -445,9 +445,9 @@ def demand_forecast():
     _logger.info('loading fact')
     fact_past_bookings = load_fact(begin_pred)
     _logger.info('computing predictions for all regions')
-    # geo_levels, cities, regions = compute_all_predictions(fact_past_bookings)  # writes in s3 (pickles)
+    geo_levels, cities, regions = compute_all_predictions(fact_past_bookings)  # writes in s3 (pickles)
     _logger.info('writing predictions to csv')
-    # forecast_to_csv(fact_past_bookings, geo_levels, cities, regions)  # reads in s3, formats, writes csv in s3
+    forecast_to_csv(fact_past_bookings, geo_levels, cities, regions)  # reads in s3, formats, writes csv in s3
 
 
 if __name__ == "__main__":
