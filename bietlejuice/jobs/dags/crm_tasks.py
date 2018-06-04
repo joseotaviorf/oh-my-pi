@@ -139,7 +139,7 @@ def extract_manual_tasks(_uri, dt=None):
                           'subject', 'dt_created', 'dt_reschedule', 'dt_closed']
 
     _filter = {
-        "type": {"$in": ["ConverterLead", "ConverterLeadPrioritario"]}
+        "type": {"$in": ["Manual"]}
     }
     if dt is not None:
         _filter = {
