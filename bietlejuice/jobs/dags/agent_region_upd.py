@@ -12,8 +12,10 @@ env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB')
 
 def upd_agent_region(**kwargs):
     exec_date = kwargs['prev_execution_date']
+    exec_date_max = kwargs['execution_date']
     ar = Agent_Region()
-    new_data = ar.get_agent_region(f_name='etl_agent_region_daily', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date)
+    new_data = ar.get_agent_region(f_name='etl_agent_region_daily', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date,
+                                   dtmax=exec_date_max)
     inserted_data, updated_data = ar.split_new_rows(new_data=new_data, dt=exec_date)
     ar.insert_new_data(inserted_data, 'agent_region_hist')
     ar.update_data(data=updated_data, db='public', table='agent_region_hist', enumdb=EnumDb.BI_ODS, date=exec_date)

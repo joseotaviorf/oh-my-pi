@@ -22,13 +22,13 @@ class Agent_Region(object):
             dir = DW_QUERIES_DIR
         return '{}/{}.sql'.format(dir, filename)
 
-    def get_agent_region(self, f_name, db_enum, dt=None):
+    def get_agent_region(self, f_name, db_enum, dt=None, dtmax=None):
         filename = self.__format_query_filename(f_name, db_enum)
         with open(filename) as f:
             raw_query = f.read()
 
         if dt is not None:
-            raw_query = raw_query.format(str(dt))
+            raw_query = raw_query.format(str(dt), str(dtmax))
 
         agent_region_data = BaseETL.from_db_query(
             db_enum=db_enum,
@@ -110,7 +110,7 @@ class Agent_Region(object):
             raw_query = f.read()
 
         if dt is not None:
-            raw_query = raw_query.format(str(dt), str(dt))
+            raw_query = raw_query.format(str(dt), str(dt), str(dt), str(dt), str(dt))
 
         agent_region_data = BaseETL.from_db_query(
             db_enum=db_enum,

@@ -18,7 +18,7 @@ def load_agent_region(**kwargs):
 
 def clean_agent_region(**kwargs):
     ar = Agent_Region()
-    ar.clean_agent_region(schema='public', table='agent_region_hist', enumdb=EnumDb.BI_ODS)
+    ar.clean_agent_dim(schema='public', table='agent_region_hist', enumdb=EnumDb.BI_ODS)
 
 
 dag = DAG(

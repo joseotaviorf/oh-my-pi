@@ -14,11 +14,11 @@ SELECT
 		ELSE 36			-- Other days
 	END as total_slots,
 	a.area,
-	a.sk_agentregiongroup_id
+	a.sk_agentregion
 FROM schedule s
 LEFT JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
 LEFT JOIN public.dim_agent_region a
-	ON a.sk_date = s.sk_date
-		AND a.sk_dadosagente_id = s.sk_agent_id
+	ON a.sk_regions_date = s.sk_date
+		AND a.sk_agent = s.sk_agent_id
 ORDER BY s.sk_date;

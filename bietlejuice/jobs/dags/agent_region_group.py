@@ -47,7 +47,7 @@ def create_dim_agent_review(**kwargs):
 def load_dim_agent_review_dw(**kwargs):
     exec_date = kwargs['prev_execution_date']
     ar = Agent_Region()
-    ar.clean_agent_dim(schema='public', table='public.dim_agent_review', enumdb=EnumDb.BI_DW)
+    ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
 
 
