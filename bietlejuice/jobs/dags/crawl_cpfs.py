@@ -65,7 +65,7 @@ def crawl_cpfs(**kwargs):
     crawler_cpfs.start_batch_job(
         job_name='crawl_' + suffix.split('.')[0].replace('-', '_'),
         job_queue='crawling-cpfs',
-        job_definition='crawling-cpfs:1',
+        job_definition='crawling-cpfs:2',
         exec_command=['./crawlers/get_cpfs.py',
                       's3://{}/{}'.format(s3_bucket, filename),
                       '--max_crawl', '1000000', '--threads', '2']
