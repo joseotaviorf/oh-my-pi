@@ -27,7 +27,7 @@ class CrawlerCPFs(CrawlerEntity):
         return data
 
     @logger(exclude='data')
-    def fill_in(self, data, limit, debug=False):
+    def fill_in(self, data, limit, allow_enrichment=True):
         data = self.parse_address(data)
 
         to_fill = """street_name.isnull() or street_number.isnull()"""
@@ -35,29 +35,31 @@ class CrawlerCPFs(CrawlerEntity):
 
         n_locations = len(data.query(as_ref).groupby(['street_name', 'street_number']).size())
 
-        if debug is False and n_locations <= limit:
-            df_to_fill = data.query(to_fill)
-            for i, row in df_to_fill.iterrows():
-                try:
-                    df_as_ref = data.query(as_ref)
-                    actual_address = df_as_ref.loc[
-                        (df_as_ref.lat == row.lat) & (df_as_ref.lng == row.lng), ['street_name', 'street_number']]
+        if allow_enrichment is False or n_locations >= limit:
+            return data.query(as_ref)
 
-                    if actual_address.empty:
-                        street, number = self.reverse_geocode(row.lat, row.lng)
-                        street = ' '.join(street.split(' ')[1:])
-                        n_locations += 1
-                    else:
-                        street = actual_address.iloc[0].street_name
-                        number = actual_address.iloc[0].street_number
+        df_to_fill = data.query(to_fill)
+        for i, row in df_to_fill.iterrows():
+            try:
+                df_as_ref = data.query(as_ref)
+                actual_address = df_as_ref.loc[
+                    (df_as_ref.lat == row.lat) & (df_as_ref.lng == row.lng), ['street_name', 'street_number']]
 
-                    data.loc[i, 'street_name'] = street.lower()
-                    data.loc[i, 'street_number'] = number
-                except Exception:
-                    _logger.warn('m=fill_in, could not retrieve street and number.')
+                if actual_address.empty:
+                    street, number = self.reverse_geocode(row.lat, row.lng)
+                    street = ' '.join(street.split(' ')[1:])
+                    n_locations += 1
+                else:
+                    street = actual_address.iloc[0].street_name
+                    number = actual_address.iloc[0].street_number
 
-                if n_locations >= limit:
-                    break
+                data.loc[i, 'street_name'] = street.lower()
+                data.loc[i, 'street_number'] = number
+            except Exception:
+                _logger.warn('m=fill_in, could not retrieve street and number.')
+
+            if n_locations >= limit:
+                break
 
         return data.query(as_ref)
 
