@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 
 import boto3
@@ -70,7 +71,8 @@ class EBDBDatalake(object):
     @logger
     def __get_data_from_table(self, db, table_name, columns):
         if '_AUD' in table_name:
-            _date = self.incremental_date.strftime('%Y-%m-%d')
+            _date = (self.incremental_date.strftime('%Y-%m-%d') if self.incremental_date is not None
+                     else datetime.today().date().strftime('%Y-%m-%d'))
             query = """
                         select distinct {}
                         from {} t
