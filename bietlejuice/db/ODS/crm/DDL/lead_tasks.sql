@@ -4,9 +4,9 @@ CREATE TABLE crm.lead_tasks (
 	task_id varchar(255) NULL,
 	task_status varchar(255) NULL,
 	rep_id int4 NULL,
+	first_rep_id int4 NULL,
 	lead_id int4 NULL,
 	number_of_reschedules int4 NULL,
-	first_rep_id int4 NULL,
 	dt_created timestamp NULL,
 	dt_closed timestamp NULL
 )
