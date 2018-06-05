@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 
 import boto3
@@ -12,11 +11,28 @@ from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 class EBDBDatalake(object):
     SCHEMA_NAME = 'ebdb'
+    RAW_DDL_SUFFIX = """
+                ) row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+                with serdeproperties (
+                    'separatorChar' = ',',
+                    'quoteChar' = '\"'
+                )
+                tblproperties (
+                    'skip.header.line.count' = '1'
+                )
+                location 's3://{}/raw/{}/{}/'
+            """
 
-    def __init__(self, bucket_datalake):
+    CLEAN_DDL_SUFFIX = """
+        ) stored as parquet
+        location 's3://{}/clean/{}/{}/'
+    """
+
+    def __init__(self, bucket_datalake, incremental_date=None):
         self.bucket_datalake = bucket_datalake
         self.s3_client = boto3.resource('s3')
         self.athena_client = AthenaClient(bucket_datalake)
+        self.incremental_date = incremental_date
 
     @logger
     def move_to_datalake(self, table_name):
@@ -54,7 +70,7 @@ class EBDBDatalake(object):
     @logger
     def __get_data_from_table(self, db, table_name, columns):
         if '_AUD' in table_name:
-            _date = datetime.today().strftime('%Y-%m-%d')
+            _date = self.incremental_date.strftime('%Y-%m-%d')
             query = """
                         select distinct {}
                         from {} t
@@ -90,7 +106,7 @@ class EBDBDatalake(object):
 
         self.s3_client.Object(self.bucket_datalake, file_path).put(Body=csv_buffer.getvalue())
 
-    def transform_tables_to_clean(self, table_infos, ddl_suffix):
+    def transform_tables_to_clean(self, table_infos):
         _logger.info('m=transform_tables_to_clean, msg=init')
 
         for table_info in table_infos:
@@ -102,8 +118,12 @@ class EBDBDatalake(object):
                 df=df
             )
 
-            self.create_external_table(table_info['new_name'], ddl_suffix, table_info['original_name'],
-                                       'datalake_clean')
+            self.create_external_table(
+                table_info['new_name'],
+                EBDBDatalake.CLEAN_DDL_SUFFIX,
+                table_info['original_name'],
+                'datalake_clean'
+            )
 
     @logger
     def get_type_conversion_dict(self):
@@ -143,6 +163,10 @@ class EBDBDatalake(object):
         command += ddl_suffix.format(self.bucket_datalake, EBDBDatalake.SCHEMA_NAME, table_name)
 
         self.athena_client.execute_query_and_wait_for_results(command)
+
+    def create_raw_external_tables(self, table_names):
+        for table_name in table_names:
+            self.create_external_table(table_name[0], EBDBDatalake.RAW_DDL_SUFFIX)
 
     @logger
     def get_table_names(self, skip_header=True):
