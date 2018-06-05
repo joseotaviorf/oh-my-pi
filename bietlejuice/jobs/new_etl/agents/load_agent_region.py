@@ -27,7 +27,7 @@ class Agent_Region(object):
         with open(filename) as f:
             raw_query = f.read()
 
-        if dt is not None:
+        if dtmax is not None:
             raw_query = raw_query.format(str(dt), str(dtmax))
 
         agent_region_data = BaseETL.from_db_query(
@@ -129,12 +129,15 @@ class Agent_Region(object):
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, 'agent_region_group')
         )
 
-    def create_dim_dw(self, dim_name):
+    def create_dim_or_fact_dw(self, dim_name, append, dt=None):
         print("Start query to create {}: {}".format(dim_name, datetime.now()))
 
         filename = self.__format_query_filename(dim_name, EnumDb.BI_DW)
         with open(filename) as f:
             raw_query = f.read()
+
+        if dt is not None:
+            raw_query = raw_query.format(str(dt))
 
         table = BaseETL.from_db_query(
             db_enum=EnumDb.BI_DW,
@@ -149,36 +152,9 @@ class Agent_Region(object):
             table_name=dim_name,
             db_enum=EnumDb.BI_DW,
             encoding='UTF8',
-            append=False,
+            append=append,
             commit=True,
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, dim_name)
-        )
-
-    def create_fact_dw(self, fact_name, dt):
-        print("Start query to create {}: {}".format(fact_name, datetime.now()))
-
-        filename = self.__format_query_filename(fact_name, EnumDb.BI_DW)
-        with open(filename) as f:
-            raw_query = f.read()
-
-        raw_query = raw_query.format(str(dt))
-
-        table = BaseETL.from_db_query(
-            db_enum=EnumDb.BI_DW,
-            query=raw_query)
-
-        print("To DW: {}".format(datetime.now()))
-
-        table = BaseETL.decode_table(table, 'LATIN-1')
-
-        BaseETL.bulk_insert(
-            table=table,
-            table_name=fact_name,
-            db_enum=EnumDb.BI_DW,
-            encoding='UTF8',
-            append=True,
-            commit=True,
-            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, fact_name)
         )
 
     def get_agent_reviews(self, f_name, db_enum):

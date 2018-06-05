@@ -27,13 +27,13 @@ def create_dim_agent_region_dw(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
-    ar.create_dim_dw('dim_agent_region')
+    ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
 
 
 def create_fact_agent_availability(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    ar.create_fact_dw('fact_agent', exec_date)
+    ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
 
 
 def create_dim_agent_review(**kwargs):
