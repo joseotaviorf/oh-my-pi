@@ -11,33 +11,33 @@ env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACC
 
 
 def group_agent_region(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     group_data = ar.get_group_regions(f_name='agent_region_group', db_enum=EnumDb.BI_ODS, dt=exec_date)
     ar.move_data_to_ods(data=group_data, table_name='agent_region_group')
 
 
 def load_group_agent_region_dw(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.move_table_to_dw(table_s='agent_region_group', table_d='staging.agent_region_group')
 
 
 def create_dim_agent_region_dw(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
     ar.create_dim_dw('dim_agent_region')
 
 
 def create_fact_agent_availability(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.create_fact_dw('fact_agent', exec_date)
 
 
 def create_dim_agent_review(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
     rev_data = ar.get_agent_reviews(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb)
@@ -45,7 +45,7 @@ def create_dim_agent_review(**kwargs):
 
 
 def load_dim_agent_review_dw(**kwargs):
-    exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
@@ -58,8 +58,8 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 5, 20, 1, 0, 0),
-    schedule_interval='@daily',
+    start_date=datetime(2018, 5, 20, 0, 0, 0),
+    schedule_interval='0 2 * * *',
     max_active_runs=1
 )
 

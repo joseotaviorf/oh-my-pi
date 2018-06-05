@@ -1,3 +1,4 @@
+import datetime as dt
 from datetime import datetime
 
 import dateutil.parser as parser
@@ -11,8 +12,9 @@ env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB')
 
 
 def upd_agent_region(**kwargs):
-    exec_date = kwargs['prev_execution_date']
-    exec_date_max = kwargs['execution_date']
+    # exec_date = kwargs['prev_execution_date']
+    exec_date = kwargs['execution_date']
+    exec_date_max = exec_date + dt.timedelta(days=1)
     ar = Agent_Region()
     new_data = ar.get_agent_region(f_name='etl_agent_region_daily', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date,
                                    dtmax=exec_date_max)
@@ -26,7 +28,7 @@ dag = DAG(
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
-        'depends_on_past': False
+        'depends_on_past': True
     },
     start_date=datetime(2018, 5, 30, 0, 0, 0),
     schedule_interval='@daily',
@@ -44,6 +46,9 @@ update_agent_region_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoanda
 
 if __name__ == '__main__':
     exec_date = parser.parse('2018-05-28 00:00:00')
+    exec_date_max = exec_date + dt.timedelta(days=1)
+    print(exec_date)
+    print(exec_date_max)
     ar = Agent_Region()
     new_data = ar.get_agent_region(f_name='etl_agent_region_daily', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date)
     inserted_data, updated_data = ar.split_new_rows(new_data=new_data, dt=exec_date)

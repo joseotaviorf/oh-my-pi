@@ -7,5 +7,5 @@ dt_start DATETIME,
 dt_end DATETIME,
 revtype INT,
 dt DATETIME,
-PRIMARY KEY (DadosAgente_id, regiao_id, dt_start)
+PRIMARY KEY (DadosAgente_id, regiao_id, dt_start, dt_end, dt)
 );
