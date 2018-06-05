@@ -34,16 +34,15 @@ def transform_to_clean():
 
 # dag definition
 dag = DAG(
-    dag_id='bi-elt-ebdb-to-datalake',
+    dag_id='bi-ebdb-to-datalake',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=datetime(2018, 1, 1, 0, 0, 0),
+    start_date=datetime(2018, 5, 25, 0, 0, 0),
     schedule_interval='0 4 * * *',
-    max_active_runs=1,
-    catchup=False
+    max_active_runs=1
 )
 
 # operators
