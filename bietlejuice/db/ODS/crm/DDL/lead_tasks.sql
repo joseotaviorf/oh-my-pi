@@ -15,10 +15,3 @@ WITH (
 ) ;
 CREATE INDEX dtx ON crm.lead_tasks USING btree (dt_created) ;
 CREATE INDEX lead_idx ON crm.lead_tasks USING btree (lead_id) ;
-
-
-
-
-
-        'task_id', 'task_status', 'rep_id', 'first_rep_id', 'lead_id', 'number_of_reschedules',
-        'dt_created', 'dt_closed'
