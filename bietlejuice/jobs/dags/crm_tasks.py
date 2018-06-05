@@ -195,7 +195,7 @@ def extract_manual_tasks(_uri, dt=None):
 
         task = {
             "id_task": task_id,
-            "id_task_opener": int(task_opener_id),
+            "id_task_opener": task_opener_id if task_opener_id is None else int(task_opener_id),
             "id_assignee": assignee_id,
             "id_workgroup": workgroup_id,
             "task_done": task_done,
