@@ -29,7 +29,7 @@ def move_ebdb_to_datalake(**kwargs):
 
 
 def transform_to_clean():
-    EBDBDatalake(bucket).transform_tables_to_clean(config_json['clean_table'])
+    EBDBDatalake(bucket).transform_tables_to_clean(config_json['clean_tables'])
 
 
 # dag definition
