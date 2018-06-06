@@ -18,10 +18,10 @@ class EBDBDatalake(object):
                     'separatorChar' = ',',
                     'quoteChar' = '\"'
                 )
+                location 's3://{}/raw/{}/{}/'
                 tblproperties (
                     'skip.header.line.count' = '1'
                 )
-                location 's3://{}/raw/{}/{}/'
             """
 
     CLEAN_DDL_SUFFIX = """
