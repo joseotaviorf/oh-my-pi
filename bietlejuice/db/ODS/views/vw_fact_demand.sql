@@ -17,6 +17,7 @@ with _fact as (
 	  hrf.dt_booking_created,
 	  coalesce(to_char(hrf.dt_visit, 'YYYYMMDD')::integer, -1) as sk_visit_date,
 	  hrf.dt_visit,
+	  hrf.visit_completed as flg_visit_completed,
 	  coalesce(hrf.id_owner, -1) as sk_owner,
 	  coalesce(hrf.id_user_agent, -1) as sk_user_agent,
 	  coalesce(to_char(hrf.dt_agent_sign_up, 'YYYYMMDD')::integer, -1) as sk_agent_sign_up_date,
@@ -69,9 +70,9 @@ with _fact as (
         then vdp.dt_credit_analysis_end
       else null::timestamp
     end as dt_credit_analysis_approved,
-	  hrf.visit_created_from_app,
+	  hrf.visit_created_from_app as flg_visit_created_from_app,
 	  hrf.visit_created_type,
-	  hrf.visit_last_updated_from_app,
+	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
 	  hrf.visit_last_updated_type,
 	  now()::timestamp as dt_timestamp
 	from house_rent_flow hrf
@@ -127,9 +128,10 @@ select
   sk_credit_analysis_init_date,
   sk_credit_analysis_end_date,
   sk_credit_analysis_approved_date,
-  visit_created_from_app,
+  flg_visit_completed,
+  flg_visit_created_from_app,
   visit_created_type,
-  visit_last_updated_from_app,
+  flg_visit_last_updated_from_app,
   visit_last_updated_type,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +

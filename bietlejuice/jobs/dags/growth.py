@@ -1,18 +1,18 @@
-from datetime import datetime
-
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag_operator import SubDagOperator
-from qa_python_utils.default_logger import logger, _logger
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
 from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews
+from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViewsBV
 from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
+from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -82,6 +82,17 @@ def materialize_owner_landing_views_table_query():
 @logger
 def truncate_owner_landing_views_table():
     OwnerLandingViews.truncate_table()
+
+
+@logger
+def materialize_owner_landing_views_bv_table_query():
+    owner_landing_views_bv = OwnerLandingViewsBV(bucket)
+    owner_landing_views_bv.append_to_table(_filter='all')
+
+
+@logger
+def truncate_owner_landing_views_bv_table():
+    OwnerLandingViewsBV.truncate_table()
 
 
 @logger
@@ -399,6 +410,27 @@ def sub_dag_func_owner_landing_views_users(main_dag_name, sub_dag_name, funnel, 
     return local_dag
 
 
+def sub_dag_func_owner_landing_views_bv_users(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval,
+                                              materialize_func, placeholders, truncate_func):
+    local_dag = DAG(
+        '{}.{}'.format(main_dag_name, sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date
+    )
+
+    owner_landing_views_bv_truncate_task = get_python_operator('truncate_table', truncate_owner_landing_views_bv_table,
+                                                               local_dag)
+
+    owner_landing_views_bv_all_task = get_python_operator('extract_all_data',
+                                                          materialize_owner_landing_views_bv_table_query,
+                                                          local_dag)
+
+    # must be sequential because of the appending operation
+    owner_landing_views_bv_truncate_task >> owner_landing_views_bv_all_task
+
+    return local_dag
+
+
 # supply measures
 leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'leads',
                                      'supply')
@@ -406,6 +438,9 @@ new_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materiali
                                             'new_listings', 'supply')
 new_listings_landing_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                                     'new_listings_landing', 'supply')
+new_listings_landing_bv_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                       materialize_growth_measure_table_query,
+                                                       'new_listings_landing_bv', 'supply')
 opportunities_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'opportunities', 'supply')
 prospects_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'prospects',
@@ -453,6 +488,13 @@ amplitude_owner_landing_views_previous_task = get_sub_dag_operator(sub_dag_func_
                                                                    'top_funnel')
 owner_landing_views_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
                                                    'owner_landing_views', 'top_funnel')
+
+amplitude_owner_landing_views_bv_previous_task = get_sub_dag_operator(sub_dag_func_owner_landing_views_bv_users,
+                                                                      None,
+                                                                      'amplitude_owner_landing_views_bv_previous',
+                                                                      'top_funnel')
+owner_landing_views_bv_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
+                                                      'owner_landing_views_bv', 'top_funnel')
 
 employees_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query, 'employees',
                                          'top_funnel')
@@ -550,14 +592,16 @@ amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
+amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
 
-(leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> opportunities_sub_dag >> prospects_sub_dag >>
- qualifieds_sub_dag >> ongoing_contracts_sub_dag >> engaged_users_sub_dag >> schedule_page_views_sub_dag >>
- active_users_sub_dag >> owner_landing_views_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >>
- tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >>
- offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >>
- tenant_prospects_sub_dag >> tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >>
- visits_completed_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >>
- prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >>
+(leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
+ opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag >>
+ engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
+ owner_landing_views_bv_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >>
+ approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >>
+ offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >>
+ tenants_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> fact_task >>
+ prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >>
+ prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >>
  prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task
  )

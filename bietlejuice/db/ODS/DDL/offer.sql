@@ -2,6 +2,7 @@ drop table if exists offer;
 create table offer (
   id bigint not null,
   atualizado_em timestamp,
+  analysis_date timestamp,
   criado_em timestamp,
   firestore_id varchar(255),
   godfather_id bigint,

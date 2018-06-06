@@ -11,8 +11,8 @@ with base_jobs as (
 select
 	j1.id as sk_photo_job,
 	j1.id,
-	j2.id,
 	j1.imovel_id,
+	j1.rep_id,
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
@@ -44,7 +44,8 @@ select
 	j1.user_cancel_id,
 	j1.user_cancel_name,
 	j1.user_cancel_email,
-	(j2 is not null) rescheduled
+	j1.user_cancel_type,
+	(j2.id is not null) as rescheduled
 from
 	base_jobs j1
 left join

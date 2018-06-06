@@ -24,6 +24,7 @@ select
 	flow,
 	acquisition_method,
 	acquisition_channel,
+	acquisition_source,
 	case
 		when (dt_first_listing is not null) then 'Listed'
 		when (dt_opportunity is not null and dt_first_listing is null) and photo_job_status in ('FotosTiradas','Completado', 'NaoListado') then 'NotListedYet'
@@ -40,8 +41,8 @@ select
 		when (flow = 'Lead Flow' and dt_qualified is null) then 'NaoProcessado'
 		when (lead_status = 'Convertido' and conversao_id is null) then 'BrokenLeadFlow'
 		when (flow = 'Lead Flow' and dt_prospect is null and lead_status is null) then 'DiscardedLead'
-		when (flow = 'Self Service Flow' and dt_prospect is not null and dt_qualified is null) then 'TermsNotAccepted'
-		when (flow = 'Self Service Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
+		when (flow = 'Self-Service Flow' and dt_prospect is not null and dt_qualified is null) then 'TermsNotAccepted'
+		when (flow = 'Self-Service Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
 		when (flow = 'Organic Flow' and dt_prospect is not null and dt_qualified is null) then 'UnfinishedForm'
 		when (flow = 'Organic Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
 		else 'NotMapped'
@@ -99,7 +100,10 @@ from
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
-		(sc.id is not null and optedOutAt is null) as exclusivity
+		base.acquisition_source,
+		(sc.id is not null and optedOutAt is null) as exclusivity,
+		l.cidade,
+		l.bairro
 	from
 	(
 		select
@@ -127,7 +131,7 @@ from
 			end as dt_qualified,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
-				then 'Self Service Flow'
+				then 'Self-Service Flow'
 				else 'Organic Flow'
 			end as flow,
 			case
@@ -137,9 +141,14 @@ from
 			end as acquisition_method,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				then 'Organic Owner App'
+				else 'Admin'
+			end as acquisition_channel,
+			case
+				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Owner App'
 				else 'Admin'
-			end as acquisition_channel
+			end as acquisition_source
 		from
 			Imovel i
 		left join
@@ -166,65 +175,86 @@ from
 		  on ig.REV = ure.id
 		where cl.id is null
 	union all
-		select
-			i.id as imovel_id,
-			l.id as lead_id,
-			l.status as lead_status,
-			l.reason as lead_reason,
-			cl.id as conversao_id,
-			i.usuarioQueCadastrou_id as rep_id,
-			uda.id as affiliate_id,
-			i.usuario_id as owner_id,
-			coalesce(i.regiao_id, pr.regiao_id) as region_id,
-			coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as dt_lead,
-			case
-				when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
-				else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
-			end as dt_prospect,
-			isc.dt dt_first_inside_sales_contact,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
-			case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
-		    when cl.leadConvertido_id is not null
-		    	then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
-		    when l.reason in ('ProprietarioRecusou', 'Exclusivo')
-		    	then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
-		  end as dt_qualified,
-			'Lead Flow' as flow,
-			'Non-Self Service' as acquisition_method,
-			case
-				when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
-		    when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
-		    when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
-		    when l.tipo = 'Afiliado' and l.origem = 'Planilha' then 'Affiliate Spreadsheet'
-		    when l.tipo = 'Afiliado' and l.origem = 'Desconhecida' then 'Affiliate Unknown'
-		    when l.tipo = 'OpenLink' and l.origem = 'Landing' then 'Direct Referral'
-		    when l.origem = 'Facebook' then 'Facebook'
-		    when l.origem = 'Landing' then 'Landing Page Leads' -- BrokenOpenLink goes here also
-		    when l.origem = 'Crawling' then 'Crawling'
-		    when l.origem = 'Reprocessado' and old_lead.origem = 'Landing' then 'Reprocessed Landing'
-		    when l.origem = 'Reprocessado' and old_lead.tipo = 'Afiliado' then 'Reprocessed Affiliate'
-		    when l.origem = 'Reprocessado' then 'Reprocessed Others'
-		    else 'Other'
-		  end as acquisition_channel
-		from
-			(
-				select
-					*,
-					case
-			 			when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
-			 				then SUBSTRING_INDEX(infosExtras,';',1)
-			 			else NULL
-			 		end as old_id
-		 		from Lead
-			) l -- all data from Lead table plus a reprocessed Extra Field
-		left join
-			ConversaoLead cl
-			on cl.leadConvertido_id = l.id
-		left join
-			Imovel i
-			on i.id = cl.imovel_id
-		left join
-			(
+    select
+      i.id as imovel_id,
+      l.id as lead_id,
+      l.status as lead_status,
+      l.reason as lead_reason,
+      cl.id as conversao_id,
+      i.usuarioQueCadastrou_id as rep_id,
+      uda.id as affiliate_id,
+      i.usuario_id as owner_id,
+      coalesce(i.regiao_id, min(pr.regiao_id)) as region_id,
+      coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as dt_lead,
+      case
+        when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
+        else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
+      end as dt_prospect,
+      isc.dt dt_first_inside_sales_contact,
+      coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
+      case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
+        when cl.leadConvertido_id is not null
+          then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
+        when l.reason in ('ProprietarioRecusou', 'Exclusivo')
+          then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
+      end as dt_qualified,
+      case
+        when l.origem = 'OwnerPWA' then 'Self-Service Flow'
+        else 'Lead Flow'
+      end as flow,
+      case
+        when l.origem = 'OwnerPWA' then 'Self-Service'
+        else 'Non-Self Service'
+      end as acquisition_method,
+      case
+        when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
+        when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
+        when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
+        when l.tipo = 'Afiliado' and l.origem = 'Planilha' then 'Affiliate Spreadsheet'
+        when l.tipo = 'Afiliado' and l.origem = 'Desconhecida' then 'Affiliate Unknown'
+        when l.tipo = 'OpenLink' and l.origem = 'Landing' then 'Direct Referral'
+        when l.origem = 'Facebook' then 'Facebook'
+        when l.origem = 'Landing' then 'Landing Page Leads' -- BrokenOpenLink goes here also
+        when l.origem = 'Crawling' then 'Crawling'
+        when l.origem = 'Reprocessado' and old_lead.origem = 'Landing' then 'Reprocessed Landing'
+        when l.origem = 'Reprocessado' and old_lead.tipo = 'Afiliado' then 'Reprocessed Affiliate'
+        when l.origem = 'Reprocessado' then 'Reprocessed Others'
+        when l.origem = 'OwnerPWA' and l.tipo = 'BrokenOpenLink' then 'Direct Referral'
+        when l.origem = 'OwnerPWA' and l.tipo = 'LandingMarketing' then 'Landing Owner App'
+        when l.origem = 'OwnerPWA' and l.tipo = 'LandingOpenLink' then 'Direct Referral'
+        when l.origem = 'OwnerPWA' and l.tipo = 'Organic' then 'Organic Owner App'
+        else 'Other'
+      end as acquisition_channel,
+      case
+        when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
+        when l.origem = 'Reprocessado' then 'Reprocessed'
+        when l.tipo = 'Afiliado' then 'Affiliate'
+        when l.tipo = 'OpenLink' then 'Affiliate'
+        when l.origem = 'Facebook' then 'Facebook'
+        when l.origem = 'Landing' then 'Landing Page Leads' -- BrokenOpenLink goes here also
+        when l.origem = 'Crawling' then 'Crawling'
+        when l.origem = 'OwnerPWA' then 'Owner App'
+        else 'Other'
+      end as acquisition_source
+    from
+      (
+        select
+          *,
+          case
+            when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
+            then SUBSTRING_INDEX(infosExtras,';',1)
+          else NULL
+        end as old_id
+      from Lead
+    ) l -- all data from Lead table plus a reprocessed Extra Field
+    left join
+      ConversaoLead cl
+      on cl.leadConvertido_id = l.id
+    left join
+      Imovel i
+      on i.id = cl.imovel_id
+    left join
+      (
         select
           a.id,
           min(a.REV) as REV
@@ -234,72 +264,73 @@ from
           and coalesce(a.automaticallyDiscarded, 0) = 0
         group by a.id
       ) first_update
-			on first_update.id = l.id
-		left join
-		  Lead_AUD la
-		  on la.id = l.id
-		  and la.REV = first_update.REV
-		left join
-		  UsuarioRevisionEntity ure
-		  on ure.id = la.REV
-		left join
-			(select max(REV) as REV, id from Lead_AUD where status_MOD = 1 and status = 'Descartado' group by id) discard
-			on l.id = discard.id
-		left join
-		  UsuarioRevisionEntity dure
-		  on dure.id = discard.REV
-		left join
-		 	(select max(REV) as REV, id from Lead_AUD group by id) has_aud
-		 	on has_aud.id = l.id
-		left join
-			(
-				select
-					la.id,
-					min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
-				from
-					Lead_AUD la
-				left join
-					UsuarioRevisionEntity ure
-					on ure.id = la.REV
-				left join
-					Usuario u
-					on u.id = ure.usuario_id
-				where
-					(u.dadosVendedor_id is not null)
-				group by la.id
-			) isc
-			on isc.id = l.id
-		left join
-		  DadosAfiliado da
-		  on da.id = l.afiliadoQueIndicou_id
-		left join
-		  Usuario uda
-		  on uda.dadosAfiliado_id = da.id
-		left join
-			Lead old_lead
-			on old_lead.id = l.old_id
-		left join -- trying to find regions for leads using lat lng with the region polygons
-			(
-				SELECT
-					p.*,
-					r.cidadeNome as cidade
-				FROM PoligonoRegiao p
-				left join (
-										select
-											max(pr.id) as id
-										from PoligonoRegiao pr
-										left join MapRegiao mr on pr.regiao_id = mr.id
-										where mr.id is not null
-										group by poligono
-									) latest on latest.id = p.id
-				left join MapRegiao r on r.id = p.regiao_id
-				where latest.id is not null
-			) pr
-			on pr.cidade = l.cidade -- to avoid too much processing
-			and ST_Contains(
-						ST_GeometryFromText(ST_AsText(pr.poligono)),
-						ST_GeometryFromText(concat('Point(',coalesce(i.lng,l.lng),' ',coalesce(i.lat,l.lat),')'))
-					) = 1
+      on first_update.id = l.id
+    left join
+      Lead_AUD la
+      on la.id = l.id
+      and la.REV = first_update.REV
+    left join
+      UsuarioRevisionEntity ure
+      on ure.id = la.REV
+    left join
+      (select max(REV) as REV, id from Lead_AUD where status_MOD = 1 and status = 'Descartado' group by id) discard
+      on l.id = discard.id
+    left join
+      UsuarioRevisionEntity dure
+      on dure.id = discard.REV
+    left join
+      (select max(REV) as REV, id from Lead_AUD group by id) has_aud
+      on has_aud.id = l.id
+    left join
+      (
+        select
+          la.id,
+          min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
+        from
+          Lead_AUD la
+        left join
+          UsuarioRevisionEntity ure
+          on ure.id = la.REV
+        left join
+          Usuario u
+          on u.id = ure.usuario_id
+        where
+          (u.dadosVendedor_id is not null)
+        group by la.id
+      ) isc
+      on isc.id = l.id
+    left join
+      DadosAfiliado da
+      on da.id = l.afiliadoQueIndicou_id
+    left join
+      Usuario uda
+      on uda.dadosAfiliado_id = da.id
+    left join
+      Lead old_lead
+      on old_lead.id = l.old_id
+    left join -- trying to find regions for leads using lat lng with the region polygons
+    (
+      SELECT
+        p.*,
+        r.cidadeNome as cidade
+      FROM PoligonoRegiao p
+      left join (
+                  select
+                    max(pr.id) as id
+                  from PoligonoRegiao pr
+                  left join MapRegiao mr on pr.regiao_id = mr.id
+                  where mr.id is not null
+                  group by poligono
+                ) latest on latest.id = p.id
+      left join MapRegiao r on r.id = p.regiao_id
+      where latest.id is not null
+    ) pr
+    on pr.cidade = l.cidade -- to avoid too much processing
+    and ST_Contains(
+          ST_GeometryFromText(ST_AsText(pr.poligono)),
+          ST_GeometryFromText(concat('Point(',coalesce(i.lng,l.lng),' ',coalesce(i.lat,l.lat),')'))
+        ) = 1
+    group by 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18 -- this aggregation is to deduplicate overlapping regions
 	union all
 		select
 			i.id as imovel_id,
@@ -318,7 +349,8 @@ from
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
-			'Inside Sales' as acquisition_channel
+			'Inside Sales' as acquisition_channel,
+			'Admin' as acquisition_source
 		from
 			ConversaoLead cl
 		left join
@@ -353,6 +385,9 @@ from
 	left join
 		SpecialCondition sc
 		on sc.id = maxsc.id
+	left join
+		Lead l
+		on l.id = base.lead_id
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;
 END
