@@ -15,14 +15,14 @@ config_json = json.loads(env.get_airflow_env_var('ebdb_to_datalake'))
 
 def create_raw_external_tables():
     ebdb_datalake = EBDBDatalake(bucket)
-    table_names = ebdb_datalake.get_table_names()
+    table_names = ebdb_datalake.get_table_names(skip_header=False)
 
     ebdb_datalake.create_raw_external_tables(table_names)
 
 
 def move_ebdb_to_datalake(**kwargs):
     ebdb_datalake = EBDBDatalake(bucket, kwargs['execution_date'])
-    table_names = ebdb_datalake.get_table_names()
+    table_names = ebdb_datalake.get_table_names(skip_header=False)
 
     for table_name in table_names:
         ebdb_datalake.move_to_datalake(table_name[0])
