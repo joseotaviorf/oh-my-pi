@@ -32,25 +32,17 @@ def write_to_s3(bucket, obj, filename, to_csv=True, to_pickle=False):
             obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=True)
             s3.Object(bucket, 'KPI_predictor/' + filename + '.csv').put(Body=csv_buffer.getvalue())
         if to_pickle is True:
-            # pickle_buffer = io.BytesIO()
-            # obj.to_pickle(pickle_buffer)
-            # file = io.BytesIO()
-            # with gzip.GzipFile(fileobj=file, mode='w') as fp:
-            #     fp.write(pickle_buffer.getvalue())
-            # s3.Object(bucket, 'KPI_predictor/' + filename + '.gzip').put(
-            #     Body=file.getvalue())
-
             file = io.BytesIO()
             with gzip.GzipFile(fileobj=file, mode='w') as fp:
                 fp.write(pickle.dumps(obj))
-            s3.Object(bucket, 'KPI_predictor/' + filename + '.test.gzip').put(
+            s3.Object(bucket, 'KPI_predictor/' + filename + '.gz').put(
                 Body=file.getvalue())
 
 
 def get_prediction(city, region, begin_pred):
     begin_pred_string = begin_pred.strftime(format='%Y-%m-%d')
     flag = get_file_from_s3('5a-data-science',
-                            'KPI_predictor/monitoring/%s/%s/%s/kpis_prediction.p' % (begin_pred_string, city, region),
+                            'KPI_predictor/monitoring/%s/%s/%s/kpis_prediction.gz' % (begin_pred_string, city, region),
                             'kpis_prediction.gz')
     if flag is False:  # error getting the file
         return None

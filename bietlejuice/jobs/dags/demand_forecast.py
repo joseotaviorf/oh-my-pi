@@ -13,6 +13,7 @@ from bietlejuice.jobs.new_etl.kpi_forecast.helpers import get_count, write_to_s3
 from bietlejuice.jobs.new_etl.kpi_forecast.preprocessor import Preprocessor
 from bietlejuice.jobs.new_etl.kpi_forecast.steps_demand import steps
 from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
+from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
 from qa_python_utils.default_logger import _logger
 
 # bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
@@ -24,8 +25,12 @@ MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every month
 
 # parameters of the script
-begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(),
-                                                            unit='days')  # last monday # must be a monday pandas timestamp
+begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days')  # last monday # must be a monday pandas timestamp
+
+
+# temp !!
+begin_pred = pd.to_datetime('20180528')
+
 _logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
 n_training_days = 63  # hard limit on the days we do not want to consider for creating distributions
@@ -50,27 +55,26 @@ range_training_day = pd.date_range(begin_pred - pd.to_timedelta(n_training_days,
 
 
 def load_fact(begin_pred):
-    # table_demand = BaseETL.from_db_query(
-    #     db_enum=EnumDb.BI_DW,
-    #     query=query_demand
-    # )
-    # fact = petl.todataframe(table_demand)
-    # fact.to_pickle('fact_raw.gzip', compression='gzip')
-    fact = pd.read_pickle('fact_raw.gz', compression='gzip')
-    # fact.to_pickle('fact_raw.gz', compression='gzip')
+    table_demand = BaseETL.from_db_query(
+        db_enum=EnumDb.BI_DW,
+        query=query_demand
+    )
+    fact = petl.todataframe(table_demand)
+    fact.to_pickle('fact_raw.gz', compression='gzip')
+    # fact = pd.read_pickle('fact_raw.gz', compression='gzip')
 
     preprocessor_demand = Preprocessor(steps)
     fact = preprocessor_demand.preprocess(fact)
     write_to_s3(bucket_ds, fact, 'monitoring/%s/fact' % (
-        begin_pred.strftime("%Y-%m-%d")), to_csv=False, to_pickle=True)
+        begin_pred.strftime("%Y-%m-%d")), to_csv=False, to_pickle=True)  # write to s3 compressed
 
     # split df_demand into past and future bookings (putting ourselves at the beginning of begin_pred)
     fact_past_bookings = fact[(fact[steps.index[0]] < begin_pred)]
-    write_to_s3(bucket_ds,
-                fact_past_bookings,
-                'monitoring/%s/fact_past_bookings' % (begin_pred.strftime(
-                    "%Y-%m-%d")),
-                to_csv=False, to_pickle=True)
+    # write_to_s3(bucket_ds,
+    #             fact_past_bookings,
+    #             'monitoring/%s/fact_past_bookings' % (begin_pred.strftime(
+    #                 "%Y-%m-%d")),
+    #             to_csv=False, to_pickle=True)
 
     return fact_past_bookings
 
@@ -87,7 +91,7 @@ def get_default_parameters(city, region):
         # city level. only possible default is the global level
         if get_file_from_s3(
             bucket_ds,
-            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' %
+            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.gz' %
             (begin_pred.strftime("%Y-%m-%d")),
                 'global_default_yearly_seasonality.gz'):
             default_yearly_seasonality = pd.read_pickle(
@@ -95,30 +99,30 @@ def get_default_parameters(city, region):
 
         if get_file_from_s3(bucket_ds,
                             'KPI_predictor/monitoring/%s/all/all/distribs.gz' % (begin_pred.strftime("%Y-%m-%d")),
-                            'global_default_distribs.p'):
+                            'global_default_distribs.gz'):
             default_distribs = pd.read_pickle('global_default_distribs.gz', compression='gzip')
 
     else:
         # region level. default is city level, if not available then use the global level
-        # if get_file_from_s3(bucket_ds,'KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.p'%(begin_pred.strftime("%Y-%m-%d"),city),
-        #                     'city_default_yearly_seasonality.p'):
+        # if get_file_from_s3(bucket_ds,'KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.gz'%(begin_pred.strftime("%Y-%m-%d"),city),
+        #                     'city_default_yearly_seasonality.gz'):
         #     default_yearly_seasonality = pd.read_pickle(
         # 'city_default_yearly_seasonality.gz', compression='gzip')
         if get_file_from_s3(
             bucket_ds,
-            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.p' %
+            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.gz' %
             (begin_pred.strftime("%Y-%m-%d")),
-                'global_default_yearly_seasonality.p'):
+                'global_default_yearly_seasonality.gz'):
             default_yearly_seasonality = pd.read_pickle(
                 'global_default_yearly_seasonality.gz', compression='gzip')
 
         if get_file_from_s3(bucket_ds,
                             'KPI_predictor/monitoring/%s/%s/all/distribs.gz' % (begin_pred.strftime("%Y-%m-%d"), city),
-                            'city_default_distribs.p'):
+                            'city_default_distribs.gz'):
             default_distribs = pd.read_pickle('city_default_distribs.gz', compression='gzip')
         elif get_file_from_s3(bucket_ds,
                               'KPI_predictor/monitoring/%s/all/all/distribs.gz' % (begin_pred.strftime("%Y-%m-%d")),
-                              'global_default_distribs.p'):
+                              'global_default_distribs.gz'):
             default_distribs = pd.read_pickle('global_default_distribs.gz', compression='gzip')
 
     return [default_yearly_seasonality, default_distribs]
