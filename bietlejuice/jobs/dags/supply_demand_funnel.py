@@ -271,10 +271,11 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-xcom_fact_demand = BaseSubDag.get_sub_dag_operator(
+xcom_fact_demand = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
-    sub_dag_func=xcom_fact_demand_task,
-    sub_dag_name='XCom_fact_demand'
+    task_id='XCom_fact_demand',
+    func_command=xcom_fact_demand_task,
+    provide_context=True
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
