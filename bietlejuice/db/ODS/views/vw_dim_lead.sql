@@ -63,6 +63,7 @@ CREATE VIEW public.vw_dim_lead as
   atualizado_em,
   criado_em,
   url_source,
+  utm_source,
   utm_medium,
   utm_campaign,
   coalesce(l.utm_source, an.network) as network, -- add the network of the campaign (currenlty only present for leads from the landing page), or network of the afiliado (if the lead was recommended by an affiliate)

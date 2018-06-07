@@ -61,6 +61,7 @@ CREATE TABLE staging.dim_lead (
   atualizado_em TIMESTAMP WITHOUT TIME ZONE,
   criado_em TIMESTAMP WITHOUT TIME ZONE,
   url_source VARCHAR(255),
+  utm_source VARCHAR(255),
   utm_medium VARCHAR(255),
   utm_campaign VARCHAR(255),
   network VARCHAR(255),
