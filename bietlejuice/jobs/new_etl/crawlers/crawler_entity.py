@@ -6,13 +6,15 @@ import googlemaps
 import numpy as np
 import pandas as pd
 import requests
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import logger, _logger
 from shapely import wkt
 from shapely.geometry import Point
 from unidecode import unidecode
+
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 
 class CrawlerEntity(object):
@@ -158,25 +160,6 @@ class CrawlerEntity(object):
 
         return info
 
-    @logger(exclude='data')
-    def fill_in(self, data):
-        street_pattern = re.compile(r'-(.*)-n-(\d+)|-(.*)')
-        data['street_name'] = data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 1))
-        data.street_name = data.street_name.combine_first(
-            data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 3)))
-        data.street_name = data.street_name.apply(lambda x: x.replace('-', ' ') if x is not None else None)
-        data['street_number'] = data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 2))
-
-        for i, row in data.query("""street_name.isnull() or street_number.isnull()""").iterrows():
-            try:
-                street, number = self.reverse_geocode(row.lat, row.lng)
-                data.loc[i, 'street_name'] = ' '.join(street.split(' ')[1:])
-                data.loc[i, 'street_number'] = number
-            except Exception:
-                _logger.warn('m=fill_in, could not retrieve street and number.')
-
-        return data.query("""~street_name.isnull() and ~street_number.isnull()""")
-
     @staticmethod
     @logger
     def _search_pattern(string, pattern, group=0):
@@ -195,13 +178,15 @@ class CrawlerEntity(object):
             'location_type': 'ROOFTOP'
         }
         page = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=params).json()
-        addr = page['results'][0]['address_components']
-        route = CrawlerEntity._get_long_name(addr, 'route')
-        number = CrawlerEntity._get_long_name(addr, 'street_number')
-        return route, number
+        try:
+            addr = page['results'][0]['address_components']
+            route = self._get_long_name(addr, 'route')
+            number = self._get_long_name(addr, 'street_number')
+            return route, number
+        except Exception:
+            _logger.warning('m=reverse_geocode, maps api response has no address components')
 
     @staticmethod
-    @logger
     def _get_long_name(addr, addr_type):
         for component in addr:
             if addr_type in component['types']:
@@ -209,7 +194,7 @@ class CrawlerEntity(object):
 
     @logger
     def start_batch_job(self, job_name, job_queue, job_definition, exec_command):
-        r = BaseETL.start_batch_job(
+        r = BatchClient().start_batch_job(
             job_name=job_name,
             job_queue=job_queue,
             job_definition=job_definition,

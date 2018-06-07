@@ -12,12 +12,11 @@ BEGIN
         else f.status
       end as job_status,
       case
-        when jfo.name = 'Admin'
-        then 'Admin'
-        when jfo.name = 'Owner'
-        then 'Owner App'
-        when jfo.name = 'System'
-        then 'System - Auto'
+        when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
+        when creator.dadosFotografo_id is not null then 'Fotografo'
+        when creator.dadosVendedor_id is not null then 'InsideSales'
+        when creator.email like ('%quintoandar%') then 'Admin'
+        else 'Prop'
       end as creation_origin,
       case
         when hour(f.dataAgendamento) between 8 and 17 or f.dataAgendamento is null
@@ -56,9 +55,19 @@ BEGIN
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
       uc.nome as user_cancel_name,
-      uc.email as user_cancel_email
-    from
-        JobFotografo f
+      uc.email as user_cancel_email,
+      case
+        when uc.dadosFotografo_id is not null and uc.dadosVendedor_id is not null then 'Teste'
+        when uc.dadosFotografo_id is not null then 'Fotografo'
+        when uc.dadosVendedor_id is not null then 'InsideSales'
+        when uc.email like ('%quintoandar%') then 'Admin'
+        else 'Prop'
+      end as user_cancel_type,
+      case
+        when creator.dadosVendedor_id is not null then creator.id
+        else null
+      end as rep_id
+    from JobFotografo f
     left join
         (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j
         on max_j.id = f.id
@@ -67,19 +76,13 @@ BEGIN
         (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
         on comp.id = f.id
         and f.status = 'Cancelado'
+    left join UsuarioRevisionEntity ure on ure.id = max_j.REV
+    left join Usuario uc on uc.id = ure.usuario_id
+    left join Usuario af on af.dadosFotografo_id = f.dadosFotografo_id
+    left join DadosFotografo df on df.id = f.dadosFotografo_id
     left join
-        UsuarioRevisionEntity ure
-        on ure.id = max_j.REV
-    left join
-        Usuario uc
-        on uc.id = ure.usuario_id
-    left join
-        Usuario af
-        on af.dadosFotografo_id = f.dadosFotografo_id
-    left join
-        DadosFotografo df
-        on df.id = f.dadosFotografo_id
-    left join
-        JobFotografoOrigin jfo
-        on jfo.id = f.originCreation_id;
+      (select id, min(REV) as REV from JobFotografo_AUD group by id) min_j
+      on min_j.id = f.id
+    left join UsuarioRevisionEntity ure2 on ure2.id = min_j.REV
+    left join Usuario creator on creator.id = ure2.usuario_id;
 END

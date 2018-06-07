@@ -298,7 +298,8 @@ select
 	vu.self_service_visit,
 	vu.last_change_reason,
 	ah.status as history_status,
-	case when pa._count > 0 then '1' else '0' end as planner_status
+	case when pa._count > 0 then '1' else '0' end as planner_status,
+	vu.specific_slot
 from
 	visits_updates vu
 left join
@@ -310,5 +311,6 @@ left join
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
 where date(vu.slot_dt) = date('{}')
+   and ah.status = '1'
 order by vu.slot_dt
 ;

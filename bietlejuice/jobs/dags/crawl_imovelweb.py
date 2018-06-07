@@ -2,10 +2,10 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
+from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'
@@ -23,7 +23,7 @@ def submit_iw(**kwargs):
     assert isinstance(states, list)
 
     _logger.info('Starting job...')
-    r = BaseETL.start_batch_job(
+    r = BatchClient().start_batch_job(
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:8',

@@ -14,5 +14,6 @@ CREATE TABLE staging.agents_slots (
 	self_service_visit bool,
 	last_change_reason varchar(100),
 	history_status int4,
-	planner_status int4
+	planner_status int4,
+	specific_slot int4
 ) ;
