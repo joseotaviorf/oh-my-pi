@@ -5,6 +5,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY')
@@ -30,7 +31,7 @@ def create_dim_agent_region_dw(**kwargs):
     ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
 
 
-def create_fact_agent_availability(**kwargs):
+def create_fact_agent(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
@@ -49,6 +50,11 @@ def load_dim_agent_review_dw(**kwargs):
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
+
+
+def xcom_fact_agent(**kwargs):
+    exec_date = str(datetime.date(kwargs['execution_date']))
+    xcom.xcom_push(kwargs['ti'], exec_date)
 
 
 dag = DAG(
@@ -91,11 +97,11 @@ create_dim_agent_region_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoa
 )
 
 # Creates dim_agent_region in DW
-create_fact_agent_availability = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+create_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
     dag=dag,
-    task_id='create_fact_agent_availability',
+    task_id='create_fact_agent',
     provide_context=True,
-    func_command=create_fact_agent_availability,
+    func_command=create_fact_agent,
     op_kwargs=None
 )
 
@@ -117,9 +123,18 @@ load_dim_agent_review_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
     op_kwargs=None
 )
 
+# Creates push xcom
+xcom_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='XCom_fact_agent',
+    provide_context=True,
+    func_command=xcom_fact_agent
+)
+
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_dim_agent_region_dw >> create_fact_agent_availability
+create_dim_agent_region_dw >> create_fact_agent
+create_fact_agent >> xcom_fact_agent
 create_dim_agent_review >> load_dim_agent_review_dw
 
 if __name__ == '__main__':
