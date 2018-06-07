@@ -271,12 +271,6 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-booking_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=booking_sub_dag,
-    sub_dag_name='Booking'
-)
-
 xcom_fact_demand = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=xcom_fact_demand_task,
