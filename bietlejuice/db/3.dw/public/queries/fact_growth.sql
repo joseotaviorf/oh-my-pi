@@ -366,6 +366,32 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
+	'ended_rentals' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.ended_rentals
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
 	'visits_booked' as measure,
 	null as team,
 	_year,

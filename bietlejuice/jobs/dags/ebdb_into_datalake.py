@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -15,21 +15,21 @@ config_json = json.loads(env.get_airflow_env_var('ebdb_to_datalake'))
 
 def create_raw_external_tables():
     ebdb_datalake = EBDBDatalake(bucket)
-    table_names = ebdb_datalake.get_table_names(skip_header=False)
+    table_names = ebdb_datalake.get_table_names()
 
     ebdb_datalake.create_raw_external_tables(table_names)
 
 
 def move_ebdb_to_datalake(**kwargs):
     ebdb_datalake = EBDBDatalake(bucket, kwargs['execution_date'])
-    table_names = ebdb_datalake.get_table_names(skip_header=False)
+    table_names = ebdb_datalake.get_table_names()
 
     for table_name in table_names:
         ebdb_datalake.move_to_datalake(table_name[0])
 
 
-def transform_to_clean():
-    EBDBDatalake(bucket).transform_tables_to_clean(config_json['clean_tables'])
+# def transform_to_clean():
+#     EBDBDatalake(bucket).transform_tables_to_clean(config_json['clean_tables'])
 
 
 # dag definition
@@ -46,24 +46,24 @@ dag = DAG(
 )
 
 # operators
-move = PythonOperator(
+move = QuintoAndarPythonOperator(
     task_id='move_ebdb_to_datalake',
     provide_context=True,
     python_callable=move_ebdb_to_datalake,
     dag=dag
 )
 
-create_raw = PythonOperator(
+create_raw = QuintoAndarPythonOperator(
     task_id='create_raw_external_tables',
     python_callable=create_raw_external_tables,
     dag=dag
 )
 
-move_to_clean = PythonOperator(
-    task_id='transform_to_clean',
-    python_callable=transform_to_clean,
-    dag=dag
-)
+# move_to_clean = PythonOperator(
+#     task_id='transform_to_clean',
+#     python_callable=transform_to_clean,
+#     dag=dag
+# )
 
 # flow
-move >> create_raw >> move_to_clean
+move >> create_raw  # >> move_to_clean
