@@ -14,6 +14,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDa
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import xcom as xcom
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -169,9 +170,8 @@ def booking_sub_dag(sub_dag_name):
 
 
 def xcom_fact_demand_task(**kwargs):
-    exec_date = kwargs['execution_date']
-    xcom_key = str(datetime.date(exec_date))
-    kwargs['ti'].xcom_push(key=xcom_key, value=True)
+    exec_date = str(datetime.date(kwargs['execution_date']))
+    xcom.xcom_push(kwargs['ti'], exec_date)
 
 
 ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
