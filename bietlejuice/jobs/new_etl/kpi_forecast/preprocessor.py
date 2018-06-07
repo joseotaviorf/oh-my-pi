@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+
+
 class Preprocessor():
     """
     preprocessing the dataframe (adding columns with steps of the process, filling values, removing lines that dont make sense)
@@ -16,6 +20,8 @@ class Preprocessor():
             df.reason_category != 'Reschedule')  # source ribaldo
         df.loc[:, 'dt_effective_visit'] = df['dt_booking_scheduling'].where(
             df.visit_follow_up.isin(['VaiNegociar', 'Talvez', 'VisitouSozinho', 'NaoGostou']))  # source ribaldo
+        df.loc[:, 'dt_credit_analysis_approved'] = pd.to_datetime(df['sk_credit_analysis_approved_date'].replace(to_replace='-1', value=np.nan))
+
         df.loc[:, 'dt_signature_notcancelled'] = df['dt_contract_signature'].where(
             df.contract_status.isin(['Ativo', 'Finalizado']))  # source ribaldo
 

@@ -9,19 +9,11 @@ class Funnel:
     define its properties (the distributions)
     """
 
-    def __init__(self,
-                 steps,  # deduplication_col	order	predict_with	step	q_threshold
-                 train_df,
-                 # we do not to give any info about the future away. contains lines at most
+    def __init__(self, steps,  # deduplication_col	order	predict_with	step	q_threshold
+                 train_df,  # we do not to give any info about the future away. contains lines at most
                  # n_training_days old, up to today
-                 begin_pred,
-                 end_pred,
-                 range_recent_day,
-                 range_pred_day,
-                 default_distribs=None,
-                 min_samples=1000,
-                 max_samples=4000
-                 ):
+                 begin_pred, end_pred, range_recent_day, range_pred_day, default_distribs=None, min_samples=1000,
+                 max_samples=4000):
         # store parameters
         self.steps = steps
         self.train_df = train_df
@@ -47,14 +39,14 @@ class Funnel:
         less than q_threshold days ago.
 
         eg if q_threshold=4 days, we will ignore events from d-1, d-2,d-3 and d-4
-        (if an event happened on d-4, the 95th pc will happen on d-0, which is a day we are trying to predict)
+        (if an event happened on d-4, the 99th pc will happen on d-0, which is a day we are trying to predict)
         """
 
         # we want to determine the time-to-next-step
-        # based on processes that have started between 14 days ago and two months before that.
+        # based on processes that have started between 40 days ago and two months before that.
         analysis_df = self.train_df[
-            (self.train_df[self.steps.index[0]] < (self.begin_pred - pd.to_timedelta(14, unit='days'))) &  # needed ?
-            (self.train_df[self.steps.index[0]] >= (self.begin_pred - pd.to_timedelta(14 + 60, unit='days')))].copy()
+            (self.train_df[self.steps.index[0]] < (self.begin_pred - pd.to_timedelta(40, unit='days'))) &  # needed ?
+            (self.train_df[self.steps.index[0]] >= (self.begin_pred - pd.to_timedelta(40 + 60, unit='days')))].copy()
 
         self.steps['q_threshold'] = np.nan
         # DF with one column per step and as many lines as analysis_df, where we
@@ -73,15 +65,13 @@ class Funnel:
 
                 # we deduplicate analysis df for deduplication_col_step since we do not want to double count them
                 # we need step and predictor step to be not null to be able to define a duration
-                t = analysis_df[
-                    analysis_df[predictor_step].notnull() &
-                    analysis_df[step].notnull() &
-                    (~analysis_df.duplicated(subset=[deduplication_col_step]))]
+                t = analysis_df[analysis_df[predictor_step].notnull() & analysis_df[step].notnull() & (
+                    ~analysis_df.duplicated(subset=[deduplication_col_step]))]
                 if t.shape[0] > 0:
                     step_duration_deduplicated = t[step].dt.date - t[predictor_step].dt.date
                     step_duration_deduplicated = step_duration_deduplicated[step_duration_deduplicated.notnull()]
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(
-                        step_duration_deduplicated.quantile(q=.95).days, unit='days')
+                        step_duration_deduplicated.quantile(q=.99).days, unit='days')
                 else:
                     _logger.info('no durations for step ' + step + '. using default of 10')
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(10, unit='days')
@@ -107,16 +97,21 @@ class Funnel:
                     # take the train df, select the lines where the predictor step happened,
                     # and it happened on that day of the week
                     # and it happened more than q_t days ago
-                    t = self.train_df[self.train_df[predictor_step].notnull() &
-                                      (self.train_df[predictor_step].dt.weekday == weekday) &
-                                      (self.train_df[predictor_step] < self.begin_pred - q_threshold)].copy()
+                    modified_q_threshold = min(max(q_threshold, pd.to_timedelta(4, unit='days')),
+                                               pd.to_timedelta(35, unit='days'))
+                    t = self.train_df[self.train_df[predictor_step].notnull() & (
+                        self.train_df[predictor_step].dt.weekday == weekday) & (self.train_df[
+                            predictor_step] < self.begin_pred - modified_q_threshold)].copy()
                     # find the date for which we have a significant number of steps that have happened
-                    n_events = t.groupby(t[step].dt.date).size()  # we count the number of steps that happen per day
+                    n_events = t.groupby(
+                        t[predictor_step].dt.date).size()  # we count the number of steps that happen per day
                     n_events = n_events.sort_index(ascending=False).cumsum()  # we order them by decreasing dates
                     # we select the last date for which the cumsum of what follows is larger tahn a threshold
                     threshold_date = n_events[n_events > self.max_samples].index.max()
-                    if pd.notnull(threshold_date):  # there is a date after which enough events happen
-                        t = t[t[predictor_step] >= threshold_date]
+                    if pd.notnull(threshold_date):  # there is a stepdate [after which enough events happen
+                        t = t[t[predictor_step] >= pd.to_datetime(threshold_date)]
+                    # else:
+                    #                       print 'no threshold date for ' + step
 
                     # how many distinct instances of the the step are there for this particular weekday?
                     unique_predictor_id = t[deduplication_col_predictor_step].nunique()
@@ -132,17 +127,12 @@ class Funnel:
                     # store the distribution of delays
                     n_samples = u.shape[0]
                     distrib = u[predictor_step + '_to_' + step].value_counts() / unique_predictor_id
-                    self.distribs = self.distribs.append({'predictor_step': predictor_step,
-                                                          'weekday': weekday,
-                                                          'step': step,
-                                                          'distrib': distrib,
-                                                          'conversion_rate': distrib.sum(),
-                                                          'samples': n_samples,
-                                                          # number of steps on which the distrib is based
-                                                          'unique_predictor_id': unique_predictor_id,
-                                                          'threshold_date': threshold_date,
-                                                          },
-                                                         ignore_index=True)
+                    self.distribs = self.distribs.append(
+                        {'predictor_step': predictor_step, 'weekday': weekday, 'step': step, 'distrib': distrib,
+                         'conversion_rate': distrib.sum(), 'samples': n_samples,
+                         # number of steps on which the distrib is based
+                         'unique_predictor_id': unique_predictor_id, 'threshold_date': threshold_date, },
+                        ignore_index=True)
         self.distribs = self.distribs.set_index(['predictor_step', 'weekday', 'step'])
 
     def get_prior_knowledge_distrib(self, distrib, min_days_to_next_event=None):
@@ -173,7 +163,7 @@ class Funnel:
 
             if predictor_step is not None:  # we need to predict this step
                 row_predictor_step = self.steps.loc[predictor_step]
-                # deduplication_col_predictor_step = row_predictor_step.deduplication_col
+                deduplication_col_predictor_step = row_predictor_step.deduplication_col
 
                 # find the lines in recent_df that have performed predictor_step but not step,
                 # !! at the time of begin_pred !!
@@ -181,9 +171,12 @@ class Funnel:
                 # have perfomed predictor step
                 # have performed it before at the time of the prediction
                 # have not preformed the step to be predicted or any step further
-                sel = self.recent_df[self.recent_df[predictor_step].notnull() &
-                                     (self.recent_df[predictor_step] < self.begin_pred) &
-                                     (self.recent_df['last_step_order'] < step_order)]
+                sel = self.recent_df[
+                    self.recent_df[predictor_step].notnull() & (self.recent_df[predictor_step] < self.begin_pred) & (
+                        self.recent_df['last_step_order'] < step_order)]
+
+                sel = sel[~sel.duplicated(
+                    subset=[deduplication_col_predictor_step])]  # we want to count each predictor step once
 
                 col = sel.groupby(pd.to_datetime(self.recent_df[predictor_step].dt.date)).size()
                 col = col.rename(step)
@@ -211,15 +204,15 @@ class Funnel:
             # if there is no last step and step is not null and step>begin_pred => the
             # date of the last step is the date of the step
             # date of the step for the lines for which it is the last step
-            self.recent_df.loc[self.recent_df['last_step_name'].isnull() &
-                               (self.recent_df[step] < self.begin_pred), 'last_step_date'] = self.recent_df.loc[
+            self.recent_df.loc[self.recent_df['last_step_name'].isnull() & (
+                self.recent_df[step] < self.begin_pred), 'last_step_date'] = self.recent_df.loc[
                 self.recent_df['last_step_name'].isnull() & (self.recent_df[step] < self.begin_pred), step].dt.date
             # the order is the order of the last step
-            self.recent_df.loc[self.recent_df['last_step_name'].isnull() &
-                               (self.recent_df[step] < self.begin_pred), 'last_step_order'] = self.steps.loc[step].order
+            self.recent_df.loc[self.recent_df['last_step_name'].isnull() & (
+                self.recent_df[step] < self.begin_pred), 'last_step_order'] = self.steps.loc[step].order
             # and the last step is the step
-            self.recent_df.loc[self.recent_df['last_step_name'].isnull() &
-                               (self.recent_df[step] < self.begin_pred), 'last_step_name'] = step
+            self.recent_df.loc[self.recent_df['last_step_name'].isnull() & (
+                self.recent_df[step] < self.begin_pred), 'last_step_name'] = step
 
         # finally, the weekday of the last step date
         self.recent_df.loc[self.recent_df.last_step_date.notnull(), 'last_step_weekday'] = self.recent_df[
@@ -268,8 +261,8 @@ class Funnel:
             predictor_step = row_step.predict_with
             if predictor_step is not None:  # has to be predicted
                 # create a temporary series that will host the number of applications per day
-                final_predictor = pd.concat([kpi_pred.loc[:, predictor_step],
-                                             self.predictor_df.loc[:, step]], axis=1).sum(axis=1)
+                final_predictor = pd.concat([kpi_pred.loc[:, predictor_step], self.predictor_df.loc[:, step]],
+                                            axis=1).sum(axis=1)
 
                 # the dates for which the predictor of step is positive
                 for predictor_step_date in final_predictor[final_predictor > 0].index:
@@ -285,9 +278,8 @@ class Funnel:
                     distrib = self.get_prior_knowledge_distrib(distrib, min_days_to_next_event)
                     for delay, conv in distrib.iteritems():
                         if predictor_step_date + delay in kpi_pred.index:
-                            kpi_pred.loc[predictor_step_date + delay, step] = \
-                                kpi_pred.loc[predictor_step_date + delay, step] + \
-                                final_predictor[predictor_step_date] * conv
+                            kpi_pred.loc[predictor_step_date + delay, step] = kpi_pred.loc[
+                                predictor_step_date + delay, step] + final_predictor[predictor_step_date] * conv
 
         kpi_pred = kpi_pred.loc[self.range_pred_day.tolist(), :]
         kpi_pred.index.set_names(['date'], inplace=True)

@@ -30,6 +30,7 @@ db.visit_follow_up,
 --db.visit_type? ...
 db.dt_created as dt_booking_created,
 db.dt_scheduling as dt_booking_scheduling,
+db.reason_category,
 
 -- offer --
 -- dof.dt_created as dt_offer_created,
@@ -41,7 +42,8 @@ dof.status as offer_status, -- ? see above
 
 -- proposal --
 dp.dt_created as dt_proposal_created,
-dp.dt_proposal_approved,
+-- dp.dt_proposal_approved, -- this is the date in admin. pbi uses the date in SH (next line)
+cast(f.sk_credit_analysis_approved_date as text), -- to_date(, 'YYYYMMDD') does not work. as dt_credit_analysis_approved,
 -- dp.status as proposal_status, -- needed ? not needed
 dp.dt_tenant_first_document_sent, --correct field? why first? the date he
 -- sent his docs for the first time
@@ -51,7 +53,7 @@ dp.dt_credit_analysis_init,
 dc.dt_created as dt_contract_created,
 dc.dt_signature as dt_contract_signature,
 dc.contract_status,
-db.reason_category,
+
 
 -- region --
 dr.region_code,

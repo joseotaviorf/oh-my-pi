@@ -3,7 +3,7 @@ from collections import deque
 import numpy as np
 import pandas as pd
 from qa_python_utils.default_logger import _logger
-from statsmodels.tsa.arima_model import ARIMA
+# from statsmodels.tsa.arima_model import ARIMA
 
 
 class Ts_predictor:
@@ -207,24 +207,28 @@ class Ts_predictor:
         ts = ts[pd.notnull(ts)]
         weekly_ts = ts.resample('W-MON', closed='left', label='left').sum()
 
+        weekly_ts_pred = pd.Series(weekly_ts[-4:].mean(), index=self.range_pred_week)
+
         # modeling
         # create model based on last 3 weeks (this data does not contain yearly patterns) to predict the next one
-        ts = weekly_ts
-        model = ARIMA(ts, order=(3, 0, 0))
-        try:
-            results_AR = model.fit(disp=-1)
-        except np.linalg.linalg.LinAlgError:
-            _logger.info('fit did not converge')
-            return None
-        except ValueError:
-            _logger.info('value error. probably not enough degrees of freedom to converge')
-            return None
-        else:
-            ts_pred = model.predict(results_AR.params, start=self.begin_pred, end=self.end_pred, dynamic=False)
-            weekly_ts_pred = pd.Series(ts_pred, index=self.range_pred_week)
-            # when a week is predicted, split its size in 7 equal days
-            ts_pred = weekly_ts_pred.resample('D').ffill()[self.range_pred_day].ffill() / 7
-            return ts_pred
+
+        # ts = weekly_ts
+        # model = ARIMA(ts, order=(3, 0, 0))
+        # try:
+        #     results_AR = model.fit(disp=-1)
+        # except np.linalg.linalg.LinAlgError:
+        #     _logger.info('fit did not converge')
+        #     return None
+        # except ValueError:
+        #     _logger.info('value error. probably not enough degrees of freedom to converge')
+        #     return None
+        # else:
+        #     ts_pred = model.predict(results_AR.params, start=self.begin_pred, end=self.end_pred, dynamic=False)
+        #     weekly_ts_pred = pd.Series(ts_pred, index=self.range_pred_week)
+
+        # when a week is predicted, split its size in 7 equal days
+        ts_pred = weekly_ts_pred.resample('D').ffill()[self.range_pred_day].ffill() / 7
+        return ts_pred
 
     def predict(self,
                 model_weekly_seasonality=True,
