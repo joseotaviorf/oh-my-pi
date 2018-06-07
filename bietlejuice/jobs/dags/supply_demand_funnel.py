@@ -168,6 +168,12 @@ def booking_sub_dag(sub_dag_name):
     return sub_dag.build_booking_with_tests()
 
 
+def xcom_fact_demand_task(**kwargs):
+    exec_date = kwargs['execution_date']
+    xcom_key = str(datetime.date(exec_date))
+    kwargs['ti'].xcom_push(key=xcom_key, value=True)
+
+
 ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -265,11 +271,24 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
+booking_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=booking_sub_dag,
+    sub_dag_name='Booking'
+)
+
+xcom_fact_demand = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=xcom_fact_demand_task,
+    sub_dag_name='XCom_fact_demand'
+)
+
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 ods_house_rent_flow.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                   user_dag, house_dag])
 
 ods_supply >> fact_supply
 ods_house_rent_flow >> fact_demand
+fact_demand >> xcom_fact_demand
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
