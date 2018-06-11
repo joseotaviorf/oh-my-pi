@@ -91,7 +91,10 @@ from
 		base.dt_first_inside_sales_contact,
 		base.dt_conversion,
 		case
-			when (base.lead_status = 'Descartado' and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null)
+			when (
+						base.lead_status = 'Descartado'
+						and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null
+						and base.lead_reason not in ('ProprietarioRecusou', 'Exclusivo'))
 				then null
 			else base.dt_qualified
 		end as dt_qualified,
