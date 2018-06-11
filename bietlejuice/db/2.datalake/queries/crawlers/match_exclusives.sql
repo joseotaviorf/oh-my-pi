@@ -12,8 +12,8 @@ with exclusives as (
         u.telefonePrincipal as phone_number,
         u.email as email
     from datalake_raw.ebdb_imovel i
-    left join datalake_raw.ebdb_usuario u on u.id = i.usuario_id
-    right join datalake_raw.ebdb_specialcondition sc
+    join datalake_raw.ebdb_usuario u on u.id = i.usuario_id
+    join datalake_raw.ebdb_specialcondition sc
         on sc.imovel_id = i.id
     where (sc.optedOutAt is null or sc.optedOutat = '')
         and i.status = 'publicado'
