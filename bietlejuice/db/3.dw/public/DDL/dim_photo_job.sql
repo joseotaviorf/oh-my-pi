@@ -7,6 +7,7 @@ create table public.dim_photo_job (
 	job_status varchar(255),
 	creation_origin varchar(20),
 	flexible_schedule int,
+	same_day_listing int,
 	dt_photographer_accepted datetime,
 	dt_job_created datetime,
 	dt_job_issued datetime,
@@ -37,7 +38,7 @@ create table public.dim_photo_job (
 	user_cancel_email varchar(255),
 	user_cancel_type varchar(255),
 	rescheduled boolean,
-	creation_to_scheduling_diff_minutes int8,
-	creation_to_scheduling_diff_hours int8,
-	creation_to_scheduling_diff_days int8
+	creation_to_scheduling_diff_minutes decimal(10,1),
+	creation_to_scheduling_diff_hours decimal(10,1),
+	creation_to_scheduling_diff_days decimal(10,1)
 )

@@ -16,6 +16,7 @@ select
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
+	j1.same_day_listing,
 	j1.dt_photographer_accepted,
 	j1.dt_job_created,
 	j1.dt_job_issued,

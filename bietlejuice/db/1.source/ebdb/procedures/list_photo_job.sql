@@ -23,6 +23,7 @@ BEGIN
         then 0
         else 1
       end as flexible_schedule,
+      (date(first_pub.nxt_pub) = date(coalesce(f.dataInicioSessao, f.dataAgendamento))) as same_day_listing,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
@@ -108,5 +109,18 @@ BEGIN
       (select id, min(REV) as REV from JobFotografo_AUD group by id) min_j
       on min_j.id = f.id
     left join UsuarioRevisionEntity ure2 on ure2.id = min_j.REV
-    left join Usuario creator on creator.id = ure2.usuario_id;
+    left join Usuario creator on creator.id = ure2.usuario_id
+    left join
+    (
+      SELECT
+        jf.id,
+        min(msi.data) as nxt_pub
+      from
+        JobFotografo jf
+      left join MudancaStatusImovel msi
+        on msi.imovel_id = jf.imovel_id
+        and msi.novoStatus = 'publicado'
+        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
+      group by jf.id
+    ) first_pub on first_pub.id = f.id;
 END
