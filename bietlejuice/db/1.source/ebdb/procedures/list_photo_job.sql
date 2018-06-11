@@ -19,7 +19,7 @@ BEGIN
         else 'Prop'
       end as creation_origin,
       case
-        when hour(f.dataAgendamento) between 8 and 17 or f.dataAgendamento is null
+        when hour(f.dataAgendamento) between 6 and 23 or f.dataAgendamento is null
         then 0
         else 1
       end as flexible_schedule,
@@ -66,7 +66,31 @@ BEGIN
       case
         when creator.dadosVendedor_id is not null then creator.id
         else null
-      end as rep_id
+      end as rep_id,
+      TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      ) as creation_to_scheduling_diff_minutes,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/60,1) as creation_to_scheduling_diff_hours,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
         (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j

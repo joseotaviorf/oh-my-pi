@@ -32,5 +32,8 @@ create table public.fact_photo_job(
   job_problem_reason varchar(255),
   cancel_reason varchar(255),
   rescheduled boolean,
-  user_cancel_type varchar(255)
+  user_cancel_type varchar(255),
+	creation_to_scheduling_diff_minutes int8,
+	creation_to_scheduling_diff_hours int8,
+	creation_to_scheduling_diff_days int8
 )

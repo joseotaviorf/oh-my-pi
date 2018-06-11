@@ -36,5 +36,8 @@ create table public.dim_photo_job (
 	user_cancel_name varchar(255),
 	user_cancel_email varchar(255),
 	user_cancel_type varchar(255),
-	rescheduled boolean
+	rescheduled boolean,
+	creation_to_scheduling_diff_minutes int8,
+	creation_to_scheduling_diff_hours int8,
+	creation_to_scheduling_diff_days int8
 )

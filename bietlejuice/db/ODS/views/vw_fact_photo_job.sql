@@ -40,7 +40,10 @@ select
 	j1.job_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
 	(j2.id is not null) as rescheduled,
-	j1.user_cancel_type
+	j1.user_cancel_type,
+	j1.creation_to_scheduling_diff_minutes,
+	j1.creation_to_scheduling_diff_hours,
+	j1.creation_to_scheduling_diff_days
 from
 	base_jobs j1
 left join
