@@ -19,10 +19,11 @@ from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 class CrawlerEntity(object):
 
-    def __init__(self, s3_bucket, google_maps_api_key):
+    def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True, get_house_allowed=True):
         self.athena_client = AthenaClient(s3_bucket)
-        self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
-        self.google_maps_api_key = google_maps_api_key
+        if google_maps_api_key is not None:
+            self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
+            self.google_maps_api_key = google_maps_api_key
 
         types_apto = ['apartamento-padrao', 'apartamento', 'aluguel-apartamento-duplex-triplex',
                       'aluguel-apartamento-padrao', 'venda-apartamento-padrao', 'aluguel-apartamento', 'apartment']
@@ -42,10 +43,12 @@ class CrawlerEntity(object):
         map_types.update({k: 'loft-studio-kitchenette' for k in types_kiti})
         self.map_types = map_types
 
-        self.polygons = self.__get_polygons()
+        if get_polygons is True:
+            self.polygons = self.__get_polygons()
 
-        q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
-        self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
+        if get_house_allowed is True:
+            q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
+            self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
 
     def _get_address(self, lat=None, lng=None, cep=None):
         r = None
