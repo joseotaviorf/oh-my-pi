@@ -31,9 +31,9 @@ crawled as (
         cast(if(bedrooms <> '', bedrooms) as smallint) as bedrooms,
         cast(if(updated_on <> '', updated_on) as date) as updated_on
     from datalake_raw.crawlers
-    where ws in ('vivareal', 'zapimoveis')
+    where ((ws = 'vivareal' and started_on = (select max(started_on) from datalake_raw.crawlers where ws='vivareal'))
+            or (ws = 'zapimoveis' and started_on = (select max(started_on) from datalake_raw.crawlers where ws='zapimoveis')))
         and not regexp_like(advertiser_name, '(?i)quinto ?andar')
-        and started_on = date '{started_on}'
         and lat is not null and lat <> '0'
         and lng is not null and lng <> '0'
 )
