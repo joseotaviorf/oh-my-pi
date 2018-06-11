@@ -18,6 +18,7 @@ select
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
+	j1.same_day_listing,
 	coalesce(to_char(j1.dt_photographer_accepted::date,'YYYYMMDD')::integer, -1) as sk_date_photographer_accepted,
 	coalesce(to_char(j1.dt_job_created::date,'YYYYMMDD')::integer, -1) as sk_date_job_created,
 	coalesce(to_char(j1.dt_job_issued::date,'YYYYMMDD')::integer, -1) as sk_date_job_issued,
@@ -40,7 +41,10 @@ select
 	j1.job_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
 	(j2.id is not null) as rescheduled,
-	j1.user_cancel_type
+	j1.user_cancel_type,
+	j1.creation_to_scheduling_diff_minutes,
+	j1.creation_to_scheduling_diff_hours,
+	j1.creation_to_scheduling_diff_days
 from
 	base_jobs j1
 left join
