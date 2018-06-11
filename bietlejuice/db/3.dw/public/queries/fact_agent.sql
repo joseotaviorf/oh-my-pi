@@ -14,7 +14,8 @@ SELECT
 		ELSE 36			-- Other days
 	END as total_slots,
 	a.area,
-	a.sk_agentregion
+	a.sk_agentregion,
+	CAST(CAST(s.sk_date AS VARCHAR) + CAST(sk_agent_id AS VARCHAR) AS BIGINT)
 FROM schedule s
 LEFT JOIN public.dim_date d
 	ON d.sk_date = s.sk_date

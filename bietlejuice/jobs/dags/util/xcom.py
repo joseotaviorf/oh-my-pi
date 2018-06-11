@@ -11,8 +11,9 @@ def xcom_push(task_instance, key):
 
 def xcom_pull(task_instance, key, task_id, dag_id, include_prior_dates=True):
     # Executes airflow interdag communication, gathering previous messages
-    status = task_instance.xcom_pull(key=key, task_ids=task_id, dag_id=dag_id, include_prior_dates=include_prior_dates)
-
     logging.info('Getting Xcom: key={} | task_id={} | dag_id={}'.format(key, task_id, dag_id))
+    status = task_instance.xcom_pull(key=key, task_ids=task_id, dag_id=dag_id,
+                                     include_prior_dates=include_prior_dates)
     logging.info('Got Xcom: key={} | value={}'.format(key, str(status)))
+
     return status

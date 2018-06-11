@@ -5,5 +5,6 @@ CREATE TABLE public.fact_agent (
   available_slots INTEGER,
   total_slots INTEGER,
   area VARCHAR(10),
-  sk_agentregion VARCHAR(20)
+  sk_agentregion VARCHAR(20),
+  sk_slot_date_agent BIGINT
 );
