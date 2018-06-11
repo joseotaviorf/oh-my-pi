@@ -19,9 +19,6 @@ class EBDBDatalake(object):
                     'quoteChar' = '\"'
                 )
                 location 's3://{}/raw/{}/{}/'
-                tblproperties (
-                    'skip.header.line.count' = '1'
-                )
             """
 
     CLEAN_DDL_SUFFIX = """

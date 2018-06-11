@@ -8,7 +8,7 @@ SELECT
   r."macroId" as macro_id,
   r."macroNome" as macro_name,
   r."cidadeId" as city_id,
-  coalesce(r."cidadeNome", ar."cidadeNome") as city_name,
+  coalesce(ar."cidadeNome", r."cidadeNome") as city_name,
   ar."Nossa nomenclatura" as region_code,
 	ar."Short region name" as short_region_name,
 	ar."Long region name" as long_region_name,
