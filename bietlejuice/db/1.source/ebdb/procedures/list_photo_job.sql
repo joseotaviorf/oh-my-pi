@@ -19,10 +19,11 @@ BEGIN
         else 'Prop'
       end as creation_origin,
       case
-        when hour(f.dataAgendamento) between 8 and 17 or f.dataAgendamento is null
+        when hour(f.dataAgendamento) between 6 and 23 or f.dataAgendamento is null
         then 0
         else 1
       end as flexible_schedule,
+      (date(first_pub.nxt_pub) = date(coalesce(f.dataInicioSessao, f.dataAgendamento))) as same_day_listing,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
@@ -66,7 +67,31 @@ BEGIN
       case
         when creator.dadosVendedor_id is not null then creator.id
         else null
-      end as rep_id
+      end as rep_id,
+      TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      ) as creation_to_scheduling_diff_minutes,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/60,1) as creation_to_scheduling_diff_hours,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
         (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j
@@ -84,5 +109,18 @@ BEGIN
       (select id, min(REV) as REV from JobFotografo_AUD group by id) min_j
       on min_j.id = f.id
     left join UsuarioRevisionEntity ure2 on ure2.id = min_j.REV
-    left join Usuario creator on creator.id = ure2.usuario_id;
+    left join Usuario creator on creator.id = ure2.usuario_id
+    left join
+    (
+      SELECT
+        jf.id,
+        min(msi.data) as nxt_pub
+      from
+        JobFotografo jf
+      left join MudancaStatusImovel msi
+        on msi.imovel_id = jf.imovel_id
+        and msi.novoStatus = 'publicado'
+        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
+      group by jf.id
+    ) first_pub on first_pub.id = f.id;
 END
