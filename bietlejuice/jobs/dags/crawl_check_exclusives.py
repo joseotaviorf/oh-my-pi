@@ -37,9 +37,7 @@ def check_exclusives(**kwargs):
 
     q = BaseETL.get_query_from_file_name('{}/crawlers/match_exclusives.sql'.format(DATALAKE_QUERIES_DIR))
 
-    started_on = crawler_entity.get_last_crawling_date('vivareal')
     q = q.format(
-        started_on=started_on,
         distance_m=distance_m,
         condo_percent=condo_percent,
         rent_percent=rent_percent,
