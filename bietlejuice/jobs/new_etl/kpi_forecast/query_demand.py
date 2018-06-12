@@ -64,6 +64,6 @@ left join dim_region dr on f.sk_region = dr.sk_region
 
 -- when a booking is cancelled AND rescheduled we want to count the new scheduling only.
 -- the status of the first one will be cancelled and the reason will be 'rescheduling'
-where db.reason_category != 'Reschedule'
+-- where db.reason_category != 'Reschedule'
 
 ;"""

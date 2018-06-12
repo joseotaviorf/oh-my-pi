@@ -31,7 +31,6 @@ with all_dates as (
 	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
   order by date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
@@ -49,7 +48,6 @@ all_dates_last_month as (
 	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
   where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
@@ -67,7 +65,6 @@ all_dates_last_year as (
 	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
