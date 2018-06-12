@@ -19,3 +19,4 @@ WITH (
 ) ;
 CREATE INDEX property_listing_idx_max_v ON public.property_listing (max_version_time DESC) ;
 CREATE INDEX property_listing_idx_min_v ON public.property_listing (min_version_time DESC) ;
+CREATE INDEX property_listing_idx ON public.property_listing (id ASC) ;
