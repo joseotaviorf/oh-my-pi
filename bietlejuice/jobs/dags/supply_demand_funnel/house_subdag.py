@@ -1,8 +1,7 @@
-from qa_python_utils.default_logger import logger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils.default_logger import logger
 
 
 class HouseSubDag(DimSubDag):
@@ -118,7 +117,6 @@ class HouseSubDag(DimSubDag):
             func_command=utils.load_dim_from_ods_to_dw,
             op_kwargs={
                 'dim_name': 'property_status_over_period',
-                'insert_dummy': False,
                 'bucket': DimSubDag.S3_BUCKET
             }
         )

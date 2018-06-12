@@ -1,10 +1,9 @@
 import os
 from datetime import datetime
 
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
-
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
@@ -86,7 +85,7 @@ def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
     _logger.info("END - To Staging: {}".format(datetime.utcnow()))
 
 
-def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, pre_command=None, post_command=None,
+def load_dim_from_ods_to_dw(dim_name, bucket, is_fact=False, pre_command=None, post_command=None,
                             schema_source='public', schema_dest='public'):
     table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
     table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
@@ -106,12 +105,6 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
         bucket_name='{}/clean/ods/{}'.format(bucket, dim_name),
         process_name=dim_name
     )
-    if insert_dummy:
-        BaseETL.execute_command(
-            command='insert into {} values (-1);'.format(table_name_dest),
-            db_enum=EnumDb.BI_DW,
-            commit=True
-        )
     if post_command is not None:
         BaseETL.execute_command(
             command=post_command,
@@ -120,7 +113,7 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
         )
 
 
-def load_dim_from_ods_to_staging(dim_name, insert_dummy=True, is_fact=False, pre_command=None, post_command=None,
+def load_dim_from_ods_to_staging(dim_name, is_fact=False, pre_command=None, post_command=None,
                                  schema_source='public', schema_dest='staging'):
     table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
     table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
@@ -141,12 +134,6 @@ def load_dim_from_ods_to_staging(dim_name, insert_dummy=True, is_fact=False, pre
         db_enum=EnumDb.BI_ODS,
         commit=True
     )
-    if insert_dummy:
-        BaseETL.execute_command(
-            command='insert into {}.{} values (-1);'.format(schema_dest, table_name_dest),
-            db_enum=EnumDb.BI_ODS,
-            commit=True
-        )
     if post_command is not None:
         BaseETL.execute_command(
             command=post_command,
