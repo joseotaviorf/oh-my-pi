@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
@@ -64,9 +62,7 @@ class VisitSubDag(DimSubDag):
             task_id='STAGING_dim_visit',
             func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'visit',
-                'post_command': "update staging.dim_visit set dt_timestamp = '{}' where sk_visit = -1;".format(
-                    datetime.now().strftime('%Y-%m-%d'))
+                'dim_name': 'visit'
             }
         )
 
