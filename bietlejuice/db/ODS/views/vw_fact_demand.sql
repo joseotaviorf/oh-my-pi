@@ -186,6 +186,7 @@ select
 	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_house_listing)::integer as days_house_listing_to_contract_signed,
+	date_part('day', dt_visit - dt_house_listing)::integer as days_house_listing_to_visit,
   dt_timestamp
 from _fact
 ;
