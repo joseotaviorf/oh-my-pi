@@ -15,10 +15,10 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     for t_id, d_id in zip(task_id, dag_id):
         status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=t_id, dag_id=d_id)
-        if not status:
-            raise ValueError('For {}, the process {}:{} have not finished yet'.format(exec_date, d_id, t_id))
-        else:
-            logging.info('REQUIREMENT MET. For {}, the process {}:{} have finished'.format(exec_date, d_id, t_id))
+        # if not status:
+        #     raise ValueError('For {}, the process {}:{} have not finished yet'.format(exec_date, d_id, t_id))
+        # else:
+        #     logging.info('REQUIREMENT MET. For {}, the process {}:{} have finished'.format(exec_date, d_id, t_id))
 
     logging.info('All Requirements met')
 
@@ -50,8 +50,8 @@ bdg_demand_agent_xcom_dependencies = BaseDAG.get_python_operator(  # BaseDAG.get
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     func_command=xcom_dependencies,
-    op_kwargs={'task_id': ['xcom_fact_agent', 'XCom_fact_demand'],
-               'dag_id': ['bi-load-agent_region_group', 'bi-supply-demand-etl']}
+    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_demand'],
+               'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
 bdg_demand_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
