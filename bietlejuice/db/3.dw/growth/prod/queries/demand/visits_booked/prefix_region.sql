@@ -39,7 +39,6 @@ with all_dates as (
 	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
 	join dim_property dpr
@@ -61,7 +60,6 @@ all_dates_last_month as (
 	from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
 	join dim_property dpr
@@ -83,7 +81,6 @@ all_dates_last_year as (
   from fact_demand f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.reason_category != 'Reschedule'
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
   join dim_property dpr
