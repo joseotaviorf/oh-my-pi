@@ -31,7 +31,7 @@ select
 		when (dt_opportunity is not null and dt_first_listing is null and photo_job_status in ('Agendado','Iniciado','Novo')) then 'PhotoJobScheduled'
 		when (dt_opportunity is not null and dt_first_listing is null and photo_job_status = 'Cancelado') then coalesce(photo_job_reason, 'CancelledPhotoJob')
 		when (dt_opportunity is not null and dt_first_listing is null) then coalesce(photo_job_reason, 'CancelledPhotoJob')
-		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Descartado') then lead_status
+		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Descartado') then coalesce(lead_reason, 'DiscardedLead')
 		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Convertido') then 'NoPhotoJob'
 		when (dt_opportunity is null and dt_qualified is not null and conversao_id is not null) then 'NoPhotoJob'
 		when (dt_opportunity is null and lead_reason in ('ProprietarioAvaliando', 'ProprietarioNaoAtende', 'ProprietarioVaiAnunciar')) then 'OnHold'
