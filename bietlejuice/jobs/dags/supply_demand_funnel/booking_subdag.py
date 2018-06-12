@@ -1,10 +1,7 @@
-from datetime import datetime
-
-from qa_python_utils.default_logger import logger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils.default_logger import logger
 
 
 class BookingSubDag(DimSubDag):
@@ -65,9 +62,7 @@ class BookingSubDag(DimSubDag):
             task_id='STAGING_dim_booking',
             func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'booking',
-                'post_command': "update staging.dim_booking set dt_timestamp = '{}' where sk_booking = -1;".format(
-                    datetime.now().strftime('%Y-%m-%d'))
+                'dim_name': 'booking'
             }
         )
 
