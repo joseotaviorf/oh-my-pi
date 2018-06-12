@@ -6,7 +6,8 @@ select
 	ags.agent_name,
 	ags.available_slots_96 as available_slots,
 	ags.slot_dt::date,
-	count(db.sk_booking) as visits_completed
+	count(db.sk_booking) as visits_completed,
+	ags.available_slots_0
 from staging.agents_scheduling ags
 join dim_user du
 	on du.id = ags.agent_id
