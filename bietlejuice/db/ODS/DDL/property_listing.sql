@@ -5,11 +5,13 @@ CREATE TABLE public.property_listing (
 	"version" int8 NOT NULL,
 	min_version_time timestamp NULL,
 	max_version_time timestamp NULL,
-	nr_renting integer null,
+	nr_renting int8 null,
 	first_publication_date timestamp NULL,
+	de_publication_date timestamp NULL,
 	start_version_category varchar null,
 	end_version_category varchar null,
-	is_last_version int8,
+	contract_id int8 null,
+	is_last_version int8 null,
 	CONSTRAINT property_listing_pk PRIMARY KEY (id,"version")
 )
 WITH (
