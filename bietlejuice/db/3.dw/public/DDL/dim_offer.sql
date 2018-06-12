@@ -5,7 +5,7 @@ create table dim_offer (
   renting_value integer,
   renting_original_value integer,
   condo_original_value integer,
-  dt_approved timestamp,
+  dt_analysis timestamp,
   editing varchar(50),
   status varchar(50),
   id_user integer,
