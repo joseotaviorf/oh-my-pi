@@ -4,7 +4,8 @@ select
 	ags.agent_id,
 	du.dados_agente_id,
 	ags.agent_name,
-	ags.available_slots,
+    cast(ags.available_slots_96 as INTEGER) as available_slots,
+	cast(ags.available_slots_0 as INTEGER) as available_slots_0,
 	ags.slot_dt::date,
 	count(db.sk_booking) as visits_completed
 from staging.agents_scheduling ags
@@ -15,7 +16,7 @@ left join dim_booking db
 		and db.dt_scheduling::date = ags.slot_dt::date
 		and db."type" = 'Visita'
 		and db.visit_follow_up in ('Talvez', 'VisitouSozinho', 'VaiNegociar', 'NaoGostou')
-group by 1, 2, 3, 4, 5
+group by 1, 2, 3, 4, 5, 6
 having count(db.sk_booking) > 0
 )
 ;
