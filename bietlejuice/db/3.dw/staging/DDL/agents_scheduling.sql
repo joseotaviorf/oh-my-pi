@@ -6,6 +6,7 @@ create table if not exists staging.agents_scheduling (
 	history_status integer,
 	slot_dt timestamp,
 	realized_schedule varchar,
-	available_slots integer
+	available_slots_96 integer,
+	available_slots_0 integer
 )
 ;

@@ -63,6 +63,7 @@ create table fact_demand (
 	days_credit_approved_to_contract_signed integer,
 	days_contract_created_to_contract_signed integer,
 	days_house_listing_to_contract_signed integer,
+	days_house_listing_to_visit integer,
   dt_timestamp timestamp without time zone
 ) with oids
 ;

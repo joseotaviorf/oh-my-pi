@@ -10,7 +10,7 @@ select
   p.aluguel,
   p.aluguelOriginal,
   p.condominioOriginal,
-  p.dataAprovacao,
+  pp_aud_analysis.dt as dt_analysis,
   p.edicao,
   p.status,
   p.proprietarioAceitouCondicoes5A,
@@ -81,5 +81,16 @@ left join
 	group by pp.id
 ) special_conditions
 on p.id = special_conditions.id
+left join (
+  select
+  	ppa.id,
+    max(from_unixtime(ure.`timestamp` / 1000)) as dt
+  from PreProposta_AUD ppa
+  join UsuarioRevisionEntity ure
+  	on ure.id = ppa.REV
+  		and ppa.status in ('Aprovada', 'Rejeitada')
+  group by ppa.id
+) pp_aud_analysis
+	on pp_aud_analysis.id = p.id
 ;
 END

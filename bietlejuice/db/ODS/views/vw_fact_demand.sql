@@ -28,11 +28,19 @@ with _fact as (
 	  coalesce(vdo.sk_offer, -1) as sk_offer,
 	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
 	  vdo.dt_first_sent as dt_offer_submitted,
-	  coalesce(to_char(vdo.dt_approved, 'YYYYMMDD')::integer, -1) as sk_offer_approved_date,
-	  vdo.dt_approved as dt_offer_approved,
+	  case
+	    when vdo.status = 'Aprovada'
+	      then coalesce(to_char(vdo.dt_analysis, 'YYYYMMDD')::integer, -1)
+	    else -1
+	  end as sk_offer_approved_date,
+	  case
+	    when vdo.status = 'Aprovada'
+	      then vdo.dt_analysis
+	    else null::timestamp
+	  end as dt_offer_approved,
 	  case
 	    when vdo.status in ('Aprovada', 'Rejeitada')
-	      then vdp.dt_updated
+	      then vdo.dt_analysis
 	    else null::timestamp
 	  end dt_internal_analysis,
 	  coalesce(hrf.id_proposal, -1) as sk_proposal,
@@ -178,6 +186,7 @@ select
 	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_house_listing)::integer as days_house_listing_to_contract_signed,
+	date_part('day', dt_visit - dt_house_listing)::integer as days_house_listing_to_visit,
   dt_timestamp
 from _fact
 ;
