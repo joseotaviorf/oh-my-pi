@@ -32,11 +32,7 @@ old_pre_proposal as (
       p.aluguel as renting_value,
       p."aluguelOriginal" as renting_original_value,
       p."condominioOriginal" as condo_original_value,
-      case
-        when status = 'Aprovada'
-          then p."dataAprovacao"
-        else "atualizadoEm"
-      end as dt_analysis,
+      p.dt_analysis,
       p.edicao as editing,
       p.status,
       p.usuario_id as user_id,
