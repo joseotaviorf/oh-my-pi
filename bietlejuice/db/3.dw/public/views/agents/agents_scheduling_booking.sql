@@ -4,7 +4,7 @@ select
 	ags.agent_id,
 	du.dados_agente_id,
 	ags.agent_name,
-	ags.available_slots,
+	ags.available_slots_96 as available_slots,
 	ags.slot_dt::date,
 	count(db.sk_booking) as visits_completed
 from staging.agents_scheduling ags
