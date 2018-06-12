@@ -8,7 +8,7 @@ CREATE TABLE public.pre_proposal (
   "aluguelOriginal" INTEGER,
   "condominioOriginal" INTEGER,
   -- "iptuOriginal" integer,
-  "dataAprovacao" public.datetime,
+  dt_analysis public.datetime,
   edicao VARCHAR(50) NOT NULL,
   status VARCHAR(50) NOT NULL,
   "proprietarioAceitouCondicoes5A" INTEGER,
