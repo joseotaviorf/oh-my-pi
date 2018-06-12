@@ -65,8 +65,6 @@ SELECT
   dadosfotografo_ativo,
   dadosvendedor_inicio_contrato,
   dadosvendedor_nome_gerente,
-  dadosafiliado_contador_planilha_leads,
-  dadosafiliado_contratos_fechados,
   dadosafiliado_indicacao_shorturl,
   dadosafiliado_inicio_atuacao,
   dadosafiliado_ultim_calculo_comissao_indicado,
