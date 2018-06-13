@@ -12,18 +12,18 @@ BEGIN
         else f.status
       end as job_status,
       case
-        when jfo.name = 'Admin'
-        then 'Admin'
-        when jfo.name = 'Owner'
-        then 'Owner App'
-        when jfo.name = 'System'
-        then 'System - Auto'
+        when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
+        when creator.dadosFotografo_id is not null then 'Fotografo'
+        when creator.dadosVendedor_id is not null then 'InsideSales'
+        when creator.email like ('%quintoandar%') then 'Admin'
+        else 'Prop'
       end as creation_origin,
       case
-        when hour(f.dataAgendamento) between 8 and 17 or f.dataAgendamento is null
+        when hour(f.dataAgendamento) between 6 and 23 or f.dataAgendamento is null
         then 0
         else 1
       end as flexible_schedule,
+      (date(first_pub.nxt_pub) = date(coalesce(f.dataInicioSessao, f.dataAgendamento))) as same_day_listing,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
@@ -56,9 +56,43 @@ BEGIN
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
       uc.nome as user_cancel_name,
-      uc.email as user_cancel_email
-    from
-        JobFotografo f
+      uc.email as user_cancel_email,
+      case
+        when uc.dadosFotografo_id is not null and uc.dadosVendedor_id is not null then 'Teste'
+        when uc.dadosFotografo_id is not null then 'Fotografo'
+        when uc.dadosVendedor_id is not null then 'InsideSales'
+        when uc.email like ('%quintoandar%') then 'Admin'
+        else 'Prop'
+      end as user_cancel_type,
+      case
+        when creator.dadosVendedor_id is not null then creator.id
+        else null
+      end as rep_id,
+      TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      ) as creation_to_scheduling_diff_minutes,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/60,1) as creation_to_scheduling_diff_hours,
+      round(TIMESTAMPDIFF(
+        MINUTE,
+        f.dataCriacao,
+        case
+          when hour(f.dataAgendamento) between 6 and 23 then f.dataAgendamento
+          when date(f.dataAgendamento) + interval '12' hour < f.dataCriacao then f.dataCriacao
+        else date(f.dataAgendamento) + interval '12' hour end
+      )/1440,1) as creation_to_scheduling_days
+    from JobFotografo f
     left join
         (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j
         on max_j.id = f.id
@@ -67,19 +101,26 @@ BEGIN
         (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
         on comp.id = f.id
         and f.status = 'Cancelado'
+    left join UsuarioRevisionEntity ure on ure.id = max_j.REV
+    left join Usuario uc on uc.id = ure.usuario_id
+    left join Usuario af on af.dadosFotografo_id = f.dadosFotografo_id
+    left join DadosFotografo df on df.id = f.dadosFotografo_id
     left join
-        UsuarioRevisionEntity ure
-        on ure.id = max_j.REV
+      (select id, min(REV) as REV from JobFotografo_AUD group by id) min_j
+      on min_j.id = f.id
+    left join UsuarioRevisionEntity ure2 on ure2.id = min_j.REV
+    left join Usuario creator on creator.id = ure2.usuario_id
     left join
-        Usuario uc
-        on uc.id = ure.usuario_id
-    left join
-        Usuario af
-        on af.dadosFotografo_id = f.dadosFotografo_id
-    left join
-        DadosFotografo df
-        on df.id = f.dadosFotografo_id
-    left join
-        JobFotografoOrigin jfo
-        on jfo.id = f.originCreation_id;
+    (
+      SELECT
+        jf.id,
+        min(msi.data) as nxt_pub
+      from
+        JobFotografo jf
+      left join MudancaStatusImovel msi
+        on msi.imovel_id = jf.imovel_id
+        and msi.novoStatus = 'publicado'
+        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
+      group by jf.id
+    ) first_pub on first_pub.id = f.id;
 END

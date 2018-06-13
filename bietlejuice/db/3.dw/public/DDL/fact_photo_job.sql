@@ -6,9 +6,11 @@ create table public.fact_photo_job(
   sk_region int8,
   sk_user_cancel int8,
   sk_user_photographer int8,
+  sk_user_rep int8,
   job_status varchar(255),
   creation_origin varchar(255),
   flexible_schedule int8,
+  same_day_listing int8,
   sk_date_photographer_accepted int8,
   sk_date_job_created int8,
   sk_date_job_issued int8,
@@ -30,5 +32,9 @@ create table public.fact_photo_job(
   photographer_contract_type varchar(255),
   job_problem_reason varchar(255),
   cancel_reason varchar(255),
-  rescheduled boolean
+  rescheduled boolean,
+  user_cancel_type varchar(255),
+	creation_to_scheduling_diff_minutes decimal(10,1),
+	creation_to_scheduling_diff_hours decimal(10,1),
+	creation_to_scheduling_diff_days decimal(10,1)
 )

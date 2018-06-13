@@ -72,7 +72,7 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         )
 
 
-def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, pre_command=None, post_command=None,
+def load_dim_from_ods_to_dw(dim_name, bucket, is_fact=False, pre_command=None, post_command=None,
                             schema_source='public', schema_dest='public'):
     table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
     table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
@@ -92,12 +92,6 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
         bucket_name='{}/clean/ods/{}'.format(bucket, dim_name),
         process_name=dim_name
     )
-    if insert_dummy:
-        BaseETL.execute_command(
-            command='insert into {} values (-1);'.format(table_name_dest),
-            db_enum=EnumDb.BI_DW,
-            commit=True
-        )
     if post_command is not None:
         BaseETL.execute_command(
             command=post_command,

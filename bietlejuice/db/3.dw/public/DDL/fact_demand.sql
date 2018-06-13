@@ -31,9 +31,10 @@ create table fact_demand (
 	sk_credit_analysis_init_date integer,
 	sk_credit_analysis_end_date integer,
 	sk_credit_analysis_approved_date integer,
-	visit_created_from_app integer,
+	flg_visit_completed integer,
+	flg_visit_created_from_app integer,
 	visit_created_type varchar(14),
-	visit_last_updated_from_app integer,
+	flg_visit_last_updated_from_app integer,
 	visit_last_updated_type varchar(14),
   booking_to_visit numeric(14,2),
   offer_submitted_to_internal_analyis numeric(14,2),
@@ -62,6 +63,7 @@ create table fact_demand (
 	days_credit_approved_to_contract_signed integer,
 	days_contract_created_to_contract_signed integer,
 	days_house_listing_to_contract_signed integer,
+	days_house_listing_to_visit integer,
   dt_timestamp timestamp without time zone
 ) with oids
 ;

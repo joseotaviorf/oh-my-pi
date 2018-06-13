@@ -1,5 +1,5 @@
 with all_dates as (
-  select
+  select distinct
     date_part('year', cast(cast("date" as timestamp) as date))::int as _year,
     date_part('month', cast(cast("date" as timestamp) as date))::int as _month,
     date_part('week', cast(cast("date" as timestamp) as date))::int as _week,
@@ -18,7 +18,7 @@ all_dates_last_week as (
 	select 1
 ),
 all_dates_last_month as (
-	select
+	select distinct
 	  date_part('year', cast(cast("date" as timestamp) as date))::int as _year,
     date_part('month', cast(cast("date" as timestamp) as date))::int as _month,
 	  'QuintoAndar'::varchar as region,
@@ -33,7 +33,7 @@ all_dates_last_month as (
   order by city, date_part('year', cast(cast("date" as timestamp) as date)), date_part('month', cast(cast("date" as timestamp) as date))
 ),
 all_dates_last_year as (
-	select
+	select distinct
 	 	date_part('year', cast(cast("date" as timestamp) as date))::int as _year,
 	  'QuintoAndar'::varchar as region,
 	  city,

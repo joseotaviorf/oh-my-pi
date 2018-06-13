@@ -11,11 +11,12 @@ with base_jobs as (
 select
 	j1.id as sk_photo_job,
 	j1.id,
-	j2.id,
 	j1.imovel_id,
+	j1.rep_id,
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
+	j1.same_day_listing,
 	j1.dt_photographer_accepted,
 	j1.dt_job_created,
 	j1.dt_job_issued,
@@ -44,7 +45,11 @@ select
 	j1.user_cancel_id,
 	j1.user_cancel_name,
 	j1.user_cancel_email,
-	(j2 is not null) rescheduled
+	j1.user_cancel_type,
+	(j2.id is not null) as rescheduled,
+	j1.creation_to_scheduling_diff_minutes,
+	j1.creation_to_scheduling_diff_hours,
+	j1.creation_to_scheduling_diff_days
 from
 	base_jobs j1
 left join

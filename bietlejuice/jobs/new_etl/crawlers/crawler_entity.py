@@ -19,10 +19,11 @@ from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 class CrawlerEntity(object):
 
-    def __init__(self, s3_bucket, google_maps_api_key):
+    def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True, get_house_allowed=True):
         self.athena_client = AthenaClient(s3_bucket)
-        self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
-        self.google_maps_api_key = google_maps_api_key
+        if google_maps_api_key is not None:
+            self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
+            self.google_maps_api_key = google_maps_api_key
 
         types_apto = ['apartamento-padrao', 'apartamento', 'aluguel-apartamento-duplex-triplex',
                       'aluguel-apartamento-padrao', 'venda-apartamento-padrao', 'aluguel-apartamento', 'apartment']
@@ -42,10 +43,12 @@ class CrawlerEntity(object):
         map_types.update({k: 'loft-studio-kitchenette' for k in types_kiti})
         self.map_types = map_types
 
-        self.polygons = self.__get_polygons()
+        if get_polygons is True:
+            self.polygons = self.__get_polygons()
 
-        q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
-        self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
+        if get_house_allowed is True:
+            q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
+            self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
 
     def _get_address(self, lat=None, lng=None, cep=None):
         r = None
@@ -160,25 +163,6 @@ class CrawlerEntity(object):
 
         return info
 
-    @logger(exclude='data')
-    def fill_in(self, data):
-        street_pattern = re.compile(r'-(.*)-n-(\d+)|-(.*)')
-        data['street_name'] = data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 1))
-        data.street_name = data.street_name.combine_first(
-            data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 3)))
-        data.street_name = data.street_name.apply(lambda x: x.replace('-', ' ') if x is not None else None)
-        data['street_number'] = data.street.apply(lambda x: CrawlerEntity._search_pattern(x, street_pattern, 2))
-
-        for i, row in data.query("""street_name.isnull() or street_number.isnull()""").iterrows():
-            try:
-                street, number = self.reverse_geocode(row.lat, row.lng)
-                data.loc[i, 'street_name'] = ' '.join(street.split(' ')[1:])
-                data.loc[i, 'street_number'] = number
-            except Exception:
-                _logger.warn('m=fill_in, could not retrieve street and number.')
-
-        return data.query("""~street_name.isnull() and ~street_number.isnull()""")
-
     @staticmethod
     @logger
     def _search_pattern(string, pattern, group=0):
@@ -197,13 +181,15 @@ class CrawlerEntity(object):
             'location_type': 'ROOFTOP'
         }
         page = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=params).json()
-        addr = page['results'][0]['address_components']
-        route = CrawlerEntity._get_long_name(addr, 'route')
-        number = CrawlerEntity._get_long_name(addr, 'street_number')
-        return route, number
+        try:
+            addr = page['results'][0]['address_components']
+            route = self._get_long_name(addr, 'route')
+            number = self._get_long_name(addr, 'street_number')
+            return route, number
+        except Exception:
+            _logger.warning('m=reverse_geocode, maps api response has no address components')
 
     @staticmethod
-    @logger
     def _get_long_name(addr, addr_type):
         for component in addr:
             if addr_type in component['types']:
