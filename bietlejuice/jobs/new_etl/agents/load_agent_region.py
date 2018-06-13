@@ -165,3 +165,18 @@ class Agent_Region(object):
         )
 
         return agent_reviews_data
+
+    def clean_daily_data_in_table(self, enum, schema, dim_name, date_column, dt, format):
+        print("Start query to clean {}: {}".format(dim_name, str(dt)))
+
+        raw_query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'{}')"
+
+        raw_query = raw_query.format(schema, dim_name, date_column, str(dt), format)
+        print(raw_query)
+
+        BaseETL.execute_command(
+            db_enum=enum,
+            encoding='UTF8',
+            command=raw_query,
+            commit=True
+        )

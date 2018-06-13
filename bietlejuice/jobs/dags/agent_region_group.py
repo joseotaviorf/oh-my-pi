@@ -14,6 +14,8 @@ env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACC
 def group_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
+    ar.clean_daily_data_in_table(enum=EnumDb.BI_ODS, schema='public', dim_name='agent_region_group', date_column='dt',
+                                 dt=exec_date, format='YYYY-MM-DD')
     group_data = ar.get_group_regions(f_name='agent_region_group', db_enum=EnumDb.BI_ODS, dt=exec_date)
     ar.move_data_to_ods(data=group_data, table_name='agent_region_group')
 
@@ -34,6 +36,8 @@ def create_dim_agent_region_dw(**kwargs):
 def create_fact_agent(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
+    ar.clean_daily_data_in_table(enum=EnumDb.BI_DW, schema='public', dim_name='fact_agent', date_column='sk_slot_date',
+                                 dt=exec_date, format='YYYYMMDD')
     ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
 
 
