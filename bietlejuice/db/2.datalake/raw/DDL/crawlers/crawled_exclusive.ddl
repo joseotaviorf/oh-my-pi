@@ -9,6 +9,8 @@ create external table datalake_raw.crawled_exclusive (
 	pp_nome string,
 	pp_telefone string,
 	pp_email string,
+	id_externo string,
+	website string,
 	match_em string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
@@ -16,7 +18,7 @@ with serdeproperties (
   'separatorChar' = ',',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/raw/crawled_exclusives/'
+location 's3://5a-datalake/raw/crawled_exclusive/'
 tblproperties (
   'skip.header.line.count' = '1'
 )
