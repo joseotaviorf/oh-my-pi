@@ -20,6 +20,8 @@ with exclusives as (
 ),
 crawled as (
     select distinct
+        ws,
+        id,
         url,
         advertiser_name,
         cast(lat as double) as lat,
@@ -38,14 +40,16 @@ crawled as (
         and lng is not null and lng <> '0'
 )
 select distinct
-    ex.id,
+    ex.id as id,
     c.url,
     c.advertiser_name as anunciante,
     ex.firstpublication as publicacao_5a_em,
     c.updated_on atualizacao_externa_em,
     ex.name as pp_nome,
     ex.phone_number as pp_telefone,
-    ex.email as pp_email
+    ex.email as pp_email,
+    c.id as id_externo,
+    c.ws as website
 from exclusives ex
 join crawled c
     on (acos(sin(radians(ex.lat)) * sin(radians(c.lat)) + cos(radians(ex.lat)) * cos(radians(c.lat)) * cos(radians(ex.lng) - radians(c.lng))) * 6371000 <= {distance_m})
