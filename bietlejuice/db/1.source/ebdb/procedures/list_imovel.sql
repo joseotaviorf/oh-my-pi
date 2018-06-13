@@ -106,28 +106,12 @@ select -- count(1)
   i.confirmadoInformacoesVisita+0	  as confirmado_informacoes_visita,
   e.abreviacao as estado_abreviacao,
   e.nome as estado_nome,
-  null as dados_afiliado_tipo_afiliado,
-  null as dados_afiliado_inicio_atuacao,
-  null as dados_afiliado_cidade_atuacao,
   r.cidade as regiao_cidade,
   r.macro_regiao as regiao_macro,
   r.sub_regiao as regiao_sub,
   i.regiao_id,
   c.nome as condominio_nome,
   l.nome as local_nome,
-  cor.nome as corretor_nome,
-  ie.WEB_CARACTERISTICAS as etapa_data_web_caracteristicas,
-  ie.WEB_COPIARMAISDADOS as etapa_data_web_copiarmaisdados,
-  ie.WEB_FOTOS as etapa_data_web_fotos,
-  ie.WEB_UPLOADFOTOS as etapa_data_web_uploadfotos,
-  ie.WEB_VALORES as etapa_data_web_valores,
-  ie.MOB_DETALHES as etapa_data_mob_detalhes,
-  ie.MOB_ENDERECO as etapa_data_mob_endereco,
-  ie.MOB_FOTOS as etapa_data_mob_fotos,
-  ie.MOB_PRECO as etapa_data_mob_preco,
-  ie.MOB_TITULO as etapa_data_mob_titulo,
-  ie.MOB_VISITAS as etapa_data_mob_visitas,
-  ie.MOB_VISTORIA as etapa_data_mob_vistoria,
   coalesce(iv.autorizacao_de_entrada,0) as info_visita_autorizacao_de_entrada,
   coalesce(iv.proprietario_acompanha,0) as info_visita_proprietario_acompanha,
   coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
@@ -136,8 +120,7 @@ select -- count(1)
   i.dataCriacao as data_criacao,
   i.atualizadoEm as atualizado_em,
   i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
-  i.announcedBy is not null
-    or i.announcedBy_id is not null as imovel_v3,
+  i.announcedBy is not null or i.announcedBy_id is not null as imovel_v3,
   i.areaTotal as area_total,
   i.areaTerreno as area_terreno,
  case
@@ -217,37 +200,6 @@ left join
 left join
   Local l
   on l.id = i.estacaoMaisProxima_id
-left join
-  DadosCorretor dc
-  on dc.id = i.dadosCorretor_id
-left join
-  Usuario cor
-  on dc.usuario_id = cor.id
-left join
-(
-  select
-    i.id as imovel_id,
-    max(if(etapa='WEB_CARACTERISTICAS', data, null)) as WEB_CARACTERISTICAS,
-    max(if(etapa='WEB_COPIARMAISDADOS', data, null)) as WEB_COPIARMAISDADOS,
-    max(if(etapa='WEB_FOTOS', data, null)) as WEB_FOTOS,
-    max(if(etapa='WEB_UPLOADFOTOS', data, null)) as WEB_UPLOADFOTOS,
-    max(if(etapa='WEB_VALORES', data, null)) as WEB_VALORES,
-    max(if(etapa='MOB_DETALHES', data, null)) as MOB_DETALHES,
-    max(if(etapa='MOB_ENDERECO', data, null)) as MOB_ENDERECO,
-    max(if(etapa='MOB_FOTOS', data, null)) as MOB_FOTOS,
-    max(if(etapa='MOB_PRECO', data, null)) as MOB_PRECO,
-    max(if(etapa='MOB_TITULO', data, null)) as MOB_TITULO,
-    max(if(etapa='MOB_VISITAS', data, null)) as MOB_VISITAS,
-    max(if(etapa='MOB_VISTORIA', data, null)) as MOB_VISTORIA
-  from
-    Imovel i
-  left join
-    Imovel_Etapas ie
-    on ie.imovel_id = i.id
-  group by
-    i.id
-) ie
-  on ie.imovel_id = i.id
 left join
 (
     select

@@ -1,5 +1,5 @@
 drop view if exists vw_imovel_agent_comission_slot;
-create view vw_imovel_agent_comission_slot as
+create or replace view vw_imovel_agent_comission_slot as
 with published as
 (
   select
@@ -18,7 +18,7 @@ with published as
     and h.last_position_date_flag
     
   inner join
-	vw_property_listing p
+	property_listing p
 	on p.id = h.id
 	and h.date between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
 

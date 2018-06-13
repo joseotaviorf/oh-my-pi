@@ -1,5 +1,5 @@
 drop view if exists vw_imovel_liquidity_classifieds_costs;
-create view vw_imovel_liquidity_classifieds_costs as
+create or replace view vw_imovel_liquidity_classifieds_costs as
 with costs as
 (
   select
@@ -25,7 +25,7 @@ published_listings as
   from
   	imovel_status_full_history i
   inner join
-	vw_property_listing p
+	property_listing p
 	on p.id = i.id
 	and i.date between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
   where
@@ -48,7 +48,6 @@ inner join
   published_listings p
   on p.year_status_date = c.year
   and p.month_status_date = c.month
-
 ;
 
 /*
