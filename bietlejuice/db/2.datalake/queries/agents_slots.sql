@@ -7,6 +7,8 @@ with weekly_schedule_prev as (
 		key as slot_number
 	from
 		datalake_raw.ebdb_horariosemanalagente_aud hsa
+	join datalake_raw.ebdb_dadosagente_tipos dat
+		on hsa.agente_id = dat.dadosagente_id
 	cross join
 		unnest(
 			sequence(0,47),
@@ -25,6 +27,7 @@ with weekly_schedule_prev as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
+	where dat.tipos = 'Visita'
 ), weekly_schedule as (
 	select
 		*,
