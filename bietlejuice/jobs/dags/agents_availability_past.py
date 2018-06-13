@@ -74,7 +74,7 @@ def load_agents_scheduling(**kwargs):
 
 # create DAG definition
 dag = DAG(
-    dag_id='bi-agents-availability',
+    dag_id='bi-agents-availability-past',
     description='Task to load agents slots availability and scheduling',
     default_args={
         'owner': 'Data Team',
@@ -89,14 +89,14 @@ dag = DAG(
 # operators
 agents_slots = QuintoAndarPythonOperator(
     dag=dag,
-    task_id='load_agents_slots',
+    task_id='load_agents_slots_p',
     python_callable=load_agents_slots,
     provide_context=True
 )
 
 agents_scheduling = QuintoAndarPythonOperator(
     dag=dag,
-    task_id='load_agents_scheduling',
+    task_id='load_agents_scheduling_p',
     python_callable=load_agents_scheduling,
     provide_context=True
 )
