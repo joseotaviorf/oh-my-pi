@@ -84,12 +84,12 @@ imovel_dates as
 		as version_first_pre_proposal_date,
 	 	min(p."criadoEm")
 	 		filter (
-	 			where p."statusDocumentacaoInq" = 'RecusadoCardiff'
+	 			where p."statusDocumentacaoInq" = 'RecusadoCredito'
  			)
  		as first_proposal_refused_by_insurance_date,
     min(p."criadoEm")
     	filter (
-				where p."statusDocumentacaoInq"::text = 'RecusadoCardiff'::text
+				where p."statusDocumentacaoInq"::text = 'RecusadoCredito'::text
 				and p."criadoEm" > COALESCE(pl.min_version_time, '2000-01-01 00:00:00'::timestamp)
 				and p."criadoEm" <= COALESCE(pl.max_version_time::timestamp, now())
 			)

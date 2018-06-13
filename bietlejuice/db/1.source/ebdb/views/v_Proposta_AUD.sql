@@ -5,11 +5,11 @@ select
   p.id as id,
   
   max(p_5a.REV) as REV_Analise5a,
-  max(p_c.REV) as REV_AnaliseCardiff,
+  max(p_c.REV) as REV_AnaliseCredito,
   max(p_ap.REV) as REV_Aprovado,
   
   cast(FROM_UNIXTIME(ure_5a.timestamp/ 1000) as date) as dataAnalise5a,
-	cast(FROM_UNIXTIME(ure_c.timestamp/ 1000) as date) as dataAnaliseCardiff,
+	cast(FROM_UNIXTIME(ure_c.timestamp/ 1000) as date) as dataAnaliseCredito,
 	cast(FROM_UNIXTIME(ure_ap.timestamp/ 1000) as date) as dataAprovado,
 		
   p.dataParaMudanca as dataParaMudanca,
@@ -54,7 +54,7 @@ left join
 left join 
 	ebdb.Proposta_AUD p_c 
 	on p_c.id = p.id
-	and p_c.statusDocumentacaoInq = 'AnaliseCardiff' and p_c.statusDocumentacaoInq_MOD = 1 
+	and p_c.statusDocumentacaoInq = 'AnaliseCredito' and p_c.statusDocumentacaoInq_MOD = 1
 left join 
 	ebdb.UsuarioRevisionEntity ure_c
 	on p_c.REV  = ure_c.id

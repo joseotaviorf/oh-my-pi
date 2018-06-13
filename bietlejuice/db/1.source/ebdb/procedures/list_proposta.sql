@@ -46,7 +46,7 @@ left join (
 		from Proposta_AUD p_aud
 		join UsuarioRevisionEntity u
 			on p_aud.REV = u.id
-		where p_aud.statusDocumentacaoInq = 'AnaliseCardiff'
+		where p_aud.statusDocumentacaoInq = 'AnaliseCredito'
 			and p_aud.statusDocumentacaoInq_MOD = 1
 		group by p_aud.id
 	) aud_5a_analysis_init
@@ -58,7 +58,7 @@ left join (
 		from Proposta_AUD p_aud
 		join UsuarioRevisionEntity u
 			on p_aud.REV = u.id
-		where p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCardiff')
+		where p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito')
 			and p_aud.statusDocumentacaoInq_MOD = 1
 		group by p_aud.id
 	) aud_5a_analysis_end
