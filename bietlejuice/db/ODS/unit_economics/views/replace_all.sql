@@ -2,7 +2,7 @@ drop view if exists unit_economics.vw_base_property_costs cascade;
 drop view if exists unit_economics.vw_base_contract_costs cascade;
 drop view if exists unit_economics.vw_base_dre_costs cascade;
 drop table if exists unit_economics.vw_base_merged_users cascade;
-drop view if exists unit_economics.vw_base_ticket_task cascade;
+drop table if exists unit_economics.vw_base_ticket_task cascade;
 drop view if exists unit_economics.vw_supply_ops_inside_sales_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_photos_costs cascade;
 drop view if exists unit_economics.vw_supply_ops_costs cascade;
@@ -181,7 +181,7 @@ where (email is not null or phone is not null)
 and property_id is not null
 ;
 
-create view unit_economics.vw_base_ticket_task as
+create table unit_economics.vw_base_ticket_task as
 with zendesk_groups as (
   select distinct
     id,
