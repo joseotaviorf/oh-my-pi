@@ -34,7 +34,7 @@ def import_ebdb_proposta(client):
     join datalake_raw.ebdb_usuariorevisionentity r on a.REV = r.id
     where
         a.statusDocumentacaoInq_MOD = '1' and
-        a.statusDocumentacaoInq in ('AnaliseCardiff', 'AnaliseCredito')
+        a.statusDocumentacaoInq = 'AnaliseCredito'
     '''
 
     df_proposta_ebdb = client.execute_query_and_return_dataframe(sql_proposta_ebdb)

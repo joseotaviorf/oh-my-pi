@@ -11,7 +11,7 @@ with dup as (
     i.status_time,
     i.date as date,
     i.status_history as status
-  from vw_property_listing  p
+  from property_listing  p
   join imovel_status_full_history i
     on i.id = p.id
        and i.date in (

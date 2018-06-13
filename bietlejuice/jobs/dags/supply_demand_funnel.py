@@ -45,7 +45,6 @@ def load_dim_from_ods_to_dw(**kwargs):
     utils.load_dim_from_ods_to_dw(
         dim_name=kwargs['dim_name'],
         bucket=bucket,
-        insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
         post_command=None if 'post_command' not in kwargs else kwargs['post_command']
@@ -193,21 +192,21 @@ fact_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket}
 )
 
 fact_photo_job = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_photo_job',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket}
 )
 
 fact_demand = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_demand',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket}
 )
 
 # flow
@@ -271,10 +270,11 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-xcom_fact_demand = BaseSubDag.get_sub_dag_operator(
+xcom_fact_demand = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
-    sub_dag_func=xcom_fact_demand_task,
-    sub_dag_name='XCom_fact_demand'
+    task_id='XCom_fact_demand',
+    func_command=xcom_fact_demand_task,
+    provide_context=True
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
