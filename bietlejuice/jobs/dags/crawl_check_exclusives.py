@@ -46,9 +46,9 @@ def check_exclusives(**kwargs):
     matches = crawler_entity.athena_client.execute_query_and_return_dataframe(q)
 
     past_matches = crawler_entity.athena_client.execute_query_and_return_dataframe(
-        """select id, url, match_em from datalake_raw.crawled_exclusive""")
+        """select id, id_externo, website from datalake_raw.crawled_exclusive""")
 
-    m_key = ['id', 'url']
+    m_key = ['id', 'id_externo', 'website']
     merged = matches.merge(past_matches, on=m_key, how='outer', indicator=True)
     merged = merged[merged['_merge'] == 'left_only']
     matches = matches.merge(merged[m_key], on=m_key, how='right')
