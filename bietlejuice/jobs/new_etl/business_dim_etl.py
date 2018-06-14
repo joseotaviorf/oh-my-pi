@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from __init__ import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from dim_etl import DimensionETL
 from qa_python_utils.default_logger import logger, _logger
+
+from __init__ import DATALAKE_QUERIES_DIR
+from dim_etl import DimensionETL
 
 
 class BusinessDimensionETL(DimensionETL):
@@ -73,7 +74,7 @@ class BusinessDimensionETL(DimensionETL):
             )
 
     @logger
-    def load_dim_from_ods_to_dw(self, dim_name, is_fact=False, pre_command=None, post_command=None):
+    def load_dim_from_ods_to_dw(self, dim_name, insert_dummy=True, is_fact=False, pre_command=None, post_command=None):
         table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
         table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
 
@@ -93,6 +94,13 @@ class BusinessDimensionETL(DimensionETL):
             bucket_name='{}/clean/ods/{}'.format(self.bucket, dim_name),
             process_name=dim_name
         )
+
+        if insert_dummy:
+            BaseETL.execute_command(
+                command='insert into {} values (-1);'.format(table_name_dest),
+                db_enum=EnumDb.BI_DW,
+                commit=True
+            )
 
         if post_command is not None:
             BaseETL.execute_command(
