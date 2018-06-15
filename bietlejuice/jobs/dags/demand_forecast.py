@@ -37,7 +37,7 @@ n_training_days = 126  # hard limit on the days we do not want to consider for c
 n_recent_days = 60
 rolavg_duration = 120
 min_samples = 500
-max_samples = 5000
+max_samples = 10000
 model_weekly_seasonality = True
 model_yearly_seasonality = True
 

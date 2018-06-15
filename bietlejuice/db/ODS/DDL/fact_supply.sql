@@ -21,6 +21,7 @@ create table public.fact_supply (
 	flow character varying(255) DEFAULT NULL::character varying,
 	acquisition_method character varying(255) DEFAULT NULL::character varying,
 	acquisition_channel character varying(255) DEFAULT NULL::character varying,
+	acquisition_source character varying(255) DEFAULT NULL::character varying,
 	funnel_step character varying(255) DEFAULT NULL::character varying,
 	lead_to_prospect_diff_minutes integer,
 	prospect_to_qualified_diff_minutes integer,

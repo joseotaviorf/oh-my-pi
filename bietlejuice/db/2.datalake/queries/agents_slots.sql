@@ -7,6 +7,8 @@ with weekly_schedule_prev as (
 		key as slot_number
 	from
 		datalake_raw.ebdb_horariosemanalagente_aud hsa
+	join datalake_raw.ebdb_dadosagente_tipos dat
+		on hsa.agente_id = dat.dadosagente_id
 	cross join
 		unnest(
 			sequence(0,47),
@@ -25,6 +27,7 @@ with weekly_schedule_prev as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
+	where dat.tipos = 'Visita'
 ), weekly_schedule as (
 	select
 		*,
@@ -73,7 +76,9 @@ with weekly_schedule_prev as (
 	left join
 		datalake_raw.ebdb_visitaorigem vo
 		on vo.id = aa.origemultimaatualizacao_id
-	where a.status='Realizado' and vo.nome in ('Inquilinos', 'SelfServiceWeb')
+	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
+	  and a.tipo = 'Visita'
+	  and vo.nome in ('Inquilinos', 'SelfServiceWeb')
 ), full_visits as (
 	select distinct
 		a.agente_id as agent_id,
@@ -84,7 +89,8 @@ with weekly_schedule_prev as (
 		datalake_raw.ebdb_agendamento_aud aa
 		on aa.id = a.id
 		and aa.revtype='0'
-	where a.status='Realizado'
+	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
+	  and a.tipo = 'Visita'
 ), base_time as (
 	select
     cast(date_column AS timestamp) as dt,
@@ -295,7 +301,8 @@ select
 	vu.self_service_visit,
 	vu.last_change_reason,
 	ah.status as history_status,
-	case when pa._count > 0 then '1' else '0' end as planner_status
+	case when pa._count > 0 then '1' else '0' end as planner_status,
+	vu.specific_slot
 from
 	visits_updates vu
 left join
@@ -307,5 +314,6 @@ left join
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
 where date(vu.slot_dt) = date('{}')
+   and ah.status = '1'
 order by vu.slot_dt
 ;

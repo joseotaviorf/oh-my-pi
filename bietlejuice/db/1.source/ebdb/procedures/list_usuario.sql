@@ -223,7 +223,7 @@ BEGIN
       UsuarioRevisionEntity r
       on r.id = p.REV
     where 
-      statusDocumentacaoInq = 'AnaliseCardiff'
+      statusDocumentacaoInq = 'AnaliseCredito'
     group BY
       1
   ) i

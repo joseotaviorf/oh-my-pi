@@ -34,7 +34,7 @@ def import_ebdb_proposta(client):
     join datalake_raw.ebdb_usuariorevisionentity r on a.REV = r.id
     where
         a.statusDocumentacaoInq_MOD = '1' and
-        a.statusDocumentacaoInq = 'AnaliseCardiff'
+        a.statusDocumentacaoInq = 'AnaliseCredito'
     '''
 
     df_proposta_ebdb = client.execute_query_and_return_dataframe(sql_proposta_ebdb)
@@ -97,7 +97,9 @@ def import_sortinghat_proposal(client):
         'score_5a',
         'score_5a_best_subset',
         'score_cardif',
-        'score_cardif_best_subset']
+        'score_cardif_best_subset',
+        'home_area'
+    ]
     df_proposal_sh.loc[:, col_string_to_float] = df_proposal_sh.loc[:, col_string_to_float].replace(
         to_replace='',
         value=np.nan).astype(float)

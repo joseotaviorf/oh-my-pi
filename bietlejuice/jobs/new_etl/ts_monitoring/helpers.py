@@ -65,8 +65,8 @@ def create_sk_dates(df):
     """
     for col, dtype in df.dtypes.iteritems():
         if str(dtype) == 'datetime64[ns]':
-            df['sk_' + col] = df[col].dt.strftime('%Y%m%d').replace(
-                {'NaT': ''})  # sk date is a string in dim_date so we keep it as a string here too
+            # sk date is a string in dim_date so we keep it as a string here too
+            df['sk_' + col] = df[col].dt.strftime('%Y%m%d').replace({'NaT': ''})
 
     return df
 

@@ -12,6 +12,7 @@ create table house_rent_flow (
   dt_client_sign_up timestamp,
   dt_agent_sign_up timestamp,
   id_visit integer,
+  visit_completed integer,
   visit_created_from_app integer,
   visit_created_type varchar(14),
   visit_last_updated_from_app integer,

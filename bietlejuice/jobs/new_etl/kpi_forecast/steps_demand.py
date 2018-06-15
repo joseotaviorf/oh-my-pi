@@ -39,7 +39,7 @@ steps = pd.DataFrame([{'step': 'dt_booking_created',
                       {'step': 'dt_credit_analysis_approved',
                        'deduplication_col': 'sk_proposal',
                        'order': 8,
-                       'predict_with': 'dt_booking_created'},  #
+                       'predict_with': 'dt_booking_created'}, 
 
                       {'step': 'dt_signature_notcancelled',
                        'deduplication_col': 'sk_contract',

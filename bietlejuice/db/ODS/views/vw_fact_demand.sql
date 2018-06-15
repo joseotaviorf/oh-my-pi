@@ -4,6 +4,7 @@ with _fact as (
 	select
 		hrf.id_house_rent_flow as ods_id,
 		coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house,
+		hrf.id_house,
 		coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
 		coalesce(to_char(vdh.min_version_time, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
 		vdh.min_version_time as dt_house_listing,
@@ -16,6 +17,7 @@ with _fact as (
 	  hrf.dt_booking_created,
 	  coalesce(to_char(hrf.dt_visit, 'YYYYMMDD')::integer, -1) as sk_visit_date,
 	  hrf.dt_visit,
+	  hrf.visit_completed as flg_visit_completed,
 	  coalesce(hrf.id_owner, -1) as sk_owner,
 	  coalesce(hrf.id_user_agent, -1) as sk_user_agent,
 	  coalesce(to_char(hrf.dt_agent_sign_up, 'YYYYMMDD')::integer, -1) as sk_agent_sign_up_date,
@@ -26,11 +28,19 @@ with _fact as (
 	  coalesce(vdo.sk_offer, -1) as sk_offer,
 	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
 	  vdo.dt_first_sent as dt_offer_submitted,
-	  coalesce(to_char(vdo.dt_approved, 'YYYYMMDD')::integer, -1) as sk_offer_approved_date,
-	  vdo.dt_approved as dt_offer_approved,
+	  case
+	    when vdo.status = 'Aprovada'
+	      then coalesce(to_char(vdo.dt_analysis, 'YYYYMMDD')::integer, -1)
+	    else -1
+	  end as sk_offer_approved_date,
+	  case
+	    when vdo.status = 'Aprovada'
+	      then vdo.dt_analysis
+	    else null::timestamp
+	  end as dt_offer_approved,
 	  case
 	    when vdo.status in ('Aprovada', 'Rejeitada')
-	      then vdp.dt_updated
+	      then vdo.dt_analysis
 	    else null::timestamp
 	  end dt_internal_analysis,
 	  coalesce(hrf.id_proposal, -1) as sk_proposal,
@@ -68,9 +78,9 @@ with _fact as (
         then vdp.dt_credit_analysis_end
       else null::timestamp
     end as dt_credit_analysis_approved,
-	  hrf.visit_created_from_app,
+	  hrf.visit_created_from_app as flg_visit_created_from_app,
 	  hrf.visit_created_type,
-	  hrf.visit_last_updated_from_app,
+	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
 	  hrf.visit_last_updated_type,
 	  now()::timestamp as dt_timestamp
 	from house_rent_flow hrf
@@ -114,6 +124,7 @@ select
   sk_visit,
   sk_offer,
   sk_offer_submitted_date,
+  min(sk_offer_submitted_date) filter (where sk_offer_submitted_date != -1) over (partition by id_house) as sk_min_offer_submitted_date,
   sk_offer_approved_date,
   sk_proposal,
   sk_proposal_approved_date,
@@ -125,9 +136,10 @@ select
   sk_credit_analysis_init_date,
   sk_credit_analysis_end_date,
   sk_credit_analysis_approved_date,
-  visit_created_from_app,
+  flg_visit_completed,
+  flg_visit_created_from_app,
   visit_created_type,
-  visit_last_updated_from_app,
+  flg_visit_last_updated_from_app,
   visit_last_updated_type,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +
@@ -174,6 +186,7 @@ select
 	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_house_listing)::integer as days_house_listing_to_contract_signed,
+	date_part('day', dt_visit - dt_house_listing)::integer as days_house_listing_to_visit,
   dt_timestamp
 from _fact
 ;

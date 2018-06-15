@@ -2,12 +2,11 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
-
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags import DW_STAGING_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -75,7 +74,7 @@ def load_agents_scheduling(**kwargs):
 
 # create DAG definition
 dag = DAG(
-    dag_id='bi-agents-availability-PAST',
+    dag_id='bi-agents-availability-past',
     description='Task to load agents slots availability and scheduling',
     default_args={
         'owner': 'Data Team',
@@ -83,7 +82,6 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=datetime(2017, 1, 1, 0, 0, 0),
-    end_date=datetime(2017, 5, 11, 0, 0, 0),
     schedule_interval=env.convert_to_utc_schedule('30 4 * * *'),
     max_active_runs=1
 )
@@ -91,14 +89,14 @@ dag = DAG(
 # operators
 agents_slots = QuintoAndarPythonOperator(
     dag=dag,
-    task_id='load_agents_slots',
+    task_id='load_agents_slots_p',
     python_callable=load_agents_slots,
     provide_context=True
 )
 
 agents_scheduling = QuintoAndarPythonOperator(
     dag=dag,
-    task_id='load_agents_scheduling',
+    task_id='load_agents_scheduling_p',
     python_callable=load_agents_scheduling,
     provide_context=True
 )

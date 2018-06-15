@@ -43,7 +43,7 @@ WITH mkt_costs AS
 	imovel_status_full_history h
     
   inner join
-	vw_property_listing p
+	property_listing p
 	on p.id = h.id
 	and h.date between coalesce(p.min_version_time, '1900-01-01') and coalesce(p.max_version_time, now()) 
 

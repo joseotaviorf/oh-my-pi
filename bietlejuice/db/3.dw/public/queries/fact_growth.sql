@@ -158,6 +158,32 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
+	'new_listings_landing_bv' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.new_listings_landing_bv
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
 	'tenant_prospects' as measure,
 	null as team,
 	_year,
@@ -334,6 +360,32 @@ select
 	yoy,
 	0 as flg_predicted
 from growth.tenants
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
+	'ended_rentals' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.ended_rentals
 
 union all
 
@@ -594,6 +646,58 @@ select
 	yoy,
 	0 as flg_predicted
 from growth.owner_landing_views
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
+	'owner_landing_views_bv' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.owner_landing_views_bv
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
+	'schedule_page_views' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted
+from growth.schedule_page_views
 
 union all
 

@@ -1,39 +1,59 @@
 drop view if exists vw_dim_photo_job;
 create or replace view vw_dim_photo_job
 as
+with base_jobs as (
+	select
+		*,
+		row_number() over (partition by imovel_id order by dt_job_created) as rn
+	from
+		public.photo_job
+)
 select
-	id as sk_photo_job,
-	id,
-	imovel_id,
-	job_status,
-	creation_origin,
-	flexible_schedule,
-	dt_photographer_accepted,
-	dt_job_created,
-	dt_job_issued,
-	dt_shoot_started,
-	dt_job_scheduled,
-	dt_photos_uploaded,
-	dt_updated,
-	scheduling_instructions::varchar(100) as scheduling_instructions,
-	photo_shoot_contact_name,
-	photo_shoot_email,
-	photo_shoot_phone,
-	photo_shoot_second_phone,
-	approved,
-	confirmed,
-	lockbox,
-	key_withdraw,
-	key_comments::varchar(100) as key_comments,
-	photographer_id,
-	photographer_name,
-	photographer_email,
-	dt_photographer_start,
-	photographer_contract_type,
-	job_problem_reason,
-	cancel_reason::varchar(100) as cancel_reason,
-	user_cancel_dt,
-	user_cancel_id,
-	user_cancel_name,
-	user_cancel_email
-from public.photo_job;
+	j1.id as sk_photo_job,
+	j1.id,
+	j1.imovel_id,
+	j1.rep_id,
+	j1.job_status,
+	j1.creation_origin,
+	j1.flexible_schedule,
+	j1.same_day_listing,
+	j1.dt_photographer_accepted,
+	j1.dt_job_created,
+	j1.dt_job_issued,
+	j1.dt_shoot_started,
+	j1.dt_job_scheduled,
+	j1.dt_photos_uploaded,
+	j1.dt_updated,
+	j1.scheduling_instructions::varchar(100) as scheduling_instructions,
+	j1.photo_shoot_contact_name,
+	j1.photo_shoot_email,
+	j1.photo_shoot_phone,
+	j1.photo_shoot_second_phone,
+	j1.approved,
+	j1.confirmed,
+	j1.lockbox,
+	j1.key_withdraw,
+	j1.key_comments::varchar(100) as key_comments,
+	j1.photographer_id,
+	j1.photographer_name,
+	j1.photographer_email,
+	j1.dt_photographer_start,
+	j1.photographer_contract_type,
+	j1.job_problem_reason,
+	j1.cancel_reason::varchar(100) as cancel_reason,
+	j1.user_cancel_dt,
+	j1.user_cancel_id,
+	j1.user_cancel_name,
+	j1.user_cancel_email,
+	j1.user_cancel_type,
+	(j2.id is not null) as rescheduled,
+	j1.creation_to_scheduling_diff_minutes,
+	j1.creation_to_scheduling_diff_hours,
+	j1.creation_to_scheduling_diff_days
+from
+	base_jobs j1
+left join
+	base_jobs j2
+	on j1.imovel_id = j2.imovel_id
+	and j1.rn = j2.rn -1
+	and j1.dt_job_created + interval '30 day' > j2.dt_job_created;
