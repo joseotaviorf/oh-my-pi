@@ -346,15 +346,17 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
-    def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True):
+    def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True, bucket_name=None):
         df_table = petl.fromdataframe(df=df)
+        df_transformed = petl.convert(df_table, 'id_task_opener', int)
         BaseETL.bulk_insert(
-            table=df_table,
+            table=df_transformed,
             table_name=table_name,
             db_enum=enum_db,
             encoding=encoding,
             append=append,
-            commit=commit
+            commit=commit,
+            bucket_name=bucket_name
         )
 
     @classmethod
