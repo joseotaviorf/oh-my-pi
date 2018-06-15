@@ -35,10 +35,8 @@ db.reason_category,
 -- offer --
 -- dof.dt_created as dt_offer_created,
 dof.dt_first_sent as dt_offer_first_sent,
-dof.dt_approved as dt_offer_approved, -- what is the meaning when the offer
--- is not approved ? bug. rib will check. for now remove the date approved if
--- the status is not approvada
-dof.status as offer_status, -- ? see above
+case when dof.status='Aprovada' then dof.dt_analysis else null end as dt_offer_approved,
+dof.status as offer_status,
 
 -- proposal --
 dp.dt_created as dt_proposal_created,
