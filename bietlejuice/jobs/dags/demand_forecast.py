@@ -7,6 +7,7 @@ from airflow.models import DAG
 from airflow.operators import PythonOperator
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.kpi_forecast.funnel import Funnel
 from bietlejuice.jobs.new_etl.kpi_forecast.helpers import get_count, write_to_s3, get_file_from_s3, get_prediction, \
     get_kpis
@@ -16,9 +17,12 @@ from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
 from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
 from qa_python_utils.default_logger import _logger
 
-# bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
-bucket_ds = '5a-data-science'
-# env.set_airflow_var_to_local_env('BI_DW')
+bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
+bucket_dl = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+# bucket_ds = '5a-data-science'
+# bucket_dl = '5a-datalake'
+
+env.set_airflow_var_to_local_env('BI_DW')
 
 MAIN_DAG_NAME = 'bi-demand-forecast'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -26,10 +30,6 @@ MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every m
 
 # parameters of the script
 begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days')  # last monday # must be a monday pandas timestamp
-
-
-# temp !!
-# begin_pred = pd.to_datetime('20180528')
 
 _logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
@@ -60,9 +60,7 @@ def load_fact(begin_pred):
         query=query_demand
     )
     fact = petl.todataframe(table_demand)
-    print 'end query'
-    fact.to_pickle('fact_raw.gz', compression='gzip')
-    # fact = pd.read_pickle('fact_raw.gz', compression='gzip')
+    _logger.info('end query')
 
     preprocessor_demand = Preprocessor(steps)
     fact = preprocessor_demand.preprocess(fact)
@@ -71,33 +69,18 @@ def load_fact(begin_pred):
 
     # split df_demand into past and future bookings (putting ourselves at the beginning of begin_pred)
     fact_past_bookings = fact[(fact[steps.index[0]] < begin_pred)]
-    # write_to_s3(bucket_ds,
-    #             fact_past_bookings,
-    #             'monitoring/%s/fact_past_bookings' % (begin_pred.strftime(
-    #                 "%Y-%m-%d")),
-    #             to_csv=False, to_pickle=True)
 
     return fact_past_bookings
 
 
 def get_default_parameters(city, region):
-    default_yearly_seasonality = None
     default_distribs = None
-
     if city == 'all':
         # global level. no default
         pass
 
     elif region == 'all':
         # city level. only possible default is the global level
-        if get_file_from_s3(
-            bucket_ds,
-            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.gz' %
-            (begin_pred.strftime("%Y-%m-%d")),
-                'global_default_yearly_seasonality.gz'):
-            default_yearly_seasonality = pd.read_pickle(
-                'global_default_yearly_seasonality.gz', compression='gzip')
-
         if get_file_from_s3(bucket_ds,
                             'KPI_predictor/monitoring/%s/all/all/distribs.gz' % (begin_pred.strftime("%Y-%m-%d")),
                             'global_default_distribs.gz'):
@@ -105,18 +88,6 @@ def get_default_parameters(city, region):
 
     else:
         # region level. default is city level, if not available then use the global level
-        # if get_file_from_s3(bucket_ds,'KPI_predictor/monitoring/%s/%s/all/own_yearly_seasonality.gz'%(begin_pred.strftime("%Y-%m-%d"),city),
-        #                     'city_default_yearly_seasonality.gz'):
-        #     default_yearly_seasonality = pd.read_pickle(
-        # 'city_default_yearly_seasonality.gz', compression='gzip')
-        if get_file_from_s3(
-            bucket_ds,
-            'KPI_predictor/monitoring/%s/all/all/own_yearly_seasonality.gz' %
-            (begin_pred.strftime("%Y-%m-%d")),
-                'global_default_yearly_seasonality.gz'):
-            default_yearly_seasonality = pd.read_pickle(
-                'global_default_yearly_seasonality.gz', compression='gzip')
-
         if get_file_from_s3(bucket_ds,
                             'KPI_predictor/monitoring/%s/%s/all/distribs.gz' % (begin_pred.strftime("%Y-%m-%d"), city),
                             'city_default_distribs.gz'):
@@ -126,7 +97,7 @@ def get_default_parameters(city, region):
                               'global_default_distribs.gz'):
             default_distribs = pd.read_pickle('global_default_distribs.gz', compression='gzip')
 
-    return [default_yearly_seasonality, default_distribs]
+    return default_distribs
 
 
 def split_train_recent(df, n_training_days=63, n_recent_days=21):
@@ -137,7 +108,6 @@ def split_train_recent(df, n_training_days=63, n_recent_days=21):
     """
 
     # todo : we can probably reduce the period of the recent set as we are limited by the maximum delay between two consecutive steps, not the delay between booking and contract
-    # todo : check if we need the copy()
     train_df = df[
         df[steps.index[0]] >= (begin_pred - pd.to_timedelta(n_training_days, unit='days'))]
 
@@ -148,15 +118,13 @@ def split_train_recent(df, n_training_days=63, n_recent_days=21):
     return [train_df, recent_df]
 
 
-def predict_bookings(fact_past_bookings, default_yearly_seasonality):
+def predict_bookings(fact_past_bookings):
     """
     predicts the upcoming bookings per day, starting at begin_pred
     :param fact_past_bookings:
-    :param default_yearly_seasonality:
     :return:ts_first_step_pred : None in case of failure. otherwise a Series defined over range_pred_day
     predictor.own_yearly_seasonality : None in case it uses the default or faillure
     """
-
     # Predict bookings
     # contains first step regions that have data in the past #defined over beginning-begin_pred -1
     ts_first_step = get_count(fact_past_bookings, steps, steps.index[0])
@@ -166,14 +134,9 @@ def predict_bookings(fact_past_bookings, default_yearly_seasonality):
                              range_pred_day,
                              range_pred_week,
                              )
-    ts_first_step_pred = predictor.predict(
-        model_weekly_seasonality=model_weekly_seasonality,
-        model_yearly_seasonality=model_yearly_seasonality,
-        default_yearly_seasonality=default_yearly_seasonality,
-        rolavg_duration=rolavg_duration,
-    )  # defined over range_pred_day
+    ts_first_step_pred = predictor.predict()  # defined over range_pred_day
 
-    return [ts_first_step_pred, predictor.own_yearly_seasonality]
+    return ts_first_step_pred
 
 
 def predict_next_steps(fact_past_bookings, ts_first_step_pred, default_distribs):
@@ -219,17 +182,12 @@ def compute_all_predictions(fact_past_bookings):
     region = 'all'
     _logger.info(city + ' ' + region)
     fact_regional = fact_past_bookings.copy()
-    default_yearly_seasonality, default_distribs = get_default_parameters(city, region)  # [None, None]
-    bookings_pred, own_yearly_seasonality = predict_bookings(fact_regional, default_yearly_seasonality)
+    bookings_pred = predict_bookings(fact_regional)
     write_to_s3(bucket_ds,
                 bookings_pred,
                 'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
                 to_csv=True, to_pickle=True)
-    write_to_s3(bucket_ds,
-                own_yearly_seasonality,
-                'monitoring/%s/%s/%s/own_yearly_seasonality' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-                to_csv=True, to_pickle=True)
-
+    default_distribs = None
     kpis_prediction, distribs = predict_next_steps(fact_regional, bookings_pred, default_distribs)
     kpis_prediction['city'] = city
     kpis_prediction['region'] = region
@@ -242,61 +200,53 @@ def compute_all_predictions(fact_past_bookings):
                 'monitoring/%s/%s/%s/distribs' % (begin_pred.strftime("%Y-%m-%d"), city, region),
                 to_csv=True, to_pickle=True)
 
-    # for city in cities:
-    #     region = 'all'
-    #     _logger.info(city + ' ' + region)
-    #     fact_regional = fact_past_bookings[fact_past_bookings.city_name == city]
-    #     default_yearly_seasonality, default_distribs = get_default_parameters(city, region)
-    #     bookings_pred, own_yearly_seasonality = predict_bookings(fact_regional, default_yearly_seasonality)
-    #     if bookings_pred is not None:
-    #         write_to_s3(bucket_ds,
-    #                     bookings_pred,
-    #                     'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                     to_csv=True, to_pickle=True)
-    #         write_to_s3(bucket_ds,
-    #                     own_yearly_seasonality,
-    #                     'monitoring/%s/%s/%s/own_yearly_seasonality' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                     to_csv=True, to_pickle=True)
-    #         kpis_prediction, distribs = predict_next_steps(fact_regional, bookings_pred, default_distribs)
-    #         if kpis_prediction is not None:
-    #             kpis_prediction['city'] = city
-    #             kpis_prediction['region'] = region
-    #             write_to_s3(bucket_ds,
-    #                         kpis_prediction,
-    #                         'monitoring/%s/%s/%s/kpis_prediction' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                         to_csv=True, to_pickle=True)
-    #             write_to_s3(bucket_ds,
-    #                         distribs,
-    #                         'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                         to_csv=True, to_pickle=True)
-    #
-    # for region in regions:
-    #     city = geo_levels.set_index('region').loc[region, 'city']
-    #     _logger.info(city + ' ' + region)
-    #     fact_regional = fact_past_bookings[fact_past_bookings.region_code == region]
-    #     default_yearly_seasonality, default_distribs = get_default_parameters(city, region)
-    #     bookings_pred, own_yearly_seasonality = predict_bookings(fact_regional, default_yearly_seasonality)
-    #     if bookings_pred is not None:
-    #         write_to_s3(bucket_ds,
-    #                     bookings_pred,
-    #                     'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                     to_csv=True, to_pickle=True)
-    #         write_to_s3(bucket_ds,
-    #                     own_yearly_seasonality,
-    #                     'monitoring/%s/%s/%s/own_yearly_seasonality' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                     to_csv=True, to_pickle=True)
-    #         kpis_prediction, distribs = predict_next_steps(fact_regional, bookings_pred, default_distribs)
-    #         if kpis_prediction is not None:
-    #             kpis_prediction['city'] = city
-    #             kpis_prediction['region'] = region
-    #             write_to_s3(bucket_ds,
-    #                         kpis_prediction,
-    #                         'monitoring/%s/%s/%s/kpis_prediction' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                         to_csv=True, to_pickle=True)
-    #             write_to_s3(bucket_ds,
-    #                         distribs,
-    #                         'monitoring/%s/%s/%s/distribs' % (begin_pred.strftime("%Y-%m-%d"), city, region),
-    #                         to_csv=True, to_pickle=True)
+    for city in cities:
+        region = 'all'
+        _logger.info(city + ' ' + region)
+        fact_regional = fact_past_bookings[fact_past_bookings.city_name == city]
+        bookings_pred = predict_bookings(fact_regional)
+        if bookings_pred is not None:
+            write_to_s3(bucket_ds,
+                        bookings_pred,
+                        'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                        to_csv=True, to_pickle=True)
+            default_distribs = get_default_parameters(city, region)
+            kpis_prediction, distribs = predict_next_steps(fact_regional, bookings_pred, default_distribs)
+            if kpis_prediction is not None:
+                kpis_prediction['city'] = city
+                kpis_prediction['region'] = region
+                write_to_s3(bucket_ds,
+                            kpis_prediction,
+                            'monitoring/%s/%s/%s/kpis_prediction' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                            to_csv=True, to_pickle=True)
+                write_to_s3(bucket_ds,
+                            distribs,
+                            'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                            to_csv=True, to_pickle=True)
+
+    for region in regions:
+        city = geo_levels.set_index('region').loc[region, 'city']
+        _logger.info(city + ' ' + region)
+        fact_regional = fact_past_bookings[fact_past_bookings.region_code == region]
+        bookings_pred = predict_bookings(fact_regional)
+        if bookings_pred is not None:
+            write_to_s3(bucket_ds,
+                        bookings_pred,
+                        'monitoring/%s/%s/%s/bookings_pred' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                        to_csv=True, to_pickle=True)
+            default_distribs = get_default_parameters(city, region)
+            kpis_prediction, distribs = predict_next_steps(fact_regional, bookings_pred, default_distribs)
+            if kpis_prediction is not None:
+                kpis_prediction['city'] = city
+                kpis_prediction['region'] = region
+                write_to_s3(bucket_ds,
+                            kpis_prediction,
+                            'monitoring/%s/%s/%s/kpis_prediction' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                            to_csv=True, to_pickle=True)
+                write_to_s3(bucket_ds,
+                            distribs,
+                            'monitoring/%s/%s/%s/distribs' % (begin_pred.strftime("%Y-%m-%d"), city, region),
+                            to_csv=True, to_pickle=True)
     return [geo_levels, cities, regions]
 
 
@@ -321,19 +271,19 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     if kpis_prediction is not None:
         kpi_pred_demand = kpis_prediction
 
-    # for city in cities:
-    #     region = 'all'
-    #     _logger.info('getting ' + city + ' ' + region)
-    #     kpis_prediction = get_prediction(city, region, begin_pred)
-    #     if kpis_prediction is not None:
-    #         kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
-    #
-    # for region in regions:
-    #     city = geo_levels.set_index('region').loc[region, 'city']
-    #     _logger.info('getting ' + city + ' ' + region)
-    #     kpis_prediction = get_prediction(city, region, begin_pred)
-    #     if kpis_prediction is not None:
-    #         kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
+    for city in cities:
+        region = 'all'
+        _logger.info('getting ' + city + ' ' + region)
+        kpis_prediction = get_prediction(city, region, begin_pred)
+        if kpis_prediction is not None:
+            kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
+
+    for region in regions:
+        city = geo_levels.set_index('region').loc[region, 'city']
+        _logger.info('getting ' + city + ' ' + region)
+        kpis_prediction = get_prediction(city, region, begin_pred)
+        if kpis_prediction is not None:
+            kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
 
     kpi_pred_demand = kpi_pred_demand.reset_index().set_index(['city', 'region', 'date'])
 
@@ -352,7 +302,6 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     output_count_weekly = pd.DataFrame()
     output_count_yearly = pd.DataFrame()
     output_count_monthly = pd.DataFrame()
-    output.reset_index()[['city', 'region']].drop_duplicates()
     # for every unique combination of city and region,
     # filter the dataframe, drop the region, and compute weekly monthly and yearly
     for (city, region), row in output.reset_index()[['city', 'region']].drop_duplicates().set_index(
@@ -415,30 +364,38 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     ddl = ['city',
            'region',
            'date',
-           'booking_created',  # not rescheduled?
+           'booking_created',
            'effective_visit',
            'offer_first_sent',
            'offer_approved',
            'tenant_first_document_sent',
-           'proposal_approved',
-           'booking_created_yearly_count',  # not rescheduled?
+           'credit_analysis_init',
+           'credit_analysis_approved',
+           'signature_notcancelled',
+           'booking_created_yearly_count',
            'effective_visit_yearly_count',
            'offer_first_sent_yearly_count',
+           'credit_analysis_init_yearly_count',
            'offer_approved_yearly_count',
            'tenant_first_document_sent_yearly_count',
            'credit_analysis_approved_yearly_count',
-           'booking_created_monthly_count',  # not rescheduled?
+           'signature_notcancelled_yearly_count',
+           'booking_created_monthly_count',
            'effective_visit_monthly_count',
            'offer_first_sent_monthly_count',
+           'credit_analysis_init_monthly_count',
            'offer_approved_monthly_count',
            'tenant_first_document_sent_monthly_count',
            'credit_analysis_approved_monthly_count',
-           'booking_created_weekly_count',  # not rescheduled?
+           'signature_notcancelled_monthly_count',
+           'booking_created_weekly_count',
            'effective_visit_weekly_count',
            'offer_first_sent_weekly_count',
            'offer_approved_weekly_count',
            'tenant_first_document_sent_weekly_count',
+           'credit_analysis_init_weekly_count',
            'credit_analysis_approved_weekly_count',
+           'signature_notcancelled_weekly_count',
            'dt_timestamp', ]
     unused_cols = [col for col in output.columns if col not in ddl]
     output = output[ddl + unused_cols]
@@ -446,6 +403,7 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     # finally, write the csv
     _logger.info('writing csv in s3')
     write_to_s3(bucket_ds, output, 'demand_funnel_' + dt_timestamp.split(' ')[0], to_csv=True, to_pickle=False)
+    write_to_s3(bucket_dl, output, 'demand_funnel', to_csv=True, to_pickle=False, path='raw/growth/demand_prediction/')
 
 
 def demand_forecast():

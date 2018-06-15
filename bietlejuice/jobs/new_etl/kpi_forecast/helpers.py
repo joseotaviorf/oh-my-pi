@@ -22,7 +22,7 @@ def get_file_from_s3(bucket, file_name_s3, file_name_local):
     return True
 
 
-def write_to_s3(bucket, obj, filename, to_csv=True, to_pickle=False):
+def write_to_s3(bucket, obj, filename, to_csv=True, to_pickle=False, path='KPI_predictor/'):
     """write dataframe obj to s3 (in the ts/monitoring directory)"""
     if (isinstance(obj, pd.DataFrame)) or (isinstance(obj, pd.Series)):
 
@@ -31,12 +31,12 @@ def write_to_s3(bucket, obj, filename, to_csv=True, to_pickle=False):
         if to_csv is True:
             csv_buffer = io.BytesIO()
             obj.to_csv(csv_buffer, index=False, sep=',', encoding='utf-8', header=True)
-            s3.Object(bucket, 'KPI_predictor/' + filename + '.csv').put(Body=csv_buffer.getvalue())
+            s3.Object(bucket, path + filename + '.csv').put(Body=csv_buffer.getvalue())
         if to_pickle is True:
             file = io.BytesIO()
             with gzip.GzipFile(fileobj=file, mode='w') as fp:
                 fp.write(pickle.dumps(obj))
-            s3.Object(bucket, 'KPI_predictor/' + filename + '.gz').put(
+            s3.Object(bucket, path + filename + '.gz').put(
                 Body=file.getvalue())
 
 

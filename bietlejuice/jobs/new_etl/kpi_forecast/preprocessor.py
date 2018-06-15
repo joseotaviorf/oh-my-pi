@@ -14,6 +14,8 @@ class Preprocessor():
         # regionless lines are assigned the region NONE
         df.loc[df.region_code.isnull(), 'region_code'] = 'NONE'
         df.loc[df.city_name.isnull(), 'city_name'] = 'NONE'
+        df.loc[df.region_code == '', 'region_code'] = 'NONE'
+        df.loc[df.city_name == '', 'city_name'] = 'NONE'
 
         # define steps of the process
         df.loc[:, 'dt_booking_created_notrescheduled'] = df['dt_booking_created'].where(

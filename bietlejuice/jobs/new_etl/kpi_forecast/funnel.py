@@ -110,8 +110,6 @@ class Funnel:
                     threshold_date = n_events[n_events > self.max_samples].index.max()
                     if pd.notnull(threshold_date):  # there is a stepdate [after which enough events happen
                         t = t[t[predictor_step] >= pd.to_datetime(threshold_date)]
-                    # else:
-                    #                       print 'no threshold date for ' + step
 
                     # how many distinct instances of the the step are there for this particular weekday?
                     unique_predictor_id = t[deduplication_col_predictor_step].nunique()
