@@ -1,5 +1,5 @@
 query_demand = """select
-dpt.sk_property as sk_house,
+dpt.id as sk_house,
 dpt.min_version_time as dt_publication,
 f.sk_rent_flow,
 f.sk_booking,
@@ -30,25 +30,27 @@ db.visit_follow_up,
 --db.visit_type? ...
 db.dt_created as dt_booking_created,
 db.dt_scheduling as dt_booking_scheduling,
+db.reason_category,
 
 -- offer --
 -- dof.dt_created as dt_offer_created,
 dof.dt_first_sent as dt_offer_first_sent,
-dof.dt_approved as dt_offer_approved, -- what is the meaning when the offer is not approved ? bug. rib will check. for now remove the date approved if the status is not approvada
-dof.status as offer_status, -- ? see above
+case when dof.status='Aprovada' then dof.dt_analysis else null end as dt_offer_approved,
+dof.status as offer_status,
 
 -- proposal --
 dp.dt_created as dt_proposal_created,
-dp.dt_proposal_approved,
+-- dp.dt_proposal_approved, -- this is the date in admin. pbi uses the date in SH (next line)
+cast(f.sk_credit_analysis_approved_date as text), -- to_date(, 'YYYYMMDD') does not work. as dt_credit_analysis_approved,
 -- dp.status as proposal_status, -- needed ? not needed
-dp.dt_tenant_first_document_sent, --correct field? why first? the date he sent his docs for the first time
+dp.dt_tenant_first_document_sent,
 dp.dt_credit_analysis_init,
 
 -- contract --
 dc.dt_created as dt_contract_created,
 dc.dt_signature as dt_contract_signature,
 dc.contract_status,
-db.reason_category,
+
 
 -- region --
 dr.region_code,
@@ -61,9 +63,4 @@ left join dim_offer dof on f.sk_offer = dof.sk_offer
 left join dim_proposal dp on f.sk_proposal = dp.sk_proposal
 left join dim_contract dc on f.sk_contract = dc.sk_contract
 left join dim_region dr on f.sk_region = dr.sk_region
-
--- when a booking is cancelled AND rescheduled we want to count the new scheduling only.
--- the status of the first one will be cancelled and the reason will be 'rescheduling'
--- where db.reason_category != 'Reschedule'
-
 ;"""
