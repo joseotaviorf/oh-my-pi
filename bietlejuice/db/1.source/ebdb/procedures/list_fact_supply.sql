@@ -405,8 +405,8 @@ from
 	(
 		select min(REV) as REV, ja.id from
 		JobFotografo_AUD ja
-		left join UsuarioRevisionEntity ure on ure.id = ja.REV
-		left join Usuario u on u.id = ure.usuario_id
+		inner join UsuarioRevisionEntity ure on ure.id = ja.REV
+		inner join Usuario u on u.id = ure.usuario_id
 		where (u.dadosVendedor_id is not null)
 		group by ja.id
 	) photo_rep
