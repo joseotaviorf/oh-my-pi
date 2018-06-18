@@ -175,28 +175,13 @@ def extract_manual_tasks(_uri, dt=None):
         assignee_id = row['assigneeId']
         dt_created = row['dataInicio']
         task_done = row['resolvida']
-        dt_closed = None
-        dt_reschedule = None
-        workgroup_id = None
-        subject = None
-        description = None
-        task_opener_id = None
-        original_assignee_id = None
-
-        if 'openedById' in row:
-            task_opener_id = row['openedById']
-        if 'workgroupId' in row['metadata']:
-            workgroup_id = row['metadata']['workgroupId']
-        if 'assigneeId' in row['metadata']:
-            original_assignee_id = row['metadata']['assigneeId']
-        if 'assunto' in row['metadata']:
-            subject = row['metadata']['assunto']
-        if 'descricao' in row['metadata']:
-            description = row['metadata']['descricao']
-        if 'silenciadaAte' in row:
-            dt_reschedule = row['silenciadaAte']
-        if 'realizadaEm' in row:
-            dt_closed = row['realizadaEm']
+        task_opener_id = row.get('openedById', None)
+        workgroup_id = row['metadata'].get('workgroupId', None)
+        original_assignee_id = row['metadata'].get('assigneeId', None)
+        subject = row['metadata'].get('assunto', None)
+        description = row['metadata'].get('descricao', None)
+        dt_reschedule = row.get('silenciadaAte', None)
+        dt_closed = row.get('realizadaEm', None)
 
         task = {
             "id_task": task_id,
@@ -219,6 +204,8 @@ def extract_manual_tasks(_uri, dt=None):
     df = pd.DataFrame(tasks)
     df['id_task_opener'] = \
         pd.to_numeric(df['id_task_opener'], errors='coerce').where(pd.notnull(df['id_task_opener']), None)
+    df['id_original_assignee'] = \
+        pd.to_numeric(df['id_original_assignee'], errors='coerce').where(pd.notnull(df['id_original_assignee']), None)
     df['sk_date_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y%m%d') if not pd.isnull(x) else '')
     df['dt_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
     df['dt_closed'] = df['dt_closed'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
@@ -252,7 +239,8 @@ def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
         table_name='{}.{}'.format(schema_name, table_name),
         encoding='utf-8',
         append=False,
-        bucket_name='{}/raw/crm/{}'.format(_bucket, table_name)
+        bucket_name='{}/raw/crm/{}'.format(_bucket, table_name),
+        int_columns=['id_task_opener', 'id_original_assignee']
     )
     _logger.info('m=load_manual_tasks, msg=saved to db')
 
