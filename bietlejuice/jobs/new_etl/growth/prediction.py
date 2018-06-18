@@ -63,10 +63,10 @@ class GrowthPrediction(Growth):
     @logger
     def get_approved_by_insurer_placeholders():
         return {
-            'daily_count': 'proposal_approved',
-            'weekly_count': 'proposal_approved_weekly_count',
-            'monthly_count': 'proposal_approved_monthly_count',
-            'yearly_count': 'proposal_approved_yearly_count'
+            'daily_count': 'credit_analysis_approved',
+            'weekly_count': 'credit_analysis_approved_weekly_count',
+            'monthly_count': 'credit_analysis_approved_monthly_count',
+            'yearly_count': 'credit_analysis_approved_yearly_count'
         }
 
     @staticmethod

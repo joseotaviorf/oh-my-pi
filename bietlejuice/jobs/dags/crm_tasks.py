@@ -135,8 +135,9 @@ def extract_lead_tasks(_uri, dt=None):
 def extract_manual_tasks(_uri, dt=None):
     client = MongoClient(_uri)
     db = client.tasks
-    conversion_columns = ['id_task', 'id_task_opener', 'id_assignee', 'id_workgroup', 'task_done', 'description',
-                          'subject', 'dt_created', 'dt_reschedule', 'dt_closed']
+    conversion_columns = ['id_task', 'id_task_opener', 'id_assignee', 'id_original_assignee', 'id_workgroup',
+                          'task_done', 'description', 'subject', 'sk_date_created', 'dt_created', 'dt_reschedule',
+                          'dt_closed']
 
     _filter = {
         "type": {"$in": ["Manual"]}
@@ -156,6 +157,7 @@ def extract_manual_tasks(_uri, dt=None):
         "metadata.workgroupId": 1,
         "metadata.assunto": 1,
         "metadata.descricao": 1,
+        "metadata.assigneeId": 1,
         "silenciadaAte": 1,
         "openedById": 1
     }
@@ -173,34 +175,24 @@ def extract_manual_tasks(_uri, dt=None):
         assignee_id = row['assigneeId']
         dt_created = row['dataInicio']
         task_done = row['resolvida']
-        dt_closed = None
-        dt_reschedule = None
-        workgroup_id = None
-        subject = None
-        description = None
-        task_opener_id = None
-        if 'openedById' in row:
-            task_opener_id = row['openedById']
-
-        if 'workgroupId' in row['metadata']:
-            workgroup_id = row['metadata']['workgroupId']
-        if 'assunto' in row['metadata']:
-            subject = row['metadata']['assunto']
-        if 'descricao' in row['metadata']:
-            description = row['metadata']['descricao']
-        if 'silenciadaAte' in row:
-            dt_reschedule = row['silenciadaAte']
-        if 'realizadaEm' in row:
-            dt_closed = row['realizadaEm']
+        task_opener_id = row.get('openedById', None)
+        workgroup_id = row['metadata'].get('workgroupId', None)
+        original_assignee_id = row['metadata'].get('assigneeId', None)
+        subject = row['metadata'].get('assunto', None)
+        description = row['metadata'].get('descricao', None)
+        dt_reschedule = row.get('silenciadaAte', None)
+        dt_closed = row.get('realizadaEm', None)
 
         task = {
             "id_task": task_id,
-            "id_task_opener": task_opener_id if task_opener_id is None else int(task_opener_id),
+            "id_task_opener": task_opener_id,
             "id_assignee": assignee_id,
+            "id_original_assignee": original_assignee_id,
             "id_workgroup": workgroup_id,
             "task_done": task_done,
             "description": description,
             "subject": subject,
+            "sk_date_created": dt_created,
             "dt_created": dt_created,
             "dt_reschedule": dt_reschedule,
             "dt_closed": dt_closed
@@ -210,6 +202,11 @@ def extract_manual_tasks(_uri, dt=None):
     if len(tasks) == 0:
         return None
     df = pd.DataFrame(tasks)
+    df['id_task_opener'] = \
+        pd.to_numeric(df['id_task_opener'], errors='coerce').where(pd.notnull(df['id_task_opener']), None)
+    df['id_original_assignee'] = \
+        pd.to_numeric(df['id_original_assignee'], errors='coerce').where(pd.notnull(df['id_original_assignee']), None)
+    df['sk_date_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y%m%d') if not pd.isnull(x) else '')
     df['dt_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
     df['dt_closed'] = df['dt_closed'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
     df['dt_reschedule'] = df['dt_reschedule'].apply(
@@ -219,7 +216,7 @@ def extract_manual_tasks(_uri, dt=None):
     return df.loc[:, conversion_columns]
 
 
-def load_lead_tasks(_uri, table_name, schema_name='crm'):
+def load_lead_tasks(_uri, table_name, _bucket, schema_name='crm'):
     df = extract_lead_tasks(_uri=_uri)
     _logger.info('m=load_lead_tasks, msg=start saving to db')
     BaseETL.dataframe_to_db(
@@ -227,21 +224,23 @@ def load_lead_tasks(_uri, table_name, schema_name='crm'):
         enum_db=EnumDb.BI_ODS,
         table_name='{}.{}'.format(schema_name, table_name),
         encoding='utf-8',
-        append=False
+        append=False,
+        bucket_name='{}/raw/crm/{}'.format(_bucket, table_name)
     )
     _logger.info('m=load_lead_tasks, msg=saved to db')
 
 
-def load_manual_tasks(_uri, table_name, schema_name='crm'):
+def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
     df = extract_manual_tasks(_uri=_uri)
-    print df
     _logger.info('m=load_manual_tasks, msg=start saving to db')
     BaseETL.dataframe_to_db(
         df=df,
         enum_db=EnumDb.BI_ODS,
         table_name='{}.{}'.format(schema_name, table_name),
         encoding='utf-8',
-        append=False
+        append=False,
+        bucket_name='{}/raw/crm/{}'.format(_bucket, table_name),
+        int_columns=['id_task_opener', 'id_original_assignee']
     )
     _logger.info('m=load_manual_tasks, msg=saved to db')
 
@@ -258,14 +257,14 @@ lead_tasks = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='load_lead_tasks',
     func_command=load_lead_tasks,
-    op_kwargs={'table_name': 'lead_tasks', '_uri': uri, 'schema_name': 'crm'}
+    op_kwargs={'table_name': 'lead_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
 )
 
 manual_tasks = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='load_manual_tasks',
     func_command=load_manual_tasks,
-    op_kwargs={'table_name': 'manual_tasks', '_uri': uri, 'schema_name': 'crm'}
+    op_kwargs={'table_name': 'manual_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
 )
 
 lead_tasks >> manual_tasks
