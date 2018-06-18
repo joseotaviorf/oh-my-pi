@@ -1,5 +1,4 @@
 import codecs
-import datetime
 import gzip
 import io
 import json
@@ -12,6 +11,7 @@ from io import BytesIO
 from logging import info as log
 
 import boto3
+import datetime
 import petl
 from petl.io.db import create_table
 
@@ -346,11 +346,13 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
-    def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True, bucket_name=None):
+    def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True, bucket_name=None,
+                        int_columns=None):
         df_table = petl.fromdataframe(df=df)
-        df_transformed = petl.convert(df_table, 'id_task_opener', int)
+        for column in int_columns or []:
+            df_table = petl.convert(df_table, column, int)
         BaseETL.bulk_insert(
-            table=df_transformed,
+            table=df_table,
             table_name=table_name,
             db_enum=enum_db,
             encoding=encoding,
