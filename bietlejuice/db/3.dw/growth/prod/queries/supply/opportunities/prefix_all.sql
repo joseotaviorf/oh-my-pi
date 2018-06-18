@@ -47,8 +47,8 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as city,
   	count(f.sk_opportunity_date) as monthly_count
 	from fact_supply f
-	where f.sk_opportunity_date between to_char(add_months(date_trunc('month', current_date), -1), 'YYYYMMDD')
-    and to_char(add_months(current_date - 1, -1), 'YYYYMMDD')
+	where f.sk_opportunity_date between to_char(add_months(date_trunc('month', current_date), -1), 'YYYYMMDD')::integer
+    and to_char(add_months(current_date - 1, -1), 'YYYYMMDD')::integer
   group by 1, 2
   order by 1, 2
 ),
@@ -59,8 +59,8 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as city,
   	count(f.sk_opportunity_date) as yearly_count
 	from fact_supply f
-	where f.sk_opportunity_date between to_char(add_months(date_trunc('year', current_date), -12), 'YYYYMMDD')
-    and to_char(add_months(current_date - 1, -12), 'YYYYMMDD')
+	where f.sk_opportunity_date between to_char(add_months(date_trunc('year', current_date), -12), 'YYYYMMDD')::integer
+    and to_char(add_months(current_date - 1, -12), 'YYYYMMDD')::integer
   group by 1
   order by 1
 ),
