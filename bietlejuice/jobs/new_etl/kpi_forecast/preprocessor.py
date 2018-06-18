@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+
+
 class Preprocessor():
     """
     preprocessing the dataframe (adding columns with steps of the process, filling values, removing lines that dont make sense)
@@ -10,10 +14,15 @@ class Preprocessor():
         # regionless lines are assigned the region NONE
         df.loc[df.region_code.isnull(), 'region_code'] = 'NONE'
         df.loc[df.city_name.isnull(), 'city_name'] = 'NONE'
+        df.loc[df.region_code == '', 'region_code'] = 'NONE'
+        df.loc[df.city_name == '', 'city_name'] = 'NONE'
 
         # define steps of the process
+        df.loc[:, 'dt_booking_created_notrescheduled'] = df['dt_booking_created'].where(
+            df.reason_category != 'Reschedule')  # source ribaldo
         df.loc[:, 'dt_effective_visit'] = df['dt_booking_scheduling'].where(
             df.visit_follow_up.isin(['VaiNegociar', 'Talvez', 'VisitouSozinho', 'NaoGostou']))  # source ribaldo
+        df.loc[:, 'dt_credit_analysis_approved'] = pd.to_datetime(df['sk_credit_analysis_approved_date'].replace(to_replace='-1', value=np.nan))
         df.loc[:, 'dt_signature_notcancelled'] = df['dt_contract_signature'].where(
             df.contract_status.isin(['Ativo', 'Finalizado']))  # source ribaldo
 
