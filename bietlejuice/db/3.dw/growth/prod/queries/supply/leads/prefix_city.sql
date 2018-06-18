@@ -23,7 +23,7 @@ with all_dates_prev as (
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	where f.sk_lead_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')
+	where f.sk_lead_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')::integer
   order by 6, 1, 2, 3, 4
 ),
 all_dates as (
