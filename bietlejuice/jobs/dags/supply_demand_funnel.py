@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -19,6 +20,8 @@ from bietlejuice.jobs.dags.util import xcom as xcom
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+QUERIES_EBDB_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/supply_demand_funnel')
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
@@ -32,11 +35,22 @@ main_dag = BaseDAG.build_dag(
 )
 
 
+def get_query(dim_name):
+    file_name = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim_name)
+
+    with open(file_name) as f:
+        lines = f.read()
+
+    return lines
+
+
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
+    query = get_query(dim_name=kwargs['dim_name'])
+
     utils.extract_query_dim_from_ebdb_to_ods(
         dim_name=kwargs['dim_name'],
         bucket=bucket,
-        command=kwargs['command'],
+        command=query,
         table_name=None if 'table_name' not in kwargs else kwargs['table_name']
     )
 
@@ -178,15 +192,16 @@ ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'house_rent_flow', 'command': 'call ebdb.list_house_rent_flow();'}
+    # op_kwargs={'dim_name': 'house_rent_flow', 'command': 'call ebdb.list_house_rent_flow();'}
+    op_kwargs={'dim_name': 'house_rent_flow'}
 )
 
 ods_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'fact_supply',
-               'command': 'call ebdb.list_fact_supply(null);'}
+    # op_kwargs={'dim_name': 'fact_supply', 'command': 'call ebdb.list_fact_supply(null);'}
+    op_kwargs={'dim_name': 'fact_supply'}
 )
 
 fact_supply = BaseDAG.get_quintoandar_python_operator(
@@ -207,7 +222,7 @@ fact_demand = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_demand',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket, 'insert_dummy': True}
 )
 
 # flow
@@ -279,11 +294,10 @@ xcom_fact_demand = BaseDAG.get_quintoandar_python_operator(
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
-ods_house_rent_flow.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                  user_dag, house_dag])
+fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+                          user_dag, house_dag, ods_house_rent_flow])
 
 ods_supply >> fact_supply
-ods_house_rent_flow >> fact_demand
 fact_demand >> xcom_fact_demand
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job

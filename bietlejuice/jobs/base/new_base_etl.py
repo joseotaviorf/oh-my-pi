@@ -1,19 +1,22 @@
 import os
 from datetime import datetime
 
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
+QUERIES_EBDB_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/supply_demand_funnel')
 now = datetime.now()
 
 
-def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None):
+def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None, exec_date=None):
     if table_name is None:
         table_name = dim_name
+
+    if exec_date is not None:
+        command = command.format(exec_date)
 
     _logger.info("Start query: {}".format(datetime.now()))
     table = BaseETL.from_db_query(

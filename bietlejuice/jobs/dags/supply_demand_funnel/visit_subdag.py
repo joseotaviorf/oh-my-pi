@@ -1,10 +1,13 @@
+import os
 from datetime import datetime
-
-from qa_python_utils.default_logger import logger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils.default_logger import logger
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+QUERIES_EBDB_DIR = os.path.join(dir_path, '../../../db/1.source/ebdb/queries/supply_demand_funnel')
 
 
 class VisitSubDag(DimSubDag):
@@ -36,16 +39,39 @@ class VisitSubDag(DimSubDag):
         return visit_dag
 
     @logger
+    def get_visit_query(self, **kwargs):
+        exec_date = kwargs['execution_date']
+        dim = 'visit'
+
+        query = self.get_query(dim_name=dim)
+        query = query.format(str(exec_date))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+                                                 table_name=None)
+
+    @logger
+    def get_query(self, dim_name):
+        file_name = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim_name)
+
+        with open(file_name) as f:
+            lines = f.read()
+
+        return lines
+
+    @logger
     def __build_data_tasks(self, dag):
         visits = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_visits',
             dag=dag,
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'visit',
-                'command': 'call ebdb.list_visita();',
-                'bucket': DimSubDag.S3_BUCKET
-            }
+            provide_context=True,
+            func_command=self.get_visit_query
+            # func_command=utils.extract_query_dim_from_ebdb_to_ods,
+            #
+            # op_kwargs={
+            #     'dim_name': 'visit',
+            #     'command': 'call ebdb.list_visita();',
+            #     'bucket': DimSubDag.S3_BUCKET
+            # }
         )
 
         property_visit_information = BaseDAG.get_quintoandar_python_operator(

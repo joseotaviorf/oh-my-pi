@@ -1,8 +1,12 @@
-from qa_python_utils.default_logger import logger
+import os
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils.default_logger import logger
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+QUERIES_EBDB_DIR = os.path.join(dir_path, '../../../db/1.source/ebdb/queries/supply_demand_funnel')
 
 
 class HouseSubDag(DimSubDag):
@@ -36,17 +40,39 @@ class HouseSubDag(DimSubDag):
         return house_dag
 
     @logger
+    def get_property_query(self, **kwargs):
+        exec_date = kwargs['execution_date']
+        dim = 'property'
+
+        query = self.get_query(dim_name=dim)
+        query = query.format(str(exec_date))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+                                                 table_name='imovel')
+
+    @logger
+    def get_query(self, dim_name):
+        file_name = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim_name)
+
+        with open(file_name) as f:
+            lines = f.read()
+
+        return lines
+
+    @logger
     def __build_data_tasks(self, dag):
         property_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_imovel',
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'property',
-                'command': 'call ebdb.list_imovel();',
-                'table_name': 'imovel',
-                'bucket': DimSubDag.S3_BUCKET
-            }
+            provide_context=True,
+            func_command=self.get_property_query
+            # func_command=utils.extract_query_dim_from_ebdb_to_ods,
+            # op_kwargs={
+            #     'dim_name': 'property',
+            #     'command': 'call ebdb.list_imovel();',
+            #     'table_name': 'imovel',
+            #     'bucket': DimSubDag.S3_BUCKET
+            # }
         )
 
         affiliate = BaseDAG.get_quintoandar_python_operator(
