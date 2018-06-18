@@ -135,8 +135,9 @@ def extract_lead_tasks(_uri, dt=None):
 def extract_manual_tasks(_uri, dt=None):
     client = MongoClient(_uri)
     db = client.tasks
-    conversion_columns = ['id_task', 'id_task_opener', 'id_assignee', 'id_workgroup', 'task_done', 'description',
-                          'subject', 'dt_created', 'dt_reschedule', 'dt_closed']
+    conversion_columns = ['id_task', 'id_task_opener', 'id_assignee', 'id_original_assignee', 'id_workgroup',
+                          'task_done', 'description', 'subject', 'sk_date_created', 'dt_created', 'dt_reschedule',
+                          'dt_closed']
 
     _filter = {
         "type": {"$in": ["Manual"]}
@@ -156,6 +157,7 @@ def extract_manual_tasks(_uri, dt=None):
         "metadata.workgroupId": 1,
         "metadata.assunto": 1,
         "metadata.descricao": 1,
+        "metadata.assigneeId": 1,
         "silenciadaAte": 1,
         "openedById": 1
     }
@@ -179,11 +181,14 @@ def extract_manual_tasks(_uri, dt=None):
         subject = None
         description = None
         task_opener_id = None
+        original_assignee_id = None
+
         if 'openedById' in row:
             task_opener_id = row['openedById']
-
         if 'workgroupId' in row['metadata']:
             workgroup_id = row['metadata']['workgroupId']
+        if 'assigneeId' in row['metadata']:
+            original_assignee_id = row['metadata']['assigneeId']
         if 'assunto' in row['metadata']:
             subject = row['metadata']['assunto']
         if 'descricao' in row['metadata']:
@@ -197,10 +202,12 @@ def extract_manual_tasks(_uri, dt=None):
             "id_task": task_id,
             "id_task_opener": task_opener_id,
             "id_assignee": assignee_id,
+            "id_original_assignee": original_assignee_id,
             "id_workgroup": workgroup_id,
             "task_done": task_done,
             "description": description,
             "subject": subject,
+            "sk_date_created": dt_created,
             "dt_created": dt_created,
             "dt_reschedule": dt_reschedule,
             "dt_closed": dt_closed
@@ -212,6 +219,7 @@ def extract_manual_tasks(_uri, dt=None):
     df = pd.DataFrame(tasks)
     df['id_task_opener'] = \
         pd.to_numeric(df['id_task_opener'], errors='coerce').where(pd.notnull(df['id_task_opener']), None)
+    df['sk_date_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y%m%d') if not pd.isnull(x) else '')
     df['dt_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
     df['dt_closed'] = df['dt_closed'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if not pd.isnull(x) else '')
     df['dt_reschedule'] = df['dt_reschedule'].apply(
