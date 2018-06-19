@@ -7,7 +7,6 @@ from qa_python_utils.default_logger import _logger
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
-QUERIES_EBDB_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/supply_demand_funnel')
 now = datetime.now()
 
 
