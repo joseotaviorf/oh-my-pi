@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from qa_python_utils.default_logger import logger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from bietlejuice.jobs.new_etl.godfather import GodFather
+from qa_python_utils.default_logger import logger
 
 
 class OfferSubDag(DimSubDag):
@@ -48,6 +49,18 @@ class OfferSubDag(DimSubDag):
         GodFather.to_s3(s3_bucket=OfferSubDag.S3_BUCKET, table_name=kwargs['table_name'])
 
     @logger
+    def get_pre_proposal_query(self, **kwargs):
+        exec_date = kwargs['execution_date']
+        dim = 'pre_proposal'
+
+        file_path = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim)
+        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        query = query.format(str(exec_date))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+                                                 table_name=None)
+
+    @logger
     def __build_data_tasks(self, dag):
         offer_to_s3_task = BaseDAG.get_quintoandar_python_operator(
             task_id='offer_to_s3',
@@ -82,13 +95,8 @@ class OfferSubDag(DimSubDag):
         pre_proposal_task = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_pre_proposal',
             dag=dag,
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'pre_proposal',
-                'command': 'call ebdb.list_preproposta();',
-                'bucket': DimSubDag.S3_BUCKET
-            }
-
+            provide_context=True,
+            func_command=self.get_pre_proposal_query
         )
 
         pre_proposta_aud_task = BaseDAG.get_quintoandar_python_operator(
