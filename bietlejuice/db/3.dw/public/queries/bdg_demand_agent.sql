@@ -17,10 +17,10 @@ FROM
 public.fact_agent a
 )
 SELECT
-	demand.sk_demand,
-	COALESCE(demand.dt, agent.dt) as dt,
-	COALESCE(demand.sk_agent, agent.sk_agent) as sk_agent,
-	agent.sk_slot_date_agent
+	coalesce (demand.sk_demand, -1) as sk_demand,
+	COALESCE(COALESCE(demand.dt, agent.dt), -1) as dt,
+	COALESCE(COALESCE(demand.sk_agent, agent.sk_agent), -1) as sk_agent,
+	COALESCE(agent.sk_slot_date_agent, -1) as sk_slot_date_agent
 FROM demand
 FULL OUTER JOIN
 	agent
