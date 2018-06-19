@@ -32,11 +32,8 @@ class BookingSubDag(DimSubDag):
 
         tests_tasks = self.build_tests_tasks(booking_dag)
 
-        # property_booking_information >> bookings
-        # bookings >> staging_dim_booking_task
-
-        bookings >> property_booking_information
-        property_booking_information >> staging_dim_booking_task
+        property_booking_information >> bookings
+        bookings >> staging_dim_booking_task
         staging_dim_booking_task.set_downstream(tests_tasks)
         dim_bookings.set_upstream(tests_tasks)
 
@@ -68,12 +65,7 @@ class BookingSubDag(DimSubDag):
             task_id='ODS_booking',
             dag=dag,
             provide_context=True,
-            func_command=self.get_booking_query  # ,   utils.extract_query_dim_from_ebdb_to_ods,
-            # op_kwargs={
-            #     'dim_name': 'booking',
-            #     'command': 'call ebdb.list_agendamento();',
-            #     'bucket': DimSubDag.S3_BUCKET
-            # }
+            func_command=self.get_booking_query
         )
 
         booking_media_sources_task = BaseDAG.get_quintoandar_python_operator(

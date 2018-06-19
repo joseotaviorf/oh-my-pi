@@ -17,6 +17,7 @@ with exclusives as (
         on sc.imovel_id = i.id
     where (sc.optedOutAt is null or sc.optedOutat = '')
         and i.status = 'publicado'
+        and sc.specialConditionType = 'Exclusivity'
 ),
 crawled as (
     select distinct

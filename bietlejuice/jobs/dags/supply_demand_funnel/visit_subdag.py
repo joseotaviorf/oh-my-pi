@@ -65,13 +65,6 @@ class VisitSubDag(DimSubDag):
             dag=dag,
             provide_context=True,
             func_command=self.get_visit_query
-            # func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            #
-            # op_kwargs={
-            #     'dim_name': 'visit',
-            #     'command': 'call ebdb.list_visita();',
-            #     'bucket': DimSubDag.S3_BUCKET
-            # }
         )
 
         property_visit_information = BaseDAG.get_quintoandar_python_operator(
