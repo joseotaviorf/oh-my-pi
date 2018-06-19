@@ -19,7 +19,7 @@ with all_dates_prev as (
     	+ rank() over (partition by 1 order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
-	where f.sk_prospect_date between 20170101 and to_date(current_date - 1, 'YYYYMMDD')::integer
+	where f.sk_prospect_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')::integer
   order by 1, 2, 3, 4
 ),
 all_dates as (
