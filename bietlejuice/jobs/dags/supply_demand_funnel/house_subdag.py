@@ -66,13 +66,6 @@ class HouseSubDag(DimSubDag):
             task_id='ODS_imovel',
             provide_context=True,
             func_command=self.get_property_query
-            # func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            # op_kwargs={
-            #     'dim_name': 'property',
-            #     'command': 'call ebdb.list_imovel();',
-            #     'table_name': 'imovel',
-            #     'bucket': DimSubDag.S3_BUCKET
-            # }
         )
 
         affiliate = BaseDAG.get_quintoandar_python_operator(

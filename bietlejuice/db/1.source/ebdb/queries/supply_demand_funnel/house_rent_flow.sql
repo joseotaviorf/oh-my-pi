@@ -1,5 +1,5 @@
 select
-  @rank := @rank+1 as id_house_rent_flow,
+  CAST(@rank := @rank+1 AS UNSIGNED) as id_house_rent_flow,
 	id_house,
 	dt_house_first_listing,
   id_booking,
@@ -23,7 +23,7 @@ select
   id_proposal,
   dt_proposal_approved,
   id_contract,
-  dt_contract_created
+  dt_contract_created,
   dt_contract_signed,
   dt_contract_annulment
 	from (
@@ -292,5 +292,4 @@ select
 			on pp.id_house = o.id_house
 				and (if(pp.id_booking is not null, pp.id_booking = o.id_booking, true))
 				and pp.id_rent_flow = o.id_rent_flow
-) _result,
-(SELECT @rank:=0) AS dummy
+) _result, (SELECT @rank:=0) AS dummy
