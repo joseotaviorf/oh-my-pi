@@ -23,11 +23,16 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
     logging.info('All Requirements met')
 
 
-def create_bdg_demand_agent(**kwargs):
+def create_bdg_demand_agent():
     bridge = Bridge()
     data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDb.BI_DW)
     bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDb.BI_DW)
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
+
+
+def create_bdg_demand_agent_data_integrity():
+    bridge = Bridge()
+    data = bridge.garantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', dim_name='fact_agent')
 
 
 dag = DAG(
@@ -62,7 +67,16 @@ bdg_demand_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_pytho
     op_kwargs=None
 )
 
+bdg_demand_agent_data_integrity = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='bdg_demand_agent_data_integrity',
+    provide_context=True,
+    func_command=create_bdg_demand_agent_data_integrity,
+    op_kwargs=None
+)
+
 bdg_demand_agent_xcom_dependencies >> bdg_demand_agent
+bdg_demand_agent >> bdg_demand_agent_data_integrity
 
 if __name__ == '__main__':
     bridge = Bridge()
