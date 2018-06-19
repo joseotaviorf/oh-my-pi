@@ -26,8 +26,7 @@ with all_dates_prev as (
 			- 1 as weekly_count,
     rank() over (partition by coalesce(dr.city_name, ''),
                               date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
-                              date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
-                              date_part('week', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
+                              date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.city_name, ''),
                               date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                               date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
