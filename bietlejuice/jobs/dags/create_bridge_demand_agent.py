@@ -32,7 +32,7 @@ def create_bdg_demand_agent():
 
 def create_bdg_demand_agent_data_integrity():
     bridge = Bridge()
-    data = bridge.garantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', dim_name='fact_agent')
+    bridge.garantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', dim_name='fact_agent')
 
 
 dag = DAG(

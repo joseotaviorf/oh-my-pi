@@ -180,3 +180,10 @@ class Agent_Region(object):
             command=raw_query,
             commit=True
         )
+
+    def insert_dummy(self, table_name, key_column):
+        BaseETL.execute_command(
+            'insert into {}({}) values (-1);'.format(table_name, key_column),
+            db_enum=EnumDb.BI_DW,
+            commit=True
+        )

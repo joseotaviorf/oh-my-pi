@@ -51,3 +51,17 @@ class Bridge(object):
             commit=True,
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_name)
         )
+
+    def garantee_integrity(self, db_enum, f_name, f_column, dim_name, dim_column):
+        query = """
+                DELETE FROM {0} f
+                    left join {2} d
+                        on f.{1} = d.{3}
+                    where d.{3} is null
+                """.format(f_name, f_column, dim_name, dim_column)
+
+        BaseETL.execute_command(
+            query,
+            db_enum=db_enum,
+            commit=True
+        )
