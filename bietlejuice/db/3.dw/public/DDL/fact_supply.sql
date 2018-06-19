@@ -15,6 +15,7 @@ create table public.fact_supply (
 	sk_lead_date integer,
 	sk_prospect_date integer,
 	sk_task_created_date integer,
+	sk_task_closed_date integer,
 	sk_first_inside_sales_contact_date integer,
 	sk_conversion_date integer,
 	sk_qualified_date integer,

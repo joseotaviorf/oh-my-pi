@@ -81,7 +81,7 @@ from
 		base.conversao_id,
 		jf2.id as photo_job_id,
 		base.imovel_id,
-		base.rep_id,
+		coalesce(base.rep_id, photo_ure.usuario_id) as rep_id,
 		base.affiliate_id,
 		base.owner_id,
 		base.region_id,
@@ -184,7 +184,11 @@ from
       l.status as lead_status,
       l.reason as lead_reason,
       cl.id as conversao_id,
-      i.usuarioQueCadastrou_id as rep_id,
+      case
+        when rep.id is not null then rep.id
+        when reg.dadosVendedor_id is not null then reg.id
+        else null
+      end as rep_id,
       uda.id as affiliate_id,
       i.usuario_id as owner_id,
       coalesce(i.regiao_id, min(pr.regiao_id)) as region_id,
@@ -309,6 +313,12 @@ from
       Usuario uda
       on uda.dadosAfiliado_id = da.id
     left join
+      Usuario rep
+      on rep.dadosVendedor_id = cl.vendedor_id
+    left join
+      Usuario reg
+      on reg.id = i.usuarioQueCadastrou_id
+    left join
       Lead old_lead
       on old_lead.id = l.old_id
     left join -- trying to find regions for leads using lat lng with the region polygons
@@ -391,6 +401,17 @@ from
 	left join
 		Lead l
 		on l.id = base.lead_id
+	left join
+	(
+		select min(REV) as REV, ja.id from
+		JobFotografo_AUD ja
+		inner join UsuarioRevisionEntity ure on ure.id = ja.REV
+		inner join Usuario u on u.id = ure.usuario_id
+		where (u.dadosVendedor_id is not null)
+		group by ja.id
+	) photo_rep
+		on photo_rep.id = jf.id
+	left join	UsuarioRevisionEntity photo_ure	on photo_ure.id = photo_rep.REV
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;
 END
