@@ -181,7 +181,7 @@ select
 				left join Contrato c
 				  on c.proposta_id = coalesce(poa.id, pof.id)
 				where (_offer.o_id = o.id) is null
-					or _offer.o_id = o.id ------
+					or _offer.o_id = o.id
 			) int_offer
 		) o
 	  left join (

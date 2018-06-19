@@ -192,7 +192,6 @@ ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
     func_command=extract_query_dim_from_ebdb_to_ods,
-    # op_kwargs={'dim_name': 'house_rent_flow', 'command': 'call ebdb.list_house_rent_flow();'}
     op_kwargs={'dim_name': 'house_rent_flow'}
 )
 
@@ -200,7 +199,6 @@ ods_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
     func_command=extract_query_dim_from_ebdb_to_ods,
-    # op_kwargs={'dim_name': 'fact_supply', 'command': 'call ebdb.list_fact_supply(null);'}
     op_kwargs={'dim_name': 'fact_supply'}
 )
 
