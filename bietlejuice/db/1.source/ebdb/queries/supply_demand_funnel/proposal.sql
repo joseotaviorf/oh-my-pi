@@ -46,4 +46,4 @@ left join (
 	group by p_aud.id
 ) aud
 	on aud.id_aud = p.id
-where date(coalesce(p.criadoEm, '1900-01-01 00:00:00')) < date('{}')
+where date(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= date('{}')
