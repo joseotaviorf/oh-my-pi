@@ -150,15 +150,15 @@ select
   ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
     date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
 		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as offer_submitted_to_internal_analyis,
-  ((date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent) - dt_offer_approved) * 1440 +
-    date_part('hour', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent) - dt_offer_approved) * 60 +
-		date_part('minute', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent) - dt_offer_approved)) / 1440.)::numeric(14,2) as offer_approved_to_doc_first_sent,
-  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent)) * 1440 +
-    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent)) * 60 +
-		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent))) / 1440.)::numeric(14,2) as doc_first_sent_to_credit_processed,
-  ((date_part('day', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent)) * 1440 +
-    date_part('hour', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent)) * 60 +
-		date_part('minute', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent))) / 1440.)::numeric(14,2) as doc_first_sent_to_doc_completed,
+  ((date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) - dt_offer_approved) * 1440 +
+    date_part('hour', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) - dt_offer_approved) * 60 +
+		date_part('minute', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) - dt_offer_approved)) / 1440.)::numeric(14,2) as offer_approved_to_doc_first_sent,
+  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent)) * 1440 +
+    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent)) * 60 +
+		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent))) / 1440.)::numeric(14,2) as doc_first_sent_to_credit_processed,
+  ((date_part('day', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent)) * 1440 +
+    date_part('hour', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent)) * 60 +
+		date_part('minute', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent))) / 1440.)::numeric(14,2) as doc_first_sent_to_doc_completed,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
 		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as doc_completed_to_credit_processed,
@@ -177,14 +177,14 @@ select
 	date_part('day', dt_contract_signed - dt_visit)::integer as days_visit_to_contract_signed,
 	date_part('day', dt_offer_submitted - dt_visit)::integer as days_visit_to_offer_submitted,
 	date_part('day', dt_offer_submitted - dt_booking_created)::integer as days_booking_created_to_offer_submitted,
-	date_part('day', dt_credit_analysis_approved - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent))::integer as days_tenant_doc_sent_to_insurance_approval,
+	date_part('day', dt_credit_analysis_approved - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent))::integer as days_tenant_doc_sent_to_insurance_approval,
 	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_insurance_approval_to_contract_signed,
-	date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent) - dt_offer_approved)::integer as days_offer_approved_to_tenant_doc_sent,
+	date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) - dt_offer_approved)::integer as days_offer_approved_to_tenant_doc_sent,
 	date_part('day', dt_offer_approved - dt_offer_submitted)::integer as days_offer_submitted_to_offer_approved,
 	date_part('day', dt_credit_analysis_init - dt_offer_approved)::integer as days_offer_approved_to_credit_init,
 	date_part('day', dt_contract_signed - dt_offer_submitted)::integer as days_offer_submitted_to_contract_signed,
 	date_part('day', dt_credit_analysis_approved - dt_credit_analysis_init)::integer as days_tenant_doc_completed_to_credit_approved,
-	date_part('day', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_doc_sent))::integer as days_tenant_doc_sent_to_doc_completed,
+	date_part('day', dt_credit_analysis_init - coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent))::integer as days_tenant_doc_sent_to_doc_completed,
 	date_part('day', dt_contract_created - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_created,
 	date_part('day', dt_contract_signed - dt_credit_analysis_approved)::integer as days_credit_approved_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
