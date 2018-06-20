@@ -36,8 +36,66 @@ base_list as (
 			when array_join(split(lower(c.type),' '),'-') in ('kitnet', 'loft', 'studio') then 'loft-studio-kitchenette'
 			else concat('other-',array_join(split(lower(c.type),' '),'-'))
 		end as listing_type,
+		regexp_extract(phones, '.(\d+),.(\d+).*', 1) as primary_phone_number,
+	  regexp_extract(phones, '.(\d+),[^0-9]?(\d+).*', 2) as secondary_phone_number,
+	  case
+	    when price is null or trim(price) = ''
+	      then null
+	    else cast(price as double)
+	  end as price,
+	  case
+	    when rent is null or trim(rent) = ''
+	      then null
+	    else cast(rent as double)
+	  end as rent,
+	  case
+	    when condominium is null or trim(condominium) = ''
+	      then null
+	    else cast(condominium as double)
+	  end as condominium,
+	  case
+	    when iptu is null or trim(iptu) = ''
+	      then null
+	    else cast(iptu as double)
+	  end as iptu,
+	  case
+	    when total_area is null or trim(total_area) = ''
+	      then null
+	    else cast(total_area as double)
+	  end as total_area,
+	  case
+	    when useful_area is null or trim(useful_area) = ''
+	      then null
+	    else cast(useful_area as double)
+	  end as useful_area,
+	  case
+	    when bedrooms is null or trim(bedrooms) = ''
+	      then null
+	    else cast(cast(bedrooms as real) as smallint)
+	  end as bedrooms,
+	  case
+	    when suites is null or trim(suites) = ''
+	      then null
+	    else cast(cast(suites as real) as smallint)
+	  end as suites,
+	  case
+	    when toilets is null or trim(toilets) = ''
+	      then null
+	    else cast(cast(toilets as real) as smallint)
+	  end as toilets,
+	  case
+	    when garages is null or trim(garages) = ''
+	      then null
+	    else cast(cast(garages as real) as smallint)
+	  end as garages,
+	  case
+	    when year_building is null or year_building = '' or year_building < '1900'
+	      then null
+	    else cast(cast(year_building as real) as integer)
+	  end as year_building,
+	  cast(regexp_replace(cep, '\D', '') as varchar) as cep,
 		c.street,
-	  advertiser_name,
+		advertiser_name,
 		c.neighborhood,
 		c.city,
 		c.state,
@@ -66,6 +124,20 @@ select
 	state,
 	lat,
 	lng,
+	primary_phone_number,
+	secondary_phone_number,
+	price,
+	rent,
+	condominium,
+	iptu,
+	total_area,
+	useful_area,
+	bedrooms,
+	suites,
+	toilets,
+	garages,
+	year_building,
+	cep,
 	date_format(dt_last_run, '%Y%m%d') as sk_date_last_run,
 	date_format(dt_first_seen, '%Y%m%d') as sk_date_first_seen,
 	date_format(dt_last_seen, '%Y%m%d') as sk_date_last_seen,
@@ -80,7 +152,7 @@ select
 	advertiser_name
 from
 	base_list bl
-left join -- trying to find regions for leads using lat lng with the region polygons
+left join
   (
     SELECT
       p.*,
