@@ -42,5 +42,6 @@ CREATE TABLE dim_booking (
   owner_missing_reason varchar(255),
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
+  checkin_status varchar(255),
   CONSTRAINT dim_booking_pkey PRIMARY KEY(sk_booking)
 );

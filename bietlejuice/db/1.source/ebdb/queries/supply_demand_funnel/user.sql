@@ -208,4 +208,4 @@ select
       1
   ) i
   on i.proponente_id = u.id
-where coalesce(u.criadoEm, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(u.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
