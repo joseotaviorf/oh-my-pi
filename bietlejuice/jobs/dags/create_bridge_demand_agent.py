@@ -30,9 +30,10 @@ def create_bdg_demand_agent():
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
 
 
-def create_bdg_demand_agent_data_integrity():
+def guarantee_data_integrity(**kwargs):
     bridge = Bridge()
-    bridge.garantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', dim_name='fact_agent')
+    bridge.guarantee_integrity(db_enum=kwargs['db_enum'], f_name=kwargs['f_name'], f_column=kwargs['f_column'],
+                               dim_name=kwargs['dim_name'], dim_column=kwargs['dim_column'])
 
 
 dag = DAG(
@@ -62,24 +63,73 @@ bdg_demand_agent_xcom_dependencies = BaseDAG.get_python_operator(  # BaseDAG.get
 bdg_demand_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent',
-    provide_context=True,
     func_command=create_bdg_demand_agent,
     op_kwargs=None
 )
 
-bdg_demand_agent_data_integrity = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
     dag=dag,
-    task_id='bdg_demand_agent_data_integrity',
-    provide_context=True,
-    func_command=create_bdg_demand_agent_data_integrity,
-    op_kwargs=None
+    task_id='data_integrity_bdg_fact_agent',
+    func_command=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDb.BI_DW,
+               'f_name': 'bdg_demand_agent',
+               'f_column': 'sk_slot_date_agent',
+               'dim_name': 'fact_agent',
+               'dim_column': 'sk_slot_date_agent'}
+)
+
+data_integrity_bdg_dim_date = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='data_integrity_bdg_dim_date',
+    func_command=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDb.BI_DW,
+               'f_name': 'bdg_demand_agent',
+               'f_column': 'sk_date',
+               'dim_name': 'dim_date',
+               'dim_column': 'sk_date'}
+)
+
+data_integrity_bdg_dim_user = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='data_integrity_bdg_dim_user',
+    func_command=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDb.BI_DW,
+               'f_name': 'bdg_demand_agent',
+               'f_column': 'sk_agent',
+               'dim_name': 'dim_user',
+               'dim_column': 'dados_agente_id'}
+)
+
+data_integrity_bdg_fact_demand = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='data_integrity_bdg_fact_demand',
+    func_command=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDb.BI_DW,
+               'f_name': 'bdg_demand_agent',
+               'f_column': 'sk_demand',
+               'dim_name': 'fact_demand',
+               'dim_column': 'ods_id'}
+)
+
+data_integrity_fact_demand_dim_booking = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+    dag=dag,
+    task_id='data_integrity_fact_demand_dim_booking',
+    func_command=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDb.BI_DW,
+               'f_name': 'fact_demand',
+               'f_column': 'sk_booking',
+               'dim_name': 'dim_booking',
+               'dim_column': 'sk_booking'}
 )
 
 bdg_demand_agent_xcom_dependencies >> bdg_demand_agent
-bdg_demand_agent >> bdg_demand_agent_data_integrity
+bdg_demand_agent >> data_integrity_bdg_fact_agent
+data_integrity_bdg_fact_agent >> data_integrity_bdg_dim_date
+data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user
+data_integrity_bdg_dim_user >> data_integrity_bdg_fact_demand
+data_integrity_bdg_fact_demand >> data_integrity_fact_demand_dim_booking
 
 if __name__ == '__main__':
     bridge = Bridge()
-    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDb.BI_DW)
-    bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDb.BI_DW)
-    bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
+    bridge.guarantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', f_column='sk_demand',
+                               dim_name='fact_demand', dim_column='ods_id')
