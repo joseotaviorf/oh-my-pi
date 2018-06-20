@@ -13,4 +13,4 @@
     bookingType
   from
     Visita v
-where coalesce(v.criadoEm, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(v.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

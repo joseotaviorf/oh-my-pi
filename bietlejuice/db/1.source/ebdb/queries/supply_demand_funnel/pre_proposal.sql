@@ -88,4 +88,4 @@ left join (
   group by ppa.id
 ) pp_aud_analysis
 	on pp_aud_analysis.id = p.id
-where coalesce(p.criadoEm, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

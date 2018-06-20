@@ -118,4 +118,4 @@ select
         and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
       group by jf.id
     ) first_pub on first_pub.id = f.id
-where coalesce(f.dataCriacao, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(f.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')

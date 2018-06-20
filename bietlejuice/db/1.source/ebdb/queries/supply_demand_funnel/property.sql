@@ -221,4 +221,4 @@ left join
 left join
 	SpecialCondition sc
 	on sc.id = maxsc.id
-where coalesce(i.dataCriacao, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')

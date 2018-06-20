@@ -59,4 +59,4 @@ left join (
 		group by p_aud.id
 	) aud_5a_analysis_end
 	on aud_5a_analysis_end.id_aud = p.id
-where coalesce(p.criadoEm, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

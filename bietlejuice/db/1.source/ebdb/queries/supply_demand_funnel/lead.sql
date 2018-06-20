@@ -94,4 +94,4 @@ left join
  left join
    Usuario ua
    on da.id=ua.dadosAfiliado_id
-where coalesce(l.criadoEm, '1900-01-01 00:00:00') < '{}'
+where DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
