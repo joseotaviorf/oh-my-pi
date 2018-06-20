@@ -255,7 +255,7 @@ with weekly_schedule_prev as (
 , active_history_mod as (
 	select distinct
 		from_unixtime(cast(ure."timestamp" as bigint)/1000) as dt_status,
-		coalesce(lag(ativo) over (partition by da.id order by CAST(rev AS BIGINT))<>ativo,true) as status_mod,
+		coalesce(lag(ativo) over (partition by da.id order by cast(rev as bigint))<>ativo,true) as status_mod,
 		da.id,
 		da.ativo as status
 	from
