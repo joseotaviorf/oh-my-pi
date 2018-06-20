@@ -3,10 +3,10 @@ create table if not exists proposal (
   id integer not null,
   "dataParaMudanca" public.datetime null,
   "dataProposta" public.datetime null,
-  garantia VARCHAR(50) null,
-  motivacao VARCHAR(100),
+  garantia varchar(50) null,
+  motivacao varchar(100),
   "propostaAluguel" double precision null,
-  status VARCHAR(50) null,
+  status varchar(50) null,
   "dataAprovacao" public.datetime,
   "inquilinoEnviouDocumentos" integer null,
   "dataDocumentosEnviados" public.datetime,
@@ -14,8 +14,8 @@ create table if not exists proposal (
   "dataDocumentosProprietarioEnviados" timestamp,
   "inquilinoAceitouContrato" integer null,
   "proprietarioAceitouContrato" integer null,
-  "statusDocumentacaoInq" VARCHAR(50) null,
-  "statusDocumentacaoProp" VARCHAR(50) null,
+  "statusDocumentacaoInq" varchar(50) null,
+  "statusDocumentacaoProp" varchar(50) null,
   "fazerTermoAditivo" integer null,
   "preProposta_id" integer,
   "offer_id" integer,
@@ -28,4 +28,4 @@ create table if not exists proposal (
   credit_analysis_end_date timestamp,
   doc_reused
 )
-WITH (oids = false);
+with (oids = false);
