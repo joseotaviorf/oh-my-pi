@@ -19,7 +19,7 @@ create table if not exists dim_proposal (
   dt_created timestamp,
   dt_updated timestamp,
   dt_timestamp timestamp without time zone,
-  dt_tenant_first_doc_sent timestamp,
+  dt_tenant_first_document_sent timestamp,
   dt_tenant_auto_first_doc_sent timestamp,
   dt_credit_analysis_init timestamp,
   dt_credit_analysis_end timestamp,
@@ -27,6 +27,7 @@ create table if not exists dim_proposal (
   tenant_auto_first_doc_sent,
   credit_analysis_init_date timestamp,
   credit_analysis_end_date timestamp,
+  status_sortinghat varchar(50),
   flg_doc_reused integer
 )
 ;

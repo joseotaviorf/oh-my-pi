@@ -96,12 +96,12 @@ select
   p."criadoEm" as dt_created,
   p."atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
-  p.tenant_first_doc_sent as dt_tenant_first_doc_sent,
+  p.tenant_first_doc_sent as dt_tenant_first_document_sent,
   tenant_auto_first_doc_sent as dt_tenant_auto_first_doc_sent,
   coalesce(shp.first_analysis_date, p.credit_analysis_init_date) as dt_credit_analysis_init,
   coalesce(shp.process_date, p.credit_analysis_end_date, shp.analysis_date) as dt_credit_analysis_end,
-  doc_reused as flg_doc_reused,
-  shp.status as status_sortinghat
+  shp.status as status_sortinghat,
+  doc_reused as flg_doc_reused
 from proposal p
 left join sortinghat_prop shp
   on shp.id = p.id

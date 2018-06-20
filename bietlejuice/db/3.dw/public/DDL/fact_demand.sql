@@ -24,6 +24,7 @@ create table fact_demand (
 	sk_proposal integer,
 	sk_proposal_approved_date integer,
 	sk_tenant_first_document_sent_date integer,
+	sk_tenant_auto_first_doc_sent_date integer,
 	sk_contract integer,
 	sk_contract_created_date integer,
 	sk_contract_signed_date integer,

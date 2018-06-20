@@ -46,9 +46,9 @@ with _fact as (
 	  coalesce(hrf.id_proposal, -1) as sk_proposal,
 	  coalesce(to_char(hrf.dt_proposal_approved, 'YYYYMMDD')::integer, -1) as sk_proposal_approved_date,
 	  hrf.dt_proposal_approved,
-	  coalesce(to_char(vdp.dt_tenant_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_first_doc_sent_date,
+	  coalesce(to_char(vdp.dt_tenant_first_document_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_first_document_sent_date,
 	  coalesce(to_char(vdp.dt_tenant_auto_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_auto_first_doc_sent_date,
-	  vdp.dt_tenant_first_doc_sent,
+	  vdp.dt_tenant_first_document_sent,
 	  vdp.dt_tenant_auto_first_doc_sent,
 	  case
       when vdp.status in ('Aprovada', 'Rejeitada')
@@ -130,7 +130,7 @@ select
   sk_offer_approved_date,
   sk_proposal,
   sk_proposal_approved_date,
-  sk_tenant_first_doc_sent_date,
+  sk_tenant_first_document_sent_date,
   sk_tenant_auto_first_doc_sent_date,
   sk_contract,
   sk_contract_created_date,
