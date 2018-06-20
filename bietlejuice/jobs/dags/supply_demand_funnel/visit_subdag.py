@@ -1,5 +1,9 @@
+from datetime import datetime
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from qa_python_utils.default_logger import logger
 
@@ -33,16 +37,24 @@ class VisitSubDag(DimSubDag):
         return visit_dag
 
     @logger
+    def get_visit_query(self, **kwargs):
+        exec_date = kwargs['execution_date']
+        dim = 'visit'
+
+        file_path = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim)
+        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        query = query.format(str(exec_date))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+                                                 table_name=None)
+
+    @logger
     def __build_data_tasks(self, dag):
         visits = BaseDAG.get_quintoandar_python_operator(
             task_id='ODS_visits',
             dag=dag,
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'visit',
-                'command': 'call ebdb.list_visita();',
-                'bucket': DimSubDag.S3_BUCKET
-            }
+            provide_context=True,
+            func_command=self.get_visit_query
         )
 
         property_visit_information = BaseDAG.get_quintoandar_python_operator(
@@ -62,7 +74,9 @@ class VisitSubDag(DimSubDag):
             task_id='STAGING_dim_visit',
             func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'visit'
+                'dim_name': 'visit',
+                'post_command': "update staging.dim_visit set dt_timestamp = '{}' where sk_visit = -1;".format(
+                    datetime.now().strftime('%Y-%m-%d'))
             }
         )
 

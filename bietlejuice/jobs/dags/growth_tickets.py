@@ -1,11 +1,10 @@
-import os
 from datetime import datetime, timedelta
-
-from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags.util import environment as env
+from airflow.models import DAG
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
+import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/staging/queries')
@@ -65,7 +64,7 @@ tickets_whats = QuintoAndarPythonOperator(
     task_id='etl_tickets_and_whatsapp',
     execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'post_contract_tickets_and_whatsapp', 'bucket': bucket,
+    op_kwargs={'dim_name': 'post_contract_tickets_and_whatsapp', 'bucket': bucket, 'insert_dummy': False,
                'schema_source': 'zendesk', 'schema_dest': 'growth_staging'}
 )
 
@@ -74,7 +73,7 @@ ticket_res_time = QuintoAndarPythonOperator(
     task_id='etl_ticket_res_time',
     execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'post_contract_ticket_full_resolution_time', 'bucket': bucket,
+    op_kwargs={'dim_name': 'post_contract_ticket_full_resolution_time', 'bucket': bucket, 'insert_dummy': False,
                'schema_source': 'zendesk', 'schema_dest': 'growth_staging'}
 )
 

@@ -1,12 +1,5 @@
-drop procedure if exists list_house_rent_flow;
-create definer = 'QuintoAndarMain'@'%'
-procedure list_house_rent_flow()
-begin
-
-set @rank=0;
-
 select
-  @rank := @rank+1 as id_house_rent_flow,
+  CAST(@rank := @rank+1 AS UNSIGNED) as id_house_rent_flow,
 	id_house,
 	dt_house_first_listing,
   id_booking,
@@ -55,6 +48,8 @@ select
 		  o.dt_rent_flow_created,
 		  o.id_offer,
 	  	pp.id_pre_proposal,
+	  	o.id_contract as o,
+	  	pp.id_contract as pp,
 	  	coalesce(o.id_proposal, pp.id_proposal) as id_proposal,
 	  	coalesce(o.dt_proposal_approved, pp.dt_proposal_approved) as dt_proposal_approved,
 	  	coalesce(o.id_contract, pp.id_contract) as id_contract,
@@ -297,7 +292,4 @@ select
 			on pp.id_house = o.id_house
 				and (if(pp.id_booking is not null, pp.id_booking = o.id_booking, true))
 				and pp.id_rent_flow = o.id_rent_flow
-) _result
-;
-
-end
+) _result, (SELECT @rank:=0) AS dummy

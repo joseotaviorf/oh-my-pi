@@ -2,7 +2,9 @@ from datetime import datetime
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.dags import QUERIES_EBDB_SUPPLY_DEMAND_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.booking_subdag import BookingSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
@@ -33,10 +35,13 @@ main_dag = BaseDAG.build_dag(
 
 
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
+    file_path = '{}/{}.sql'.format(QUERIES_EBDB_SUPPLY_DEMAND_DIR, kwargs['table_name'])
+    query = BaseETL.get_query_from_file_name(file_name=file_path)
+
     utils.extract_query_dim_from_ebdb_to_ods(
-        dim_name=kwargs['dim_name'],
+        dim_name=kwargs['table_name'],
         bucket=bucket,
-        command=kwargs['command'],
+        command=query,
         table_name=None if 'table_name' not in kwargs else kwargs['table_name']
     )
 
@@ -45,6 +50,7 @@ def load_dim_from_ods_to_dw(**kwargs):
     utils.load_dim_from_ods_to_dw(
         dim_name=kwargs['dim_name'],
         bucket=bucket,
+        insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
         post_command=None if 'post_command' not in kwargs else kwargs['post_command']
@@ -177,29 +183,28 @@ ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'house_rent_flow', 'command': 'call ebdb.list_house_rent_flow();'}
+    op_kwargs={'table_name': 'house_rent_flow'}
 )
 
 ods_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
     func_command=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'dim_name': 'fact_supply',
-               'command': 'call ebdb.list_fact_supply(null);'}
+    op_kwargs={'table_name': 'fact_supply'}
 )
 
 fact_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket}
+    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_photo_job = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_photo_job',
     func_command=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket}
+    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
 fact_demand = BaseDAG.get_quintoandar_python_operator(
@@ -278,11 +283,10 @@ xcom_fact_demand = BaseDAG.get_quintoandar_python_operator(
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
-ods_house_rent_flow.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                  user_dag, house_dag])
+fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+                          user_dag, house_dag, ods_house_rent_flow])
 
 ods_supply >> fact_supply
-ods_house_rent_flow >> fact_demand
 fact_demand >> xcom_fact_demand
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job

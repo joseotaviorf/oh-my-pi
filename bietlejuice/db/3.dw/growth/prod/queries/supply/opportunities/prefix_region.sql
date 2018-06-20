@@ -4,45 +4,45 @@ with all_dates_prev as (
     date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _month,
     date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _week,
     date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _day,
-    coalesce(dr.long_region_name, '') as region,
+		coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
     rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
+                              date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+                              date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+                              date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+                              date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																		date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																		date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																		date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
+    	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+    	                            date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+    	                            date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+    	                            date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as daily_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
+                              date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+                              date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																		date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
+    	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+    	                            date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as weekly_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
+                              date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+                              date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
-    																		date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
+    	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
+    	                            date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as monthly_count,
     rank() over (partition by coalesce(dr.long_region_name, ''),
-                                    date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
+                              date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by coalesce(dr.long_region_name, ''),
-    	                                  date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
+    	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
 	join dim_property dpr
 		on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	where to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD') >= '2017-01-01' and to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD') < current_date
-  order by coalesce(dr.long_region_name, ''), date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')), date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')), date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')), date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD'))
+	where f.sk_opportunity_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')::integer
+  order by 5, 1, 2, 3, 4
 ),
 all_dates as (
   select distinct
@@ -63,38 +63,34 @@ all_dates_last_week as (
 ),
 all_dates_last_month as (
 	select
-    date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _year,
-    date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _month,
+    substring(f.sk_opportunity_date::varchar, 0, 5) as _year,
+	  substring(f.sk_opportunity_date::varchar, 5, 2) as _month,
     coalesce(dr.long_region_name, '') as region,
     'QuintoAndar'::varchar as city,
-    count(to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as monthly_count
+    count(f.sk_opportunity_date) as monthly_count
 	from fact_supply f
 	join dim_property dpr
   	on f.sk_property = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-	where date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) = date_part('year', add_months(current_date, -1))
-  		and date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) = date_part('month', add_months(current_date, -1))
-  		and date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) < date_part('day', current_date)
- 	group by coalesce(dr.long_region_name, ''), date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')), date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD'))
-  order by coalesce(dr.long_region_name, ''), date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')), date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD'))
+	where f.sk_opportunity_date between to_char(add_months(date_trunc('month', current_date), -1), 'YYYYMMDD')::integer
+    and to_char(add_months(current_date - 1, -1), 'YYYYMMDD')::integer
+  group by 3, 1, 2
+  order by 3, 1, 2
 ),
 all_dates_last_year as (
 	select
-		date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _year,
+		substring(f.sk_opportunity_date::varchar, 0, 5) as _year,
     coalesce(dr.long_region_name, '') as region,
-    'QuintoAndar'::varchar as city,
-    count(to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as yearly_count
+		'QuintoAndar'::varchar as city,
+    count(f.sk_opportunity_date) as yearly_count
   from fact_supply f
   join dim_property dpr
   	on f.sk_property = dpr.sk_property
   left join dim_region dr
   	on dpr.regiao_id = dr.id
-	where date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) = date_part('year', add_months(current_date, -12))
-  		and ((date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) = date_part('month', add_months(current_date, -12))
-  		      and date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) < date_part('day', add_months(current_date, -12)))
-  		  or date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) < date_part('month', add_months(current_date, -12))
-  		  )
-	group by coalesce(dr.long_region_name, ''), date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD'))
-	order by coalesce(dr.long_region_name, ''), date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD'))
+  where f.sk_opportunity_date between to_char(add_months(date_trunc('year', current_date), -12), 'YYYYMMDD')::integer
+    and to_char(add_months(current_date - 1, -12), 'YYYYMMDD')::integer
+	group by 2, 1
+	order by 2, 1
 ),
