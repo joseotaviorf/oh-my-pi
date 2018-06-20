@@ -22,10 +22,10 @@ select
   p.atualizadoEm,
   aud.tenant_doc_sent_count,
   aud.tenant_first_doc_sent,
+  if(aud.doc_reused, aud.added_rev_doc_row, null) as tenant_auto_first_doc_sent
   aud.credit_analysis_init_date,
   aud.credit_analysis_end_date,
   aud.doc_reused,
-  if(aud.doc_reused, aud.added_rev_doc_row, null) as tenant_auto_first_doc_sent
 from
   Proposta p
 left join (

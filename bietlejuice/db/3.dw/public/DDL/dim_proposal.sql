@@ -1,27 +1,32 @@
-DROP TABLE IF EXISTS dim_proposal;
-CREATE TABLE dim_proposal (
-  sk_proposal INTEGER,
-  id_proposal INTEGER,
-  dt_proposal TIMESTAMP,
-  guarantee VARCHAR(50),
-  renting_proposal_value DOUBLE PRECISION,
-  status VARCHAR(50),
-  dt_proposal_approved TIMESTAMP,
-  tenant_document_sent INTEGER,
-  dt_tenant_document_sent TIMESTAMP,
-  owner_document_sent INTEGER,
-  dt_owner_document_sent TIMESTAMP WITHOUT TIME ZONE,
-  tenant_contract_accepted INTEGER,
-  owner_contract_accepted INTEGER,
-  status_doc_tenant VARCHAR(50),
-  status_doc_owner VARCHAR(50),
+drop table if exists dim_proposal;
+create table if not exists dim_proposal (
+  sk_proposal integer,
+  id_proposal integer,
+  dt_proposal timestamp,
+  guarantee varchar(50),
+  renting_proposal_value double precision,
+  status varchar(50),
+  dt_proposal_approved timestamp,
+  tenant_document_sent integer,
+  dt_tenant_document_sent timestamp,
+  owner_document_sent integer,
+  dt_owner_document_sent timestamp without time zone,
+  tenant_contract_accepted integer,
+  owner_contract_accepted integer,
+  status_doc_tenant varchar(50),
+  status_doc_owner varchar(50),
   tenant_document_sent_count integer,
-  dt_created TIMESTAMP,
-  dt_updated TIMESTAMP,
-  dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  dt_tenant_first_document_sent TIMESTAMP,
-  dt_credit_analysis_init TIMESTAMP,
-  dt_credit_analysis_end TIMESTAMP,
-  status_sortinghat VARCHAR(50)
-  CONSTRAINT dim_proposal_pkey PRIMARY KEY(sk_proposal)
-) ;
+  dt_created timestamp,
+  dt_updated timestamp,
+  dt_timestamp timestamp without time zone,
+  dt_tenant_first_doc_sent timestamp,
+  dt_tenant_auto_first_doc_sent timestamp,
+  dt_credit_analysis_init timestamp,
+  dt_credit_analysis_end timestamp,
+  status_sortinghat varchar(50),
+  tenant_auto_first_doc_sent,
+  credit_analysis_init_date timestamp,
+  credit_analysis_end_date timestamp,
+  flg_doc_reused integer
+)
+;
