@@ -53,15 +53,15 @@ class Bridge(object):
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_name)
         )
 
-    def guarantee_integrity(self, db_enum, f_name, f_column, dim_name, dim_column):
+    def guarantee_integrity(self, db_enum, schema, f_name, f_column, dim_name, dim_column):
         query = """
-                DELETE FROM {0}
+                DELETE FROM {0}.{1}
                 WHERE  NOT EXISTS (
                    SELECT 1
-                   FROM   {2} d
-                   WHERE  {0}.{1} = d.{3}
+                   FROM   {0}.{3} d
+                   WHERE  {1}.{2} = d.{4}
                    );
-                """.format(f_name, f_column, dim_name, dim_column)
+                """.format(schema, f_name, f_column, dim_name, dim_column)
 
         _logger.info(query)
 

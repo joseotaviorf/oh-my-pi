@@ -32,8 +32,9 @@ def create_bdg_demand_agent():
 
 def guarantee_data_integrity(**kwargs):
     bridge = Bridge()
-    bridge.guarantee_integrity(db_enum=kwargs['db_enum'], f_name=kwargs['f_name'], f_column=kwargs['f_column'],
-                               dim_name=kwargs['dim_name'], dim_column=kwargs['dim_column'])
+    bridge.guarantee_integrity(db_enum=kwargs['db_enum'], schema=kwargs['schema'], f_name=kwargs['f_name'],
+                               f_column=kwargs['f_column'], dim_name=kwargs['dim_name'],
+                               dim_column=kwargs['dim_column'])
 
 
 dag = DAG(
@@ -72,6 +73,7 @@ data_integrity_bdg_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quin
     task_id='data_integrity_bdg_fact_agent',
     func_command=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDb.BI_DW,
+               'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_slot_date_agent',
                'dim_name': 'fact_agent',
@@ -83,6 +85,7 @@ data_integrity_bdg_dim_date = BaseDAG.get_python_operator(  # BaseDAG.get_quinto
     task_id='data_integrity_bdg_dim_date',
     func_command=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDb.BI_DW,
+               'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_date',
                'dim_name': 'dim_date',
@@ -94,6 +97,7 @@ data_integrity_bdg_dim_user = BaseDAG.get_python_operator(  # BaseDAG.get_quinto
     task_id='data_integrity_bdg_dim_user',
     func_command=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDb.BI_DW,
+               'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_agent',
                'dim_name': 'dim_user',
@@ -105,6 +109,7 @@ data_integrity_bdg_fact_demand = BaseDAG.get_python_operator(  # BaseDAG.get_qui
     task_id='data_integrity_bdg_fact_demand',
     func_command=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDb.BI_DW,
+               'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_demand',
                'dim_name': 'fact_demand',
@@ -116,6 +121,7 @@ data_integrity_fact_demand_dim_booking = BaseDAG.get_python_operator(  # BaseDAG
     task_id='data_integrity_fact_demand_dim_booking',
     func_command=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDb.BI_DW,
+               'schema': 'public',
                'f_name': 'fact_demand',
                'f_column': 'sk_booking',
                'dim_name': 'dim_booking',
@@ -126,10 +132,10 @@ bdg_demand_agent_xcom_dependencies >> bdg_demand_agent
 bdg_demand_agent >> data_integrity_bdg_fact_agent
 data_integrity_bdg_fact_agent >> data_integrity_bdg_dim_date
 data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user
-data_integrity_bdg_dim_user >> data_integrity_bdg_fact_demand
-data_integrity_bdg_fact_demand >> data_integrity_fact_demand_dim_booking
+data_integrity_bdg_dim_user >> data_integrity_fact_demand_dim_booking
+data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand
 
 if __name__ == '__main__':
     bridge = Bridge()
-    bridge.guarantee_integrity(db_enum=EnumDb.BI_DW, f_name='bdg_demand_agent', f_column='sk_demand',
+    bridge.guarantee_integrity(db_enum=EnumDb.BI_DW, schema='public', f_name='bdg_demand_agent', f_column='sk_demand',
                                dim_name='fact_demand', dim_column='ods_id')
