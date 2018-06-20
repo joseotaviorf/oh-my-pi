@@ -1,8 +1,9 @@
-from qa_python_utils.default_logger import logger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils.default_logger import logger
 
 
 class HouseSubDag(DimSubDag):
@@ -36,17 +37,24 @@ class HouseSubDag(DimSubDag):
         return house_dag
 
     @logger
+    def get_property_query(self, **kwargs):
+        exec_date = kwargs['execution_date']
+        dim = 'property'
+
+        file_path = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim)
+        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        query = query.format(str(exec_date))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+                                                 table_name='imovel')
+
+    @logger
     def __build_data_tasks(self, dag):
         property_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_imovel',
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'property',
-                'command': 'call ebdb.list_imovel();',
-                'table_name': 'imovel',
-                'bucket': DimSubDag.S3_BUCKET
-            }
+            provide_context=True,
+            func_command=self.get_property_query
         )
 
         affiliate = BaseDAG.get_quintoandar_python_operator(

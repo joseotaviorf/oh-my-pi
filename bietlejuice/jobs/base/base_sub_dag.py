@@ -1,8 +1,7 @@
-from airflow.operators.subdag_operator import SubDagOperator
-from qa_python_utils.default_logger import logger
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.subdag_operator import SubDagOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from qa_python_utils.default_logger import logger
 
 
 class BaseSubDag(object):
@@ -84,6 +83,9 @@ class BaseSubDag(object):
 
         return entity_dag
 
+    def extract_query_dt_dim_from_ebdb_to_ods(self, dim_name, bucket, command, table_name, **kwargs):
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name, kwargs['execution_date'])
+
     @logger
     def _build_data_tasks(self, dag, entity, source_command, table_name=None):
         """
@@ -96,7 +98,8 @@ class BaseSubDag(object):
         entity_task = BaseDAG.get_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_{}'.format(entity),
-            func_command=utils.extract_query_dim_from_ebdb_to_ods,
+            provide_context=True,
+            func_command=self.extract_query_dt_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket,
