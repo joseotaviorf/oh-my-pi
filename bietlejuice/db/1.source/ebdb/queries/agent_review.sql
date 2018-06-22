@@ -30,5 +30,5 @@ left join RatingLabel rl
 where v.realEstateAgentRating_id is not null
 	and d.mobileApp = 'Inquilinos'
 	and a.fupVisita is not null
-	and
+	and DATE(coalesce(a.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
 group by 1, 2, 3

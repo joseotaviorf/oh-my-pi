@@ -1,7 +1,6 @@
 import boto3
-from __init__ import DW_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from qa_python_utils.default_logger import _logger
+from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
 
 
 class Bridge(object):
@@ -53,17 +52,26 @@ class Bridge(object):
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_name)
         )
 
-    def guarantee_integrity(self, db_enum, schema, f_name, f_column, dim_name, dim_column):
-        query = """
-                DELETE FROM {0}.{1}
-                WHERE  NOT EXISTS (
-                   SELECT 1
-                   FROM   {0}.{3} d
-                   WHERE  {1}.{2} = d.{4}
-                   );
-                """.format(schema, f_name, f_column, dim_name, dim_column)
-
-        _logger.info(query)
+    def guarantee_integrity(self, db_enum, schema, f_name, f_column, dim_name, dim_column, type):
+        if type == 'update':
+            query = """
+                    UPDATE {0}.{1}
+                    SET {2} = -1
+                    WHERE  NOT EXISTS (
+                       SELECT 1
+                       FROM   {0}.{3} d
+                       WHERE  {1}.{2} = d.{4}
+                       );
+                    """.format(schema, f_name, f_column, dim_name, dim_column)
+        else:
+            query = """
+                    DELETE FROM {0}.{1}
+                    WHERE  NOT EXISTS (
+                       SELECT 1
+                       FROM   {0}.{3} d
+                       WHERE  {1}.{2} = d.{4}
+                       );
+                    """.format(schema, f_name, f_column, dim_name, dim_column)
 
         BaseETL.execute_command(
             query,

@@ -6,7 +6,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
+from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent_Region
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY')
 
@@ -46,7 +46,7 @@ def create_dim_agent_review(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
-    rev_data = ar.get_agent_reviews(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb)
+    rev_data = ar.get_agent_reviews(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb, exec_dt=exec_date)
     ar.move_data_to_ods(data=rev_data, table_name='agent_review')
 
 

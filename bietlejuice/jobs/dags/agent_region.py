@@ -4,7 +4,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.agents.load_agent_region import Agent_Region
+from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent_Region
 
 env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'ENV_EBDB')
 

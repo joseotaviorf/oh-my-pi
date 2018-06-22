@@ -157,14 +157,14 @@ class Agent_Region(object):
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, dim_name)
         )
 
-    def get_agent_reviews(self, f_name, db_enum):
+    def get_agent_reviews(self, f_name, db_enum, exec_dt):
         filename = self.__format_query_filename(f_name, db_enum)
         with open(filename) as f:
             raw_query = f.read()
 
         agent_reviews_data = BaseETL.from_db_query(
             db_enum=db_enum,
-            query=raw_query
+            query=raw_query.format(str(exec_dt))
         )
 
         return agent_reviews_data
