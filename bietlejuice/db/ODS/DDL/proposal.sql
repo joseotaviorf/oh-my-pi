@@ -23,9 +23,9 @@ create table if not exists proposal (
   "atualizadoEm" timestamp null,
   tenant_doc_sent_count integer null,
   tenant_first_doc_sent public.datetime,
-  tenant_auto_first_doc_sent,
+  tenant_auto_first_doc_sent public.datetime,
   credit_analysis_init_date timestamp,
   credit_analysis_end_date timestamp,
-  doc_reused
+  doc_reused integer
 )
 with (oids = false);
