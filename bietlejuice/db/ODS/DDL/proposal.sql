@@ -1,4 +1,4 @@
-drop table if exists proposal cascade;
+drop table if exists proposal;
 create table if not exists proposal (
   id integer not null,
   "dataParaMudanca" public.datetime null,
