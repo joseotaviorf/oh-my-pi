@@ -55,6 +55,7 @@ def load_dim_agent_review_dw(**kwargs):
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
+    ar.insert_dummy(table_name='dim_agent_review', key_column='sk_agentreview, sk_booking', value='-1,-1')
 
 
 def xcom_fact_agent(**kwargs):
