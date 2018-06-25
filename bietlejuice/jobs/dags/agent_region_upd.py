@@ -24,13 +24,13 @@ def upd_agent_region(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-ebdb-load-agent_region_upd',
+    dag_id='bi-ebdb-load-agent_region_upd_1',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': True
     },
-    start_date=datetime(2018, 5, 30, 0, 0, 0),
+    start_date=datetime(2018, 6, 25, 0, 0, 0),
     schedule_interval='@daily',
     max_active_runs=1
 )

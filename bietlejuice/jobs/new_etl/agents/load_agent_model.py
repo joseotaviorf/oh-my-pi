@@ -64,27 +64,20 @@ class Agent_Region(object):
         infinity_date = '2099-12-31 00:00:00'
         new_table = BaseETL.decode_table(new_data, 'LATIN-1')  # decode table from LATIN-1
         new_table = petl.sort(new_table, key=['dt'])
-        print('started')
-        print(petl.nrows(new_table))
 
         # Inserted
         table_ins = petl.select(new_table, lambda rec: str(rec.REVTYPE) == '0')
-        print(petl.nrows(table_ins))
-        print(petl.head(table_ins, 5))
+
         table_ins = petl.addfield(table_ins, 'dt_end', infinity_date)
         table_ins = petl.rename(table_ins,
                                 {'dt': 'dt_start', 'DadosAgente_id': 'dadosagente_id', 'REVTYPE': 'revtype'})
         table_ins = petl.addfield(table_ins, 'dt', str(dt))
         table_ins = petl.movefield(table_ins, 'dt_end', 3)
-        print(petl.nrows(table_ins))
-        print(petl.head(table_ins, 5))
 
         # Updated
         table_upd = petl.select(new_table, lambda rec: str(rec.REVTYPE) == '2')
         table_upd = petl.rename(table_upd,
                                 {'dt': 'dt_end', 'DadosAgente_id': 'dadosagente_id', 'REVTYPE': 'revtype'})
-        print(petl.nrows(table_upd))
-        print(petl.head(table_upd, 5))
 
         return table_ins, table_upd
 
@@ -172,10 +165,12 @@ class Agent_Region(object):
     def clean_daily_data_in_table(self, enum, schema, dim_name, date_column, dt, format):
         print("Start query to clean {}: {}".format(dim_name, str(dt)))
 
+        if format == 'YYYY-MM-DD':
+            date_column = 'date({})'.format(date_column)
+
         raw_query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'{}')"
 
         raw_query = raw_query.format(schema, dim_name, date_column, str(dt), format)
-        print(raw_query)
 
         BaseETL.execute_command(
             db_enum=enum,
@@ -185,8 +180,38 @@ class Agent_Region(object):
         )
 
     def insert_dummy(self, table_name, key_column, value='-1'):
+        if not self.check_dummy_exists(enumdb=EnumDb.BI_DW, schema='public', table_name=table_name,
+                                       key_column=key_column):
+            BaseETL.execute_command(
+                'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                db_enum=EnumDb.BI_DW,
+                commit=True
+            )
+
+    def reprocess_old_records(self, exec_dt):
+        infinity_date = '2099-12-31 00:00:00'
+
+        raw_query = "UPDATE {}.{} SET {} = date('{}') WHERE date({}) = date('{}')"
+
+        raw_query = raw_query.format('public', 'agent_region_hist', 'dt_end', str(infinity_date), 'dt_end',
+                                     str(exec_dt))
+
         BaseETL.execute_command(
-            'insert into {}({}) values ({});'.format(table_name, key_column, value),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDb.BI_ODS,
+            encoding='UTF8',
+            command=raw_query,
             commit=True
         )
+
+    def check_dummy_exists(self, enumdb, schema, table_name, key_column):
+        table = BaseETL.from_db_query(
+            db_enum=enumdb,
+            query='SELECT count(1) FROM {}.{} WHERE {} = -1;'.format(schema, table_name, key_column)
+        )
+
+        if table[1][0] > 0:
+            dummy_exists = True
+        else:
+            dummy_exists = False
+
+        return dummy_exists
