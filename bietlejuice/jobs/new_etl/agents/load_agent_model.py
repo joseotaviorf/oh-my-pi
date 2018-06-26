@@ -179,9 +179,16 @@ class Agent_Region(object):
             commit=True
         )
 
-    def insert_dummy(self, table_name, key_column, value='-1'):
-        if not self.check_dummy_exists(enumdb=EnumDb.BI_DW, schema='public', table_name=table_name,
-                                       key_column=key_column):
+    def insert_dummy(self, table_name, key_column, value='-1', previous_check=False):
+        if previous_check:
+            if not self.check_dummy_exists(enumdb=EnumDb.BI_DW, schema='public', table_name=table_name,
+                                           key_column=key_column):
+                BaseETL.execute_command(
+                    'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                    db_enum=EnumDb.BI_DW,
+                    commit=True
+                )
+        else:
             BaseETL.execute_command(
                 'insert into {}({}) values ({});'.format(table_name, key_column, value),
                 db_enum=EnumDb.BI_DW,

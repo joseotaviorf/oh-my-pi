@@ -40,7 +40,7 @@ def create_fact_agent(**kwargs):
     ar.clean_daily_data_in_table(enum=EnumDb.BI_DW, schema='public', dim_name='fact_agent', date_column='sk_slot_date',
                                  dt=exec_date, format='YYYYMMDD')
     ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
-    ar.insert_dummy(table_name='fact_agent', key_column='sk_slot_date_agent')
+    ar.insert_dummy(table_name='fact_agent', key_column='sk_slot_date_agent', previous_check=True)
 
 
 def create_dim_agent_review(**kwargs):
@@ -178,4 +178,4 @@ if __name__ == '__main__':
     # ar.move_data_to_ods(data=group_data, table_name='agent_region_group')
     ar = Agent_Region()
 
-    ar.insert_dummy(table_name='fact_agent', key_column='sk_slot_date_agent')
+    ar.insert_dummy(table_name='fact_agent', key_column='sk_slot_date_agent', previous_check=True)
