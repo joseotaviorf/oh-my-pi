@@ -4,10 +4,9 @@ from io import BytesIO
 import boto3
 import pandas as pd
 import petl
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
-
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 
 
 class EBDBDatalake(object):
@@ -77,6 +76,15 @@ class EBDBDatalake(object):
                             on t.REV = ure.id
                         where date(from_unixtime(ure.`timestamp` / 1000)) = date('{}')
             """.format(', '.join(columns), table_name, _date)
+            file_path_suffix = '_{}'.format(_date)
+        elif table_name == 'UsuarioRevisionEntity':
+            _date = (self.incremental_date.strftime('%Y-%m-%d') if self.incremental_date is not None
+                     else datetime.today().date().strftime('%Y-%m-%d'))
+            query = """
+                        select {}
+                        from {} t
+                        where date(from_unixtime(t.`timestamp` / 1000)) = date('{}')
+                    """.format(', '.join(columns), table_name, _date)
             file_path_suffix = '_{}'.format(_date)
         else:
             query = 'select {} from {} t'.format(', '.join(columns), table_name)
@@ -176,6 +184,7 @@ class EBDBDatalake(object):
                             and (TABLE_TYPE = 'BASE TABLE'
                                     or TABLE_NAME = 'MapRegiao'
                             )
+                            and TABLE_NAME not in ('ENT_REVTYPE', 'REVCHANGES')
                     """.format(EBDBDatalake.SCHEMA_NAME)
         table_names = BaseETL.from_db_query(
             db_enum=EnumDb.QuintoAndar_ebdb,
