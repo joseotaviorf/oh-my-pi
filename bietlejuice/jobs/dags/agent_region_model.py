@@ -82,14 +82,14 @@ def upd_agent_region(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-load-agent_model',
+    dag_id='bi-load-agent_model_2',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': True
     },
-    start_date=datetime(2018, 1, 1, 0, 0, 0),
-    schedule_interval='0 2 * * *',
+    start_date=datetime(2018, 6, 26, 0, 0, 0),
+    schedule_interval='0 8 * * *',
     max_active_runs=1
 )
 
