@@ -297,12 +297,12 @@ select
 	(
 		select
 			c_new.imovel_id as id_house,
-			null as dt_house_first_listing,
+			i.firstPublication as dt_house_first_listing,
 		 	null as id_booking,
 		  	null as dt_booking_created,
 		  	null as dt_visit,
 		  	null as visit_completed,
-	  	  	null as id_owner,
+	  	  	i.usuario_id as id_owner,
 		  	null as id_user_agent,
 		  	fl.cliente_id as id_client,
 		    null as dt_client_sign_up,
@@ -329,6 +329,8 @@ select
 		join FluxoLocacao fl
 			on    c_new.imovel_id = fl.imovel_id
 			and c_new.usuario_id = fl.cliente_id
+		join Imovel i
+			on i.id = fl.imovel_id
 		left join Proposta p
 			on c_new.proposta_id = p.id
 		where (p.id is null) or
