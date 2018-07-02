@@ -25,6 +25,7 @@ min_max as (
 )
 select
 	coalesce(sdp.sk_property, rpad(mm.id::varchar, 12, '0')::bigint) as sk_property,
+	coalesce(sdp.regiao_id, -1) as sk_region,
 	mm.status_history,
 	to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
 	to_char(mm.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date,
