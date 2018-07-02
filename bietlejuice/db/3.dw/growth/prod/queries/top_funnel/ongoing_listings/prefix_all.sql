@@ -9,33 +9,29 @@ with all_dates as (
     dense_rank() over (partition by dd.year,
     																dd.month,
     																dd.calendar_week,
-    																dd.day order by f.sk_contract asc)
+    																dd.day order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
     																		dd.month,
     																		dd.calendar_week,
-    																		dd.day order by f.sk_contract desc)
+    																		dd.day order by f.sk_house desc)
 			- 1 as daily_count,
     dense_rank() over (partition by dd.year,
-    																dd.calendar_week order by f.sk_contract asc)
+    																dd.calendar_week order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
-    																		dd.calendar_week order by f.sk_contract desc)
+    																		dd.calendar_week order by f.sk_house desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by dd.year,
-    																dd.month order by f.sk_contract asc)
+    																dd.month order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
-    																		dd.month order by f.sk_contract desc)
+    																		dd.month order by f.sk_house desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by dd.year order by f.sk_contract asc)
-    	+ dense_rank() over (partition by dd.year order by f.sk_contract desc)
+    dense_rank() over (partition by dd.year order by f.sk_house asc)
+    	+ dense_rank() over (partition by dd.year order by f.sk_house desc)
 			- 1 as yearly_count
-	from fact_demand f
-	left join dim_contract dc
-		on f.sk_contract = dc.sk_contract
+	from fact_house_status f
 	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+			and f.status_history = 'publicado'
 	where dd."date" < current_date
   order by 1, 2, 3, 4
 ),
@@ -48,16 +44,12 @@ all_dates_last_month as (
 	  dd.month as _month,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_contract) as monthly_count
-	from fact_demand f
-	left join dim_contract dc
-		on f.sk_contract = dc.sk_contract
+  	count(distinct f.sk_house) as monthly_count
+	from fact_house_status f
 	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
-  where dd."date" < current_date
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+			and f.status_history = 'publicado'
+	where dd."date" < current_date
 		and dd.year = date_part('year', add_months(current_date, -1))
   	and dd.month = date_part('month', add_months(current_date, -1))
   	and dd.day < date_part('day', current_date)
@@ -69,15 +61,11 @@ all_dates_last_year as (
 	 	dd.year as _year,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_contract) as yearly_count
-	from fact_demand f
-	left join dim_contract dc
-		on f.sk_contract = dc.sk_contract
+  	count(distinct f.sk_house) as yearly_count
+	from fact_house_status f
 	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+			and f.status_history = 'publicado'
 	where dd."date" < current_date
 	  and dd.year = date_part('year', add_months(current_date, -12))
   		and ((dd.month = date_part('month', add_months(current_date, -12))
