@@ -27,8 +27,6 @@ select
 	coalesce(sdp.sk_property, rpad(mm.id::varchar, 12, '0')::bigint) as sk_property,
 	mm.id as id_house,
 	mm.status_history,
-	mm.dt_min_status,
-	mm.dt_max_status,
 	to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
 	to_char(mm.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date,
 	now() as dt_timestamp
