@@ -127,13 +127,11 @@ SELECT
   pl.end_version_category,
   pl.is_last_version,
   i.exclusivity,
-  COALESCE(
-    CASE  WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8927'
+  CASE  WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8927'
             THEN SUBSTRING(i.id::VARCHAR(24) FROM 5)
         WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8928'
             THEN CONCAT('1',SUBSTRING(i.id::VARCHAR(24) FROM 5))
-    END::INTEGER
-    , -1)
+  END::INTEGER
   AS short_id
 from
 	imovel i
