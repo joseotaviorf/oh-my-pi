@@ -126,7 +126,13 @@ SELECT
   pl.start_version_category,
   pl.end_version_category,
   pl.is_last_version,
-  i.exclusivity
+  i.exclusivity,
+  CASE  WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8927'
+            THEN SUBSTRING(i.id::VARCHAR(24) FROM 5)
+        WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8928'
+            THEN CONCAT('1',SUBSTRING(i.id::VARCHAR(24) FROM 5))
+  END
+  AS short_id_property
 from
 	imovel i
 left join
