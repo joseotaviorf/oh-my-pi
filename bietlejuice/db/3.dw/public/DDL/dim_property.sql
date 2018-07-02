@@ -125,6 +125,6 @@ CREATE TABLE public.dim_property (
   end_version_category varchar(255),
   is_last_status INTEGER,
   exclusivity smallint,
-  short_id INTEGER DEFAULT -1::integer,
+  short_id INTEGER DEFAULT -1::INTEGER,
   CONSTRAINT dim_property_pkey PRIMARY KEY(sk_property)
 ) WITH OIDS;
