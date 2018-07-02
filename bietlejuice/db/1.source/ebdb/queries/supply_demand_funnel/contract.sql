@@ -44,5 +44,4 @@ select
   atualizadoEm
 from
   Contrato
-where id != 4055 -- esse contrato tem varios cobrancas de TaxaCorretagem, entao decidimos por enquanto em nao trazer ele para o DW
-and DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
+where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
