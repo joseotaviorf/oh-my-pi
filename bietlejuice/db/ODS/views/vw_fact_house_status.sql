@@ -10,6 +10,7 @@ with distinct_status as (
 ),
 min_max as (
 	select distinct
+	  row_number() over (partition by id order by dt_min_status) as rn,
 		id,
 		status_history,
 		dt_min_status,
@@ -22,17 +23,46 @@ min_max as (
 		coalesce(not(dt_min_status = lag(dt_max_status) over (partition by id order by dt_min_status)
 				and status_history = lag(status_history) over (partition by id order by dt_min_status)), true) as valid
 	from distinct_status
+),
+rn_max as (
+	select id, max(rn) as max_rn
+	from min_max
+	group by id
+),
+_fact as (
+	select
+		mm.id,
+		mm.status_history,
+		mm.dt_min_status,
+		mm.dt_max_status,
+		-- because there are some houses with invalid status transitions, the result ends up with one invalid row between
+		--   the last status change and the current one
+		-- examples: 892765930 and 892777293
+		case
+			when mm.valid is true
+					or (mm.valid is false
+								and rm.id is not null
+								and mm.status_history = 'publicado'
+								and mm.dt_max_status is null
+						)
+				then true
+			else false
+		end as valid
+	from min_max mm
+	left join rn_max rm
+		on mm.rn = rm.max_rn
+			and mm.id = rm.id
 )
 select
-	coalesce(sdp.sk_property, rpad(mm.id::varchar, 12, '0')::bigint) as sk_property,
-	mm.status_history,
-	to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
-	to_char(mm.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date,
+	coalesce(sdp.sk_property, rpad(f.id::varchar, 12, '0')::bigint) as sk_house,
+	f.status_history,
+	to_char(f.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
+	to_char(f.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date,
 	now() as dt_timestamp
-from min_max mm
+from _fact f
 left join staging.dim_property sdp
-	on sdp.id = mm.id
-		and mm.dt_min_status >= sdp.min_version_time::date
-		and coalesce(mm.dt_max_status, now()) <= coalesce(sdp.max_version_time::date, now())
-where mm.valid is true
+	on sdp.id = f.id
+		and f.dt_min_status >= sdp.min_version_time::date
+		and coalesce(f.dt_max_status, now()) <= coalesce(sdp.max_version_time::date, now())
+where f.valid is true
 ;
