@@ -127,12 +127,7 @@ SELECT
   pl.end_version_category,
   pl.is_last_version,
   i.exclusivity,
-  CASE  WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8927'
-            THEN SUBSTRING(i.id::VARCHAR(24) FROM 5)
-        WHEN SUBSTRING(i.id::VARCHAR(24) FOR 4) = '8928'
-            THEN CONCAT('1',SUBSTRING(i.id::VARCHAR(24) FROM 5))
-  END::INTEGER
-  AS short_id
+  i.id % 892700000 as short_id
 from
 	imovel i
 left join
