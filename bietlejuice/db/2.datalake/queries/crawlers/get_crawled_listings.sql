@@ -31,61 +31,17 @@ base_list as (
 		c.type as listing_type,
 		regexp_extract(phones, '.(\d+),.(\d+).*', 1) as primary_phone_number,
 	  regexp_extract(phones, '.(\d+),[^0-9]?(\d+).*', 2) as secondary_phone_number,
-	  case
-	    when price is null or trim(price) = ''
-	      then null
-	    else cast(price as double)
-	  end as price,
-	  case
-	    when rent is null or trim(rent) = ''
-	      then null
-	    else cast(rent as double)
-	  end as rent,
-	  case
-	    when condominium is null or trim(condominium) = ''
-	      then null
-	    else cast(condominium as double)
-	  end as condominium,
-	  case
-	    when iptu is null or trim(iptu) = ''
-	      then null
-	    else cast(iptu as double)
-	  end as iptu,
-	  case
-	    when total_area is null or trim(total_area) = ''
-	      then null
-	    else cast(total_area as double)
-	  end as total_area,
-	  case
-	    when useful_area is null or trim(useful_area) = ''
-	      then null
-	    else cast(useful_area as double)
-	  end as useful_area,
-	  case
-	    when bedrooms is null or trim(bedrooms) = ''
-	      then null
-	    else cast(cast(bedrooms as real) as smallint)
-	  end as bedrooms,
-	  case
-	    when suites is null or trim(suites) = ''
-	      then null
-	    else cast(cast(suites as real) as smallint)
-	  end as suites,
-	  case
-	    when toilets is null or trim(toilets) = ''
-	      then null
-	    else cast(cast(toilets as real) as smallint)
-	  end as toilets,
-	  case
-	    when garages is null or trim(garages) = ''
-	      then null
-	    else cast(cast(garages as real) as smallint)
-	  end as garages,
-	  case
-	    when year_building is null or year_building = '' or year_building < '1900'
-	      then null
-	    else cast(cast(year_building as real) as integer)
-	  end as year_building,
+	  try(cast(price as double)) as price,
+	  try(cast(rent as double)) as rent,
+	  try(cast(condominium as double)) as condominium,
+	  try(cast(iptu as double)) as iptu,
+	  try(cast(total_area as double)) as total_area,
+	  try(cast(useful_area as double)) as useful_area,
+	  try(cast(try(cast(bedrooms as real)) as smallint)) as bedrooms,
+	  try(cast(try(cast(suites as real)) as smallint)) as suites,
+	  try(cast(try(cast(toilets as real)) as smallint)) as toilets,
+	  try(cast(try(cast(garages as real)) as smallint)) as garages,
+	  try(cast(try(cast(year_building as real)) as smallint)) as year_building,
 		advertiser_name,
 		case
 			when lower(replace(trim(advertiser_name),' ','')) like 'r20%' then 'r2o-flats'
@@ -280,4 +236,3 @@ left join
 where
 	bl.id is not null
 	and crawl_run = last_run_seen
-limit 1000

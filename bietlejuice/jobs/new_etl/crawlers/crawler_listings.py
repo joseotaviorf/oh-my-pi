@@ -2,6 +2,7 @@
 
 import cStringIO
 import csv
+import itertools
 import os
 
 import numpy as np
@@ -11,6 +12,7 @@ from datetime import datetime
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
+from qa_python_utils.default_logger import _logger, logger
 
 s3_bucket = os.environ.get('bi-datalake-s3-bucket')
 data_google_api_key = os.environ.get('DATA_GOOGLE_API_KEY')
@@ -30,16 +32,25 @@ class CrawlerListings(CrawlerEntity):
                      'sk_date_first_seen', 'sk_date_last_seen', 'active', 'days_seen', 'days_unseen', 'runs_unseen',
                      'rental_flg', 'sale_flg', 'listing_type', 'advertiser_type', 'big_advertiser', 'advertiser_name']
 
-    def __init__(self, s3_bucket, google_maps_api_key):
+    @logger
+    def __init__(self, s3_bucket, google_maps_api_key, google_maps_daily_quota):
         super(CrawlerListings, self).__init__(
             s3_bucket=s3_bucket,
             google_maps_api_key=google_maps_api_key,
             get_polygons=True,
             get_house_allowed=False
         )
+        self.google_maps_daily_quota = google_maps_daily_quota
         self.listings = pd.DataFrame([], columns=self.CLEAN_COLUMNS)
         self.latlngs = pd.DataFrame([], columns=['lat', 'lng'])
         self.addresses = pd.DataFrame([], columns=['full_address'])
+        daily_gaddress_count = self.get_daily_gaddress_count()
+        daily_quota = google_maps_daily_quota if type(google_maps_daily_quota) == 'int' else int(
+            google_maps_daily_quota)
+        self.api_quota = daily_quota - daily_gaddress_count
+        self.api_quota = self.api_quota if self.api_quota > 0 else 0
+        if self.api_quota == 0:
+            _logger.warning('Number of daily requests reached the daily quota')
 
     def get_crawler_listings(self):
         return self.listings
@@ -49,6 +60,25 @@ class CrawlerListings(CrawlerEntity):
 
     def get_crawler_addresses(self):
         return self.addresses
+
+    def get_daily_gaddress_count(self):
+        ''' Get how many addresses were added to the DB today to avoid breaking the defined quota '''
+
+        query = BaseETL.get_query_from_file_name(
+            '{}/crawlers/get_daily_gaddress_count.sql'.format(DATALAKE_QUERIES_DIR))
+        if not query:
+            return None
+        df = self.athena_client.execute_query_and_return_dataframe(query)
+        return df.daily_total.values[0]
+
+    def get_crawler_locations(self):
+        ''' Get how many addresses were added to the DB today to avoid breaking the defined quota '''
+
+        query = BaseETL.get_query_from_file_name('{}/crawlers/get_crawler_locations.sql'.format(DATALAKE_QUERIES_DIR))
+        if not query:
+            return None
+        df = self.athena_client.execute_query_and_return_dataframe(query)
+        return df
 
     # TODO: Move this to a Google Maps Wrapper
     @staticmethod
@@ -80,8 +110,12 @@ class CrawlerListings(CrawlerEntity):
         info = pd.DataFrame([], columns=cols)
         dt_gaddress = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         info['location'] = None
-        for l in entity:
+
+        iter_count = self.api_quota
+        _logger.info('m=enrich, quota={}, entity_size={}, starting to call api'.format(self.api_quota, len(entity)))
+        for l in itertools.islice(entity, self.api_quota):
             r = self._get_address(lat=l[0], lng=l[1]) if reverse else self._get_address(raw_address=l)
+            iter_count -= 1
             if r:
                 s = pd.Series(index=cols)
                 location = '{0},{1}'.format(l[0], l[1]) if reverse else l
@@ -109,6 +143,10 @@ class CrawlerListings(CrawlerEntity):
                 s['dt_gaddress'] = dt_gaddress
                 info = info.append(s, ignore_index=True)
 
+            if iter_count % 100 == 0:
+                _logger.info('m=enrich, iterated={}, continuing iteration'.format(self.api_quota - iter_count))
+        self.api_quota = iter_count
+        _logger.info('m=enrich, quota_left={}, finished iterating'.format(self.api_quota))
         info.gcep = info.gcep.astype(str).str.zfill(8)
         info.gcep = info.gcep.replace({'00000nan': None})
 
@@ -123,12 +161,19 @@ class CrawlerListings(CrawlerEntity):
             self.listings.drop([col_new], axis=1, inplace=True)
         self.listings.drop(['location'], axis=1, inplace=True)
 
+    @logger
     def persist_address_attribution(self):
         ''' Persist new attributions to the datalake '''
         cols = ['id', 'website', 'glat', 'glng', 'gcep', 'gstreet', 'gstreet_number', 'gneighborhood', 'gcity',
                 'gstate', 'location_type', 'location_precision', 'dt_gaddress']
-        output = self.listings[~self.listings['full_address_flg'].astype(bool)][cols]
-        output = output.where(~output.isnull(), '')
+        new_locations = \
+            self.listings[
+                ~self.listings['full_address_flg'].astype(bool) & ~self.listings['gaddress_flg'].astype(bool) & ~
+                self.listings['glat'].where(self.listings['glat'] != '', None).isnull()][cols]
+        new_locations = new_locations.where(~new_locations.isnull(), '')
+        current_locations = self.get_crawler_locations()
+
+        output = current_locations.append(new_locations)
 
         filename = 'crawler_locations'
 
@@ -141,13 +186,32 @@ class CrawlerListings(CrawlerEntity):
         )
         # add flag that indicates
 
+    @logger
+    def persist_clean_crawler_data(self):
+        filename = 'crawler_listings'
+        output = self.listings
+        obj = output.to_csv(index=False, encoding='utf8', quoting=csv.QUOTE_NONNUMERIC)
+        io = cStringIO.StringIO(obj)
+        BaseETL.obj_to_s3(
+            obj_io=io,
+            bucket=s3_bucket,
+            file_path='clean/{0}/{0}.csv'.format(filename)
+        )
 
-crawled_listings = CrawlerListings(s3_bucket, data_google_api_key)
+    @logger
+    def enrich_crawler_addresses(self):
+        new_latlng = self.get_crawler_latlngs()
+        new_addresses = self.get_crawler_addresses()
+        self.enrich(new_latlng.values)
+        self.enrich(new_addresses.values, reverse=False)
 
-# print crawled_listings.get_crawler_listings()
-crawled_listings.load_crawler_listings()
-ll = crawled_listings.get_crawler_latlngs()
-a = crawled_listings.get_crawler_addresses()
-crawled_listings.enrich(ll.values)
-crawled_listings.enrich(a.values, reverse=False)
-crawled_listings.persist_address_attribution()
+    @logger
+    def transform_crawler_data(self):
+        self.load_crawler_listings()
+        self.enrich_crawler_addresses()
+        self.persist_address_attribution()
+        self.persist_clean_crawler_data()
+
+
+crawled_listings = CrawlerListings(s3_bucket, data_google_api_key, google_maps_max_calls)
+crawled_listings.transform_crawler_data()

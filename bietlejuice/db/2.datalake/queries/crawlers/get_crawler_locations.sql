@@ -1,0 +1,16 @@
+select
+  id,
+  website,
+  glat,
+  glng,
+  gcep,
+  gstreet,
+  gstreet_number,
+  gneighborhood,
+  gcity,
+  gstate,
+  location_type,
+  location_precision,
+  dt_gaddress
+from
+  datalake_raw.crawler_locations
