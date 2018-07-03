@@ -214,6 +214,13 @@ fact_demand = BaseDAG.get_quintoandar_python_operator(
     op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket}
 )
 
+fact_house_status = BaseDAG.get_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_house_status',
+    func_command=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'house_status', 'is_fact': True, 'bucket': bucket}
+)
+
 # flow
 lead_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -290,3 +297,4 @@ ods_supply >> fact_supply
 fact_demand >> xcom_fact_demand
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
+house_dag >> fact_house_status

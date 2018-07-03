@@ -66,7 +66,7 @@ class RegionSubDag(DimSubDag):
             func_command=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'region',
-                'post_command': "update staging.dim_region set dt_timestamp = '{}' where sk_region = -1;".format(
+                'post_command': "update staging.dim_region set dt_timestamp = '{}', region_code = '-1' where sk_region = -1;".format(
                     datetime.now().strftime('%Y-%m-%d'))
             }
         )

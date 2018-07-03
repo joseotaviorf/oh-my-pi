@@ -20,9 +20,12 @@ def read_query(file_name):
 
 
 @logger
-def delete_old_entries(entity, execution_date):
+def delete_old_entries(entity, execution_date=None):
+    query = ("delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity, execution_date)
+             if execution_date is not None else 'truncate staging.{0}'.format(entity))
+
     BaseETL.execute_command(
-        command="delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity, execution_date),
+        command=query,
         db_enum=EnumDb.BI_DW,
         commit=True
     )
@@ -73,6 +76,26 @@ def load_agents_scheduling(**kwargs):
     )
 
 
+def load_agents_signed_contracts():
+    entity = 'agents_signed_contracts'
+    query = read_query('{}/{}.sql'.format(DW_STAGING_QUERIES_DIR, entity))
+
+    data_table = BaseETL.from_db_query(
+        db_enum=EnumDb.BI_DW,
+        query=query,
+        encoding='utf-8'
+    )
+
+    BaseETL.to_db(
+        db_enum=EnumDb.BI_DW,
+        data_table=data_table,
+        table_name=entity,
+        encoding='utf-8',
+        append=False,
+        schema='staging'
+    )
+
+
 # create DAG definition
 dag = DAG(
     dag_id='bi-agents-availability',
@@ -100,6 +123,12 @@ agents_scheduling = QuintoAndarPythonOperator(
     task_id='load_agents_scheduling',
     python_callable=load_agents_scheduling,
     provide_context=True
+)
+
+agents_signed_contracts = QuintoAndarPythonOperator(
+    dag=dag,
+    task_id='load_agents_signed_contracts',
+    python_callable=load_agents_signed_contracts
 )
 
 # flow

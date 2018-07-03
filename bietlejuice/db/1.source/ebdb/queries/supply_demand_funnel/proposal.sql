@@ -20,43 +20,30 @@ select
   p.offer_id,
   p.criadoEm,
   p.atualizadoEm,
-  aud.qtdeEnviosDocumentacaoInq,
-  aud.primeiroEnvioDocInq,
-  aud_5a_analysis_init.credit_analysis_init_date,
-  aud_5a_analysis_end.credit_analysis_end_date
+  aud.tenant_doc_sent_count,
+  aud.tenant_first_doc_sent,
+  if(aud.doc_reused, aud.added_rev_doc_row, null) as tenant_auto_first_doc_sent,
+  aud.credit_analysis_init_date,
+  aud.credit_analysis_end_date,
+  coalesce(aud.doc_reused, 0) as doc_reused
 from
   Proposta p
-join (
-		select
-			id as id_aud,
-			min(dataDocumentosEnviados) as primeiroEnvioDocInq,
-			count(distinct dataDocumentosEnviados) as qtdeEnviosDocumentacaoInq
-		from Proposta_AUD
-		group by id
-	) aud
+left join (
+	select
+		p_aud.id as id_aud,
+		min(p_aud.dataDocumentosEnviados) as tenant_first_doc_sent,
+		count(distinct p_aud.dataDocumentosEnviados) as tenant_doc_sent_count,
+		max(if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)) as credit_analysis_init_date,
+		max(if(p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito'), from_unixtime(ure.`timestamp` / 1000), null)) as credit_analysis_end_date,
+		if(date_format(min(from_unixtime(ure.`timestamp` / 1000)), '%Y-%m-%d %H') != date_format(min(p_aud.dataDocumentosEnviados), '%Y-%m-%d %H'),
+		     max(ure.motivo is null or ure.motivo like '[AUTO] used previous tenant%'), 0) as doc_reused,
+	  min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row
+	from Proposta_AUD p_aud
+	join UsuarioRevisionEntity ure
+		on p_aud.REV = ure.id
+	where p_aud.statusDocumentacaoInq_MOD = 1
+		and p_aud.statusDocumentacaoInq != 'NaoEnviado'
+	group by p_aud.id
+) aud
 	on aud.id_aud = p.id
-left join (
-		select
-			p_aud.id as id_aud,
-			max(from_unixtime(u.`timestamp`/1000)) as credit_analysis_init_date
-		from Proposta_AUD p_aud
-		join UsuarioRevisionEntity u
-			on p_aud.REV = u.id
-		where p_aud.statusDocumentacaoInq = 'AnaliseCredito'
-			and p_aud.statusDocumentacaoInq_MOD = 1
-		group by p_aud.id
-	) aud_5a_analysis_init
-	on aud_5a_analysis_init.id_aud = p.id
-left join (
-		select
-			p_aud.id as id_aud,
-			max(from_unixtime(u.`timestamp`/1000)) as credit_analysis_end_date
-		from Proposta_AUD p_aud
-		join UsuarioRevisionEntity u
-			on p_aud.REV = u.id
-		where p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito')
-			and p_aud.statusDocumentacaoInq_MOD = 1
-		group by p_aud.id
-	) aud_5a_analysis_end
-	on aud_5a_analysis_end.id_aud = p.id
-where DATE(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
+where date(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= date('{}')
