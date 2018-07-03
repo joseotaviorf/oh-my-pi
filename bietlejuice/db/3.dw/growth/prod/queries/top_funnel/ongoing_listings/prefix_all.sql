@@ -29,7 +29,7 @@ with all_dates as (
     	+ dense_rank() over (partition by dd.year order by f.sk_house desc)
 			- 1 as yearly_count
 	from fact_house_status f
-	right join dim_date dd
+	join dim_date dd
 		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
@@ -46,7 +46,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_house) as monthly_count
 	from fact_house_status f
-	right join dim_date dd
+	join dim_date dd
 		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
@@ -63,7 +63,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_house) as yearly_count
 	from fact_house_status f
-	right join dim_date dd
+	join dim_date dd
 		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
