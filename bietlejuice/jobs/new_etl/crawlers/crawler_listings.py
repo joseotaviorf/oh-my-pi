@@ -189,7 +189,7 @@ class CrawlerListings(CrawlerEntity):
     @logger
     def persist_clean_crawler_data(self):
         filename = 'crawler_listings'
-        output = self.listings
+        output = self.listings[self.CLEAN_COLUMNS]
         obj = output.to_csv(index=False, encoding='utf8', quoting=csv.QUOTE_NONNUMERIC)
         io = cStringIO.StringIO(obj)
         BaseETL.obj_to_s3(
@@ -211,7 +211,3 @@ class CrawlerListings(CrawlerEntity):
         self.enrich_crawler_addresses()
         self.persist_address_attribution()
         self.persist_clean_crawler_data()
-
-
-crawled_listings = CrawlerListings(s3_bucket, data_google_api_key, google_maps_max_calls)
-crawled_listings.transform_crawler_data()
