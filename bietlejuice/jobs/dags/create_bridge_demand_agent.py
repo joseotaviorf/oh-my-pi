@@ -38,7 +38,7 @@ def guarantee_data_integrity(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-load-bdg_demand_fact_1',
+    dag_id='bi-load-bdg_demand_fact_2',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
@@ -46,8 +46,8 @@ dag = DAG(
         'retries': 1,
         'retry_delay': timedelta(minutes=30),
     },
-    start_date=datetime(2018, 6, 7, 0, 0, 0),
-    schedule_interval='0 3 * * *',
+    start_date=datetime(2018, 6, 29, 0, 0, 0),
+    schedule_interval='0 9 * * *',
     max_active_runs=1
 )
 

@@ -32,6 +32,7 @@ def create_dim_agent_region_dw(**kwargs):
     ar = Agent_Region()
     ar.clean_agent_dim(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
     ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
+    ar.insert_dummy(table_name='dim_agent_region', key_column='sk_agentregion', previous_check=True)
 
 
 def create_fact_agent(**kwargs):
