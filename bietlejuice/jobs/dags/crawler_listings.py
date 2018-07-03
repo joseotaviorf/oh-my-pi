@@ -17,7 +17,7 @@ google_maps_max_calls = env.get_airflow_env_var('GOOGLE_MAPS_MAX_CALLS')
 
 def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000):
     if api_key is None:
-        _logger.error('google api key not present')
+        _logger.error('m=transform_crawler_data, msg=google api key not present')
         raise Exception('Variable missing')
     _logger.info('m=transform_crawler_data, starting execution with quota={}'.format(api_daily_quota))
     crawled_listings = CrawlerListings(bucket, api_key, api_daily_quota)

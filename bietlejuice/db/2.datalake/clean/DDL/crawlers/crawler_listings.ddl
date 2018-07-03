@@ -36,7 +36,7 @@ create external table datalake_clean.crawler_listings (
 	price string,
 	rent string,
 	condominium string,
-	ipty string,
+	iptu string,
 	total_area string,
 	useful_area string,
 	bedrooms string,

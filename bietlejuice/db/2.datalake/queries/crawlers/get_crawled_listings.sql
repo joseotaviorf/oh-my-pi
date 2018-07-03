@@ -14,10 +14,12 @@ base_list as (
 		c.id,
 		case
 			when lower(c.business) in ('venda/aluguel','rental','aluguel') then true
+			when try(cast(rent as double)) is not null then true
 			else false
 		end as rental_flg,
 		case
 			when lower(c.business) in ('venda/aluguel') then true
+			when try(cast(price as double)) is not null then true
 			else false
 		end as sale_flg,
 		case
@@ -29,19 +31,19 @@ base_list as (
 			else concat('other-',array_join(split(lower(c.advertiser_type),' '),'-'))
 		end as advertiser_type,
 		c.type as listing_type,
-		regexp_extract(phones, '.(\d+),.(\d+).*', 1) as primary_phone_number,
-	  regexp_extract(phones, '.(\d+),[^0-9]?(\d+).*', 2) as secondary_phone_number,
+		regexp_replace(replace(try(split(phones,',')[1]),'''',''),'\W') as primary_phone_number,
+	  regexp_replace(replace(try(split(phones,',')[2]),'''',''),'\W')as secondary_phone_number.
 	  try(cast(price as double)) as price,
 	  try(cast(rent as double)) as rent,
 	  try(cast(condominium as double)) as condominium,
 	  try(cast(iptu as double)) as iptu,
 	  try(cast(total_area as double)) as total_area,
 	  try(cast(useful_area as double)) as useful_area,
-	  try(cast(try(cast(bedrooms as real)) as smallint)) as bedrooms,
-	  try(cast(try(cast(suites as real)) as smallint)) as suites,
-	  try(cast(try(cast(toilets as real)) as smallint)) as toilets,
-	  try(cast(try(cast(garages as real)) as smallint)) as garages,
-	  try(cast(try(cast(year_building as real)) as smallint)) as year_building,
+	  try(cast(bedrooms as smallint)) as bedrooms,
+	  try(cast(suites as smallint)) as suites,
+	  try(cast(toilets as smallint)) as toilets,
+	  try(cast(garages as smallint)) as garages,
+	  try(cast(year_building as smallint)) as year_building,
 		advertiser_name,
 		case
 			when lower(replace(trim(advertiser_name),' ','')) like 'r20%' then 'r2o-flats'
@@ -147,11 +149,10 @@ base_list as (
 			when lower(replace(trim(advertiser_name),' ','')) like 'nafneg%' then 'naf-negocios'
 			else null
 		end as big_advertiser,
-		if(round(cast(c.lat as double), 5) = 0, null, round(cast(c.lat as double), 5)) as lat,
-		if(round(cast(c.lng as double), 5) = 0, null, round(cast(c.lng as double), 5)) as lng,
-		if((c.lat<>'0' and c.lng<>'0'), true, false) as latlng_flg,
+		if(round(try(cast(c.lat as double)), 5) = 0, null, round(try(cast(c.lat as double)), 5)) as lat,
+		if(round(try(cast(c.lng as double)), 5) = 0, null, round(try(cast(c.lng as double)), 5)) as lng,
 		if(c.street = 'Endereço Não Informado' or c.street = '', null, split(c.street, ',')[1]) as street,
-		regexp_extract(c.street, '[0-9]+') as street_number,
+		regexp_extract(street, ',?[0-9]+$') as street_number,
 		if(c.neighborhood='', null, c.neighborhood) as neighborhood,
 		c.city,
 		if(c.cep='',null,cep) as cep,
@@ -168,54 +169,53 @@ base_list as (
 		datalake_raw.crawlers c
 		on bc.website = c.website
 		and bc.started_on = c.started_on
---		and c.id in ('10219902','10206742','10300335','10138064','10127529','93019942','93019984','94394366','1037759334','71406486','11183393','18803971')
 )
 select
 	bl.id,
 	bl.website,
-	street,
-	street_number,
-	neighborhood,
-	city,
-	state,
-	lat,
-	lng,
-	concat(cast(lat as varchar),',',cast(lng as varchar)) as latlng,
-	array_join(array[street,street_number,neighborhood,city,state],', ') as full_address,
-	(street is not null) as street_flg,
-	(street_number is not null) as street_number_flg,
-	(neighborhood is not null) as neighborhood_flg,
-	(cep is not null) as cep_flg,
-	(city is not null) as city_flg,
-	latlng_flg,
-	((street is not null) and (street_number is not null) and (neighborhood is not null) and latlng_flg) as full_address_flg,
-	primary_phone_number,
-	secondary_phone_number,
-	price,
-	rent,
-	condominium,
-	iptu,
-	total_area,
-	useful_area,
-	bedrooms,
-	suites,
-	toilets,
-	garages,
-	year_building,
-	cep,
-	cast(date_format(dt_last_run, '%Y%m%d') as integer) as sk_date_last_run,
-	cast(date_format(dt_first_seen, '%Y%m%d') as integer) as sk_date_first_seen,
-	cast(date_format(dt_last_seen, '%Y%m%d') as integer) as sk_date_last_seen,
+	bl.street,
+	bl.street_number,
+	bl.neighborhood,
+	bl.city,
+	bl.state,
+	bl.lat,
+	bl.lng,
+	concat(try(cast(bl.lat as varchar)),',',try(cast(bl.lng as varchar))) as latlng,
+	array_join(array[bl.street,bl.street_number,bl.neighborhood,bl.city,bl.state],', ') as full_address,
+	(bl.street is not null) as street_flg,
+	(bl.street_number is not null) as street_number_flg,
+	(bl.neighborhood is not null) as neighborhood_flg,
+	(bl.cep is not null) as cep_flg,
+	(bl.city is not null) as city_flg,
+	(bl.lat is not null and bl.lng is not null) as latlng_flg,
+	((bl.street is not null) and (bl.street_number is not null) and (bl.neighborhood is not null) and bl.latlng_flg) as full_address_flg,
+	bl.primary_phone_number,
+	bl.secondary_phone_number,
+	bl.price,
+	bl.rent,
+	bl.condominium,
+	bl.iptu,
+	bl.total_area,
+	bl.useful_area,
+	bl.bedrooms,
+	bl.suites,
+	bl.toilets,
+	bl.garages,
+	bl.year_building,
+	bl.cep,
+	cast(date_format(bl.dt_last_run, '%Y%m%d') as integer) as sk_date_last_run,
+	cast(date_format(bl.dt_first_seen, '%Y%m%d') as integer) as sk_date_first_seen,
+	cast(date_format(bl.dt_last_seen, '%Y%m%d') as integer) as sk_date_last_seen,
 	(dt_last_seen = dt_last_run) as active,
-	date_diff('day', dt_first_seen, dt_last_seen) as days_seen,
-	date_diff('day', dt_last_seen, dt_last_run) as days_unseen,
-	(last_run - last_run_seen) as runs_unseen,
-	rental_flg,
-	sale_flg,
-	listing_type,
-	advertiser_type,
-	big_advertiser,
-	advertiser_name,
+	bl.date_diff('day', bl.dt_first_seen, dt_last_seen) as days_seen,
+	bl.date_diff('day', bl.dt_last_seen, dt_last_run) as days_unseen,
+	(bl.last_run - bl.last_run_seen) as runs_unseen,
+	bl.rental_flg,
+	bl.sale_flg,
+	bl.listing_type,
+	bl.advertiser_type,
+	bl.big_advertiser,
+	bl.advertiser_name,
 	(cl.id is not null) as gaddress_flg,
 	nullif(cl.glat, '') as glat,
 	nullif(cl.glng, '') as glng,
@@ -235,4 +235,4 @@ left join
 	on cl.id = bl.id and cl.website = bl.website
 where
 	bl.id is not null
-	and crawl_run = last_run_seen
+	and bl.crawl_run = bl.last_run_seen

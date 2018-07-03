@@ -21,16 +21,14 @@ google_maps_max_calls = os.environ.get('GOOGLE_MAPS_MAX_CALLS')
 
 class CrawlerListings(CrawlerEntity):
     CLEAN_COLUMNS = ['id', 'website', 'street', 'street_number', 'neighborhood', 'city', 'state', 'lat', 'lng',
-                     'latlng',
-                     'full_address', 'location_type', 'location_precision', 'gcep', 'glat', 'glng', 'gstreet',
+                     'latlng', 'full_address', 'location_type', 'location_precision', 'gcep', 'glat', 'glng', 'gstreet',
                      'gaddress_flg', 'dt_gaddress', 'gstreet_number', 'gneighborhood', 'gcity', 'gstate', 'street_flg',
-                     'street_number_flg',
-                     'neighborhood_flg', 'cep_flg', 'city_flg', 'latlng_flg', 'full_address_flg',
-                     'primary_phone_number',
-                     'secondary_phone_number', 'price', 'rent', 'condominium', 'iptu', 'total_area', 'useful_area',
-                     'bedrooms', 'suites', 'toilets', 'garages', 'year_building', 'cep', 'sk_date_last_run',
-                     'sk_date_first_seen', 'sk_date_last_seen', 'active', 'days_seen', 'days_unseen', 'runs_unseen',
-                     'rental_flg', 'sale_flg', 'listing_type', 'advertiser_type', 'big_advertiser', 'advertiser_name']
+                     'street_number_flg', 'neighborhood_flg', 'cep_flg', 'city_flg', 'latlng_flg', 'full_address_flg',
+                     'primary_phone_number', 'secondary_phone_number', 'price', 'rent', 'condominium', 'iptu',
+                     'total_area', 'useful_area', 'bedrooms', 'suites', 'toilets', 'garages', 'year_building', 'cep',
+                     'sk_date_last_run', 'sk_date_first_seen', 'sk_date_last_seen', 'active', 'days_seen',
+                     'days_unseen', 'runs_unseen', 'rental_flg', 'sale_flg', 'listing_type', 'advertiser_type',
+                     'big_advertiser', 'advertiser_name']
 
     @logger
     def __init__(self, s3_bucket, google_maps_api_key, google_maps_daily_quota):
@@ -184,7 +182,6 @@ class CrawlerListings(CrawlerEntity):
             bucket=s3_bucket,
             file_path='raw/{0}/{0}.csv'.format(filename)
         )
-        # add flag that indicates
 
     @logger
     def persist_clean_crawler_data(self):
