@@ -3,16 +3,11 @@ select distinct
   f.sk_house,
   f.sk_contract,
   agent.nome as agent_name,
-  coalesce(nullif(dprop.nome, ''), ecp.nome) as owner_name,
-  coalesce(nullif(dprop.cpf, ''), ecp.cpf) as owner_cpf,
+  coalesce(ecp.nome, dprop.nome) as owner_name,
+  coalesce(ecp.cpf, dprop.cpf) as owner_cpf,
   sig."date" as dt_contract_signed,
 	c.contract_status,
-  case
-  	when substring(p.id for 4) = '8927'
-  		then substring(p.id from 5)
-		when substring(p.id for 4) = '8928'
-			then concat('1', substring(p.id from 5))
-	end as short_id_property,
+  p.short_id as short_id_property,
 	r.name as property_region,
 	(
 		dense_rank() over (partition by f.sk_contract order by f2.sk_user_agent asc)
