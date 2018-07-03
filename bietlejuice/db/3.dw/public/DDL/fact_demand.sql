@@ -33,6 +33,7 @@ create table fact_demand (
 	sk_credit_analysis_end_date integer,
 	sk_credit_analysis_approved_date integer,
 	flg_visit_completed integer,
+    flg_visit_performed integer,
 	flg_visit_created_from_app integer,
 	visit_created_type varchar(14),
 	flg_visit_last_updated_from_app integer,
