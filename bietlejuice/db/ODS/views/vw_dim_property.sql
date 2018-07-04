@@ -126,7 +126,8 @@ SELECT
   pl.start_version_category,
   pl.end_version_category,
   pl.is_last_version,
-  i.exclusivity
+  i.exclusivity,
+  i.id % 892700000 as short_id
 from
 	imovel i
 left join

@@ -33,6 +33,7 @@ create external table datalake_clean.ods_fact_demand (
 	sk_credit_analysis_end_date string,
 	sk_credit_analysis_approved_date string,
 	flg_visit_completed string,
+	flg_visit_performed string,
 	flg_visit_created_from_app string,
 	visit_created_type string,
 	flg_visit_last_updated_from_app string,
