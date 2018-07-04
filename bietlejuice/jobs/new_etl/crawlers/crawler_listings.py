@@ -3,7 +3,6 @@
 import cStringIO
 import csv
 import itertools
-import os
 
 import numpy as np
 import pandas as pd
@@ -13,10 +12,6 @@ from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
 from qa_python_utils.default_logger import _logger, logger
-
-s3_bucket = os.environ.get('bi-datalake-s3-bucket')
-data_google_api_key = os.environ.get('DATA_GOOGLE_API_KEY')
-google_maps_max_calls = os.environ.get('GOOGLE_MAPS_MAX_CALLS')
 
 
 class CrawlerListings(CrawlerEntity):
@@ -94,6 +89,8 @@ class CrawlerListings(CrawlerEntity):
         if not query:
             return None
         self.listings = self.athena_client.execute_query_and_return_dataframe(query)
+        for column in self.listings.columns:
+            self.listings[column] = self.listings[column].apply(lambda x: x if x != '' else None)
         self.listings = self.cleaning(self.listings, ['advertiser_name', 'listing_type'])
         self.latlngs = self.listings[
             self.listings['latlng_flg'].astype('bool') & ~self.listings['full_address_flg'].astype(bool) & ~
@@ -119,24 +116,24 @@ class CrawlerListings(CrawlerEntity):
                 location = '{0},{1}'.format(l[0], l[1]) if reverse else l
                 nearest = self.get_nearest_reverse_geocode_result(l[0], l[1], r) if reverse else r[0]
 
-                s.glat = nearest.get('geometry', dict()).get('location', dict()).get('lat')
-                s.glng = nearest.get('geometry', dict()).get('location', dict()).get('lng')
-                s.location_precision = nearest.get('geometry', dict()).get('location_type', '')
+                s.glat = nearest.get('geometry', dict()).get('location', dict()).get('lat', None)
+                s.glng = nearest.get('geometry', dict()).get('location', dict()).get('lng', None)
+                s.location_precision = nearest.get('geometry', dict()).get('location_type', None)
                 s.location_type = 'latlng' if reverse else 'raw_address'
 
                 for component in nearest.get('address_components', []):
                     if 'postal_code' in component.get('types', []):
-                        s.gcep = component.get('short_name', '').replace('-', '')
+                        s.gcep = component.get('short_name', None).replace('-', '')
                     if 'route' in component.get('types', []):
-                        s.gstreet = component.get('short_name', '').replace('-', '')
+                        s.gstreet = component.get('short_name', None).replace('-', '')
                     if 'street_number' in component.get('types', []):
-                        s.gstreet_number = component.get('short_name', '').replace('-', '')
+                        s.gstreet_number = component.get('short_name', None).replace('-', '')
                     if 'sublocality_level_1' in component.get('types', []):
-                        s.gneighborhood = component.get('short_name', '').replace('-', '')
+                        s.gneighborhood = component.get('short_name', None).replace('-', '')
                     if 'administrative_area_level_2' in component.get('types', []):
-                        s.gcity = component.get('short_name', '').replace('-', '')
+                        s.gcity = component.get('short_name', None).replace('-', '')
                     if 'administrative_area_level_1' in component.get('types', []):
-                        s.gstate = component.get('short_name', '').replace('-', '')
+                        s.gstate = component.get('short_name', None).replace('-', '')
                 s['location'] = location
                 s['dt_gaddress'] = dt_gaddress
                 info = info.append(s, ignore_index=True)
@@ -179,7 +176,7 @@ class CrawlerListings(CrawlerEntity):
         io = cStringIO.StringIO(obj)
         BaseETL.obj_to_s3(
             obj_io=io,
-            bucket=s3_bucket,
+            bucket=self.bucket,
             file_path='raw/{0}/{0}.csv'.format(filename)
         )
 
@@ -187,12 +184,11 @@ class CrawlerListings(CrawlerEntity):
     def persist_clean_crawler_data(self):
         filename = 'crawler_listings'
         output = self.listings[self.CLEAN_COLUMNS]
-        obj = output.to_csv(index=False, encoding='utf8', quoting=csv.QUOTE_NONNUMERIC)
-        io = cStringIO.StringIO(obj)
-        BaseETL.obj_to_s3(
-            obj_io=io,
-            bucket=s3_bucket,
-            file_path='clean/{0}/{0}.csv'.format(filename)
+        for column in output.columns:
+            output[column] = output[column].fillna('').astype(str)
+        self.athena_client.create_parquet_from_df(
+            df=output,
+            key='clean/{0}/{0}.parq'.format(filename)
         )
 
     @logger

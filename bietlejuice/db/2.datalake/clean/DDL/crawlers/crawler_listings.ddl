@@ -59,12 +59,6 @@ create external table datalake_clean.crawler_listings (
 	big_advertiser string,
 	advertiser_name string
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
+stored as parquet
 location 's3://5a-datalake/clean/crawler_listings/'
-tblproperties (
-  'skip.header.line.count' = '1'
-);
+;

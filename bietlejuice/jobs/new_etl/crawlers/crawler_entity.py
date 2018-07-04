@@ -21,6 +21,7 @@ class CrawlerEntity(object):
 
     def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True, get_house_allowed=True):
         self.athena_client = AthenaClient(s3_bucket)
+        self.bucket = s3_bucket
         if google_maps_api_key is not None:
             self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
             self.google_maps_api_key = google_maps_api_key
