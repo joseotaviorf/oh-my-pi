@@ -89,8 +89,8 @@ def reprocess_leads(variant):
     if recency_bucket:
         buckets = (
             ((datetime.utcnow().date() - processed.atualizadoEm.dt.date).dt.days / processor.get_unit_divisor()).
-                apply(math.floor).
-                astype(int)
+            apply(math.floor).
+            astype(int)
         )
         processed['infosExtras'] = processed['infosExtras'] + ';' + buckets.astype(str) + lead_options.get('unit')
 
