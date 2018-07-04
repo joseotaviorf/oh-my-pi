@@ -39,7 +39,7 @@ class LeadsProcessor(object):
     @logger
     def get_unit_divisor(self, unit=None):
         if unit is not None:
-            unit_d = {'week': 7.0, 'day': 1.0, 'year': 365.25}
+            unit_d = {'week': 7.0, 'day': 1.0, 'year': 365.25, 'month': 30.0}
             self.__unit_d = unit_d.get(unit)
 
         return self.__unit_d
