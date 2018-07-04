@@ -1,4 +1,4 @@
-drop table if exists public.dim_agent_region ;
+DROP TABLE IF EXISTS public.dim_agent_region ;
 CREATE TABLE public.dim_agent_region (
   sk_agentregion BIGINT,
   sk_regions_date INTEGER,

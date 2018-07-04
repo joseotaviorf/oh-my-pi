@@ -1,14 +1,14 @@
-with reg as (
-select
-	coalesce(to_char(r.dt::DATE,'YYYYMMDD')::integer, -1) as sk_date,
-	dadosagente_id as sk_dadosagente_id,
+WITH reg AS (
+SELECT
+	COALESCE(to_char(r.dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
+	dadosagente_id AS sk_dadosagente_id,
 	regioes,
 	area,
 	secondary_area
-from staging.agent_region_group r
+FROM staging.agent_region_group r
 )
-select
-	cast(sk_date as char(8)) +
-	cast(sk_dadosagente_id as char(8)) as sk_agentregiongroup_id,
+SELECT
+	cast(sk_date AS CHAR(8)) +
+	cast(sk_dadosagente_id AS CHAR(8)) AS sk_agentregiongroup_id,
 	*
-from reg
+FROM reg

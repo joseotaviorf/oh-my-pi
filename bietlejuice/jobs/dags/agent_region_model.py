@@ -30,7 +30,7 @@ def load_group_agent_region_dw(**kwargs):
 def create_dim_agent_region_dw(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    ar.clean_agent_dim(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
+    ar.truncate_table(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
     ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
     ar.insert_dummy(table_name='dim_agent_region', key_column='sk_agentregion', previous_check=True)
 
@@ -47,7 +47,7 @@ def create_fact_agent(**kwargs):
 def create_dim_agent_review(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    ar.clean_agent_dim(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
+    ar.truncate_table(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
     rev_data = ar.get_agent_reviews(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb, exec_dt=exec_date)
     ar.move_data_to_ods(data=rev_data, table_name='agent_review')
 
@@ -55,7 +55,7 @@ def create_dim_agent_review(**kwargs):
 def load_dim_agent_review_dw(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent_Region()
-    ar.clean_agent_dim(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
+    ar.truncate_table(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
     ar.insert_dummy(table_name='dim_agent_review', key_column='sk_agentreview, sk_booking', value='-1,-1')
 
@@ -78,7 +78,7 @@ def upd_agent_region(**kwargs):
     new_data = ar.get_agent_region(f_name='etl_agent_region_daily', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date,
                                    dtmax=exec_date_max)
     inserted_data, updated_data = ar.split_new_rows(new_data=new_data, dt=exec_date)
-    ar.insert_new_data(inserted_data, 'agent_region_hist')
+    ar.move_data_to_ods(inserted_data, 'agent_region_hist')
     ar.update_data(data=updated_data, db='public', table='agent_region_hist', enumdb=EnumDb.BI_ODS, date=exec_date)
 
 

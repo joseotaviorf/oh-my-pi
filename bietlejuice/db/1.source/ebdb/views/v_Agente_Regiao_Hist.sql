@@ -13,6 +13,4 @@ CREATE OR REPLACE VIEW v_Agente_Regiao_Hist AS
 	FROM DadosAgente_Regiao_AUD a
 	 left join UsuarioRevisionEntity b
 		 on a.rev = b.id
-	-- where dadosagente_id = 386
-	-- where FROM_UNIXTIME(floor(timestamp/1000)) < TIMESTAMP('2018-05-24 00:00:00')
 );

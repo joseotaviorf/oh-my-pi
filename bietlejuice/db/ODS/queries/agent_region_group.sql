@@ -1,4 +1,4 @@
-with i_full as
+WITH i_full AS
 (
 SELECT 
 	DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))  AS dt,
@@ -11,69 +11,68 @@ LEFT join
 	files.aux_regiao aux ON aux.id = t_out.regiao_id
 WHERE
 	TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') BETWEEN dt_start AND dt_end
-	and TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
+	AND TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
 ORDER BY 2, 4
 )
-, i_union as
+, i_union AS
 (
-select
+SELECT
 	*
- from i_full
-union all
-select distinct
-	ag.available_date as dt,
-	us.dados_agente_id as dadosagente_id,
-	region_id as regiao_id,
+ FROM i_full
+UNION ALL
+SELECT DISTINCT
+	ag.available_date AS dt,
+	us.dados_agente_id AS dadosagente_id,
+	region_id AS regiao_id,
 	aux."Nossa nomenclatura"
-from
+FROM
 	public.agents_schedule ag
-left join public.usuario us
-	on us.id = ag.agent_user_id
-left join files.aux_regiao aux
+LEFT JOIN public.usuario us
+	ON us.id = ag.agent_user_id
+LEFT JOIN files.aux_regiao aux
 	ON aux.id = ag.region_id
-where
-	ag.region_id is not null
-	and us.dados_agente_id is not null
-	and	ag.available_date = date(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))
-	and date(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS')) <= date(TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))  -- limit date, where aud started to be implemented
+WHERE
+	ag.region_id IS NOT NULL
+	AND us.dados_agente_id IS NOT NULL
+	AND	ag.available_date = DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))
+	AND DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS')) <= DATE(TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))  -- limit date, where aud started to be implemented
 )
-, i_group as
-(select
+, i_group AS
+(SELECT
 	i_union.dt,
 	i_union.dadosagente_id,
-	-- i.regiao_id,
 	i_union."Nossa nomenclatura",
-	count(i_union."Nossa nomenclatura") as times,
-	rank() over (partition by i_union.dadosagente_id order by count(i_union."Nossa nomenclatura") DESC, i_union."Nossa nomenclatura" asc) ranking
-from i_union
-	group by
+	count(i_union."Nossa nomenclatura") AS times,
+	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union."Nossa nomenclatura") DESC, i_union."Nossa nomenclatura" ASC) ranking
+FROM i_union
+	GROUP BY
 	i_union.dt,
 	i_union.dadosagente_id,
 	i_union."Nossa nomenclatura")
-select
+SELECT
 	g.dt,
 	g.dadosagente_id,
 	list.regions,
-	g."Nossa nomenclatura" as area,
+	g."Nossa nomenclatura" AS area,
 	(
-	select r2."Nossa nomenclatura"
-		from i_group r2
-	where r2.dadosagente_id = g.dadosagente_id
-			and r2.dt = g.dt
-			and r2.ranking = 2
-			and r2.times = g.times
-	 ) as secondary_area
-from i_group g
-left join
-	(select
+	SELECT r2."Nossa nomenclatura"
+		FROM i_group r2
+	WHERE r2.dadosagente_id = g.dadosagente_id
+			AND r2.dt = g.dt
+			AND r2.ranking = 2
+			AND r2.times = g.times
+	 ) AS secondary_area
+FROM i_group g
+LEFT JOIN
+	(SELECT
 		arh.dt,
 		arh.dadosagente_id,
-	    array_agg(arh.regiao_id order by arh.regiao_id) as regions
-	 from
+	    array_agg(arh.regiao_id ORDER BY arh.regiao_id) AS regions
+	 FROM
 	 	i_union arh
-	 group by
+	 GROUP BY
 	 	arh.dt,
 		arh.dadosagente_id
 	) list
-on list.dt = g.dt and list.dadosagente_id = g.dadosagente_id
-where ranking = 1;
+ON list.dt = g.dt AND list.dadosagente_id = g.dadosagente_id
+WHERE ranking = 1;

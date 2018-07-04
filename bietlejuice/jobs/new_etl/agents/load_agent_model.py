@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import boto3
 import petl
 from __init__ import QUERIES_DIR, ODS_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
@@ -9,9 +8,7 @@ from qa_python_utils.default_logger import _logger
 
 class Agent_Region(object):
     def __init__(self):
-        self.schema_name = ''
         self.bucket_datalake = '5a-datalake'
-        self.s3_client = boto3.resource('s3')
 
     def __format_query_filename(self, filename, db_enum):
         if db_enum == EnumDb.QuintoAndar_ebdb:
@@ -37,14 +34,14 @@ class Agent_Region(object):
 
         return agent_region_data
 
-    def clean_agent_dim(self, schema, table, enumdb):
-        filename = "TRUNCATE TABLE {}.{}"
-        raw_query = filename.format(schema, table)
+    def truncate_table(self, schema, table, enumdb):
+        raw_query = "TRUNCATE TABLE {}.{}"
+        query = raw_query.format(schema, table)
 
         BaseETL.execute_command(
             db_enum=enumdb,
-            encoding='UTF8',  # conn=conn,
-            command=raw_query,
+            encoding='UTF8',
+            command=query,
             commit=True
         )
 
@@ -80,9 +77,6 @@ class Agent_Region(object):
                                 {'dt': 'dt_end', 'DadosAgente_id': 'dadosagente_id', 'REVTYPE': 'revtype'})
 
         return table_ins, table_upd
-
-    def insert_new_data(self, data, table):
-        self.move_data_to_ods(data, table)
 
     def update_data(self, data, db, table, enumdb, date):
         infinity_date = '2099-12-31 00:00:00'

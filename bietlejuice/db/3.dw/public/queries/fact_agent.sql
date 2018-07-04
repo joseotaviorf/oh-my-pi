@@ -1,21 +1,21 @@
 WITH schedule AS
-(select
-	t.agent_id as sk_agent_id,
-	coalesce(to_char(t.slot_dt::DATE,'YYYYMMDD')::integer, -1) as sk_date,
-	sum(cast(t.available_slot as integer)) as available_slots,
-	sum(cast(t.specific_slot as integer)) as available_slots_0
- from staging.agents_slots t
- where date(t.slot_dt) = date('{}')
-group by 1, 2
+(SELECT
+	t.agent_id AS sk_agent_id,
+	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
+	sum(cast(t.available_slot AS INTEGER)) AS available_slots,
+	sum(cast(t.specific_slot AS INTEGER)) AS available_slots_0
+ FROM staging.agents_slots t
+ WHERE DATE(t.slot_dt) = DATE('{}')
+GROUP BY 1, 2
 )
 SELECT
 	s.*,
 	CASE d.week_day
 		WHEN 6 THEN 20	-- Saturday
 		ELSE 36			-- Other days
-	END as total_slots,
+	END AS total_slots,
 	COALESCE(a.area, '-1') AS area,
-	COALESCE(a.sk_agentregion, -1) as sk_agentregion,
+	COALESCE(a.sk_agentregion, -1) AS sk_agentregion,
 	CAST(CAST(s.sk_date AS VARCHAR) + CAST(sk_agent_id AS VARCHAR) AS BIGINT)
 FROM schedule s
 LEFT JOIN public.dim_date d
