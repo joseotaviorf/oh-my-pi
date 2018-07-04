@@ -37,13 +37,17 @@ with all_dates as (
     	                                  dd.year order by f.sk_contract desc)
 			- 1 as yearly_count
 	from fact_demand f
-	left join dim_contract dc
+	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
+	join dim_date dd
+		on dc.dt_signature is not null
+		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and (case
+		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
+		  		     then dc.contract_status = 'Ativo'
+		  		   else dc.contract_status != 'Cancelado'
+		  		 end
+		  		)
 	join dim_property dpr
 		on f.sk_house = dpr.sk_property
 	left join dim_region dr
@@ -62,13 +66,17 @@ all_dates_last_month as (
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as monthly_count
 	from fact_demand f
-	left join dim_contract dc
+	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
+	join dim_date dd
+		on dc.dt_signature is not null
+		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and (case
+		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
+		  		     then dc.contract_status = 'Ativo'
+		  		   else dc.contract_status != 'Cancelado'
+		  		 end
+		  		)
 	join dim_property dpr
   	on f.sk_house = dpr.sk_property
 	left join dim_region dr
@@ -87,13 +95,17 @@ all_dates_last_year as (
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as yearly_count
   from fact_demand f
-	left join dim_contract dc
+	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-	right join dim_date dd
-		on dc.contract_status != 'Cancelado'
-		  and dc.dt_signature is not null
-		  and dc.dt_contract_start <= dd."date"
-			and coalesce(dc.dt_contract_annulment, dc.dt_contract_intended_end) >= dd."date"
+	join dim_date dd
+		on dc.dt_signature is not null
+		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and (case
+		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
+		  		     then dc.contract_status = 'Ativo'
+		  		   else dc.contract_status != 'Cancelado'
+		  		 end
+		  		)
   join dim_property dpr
   	on f.sk_house = dpr.sk_property
   left join dim_region dr
