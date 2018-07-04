@@ -69,8 +69,8 @@ def reprocess_leads(variant):
 
         _logger.info('m=reprocess_leads, msg=filtering out already contacted phone numbers.')
         blacklist = set()
-        for c_phone in [c for c in leads.columns if c.startswith('telefoneAnunciante')]:
-            contacted = leads.merge(contacts, left_on=c_phone, right_on='phone', how='left')
+        for c_phone in [c for c in processed.columns if c.startswith('telefoneAnunciante')]:
+            contacted = processed.merge(contacts, left_on=c_phone, right_on='phone', how='left')
             indicator = ((contacted.contacted == 1) & (contacted.contact_time >= contacted.atualizadoEm))
             blacklist |= set(contacted.loc[indicator, 'id'].tolist())
 
