@@ -120,7 +120,7 @@ dag = DAG(
 # operators
 PythonOperator(
     dag=dag,
-    task_id='insert-leads',
+    task_id='reprocess-leads',
     python_callable=reprocess_leads,
     op_kwargs={'variant': reprocess_leads_variant}
 )
