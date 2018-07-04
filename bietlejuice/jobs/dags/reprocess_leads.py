@@ -3,8 +3,6 @@ import math
 import os
 from datetime import datetime
 
-from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
 from qa_python_utils.default_logger import logger
 
@@ -14,7 +12,7 @@ from bietlejuice.jobs.new_etl import LEAD_VARIANT_CONFIG_DIR
 from bietlejuice.jobs.new_etl.leads.leads_processor import LeadsProcessor
 
 MAIN_DAG_NAME = 'reprocess-leads'
-MAIN_START_DATE = datetime(2018, 07, 03)
+MAIN_START_DATE = datetime(2018, 7, 3)
 MAIN_SCHEDULE_INTERVAL = '@once'
 
 env.set_airflow_var_to_local_env('EBDB')
@@ -104,23 +102,19 @@ def reprocess_leads(variant):
     _logger.info('m=reprocess_leads, msg=done!')
 
 
-dag = DAG(
+dag = BaseDAG.build_dag(
     dag_id=MAIN_DAG_NAME,
-    default_args={
-        'owner': BaseDAG.DEFAULT_OWNER,
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
+    wait_for_downstream=False,
+    depends_on_past=False,
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1,
     catchup=False
 )
 
 # operators
-PythonOperator(
+BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='reprocess-leads',
-    python_callable=reprocess_leads,
+    func_command=reprocess_leads,
     op_kwargs={'variant': reprocess_leads_variant}
 )
