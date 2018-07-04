@@ -1,0 +1,33 @@
+{
+  "variant": "LNA",
+  "lead": {
+    "status": [
+      "Descartado"
+    ],
+    "origin": [
+      "Landing",
+      "OwnerPWA"
+    ],
+    "reason": [
+      "ProprietarioNuncaAtende"
+    ],
+    "interval": [
+      1,
+      6
+    ],
+    "unit": "week"
+  },
+  "contact": {
+    "reasons": [
+      "ProprietarioNuncaAtende"
+    ],
+    "week_interval": 8,
+    "status_in": false,
+    "statuses": [
+      "Descartado"
+    ],
+    "reason_in": false
+  },
+  "size_limit": 250,
+  "recency_bucket": false
+}

@@ -459,6 +459,10 @@ ended_rentals_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, material
 ongoing_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                                 'ongoing_listings', 'top_funnel')
 
+ongoing_stranded_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                         materialize_growth_measure_table_query,
+                                                         'ongoing_stranded_listings', 'top_funnel')
+
 # Amplitude engaged users
 amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
                                                              materialize_engaged_users_table_query,
@@ -606,7 +610,8 @@ amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
  approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >>
  offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >>
  tenants_sub_dag >> ended_rentals_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >>
- ongoing_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >> prediction_visits_completed_sub_dag >>
- prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >> prediction_documentation_sent_sub_dag >>
- prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >> fact_append_task
+ ongoing_listings_sub_dag >> ongoing_stranded_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >>
+ prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >>
+ prediction_documentation_sent_sub_dag >> prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >>
+ fact_append_task
  )
