@@ -1,0 +1,32 @@
+{
+  "variant": "OCA",
+  "lead": {
+    "status": [
+      "Descartado"
+    ],
+    "reason": [
+      "EnderecoIncorreto",
+      "ForaArea"
+    ],
+    "interval": [
+      1,
+      6
+    ],
+    "unit": "week"
+  },
+  "contact": {
+    "reasons": [
+      "EnderecoIncorreto",
+      "ForaArea"
+    ],
+    "week_interval": 8,
+    "status_in": false,
+    "statuses": [
+      "Descartado"
+    ],
+    "reason_in": false
+  },
+  "check_coverage": true,
+  "size_limit": 100,
+  "recency_bucket": false
+}

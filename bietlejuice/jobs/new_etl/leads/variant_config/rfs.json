@@ -1,0 +1,29 @@
+{
+  "variant": "EXC",
+  "lead": {
+    "status": [
+      "Descartado"
+    ],
+    "reason": [
+      "ProprietarioRecusou"
+    ],
+    "interval": [
+      4,
+      12
+    ],
+    "unit": "week"
+  },
+  "contact": {
+    "reasons": [
+      "ProprietarioRecusou"
+    ],
+    "week_interval": 16,
+    "status_in": false,
+    "statuses": [
+      "Descartado"
+    ],
+    "reason_in": false
+  },
+  "size_limit": 100,
+  "recency_bucket": true
+}
