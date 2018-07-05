@@ -38,6 +38,9 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
     file_path = '{}/{}.sql'.format(QUERIES_EBDB_SUPPLY_DEMAND_DIR, kwargs['table_name'])
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
+    if 'execution_date' in kwargs:
+        query.format(str(kwargs['execution_date']))
+
     utils.extract_query_dim_from_ebdb_to_ods(
         dim_name=kwargs['table_name'],
         bucket=bucket,
@@ -189,6 +192,7 @@ ods_house_rent_flow = BaseDAG.get_quintoandar_python_operator(
 ods_supply = BaseDAG.get_quintoandar_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
+    provide_context=True,
     func_command=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'table_name': 'fact_supply'}
 )
