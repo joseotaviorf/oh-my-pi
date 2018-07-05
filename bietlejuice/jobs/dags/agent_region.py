@@ -4,20 +4,20 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent_Region
+from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent
 
 env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'ENV_EBDB')
 
 
 def load_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
-    ar = Agent_Region()
-    data = ar.get_agent_region(f_name='etl_agent_region', dt=exec_date, db_enum=EnumDb.QuintoAndar_ebdb)
-    ar.move_data_to_ods(data, 'agent_region_hist')
+    ar = Agent()
+    data = ar.get_agent_data(f_name='etl_agent_region', dt=exec_date, db_enum=EnumDb.QuintoAndar_ebdb)
+    ar.move_data_to_destination(data, 'agent_region_hist')
 
 
 def clean_agent_region():
-    ar = Agent_Region()
+    ar = Agent()
     ar.truncate_table(schema='public', table='agent_region_hist', enumdb=EnumDb.BI_ODS)
 
 

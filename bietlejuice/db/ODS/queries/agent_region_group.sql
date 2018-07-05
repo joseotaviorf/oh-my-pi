@@ -1,7 +1,7 @@
 WITH i_full AS
 (
 SELECT 
-	DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))  AS dt,
+	DATE(TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS'))  AS dt,
 	t_out.dadosagente_id,
     t_out.regiao_id,
     aux."Nossa nomenclatura"
@@ -10,8 +10,8 @@ FROM
 LEFT join
 	files.aux_regiao aux ON aux.id = t_out.regiao_id
 WHERE
-	TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') BETWEEN dt_start AND dt_end
-	AND TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
+	TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS') BETWEEN dt_start AND dt_end
+	AND TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
 ORDER BY 2, 4
 )
 , i_union AS
@@ -34,8 +34,8 @@ LEFT JOIN files.aux_regiao aux
 WHERE
 	ag.region_id IS NOT NULL
 	AND us.dados_agente_id IS NOT NULL
-	AND	ag.available_date = DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS'))
-	AND DATE(TO_TIMESTAMP('{}', 'YYYY-MM-DD HH24:MI:SS')) <= DATE(TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))  -- limit date, where aud started to be implemented
+	AND	ag.available_date = DATE(TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS'))
+	AND DATE(TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS')) <= DATE(TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'))  -- limit date, where aud started to be implemented
 )
 , i_group AS
 (SELECT

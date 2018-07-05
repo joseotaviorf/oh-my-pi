@@ -6,7 +6,7 @@ from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from qa_python_utils.default_logger import _logger
 
 
-class Agent_Region(object):
+class Agent(object):
     def __init__(self):
         self.bucket_datalake = '5a-datalake'
 
@@ -17,22 +17,27 @@ class Agent_Region(object):
             dir = ODS_QUERIES_DIR
         elif db_enum == EnumDb.BI_DW:
             dir = DW_QUERIES_DIR
+        else:
+            dir = ''
+
         return '{}/{}.sql'.format(dir, filename)
 
-    def get_agent_region(self, f_name, db_enum, dt=None, dtmax=None):
+    def get_agent_data(self, f_name, db_enum, dt=None, dtmax=None):
         filename = self.__format_query_filename(f_name, db_enum)
         with open(filename) as f:
             raw_query = f.read()
 
         if dtmax is not None:
             raw_query = raw_query.format(str(dt), str(dtmax))
+        elif dt is not None:
+            raw_query = raw_query.format(str(dt))
 
-        agent_region_data = BaseETL.from_db_query(
+        agent_data = BaseETL.from_db_query(
             db_enum=db_enum,
             query=raw_query
         )
 
-        return agent_region_data
+        return agent_data
 
     def truncate_table(self, schema, table, enumdb):
         raw_query = "TRUNCATE TABLE {}.{}"
@@ -45,17 +50,17 @@ class Agent_Region(object):
             commit=True
         )
 
-    def move_data_to_ods(self, data, table_name):
+    def move_data_to_destination(self, data, table_name, enumdb=EnumDb.BI_ODS, bucket='raw', append=True):
         _logger.info("To ODS: {}".format(datetime.now()))
         table = BaseETL.decode_table(data, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
             table_name=table_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=enumdb,
             encoding='UTF8',
-            append=True,
+            append=append,
             commit=True,
-            bucket_name='{}/raw/ods/{}'.format(self.bucket_datalake, table_name))
+            bucket_name='{}/{}/ods/{}'.format(self.bucket_datalake, bucket, table_name))
 
     def split_new_rows(self, new_data, dt):
         infinity_date = '2099-12-31 00:00:00'
@@ -91,21 +96,6 @@ class Agent_Region(object):
                     db_enum=enumdb
                 )
 
-    def get_group_regions(self, f_name, db_enum, dt=None):
-        filename = self.__format_query_filename(f_name, db_enum)
-        with open(filename) as f:
-            raw_query = f.read()
-
-        if dt is not None:
-            raw_query = raw_query.format(str(dt), str(dt), str(dt), str(dt), str(dt))
-
-        agent_region_data = BaseETL.from_db_query(
-            db_enum=db_enum,
-            query=raw_query
-        )
-
-        return agent_region_data
-
     def move_table_to_dw(self, table_s, table_d):
         BaseETL.move_table_to_dw(
             table_name=table_s,
@@ -113,48 +103,15 @@ class Agent_Region(object):
             enum_db_source=EnumDb.BI_ODS,
             enum_db_dest=EnumDb.BI_DW,
             append=False,
-            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, 'agent_region_group')
+            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_d)
         )
 
-    def create_dim_or_fact_dw(self, dim_name, append, dt=None):
+    def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDb.BI_DW, bucket='clean'):
         print("Start query to create {}: {}".format(dim_name, datetime.now()))
-
-        filename = self.__format_query_filename(dim_name, EnumDb.BI_DW)
-        with open(filename) as f:
-            raw_query = f.read()
-
-        if dt is not None:
-            raw_query = raw_query.format(str(dt))
-
-        table = BaseETL.from_db_query(
-            db_enum=EnumDb.BI_DW,
-            query=raw_query)
+        table = self.get_agent_data(f_name=dim_name, db_enum=enumdb, dt=dt)
 
         print("To DW: {}".format(datetime.now()))
-
-        table = BaseETL.decode_table(table, 'LATIN-1')
-
-        BaseETL.bulk_insert(
-            table=table,
-            table_name=dim_name,
-            db_enum=EnumDb.BI_DW,
-            encoding='UTF8',
-            append=append,
-            commit=True,
-            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, dim_name)
-        )
-
-    def get_agent_reviews(self, f_name, db_enum, exec_dt):
-        filename = self.__format_query_filename(f_name, db_enum)
-        with open(filename) as f:
-            raw_query = f.read()
-
-        agent_reviews_data = BaseETL.from_db_query(
-            db_enum=db_enum,
-            query=raw_query.format(str(exec_dt))
-        )
-
-        return agent_reviews_data
+        self.move_data_to_destination(data=table, table_name=dim_name, enumdb=enumdb, bucket=bucket, append=append)
 
     def clean_daily_data_in_table(self, enum, schema, dim_name, date_column, dt, format):
         print("Start query to clean {}: {}".format(dim_name, str(dt)))
@@ -168,6 +125,21 @@ class Agent_Region(object):
 
         BaseETL.execute_command(
             db_enum=enum,
+            encoding='UTF8',
+            command=raw_query,
+            commit=True
+        )
+
+    def reprocess_old_records(self, exec_dt):
+        infinity_date = '2099-12-31 00:00:00'
+
+        raw_query = "UPDATE {}.{} SET {} = date('{}') WHERE date({}) = date('{}')"
+
+        raw_query = raw_query.format('public', 'agent_region_hist', 'dt_end', str(infinity_date), 'dt_end',
+                                     str(exec_dt))
+
+        BaseETL.execute_command(
+            db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
             command=raw_query,
             commit=True
@@ -188,21 +160,6 @@ class Agent_Region(object):
                 db_enum=EnumDb.BI_DW,
                 commit=True
             )
-
-    def reprocess_old_records(self, exec_dt):
-        infinity_date = '2099-12-31 00:00:00'
-
-        raw_query = "UPDATE {}.{} SET {} = date('{}') WHERE date({}) = date('{}')"
-
-        raw_query = raw_query.format('public', 'agent_region_hist', 'dt_end', str(infinity_date), 'dt_end',
-                                     str(exec_dt))
-
-        BaseETL.execute_command(
-            db_enum=EnumDb.BI_ODS,
-            encoding='UTF8',
-            command=raw_query,
-            commit=True
-        )
 
     def check_dummy_exists(self, enumdb, schema, table_name, key_column):
         table = BaseETL.from_db_query(

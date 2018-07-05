@@ -153,8 +153,3 @@ data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user
 data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking
 data_integrity_dim_agentreview_booking >> data_integrity_fact_demand_dim_booking
 data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand
-
-if __name__ == '__main__':
-    bridge = Bridge()
-    bridge.guarantee_integrity(db_enum=EnumDb.BI_DW, schema='public', f_name='bdg_demand_agent', f_column='sk_demand',
-                               dim_name='fact_demand', dim_column='ods_id')
