@@ -39,7 +39,7 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
     if 'execution_date' in kwargs:
-        query.format(str(kwargs['execution_date']))
+        query = query.format(str(kwargs['execution_date']))
 
     utils.extract_query_dim_from_ebdb_to_ods(
         dim_name=kwargs['table_name'],
