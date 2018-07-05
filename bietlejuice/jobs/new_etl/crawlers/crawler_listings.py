@@ -4,8 +4,10 @@ import cStringIO
 import csv
 import itertools
 
+import fastparquet as fp
 import numpy as np
 import pandas as pd
+import s3fs
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -183,13 +185,14 @@ class CrawlerListings(CrawlerEntity):
     @logger
     def persist_clean_crawler_data(self):
         filename = 'crawler_listings'
+        file_path = 'clean/{0}/{0}.parq'.format(filename)
         output = self.listings[self.CLEAN_COLUMNS]
         for column in output.columns:
             output[column] = output[column].fillna('').astype(str)
-        self.athena_client.create_parquet_from_df(
-            df=output,
-            key='clean/{0}/{0}.parq'.format(filename)
-        )
+        s3_fs = s3fs.S3FileSystem()
+        _logger.info('m=persist_clean_crawler_data, msg=ready to upload')
+        fp.write('{}/{}'.format(self.bucket, file_path), output, open_with=s3_fs.open)
+        _logger.info('m=persist_clean_crawler_data, msg={} ready on s3'.format(file_path))
 
     @logger
     def enrich_crawler_addresses(self):
