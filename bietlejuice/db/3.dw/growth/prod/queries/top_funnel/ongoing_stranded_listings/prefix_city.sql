@@ -38,7 +38,7 @@ with all_dates as (
 			- 1 as yearly_count
 	from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 		  and datediff('day', to_date(f.sk_min_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
@@ -58,7 +58,7 @@ all_dates_last_month as (
     count(distinct f.sk_house) as monthly_count
 	from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and datediff('day', to_date(f.sk_min_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
@@ -78,7 +78,7 @@ all_dates_last_year as (
     count(distinct f.sk_house) as yearly_count
   from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and datediff('day', to_date(f.sk_min_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
