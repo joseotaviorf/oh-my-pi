@@ -51,7 +51,8 @@ class Agent(object):
         )
 
     def move_data_to_destination(self, data, table_name, enumdb=EnumDb.BI_ODS, bucket='raw', append=True):
-        _logger.info("To ODS: {}".format(datetime.now()))
+        _logger.info("To Destination: {}".format(datetime.now()))
+
         table = BaseETL.decode_table(data, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
@@ -95,16 +96,6 @@ class Agent(object):
                     commit=True,
                     db_enum=enumdb
                 )
-
-    def move_table_to_dw(self, table_s, table_d):
-        BaseETL.move_table_to_dw(
-            table_name=table_s,
-            table_name_dest=table_d,
-            enum_db_source=EnumDb.BI_ODS,
-            enum_db_dest=EnumDb.BI_DW,
-            append=False,
-            bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_d)
-        )
 
     def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDb.BI_DW, bucket='clean'):
         print("Start query to create {}: {}".format(dim_name, datetime.now()))

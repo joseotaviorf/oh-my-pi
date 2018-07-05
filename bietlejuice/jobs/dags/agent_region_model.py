@@ -3,7 +3,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import EnumDb
+from bietlejuice.jobs.base.base_etl import EnumDb, BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent
@@ -22,7 +22,9 @@ def group_agent_region(**kwargs):
 
 def load_group_agent_region_dw():
     ar = Agent()
-    ar.move_table_to_dw(table_s='agent_region_group', table_d='staging.agent_region_group')
+    # ar.move_table_to_dw(table_s='agent_region_group', table_d='staging.agent_region_group')
+    BaseETL.move_table_to_dw('agent_region_group', EnumDb.BI_ODS, EnumDb.BI_DW,
+                             table_name_dest='staging.agent_region_group', append=False)
 
 
 def create_dim_agent_region_dw():
@@ -52,7 +54,9 @@ def create_dim_agent_review(**kwargs):
 def load_dim_agent_review_dw():
     ar = Agent()
     ar.truncate_table(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
-    ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
+    # ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
+    BaseETL.move_table_to_dw('vw_dim_agent_review', EnumDb.BI_ODS, EnumDb.BI_DW,
+                             table_name_dest='public.dim_agent_review', append=False)
     ar.insert_dummy(table_name='dim_agent_review', key_column='sk_agentreview, sk_booking', value='-1,-1')
 
 
