@@ -34,7 +34,7 @@ dag = DAG(
 )
 
 # Get EBDB data of Agent_Region and dumps into ODS
-load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+load_agent_region_to_ods = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='load_agent_region_to_ods',
     provide_context=True,
@@ -42,7 +42,7 @@ load_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
     op_kwargs=None
 )
 
-clean_agent_region_to_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+clean_agent_region_to_ods = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='clean_agent_region_to_ods',
     func_command=clean_agent_region,

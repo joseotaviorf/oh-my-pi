@@ -52,7 +52,7 @@ dag = DAG(
 )
 
 # check the dependencies for bdg_demand_agent
-bdg_demand_agent_xcom_dependencies = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+bdg_demand_agent_xcom_dependencies = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
@@ -61,14 +61,14 @@ bdg_demand_agent_xcom_dependencies = BaseDAG.get_python_operator(  # BaseDAG.get
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
-bdg_demand_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+bdg_demand_agent = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent',
     func_command=create_bdg_demand_agent,
     op_kwargs=None
 )
 
-data_integrity_bdg_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_fact_agent = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_agent',
     func_command=guarantee_data_integrity,
@@ -81,7 +81,7 @@ data_integrity_bdg_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quin
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_date = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_dim_date = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_date',
     func_command=guarantee_data_integrity,
@@ -94,7 +94,7 @@ data_integrity_bdg_dim_date = BaseDAG.get_python_operator(  # BaseDAG.get_quinto
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_user = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_dim_user = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_user',
     func_command=guarantee_data_integrity,
@@ -107,7 +107,7 @@ data_integrity_bdg_dim_user = BaseDAG.get_python_operator(  # BaseDAG.get_quinto
                'type': 'update'}
 )
 
-data_integrity_bdg_fact_demand = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_fact_demand = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_demand',
     func_command=guarantee_data_integrity,
@@ -120,7 +120,7 @@ data_integrity_bdg_fact_demand = BaseDAG.get_python_operator(  # BaseDAG.get_qui
                'type': 'update'}
 )
 
-data_integrity_fact_demand_dim_booking = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_fact_demand_dim_booking = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_fact_demand_dim_booking',
     func_command=guarantee_data_integrity,
@@ -133,7 +133,7 @@ data_integrity_fact_demand_dim_booking = BaseDAG.get_python_operator(  # BaseDAG
                'type': 'update'}
 )
 
-data_integrity_dim_agentreview_booking = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+data_integrity_dim_agentreview_booking = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_dim_agentreview_booking',
     func_command=guarantee_data_integrity,

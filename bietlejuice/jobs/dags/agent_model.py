@@ -92,7 +92,7 @@ dag = DAG(
 )
 
 # Get ODS data of Agent_Region per day and groups into ODS
-group_agent_region_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+group_agent_region_ods = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='group_agent_region_ods',
     provide_context=True,
@@ -101,7 +101,7 @@ group_agent_region_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar
 )
 
 # Get ODS grouped data to DW
-load_group_agent_region_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+load_group_agent_region_dw = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='load_group_agent_region_dw',
     func_command=load_group_agent_region_dw,
@@ -109,7 +109,7 @@ load_group_agent_region_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoa
 )
 
 # Creates dim_agent_region in DW
-create_dim_agent_region_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+create_dim_agent_region_dw = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='create_dim_agent_region_dw',
     func_command=create_dim_agent_region_dw,
@@ -117,7 +117,7 @@ create_dim_agent_region_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoa
 )
 
 # Creates dim_agent_region in DW
-create_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+create_fact_agent = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='create_fact_agent',
     provide_context=True,
@@ -126,7 +126,7 @@ create_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_pyth
 )
 
 # Creates dim_agent_review in ODS
-create_dim_agent_review = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+create_dim_agent_review = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='create_dim_agent_review',
     provide_context=True,
@@ -135,7 +135,7 @@ create_dim_agent_review = BaseDAG.get_python_operator(  # BaseDAG.get_quintoanda
 )
 
 # Moves dim_agent_review from ODS to DW
-load_dim_agent_review_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+load_dim_agent_review_dw = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='load_dim_agent_review_dw',
     func_command=load_dim_agent_review_dw,
@@ -143,7 +143,7 @@ load_dim_agent_review_dw = BaseDAG.get_python_operator(  # BaseDAG.get_quintoand
 )
 
 # Creates push xcom
-xcom_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+xcom_fact_agent = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='XCom_fact_agent',
     provide_context=True,
@@ -151,7 +151,7 @@ xcom_fact_agent = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python
 )
 
 # Get EBDB data of Agent_Region per day and updates into ODS
-update_agent_region_ods = BaseDAG.get_python_operator(  # BaseDAG.get_quintoandar_python_operator(
+update_agent_region_ods = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='update_agent_region_ods',
     provide_context=True,
