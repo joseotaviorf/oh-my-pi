@@ -4,36 +4,36 @@ with all_dates as (
     date_part('month', db.dt_created) as _month,
     date_part('week', db.dt_created) as _week,
     date_part('day', db.dt_created) as _day,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', db.dt_created),
     																date_part('month', db.dt_created),
     																date_part('week', db.dt_created),
     																date_part('day', db.dt_created) order by db.id_booking asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', db.dt_created),
     																		date_part('month', db.dt_created),
     																		date_part('week', db.dt_created),
     																		date_part('day', db.dt_created) order by db.id_booking desc)
 			- 1 as daily_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', db.dt_created),
     																date_part('week', db.dt_created) order by db.id_booking asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', db.dt_created),
     																		date_part('week', db.dt_created) order by db.id_booking desc)
 			- 1 as weekly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', db.dt_created),
     																date_part('month', db.dt_created) order by db.id_booking asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', db.dt_created),
     																		date_part('month', db.dt_created) order by db.id_booking desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', db.dt_created) order by db.id_booking asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', db.dt_created) order by db.id_booking desc)
 			- 1 as yearly_count
 	from fact_demand f
@@ -45,7 +45,7 @@ with all_dates as (
 		on f.sk_house = dpr.sk_property
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
-  order by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
+  order by coalesce(dr.region_code, ''), date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
 ),
 all_dates_last_week as (
 	select 1
@@ -54,7 +54,7 @@ all_dates_last_month as (
 	select
     date_part('year', db.dt_created) as _year,
     date_part('month', db.dt_created) as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct db.id_booking) as monthly_count
 	from fact_demand f
@@ -69,13 +69,13 @@ all_dates_last_month as (
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -1))
   		and date_part('day', db.dt_created) < date_part('day', current_date)
- 	group by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
-  order by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
+ 	group by coalesce(dr.region_code, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
+  order by coalesce(dr.region_code, ''), date_part('year', db.dt_created), date_part('month', db.dt_created)
 ),
 all_dates_last_year as (
 	select
 		date_part('year', db.dt_created) as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct db.id_booking) as yearly_count
   from fact_demand f
@@ -92,6 +92,6 @@ all_dates_last_year as (
   		      and date_part('day', db.dt_created) < date_part('day', add_months(current_date, -12)))
   		  or date_part('month', db.dt_created) < date_part('month', add_months(current_date, -12))
   		  )
-	group by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created)
-	order by coalesce(dr.long_region_name, ''), date_part('year', db.dt_created)
+	group by coalesce(dr.region_code, ''), date_part('year', db.dt_created)
+	order by coalesce(dr.region_code, ''), date_part('year', db.dt_created)
 ),

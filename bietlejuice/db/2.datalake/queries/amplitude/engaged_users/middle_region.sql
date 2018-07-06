@@ -6,7 +6,7 @@ listings as (
     ae._day,
     ae.amplitude_id,
     ae.house_id,
-    trim(dr.long_region_name) as region,
+    trim(dr.region_code) as region,
     'QuintoAndar' as city,
     ae.partial
   from all_events ae

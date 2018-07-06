@@ -4,36 +4,36 @@ with all_dates_prev as (
     date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _month,
     date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _week,
     date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) as _day,
-		coalesce(dr.long_region_name, '') as region,
+		coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    rank() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.region_code, ''),
                               date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
                               date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
                               date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
                               date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
-    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ rank() over (partition by coalesce(dr.region_code, ''),
     	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
     	                            date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
     	                            date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
     	                            date_part('day', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as daily_count,
-    rank() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.region_code, ''),
                               date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
                               date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
-    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ rank() over (partition by coalesce(dr.region_code, ''),
     	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
     	                            date_part('week', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as weekly_count,
-    rank() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.region_code, ''),
                               date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
                               date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
-    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ rank() over (partition by coalesce(dr.region_code, ''),
     	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')),
     	                            date_part('month', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as monthly_count,
-    rank() over (partition by coalesce(dr.long_region_name, ''),
+    rank() over (partition by coalesce(dr.region_code, ''),
                               date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
-    	+ rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ rank() over (partition by coalesce(dr.region_code, ''),
     	                            date_part('year', to_date(f.sk_opportunity_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
 	from fact_supply f
@@ -65,7 +65,7 @@ all_dates_last_month as (
 	select
     substring(f.sk_opportunity_date::varchar, 0, 5) as _year,
 	  substring(f.sk_opportunity_date::varchar, 5, 2) as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(f.sk_opportunity_date) as monthly_count
 	from fact_supply f
@@ -81,7 +81,7 @@ all_dates_last_month as (
 all_dates_last_year as (
 	select
 		substring(f.sk_opportunity_date::varchar, 0, 5) as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
 		'QuintoAndar'::varchar as city,
     count(f.sk_opportunity_date) as yearly_count
   from fact_supply f
