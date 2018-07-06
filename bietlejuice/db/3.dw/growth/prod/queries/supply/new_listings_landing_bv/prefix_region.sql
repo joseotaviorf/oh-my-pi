@@ -4,36 +4,36 @@ with all_dates as (
     date_part('month', dl.criado_em) as _month,
     date_part('week', dl.criado_em) as _week,
     date_part('day', dl.criado_em) as _day,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dl.criado_em),
     																date_part('month', dl.criado_em),
     																date_part('week', dl.criado_em),
     																date_part('day', dl.criado_em) order by dp.sk_property asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dl.criado_em),
     																		date_part('month', dl.criado_em),
     																		date_part('week', dl.criado_em),
     																		date_part('day', dl.criado_em) order by dp.sk_property desc)
 			- 1 as daily_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dl.criado_em),
     																date_part('week', dl.criado_em) order by dp.sk_property asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dl.criado_em),
     																		date_part('week', dl.criado_em) order by dp.sk_property desc)
 			- 1 as weekly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dl.criado_em),
     																date_part('month', dl.criado_em) order by dp.sk_property asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dl.criado_em),
     																		date_part('month', dl.criado_em) order by dp.sk_property desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dl.criado_em) order by dp.sk_property asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dl.criado_em) order by dp.sk_property desc)
 			- 1 as yearly_count
 	from fact_supply f
@@ -48,7 +48,7 @@ with all_dates as (
 		on f.sk_lead = dl.sk_lead
 		  and dl.criado_em >= '2017-01-01' and dl.criado_em < current_date
 	where dl.origem = 'OwnerPWA' and dl.tipo <> 'Organic'
-  order by coalesce(dr.long_region_name, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em), date_part('week', dl.criado_em), date_part('day', dl.criado_em)
+  order by coalesce(dr.region_code, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em), date_part('week', dl.criado_em), date_part('day', dl.criado_em)
 ),
 all_dates_last_week as (
 	select 1
@@ -57,7 +57,7 @@ all_dates_last_month as (
 	select
     date_part('year', dl.criado_em) as _year,
     date_part('month', dl.criado_em) as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dp.sk_property) as monthly_count
 	from fact_supply f
@@ -75,13 +75,13 @@ all_dates_last_month as (
   		and date_part('month', dl.criado_em) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dl.criado_em) < date_part('day', current_date)
   		and dl.origem = 'OwnerPWA' and dl.tipo <> 'Organic'
- 	group by coalesce(dr.long_region_name, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em)
-  order by coalesce(dr.long_region_name, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em)
+ 	group by coalesce(dr.region_code, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em)
+  order by coalesce(dr.region_code, ''), date_part('year', dl.criado_em), date_part('month', dl.criado_em)
 ),
 all_dates_last_year as (
 	select
 		date_part('year', dl.criado_em) as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dp.sk_property) as yearly_count
   from fact_supply f
@@ -101,6 +101,6 @@ all_dates_last_year as (
   		  or date_part('month', dl.criado_em) < date_part('month', add_months(current_date, -12))
   		  )
   		and dl.origem = 'OwnerPWA' and dl.tipo <> 'Organic'
-	group by coalesce(dr.long_region_name, ''), date_part('year', dl.criado_em)
-	order by coalesce(dr.long_region_name, ''), date_part('year', dl.criado_em)
+	group by coalesce(dr.region_code, ''), date_part('year', dl.criado_em)
+	order by coalesce(dr.region_code, ''), date_part('year', dl.criado_em)
 ),

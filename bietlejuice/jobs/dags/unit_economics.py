@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
-
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
+from datetime import datetime, timedelta
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
@@ -369,7 +369,7 @@ load_fact = QuintoAndarPythonOperator(
     task_id='DW_fact_property_economics',
     execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket,
+    op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False,
                'schema_source': 'unit_economics'}
 )
 

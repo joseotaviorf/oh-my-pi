@@ -295,7 +295,7 @@ select
 			) int_pre_proposal
 		) pp
 			on pp.id_house = o.id_house
-				and pp.id_booking = o.id_booking
+				and (if(pp.id_booking is not null, pp.id_booking = o.id_booking, true))
 				and pp.id_rent_flow = o.id_rent_flow
 ) _result
 ;

@@ -26,6 +26,7 @@ select
 	coalesce(f.photo_job_id, -1) as sk_photo_job,
 	coalesce(f.imovel_id || '001' , '-1') as sk_property,
 	coalesce(f.rep_id, -1) as sk_user_rep,
+	coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
 	coalesce(f.affiliate_id, -1) as sk_user_affiliate,
 	coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 	coalesce(f.owner_id, -1) as sk_user_owner,

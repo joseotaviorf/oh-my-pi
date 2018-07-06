@@ -35,6 +35,6 @@ CREATE TABLE public.booking (
   owner_missing_reason varchar(255),
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
-  fup_comments varchar(255)
+  checkin_status varchar(255)
 )
 WITH (oids = false);

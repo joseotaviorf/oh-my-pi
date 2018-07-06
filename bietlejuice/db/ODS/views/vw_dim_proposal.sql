@@ -81,7 +81,7 @@ select
   p.id as id_proposal,
   p."dataProposta" as dt_proposal,
   p.garantia as guarantee,
-  p."propostaAluguel" as renting_proposal_value ,
+  p."propostaAluguel" as renting_proposal_value,
   p.status,
   p."dataAprovacao" as dt_proposal_approved,
   p."inquilinoEnviouDocumentos" as tenant_document_sent,
@@ -92,14 +92,16 @@ select
   p."proprietarioAceitouContrato" as owner_contract_accepted,
   p."statusDocumentacaoInq" as status_doc_tenant,
   p."statusDocumentacaoProp" as status_doc_owner,
-  p."qtdeEnviosDocumentacaoInq" as tenant_document_sent_count,
+  p.tenant_doc_sent_count,
   p."criadoEm" as dt_created,
   p."atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
-  p."primeiroEnvioDocInq" as dt_tenant_first_document_sent,
+  p.tenant_first_doc_sent as dt_tenant_first_document_sent,
+  tenant_auto_first_doc_sent as dt_tenant_auto_first_doc_sent,
   coalesce(shp.first_analysis_date, p.credit_analysis_init_date) as dt_credit_analysis_init,
-  coalesce(shp.process_date, p.credit_analysis_end_date) as dt_credit_analysis_end,
-  shp.status as status_sortinghat
+  coalesce(shp.process_date, p.credit_analysis_end_date, shp.analysis_date) as dt_credit_analysis_end,
+  nullif(shp.status, '') as status_sortinghat,
+  doc_reused as flg_doc_reused
 from proposal p
 left join sortinghat_prop shp
   on shp.id = p.id

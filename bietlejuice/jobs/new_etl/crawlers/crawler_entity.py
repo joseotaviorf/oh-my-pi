@@ -21,6 +21,7 @@ class CrawlerEntity(object):
 
     def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True, get_house_allowed=True):
         self.athena_client = AthenaClient(s3_bucket)
+        self.bucket = s3_bucket
         if google_maps_api_key is not None:
             self.gmaps_client = googlemaps.Client(key=google_maps_api_key)
             self.google_maps_api_key = google_maps_api_key
@@ -50,12 +51,14 @@ class CrawlerEntity(object):
             q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
             self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
 
-    def _get_address(self, lat=None, lng=None, cep=None):
+    def _get_address(self, lat=None, lng=None, cep=None, raw_address=None):
         r = None
         if lat is not None and lng is not None:
             r = self.gmaps_client.reverse_geocode((lat, lng))
         elif cep is not None:
             r = self.gmaps_client.geocode('cep {}'.format(cep))
+        elif raw_address is not None:
+            r = self.gmaps_client.geocode('{}'.format(raw_address))
 
         return r
 
@@ -98,8 +101,11 @@ class CrawlerEntity(object):
         return polygons
 
     @logger(exclude='entity')
-    def cleaning(self, entity):
-        text_columns = ['type', 'advertiser_name', 'street', 'neighborhood', 'city', 'state']
+    def cleaning(self, entity, columns=None):
+        if columns:
+            text_columns = columns
+        else:
+            text_columns = ['type', 'advertiser_name', 'street', 'neighborhood', 'city', 'state', 'listing_type']
         for c in text_columns:
             if c in entity:
                 entity[c] = entity[c].apply(self.sanitize_text)
@@ -108,6 +114,8 @@ class CrawlerEntity(object):
             entity.cep = entity.cep.astype(str).str.zfill(8)
         if 'type' in entity:
             entity.type = entity.type.replace(self.map_types)
+        if 'listing_type' in entity:
+            entity.listing_type = entity.listing_type.replace(self.map_types)
 
         num_columns = ['rent', 'lat', 'lng']
         for c in num_columns:
@@ -128,7 +136,7 @@ class CrawlerEntity(object):
         return -1
 
     @logger(exclude='entity')
-    def enrich(self, entity, cep=True):
+    def enrich(self, entity, cep=True, location_type=False):
         cols = ['location', 'gcep', 'glat', 'glng', 'gstreet', 'gstreet_number', 'gneighbourhood', 'gcity', 'gstate']
         info = pd.DataFrame([], columns=cols)
 

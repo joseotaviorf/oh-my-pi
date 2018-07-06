@@ -20,7 +20,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.leads
 
 union all
@@ -46,7 +47,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.prospects
 
 union all
@@ -72,7 +74,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.qualifieds
 
 union all
@@ -98,7 +101,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.opportunities
 
 union all
@@ -124,7 +128,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.new_listings
 
 union all
@@ -150,7 +155,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.new_listings_landing
 
 union all
@@ -176,7 +182,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.new_listings_landing_bv
 
 union all
@@ -202,7 +209,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.tenant_prospects
 
 union all
@@ -228,7 +236,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.visitors
 
 union all
@@ -254,7 +263,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.offerers
 
 union all
@@ -280,7 +290,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.offerers_approved
 
 union all
@@ -306,7 +317,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.offerers_sent_doc
 
 union all
@@ -332,7 +344,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.approved_by_insurer
 
 union all
@@ -358,7 +371,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.tenants
 
 union all
@@ -384,7 +398,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.ended_rentals
 
 union all
@@ -410,7 +425,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.visits_booked
 
 union all
@@ -436,7 +452,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.visits_completed
 
 union all
@@ -462,7 +479,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.offers_submitted
 
 union all
@@ -488,7 +506,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.offers_approved
 
 union all
@@ -514,7 +533,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.documentation_sent
 
 union all
@@ -540,8 +560,63 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.ongoing_contracts
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
+	'ongoing_listings' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted,
+	now() as dt_timestamp
+from growth.ongoing_listings
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
+	'ongoing_stranded_listings' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted,
+	now() as dt_timestamp
+from growth.ongoing_stranded_listings
 
 union all
 
@@ -566,7 +641,8 @@ select
 	ytd,
 	0 as mom,
 	0 as yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.employees
 
 union all
@@ -592,7 +668,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.engaged_users
 
 union all
@@ -618,7 +695,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.active_users
 
 union all
@@ -644,7 +722,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.owner_landing_views
 
 union all
@@ -670,7 +749,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.owner_landing_views_bv
 
 union all
@@ -696,7 +776,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.schedule_page_views
 
 union all
@@ -722,7 +803,8 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.ticket_resolution
 
 union all
@@ -748,6 +830,7 @@ select
 	ytd,
 	mom,
 	yoy,
-	0 as flg_predicted
+	0 as flg_predicted,
+	now() as dt_timestamp
 from growth.tickets
 ;

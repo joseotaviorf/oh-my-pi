@@ -81,7 +81,7 @@ bookings as
         s.owner_missing_reason,
         s.successful_entrance,
         s.troublesome_entrance,
-        s.fup_comments
+        s.checkin_status
 	from
 		public.booking s
 
@@ -151,7 +151,8 @@ select
     owner_arrived,
     owner_missing_reason,
     successful_entrance,
-    troublesome_entrance
+    troublesome_entrance,
+    checkin_status
    
 	
 from
