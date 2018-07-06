@@ -172,6 +172,7 @@ from
 		  UsuarioRevisionEntity ure
 		  on ig.REV = ure.id
 		where cl.id is null
+		and DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 	union all
     select
       i.id as imovel_id,
@@ -248,6 +249,7 @@ from
           else NULL
         end as old_id
       from Lead
+      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
     ) l -- all data from Lead table plus a reprocessed Extra Field
     left join
       ConversaoLead cl
@@ -255,6 +257,7 @@ from
     left join
       Imovel i
       on i.id = cl.imovel_id
+      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join
       (
         select
@@ -316,6 +319,7 @@ from
     left join
       Lead old_lead
       on old_lead.id = l.old_id
+      AND DATE(coalesce(old_lead.criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
@@ -364,6 +368,7 @@ from
 		left join
 			Imovel i
 			on i.id = cl.imovel_id
+			AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 		left join
 			Usuario u
 			on u.id = i.usuarioQueCadastrou_id
