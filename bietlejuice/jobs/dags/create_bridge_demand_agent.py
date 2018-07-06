@@ -15,10 +15,10 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     for t_id, d_id in zip(task_id, dag_id):
         status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=t_id, dag_id=d_id)
-        # if not status:
-        #     raise ValueError('For {}, the process {}:{} have not finished yet'.format(exec_date, d_id, t_id))
-        # else:
-        #     logging.info('REQUIREMENT MET. For {}, the process {}:{} have finished'.format(exec_date, d_id, t_id))
+        if not status:
+            raise ValueError('For {}, the process {}:{} have not finished yet'.format(exec_date, d_id, t_id))
+        else:
+            logging.info('REQUIREMENT MET. For {}, the process {}:{} have finished'.format(exec_date, d_id, t_id))
 
     logging.info('All Requirements met')
 
@@ -38,7 +38,7 @@ def guarantee_data_integrity(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-load-bdg_demand_fact_2',
+    dag_id='bi-load-bdg_demand_agent',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
@@ -46,7 +46,7 @@ dag = DAG(
         'retries': 1,
         'retry_delay': timedelta(minutes=30),
     },
-    start_date=datetime(2018, 6, 29, 0, 0, 0),
+    start_date=datetime(2018, 7, 6, 0, 0, 0),
     schedule_interval='0 9 * * *',
     max_active_runs=1
 )

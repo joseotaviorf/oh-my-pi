@@ -21,8 +21,6 @@ def group_agent_region(**kwargs):
 
 
 def load_group_agent_region_dw():
-    ar = Agent()
-    # ar.move_table_to_dw(table_s='agent_region_group', table_d='staging.agent_region_group')
     BaseETL.move_table_to_dw('agent_region_group', EnumDb.BI_ODS, EnumDb.BI_DW,
                              table_name_dest='staging.agent_region_group', append=False)
 
@@ -54,7 +52,6 @@ def create_dim_agent_review(**kwargs):
 def load_dim_agent_review_dw():
     ar = Agent()
     ar.truncate_table(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
-    # ar.move_table_to_dw(table_s='vw_dim_agent_review', table_d='public.dim_agent_review')
     BaseETL.move_table_to_dw('vw_dim_agent_review', EnumDb.BI_ODS, EnumDb.BI_DW,
                              table_name_dest='public.dim_agent_review', append=False)
     ar.insert_dummy(table_name='dim_agent_review', key_column='sk_agentreview, sk_booking', value='-1,-1')
@@ -83,13 +80,13 @@ def upd_agent_region(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-load-agent_model_2',
+    dag_id='bi-load-agent_model',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': True
     },
-    start_date=datetime(2018, 6, 26, 0, 0, 0),
+    start_date=datetime(2018, 7, 6, 0, 0, 0),
     schedule_interval='0 8 * * *',
     max_active_runs=1
 )
