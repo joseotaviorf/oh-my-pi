@@ -4,36 +4,36 @@ with all_dates as (
     dd.month as _month,
     dd.calendar_week as _week,
     dd.day as _day,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.month,
     																dd.calendar_week,
     																dd.day order by f.sk_contract asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.month,
     																		dd.calendar_week,
     																		dd.day order by f.sk_contract desc)
 			- 1 as daily_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.calendar_week order by f.sk_contract asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.calendar_week order by f.sk_contract desc)
 			- 1 as weekly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.month order by f.sk_contract asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.month order by f.sk_contract desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year order by f.sk_contract asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year order by f.sk_contract desc)
 			- 1 as yearly_count
 	from fact_demand f
@@ -62,7 +62,7 @@ all_dates_last_month as (
 	select
     dd.year as _year,
     dd.month as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_contract) as monthly_count
 	from fact_demand f
@@ -91,7 +91,7 @@ all_dates_last_month as (
 all_dates_last_year as (
 	select
 		dd.year as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_contract) as yearly_count
   from fact_demand f

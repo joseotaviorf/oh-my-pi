@@ -4,36 +4,36 @@ with all_dates as (
     date_part('month', dof.dt_analysis) as _month,
     date_part('week', dof.dt_analysis) as _week,
     date_part('day', dof.dt_analysis) as _day,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dof.dt_analysis),
     																date_part('month', dof.dt_analysis),
     																date_part('week', dof.dt_analysis),
     																date_part('day', dof.dt_analysis) order by dof.sk_offer asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dof.dt_analysis),
     																		date_part('month', dof.dt_analysis),
     																		date_part('week', dof.dt_analysis),
     																		date_part('day', dof.dt_analysis) order by dof.sk_offer desc)
 			- 1 as daily_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dof.dt_analysis),
     																date_part('week', dof.dt_analysis) order by dof.sk_offer asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dof.dt_analysis),
     																		date_part('week', dof.dt_analysis) order by dof.sk_offer desc)
 			- 1 as weekly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dof.dt_analysis),
     																date_part('month', dof.dt_analysis) order by dof.sk_offer asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dof.dt_analysis),
     																		date_part('month', dof.dt_analysis) order by dof.sk_offer desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dof.dt_analysis) order by dof.sk_offer asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dof.dt_analysis) order by dof.sk_offer desc)
 			- 1 as yearly_count
 	from fact_demand f
@@ -55,7 +55,7 @@ all_dates_last_month as (
 	select
     date_part('year', dof.dt_analysis) as _year,
     date_part('month', dof.dt_analysis) as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dof.sk_offer) as monthly_count
 	from fact_demand f
@@ -77,7 +77,7 @@ all_dates_last_month as (
 all_dates_last_year as (
 	select
 		date_part('year', dof.dt_analysis) as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dof.sk_offer) as yearly_count
   from fact_demand f
