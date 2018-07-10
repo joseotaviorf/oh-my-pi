@@ -12,6 +12,7 @@ base_list as (
 		bc.started_on,
 		bc.website,
 		c.id,
+		try(cast(regexp_extract(c.updated_on, '^(\d{4}-\d{2}-\d{2}).*', 1) as date)) as dt_updated_on,
 		case
 			when lower(c.business) in ('venda/aluguel','rental','aluguel') then true
 			when try(cast(rent as double)) is not null then true
@@ -169,6 +170,7 @@ select
 	bl.garages,
 	bl.year_building,
 	bl.cep,
+	cast(date_format(bl.dt_updated_on, '%Y%m%d') as integer) as sk_date_updated_on,
 	cast(date_format(bl.dt_last_run, '%Y%m%d') as integer) as sk_date_last_run,
 	cast(date_format(bl.dt_first_seen, '%Y%m%d') as integer) as sk_date_first_seen,
 	cast(date_format(bl.dt_last_seen, '%Y%m%d') as integer) as sk_date_last_seen,
