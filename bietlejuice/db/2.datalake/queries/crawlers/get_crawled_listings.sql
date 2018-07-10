@@ -119,7 +119,7 @@ base_list as (
 		if(round(try(cast(c.lat as double)), 5) = 0, null, round(try(cast(c.lat as double)), 5)) as lat,
 		if(round(try(cast(c.lng as double)), 5) = 0, null, round(try(cast(c.lng as double)), 5)) as lng,
 		if(c.street = 'Endereço Não Informado' or c.street = '', null, split(c.street, ',')[1]) as street,
-		regexp_extract(street, ',?[0-9]+$') as street_number,
+		regexp_replace(regexp_extract(street, ',[ +]?(n\. )?(\d+(\.\d+)?)([ |\/].*)?(,.*)?$', 2), '\D+', '') as street_number,
 		if(c.neighborhood='', null, c.neighborhood) as neighborhood,
 		c.city,
 		if(c.cep='',null,cep) as cep,
