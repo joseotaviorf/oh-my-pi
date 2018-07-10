@@ -23,9 +23,9 @@ class CrawlerListings(CrawlerEntity):
                      'street_number_flg', 'neighborhood_flg', 'cep_flg', 'city_flg', 'latlng_flg', 'full_address_flg',
                      'primary_phone_number', 'secondary_phone_number', 'price', 'rent', 'condominium', 'iptu',
                      'total_area', 'useful_area', 'bedrooms', 'suites', 'toilets', 'garages', 'year_building', 'cep',
-                     'sk_date_last_run', 'sk_date_first_seen', 'sk_date_last_seen', 'active', 'days_seen',
-                     'days_unseen', 'runs_unseen', 'rental_flg', 'sale_flg', 'listing_type', 'advertiser_type',
-                     'big_advertiser', 'advertiser_name']
+                     'sk_date_updated_on', 'sk_date_last_run', 'sk_date_first_seen', 'sk_date_last_seen', 'active',
+                     'days_seen', 'days_unseen', 'runs_unseen', 'rental_flg', 'sale_flg', 'listing_type',
+                     'advertiser_type', 'big_advertiser', 'advertiser_name']
 
     @logger
     def __init__(self, s3_bucket, google_maps_api_key, google_maps_daily_quota):
