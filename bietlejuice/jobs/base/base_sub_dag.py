@@ -1,7 +1,8 @@
-import bietlejuice.jobs.base.new_base_etl as utils
 from airflow.operators.subdag_operator import SubDagOperator
-from bietlejuice.jobs.base.base_dag import BaseDAG
 from qa_python_utils.default_logger import logger
+
+import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 
 
 class BaseSubDag(object):
@@ -34,7 +35,7 @@ class BaseSubDag(object):
 
     @staticmethod
     @logger(exclude='dag')
-    def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func):
+    def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func, **kwargs):
         """
         Gets the corresponding subdag operator statically
         :param dag: the main dag which will contain the subdag
@@ -42,7 +43,7 @@ class BaseSubDag(object):
         :return: the new subdag operator
         """
         return SubDagOperator(
-            subdag=sub_dag_func(sub_dag_name),
+            subdag=sub_dag_func(sub_dag_name, **kwargs),
             task_id=sub_dag_name,
             dag=dag,
         )
