@@ -11,7 +11,7 @@ count_houses_prev as (
     dense_rank() over (partition by _year, _month, _week, _day, amplitude_id, region, city, partial order by house_id asc)
         + dense_rank() over (partition by _year, _month, _week, _day, amplitude_id, region, city, partial order by house_id desc)
         - 1 as house_id_count_daily,
-    dense_rank() over (partition by _year, _month, _week, amplitude_id, region, city, partial order by house_id asc)
+    dense_rank() over (partition by _year, _week, amplitude_id, region, city, partial order by house_id asc)
         + dense_rank() over (partition by _year, _month, _week, amplitude_id, region, city, partial order by house_id desc)
         - 1 as house_id_count_weekly,
     dense_rank() over (partition by _year, _month, amplitude_id, region, city, partial order by house_id asc)
