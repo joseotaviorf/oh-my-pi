@@ -41,7 +41,13 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
-		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and dd."date" between dc.dt_contract_start
+		                  and coalesce(dc.dt_contract_annulment, case
+		                                                           when dc.contract_status = 'Finalizado'
+		                                                             then least(dc.dt_contract_intended_end, current_date - 1)
+		                                                           else null
+		                                                         end, current_date - 1
+		                      )
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
 		  		     then dc.contract_status = 'Ativo'
@@ -70,7 +76,13 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
-		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and dd."date" between dc.dt_contract_start
+		                  and coalesce(dc.dt_contract_annulment, case
+		                                                           when dc.contract_status = 'Finalizado'
+		                                                             then least(dc.dt_contract_intended_end, current_date - 1)
+		                                                           else null
+		                                                         end, current_date - 1
+		                      )
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
 		  		     then dc.contract_status = 'Ativo'
@@ -99,7 +111,13 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
-		  and dd."date" between dc.dt_contract_start and coalesce(dc.dt_contract_annulment, current_date)
+		  and dd."date" between dc.dt_contract_start
+		                  and coalesce(dc.dt_contract_annulment, case
+		                                                           when dc.contract_status = 'Finalizado'
+		                                                             then least(dc.dt_contract_intended_end, current_date - 1)
+		                                                           else null
+		                                                         end, current_date - 1
+		                      )
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
 		  		     then dc.contract_status = 'Ativo'
