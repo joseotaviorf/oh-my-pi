@@ -2,8 +2,7 @@ from datetime import datetime
 
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR, DW_QUERIES_DIR
-from bietlejuice.jobs.new_etl.agents import ODS_QUERIES_DIR
+from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
 from qa_python_utils.default_logger import _logger, logger
 
 
