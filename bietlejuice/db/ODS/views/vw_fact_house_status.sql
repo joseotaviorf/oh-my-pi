@@ -105,7 +105,7 @@ min_max as (
 _result as (
   -- joining status result with the house dimension to get the sk through min_version_time and max_version_time
 	select
-	  -- if no house if found in the dimension table, the sk gets concatenated with '000' so there will always be a "valid" integer sk
+	  -- if no house is found in the dimension table, the sk gets concatenated with '000' so there will always be a "valid" integer sk
 		coalesce(sdp.sk_property, rpad(mm.id::varchar, 12, case when mm.status_history = 'publicado' then '001' else '0' end)::bigint) as sk_house,
 		coalesce(sdp.regiao_id, -1) as sk_region,
 		-- there are some cases where the house history says, for example, status = 'despublicado', but the house dimension/ebdb says the house is in another status
