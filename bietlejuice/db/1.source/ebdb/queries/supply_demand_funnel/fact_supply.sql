@@ -31,7 +31,7 @@ select
 		when (dt_opportunity is null and dt_qualified is not null and conversao_id is not null) then 'NoPhotoJob'
 		when (dt_opportunity is null and lead_reason in ('ProprietarioAvaliando', 'ProprietarioNaoAtende', 'ProprietarioVaiAnunciar')) then 'OnHold'
 		when (dt_qualified is null and lead_status = 'Descartado') then coalesce(lead_reason, 'DiscardedLead')
-		when (dt_qualified is null and lead_status = 'Novo' and (cidade = 'Outra cidade' or bairro = 'Outro bairro')) then 'NaoProcessadoArea'
+		when (dt_qualified is null and lead_status = 'Novo' and cidade = 'Outra cidade') then 'NaoProcessadoArea'
 		when (dt_qualified is null and lead_status = 'Novo') then 'NaoProcessado'
 		when (flow = 'Lead Flow' and dt_qualified is null) then 'NaoProcessado'
 		when (lead_status = 'Convertido' and conversao_id is null) then 'BrokenLeadFlow'

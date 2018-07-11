@@ -16,7 +16,7 @@ uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
 MAIN_DAG_NAME = 'bi-crm-tasks'
 MAIN_START_DATE = datetime(2018, 5, 15, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '0 4 * * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
 
 def parse_dt(dt):
