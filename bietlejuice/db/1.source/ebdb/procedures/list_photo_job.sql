@@ -23,7 +23,7 @@ BEGIN
         then 0
         else 1
       end as flexible_schedule,
-      (date(first_pub.nxt_pub) = date(coalesce(f.dataInicioSessao, f.dataAgendamento))) as same_day_listing,
+      (first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '5' hour) as same_day_listing,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
