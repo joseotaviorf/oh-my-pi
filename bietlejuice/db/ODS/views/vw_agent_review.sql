@@ -6,15 +6,16 @@ SELECT
 	id_booking,
 	rating,
 	tag_other,
-	tag_punctuality,
-	tag_agent_well_informed,
-	tag_kindness,
-	tag_no_kindness,
-	tag_house_as_listing,
-	tag_house_not_as_listing,
-	tag_other_reason_positive,
-	tag_other_reason_negative,
-	tag_agent_late,
-	tag_agent_with_no_info
+	flg_punctuality,
+	flg_agent_well_informed,
+	flg_kindness,
+	flg_no_kindness,
+	flg_house_as_listing,
+	flg_house_not_as_listing,
+	flg_other_reason_positive,
+	flg_other_reason_negative,
+	flg_agent_late,
+	flg_agent_with_no_info,
+    now() as dt_timestamp
 FROM
   public.agent_review ;

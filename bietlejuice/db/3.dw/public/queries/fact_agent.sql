@@ -11,14 +11,16 @@ GROUP BY 1, 2
 SELECT
 	s.*,
 	CASE d.week_day
+		WHEN 0 THEN 0	-- Sunday
 		WHEN 6 THEN 20	-- Saturday
 		ELSE 36			-- Other days
 	END AS total_slots,
 	COALESCE(a.area, '-1') AS area,
-	COALESCE(a.sk_agentregion, -1) AS sk_agentregion,
-	CAST(CAST(s.sk_date AS VARCHAR) + CAST(sk_agent_id AS VARCHAR) AS BIGINT)
+	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
+	CAST(CAST(s.sk_date AS VARCHAR) + CAST(sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
+	getdate() as dt_timestamp
 FROM schedule s
-LEFT JOIN public.dim_date d
+JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
 LEFT JOIN public.dim_agent_region a
 	ON a.sk_regions_date = s.sk_date

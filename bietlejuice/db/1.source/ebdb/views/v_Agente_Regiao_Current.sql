@@ -5,7 +5,7 @@ SELECT
 	regioes_id as regiao_id,
 	NULL as dt_start,
 	TIMESTAMP('2099-12-31 00:00:00') as dt_end,
-	3 as revtype,
+	3 as revtype, -- Using 3 to determine that this register is from current data, not an addition (0) or deletion (2)
 	TIMESTAMP('2099-12-31 00:00:00') as dt
 FROM DadosAgente_Regiao a
 );

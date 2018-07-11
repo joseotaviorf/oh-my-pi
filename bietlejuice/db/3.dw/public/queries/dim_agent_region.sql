@@ -8,7 +8,7 @@ SELECT
 FROM staging.agent_region_group r
 )
 SELECT
-	cast(sk_date AS CHAR(8)) +
-	cast(sk_dadosagente_id AS CHAR(8)) AS sk_agentregiongroup_id,
-	*
+	CONCAT(sk_date, sk_dadosagente_id)::BIGINT AS sk_agentregiongroup_id,
+	*,
+	getdate() as dt_timestamp
 FROM reg

@@ -1,18 +1,19 @@
 from datetime import datetime
 
 import petl
-from __init__ import QUERIES_DIR, ODS_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from qa_python_utils.default_logger import _logger
+from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR, DW_QUERIES_DIR
+from bietlejuice.jobs.new_etl.agents import ODS_QUERIES_DIR
+from qa_python_utils.default_logger import _logger, logger
 
 
 class Agent(object):
-    def __init__(self):
-        self.bucket_datalake = '5a-datalake'
+    def __init__(self, bucket_name):
+        self.bucket_datalake = bucket_name
 
     def __format_query_filename(self, filename, db_enum):
         if db_enum == EnumDb.QuintoAndar_ebdb:
-            dir = QUERIES_DIR
+            dir = EBDB_QUERIES_DIR
         elif db_enum == EnumDb.BI_ODS:
             dir = ODS_QUERIES_DIR
         elif db_enum == EnumDb.BI_DW:
@@ -22,6 +23,7 @@ class Agent(object):
 
         return '{}/{}.sql'.format(dir, filename)
 
+    @logger
     def get_agent_data(self, f_name, db_enum, dt=None, dtmax=None):
         filename = self.__format_query_filename(f_name, db_enum)
         with open(filename) as f:
@@ -39,6 +41,7 @@ class Agent(object):
 
         return agent_data
 
+    @logger
     def truncate_table(self, schema, table, enumdb):
         raw_query = "TRUNCATE TABLE {}.{}"
         query = raw_query.format(schema, table)
@@ -50,8 +53,9 @@ class Agent(object):
             commit=True
         )
 
+    @logger(exclude='data')
     def move_data_to_destination(self, data, table_name, enumdb=EnumDb.BI_ODS, bucket='raw', append=True):
-        _logger.info("To Destination: {}".format(datetime.now()))
+        _logger.info("m=move_data_to_destination, To Destination: {}".format(datetime.now()))
 
         table = BaseETL.decode_table(data, 'LATIN-1')
         BaseETL.bulk_insert(
@@ -63,6 +67,7 @@ class Agent(object):
             commit=True,
             bucket_name='{}/{}/ods/{}'.format(self.bucket_datalake, bucket, table_name))
 
+    @logger(exclude='new_data')
     def split_new_rows(self, new_data, dt):
         infinity_date = '2099-12-31 00:00:00'
         new_table = BaseETL.decode_table(new_data, 'LATIN-1')  # decode table from LATIN-1
@@ -84,6 +89,7 @@ class Agent(object):
 
         return table_ins, table_upd
 
+    @logger(exclude='data')
     def update_data(self, data, db, table, enumdb, date):
         infinity_date = '2099-12-31 00:00:00'
         upd_data = data
@@ -97,45 +103,49 @@ class Agent(object):
                     db_enum=enumdb
                 )
 
+    @logger
     def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDb.BI_DW, bucket='clean'):
-        print("Start query to create {}: {}".format(dim_name, datetime.now()))
+        _logger.info('m=create_dim_or_fact_dw, Start query to create {}: {}'.format(dim_name, datetime.now()))
         table = self.get_agent_data(f_name=dim_name, db_enum=enumdb, dt=dt)
 
-        print("To DW: {}".format(datetime.now()))
+        _logger.info('m=create_dim_or_fact_dw, To DW: {}'.format(datetime.now()))
         self.move_data_to_destination(data=table, table_name=dim_name, enumdb=enumdb, bucket=bucket, append=append)
 
+    @logger
     def clean_daily_data_in_table(self, enum, schema, dim_name, date_column, dt, format):
-        print("Start query to clean {}: {}".format(dim_name, str(dt)))
+        _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, str(dt)))
 
         if format == 'YYYY-MM-DD':
             date_column = 'date({})'.format(date_column)
 
-        raw_query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'{}')"
-
-        raw_query = raw_query.format(schema, dim_name, date_column, str(dt), format)
+        query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'{}')".format(schema, dim_name,
+                                                                                                date_column,
+                                                                                                str(dt), format)
 
         BaseETL.execute_command(
             db_enum=enum,
             encoding='UTF8',
-            command=raw_query,
+            command=query,
             commit=True
         )
 
+    @logger
     def reprocess_old_records(self, exec_dt):
         infinity_date = '2099-12-31 00:00:00'
 
-        raw_query = "UPDATE {}.{} SET {} = date('{}') WHERE date({}) = date('{}')"
-
-        raw_query = raw_query.format('public', 'agent_region_hist', 'dt_end', str(infinity_date), 'dt_end',
-                                     str(exec_dt))
+        query = "UPDATE {}.{} SET {} = date('{}') WHERE date({}) = date('{}')".format('public', 'agent_region_hist',
+                                                                                      'dt_end', str(infinity_date),
+                                                                                      'dt_end',
+                                                                                      str(exec_dt))
 
         BaseETL.execute_command(
             db_enum=EnumDb.BI_ODS,
             encoding='UTF8',
-            command=raw_query,
+            command=query,
             commit=True
         )
 
+    @logger
     def insert_dummy(self, table_name, key_column, value='-1', previous_check=False):
         if previous_check:
             if not self.check_dummy_exists(enumdb=EnumDb.BI_DW, schema='public', table_name=table_name,
@@ -152,6 +162,7 @@ class Agent(object):
                 commit=True
             )
 
+    @logger
     def check_dummy_exists(self, enumdb, schema, table_name, key_column):
         table = BaseETL.from_db_query(
             db_enum=enumdb,

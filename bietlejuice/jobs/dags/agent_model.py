@@ -6,14 +6,15 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDb, BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.agents.load_agent_model import Agent
+from bietlejuice.jobs.new_etl.agents.agent_model import Agent
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
 def group_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
-    ar = Agent()
+    ar = Agent(bucket_datalake)
     ar.clean_daily_data_in_table(enum=EnumDb.BI_ODS, schema='public', dim_name='agent_region_group', date_column='dt',
                                  dt=exec_date, format='YYYY-MM-DD')
     group_data = ar.get_agent_data(f_name='agent_region_group', db_enum=EnumDb.BI_ODS, dt=exec_date)
@@ -26,15 +27,15 @@ def load_group_agent_region_dw():
 
 
 def create_dim_agent_region_dw():
-    ar = Agent()
+    ar = Agent(bucket_datalake)
     ar.truncate_table(schema='public', table='dim_agent_region', enumdb=EnumDb.BI_DW)
     ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
-    ar.insert_dummy(table_name='dim_agent_region', key_column='sk_agentregion', previous_check=True)
+    ar.insert_dummy(table_name='dim_agent_region', key_column='sk_agent_region', previous_check=True)
 
 
 def create_fact_agent(**kwargs):
     exec_date = kwargs['execution_date']
-    ar = Agent()
+    ar = Agent(bucket_datalake)
     ar.clean_daily_data_in_table(enum=EnumDb.BI_DW, schema='public', dim_name='fact_agent', date_column='sk_slot_date',
                                  dt=exec_date, format='YYYYMMDD')
     ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
@@ -43,14 +44,14 @@ def create_fact_agent(**kwargs):
 
 def create_dim_agent_review(**kwargs):
     exec_date = kwargs['execution_date']
-    ar = Agent()
+    ar = Agent(bucket_datalake)
     ar.truncate_table(schema='public', table='agent_review', enumdb=EnumDb.BI_ODS)
     rev_data = ar.get_agent_data(f_name='agent_review', db_enum=EnumDb.QuintoAndar_ebdb, dt=exec_date)
     ar.move_data_to_destination(data=rev_data, table_name='agent_review')
 
 
 def load_dim_agent_review_dw():
-    ar = Agent()
+    ar = Agent(bucket_datalake)
     ar.truncate_table(schema='public', table='dim_agent_review', enumdb=EnumDb.BI_DW)
     BaseETL.move_table_to_dw('vw_dim_agent_review', EnumDb.BI_ODS, EnumDb.BI_DW,
                              table_name_dest='public.dim_agent_review', append=False)
@@ -65,7 +66,7 @@ def xcom_fact_agent(**kwargs):
 def upd_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
     exec_date_max = exec_date + dt.timedelta(days=1)
-    ar = Agent()
+    ar = Agent(bucket_datalake)
 
     ar.clean_daily_data_in_table(enum=EnumDb.BI_ODS, schema='public', dim_name='agent_region_hist',
                                  date_column='dt_start', dt=exec_date, format='YYYY-MM-DD')
@@ -86,7 +87,7 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': True
     },
-    start_date=datetime(2018, 7, 6, 0, 0, 0),
+    start_date=datetime(2018, 7, 10, 0, 0, 0),
     schedule_interval='0 8 * * *',
     max_active_runs=1
 )

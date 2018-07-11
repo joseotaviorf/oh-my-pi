@@ -8,7 +8,8 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.agents.bridge_demand_agent import Bridge
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'ENV_EBDB', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
 def xcom_dependencies(task_id, dag_id, **kwargs):
@@ -24,14 +25,14 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 
 def create_bdg_demand_agent():
-    bridge = Bridge()
+    bridge = Bridge(bucket_datalake)
     data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDb.BI_DW)
     bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDb.BI_DW)
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
 
 
 def guarantee_data_integrity(**kwargs):
-    bridge = Bridge()
+    bridge = Bridge(bucket_datalake)
     bridge.guarantee_integrity(db_enum=kwargs['db_enum'], schema=kwargs['schema'], f_name=kwargs['f_name'],
                                f_column=kwargs['f_column'], dim_name=kwargs['dim_name'],
                                dim_column=kwargs['dim_column'], type=kwargs['type'])
@@ -46,7 +47,7 @@ dag = DAG(
         'retries': 1,
         'retry_delay': timedelta(minutes=30),
     },
-    start_date=datetime(2018, 7, 6, 0, 0, 0),
+    start_date=datetime(2018, 7, 10, 0, 0, 0),
     schedule_interval='0 9 * * *',
     max_active_runs=1
 )

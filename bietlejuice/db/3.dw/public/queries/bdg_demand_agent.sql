@@ -18,9 +18,10 @@ public.fact_agent a
 )
 SELECT
 	COALESCE(demand.sk_demand, -1) AS sk_demand,
-	COALESCE(COALESCE(demand.dt, agent.dt), -1) AS dt,
-	COALESCE(COALESCE(demand.sk_agent, agent.sk_agent), -1) AS sk_agent,
-	COALESCE(agent.sk_slot_date_agent, -1) AS sk_slot_date_agent
+	COALESCE(demand.dt, agent.dt, -1) AS dt,
+	COALESCE(demand.sk_agent, agent.sk_agent, -1) AS sk_agent,
+	COALESCE(agent.sk_slot_date_agent, -1) AS sk_slot_date_agent,
+	getdate() as dt_timestamp
 FROM demand
 FULL OUTER JOIN
 agent

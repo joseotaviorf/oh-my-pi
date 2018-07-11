@@ -1,23 +1,19 @@
 import boto3
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
+from qa_python_utils.default_logger import logger
 
 
 class Bridge(object):
-    def __init__(self):
+    def __init__(self, bucket_name):
         self.schema_name = ''
-        self.bucket_datalake = '5a-datalake'
+        self.bucket_datalake = bucket_name
         self.s3_client = boto3.resource('s3')
 
-    def __format_query_filename(self, filename, db_enum):
-        if db_enum == EnumDb.BI_DW:
-            dir = DW_QUERIES_DIR
-        else:
-            dir = ''
-        return '{}/{}.sql'.format(dir, filename)
-
+    @logger
     def get_data(self, f_name, db_enum):
-        filename = self.__format_query_filename(f_name, db_enum)
+        filename = '{}/{}.sql'.format(DW_QUERIES_DIR, f_name)
+
         with open(filename) as f:
             raw_query = f.read()
 
@@ -28,17 +24,19 @@ class Bridge(object):
 
         return data
 
+    @logger
     def clean_table(self, schema, table, enumdb):
         filecommand = "TRUNCATE TABLE {}.{}"
         raw_query = filecommand.format(schema, table)
 
         BaseETL.execute_command(
             db_enum=enumdb,
-            encoding='UTF8',  # conn=conn,
+            encoding='UTF8',
             command=raw_query,
             commit=True
         )
 
+    @logger(exclude='data')
     def create_table_dw(self, table_name, data):
         table = BaseETL.decode_table(data, 'LATIN-1')
 
@@ -52,6 +50,7 @@ class Bridge(object):
             bucket_name='{}/clean/ods/{}'.format(self.bucket_datalake, table_name)
         )
 
+    @logger
     def guarantee_integrity(self, db_enum, schema, f_name, f_column, dim_name, dim_column, type):
         if type == 'update':
             query = """
