@@ -22,7 +22,7 @@ partitioned by (
   ym string
 )
 stored as parquet
-location 's3://5a-datalake/clean/seubarriga/invoice/'
+location 's3://5a-datalake/clean/seubarriga/invoice/report/'
 ;
 
 msck repair table datalake_clean.invoice;

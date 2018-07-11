@@ -9,7 +9,7 @@ partitioned by (
   ym string
 )
 stored as parquet
-location 's3://5a-datalake/clean/seubarriga/invoice/fines/'
+location 's3://5a-datalake/clean/seubarriga/invoice/fine/'
 ;
 
 msck repair table datalake_clean.invoice_fine;
