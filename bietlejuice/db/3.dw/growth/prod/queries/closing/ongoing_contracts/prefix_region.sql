@@ -41,6 +41,7 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
+		  and dc.contract_type = 'FullService'
 		  and dd."date" between dc.dt_contract_start
 		                  and coalesce(dc.dt_contract_annulment, case
 		                                                           when dc.contract_status = 'Finalizado'
@@ -76,6 +77,7 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
+		  and dc.contract_type = 'FullService'
 		  and dd."date" between dc.dt_contract_start
 		                  and coalesce(dc.dt_contract_annulment, case
 		                                                           when dc.contract_status = 'Finalizado'
@@ -111,6 +113,7 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on dc.dt_signature is not null
+		  and dc.contract_type = 'FullService'
 		  and dd."date" between dc.dt_contract_start
 		                  and coalesce(dc.dt_contract_annulment, case
 		                                                           when dc.contract_status = 'Finalizado'
