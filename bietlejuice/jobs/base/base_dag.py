@@ -25,12 +25,13 @@ class BaseDAG(object):
         )
 
     @staticmethod
-    def get_python_operator(task_id, func_command, dag, op_kwargs=None):
+    def get_python_operator(task_id, func_command, dag, op_kwargs=None, provide_context=False):
         return PythonOperator(
             dag=dag,
             task_id=task_id,
             python_callable=func_command,
-            op_kwargs=op_kwargs
+            op_kwargs=op_kwargs,
+            provide_context=provide_context
         )
 
     @staticmethod
