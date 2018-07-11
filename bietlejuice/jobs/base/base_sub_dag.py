@@ -59,6 +59,7 @@ class BaseSubDag(object):
         entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity)
 
         # flow
+        # TODO: remove dim/fact responsibility from base_sub_dag to leave it generic
         entity >> staging_dim_entity >> load_entity
 
         return entity_dag
