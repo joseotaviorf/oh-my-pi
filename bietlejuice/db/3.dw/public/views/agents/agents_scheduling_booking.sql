@@ -17,6 +17,5 @@ left join dim_booking db
 		and db."type" = 'Visita'
 		and db.visit_follow_up in ('Talvez', 'VisitouSozinho', 'VaiNegociar', 'NaoGostou')
 group by 1, 2, 3, 4, 5, 6
-having count(db.sk_booking) > 0
 )
 ;
