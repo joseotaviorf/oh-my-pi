@@ -7,6 +7,7 @@ from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.dags.invoice import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.invoice import InvoiceFactory
 
@@ -146,17 +147,46 @@ def table_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
+def unit_tests_sub_dag(sub_dag_name, **kwargs):
+    return unit_tests.build(
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        entity=kwargs['_class']
+    )
+
+
 # operators
-BaseSubDag.get_sub_dag_operator(
+report_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='report',
     sub_dag_func=table_sub_dag,
     endpoint_suffix='reports/invoice'
 )
 
-BaseSubDag.get_sub_dag_operator(
+fine_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='fine',
     sub_dag_func=table_sub_dag,
     endpoint_suffix='invoices/fines'
 )
+
+# unit tests
+report_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='report_unit_tests',
+    _class='report'
+)
+
+fine_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='fine_unit_tests',
+    _class='fine'
+)
+
+# flow
+report_sub_dag >> report_unit_tests_dag
+fine_sub_dag >> fine_unit_tests_dag
