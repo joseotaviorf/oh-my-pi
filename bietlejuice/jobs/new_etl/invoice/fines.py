@@ -48,9 +48,12 @@ class Fine(Invoice):
 
         c_cols = OrderedDict([
             ('contract_id', long),
-            ('fine', [float, re.compile(Invoice.REGEX['float']), Invoice.GROUP['float']]),
-            ('due_date', [str, re.compile(Invoice.REGEX['date']), Invoice.GROUP['date']]),
-            ('paid_date', [str, re.compile(Invoice.REGEX['date']), Invoice.GROUP['date']])
+            ('fine', [float, re.compile(Invoice.REGEX_MAPPING['float']['regex']),
+                      Invoice.REGEX_MAPPING['float']['group']]),
+            ('due_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                          Invoice.REGEX_MAPPING['date']['group']]),
+            ('paid_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                           Invoice.REGEX_MAPPING['date']['group']])
         ])
 
         self._transform_data(

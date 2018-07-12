@@ -15,14 +15,15 @@ from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 
 class Invoice(object):
-    REGEX = {
-        'float': '(\d+),(\d+)',
-        'date': '(\d{2})/(\d{2})/(\d{4})'
-    }
-
-    GROUP = {
-        'float': '\g<1>.\g<2>',
-        'date': '\g<3>-\g<2>-\g<1>'
+    REGEX_MAPPING = {
+        'float': {
+            'regex': '(\d+),(\d+)',
+            'group': '\g<1>.\g<2>'
+        },
+        'date': {
+            'regex': '(\d{2})/(\d{2})/(\d{4})',
+            'group': '\g<3>-\g<2>-\g<1>'
+        }
     }
 
     def __init__(self, bucket, _type, year, month, api_dict):
