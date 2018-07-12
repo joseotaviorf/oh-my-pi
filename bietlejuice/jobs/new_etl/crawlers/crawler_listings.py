@@ -109,11 +109,15 @@ class CrawlerListings(CrawlerEntity):
                 self.listings[column] = self.listings[column].apply(lambda x: True if x == 'true' else False)
         self.listings = self.cleaning(self.listings, ['advertiser_name', 'listing_type'])
         self.latlngs = self.listings[
-            self.listings['latlng_flg'].astype('bool') & ~self.listings['full_address_flg'].astype(bool) & ~
-            self.listings['gaddress_flg'].astype(bool)][['lat', 'lng']].drop_duplicates()
+            self.listings['latlng_flg'].astype('bool') &
+            ~self.listings['full_address_flg'].astype(bool) &
+            ~self.listings['gaddress_flg'].astype(bool)
+        ][['lat', 'lng']].drop_duplicates()
         self.addresses = self.listings[
-            ~self.listings['latlng_flg'].astype('bool') & ~self.listings['full_address_flg'].astype(bool) & ~
-            self.listings['gaddress_flg'].astype(bool)]['full_address'].drop_duplicates()
+            ~self.listings['latlng_flg'].astype('bool') &
+            ~self.listings['full_address_flg'].astype(bool) &
+            ~self.listings['gaddress_flg'].astype(bool)
+        ]['full_address'].drop_duplicates()
 
     @logger(exclude='entity')
     def enrich(self, entity, cep=False, location_type=False, reverse=True):
@@ -176,8 +180,10 @@ class CrawlerListings(CrawlerEntity):
     def merge_new_addresses(self):
         new_locations = \
             self.listings[
-                ~self.listings['full_address_flg'].astype(bool) & ~self.listings['gaddress_flg'].astype(bool) & ~
-                self.listings['glat'].where(self.listings['glat'] != '', None).isnull()][self.LOCATION_COLUMNS]
+                ~self.listings['full_address_flg'].astype(bool) &
+                ~self.listings['gaddress_flg'].astype(bool) &
+                ~self.listings['glat'].where(self.listings['glat'] != '', None).isnull()
+            ][self.LOCATION_COLUMNS]
         _logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(
             new_locations.shape, self.new_locations.shape))
         self.new_locations = self.new_locations.append(new_locations.where(~new_locations.isnull(), ''))
