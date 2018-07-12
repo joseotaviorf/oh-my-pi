@@ -15,7 +15,8 @@ create external table datalake_raw.seubarriga_invoice (
   `tenant-status` string,
   `landlord-due-date` string,
   `landlord-paid-date` string,
-  `landlord-status` string
+  `landlord-status` string,
+  purpose string
 )
 partitioned by (
   ym string

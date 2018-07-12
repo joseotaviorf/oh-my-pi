@@ -3,6 +3,6 @@ select
   fine,
   due_date,
   paid_date,
-  ym as year_month
+  ym as ym_partition
 from datalake_clean.invoice_fine
-where ym = '{year}-{month}'
+where ym = '{year_month}'
