@@ -99,7 +99,6 @@ class CrawlerListings(CrawlerEntity):
         if not query:
             return None
         return self.athena_client.execute_query_and_return_dataframe(sql=query, paginate=True, page_size=self.page_size)
-        # self.listings = self.athena_client.execute_query_and_return_dataframe(query)
 
     @logger
     def clean_listings(self):
