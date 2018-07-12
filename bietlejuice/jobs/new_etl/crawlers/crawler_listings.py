@@ -167,9 +167,8 @@ class CrawlerListings(CrawlerEntity):
                                  suffixes=('', '_new'))
         for col in cols:
             col_new = '{}_new'.format(col)
-            self.listings[col].replace('', np.nan, inplace=True)
+            self.listings[col] = self.listings[col].where(self.listings[col] != '', None)
             self.listings[col] = self.listings[col].combine_first(self.listings[col_new])
-            self.listings[col].replace(np.nan, None, inplace=True)
             self.listings.drop([col_new], axis=1, inplace=True)
         self.listings.drop(['location'], axis=1, inplace=True)
 
