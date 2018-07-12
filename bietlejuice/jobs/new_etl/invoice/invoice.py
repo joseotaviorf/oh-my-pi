@@ -84,11 +84,13 @@ class Invoice(object):
 
     @logger(exclude='object')
     def save_into_s3_raw(self, object, file_path_prefix, raw_table_name):
+        year_month = '{}-{}'.format(self.year, self.month)
+
         _logger.info(
             BaseETL.obj_to_s3(
                 obj_io=object,
                 bucket=self.bucket,
-                file_path='{0}/ym={2}-{3}/data.gz'.format(file_path_prefix, self._type, self.year, self.month)
+                file_path='{}/ym={}/data.gz'.format(file_path_prefix, year_month)
             )
         )
 
@@ -97,15 +99,17 @@ class Invoice(object):
             database='datalake_raw',
             table=raw_table_name,
             partition_name='ym',
-            partition_value='{}-{}'.format(self.year, self.month)
+            partition_value=year_month
         )
 
     @logger
     def _transform_data(self, query, raw_columns, clean_columns, clean_table_name):
-        key = 'clean/seubarriga/invoice/{0}/ym={1}-{2}/data.parq'.format(self._type, self.year, self.month)
+        year_month = '{}-{}'.format(self.year, self.month)
+        key = 'clean/seubarriga/invoice/{}/ym={}/data.parq'.format(self._type, year_month)
+
         self.athena_client.create_parquet_from_query(
             key=key,
-            query=query.format(year=self.year, month=self.month),
+            query=query.format(year_month=year_month),
             raw_columns=raw_columns,
             clean_columns=clean_columns
         )
@@ -115,7 +119,7 @@ class Invoice(object):
             database='datalake_clean',
             table=clean_table_name,
             partition_name='ym',
-            partition_value='{}-{}'.format(self.year, self.month)
+            partition_value=year_month
         )
 
     @logger
@@ -123,15 +127,19 @@ class Invoice(object):
         query = BaseETL.get_query_from_file_name(
             '{}/invoice/{}_clean_load_ods.sql'.format(DATALAKE_QUERIES_DIR, self._type))
 
-        data_frame = self.athena_client.execute_query_and_return_dataframe(
-            query.format(year=self.year, month=self.month))
+        year_month = '{}-{}'.format(self.year, self.month)
+        data_frame = self.athena_client.execute_query_and_return_dataframe(query.format(year_month=year_month))
+
+        _logger.info(
+            'm=load_into_ods, _type={}, year_month={}, msg=deleting from ods table'.format(self._type, year_month))
         BaseETL.execute_command(
-            command="delete from invoice.{} where year_month = '{}-{}'".format(self._type, self.year, self.month),
+            command="delete from invoice.{} where ym_partition = '{}'".format(self._type, year_month),
             db_enum=EnumDb.BI_ODS,
             encoding='utf-8',
             commit=True
         )
 
+        _logger.info('m=load_into_ods, _type={}, msg=sending dataframe to ods'.format(self._type))
         BaseETL.dataframe_to_ods(
             df=data_frame,
             table_name='invoice.{}'.format(self._type),
