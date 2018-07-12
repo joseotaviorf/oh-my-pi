@@ -47,7 +47,7 @@ def extract_table(**kwargs):
 
     _object = _invoice.convert_df_to_json(data_frame=data_frame)
     _invoice.save_into_s3_raw(
-        object=_object,
+        _object=_object,
         file_path_prefix='raw/seubarriga/invoice/{}'.format(_invoice._type),
         raw_table_name=raw_table_name
     )

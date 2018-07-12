@@ -82,13 +82,13 @@ class Invoice(object):
 
         return gz_body
 
-    @logger(exclude='object')
-    def save_into_s3_raw(self, object, file_path_prefix, raw_table_name):
+    @logger(exclude='_object')
+    def save_into_s3_raw(self, _object, file_path_prefix, raw_table_name):
         year_month = '{}-{}'.format(self.year, self.month)
 
         _logger.info(
             BaseETL.obj_to_s3(
-                obj_io=object,
+                obj_io=_object,
                 bucket=self.bucket,
                 file_path='{}/ym={}/data.gz'.format(file_path_prefix, year_month)
             )
