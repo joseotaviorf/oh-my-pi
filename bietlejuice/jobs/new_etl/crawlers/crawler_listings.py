@@ -38,7 +38,7 @@ class CrawlerListings(CrawlerEntity):
             get_polygons=False,
             get_house_allowed=False
         )
-        self.max_batch_size = max_batch_size
+        self.max_batch_size = int(max_batch_size)
         self.google_maps_daily_quota = google_maps_daily_quota
         self.listings = pd.DataFrame([], columns=self.CLEAN_COLUMNS)
         self.latlngs = pd.DataFrame([], columns=['lat', 'lng'])
@@ -247,6 +247,7 @@ class CrawlerListings(CrawlerEntity):
             current_batch_size += self.page_size
             batch_size = len(df) if i > 0 else len(df) + 1
             self.listings = self.listings.append(df)
+            _logger.info('m=iterate_crawler_data, msg=max batch size {}'.format(self.max_batch_size))
             _logger.info('m=iterate_crawler_data, msg=current df size {}'.format(self.listings.shape))
             _logger.info('m=iterate_crawler_data, msg=current batch size {}'.format(current_batch_size))
             if (current_batch_size >= self.max_batch_size) or (batch_size < self.page_size):
