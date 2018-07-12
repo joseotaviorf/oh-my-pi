@@ -45,12 +45,30 @@ with listings as (
     and loc.latitude is not null
     and loc.longitude is not null
 )
+, new_listings as (
+    select
+      trim(abbreviation) as abbreviation,
+      case
+        when abbreviation is null then try(upper(trim(substr(street, strpos(street, ' ')))))
+        else trim(upper(substr(street, length(prefix)+1)))
+      end as street_name,
+      street_number
+    from ds
+    where rnk = 1
+)
 select
-  trim(abbreviation) as abbreviation,
-  case
-    when abbreviation is null then try(upper(trim(substr(street, strpos(street, ' ')))))
-    else trim(upper(substr(street, length(prefix)+1)))
-  end as street_name,
-  street_number
-from ds
-where rnk = 1
+  l.abbreviation,
+  l.street_name,
+  l.street_number
+from new_listings l
+left join datalake_raw.crawled_cpf cc
+    on l.abbreviation = cc.abbreviation
+      and l.street_name = cc.street_name
+      and l.street_number = cc.street_number
+where cc.abbreviation is null
+  and cc.street_name is null
+  and cc.street_number is null
+group by
+  l.abbreviation,
+  l.street_name,
+  l.street_number
