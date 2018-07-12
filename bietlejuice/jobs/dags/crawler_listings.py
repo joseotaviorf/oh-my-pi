@@ -13,15 +13,16 @@ MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 google_maps_max_calls = env.get_airflow_env_var('GOOGLE_MAPS_MAX_CALLS')
+_max_batch_size = env.get_airflow_env_var('CRAWLER_MAX_BATCH_SIZE')
 
 
-def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000):
+def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000, max_batch_size=100000):
     if api_key is None:
         _logger.error('m=transform_crawler_data, msg=google api key not present')
         raise Exception('Variable missing')
     _logger.info('m=transform_crawler_data, starting execution with quota={}'.format(api_daily_quota))
-    crawled_listings = CrawlerListings(bucket, api_key, api_daily_quota)
-    crawled_listings.transform_crawler_data()
+    crawled_listings = CrawlerListings(bucket, api_key, api_daily_quota, max_batch_size)
+    crawled_listings.iterate_crawler_data()
     _logger.info('m=transform_crawler_data, finished execution'.format(api_daily_quota))
 
 
@@ -41,5 +42,6 @@ BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='transform-crawler-data',
     func_command=transform_crawler_data,
-    op_kwargs={'bucket': s3_bucket, 'api_key': data_google_api_key, 'api_daily_quota': google_maps_max_calls}
+    op_kwargs={'bucket': s3_bucket, 'api_key': data_google_api_key, 'api_daily_quota': google_maps_max_calls,
+               'max_batch_size': _max_batch_size}
 )
