@@ -1,4 +1,5 @@
-from bietlejuice.jobs.new_etl.invoice import Report, Fine
+from bietlejuice.jobs.new_etl.invoice.fines import Fine
+from bietlejuice.jobs.new_etl.invoice.reports import Report
 
 
 class InvoiceFactory(object):
