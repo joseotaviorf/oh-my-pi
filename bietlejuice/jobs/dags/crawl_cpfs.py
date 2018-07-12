@@ -44,9 +44,9 @@ def crawl_cpfs(**kwargs):
         job_name='crawl_' + suffix.split('.')[0].replace('-', '_'),
         job_queue='crawling-cpfs',
         job_definition='crawling-cpfs:2',
-        exec_command=['./crawlers/get_cpfs.py',
-                      's3://{}/{}'.format(s3_bucket, filename),
-                      '--max_crawl', '1000000', '--threads', '2']
+        command=['./crawlers/get_cpfs.py',
+                 's3://{}/{}'.format(s3_bucket, filename),
+                 '--max_crawl', '1000000', '--threads', '2']
     )
 
     _logger.info('m=crawl_cpfs, job submitted with status {}. {}'.format(
