@@ -242,8 +242,8 @@ class CrawlerListings(CrawlerEntity):
             current_batch_size += self.page_size
             batch_size = len(df) if i > 0 else len(df) + 1
             self.listings = self.listings.append(df)
-            _logger.info('m=transform_crawler_data, msg=current df size {}'.format(self.listings.shape))
-            _logger.info('m=transform_crawler_data, msg=current batch size {}'.format(current_batch_size))
+            _logger.info('m=iterate_crawler_data, msg=current df size {}'.format(self.listings.shape))
+            _logger.info('m=iterate_crawler_data, msg=current batch size {}'.format(current_batch_size))
             if (current_batch_size >= self.max_batch_size) or (batch_size < self.page_size):
                 self.transform_crawler_data()
                 self.page_count += 1

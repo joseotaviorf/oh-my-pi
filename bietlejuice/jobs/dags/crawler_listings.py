@@ -20,10 +20,10 @@ def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000):
     if api_key is None:
         _logger.error('m=transform_crawler_data, msg=google api key not present')
         raise Exception('Variable missing')
-    _logger.info('m=iterate_crawler_data, starting execution with quota={}'.format(api_daily_quota))
+    _logger.info('m=transform_crawler_data, starting execution with quota={}'.format(api_daily_quota))
     crawled_listings = CrawlerListings(bucket, api_key, api_daily_quota, max_batch_size)
     crawled_listings.iterate_crawler_data()
-    _logger.info('m=iterate_crawler_data, finished execution'.format(api_daily_quota))
+    _logger.info('m=transform_crawler_data, finished execution'.format(api_daily_quota))
 
 
 dag = DAG(
