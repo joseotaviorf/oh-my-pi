@@ -37,8 +37,10 @@ def extract_table(**kwargs):
 
         content = _invoice.request_job_data(job_url=job_url)
         data_frame = _invoice.load_content_to_memory_as_csv(content=content)
+        raw_table_name = 'seubarriga_invoice'
     elif kwargs['_class'] == 'fine':
         data_frame = pd.read_json(_result)
+        raw_table_name = 'seubarriga_invoice_fine'
     else:
         _logger.error("m=extract_table, kwargs['_class']={}".format(kwargs['_class']))
         raise Exception
@@ -47,7 +49,7 @@ def extract_table(**kwargs):
     _invoice.save_into_s3_raw(
         object=_object,
         file_path_prefix='raw/seubarriga/invoice/{}'.format(_invoice._type),
-        raw_table_name='seubarriga_invoice'
+        raw_table_name=raw_table_name
     )
     _object.flush()
 
