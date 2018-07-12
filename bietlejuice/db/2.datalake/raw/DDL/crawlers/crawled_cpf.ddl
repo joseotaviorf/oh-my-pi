@@ -8,6 +8,9 @@ create external table datalake_raw.crawled_cpf (
   iptu_cod string,
   owners string
 )
+partitioned by (
+  started_on_dd string
+)
 row format serde 'org.openx.data.jsonserde.JsonSerDe'
 with serdeproperties ('mapping.owners' = 'cpf')
 location 's3://5a-datalake/raw/crawled_cpfs/enriched'
