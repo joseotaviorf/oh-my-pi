@@ -63,8 +63,8 @@ incurred as (
             and date_trunc('month', greatest(landlord_due_date, due_date, landlord_paid_date)) = bc.date_range
             and item = 'TaxaAdministracao'
             and landlord_status = 'paid'
-            and "from" = 'Proprietario'
-            and "to" = 'Contrato'
+            and _from = 'Proprietario'
+            and _to = 'Contrato'
 ),
 incurred_diff as (
     select
