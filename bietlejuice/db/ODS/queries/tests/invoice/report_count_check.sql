@@ -1,4 +1,4 @@
-select count(1)
-from datalake_clean.invoice
-where ym = '{year-month}'
+select count(*)
+from invoice.report
+where ym_partition = '{year_month}'
 ;
