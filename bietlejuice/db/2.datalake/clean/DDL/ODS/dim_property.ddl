@@ -39,7 +39,7 @@ create external table if not exists datalake_clean.ods_dim_property (
   tipo_porteiro string,
   tipo_vagas string,
   verificado string,
-  usuario_id BIGINT,
+  usuario_id string,
   codigo_promocao string,
   cotar_seguro string,
   valor_total string,
@@ -123,7 +123,9 @@ create external table if not exists datalake_clean.ods_dim_property (
   unpublished_reason string,
   start_version_category string,
   end_version_category string,
-  is_last_status string
+  is_last_status string,
+  exclusivity string,
+  short_id string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

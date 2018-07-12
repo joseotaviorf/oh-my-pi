@@ -31,7 +31,7 @@ select
 		when (dt_opportunity is null and dt_qualified is not null and conversao_id is not null) then 'NoPhotoJob'
 		when (dt_opportunity is null and lead_reason in ('ProprietarioAvaliando', 'ProprietarioNaoAtende', 'ProprietarioVaiAnunciar')) then 'OnHold'
 		when (dt_qualified is null and lead_status = 'Descartado') then coalesce(lead_reason, 'DiscardedLead')
-		when (dt_qualified is null and lead_status = 'Novo' and (cidade = 'Outra cidade' or bairro = 'Outro bairro')) then 'NaoProcessadoArea'
+		when (dt_qualified is null and lead_status = 'Novo' and cidade = 'Outra cidade') then 'NaoProcessadoArea'
 		when (dt_qualified is null and lead_status = 'Novo') then 'NaoProcessado'
 		when (flow = 'Lead Flow' and dt_qualified is null) then 'NaoProcessado'
 		when (lead_status = 'Convertido' and conversao_id is null) then 'BrokenLeadFlow'
@@ -172,6 +172,7 @@ from
 		  UsuarioRevisionEntity ure
 		  on ig.REV = ure.id
 		where cl.id is null
+		and DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 	union all
     select
       i.id as imovel_id,
@@ -248,6 +249,7 @@ from
           else NULL
         end as old_id
       from Lead
+      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
     ) l -- all data from Lead table plus a reprocessed Extra Field
     left join
       ConversaoLead cl
@@ -255,6 +257,7 @@ from
     left join
       Imovel i
       on i.id = cl.imovel_id
+      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join
       (
         select
@@ -316,6 +319,7 @@ from
     left join
       Lead old_lead
       on old_lead.id = l.old_id
+      AND DATE(coalesce(old_lead.criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
@@ -364,6 +368,7 @@ from
 		left join
 			Imovel i
 			on i.id = cl.imovel_id
+			AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 		left join
 			Usuario u
 			on u.id = i.usuarioQueCadastrou_id

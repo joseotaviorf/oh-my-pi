@@ -4,41 +4,41 @@ with all_dates as (
     dd.month as _month,
     dd.calendar_week as _week,
     dd.day as _day,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.month,
     																dd.calendar_week,
     																dd.day order by f.sk_house asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.month,
     																		dd.calendar_week,
     																		dd.day order by f.sk_house desc)
 			- 1 as daily_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.calendar_week order by f.sk_house asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.calendar_week order by f.sk_house desc)
 			- 1 as weekly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year,
     																dd.month order by f.sk_house asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year,
     																		dd.month order by f.sk_house desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     dd.year order by f.sk_house asc)
-    	+ dense_rank() over (partition by coalesce(dr.long_region_name, ''),
+    	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  dd.year order by f.sk_house desc)
 			- 1 as yearly_count
 	from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
@@ -52,12 +52,12 @@ all_dates_last_month as (
 	select
     dd.year as _year,
     dd.month as _month,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_house) as monthly_count
 	from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
@@ -71,12 +71,12 @@ all_dates_last_month as (
 all_dates_last_year as (
 	select
 		dd.year as _year,
-    coalesce(dr.long_region_name, '') as region,
+    coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_house) as yearly_count
   from fact_house_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date, 'YYYYMMDD')::bigint)
+		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region

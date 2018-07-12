@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import requests
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import logger, _logger
 from shapely import wkt
 from shapely.geometry import Point
@@ -71,9 +70,6 @@ class CrawlerEntity(object):
         return None
 
     def __get_crawling_dates(self):
-        q = """msck repair table datalake_raw.crawlers"""
-        self.athena_client.execute_query_and_wait_for_results(q)
-
         q = """show partitions datalake_raw.crawlers"""
         partitions = self.athena_client.execute_txt_query_and_return_dataframe(q)
         pattern = re.compile(r'ws=(\D+)\/started_on=(\d{4}-\d{2}-\d{2})')
@@ -202,15 +198,3 @@ class CrawlerEntity(object):
         for component in addr:
             if addr_type in component['types']:
                 return component['long_name']
-
-    @logger
-    def start_batch_job(self, job_name, job_queue, job_definition, exec_command):
-        r = BatchClient().start_batch_job(
-            job_name=job_name,
-            job_queue=job_queue,
-            job_definition=job_definition,
-            command=exec_command
-        )
-
-        _logger.info('m=start_batch_job, finished with status {}. {}'.format(
-            r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))

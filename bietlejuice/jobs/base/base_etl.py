@@ -13,10 +13,9 @@ from logging import info as log
 import boto3
 import datetime
 import petl
-from petl.io.db import create_table
-
 from db_factory import DBFactory
 from enum_db import EnumDb
+from petl.io.db import create_table
 
 
 class BaseETL(object):
@@ -404,6 +403,8 @@ class BaseETL(object):
             if enum_db_dest == EnumDb.BI_DW and not eval(str(forno)):
                 sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
+                        NULL AS 'NULL'
+                        EMPTYASNULL
                         DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
                     table_name,
                     file,
