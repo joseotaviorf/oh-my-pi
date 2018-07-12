@@ -1,11 +1,11 @@
+from qa_python_utils.default_logger import logger, _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDb
-from bietlejuice.jobs.dags import DATALAKE_RAW_TEST_QUERIES_DIR
-from bietlejuice.jobs.dags import ODS_TEST_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_RAW_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
 from bietlejuice.jobs.dags.sorting_hat import SORTINGHAT_TEST_QUERIES_DIR
-from qa_python_utils.default_logger import logger, _logger
 
 COUNT_CHECK_SQL_SUFFIX = 'count_check.sql'
 
@@ -55,17 +55,15 @@ def __test_count(**kwargs):
 
 @logger
 def __build_test_tasks(local_dag, entity):
-    # FIXME: change to get_quintoandar_python_operator after testing
-    test_entity_count = BaseDAG.get_python_operator(
+    return BaseDAG.get_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_{}_count'.format(entity),
         func_command=__test_count,
         op_kwargs={
-            'sh_file_path': '{}/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
-            'dl_file_path': '{}/{}_{}'.format(DATALAKE_RAW_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
-            'ods_file_path': '{}/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'sh_file_path': '{}/sorting_hat/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'dl_file_path': '{}/sorting_hat/{}_{}'.format(DATALAKE_RAW_TEST_QUERIES_DIR, entity,
+                                                          COUNT_CHECK_SQL_SUFFIX),
+            'ods_file_path': '{}/sorting_hat/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'acceptable_diff': .0
         }
     )
-
-    return test_entity_count

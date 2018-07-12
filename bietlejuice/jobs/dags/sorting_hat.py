@@ -2,12 +2,13 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from qa_python_utils.default_logger import logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.sorting_hat import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.sorting_hat import SortingHat
-from qa_python_utils.default_logger import logger
 
 # env vars
 env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
@@ -47,33 +48,13 @@ main_dag = DAG(
 )
 
 
-def proposal_unit_tests_sub_dag(sub_dag_name):
+def unit_tests_sub_dag(sub_dag_name, **kwargs):
     return unit_tests.build(
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        entity='proposal'
-    )
-
-
-def proponent_unit_tests_sub_dag(sub_dag_name):
-    return unit_tests.build(
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-        entity='proponent'
-    )
-
-
-def proposalversion_unit_tests_sub_dag(sub_dag_name):
-    return unit_tests.build(
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-        entity='proposalversion'
+        entity=kwargs['entity']
     )
 
 
@@ -110,23 +91,26 @@ proponent_task = PythonOperator(
     }
 )
 
-# Unit tests
+# unit tests
 proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=proposal_unit_tests_sub_dag,
-    sub_dag_name='proposal_unit_tests'
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='proposal_unit_tests',
+    entity='proposal'
 )
 
 proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=proponent_unit_tests_sub_dag,
-    sub_dag_name='proponent_unit_tests'
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='proponent_unit_tests',
+    entity='proponent'
 )
 
 proposalversion_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=proposalversion_unit_tests_sub_dag,
-    sub_dag_name='proposalversion_unit_tests'
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='proposalversion_unit_tests',
+    entity='proposalversion'
 )
 
 # flow

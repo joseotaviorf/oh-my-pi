@@ -50,7 +50,15 @@ class BaseTest(object):
     @staticmethod
     @logger
     def compare_sources(acceptable_diff, sources_list):
-        for x, y in combinations(filter(None, sources_list), 2):
+        if sources_list is None:
+            _logger.error('m=compare_sources, msg=sources_list is none')
+            raise Exception
+
+        unique_sources_list = set([elem for elem in sources_list if elem is not None])
+        for x, y in combinations(unique_sources_list, 2):
+            if x == 0 or float(y) == 0:
+                _logger.warn('m=compare_sources, msg=empty source')
+                raise Exception
             if abs((x / float(y)) - 1) > acceptable_diff:
                 _logger.warn('m=compare_sources, msg=sources are different')
                 raise Exception

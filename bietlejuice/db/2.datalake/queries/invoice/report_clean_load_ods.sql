@@ -1,21 +1,23 @@
 select
   contract_id,
-  version,
+  trim(version) as version,
   blocked,
-  "from",
-  "to",
-  description,
+  trim("_from") as "_from",
+  trim("_to") as "_to",
+  trim(description) as description,
   amount,
-  item,
-  year_month as ref_item_ym,
-  due_date,
-  tenant_due_date,
-  tenant_paid_date,
-  tenant_status,
-  landlord_due_date,
-  landlord_paid_date,
-  landlord_status,
+  trim(item) as item,
+  trim(ref_item_ym) as ref_item_ym,
+  trim(due_date) as due_date,
+  trim(tenant_due_date) as tenant_due_date,
+  trim(tenant_paid_date) as tenant_paid_date,
+  trim(tenant_status) as tenant_status,
+  trim(landlord_due_date) as landlord_due_date,
+  trim(landlord_paid_date) as landlord_paid_date,
+  trim(landlord_status) as landlord_status,
   cast(delayed_days as smallint) as delayed_days,
-  ym as year_month
+  ym as ym_partition,
+  trim(purpose) as purpose
 from datalake_clean.invoice
-where ym = '{year}-{month}'
+where ym = '{year_month}'
+;
