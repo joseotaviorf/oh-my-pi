@@ -45,7 +45,7 @@ create external table datalake_clean.crawler_listings (
 	garages string,
 	year_building string,
 	cep string,
-	sk_updated_on string,
+	sk_date_updated_on string,
 	sk_date_last_run string,
 	sk_date_first_seen string,
 	sk_date_last_seen string,
