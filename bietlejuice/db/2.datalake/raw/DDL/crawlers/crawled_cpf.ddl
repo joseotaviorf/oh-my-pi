@@ -3,7 +3,7 @@ drop table datalake_raw.crawled_cpf
 create external table datalake_raw.crawled_cpf (
   abbreviation string,
   street_name string,
-  street_number int,
+  street_number string,
   complement string,
   iptu_cod string,
   owners string
