@@ -9,14 +9,16 @@ with listings as (
     max(try(cast(regexp_extract(updated_on, '^(\d{4}-\d{2}-\d{2}).*', 1) as date))) as last_update
   from datalake_raw.crawlers
   where ws in ('vivareal', 'zapimoveis')
-  group by 1, 2
+  group by
+    1,
+    2
 )
 , locations as (
   select distinct
     id,
     ws,
-    if(street <> 'Endereço Não Informado' and street <> '', split(street, ',')[1]) as street,
-    try(cast(regexp_replace(regexp_extract(street, ',[ +]?(n\. )?(\d+(\.\d+)?)([ |\/].*)?(,.*)?$', 2), '\D+', '') as integer)) as street_number,
+    upper(if(street <> 'Endereço Não Informado' and street <> '', split(street, ',')[1])) as street,
+    try(regexp_replace(regexp_extract(street, ',[ +]?(n\. )?(\d+(\.\d+)?)([ |\/].*)?(,.*)?$', 2), '\D+', '')) as street_number,
     try(cast(lat as double)) as latitude,
     try(cast(lng as double)) as longitude
   from datalake_raw.crawlers
@@ -38,7 +40,7 @@ with listings as (
   join datalake_raw.ebdb_poligonoregiao pr
     on ST_Contains(ST_Polygon(pr.poligono), ST_Point(loc.longitude, loc.latitude))
   left join datalake_raw.street_type st
-    on strpos(replace(loc.street, ' ', ''), replace(st.prefix, ' ', '')) = 1
+    on strpos(replace(loc.street, ' ', ''), upper(replace(st.prefix, ' ', ''))) = 1
       and st.city = 'sp'
   where lis.first_seen >= date '__LAST_CRAWLER_RUN__'
     and loc.street_number is not null
@@ -47,10 +49,10 @@ with listings as (
 )
 , new_listings as (
     select
-      trim(abbreviation) as abbreviation,
+      coalesce(trim(abbreviation), 'OTHER') as abbreviation,
       case
         when abbreviation is null then try(upper(trim(substr(street, strpos(street, ' ')))))
-        else trim(upper(substr(street, length(prefix)+1)))
+        else trim(substr(street, length(prefix)+1))
       end as street_name,
       street_number
     from ds
@@ -59,16 +61,15 @@ with listings as (
 select
   l.abbreviation,
   l.street_name,
-  l.street_number
+  try(cast(l.street_number as integer)) as street_number
 from new_listings l
 left join datalake_raw.crawled_cpf cc
     on l.abbreviation = cc.abbreviation
       and l.street_name = cc.street_name
       and l.street_number = cc.street_number
-where cc.abbreviation is null
-  and cc.street_name is null
+where cc.street_name is null
   and cc.street_number is null
 group by
-  l.abbreviation,
-  l.street_name,
-  l.street_number
+  3,
+  2,
+  1
