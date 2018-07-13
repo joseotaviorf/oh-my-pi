@@ -869,12 +869,9 @@ brokerage_fill as (
 	left join
 		invoice.report i
 		on bc.contract_id = i.contract_id
-	and
-		item = 'TaxaCorretagem'
-	and
-		"from" = 'Proprietario'
-	and
-		"to" = 'Contrato'
+	    and item = 'TaxaCorretagem'
+	    and _from = 'Proprietario'
+	    and _to = 'Contrato'
 )
 select
 	sk_property,
@@ -947,8 +944,8 @@ incurred as (
             and date_trunc('month', greatest(landlord_due_date, due_date, landlord_paid_date)) = bc.date_range
             and item = 'TaxaAdministracao'
             and landlord_status = 'paid'
-            and "from" = 'Proprietario'
-            and "to" = 'Contrato'
+            and _from = 'Proprietario'
+            and _to = 'Contrato'
 ),
 incurred_diff as (
     select
@@ -1898,8 +1895,8 @@ rent_delay as (
    tenant_paid_date,
    date_part('day', cast(tenant_paid_date as timestamp) - cast(tenant_due_date as timestamp)) as rent_delayed_days
    from invoice.report
-  where trim("from") = 'Inquilino'
-   and trim(item) = 'Aluguel'
+  where _from = 'Inquilino'
+   and item = 'Aluguel'
    and tenant_due_date is not null
    and tenant_paid_date is not null
 ),

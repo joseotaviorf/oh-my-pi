@@ -1,16 +1,11 @@
 import re
-import sys
 from collections import OrderedDict
-from datetime import datetime
 
-import requests
 from qa_python_utils.default_logger import logger, _logger
 
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from invoice import Invoice
-
-args = sys.argv
-full_date = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
-exec_year, exec_month = full_date.strftime('%Y'), full_date.strftime('%m')
 
 
 class Report(Invoice):
@@ -40,26 +35,25 @@ class Report(Invoice):
     -----------------------------------------------------------------------------------
     """
 
-    def __init__(self):
-        super(Report, self).__init__(_type='reports', year=exec_year, month=exec_month)
+    def __init__(self, bucket, api_dict, execution_date):
+        super(Report, self).__init__(
+            bucket=bucket,
+            _type='report',
+            year=execution_date.strftime('%Y'),
+            month=execution_date.strftime('%m'),
+            api_dict=api_dict
+        )
 
     @logger
-    def request_data(self, endpoint_complement):
-        request_result = requests.get(
-            url='{0}/{1}/{2}/{3}/all'.format(Invoice.SEUBARRIGA_INVOICE['endpoint'], endpoint_complement, self.year,
-                                             self.month),
-            headers={'jwt-token': Invoice.SEUBARRIGA_INVOICE['token']}
-        )
+    def request_data(self, endpoint_suffix):
+        request_result = self._request_data('{}/{}/{}/all'.format(endpoint_suffix, self.year, self.month))
 
         _logger.info('m=request_data, request_result={}'.format(request_result.content))
         return request_result.json()['file-url'], request_result.json()['status-url']
 
     @logger
-    def prepare_and_transform_data(self):
-        file_query = './bietlejuice/db/2.datalake/queries/invoice/report_raw_transform.sql'
-        with open(file_query) as f:
-            q = f.read()
-
+    def transform_data(self):
+        query = BaseETL.get_query_from_file_name('{}/invoice/report_raw_transform.sql'.format(DATALAKE_QUERIES_DIR))
         r_cols = OrderedDict([
             ('contract-id', str),
             ('version', str),
@@ -84,51 +78,32 @@ class Report(Invoice):
             ('contract_id', long),
             ('version', str),
             ('blocked', bool),
-            ('from', str),
-            ('to', str),
+            ('_from', str),
+            ('_to', str),
             ('description', str),
-            ('amount', [float, re.compile(r'(\d+),(\d+)'), r'\g<1>.\g<2>']),
+            ('amount', [float, re.compile(Invoice.REGEX_MAPPING['float']['regex']),
+                        Invoice.REGEX_MAPPING['float']['group']]),
             ('item', str),
-            ('year_month', str),
-            ('due_date', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
-            ('tenant_due_date', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
-            ('tenant_paid_date', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
-            ('tenant_status', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
-            ('landlord_due_date', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
-            ('landlord_paid_date', [str, re.compile(Invoice.REGEX_DATE), Invoice.GROUP_DATE]),
+            ('ref_item_ym', str),
+            ('due_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                          Invoice.REGEX_MAPPING['date']['group']]),
+            ('tenant_due_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                                 Invoice.REGEX_MAPPING['date']['group']]),
+            ('tenant_paid_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                                  Invoice.REGEX_MAPPING['date']['group']]),
+            ('tenant_status', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                               Invoice.REGEX_MAPPING['date']['group']]),
+            ('landlord_due_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                                   Invoice.REGEX_MAPPING['date']['group']]),
+            ('landlord_paid_date', [str, re.compile(Invoice.REGEX_MAPPING['date']['regex']),
+                                    Invoice.REGEX_MAPPING['date']['group']]),
             ('landlord_status', str),
             ('delayed_days', int)
         ])
 
-        self.transform_data(query=q.format(year=exec_year, month=exec_month), raw_columns=r_cols, clean_columns=c_cols,
-                            clean_table_name='invoice')
-
-    @logger
-    def prepare_and_load_into_ods(self):
-        file_query = './bietlejuice/db/2.datalake/queries/invoice/report_clean_load_ods.sql'
-        with open(file_query) as f:
-            q = f.read()
-
-        self.load_into_ods(query=q.format(year=exec_year, month=exec_month), ods_table='report')
-
-
-if __name__ == '__main__':
-    report = Report()
-
-    if args[1] == 'extract':
-        job_url, status_url = report.request_data(endpoint_complement='{}/invoice'.format(report._type))
-
-        report.wait_for_results(status_url=status_url)
-
-        content = report.request_job_data(job_url=job_url)
-        data_frame = report.load_content_to_memory_as_csv(content=content)
-        _object = report.convert_df_to_json(data_frame=data_frame)
-        report.save_into_s3_raw(object=_object, file_path_prefix='raw/seubarriga/invoice/{}'.format(report._type),
-                                raw_table_name='seubarriga_invoice')
-        _object.flush()
-    elif args[1] == 'transform':
-        report.prepare_and_transform_data()
-    elif args[1] == 'load':
-        report.prepare_and_load_into_ods()
-    else:
-        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
+        self._transform_data(
+            query=query,
+            raw_columns=r_cols,
+            clean_columns=c_cols,
+            clean_table_name='invoice'
+        )

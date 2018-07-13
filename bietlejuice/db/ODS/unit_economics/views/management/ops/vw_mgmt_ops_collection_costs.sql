@@ -50,8 +50,8 @@ rent_delay as (
    tenant_paid_date,
    date_part('day', cast(tenant_paid_date as timestamp) - cast(tenant_due_date as timestamp)) as rent_delayed_days
    from invoice.report
-  where trim("from") = 'Inquilino'
-   and trim(item) = 'Aluguel'
+  where _from = 'Inquilino'
+   and item = 'Aluguel'
    and tenant_due_date is not null
    and tenant_paid_date is not null
 ),

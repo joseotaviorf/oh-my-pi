@@ -5,7 +5,7 @@ create table invoice.fine
   fine decimal(14,2),
   due_date date,
   paid_date date,
-  year_month varchar
+  ym_partition varchar
 )
 ;
 
@@ -13,6 +13,6 @@ create index invoice_fine_contract_id_index
 	on invoice.fine (contract_id)
 ;
 
-create index invoice_fines_year_month_index
-	on invoice.fine (year_month)
+create index invoice_fines_ym_partition_index
+	on invoice.fine (ym_partition)
 ;

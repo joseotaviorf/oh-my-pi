@@ -9,7 +9,7 @@ partitioned by (
   ym string
 )
 row format serde 'org.openx.data.jsonserde.JsonSerDe'
-location 's3://5a-datalake/raw/seubarriga/invoice/fines/'
+location 's3://5a-datalake/raw/seubarriga/invoice/fine/'
 ;
 
 msck repair table datalake_raw.seubarriga_invoice_fine;

@@ -50,12 +50,9 @@ brokerage_fill as (
 	left join
 		invoice.report i
 		on bc.contract_id = i.contract_id
-	and
-		item = 'TaxaCorretagem'
-	and
-		"from" = 'Proprietario'
-	and
-		"to" = 'Contrato'
+	    and item = 'TaxaCorretagem'
+	    and _from = 'Proprietario'
+	    and _to = 'Contrato'
 )
 select
 	sk_property,
