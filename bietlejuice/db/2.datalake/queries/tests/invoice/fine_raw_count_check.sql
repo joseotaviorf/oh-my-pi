@@ -1,4 +1,9 @@
+-- because the API from Seu Barriga returns duplicate data, the following distinct must be applied
+with _distinct as (
+  select distinct *
+  from datalake_raw.seubarriga_invoice_fine
+  where ym = '{year_month}'
+)
 select count(*)
-from datalake_raw.seubarriga_invoice_fine
-where ym = '{year_month}'
+from _distinct
 ;

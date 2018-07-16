@@ -5,12 +5,21 @@ with rent_delay as (
     purpose,
     "year-month",
     date_diff('day',
-              cast((regexp_extract("tenant-due-date", '\d+/\d+/(\d+)', 1) || '-' ||
-                    regexp_extract("tenant-due-date", '\d+/(\d+)/\d+', 1) || '-' ||
-                    regexp_extract("tenant-due-date", '(\d+)/\d+/\d+', 1)) as timestamp),
-              cast((regexp_extract("tenant-paid-date", '\d+/\d+/(\d+)', 1) || '-' ||
-                    regexp_extract("tenant-paid-date", '\d+/(\d+)/\d+', 1) || '-' ||
-                    regexp_extract("tenant-paid-date", '(\d+)/\d+/\d+', 1)) as timestamp)) as rent_delayed_days
+               cast((if(cast(regexp_extract("tenant-due-date", '\d+/\d+/(\d+)', 1) as smallint) < 2000,
+				                cast((cast(regexp_extract("tenant-due-date", '\d+/\d+/(\d+)', 1) as smallint) + 2000) as varchar),
+				                cast(cast(regexp_extract("tenant-due-date", '\d+/\d+/(\d+)', 1) as smallint) as varchar)
+				             ) || '-' ||
+                     regexp_extract("tenant-due-date", '\d+/(\d+)/\d+', 1) || '-' ||
+                     regexp_extract("tenant-due-date", '(\d+)/\d+/\d+', 1)
+                    ) as timestamp),
+               cast((if(cast(regexp_extract("tenant-paid-date", '\d+/\d+/(\d+)', 1) as smallint) < 2000,
+				                cast((cast(regexp_extract("tenant-paid-date", '\d+/\d+/(\d+)', 1) as smallint) + 2000) as varchar),
+				                cast(cast(regexp_extract("tenant-paid-date", '\d+/\d+/(\d+)', 1) as smallint) as varchar)
+				             ) || '-' ||
+                     regexp_extract("tenant-paid-date", '\d+/(\d+)/\d+', 1) || '-' ||
+                     regexp_extract("tenant-paid-date", '(\d+)/\d+/\d+', 1)
+                    ) as timestamp)
+              ) as rent_delayed_days
   from datalake_raw.seubarriga_invoice
   where trim("from") = 'Inquilino'
     and trim(item) = 'Aluguel'
@@ -35,7 +44,7 @@ select distinct
   inv."landlord-due-date",
   inv."landlord-paid-date",
   inv."landlord-status",
-  cast(rd.rent_delayed_days as smallint) as delayed_days,
+  cast(rd.rent_delayed_days as integer) as delayed_days,
   inv.purpose
 from datalake_raw.seubarriga_invoice inv
 left join rent_delay rd
