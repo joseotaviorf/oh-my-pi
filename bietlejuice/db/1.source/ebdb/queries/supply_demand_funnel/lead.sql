@@ -62,7 +62,8 @@ select  -- count(1)
   l.utmMedium as utm_medium,
   l.utmCampaign as utm_campaign,
   l.utmSource as utm_source,
-  ua.id as usuario_que_indicou_id
+  ua.id as usuario_que_indicou_id,
+  l.codigoImobiliaria as codigo_imobiliaria
 from
   Lead l
 left join
