@@ -1,9 +1,8 @@
 from itertools import combinations
 
+from base_etl import BaseETL
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
-
-from base_etl import BaseETL
 
 
 class BaseTest(object):
@@ -59,7 +58,7 @@ class BaseTest(object):
             if x == 0 or float(y) == 0:
                 _logger.warn('m=compare_sources, msg=empty source')
                 raise Exception
-            if abs((x / float(y)) - 1) > acceptable_diff:
+            if abs((float(x) / float(y)) - 1) > acceptable_diff:
                 _logger.warn('m=compare_sources, msg=sources are different')
                 raise Exception
 
