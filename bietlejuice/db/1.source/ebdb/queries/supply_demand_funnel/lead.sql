@@ -63,7 +63,12 @@ select  -- count(1)
   l.utmCampaign as utm_campaign,
   l.utmSource as utm_source,
   ua.id as usuario_que_indicou_id,
-  l.codigoImobiliaria as codigo_imobiliaria
+  l.codigoImobiliaria as codigo_imobiliaria,
+  case
+    when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
+    then SUBSTRING_INDEX(infosExtras,';',1)
+    else NULL
+  end as reprocessed_lead_id
 from
   Lead l
 left join
