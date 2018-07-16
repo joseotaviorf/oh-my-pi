@@ -44,7 +44,7 @@ select distinct
   inv."landlord-due-date",
   inv."landlord-paid-date",
   inv."landlord-status",
-  cast(rd.rent_delayed_days as smallint) as delayed_days,
+  cast(rd.rent_delayed_days as integer) as delayed_days,
   inv.purpose
 from datalake_raw.seubarriga_invoice inv
 left join rent_delay rd
