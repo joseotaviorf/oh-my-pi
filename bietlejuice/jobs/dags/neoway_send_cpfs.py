@@ -1,7 +1,6 @@
 # coding=utf-8
 import cStringIO
 import json
-import os
 from datetime import datetime
 
 import paramiko
@@ -11,7 +10,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_cpfs import CrawlerCPFs
 
-s3_bucket = os.getenv('bi-datalake-s3-bucket')
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 NEOWAY_SEND_CPFS_PARAMS = env.get_airflow_env_var('NEOWAY_SEND_CPFS_PARAMS')
 NEOWAY_SFTP_PKEY = env.get_airflow_env_var('NEOWAY_SFTP_PKEY').replace('\\n', '\n')
 
