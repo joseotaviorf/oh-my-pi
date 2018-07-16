@@ -26,3 +26,17 @@ class CrawlerCPFs(CrawlerEntity):
         q = q.replace('__LAST_CRAWLER_RUN__', since.strftime('%Y-%m-%d'))
 
         return self.athena_client.execute_query_and_return_dataframe(q)
+
+    @logger
+    def get_new_cpfs(self, new=True, limit=None):
+        q = BaseETL.get_query_from_file_name('{}/crawlers/get_cpf_not_enriched.sql'.format(DATALAKE_QUERIES_DIR))
+        if new:
+            q += ("""\nleft join datalake_raw.neoway_owners neo"""
+                  """\n  on lpad(regexp_replace(t.cpf, '\D', ''), 11, '0') = """
+                  """lpad(regexp_replace(neo.cpf, '\D', ''), 11, '0')"""
+                  """\nwhere neo.cpf is null""")
+
+        if isinstance(limit, int):
+            q += """\nlimit {}""".format(limit)
+
+        return self.athena_client.execute_query_and_return_dataframe(q)
