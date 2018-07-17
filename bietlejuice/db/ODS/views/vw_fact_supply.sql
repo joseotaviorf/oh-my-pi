@@ -138,7 +138,7 @@ potential_listings as (
 		end as doorman_lead,
 		(acquisition_channel = 'Inside Sales') as isales_direct_register,
 		(acquisition_channel = 'Admin') as cx_direct_register,
-		(bt.rep_id is not null) as isales_intervention
+		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention
 	from
 		fact_supply f
 	left join
@@ -324,12 +324,12 @@ select
 	lead_origin,
 	utm_source as lead_utm_source,
 	utm_medium as lead_utm_medium,
-	branded_lead as branded_flg,
-	b2b_lead as b2b_flg,
-	doorman_lead as doorman_flg,
-	isales_direct_register as isales_direct_register_flg,
-	cx_direct_register as cx_direct_register_flg,
-	isales_intervention as isales_intervention_flg,
+	branded_lead as flg_branded,
+	b2b_lead as flg_b2b,
+	doorman_lead as flg_doorman,
+	isales_direct_register as flg_isales_direct_register,
+	cx_direct_register as flg_cx_direct_register,
+	isales_intervention as flg_isales_intervention,
 	mkt_branded,
 	mkt_category,
 	mkt_flow,
