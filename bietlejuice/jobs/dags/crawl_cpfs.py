@@ -14,8 +14,8 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 crawl_cpfs_params = env.get_airflow_env_var('crawl_cpfs_params')
 
 MAIN_DAG_NAME = 'crawling-cpfs'
-MAIN_START_DATE = datetime(2018, 7, 1)
-MAIN_SCHEDULE_INTERVAL = '0 16 * * 7'
+MAIN_START_DATE = datetime(2018, 6, 30)
+MAIN_SCHEDULE_INTERVAL = '0 16 * * 6'
 
 
 def crawl_cpfs(delta_days=0, ws='vivareal', limit=0, threads=3):
