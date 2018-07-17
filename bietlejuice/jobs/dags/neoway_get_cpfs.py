@@ -34,6 +34,9 @@ def get_cpfs():
     files = sftp.listdir(out_dir)
     _logger.info('m=get_cpfs, msg=found {} files: {}'.format(len(files), files))
 
+    if not files:
+        raise Exception('there are no files to retrieve.')
+
     for f in files:
         if f.endswith('.csv'):
             _logger.info('m=get_cpfs, copying {} to s3'.format(f))
