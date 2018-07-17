@@ -38,12 +38,13 @@ base_leads as (
 rep_leads as (
 	select
 		bl.lead_id,
-		bl.lead_type,
-		bl.lead_origin,
+		coalesce(old_bl.lead_type, bl.lead_type) as lead_type,
+		coalesce(old_bl.lead_origin, bl.lead_origin) as lead_origin,
 		coalesce(old_bl.utm_source, bl.utm_source) as utm_source,
 		coalesce(old_bl.utm_medium, bl.utm_medium) as utm_medium,
 		coalesce(old_bl.branded_lead, bl.branded_lead) as branded_lead,
-		coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead
+		coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead,
+		coalesce((bl.lead_origin = 'Reprocessado'), false) as reprocessed_flg
 	from
 		base_leads bl
 	left join
@@ -129,6 +130,7 @@ potential_listings as (
 		bl.utm_medium,
 		bl.branded_lead,
 		bl.b2b_lead,
+		bl.reprocessed_flg,
 		case
 			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 			then true
@@ -154,7 +156,7 @@ initial_categories as (
 	select
 		*,
 		case
-			when lead_origin = 'Reprocessado' then 'Outbound'
+			when reprocessed_flg then 'Outbound'
 			when b2b_lead then 'Outbound'
 			when doorman_lead then 'Outbound'
 			when lead_origin = 'Crawling' then 'Outbound'
@@ -172,7 +174,7 @@ initial_categories as (
 			else 'Other'
 		end as mkt_branded,
 		case
-			when lead_origin = 'Reprocessado' then 'Reprocessed'
+			when reprocessed_flg then 'Reprocessed'
 			when lead_type in ('Afiliado', 'OpenLink', 'LandingOpenLink') then 'Affiliates'
 			when b2b_lead or doorman_lead then 'Affiliates'
 			when lead_origin = 'Crawling' then 'Other'
@@ -207,7 +209,6 @@ final_categories as (
 			else 'Online Paid'
 		end as mkt_channel,
 		case
-			when lead_origin = 'Reprocessado' then null -- we will fill this later with reprocessed_lead_id
 			when isales_direct_register or cx_direct_register then 'Admin'
 			when lead_origin = 'Facebook' then 'Online Lead Ads'
 			when b2b_lead then 'B2B Landing Page Form'
@@ -223,10 +224,13 @@ final_categories as (
 			when lead_type = 'Afiliado' and lead_origin = 'Form' then 'IndicaAi App'
 			when lead_type = 'Afiliado' and lead_origin = 'Desconhecida' then 'IndicaAi Unknown'
 			when lead_type = 'Afiliado' and lead_origin = 'Planilha' then 'IndicaAi Spreadsheet'
+			when lead_origin = 'Reprocessado' then 'Other'
+			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
+			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
 			else null
 		end as mkt_platform,
 		case
-			when lead_origin = 'Reprocessado' then null -- we will fill this later with reprocessed_lead_id
+			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when trim(utm_medium) like 'display%' then 'Display'
 			when lead_origin = 'Facebook' then 'Display'
 			when trim(utm_medium) = 'retargeting' then 'Retargeting'
@@ -248,7 +252,7 @@ final_categories as (
 			else null
 		end as mkt_medium,
 		case
-			when lead_origin = 'Reprocessado' then null -- we will fill this later with reprocessed_lead_id
+			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when trim(utm_source) = 'directreferral' then 'Direct Referral'
 			when trim(utm_source) like 'facebook%' then 'Facebook'
 			when trim(utm_source) like 'google%' then 'Google'
@@ -259,6 +263,7 @@ final_categories as (
 			when trim(utm_source) = 'ybox' then 'Ybox'
 			when trim(utm_source) = 'quintoandar' then 'Organic'
 			when utm_medium is null and utm_source is null and mkt_channel_type = 'Online' then 'Organic'
+			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
 			else null
 		end as mkt_source
@@ -331,7 +336,7 @@ select
 	mkt_completion,
 	mkt_channel_type,
 	mkt_channel,
-	case when lead_origin = 'Reprocessado' then trim(concat('Reprocessed ',mkt_platform)) else mkt_platform end as mkt_platform,
+	case when reprocessed_flg then trim(concat('Reprocessed ', mkt_platform)) else mkt_platform end as mkt_platform,
 	mkt_medium,
 	mkt_source
 from
