@@ -18,11 +18,7 @@ MAIN_START_DATE = datetime(2018, 7, 1)
 MAIN_SCHEDULE_INTERVAL = '0 16 * * 7'
 
 
-def crawl_cpfs(**kwargs):
-    delta_days = kwargs.get('delta_days', 0)
-    ws = kwargs.get('ws', 'vivareal')
-    limit = kwargs.get('limit', 0)
-
+def crawl_cpfs(delta_days=0, ws='vivareal', limit=0, threads=3):
     crawler_cpfs = CrawlerCPFs(s3_bucket=s3_bucket, google_maps_api_key=None)
     locations_raw = crawler_cpfs.get_locations(ws=ws, delta_days=delta_days)
     if locations_raw.empty:
@@ -46,7 +42,7 @@ def crawl_cpfs(**kwargs):
         job_definition='crawling-cpfs:2',
         command=['./crawlers/get_cpfs.py',
                  's3://{}/{}'.format(s3_bucket, filename),
-                 '--max_crawl', '1000000', '--threads', '2']
+                 '--max_crawl', '1000000', '--threads', str(threads)]
     )
 
     _logger.info('m=crawl_cpfs, job submitted with status {}. {}'.format(
