@@ -1,5 +1,6 @@
 {
   "variant": "EXC",
+  "variant_group": "Test",
   "lead": {
     "status": [
       "Descartado"
