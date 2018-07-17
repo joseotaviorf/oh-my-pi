@@ -1,0 +1,21 @@
+from qa_python_utils.default_logger import logger
+
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.campaign_monitor import CampaignMonitorCampaign
+
+
+class CampaignOpens(CampaignMonitorCampaign):
+    @logger(exclude='cm_auth')
+    def __init__(self, s3_bucket, cm_auth, _type, execution_date):
+        super(CampaignOpens, self).__init__(s3_bucket, cm_auth, _type, execution_date)
+
+    @logger
+    def request_campaign_data(self):
+        result_gen = self.request_incremental_campaign_data()
+        self.build_objs_and_send_to_s3(
+            result_gen=result_gen,
+            json_fields=self.get_json_fields()
+        )
+
+    @logger
+    def get_json_fields(self):
+        return ['Date', 'EmailAddress', 'ListID', 'IPAddress']

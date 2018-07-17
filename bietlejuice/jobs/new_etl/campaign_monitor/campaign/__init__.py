@@ -1,0 +1,7 @@
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.bounces import CampaignBounces
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.campaign_monitor_factory import CampaignMonitorFactory
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.clicks import CampaignClicks
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.opens import CampaignOpens
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.recipients import CampaignRecipients
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.spams import CampaignSpams
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.unsubscribes import CampaignUnsubscribes

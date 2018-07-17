@@ -1,0 +1,182 @@
+import gzip
+import json
+from abc import abstractmethod
+from io import BytesIO
+from time import time
+
+import boto3
+from createsend import CreateSend, Client, Campaign
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import logger, _logger
+
+from bietlejuice.jobs.base.base_etl import BaseETL
+
+
+class CampaignMonitorCampaign(object):
+    @logger(exclude='cm_auth')
+    def __init__(self, s3_bucket, cm_auth, _type, execution_date):
+        self.auth = {'api_key': cm_auth['api_key']}
+
+        cs = CreateSend(self.auth)
+        cs.user_agent = cm_auth['user_agent']
+        self.client = Client(self.auth, cm_auth['client_id'])
+
+        self.s3_bucket = s3_bucket
+        self.s3_client = boto3.resource('s3')
+        self.athena_client = AthenaClient(s3_bucket)
+
+        self._type = _type
+        self.formatted_date = execution_date.strftime('%Y-%m-%d %H:%M')
+
+    # abstract methods
+    @abstractmethod
+    def request_campaign_data(self):
+        _logger.error('m=request_campaign_data, msg=method not implemented')
+        raise Exception
+
+    @abstractmethod
+    def get_json_fields(self):
+        _logger.error('m=get_json_fields, msg=method not implemented')
+        raise Exception
+
+    # static methods
+    @staticmethod
+    @logger
+    def _build_full_params(page=1, default_page_size=1000, order_field='email', order_direction='asc'):
+        return {
+            'page': page,
+            'page_size': default_page_size,
+            'order_field': order_field,
+            'order_direction': order_direction
+        }
+
+    @staticmethod
+    @logger
+    def _build_incremental_params(_date, page=1, default_page_size=1000, order_field='date', order_direction='asc'):
+        return {
+            'date': _date,
+            'page': page,
+            'page_size': default_page_size,
+            'order_field': order_field,
+            'order_direction': order_direction
+        }
+
+    # instance methods
+    @logger(exclude='result_gen')
+    def build_objs_and_send_to_s3(self, result_gen, json_fields):
+        for result, campaign_id in result_gen:
+            json_result = self.__build_json_response(
+                cm_obj=result,
+                json_fields=json_fields
+            )
+
+            self.__save_to_s3(
+                json_list=json_result,
+                file_path='raw/campaign_monitor/test_ribs/campaigns/{0}/campaign_id={1}/{0}_{2}.gz'.format(self._type,
+                                                                                                           campaign_id,
+                                                                                                           int(time()))
+            )
+
+    @logger(exclude='cm_obj')
+    def __build_json_response(self, cm_obj, json_fields):
+        if cm_obj is None:
+            _logger.error('m=__build_json_response, msg=cm_obj is none')
+            raise Exception
+
+        _json = []
+        for _obj in cm_obj.Results:
+            json_item = self.__build_json_item(
+                _obj=_obj,
+                json_fields=json_fields
+            )
+            _json.append(json_item)
+
+        return _json
+
+    @logger(exclude='obj')
+    def __build_json_item(self, _obj, json_fields):
+        _json_item = {}
+        for json_field in json_fields:
+            _json_item[json_field] = (getattr(_obj, json_field)).encode('utf-8')
+
+        return _json_item
+
+    @logger
+    def __save_to_s3(self, json_list, file_path):
+        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        gz_body = BytesIO()
+        with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
+            for row in json_list:
+                fp.write(json.dumps(row))
+                fp.write('\n')
+
+        BaseETL.obj_to_s3(
+            obj_io=gz_body,
+            bucket=self.s3_bucket,
+            file_path=file_path
+        )
+
+        _logger.info('m=__save_to_s3, file_path={}, msg=_json sent to s3'.format(file_path))
+        gz_body.flush()
+
+    @logger
+    def request_incremental_campaign_data(self):
+        return self.__request_campaign_data(
+            params_dict=CampaignMonitorCampaign._build_incremental_params(_date=self.formatted_date)
+        )
+
+    @logger
+    def request_full_campaign_data(self):
+        self.__request_campaign_data(
+            params_dict=CampaignMonitorCampaign._build_full_params()
+        )
+
+    @logger
+    def __get_campaign_max_pages_for_obj_type(self, campaign_id, params_dict):
+        campaign = Campaign(self.auth, campaign_id)
+        result = getattr(campaign, self._type)(**params_dict)
+
+        if result is None:
+            _logger.error(
+                'm=__get_campaign_obj_type_max_pages, campaign_id={}, params_dict={}, msg=result is none'.format(
+                    campaign_id, params_dict))
+            return -1
+
+        return result.NumberOfPages
+
+    @logger
+    def __request_campaign_data(self, params_dict):
+        for client_campaign in self.client.campaigns():
+            _logger.info('m=request_campaign_data, campaign_id={}'.format(client_campaign.CampaignID))
+
+            campaign = Campaign(self.auth, client_campaign.CampaignID)
+            max_pages = self.__get_campaign_max_pages_for_obj_type(
+                campaign_id=campaign.campaign_id,
+                params_dict=params_dict
+            )
+
+            if max_pages == -1:
+                _logger.error(
+                    'm=__get_campaign_obj_type_max_pages, campaign_id={}, msg=result is none'.format(
+                        campaign.campaign_id))
+                raise Exception
+
+            if max_pages == 0:
+                _logger.info('m=__request_campaign_data, campaign_id={}, msg=empty result'.format(campaign.campaign_id))
+                continue
+
+            current_page = 0
+            while current_page < max_pages:
+                current_page += 1
+
+                result = getattr(campaign, self._type)(**params_dict)
+                params_dict['page'] = current_page
+
+                yield result, campaign.campaign_id
+
+        # TODO
+        # upsert partition
+
+    #         file_path='raw/campaign_monitor/campaigns/{0}/campaign_id={1}/dt={2}/{0}.gz'.format(self._type,
+    #                                                                                             campaign.campaign_id,
+    #                                                                                             '2018-07-13')
