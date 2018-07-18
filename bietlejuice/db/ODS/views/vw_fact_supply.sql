@@ -160,13 +160,16 @@ initial_categories as (
 			when b2b_lead then 'Outbound'
 			when doorman_lead then 'Outbound'
 			when lead_origin = 'Crawling' then 'Outbound'
+			when lead_type = 'OLX' and lead_origin is null then 'Outbound'
 			when lead_type = 'Afiliado' then 'Outbound'
 			when acquisition_method = 'Self-Service' then 'Inbound'
+			when isales_direct_register or cx_direct_register then 'Inbound'
 			when lead_type in ('Marketing', 'OpenLink', 'BrokenOpenLink') then 'Inbound'
 			else 'Other'
 		end as mkt_category,
 		case
 			when lead_type in ('Proporparceria', 'CadastroImobiliario') then 'Other'
+			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			else acquisition_method
 		end as mkt_flow,
 		case
@@ -179,6 +182,7 @@ initial_categories as (
 			when b2b_lead or doorman_lead then 'Affiliates'
 			when lead_origin = 'Crawling' then 'Other'
 			when isales_direct_register or cx_direct_register then 'Other'
+			when lead_type = 'OLX' and lead_origin is null then 'Other'
 			else 'Online'
 		end as mkt_channel_type
 	from potential_listings
@@ -187,6 +191,7 @@ final_categories as (
 	select
 		*,
 		case
+			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when mkt_flow in ('Non-Self Service', 'Other') then mkt_flow
 			when isales_intervention and mkt_flow = 'Self-Service' then 'Recovered Self-Service'
 			when mkt_flow = 'Self-Service'  then 'Full Self-Service'
@@ -195,11 +200,13 @@ final_categories as (
 		case
 			when mkt_channel_type = 'Reprocessed' then 'Reprocessed'
 			when doorman_lead then 'Doorman'
+			when lead_origin = 'Facebook' then 'Online Paid'
 			when b2b_lead then 'B2B'
 			when isales_direct_register then 'Inside Sales'
 			when cx_direct_register then 'CX'
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
-			when lead_origin = 'Crawling' then 'Crawling'
+			when lead_origin = 'Desconhecida' and lead_type <> 'Afiliado' then 'Online Free'
+			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
 			when branded_lead then 'Online Free'
 			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Online Free'
 			when lead_origin ='Landing' and utm_source like 'facebook%' and utm_medium = 'social' then 'Online Free'
@@ -215,22 +222,25 @@ final_categories as (
 			when mkt_flow = 'Self-Service' and mkt_channel_type = 'Online' then 'Online Owner App'
 			when mkt_flow = 'Self-Service' and mkt_channel_type = 'Affiliates' then 'IndicaAi Owner App'
 			when mkt_flow = 'Other' and mkt_channel_type = 'Online' then 'Online Other'
-			when mkt_channel_type = 'Online' then 'Online Landing Page Form'
 			when lead_origin = 'Crawling' then 'Crawling'
+			when lead_type = 'OLX' and lead_origin is null then 'Crawling'
 			when doorman_lead and (lead_origin = 'Form' or lead_origin is null) then 'Doorman Whatsapp'
 			when doorman_lead then 'Doorman Other'
 			when lead_type = 'OpenLink' then 'IndicaAi Landing Page Form'
-			when lead_type = 'Afiliado' and lead_origin = 'App' then 'IndicaAi Form'
-			when lead_type = 'Afiliado' and lead_origin = 'Form' then 'IndicaAi App'
+			when lead_type = 'Afiliado' and lead_origin = 'Form' then 'IndicaAi Form'
+			when lead_type = 'Afiliado' and lead_origin = 'App' then 'IndicaAi App'
 			when lead_type = 'Afiliado' and lead_origin = 'Desconhecida' then 'IndicaAi Unknown'
 			when lead_type = 'Afiliado' and lead_origin = 'Planilha' then 'IndicaAi Spreadsheet'
 			when lead_origin = 'Reprocessado' then 'Other'
+			when lead_origin = 'Desconhecida' then 'Online Other'
+			when mkt_channel_type = 'Online' then 'Online Landing Page Form'
 			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
 			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
 			else null
 		end as mkt_platform,
 		case
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
+			when doorman_lead then null
 			when trim(utm_medium) like 'display%' then 'Display'
 			when lead_origin = 'Facebook' then 'Display'
 			when trim(utm_medium) = 'retargeting' then 'Retargeting'
@@ -246,6 +256,8 @@ final_categories as (
 			when trim(utm_medium) = 'facebook' then 'Facebook'
 			when trim(utm_source) = 'quintoandar' then 'Organic'
 			when trim(utm_medium) = 'social' then 'Social'
+			when lead_origin = 'Desconhecida' then null
+			when lead_type = 'OLX' then null
 			when utm_medium is null and utm_source is null and mkt_channel_type = 'Online' then 'Organic'
 			when trim(utm_source) in ('google','bing') then 'SEM non-branded'
 			when mkt_flow = 'Other' then 'Other'
@@ -253,15 +265,17 @@ final_categories as (
 		end as mkt_medium,
 		case
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
-			when trim(utm_source) = 'directreferral' then 'Direct Referral'
-			when trim(utm_source) like 'facebook%' then 'Facebook'
+			when doorman_lead then null
+			when lead_type = 'OpenLink' then 'Direct Referral'
+			when trim(utm_source) like 'facebook%' or lead_origin = 'Facebook' then 'Facebook'
 			when trim(utm_source) like 'google%' then 'Google'
 			when trim(utm_source) = 'bing' then 'Bing'
-			when trim(utm_source) like 'facebook%' then 'Facebook'
 			when trim(utm_source) = 'rtbhouse' then 'RTB House'
 			when trim(utm_source) = 'Zap' then 'Zap'
 			when trim(utm_source) = 'ybox' then 'Ybox'
 			when trim(utm_source) = 'quintoandar' then 'Organic'
+			when lead_origin = 'Desconhecida' then null
+			when lead_type = 'OLX' then null
 			when utm_medium is null and utm_source is null and mkt_channel_type = 'Online' then 'Organic'
 			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
