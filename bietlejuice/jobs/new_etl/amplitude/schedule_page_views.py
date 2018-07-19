@@ -1,10 +1,10 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl.amplitude import QUERIES_DIR
-from bietlejuice.jobs.new_etl.amplitude.growth_users import GrowthUsers
+from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
 from qa_python_utils.default_logger import logger
 
 
-class SchedulePageViews(GrowthUsers):
+class SchedulePageViews(GrowthAmplitude):
     TABLE_NAME = 'amplitude_schedule_page_views'
 
     @logger
@@ -14,12 +14,12 @@ class SchedulePageViews(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers._df_to_dw(df, SchedulePageViews.TABLE_NAME)
+        GrowthAmplitude._df_to_dw(df, SchedulePageViews.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers._truncate_table(SchedulePageViews.TABLE_NAME)
+        GrowthAmplitude._truncate_table(SchedulePageViews.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
