@@ -67,8 +67,8 @@ class CrawlerListings(CrawlerEntity):
         self.listings['sk_region'] = self.listings.apply(lambda row: self.check_coverage(row.lat, row.lng), axis=1)
 
     def coalesce_lat_lngs(self):
-        self.listings['o_lat'] = self.listings['glat'].combine_first(self.listings['lat']).round(4)
-        self.listings['o_lng'] = self.listings['glng'].combine_first(self.listings['lng']).round(4)
+        self.listings['o_lat'] = self.listings['glat'].combine_first(self.listings['lat']).astype('float').round(4)
+        self.listings['o_lng'] = self.listings['glng'].combine_first(self.listings['lng']).astype('float').round(4)
 
     def get_daily_gaddress_count(self):
         ''' Get how many addresses were added to the DB today to avoid breaking the defined quota '''
