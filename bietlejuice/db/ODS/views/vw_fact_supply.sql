@@ -352,6 +352,7 @@ select
 	mkt_channel,
 	case when reprocessed_flg then trim(concat('Reprocessed ', mkt_platform)) else mkt_platform end as mkt_platform,
 	mkt_medium,
-	mkt_source
+	mkt_source,
+    now() as dt_timestamp
 from
 	final_categories
