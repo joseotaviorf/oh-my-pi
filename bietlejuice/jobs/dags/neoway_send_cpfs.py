@@ -7,6 +7,7 @@ import paramiko
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_cpfs import CrawlerCPFs
 
@@ -37,9 +38,14 @@ def send_cpfs(limit, new):
     cpfs.to_csv(cpfs_fl, header=False, index=False)
     cpfs_fl.seek(0)
 
+    filename = 'cpfs-{}.txt'.format(datetime.today().strftime('%Y%m%d'))
+
     sftp = client.open_sftp()
-    sftp.putfo(cpfs_fl, '/files/entrada/cpfs-{}.txt'.format(datetime.today().strftime('%Y%m%d')))
+    sftp.putfo(cpfs_fl, '/files/entrada/' + filename)
     sftp.close()
+
+    _logger.info('m=send_cpfs, msg=saving cpf list to s3')
+    BaseETL.obj_to_s3(cpfs_fl, s3_bucket, 'raw/external/owners/sent/' + filename)
 
     _logger.info('m=send_cpfs, msg=done!')
 
