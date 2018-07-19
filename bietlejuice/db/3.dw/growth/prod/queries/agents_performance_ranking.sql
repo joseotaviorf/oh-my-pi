@@ -34,7 +34,7 @@ with counts as (
 	and	v.day_visit >= date(ddate.week_start) - interval '6 weeks'
 	and v.day_visit < date(ddate.week_start) - interval '2 weeks'
 	and (c.dt_signature::date is not null or liq.sk_contract = -1)
-	group by sk_user_agent, agent_name, r.greater_region
+	group by sk_user_agent, agent_name, r.greater_region, ddate.week_start
 ),
 ratios as (
 	select

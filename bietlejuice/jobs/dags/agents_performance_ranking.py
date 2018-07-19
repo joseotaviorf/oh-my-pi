@@ -45,9 +45,11 @@ def clean_previous_data(dim_name, schema, date_column, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
 
-    query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'YYYYMMDD')".format(schema, dim_name,
-                                                                                                  date_column,
-                                                                                                  exec_date)
+    query = "DELETE FROM {0}.{1}" \
+            " USING public.dim_date ddate" \
+            " WHERE ddate.date = '{3}' " \
+            "AND cast({1}.{2} as varchar) = to_char(ddate.week_start::DATE,'YYYYMMDD')".format(schema, dim_name,
+                                                                                               date_column, exec_date)
 
     BaseETL.execute_command(
         db_enum=EnumDb.BI_DW,
@@ -92,5 +94,8 @@ tickets_whats = QuintoAndarPythonOperator(
 clear_old_data >> tickets_whats
 
 if __name__ == '__main__':
-    load_agents_performance_ranking('agents_performance_ranking', PROD_QUERIES_DIR, None,
-                                    execution_date=datetime.today())
+    # load_agents_performance_ranking('agents_performance_ranking', PROD_QUERIES_DIR, None,
+    #                                execution_date=datetime.today())
+
+    clean_previous_data(dim_name='agents_performance_ranking', schema='growth', date_column='sk_date',
+                        execution_date=datetime.today())
