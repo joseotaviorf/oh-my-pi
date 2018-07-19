@@ -1,21 +1,14 @@
-import os
 from datetime import datetime
 from datetime import timedelta
 
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.dags import GROWTH_PROD_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from qa_python_utils.default_logger import _logger, logger
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-PROD_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/prod/queries')
-env.set_airflow_var_to_local_env(
-    'BI_DW',
-    'AWS_ACCESS_KEY_ID',
-    'AWS_SECRET_ACCESS_KEY',
-    'AWS_DEFAULT_REGION'
-)
+env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
@@ -42,11 +35,13 @@ def clean_previous_data(dim_name, schema, date_column, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
 
-    query = "DELETE FROM {0}.{1}" \
-            " USING public.dim_date ddate" \
-            " WHERE ddate.date = '{3}' " \
-            "AND cast({1}.{2} as varchar) = to_char(ddate.week_start::DATE,'YYYYMMDD')".format(schema, dim_name,
-                                                                                               date_column, exec_date)
+    query = '''DELETE FROM {0}.{1}
+                USING public.dim_date ddate
+                WHERE ddate.date = '{3}'
+                AND cast({1}.{2} as varchar) = to_char(ddate.week_start::DATE,'YYYYMMDD')'''.format(schema,
+                                                                                                    dim_name,
+                                                                                                    date_column,
+                                                                                                    exec_date)
 
     BaseETL.execute_command(
         db_enum=EnumDb.BI_DW,
@@ -85,7 +80,7 @@ tickets_whats = QuintoAndarPythonOperator(
     execution_timeout=timedelta(hours=3),
     provide_context=True,
     python_callable=load_agents_performance_ranking,
-    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': PROD_QUERIES_DIR}
+    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': GROWTH_PROD_QUERIES_DIR}
 )
 
 clear_old_data >> tickets_whats
