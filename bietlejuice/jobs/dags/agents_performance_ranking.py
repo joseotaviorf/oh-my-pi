@@ -1,11 +1,12 @@
 import os
+from datetime import datetime
+from datetime import timedelta
 
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from datetime import datetime, timedelta
-
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.default_logger import _logger, logger
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 PROD_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/prod/queries')
@@ -18,7 +19,13 @@ env.set_airflow_var_to_local_env(
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
-def load_agents_performance_ranking(dim_name, query_dir, filename=None):
+@logger
+def load_agents_performance_ranking(dim_name, query_dir, filename=None, **kwargs):
+    exec_date = str(datetime.date(kwargs['execution_date']))
+
+    clean_previous_data(enum=EnumDb.BI_DW, schema='growth', table_name='agents_performance_ranking',
+                        date_column='sk_date', dt=exec_date)
+
     # read query and suffix and concatenate
     if filename is None:
         filename = dim_name
@@ -27,9 +34,24 @@ def load_agents_performance_ranking(dim_name, query_dir, filename=None):
         query = f.read()
 
     BaseETL.execute_command(
-        command=query,
+        command=query.format(exec_date),
         commit=True,
         db_enum=EnumDb.BI_DW
+    )
+
+
+@logger
+def clean_previous_data(enum, schema, table_name, date_column, dt):
+    _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(table_name, str(dt)))
+
+    query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'YYYYMMDD')".format(schema, table_name,
+                                                                                                  date_column, str(dt))
+
+    BaseETL.execute_command(
+        db_enum=enum,
+        encoding='UTF8',
+        command=query,
+        commit=True
     )
 
 
@@ -51,6 +73,11 @@ tickets_whats = QuintoAndarPythonOperator(
     dag=dag,
     task_id='load_agents_performance_ranking',
     execution_timeout=timedelta(hours=3),
+    provide_context=True,
     python_callable=load_agents_performance_ranking,
     op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': PROD_QUERIES_DIR}
 )
+
+if __name__ == '__main__':
+    load_agents_performance_ranking('agents_performance_ranking', PROD_QUERIES_DIR, None,
+                                    execution_date=datetime.today())

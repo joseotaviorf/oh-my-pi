@@ -4,11 +4,15 @@ with counts as (
 		sk_user_agent as agent_id,
 		u.nome as agent_name,
 		r.greater_region,
+		ddate.week_start,
 		count(distinct(nullif(liq.sk_visit,-1)))::decimal(10,4) as booked_visits,
 		count(distinct(nullif(c.sk_contract,-1)))::decimal(10,4) as signed_contracts,
 		count(distinct(nullif(v.day_visit,-1))) as days_worked
 	from
 		public.fact_demand liq
+	left join
+		public.dim_date ddate
+		on ddate.date = '{0}'
 	left join
 		public.dim_visit v
 		on v.sk_visit = liq.sk_visit
@@ -24,11 +28,11 @@ with counts as (
 	left join
 		public.dim_contract c
 		on c.sk_contract = liq.sk_contract
-		and c.dt_signature::date < current_date
+		and c.dt_signature::date < date(ddate.week_start)
 	where
 		sk_user_agent<>-1
-	and	v.day_visit >= current_date - interval '6 weeks'
-	and v.day_visit < current_date - interval '2 weeks'
+	and	v.day_visit >= date(ddate.week_start) - interval '6 weeks'
+	and v.day_visit < date(ddate.week_start) - interval '2 weeks'
 	and (c.dt_signature::date is not null or liq.sk_contract = -1)
 	group by sk_user_agent, agent_name, r.greater_region
 ),
@@ -76,7 +80,7 @@ limits as (
 	group by greater_region, commission
 )
 select
-  coalesce(to_char(current_date,'YYYYMMDD')::integer, -1) as sk_date,
+  coalesce(to_char(date(c.week_start),'YYYYMMDD')::integer, -1) as sk_date,
 	c.agent_id as agent_id,
 	c.agent_name as agent_name,
 	c.greater_region as greater_region,
@@ -91,7 +95,7 @@ select
 	gold.threshold as gold_threshold,
 	silver.threshold as silver_threshold,
 	round(c.average_ratio*1.5, 1) as yellow_flag_threshold,
-	current_date as dt_ranking
+	date('{0}') as dt_ranking
 from
 	commission c
 left join
