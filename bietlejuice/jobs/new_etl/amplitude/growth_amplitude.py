@@ -6,7 +6,7 @@ from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDb
 
 
-class GrowthUsers(object):
+class GrowthAmplitude(object):
     SCHEMA = 'growth_staging'
 
     @logger
@@ -36,7 +36,7 @@ class GrowthUsers(object):
     def _df_to_dw(df, table_name):
         BaseETL.dataframe_to_db(
             df=df,
-            table_name='{}.{}'.format(GrowthUsers.SCHEMA, table_name),
+            table_name='{}.{}'.format(GrowthAmplitude.SCHEMA, table_name),
             encoding='utf-8',
             enum_db=EnumDb.BI_DW,
             append=True
@@ -46,7 +46,7 @@ class GrowthUsers(object):
     @logger
     def _truncate_table(table_name):
         BaseETL.execute_command(
-            command='truncate table {}.{};'.format(GrowthUsers.SCHEMA, table_name),
+            command='truncate table {}.{};'.format(GrowthAmplitude.SCHEMA, table_name),
             commit=True,
             db_enum=EnumDb.BI_DW
         )
