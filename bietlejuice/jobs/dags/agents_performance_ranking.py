@@ -23,9 +23,6 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 def load_agents_performance_ranking(dim_name, query_dir, filename=None, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
 
-    # clean_previous_data(enum=EnumDb.BI_DW, schema='growth', table_name='agents_performance_ranking',
-    #                   date_column='sk_date', dt=exec_date)
-
     # read query and suffix and concatenate
     if filename is None:
         filename = dim_name
@@ -92,10 +89,3 @@ tickets_whats = QuintoAndarPythonOperator(
 )
 
 clear_old_data >> tickets_whats
-
-if __name__ == '__main__':
-    # load_agents_performance_ranking('agents_performance_ranking', PROD_QUERIES_DIR, None,
-    #                                execution_date=datetime.today())
-
-    clean_previous_data(dim_name='agents_performance_ranking', schema='growth', date_column='sk_date',
-                        execution_date=datetime.today())
