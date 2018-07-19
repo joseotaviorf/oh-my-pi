@@ -18,8 +18,8 @@ select
         then 0
         else 1
       end as flexible_schedule,
-      -- same_day_listing applies to any publishing until 7 AM of the next day after the photo shoot
-      (first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '7' hour) as same_day_listing,
+      -- same_day_listing applies to any publishing until 10 AM (7AM - due to UTC diff) of the next day after the photo shoot
+      (first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '10' hour) as same_day_listing,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,

@@ -68,5 +68,6 @@ create table public.fact_supply (
 	mkt_channel varchar(255),
 	mkt_platform varchar(255),
 	mkt_medium varchar(255),
-	mkt_source varchar(255)
+	mkt_source varchar(255),
+	dt_timestamp timestamp default getdate()
 )
