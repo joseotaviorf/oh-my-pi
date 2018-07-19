@@ -25,7 +25,7 @@ class CrawlerListings(CrawlerEntity):
                      'total_area', 'useful_area', 'bedrooms', 'suites', 'toilets', 'garages', 'year_building', 'cep',
                      'sk_date_updated_on', 'sk_date_last_run', 'sk_date_first_seen', 'sk_date_last_seen', 'active',
                      'days_seen', 'days_unseen', 'runs_unseen', 'rental_flg', 'sale_flg', 'listing_type',
-                     'advertiser_type', 'big_advertiser', 'advertiser_name']
+                     'advertiser_type', 'big_advertiser', 'advertiser_name', 'o_lat', 'o_lng', 'sk_region']
 
     LOCATION_COLUMNS = ['id', 'website', 'glat', 'glng', 'gcep', 'gstreet', 'gstreet_number', 'gneighborhood', 'gcity',
                         'gstate', 'location_type', 'location_precision', 'dt_gaddress']
@@ -35,7 +35,7 @@ class CrawlerListings(CrawlerEntity):
         super(CrawlerListings, self).__init__(
             s3_bucket=s3_bucket,
             google_maps_api_key=google_maps_api_key,
-            get_polygons=False,
+            get_polygons=True,
             get_house_allowed=False
         )
         self.max_batch_size = int(max_batch_size)
@@ -62,6 +62,13 @@ class CrawlerListings(CrawlerEntity):
 
     def get_crawler_addresses(self):
         return self.addresses
+
+    def add_5a_regions(self):
+        self.listings['sk_region'] = self.listings.apply(lambda row: self.check_coverage(row.lat, row.lng), axis=1)
+
+    def coalesce_lat_lngs(self):
+        self.listings['o_lat'] = self.listings['glat'].combine_first(self.listings['lat'])
+        self.listings['o_lng'] = self.listings['glng'].combine_first(self.listings['lng'])
 
     def get_daily_gaddress_count(self):
         ''' Get how many addresses were added to the DB today to avoid breaking the defined quota '''
@@ -236,6 +243,8 @@ class CrawlerListings(CrawlerEntity):
         self.clean_listings()
         self.enrich_crawler_addresses()
         self.merge_new_addresses()
+        self.coalesce_lat_lngs()
+        self.add_5a_regions()
         self.persist_clean_crawler_data()
         self.listings = pd.DataFrame([], columns=self.CLEAN_COLUMNS)
 
