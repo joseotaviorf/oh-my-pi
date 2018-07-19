@@ -47,8 +47,7 @@ left join public.dim_booking b
 	on f2.sk_booking = b.sk_booking
 left join growth.agents_performance_ranking ranking
 	on ranking.agent_id = agent.sk_user
-		and extract(week from dt_ranking) = extract(week from sig."date")
-		and extract(year from dt_ranking) = extract(year from sig."date")
+		and ranking.sk_date = to_char(date(sig.week_start),'YYYYMMDD')
 where sig."date" is not null
 	and b.visit_follow_up in ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez')
 ;
