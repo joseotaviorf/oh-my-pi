@@ -1,4 +1,6 @@
+-- returns listings with more than 200 unique page views from the last 7 days
 with unique_views_prev as (
+-- get unique amplitude ids from the listing page view event (considering old ones) from last month
   select
     false as partial,
     cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) as dt,
@@ -37,6 +39,7 @@ with unique_views_prev as (
   group by 2, 3, 4, 5, 6, 7, 9
 ),
 unique_views as (
+-- get house region and filter only published houses at the time of the event
   select distinct
     uvp.dt,
     uvp.unique_amplitude_ids,
@@ -50,6 +53,7 @@ unique_views as (
       and date_diff('day', date_parse(fhs.sk_min_version_status_date, '%Y%m%d'), if(fhs.sk_max_status_date = '', current_date, cast(date_parse(fhs.sk_max_status_date, '%Y%m%d') as date))) >= 7
 ),
 date_fill as (
+-- fill date gaps with null unique views
   select
     cast(date_parse(dd."date", '%Y-%m-%d') as date) as dt,
     uv.house_id,
@@ -62,6 +66,7 @@ date_fill as (
   group by 1, 2, 3
 ),
 listing_views as (
+-- get remaining columns to compose the date gap fill cte and summing unique page views per house from the last 7 days
   select
     extract(year from df.dt) as _year,
     extract(month from df.dt) as _month,
@@ -78,6 +83,7 @@ listing_views as (
       and df.dt = uv.dt
 ),
 all_events as (
+-- filter 200 unique page views per house
   select
     _year,
     _month,
