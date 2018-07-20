@@ -8,20 +8,20 @@ from bietlejuice.jobs.new_etl.campaign_monitor.campaign.spams import CampaignSpa
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.unsubscribes import CampaignUnsubscribes
 
 
-class CampaignMonitorFactory(object):
+class CampaignMonitorCampaignFactory(object):
 
     @staticmethod
-    def factory(_class, **kwargs):
-        __class = CampaignMonitorFactory.__dispatch_dict(_class)
+    def factory(_class, s3_bucket, cm_auth, execution_date):
+        __class = CampaignMonitorCampaignFactory.__dispatch_dict(_class)
         if _class is None:
             _logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
             raise Exception
 
         return __class(
-            bucket=kwargs['bucket'],
-            cm_auth=kwargs['cm_auth'],
+            s3_bucket=s3_bucket,
+            cm_auth=cm_auth,
             _type=_class,
-            execution_date=kwargs['execution_date']
+            execution_date=execution_date
         )
 
     @staticmethod
