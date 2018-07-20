@@ -64,7 +64,8 @@ class CrawlerListings(CrawlerEntity):
         return self.addresses
 
     def add_5a_regions(self):
-        self.listings['sk_region'] = self.listings.apply(lambda row: self.check_coverage(row.lat, row.lng), axis=1)
+        self.listings['sk_region'] = self.listings.apply(lambda row: self.check_coverage(row['o_lat'], row['o_lng']),
+                                                         axis=1)
 
     def coalesce_lat_lngs(self):
         self.listings['o_lat'] = self.listings['glat'].combine_first(self.listings['lat']).astype('float').round(4)
