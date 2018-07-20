@@ -58,7 +58,10 @@ create external table datalake_clean.crawler_listings (
 	listing_type string,
 	advertiser_type string,
 	big_advertiser string,
-	advertiser_name string
+	advertiser_name string,
+	o_lat string,
+	o_lng string,
+	sk_region string
 )
 stored as parquet
 location 's3://5a-datalake/clean/crawler_listings/'

@@ -1,5 +1,6 @@
 {
   "variant": "LNA",
+  "variant_group": "Test",
   "lead": {
     "status": [
       "Descartado"
@@ -29,5 +30,5 @@
     "reason_in": false
   },
   "size_limit": 250,
-  "recency_bucket": false
+  "recency_bucket": true
 }

@@ -9,5 +9,6 @@ ODS_STAGING_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/ODS/staging/quer
 EBDB_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/tests')
 DW_STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/staging/queries')
 QUERIES_EBDB_SUPPLY_DEMAND_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries/supply_demand_funnel')
+GROWTH_PROD_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/prod/queries')
 
 DEFAULT_DAG_OWNER = 'Data Team'
