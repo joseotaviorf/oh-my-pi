@@ -4,22 +4,22 @@ from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
 from qa_python_utils.default_logger import logger
 
 
-class SchedulePageViews(GrowthAmplitude):
-    TABLE_NAME = 'amplitude_schedule_page_views'
+class ListingsWithPageViews(GrowthAmplitude):
+    TABLE_NAME = 'amplitude_listings_unique_page_views'
 
     @logger
     def __init__(self, s3_bucket):
-        super(SchedulePageViews, self).__init__(measure='schedule_page_views', s3_bucket=s3_bucket)
+        super(ListingsWithPageViews, self).__init__(measure='listings_unique_page_views', s3_bucket=s3_bucket)
 
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthAmplitude._df_to_dw(df, SchedulePageViews.TABLE_NAME)
+        GrowthAmplitude._df_to_dw(df, ListingsWithPageViews.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthAmplitude._truncate_table(SchedulePageViews.TABLE_NAME)
+        GrowthAmplitude._truncate_table(ListingsWithPageViews.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
@@ -29,10 +29,10 @@ class SchedulePageViews(GrowthAmplitude):
     @logger
     def __append(self, _filter, prefix):
         middle_query = BaseETL.get_query_from_file_name(
-            '{}/{}/middle_{}.sql'.format(QUERIES_DIR, self.measure, _filter))
+            '{}/listings_unique_page_views/middle_{}.sql'.format(QUERIES_DIR, _filter))
 
         df = self.get_df(prefix=prefix,
                          middle=middle_query,
                          suffix=self.suffix_query)
 
-        SchedulePageViews.df_to_dw(df=df)
+        ListingsWithPageViews.df_to_dw(df=df)

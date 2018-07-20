@@ -1,8 +1,8 @@
-from bietlejuice.jobs.new_etl.amplitude.growth_users import GrowthUsers
+from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
 from qa_python_utils.default_logger import logger
 
 
-class OwnerLandingViews(GrowthUsers):
+class OwnerLandingViews(GrowthAmplitude):
     TABLE_NAME = 'amplitude_owner_landing_views'
 
     @logger
@@ -12,12 +12,12 @@ class OwnerLandingViews(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers._df_to_dw(df, OwnerLandingViews.TABLE_NAME)
+        GrowthAmplitude._df_to_dw(df, OwnerLandingViews.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers._truncate_table(OwnerLandingViews.TABLE_NAME)
+        GrowthAmplitude._truncate_table(OwnerLandingViews.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):
@@ -30,7 +30,7 @@ class OwnerLandingViews(GrowthUsers):
         OwnerLandingViews.df_to_dw(df=df)
 
 
-class OwnerLandingViewsBV(GrowthUsers):
+class OwnerLandingViewsBV(GrowthAmplitude):
     TABLE_NAME = 'amplitude_owner_landing_views_bv'
 
     @logger
@@ -40,12 +40,12 @@ class OwnerLandingViewsBV(GrowthUsers):
     @staticmethod
     @logger(exclude='df')
     def df_to_dw(df):
-        GrowthUsers._df_to_dw(df, OwnerLandingViewsBV.TABLE_NAME)
+        GrowthAmplitude._df_to_dw(df, OwnerLandingViewsBV.TABLE_NAME)
 
     @staticmethod
     @logger
     def truncate_table():
-        GrowthUsers._truncate_table(OwnerLandingViewsBV.TABLE_NAME)
+        GrowthAmplitude._truncate_table(OwnerLandingViewsBV.TABLE_NAME)
 
     @logger
     def append_to_table(self, _filter):

@@ -9,6 +9,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
+from bietlejuice.jobs.new_etl.amplitude.listings_unique_page_views import ListingsWithPageViews
 from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
 from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
@@ -47,6 +48,19 @@ def materialize_engaged_users_table_query(**kwargs):
 @logger
 def truncate_engaged_users_table():
     EngagedUsers.truncate_table()
+
+
+@logger
+def materialize_listings_unique_page_views_table_query(**kwargs):
+    _filter = kwargs['filter']
+
+    listings_unique_page_views = ListingsWithPageViews(bucket)
+    listings_unique_page_views.append_to_table(_filter=_filter)
+
+
+@logger
+def truncate_listings_unique_page_views_table():
+    ListingsWithPageViews.truncate_table()
 
 
 @logger
@@ -472,6 +486,17 @@ amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplit
 engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                              'engaged_users', 'top_funnel', None, truncate_engaged_users_table)
 
+# Amplitude engaged users
+amplitude_listings_unique_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
+                                                                          materialize_listings_unique_page_views_table_query,
+                                                                          'amplitude_listings_unique_page_views_previous',
+                                                                          'top_funnel', None,
+                                                                          truncate_listings_unique_page_views_table)
+listings_unique_page_views_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                          materialize_growth_measure_table_query,
+                                                          'listings_unique_page_views', 'top_funnel', None,
+                                                          truncate_listings_unique_page_views_table)
+
 # Amplitude schedule page views
 amplitude_schedule_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
                                                                    materialize_schedule_page_views_table_query,
@@ -602,15 +627,17 @@ amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
+amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views_sub_dag
 
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
  opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag >>
  engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
- owner_landing_views_bv_sub_dag >> employees_sub_dag >> ticket_resolution_sub_dag >> tickets_sub_dag >>
- approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> offerers_sub_dag >> offerers_approved_sub_dag >>
- offerers_sent_doc_sub_dag >> offers_approved_sub_dag >> offers_submitted_sub_dag >> tenant_prospects_sub_dag >>
- tenants_sub_dag >> ended_rentals_sub_dag >> visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >>
- ongoing_listings_sub_dag >> ongoing_stranded_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >>
+ owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> employees_sub_dag >>
+ ticket_resolution_sub_dag >> tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >>
+ offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >>
+ offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> ended_rentals_sub_dag >>
+ visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> ongoing_listings_sub_dag >>
+ ongoing_stranded_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >>
  prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >>
  prediction_documentation_sent_sub_dag >> prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >>
  fact_append_task
