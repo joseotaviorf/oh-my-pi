@@ -10,4 +10,14 @@ class CampaignRecipients(CampaignMonitorCampaign):
 
     @logger
     def request_campaign_data(self):
-        self.request_full_campaign_data()
+        self._delete_old_files()
+
+        result_gen = self._request_full_campaign_data()
+        self._build_objs_and_send_to_s3(
+            result_gen=result_gen,
+            json_fields=self.get_json_fields()
+        )
+
+    @logger
+    def get_json_fields(self):
+        return ['EmailAddress', 'ListID']

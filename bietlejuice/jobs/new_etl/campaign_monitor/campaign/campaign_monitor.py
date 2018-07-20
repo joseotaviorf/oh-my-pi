@@ -1,8 +1,8 @@
 import gzip
 import json
+import re
 from abc import abstractmethod
 from io import BytesIO
-from time import time
 
 import boto3
 from createsend import CreateSend, Client, Campaign
@@ -13,6 +13,10 @@ from bietlejuice.jobs.base.base_etl import BaseETL
 
 
 class CampaignMonitorCampaign(object):
+    S3_PATH_PREFIX = {
+        'raw': 'raw/campaign_monitor/campaigns'
+    }
+
     @logger(exclude='cm_auth')
     def __init__(self, s3_bucket, cm_auth, _type, execution_date):
         self.auth = {'api_key': cm_auth['api_key']}
@@ -22,11 +26,12 @@ class CampaignMonitorCampaign(object):
         self.client = Client(self.auth, cm_auth['client_id'])
 
         self.s3_bucket = s3_bucket
-        self.s3_client = boto3.resource('s3')
+        self.s3_resource = boto3.resource('s3')
         self.athena_client = AthenaClient(s3_bucket)
 
         self._type = _type
-        self.formatted_date = execution_date.strftime('%Y-%m-%d %H:%M')
+        self.formatted_date = execution_date.strftime('%Y-%m-%d 00:00')
+        self.epoch_date = execution_date.strftime('%s')
 
     # abstract methods
     @abstractmethod
@@ -62,19 +67,71 @@ class CampaignMonitorCampaign(object):
         }
 
     # instance methods
+    @logger
+    def _delete_old_files(self):
+        key = '{}/campaign_id='.format(CampaignMonitorCampaign.S3_PATH_PREFIX['raw'])
+        s3_bucket_obj = self.s3_resource.Bucket(self.s3_bucket)
+
+        _files = (s3_bucket_obj
+                  .objects
+                  .filter(Prefix=key)
+                  .all())
+
+        key_files = [f.key for f in list(_files)]
+        obj_keys = filter(re.compile(r'{}/data_\d+-\d+\.gz'.format(self._type)).search, key_files)
+        for _obj_key in obj_keys:
+            # because the API only allows a start or end date, the file deletion should not consider past data
+            epoch_report_date = re.search(r'/{}/data_(\d+)-\d+\.gz'.format(self._type), _obj_key).group(1)
+            if int(epoch_report_date) < self.epoch_date:
+                continue
+
+            response = (s3_bucket_obj
+                        .objects
+                        .filter(Prefix=_obj_key)
+                        .delete())
+
+            if (response is None or
+                    len(response) == 0 or
+                    'ResponseMetadata' not in response[0] or
+                    'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
+                    response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
+                _logger.error('m=_exclude_old_files, key={}, msg=error deleting files from S3'.format(key))
+                raise Exception
+
     @logger(exclude='result_gen')
-    def build_objs_and_send_to_s3(self, result_gen, json_fields):
-        for result, campaign_id in result_gen:
+    def _build_objs_and_send_to_s3(self, result_gen, json_fields):
+        campaign_ids = []
+        for result_dict in result_gen:
             json_result = self.__build_json_response(
-                cm_obj=result,
+                cm_obj=result_dict['result'],
                 json_fields=json_fields
             )
 
             self.__save_to_s3(
                 json_list=json_result,
-                file_path='raw/campaign_monitor/test_ribs/campaigns/{0}/campaign_id={1}/{0}_{2}.gz'.format(self._type,
-                                                                                                           campaign_id,
-                                                                                                           int(time()))
+                file_path='{}/campaign_id={}/{}/data_{}-{}.gz'.format(
+                    CampaignMonitorCampaign.S3_PATH_PREFIX['raw'],
+                    result_dict['campaign_id'],
+                    self._type,
+                    self.epoch_date,
+                    result_dict['page']
+                )
+            )
+
+            # list used to skip multiple partition upserts throughout the possible paging and different report types
+            campaign_ids.append(result_dict['campaign_id'])
+
+        for campaign_id in campaign_ids:
+            # use of 'upsert' instead of 'add' partition method to contemplate cases where files are not longer in S3
+            # it shouldn't have, so this is just a precaution
+            self.athena_client.upsert_single_partition(
+                bucket_folder_path='{}/{}/{}'.format(self.s3_bucket,
+                                                     CampaignMonitorCampaign.S3_PATH_PREFIX['raw'],
+                                                     self._type),
+                database='datalake_raw',
+                table='campaignmonitor_campaign_{}'.format(self._type),
+                partition_name='campaign_id',
+                partition_value=campaign_id
             )
 
     @logger(exclude='cm_obj')
@@ -83,6 +140,7 @@ class CampaignMonitorCampaign(object):
             _logger.error('m=__build_json_response, msg=cm_obj is none')
             raise Exception
 
+        _logger.info('m=__build_json_response, msg=building json item list')
         _json = []
         for _obj in cm_obj.Results:
             json_item = self.__build_json_item(
@@ -91,9 +149,9 @@ class CampaignMonitorCampaign(object):
             )
             _json.append(json_item)
 
+        _logger.info('m=__build_json_response, msg=json item list built successfully')
         return _json
 
-    @logger(exclude='obj')
     def __build_json_item(self, _obj, json_fields):
         _json_item = {}
         for json_field in json_fields:
@@ -101,7 +159,7 @@ class CampaignMonitorCampaign(object):
 
         return _json_item
 
-    @logger
+    @logger(exclude='json_list')
     def __save_to_s3(self, json_list, file_path):
         _logger.info('m=__save_to_s3, msg=gzipping json_list')
         gz_body = BytesIO()
@@ -120,14 +178,14 @@ class CampaignMonitorCampaign(object):
         gz_body.flush()
 
     @logger
-    def request_incremental_campaign_data(self):
+    def _request_incremental_campaign_data(self):
         return self.__request_campaign_data(
             params_dict=CampaignMonitorCampaign._build_incremental_params(_date=self.formatted_date)
         )
 
     @logger
-    def request_full_campaign_data(self):
-        self.__request_campaign_data(
+    def _request_full_campaign_data(self):
+        return self.__request_campaign_data(
             params_dict=CampaignMonitorCampaign._build_full_params()
         )
 
@@ -172,11 +230,8 @@ class CampaignMonitorCampaign(object):
                 result = getattr(campaign, self._type)(**params_dict)
                 params_dict['page'] = current_page
 
-                yield result, campaign.campaign_id
-
-        # TODO
-        # upsert partition
-
-    #         file_path='raw/campaign_monitor/campaigns/{0}/campaign_id={1}/dt={2}/{0}.gz'.format(self._type,
-    #                                                                                             campaign.campaign_id,
-    #                                                                                             '2018-07-13')
+                yield {
+                    'result': result,
+                    'campaign_id': campaign.campaign_id,
+                    'page': current_page
+                }
