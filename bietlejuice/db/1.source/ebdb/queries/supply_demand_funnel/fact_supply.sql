@@ -211,6 +211,8 @@ from
       end as acquisition_method,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
+        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when l.tipo = 'Porteiro' then 'Doorman'
         when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
         when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
         when l.tipo = 'Afiliado' and l.origem = 'Planilha' then 'Affiliate Spreadsheet'
@@ -230,6 +232,8 @@ from
       end as acquisition_channel,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
+        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when l.tipo = 'Porteiro' then 'Doorman'
         when l.origem = 'Reprocessado' then 'Reprocessed'
         when l.tipo = 'Afiliado' then 'Affiliate'
         when l.tipo = 'OpenLink' then 'Affiliate'
