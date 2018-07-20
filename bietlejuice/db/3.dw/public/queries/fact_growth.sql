@@ -677,6 +677,33 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
+	'listings_unique_page_views' as measure,
+	null as team,
+	_year,
+	_month,
+	_week,
+	_day,
+	region,
+	city,
+	daily_count,
+	prev_weekly_count,
+	weekly_count,
+	monthly_count,
+	yearly_count,
+	wow,
+	mtd,
+	ytd,
+	mom,
+	yoy,
+	0 as flg_predicted,
+	getdate() as dt_timestamp
+from growth.listings_unique_page_views
+
+union all
+
+select
+	sk_date,
+	sk_week_start_date,
 	'active_users' as measure,
 	null as team,
 	_year,

@@ -41,9 +41,10 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
+			and dc.contract_status != 'Cancelado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-  order by coalesce(dr.region_code, ''), date_part('year', dc.dt_contract_annulment), date_part('month', dc.dt_contract_annulment), date_part('week', dc.dt_contract_annulment), date_part('day', dc.dt_contract_annulment)
+  order by 5, 1, 2, 3, 4
 ),
 all_dates_last_week as (
 	select 1
@@ -60,13 +61,14 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
+			and dc.contract_status != 'Cancelado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dc.dt_contract_annulment) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dc.dt_contract_annulment) < date_part('day', current_date)
- 	group by coalesce(dr.region_code, ''), date_part('year', dc.dt_contract_annulment), date_part('month', dc.dt_contract_annulment)
-  order by coalesce(dr.region_code, ''), date_part('year', dc.dt_contract_annulment), date_part('month', dc.dt_contract_annulment)
+ 	group by 3, 1, 2
+  order by 3, 1, 2
 ),
 all_dates_last_year as (
 	select
@@ -79,6 +81,7 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
+			and dc.contract_status != 'Cancelado'
   left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -12))
@@ -86,6 +89,6 @@ all_dates_last_year as (
   		      and date_part('day', dc.dt_contract_annulment) < date_part('day', add_months(current_date, -12)))
   		  or date_part('month', dc.dt_contract_annulment) < date_part('month', add_months(current_date, -12))
   		  )
-	group by coalesce(dr.region_code, ''), date_part('year', dc.dt_contract_annulment)
-	order by coalesce(dr.region_code, ''), date_part('year', dc.dt_contract_annulment)
+	group by 2, 1
+	order by 2, 1
 ),

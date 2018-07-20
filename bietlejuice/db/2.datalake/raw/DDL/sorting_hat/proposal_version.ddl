@@ -17,6 +17,7 @@ create external table datalake_raw.sortinghat_proposalversion (
   iptu_value string,
   created_at string,
   updated_at string,
+  versioned_at string,
   home_area string,
   home_bathrooms string,
   home_bedrooms string,
