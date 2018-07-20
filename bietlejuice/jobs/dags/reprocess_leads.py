@@ -42,6 +42,7 @@ def reprocess_leads(variant):
     contact_options = variant_config.get('contact', {})
     lead_options = variant_config.get('lead', {})
     variant = variant_config.get('variant', 'UNMAPPED')
+    variant_group = variant_config.get('variant_group', 'UNMAPPED')
     recency_bucket = variant_config.get('recency_bucket', False)
     size_limit = variant_config.get('size_limit')
     check_coverage = variant_config.get('check_coverage', False)
@@ -83,7 +84,7 @@ def reprocess_leads(variant):
         processed = processed[~region_id.isnull() & (region_id != -1)]
 
     processed['origem'] = 'Reprocessado'
-    processed['infosExtras'] = processed.id.apply(lambda x: '{};{}'.format(x, variant))
+    processed['infosExtras'] = processed.id.apply(lambda x: '{};{};{}'.format(x, variant, variant_group))
     if recency_bucket:
         buckets = (
             ((datetime.utcnow().date() - processed.atualizadoEm.dt.date).dt.days / processor.get_unit_divisor()).
