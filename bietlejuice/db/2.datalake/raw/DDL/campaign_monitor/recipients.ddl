@@ -12,5 +12,5 @@ with serdeproperties (
 	'mapping.email_address' = 'EmailAddress',
 	'mapping.list_id' = 'ListID'
 )
-location 's3://5a-datalake/raw/campaign_monitor/test_ribs/campaigns/recipients/'
+location 's3://5a-datalake/raw/campaign_monitor/campaigns/recipients/'
 ;

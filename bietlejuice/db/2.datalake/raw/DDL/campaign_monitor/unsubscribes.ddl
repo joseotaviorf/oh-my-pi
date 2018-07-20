@@ -16,5 +16,5 @@ with serdeproperties (
 	'mapping.list_id' = 'ListID',
 	'mapping.ip_address' = 'IPAddress'
 )
-location 's3://5a-datalake/raw/campaign_monitor/test_ribs/campaigns/unsubscribes/'
+location 's3://5a-datalake/raw/campaign_monitor/campaigns/unsubscribes/'
 ;

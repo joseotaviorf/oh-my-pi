@@ -18,5 +18,5 @@ with serdeproperties (
 	'mapping.ip_address' = 'IPAddress',
 	'mapping.url' = 'URL'
 )
-location 's3://5a-datalake/raw/campaign_monitor/test_ribs/campaigns/clicks/'
+location 's3://5a-datalake/raw/campaign_monitor/campaigns/clicks/'
 ;

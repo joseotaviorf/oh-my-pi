@@ -18,5 +18,5 @@ with serdeproperties (
 	'mapping.bounce_type' = 'BounceType',
 	'mapping.reason' = 'Reason'
 )
-location 's3://5a-datalake/raw/campaign_monitor/test_ribs/campaigns/bounces/'
+location 's3://5a-datalake/raw/campaign_monitor/campaigns/bounces/'
 ;
