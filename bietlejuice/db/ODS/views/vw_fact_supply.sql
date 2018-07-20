@@ -159,12 +159,12 @@ initial_categories as (
 			when reprocessed_flg then 'Outbound'
 			when b2b_lead then 'Outbound'
 			when doorman_lead then 'Outbound'
+			when isales_direct_register or cx_direct_register then 'Inbound'
 			when lead_origin = 'Crawling' then 'Outbound'
 			when lead_type = 'OLX' and lead_origin is null then 'Outbound'
 			when lead_type = 'Afiliado' then 'Outbound'
-			when acquisition_method = 'Self-Service' then 'Inbound'
-			when isales_direct_register or cx_direct_register then 'Inbound'
 			when lead_type in ('Marketing', 'OpenLink', 'BrokenOpenLink') then 'Inbound'
+			when acquisition_method = 'Self-Service' then 'Inbound'
 			else 'Other'
 		end as mkt_category,
 		case
@@ -233,10 +233,10 @@ final_categories as (
 			when lead_type = 'Afiliado' and lead_origin = 'Planilha' then 'IndicaAi Spreadsheet'
 			when lead_origin = 'Reprocessado' then 'Other'
 			when lead_origin = 'Desconhecida' then 'Online Other'
-			when mkt_channel_type = 'Online' then 'Online Landing Page Form'
+			when lead_origin = 'Landing' then 'Online Landing Page Form'
 			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
 			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
-			else null
+			else 'Other'
 		end as mkt_platform,
 		case
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
@@ -258,7 +258,9 @@ final_categories as (
 			when trim(utm_medium) = 'social' then 'Social'
 			when lead_origin = 'Desconhecida' then null
 			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and mkt_channel_type = 'Online' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type is null then 'Organic'
 			when trim(utm_source) in ('google','bing') then 'SEM non-branded'
 			when mkt_flow = 'Other' then 'Other'
 			else null
@@ -276,7 +278,9 @@ final_categories as (
 			when trim(utm_source) = 'quintoandar' then 'Organic'
 			when lead_origin = 'Desconhecida' then null
 			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and mkt_channel_type = 'Online' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type is null then 'Organic'
 			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
 			else null
