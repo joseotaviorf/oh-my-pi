@@ -15,7 +15,7 @@ class S3ToODS(object):
     def move_files_to_ods(self):
         for f in self.files:
             try:
-                table = pd.read_excel(f[0], skiprows=1)
+                table = pd.read_excel(f[0], skiprows=0)
                 table = table.where(pd.notnull(table), None)
 
                 table_name = f[1]

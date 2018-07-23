@@ -20,7 +20,7 @@ def move_files_to_ods():
 
 # dags
 dag = DAG(
-    dag_id='bi-s3_to_ods',
+    dag_id='bi-s3_to_ods-test',
     default_args={
         'owner': 'Data Team',
         'wait_for_downstream': False,
@@ -37,3 +37,10 @@ PythonOperator(
     task_id='move_files_to_ods',
     python_callable=move_files_to_ods
 )
+
+if __name__ == '__main__':
+    s3_to_ods = S3ToODS(
+        s3_bucket='5a-datalake',
+        xls_s3_bucket='bi-etl-ejuice-xls2ods'
+    )
+    s3_to_ods.move_files_to_ods()
