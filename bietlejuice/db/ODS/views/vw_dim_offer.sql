@@ -29,6 +29,7 @@ old_pre_proposal as (
     select
       (p.id * 100) + 1 as sk_offer,
       p.id as id_offer,
+      null::bigint as id_godfather,
       p.aluguel as renting_value,
       p."aluguelOriginal" as renting_original_value,
       p."condominioOriginal" as condo_original_value,
@@ -69,6 +70,7 @@ new_offer as (
     select distinct
       (id * 100) + 2 as sk_offer,
       id as id_offer,
+      godfather_id as id_godfather,
       rent as renting_value,
       original_rent as renting_original_value,
       original_condo as condo_original_value,
