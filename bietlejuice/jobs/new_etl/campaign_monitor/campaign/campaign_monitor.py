@@ -109,10 +109,10 @@ class CampaignMonitorCampaign(object):
 
             self.__save_to_s3(
                 json_list=json_result,
-                file_path='{}/campaign_id={}/{}/data_{}-{}.gz'.format(
+                file_path='{}/{}/campaign_id={}/data_{}-{}.gz'.format(
                     CampaignMonitorCampaign.S3_PATH_PREFIX['raw'],
-                    result_dict['campaign_id'],
                     self._type,
+                    result_dict['campaign_id'],
                     self.epoch_date,
                     result_dict['page']
                 )
