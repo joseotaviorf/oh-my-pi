@@ -2,6 +2,7 @@ drop table if exists dim_offer;
 create table dim_offer (
   sk_offer integer,
   id_offer integer,
+  id_godfather integer,
   renting_value integer,
   renting_original_value integer,
   condo_original_value integer,
