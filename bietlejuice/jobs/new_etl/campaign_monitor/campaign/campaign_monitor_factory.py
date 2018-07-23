@@ -4,7 +4,7 @@ from bietlejuice.jobs.new_etl.campaign_monitor.campaign.bounces import CampaignB
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.clicks import CampaignClicks
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.opens import CampaignOpens
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.recipients import CampaignRecipients
-from bietlejuice.jobs.new_etl.campaign_monitor.campaign.spams import CampaignSpams
+from bietlejuice.jobs.new_etl.campaign_monitor.campaign.spam import CampaignSpam
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.unsubscribes import CampaignUnsubscribes
 
 
@@ -31,6 +31,6 @@ class CampaignMonitorCampaignFactory(object):
             'clicks': CampaignClicks,
             'opens': CampaignOpens,
             'recipients': CampaignRecipients,
-            'spams': CampaignSpams,
+            'spam': CampaignSpam,
             'unsubscribes': CampaignUnsubscribes
         }.get(_class)
