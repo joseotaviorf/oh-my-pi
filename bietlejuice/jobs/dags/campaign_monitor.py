@@ -72,7 +72,7 @@ task_spams = QuintoAndarPythonOperator(
     provide_context=True,
     python_callable=get_campaign_data,
     dag=main_dag,
-    op_kwargs={'_class': 'spams'}
+    op_kwargs={'_class': 'spam'}
 )
 
 task_recipients = QuintoAndarPythonOperator(
