@@ -1,5 +1,5 @@
-drop table if exists datalake_raw.campaignmonitor_campaign_spams;
-create external table datalake_raw.campaignmonitor_campaign_spams (
+drop table if exists datalake_raw.campaignmonitor_campaign_spam;
+create external table datalake_raw.campaignmonitor_campaign_spam (
   dt string,
   email_address string,
   list_id string
@@ -14,5 +14,5 @@ with serdeproperties (
 	'mapping.email_address' = 'EmailAddress',
 	'mapping.list_id' = 'ListID'
 )
-location 's3://5a-datalake/raw/campaign_monitor/campaigns/spams/'
+location 's3://5a-datalake/raw/campaign_monitor/campaigns/spam/'
 ;
