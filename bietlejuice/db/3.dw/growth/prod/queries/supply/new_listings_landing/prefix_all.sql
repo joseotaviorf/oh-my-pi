@@ -35,7 +35,9 @@ with all_dates as (
 		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
-	where f.acquisition_channel = 'Landing Page Leads' and coalesce(f.mkt_medium, '') <> 'Affiliate Networks'
+	where f.acquisition_channel = 'Landing Page Leads'
+	    and coalesce(f.mkt_medium, '') <> 'Affiliate Networks'
+		and coalesce(f.flg_b2b, false) = false
   order by date_part('year', dl.criado_em), date_part('month', dl.criado_em), date_part('week', dl.criado_em), date_part('day', dl.criado_em)
 ),
 all_dates_last_week as (
@@ -59,6 +61,8 @@ all_dates_last_month as (
   		and date_part('month', dl.criado_em) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dl.criado_em) < date_part('day', current_date)
   		and f.acquisition_channel = 'Landing Page Leads'
+  	    and coalesce(f.mkt_medium, '') <> 'Affiliate Networks'
+		and coalesce(f.flg_b2b, false) = false
   group by date_part('year', dl.criado_em), date_part('month', dl.criado_em)
   order by date_part('year', dl.criado_em), date_part('month', dl.criado_em)
 ),
@@ -80,7 +84,9 @@ all_dates_last_year as (
   		      and date_part('day', dl.criado_em) < date_part('day', add_months(current_date, -12)))
   		  or date_part('month', dl.criado_em) < date_part('month', add_months(current_date, -12))
   		  )
-  		and f.acquisition_channel = 'Landing Page Leads' and coalesce(f.mkt_medium, '') <> 'Affiliate Networks'
+  		and f.acquisition_channel = 'Landing Page Leads'
+  	    and coalesce(f.mkt_medium, '') <> 'Affiliate Networks'
+		and coalesce(f.flg_b2b, false) = false
   group by date_part('year', dl.criado_em)
   order by date_part('year', dl.criado_em)
 ),
