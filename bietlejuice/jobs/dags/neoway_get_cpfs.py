@@ -24,7 +24,8 @@ MAIN_SCHEDULE_INTERVAL = '0 12 * * 2'  # At 12:00 on Tuesday.
 @logger(exclude='df')
 def treat_phones_df(df):
     df2 = pd.DataFrame(df['phone_numbers'].str.split(';').values.tolist())
-    result = pd.concat([df.drop(['cpf', 'phone_numbers'], axis=1), df2], axis=1)
+    df2_rnm = df2.add_prefix('phone_')
+    result = pd.concat([df.drop(['cpf', 'phone_numbers'], axis=1), df2_rnm], axis=1)
     return petl.fromdataframe(df=result)
 
 
@@ -62,9 +63,9 @@ def get_cpfs():
     _logger.info('m=get_cpfs, msg=done!')
 
 
-def treat_cpfs_after_return(**kwargs):
+def treat_cpfs_after_return():
     file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, 'crawled_cpfs')
-    exec_date = str(datetime.date(kwargs['execution_date']))
+    exec_date = str(datetime.date(datetime.today()))
     s3_file_path_csv = 'clean/crawled/cpfs_csv'
     full_s3_file_path = 'clean/crawled/cpfs/dt={0}/{0}.parq'.format(exec_date)
 
@@ -80,8 +81,8 @@ def treat_cpfs_after_return(**kwargs):
     athena_client.create_parquet_from_df(key=full_s3_file_path, df=df)
 
 
-def add_partition_to_athena(**kwargs):
-    exec_date = str(datetime.date(kwargs['execution_date']))
+def add_partition_to_athena():
+    exec_date = str(datetime.date(datetime.today()))
     s3_file_path = 'clean/crawled/cpfs'
 
     athena_client = AthenaClient(s3_bucket=s3_bucket)
@@ -108,14 +109,12 @@ neoway_get_cpfs = BaseDAG.get_quintoandar_python_operator(
 treat_data_to_callcenter = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='treat_data_to_callcenter',
-    provide_context=True,
     func_command=treat_cpfs_after_return
 )
 
 add_partition_to_athena = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='add_partition_to_athena',
-    provide_context=True,
     func_command=add_partition_to_athena
 )
 
