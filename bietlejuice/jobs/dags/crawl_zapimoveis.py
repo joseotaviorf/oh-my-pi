@@ -26,7 +26,7 @@ def submit_zap(**kwargs):
     r = BatchClient().start_batch_job(
         job_name='crawl-zapimoveis',
         job_queue='crawling-houses',
-        job_definition='crawling-houses:8',
+        job_definition='crawling-houses:10',
         command=['./crawlers/zapimoveis.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
     _logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
