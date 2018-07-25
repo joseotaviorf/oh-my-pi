@@ -18,6 +18,12 @@ from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
+aws_secret = env.get_airflow_env_var('AWS_SECRET_ACCESS_KEY')
+aws_key = env.get_airflow_env_var('AWS_ACCESS_KEY_ID')
+
+print 'AWS_SECRET_ACCESS_KEY: {}'.format(aws_secret)
+print 'AWS_ACCESS_KEY_ID: {}'.format(aws_key)
+
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
