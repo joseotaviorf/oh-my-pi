@@ -9,8 +9,9 @@ select
 			then 'Open Schedule'
 		else 'Realized Schedule'
 	end as realized_schedule,
-	sum(cast(t.available_slot as integer)) as available_slots_96,
-	sum(cast(t.specific_slot as integer)) as available_slots_0
+	sum(cast(t.specific_slot as integer)) as available_slots_0,
+	sum(cast(t.available_slot_24h as integer)) as available_slots_24,
+	sum(cast(t.available_slot as integer)) as available_slots_96
 from staging.agents_slots t
 join datalake_raw.ebdb_usuario u
 	on u.dadosagente_id = t.agent_id
