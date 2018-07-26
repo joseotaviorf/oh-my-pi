@@ -139,7 +139,7 @@ potential_listings as (
 		(acquisition_channel = 'Inside Sales') as isales_direct_register,
 		(acquisition_channel = 'Admin') as cx_direct_register,
 		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention,
-		case when (us_cad.id is not null) then true else false end as flg_callcenter
+		(us_cad.id is not null) as flg_callcenter
 	from
 		fact_supply f
 	left join
