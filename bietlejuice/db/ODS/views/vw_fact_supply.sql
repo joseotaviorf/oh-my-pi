@@ -138,7 +138,8 @@ potential_listings as (
 		end as doorman_lead,
 		(acquisition_channel = 'Inside Sales') as isales_direct_register,
 		(acquisition_channel = 'Admin') as cx_direct_register,
-		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention
+		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention,
+		case when (us_cad.id is not null) then true else false end as flg_callcenter
 	from
 		fact_supply f
 	left join
@@ -151,6 +152,13 @@ potential_listings as (
 	left join
 		rep_leads bl
 		on bl.lead_id = f.lead_id
+	left join
+		imovel i
+		on f.imovel_id = i.id
+	left join
+		usuario us_cad
+	    on us_cad.id = i.usuario_que_cadastrou_id
+	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
 ), -- initial categories that will derivate others
 initial_categories as (
 	select
@@ -348,6 +356,7 @@ select
 	isales_direct_register as flg_isales_direct_register,
 	cx_direct_register as flg_cx_direct_register,
 	isales_intervention as flg_isales_intervention,
+	flg_callcenter,
 	mkt_branded,
 	mkt_category,
 	mkt_flow,
