@@ -26,7 +26,7 @@ def submit_iw(**kwargs):
     r = BatchClient().start_batch_job(
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
-        job_definition='crawling-houses:8',
+        job_definition='crawling-houses:10',
         command=['./crawlers/imovelweb.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
     _logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
