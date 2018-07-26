@@ -2,7 +2,7 @@ WITH schedule AS
 (SELECT
 	t.agent_id AS sk_agent_id,
 	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
-	sum(cast(t.available_slot AS INTEGER)) AS available_slots,
+	sum(cast(t.available_slot_24h AS INTEGER)) AS available_slots,
 	sum(cast(t.specific_slot AS INTEGER)) AS available_slots_0
  FROM staging.agents_slots t
  WHERE DATE(t.slot_dt) = DATE('{}')
