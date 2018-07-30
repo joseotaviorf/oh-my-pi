@@ -118,7 +118,7 @@ class CRMTasks(object):
                 'ResponseMetadata' not in response[0] or
                 'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
                 response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
-            _logger.error('m=_exclude_old_files, key={}, msg=error deleting files from S3'.format(key))
+            _logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
             raise Exception
 
     @logger(exclude='json_list')
@@ -150,13 +150,13 @@ class CRMTasks(object):
         _logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
 
     def __obj_to_s3(self, obj_io, file_suffix):
-        _logger.info('m=__save_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=obj_io,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__save_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
     @logger
     def _upsert_partition(self, bucket_type):
