@@ -12,7 +12,7 @@ env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
-MAIN_DAG_NAME = 'bi-crm'
+MAIN_DAG_NAME = 'bi-crm-model'
 MAIN_START_DATE = datetime(2015, 1, 1)
 MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
