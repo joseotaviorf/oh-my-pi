@@ -1,0 +1,1 @@
+delete from {schema}.{table_name} where {sk_column} in ({sks});
