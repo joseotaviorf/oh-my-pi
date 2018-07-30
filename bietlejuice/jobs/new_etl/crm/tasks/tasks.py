@@ -60,7 +60,7 @@ class CRMTasks(object):
         raise NotImplementedError
 
     # instance methods
-        def __add_incremental_constraints(self, _filter):
+    def __add_incremental_constraints(self, _filter):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
         _filter['$or'] = [
