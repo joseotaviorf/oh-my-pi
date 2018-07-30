@@ -130,7 +130,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
 
     upsert_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
         task_id='upsert_clean_partition',
-        func_command=extract_and_load_data,
+        func_command=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
