@@ -60,22 +60,27 @@ class CRMTasks(object):
         raise NotImplementedError
 
     # instance methods
-    def __add_incremental_constraints(self, _filter):
+        def __add_incremental_constraints(self, _filter):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
-        _filter['actions.date'] = {
-            '$gte': self.execution_date_from,
-            '$lte': self.execution_date_to
-        }
-
-        _filter['dataInicio'] = {
-            '$gte': self.execution_date_from,
-            '$lte': self.execution_date_to
-        }
+        _filter['$or'] = [
+            {
+                'actions.date': {
+                    '$gte': self.execution_date_from,
+                    '$lte': self.execution_date_to
+                }
+            },
+            {
+                'dataInicio': {
+                    '$gte': self.execution_date_from,
+                    '$lte': self.execution_date_to
+                }
+            }
+        ]
 
         return _filter
 
-    @logger
+    @logger(exclude='_filter')
     def _extract_and_load_data(self, _filter, fields_projection=None):
         incremental_filter = self.__add_incremental_constraints(_filter)
 
