@@ -83,8 +83,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1,
-    catchup=False
+    max_active_runs=1
 )
 
 
