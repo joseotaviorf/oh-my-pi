@@ -223,6 +223,8 @@ class CampaignMonitorCampaign(object):
                 _logger.info('m=__request_campaign_data, campaign_id={}, msg=empty result'.format(campaign.campaign_id))
                 continue
 
+            self.__save_campaign(client_campaign)
+
             current_page = 0
             while current_page < max_pages:
                 current_page += 1
@@ -235,3 +237,22 @@ class CampaignMonitorCampaign(object):
                     'campaign_id': campaign.campaign_id,
                     'page': current_page
                 }
+
+    @logger
+    def __save_campaign(self, client_campaign):
+        campaign_json = {
+            'CampaignID': client_campaign.CampaignID,
+            'FromEmail': client_campaign.FromEmail,
+            'FromName': client_campaign.FromName,
+            'Name': client_campaign.Name,
+            'ReplyTo': client_campaign.ReplyTo,
+            'Subject': client_campaign.Subject,
+            'WebVersionTextURL': client_campaign.WebVersionTextURL,
+            'WebVersionURL': client_campaign.WebVersionURL,
+        }
+
+        self.__save_to_s3(
+            json_list=[campaign_json],
+            file_path='{}/campaigns/{}.gz'.format(CampaignMonitorCampaign.S3_PATH_PREFIX['raw'],
+                                                  campaign_json['CampaignID'])
+        )
