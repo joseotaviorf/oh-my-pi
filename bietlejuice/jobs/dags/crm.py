@@ -123,8 +123,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
-            'bucket_type': 'clean'
+            '_class': kwargs['_class']
         }
     )
 
@@ -134,7 +133,8 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class']
+            '_class': kwargs['_class'],
+            'bucket_type': 'clean'
         }
     )
 
