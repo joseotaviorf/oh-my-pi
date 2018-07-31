@@ -89,6 +89,8 @@ SELECT
   dados_fotografo_id,
   dados_vendedor_id,
   dados_afiliado_id,
+  flg_doorman_affiliate,
+  dt_doorman_joined,
   tem_imovel,
   tem_app_inquilino,
   tem_contrato_ativo,

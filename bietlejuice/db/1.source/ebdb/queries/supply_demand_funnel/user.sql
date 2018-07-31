@@ -76,6 +76,8 @@ select
     u.dadosFotografo_id as dados_fotografo_id,
     u.dadosVendedor_id as dados_vendedor_id,
     u.dadosAfiliado_id as dados_afiliado_id,
+    (daf.doormanAffiliateData_id is not null) as flg_doorman_affiliate,
+    dmn.joinedProgramAt as dt_doorman_joined,
     u_c.tem_imovel,
     u_c.tem_app_inquilino,
     u_c.tem_contrato_ativo,
@@ -111,6 +113,9 @@ select
   left join
     DadosAfiliado daf
     on daf.id = u.dadosAfiliado_id
+  left join
+    DoormanAffiliateData dmn
+    on dmn.id = daf.doormanAffiliateData_id
   left join
 	(select id, min(REV) as REV from DadosAfiliado_AUD where inicioAtuacao is not null group by id) da1
 	on da1.id = u.dadosAfiliado_id
