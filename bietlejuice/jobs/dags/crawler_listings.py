@@ -7,8 +7,8 @@ from bietlejuice.jobs.new_etl.crawlers.crawler_listings import CrawlerListings
 from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'bi-crawler-listings'
-MAIN_START_DATE = datetime(2018, 7, 2)
-MAIN_SCHEDULE_INTERVAL = '0 2 * * *'
+MAIN_START_DATE = datetime(2018, 7, 30)
+MAIN_SCHEDULE_INTERVAL = '0 2 * * 1-6'
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
@@ -35,7 +35,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 BaseDAG.get_quintoandar_python_operator(
