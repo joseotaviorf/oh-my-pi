@@ -12,7 +12,7 @@ env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
-MAIN_DAG_NAME = 'bi-crm'
+MAIN_DAG_NAME = 'bi-crm-model'
 MAIN_START_DATE = datetime(2015, 1, 1)
 MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
@@ -83,8 +83,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1,
-    catchup=False
+    max_active_runs=1
 )
 
 
@@ -131,7 +130,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
 
     upsert_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
         task_id='upsert_clean_partition',
-        func_command=extract_and_load_data,
+        func_command=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
