@@ -191,6 +191,7 @@ initial_categories as (
 			when lead_origin = 'Crawling' then 'Other'
 			when isales_direct_register or cx_direct_register then 'Other'
 			when lead_type = 'OLX' and lead_origin is null then 'Other'
+			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			else 'Online'
 		end as mkt_channel_type
 	from potential_listings
@@ -213,7 +214,7 @@ final_categories as (
 			when isales_direct_register then 'Inside Sales'
 			when cx_direct_register then 'CX'
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
-			when lead_origin = 'Desconhecida' and lead_type <> 'Afiliado' then 'Online Free'
+			when lead_origin = 'Desconhecida' and lead_type <> 'Afiliado' then 'Other'
 			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
 			when branded_lead then 'Online Free'
 			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Online Free'
