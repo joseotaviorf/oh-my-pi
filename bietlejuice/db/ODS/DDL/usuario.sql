@@ -1,7 +1,5 @@
 drop table if exists usuario;
-
 CREATE TABLE usuario (
-
   id bigint NOT NULL PRIMARY KEY,
   nome varchar(255) DEFAULT NULL,
   bairro varchar(255) DEFAULT NULL,
@@ -75,7 +73,6 @@ CREATE TABLE usuario (
   dadosGerenteContas_inicio_contrato timestamp,
   dadosGerenteContas_nome varchar(255) DEFAULT NULL,
   active integer DEFAULT NULL,
-
   dados_agente_id integer,
   dados_fotografo_id integer,
   dados_vendedor_id integer,
@@ -86,11 +83,9 @@ CREATE TABLE usuario (
   tem_app_inquilino smallint,
   tem_contrato_ativo smallint,
   inquilino smallint,
-
   first_dt_document_sent timestamp,
   last_dt_document_sent timestamp,
   first_dt_sent_to_insurance timestamp,
-
   criado_em timestamp DEFAULT NULL ,
   atualizado_em timestamp DEFAULT NULL
 )
