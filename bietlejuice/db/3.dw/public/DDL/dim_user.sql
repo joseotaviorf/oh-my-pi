@@ -80,6 +80,8 @@ CREATE TABLE dim_user (
   dados_fotografo_id integer,
   dados_vendedor_id integer,
   dados_afiliado_id integer,
+  flg_doorman_affiliate integer,
+  sk_doorman_joined_date bigint,
   tem_imovel varchar(10),
   tem_app_inquilino varchar(10),
   tem_contrato_ativo varchar(10),
