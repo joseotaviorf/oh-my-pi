@@ -90,7 +90,7 @@ SELECT
   dados_vendedor_id,
   dados_afiliado_id,
   flg_doorman_affiliate,
-  dt_doorman_joined,
+  coalesce(to_char(dt_doorman_joined, 'YYYYMMDD')::integer, -1) as sk_doorman_joined_date,
   tem_imovel,
   tem_app_inquilino,
   tem_contrato_ativo,
