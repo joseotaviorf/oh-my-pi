@@ -5,6 +5,7 @@ from gzip import GzipFile
 from io import BytesIO
 
 import boto3
+from botocore.exceptions import ClientError
 from pymongo import MongoClient
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
@@ -60,6 +61,20 @@ class CRMTasks(object):
         raise NotImplementedError
 
     # instance methods
+    @logger
+    def _data_existence_check(self, bucket_type):
+        file_path = '{}/{}/{}/dt={}/data.gz'.format(bucket_type, CRMTasks.BUCKET_FOLDER_SUFFIX, self._class,
+                                                    self.partition_date)
+
+        try:
+            self.s3_resource.Object(self.s3_bucket, file_path).load()
+        except ClientError as e:
+            if e.response['Error']['Code'] == '404':
+                return False  # file does not exist
+            raise  # something else had gone wrong
+
+        return True
+
     def __add_incremental_constraints(self, _type):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
@@ -139,6 +154,10 @@ class CRMTasks(object):
 
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, total_count):
+        if json_list is None or json_list.count() == 0:
+            _logger.info('m=__save_to_s3, msg=no results')
+            return
+
         self.__delete_old_files()
 
         _logger.info('m=__save_to_s3, msg=gzipping json_list')
