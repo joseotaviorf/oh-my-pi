@@ -63,20 +63,14 @@ class CRMTasks(object):
     def __add_incremental_constraints(self, _filter):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
-        _filter['$or'] = [
+        _filter['$and'].append(
             {
                 'actions.date': {
                     '$gte': self.execution_date_from,
                     '$lte': self.execution_date_to
                 }
-            },
-            {
-                'dataInicio': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
             }
-        ]
+        )
 
         return _filter
 
