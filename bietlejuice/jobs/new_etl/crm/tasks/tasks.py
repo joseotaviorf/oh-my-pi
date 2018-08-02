@@ -60,29 +60,33 @@ class CRMTasks(object):
         raise NotImplementedError
 
     # instance methods
-    def __add_incremental_constraints(self, _filter):
+    def __add_incremental_constraints(self, _type):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
-        _filter['$or'] = [
-            {
-                'actions.date': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
-            },
-            {
-                'dataInicio': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
+        if _type is None:
+            _logger.info('m=__add_incremental_constraints, _type=None')
+            raise ValueError
+
+        if isinstance(_type, list):
+            # TODO add '$in' field to contemplate multiple CRM queues
+            _filter = None
+
+        else:
+            _filter = {
+                '$and': [{
+                    'type': _type,  # adding child previous filter
+                    'actions.date': {
+                        '$gte': self.execution_date_from,
+                        '$lte': self.execution_date_to
+                    }
+                }]
             }
-        ]
 
         return _filter
 
-    @logger(exclude='_filter')
-    def _extract_and_load_data(self, _filter, fields_projection=None):
-        incremental_filter = self.__add_incremental_constraints(_filter)
+    @logger
+    def _extract_and_load_data(self, _type, fields_projection=None):
+        incremental_filter = self.__add_incremental_constraints(_type)
 
         db = self.mongo_client.tasks
         collection_gen = db.tasks.find(
