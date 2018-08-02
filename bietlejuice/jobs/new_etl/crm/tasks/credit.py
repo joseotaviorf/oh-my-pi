@@ -13,12 +13,8 @@ class CRMTasksCredit(CRMTasks):
 
     @logger
     def extract_and_load_data(self):
-        _filter = {
-            'type': 'EnviarCardiff'
-        }
-
         self._extract_and_load_data(
-            _filter=_filter
+            _type='EnviarCardiff'
         )
 
     @logger
