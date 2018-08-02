@@ -69,20 +69,28 @@ class CRMTasks(object):
 
         if isinstance(_type, list):
             # TODO add '$in' field to contemplate multiple CRM queues
-            _filter = None
+            return None
 
         else:
-            _filter = {
-                '$and': [{
-                    'type': _type,  # adding child previous filter
-                    'actions.date': {
-                        '$gte': self.execution_date_from,
-                        '$lte': self.execution_date_to
+            return {
+                '$and': [
+                    {
+                        # adding child previous filter for better performance
+                        # (if type not found, actions won't be evaluated)
+                        'type': _type,
+                    },
+                    {
+                        'actions': {
+                            '$elemMatch': {
+                                'date': {
+                                    '$lte': self.execution_date_to,
+                                    '$gte': self.execution_date_from
+                                }
+                            }
+                        }
                     }
-                }]
+                ]
             }
-
-        return _filter
 
     @logger
     def _extract_and_load_data(self, _type, fields_projection=None):
