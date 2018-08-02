@@ -84,7 +84,7 @@ class CRMTasks(object):
 
         return _filter
 
-    @logger(exclude='_filter')
+    @logger
     def _extract_and_load_data(self, _type, fields_projection=None):
         incremental_filter = self.__add_incremental_constraints(_type)
 
