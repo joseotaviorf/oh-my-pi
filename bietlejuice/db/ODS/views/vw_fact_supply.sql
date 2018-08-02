@@ -176,8 +176,7 @@ initial_categories as (
 			else 'Other'
 		end as mkt_category,
 		case
-			when lead_type in ('Proporparceria', 'CadastroImobiliario') then 'Other'
-			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
+			when acquisition_method not in ('Self-Service', 'Non-Self Service') then 'Other'
 			else acquisition_method
 		end as mkt_flow,
 		case
@@ -200,7 +199,6 @@ final_categories as (
 	select
 		*,
 		case
-			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when mkt_flow in ('Non-Self Service', 'Other') then mkt_flow
 			when isales_intervention and mkt_flow = 'Self-Service' then 'Recovered Self-Service'
 			when mkt_flow = 'Self-Service'  then 'Full Self-Service'
