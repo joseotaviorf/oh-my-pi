@@ -53,7 +53,8 @@ select
     ), -1) as sk_task_user_end_date,
   dt_task_user_end,
   task_user_type,
-  task_user_resolve_hours
+  task_user_resolve_hours,
+  now() as dt_timestamp
 from _result
 where dt = '__PARTITION_DATE__'
 ;
