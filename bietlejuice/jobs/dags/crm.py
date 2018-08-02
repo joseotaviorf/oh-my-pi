@@ -1,6 +1,8 @@
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from airflow.operators.python_operator import ShortCircuitOperator
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,6 +20,17 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 
 # functions
+def data_existence_check(_class, bucket_type, **kwargs):
+    crm_tasks = CRMTasksFactory.factory(
+        _class=_class,
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_tasks._data_existence_check(bucket_type)
+
+
 def upsert_partition(_class, bucket_type, **kwargs):
     crm_tasks = CRMTasksFactory.factory(
         _class=_class,
@@ -106,6 +119,17 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
+    data_existence_check_task = ShortCircuitOperator(
+        task_id='data_existence_check',
+        python_callable=data_existence_check,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'bucket_type': 'raw'
+        }
+    )
+
     upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
         task_id='upsert_raw_partition',
         func_command=upsert_partition,
@@ -158,7 +182,13 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    extract_and_load_task >> upsert_raw_partition_task >> move_to_clean_task >> upsert_clean_partition_task
+    airflow_helpers.chain(
+        extract_and_load_task,
+        data_existence_check_task,
+        upsert_raw_partition_task,
+        move_to_clean_task,
+        upsert_clean_partition_task
+    )
     upsert_clean_partition_task.set_downstream([load_dim_task, load_fact_task])
 
     return local_dag
