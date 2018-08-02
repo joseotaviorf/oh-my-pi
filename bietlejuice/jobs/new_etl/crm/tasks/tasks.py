@@ -69,17 +69,18 @@ class CRMTasks(object):
 
         if isinstance(_type, list):
             # TODO add '$in' field to contemplate multiple CRM queues
-            pass
+            _filter = None
 
-        _filter = {
-            '$and': [{
-                'type': _type,  # adding child previous filter
-                'actions.date': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
-            }]
-        }
+        else:
+            _filter = {
+                '$and': [{
+                    'type': _type,  # adding child previous filter
+                    'actions.date': {
+                        '$gte': self.execution_date_from,
+                        '$lte': self.execution_date_to
+                    }
+                }]
+            }
 
         return _filter
 
