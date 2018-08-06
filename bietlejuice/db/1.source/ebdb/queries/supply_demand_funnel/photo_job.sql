@@ -6,6 +6,7 @@ select
         then 'ComProblema'
         else f.status
       end as job_status,
+      coalesce(h.photoShootSchedulingReason, h.status) as job_detailed_status,
       case
         when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
         when creator.dadosFotografo_id is not null then 'Fotografo'
@@ -119,4 +120,13 @@ select
         and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
       group by jf.id
     ) first_pub on first_pub.id = f.id
+    left join
+    (
+      SELECT
+        hrs_aud.photoShoot_id,
+        MAX(REV) as rev
+      FROM HouseRegistrationStatus_AUD hrs_aud
+      GROUP BY hrs_aud.photoShoot_id
+    ) rev on rev.photoShoot_id = f.id
+    left join HouseRegistrationStatus_AUD h on h.REV = rev.rev
 where DATE(coalesce(f.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
