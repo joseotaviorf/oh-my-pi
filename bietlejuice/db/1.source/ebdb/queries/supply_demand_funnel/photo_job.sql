@@ -6,7 +6,6 @@ select
         then 'ComProblema'
         else f.status
       end as job_status,
-      coalesce(h.photoShootSchedulingReason, h.status) as job_detailed_status,
       case
         when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
         when creator.dadosFotografo_id is not null then 'Fotografo'
@@ -65,6 +64,7 @@ select
         when creator.dadosVendedor_id is not null then creator.id
         else null
       end as rep_id,
+      h.photoShootSchedulingReason as job_scheduling_reason,
       TIMESTAMPDIFF(
         MINUTE,
         f.dataCriacao,
