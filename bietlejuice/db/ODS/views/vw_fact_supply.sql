@@ -226,7 +226,7 @@ final_categories as (
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
-			else 'Online Paid'
+			else null
 		end as mkt_channel,
 		case
 			when isales_direct_register or cx_direct_register then 'Admin'
@@ -376,7 +376,7 @@ select
 	mkt_flow,
 	mkt_completion,
 	mkt_channel_type,
-	mkt_channel,
+	coalesce(mkt_channel, mkt_medium) as mkt_channel,
 	case when reprocessed_flg then trim(concat('Reprocessed ', mkt_platform)) else mkt_platform end as mkt_platform,
 	mkt_medium,
 	mkt_source,
