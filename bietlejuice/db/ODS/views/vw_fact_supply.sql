@@ -184,14 +184,26 @@ initial_categories as (
 			else 'Other'
 		end as mkt_branded,
 		case
-			when reprocessed_flg then 'Reprocessed'
 			when lead_type in ('Afiliado', 'OpenLink', 'LandingOpenLink') then 'Affiliates'
 			when b2b_lead or doorman_lead then 'Affiliates'
+			when lead_type = 'Marketing' and lead_origin = 'Facebook' then 'Online Paid'
+			when trim(utm_medium) = 'classifieds' then 'Online Classifieds'
+			when branded_lead then 'Organic'
+			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Organic'
+			when lead_origin ='Landing' and utm_source like 'facebook%' and utm_medium = 'social' then 'Organic'
+			when lead_type = 'BrokenOpenLink' then 'Organic'
+			when utm_source = 'mkt_supply' then 'Organic'
+			when reprocessed_flg then 'Other'
 			when lead_origin = 'Crawling' then 'Other'
 			when isales_direct_register or cx_direct_register then 'Other'
 			when lead_type = 'OLX' and lead_origin is null then 'Other'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
-			else 'Online'
+			when lead_type = 'LandingMarketing' and utm_source in ('facebook', 'google') and not branded_lead then 'Online Paid'
+			when lead_type = 'Marketing' and utm_source in ('criteo', 'rtbhouse', 'ybox') then 'Online Paid'
+			when lead_type = 'Marketing' and (utm_source like '%facebook%' or utm_source like '%google%') then 'Online Paid'
+			when utm_medium is null and utm_source is null then 'Organic'
+			when lead_type = 'Marketing' and utm_source is null then 'Online Paid'
+			else 'Other'
 		end as mkt_channel_type
 	from potential_listings
 ), -- remaining categories
@@ -214,12 +226,6 @@ final_categories as (
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
-			when branded_lead then 'Online Free'
-			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Online Free'
-			when lead_origin ='Landing' and utm_source like 'facebook%' and utm_medium = 'social' then 'Online Free'
-			when lead_type = 'BrokenOpenLink' then 'Online Free'
-			when utm_source = 'mkt_supply' then 'Online Free'
-			when utm_medium is null and utm_source is null then 'Online Free'
 			else 'Online Paid'
 		end as mkt_channel,
 		case
