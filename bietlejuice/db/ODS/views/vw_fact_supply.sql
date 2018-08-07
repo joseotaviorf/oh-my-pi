@@ -307,7 +307,12 @@ final_categories as (
 			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
 			else null
-		end as mkt_source
+		end as mkt_source,
+	    case
+	        when lead_type = 'Organic' and lead_origin = 'OwnerPWA' then 'App Android'
+	        when mkt_channel_type = 'Organic' and lead_type is null and lead_origin is null then 'App iOS'
+            else null
+        end as mkt_device
 	from
 		initial_categories
 )
@@ -381,6 +386,7 @@ select
 	case when reprocessed_flg then trim(concat('Reprocessed ', mkt_platform)) else mkt_platform end as mkt_platform,
 	mkt_medium,
 	mkt_source,
+	mkt_device,
     now() as dt_timestamp
 from
 	final_categories
