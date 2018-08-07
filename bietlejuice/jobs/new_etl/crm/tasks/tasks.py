@@ -5,6 +5,7 @@ from gzip import GzipFile
 from io import BytesIO
 
 import boto3
+from botocore.exceptions import ClientError
 from pymongo import MongoClient
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
@@ -60,29 +61,54 @@ class CRMTasks(object):
         raise NotImplementedError
 
     # instance methods
-    def __add_incremental_constraints(self, _filter):
+    @logger
+    def _data_existence_check(self, bucket_type):
+        file_path = '{}/{}/{}/dt={}/data.gz'.format(bucket_type, CRMTasks.BUCKET_FOLDER_SUFFIX, self._class,
+                                                    self.partition_date)
+
+        try:
+            self.s3_resource.Object(self.s3_bucket, file_path).load()
+        except ClientError as e:
+            if e.response['Error']['Code'] == '404':
+                return False  # file does not exist
+            raise  # something else had gone wrong
+
+        return True
+
+    def __add_incremental_constraints(self, _type):
         _logger.info('m=__add_incremental_constraints, msg=init')
 
-        _filter['$or'] = [
-            {
-                'actions.date': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
-            },
-            {
-                'dataInicio': {
-                    '$gte': self.execution_date_from,
-                    '$lte': self.execution_date_to
-                }
-            }
-        ]
+        if _type is None:
+            _logger.info('m=__add_incremental_constraints, _type=None')
+            raise ValueError
 
-        return _filter
+        if isinstance(_type, list):
+            # TODO add '$in' field to contemplate multiple CRM queues
+            return None
 
-    @logger(exclude='_filter')
-    def _extract_and_load_data(self, _filter, fields_projection=None):
-        incremental_filter = self.__add_incremental_constraints(_filter)
+        return {
+            '$and': [
+                {
+                    # adding child previous filter for better performance
+                    # (if type not found, actions won't be evaluated)
+                    'type': _type,
+                },
+                {
+                    'actions': {
+                        '$elemMatch': {
+                            'date': {
+                                '$lte': self.execution_date_to,
+                                '$gte': self.execution_date_from
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+
+    @logger
+    def _extract_and_load_data(self, _type, fields_projection=None):
+        incremental_filter = self.__add_incremental_constraints(_type)
 
         db = self.mongo_client.tasks
         collection_gen = db.tasks.find(
@@ -128,6 +154,10 @@ class CRMTasks(object):
 
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, total_count):
+        if json_list is None or json_list.count() == 0:
+            _logger.info('m=__save_to_s3, msg=no results')
+            return
+
         self.__delete_old_files()
 
         _logger.info('m=__save_to_s3, msg=gzipping json_list')
