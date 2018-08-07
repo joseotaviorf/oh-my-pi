@@ -226,7 +226,8 @@ final_categories as (
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
-			else null
+			when mkt_channel_type in ('Online Paid', 'Organic', 'Online Classifieds') then null
+			else 'Other'
 		end as mkt_channel,
 		case
 			when isales_direct_register or cx_direct_register then 'Admin'
