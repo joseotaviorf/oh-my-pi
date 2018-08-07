@@ -205,12 +205,12 @@ final_categories as (
 			else 'Other'
 		end as mkt_completion,
 		case
-			when mkt_channel_type = 'Reprocessed' then 'Reprocessed'
+			when mkt_channel_type = 'Reprocessed' then 'Recovered Leads'
 			when doorman_lead then 'Doorman'
 			when lead_origin = 'Facebook' then 'Online Paid'
 			when b2b_lead then 'B2B'
-			when isales_direct_register then 'Inside Sales'
-			when cx_direct_register then 'CX'
+			when isales_direct_register then 'Lost Tracking'
+			when cx_direct_register then 'Lost Tracking'
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
 			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
@@ -246,13 +246,16 @@ final_categories as (
 			else 'Other'
 		end as mkt_platform,
 		case
+			when isales_direct_register then 'Inside Sales'
+			when cx_direct_register then 'CX'
+			when lead_type = 'OpenLink' then 'Direct Referral'
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when doorman_lead then null
 			when trim(utm_medium) like 'display%' then 'Display'
 			when lead_origin = 'Facebook' then 'Display'
 			when trim(utm_medium) = 'retargeting' then 'Retargeting'
 			when lead_type = 'OpenLink' and utm_medium is null then 'Product'
-			when trim(utm_medium) = 'email' then 'Email'
+			when trim(utm_medium) = 'email' then 'Notifications'
 			when trim(utm_medium) = 'product' then 'Product'
 			when trim(utm_medium) = 'whatsapp' then 'Whatsapp'
 			when trim(utm_medium) = 'profilepage' then 'Profile page'
@@ -261,33 +264,39 @@ final_categories as (
 			when trim(utm_medium) = 'affiliates' then 'Affiliate Networks'
 			when trim(utm_medium) = 'classifieds' then 'Classifieds'
 			when trim(utm_medium) = 'facebook' then 'Facebook'
-			when trim(utm_source) = 'quintoandar' then 'Organic'
+			when trim(utm_source) = 'quintoandar' then 'Direct'
 			when trim(utm_medium) = 'social' then 'Social'
 			when lead_origin = 'Desconhecida' then null
 			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Organic'
-			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Organic'
-			when utm_medium is null and utm_source is null and lead_type is null then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Direct'
+			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Direct'
+			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
 			when trim(utm_source) in ('google','bing') then 'SEM non-branded'
 			when mkt_flow = 'Other' then 'Other'
 			else null
 		end as mkt_medium,
 		case
+		    when isales_direct_register then 'Inside Sales'
+			when cx_direct_register then 'CX'
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when doorman_lead then null
-			when lead_type = 'OpenLink' then 'Direct Referral'
+			when trim(utm_source) = 'directreferral' and utm_medium is null then null
+			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'email' then 'Email'
+			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'product' then 'Product'
+			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'profilepage' then 'Profile Page'
+			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'whatsapp' then 'Whatsapp'
 			when trim(utm_source) like 'facebook%' or lead_origin = 'Facebook' then 'Facebook'
 			when trim(utm_source) like 'google%' then 'Google'
 			when trim(utm_source) = 'bing' then 'Bing'
 			when trim(utm_source) = 'rtbhouse' then 'RTB House'
 			when trim(utm_source) = 'Zap' then 'Zap'
 			when trim(utm_source) = 'ybox' then 'Ybox'
-			when trim(utm_source) = 'quintoandar' then 'Organic'
+			when trim(utm_source) = 'quintoandar' then 'Direct'
 			when lead_origin = 'Desconhecida' then null
 			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Organic'
-			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Organic'
-			when utm_medium is null and utm_source is null and lead_type is null then 'Organic'
+			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Direct'
+			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Direct'
+			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
 			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
 			else null
