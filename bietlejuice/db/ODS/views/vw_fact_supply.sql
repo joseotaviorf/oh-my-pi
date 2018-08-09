@@ -223,7 +223,6 @@ final_categories as (
 		case
 			when reprocessed_flg then 'Recovered Leads'
 			when doorman_lead then 'Doorman'
-			when lead_origin = 'Facebook' then 'Online Paid'
 			when b2b_lead then 'B2B'
 			when isales_direct_register then 'Lost Tracking'
 			when cx_direct_register then 'Lost Tracking'
@@ -265,6 +264,7 @@ final_categories as (
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when doorman_lead then null
 			when trim(utm_medium) like '%display%' then 'Display'
+			when lower(utm_medium) in ('source', 'post') then 'Display'
 			when lead_origin = 'Facebook' then 'Display'
 			when trim(utm_medium) = 'retargeting' then 'Retargeting'
 			when lead_type = 'OpenLink' and utm_medium is null then 'Product'
@@ -273,8 +273,8 @@ final_categories as (
 			when trim(utm_medium) = 'whatsapp' then 'Whatsapp'
 			when trim(utm_medium) = 'profilepage' then 'Profile page'
 			when branded_lead then 'SEM branded'
-			when trim(utm_medium) = 'cpc' then 'SEM non-branded'
-			when trim(utm_medium) = 'affiliates' then 'Affiliate Networks'
+			when trim(lower(utm_medium)) = 'cpc' then 'SEM non-branded'
+			when trim(utm_medium) like 'affiliate%' then 'Affiliate Networks'
 			when trim(utm_medium) = 'classifieds' then 'Classifieds'
 			when trim(utm_medium) = 'facebook' then 'Facebook'
 			when trim(utm_source) = 'quintoandar' then 'Direct'
@@ -288,6 +288,7 @@ final_categories as (
 			when trim(utm_source) like 'google%' then 'SEM non-branded'
 			when mkt_flow = 'Other' then 'Other'
 			when mkt_channel_type = 'Organic' then 'Direct'
+			when trim(lower(utm_source)) like 'facebook%' then 'Display'
 			else null
 		end as mkt_medium,
 		case
