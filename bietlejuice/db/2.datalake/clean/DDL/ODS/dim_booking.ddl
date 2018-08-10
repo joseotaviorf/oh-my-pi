@@ -40,7 +40,18 @@ create external table if not exists datalake_clean.ods_dim_booking (
   owner_arrived string,
   owner_missing_reason string,
   successful_entrance string,
-  troublesome_entrance string
+  troublesome_entrance string,
+  checkin_status string,
+  flg_branded string,
+  flg_via_reschedule string,
+  mkt_category string,
+  mkt_flow string,
+  mkt_completion string,
+  mkt_device string,
+  mkt_channel_type string,
+  mkt_channel string,
+  mkt_medium string,
+  mkt_source string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
