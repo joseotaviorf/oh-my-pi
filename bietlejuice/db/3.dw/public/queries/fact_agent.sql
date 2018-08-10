@@ -5,7 +5,7 @@ WITH schedule AS
 	sum(cast(t.available_slot_24h AS INTEGER)) AS available_slots,
 	sum(cast(t.specific_slot AS INTEGER)) AS available_slots_0
  FROM staging.agents_slots t
- WHERE DATE(t.slot_dt) = DATE('{}')
+ WHERE DATE(t.slot_dt) = DATE('{0}')
 GROUP BY 1, 2
 ),
 first_visits AS
@@ -15,6 +15,14 @@ first_visits AS
  FROM public.dim_booking db
  WHERE db.type = 'Visita'
  GROUP BY id_agent
+),
+available_next_days AS
+(SELECT
+	t.agent_id AS sk_agent_id,
+	case when sum(cast(t.available_slot_24h AS INTEGER)) > 0 then 1 else 0 end AS flg_available_next_days
+ FROM staging.agents_slots t
+ WHERE DATE(t.slot_dt) BETWEEN DATEADD(DAY, 1, DATE('{0}')) AND DATEADD(DAY, 3, DATE('{0}'))
+GROUP BY 1
 )
 SELECT
 	s.*,
@@ -25,8 +33,9 @@ SELECT
 	END AS total_slots,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	CAST(CAST(s.sk_date AS VARCHAR) + CAST(sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
+	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
 	dt_first_visit,
+	coalesce(av.flg_available_next_days, 0) as flg_available_next_days,
 	getdate() as dt_timestamp
 FROM schedule s
 JOIN public.dim_date d
@@ -36,4 +45,6 @@ LEFT JOIN public.dim_agent_region a
 		AND a.sk_agent = s.sk_agent_id
 LEFT JOIN first_visits fv
 	ON fv.id_agent = s.sk_agent_id
+LEFT JOIN available_next_days av
+    ON av.sk_agent_id = s.sk_agent_id
 ORDER BY s.sk_date;
