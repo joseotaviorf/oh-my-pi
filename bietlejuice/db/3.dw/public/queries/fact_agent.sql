@@ -21,7 +21,7 @@ available_next_days AS
 	t.agent_id AS sk_agent_id,
 	case when sum(cast(t.available_slot_24h AS INTEGER)) > 0 then 1 else 0 end AS flg_available_next_days
  FROM staging.agents_slots t
- WHERE DATE(t.slot_dt) BETWEEN DATEADD(DAY, 1, DATE('{0}')) AND DATEADD(DAY, 3, DATE('{0}'))
+ WHERE DATE(t.slot_dt) BETWEEN DATEADD(DAY, 1, DATE('{0}')) AND DATEADD(DAY, 4, DATE('{0}'))
 GROUP BY 1
 )
 SELECT
