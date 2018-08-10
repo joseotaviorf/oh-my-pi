@@ -15,7 +15,6 @@ class CRMTasksFactory(object):
         return __class(
             s3_bucket=s3_bucket,
             mongo_client_uri=mongo_client_uri,
-            _class=_class,
             execution_date=execution_date
         )
 

@@ -1,5 +1,5 @@
-drop table if exists crm.fact_credit_tasks;
-create table if not exists crm.fact_credit_tasks (
+drop table if exists staging.fact_credit_tasks;
+create table if not exists staging.fact_credit_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,5 +17,6 @@ create table if not exists crm.fact_credit_tasks (
   dt_task_user_end timestamp,
   task_user_type varchar,
   task_user_resolve_hours numeric(14,2),
-  dt_timestamp timestamp without time zone
-);
+  dt_partition date
+)
+;

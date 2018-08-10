@@ -6,5 +6,6 @@ DATALAKE_QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
 SORTINGHAT_QUERIES_DIR = os.path.join(dir_path, '../../db/sorting_hat/queries')
 EBDB_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries')
 LEAD_VARIANT_CONFIG_DIR = os.path.join(dir_path, 'leads/variant_config')
-DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/public/queries')
+DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/public/queries')  # remove after refactoring
+NEW_DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/queries')
 ODS_QUERIES_DIR = os.path.join(dir_path, '../../db/ODS/queries')
