@@ -164,45 +164,49 @@ initial_categories as (
 	select
 		*,
 		case
+			when lead_type = 'Afiliado' then 'Outbound'
+			when lead_origin = 'Desconhecida' then 'Other'
 			when reprocessed_flg then 'Outbound'
+			when flg_callcenter then 'Outbound'
 			when b2b_lead then 'Outbound'
 			when doorman_lead then 'Outbound'
-			when isales_direct_register or cx_direct_register then 'Inbound'
 			when lead_origin = 'Crawling' then 'Outbound'
 			when lead_type = 'OLX' and lead_origin is null then 'Outbound'
-			when lead_type = 'Afiliado' then 'Outbound'
-			when lead_type in ('Marketing', 'OpenLink', 'BrokenOpenLink') then 'Inbound'
-			when acquisition_method = 'Self-Service' then 'Inbound'
-			else 'Other'
+			when lead_origin = 'Reprocessado' then 'Outbound'
+		    else 'Inbound'
 		end as mkt_category,
 		case
-			when acquisition_method not in ('Self-Service', 'Non-Self Service') then 'Other'
-			else acquisition_method
+			when lead_origin = 'OwnerPWA' then 'Self-Service'
+			when lead_type is null and lead_origin is null and
+				not(doorman_lead) and not(isales_direct_register) and not(cx_direct_register) and not(flg_callcenter) and not(isales_intervention) and not(b2b_lead) then 'Self-Service'
+			else 'Non-Self Service'
 		end as mkt_flow,
 		case
 			when branded_lead then 'Branded'
 			else 'Other'
 		end as mkt_branded,
 		case
+			when reprocessed_flg then 'Other'
 			when lead_type in ('Afiliado', 'OpenLink', 'LandingOpenLink') then 'Affiliates'
 			when b2b_lead or doorman_lead then 'Affiliates'
 			when lead_type = 'Marketing' and lead_origin = 'Facebook' then 'Online Paid'
 			when trim(utm_medium) = 'classifieds' then 'Online Classifieds'
 			when branded_lead then 'Organic'
 			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Organic'
-			when lead_origin ='Landing' and utm_source like 'facebook%' and utm_medium = 'social' then 'Organic'
+			when (lead_type = 'LandingMarketing' or lead_origin = 'Landing') and utm_source like 'facebook%' and utm_medium = 'social' then 'Organic'
 			when lead_type = 'BrokenOpenLink' then 'Organic'
 			when utm_source = 'mkt_supply' then 'Organic'
-			when reprocessed_flg then 'Other'
 			when lead_origin = 'Crawling' then 'Other'
 			when isales_direct_register or cx_direct_register then 'Other'
 			when lead_type = 'OLX' and lead_origin is null then 'Other'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
-			when lead_type = 'LandingMarketing' and utm_source in ('facebook', 'google') and not branded_lead then 'Online Paid'
-			when lead_type = 'Marketing' and utm_source in ('criteo', 'rtbhouse', 'ybox') then 'Online Paid'
+			when lead_type = 'LandingMarketing' and lower(utm_source) in ('facebook', 'google', 'criteo', 'trovit') and not branded_lead then 'Online Paid'
+			when lead_type = 'LandingMarketing' and (utm_source like 'facebook%' or utm_source like 'google%') and not branded_lead then 'Online Paid'
+			when lead_type = 'Marketing' and (utm_source in ('criteo', 'rtbhouse', 'ybox', 'bing') or lower(utm_medium) like 'cpc%') then 'Online Paid'
 			when lead_type = 'Marketing' and (utm_source like '%facebook%' or utm_source like '%google%') then 'Online Paid'
 			when utm_medium is null and utm_source is null then 'Organic'
 			when lead_type = 'Marketing' and utm_source is null then 'Online Paid'
+			when lead_type = 'Marketing' and lower(utm_medium) = 'affiliates' then 'Online Paid'
 			else 'Other'
 		end as mkt_channel_type
 	from potential_listings
@@ -217,27 +221,28 @@ final_categories as (
 			else 'Other'
 		end as mkt_completion,
 		case
-			when mkt_channel_type = 'Reprocessed' then 'Recovered Leads'
+			when reprocessed_flg then 'Recovered Leads'
 			when doorman_lead then 'Doorman'
-			when lead_origin = 'Facebook' then 'Online Paid'
 			when b2b_lead then 'B2B'
 			when isales_direct_register then 'Lost Tracking'
 			when cx_direct_register then 'Lost Tracking'
 			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
 			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
-			when lead_origin = 'Crawling' or lead_type = 'OLX' then 'Crawling'
+			when lead_origin = 'Crawling' or lead_type = 'OLX' or flg_callcenter then 'Crawling'
+			when lower(utm_source) = 'directreferral' then 'Direct Referral'
 			when mkt_channel_type in ('Online Paid', 'Organic', 'Online Classifieds') then null
 			else 'Other'
 		end as mkt_channel,
 		case
+			when flg_callcenter then 'Crawling Indirect'
 			when isales_direct_register or cx_direct_register then 'Admin'
 			when lead_origin = 'Facebook' then 'Online Lead Ads'
 			when b2b_lead then 'B2B Landing Page Form'
-			when mkt_flow = 'Self-Service' and mkt_channel_type = 'Online' then 'Online Owner App'
-			when mkt_flow = 'Self-Service' and mkt_channel_type = 'Affiliates' then 'IndicaAi Owner App'
+			when lead_type = 'LandingOpenLink' and utm_source = 'directreferral' then 'IndicaAi Owner App'
+			when lead_origin = 'OwnerPWA' and coalesce(utm_source,'') <> 'directreferral' then 'Online Owner App'
 			when mkt_flow = 'Other' and mkt_channel_type = 'Online' then 'Online Other'
-			when lead_origin = 'Crawling' then 'Crawling'
-			when lead_type = 'OLX' and lead_origin is null then 'Crawling'
+			when lead_origin = 'Crawling' then 'Crawling Direct'
+			when lead_type = 'OLX' and lead_origin is null then 'Crawling Direct'
 			when doorman_lead and (lead_origin = 'Form' or lead_origin is null) then 'Doorman Whatsapp'
 			when doorman_lead then 'Doorman Other'
 			when lead_type = 'OpenLink' then 'IndicaAi Landing Page Form'
@@ -245,20 +250,21 @@ final_categories as (
 			when lead_type = 'Afiliado' and lead_origin = 'App' then 'IndicaAi App'
 			when lead_type = 'Afiliado' and lead_origin = 'Desconhecida' then 'IndicaAi Unknown'
 			when lead_type = 'Afiliado' and lead_origin = 'Planilha' then 'IndicaAi Spreadsheet'
-			when lead_origin = 'Reprocessado' then 'Other'
-			when lead_origin = 'Desconhecida' then 'Online Other'
+			when lead_origin in ('Reprocessado', 'Desconhecida') then 'Other'
 			when lead_origin = 'Landing' then 'Online Landing Page Form'
 			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
 			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
 			else 'Other'
 		end as mkt_platform,
 		case
+			when flg_callcenter then null
 			when isales_direct_register then 'Inside Sales'
 			when cx_direct_register then 'CX'
-			when lead_type = 'OpenLink' then 'Direct Referral'
+			when lower(utm_source) = 'directreferral' then 'Direct Referral'
 			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when doorman_lead then null
-			when trim(utm_medium) like 'display%' then 'Display'
+			when trim(utm_medium) like '%display%' then 'Display'
+			when lower(utm_medium) in ('source', 'post') then 'Display'
 			when lead_origin = 'Facebook' then 'Display'
 			when trim(utm_medium) = 'retargeting' then 'Retargeting'
 			when lead_type = 'OpenLink' and utm_medium is null then 'Product'
@@ -267,8 +273,8 @@ final_categories as (
 			when trim(utm_medium) = 'whatsapp' then 'Whatsapp'
 			when trim(utm_medium) = 'profilepage' then 'Profile page'
 			when branded_lead then 'SEM branded'
-			when trim(utm_medium) = 'cpc' then 'SEM non-branded'
-			when trim(utm_medium) = 'affiliates' then 'Affiliate Networks'
+			when trim(lower(utm_medium)) = 'cpc' then 'SEM non-branded'
+			when trim(utm_medium) like 'affiliate%' then 'Affiliate Networks'
 			when trim(utm_medium) = 'classifieds' then 'Classifieds'
 			when trim(utm_medium) = 'facebook' then 'Facebook'
 			when trim(utm_source) = 'quintoandar' then 'Direct'
@@ -279,26 +285,31 @@ final_categories as (
 			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Direct'
 			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
 			when trim(utm_source) in ('google','bing') then 'SEM non-branded'
+			when trim(utm_source) like 'google%' then 'SEM non-branded'
 			when mkt_flow = 'Other' then 'Other'
+			when mkt_channel_type = 'Organic' then 'Direct'
+			when trim(lower(utm_source)) like 'facebook%' then 'Display'
 			else null
 		end as mkt_medium,
 		case
+		    when flg_callcenter then null
 		    when isales_direct_register then 'Inside Sales'
 			when cx_direct_register then 'CX'
-			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
 			when doorman_lead then null
 			when trim(utm_source) = 'directreferral' and utm_medium is null then null
 			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'email' then 'Email'
 			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'product' then 'Product'
 			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'profilepage' then 'Profile Page'
 			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'whatsapp' then 'Whatsapp'
-			when trim(utm_source) like 'facebook%' or lead_origin = 'Facebook' then 'Facebook'
+			when trim(utm_source) like 'facebook%' or lead_origin = 'Facebook' or trim(utm_medium) = 'facebook' then 'Facebook'
 			when trim(utm_source) like 'google%' then 'Google'
 			when trim(utm_source) = 'bing' then 'Bing'
 			when trim(utm_source) = 'rtbhouse' then 'RTB House'
 			when trim(utm_source) = 'Zap' then 'Zap'
 			when trim(utm_source) = 'ybox' then 'Ybox'
 			when trim(utm_source) = 'quintoandar' then 'Direct'
+			when trim(utm_source) = 'criteo' then 'Criteo'
+			when trim(utm_source) = 'Trovit' then 'Trovit'
 			when lead_origin = 'Desconhecida' then null
 			when lead_type = 'OLX' then null
 			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Direct'
@@ -306,9 +317,10 @@ final_categories as (
 			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
 			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
 			when mkt_flow = 'Other' then 'Other'
+			when mkt_channel_type = 'Organic' then 'Direct'
 			else null
 		end as mkt_source,
-	    case
+        case
 	        when lead_type = 'Organic' and lead_origin = 'OwnerPWA' then 'App Android'
 	        when mkt_channel_type = 'Organic' and lead_type is null and lead_origin is null then 'App iOS'
             else null
@@ -383,7 +395,7 @@ select
 	mkt_completion,
 	mkt_channel_type,
 	coalesce(mkt_channel, mkt_medium) as mkt_channel,
-	case when reprocessed_flg then trim(concat('Reprocessed ', mkt_platform)) else mkt_platform end as mkt_platform,
+	case when reprocessed_flg then trim(concat('Recovered Leads ', mkt_platform)) else mkt_platform end as mkt_platform,
 	mkt_medium,
 	mkt_source,
 	mkt_device,
