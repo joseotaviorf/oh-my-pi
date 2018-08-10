@@ -47,6 +47,7 @@ select
 	j1.user_cancel_email,
 	j1.user_cancel_type,
 	(j2.id is not null) as rescheduled,
+	j1.job_scheduling_reason,
 	j1.creation_to_scheduling_diff_minutes,
 	j1.creation_to_scheduling_diff_hours,
 	j1.creation_to_scheduling_diff_days

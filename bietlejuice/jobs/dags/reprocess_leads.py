@@ -108,7 +108,7 @@ dag = BaseDAG.build_dag(
     wait_for_downstream=False,
     depends_on_past=False,
     start_date=MAIN_START_DATE,
-    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     catchup=False
 )
 
