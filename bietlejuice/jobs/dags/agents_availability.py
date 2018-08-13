@@ -2,12 +2,11 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
-
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.dags import DW_STAGING_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -21,7 +20,7 @@ def read_query(file_name):
 
 @logger
 def delete_old_entries(entity, execution_date=None):
-    query = ("delete from staging.{0} where date(slot_dt) = date('{1}')".format(entity, execution_date)
+    query = ("delete from staging.{0} where date(slot_dt) >= date('{1}')".format(entity, execution_date)
              if execution_date is not None else 'truncate staging.{0}'.format(entity))
 
     BaseETL.execute_command(

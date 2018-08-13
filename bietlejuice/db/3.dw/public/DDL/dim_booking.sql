@@ -43,5 +43,15 @@ CREATE TABLE dim_booking (
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
   checkin_status varchar(255),
+  flg_branded boolean,
+  flg_via_reschedule boolean,
+  mkt_category varchar(255),
+  mkt_flow varchar(255),
+  mkt_completion varchar(255),
+  mkt_device varchar(255),
+  mkt_channel_type varchar(255),
+  mkt_channel varchar(255),
+  mkt_medium varchar(255),
+  mkt_source varchar(255),
   CONSTRAINT dim_booking_pkey PRIMARY KEY(sk_booking)
 );
