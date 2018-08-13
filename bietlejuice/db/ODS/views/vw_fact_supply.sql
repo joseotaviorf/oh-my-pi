@@ -178,7 +178,8 @@ initial_categories as (
 		case
 			when lead_origin = 'OwnerPWA' then 'Self-Service'
 			when lead_type is null and lead_origin is null and
-				not(doorman_lead) and not(isales_direct_register) and not(cx_direct_register) and not(flg_callcenter) and not(isales_intervention) and not(b2b_lead) then 'Self-Service'
+				not(coalesce(doorman_lead, false)) and not(coalesce(isales_direct_register, false)) and not(coalesce(cx_direct_register, false))
+				and not(coalesce(flg_callcenter, false)) and not(coalesce(isales_intervention, false)) and not(coalesce(b2b_lead, false)) then 'Self-Service'
 			else 'Non-Self Service'
 		end as mkt_flow,
 		case
