@@ -1,3 +1,6 @@
+from io import BytesIO
+
+import boto3
 import pandas as pd
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
@@ -10,12 +13,13 @@ class S3ToODS(object):
         self.files = S3FileReader().get_files_from_bucket(xls_s3_bucket)
         self.schema = 'files'
         self.s3_bucket = s3_bucket
+        self.s3_client = boto3.resource('s3')
 
     @logger
     def move_files_to_ods(self):
         for f in self.files:
             try:
-                table = pd.read_excel(f[0], skiprows=1)
+                table = pd.read_excel(f[0], skiprows=0)
                 table = table.where(pd.notnull(table), None)
 
                 table_name = f[1]
@@ -45,24 +49,24 @@ class S3ToODS(object):
                     encoding='utf-8'
                 )
 
-                _logger.info('m=move_files_to_ods, msg=to_s3 (raw)')
-                BaseETL.to_s3(
-                    filename=table_name,
-                    data_table=table,
-                    bucket_folder_path='{}/raw/files/{}'.format(self.s3_bucket, table_name),
-                    encoding='utf8',
-                    tmp_dir='/tmp'
-                )
+                self.move_df_to_datalake(df=table, tablename=table_name)
 
-                # temp storing the same file on "clean" directory
-                # in the future, we will need to do some cleansing in data
-                _logger.info('m=move_files_to_ods, msg=to_s3 (clean)')
-                BaseETL.to_s3(
-                    filename=table_name,
-                    data_table=table,
-                    bucket_folder_path='{}/clean/files/{}'.format(self.s3_bucket, table_name),
-                    encoding='utf8',
-                    tmp_dir='/tmp'
-                )
             except Exception as ex:
                 _logger.error(ex)
+
+    @logger(exclude='df')
+    def move_df_to_datalake(self, df, tablename):
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False, sep=';', encoding='utf-8', header=True)
+
+        _logger.info('m=move_df_to_datalake, msg=to_s3 (raw)')
+        file_path = '{0}/files/{1}/{1}.csv'.format('raw', tablename)
+        self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
+
+        # temp storing the same file on "clean" directory
+        # in the future, we will need to do some cleansing in data
+        _logger.info('m=move_df_to_datalake, msg=to_s3 (clean)')
+        file_path = '{0}/files/{1}/{1}.csv'.format('clean', tablename)
+        self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
+
+        csv_buffer.flush()

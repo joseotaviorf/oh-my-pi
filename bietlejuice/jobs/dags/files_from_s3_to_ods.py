@@ -28,6 +28,7 @@ dag = DAG(
     },
     start_date=datetime(2018, 1, 1, 0, 0, 0),
     schedule_interval='0 4 * * *',
+    catchup=False,
     max_active_runs=1
 )
 
