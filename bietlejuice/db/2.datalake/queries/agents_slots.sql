@@ -200,7 +200,12 @@ with weekly_schedule_prev as (
 			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 96
 			then true
 			else false
-		end as time_window_update
+		end as time_window_update,
+		case
+			when available_slot = '1' and date_diff('hour', coalesce(last_specific_update, last_weekly_update), slot_dt) < 24
+			then '0'
+			else available_slot
+		end as available_slot_24h
 	from
 		specific_updates sc
 )
@@ -238,7 +243,12 @@ with weekly_schedule_prev as (
 			when (fv.agent_id is not null) and tw.available_slot = '0' then true
 			when lag((fv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) and tw.available_slot = '0' then true
 			else false
-		end as visit_update
+		end as visit_update,
+				case
+			when (fv.agent_id is not null) then '1'
+			when lag((fv.agent_id is not null)) over (partition by tw.agent_id order by tw.slot_dt) then '1'
+			else tw.available_slot_24h
+		end as available_slot_24h
 	from
 		time_window_updates tw
 	left join
@@ -294,6 +304,7 @@ select
 	vu.slot_number,
 	vu.ss_available_slot,
 	vu.available_slot,
+	vu.available_slot_24h,
 	vu.specific_update,
 	vu.time_window_update,
 	vu.visit_update,
@@ -313,7 +324,7 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
-where date(vu.slot_dt) = date('{}')
+where date(vu.slot_dt) between date('{0}') and date('{0}') + interval '4' day
    and ah.status = '1'
 order by vu.slot_dt
 ;

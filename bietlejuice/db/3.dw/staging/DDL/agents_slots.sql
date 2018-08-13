@@ -7,6 +7,7 @@ CREATE TABLE staging.agents_slots (
 	slot_number int4,
 	ss_available_slot int4,
 	available_slot int4,
+	available_slot_24h int4,
 	specific_update bool,
 	time_window_update bool,
 	visit_update bool,

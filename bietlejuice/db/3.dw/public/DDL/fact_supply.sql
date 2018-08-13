@@ -60,6 +60,7 @@ create table public.fact_supply (
 	flg_isales_direct_register boolean,
 	flg_cx_direct_register boolean,
 	flg_isales_intervention boolean,
+	flg_callcenter boolean,
 	mkt_branded varchar(255),
 	mkt_category varchar(255),
 	mkt_flow varchar(255),
@@ -69,5 +70,6 @@ create table public.fact_supply (
 	mkt_platform varchar(255),
 	mkt_medium varchar(255),
 	mkt_source varchar(255),
+	mkt_device varchar(255),
 	dt_timestamp timestamp default getdate()
 )

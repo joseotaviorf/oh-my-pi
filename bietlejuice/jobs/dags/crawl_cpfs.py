@@ -39,7 +39,7 @@ def crawl_cpfs(delta_days=0, ws='vivareal', limit=0, threads=3):
     job = BatchClient().start_batch_job(
         job_name='crawl_' + suffix.split('.')[0].replace('-', '_'),
         job_queue='crawling-cpfs',
-        job_definition='crawling-cpfs:2',
+        job_definition='crawling-cpfs:4',
         command=['./crawlers/get_cpfs.py',
                  's3://{}/{}'.format(s3_bucket, filename),
                  '--max_crawl', '1000000', '--threads', str(threads)]
