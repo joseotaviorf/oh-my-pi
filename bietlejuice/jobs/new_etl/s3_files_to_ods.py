@@ -1,3 +1,6 @@
+from io import BytesIO
+
+import boto3
 import pandas as pd
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
@@ -10,6 +13,7 @@ class S3ToODS(object):
         self.files = S3FileReader().get_files_from_bucket(xls_s3_bucket)
         self.schema = 'files'
         self.s3_bucket = s3_bucket
+        self.s3_client = boto3.resource('s3')
 
     @logger
     def move_files_to_ods(self):
@@ -46,23 +50,20 @@ class S3ToODS(object):
                 )
 
                 _logger.info('m=move_files_to_ods, msg=to_s3 (raw)')
-                BaseETL.to_s3(
-                    filename=table_name,
-                    data_table=table,
-                    bucket_folder_path='{}/raw/files/{}'.format(self.s3_bucket, table_name),
-                    encoding='utf8',
-                    tmp_dir='/tmp'
-                )
+                csv_buffer_raw = BytesIO()
+                table.to_csv(csv_buffer_raw, index=False, sep=',', encoding='utf-8', header=True)
+                file_path = 'raw/files/{0}/{0}.csv'.format(table_name)
+                self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer_raw.getvalue())
+                csv_buffer_raw.flush()
 
                 # temp storing the same file on "clean" directory
                 # in the future, we will need to do some cleansing in data
                 _logger.info('m=move_files_to_ods, msg=to_s3 (clean)')
-                BaseETL.to_s3(
-                    filename=table_name,
-                    data_table=table,
-                    bucket_folder_path='{}/clean/files/{}'.format(self.s3_bucket, table_name),
-                    encoding='utf8',
-                    tmp_dir='/tmp'
-                )
+                csv_buffer_clean = BytesIO()
+                table.to_csv(csv_buffer_clean, index=False, sep=',', encoding='utf-8', header=True)
+                file_path = 'clean/files/{0}/{0}.csv'.format(table_name)
+                self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer_clean.getvalue())
+                csv_buffer_clean.flush()
+
             except Exception as ex:
                 _logger.error(ex)
