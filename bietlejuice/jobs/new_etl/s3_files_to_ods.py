@@ -49,21 +49,24 @@ class S3ToODS(object):
                     encoding='utf-8'
                 )
 
-                _logger.info('m=move_files_to_ods, msg=to_s3 (raw)')
-                csv_buffer_raw = BytesIO()
-                table.to_csv(csv_buffer_raw, index=False, sep=';', encoding='utf-8', header=True)
-                file_path = 'raw/files/{0}/{0}.csv'.format(table_name)
-                self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer_raw.getvalue())
-                csv_buffer_raw.flush()
-
-                # temp storing the same file on "clean" directory
-                # in the future, we will need to do some cleansing in data
-                _logger.info('m=move_files_to_ods, msg=to_s3 (clean)')
-                csv_buffer_clean = BytesIO()
-                table.to_csv(csv_buffer_clean, index=False, sep=';', encoding='utf-8', header=True)
-                file_path = 'clean/files/{0}/{0}.csv'.format(table_name)
-                self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer_clean.getvalue())
-                csv_buffer_clean.flush()
+                self.move_df_to_datalake(df=table, tablename=table_name)
 
             except Exception as ex:
                 _logger.error(ex)
+
+    @logger(exclude='df')
+    def move_df_to_datalake(self, df, tablename):
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False, sep=';', encoding='utf-8', header=True)
+
+        _logger.info('m=move_df_to_datalake, msg=to_s3 (raw)')
+        file_path = '{0}/files/{1}/{1}.csv'.format('raw', tablename)
+        self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
+
+        # temp storing the same file on "clean" directory
+        # in the future, we will need to do some cleansing in data
+        _logger.info('m=move_df_to_datalake, msg=to_s3 (clean)')
+        file_path = '{0}/files/{1}/{1}.csv'.format('clean', tablename)
+        self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
+
+        csv_buffer.flush()
