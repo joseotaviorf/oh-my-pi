@@ -36,6 +36,7 @@ CREATE TABLE public.lead
   condominio integer,
   iptu integer,
   reason character varying(255) DEFAULT NULL::character varying,
+  reason_detail character varying(255) DEFAULT NULL::character varying,
   status character varying(255) DEFAULT NULL::character varying,
   envio_email_apresentacao_pos timestamp without time zone,
   envio_email_apresentacao_pre timestamp without time zone,

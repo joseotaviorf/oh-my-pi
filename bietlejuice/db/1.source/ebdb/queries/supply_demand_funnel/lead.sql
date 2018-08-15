@@ -32,7 +32,8 @@ select  -- count(1)
   l.lng,
   l.condominio,
   l.iptu,
-  l.reason,
+  coalesce(lr.reason, l.reason) as reason,
+  lr.reason_detail as reason_detail,
   l.status,
   l.envioEmailApresentacaoPos	as envio_email_apresentacao_pos,
   l.envioEmailApresentacaoPre	as envio_email_apresentacao_pre,
@@ -100,4 +101,6 @@ left join
  left join
    Usuario ua
    on da.id=ua.dadosAfiliado_id
+ left join vw_lead_reason lr
+      	on l.reason = lr.reason_detail
 where DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
