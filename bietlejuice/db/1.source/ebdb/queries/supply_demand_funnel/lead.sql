@@ -33,7 +33,32 @@ select  -- count(1)
   l.condominio,
   l.iptu,
   coalesce(lr.reason, l.reason) as reason,
+  -- Consider Old and New reasons
+  case
+  	when l.reason in ('CONTACT_DIDNT_EXIST', 'CONTACT_WAS_FROM_HOUSE_TENANT'
+ 					, 'CONTACT_WAS_FROM_REAL_ESTATE_BROKER_OR_AGENT', 'CONTACT_WASNT_THE_HOUSE_OWNER') then 'ContatoIncorreto'
+ 	when l.reason = 'CONTACT_WAS_NO_LONGER_THE_HOUSE_OWNER' then 'ContatoNaoValido'
+  	when l.reason = 'DUPLICATED_LEAD' then 'ImovelRepetido'
+  	when l.reason = 'HOUSE_ALREADY_PUBLISHED' then 'RepetidoPublicacao'
+  	when l.reason = 'HOUSE_ALREADY_RENTED' then 'ImovelOcupado'
+  	when l.reason = 'HOUSE_ONLY_FOR_SELLING' then 'ImovelParaVenda'
+  	when l.reason = 'HOUSE_PRICE_WAS_OUT_OF_BOUNDS' then 'ForaPreco'
+  	when l.reason = 'HOUSE_UNDER_EXCLUSIVITY_CONTRACT' then 'Exclusivo'
+  	when l.reason = 'HOUSE_UNDER_RENOVATION' then 'CasaReformando'
+  	when l.reason = 'HOUSE_WAS_A_BUSINESS_REAL_ESTATE' then 'TipoInvalido'
+  	when l.reason in ('HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS', 'HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS') then 'ForaArea'
+  	when l.reason = 'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS' then 'ProblemaEntrada'
+  	when l.reason in ('OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH', 'OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH'
+  					, 'OWNER_DIDNT_ACCEPT_ONLINE_PROCESS', 'OWNER_DIDNT_ACCEPT_SELF_CONDO_PAYMENT_MODEL'
+  					, 'OWNER_DIDNT_WANT_ADMINISTRATION') then 'ProprietarioRecusou'
+  	when l.reason = 'OWNER_DIDNT_ANSWER_PHONE' then 'ProprietarioNaoAtende'
+  	when l.reason = 'OWNER_DIDNT_LISTEN_TO_PITCH' then 'ProprietarioNaoOuviuPitch'
+  	when l.reason = 'OWNER_EVALUATING' then 'ProprietarioAvaliando'
+  	when l.reason = 'OWNER_REQUESTING_ASSISTANCE' then 'ProprietarioSolicitouAtendimento'
+  	when l.reason = 'OWNER_WONT_ANSWER_PHONE' then 'ProprietarioNuncaAtende'
+  else l.reason end as reason,
   lr.reason_detail as reason_detail,
+  case when l.reason RLIKE '[[:upper:]]+\_[[:upper:]]+.*' then l.reason else null end as reason_detail,
   l.status,
   l.envioEmailApresentacaoPos	as envio_email_apresentacao_pos,
   l.envioEmailApresentacaoPre	as envio_email_apresentacao_pre,
