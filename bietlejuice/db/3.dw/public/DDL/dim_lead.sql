@@ -35,6 +35,7 @@ CREATE TABLE public.dim_lead (
   condominio INTEGER,
   iptu INTEGER,
   reason VARCHAR(255),
+  reason_detail VARCHAR(255),
   status VARCHAR(255),
   envio_email_apresentacao_pos TIMESTAMP WITHOUT TIME ZONE,
   envio_email_apresentacao_pre TIMESTAMP WITHOUT TIME ZONE,

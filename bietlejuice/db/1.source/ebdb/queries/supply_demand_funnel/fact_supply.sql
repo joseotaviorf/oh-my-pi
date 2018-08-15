@@ -89,7 +89,7 @@ from
 			when (
 						base.lead_status = 'Descartado'
 						and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null
-						and base.lead_reason not in ('ProprietarioRecusou', 'Exclusivo'))
+						and base.lead_reason not in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada'))
 				then null
 			else base.dt_qualified
 		end as dt_qualified,
@@ -178,7 +178,7 @@ from
       i.id as imovel_id,
       l.id as lead_id,
       l.status as lead_status,
-      l.reason as lead_reason,
+      l.lead_reason as lead_reason,
       cl.id as conversao_id,
       case
         when rep.id is not null then rep.id
@@ -198,7 +198,7 @@ from
       case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         when cl.leadConvertido_id is not null
           then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
-        when l.reason in ('ProprietarioRecusou', 'Exclusivo')
+        when l.lead_reason in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada')
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
       case
@@ -246,14 +246,17 @@ from
     from
       (
         select
-          *,
+          le.*,
+          coalesce(lr.reason, le.reason) as lead_reason,
           case
-            when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
-            then SUBSTRING_INDEX(infosExtras,';',1)
+            when SUBSTRING_INDEX(le.infosExtras,';',1) REGEXP '^-?[0-9]+$'
+            then SUBSTRING_INDEX(le.infosExtras,';',1)
           else NULL
         end as old_id
-      from Lead
-      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
+      from Lead le
+      left join vw_lead_reason lr
+      	on le.reason = lr.reason_detail
+      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}') order by 1 asc
     ) l -- all data from Lead table plus a reprocessed Extra Field
     left join
       ConversaoLead cl
