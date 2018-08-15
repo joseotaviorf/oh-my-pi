@@ -20,7 +20,7 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=datetime(2018, 2, 6, 0, 0, 0),
-    schedule_interval='@daily',
+    schedule_interval='30 3 * * *',
     max_active_runs=3
 )
 
