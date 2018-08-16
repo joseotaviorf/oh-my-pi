@@ -255,6 +255,7 @@ final_categories as (
 			when lead_origin = 'Landing' then 'Online Landing Page Form'
 			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
 			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
+			when mkt_channel_type = 'Organic' and lead_type is null and lead_origin is null then 'Online Owner App'
 			else 'Other'
 		end as mkt_platform,
 		case
