@@ -21,12 +21,12 @@ select
   a.slotDia,
   m.motivo as reason,
   ap.name as reason_category,
-  vo.nome as last_update_source,
+  vo_update.nome as last_update_source,
   case
   	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null
   	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
   end as cancel_timestamp,
-  vo2.nome as first_update_source,
+  vo_create.nome as first_update_source,
   fup.inquilinoCompareceu as visitor_arrived,
   fup.motivoInquilino as visitor_missing_reason,
   fup.agenteCompareceu as agent_arrived,
@@ -80,15 +80,12 @@ left join
 left join
 	UsuarioRevisionEntity rcanc
 	on rcanc.id = c.REV_Cancelado
-left join
-    ( select id, min(REV) as min_rev from Agendamento_AUD group by id ) au1
-    on a.id = au1.id
-left join
-	Agendamento_AUD au2
-    on au1.id = au2.id and au1.min_rev = au2.REV
-left join
-    VisitaOrigem vo2
-    on au2.origemUltimaAtualizacao_id = vo2.id
+left join Visita v
+  on a.visita_id = v.id
+left join VisitaOrigem vo_create
+	on vo_create.id = v.origemCriacao_id
+left join VisitaOrigem vo_update
+	on vo_update.id = v.origemUltimaAtualizacao_id
 left join
 	(
 		SELECT

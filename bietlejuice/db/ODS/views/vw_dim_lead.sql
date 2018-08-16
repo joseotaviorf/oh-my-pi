@@ -37,6 +37,7 @@ CREATE VIEW public.vw_dim_lead as
   condominio,
   iptu,
   reason,
+  reason_detail,
   status,
   envio_email_apresentacao_pos,
   envio_email_apresentacao_pre,

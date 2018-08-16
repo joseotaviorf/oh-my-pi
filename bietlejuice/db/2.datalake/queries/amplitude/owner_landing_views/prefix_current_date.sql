@@ -20,4 +20,5 @@ with all_events as (
     and extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) = extract(month from (now() - interval '1' month))
     and extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) < extract(day from now())
     and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-01-01' as date)
+    and not(trim(e_ub_page_variant) in ('bv','cj') and trim(e_ub_page_name) = 'Proprietário')
 )

@@ -34,6 +34,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.lead (
  condominio INT,
  iptu INT,
  reason STRING,
+ reason_detail STRING,
  status STRING,
  envio_email_apresentacao_pos TIMESTAMP,
  envio_email_apresentacao_pre TIMESTAMP,
