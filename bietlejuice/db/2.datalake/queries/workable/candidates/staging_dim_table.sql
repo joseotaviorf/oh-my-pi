@@ -3,7 +3,7 @@ select
   name,
   first_name,
   last_name,
-  rpad(headline, 200, 'headline') as headline, -- some candidates insert an entire description of their careers/hobbies
+  cast(headline as varchar(200)) as headline, -- some candidates insert an entire description of their careers/hobbies
   account_subdomain,
   account_name,
   stage,
