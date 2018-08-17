@@ -46,33 +46,27 @@ class Workable(object):
     # abstract methods
     @abstractmethod
     def extract_data(self):
-        _logger.error('m=extract_data, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=extract_data, msg=method not implemented')
 
     @abstractmethod
     def save_into_s3_raw(self, json_list):
-        _logger.error('m=save_into_s3_raw, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=save_into_s3_raw, msg=method not implemented')
 
     @abstractmethod
     def move_to_clean(self):
-        _logger.error('m=move_to_clean, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=move_to_clean, msg=method not implemented')
 
     @abstractmethod
     def move_to_staging_dim(self):
-        _logger.error('m=move_to_staging_dim, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=move_to_staging_dim, msg=method not implemented')
 
     @abstractmethod
     def move_dim_to_dw(self):
-        _logger.error('m=move_dim_to_dw, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=move_dim_to_dw, msg=method not implemented')
 
     @abstractmethod
     def delete_dim_staging_entries(self):
-        _logger.error('m=delete_dim_staging_entries, msg=method not implemented')
-        raise NotImplementedError
+        raise NotImplementedError('m=delete_dim_staging_entries, msg=method not implemented')
 
     # instance methods
     @logger
@@ -89,16 +83,14 @@ class Workable(object):
             )
 
             if response.status_code not in (200, 429):
-                _logger.error(
+                raise RuntimeError(
                     'm=_extract_data, response_status_code={}, response_content={}'.format(response.status_code,
                                                                                            response.content))
-                raise RuntimeError
 
             sleep_count = 0
             while response.status_code == 429:
                 if sleep_count > 5:
-                    _logger.error('m=_extract_data, msg=exceeded sleep limit')
-                    raise RuntimeError
+                    raise RuntimeError('m=_extract_data, msg=exceeded sleep limit')
 
                 sleep_seconds = int(response.headers['X-Rate-Limit-Reset']) - int(time.time())
                 _logger.warn(
@@ -125,14 +117,12 @@ class Workable(object):
 
             _logger.info('m=_extract_data, enum_value={}, page_number={}'.format(enum_value, paging_index))
 
-        _logger.error('m=_extract_data, enum_value={}, msg=exceeded paging limit'.format(enum_value))
-        raise RuntimeError
+        raise RuntimeError('m=_extract_data, enum_value={}, msg=exceeded paging limit'.format(enum_value))
 
     @logger(exclude='json_list')
     def _save_into_s3_raw(self, json_list, enum_type):
         if json_list is None:
-            _logger.error('m=save_into_s3, msg=json_list is none')
-            raise AttributeError
+            raise AttributeError('m=save_into_s3, msg=json_list is none')
 
         gz_body = BytesIO()
         count = 0
