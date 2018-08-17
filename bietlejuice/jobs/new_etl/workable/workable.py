@@ -94,7 +94,7 @@ class Workable(object):
 
                 if 'X-Rate-Limit-Reset' not in response.headers:
                     raise RuntimeError('m=_extract_data, msg=X-Rate-Limit-Reset not present in headers')
-                    
+
                 sleep_seconds = int(response.headers['X-Rate-Limit-Reset']) - int(time.time())
                 _logger.warn(
                     'm=_extract_data, msg=exceeded rate limit, sleeping for {} seconds...'.format(sleep_seconds))
