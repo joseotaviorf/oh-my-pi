@@ -77,6 +77,10 @@ class Workable(object):
 
         paging_index = 0
         while paging_index < Workable.PAGING_LIMIT:
+            if paging_index % 10 == 0 and paging_index > 0:
+                _logger.info('m=_extract_data, msg=sleeping for 10 seconds...')
+                time.sleep(10)
+
             response = requests.get(
                 url=url,
                 headers=self.request_headers
