@@ -42,6 +42,7 @@ class ContractDashboard(object):
         self.fetch_dt = exec_time - timedelta(minutes=int(fetch_delta))
         self.num_daily_contracts = self.__get_daily_signed_contracts_number()
         self.monthly_signed_total = self.__get_monthly_signed_contracts_number()
+        self.yesterday_signed_contracts = self.__get_yesterday_signed_contracts_number()
 
     @logger
     def __get_new_signature_tasks(self, imovel_id_list):
@@ -126,6 +127,27 @@ class ContractDashboard(object):
         return table[1][0]
 
     @logger
+    def __get_yesterday_signed_contracts_number(self):
+        yesterday = self.exec_time - timedelta(days=1)
+
+        # We don't convert dataAssinado to BR timezone because we are querying with UTC
+        table = BaseETL.from_db_query(
+            db_enum=EnumDb.QuintoAndar_ebdb,
+            query='''select
+                                count(imovel_id) as total
+                                from Contrato
+                            where
+                                DATE(
+                                    CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo')
+                                ) >= DATE(CONVERT_TZ('{0}','UTC','America/Sao_Paulo'))
+                                and
+                                DATE(
+                                    CONVERT_TZ(dataAssinado,'UTC','America/Sao_Paulo')
+                                ) < DATE(CONVERT_TZ('{1}','UTC','America/Sao_Paulo'))
+                            and status IN ('Ativo', 'Finalizado')'''.format(yesterday.date(), self.exec_time.date()))
+        return table[1][0]
+
+    @logger
     def __prepare_pwbi_payload(self, data):
 
         prepared_data = []
@@ -133,6 +155,7 @@ class ContractDashboard(object):
             payload = dict()
             payload['monthly_contracts'] = self.monthly_signed_total
             payload['daily_contracts'] = self.num_daily_contracts
+            payload['yesterday_signed_contracts'] = self.yesterday_signed_contracts
             payload['imovel_id'] = str(contract['imovel_id'])
             payload['tenant'] = contract['tenant']
             payload['tenant_id'] = str(contract['tenant_id'])
