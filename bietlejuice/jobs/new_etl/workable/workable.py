@@ -32,6 +32,8 @@ class Workable(object):
         'fact': 'fact_recruitment'
     }
 
+    DEFAULT_WAITING_REQUEST_HIT = 2
+
     @logger(exclude='access_token')
     def __init__(self, s3_bucket, url_prefix, access_token):
         self.url_prefix = url_prefix
@@ -77,10 +79,6 @@ class Workable(object):
 
         paging_index = 0
         while paging_index < Workable.PAGING_LIMIT:
-            if paging_index % 10 == 0 and paging_index > 0:
-                _logger.info('m=_extract_data, msg=sleeping for 10 seconds...')
-                time.sleep(10)
-
             response = requests.get(
                 url=url,
                 headers=self.request_headers
@@ -100,6 +98,9 @@ class Workable(object):
                     raise RuntimeError('m=_extract_data, msg=X-Rate-Limit-Reset not present in headers')
 
                 sleep_seconds = int(response.headers['X-Rate-Limit-Reset']) - int(time.time())
+                if sleep_seconds <= 0:
+                    sleep_seconds = Workable.DEFAULT_WAITING_REQUEST_HIT
+
                 _logger.warn(
                     'm=_extract_data, msg=exceeded rate limit, sleeping for {} seconds...'.format(sleep_seconds))
 
@@ -121,6 +122,7 @@ class Workable(object):
             list_data += response_json[enum_value]
             url = response_json['paging']['next']
             paging_index += 1
+            time.sleep(Workable.DEFAULT_WAITING_REQUEST_HIT)
 
             _logger.info('m=_extract_data, enum_value={}, page_number={}'.format(enum_value, paging_index))
 
