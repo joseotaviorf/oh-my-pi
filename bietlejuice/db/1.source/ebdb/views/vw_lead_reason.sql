@@ -41,7 +41,7 @@ select 'OWNER_DIDNT_ACCEPT_ONLINE_PROCESS', 'ProprietarioRecusou'
 union all
 select 'OWNER_DIDNT_ACCEPT_SELF_CONDO_PAYMENT_MODEL', 'ProprietarioRecusou'
 union all
-select 'OWNER_DIDNT_ANSWER_PHONE', 'ProprietarioNaoAtende'
+select 'OWNER_DIDNT_ANSWER_PHONE', 'ProprietarioNuncaAtende'
 union all
 select 'OWNER_DIDNT_LISTEN_TO_PITCH', 'ProprietarioNaoOuviuPitch'
 union all
@@ -51,4 +51,4 @@ select 'OWNER_EVALUATING', 'ProprietarioAvaliando'
 union all
 select 'OWNER_REQUESTING_ASSISTANCE', 'ProprietarioSolicitouAtendimento'
 union all
-select 'OWNER_WONT_ANSWER_PHONE', 'ProprietarioNuncaAtende'
+select 'OWNER_WONT_ANSWER_PHONE', 'ProprietarioNaoAtende'
