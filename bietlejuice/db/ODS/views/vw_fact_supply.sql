@@ -159,6 +159,31 @@ potential_listings as (
 		usuario us_cad
 	    on us_cad.id = i.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
+),
+taxonomy as (
+    select
+        ts.lead_type,
+        ts.lead_origin,
+        ts.lead_utm_source,
+        ts.lead_utm_medium,
+        ts.flg_branded::int::boolean,
+        ts.flg_b2b::int::boolean,
+        ts.flg_doorman::int::boolean,
+        ts.flg_isales_direct_register::int::boolean,
+        ts.flg_cx_direct_register::int::boolean,
+        ts.flg_isales_intervention::int::boolean,
+        ts.flg_callcenter::int::boolean,
+        ts.mkt_category,
+        ts.mkt_flow,
+        ts.mkt_completion,
+        ts.mkt_channel_type,
+        ts.mkt_channel,
+        ts.mkt_platform,
+        ts.mkt_medium,
+        ts.mkt_source,
+        ts.mkt_device
+    from
+        files.taxonomy_supply ts
 )
 select
 	pl.ods_id,
@@ -225,30 +250,30 @@ select
         when pl.branded_lead then 'Branded'
         else 'Other'
 	end as mkt_branded,
-	ts.mkt_category,
-	ts.mkt_flow,
-	ts.mkt_completion,
-	ts.mkt_channel_type,
-	ts.mkt_channel,
-	ts.mkt_platform,
-	ts.mkt_medium,
-	ts.mkt_source,
-	ts.mkt_device,
+	t.mkt_category,
+	t.mkt_flow,
+	t.mkt_completion,
+	t.mkt_channel_type,
+	t.mkt_channel,
+	t.mkt_platform,
+	t.mkt_medium,
+	t.mkt_source,
+	t.mkt_device,
     now() as dt_timestamp
 from
     potential_listings pl
 left join
-    taxonomy_supply ts
+    taxonomy t
 on
-    pl.lead_type = ts.lead_type
-	and pl.lead_origin = ts.lead_origin
-	and pl.utm_source = ts.lead_utm_source
-	and pl.utm_medium = ts.lead_utm_medium
-	and pl.branded_lead = ts.flg_branded::int::boolean
-	and pl.b2b_lead = ts.flg_b2b::int::boolean
-	and pl.doorman_lead = ts.flg_doorman::int::boolean
-	and pl.isales_direct_register = ts.flg_isales_direct_register::int::boolean
-	and pl.cx_direct_register = ts.flg_cx_direct_register::int::boolean
-	and pl.isales_intervention = ts.flg_isales_intervention::int::boolean
-	and pl.flg_callcenter = ts.flg_callcenter::int::boolean
+    pl.lead_type = t.lead_type
+	and pl.lead_origin = t.lead_origin
+	and pl.utm_source = t.lead_utm_source
+	and pl.utm_medium = t.lead_utm_medium
+	and pl.branded_lead = t.flg_branded
+	and pl.b2b_lead = t.flg_b2b
+	and pl.doorman_lead = t.flg_doorman
+	and pl.isales_direct_register = t.flg_isales_direct_register
+	and pl.cx_direct_register = t.flg_cx_direct_register
+	and pl.isales_intervention = t.flg_isales_intervention
+	and pl.flg_callcenter = t.flg_callcenter
 
