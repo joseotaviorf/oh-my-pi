@@ -159,248 +159,96 @@ potential_listings as (
 		usuario us_cad
 	    on us_cad.id = i.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
-), -- initial categories that will derivate others
-initial_categories as (
-	select
-		*,
-		case
-			when lead_type = 'Afiliado' then 'Outbound'
-			when lead_origin = 'Desconhecida' then 'Other'
-			when reprocessed_flg then 'Outbound'
-			when flg_callcenter then 'Outbound'
-			when b2b_lead then 'Outbound'
-			when doorman_lead then 'Outbound'
-			when lead_origin = 'Crawling' then 'Outbound'
-			when lead_type = 'OLX' and lead_origin is null then 'Outbound'
-			when lead_origin = 'Reprocessado' then 'Outbound'
-		    else 'Inbound'
-		end as mkt_category,
-		case
-			when lead_origin = 'OwnerPWA' then 'Self-Service'
-			when lead_type is null and lead_origin is null and
-				not(coalesce(doorman_lead, false)) and not(coalesce(isales_direct_register, false)) and not(coalesce(cx_direct_register, false))
-				and not(coalesce(flg_callcenter, false)) and not(coalesce(isales_intervention, false)) and not(coalesce(b2b_lead, false)) then 'Self-Service'
-			else 'Non-Self Service'
-		end as mkt_flow,
-		case
-			when branded_lead then 'Branded'
-			else 'Other'
-		end as mkt_branded,
-		case
-			when reprocessed_flg then 'Other'
-			when lead_type in ('Afiliado', 'OpenLink', 'LandingOpenLink') then 'Affiliates'
-			when b2b_lead or doorman_lead then 'Affiliates'
-			when lead_type = 'Marketing' and lead_origin = 'Facebook' then 'Online Paid'
-			when trim(utm_medium) = 'classifieds' then 'Online Classifieds'
-			when branded_lead then 'Organic'
-			when utm_source = 'quintoandar' and utm_medium in ('header', 'footer') then 'Organic'
-			when (lead_type = 'LandingMarketing' or lead_origin = 'Landing') and utm_source like 'facebook%' and utm_medium = 'social' then 'Organic'
-			when lead_type = 'BrokenOpenLink' then 'Organic'
-			when utm_source = 'mkt_supply' then 'Organic'
-			when lead_origin = 'Crawling' then 'Other'
-			when isales_direct_register or cx_direct_register then 'Other'
-			when lead_type = 'OLX' and lead_origin is null then 'Other'
-			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
-			when lead_type = 'LandingMarketing' and lower(utm_source) in ('facebook', 'google', 'criteo', 'trovit') and not branded_lead then 'Online Paid'
-			when lead_type = 'LandingMarketing' and (utm_source like 'facebook%' or utm_source like 'google%') and not branded_lead then 'Online Paid'
-			when lead_type = 'Marketing' and (utm_source in ('criteo', 'rtbhouse', 'ybox', 'bing') or lower(utm_medium) like 'cpc%') then 'Online Paid'
-			when lead_type = 'Marketing' and (utm_source like '%facebook%' or utm_source like '%google%') then 'Online Paid'
-			when utm_medium is null and utm_source is null then 'Organic'
-			when lead_type = 'Marketing' and utm_source is null then 'Online Paid'
-			when lead_type = 'Marketing' and lower(utm_medium) = 'affiliates' then 'Online Paid'
-			else 'Other'
-		end as mkt_channel_type
-	from potential_listings
-), -- remaining categories
-final_categories as (
-	select
-		*,
-		case
-			when mkt_flow in ('Non-Self Service', 'Other') then mkt_flow
-			when isales_intervention and mkt_flow = 'Self-Service' then 'Recovered Self-Service'
-			when mkt_flow = 'Self-Service'  then 'Full Self-Service'
-			else 'Other'
-		end as mkt_completion,
-		case
-			when reprocessed_flg then 'Recovered Leads'
-			when doorman_lead then 'Doorman'
-			when b2b_lead then 'B2B'
-			when isales_direct_register then 'Lost Tracking'
-			when cx_direct_register then 'Lost Tracking'
-			when mkt_channel_type = 'Affiliates' then 'IndicaAi'
-			when lead_origin = 'Desconhecida' and (lead_type <> 'Afiliado' or lead_type is null) then 'Other'
-			when lead_origin = 'Crawling' or lead_type = 'OLX' or flg_callcenter then 'Crawling'
-			when lower(utm_source) = 'directreferral' then 'Direct Referral'
-			when mkt_channel_type in ('Online Paid', 'Organic', 'Online Classifieds') then null
-			else 'Other'
-		end as mkt_channel,
-		case
-			when flg_callcenter then 'Crawling Indirect'
-			when isales_direct_register or cx_direct_register then 'Admin'
-			when lead_origin = 'Facebook' then 'Online Lead Ads'
-			when b2b_lead then 'B2B Landing Page Form'
-			when lead_type = 'LandingOpenLink' and utm_source = 'directreferral' then 'IndicaAi Owner App'
-			when lead_origin = 'OwnerPWA' and coalesce(utm_source,'') <> 'directreferral' then 'Online Owner App'
-			when mkt_flow = 'Other' and mkt_channel_type = 'Online' then 'Online Other'
-			when lead_origin = 'Crawling' then 'Crawling Direct'
-			when lead_type = 'OLX' and lead_origin is null then 'Crawling Direct'
-			when doorman_lead and (lead_origin = 'Form' or lead_origin is null) then 'Doorman Whatsapp'
-			when doorman_lead then 'Doorman Other'
-			when lead_type = 'OpenLink' then 'IndicaAi Landing Page Form'
-			when lead_type = 'Afiliado' and lead_origin = 'Form' then 'IndicaAi Form'
-			when lead_type = 'Afiliado' and lead_origin = 'App' then 'IndicaAi App'
-			when lead_type = 'Afiliado' and lead_origin = 'Desconhecida' then 'IndicaAi Unknown'
-			when lead_type = 'Afiliado' and lead_origin = 'Planilha' then 'IndicaAi Spreadsheet'
-			when lead_origin in ('Reprocessado', 'Desconhecida') then 'Other'
-			when lead_origin = 'Landing' then 'Online Landing Page Form'
-			when reprocessed_flg and lead_origin = 'Landing' then 'Online Landing Page Form' -- reprocessed fallback
-			when reprocessed_flg and lead_origin = 'OwnerPWA' then 'Online Owner App' -- reprocessed fallback
-			when mkt_channel_type = 'Organic' and lead_type is null and lead_origin is null then 'Online Owner App'
-			else 'Other'
-		end as mkt_platform,
-		case
-			when flg_callcenter then null
-			when isales_direct_register then 'Inside Sales'
-			when cx_direct_register then 'CX'
-			when lower(utm_source) = 'directreferral' then 'Direct Referral'
-			when reprocessed_flg then null -- we will fill this later with reprocessed_lead_id
-			when doorman_lead then null
-			when trim(utm_medium) like '%display%' then 'Display'
-			when lower(utm_medium) in ('source', 'post') then 'Display'
-			when lead_origin = 'Facebook' then 'Display'
-			when trim(utm_medium) = 'retargeting' then 'Retargeting'
-			when lead_type = 'OpenLink' and utm_medium is null then 'Product'
-			when trim(utm_medium) = 'email' then 'Notifications'
-			when trim(utm_medium) = 'product' then 'Product'
-			when trim(utm_medium) = 'whatsapp' then 'Whatsapp'
-			when trim(utm_medium) = 'profilepage' then 'Profile page'
-			when branded_lead then 'SEM branded'
-			when trim(lower(utm_medium)) = 'cpc' then 'SEM non-branded'
-			when trim(utm_medium) like 'affiliate%' then 'Affiliate Networks'
-			when trim(utm_medium) = 'classifieds' then 'Classifieds'
-			when trim(utm_medium) = 'facebook' then 'Facebook'
-			when trim(utm_source) = 'quintoandar' then 'Direct'
-			when trim(utm_medium) = 'social' then 'Social'
-			when lead_origin = 'Desconhecida' then null
-			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Direct'
-			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Direct'
-			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
-			when trim(utm_source) in ('google','bing') then 'SEM non-branded'
-			when trim(utm_source) like 'google%' then 'SEM non-branded'
-			when mkt_flow = 'Other' then 'Other'
-			when mkt_channel_type = 'Organic' then 'Direct'
-			when trim(lower(utm_source)) like 'facebook%' then 'Display'
-			else null
-		end as mkt_medium,
-		case
-		    when flg_callcenter then null
-		    when isales_direct_register then 'Inside Sales'
-			when cx_direct_register then 'CX'
-			when doorman_lead then null
-			when trim(utm_source) = 'directreferral' and utm_medium is null then null
-			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'email' then 'Email'
-			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'product' then 'Product'
-			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'profilepage' then 'Profile Page'
-			when trim(utm_source) = 'directreferral' and trim(utm_medium) = 'whatsapp' then 'Whatsapp'
-			when trim(utm_source) like 'facebook%' or lead_origin = 'Facebook' or trim(utm_medium) = 'facebook' then 'Facebook'
-			when trim(utm_source) like 'google%' then 'Google'
-			when trim(utm_source) = 'bing' then 'Bing'
-			when trim(utm_source) = 'rtbhouse' then 'RTB House'
-			when trim(utm_source) = 'Zap' then 'Zap'
-			when trim(utm_source) = 'ybox' then 'Ybox'
-			when trim(utm_source) = 'quintoandar' then 'Direct'
-			when trim(utm_source) = 'criteo' then 'Criteo'
-			when trim(utm_source) = 'Trovit' then 'Trovit'
-			when lead_origin = 'Desconhecida' then null
-			when lead_type = 'OLX' then null
-			when utm_medium is null and utm_source is null and lead_type = 'Landing' then 'Direct'
-			when utm_medium is null and utm_source is null and lead_type = 'OwnerPWA' then 'Direct'
-			when utm_medium is null and utm_source is null and lead_type is null then 'Direct'
-			when trim(utm_medium) = 'affiliates' then lower(trim(utm_source))
-			when mkt_flow = 'Other' then 'Other'
-			when mkt_channel_type = 'Organic' then 'Direct'
-			else null
-		end as mkt_source,
-        case
-	        when lead_type = 'Organic' and lead_origin = 'OwnerPWA' then 'App Android'
-	        when mkt_channel_type = 'Organic' and lead_type is null and lead_origin is null then 'App iOS'
-            else null
-        end as mkt_device
-	from
-		initial_categories
 )
 select
-	ods_id,
-	sk_lead,
-	sk_conversion,
-	sk_photo_job,
-	sk_property,
-	sk_user_rep,
-	sk_user_sales_rep,
-	sk_user_affiliate,
-	sk_user_task_assignee,
-	sk_user_owner,
-	sk_user_photographer,
-	sk_region,
-	sk_lead_date,
-	sk_prospect_date,
-	sk_task_created_date,
-	sk_task_closed_date,
-	sk_first_inside_sales_contact_date,
-	sk_conversion_date,
-	sk_qualified_date,
-	sk_opportunity_date,
-	sk_first_listing_date,
-	flow,
-	acquisition_method,
-	acquisition_channel,
-	acquisition_source,
-	funnel_step,
-	funnel_drop_reason,
-	lead_to_prospect_diff_minutes,
-	prospect_to_qualified_diff_minutes,
-	lead_to_first_inside_sales_contact_diff_minutes,
-	prospect_to_first_inside_sales_contact_diff_minutes,
-	qualified_to_opportunity_diff_minutes,
-	opportunity_to_listing_diff_minutes,
-	lead_to_listing_diff_minutes,
-	lead_to_prospect_diff_hours,
-	prospect_to_qualified_diff_hours,
-	lead_to_first_inside_sales_contact_diff_hours,
-	prospect_to_first_inside_sales_contact_diff_hours,
-	qualified_to_opportunity_diff_hours,
-	opportunity_to_listing_diff_hours,
-	lead_to_listing_diff_hours,
-	lead_to_prospect_diff_days,
-	prospect_to_qualified_diff_days,
-	lead_to_first_inside_sales_contact_diff_days,
-	prospect_to_first_inside_sales_contact_diff_days,
-	qualified_to_opportunity_diff_days,
-	opportunity_to_listing_diff_days,
-	lead_to_listing_diff_days,
-	exclusivity,
-	lead_type,
-	lead_origin,
-	utm_source as lead_utm_source,
-	utm_medium as lead_utm_medium,
-	branded_lead as flg_branded,
-	b2b_lead as flg_b2b,
-	doorman_lead as flg_doorman,
-	isales_direct_register as flg_isales_direct_register,
-	cx_direct_register as flg_cx_direct_register,
-	isales_intervention as flg_isales_intervention,
-	flg_callcenter,
-	mkt_branded,
-	mkt_category,
-	mkt_flow,
-	mkt_completion,
-	mkt_channel_type,
-	coalesce(mkt_channel, mkt_medium) as mkt_channel,
-	case when reprocessed_flg then trim(concat('Recovered Leads ', mkt_platform)) else mkt_platform end as mkt_platform,
-	mkt_medium,
-	mkt_source,
-	mkt_device,
+	pl.ods_id,
+	pl.sk_lead,
+	pl.sk_conversion,
+	pl.sk_photo_job,
+	pl.sk_property,
+	pl.sk_user_rep,
+	pl.sk_user_sales_rep,
+	pl.sk_user_affiliate,
+	pl.sk_user_task_assignee,
+	pl.sk_user_owner,
+	pl.sk_user_photographer,
+	pl.sk_region,
+	pl.sk_lead_date,
+	pl.sk_prospect_date,
+	pl.sk_task_created_date,
+	pl.sk_task_closed_date,
+	pl.sk_first_inside_sales_contact_date,
+	pl.sk_conversion_date,
+	pl.sk_qualified_date,
+	pl.sk_opportunity_date,
+	pl.sk_first_listing_date,
+	pl.flow,
+	pl.acquisition_method,
+	pl.acquisition_channel,
+	pl.acquisition_source,
+	pl.funnel_step,
+	pl.funnel_drop_reason,
+	pl.lead_to_prospect_diff_minutes,
+	pl.prospect_to_qualified_diff_minutes,
+	pl.lead_to_first_inside_sales_contact_diff_minutes,
+	pl.prospect_to_first_inside_sales_contact_diff_minutes,
+	pl.qualified_to_opportunity_diff_minutes,
+	pl.opportunity_to_listing_diff_minutes,
+	pl.lead_to_listing_diff_minutes,
+	pl.lead_to_prospect_diff_hours,
+	pl.prospect_to_qualified_diff_hours,
+	pl.lead_to_first_inside_sales_contact_diff_hours,
+	pl.prospect_to_first_inside_sales_contact_diff_hours,
+	pl.qualified_to_opportunity_diff_hours,
+	pl.opportunity_to_listing_diff_hours,
+	pl.lead_to_listing_diff_hours,
+	pl.lead_to_prospect_diff_days,
+	pl.prospect_to_qualified_diff_days,
+	pl.lead_to_first_inside_sales_contact_diff_days,
+	pl.prospect_to_first_inside_sales_contact_diff_days,
+	pl.qualified_to_opportunity_diff_days,
+	pl.opportunity_to_listing_diff_days,
+	pl.lead_to_listing_diff_days,
+	pl.exclusivity,
+	pl.lead_type,
+	pl.lead_origin,
+	pl.utm_source as lead_utm_source,
+	pl.utm_medium as lead_utm_medium,
+	pl.branded_lead as flg_branded,
+	pl.b2b_lead as flg_b2b,
+	pl.doorman_lead as flg_doorman,
+	pl.isales_direct_register as flg_isales_direct_register,
+	pl.cx_direct_register as flg_cx_direct_register,
+	pl.isales_intervention as flg_isales_intervention,
+	pl.flg_callcenter,
+	case
+        when pl.branded_lead then 'Branded'
+        else 'Other'
+	end as mkt_branded,
+	ts.mkt_category,
+	ts.mkt_flow,
+	ts.mkt_completion,
+	ts.mkt_channel_type,
+	ts.mkt_channel,
+	ts.mkt_platform,
+	ts.mkt_medium,
+	ts.mkt_source,
+	ts.mkt_device,
     now() as dt_timestamp
 from
-	final_categories
+    potential_listings pl
+left join
+    taxonomy_supply ts
+on
+    pl.lead_type = ts.lead_type
+	and pl.lead_origin = ts.lead_origin
+	and pl.utm_source = ts.lead_utm_source
+	and pl.utm_medium = ts.lead_utm_medium
+	and pl.branded_lead = ts.flg_branded::int::boolean
+	and pl.b2b_lead = ts.flg_b2b::int::boolean
+	and pl.doorman_lead = ts.flg_doorman::int::boolean
+	and pl.isales_direct_register = ts.flg_isales_direct_register::int::boolean
+	and pl.cx_direct_register = ts.flg_cx_direct_register::int::boolean
+	and pl.isales_intervention = ts.flg_isales_intervention::int::boolean
+	and pl.flg_callcenter = ts.flg_callcenter::int::boolean
+
