@@ -11,9 +11,8 @@ from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'crawler_houses'
-MAIN_START_DATE = datetime(2018, 3, 20)
+MAIN_START_DATE = datetime(2018, 8, 24)
 MAIN_SCHEDULE_INTERVAL = '0 0 1/3 * *'
-MAX_TIMES_RUN = 20
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
@@ -24,6 +23,8 @@ def start_crawler(**kwargs):
     max_crawl = kwargs.get('max_crawl', 1000000)
     states = kwargs.get('states')
     source = kwargs.get('source')
+
+    # get task instance
     ti = kwargs.get('ti')
 
     assert isinstance(max_crawl, int)
@@ -57,7 +58,7 @@ dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
     max_active_runs=1,
-    catchup=False
+    catchup=True
 )
 
 crawl_proxies = BaseDAG.get_quintoandar_python_operator(

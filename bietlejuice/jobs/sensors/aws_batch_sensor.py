@@ -12,10 +12,10 @@ class QuintoAndarAWSBatchSensor(BaseSensorOperator):
         super(QuintoAndarAWSBatchSensor, self).__init__(*args, **kwargs)
 
         if 'job_id' not in kwargs:
-            if 'xcom_task_id' in kwargs:
-                self.xcom_task_id = kwargs['xcom_task_id']
-            else:
+            if 'xcom_task_id' not in kwargs:
                 raise Exception('job_id and xcom_task_id cannot be both None!')
+
+            self.xcom_task_id = kwargs['xcom_task_id']
         else:
             self.job_id = kwargs['job_id']
 
@@ -31,17 +31,17 @@ class QuintoAndarAWSBatchSensor(BaseSensorOperator):
 
         if job_status is None:
             raise Exception('Job not found')
-        elif job_status in ('SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING'):
+        if job_status in ('SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING'):
             return False
-        elif job_status == 'SUCCEEDED':
+        if job_status == 'SUCCEEDED':
             return True
-        elif job_status == 'FAILED':
+        if job_status == 'FAILED':
             raise Exception('Job has failed!')
 
-        raise Exception()
+        raise Exception('Status not expected!')
 
     def xcom_job_id(self, task_instance):
-        if self.xcom_task_id:
-            self.job_id = xcom.xcom_pull(task_instance=task_instance, task_id=self.xcom_task_id)
-        else:
+        if not self.xcom_task_id:
             raise Exception('There must be an xcom_task_id to receive an xcom value!')
+
+        self.job_id = xcom.xcom_pull(task_instance=task_instance, task_id=self.xcom_task_id)
