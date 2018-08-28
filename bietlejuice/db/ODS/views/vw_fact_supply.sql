@@ -250,15 +250,15 @@ select
         when pl.branded_lead then 'Branded'
         else 'Other'
 	end as mkt_branded,
-	t.mkt_category,
-	t.mkt_flow,
-	t.mkt_completion,
-	t.mkt_channel_type,
-	t.mkt_channel,
-	t.mkt_platform,
-	t.mkt_medium,
-	t.mkt_source,
-	t.mkt_device,
+	coalesce(t.mkt_category, 'Not Mapped') as mkt_category,
+	coalesce(t.mkt_flow, 'Not Mapped') as mkt_flow,
+	coalesce(t.mkt_completion, 'Not Mapped') as mkt_completion,
+	coalesce(t.mkt_channel_type, 'Not Mapped') as mkt_channel_type,
+	coalesce(t.mkt_channel, 'Not Mapped') as mkt_channel,
+	coalesce(t.mkt_platform, 'Not Mapped') as mkt_platform,
+	coalesce(t.mkt_medium, 'Not Mapped') as mkt_medium,
+	coalesce(t.mkt_source, 'Not Mapped') as mkt_source,
+	coalesce(t.mkt_device, 'Not Mapped') as mkt_device,
     now() as dt_timestamp
 from
     potential_listings pl
