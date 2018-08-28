@@ -19,33 +19,51 @@ crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 dict_params = json.loads(crawler_params)
 
 
-def start_crawler(**kwargs):
-    max_crawl = kwargs.get('max_crawl', 1000000)
-    states = kwargs.get('states')
+def crawl_proxy(**kwargs):
     source = kwargs.get('source')
+
+    # start crawling
+    cmd = ['./crawlers/{0}.py'.format(source), '--s3_bucket', s3_bucket]
+
+    r = start_crawler(cmd, **kwargs)
 
     # get task instance
     ti = kwargs.get('ti')
 
+    exec_date = str(datetime.date(kwargs.get('execution_date')))
+    xcom.xcom_push(ti,
+                   key='crawler_houses_proxy_{}'.format(exec_date),
+                   k_value=r.get('jobId'))
+
+
+def crawl_houses(**kwargs):
+    max_crawl = kwargs.get('max_crawl', 1000000)
+    states = kwargs.get('states')
+    source = kwargs.get('source')
+
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
+
+    cmd = ['./crawlers/{0}.py'.format(source), '--s3_bucket', s3_bucket, '--max_crawl', str(max_crawl),
+           '--states'] + states
+
+    r = start_crawler(cmd, **kwargs)
+
+
+def start_crawler(cmd, **kwargs):
+    source = kwargs.get('source')
 
     _logger.info('m=start_crawler, source={0}, msg=starting job...'.format(source))
     r = BatchClient().start_batch_job(
         job_name='crawl-{0}'.format(source),
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/{0}.py'.format(source), '--max_crawl', str(max_crawl), '--s3_bucket', s3_bucket,
-                 '--states'] + states
+        command=cmd
     )
     _logger.info('m=start_crawler, status={}, job={}, msg=finished.'.format(r.get('status'), '-'.join(
         [r.get('jobId'), r.get('jobName')])))
 
-    if source == 'proxies':
-        exec_date = str(datetime.date(kwargs.get('execution_date')))
-        xcom.xcom_push(ti,
-                       key='crawler_houses_proxy_{}'.format(exec_date),
-                       k_value=r.get('jobId'))
+    return r
 
 
 dag = DAG(
@@ -64,15 +82,15 @@ dag = DAG(
 crawl_proxies = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-proxies',
-    func_command=start_crawler,
+    func_command=crawl_proxy,
     provide_context=True,
-    op_kwargs=dict(dict_params.items() + ({'source': 'proxies'}).items())
+    op_kwargs={'source': 'proxies'}
 )
 
 crawl_imovelweb = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-imovelweb',
-    func_command=start_crawler,
+    func_command=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'imovelweb'}).items())
 )
@@ -80,7 +98,7 @@ crawl_imovelweb = BaseDAG.get_quintoandar_python_operator(
 crawl_vivareal = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-vivareal',
-    func_command=start_crawler,
+    func_command=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'vivareal'}).items())
 )
@@ -88,7 +106,7 @@ crawl_vivareal = BaseDAG.get_quintoandar_python_operator(
 crawl_zap = BaseDAG.get_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
-    func_command=start_crawler,
+    func_command=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'zapimoveis'}).items())
 )
