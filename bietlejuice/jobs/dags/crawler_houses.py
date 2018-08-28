@@ -30,13 +30,18 @@ def start_crawler(**kwargs):
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
 
+    if source == 'proxies':
+        cmd = ['./crawlers/{0}.py'.format(source), '--s3_bucket', s3_bucket]
+    else:
+        cmd = ['./crawlers/{0}.py'.format(source), '--s3_bucket', s3_bucket, '--max_crawl', str(max_crawl),
+               '--states'] + states
+
     _logger.info('m=start_crawler, source={0}, msg=starting job...'.format(source))
     r = BatchClient().start_batch_job(
         job_name='crawl-{0}'.format(source),
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/{0}.py'.format(source), '--max_crawl', str(max_crawl), '--s3_bucket', s3_bucket,
-                 '--states'] + states
+        command=cmd
     )
     _logger.info('m=start_crawler, status={}, job={}, msg=finished.'.format(r.get('status'), '-'.join(
         [r.get('jobId'), r.get('jobName')])))
