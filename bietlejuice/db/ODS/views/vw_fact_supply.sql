@@ -250,30 +250,30 @@ select
         when pl.branded_lead then 'Branded'
         else 'Other'
 	end as mkt_branded,
-	coalesce(t.mkt_category, 'Not Mapped') as mkt_category,
-	coalesce(t.mkt_flow, 'Not Mapped') as mkt_flow,
-	coalesce(t.mkt_completion, 'Not Mapped') as mkt_completion,
-	coalesce(t.mkt_channel_type, 'Not Mapped') as mkt_channel_type,
-	coalesce(t.mkt_channel, 'Not Mapped') as mkt_channel,
-	coalesce(t.mkt_platform, 'Not Mapped') as mkt_platform,
-	coalesce(t.mkt_medium, 'Not Mapped') as mkt_medium,
-	coalesce(t.mkt_source, 'Not Mapped') as mkt_source,
-	coalesce(t.mkt_device, 'Not Mapped') as mkt_device,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_category end as mkt_category,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_flow end as mkt_flow,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_completion end as mkt_completion,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel_type end as mkt_channel_type,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel end as mkt_channel,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_platform end as mkt_platform,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_medium end as mkt_medium,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_source end as mkt_source,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_device end as mkt_device,
     now() as dt_timestamp
 from
     potential_listings pl
 left join
     taxonomy t
 on
-    pl.lead_type = t.lead_type
-	and pl.lead_origin = t.lead_origin
-	and pl.utm_source = t.lead_utm_source
-	and pl.utm_medium = t.lead_utm_medium
-	and pl.branded_lead = t.flg_branded
-	and pl.b2b_lead = t.flg_b2b
-	and pl.doorman_lead = t.flg_doorman
-	and pl.isales_direct_register = t.flg_isales_direct_register
-	and pl.cx_direct_register = t.flg_cx_direct_register
-	and pl.isales_intervention = t.flg_isales_intervention
-	and pl.flg_callcenter = t.flg_callcenter
+    coalesce(pl.lead_type,'') = coalesce(t.lead_type,'')
+	and coalesce(pl.lead_origin,'') = coalesce(t.lead_origin,'')
+	and coalesce(pl.utm_source,'') = coalesce(t.lead_utm_source,'')
+	and coalesce(pl.utm_medium,'') = coalesce(t.lead_utm_medium,'')
+	and coalesce(pl.branded_lead,false) = coalesce(t.flg_branded,false)
+	and coalesce(pl.b2b_lead,false) = coalesce(t.flg_b2b,false)
+	and coalesce(pl.doorman_lead,false) = coalesce(t.flg_doorman,false)
+	and coalesce(pl.isales_direct_register,false) = coalesce(t.flg_isales_direct_register,false)
+	and coalesce(pl.cx_direct_register,false) = coalesce(t.flg_cx_direct_register,false)
+	and coalesce(pl.isales_intervention,false) = coalesce(t.flg_isales_intervention,false)
+	and coalesce(pl.flg_callcenter,false) = coalesce(t.flg_callcenter,false)
 
