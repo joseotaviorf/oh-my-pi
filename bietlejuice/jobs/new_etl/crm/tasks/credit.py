@@ -4,7 +4,7 @@ from bietlejuice.jobs.new_etl.crm.tasks.tasks import CRMTasks
 
 
 class CRMTasksCredit(CRMTasks):
-    QUEUES = ['EnviarCardiff']
+    QUEUES = ['EnviarCardiff', 'AnalisarDocumentacaoProprietario']
 
     TABLE_NAMES = {
         'fact': 'fact_credit_tasks',
