@@ -1,0 +1,25 @@
+select
+  id,
+  name,
+  description,
+  announcement,
+  directdial,
+  invalid_loops,
+  invalid_retry_recording,
+  invalid_destination,
+  timeout_enabled,
+  invalid_recording,
+  retvm,
+  timeout_time,
+  timeout_recording,
+  timeout_retry_recording,
+  timeout_destination,
+  timeout_loops,
+  timeout_append_announce,
+  invalid_append_announce,
+  timeout_ivr_ret,
+  invalid_ivr_ret,
+  alertinfo,
+  rvolume
+from asterisk.ivr_details
+;

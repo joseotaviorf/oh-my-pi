@@ -1,0 +1,25 @@
+select
+  cast(id as integer) as id,
+  name,
+  description,
+  cast(announcement as integer) as announcement,
+  directdial,
+  invalid_loops,
+  invalid_retry_recording,
+  invalid_destination,
+  timeout_enabled,
+  invalid_recording,
+  retvm,
+  cast(timeout_time as integer) as timeout_time,
+  timeout_recording,
+  timeout_retry_recording,
+  timeout_destination,
+  timeout_loops,
+  cast(timeout_append_announce as integer) as timeout_append_announce,
+  cast(invalid_append_announce as integer) as invalid_append_announce,
+  timeout_ivr_ret,
+  invalid_ivr_ret,
+  alertinfo,
+  rvolume
+from datalake_raw.asterisk_ivr_details
+;
