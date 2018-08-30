@@ -81,7 +81,19 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=5
+    max_active_runs=1
+)
+
+past_processing_dag = DAG(
+    dag_id='{}-PAST'.format(MAIN_DAG_ID),
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    max_active_runs=1
 )
 
 
@@ -303,5 +315,225 @@ airflow_helpers.chain(
 )
 
 clean_tasks_resolution_sub_dag_task.set_downstream([tasks_credit_sub_dag])
+
+
+# past processing
+def class_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    move_dim_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='move_dim_to_staging',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'move_dim_to_staging'
+        }
+    )
+
+    move_fact_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='move_fact_to_staging',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'move_fact_to_staging'
+        }
+    )
+
+    move_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='append_dim_to_dw',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'append_dim_to_dw'
+        }
+    )
+
+    move_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='append_fact_to_dw',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'append_fact_to_dw'
+        }
+    )
+
+    delete_staging_fact_entries_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='delete_staging_fact_entries',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'delete_staging_fact_entries'
+        }
+    )
+
+    delete_staging_dim_entries_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='delete_staging_dim_entries',
+        func_command=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            '_class': kwargs['_class'],
+            'method': 'delete_staging_dim_entries'
+        }
+    )
+
+    airflow_helpers.chain(
+        move_dim_to_staging_task,
+        move_dim_to_dw_task,
+        delete_staging_dim_entries_task
+    )
+
+    airflow_helpers.chain(
+        move_fact_to_staging_task,
+        move_fact_to_dw_task,
+        delete_staging_fact_entries_task
+    )
+
+    return local_dag
+
+
+def clean_tasks_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    move_tasks_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='move_tasks_to_clean',
+        func_command=exec_crm_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'method': '_move_tasks_to_clean'
+        }
+    )
+
+    upsert_tasks_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='upsert_tasks_clean_partition',
+        func_command=upsert_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'clean',
+            'method': '_upsert_tasks_partition'
+        }
+    )
+
+    move_tasks_to_clean_task >> upsert_tasks_clean_partition_task
+
+    return local_dag
+
+
+def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    move_tasks_resolution_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='move_tasks_resolution_to_clean',
+        func_command=exec_crm_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'method': '_move_tasks_resolution_to_clean'
+        }
+    )
+
+    upsert_tasks_resolution_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='upsert_tasks_resolution_clean_partition',
+        func_command=upsert_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'clean',
+            'method': '_upsert_tasks_resolution_partition'
+        }
+    )
+
+    move_tasks_resolution_to_clean_task >> upsert_tasks_resolution_clean_partition_task
+
+    return local_dag
+
+
+past_extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
+    task_id='past_extract_and_load',
+    func_command=extract_and_load_data,
+    dag=past_processing_dag,
+    provide_context=True
+)
+
+past_data_existence_check_task = ShortCircuitOperator(
+    task_id='past_data_existence_check',
+    python_callable=data_existence_check,
+    dag=past_processing_dag,
+    provide_context=True,
+    op_kwargs={
+        'bucket_type': 'raw'
+    }
+)
+
+past_upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
+    task_id='past_upsert_raw_partition',
+    func_command=upsert_partition,
+    dag=past_processing_dag,
+    provide_context=True,
+    op_kwargs={
+        'bucket_type': 'raw',
+        'method': '_upsert_tasks_partition'
+    }
+)
+
+past_clean_tasks_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=past_processing_dag,
+    sub_dag_name='past_create_clean_tasks_table',
+    sub_dag_func=clean_tasks_sub_dag,
+)
+
+past_clean_tasks_resolution_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=past_processing_dag,
+    sub_dag_name='past_create_clean_tasks_resolution_table',
+    sub_dag_func=clean_task_resolution_sub_dag,
+)
+
+past_tasks_credit_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=past_processing_dag,
+    sub_dag_name='past_tasks_credit',
+    sub_dag_func=class_sub_dag,
+    _class='credit'
+)
+
+# flow
+airflow_helpers.chain(
+    past_extract_and_load_task,
+    past_data_existence_check_task,
+    past_upsert_raw_partition_task,
+    past_clean_tasks_sub_dag_task,
+    past_clean_tasks_resolution_sub_dag_task
+)
+
+past_clean_tasks_resolution_sub_dag_task.set_downstream([past_tasks_credit_sub_dag])
 
 # TODO: add unit tests
