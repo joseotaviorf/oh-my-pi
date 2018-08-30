@@ -9,3 +9,4 @@ LEAD_VARIANT_CONFIG_DIR = os.path.join(dir_path, 'leads/variant_config')
 DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/public/queries')  # remove after refactoring
 NEW_DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/queries')
 ODS_QUERIES_DIR = os.path.join(dir_path, '../../db/ODS/queries')
+SOURCE_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/queries')
