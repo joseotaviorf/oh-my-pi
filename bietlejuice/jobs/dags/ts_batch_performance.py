@@ -7,8 +7,8 @@ first ever computable date : 20180206
 from datetime import datetime
 
 import pandas as pd
-from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
+# from airflow.models import DAG
+# from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
@@ -80,21 +80,21 @@ def batch_performance():
 
 # DAG
 
-dag = DAG(
-    dag_id=MAIN_DAG_NAME,
-    default_args={
-        'owner': 'Data Team',
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1,
-    catchup=False
-)
-
-PythonOperator(
-    dag=dag,
-    task_id='batch_performance',
-    python_callable=batch_performance
-)
+# dag = DAG(
+#     dag_id=MAIN_DAG_NAME,
+#     default_args={
+#         'owner': 'Data Team',
+#         'wait_for_downstream': False,
+#         'depends_on_past': False
+#     },
+#     start_date=MAIN_START_DATE,
+#     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+#     max_active_runs=1,
+#     catchup=False
+# )
+#
+# PythonOperator(
+#     dag=dag,
+#     task_id='batch_performance',
+#     python_callable=batch_performance
+# )
