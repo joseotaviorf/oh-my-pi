@@ -16,11 +16,7 @@ class DBFactory(object):
 
     @staticmethod
     def get_connection(db_enum, encoding, timeout=0):
-        print 'DB_ENUM'
-        print db_enum
         env_str = os.environ.get(str(db_enum))
-        print 'ENV_STR'
-        print env_str
         env = json.loads(env_str)
 
         host = env['host']
