@@ -7,7 +7,7 @@ from airflow.operators.python_operator import ShortCircuitOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.crm.tasks import CRMTasks, CRMTasksFactory
+from bietlejuice.jobs.new_etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -15,7 +15,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
 MAIN_DAG_ID = 'bi-crm-load'
-MAIN_START_DATE = datetime(2015, 1, 1)
+MAIN_START_DATE = datetime(2018, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 
@@ -81,19 +81,25 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
+PAST_PROCESSING_DAG_ID = '{}-past-2015-2018'.format(MAIN_DAG_ID)
+PAST_PROCESSING_START_DATE = datetime(2015, 10, 29)
+PAST_PROCESSING_END_DATE = datetime(2018, 8, 1)
+
 past_processing_dag = DAG(
-    dag_id='{}-PAST'.format(MAIN_DAG_ID),
+    dag_id=PAST_PROCESSING_DAG_ID,
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
         'depends_on_past': False
     },
-    start_date=MAIN_START_DATE,
+    start_date=PAST_PROCESSING_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 
@@ -128,7 +134,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
         task_id='append_dim_to_dw',
         func_command=exec_factory_method,
         dag=local_dag,
@@ -139,7 +145,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
         task_id='append_fact_to_dw',
         func_command=exec_factory_method,
         dag=local_dag,
@@ -172,15 +178,56 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
+    if 'has_bridge' in kwargs and kwargs['has_bridge'] is True:
+        move_bdg_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='move_bdg_to_staging',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'move_bdg_to_staging'
+            }
+        )
+
+        insert_bdg_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='insert_bdg_to_dw',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'insert_bdg_to_dw'
+            }
+        )
+
+        delete_staging_bdg_entries_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='delete_staging_bdg_entries',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'delete_staging_bdg_entries'
+            }
+        )
+
+        airflow_helpers.chain(
+            append_fact_to_dw_task,
+            move_bdg_to_staging_task,
+            insert_bdg_to_dw_task,
+            delete_staging_bdg_entries_task
+        )
+
     airflow_helpers.chain(
         move_dim_to_staging_task,
-        move_dim_to_dw_task,
+        append_dim_to_dw_task,
         delete_staging_dim_entries_task
     )
 
     airflow_helpers.chain(
         move_fact_to_staging_task,
-        move_fact_to_dw_task,
+        append_fact_to_dw_task,
         delete_staging_fact_entries_task
     )
 
@@ -302,7 +349,15 @@ tasks_credit_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_credit',
     sub_dag_func=class_sub_dag,
-    _class='credit'
+    _class=CRMTasksTableEnum.CREDIT
+)
+
+tasks_visit_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_visit',
+    sub_dag_func=class_sub_dag,
+    _class=CRMTasksTableEnum.VISIT,
+    has_bridge=True
 )
 
 # flow
@@ -314,21 +369,21 @@ airflow_helpers.chain(
     clean_tasks_resolution_sub_dag_task
 )
 
-clean_tasks_resolution_sub_dag_task.set_downstream([tasks_credit_sub_dag])
+clean_tasks_resolution_sub_dag_task.set_downstream([tasks_credit_sub_dag, tasks_visit_sub_dag])
 
 
 # past processing
-def class_sub_dag(sub_dag_name, **kwargs):
+def pp_class_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
-        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        dag_name=PAST_PROCESSING_DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
+        start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
     move_dim_to_staging_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='move_dim_to_staging',
+        task_id='pp_move_dim_to_staging',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -339,7 +394,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
     )
 
     move_fact_to_staging_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='move_fact_to_staging',
+        task_id='pp_move_fact_to_staging',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -349,8 +404,8 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='append_dim_to_dw',
+    append_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='pp_append_dim_to_dw',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -360,8 +415,8 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='append_fact_to_dw',
+    append_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        task_id='pp_append_fact_to_dw',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -372,7 +427,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
     )
 
     delete_staging_fact_entries_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='delete_staging_fact_entries',
+        task_id='pp_delete_staging_fact_entries',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -383,7 +438,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
     )
 
     delete_staging_dim_entries_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='delete_staging_dim_entries',
+        task_id='pp_delete_staging_dim_entries',
         func_command=exec_factory_method,
         dag=local_dag,
         provide_context=True,
@@ -393,32 +448,73 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
+    if 'has_bridge' in kwargs and kwargs['has_bridge'] is True:
+        move_bdg_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='pp_move_bdg_to_staging',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'move_bdg_to_staging'
+            }
+        )
+
+        insert_bdg_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='pp_insert_bdg_to_dw',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'insert_bdg_to_dw'
+            }
+        )
+
+        delete_staging_bdg_entries_task = BaseDAG.get_quintoandar_python_operator(
+            task_id='pp_delete_staging_bdg_entries',
+            func_command=exec_factory_method,
+            dag=local_dag,
+            provide_context=True,
+            op_kwargs={
+                '_class': kwargs['_class'],
+                'method': 'delete_staging_bdg_entries'
+            }
+        )
+
+        airflow_helpers.chain(
+            append_fact_to_dw_task,
+            move_bdg_to_staging_task,
+            insert_bdg_to_dw_task,
+            delete_staging_bdg_entries_task
+        )
+
     airflow_helpers.chain(
         move_dim_to_staging_task,
-        move_dim_to_dw_task,
+        append_dim_to_dw_task,
         delete_staging_dim_entries_task
     )
 
     airflow_helpers.chain(
         move_fact_to_staging_task,
-        move_fact_to_dw_task,
+        append_fact_to_dw_task,
         delete_staging_fact_entries_task
     )
 
     return local_dag
 
 
-def clean_tasks_sub_dag(sub_dag_name, **kwargs):
+def pp_clean_tasks_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
-        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        dag_name=PAST_PROCESSING_DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
+        start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
     move_tasks_to_clean_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='move_tasks_to_clean',
+        task_id='pp_move_tasks_to_clean',
         func_command=exec_crm_method,
         dag=local_dag,
         provide_context=True,
@@ -428,7 +524,7 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
     )
 
     upsert_tasks_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='upsert_tasks_clean_partition',
+        task_id='pp_upsert_tasks_clean_partition',
         func_command=upsert_partition,
         dag=local_dag,
         provide_context=True,
@@ -443,17 +539,17 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
-def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
+def pp_clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
-        dag_name='{}-PAST'.format(MAIN_DAG_ID),
+        dag_name=PAST_PROCESSING_DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
+        start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
     move_tasks_resolution_to_clean_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='move_tasks_resolution_to_clean',
+        task_id='pp_move_tasks_resolution_to_clean',
         func_command=exec_crm_method,
         dag=local_dag,
         provide_context=True,
@@ -463,7 +559,7 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
     )
 
     upsert_tasks_resolution_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
-        task_id='upsert_tasks_resolution_clean_partition',
+        task_id='pp_upsert_tasks_resolution_clean_partition',
         func_command=upsert_partition,
         dag=local_dag,
         provide_context=True,
@@ -478,15 +574,16 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
-past_extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
-    task_id='past_extract_and_load',
+# operators
+pp_extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
+    task_id='pp_extract_and_load',
     func_command=extract_and_load_data,
     dag=past_processing_dag,
     provide_context=True
 )
 
-past_data_existence_check_task = ShortCircuitOperator(
-    task_id='past_data_existence_check',
+pp_data_existence_check_task = ShortCircuitOperator(
+    task_id='pp_data_existence_check',
     python_callable=data_existence_check,
     dag=past_processing_dag,
     provide_context=True,
@@ -495,8 +592,8 @@ past_data_existence_check_task = ShortCircuitOperator(
     }
 )
 
-past_upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
-    task_id='past_upsert_raw_partition',
+pp_upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
+    task_id='pp_upsert_raw_partition',
     func_command=upsert_partition,
     dag=past_processing_dag,
     provide_context=True,
@@ -506,34 +603,42 @@ past_upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
     }
 )
 
-past_clean_tasks_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+pp_clean_tasks_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=past_processing_dag,
-    sub_dag_name='past_create_clean_tasks_table',
-    sub_dag_func=clean_tasks_sub_dag,
+    sub_dag_name='pp_create_clean_tasks_table',
+    sub_dag_func=pp_clean_tasks_sub_dag,
 )
 
-past_clean_tasks_resolution_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+pp_clean_tasks_resolution_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=past_processing_dag,
-    sub_dag_name='past_create_clean_tasks_resolution_table',
-    sub_dag_func=clean_task_resolution_sub_dag,
+    sub_dag_name='pp_create_clean_tasks_resolution_table',
+    sub_dag_func=pp_clean_task_resolution_sub_dag,
 )
 
-past_tasks_credit_sub_dag = BaseSubDag.get_sub_dag_operator(
+pp_tasks_credit_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=past_processing_dag,
-    sub_dag_name='past_tasks_credit',
-    sub_dag_func=class_sub_dag,
-    _class='credit'
+    sub_dag_name='pp_tasks_credit',
+    sub_dag_func=pp_class_sub_dag,
+    _class=CRMTasksTableEnum.CREDIT
+)
+
+pp_tasks_visit_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=past_processing_dag,
+    sub_dag_name='pp_tasks_visit',
+    sub_dag_func=pp_class_sub_dag,
+    _class=CRMTasksTableEnum.VISIT,
+    has_bridge=True
 )
 
 # flow
 airflow_helpers.chain(
-    past_extract_and_load_task,
-    past_data_existence_check_task,
-    past_upsert_raw_partition_task,
-    past_clean_tasks_sub_dag_task,
-    past_clean_tasks_resolution_sub_dag_task
+    pp_extract_and_load_task,
+    pp_data_existence_check_task,
+    pp_upsert_raw_partition_task,
+    pp_clean_tasks_sub_dag_task,
+    pp_clean_tasks_resolution_sub_dag_task
 )
 
-past_clean_tasks_resolution_sub_dag_task.set_downstream([past_tasks_credit_sub_dag])
+pp_clean_tasks_resolution_sub_dag_task.set_downstream([pp_tasks_credit_sub_dag, pp_tasks_visit_sub_dag])
 
 # TODO: add unit tests
