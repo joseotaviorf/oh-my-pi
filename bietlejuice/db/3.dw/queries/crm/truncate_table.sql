@@ -1,1 +1,0 @@
-delete from {schema}.{table_name};
