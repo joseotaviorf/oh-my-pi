@@ -6,7 +6,8 @@ select
   dt_completed,
   version,
   origin,
-  type
+  type,
+  getdate() as dt_timestamp
 from staging.{table_name}
 where dt_partition = '{partition_date}'
 ;
