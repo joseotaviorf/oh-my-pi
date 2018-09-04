@@ -11,8 +11,8 @@ select
       replace(regexp_extract(cast(dt_completed as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
      as bigint
     ), -1) as sk_completed_date,
-  cast(id_origin as bigint) as sk_origin,
-  cast(id_assignee as bigint) as sk_assignee,
+  coalesce(cast(id_origin as bigint), -1) as sk_origin,
+  coalesce(cast(id_assignee as bigint), -1) as sk_assignee,
   action_user_name,
   coalesce(cast(id_user_action as bigint), -1) as sk_user_action,
   coalesce(
