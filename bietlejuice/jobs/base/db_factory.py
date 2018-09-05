@@ -37,7 +37,7 @@ class DBFactory(object):
                 conn.set_client_encoding(encoding)
 
             if timeout:
-                conn.cursor().execute("SET statement_timeout = '{}s'".format(timeout))
+                conn.cursor().execute("SET statement_timeout = {}".format(timeout))
 
             return conn
         elif dbtype == EnumDbType.MySQL:

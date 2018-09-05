@@ -46,7 +46,8 @@ class CRMTasks(object):
 
     SCHEMA_NAMES = {
         'staging': 'staging',
-        'prod': 'crm'
+        'prod': 'crm',
+        'bdg': 'public'
     }
 
     S3_FILE_NAME = 'data'
@@ -442,6 +443,14 @@ class CRMTasks(object):
         )
 
     @logger
+    def _move_bdg_to_staging(self, table_name, queues):
+        self.__move_to_staging(
+            table_name=table_name,
+            queues=queues,
+            file_name='create_staging_{}_table.sql'.format(table_name)
+        )
+
+    @logger
     def __move_to_staging(self, table_name, queues, file_name):
         query = BaseETL.get_query_from_file_name(
             '{}/{}/{}'.format(DATALAKE_QUERIES_DIR,
@@ -466,6 +475,7 @@ class CRMTasks(object):
     def _append_fact_to_dw(self, table_name):
         self.__append_to_dw(
             filename='append_fact_table.sql',
+            schema=CRMTasks.SCHEMA_NAMES['prod'],
             table_name=table_name
         )
 
@@ -473,50 +483,81 @@ class CRMTasks(object):
     def _append_dim_to_dw(self, table_name):
         self.__append_to_dw(
             filename='append_dim_table.sql',
+            schema=CRMTasks.SCHEMA_NAMES['prod'],
             table_name=table_name
         )
 
     @logger
-    def __append_to_dw(self, filename, table_name):
-        query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(NEW_DW_QUERIES_DIR, filename))
+    def _insert_into_dw(self, schema, table_name):
+        self._truncate_table(
+            schema=schema,
+            table_name=table_name
+        )
 
-        _logger.info(
-            '__append_to_dw, schema={}, table_name={}, msg=querying table...'.format(CRMTasks.SCHEMA_NAMES['prod'],
-                                                                                     table_name))
+        upsert_query = BaseETL.get_query_from_file_name(
+            '{}/crm/insert_{}_table.sql'.format(NEW_DW_QUERIES_DIR, table_name))
+        self.__upsert_into_dw(
+            upsert_query=upsert_query,
+            schema=schema,
+            table_name=table_name
+        )
+
+    @logger
+    def __append_to_dw(self, filename, schema, table_name):
+        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(NEW_DW_QUERIES_DIR, filename))
+        deletion_query = BaseETL.get_query_from_file_name(
+            file_name='{}/crm/delete_old_entries.sql'.format(NEW_DW_QUERIES_DIR))
+
+        BaseETL.execute_command(
+            command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
+            db_enum=EnumDb.BI_DW,
+            encoding='utf-8'
+        )
+
+        self.__upsert_into_dw(
+            upsert_query=upsert_query.format(table_name=table_name, partition_date=self.partition_date),
+            schema=schema,
+            table_name=table_name
+        )
+
+    @logger
+    def __upsert_into_dw(self, upsert_query, schema, table_name):
+        self._truncate_table(
+            schema=schema,
+            table_name=table_name
+        )
+
         table_data = BaseETL.from_db_query(
             db_enum=EnumDb.BI_DW,
-            query=query.format(table_name=table_name, partition_date=self.partition_date),
+            query=upsert_query,
             encoding='utf-8',
         )
 
-        self.__delete_entries(
-            table_name=table_name,
-            filename='delete_old_entries.sql'
-        )
-
         _logger.info(
-            '__append_to_dw, schema={}, table_name={}, msg=bulk inserting...'.format(CRMTasks.SCHEMA_NAMES['prod'],
-                                                                                     table_name))
+            '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(schema, table_name))
+
         BaseETL.bulk_insert(
             table=table_data,
-            table_name='{}.{}'.format(CRMTasks.SCHEMA_NAMES['prod'], table_name),
+            table_name='{}.{}'.format(schema, table_name),
             db_enum=EnumDb.BI_DW,
             encoding='utf-8'
         )
 
     @logger
     def _delete_staging_entries(self, table_name):
-        self.__delete_entries(
-            table_name=table_name,
-            filename='delete_staging_entries.sql'
-        )
-
-    @logger
-    def __delete_entries(self, table_name, filename):
-        query = BaseETL.get_query_from_file_name(file_name='{}/crm/{}'.format(NEW_DW_QUERIES_DIR, filename))
+        query = BaseETL.get_query_from_file_name(
+            file_name='{}/crm/delete_staging_entries.sql'.format(NEW_DW_QUERIES_DIR))
         BaseETL.execute_command(
             command=query.format(table_name=table_name, partition_date=self.partition_date),
             db_enum=EnumDb.BI_DW,
             encoding='utf-8',
             commit=True
+        )
+
+    @logger
+    def _truncate_table(self, schema, table_name):
+        BaseETL.truncate_table(
+            db_enum=EnumDb.BI_DW,
+            schema=schema,
+            table_name=table_name
         )

@@ -10,12 +10,12 @@ select
   sk_action_date,
   dt_action,
   action_type,
-  sk_task_user_start_date,
-  dt_task_user_start,
-  sk_task_user_end_date,
-  dt_task_user_end,
-  task_user_type,
-  task_user_resolve_hours,
+  sk_task_action_start_date,
+  dt_task_action_start,
+  sk_task_action_end_date,
+  dt_task_action_end,
+  task_action_type,
+  task_user_action_resolve_hours,
   getdate() as dt_timestamp
 from staging.{table_name}
 where dt_partition = '{partition_date}'

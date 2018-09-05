@@ -308,8 +308,7 @@ class BaseETL(object):
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
-        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True, timeout=30)
+        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum, timeout=30)
 
     @classmethod
     def move_table_to_dw(cls, table_name, enum_db_source, enum_db_dest,
