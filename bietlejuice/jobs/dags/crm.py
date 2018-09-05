@@ -85,7 +85,7 @@ main_dag = DAG(
     catchup=False
 )
 
-PAST_PROCESSING_DAG_ID = '{}-past-2015-2018'.format(MAIN_DAG_ID)
+PAST_PROCESSING_DAG_ID = '{}-past-2015'.format(MAIN_DAG_ID)
 PAST_PROCESSING_START_DATE = datetime(2015, 10, 29)
 PAST_PROCESSING_END_DATE = datetime(2018, 8, 1)
 
@@ -99,7 +99,7 @@ past_processing_dag = DAG(
     start_date=PAST_PROCESSING_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
-    catchup=False
+    catchup=True
 )
 
 
