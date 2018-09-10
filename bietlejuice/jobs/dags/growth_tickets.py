@@ -64,7 +64,6 @@ dag = DAG(
 tickets_whats = QuintoAndarPythonOperator(
     dag=dag,
     task_id='etl_tickets_and_whatsapp',
-    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'post_contract_tickets_and_whatsapp', 'bucket': bucket, 'insert_dummy': False,
                'schema_source': 'zendesk', 'schema_dest': 'growth_staging'}
@@ -82,7 +81,6 @@ ticket_res_time = QuintoAndarPythonOperator(
 ticket_base = QuintoAndarPythonOperator(
     dag=dag,
     task_id='etl_ticket_base_data',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_table_query_dw,
     op_kwargs={'dim_name': 'post_contract_ticket_base', 'query_dir': STAGING_QUERIES_DIR,
                'filename': 'load_post_contract_ticket_base'}

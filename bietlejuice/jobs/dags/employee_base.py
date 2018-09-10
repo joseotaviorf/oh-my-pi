@@ -90,7 +90,6 @@ dag = DAG(
 employee_base = QuintoAndarPythonOperator(
     dag=dag,
     task_id='etl_employee_base_data',
-    execution_timeout=timedelta(hours=3),
     python_callable=load_employee_base_data,
     op_kwargs={'_table_name': table_name, '_bucket': bucket}
 )

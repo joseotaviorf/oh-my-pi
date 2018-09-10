@@ -69,7 +69,6 @@ dag = DAG(
 clear_old_data = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='clean_previous_data',
-    execution_timeout=timedelta(hours=3),
     provide_context=True,
     python_callable=clean_previous_data,
     op_kwargs={'dim_name': 'agents_performance_ranking', 'schema': 'growth', 'date_column': 'sk_date'}
