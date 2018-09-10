@@ -2,11 +2,12 @@ from datetime import datetime
 from datetime import timedelta
 
 from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from qa_python_utils.default_logger import _logger, logger
+
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags import GROWTH_PROD_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
-from qa_python_utils.default_logger import _logger, logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -26,7 +27,7 @@ def load_agents_performance_ranking(dim_name, query_dir, filename=None, **kwargs
     BaseETL.execute_command(
         command=query.format(exec_date),
         commit=True,
-        db_enum=EnumDb.BI_DW
+        db_enum=EnumDB.BI_DW
     )
 
 
@@ -44,7 +45,7 @@ def clean_previous_data(dim_name, schema, date_column, **kwargs):
                                                                                                     exec_date)
 
     BaseETL.execute_command(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         encoding='UTF8',
         command=query,
         commit=True
@@ -65,7 +66,7 @@ dag = DAG(
     max_active_runs=1
 )
 
-clear_old_data = QuintoAndarPythonOperator(
+clear_old_data = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='clean_previous_data',
     execution_timeout=timedelta(hours=3),
@@ -74,7 +75,7 @@ clear_old_data = QuintoAndarPythonOperator(
     op_kwargs={'dim_name': 'agents_performance_ranking', 'schema': 'growth', 'date_column': 'sk_date'}
 )
 
-tickets_whats = QuintoAndarPythonOperator(
+tickets_whats = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='load_agents_performance_ranking',
     execution_timeout=timedelta(hours=3),

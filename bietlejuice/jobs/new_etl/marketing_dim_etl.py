@@ -1,6 +1,6 @@
 from datetime import date
 from dim_etl import DimensionETL
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
@@ -29,7 +29,7 @@ class MarketingDimensionETL(DimensionETL):
             BaseETL.bulk_insert(
                 table=table,
                 table_name=table_name,
-                db_enum=EnumDb.BI_ODS,
+                db_enum=EnumDB.BI_ODS,
                 encoding='UTF8',
                 append=False,
                 commit=True,

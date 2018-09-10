@@ -1,12 +1,13 @@
 from datetime import datetime
 
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from bietlejuice.jobs.new_etl.godfather import GodFather
-from qa_python_utils.default_logger import logger
 
 
 class OfferSubDag(DimSubDag):
@@ -62,28 +63,28 @@ class OfferSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        offer_to_s3_task = BaseDAG.get_quintoandar_python_operator(
+        offer_to_s3_task = BaseDAG.build_quintoandar_python_operator(
             task_id='offer_to_s3',
             dag=dag,
-            func_command=OfferSubDag.__to_s3,
+            python_callable=OfferSubDag.__to_s3,
             op_kwargs={
                 'table_name': 'offer'
             }
         )
 
-        topic_to_s3_task = BaseDAG.get_quintoandar_python_operator(
+        topic_to_s3_task = BaseDAG.build_quintoandar_python_operator(
             task_id='offer_topic_to_s3',
             dag=dag,
-            func_command=OfferSubDag.__to_s3,
+            python_callable=OfferSubDag.__to_s3,
             op_kwargs={
                 'table_name': 'topic'
             }
         )
 
-        offer_to_ods_task = BaseDAG.get_quintoandar_python_operator(
+        offer_to_ods_task = BaseDAG.build_quintoandar_python_operator(
             task_id='offer_to_ods',
             dag=dag,
-            func_command=utils.load_athena_query_to_ods,
+            python_callable=utils.load_athena_query_to_ods,
             op_kwargs={
                 'dim_name': 'offer',
                 'bucket': DimSubDag.S3_BUCKET,
@@ -92,17 +93,17 @@ class OfferSubDag(DimSubDag):
 
         )
 
-        pre_proposal_task = BaseDAG.get_quintoandar_python_operator(
+        pre_proposal_task = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_pre_proposal',
             dag=dag,
             provide_context=True,
-            func_command=self.get_pre_proposal_query
+            python_callable=self.get_pre_proposal_query
         )
 
-        pre_proposta_aud_task = BaseDAG.get_quintoandar_python_operator(
+        pre_proposta_aud_task = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_pre_proposal_aud',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal_AUD',
                 'table_name': 'PreProposta_AUD',
@@ -111,10 +112,10 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
+        condicao_proposta_task = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_condition',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'condition',
                 'table_name': 'CondicaoProposta',
@@ -123,10 +124,10 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        pre_proposta_condicao_proposta_task = BaseDAG.get_quintoandar_python_operator(
+        pre_proposta_condicao_proposta_task = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_pre_proposal_condition',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'pre_proposal_condition',
                 'table_name': 'PreProposta_CondicaoProposta',
@@ -135,10 +136,10 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        staging_dim_offer_task = BaseDAG.get_quintoandar_python_operator(
+        staging_dim_offer_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_offer',
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'offer',
                 'post_command': "update staging.dim_offer set dt_timestamp = '{}' where sk_offer = -1;".format(
@@ -146,10 +147,10 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        dim_offer_task = BaseDAG.get_quintoandar_python_operator(
+        dim_offer_task = BaseDAG.build_quintoandar_python_operator(
             task_id='DW_dim_offer',
             dag=dag,
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'offer',
                 'bucket': DimSubDag.S3_BUCKET

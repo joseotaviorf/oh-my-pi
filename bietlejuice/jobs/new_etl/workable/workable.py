@@ -9,7 +9,7 @@ from enum import Enum
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
@@ -195,7 +195,7 @@ class Workable(object):
         BaseETL.dataframe_to_db(
             df=df,
             table_name='staging.workable_{}'.format(table_name),
-            enum_db=EnumDb.BI_DW,
+            enum_db=EnumDB.BI_DW,
             encoding='utf-8',
             append=False
         )
@@ -203,7 +203,7 @@ class Workable(object):
     @logger
     def _move_to_dw(self, table_name):
         table_data = BaseETL.from_db_table(
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             table_name='staging.workable_{}'.format(table_name),
             encoding='utf-8'
         )
@@ -211,7 +211,7 @@ class Workable(object):
         BaseETL.bulk_insert(
             table=table_data,
             table_name='workable.{}'.format(table_name),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8',
             append=False
         )
@@ -220,7 +220,7 @@ class Workable(object):
     def _delete_staging_entries(self, table_name):
         BaseETL.execute_command(
             command='delete from staging.workable_{}'.format(table_name),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8',
             commit=True
         )

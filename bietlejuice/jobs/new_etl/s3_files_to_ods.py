@@ -2,7 +2,7 @@ from io import BytesIO
 
 import boto3
 import pandas as pd
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
 from qa_python_utils.default_logger import logger, _logger
 
@@ -27,14 +27,14 @@ class S3ToODS(object):
 
                 _logger.info('m=move_files_to_ods, msg=checking if table exists')
                 exists = BaseETL.table_exists(
-                    db_enum=EnumDb.BI_ODS,
+                    db_enum=EnumDB.BI_ODS,
                     table_name=table_name,
                     schema=self.schema
                 )
                 if not exists:
                     _logger.info('m=move_files_to_ods, msg=creating table')
                     BaseETL.create_table(
-                        conn=BaseETL.get_connection(db_enum=EnumDb.BI_ODS),
+                        conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
                         table=table,
                         tablename=table_name,
                         schema=self.schema,

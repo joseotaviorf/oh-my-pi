@@ -2,14 +2,14 @@ import os
 from datetime import datetime
 
 from airflow.models import DAG
+from airflow.operators.python_operator import PythonOperator
+from qa_python_utils.default_logger import _logger, logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.util import environment as env
-from airflow.operators.python_operator import PythonOperator
-from bietlejuice.jobs.dags import DATAMART_QUERIES_DIR
-from qa_python_utils.default_logger import _logger, logger
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.dags import DATAMART_QUERIES_DIR
+from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -18,6 +18,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MAIN_DAG_ID = 'bi-datamarts'
 MAIN_START_DATE = datetime(2018, 8, 22)
 MAIN_SCHEDULE_INTERVAL = None
+
 
 # functions
 
@@ -32,7 +33,7 @@ def create_datamart(table_name, **kwargs):
     _logger.info("m=create_datamart, table_name={}, msg=Dropping table".format(table_name))
     BaseETL.execute_command(
         command='drop table if exists {}.{}'.format(schema, table_name),
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
     )
@@ -40,7 +41,7 @@ def create_datamart(table_name, **kwargs):
     _logger.info("m=create_datamart, table_name={}, msg=Creating table".format(table_name))
     BaseETL.execute_command(
         command='create table {}.{} as ({})'.format(schema, table_name, query),
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
     )

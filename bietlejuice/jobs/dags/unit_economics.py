@@ -1,8 +1,9 @@
-from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from datetime import datetime, timedelta
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from airflow.models import DAG
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
+
+from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
 from bietlejuice.jobs.dags.unit_economics import unit_tests
@@ -22,7 +23,7 @@ MAIN_SCHEDULE_INTERVAL = '@daily'
 
 def materialize_view(_bucket, name):
     table = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         query='select * from unit_economics.vw_{};'.format(name)
     )
 
@@ -30,7 +31,7 @@ def materialize_view(_bucket, name):
     BaseETL.bulk_insert(
         table=table,
         table_name='unit_economics.{}'.format(name),
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=False,
         commit=True,

@@ -1,10 +1,12 @@
+import os
 from datetime import datetime, timedelta
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from bietlejuice.jobs.dags.util import environment as env
+
 from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
+
+from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
-import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/staging/queries')
@@ -29,13 +31,13 @@ def materialize_table_query_dw(dim_name, query_dir, filename=None):
     BaseETL.execute_command(
         command='drop table if exists growth_staging.{}'.format(dim_name),
         commit=True,
-        db_enum=EnumDb.BI_DW
+        db_enum=EnumDB.BI_DW
     )
 
     BaseETL.execute_command(
         command=query,
         commit=True,
-        db_enum=EnumDb.BI_DW
+        db_enum=EnumDB.BI_DW
     )
 
 

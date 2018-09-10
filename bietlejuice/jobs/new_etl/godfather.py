@@ -1,5 +1,5 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from qa_python_utils.default_logger import logger
 
 
@@ -10,7 +10,7 @@ class GodFather(object):
     @logger
     def __get_table(table_name):
         return BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_godfather,
+            db_enum=EnumDB.QuintoAndar_godfather,
             query='select * from {}.{};'.format(GodFather.SCHEMA, table_name),
             encoding='utf-8'
         )

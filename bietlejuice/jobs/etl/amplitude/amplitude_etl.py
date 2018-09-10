@@ -11,7 +11,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 args = sys.argv
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
@@ -149,7 +149,7 @@ class AmplitudeETL(object):
     def merge_user_ids(self):
         BaseETL.execute_command(
             command="""drop table if exists amplitude_events.tmp_merge_users_result""",
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
 
@@ -202,7 +202,7 @@ class AmplitudeETL(object):
                               and mu.user_id is null
                         )
                     """.format(today_ym),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
 
@@ -227,13 +227,13 @@ class AmplitudeETL(object):
                               and mu.amplitude_id is null
                               and mu.user_id is null
                     """,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
 
         BaseETL.execute_command(
             command="""drop table if exists amplitude_events.tmp_merge_users_result""",
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
 

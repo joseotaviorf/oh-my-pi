@@ -2,8 +2,9 @@ import logging
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.agents.bridge_demand_agent import Bridge
@@ -26,8 +27,8 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 def create_bdg_demand_agent():
     bridge = Bridge(bucket_datalake)
-    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDb.BI_DW)
-    bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDb.BI_DW)
+    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW)
+    bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDB.BI_DW)
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
 
 
@@ -53,27 +54,27 @@ dag = DAG(
 )
 
 # check the dependencies for bdg_demand_agent
-bdg_demand_agent_xcom_dependencies = BaseDAG.get_quintoandar_python_operator(
+bdg_demand_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
-    func_command=xcom_dependencies,
+    python_callable=xcom_dependencies,
     op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_demand'],
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
-bdg_demand_agent = BaseDAG.get_quintoandar_python_operator(
+bdg_demand_agent = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent',
-    func_command=create_bdg_demand_agent,
+    python_callable=create_bdg_demand_agent,
     op_kwargs=None
 )
 
-data_integrity_bdg_fact_agent = BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_fact_agent = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_agent',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_slot_date_agent',
@@ -82,11 +83,11 @@ data_integrity_bdg_fact_agent = BaseDAG.get_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_date = BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_dim_date = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_date',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_date',
@@ -95,11 +96,11 @@ data_integrity_bdg_dim_date = BaseDAG.get_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_user = BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_user',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_agent',
@@ -108,11 +109,11 @@ data_integrity_bdg_dim_user = BaseDAG.get_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_fact_demand = BaseDAG.get_quintoandar_python_operator(
+data_integrity_bdg_fact_demand = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_demand',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_demand',
@@ -121,11 +122,11 @@ data_integrity_bdg_fact_demand = BaseDAG.get_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_fact_demand_dim_booking = BaseDAG.get_quintoandar_python_operator(
+data_integrity_fact_demand_dim_booking = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_fact_demand_dim_booking',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'fact_demand',
                'f_column': 'sk_booking',
@@ -134,11 +135,11 @@ data_integrity_fact_demand_dim_booking = BaseDAG.get_quintoandar_python_operator
                'type': 'update'}
 )
 
-data_integrity_dim_agentreview_booking = BaseDAG.get_quintoandar_python_operator(
+data_integrity_dim_agentreview_booking = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_dim_agentreview_booking',
-    func_command=guarantee_data_integrity,
-    op_kwargs={'db_enum': EnumDb.BI_DW,
+    python_callable=guarantee_data_integrity,
+    op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'dim_agent_review',
                'f_column': 'sk_booking',

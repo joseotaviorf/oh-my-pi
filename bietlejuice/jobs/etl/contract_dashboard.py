@@ -10,7 +10,7 @@ from pytz import UTC, timezone
 from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 args = sys.argv
 run_time = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S')
@@ -68,7 +68,7 @@ class ContractDashboard(object):
     @logger
     def __get_new_signed_contracts(self):
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='''
             select
                 imovel_id, dataAssinado
@@ -84,7 +84,7 @@ class ContractDashboard(object):
     def __get_assignee_names_from_id(self, id_list):
         concat_list = ','.join(map(str, id_list))
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='select id as agent_id, nome as agent from Usuario where id in ({})'.format(concat_list))
         return table
 
@@ -92,7 +92,7 @@ class ContractDashboard(object):
     def __get_monthly_signed_contracts_number(self):
         # We don't convert dataAssinado to BR timezone because we are querying with UTC
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='''select
                         count(imovel_id) as total
                         from Contrato
@@ -115,7 +115,7 @@ class ContractDashboard(object):
     def __get_daily_signed_contracts_number(self):
         # We don't convert dataAssinado to BR timezone because we are querying with UTC
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='''select
                             count(imovel_id) as total
                             from Contrato
@@ -132,7 +132,7 @@ class ContractDashboard(object):
 
         # We don't convert dataAssinado to BR timezone because we are querying with UTC
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='''select
                                 count(imovel_id) as total
                                 from Contrato

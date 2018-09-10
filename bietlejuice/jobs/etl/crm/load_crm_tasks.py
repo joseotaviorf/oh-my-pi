@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 import sys
 
 logging.basicConfig(level=logging.INFO)
@@ -23,7 +23,7 @@ data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.form
 
 logging.info("START - To DW: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(
-    enum_db=EnumDb.BI_DW,
+    enum_db=EnumDB.BI_DW,
     df=data_frame,
     table_name='crm.{}'.format(sys.argv[1]),
     encoding='utf-8',
@@ -33,7 +33,7 @@ logging.info("END - To DW: {}".format(datetime.utcnow()))
 
 logging.info("START - To ODS: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(
-    enum_db=EnumDb.BI_ODS,
+    enum_db=EnumDB.BI_ODS,
     df=data_frame,
     table_name='crm.{}'.format(sys.argv[1]),
     encoding='utf-8',

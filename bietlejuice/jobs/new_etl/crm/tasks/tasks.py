@@ -12,7 +12,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, NEW_DW_QUERIES_DIR
 
@@ -466,7 +466,7 @@ class CRMTasks(object):
         BaseETL.dataframe_to_db(
             df=df,
             table_name='{}.{}'.format(CRMTasks.SCHEMA_NAMES['staging'], table_name),
-            enum_db=EnumDb.BI_DW,
+            enum_db=EnumDB.BI_DW,
             encoding='utf-8',
             append=False
         )
@@ -510,7 +510,7 @@ class CRMTasks(object):
 
         BaseETL.execute_command(
             command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8'
         )
 
@@ -528,7 +528,7 @@ class CRMTasks(object):
         )
 
         table_data = BaseETL.from_db_query(
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             query=upsert_query,
             encoding='utf-8',
         )
@@ -539,7 +539,7 @@ class CRMTasks(object):
         BaseETL.bulk_insert(
             table=table_data,
             table_name='{}.{}'.format(schema, table_name),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8'
         )
 
@@ -549,7 +549,7 @@ class CRMTasks(object):
             file_name='{}/crm/delete_staging_entries.sql'.format(NEW_DW_QUERIES_DIR))
         BaseETL.execute_command(
             command=query.format(table_name=table_name, partition_date=self.partition_date),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8',
             commit=True
         )
@@ -557,7 +557,7 @@ class CRMTasks(object):
     @logger
     def _truncate_table(self, schema, table_name):
         BaseETL.truncate_table(
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             schema=schema,
             table_name=table_name
         )

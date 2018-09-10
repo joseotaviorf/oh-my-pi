@@ -1,10 +1,11 @@
-from airflow.models import DAG
 from datetime import datetime
+
+from airflow.models import DAG
+from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_listings import CrawlerListings
-from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'bi-crawler-listings'
 MAIN_START_DATE = datetime(2018, 7, 30)
@@ -39,10 +40,10 @@ dag = DAG(
     catchup=False
 )
 
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='transform-crawler-data',
-    func_command=transform_crawler_data,
+    python_callable=transform_crawler_data,
     op_kwargs={'bucket': s3_bucket, 'api_key': data_google_api_key, 'api_daily_quota': google_maps_max_calls,
                'max_batch_size': _max_batch_size}
 )

@@ -44,9 +44,9 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
-    func_command=submit_zap,
+    python_callable=submit_zap,
     op_kwargs=json.loads(crawler_params)
 )

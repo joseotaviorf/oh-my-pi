@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
 from qa_python_utils.default_logger import _logger, logger
 
@@ -11,11 +11,11 @@ class Agent(object):
         self.bucket_datalake = bucket_name
 
     def __format_query_filename(self, filename, db_enum):
-        if db_enum == EnumDb.QuintoAndar_ebdb:
+        if db_enum == EnumDB.QuintoAndar_ebdb:
             dir = EBDB_QUERIES_DIR
-        elif db_enum == EnumDb.BI_ODS:
+        elif db_enum == EnumDB.BI_ODS:
             dir = ODS_QUERIES_DIR
-        elif db_enum == EnumDb.BI_DW:
+        elif db_enum == EnumDB.BI_DW:
             dir = DW_QUERIES_DIR
         else:
             dir = ''
@@ -53,7 +53,7 @@ class Agent(object):
         )
 
     @logger(exclude='data')
-    def move_data_to_destination(self, data, table_name, enumdb=EnumDb.BI_ODS, bucket='raw', append=True):
+    def move_data_to_destination(self, data, table_name, enumdb=EnumDB.BI_ODS, bucket='raw', append=True):
         _logger.info("m=move_data_to_destination, To Destination: {}".format(datetime.now()))
 
         table = BaseETL.decode_table(data, 'LATIN-1')
@@ -103,7 +103,7 @@ class Agent(object):
                 )
 
     @logger
-    def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDb.BI_DW, bucket='clean'):
+    def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean'):
         _logger.info('m=create_dim_or_fact_dw, Start query to create {}: {}'.format(dim_name, datetime.now()))
         table = self.get_agent_data(f_name=dim_name, db_enum=enumdb, dt=dt)
 
@@ -138,7 +138,7 @@ class Agent(object):
                                                                                       str(exec_dt))
 
         BaseETL.execute_command(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             command=query,
             commit=True
@@ -147,17 +147,17 @@ class Agent(object):
     @logger
     def insert_dummy(self, table_name, key_column, value='-1', previous_check=False):
         if previous_check:
-            if not self.check_dummy_exists(enumdb=EnumDb.BI_DW, schema='public', table_name=table_name,
+            if not self.check_dummy_exists(enumdb=EnumDB.BI_DW, schema='public', table_name=table_name,
                                            key_column=key_column):
                 BaseETL.execute_command(
                     'insert into {}({}) values ({});'.format(table_name, key_column, value),
-                    db_enum=EnumDb.BI_DW,
+                    db_enum=EnumDB.BI_DW,
                     commit=True
                 )
         else:
             BaseETL.execute_command(
                 'insert into {}({}) values ({});'.format(table_name, key_column, value),
-                db_enum=EnumDb.BI_DW,
+                db_enum=EnumDB.BI_DW,
                 commit=True
             )
 

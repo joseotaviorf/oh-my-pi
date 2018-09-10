@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -11,7 +11,7 @@ process_name = BaseETL.get_current_filename()
 print("Start query: {}".format(datetime.now()))
 
 table = BaseETL.from_db_table(
-    db_enum=EnumDb.QuintoAndar_darkrum,
+    db_enum=EnumDB.QuintoAndar_darkrum,
     table_name='Photosphere'
 )
 

@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -69,11 +68,7 @@ def insert_leads(**kwargs):
     # filter out units outside our coverage area
     leads_filtered = leads_enriched[
         (leads_enriched.regions > -1) &
-        (
-            (~leads_enriched.type.str.contains('casa')) |
-            leads_enriched.regions.isin(crawler_leads.house_allowed)
-        )
-    ]
+        ((~leads_enriched.type.str.contains('casa')) | leads_enriched.regions.isin(crawler_leads.house_allowed))]
     if leads_filtered.empty:
         _logger.info(NO_LEADS_MSG)
         return None
@@ -97,7 +92,7 @@ dag = DAG(
 )
 
 # operators
-PythonOperator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='insert-leads',
     python_callable=insert_leads,

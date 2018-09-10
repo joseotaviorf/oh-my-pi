@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger, _logger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
 from bietlejuice.jobs.dags.sorting_hat import SORTINGHAT_TEST_QUERIES_DIR
 
@@ -36,7 +36,7 @@ def __test_count(**kwargs):
 
     sh_return = BaseTest.get_query_result_for_comparison(
         query=sh_query,
-        enum_db=EnumDb.QuintoAndar_sortinghat
+        enum_db=EnumDB.QuintoAndar_sortinghat
     )[1][0] if sh_query != '' else None
 
     dl_return = BaseTest.get_query_result_for_comparison(
@@ -46,7 +46,7 @@ def __test_count(**kwargs):
 
     ods_return = BaseTest.get_query_result_for_comparison(
         query=ods_query,
-        enum_db=EnumDb.BI_ODS
+        enum_db=EnumDB.BI_ODS
     )[1][0] if ods_query != '' else None
 
     BaseTest.compare_sources(kwargs['acceptable_diff'], [sh_return, dl_return, ods_return])
@@ -55,10 +55,10 @@ def __test_count(**kwargs):
 
 @logger
 def __build_test_tasks(local_dag, entity):
-    return BaseDAG.get_quintoandar_python_operator(
+    return BaseDAG.build_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_{}_count'.format(entity),
-        func_command=__test_count,
+        python_callable=__test_count,
         op_kwargs={
             'sh_file_path': '{}/sorting_hat/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'dl_file_path': '{}/sorting_hat/{}_raw_{}'.format(DATALAKE_TEST_QUERIES_DIR, entity,

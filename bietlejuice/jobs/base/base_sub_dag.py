@@ -97,11 +97,11 @@ class BaseSubDag(object):
         :param source_command: command string for calling source data retrieval method
         :return: the main tasks related to the etl step
         """
-        entity_task = BaseDAG.get_quintoandar_python_operator(
+        entity_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_{}'.format(entity),
             provide_context=True,
-            func_command=self.extract_query_dt_dim_from_ebdb_to_ods,
+            python_callable=self.extract_query_dt_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket,
@@ -110,19 +110,19 @@ class BaseSubDag(object):
             }
         )
 
-        staging_dim_entity_task = BaseDAG.get_quintoandar_python_operator(
+        staging_dim_entity_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_{}'.format(entity),
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': entity
             }
         )
 
-        load_entity_task = BaseDAG.get_quintoandar_python_operator(
+        load_entity_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_{}'.format(entity),
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': entity,
                 'bucket': self.bucket
@@ -141,10 +141,10 @@ class BaseSubDag(object):
         """
         tests_tasks = []
         for _test in tests:
-            test_task = BaseDAG.get_quintoandar_python_operator(
+            test_task = BaseDAG.build_quintoandar_python_operator(
                 dag=dag,
                 task_id='TEST_{}'.format(_test[0]),
-                func_command=_test[1]
+                python_callable=_test[1]
             )
 
             tests_tasks.append(test_task)

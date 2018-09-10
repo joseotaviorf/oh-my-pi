@@ -5,7 +5,7 @@ import sys
 import petl
 from openpyxl import load_workbook
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 income_statement = petl.cat(inside_sales_table, photo_table)
 
                 print 'Loading Income Statement {} on ODS...'.format(date)
-                BaseETL.to_db(db_enum=EnumDb.BI_ODS,
+                BaseETL.to_db(db_enum=EnumDB.BI_ODS,
                               data_table=income_statement,
                               table_name='income_statement',
                               append=append)

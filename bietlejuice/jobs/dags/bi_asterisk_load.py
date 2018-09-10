@@ -76,9 +76,9 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_data_task = BaseDAG.get_quintoandar_python_operator(
+    extract_and_load_data_task = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_and_load_data',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -98,9 +98,9 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_raw_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='upsert_raw_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -109,9 +109,9 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_clean',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -120,9 +120,9 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_clean_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='upsert_clean_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -151,9 +151,9 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_data_task = BaseDAG.get_quintoandar_python_operator(
+    extract_and_load_data_task = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_and_load_data',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -173,9 +173,9 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_clean',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={

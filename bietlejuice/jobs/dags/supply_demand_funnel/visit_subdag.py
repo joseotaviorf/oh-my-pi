@@ -1,11 +1,12 @@
 from datetime import datetime
 
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils.default_logger import logger
 
 
 class VisitSubDag(DimSubDag):
@@ -50,17 +51,17 @@ class VisitSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        visits = BaseDAG.get_quintoandar_python_operator(
+        visits = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_visits',
             dag=dag,
             provide_context=True,
-            func_command=self.get_visit_query
+            python_callable=self.get_visit_query
         )
 
-        property_visit_information = BaseDAG.get_quintoandar_python_operator(
+        property_visit_information = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_property_visit_information',
             dag=dag,
-            func_command=utils.load_athena_file_query_to_ods,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'property_visit_information',
                 'append': True,
@@ -69,10 +70,10 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        staging_dim_visit_task = BaseDAG.get_quintoandar_python_operator(
+        staging_dim_visit_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_visit',
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'visit',
                 'post_command': "update staging.dim_visit set dt_timestamp = '{}' where sk_visit = -1;".format(
@@ -80,10 +81,10 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        dim_visit = BaseDAG.get_quintoandar_python_operator(
+        dim_visit = BaseDAG.build_quintoandar_python_operator(
             task_id='DW_dim_visit',
             dag=dag,
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'visit',
                 'bucket': DimSubDag.S3_BUCKET

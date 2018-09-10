@@ -2,13 +2,13 @@ from datetime import datetime
 
 import petl
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 table_name = 'imovel_status_history'
 
 # get max loaded date
 max_date = BaseETL.from_db_query(
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     query="select max(date_status_changed) from {}".format(table_name)
 )
 max_date = max_date[1][0]
@@ -38,7 +38,7 @@ query_extract = """
     datetime.today().date()
 )
 imoveis = BaseETL.from_db_query(
-    db_enum=EnumDb.QuintoAndar_ebdb,
+    db_enum=EnumDB.QuintoAndar_ebdb,
     query=query_extract
 )
 imoveis = BaseETL.decode_table(imoveis, 'latin-1')
@@ -46,7 +46,7 @@ imoveis = BaseETL.decode_table(imoveis, 'latin-1')
 BaseETL.bulk_insert(
     table=imoveis,
     table_name='stg.{}'.format(table_name),
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     encoding='UTF8',
     append=False,
     commit=True
@@ -54,7 +54,7 @@ BaseETL.bulk_insert(
 
 # LOAD
 # create connection
-conn = BaseETL.get_connection(db_enum=EnumDb.BI_ODS, encoding='UTF-8')
+conn = BaseETL.get_connection(db_enum=EnumDB.BI_ODS, encoding='UTF-8')
 
 # delete repeated ids
 q_del = 'delete from {} where id in {}'.format(

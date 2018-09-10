@@ -4,7 +4,7 @@ import sys
 import petl
 from datetime import datetime
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from collections import OrderedDict
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -25,7 +25,7 @@ def load_zendesk_table_to_datalake(table_name, raw_columns):
     _logger.info('m=load_zendesk_table_to_dw, msg=saving {} to dw'.format(table_name))
     key = 'clean/zendesk/{0}/{0}.parq'.format(table_name)
     df = BaseETL.from_db_table(
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         table_name='zendesk.{}'.format(table_name)
     )

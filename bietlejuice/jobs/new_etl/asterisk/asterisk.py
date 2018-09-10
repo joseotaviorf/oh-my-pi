@@ -11,7 +11,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, SOURCE_QUERIES_DIR
 
@@ -108,7 +108,7 @@ class Asterisk(object):
     def __extract_and_load_data(self, query, _class, file_suffix):
         table_data = BaseETL.from_db_query(
             query=query,
-            db_enum=EnumDb.QuintoAndar_asterisk
+            db_enum=EnumDB.QuintoAndar_asterisk
         )
 
         json_list = self.__convert_table_data_to_json_list(table_data=table_data)
