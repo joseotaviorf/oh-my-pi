@@ -1,4 +1,4 @@
-class EnumDb():
+class EnumDB():
     QuintoAndar_ebdb = 'ENV_EBDB'
     QuintoAndar_godfather = 'ENV_GODFATHER'
     QuintoAndar_darkrum = 'ENV_DARKRUM'
@@ -10,7 +10,7 @@ class EnumDb():
     BI_DW = 'ENV_BI_DW'
 
 
-class EnumDbType():
+class EnumDBType():
     PostgreSQL = 'postgres'
     MySQL = 'mysql'
     Redshift = 'postgres'
