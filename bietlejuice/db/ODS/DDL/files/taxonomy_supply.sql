@@ -14,10 +14,8 @@ create table files.taxonomy_supply (
     mkt_category varchar(255),
     mkt_flow varchar(255),
     mkt_completion varchar(255),
-    mkt_channel_type varchar(255),
     mkt_channel varchar(255),
     mkt_medium varchar(255),
     mkt_source varchar(255),
-    mkt_device varchar(255),
     mkt_platform varchar(255)
 );
