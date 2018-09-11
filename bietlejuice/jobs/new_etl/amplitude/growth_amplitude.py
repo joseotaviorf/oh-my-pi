@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger
 
 from __init__ import QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 
 class GrowthAmplitude(object):
@@ -38,7 +38,7 @@ class GrowthAmplitude(object):
             df=df,
             table_name='{}.{}'.format(GrowthAmplitude.SCHEMA, table_name),
             encoding='utf-8',
-            enum_db=EnumDb.BI_DW,
+            enum_db=EnumDB.BI_DW,
             append=True
         )
 
@@ -48,5 +48,5 @@ class GrowthAmplitude(object):
         BaseETL.execute_command(
             command='truncate table {}.{};'.format(GrowthAmplitude.SCHEMA, table_name),
             commit=True,
-            db_enum=EnumDb.BI_DW
+            db_enum=EnumDB.BI_DW
         )

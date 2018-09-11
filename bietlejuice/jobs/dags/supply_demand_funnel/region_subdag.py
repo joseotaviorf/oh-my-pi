@@ -35,10 +35,10 @@ class RegionSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        agent_region = BaseDAG.get_quintoandar_python_operator(
+        agent_region = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'agent_region',
                 'table_name': 'DadosAgente_Regiao',
@@ -47,10 +47,10 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        region = BaseDAG.get_quintoandar_python_operator(
+        region = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_region',
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'region',
                 'table_name': 'MapRegiao',
@@ -60,10 +60,10 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        dim_region = BaseDAG.get_quintoandar_python_operator(
+        dim_region = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_region',
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'region',
                 'post_command': "update staging.dim_region set dt_timestamp = '{}', region_code = '-1' where sk_region = -1;".format(
@@ -71,10 +71,10 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        load_region = BaseDAG.get_quintoandar_python_operator(
+        load_region = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_region',
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'region',
                 'bucket': DimSubDag.S3_BUCKET

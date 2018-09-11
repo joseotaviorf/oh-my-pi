@@ -4,7 +4,7 @@ from io import BytesIO
 import boto3
 import pandas as pd
 import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
@@ -34,11 +34,11 @@ class EBDBDatalake(object):
     @logger
     def move_to_datalake(self, table_name):
         now = BaseETL.now()
-        db = EnumDb.QuintoAndar_ebdb
+        db = EnumDB.QuintoAndar_ebdb
 
         _logger.info('m=move_to_datalake, msg=start query: {}'.format(now))
 
-        schema = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, table_name, EBDBDatalake.SCHEMA_NAME, False)
+        schema = BaseETL.get_columns_schema(EnumDB.QuintoAndar_ebdb, table_name, EBDBDatalake.SCHEMA_NAME, False)
         schema = petl.todataframe(schema)
 
         columns = []
@@ -135,7 +135,7 @@ class EBDBDatalake(object):
     @logger
     def get_type_conversion_dict(self):
         conversions_table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query="""
                 select
                     distinct DATA_TYPE,
@@ -159,7 +159,7 @@ class EBDBDatalake(object):
         if not original_table_name:
             original_table_name = table_name
 
-        columns = BaseETL.get_columns_schema(EnumDb.QuintoAndar_ebdb, original_table_name, EBDBDatalake.SCHEMA_NAME)
+        columns = BaseETL.get_columns_schema(EnumDB.QuintoAndar_ebdb, original_table_name, EBDBDatalake.SCHEMA_NAME)
         self.athena_client.execute_query_and_wait_for_results(
             'drop table if exists {}.{}_{};'.format(athena_db, EBDBDatalake.SCHEMA_NAME, table_name))
 
@@ -187,7 +187,7 @@ class EBDBDatalake(object):
                             and TABLE_NAME not in ('ENT_REVTYPE', 'REVCHANGES')
                     """.format(EBDBDatalake.SCHEMA_NAME)
         table_names = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query=sql_tables
         )
 

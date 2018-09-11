@@ -4,9 +4,11 @@ from datetime import datetime
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+from qa_python_utils.default_logger import logger, _logger
+
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.amplitude_etl import AmplitudeETL
-from qa_python_utils.default_logger import logger, _logger
 
 
 # functions
@@ -76,7 +78,7 @@ load_events_data_to_clean_task = PythonOperator(
     python_callable=load_data
 )
 
-merge_users_task = PythonOperator(
+merge_users_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='merge_users',
     provide_context=True,

@@ -1,5 +1,5 @@
 import boto3
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
 from qa_python_utils.default_logger import logger
 
@@ -43,7 +43,7 @@ class Bridge(object):
         BaseETL.bulk_insert(
             table=table,
             table_name=table_name,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='UTF8',
             append=False,
             commit=True,

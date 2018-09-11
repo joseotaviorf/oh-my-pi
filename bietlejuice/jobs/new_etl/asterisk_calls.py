@@ -6,7 +6,7 @@ import sys
 
 import boto3
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from qa_python_utils.aws.athena import AthenaClient
 
 args = sys.argv
@@ -63,14 +63,14 @@ class Asterisk(object):
 
         BaseETL.execute_command(
             command="""truncate {};""".format(process_name),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='utf-8',
             commit=True
         )
 
         BaseETL.dataframe_to_db(
             df=data_frame,
-            enum_db=EnumDb.BI_DW,
+            enum_db=EnumDB.BI_DW,
             table_name=process_name,
             encoding='utf-8'
         )

@@ -44,9 +44,9 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-olx',
-    func_command=submit_olx,
+    python_callable=submit_olx,
     op_kwargs=json.loads(crawler_params)
 )

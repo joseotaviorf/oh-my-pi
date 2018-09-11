@@ -8,7 +8,7 @@ import requests
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -196,7 +196,7 @@ class Crawlers(object):
         _logger.info('m=load_dim_external_property, msg=cleaning dim_external_property at {}'.format(today))
         BaseETL.execute_command(
             command="""delete from dim_external_property where start_date = '{0}'""".format(today),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='UTF8',
             commit=True
         )
@@ -236,14 +236,14 @@ class Crawlers(object):
                               and dep.start_date < '{0}'
                               and cr.started_on = '{0}'
                       ) and end_date is null and start_date < '{0}'""".format(today),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='UTF8',
             commit=True
         )
 
         _logger.info('m=load_dim_external_property, msg=inserting into dim_external_property')
         insert_table = BaseETL.from_db_query(
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             query="""with entries_not_changed as  (
                         select dep.id
                         from dim_external_property dep
@@ -367,7 +367,7 @@ class Crawlers(object):
         BaseETL.bulk_insert_from_s3_to_dw(
             bucket_name='bi-etl-ejuice-tmpfiles',
             filename='dim_external_property_{}'.format(today),
-            enum_db_dest=EnumDb.BI_DW,
+            enum_db_dest=EnumDB.BI_DW,
             table_name='dim_external_property',
             append=True,
             encoding='UTF8'
@@ -379,7 +379,7 @@ class Crawlers(object):
                           where sk_snapshot_date = replace('{0}', '-', '')::integer""".format(today)
         BaseETL.execute_command(
             command=query_clean,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='UTF8',
             commit=True
         )
@@ -530,7 +530,7 @@ class Crawlers(object):
 
         BaseETL.execute_command(
             command=query_insert,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             encoding='UTF8',
             commit=True
         )

@@ -1,9 +1,9 @@
 import sys
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 count_ids = BaseETL.from_db_query(
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     query="select count(distinct id) from imovel_status_history")[1][0]
 
 offset = 0
@@ -12,7 +12,7 @@ table_name = 'imovel_status_full_history'
 
 # conn = BaseETL.get_connection()
 BaseETL.execute_command(
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     encoding='UTF8',  # conn=conn,
     command="truncate table {}".format(table_name),
     commit=True
@@ -21,7 +21,7 @@ BaseETL.execute_command(
 while offset <= count_ids:
     print('BEGINING OFFSET: {}'.format(offset))
     BaseETL.execute_command(
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         command="""
             insert into
                 {}

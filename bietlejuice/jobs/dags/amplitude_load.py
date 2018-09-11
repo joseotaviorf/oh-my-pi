@@ -1,5 +1,6 @@
-from airflow.models import DAG
 from datetime import datetime, timedelta
+
+from airflow.models import DAG
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsETL
@@ -24,11 +25,11 @@ dag = DAG(
     max_active_runs=3
 )
 
-load_events_data_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+load_events_data_to_clean_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='load_events_data_to_clean',
     provide_context=True,
-    func_command=load_amplitude
+    python_callable=load_amplitude
 )
 
 dag_past = DAG(
@@ -44,9 +45,9 @@ dag_past = DAG(
     max_active_runs=3
 )
 
-load_events_data_to_clean_task_past = BaseDAG.get_quintoandar_python_operator(
+load_events_data_to_clean_task_past = BaseDAG.build_quintoandar_python_operator(
     dag=dag_past,
     task_id='load_events_data_to_clean_past',
     provide_context=True,
-    func_command=load_amplitude
+    python_callable=load_amplitude
 )

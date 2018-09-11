@@ -58,9 +58,9 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='neoway-send-cpfs',
-    func_command=send_cpfs,
+    python_callable=send_cpfs,
     op_kwargs=json.loads(NEOWAY_SEND_CPFS_PARAMS)
 )

@@ -1,8 +1,9 @@
-from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from datetime import datetime, timedelta
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from airflow.models import DAG
+from airflow.operators.quintoandar import QuintoAndarPythonOperator
+
+from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import DEFAULT_DAG_OWNER
 from bietlejuice.jobs.dags.unit_economics import unit_tests
@@ -22,7 +23,7 @@ MAIN_SCHEDULE_INTERVAL = '@daily'
 
 def materialize_view(_bucket, name):
     table = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         query='select * from unit_economics.vw_{};'.format(name)
     )
 
@@ -30,7 +31,7 @@ def materialize_view(_bucket, name):
     BaseETL.bulk_insert(
         table=table,
         table_name='unit_economics.{}'.format(name),
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=False,
         commit=True,
@@ -63,7 +64,6 @@ main_dag = DAG(
 base_ticket_task = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='base_ticket_task',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'base_ticket_task'}
 )
@@ -72,14 +72,12 @@ base_ticket_task = QuintoAndarPythonOperator(
 supply_affiliate_bonus_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_affiliate_bonus_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_affiliate_bonus_costs'}
 )
 supply_mkt_affiliate_campaigns_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_mkt_affiliate_campaigns_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_mkt_affiliate_campaigns_costs'}
 )
@@ -93,21 +91,18 @@ supply_mkt_owner_campaigns_costs = QuintoAndarPythonOperator(
 supply_mkt_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_mkt_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_mkt_costs'}
 )
 supply_ops_inside_sales_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_ops_inside_sales_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_ops_inside_sales_costs'}
 )
 supply_ops_photos_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_ops_photos_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_ops_photos_costs'}
 )
@@ -121,7 +116,6 @@ supply_ops_costs = QuintoAndarPythonOperator(
 supply_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='supply_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'supply_costs'}
 )
@@ -137,56 +131,48 @@ liquidity_ab_agent_hours_costs = QuintoAndarPythonOperator(
 liquidity_lockbox_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_lockbox_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_lockbox_costs'}
 )
 liquidity_mkt_tenant_campaigns_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_mkt_tenant_campaigns_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_mkt_tenant_campaigns_costs'}
 )
 liquidity_mkt_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_mkt_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_mkt_costs'}
 )
 liquidity_ops_bo_pre_sale_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_ops_bo_pre_sale_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_ops_bo_pre_sale_costs'}
 )
 liquidity_ops_cs_pre_sale_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_ops_cs_pre_sale_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_ops_cs_pre_sale_costs'}
 )
 liquidity_ops_field_ops_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_ops_field_ops_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_ops_field_ops_costs'}
 )
 liquidity_ops_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_ops_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_ops_costs'}
 )
 liquidity_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='liquidity_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'liquidity_costs'}
 )
@@ -195,84 +181,72 @@ liquidity_costs = QuintoAndarPythonOperator(
 net_revenue_affiliate_commission_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_affiliate_commission_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_affiliate_commission_costs'}
 )
 net_revenue_agent_commission_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_agent_commission_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_agent_commission_costs'}
 )
 net_revenue_commission_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_commission_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_commission_costs'}
 )
 net_revenue_revenues = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_revenues',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_revenues'}
 )
 net_revenue_revenues_brokerage_fee = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_revenues_brokerage_fee',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_revenues_brokerage_fee'}
 )
 net_revenue_revenues_mgmt_fee = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_revenues_mgmt_fee',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_revenues_mgmt_fee'}
 )
 net_revenue_revenues_brokerage_plus_mgmt_aux = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_revenues_brokerage_plus_mgmt_aux',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_revenues_brokerage_plus_mgmt_aux'}
 )
 net_revenue_taxes = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_taxes',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_taxes'}
 )
 net_revenue_taxes_delay_fine = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_taxes_delay_fine',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_taxes_delay_fine'}
 )
 net_revenue_taxes_sales_tax_iss = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_taxes_sales_tax_iss',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_taxes_sales_tax_iss'}
 )
 net_revenue_taxes_sales_tax_pis_cofins = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_taxes_sales_tax_pis_cofins',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_taxes_sales_tax_pis_cofins'}
 )
 net_revenue_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='net_revenue_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'net_revenue_costs'}
 )
@@ -281,77 +255,66 @@ net_revenue_costs = QuintoAndarPythonOperator(
 mgmt_insurance = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_insurance',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_insurance'}
 )
 mgmt_insurance_fee = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_insurance_fee',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_insurance_fee'}
 )
 mgmt_insurance_pis_cofins = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_insurance_pis_cofins',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_insurance_pis_cofins'}
 )
 mgmt_ops_bo_offboarding_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_bo_offboarding_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_bo_offboarding_costs'}
 )
 mgmt_ops_bo_onboarding_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_bo_onboarding_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_bo_onboarding_costs'}
 )
 mgmt_ops_bo_ongoing_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_bo_ongoing_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_bo_ongoing_costs'}
 )
 mgmt_ops_collection_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_collection_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_collection_costs'}
 )
 mgmt_ops_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_costs'}
 )
 mgmt_ops_cs_post_sale_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_cs_post_sale_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_cs_post_sale_costs'}
 )
 mgmt_ops_inspection_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_ops_inspection_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_ops_inspection_costs'}
 )
 mgmt_costs = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='mgmt_costs',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'mgmt_costs'}
 )
@@ -359,7 +322,6 @@ mgmt_costs = QuintoAndarPythonOperator(
 fact_property_economics = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='fact_property_economics',
-    execution_timeout=timedelta(hours=3),
     python_callable=materialize_view,
     op_kwargs={'_bucket': bucket, 'name': 'fact_property_economics'}
 )
@@ -367,7 +329,6 @@ fact_property_economics = QuintoAndarPythonOperator(
 load_fact = QuintoAndarPythonOperator(
     dag=main_dag,
     task_id='DW_fact_property_economics',
-    execution_timeout=timedelta(hours=3),
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'fact_property_economics', 'bucket': bucket, 'insert_dummy': False,
                'schema_source': 'unit_economics'}

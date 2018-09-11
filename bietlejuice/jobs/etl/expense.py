@@ -1,5 +1,5 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 import sys
 import os
 from datetime import datetime
@@ -10,7 +10,7 @@ bucket_datalake = os.environ['bi-datalake-s3-bucket']
 process_name = BaseETL.get_current_filename().replace('dim_', '')
 
 table = BaseETL.from_db_query(
-    db_enum=EnumDb.QuintoAndar_ebdb,
+    db_enum=EnumDB.QuintoAndar_ebdb,
     query="""
     select
       id,
@@ -36,7 +36,7 @@ table = BaseETL.decode_table(table, 'LATIN-1')
 BaseETL.bulk_insert(
     table=table,
     table_name=process_name,
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     encoding='UTF8',
     append=False,
     commit=True,

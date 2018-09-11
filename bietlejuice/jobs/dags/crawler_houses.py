@@ -3,12 +3,13 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from qa_python_utils.aws.batch import BatchClient
+from qa_python_utils.default_logger import _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
-from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'crawler_houses'
 MAIN_START_DATE = datetime(2018, 8, 24)
@@ -79,34 +80,34 @@ dag = DAG(
     catchup=True
 )
 
-crawl_proxies = BaseDAG.get_quintoandar_python_operator(
+crawl_proxies = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-proxies',
-    func_command=crawl_proxy,
+    python_callable=crawl_proxy,
     provide_context=True,
     op_kwargs={'source': 'proxies'}
 )
 
-crawl_imovelweb = BaseDAG.get_quintoandar_python_operator(
+crawl_imovelweb = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-imovelweb',
-    func_command=crawl_houses,
+    python_callable=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'imovelweb'}).items())
 )
 
-crawl_vivareal = BaseDAG.get_quintoandar_python_operator(
+crawl_vivareal = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-vivareal',
-    func_command=crawl_houses,
+    python_callable=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'vivareal'}).items())
 )
 
-crawl_zap = BaseDAG.get_quintoandar_python_operator(
+crawl_zap = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
-    func_command=crawl_houses,
+    python_callable=crawl_houses,
     provide_context=True,
     op_kwargs=dict(dict_params.items() + ({'source': 'zapimoveis'}).items())
 )

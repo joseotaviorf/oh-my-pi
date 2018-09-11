@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger, _logger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
 
 
@@ -44,7 +44,7 @@ def __test_count(**kwargs):
 
     ods_return = BaseTest.get_query_result_for_comparison(
         query=ods_query.format(year_month=year_month),
-        enum_db=EnumDb.BI_ODS
+        enum_db=EnumDB.BI_ODS
     )[1][0] if ods_query != '' else None
 
     BaseTest.compare_sources(kwargs['acceptable_diff'], [dl_raw_return, dl_clean_return, ods_return])
@@ -54,10 +54,10 @@ def __test_count(**kwargs):
 @logger
 def __build_test_tasks(local_dag, entity):
     count_check_sql_suffix = 'count_check.sql'
-    return BaseDAG.get_quintoandar_python_operator(
+    return BaseDAG.build_quintoandar_python_operator(
         dag=local_dag,
         task_id='TEST_{}_count'.format(entity),
-        func_command=__test_count,
+        python_callable=__test_count,
         provide_context=True,
         op_kwargs={
             'dl_raw_file_path': '{}/invoice/{}_raw_{}'.format(DATALAKE_TEST_QUERIES_DIR, entity,

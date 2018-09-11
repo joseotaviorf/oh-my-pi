@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import boto3
 
-from bietlejuice.jobs.base.base_etl import BaseETL, log, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, log, EnumDB
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 
@@ -67,7 +67,7 @@ class AmplitudeEventsETL(BaseETL):
                          delimiter='|', encoding='LATIN-1')
 
         self.execute_command(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             command='INSERT INTO {0}(dt_creation, message) SELECT dt_creation, message FROM {1}'.format(
                 table_name, table_name_raw
             ),
@@ -75,7 +75,7 @@ class AmplitudeEventsETL(BaseETL):
         )
 
         self.execute_command(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             command='TRUNCATE TABLE {0}'.format(table_name_raw),
             commit=True
         )
@@ -201,23 +201,23 @@ if __name__ == '__main__':
         batch_size = args[3] if arg_count > 3 else 10000
         a.run_sqs_to_ods(
             sqs_queue_name=sqs_queue_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             table_name='amplitude.events',
             batch_size=batch_size
         )
 
     elif args[1] == 'load_schedule_visit':
         table_name = 'booked_visit'
-        # BaseETL.drop_table(db_enum=EnumDb.BI_ODS, table_name=table_name)
+        # BaseETL.drop_table(db_enum=EnumDB.BI_ODS, table_name=table_name)
         vw = BaseETL.from_db_table(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             table_name='amplitude.vw_{}'.format(table_name),
             server_cursor_postgres=table_name
         )
         BaseETL.bulk_insert(
             table=vw,
             table_name='amplitude.{}'.format(table_name),
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             append=False,
             commit=True
         )

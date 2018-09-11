@@ -6,7 +6,7 @@ from airflow.models import DAG
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.base_etl import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
@@ -59,7 +59,7 @@ def load_employee_base_data(_table_name, _bucket):
     BaseETL.bulk_insert(
         table=_table,
         table_name='growth.{}'.format(_table_name),
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         encoding='UTF8',
         append=True,
         commit=True,
@@ -90,7 +90,6 @@ dag = DAG(
 employee_base = QuintoAndarPythonOperator(
     dag=dag,
     task_id='etl_employee_base_data',
-    execution_timeout=timedelta(hours=3),
     python_callable=load_employee_base_data,
     op_kwargs={'_table_name': table_name, '_bucket': bucket}
 )

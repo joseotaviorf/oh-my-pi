@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils.default_logger import logger, _logger
 
 from __init__ import DATALAKE_QUERIES_DIR
@@ -21,7 +21,7 @@ class BusinessDimensionETL(DimensionETL):
 
         _logger.info("Start query: {}".format(datetime.now()))
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query=command
         )
 
@@ -30,7 +30,7 @@ class BusinessDimensionETL(DimensionETL):
         BaseETL.bulk_insert(
             table=table,
             table_name=table_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=False,
             commit=True,
@@ -43,13 +43,13 @@ class BusinessDimensionETL(DimensionETL):
         _logger.info("Start query: {}".format(self.now))
         if add_timestamp:
             table = BaseETL.from_db_table(
-                db_enum=EnumDb.QuintoAndar_ebdb,
+                db_enum=EnumDB.QuintoAndar_ebdb,
                 table_name=table_name,
                 generator=True
             ).addfield('dt_timestamp', self.now)
         else:
             table = BaseETL.from_db_table(
-                db_enum=EnumDb.QuintoAndar_ebdb,
+                db_enum=EnumDB.QuintoAndar_ebdb,
                 table_name=table_name,
                 generator=True
             )
@@ -59,7 +59,7 @@ class BusinessDimensionETL(DimensionETL):
         BaseETL.bulk_insert(
             table=table,
             table_name=dim_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=False,
             commit=True,
@@ -81,15 +81,15 @@ class BusinessDimensionETL(DimensionETL):
         if pre_command is not None:
             BaseETL.execute_command(
                 command=pre_command,
-                db_enum=EnumDb.BI_DW,
+                db_enum=EnumDB.BI_DW,
                 commit=True
             )
 
         BaseETL.move_table_to_dw(
             table_name=table_name,
             table_name_dest=table_name_dest,
-            enum_db_source=EnumDb.BI_ODS,
-            enum_db_dest=EnumDb.BI_DW,
+            enum_db_source=EnumDB.BI_ODS,
+            enum_db_dest=EnumDB.BI_DW,
             append=False,
             bucket_name='{}/clean/ods/{}'.format(self.bucket, dim_name),
             process_name=dim_name
@@ -98,14 +98,14 @@ class BusinessDimensionETL(DimensionETL):
         if insert_dummy:
             BaseETL.execute_command(
                 command='insert into {} values (-1);'.format(table_name_dest),
-                db_enum=EnumDb.BI_DW,
+                db_enum=EnumDB.BI_DW,
                 commit=True
             )
 
         if post_command is not None:
             BaseETL.execute_command(
                 command=post_command,
-                db_enum=EnumDb.BI_DW,
+                db_enum=EnumDB.BI_DW,
                 commit=True
             )
 
@@ -113,12 +113,12 @@ class BusinessDimensionETL(DimensionETL):
     @logger
     def load_athena_file_query_to_ods(self, table_name, file_name, append=False):
         df = self.athena.execute_file_query_and_return_dataframe('{}/{}'.format(DATALAKE_QUERIES_DIR, file_name))
-        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
+        self.__df_to_db(enum_db=EnumDB.BI_ODS, df=df, table_name=table_name, append=append)
 
     @logger
     def materialize_view_ods(self, view_name, append=False):
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             query='select * from vw_{}'.format(view_name))
 
         print("To ODS: {}".format(datetime.now()))
@@ -126,7 +126,7 @@ class BusinessDimensionETL(DimensionETL):
         BaseETL.bulk_insert(
             table=table,
             table_name=view_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=append,
             commit=True,
@@ -136,7 +136,7 @@ class BusinessDimensionETL(DimensionETL):
     @logger
     def load_athena_raw_query_to_ods(self, table_name, query, append=False):
         df = self.athena.execute_query_and_return_dataframe(query)
-        self.__df_to_db(enum_db=EnumDb.BI_ODS, df=df, table_name=table_name, append=append)
+        self.__df_to_db(enum_db=EnumDB.BI_ODS, df=df, table_name=table_name, append=append)
 
     @logger
     def __df_to_db(self, enum_db, df, table_name, append=False):

@@ -9,7 +9,7 @@ import petl
 from qa_python_utils.default_logger import logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
 
@@ -70,7 +70,7 @@ class CrawlerLeads(CrawlerEntity):
         since = datetime.today() - timedelta(days=delta_days)
         q = q.format(since=since.strftime('%Y-%m-%d'))
 
-        phones = petl.todataframe(BaseETL.from_db_query(db_enum=EnumDb.QuintoAndar_ebdb, query=q))
+        phones = petl.todataframe(BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb, query=q))
         return phones.sort_values(by=['created_date'], ascending=False).drop_duplicates(subset=['phone_number'])
 
     @logger(exclude='leads')

@@ -1,16 +1,16 @@
 # -*- coding: latin-1 -*-
 
 import json
+from datetime import datetime
 
 import requests
-from datetime import datetime
 from pytz import UTC, timezone
+from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
-from qa_python_utils.default_logger import _logger
 
 env.set_airflow_var_to_local_env('EBDB')
 endpoint = env.get_airflow_env_var('LEADS_ENDPOINT')
@@ -32,7 +32,7 @@ def datetime_converter(dt):
 
 def __get_leads():
     table = BaseETL.from_db_query(
-        db_enum=EnumDb.QuintoAndar_ebdb,
+        db_enum=EnumDB.QuintoAndar_ebdb,
         query='''
             select
                 sum(case when city = 'rj' and date(tbl.dt_lead) = current_date then 1 else 0 end) as rj_leads,
@@ -341,9 +341,9 @@ dag = BaseDAG.build_dag(
     schedule_interval=env.convert_to_utc_schedule('0/5 * * * *')
 )
 
-contacts_and_prospects = BaseDAG.get_quintoandar_python_operator(
+contacts_and_prospects = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='push_potential_listing_data',
-    func_command=push_leads,
+    python_callable=push_leads,
     op_kwargs={'endpoint': endpoint}
 )

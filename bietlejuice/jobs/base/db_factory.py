@@ -5,7 +5,7 @@ import psycopg2
 import psycopg2.extensions
 import pymysql
 
-from enum_db import EnumDbType
+from enum_db import EnumDBType
 
 
 class DBFactory(object):
@@ -26,10 +26,10 @@ class DBFactory(object):
         dbtype = env['dbtype']
         port = env.get('port')
 
-        if dbtype == EnumDbType.PostgreSQL or dbtype == EnumDbType.Redshift:
+        if dbtype == EnumDBType.PostgreSQL or dbtype == EnumDBType.Redshift:
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-            p = port if port else 5439 if dbtype == EnumDbType.Redshift else 5432
+            p = port if port else 5439 if dbtype == EnumDBType.Redshift else 5432
             conn = psycopg2.connect(host=host, user=user, password=pwd, database=db, port=p)
             print('port: {}'.format(p))
             if int(p) == 5432:
@@ -40,7 +40,7 @@ class DBFactory(object):
                 conn.cursor().execute("SET statement_timeout = {}".format(timeout))
 
             return conn
-        elif dbtype == EnumDbType.MySQL:
+        elif dbtype == EnumDBType.MySQL:
             conn = pymysql.connect(host, user, pwd, db)
             conn.set_charset(encoding)
             cur = conn.cursor()

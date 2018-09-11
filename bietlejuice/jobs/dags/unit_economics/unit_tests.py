@@ -1,9 +1,10 @@
+from qa_python_utils.default_logger import logger, _logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.unit_economics import UNIT_ECONOMICS_TEST_QUERIES_DIR
-from qa_python_utils.default_logger import logger, _logger
 
 DRE_VALUE_CHECK_SQL = 'dre_value_check.sql'
 
@@ -44,13 +45,13 @@ def __test_query(**kwargs):
 
 @logger
 def __build_test_tasks(local_dag):
-    # FIXME: change to get_quintoandar_python_operator after testing
-    test_dre_onboarding = BaseDAG.get_python_operator(
+    # FIXME: change to build_quintoandar_python_operator after testing
+    test_dre_onboarding = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_onboarding',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Back-Office (onboarding)',
@@ -58,12 +59,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_offboarding = BaseDAG.get_python_operator(
+    test_dre_offboarding = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_offboarding',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Back-Office (offboarding)',
@@ -71,12 +72,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_ongoing = BaseDAG.get_python_operator(
+    test_dre_ongoing = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_ongoing',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Back-Office (ongoing)',
@@ -84,12 +85,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_cs_post_sale = BaseDAG.get_python_operator(
+    test_dre_cs_post_sale = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_cs_post_sale',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Customer Support (post-sale)',
@@ -98,12 +99,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_inside_sales = BaseDAG.get_python_operator(
+    test_dre_inside_sales = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_inside_sales',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Inside sales',
@@ -111,12 +112,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_collection = BaseDAG.get_python_operator(
+    test_dre_collection = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_collection',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Collection',
@@ -125,12 +126,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_bo_pre_sale = BaseDAG.get_python_operator(
+    test_dre_bo_pre_sale = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_bo_pre_sale',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Back-Office (pre-sale)',
@@ -138,12 +139,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_listing_photos = BaseDAG.get_python_operator(
+    test_dre_listing_photos = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_listing_photos',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Listing Photos',
@@ -151,12 +152,12 @@ def __build_test_tasks(local_dag):
                    }
     )
 
-    test_dre_field_operations = BaseDAG.get_python_operator(
+    test_dre_field_operations = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_field_ops',
-        func_command=__test_query,
+        python_callable=__test_query,
         op_kwargs={'file_path': '{}/{}'.format(UNIT_ECONOMICS_TEST_QUERIES_DIR, DRE_VALUE_CHECK_SQL),
-                   'enum_db': EnumDb.BI_ODS,
+                   'enum_db': EnumDB.BI_ODS,
                    'assertion': None,
                    'blocking': True,
                    'dre_category': 'Field Operations',

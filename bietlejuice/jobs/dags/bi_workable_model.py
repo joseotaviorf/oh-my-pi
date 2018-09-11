@@ -96,18 +96,18 @@ def class_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
+    extract_and_load_task = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_data_into_raw',
-        func_command=extract_and_load_data,
+        python_callable=extract_and_load_data,
         dag=local_dag,
         op_kwargs={
             '_class': kwargs['_class']
         }
     )
 
-    move_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_clean',
-        func_command=exec_class_method,
+        python_callable=exec_class_method,
         dag=local_dag,
         op_kwargs={
             '_class': kwargs['_class'],
@@ -115,9 +115,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_to_staging_dim_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_staging_dim_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_staging_dim',
-        func_command=exec_class_method,
+        python_callable=exec_class_method,
         dag=local_dag,
         op_kwargs={
             '_class': kwargs['_class'],
@@ -125,9 +125,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    move_dim_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_dim_to_dw',
-        func_command=exec_class_method,
+        python_callable=exec_class_method,
         dag=local_dag,
         op_kwargs={
             '_class': kwargs['_class'],
@@ -135,9 +135,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_dim_staging_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_dim_staging_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='delete_dim_staging_entries',
-        func_command=exec_class_method,
+        python_callable=exec_class_method,
         dag=local_dag,
         op_kwargs={
             '_class': kwargs['_class'],
@@ -165,24 +165,24 @@ def fact_load_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    move_to_staging_fact_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_staging_fact_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_staging_fact',
-        func_command=exec_workable_method,
+        python_callable=exec_workable_method,
         dag=local_dag,
         op_kwargs={
             'method': '_move_to_staging_fact'
         }
     )
 
-    move_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    move_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_to_dw',
-        func_command=move_fact_to_dw,
+        python_callable=move_fact_to_dw,
         dag=local_dag
     )
 
-    delete_staging_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_staging_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='delete_staging_entries',
-        func_command=delete_staging_fact_entries,
+        python_callable=delete_staging_fact_entries,
         dag=local_dag
     )
 

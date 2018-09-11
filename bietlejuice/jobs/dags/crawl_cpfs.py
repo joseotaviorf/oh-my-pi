@@ -57,9 +57,9 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-cpfs',
-    func_command=crawl_cpfs,
+    python_callable=crawl_cpfs,
     op_kwargs=json.loads(crawl_cpfs_params)
 )

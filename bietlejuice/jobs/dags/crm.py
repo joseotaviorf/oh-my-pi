@@ -112,9 +112,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    move_dim_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+    move_dim_to_staging_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_dim_to_staging',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -123,9 +123,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_fact_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+    move_fact_to_staging_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_fact_to_staging',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -134,9 +134,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    append_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_dim_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='append_dim_to_dw',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -145,9 +145,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    append_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_fact_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='append_fact_to_dw',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -156,9 +156,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_staging_fact_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_staging_fact_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='delete_staging_fact_entries',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -167,9 +167,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_staging_dim_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_staging_dim_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='delete_staging_dim_entries',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -179,9 +179,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
     )
 
     if 'has_bridge' in kwargs and kwargs['has_bridge'] is True:
-        move_bdg_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+        move_bdg_to_staging_task = BaseDAG.build_quintoandar_python_operator(
             task_id='move_bdg_to_staging',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -190,9 +190,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
             }
         )
 
-        insert_bdg_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        insert_bdg_to_dw_task = BaseDAG.build_quintoandar_python_operator(
             task_id='insert_bdg_to_dw',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -201,9 +201,9 @@ def class_sub_dag(sub_dag_name, **kwargs):
             }
         )
 
-        delete_staging_bdg_entries_task = BaseDAG.get_quintoandar_python_operator(
+        delete_staging_bdg_entries_task = BaseDAG.build_quintoandar_python_operator(
             task_id='delete_staging_bdg_entries',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -243,9 +243,9 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    move_tasks_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_tasks_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_tasks_to_clean',
-        func_command=exec_crm_method,
+        python_callable=exec_crm_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -253,9 +253,9 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_tasks_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_tasks_clean_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='upsert_tasks_clean_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -278,9 +278,9 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    move_tasks_resolution_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_tasks_resolution_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_tasks_resolution_to_clean',
-        func_command=exec_crm_method,
+        python_callable=exec_crm_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -288,9 +288,9 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_tasks_resolution_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_tasks_resolution_clean_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='upsert_tasks_resolution_clean_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -305,9 +305,9 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
 
 
 # operators
-extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
+extract_and_load_task = BaseDAG.build_quintoandar_python_operator(
     task_id='extract_and_load',
-    func_command=extract_and_load_data,
+    python_callable=extract_and_load_data,
     dag=main_dag,
     provide_context=True
 )
@@ -322,9 +322,9 @@ data_existence_check_task = ShortCircuitOperator(
     }
 )
 
-upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
+upsert_raw_partition_task = BaseDAG.build_quintoandar_python_operator(
     task_id='upsert_raw_partition',
-    func_command=upsert_partition,
+    python_callable=upsert_partition,
     dag=main_dag,
     provide_context=True,
     op_kwargs={
@@ -382,9 +382,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
-    move_dim_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+    move_dim_to_staging_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_move_dim_to_staging',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -393,9 +393,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    move_fact_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+    move_fact_to_staging_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_move_fact_to_staging',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -404,9 +404,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    append_dim_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_dim_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_append_dim_to_dw',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -415,9 +415,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    append_fact_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+    append_fact_to_dw_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_append_fact_to_dw',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -426,9 +426,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_staging_fact_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_staging_fact_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_delete_staging_fact_entries',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -437,9 +437,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_staging_dim_entries_task = BaseDAG.get_quintoandar_python_operator(
+    delete_staging_dim_entries_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_delete_staging_dim_entries',
-        func_command=exec_factory_method,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -449,9 +449,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
     )
 
     if 'has_bridge' in kwargs and kwargs['has_bridge'] is True:
-        move_bdg_to_staging_task = BaseDAG.get_quintoandar_python_operator(
+        move_bdg_to_staging_task = BaseDAG.build_quintoandar_python_operator(
             task_id='pp_move_bdg_to_staging',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -460,9 +460,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
             }
         )
 
-        insert_bdg_to_dw_task = BaseDAG.get_quintoandar_python_operator(
+        insert_bdg_to_dw_task = BaseDAG.build_quintoandar_python_operator(
             task_id='pp_insert_bdg_to_dw',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -471,9 +471,9 @@ def pp_class_sub_dag(sub_dag_name, **kwargs):
             }
         )
 
-        delete_staging_bdg_entries_task = BaseDAG.get_quintoandar_python_operator(
+        delete_staging_bdg_entries_task = BaseDAG.build_quintoandar_python_operator(
             task_id='pp_delete_staging_bdg_entries',
-            func_command=exec_factory_method,
+            python_callable=exec_factory_method,
             dag=local_dag,
             provide_context=True,
             op_kwargs={
@@ -513,9 +513,9 @@ def pp_clean_tasks_sub_dag(sub_dag_name, **kwargs):
         start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
-    move_tasks_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_tasks_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_move_tasks_to_clean',
-        func_command=exec_crm_method,
+        python_callable=exec_crm_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -523,9 +523,9 @@ def pp_clean_tasks_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_tasks_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_tasks_clean_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_upsert_tasks_clean_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -548,9 +548,9 @@ def pp_clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         start_date=PAST_PROCESSING_START_DATE
     )._build_local_dag()
 
-    move_tasks_resolution_to_clean_task = BaseDAG.get_quintoandar_python_operator(
+    move_tasks_resolution_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_move_tasks_resolution_to_clean',
-        func_command=exec_crm_method,
+        python_callable=exec_crm_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -558,9 +558,9 @@ def pp_clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    upsert_tasks_resolution_clean_partition_task = BaseDAG.get_quintoandar_python_operator(
+    upsert_tasks_resolution_clean_partition_task = BaseDAG.build_quintoandar_python_operator(
         task_id='pp_upsert_tasks_resolution_clean_partition',
-        func_command=upsert_partition,
+        python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -575,9 +575,9 @@ def pp_clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
 
 
 # operators
-pp_extract_and_load_task = BaseDAG.get_quintoandar_python_operator(
+pp_extract_and_load_task = BaseDAG.build_quintoandar_python_operator(
     task_id='pp_extract_and_load',
-    func_command=extract_and_load_data,
+    python_callable=extract_and_load_data,
     dag=past_processing_dag,
     provide_context=True
 )
@@ -592,9 +592,9 @@ pp_data_existence_check_task = ShortCircuitOperator(
     }
 )
 
-pp_upsert_raw_partition_task = BaseDAG.get_quintoandar_python_operator(
+pp_upsert_raw_partition_task = BaseDAG.build_quintoandar_python_operator(
     task_id='pp_upsert_raw_partition',
-    func_command=upsert_partition,
+    python_callable=upsert_partition,
     dag=past_processing_dag,
     provide_context=True,
     op_kwargs={

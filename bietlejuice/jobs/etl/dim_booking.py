@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 args = sys.argv
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -14,7 +14,7 @@ if len(args) > 1:
         print("Start query: {}".format(datetime.now()))
 
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='call ebdb.list_agendamento();')
 
         print("To ODS: {}".format(datetime.now()))
@@ -24,7 +24,7 @@ if len(args) > 1:
         BaseETL.bulk_insert(
             table=table,
             table_name=process_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=False,
             commit=True,
@@ -35,15 +35,15 @@ if len(args) > 1:
         BaseETL.move_table_to_dw(
             table_name='vw_dim_booking',
             table_name_dest='dim_booking',
-            enum_db_source=EnumDb.BI_ODS,
-            enum_db_dest=EnumDb.BI_DW,
+            enum_db_source=EnumDB.BI_ODS,
+            enum_db_dest=EnumDB.BI_DW,
             append=False,
             bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
             process_name=process_name
         )
         BaseETL.execute_command(
             'insert into dim_booking values (-1);',
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
         BaseETL.execute_command(
@@ -55,6 +55,6 @@ if len(args) > 1:
             where
                 visit_follow_up = ''
             """,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )

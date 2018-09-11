@@ -4,7 +4,7 @@ from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ print("To ODS: {}".format(datetime.now()))
 
 BaseETL.execute_command(
     command="""truncate {};""".format(process_name),
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     encoding='utf-8',
     commit=True
 )

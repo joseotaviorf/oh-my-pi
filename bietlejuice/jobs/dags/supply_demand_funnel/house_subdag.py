@@ -1,9 +1,10 @@
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils.default_logger import logger
 
 
 class HouseSubDag(DimSubDag):
@@ -50,17 +51,17 @@ class HouseSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        property_task = BaseDAG.get_quintoandar_python_operator(
+        property_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_imovel',
             provide_context=True,
-            func_command=self.get_property_query
+            python_callable=self.get_property_query
         )
 
-        affiliate = BaseDAG.get_quintoandar_python_operator(
+        affiliate = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_affiliate_payments',
-            func_command=utils.load_athena_file_query_to_ods,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'affiliate_payments',
                 'file_name': 'affiliate_payments.sql',
@@ -68,10 +69,10 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        rent_flow = BaseDAG.get_quintoandar_python_operator(
+        rent_flow = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_rent_flow',
             dag=dag,
-            func_command=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'rental_flow',
                 'table_name': 'FluxoLocacao',
@@ -80,10 +81,10 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        listing_views = BaseDAG.get_quintoandar_python_operator(
+        listing_views = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_listing_views',
             dag=dag,
-            func_command=utils.load_athena_file_query_to_ods,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'listing_views',
                 'file_name': 'listing_views.sql',
@@ -91,39 +92,39 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        property_listing = BaseDAG.get_quintoandar_python_operator(
+        property_listing = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_property_listing',
-            func_command=utils.materialize_view_ods,
+            python_callable=utils.materialize_view_ods,
             op_kwargs={
                 'view_name': 'property_listing',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
 
-        staging_dim_property_task = BaseDAG.get_quintoandar_python_operator(
+        staging_dim_property_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_property',
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'property'
             }
         )
 
-        dim_property = BaseDAG.get_quintoandar_python_operator(
+        dim_property = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_property',
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'property',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
 
-        dim_status_over_period = BaseDAG.get_quintoandar_python_operator(
+        dim_status_over_period = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='DW_dim_property_status_over',
-            func_command=utils.load_dim_from_ods_to_dw,
+            python_callable=utils.load_dim_from_ods_to_dw,
             op_kwargs={
                 'dim_name': 'property_status_over_period',
                 'insert_dummy': False,

@@ -1,7 +1,8 @@
+from qa_python_utils.default_logger import logger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils.default_logger import logger
 
 
 class UserSubDag(DimSubDag):

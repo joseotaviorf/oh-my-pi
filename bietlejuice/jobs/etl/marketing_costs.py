@@ -1,7 +1,7 @@
 import os
 import sys
 from datetime import date
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from marketing_costs.google_campaigns import GoogleCampaigns
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.criteo_campaigns import CriteoCampaigns
@@ -19,7 +19,7 @@ if __name__ == '__main__':
             BaseETL.bulk_insert(
                 table=facebook_table,
                 table_name=process_name,
-                db_enum=EnumDb.BI_ODS,
+                db_enum=EnumDB.BI_ODS,
                 encoding='UTF8',
                 append=False,
                 commit=True,
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             BaseETL.bulk_insert(
                 table=ga_table,
                 table_name=process_name,
-                db_enum=EnumDb.BI_ODS,
+                db_enum=EnumDB.BI_ODS,
                 encoding='UTF8',
                 append=False,
                 commit=True,
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             BaseETL.bulk_insert(
                 table=criteo_table,
                 table_name=process_name,
-                db_enum=EnumDb.BI_ODS,
+                db_enum=EnumDB.BI_ODS,
                 encoding='UTF8',
                 append=False,
                 commit=True,

@@ -7,12 +7,13 @@ from datetime import timedelta
 import pandas as pd
 import paramiko
 import petl
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import _logger, logger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger, logger
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 NEOWAY_SFTP_PKEY = env.get_airflow_env_var('NEOWAY_SFTP_PKEY').replace('\\n', '\n')
@@ -101,24 +102,24 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-neoway_get_cpfs = BaseDAG.get_quintoandar_python_operator(
+neoway_get_cpfs = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='neoway-get-cpfs',
-    func_command=get_cpfs
+    python_callable=get_cpfs
 )
 
-treat_data_to_callcenter = BaseDAG.get_quintoandar_python_operator(
+treat_data_to_callcenter = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='treat_data_to_callcenter',
     provide_context=True,
-    func_command=treat_cpfs_after_return
+    python_callable=treat_cpfs_after_return
 )
 
-add_partition_to_athena = BaseDAG.get_quintoandar_python_operator(
+add_partition_to_athena = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='add_partition_to_athena',
     provide_context=True,
-    func_command=add_partition_to_athena
+    python_callable=add_partition_to_athena
 )
 
 neoway_get_cpfs >> treat_data_to_callcenter >> add_partition_to_athena

@@ -1,4 +1,4 @@
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 import os
 from datetime import datetime
 
@@ -9,8 +9,8 @@ print("Start query: {}".format(datetime.now()))
 
 BaseETL.move_table_to_dw(
     table_name='vw_fact_listing_status',
-    enum_db_source=EnumDb.BI_ODS,
-    enum_db_dest=EnumDb.BI_DW,
+    enum_db_source=EnumDB.BI_ODS,
+    enum_db_dest=EnumDB.BI_DW,
     table_name_dest='fact_listing_status',
     encoding='utf8',
     append=False,
