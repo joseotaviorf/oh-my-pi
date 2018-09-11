@@ -35,7 +35,14 @@ class BaseSubDag(object):
 
     @staticmethod
     @logger(exclude='dag')
-    def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func, **kwargs):
+    def get_sub_dag_operator(dag,
+                             sub_dag_name,
+                             sub_dag_func,
+                             execution_timeout=BaseDAG.EXECUTION_TIMEOUT,
+                             retries=BaseDAG.OPERATOR_RETRIES['retries'],
+                             retry_delay=BaseDAG.OPERATOR_RETRIES['retry_delay'],
+                             max_retry_delay=BaseDAG.OPERATOR_RETRIES['max_retry_delay'],
+                             **kwargs):
         """
         Gets the corresponding subdag operator statically
         :param dag: the main dag which will contain the subdag
@@ -46,6 +53,10 @@ class BaseSubDag(object):
             subdag=sub_dag_func(sub_dag_name, **kwargs),
             task_id=sub_dag_name,
             dag=dag,
+            execution_timeout=execution_timeout,
+            retries=retries,
+            retry_delay=retry_delay,
+            max_retry_delay=max_retry_delay
         )
 
     @logger
