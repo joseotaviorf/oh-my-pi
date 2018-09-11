@@ -176,12 +176,10 @@ taxonomy as (
         ts.mkt_category,
         ts.mkt_flow,
         ts.mkt_completion,
-        ts.mkt_channel_type,
         ts.mkt_channel,
         ts.mkt_platform,
         ts.mkt_medium,
-        ts.mkt_source,
-        ts.mkt_device
+        ts.mkt_source
     from
         files.taxonomy_supply ts
 )
@@ -253,12 +251,10 @@ select
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_category end as mkt_category,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_flow end as mkt_flow,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_completion end as mkt_completion,
-	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel_type end as mkt_channel_type,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel end as mkt_channel,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_platform end as mkt_platform,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_medium end as mkt_medium,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_source end as mkt_source,
-	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_device end as mkt_device,
     now() as dt_timestamp
 from
     potential_listings pl
