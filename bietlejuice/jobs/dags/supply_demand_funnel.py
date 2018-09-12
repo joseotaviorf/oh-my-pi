@@ -181,9 +181,7 @@ def booking_sub_dag(sub_dag_name):
 
 def refresh_powerbi(**kwargs):
     powerbi_client = PowerBIClient(kwargs['workspace_name'], kwargs['dataset_name'])
-    r = powerbi_client.trigger_refresh()
-    if not r:
-        raise Exception('Could not trigger PowerBI refresh.')
+    powerbi_client.trigger_refresh()
 
 
 def xcom_fact_demand_task(**kwargs):
