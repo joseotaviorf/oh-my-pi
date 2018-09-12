@@ -93,6 +93,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         task_id='move_to_clean',
         python_callable=exec_class_method,
         dag=local_dag,
+        provide_context=True,
         op_kwargs={
             '_class': kwargs['_class'],
             'method': 'move_to_clean'
