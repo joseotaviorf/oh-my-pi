@@ -2,6 +2,7 @@ from io import BytesIO
 
 import boto3
 import pandas as pd
+import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
 from qa_python_utils.default_logger import logger, _logger
@@ -35,7 +36,7 @@ class S3ToODS(object):
                     _logger.info('m=move_files_to_ods, msg=creating table')
                     BaseETL.create_table(
                         conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
-                        table=table,
+                        table=petl.fromdataframe(table),
                         tablename=table_name,
                         schema=self.schema,
                         sample=100000
