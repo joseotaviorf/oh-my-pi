@@ -53,7 +53,8 @@ class PowerBIClient(object):
         except Exception:
             raise Exception('Unable to send data to server.')
 
-        return True if response.status_code in (requests.codes.ok, requests.codes.accepted) else False
+        if response.status_code not in (requests.codes.ok, requests.codes.accepted):
+            raise Exception('Could not trigger PowerBI refresh.')
 
     @logger(exclude=['refresh_token', 'client_id', 'client_secret'])
     def get_access_token(self, refresh_token, client_id, client_secret):
