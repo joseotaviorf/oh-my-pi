@@ -10,7 +10,7 @@ POWER_BI_REFRESH_TOKEN = env.get_airflow_env_var('POWER_BI_REFRESH_TOKEN')
 POWER_BI_SCHEMA = env.get_airflow_env_var('POWER_BI_SCHEMA')
 
 
-class PowerBI_API():
+class PowerBIClient(object):
     def __init__(self, workspace_name, dataset_name):
         self.group_id, self.dataset_id = self.get_powerbi_ids(workspace_name, dataset_name)
         self.url = 'https://api.powerbi.com/v1.0/myorg/groups/{0}/datasets/{1}/refreshes'.format(self.group_id,
@@ -40,7 +40,7 @@ class PowerBI_API():
         try:
             response = requests.get(self.url, headers={'Authorization': authorization_header})
         except Exception:
-            raise Exception('Unable to retrieve data from server')
+            raise Exception('Unable to retrieve data from server.')
 
         return json.dumps(json.loads(response.content))
 
@@ -51,7 +51,7 @@ class PowerBI_API():
         try:
             response = requests.post(self.url, headers={'Authorization': authorization_header})
         except Exception:
-            raise Exception('Unable to send data to server')
+            raise Exception('Unable to send data to server.')
 
         return True if response.status_code in (requests.codes.ok, requests.codes.accepted) else False
 
