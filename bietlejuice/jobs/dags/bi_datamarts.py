@@ -3,13 +3,12 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from qa_python_utils.default_logger import _logger, logger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags import DATAMART_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils.default_logger import _logger, logger
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -17,7 +16,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-datamarts'
 MAIN_START_DATE = datetime(2018, 8, 22)
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
 
 
 # functions
