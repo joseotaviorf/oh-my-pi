@@ -4,10 +4,10 @@ import requests
 from bietlejuice.jobs.dags.util import environment as env
 from qa_python_utils.default_logger import logger
 
-POWER_BI_CLIENT_ID_KEY = env.get_airflow_env_var('POWER_BI_CLIENT_ID_KEY')
-POWER_BI_SECRET_KEY = env.get_airflow_env_var('POWER_BI_SECRET_KEY')
-POWER_BI_REFRESH_TOKEN = env.get_airflow_env_var('POWER_BI_REFRESH_TOKEN')
-POWER_BI_SCHEMA = env.get_airflow_env_var('POWER_BI_SCHEMA')
+PWBI_CLIENT_ID_KEY = env.get_airflow_env_var('PWBI_CLIENT_ID_KEY')
+PWBI_SECRET_KEY = env.get_airflow_env_var('PWBI_SECRET_KEY')
+PWBI_REFRESH_TOKEN = env.get_airflow_env_var('PWBI_REFRESH_TOKEN')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 
 class PowerBIClient(object):
@@ -20,7 +20,7 @@ class PowerBIClient(object):
     def get_powerbi_ids(self, workspace_name, dataset_name):
         workspace_id = ''
         dataset_id = ''
-        json_schema = json.loads(POWER_BI_SCHEMA)
+        json_schema = json.loads(PWBI_SCHEMA)
 
         for w in json_schema['Workspaces']:
             if w['Workspace'] == workspace_name:
@@ -35,8 +35,8 @@ class PowerBIClient(object):
 
     @logger
     def get_refresh_history(self):
-        authorization_header = 'Bearer %s' % self.get_access_token(POWER_BI_REFRESH_TOKEN, POWER_BI_CLIENT_ID_KEY,
-                                                                   POWER_BI_SECRET_KEY)
+        authorization_header = 'Bearer %s' % self.get_access_token(PWBI_REFRESH_TOKEN, PWBI_CLIENT_ID_KEY,
+                                                                   PWBI_SECRET_KEY)
         try:
             response = requests.get(self.url, headers={'Authorization': authorization_header})
         except Exception:
@@ -46,8 +46,8 @@ class PowerBIClient(object):
 
     @logger
     def trigger_refresh(self):
-        authorization_header = 'Bearer %s' % self.get_access_token(POWER_BI_REFRESH_TOKEN, POWER_BI_CLIENT_ID_KEY,
-                                                                   POWER_BI_SECRET_KEY)
+        authorization_header = 'Bearer %s' % self.get_access_token(PWBI_REFRESH_TOKEN, PWBI_CLIENT_ID_KEY,
+                                                                   PWBI_SECRET_KEY)
         try:
             response = requests.post(self.url, headers={'Authorization': authorization_header})
         except Exception:
