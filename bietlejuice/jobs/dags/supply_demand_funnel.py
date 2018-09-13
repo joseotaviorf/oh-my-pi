@@ -2,6 +2,7 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,7 +19,6 @@ from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.powerbi.powerbi import PowerBIClient
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -183,10 +183,10 @@ def booking_sub_dag(sub_dag_name):
 
 
 def refresh_powerbi(**kwargs):
-    powerbi_client = PowerBIClient(PWBI_AUTH,
-                                   PWBI_SCHEMA,
-                                   kwargs['workspace_name'],
-                                   kwargs['dataset_name'])
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
     powerbi_client.trigger_refresh()
 
 
