@@ -511,7 +511,8 @@ class CRMTasks(object):
         BaseETL.execute_command(
             command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
             db_enum=EnumDB.BI_DW,
-            encoding='utf-8'
+            encoding='utf-8',
+            commit=True
         )
 
         self.__upsert_into_dw(
