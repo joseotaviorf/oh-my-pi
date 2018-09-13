@@ -23,6 +23,9 @@ from bietlejuice.jobs.new_etl.powerbi.powerbi import PowerBIClient
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
+
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 5 * * *'
@@ -180,7 +183,10 @@ def booking_sub_dag(sub_dag_name):
 
 
 def refresh_powerbi(**kwargs):
-    powerbi_client = PowerBIClient(kwargs['workspace_name'], kwargs['dataset_name'])
+    powerbi_client = PowerBIClient(PWBI_AUTH,
+                                   PWBI_SCHEMA,
+                                   kwargs['workspace_name'],
+                                   kwargs['dataset_name'])
     powerbi_client.trigger_refresh()
 
 
@@ -319,8 +325,7 @@ fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contr
                           user_dag, house_dag, ods_house_rent_flow])
 
 airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
-fact_demand >> xcom_fact_demand
-fact_demand >> refresh_demand
+fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
 house_dag >> fact_house_status
