@@ -4,6 +4,7 @@ import os
 import psycopg2
 import psycopg2.extensions
 import pymysql
+from qa_python_utils.default_logger import _logger
 
 from enum_db import EnumDBType
 
@@ -40,11 +41,18 @@ class DBFactory(object):
                 conn.cursor().execute("SET statement_timeout = {}".format(timeout))
 
             return conn
-        elif dbtype == EnumDBType.MySQL:
-            conn = pymysql.connect(host, user, pwd, db)
+        if dbtype == EnumDBType.MySQL:
+            conn = pymysql.connect(
+                host=host,
+                user=user,
+                passwd=pwd,
+                db=db,
+                port=port
+            )
             conn.set_charset(encoding)
             cur = conn.cursor()
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
             return conn
 
+        _logger.error('m=get_connection, dbtype={}, msg=unrecognized dbtype'.format(dbtype))
         return None
