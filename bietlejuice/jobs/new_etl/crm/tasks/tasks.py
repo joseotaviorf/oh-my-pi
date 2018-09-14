@@ -511,7 +511,8 @@ class CRMTasks(object):
         BaseETL.execute_command(
             command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
             db_enum=EnumDB.BI_DW,
-            encoding='utf-8'
+            encoding='utf-8',
+            commit=True
         )
 
         self.__upsert_into_dw(
@@ -522,11 +523,6 @@ class CRMTasks(object):
 
     @logger
     def __upsert_into_dw(self, upsert_query, schema, table_name):
-        self._truncate_table(
-            schema=schema,
-            table_name=table_name
-        )
-
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
             query=upsert_query,

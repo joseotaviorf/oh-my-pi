@@ -14,10 +14,6 @@
     "SCHEDULING_PLANNER_ENDPOINT": "https://planner.quintoandar.com.br/schedules/bi/agent/{}/availability/{}",
     "amplitude_BI_SQS_queue_name": "BIAmplitudeDataQueue",
     "amplitude_SQS_queue_name": "ProdAmplitudeDataQueue",
-    "asterisk": {
-        "call_queue_url": "https://sqs.us-east-1.amazonaws.com/632540934959/BIAsteriskCalls",
-        "survey_queue_url": "https://sqs.us-east-1.amazonaws.com/632540934959/PesquisaSatisfacaoAsteriskProd"
-    },
     "bi-datalake-forno-s3-bucket": "5a-datalake-forno",
     "bi-datalake-s3-bucket": "5a-datalake",
     "bi-dw-s3-bucket": "5a-dw",
