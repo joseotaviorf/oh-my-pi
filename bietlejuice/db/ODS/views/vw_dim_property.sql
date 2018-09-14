@@ -1,8 +1,8 @@
 drop view if exists public.vw_dim_property;
 
 create or replace view public.vw_dim_property as
-SELECT
-	((i.id || '00') || COALESCE(pl.version, 1))::bigint AS sk_property,
+select
+  ((i.id || '00') || coalesce(pl.version, 1))::bigint as sk_property,
   i.id,
   pl.version,
   pl.min_version_time,
@@ -106,8 +106,8 @@ SELECT
   i.first_publication,
   pl.min_version_time::date as publication_date,
   pl.de_publication_date,
-  (date_part('epoch', c."dataAssinado"::timestamp - pl.min_version_time) / 86400)::int8 AS time_first_listing_to_contract_signed,
-  (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 AS time_listing_to_depublication,
+  (date_part('epoch', c."dataAssinado"::timestamp - pl.min_version_time) / 86400)::int8 as time_first_listing_to_contract_signed,
+  (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 as time_listing_to_depublication,
   coalesce(pl.version,0) as nr_listing,
   coalesce(pl.nr_renting::bigint, 0) as nr_renting,
   i.info_visita_autorizacao_de_entrada,
@@ -117,22 +117,26 @@ SELECT
   i.info_visita_chave_box_quintoandar,
   i.data_criacao,
   i.atualizado_em,
-  now() AS load_timestamp,
+  now() as load_timestamp,
   i.usuario_que_cadastrou_id,
   i.imovel_v3 as property_v3,
   i.area_total as total_area,
   i.area_terreno as contruction_area,
-  i.unpublished_reason as unpublished_reason,
+  i.unpublished_reason,
   pl.start_version_category,
   pl.end_version_category,
   pl.is_last_version,
   i.exclusivity,
-  i.id % 892700000 as short_id
+  i.id % 892700000 as short_id,
+  i.house_occupant,
+  i.key_type,
+  i.key_location,
+  i.visit_restriction
 from
 	imovel i
 left join
 	property_listing pl
-	ON pl.id = i.id
+	on pl.id = i.id
 left join
 	contract c
 	on c.id = pl.contract_id
