@@ -1,7 +1,7 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from qa_python_utils.default_logger import _logger, logger
-from bietlejuice.jobs.new_etl import SORTINGHAT_QUERIES_DIR
+from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR
 
 
 class SortingHat(object):
@@ -12,7 +12,7 @@ class SortingHat(object):
         return BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_sortinghat,
             encoding='UTF8',
-            query=BaseETL.get_query_from_file_name('{}/{}'.format(SORTINGHAT_QUERIES_DIR, query_file_path))
+            query=BaseETL.get_query_from_file_name('{}/sorting_hat/{}'.format(SOURCE_QUERIES_DIR, query_file_path))
         )
 
     @logger(exclude='data_table')

@@ -6,7 +6,7 @@ from qa_python_utils.default_logger import _logger, logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
-from bietlejuice.jobs.dags import GROWTH_PROD_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -80,7 +80,7 @@ tickets_whats = BaseDAG.build_quintoandar_python_operator(
     execution_timeout=timedelta(hours=3),
     provide_context=True,
     python_callable=load_agents_performance_ranking,
-    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': GROWTH_PROD_QUERIES_DIR}
+    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': '{}/growth/'.format(DW_QUERIES_DIR)}
 )
 
 clear_old_data >> tickets_whats

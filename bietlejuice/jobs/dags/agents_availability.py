@@ -6,7 +6,7 @@ from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
-from bietlejuice.jobs.dags import DW_STAGING_QUERIES_DIR, DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -55,7 +55,7 @@ def load_agents_slots(**kwargs):
 
 def load_agents_scheduling(**kwargs):
     entity = 'agents_scheduling'
-    query = read_query('{}/{}.sql'.format(DW_STAGING_QUERIES_DIR, entity))
+    query = read_query('{}/staging/{}.sql'.format(DW_QUERIES_DIR, entity))
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
@@ -78,7 +78,7 @@ def load_agents_scheduling(**kwargs):
 
 def load_agents_signed_contracts():
     entity = 'agents_signed_contracts'
-    query = read_query('{}/{}.sql'.format(DW_STAGING_QUERIES_DIR, entity))
+    query = read_query('{}/staging/{}.sql'.format(DW_QUERIES_DIR, entity))
 
     data_table = BaseETL.from_db_query(
         db_enum=EnumDB.BI_DW,

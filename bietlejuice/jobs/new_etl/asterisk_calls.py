@@ -57,7 +57,7 @@ class Asterisk(object):
     def save_asterisk_data_to_dw(self):
         _logger.info('m=save_asterisk_data_to_dw, msg=saving to dw')
         athena = AthenaClient(self.bucket)
-        file_name = './db/2.datalake/queries/vw_asterisk_calls.sql'
+        file_name = './db/datalake/queries/vw_asterisk_calls.sql'
 
         data_frame = athena.execute_file_query_and_return_dataframe(file_name)
 
