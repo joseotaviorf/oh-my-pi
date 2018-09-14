@@ -1,5 +1,4 @@
-
-select -- count(1)
+select
   i.id,
   i.aluguel,
   i.bairro,
@@ -170,7 +169,11 @@ select -- count(1)
 			then 'UNKNOWN_NULL_VALUE'
 		else 'OTHER'
 	end as unpublished_reason,
-	(sc.id is not null and optedOutAt is null)+0 as exclusivity
+	(sc.id is not null and optedOutAt is null)+0 as exclusivity,
+	ot.name as house_occupant,
+    kt.name as key_type,
+    aat.name as key_location,
+    rt.name as visit_restriction
 from
   Imovel i
 left join
@@ -221,4 +224,25 @@ left join
 left join
 	SpecialCondition sc
 	on sc.id = maxsc.id
+
+left join AccessType at
+  on at.imovel_id = i.id
+
+-- who lives in the house
+left join OccupantType ot
+  on at.occupant_id = ot.id
+
+-- key types (e.g., password, biometric, etc.)
+left join KeyType kt
+  on at.type_id = kt.id
+
+-- where is the key (e.g., owner, lockbox, etc.)
+left join AccessAuthorizationType aat
+  on at.authorization_id = aat.id
+
+-- restriction
+left join RestrictionType rt
+  on at.restriction_id = rt.id
+
 where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
+;
