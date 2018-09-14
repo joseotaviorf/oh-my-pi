@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
-from bietlejuice.jobs.dags import DW_STAGING_QUERIES_DIR, DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.dags.util import environment as env
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
+
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
+from bietlejuice.jobs.dags import DW_STAGING_QUERIES_DIR, DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -25,7 +26,7 @@ def delete_old_entries(entity, execution_date=None):
 
     BaseETL.execute_command(
         command=query,
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         commit=True
     )
 
@@ -44,7 +45,7 @@ def load_agents_slots(**kwargs):
 
     _logger.info("START - To Staging: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
-        enum_db=EnumDb.BI_DW,
+        enum_db=EnumDB.BI_DW,
         df=data_frame,
         table_name='staging.{}'.format(entity),
         encoding='utf-8',
@@ -58,7 +59,7 @@ def load_agents_scheduling(**kwargs):
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         query=query.format(execution_date),
         encoding='utf-8'
     )
@@ -66,7 +67,7 @@ def load_agents_scheduling(**kwargs):
     delete_old_entries(entity, execution_date)
 
     BaseETL.to_db(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         data_table=data_table,
         table_name=entity,
         encoding='utf-8',
@@ -80,13 +81,13 @@ def load_agents_signed_contracts():
     query = read_query('{}/{}.sql'.format(DW_STAGING_QUERIES_DIR, entity))
 
     data_table = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         query=query,
         encoding='utf-8'
     )
 
     BaseETL.to_db(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         data_table=data_table,
         table_name=entity,
         encoding='utf-8',
@@ -110,21 +111,21 @@ dag = DAG(
 )
 
 # operators
-agents_slots = QuintoAndarPythonOperator(
+agents_slots = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='load_agents_slots',
     python_callable=load_agents_slots,
     provide_context=True
 )
 
-agents_scheduling = QuintoAndarPythonOperator(
+agents_scheduling = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='load_agents_scheduling',
     python_callable=load_agents_scheduling,
     provide_context=True
 )
 
-agents_signed_contracts = QuintoAndarPythonOperator(
+agents_signed_contracts = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='load_agents_signed_contracts',
     python_callable=load_agents_signed_contracts

@@ -116,9 +116,9 @@ def table_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    _extract = BaseDAG.get_quintoandar_python_operator(
+    _extract = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_table',
-        func_command=extract_table,
+        python_callable=extract_table,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
@@ -127,17 +127,17 @@ def table_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    _transform = BaseDAG.get_quintoandar_python_operator(
+    _transform = BaseDAG.build_quintoandar_python_operator(
         task_id='transform_data',
-        func_command=transform_data,
+        python_callable=transform_data,
         dag=local_dag,
         provide_context=True,
         op_kwargs={'_class': sub_dag_name}
     )
 
-    _load = BaseDAG.get_quintoandar_python_operator(
+    _load = BaseDAG.build_quintoandar_python_operator(
         task_id='load_data',
-        func_command=load_data,
+        python_callable=load_data,
         dag=local_dag,
         provide_context=True,
         op_kwargs={'_class': sub_dag_name}

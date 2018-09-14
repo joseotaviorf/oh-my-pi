@@ -4,8 +4,9 @@ import os
 import psycopg2
 import psycopg2.extensions
 import pymysql
+from qa_python_utils.default_logger import _logger
 
-from enum_db import EnumDbType
+from enum_db import EnumDBType
 
 
 class DBFactory(object):
@@ -26,10 +27,10 @@ class DBFactory(object):
         dbtype = env['dbtype']
         port = env.get('port')
 
-        if dbtype == EnumDbType.PostgreSQL or dbtype == EnumDbType.Redshift:
+        if dbtype == EnumDBType.PostgreSQL or dbtype == EnumDBType.Redshift:
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
             psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-            p = port if port else 5439 if dbtype == EnumDbType.Redshift else 5432
+            p = port if port else 5439 if dbtype == EnumDBType.Redshift else 5432
             conn = psycopg2.connect(host=host, user=user, password=pwd, database=db, port=p)
             print('port: {}'.format(p))
             if int(p) == 5432:
@@ -37,14 +38,21 @@ class DBFactory(object):
                 conn.set_client_encoding(encoding)
 
             if timeout:
-                conn.cursor().execute("SET statement_timeout = '{}s'".format(timeout))
+                conn.cursor().execute("SET statement_timeout = {}".format(timeout))
 
             return conn
-        elif dbtype == EnumDbType.MySQL:
-            conn = pymysql.connect(host, user, pwd, db)
+        if dbtype == EnumDBType.MySQL:
+            conn = pymysql.connect(
+                host=host,
+                user=user,
+                password=pwd,
+                database=db,
+                port=port
+            )
             conn.set_charset(encoding)
             cur = conn.cursor()
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
             return conn
 
+        _logger.error('m=get_connection, dbtype={}, msg=unrecognized dbtype'.format(dbtype))
         return None

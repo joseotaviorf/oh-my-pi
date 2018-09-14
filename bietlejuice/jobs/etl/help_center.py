@@ -13,7 +13,7 @@ from elasticsearch import helpers
 from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -256,7 +256,7 @@ class HelpCenter(object):
                         over (partition by quintoandar_id, email) as amplitude_ids
                     from all_info
             """,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
         )
 
         return petl.todataframe(table)

@@ -22,12 +22,12 @@ from datetime import datetime
 import petl
 import requests
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 
 def get_agents_ids():
     agents = BaseETL.from_db_query(
-        db_enum=EnumDb.QuintoAndar_ebdb,
+        db_enum=EnumDB.QuintoAndar_ebdb,
         query="""select
                   u.id,
                   da.ativo
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     table = get_table_agents_planner(agents_ids)
 
     BaseETL.bulk_insert(
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         table=table,
         table_name=table_name,
         append=True,

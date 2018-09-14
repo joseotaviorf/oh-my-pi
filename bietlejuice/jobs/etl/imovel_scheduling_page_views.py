@@ -1,7 +1,7 @@
 import os
 from datetime import date, datetime, timedelta
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.base_ga import BaseGA
 
 
@@ -130,7 +130,7 @@ def load_data():
             GROUP BY t.nomeCidade,t.nomeRegiao,t.nomeBairro,t.imovelId
             """ % (placeholders, start_date_query, end_date_query)
 
-    db = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb, encoding='UTF8')
+    db = BaseETL.get_connection(db_enum=EnumDB.QuintoAndar_ebdb, encoding='UTF8')
     cursor = db.cursor()
     cursor.execute(query, imovelIds)
 
@@ -162,7 +162,7 @@ def load_data():
     BaseETL.bulk_insert(
         table=finalData,
         table_name=process_name,
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=True,
         commit=True,

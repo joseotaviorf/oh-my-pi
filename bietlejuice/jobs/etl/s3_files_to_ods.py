@@ -3,7 +3,7 @@ import os
 import sys
 
 import pandas as pd
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
 
 if __name__ == '__main__':
@@ -21,10 +21,10 @@ if __name__ == '__main__':
 
             table_name = f[1]
 
-            exists = BaseETL.table_exists(db_enum=EnumDb.BI_ODS, table_name=table_name, schema=schema)
+            exists = BaseETL.table_exists(db_enum=EnumDB.BI_ODS, table_name=table_name, schema=schema)
             if not exists:
                 BaseETL.create_table(
-                    conn=BaseETL.get_connection(db_enum=EnumDb.BI_ODS),
+                    conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
                     table=table,
                     tablename=table_name,
                     schema=schema,

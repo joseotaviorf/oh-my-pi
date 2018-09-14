@@ -3,7 +3,7 @@ import os
 
 import petl
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.GoogleDrive.google_drive_api import GoogleDriveApi
 
 bucket_datalake = os.environ['bi-datalake-s3-bucket']
@@ -14,7 +14,7 @@ def get_list_descredenciados():
     AGENT_ID_COLUMN = 2
     DATE_COLUMN = 1
     agentes = BaseETL.from_db_query(
-        EnumDb.QuintoAndar_ebdb,
+        EnumDB.QuintoAndar_ebdb,
         query="""
             select
               u.dadosAgente_id,
@@ -48,7 +48,7 @@ def get_list_descredenciados():
 def get_agent_schedule():
     descredenciados = get_list_descredenciados()
 
-    db = BaseETL.get_connection(db_enum=EnumDb.QuintoAndar_ebdb)
+    db = BaseETL.get_connection(db_enum=EnumDB.QuintoAndar_ebdb)
     cursor = db.cursor()
     cursor.execute("""
         SELECT  agente_id,
@@ -179,7 +179,7 @@ def get_agent_schedule():
 BaseETL.bulk_insert(
     table=get_agent_schedule(),
     table_name=process_name,
-    db_enum=EnumDb.BI_ODS,
+    db_enum=EnumDB.BI_ODS,
     append=False,
     commit=True,
     bucket_name='{}/raw/ods/{}'.format(bucket_datalake, process_name)

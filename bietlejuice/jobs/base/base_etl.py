@@ -14,7 +14,7 @@ import boto3
 import datetime
 import petl
 from db_factory import DBFactory
-from enum_db import EnumDb
+from enum_db import EnumDB
 from petl.io.db import create_table
 
 
@@ -308,8 +308,7 @@ class BaseETL(object):
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
-        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum,
-                            commit=True, timeout=30)
+        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum, timeout=30)
 
     @classmethod
     def move_table_to_dw(cls, table_name, enum_db_source, enum_db_dest,
@@ -362,7 +361,7 @@ class BaseETL(object):
 
     @classmethod
     def dataframe_to_ods(cls, df, table_name, encoding='LATIN1', append=True, commit=True):
-        cls.dataframe_to_db(df, table_name, EnumDb.BI_ODS, encoding=encoding, append=append, commit=commit)
+        cls.dataframe_to_db(df, table_name, EnumDB.BI_ODS, encoding=encoding, append=append, commit=commit)
 
     @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
@@ -400,7 +399,7 @@ class BaseETL(object):
         try:
             if not append:
                 con.cursor().execute('truncate table {};'.format(table_name))
-            if enum_db_dest == EnumDb.BI_DW and not eval(str(forno)):
+            if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
                 sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                         NULL AS 'NULL'
@@ -469,7 +468,7 @@ class BaseETL(object):
         bucket_datalake = os.environ['bi-datalake-s3-bucket']
         BaseETL.to_s3(
             filename='{}.csv'.format(filename),
-            data_table=BaseETL.from_db_table(db_enum=EnumDb.BI_ODS, table_name=table_name),
+            data_table=BaseETL.from_db_table(db_enum=EnumDB.BI_ODS, table_name=table_name),
             bucket_folder_path='{}/raw/ods/{}'.format(bucket_datalake, filename)
         )
         BaseETL.copy_file_between_s3_buckets(
@@ -543,7 +542,7 @@ class BaseETL(object):
     def get_columns_schema(cls, db_enum, table_name, schema_name=None, skip_header=True):
         columns_table = None
 
-        if db_enum == EnumDb.QuintoAndar_ebdb:
+        if db_enum == EnumDB.QuintoAndar_ebdb:
             query = """
                 select
                     COLUMN_NAME,

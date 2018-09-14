@@ -2,7 +2,7 @@
 import sys
 from datetime import datetime, timedelta
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.base_ga import BaseGA
 
 
@@ -33,14 +33,14 @@ def load_ods():
         '1- Prod (Tracking GTM)'
     )
 
-    create_table = ga.get_flag_create_table(EnumDb.BI_ODS, ga.table_name)
+    create_table = ga.get_flag_create_table(EnumDB.BI_ODS, ga.table_name)
 
     count = 0
     if not create_table:
-        count = BaseETL.get_table_count(EnumDb.BI_ODS, ga.table_name)
+        count = BaseETL.get_table_count(EnumDB.BI_ODS, ga.table_name)
         BaseETL.execute_command(
             command="DELETE from {} where date >= '{}'".format(ga.table_name, min_date),
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             commit=True
         )
 
@@ -52,7 +52,7 @@ def load_ods():
         result, contains_sampling_data = ga.get(start_date, end_date)
         print('{} - Sampling Data: {}'.format(ga.ga.property_name, contains_sampling_data))
         BaseETL.to_db(
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             data_table=result,
             table_name=ga.table_name,
             append=True,
@@ -70,7 +70,7 @@ def load_ods():
 
     BaseETL.execute_command(
         command="delete from {} where date = 'date'".format(ga.table_name),
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         commit=True
     )
 
@@ -80,7 +80,7 @@ def load_ods():
                     where
                         campaign like 'Trazer proprietÃ%'
                 """.format(ga.table_name),
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         commit=True
     )
     return ga.table_name
@@ -93,21 +93,21 @@ def load_dw():
 
     BaseETL.execute_command(
         command="DELETE from {} where sk_date >= '{}'".format(fact_table, min_date),
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         commit=True
     )
 
     BaseETL.move_table_to_dw(
         table_name='vw_fact_liquidity_ga_confirmed_visits',
         table_name_dest=fact_table,
-        enum_db_source=EnumDb.BI_ODS,
-        enum_db_dest=EnumDb.BI_DW,
+        enum_db_source=EnumDB.BI_ODS,
+        enum_db_dest=EnumDB.BI_DW,
         append=True,
         encoding='UTF8'
     )
     BaseETL.execute_command(
         command="update ga_confirmed_visits set processed_date = '{}' where processed_date is null".format(now),
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         commit=True
     )
 

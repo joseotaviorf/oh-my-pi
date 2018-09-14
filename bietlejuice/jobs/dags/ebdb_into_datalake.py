@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -46,14 +45,14 @@ dag = DAG(
 )
 
 # operators
-move = QuintoAndarPythonOperator(
+move = BaseDAG.build_quintoandar_python_operator(
     task_id='move_ebdb_to_datalake',
     provide_context=True,
     python_callable=move_ebdb_to_datalake,
     dag=dag
 )
 
-create_raw = QuintoAndarPythonOperator(
+create_raw = BaseDAG.build_quintoandar_python_operator(
     task_id='create_raw_external_tables',
     python_callable=create_raw_external_tables,
     dag=dag

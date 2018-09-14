@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -82,7 +81,7 @@ dag = DAG(
 )
 
 # operators
-PythonOperator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawling-check-exclusives',
     python_callable=check_exclusives,

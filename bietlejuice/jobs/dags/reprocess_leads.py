@@ -86,11 +86,8 @@ def reprocess_leads(variant):
     processed['origem'] = 'Reprocessado'
     processed['infosExtras'] = processed.id.apply(lambda x: '{};{};{}'.format(x, variant, variant_group))
     if recency_bucket:
-        buckets = (
-            ((datetime.utcnow().date() - processed.atualizadoEm.dt.date).dt.days / processor.get_unit_divisor()).
-            apply(math.floor).
-            astype(int)
-        )
+        buckets = (((datetime.utcnow().date() - processed.atualizadoEm.dt.date).dt.days / processor.get_unit_divisor()).
+                   apply(math.floor).astype(int))
         processed['infosExtras'] = processed['infosExtras'] + ';' + buckets.astype(str) + lead_options.get('unit')
 
     if size_limit is not None and len(processed) > size_limit:
@@ -113,9 +110,9 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='reprocess-leads',
-    func_command=reprocess_leads,
+    python_callable=reprocess_leads,
     op_kwargs={'variant': reprocess_leads_variant}
 )

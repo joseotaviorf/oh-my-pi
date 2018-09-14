@@ -10,7 +10,7 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 
@@ -135,7 +135,7 @@ class Invoice(object):
             'm=load_into_ods, _type={}, year_month={}, msg=deleting from ods table'.format(self._type, year_month))
         BaseETL.execute_command(
             command="delete from invoice.{} where ym_partition = '{}'".format(self._type, year_month),
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='utf-8',
             commit=True
         )

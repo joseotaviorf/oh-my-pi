@@ -4,18 +4,19 @@ from datetime import datetime
 import pandas as pd
 import petl
 from airflow.models import DAG
-from airflow.operators import PythonOperator
+from qa_python_utils.default_logger import _logger
+
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.kpi_forecast.funnel import Funnel
 from bietlejuice.jobs.new_etl.kpi_forecast.helpers import get_count, write_to_s3, get_file_from_s3, get_prediction, \
     get_kpis
 from bietlejuice.jobs.new_etl.kpi_forecast.preprocessor import Preprocessor
+from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
 from bietlejuice.jobs.new_etl.kpi_forecast.steps_demand import steps
 from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
-from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
-from qa_python_utils.default_logger import _logger
 
 bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
 bucket_dl = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
@@ -29,7 +30,8 @@ MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every month
 
 # parameters of the script
-begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(), unit='days')  # last monday # must be a monday pandas timestamp
+begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(),
+                                                            unit='days')  # last monday # must be a monday pandas timestamp
 
 _logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
@@ -56,7 +58,7 @@ range_training_day = pd.date_range(begin_pred - pd.to_timedelta(n_training_days,
 
 def load_fact(begin_pred):
     table_demand = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         query=query_demand
     )
     fact = petl.todataframe(table_demand)
@@ -345,7 +347,7 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     # add long region name
     long_region_name_query = '''select distinct long_region_name, region_code from dim_region'''
     table_long_region_name = BaseETL.from_db_query(
-        db_enum=EnumDb.BI_DW,
+        db_enum=EnumDB.BI_DW,
         query=long_region_name_query
     )
     df_long_region_name = petl.todataframe(table_long_region_name)
@@ -418,7 +420,6 @@ def demand_forecast():
 if __name__ == "__main__":
     demand_forecast()
 
-
 # DAG
 
 dag = DAG(
@@ -434,7 +435,7 @@ dag = DAG(
     catchup=False
 )
 
-PythonOperator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='demand_forecast',
     python_callable=demand_forecast

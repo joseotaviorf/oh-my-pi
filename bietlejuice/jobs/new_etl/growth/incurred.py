@@ -1,5 +1,5 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDb
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DW_DIR
 from qa_python_utils.default_logger import logger
 
@@ -35,7 +35,7 @@ class Growth(object):
         BaseETL.execute_command(
             command='drop table if exists {}.{};'.format(schema, table_name),
             commit=True,
-            db_enum=EnumDb.BI_DW
+            db_enum=EnumDB.BI_DW
         )
 
     @staticmethod
@@ -55,7 +55,7 @@ class Growth(object):
         BaseETL.execute_command(
             command=query,
             commit=True,
-            db_enum=EnumDb.BI_DW
+            db_enum=EnumDB.BI_DW
         )
 
     @staticmethod
@@ -64,5 +64,5 @@ class Growth(object):
         BaseETL.execute_file_query(
             filename=file_name,
             commit=True,
-            db_enum=EnumDb.BI_DW
+            db_enum=EnumDB.BI_DW
         )

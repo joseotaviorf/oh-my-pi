@@ -1,0 +1,26 @@
+select
+  extension,
+  descr,
+  grppre,
+  alertinfo,
+  cast(ringing as integer) as ringing,
+  maxwait,
+  password,
+  ivr_id,
+  dest,
+  cast(cwignore as integer) as cwignore,
+  cast(queuewait as integer) as queuewait,
+  cast(use_queue_context as integer) as use_queue_context,
+  cast(togglehint as integer) as togglehint,
+  cast(qnoanswer as integer) as qnoanswer,
+  cast(callconfirm as integer) as callconfirm,
+  cast(callconfirm_id as integer) as callconfirm_id,
+  qregex,
+  cast(agentannounce_id as integer) as agentannounce_id,
+  cast(joinannounce_id as integer) as joinannounce_id,
+  monitor_type,
+  cast(monitor_heard as integer) as monitor_heard,
+  cast(monitor_spoken as integer) as monitor_spoken,
+  callback_id
+from datalake_raw.asterisk_queues_config
+;

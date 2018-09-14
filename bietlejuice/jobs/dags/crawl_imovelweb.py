@@ -44,9 +44,9 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-imovelweb',
-    func_command=submit_iw,
+    python_callable=submit_iw,
     op_kwargs=json.loads(crawler_params)
 )

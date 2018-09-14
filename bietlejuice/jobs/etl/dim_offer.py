@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger, logger
 
@@ -25,7 +25,7 @@ def execute_etl(db_enum_src, table_src_name, table_dest_name):
     BaseETL.bulk_insert(
         table=table,
         table_name=table_dest_name,
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=False,
         commit=True,
@@ -38,7 +38,7 @@ if len(args) > 1:
         _logger.info("Start query PreProposta: {}".format(datetime.now()))
 
         table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             query='call ebdb.list_preproposta();')
 
         _logger.info("To ODS PreProposta: {}".format(datetime.now()))
@@ -47,7 +47,7 @@ if len(args) > 1:
         BaseETL.bulk_insert(
             table=table,
             table_name=old_process_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=False,
             bucket_name='{}/raw/ods/{}'.format(bucket_datalake, old_process_name)
@@ -55,7 +55,7 @@ if len(args) > 1:
 
         _logger.info("GodFather Steps (offer): {} - from db".format(datetime.now()))
         godf_offer_table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_godfather,
+            db_enum=EnumDB.QuintoAndar_godfather,
             query='select * from business.offer;'
         )
 
@@ -69,7 +69,7 @@ if len(args) > 1:
 
         _logger.info("GodFather Steps (topic): {} - from db".format(datetime.now()))
         godf_topic_table = BaseETL.from_db_query(
-            db_enum=EnumDb.QuintoAndar_godfather,
+            db_enum=EnumDB.QuintoAndar_godfather,
             query='select * from business.topic;'
         )
 
@@ -102,20 +102,20 @@ if len(args) > 1:
         BaseETL.dataframe_to_db(
             df=a_df,
             table_name=process_name,
-            enum_db=EnumDb.BI_ODS,
+            enum_db=EnumDB.BI_ODS,
             append=False
         )
 
-        execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_AUD', old_process_name + '_AUD')
-        execute_etl(EnumDb.QuintoAndar_ebdb, 'CondicaoProposta', 'condition')
-        execute_etl(EnumDb.QuintoAndar_ebdb, 'PreProposta_CondicaoProposta', 'pre_proposal_condition')
+        execute_etl(EnumDB.QuintoAndar_ebdb, 'PreProposta_AUD', old_process_name + '_AUD')
+        execute_etl(EnumDB.QuintoAndar_ebdb, 'CondicaoProposta', 'condition')
+        execute_etl(EnumDB.QuintoAndar_ebdb, 'PreProposta_CondicaoProposta', 'pre_proposal_condition')
 
     elif args[1] == 'DW':
         BaseETL.move_table_to_dw(
             table_name='vw_dim_offer',
             table_name_dest='dim_{}'.format(process_name),
-            enum_db_source=EnumDb.BI_ODS,
-            enum_db_dest=EnumDb.BI_DW,
+            enum_db_source=EnumDB.BI_ODS,
+            enum_db_dest=EnumDB.BI_DW,
             append=False,
             bucket_name='{}/clean/ods/{}'.format(bucket_datalake, process_name),
             process_name='dim_{}'.format(process_name)

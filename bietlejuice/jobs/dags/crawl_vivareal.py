@@ -44,9 +44,9 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.get_quintoandar_python_operator(
+BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-vivareal',
-    func_command=submit_vr,
+    python_callable=submit_vr,
     op_kwargs=json.loads(crawler_params)
 )

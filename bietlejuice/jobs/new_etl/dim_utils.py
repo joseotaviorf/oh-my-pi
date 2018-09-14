@@ -4,7 +4,7 @@ from datetime import datetime, date
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import _logger
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDb
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from marketing_costs.fb_campaigns import FacebookCampaigns
 from marketing_costs.google_campaigns import GoogleCampaigns
 
@@ -19,7 +19,7 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
 
     _logger.info("Start query: {}".format(datetime.now()))
     table = BaseETL.from_db_query(
-        db_enum=EnumDb.QuintoAndar_ebdb,
+        db_enum=EnumDB.QuintoAndar_ebdb,
         query=command
     )
 
@@ -28,7 +28,7 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
     BaseETL.bulk_insert(
         table=table,
         table_name=table_name,
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=False,
         commit=True,
@@ -41,13 +41,13 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
     _logger.info("Start query: {}".format(now))
     if add_timestamp:
         table = BaseETL.from_db_table(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
             generator=True
         ).addfield('dt_timestamp', now)
     else:
         table = BaseETL.from_db_table(
-            db_enum=EnumDb.QuintoAndar_ebdb,
+            db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
             generator=True
         )
@@ -57,7 +57,7 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
     BaseETL.bulk_insert(
         table=table,
         table_name=dim_name,
-        db_enum=EnumDb.BI_ODS,
+        db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
         append=False,
         commit=True,
@@ -80,14 +80,14 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
     if pre_command is not None:
         BaseETL.execute_command(
             command=pre_command,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
     BaseETL.move_table_to_dw(
         table_name='{}.{}'.format(schema_source, table_name),
         table_name_dest='{}.{}'.format(schema_dest, table_name_dest),
-        enum_db_source=EnumDb.BI_ODS,
-        enum_db_dest=EnumDb.BI_DW,
+        enum_db_source=EnumDB.BI_ODS,
+        enum_db_dest=EnumDB.BI_DW,
         append=False,
         bucket_name='{}/clean/ods/{}'.format(bucket, dim_name),
         process_name=dim_name
@@ -95,13 +95,13 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
     if insert_dummy:
         BaseETL.execute_command(
             command='insert into {} values (-1);'.format(table_name_dest),
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
     if post_command is not None:
         BaseETL.execute_command(
             command=post_command,
-            db_enum=EnumDb.BI_DW,
+            db_enum=EnumDB.BI_DW,
             commit=True
         )
 
@@ -115,7 +115,7 @@ def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
 
     _logger.info("START - To Staging: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
-        enum_db=EnumDb.BI_ODS,
+        enum_db=EnumDB.BI_ODS,
         df=data_frame,
         table_name=dim_name,
         encoding='utf-8',
@@ -142,7 +142,7 @@ def load_marketing_costs(dim_name, bucket, mkt_configs):
         BaseETL.bulk_insert(
             table=table,
             table_name=table_name,
-            db_enum=EnumDb.BI_ODS,
+            db_enum=EnumDB.BI_ODS,
             encoding='UTF8',
             append=False,
             commit=True,

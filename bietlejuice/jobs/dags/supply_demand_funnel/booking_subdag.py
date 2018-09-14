@@ -1,11 +1,12 @@
 from datetime import datetime
 
+from qa_python_utils.default_logger import logger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils.default_logger import logger
 
 
 class BookingSubDag(DimSubDag):
@@ -51,17 +52,17 @@ class BookingSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        booking = BaseDAG.get_quintoandar_python_operator(
+        booking = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_booking',
             dag=dag,
             provide_context=True,
-            func_command=self.get_booking_query
+            python_callable=self.get_booking_query
         )
 
-        booking_media_sources_task = BaseDAG.get_quintoandar_python_operator(
+        booking_media_sources_task = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_booking_media_sources',
             dag=dag,
-            func_command=utils.load_athena_file_query_to_ods,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
                 'table_name': 'booking_media_sources',
                 'file_name': 'extract_booking_media_sources.sql',
@@ -69,10 +70,10 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        staging_dim_booking_task = BaseDAG.get_quintoandar_python_operator(
+        staging_dim_booking_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='STAGING_dim_booking',
-            func_command=utils.load_dim_from_ods_to_staging,
+            python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'booking',
                 'post_command': "update staging.dim_booking set dt_timestamp = '{}' where sk_booking = -1;".format(
@@ -80,10 +81,10 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        dim_booking_task = BaseDAG.get_quintoandar_python_operator(
+        dim_booking_task = BaseDAG.build_quintoandar_python_operator(
             task_id='DW_dim_booking',
             dag=dag,
-            func_command=utils.load_dim_from_staging_to_dw,
+            python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'booking',
                 'bucket': DimSubDag.S3_BUCKET
