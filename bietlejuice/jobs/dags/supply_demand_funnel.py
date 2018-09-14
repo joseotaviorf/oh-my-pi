@@ -1,6 +1,8 @@
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -20,6 +22,9 @@ from bietlejuice.jobs.dags.util import xcom as xcom
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
@@ -177,6 +182,14 @@ def booking_sub_dag(sub_dag_name):
     return sub_dag.build_booking_with_tests()
 
 
+def refresh_powerbi(**kwargs):
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
+    powerbi_client.trigger_refresh()
+
+
 def xcom_fact_demand_task(**kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     xcom.xcom_push(kwargs['ti'], exec_date)
@@ -293,12 +306,26 @@ xcom_fact_demand = BaseDAG.build_quintoandar_python_operator(
     provide_context=True
 )
 
+refresh_supply = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Supply',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
+)
+
+refresh_demand = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Demand',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Demand'}
+)
+
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                           user_dag, house_dag, ods_house_rent_flow])
 
-ods_supply >> fact_supply
-fact_demand >> xcom_fact_demand
+airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
+fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
 house_dag >> fact_house_status
