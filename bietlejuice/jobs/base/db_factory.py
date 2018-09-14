@@ -45,8 +45,8 @@ class DBFactory(object):
             conn = pymysql.connect(
                 host=host,
                 user=user,
-                passwd=pwd,
-                db=db,
+                password=pwd,
+                database=db,
                 port=port
             )
             conn.set_charset(encoding)
