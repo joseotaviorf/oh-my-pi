@@ -2,7 +2,7 @@ from datetime import datetime
 
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
+from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
 from qa_python_utils.default_logger import _logger, logger
 
 
@@ -12,7 +12,7 @@ class Agent(object):
 
     def __format_query_filename(self, filename, db_enum):
         if db_enum == EnumDB.QuintoAndar_ebdb:
-            dir = EBDB_QUERIES_DIR
+            dir = SOURCE_QUERIES_DIR
         elif db_enum == EnumDB.BI_ODS:
             dir = ODS_QUERIES_DIR
         elif db_enum == EnumDB.BI_DW:

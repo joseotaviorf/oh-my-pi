@@ -6,7 +6,7 @@ import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags import QUERIES_EBDB_SUPPLY_DEMAND_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.booking_subdag import BookingSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
@@ -40,7 +40,7 @@ main_dag = BaseDAG.build_dag(
 
 
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
-    file_path = '{}/{}.sql'.format(QUERIES_EBDB_SUPPLY_DEMAND_DIR, kwargs['table_name'])
+    file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, kwargs['table_name'])
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
     if 'execution_date' in kwargs:

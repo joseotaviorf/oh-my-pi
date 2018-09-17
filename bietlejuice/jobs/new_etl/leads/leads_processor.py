@@ -8,7 +8,7 @@ from shapely.geometry import Point
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl import EBDB_QUERIES_DIR
+from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR
 
 
 def decimal_default(obj):
@@ -27,7 +27,7 @@ class LeadsProcessor(object):
     @logger
     def get_polygons(self):
         if self.__poly is None:
-            q = BaseETL.get_query_from_file_name('{}/leads/get_polygons.sql'.format(EBDB_QUERIES_DIR))
+            q = BaseETL.get_query_from_file_name('{}/ebdb/leads/get_polygons.sql'.format(SOURCE_QUERIES_DIR))
             poly = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb, query=q, encoding='utf8mb4')
             poly = petl.todataframe(poly)
 
@@ -62,7 +62,7 @@ class LeadsProcessor(object):
     @staticmethod
     @logger
     def get_reprocessed():
-        q = BaseETL.get_query_from_file_name('{}/leads/get_reprocessed.sql'.format(EBDB_QUERIES_DIR))
+        q = BaseETL.get_query_from_file_name('{}/ebdb/leads/get_reprocessed.sql'.format(SOURCE_QUERIES_DIR))
         reprocessed = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb, query=q, encoding='utf8mb4')
 
         return petl.todataframe(reprocessed)
@@ -70,7 +70,7 @@ class LeadsProcessor(object):
     @staticmethod
     @logger
     def get_contacts(week_interval, status_in, reason_in, statuses, reasons):
-        q = BaseETL.get_query_from_file_name('{}/leads/get_contacts.sql'.format(EBDB_QUERIES_DIR))
+        q = BaseETL.get_query_from_file_name('{}/ebdb/leads/get_contacts.sql'.format(SOURCE_QUERIES_DIR))
 
         status_in = '' if status_in else 'not'
         reason_in = '' if reason_in else 'not'

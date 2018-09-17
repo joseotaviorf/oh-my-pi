@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 athena = AthenaClient('5a-datalake')
-file_name = './bietlejuice/db/2.datalake/queries/affiliate_payments.sql'
+file_name = './bietlejuice/db/datalake/queries/affiliate_payments.sql'
 process_name = BaseETL.get_current_filename()
 
 logging.info("Reading from S3: {}".format(datetime.utcnow()))

@@ -6,7 +6,7 @@ from airflow.operators.python_operator import PythonOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.dags import DATAMART_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from qa_python_utils.default_logger import _logger, logger
 
@@ -27,7 +27,7 @@ def create_datamart(table_name, **kwargs):
     """
     """
     schema = "datamarts"
-    query = BaseETL.get_query_from_file_name('{}/{}.sql'.format(DATAMART_QUERIES_DIR, table_name))
+    query = BaseETL.get_query_from_file_name('{}/datamarts/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
     _logger.info("m=create_datamart, table_name={}, msg=Dropping table".format(table_name))
     BaseETL.execute_command(
@@ -62,7 +62,7 @@ main_dag = DAG(
 
 # operators
 
-for filename in os.listdir(DATAMART_QUERIES_DIR):
+for filename in os.listdir(DW_QUERIES_DIR):
 
     filename_split = filename.split(".")
 

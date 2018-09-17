@@ -3,7 +3,7 @@ from qa_python_utils.default_logger import logger
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags import EBDB_TEST_QUERIES_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_TESTS_DIR
 
 
 class DimSubDag(BaseSubDag):
@@ -66,7 +66,7 @@ class DimSubDag(BaseSubDag):
                     'enum_db': EnumDB.BI_ODS
                 },
                 {
-                    'file_path': '{}/{}_count_check.sql'.format(EBDB_TEST_QUERIES_DIR, self.ebdb_table_name),
+                    'file_path': '{}/ebdb/{}_count_check.sql'.format(SOURCE_QUERIES_TESTS_DIR, self.ebdb_table_name),
                     'enum_db': EnumDB.QuintoAndar_ebdb,
                     'encoding': 'LATIN1'
                 }

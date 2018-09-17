@@ -14,7 +14,7 @@ from unidecode import unidecode
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, NEW_DW_QUERIES_DIR
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 
 # TODO: move to generic wrapper
@@ -495,7 +495,7 @@ class CRMTasks(object):
         )
 
         upsert_query = BaseETL.get_query_from_file_name(
-            '{}/crm/insert_{}_table.sql'.format(NEW_DW_QUERIES_DIR, table_name))
+            '{}/crm/insert_{}_table.sql'.format(DW_QUERIES_DIR, table_name))
         self.__upsert_into_dw(
             upsert_query=upsert_query,
             schema=schema,
@@ -504,9 +504,9 @@ class CRMTasks(object):
 
     @logger
     def __append_to_dw(self, filename, schema, table_name):
-        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(NEW_DW_QUERIES_DIR, filename))
+        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(DW_QUERIES_DIR, filename))
         deletion_query = BaseETL.get_query_from_file_name(
-            file_name='{}/crm/delete_old_entries.sql'.format(NEW_DW_QUERIES_DIR))
+            file_name='{}/crm/delete_old_entries.sql'.format(DW_QUERIES_DIR))
 
         BaseETL.execute_command(
             command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
@@ -542,7 +542,7 @@ class CRMTasks(object):
     @logger
     def _delete_staging_entries(self, table_name):
         query = BaseETL.get_query_from_file_name(
-            file_name='{}/crm/delete_staging_entries.sql'.format(NEW_DW_QUERIES_DIR))
+            file_name='{}/crm/delete_staging_entries.sql'.format(DW_QUERIES_DIR))
         BaseETL.execute_command(
             command=query.format(table_name=table_name, partition_date=self.partition_date),
             db_enum=EnumDB.BI_DW,
