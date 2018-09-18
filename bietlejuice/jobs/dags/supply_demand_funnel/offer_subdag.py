@@ -5,7 +5,7 @@ from qa_python_utils.default_logger import logger
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.dags.supply_demand_funnel import QUERIES_EBDB_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from bietlejuice.jobs.new_etl.godfather import GodFather
 
@@ -54,7 +54,7 @@ class OfferSubDag(DimSubDag):
         exec_date = kwargs['execution_date']
         dim = 'pre_proposal'
 
-        file_path = '{}/{}.sql'.format(QUERIES_EBDB_DIR, dim)
+        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, dim)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
