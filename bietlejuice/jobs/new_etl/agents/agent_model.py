@@ -16,7 +16,7 @@ class Agent(object):
         elif db_enum == EnumDB.BI_ODS:
             dir = ODS_QUERIES_DIR
         elif db_enum == EnumDB.BI_DW:
-            dir = DW_QUERIES_DIR
+            dir = '{}/public'.format(DW_QUERIES_DIR)
         else:
             dir = ''
 
