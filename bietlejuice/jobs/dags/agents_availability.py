@@ -55,7 +55,7 @@ def load_agents_slots(**kwargs):
 
 def load_agents_scheduling(**kwargs):
     entity = 'agents_scheduling'
-    query = read_query('{}staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
@@ -78,7 +78,7 @@ def load_agents_scheduling(**kwargs):
 
 def load_agents_signed_contracts():
     entity = 'agents_signed_contracts'
-    query = read_query('{}staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
 
     data_table = BaseETL.from_db_query(
         db_enum=EnumDB.BI_DW,
