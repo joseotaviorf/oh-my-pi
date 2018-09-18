@@ -12,7 +12,7 @@ class Agent(object):
 
     def __format_query_filename(self, filename, db_enum):
         if db_enum == EnumDB.QuintoAndar_ebdb:
-            dir = SOURCE_QUERIES_DIR
+            dir = '{}/ebdb'.format(SOURCE_QUERIES_DIR)
         elif db_enum == EnumDB.BI_ODS:
             dir = ODS_QUERIES_DIR
         elif db_enum == EnumDB.BI_DW:
