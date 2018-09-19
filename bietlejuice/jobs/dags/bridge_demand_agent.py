@@ -2,7 +2,6 @@ import logging
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -27,7 +26,7 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 def create_bdg_demand_agent():
     bridge = Bridge(bucket_datalake)
-    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW)
+    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW, schema='public')
     bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDB.BI_DW)
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
 
