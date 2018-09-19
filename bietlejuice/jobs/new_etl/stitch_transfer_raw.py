@@ -30,7 +30,7 @@ class StitchTransferRaw(object):
             try:
                 self.s3_client.meta.client.copy_object(
                     CopySource=copy_source,
-                    Bucket='5a-leo-test-datalake',
+                    Bucket=self.bucket.name,
                     Key=new_key
                 )
             except Exception as error:
