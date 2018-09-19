@@ -17,7 +17,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 def move_files_to_raw(integration, **kwargs):
     transfer = StitchTransferRaw(
         bucket=s3_bucket,
-        date=kwargs['execution_date'],
+        execution_date=kwargs['execution_date'],
         integration=integration)
     transfer.copy_files()
 
