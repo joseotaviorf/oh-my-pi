@@ -11,8 +11,8 @@ class Bridge(object):
         self.s3_client = boto3.resource('s3')
 
     @logger
-    def get_data(self, f_name, db_enum):
-        filename = '{}/{}.sql'.format(DW_QUERIES_DIR, f_name)
+    def get_data(self, f_name, db_enum, schema):
+        filename = '{}/{}/{}.sql'.format(DW_QUERIES_DIR, schema, f_name)
 
         with open(filename) as f:
             raw_query = f.read()
