@@ -14,6 +14,7 @@ CREATE TABLE public.dim_agent_review (
 	"flg_other_reason_negative" integer NULL,
 	"flg_agent_late" integer NULL,
 	"flg_agent_with_no_info" integer,
+	"dt_rating" timestamp,
 	dt_timestamp TIMESTAMP default getdate(),
   CONSTRAINT dim_agent_review_pkey PRIMARY KEY(sk_agentreview)
 )
