@@ -69,6 +69,9 @@ CREATE VIEW public.vw_dim_lead as
   utm_campaign,
   coalesce(l.utm_source, an.network) as network, -- add the network of the campaign (currenlty only present for leads from the landing page), or network of the afiliado (if the lead was recommended by an affiliate)
   usuario_que_indicou_id,
+  flg_atende_cidade,
+  flg_atende_latlng,
+  flg_atende_location,
   now() as load_timestamp
 FROM
   public.lead l

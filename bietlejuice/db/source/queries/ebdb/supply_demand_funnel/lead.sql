@@ -70,7 +70,13 @@ select  -- count(1)
     when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
     then SUBSTRING_INDEX(infosExtras,';',1)
     else NULL
-  end as reprocessed_lead_id
+  end as reprocessed_lead_id,
+  (region.city is not null) as flg_atende_cidade,
+  (poligons.id is not null) as flg_atende_latlng,
+  case  when l.lat is null and region.city is null then 0
+  		when l.lat is null and region.city is not null then 1
+  		when poligons.id is null then 0
+  	   else 1 end as flg_atende_location
 from
   Lead l
 left join
@@ -102,6 +108,63 @@ left join
  left join
    Usuario ua
    on da.id=ua.dadosAfiliado_id
- left join vw_lead_reason lr
-      	on l.reason = lr.reason_detail
+ left join
+ 	vw_lead_reason lr
+     	on l.reason = lr.reason_detail
+ left join
+ 	(
+	 	select
+			LOWER(TRIM(REPLACE(r.nome, ' ', ''))) as city,
+			criadaEm as dt_start,
+			coalesce(from_unixtime(ure.`timestamp`/1000), timestamp('2099-12-31')) as dt_end
+		from
+			Regiao r
+		 left join
+		 	Regiao_AUD r_aud
+		 	on  r_aud.REVTYPE = 2
+		 		and r_aud.id = r.id
+		 left join UsuarioRevisionEntity ure
+			on 	r_aud.REV = ure.id
+		where  r.nivel = 'Cidade'
+	) region
+	on region.city = LOWER(TRIM(REPLACE(l.cidade, ' ', '')))
+		and l.criadoEm between region.dt_start and region.dt_end
+left join
+	(
+		select
+			pr.id,
+			pr.poligono,
+			coalesce(pr_aud_st.dt_start, timestamp('2001-01-01')) as dt_start,
+			coalesce(pr_aud_en.dt_end, timestamp('2099-12-31')) as dt_end
+		from
+			PoligonoRegiao pr
+		join
+			Regiao r
+		on r.id = pr.regiao_id
+			and r.nivel = 'SubRegiao'
+		left join
+			(
+			select aud_st.id, min(from_unixtime(user_rev.`timestamp`/1000)) dt_start from
+				PoligonoRegiao_AUD aud_st
+			left join UsuarioRevisionEntity user_rev
+				on user_rev.id = aud_st.rev
+			where aud_st.REVTYPE = 0
+			group by 1
+			) pr_aud_st
+		on pr.id = pr_aud_st.id
+		left join
+			(
+				select aud_en.id , max(from_unixtime(user_rev.`timestamp`/1000)) dt_end
+				from
+					PoligonoRegiao_AUD aud_en
+				left join UsuarioRevisionEntity user_rev
+					on user_rev.id = aud_en.rev
+				where aud_en.REVTYPE = 2
+					group by 1
+			) pr_aud_en
+		on pr.id = pr_aud_en.id
+	) poligons
+on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
+    and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end
+	and ST_Contains(poligons.poligono, Point(l.lng, l.lat)) = 1
 where DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
