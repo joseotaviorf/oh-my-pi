@@ -73,7 +73,8 @@ select  -- count(1)
   end as reprocessed_lead_id,
   (region.city is not null) as flg_city_served,
   (poligons.id is not null) as flg_latlng_served,
-  case  when l.lat is null and region.city is null then 0
+  case  when date(coalesce(l.criadoEm, '1900-01-01 00:00:00')) < date('2018-08-01') then 1
+        when l.lat is null and region.city is null then 0
   		when l.lat is null and region.city is not null then 1
   		when poligons.id is null then 0
   	   else 1 end as flg_location_served,
