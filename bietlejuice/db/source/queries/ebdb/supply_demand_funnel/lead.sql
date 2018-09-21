@@ -76,7 +76,8 @@ select  -- count(1)
   case  when l.lat is null and region.city is null then 0
   		when l.lat is null and region.city is not null then 1
   		when poligons.id is null then 0
-  	   else 1 end as flg_atende_location
+  	   else 1 end as flg_atende_location,
+  (infosExtras like '%source=b2b_%') as flg_b2b
 from
   Lead l
 left join

@@ -71,7 +71,8 @@ CREATE TABLE public.lead
   reprocessed_lead_id  bigint,
   flg_atende_cidade boolean,
   flg_atende_latlng boolean,
-  flg_atende_location boolean
+  flg_atende_location boolean,
+  flg_b2b boolean
 )
 WITH (
   OIDS=FALSE

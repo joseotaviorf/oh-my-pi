@@ -27,7 +27,7 @@ base_leads as (
 		utm_source,
 		utm_medium,
 		coalesce((lower(trim(utm_campaign))  ~* '(institucional)|(branded)'), false) as branded_lead,
-		codigo_imobiliaria is not null as b2b_lead,
+		(codigo_imobiliaria is not null or flg_b2b) as b2b_lead,
 		case
 			when origem='Reprocessado' then reprocessed_lead_id
 			else null
