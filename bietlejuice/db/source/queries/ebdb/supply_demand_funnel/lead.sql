@@ -77,7 +77,7 @@ select  -- count(1)
   		when l.lat is null and region.city is not null then 1
   		when poligons.id is null then 0
   	   else 1 end as flg_location_served,
-  (infosExtras like '%source=b2b_%') as flg_b2b
+  coalesce(infosExtras like '%source=b2b_%', 0) as flg_b2b
 from
   Lead l
 left join
