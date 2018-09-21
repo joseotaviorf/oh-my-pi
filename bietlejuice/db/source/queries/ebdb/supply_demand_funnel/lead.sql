@@ -140,8 +140,8 @@ left join
 			PoligonoRegiao pr
 		join
 			Regiao r
-		on r.id = pr.regiao_id
-			and r.nivel = 'SubRegiao'
+		on r.nivel = 'SubRegiao'
+			and r.id = pr.regiao_id
 		left join
 			(
 			select aud_st.id, min(from_unixtime(user_rev.`timestamp`/1000)) dt_start from
@@ -164,7 +164,7 @@ left join
 			) pr_aud_en
 		on pr.id = pr_aud_en.id
 	) poligons
-on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
-    and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end
-	and ST_Contains(poligons.poligono, Point(l.lng, l.lat)) = 1
+    on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
+        and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end
+	    and ST_Contains(poligons.poligono, Point(l.lng, l.lat)) = 1
 where DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

@@ -2,6 +2,7 @@ DROP VIEW if exists public.vw_dim_lead;
 
 CREATE VIEW public.vw_dim_lead as
  select
+  distinct
   id as sk_lead,
   id,
   anuncio_criado_em,
