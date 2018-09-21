@@ -33,10 +33,10 @@ class AsteriskIVREntries(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('ivr_id', int),
+            ('ivr_id', str),
             ('selection', str),
             ('destination', str),
-            ('ivr_ret', int)
+            ('ivr_ret', str)
         ])
 
         self._move_to_clean_full(

@@ -16,6 +16,7 @@ SELECT
 	flg_other_reason_negative,
 	flg_agent_late,
 	flg_agent_with_no_info,
+	dt_rating,
     now() as dt_timestamp
 FROM
   public.agent_review ;

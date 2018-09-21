@@ -36,13 +36,13 @@ class AsteriskDevices(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('id', int),
+            ('id', str),
             ('tech', str),
             ('dial', str),
             ('device_type', str),
-            ('user_id', int),
+            ('user_id', str),
             ('description', str),
-            ('emergency_cid', int)
+            ('emergency_cid', str)
         ])
 
         self._move_to_clean_full(

@@ -13,7 +13,8 @@ select
 	coalesce(max(rl.label = 'Outro motivo (por favor, conte abaixo)'
 		and rl.ratingReference <= 3), 0) as flg_other_reason_negative,
 	coalesce(max(rl.label = 'Corretor se atrasou'), 0) as flg_agent_late,
-	coalesce(max(rl.label = 'Corretor sem informações'), 0) as flg_agent_with_no_info
+	coalesce(max(rl.label = 'Corretor sem informações'), 0) as flg_agent_with_no_info,
+    r.criadoEm as dt_rating
 from Visita v
 join Usuario u
     on u.id = v.visitante_id
