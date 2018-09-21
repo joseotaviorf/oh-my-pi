@@ -1,7 +1,7 @@
 select
-  cast(id as integer) as id,
+  id,
   keyword,
   data,
-  cast(flags as integer) as flags
+  flags
 from datalake_raw.asterisk_queues_details
 ;

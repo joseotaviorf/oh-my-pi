@@ -49,7 +49,7 @@ class AsteriskUsers(Asterisk):
             ('password', str),
             ('name', str),
             ('voicemail', str),
-            ('ring_timer', int),
+            ('ring_timer', str),
             ('no_answer', str),
             ('recording', str),
             ('outbound_cid', str),

@@ -41,18 +41,18 @@ class AsteriskCXPanelUsers(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('cxpanel_user_id', int),
-            ('user_id', int),
+            ('cxpanel_user_id', str),
+            ('user_id', str),
             ('display_name', str),
             ('peer', str),
-            ('add_extension', int),
-            ('full', int),
-            ('add_user', int),
+            ('add_extension', str),
+            ('full', str),
+            ('add_user', str),
             ('hashed_password', str),
             ('initial_password', str),
-            ('auto_answer', int),
-            ('parent_user_id', int),
-            ('password_dirty', int)
+            ('auto_answer', str),
+            ('parent_user_id', str),
+            ('password_dirty', str)
         ])
 
         self._move_to_clean_full(
