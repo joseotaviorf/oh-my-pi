@@ -67,8 +67,8 @@ CREATE TABLE public.dim_lead (
   utm_campaign VARCHAR(255),
   network VARCHAR(255),
   usuario_que_indicou_id VARCHAR(255),
-  flg_atende_cidade boolean,
-  flg_atende_latlng boolean,
-  flg_atende_location boolean,
+  flg_city_served boolean,
+  flg_latlng_served boolean,
+  flg_location_served boolean,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE
 ) ;

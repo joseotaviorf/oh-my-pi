@@ -69,9 +69,9 @@ CREATE TABLE public.lead
   usuario_que_indicou_id character varying(100) DEFAULT NULL::character varying,
   codigo_imobiliaria character varying(100) DEFAULT NULL::character varying,
   reprocessed_lead_id  bigint,
-  flg_atende_cidade boolean,
-  flg_atende_latlng boolean,
-  flg_atende_location boolean,
+  flg_city_served boolean,
+  flg_latlng_served boolean,
+  flg_location_served boolean,
   flg_b2b boolean
 )
 WITH (
