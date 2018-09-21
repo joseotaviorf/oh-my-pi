@@ -115,7 +115,7 @@ left join
 left join
  	(
 	 	select
-			LOWER(TRIM(REPLACE(r.nome, ' ', ''))) as city,
+			LOWER(REPLACE(r.nome, ' ', '')) as city,
 			criadaEm as dt_start,
 			coalesce(from_unixtime(ure.`timestamp`/1000), timestamp('2099-12-31')) as dt_end
 		from
@@ -128,42 +128,39 @@ left join
 			on 	r_aud.REV = ure.id
 		where  r.nivel = 'Cidade'
 	) region
-	on region.city = LOWER(TRIM(REPLACE(l.cidade, ' ', '')))
+	on region.city = LOWER(REPLACE(l.cidade, ' ', ''))
 		and l.criadoEm between region.dt_start and region.dt_end
 left join
 	(
 		select
-			pr.id,
-			pr.poligono,
-			coalesce(pr_aud_st.dt_start, timestamp('2001-01-01')) as dt_start,
-			coalesce(pr_aud_en.dt_end, timestamp('2099-12-31')) as dt_end
-		from
-			PoligonoRegiao pr
-		join
-			Regiao r
-		    on r.nivel = 'SubRegiao'
-			    and r.id = pr.regiao_id
-		left join
-			(
-			select aud_st.id, min(from_unixtime(user_rev.`timestamp`/1000)) dt_start from
-				PoligonoRegiao_AUD aud_st
-			left join UsuarioRevisionEntity user_rev
-				on user_rev.id = aud_st.rev
-			where aud_st.REVTYPE = 0
-			group by 1
-			) pr_aud_st
-		    on pr.id = pr_aud_st.id
-		left join
-			(
-				select aud_en.id , max(from_unixtime(user_rev.`timestamp`/1000)) dt_end
-				from
-					PoligonoRegiao_AUD aud_en
-				left join UsuarioRevisionEntity user_rev
-					on user_rev.id = aud_en.rev
-				where aud_en.REVTYPE = 2
-					group by 1
-			) pr_aud_en
-		    on pr.id = pr_aud_en.id
+            pr.id,
+            pr.poligono,
+            coalesce(from_unixtime(min_ure.`timestamp`/1000), timestamp('2001-01-01')) as dt_start,
+            coalesce(from_unixtime(max_ure.`timestamp`/1000), timestamp('2099-12-31')) as dt_end
+        from
+            PoligonoRegiao pr
+        join
+            Regiao r
+            on r.nivel = 'SubRegiao'
+                and r.id = pr.regiao_id
+        left join
+            (
+                select
+                    aud_en.id,
+                    aud_en.REVTYPE,
+                    min(aud_en.REV) as min_rev,
+                    max(aud_en.REV) as max_rev
+                from
+                    PoligonoRegiao_AUD aud_en
+                group by 1, 2
+            ) p_aud
+            on p_aud.id = pr.id
+        left join UsuarioRevisionEntity min_ure
+            on p_aud.REVTYPE = 0
+            and min_ure.id = p_aud.min_rev
+        left join UsuarioRevisionEntity max_ure
+            on p_aud.REVTYPE = 2
+            and max_ure.id = p_aud.max_rev
 	) poligons
     on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
         and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end
