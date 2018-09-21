@@ -105,13 +105,13 @@ left join
 left join
   DadosAfiliado da
   on da.id = l.afiliadoQueIndicou_id
- left join
+left join
    Usuario ua
    on da.id=ua.dadosAfiliado_id
- left join
+left join
  	vw_lead_reason lr
      	on l.reason = lr.reason_detail
- left join
+left join
  	(
 	 	select
 			LOWER(TRIM(REPLACE(r.nome, ' ', ''))) as city,
@@ -140,8 +140,8 @@ left join
 			PoligonoRegiao pr
 		join
 			Regiao r
-		on r.nivel = 'SubRegiao'
-			and r.id = pr.regiao_id
+		    on r.nivel = 'SubRegiao'
+			    and r.id = pr.regiao_id
 		left join
 			(
 			select aud_st.id, min(from_unixtime(user_rev.`timestamp`/1000)) dt_start from
@@ -151,7 +151,7 @@ left join
 			where aud_st.REVTYPE = 0
 			group by 1
 			) pr_aud_st
-		on pr.id = pr_aud_st.id
+		    on pr.id = pr_aud_st.id
 		left join
 			(
 				select aud_en.id , max(from_unixtime(user_rev.`timestamp`/1000)) dt_end
@@ -162,7 +162,7 @@ left join
 				where aud_en.REVTYPE = 2
 					group by 1
 			) pr_aud_en
-		on pr.id = pr_aud_en.id
+		    on pr.id = pr_aud_en.id
 	) poligons
     on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
         and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end

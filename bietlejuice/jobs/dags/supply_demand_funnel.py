@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -26,8 +25,8 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
 PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
-MAIN_DAG_NAME = 'bi-supply-demand-etl'
-MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
+MAIN_DAG_NAME = 'bi-supply-demand-etl-test-lead-5'
+MAIN_START_DATE = datetime(2018, 9, 19, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 5 * * *'
 
 # create main DAG definition
@@ -35,7 +34,8 @@ main_dag = BaseDAG.build_dag(
     dag_id=MAIN_DAG_NAME,
     description='ETL pipeline for the entire BI funnel',
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    catchup=True
 )
 
 
@@ -195,48 +195,50 @@ def xcom_fact_demand_task(**kwargs):
     xcom.xcom_push(kwargs['ti'], exec_date)
 
 
-ods_house_rent_flow = BaseDAG.build_quintoandar_python_operator(
-    task_id='ODS_house_rent_flow',
-    dag=main_dag,
-    python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'house_rent_flow'}
-)
-
-ods_supply = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='ODS_supply',
-    provide_context=True,
-    python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'fact_supply'}
-)
-
-fact_supply = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='DW_Fact_Supply',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-)
-
-fact_photo_job = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='DW_fact_photo_job',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-)
-
-fact_demand = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='DW_fact_demand',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket}
-)
-
-fact_house_status = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='DW_fact_house_status',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'house_status', 'is_fact': True, 'bucket': bucket}
-)
+#
+#
+# ods_house_rent_flow = BaseDAG.build_quintoandar_python_operator(
+#     task_id='ODS_house_rent_flow',
+#     dag=main_dag,
+#     python_callable=extract_query_dim_from_ebdb_to_ods,
+#     op_kwargs={'table_name': 'house_rent_flow'}
+# )
+#
+# ods_supply = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='ODS_supply',
+#     provide_context=True,
+#     python_callable=extract_query_dim_from_ebdb_to_ods,
+#     op_kwargs={'table_name': 'fact_supply'}
+# )
+#
+# fact_supply = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='DW_Fact_Supply',
+#     python_callable=load_dim_from_ods_to_dw,
+#     op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+# )
+#
+# fact_photo_job = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='DW_fact_photo_job',
+#     python_callable=load_dim_from_ods_to_dw,
+#     op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+# )
+#
+# fact_demand = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='DW_fact_demand',
+#     python_callable=load_dim_from_ods_to_dw,
+#     op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket}
+# )
+#
+# fact_house_status = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='DW_fact_house_status',
+#     python_callable=load_dim_from_ods_to_dw,
+#     op_kwargs={'dim_name': 'house_status', 'is_fact': True, 'bucket': bucket}
+# )
 
 # flow
 lead_dag = BaseSubDag.get_sub_dag_operator(
@@ -244,88 +246,88 @@ lead_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=lead_sub_dag,
     sub_dag_name='Lead'
 )
-
-photo_job_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=photo_job_sub_dag,
-    sub_dag_name='PhotoJob'
-)
-
-region_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=region_sub_dag,
-    sub_dag_name='Region'
-)
-
-user_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=user_sub_dag,
-    sub_dag_name='User'
-)
-
-house_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=house_sub_dag,
-    sub_dag_name='Property'
-)
-
-visit_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=visit_sub_dag,
-    sub_dag_name='Visit'
-)
-
-offer_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=offer_sub_dag,
-    sub_dag_name='Offer'
-)
-
-proposal_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=proposal_sub_dag,
-    sub_dag_name='Proposal'
-)
-
-contract_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=contract_sub_dag,
-    sub_dag_name='Contract'
-)
-
-booking_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=booking_sub_dag,
-    sub_dag_name='Booking'
-)
-
-xcom_fact_demand = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='XCom_fact_demand',
-    python_callable=xcom_fact_demand_task,
-    provide_context=True
-)
-
-refresh_supply = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Supply',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
-)
-
-refresh_demand = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Demand',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Demand'}
-)
-
-ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
-fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                          user_dag, house_dag, ods_house_rent_flow])
-
-airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
-fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
-house_dag >> fact_photo_job
-photo_job_dag >> fact_photo_job
-house_dag >> fact_house_status
+#
+# photo_job_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=photo_job_sub_dag,
+#     sub_dag_name='PhotoJob'
+# )
+#
+# region_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=region_sub_dag,
+#     sub_dag_name='Region'
+# )
+#
+# user_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=user_sub_dag,
+#     sub_dag_name='User'
+# )
+#
+# house_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=house_sub_dag,
+#     sub_dag_name='Property'
+# )
+#
+# visit_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=visit_sub_dag,
+#     sub_dag_name='Visit'
+# )
+#
+# offer_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=offer_sub_dag,
+#     sub_dag_name='Offer'
+# )
+#
+# proposal_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=proposal_sub_dag,
+#     sub_dag_name='Proposal'
+# )
+#
+# contract_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=contract_sub_dag,
+#     sub_dag_name='Contract'
+# )
+#
+# booking_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=booking_sub_dag,
+#     sub_dag_name='Booking'
+# )
+#
+# xcom_fact_demand = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='XCom_fact_demand',
+#     python_callable=xcom_fact_demand_task,
+#     provide_context=True
+# )
+#
+# refresh_supply = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='Refresh_PowerBI_Supply',
+#     python_callable=refresh_powerbi,
+#     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
+# )
+#
+# refresh_demand = BaseDAG.build_quintoandar_python_operator(
+#     dag=main_dag,
+#     task_id='Refresh_PowerBI_Demand',
+#     python_callable=refresh_powerbi,
+#     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Demand'}
+# )
+#
+# ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
+# fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+#                           user_dag, house_dag, ods_house_rent_flow])
+#
+# airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
+# fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
+# house_dag >> fact_photo_job
+# photo_job_dag >> fact_photo_job
+# house_dag >> fact_house_status
