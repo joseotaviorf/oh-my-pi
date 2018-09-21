@@ -33,10 +33,10 @@ class AsteriskQueuesDetails(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('id', int),
+            ('id', str),
             ('keyword', str),
             ('data', str),
-            ('flags', int)
+            ('flags', str)
         ])
 
         self._move_to_clean_full(

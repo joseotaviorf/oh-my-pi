@@ -33,10 +33,10 @@ class AsteriskCXPanelQueues(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('cxpanel_queue_id', int),
-            ('queue_id', int),
+            ('cxpanel_queue_id', str),
+            ('queue_id', str),
             ('display_name', str),
-            ('add_queue', int)
+            ('add_queue', str)
         ])
 
         self._move_to_clean_full(
