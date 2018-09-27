@@ -1,3 +1,4 @@
+import abc
 from datetime import datetime
 
 import s3fs
@@ -5,7 +6,9 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import logger, _logger
 
 
-class StitchTransferRaw(object):
+class StitchTransferRawTemplate(object):
+    __metaclass__ = abc.ABCMeta
+
     @logger
     def __init__(self, bucket, execution_date, integration, database, table, date_field):
         self.athena = AthenaClient(bucket)
@@ -16,18 +19,23 @@ class StitchTransferRaw(object):
         self.table = table
         self.date_field = date_field
         self.source_key = "raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
-        self.base_query = """
-            SELECT *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
-            FROM {database}.{table}
-            limit 10
-        """
 
-    def _build_query(self):
-        return self.base_query.format(
-            date_field=self.date_field,
-            database=self.database,
-            table=self.table
-        )
+    def execute(self):
+        query = self.build_query()
+        df = self._fetch_data(query)
+        self.copy_files(df)
+
+    @abc.abstractmethod
+    def build_query(self):
+        pass
+
+    @abc.abstractmethod
+    def copy_files(self, df):
+        pass
+
+    @abc.abstractmethod
+    def build_key(self, _date, account):
+        pass
 
     @logger
     def _fetch_data(self, query):

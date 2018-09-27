@@ -129,7 +129,11 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_demand_retargeting_ads`(
   `creative` struct<
     id:string,
     creative_id:string
-  > COMMENT 'from deserializer')
+  >
+)
+PARTITIONED BY (
+  `dt` string
+)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (

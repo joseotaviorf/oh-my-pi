@@ -124,6 +124,9 @@ CREATE EXTERNAL TABLE stitch.adwords_campaign_performance_report (
   contentimprshare double,
   bidstrategyid int
 )
+PARTITIONED BY (
+  `dt` string
+)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (

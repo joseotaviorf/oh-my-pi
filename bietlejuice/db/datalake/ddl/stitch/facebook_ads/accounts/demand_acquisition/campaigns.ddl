@@ -16,8 +16,12 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_demand_acquisition_campaigns`(
       struct<id:string>
     >
   >,
-  `_sdc_extracted_at` string)
-ROW FORMAT SERDE 
+  `_sdc_extracted_at` string
+)
+PARTITIONED BY (
+  `dt` string
+)
+ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
   'ignore.malformed.json' = 'true'

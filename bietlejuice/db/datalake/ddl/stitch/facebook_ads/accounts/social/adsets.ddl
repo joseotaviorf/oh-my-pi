@@ -112,7 +112,11 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_social_adsets`(
   `start_time` string,
   `account_id` string,
   `_sdc_batched_at` string,
-  `_sdc_extracted_at` string)
+  `_sdc_extracted_at` string
+)
+PARTITIONED BY (
+  `dt` string
+)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (

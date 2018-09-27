@@ -1,29 +1,29 @@
-CREATE EXTERNAL TABLE stitch.adwords_campaigns (
-  startdate string,
-  servingstatus string,
-  settings array<
-     struct<
-      `setting.type`: string,
-      positivegeotargettype: string,
-      negativegeotargettype: string,
+CREATE EXTERNAL TABLE stitch.`adwords_campaigns`(
+  `startdate` string,
+  `servingstatus` string,
+  `settings` array<
+    struct<
+      `setting.type`:string,
+      positivegeotargettype:string,
+      negativegeotargettype:string,
       details:array<
         struct<
-          targetall: boolean,
-          criteriontypegroup: string
+          targetall:boolean,
+          criteriontypegroup:string
         >
       >
     >
   >,
-  id int,
-  campaigntrialtype string,
-  name string,
+  `id` int,
+  `campaigntrialtype` string,
+  `name` string,
   `_sdc_table_version` int,
-  labels array<
+  `labels` array<
     struct<
-      id:int,
-      status:string,
+      id:bigint,
+      `status`:string,
       name:string,
-      attribute: struct<
+      attribute:struct<
         `labelattribute.type`:string,
         backgroundcolor:string,
         description:string
@@ -31,19 +31,22 @@ CREATE EXTERNAL TABLE stitch.adwords_campaigns (
       `label.type`:string
     >
   >,
-  status string,
+  `status` string,
   `_sdc_received_at` string,
   `_sdc_sequence` bigint,
-  conversionoptimizereligibility string,
-  frequencycap string,
-  basecampaignid int,
-  adservingoptimizationstatus string,
+  `conversionoptimizereligibility` string,
+  `frequencycap` string,
+  `basecampaignid` int,
+  `adservingoptimizationstatus` string,
   `_sdc_customer_id` string,
   `_sdc_batched_at` string,
-  networksetting string,
-  enddate string,
+  `networksetting` string,
+  `enddate` string,
   `_sdc_extracted_at` string,
-  advertisingchanneltype string
+  `advertisingchanneltype` string
+)
+PARTITIONED BY (
+  `dt` string
 )
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
@@ -51,4 +54,4 @@ WITH SERDEPROPERTIES (
   'ignore.malformed.json'='true'
 )
 LOCATION
-  's3://5a-datalake/stitch_data/adwords/campaigns.ddl/';
+  's3://5a-datalake/stitch_data/adwords/campaigns/';
