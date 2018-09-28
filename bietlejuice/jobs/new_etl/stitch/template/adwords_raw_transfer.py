@@ -16,7 +16,6 @@ class AdWordsTransferRaw(StitchTransferRawTemplate):
         self.base_query = """
             SELECT *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
             FROM {database}.{table}
-            LIMIT 10
         """
 
     def build_query(self):
@@ -52,7 +51,7 @@ class AdWordsTransferRaw(StitchTransferRawTemplate):
             account_df = df.query("account == '{}'".format(account))
             normalized_account = self.__normalize_account_name(account)
             _logger.info("m=copy_files, account={}".format(normalized_account))
-            self.__split_by_date(account_df, date_group, account)
+            self.__split_by_date(account_df, date_group, normalized_account)
 
     def __split_by_date(self, df, date_group, account):
         for _date in date_group:
@@ -69,14 +68,3 @@ class AdWordsTransferRaw(StitchTransferRawTemplate):
             return normalized_string[1:].lower()
         return normalized_string.lower()
 
-
-if __name__ == '__main__':
-    adwords = AdWordsTransferRaw(
-        '5a-datalake-leo-test',
-        datetime.now(),
-        'adwords',
-        'stitch',
-        'campaigns',
-        'startdate'
-    )
-    adwords.execute()

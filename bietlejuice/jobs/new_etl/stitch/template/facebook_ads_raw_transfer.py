@@ -53,15 +53,3 @@ class FacebookAdsTransferRaw(StitchTransferRawTemplate):
                 _logger.info("m=copy_files, msg=group records by account and date, date='{}'".format(_date))
                 self._move_files_to_raw(new_df, formatted_key)
 
-
-if __name__ == '__main__':
-    face = FacebookAdsTransferRaw(
-        bucket="5a-leo-test-datalake",
-        execution_date=datetime.now(),
-        integration='facebook_ads',
-        database='stitch',
-        table='ads',
-        date_field='created_time',
-        accounts=['demand_acquisition', 'supply_affiliates', 'social']
-    )
-    face.execute()
