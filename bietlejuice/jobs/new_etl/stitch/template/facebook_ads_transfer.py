@@ -3,14 +3,15 @@ from datetime import datetime
 
 from qa_python_utils.default_logger import logger, _logger
 
-from bietlejuice.jobs.new_etl.stitch.stitch_transfer_raw_template import StitchTransferRawTemplate
+from bietlejuice.jobs.new_etl.stitch.stitch_transfer_template import StitchTransferRawTemplate
 
 
-class FacebookAdsTransferRaw(StitchTransferRawTemplate):
+class FacebookAdsTransfer(StitchTransferRawTemplate):
 
     @logger
-    def __init__(self, bucket, execution_date, integration, database, table, date_field, accounts):
-        super(FacebookAdsTransferRaw, self).__init__(bucket, execution_date, integration, database, table, date_field)
+    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key, accounts):
+        super(FacebookAdsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field,
+                                                  source_key)
         self.accounts = accounts
         self.facebook_table = ""
         self.base_query = """
@@ -32,7 +33,7 @@ class FacebookAdsTransferRaw(StitchTransferRawTemplate):
         return "union all".join(queries)
 
     def build_key(self, _date, account):
-        return "raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl".format(
+        return "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl".format(
             integration=self.integration,
             table=self.table,
             account=account,
@@ -52,4 +53,3 @@ class FacebookAdsTransferRaw(StitchTransferRawTemplate):
                 formatted_key = self.build_key(_date, account)
                 _logger.info("m=copy_files, msg=group records by account and date, date='{}'".format(_date))
                 self._move_files_to_raw(new_df, formatted_key)
-

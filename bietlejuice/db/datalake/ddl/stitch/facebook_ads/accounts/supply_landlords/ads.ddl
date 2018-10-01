@@ -9,7 +9,7 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
     >
   >,
   `effective_status` string,
-  `bid_info` struct<actions:int>,
+  `bid_info` struct<actions:string>,
   `targeting` struct<
     excluded_custom_audiences: array<
       struct<
@@ -20,7 +20,7 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
     facebook_positions: array<string>,
     instagram_positions: array<string>,
     publisher_platforms: array<string>,
-    age_min: int,
+    age_min: string,
     device_platforms: array<string>,
     geo_locations: struct<
       location_types: array<string>,
@@ -30,7 +30,7 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
           distance_unit:string,
           name:string,
           region_id:string,
-          radius:int,
+          radius:string,
           key:string,
           country:string
         >
@@ -38,16 +38,16 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
       custom_locations: array<
         struct<
           distance_unit:string,
-          primary_city_id:int,
-          region_id:int,
-          radius:int,
-          longitude:double,
-          latitude:double,
+          primary_city_id:string,
+          region_id:string,
+          radius:string,
+          longitude:string,
+          latitude:string,
           country:string
         >
       >
     >,
-    age_max:int,
+    age_max:string,
     messenger_positions:array<string>,
     audience_network_positions:array<string>,
     user_device:array<string>,
@@ -57,11 +57,11 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
       custom_locations:array<
         struct<
           distance_unit:string,
-          primary_city_id:int,
-          region_id:int,
-          radius:int,
-          longitude:double,
-          latitude:double,
+          primary_city_id:string,
+          region_id:string,
+          radius:string,
+          longitude:string,
+          latitude:string,
           country:string
         >
       >
@@ -112,16 +112,16 @@ CREATE EXTERNAL TABLE stitch.`facebook_ads_supply_landlords_ads`(
   >,
   `source_ad_id` string,
   `updated_time` string,
-  `bid_amount` int,
+  `bid_amount` string,
   `id` string,
   `adset_id` string,
   `bid_type` string,
   `name` string,
-  `_sdc_table_version` int,
+  `_sdc_table_version` string,
   `created_time` string,
   `status` string,
   `_sdc_received_at` string,
-  `_sdc_sequence` bigint,
+  `_sdc_sequence` string,
   `last_updated_by_app_id` string,
   `account_id` string,
   `_sdc_batched_at` string,

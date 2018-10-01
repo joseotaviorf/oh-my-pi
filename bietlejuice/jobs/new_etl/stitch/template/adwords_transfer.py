@@ -1,17 +1,18 @@
-import re
 import time
 import unicodedata
 from datetime import datetime
 
+import re
 from qa_python_utils.default_logger import logger, _logger
 
-from bietlejuice.jobs.new_etl.stitch.stitch_transfer_raw_template import StitchTransferRawTemplate
+from bietlejuice.jobs.new_etl.stitch.stitch_transfer_template import StitchTransferRawTemplate
 
 
-class AdWordsTransferRaw(StitchTransferRawTemplate):
-    def __init__(self, bucket, execution_date, integration, database, table, date_field):
-        super(AdWordsTransferRaw, self).__init__(bucket, execution_date, integration, database, table, date_field)
-        self.adwords_table = self.table
+class AdWordsTransfer(StitchTransferRawTemplate):
+    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key):
+        super(AdWordsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field,
+                                              source_key)
+        self.adwords_table = table
         self.table = "{}_{}".format(self.integration, self.table)
         self.base_query = """
             SELECT *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
@@ -67,4 +68,3 @@ class AdWordsTransferRaw(StitchTransferRawTemplate):
         if normalized_string.startswith("_"):
             return normalized_string[1:].lower()
         return normalized_string.lower()
-

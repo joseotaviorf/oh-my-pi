@@ -8,19 +8,19 @@ CREATE EXTERNAL TABLE stitch.`adwords_campaigns`(
       negativegeotargettype:string,
       details:array<
         struct<
-          targetall:boolean,
+          targetall:string,
           criteriontypegroup:string
         >
       >
     >
   >,
-  `id` int,
+  `id` string,
   `campaigntrialtype` string,
   `name` string,
-  `_sdc_table_version` int,
+  `_sdc_table_version` string,
   `labels` array<
     struct<
-      id:bigint,
+      id:string,
       `status`:string,
       name:string,
       attribute:struct<
@@ -33,10 +33,10 @@ CREATE EXTERNAL TABLE stitch.`adwords_campaigns`(
   >,
   `status` string,
   `_sdc_received_at` string,
-  `_sdc_sequence` bigint,
+  `_sdc_sequence` string,
   `conversionoptimizereligibility` string,
   `frequencycap` string,
-  `basecampaignid` int,
+  `basecampaignid` string,
   `adservingoptimizationstatus` string,
   `_sdc_customer_id` string,
   `_sdc_batched_at` string,

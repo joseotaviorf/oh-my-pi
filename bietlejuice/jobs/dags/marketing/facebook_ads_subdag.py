@@ -1,6 +1,6 @@
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl.stitch.template.facebook_ads_raw_transfer import FacebookAdsTransferRaw
+from bietlejuice.jobs.new_etl.stitch.template.facebook_ads_transfer import FacebookAdsTransferRaw
 
 
 class FacebookAdsSubDag(BaseSubDag):
@@ -19,7 +19,9 @@ class FacebookAdsSubDag(BaseSubDag):
             database=self.database,
             table=table,
             date_field=date_field,
-            accounts=self.accounts)
+            accounts=self.accounts,
+            source_key="raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+        )
         transfer.execute()
 
     def build_facebook_tasks(self):

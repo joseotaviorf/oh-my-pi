@@ -10,7 +10,7 @@ class StitchTransferRawTemplate(object):
     __metaclass__ = abc.ABCMeta
 
     @logger
-    def __init__(self, bucket, execution_date, integration, database, table, date_field):
+    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key):
         self.athena = AthenaClient(bucket)
         self.bucket = bucket
         self.execution_date = execution_date
@@ -18,7 +18,7 @@ class StitchTransferRawTemplate(object):
         self.database = database
         self.table = table
         self.date_field = date_field
-        self.source_key = "raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+        self.source_key = source_key
 
     def execute(self):
         query = self.build_query()
@@ -27,15 +27,15 @@ class StitchTransferRawTemplate(object):
 
     @abc.abstractmethod
     def build_query(self):
-        pass
+        raise NotImplementedError('m=build_query, msg=method not implemented')
 
     @abc.abstractmethod
     def copy_files(self, df):
-        pass
+        raise NotImplementedError('m=build_query, msg=method not implemented')
 
     @abc.abstractmethod
     def build_key(self, _date, account):
-        pass
+        raise NotImplementedError('m=build_query, msg=method not implemented')
 
     @logger
     def _fetch_data(self, query):
