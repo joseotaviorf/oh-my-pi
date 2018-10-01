@@ -1,9 +1,8 @@
 from datetime import datetime
 
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
-from qa_python_utils.default_logger import logger, _logger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
@@ -13,11 +12,14 @@ from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingV
 from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
+from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-growth'
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 # create DAG definition
 main_dag = DAG(
@@ -446,6 +448,14 @@ def sub_dag_func_owner_landing_views_bv_users(main_dag_name, sub_dag_name, funne
     return local_dag
 
 
+def refresh_powerbi(**kwargs):
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
+    powerbi_client.trigger_refresh()
+
+
 # supply measures
 leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query, 'leads',
                                      'supply')
@@ -619,8 +629,22 @@ prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with
                                                   placeholders=get_tenants_placeholders()
                                                   )
 
+refresh_growth = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Growth',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Growth'}
+)
+
 # fact append
 fact_append_task = build_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
+
+refresh_growth_tof = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Growth_ToF',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Top-of-Funnel', 'dataset_name': 'Growth ToF'}
+)
 
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
@@ -641,5 +665,5 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
  ongoing_stranded_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >>
  prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >>
  prediction_documentation_sent_sub_dag >> prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >>
- fact_append_task
+ fact_append_task >> refresh_growth >> refresh_growth_tof
  )
