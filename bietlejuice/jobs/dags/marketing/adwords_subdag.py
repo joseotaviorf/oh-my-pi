@@ -1,6 +1,6 @@
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl.stitch.template.adwords_transfer import AdWordsTransferRaw
+from bietlejuice.jobs.new_etl.stitch import AdWordsTransfer
 
 
 class AdWordsSubDag(BaseSubDag):
@@ -11,14 +11,14 @@ class AdWordsSubDag(BaseSubDag):
         self.database = database
 
     def transfer_adwords_files(self, bucket, table, date_field, **kwargs):
-        transfer = AdWordsTransferRaw(
+        transfer = AdWordsTransfer(
             bucket=bucket,
             execution_date=kwargs['execution_date'],
             integration=self.integration,
             database=self.database,
             table=table,
             date_field=date_field,
-            source_key="raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+            source_key="raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
         )
         transfer.execute()
 

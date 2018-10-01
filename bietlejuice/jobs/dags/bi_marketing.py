@@ -4,14 +4,14 @@ from airflow.models import DAG
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags.market_cost.adwords_subdag import AdWordsSubDag
-from bietlejuice.jobs.dags.market_cost.facebook_ads_subdag import FacebookAdsSubDag
+from bietlejuice.jobs.dags.marketing.adwords_subdag import AdWordsSubDag
+from bietlejuice.jobs.dags.marketing.facebook_ads_subdag import FacebookAdsSubDag
 from bietlejuice.jobs.dags.util import environment as env
 
-MAIN_DAG_NAME = 'bi-stitch-raw-transfer'
+MAIN_DAG_NAME = 'bi-marketing'
 MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
-FACEBOOK_ADS_ACCOUNTS = ['demand_acquisition', 'social', 'demand_retargeting', 'supply_affiliates', 'supply_landlords']
+FACEBOOK_ADS_ACCOUNTS = ['demand_acqui2sition', 'social', 'demand_retargeting', 'supply_affiliates', 'supply_landlords']
 STITCH_DATABASE = 'stitch'
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')

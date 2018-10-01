@@ -1,6 +1,6 @@
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl.stitch.template.facebook_ads_transfer import FacebookAdsTransferRaw
+from bietlejuice.jobs.new_etl.stitch import FacebookAdsTransfer
 
 
 class FacebookAdsSubDag(BaseSubDag):
@@ -12,7 +12,7 @@ class FacebookAdsSubDag(BaseSubDag):
         self.accounts = accounts
 
     def transfer_facebook_files(self, bucket, table, date_field, **kwargs):
-        transfer = FacebookAdsTransferRaw(
+        transfer = FacebookAdsTransfer(
             bucket=bucket,
             execution_date=kwargs['execution_date'],
             integration=self.integration,
@@ -20,7 +20,7 @@ class FacebookAdsSubDag(BaseSubDag):
             table=table,
             date_field=date_field,
             accounts=self.accounts,
-            source_key="raw/market_cost/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+            source_key="raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
         )
         transfer.execute()
 
