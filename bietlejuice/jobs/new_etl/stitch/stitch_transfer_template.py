@@ -20,11 +20,6 @@ class StitchTransferRawTemplate(object):
         self.date_field = date_field
         self.source_key = source_key
 
-    def execute(self):
-        query = self.build_query()
-        df = self._fetch_data(query)
-        self.copy_files(df)
-
     @abc.abstractmethod
     def build_query(self):
         raise NotImplementedError('m=build_query, msg=method not implemented')
@@ -38,7 +33,7 @@ class StitchTransferRawTemplate(object):
         raise NotImplementedError('m=build_query, msg=method not implemented')
 
     @logger
-    def _fetch_data(self, query):
+    def fetch_data(self, query):
         _logger.info("m=_fetch_data, msg=building partition from execution_date")
         partition = datetime.strftime(self.execution_date, "%Y-%m-%d")
 

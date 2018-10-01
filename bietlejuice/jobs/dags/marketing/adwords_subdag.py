@@ -20,7 +20,9 @@ class AdWordsSubDag(BaseSubDag):
             date_field=date_field,
             source_key="raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
         )
-        transfer.execute()
+        query = transfer.build_query()
+        df = transfer.fetch_data(query)
+        transfer.copy_files(df)
 
     def build_adwords_tasks(self):
         adwords_dag = self._build_local_dag()
