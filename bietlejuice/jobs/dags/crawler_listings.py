@@ -1,15 +1,17 @@
 from datetime import datetime
 
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_listings import CrawlerListings
+from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'bi-crawler-listings'
 MAIN_START_DATE = datetime(2018, 7, 30)
 MAIN_SCHEDULE_INTERVAL = '0 2 * * 1-6'
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
@@ -27,6 +29,14 @@ def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000, max_batc
     _logger.info('m=transform_crawler_data, finished execution'.format(api_daily_quota))
 
 
+def refresh_powerbi(**kwargs):
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
+    powerbi_client.trigger_refresh()
+
+
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -40,10 +50,19 @@ dag = DAG(
     catchup=False
 )
 
-BaseDAG.build_quintoandar_python_operator(
+crawler_listings = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='transform-crawler-data',
     python_callable=transform_crawler_data,
     op_kwargs={'bucket': s3_bucket, 'api_key': data_google_api_key, 'api_daily_quota': google_maps_max_calls,
                'max_batch_size': _max_batch_size}
 )
+
+refresh_market_index = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='Refresh_PowerBI_MarketIndex',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Top-of-Funnel', 'dataset_name': 'Market Index'}
+)
+
+crawler_listings >> refresh_market_index
