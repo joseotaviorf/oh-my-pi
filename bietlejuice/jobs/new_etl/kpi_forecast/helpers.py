@@ -5,7 +5,9 @@ import pickle
 import boto3
 import botocore
 import pandas as pd
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('kpi-forecast-helpers')
 
 s3 = boto3.resource('s3')
 
@@ -15,7 +17,7 @@ def get_file_from_s3(bucket, file_name_s3, file_name_local):
         s3.Bucket(bucket).download_file(file_name_s3, file_name_local)
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
-            _logger.info("The object does not exist.")
+            logger.info("The object does not exist.")
             return False
         else:
             raise

@@ -1,5 +1,7 @@
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('DimensionETL')
 
 
 class DimensionETL(object):

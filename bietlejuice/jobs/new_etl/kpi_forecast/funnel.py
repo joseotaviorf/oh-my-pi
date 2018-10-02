@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('Funnel')
 
 
 class Funnel:
@@ -73,7 +75,7 @@ class Funnel:
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(
                         step_duration_deduplicated.quantile(q=.99).days, unit='days')
                 else:
-                    _logger.info('no durations for step ' + step + '. using default of 10')
+                    logger.info('no durations for step ' + step + '. using default of 10')
                     self.steps.loc[step, 'q_threshold'] = pd.to_timedelta(10, unit='days')
 
     def __compute_distribs(self):

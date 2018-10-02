@@ -6,7 +6,9 @@ import pandas as pd
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('EBDBDatalake')
 
 
 class EBDBDatalake(object):
@@ -36,7 +38,7 @@ class EBDBDatalake(object):
         now = BaseETL.now()
         db = EnumDB.QuintoAndar_ebdb
 
-        _logger.info('m=move_to_datalake, msg=start query: {}'.format(now))
+        logger.info('m=move_to_datalake, msg=start query: {}'.format(now))
 
         schema = BaseETL.get_columns_schema(EnumDB.QuintoAndar_ebdb, table_name, EBDBDatalake.SCHEMA_NAME, False)
         schema = petl.todataframe(schema)
@@ -62,7 +64,7 @@ class EBDBDatalake(object):
             file_path_suffix=file_path_suffix
         )
 
-        _logger.info('m=move_to_datalake, msg={} moved to Datalake!'.format(table_name))
+        logger.info('m=move_to_datalake, msg={} moved to Datalake!'.format(table_name))
 
     @logger
     def __get_data_from_table(self, db, table_name, columns):
@@ -114,7 +116,7 @@ class EBDBDatalake(object):
         self.s3_client.Object(self.bucket_datalake, file_path).put(Body=csv_buffer.getvalue())
 
     def transform_tables_to_clean(self, table_infos):
-        _logger.info('m=transform_tables_to_clean, msg=init')
+        logger.info('m=transform_tables_to_clean, msg=init')
 
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe(

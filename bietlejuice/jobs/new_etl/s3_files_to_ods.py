@@ -3,9 +3,12 @@ from io import BytesIO
 import boto3
 import pandas as pd
 import petl
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.wrappers.S3.S3_file_reader import S3FileReader
-from qa_python_utils.default_logger import logger, _logger
+
+logger = QuintoAndarLogger('S3ToODS')
 
 
 class S3ToODS(object):
@@ -24,16 +27,16 @@ class S3ToODS(object):
                 table = table.where(pd.notnull(table), None)
 
                 table_name = f[1]
-                _logger.info('m=move_files_to_ods, msg=processing table name "{}"'.format(table_name))
+                logger.info('m=move_files_to_ods, msg=processing table name "{}"'.format(table_name))
 
-                _logger.info('m=move_files_to_ods, msg=checking if table exists')
+                logger.info('m=move_files_to_ods, msg=checking if table exists')
                 exists = BaseETL.table_exists(
                     db_enum=EnumDB.BI_ODS,
                     table_name=table_name,
                     schema=self.schema
                 )
                 if not exists:
-                    _logger.info('m=move_files_to_ods, msg=creating table')
+                    logger.info('m=move_files_to_ods, msg=creating table')
                     BaseETL.create_table(
                         conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
                         table=petl.fromdataframe(table),
@@ -42,7 +45,7 @@ class S3ToODS(object):
                         sample=100000
                     )
 
-                _logger.info('m=move_files_to_ods, msg=dataframe_to_ods')
+                logger.info('m=move_files_to_ods, msg=dataframe_to_ods')
                 BaseETL.dataframe_to_ods(
                     df=table,
                     table_name='{}."{}"'.format(self.schema, table_name),
@@ -53,20 +56,20 @@ class S3ToODS(object):
                 self.move_df_to_datalake(df=table, tablename=table_name)
 
             except Exception as ex:
-                _logger.error(ex)
+                logger.error(ex)
 
     @logger(exclude='df')
     def move_df_to_datalake(self, df, tablename):
         csv_buffer = BytesIO()
         df.to_csv(csv_buffer, index=False, sep=';', encoding='utf-8', header=True)
 
-        _logger.info('m=move_df_to_datalake, msg=to_s3 (raw)')
+        logger.info('m=move_df_to_datalake, msg=to_s3 (raw)')
         file_path = '{0}/files/{1}/{1}.csv'.format('raw', tablename)
         self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
 
         # temp storing the same file on "clean" directory
         # in the future, we will need to do some cleansing in data
-        _logger.info('m=move_df_to_datalake, msg=to_s3 (clean)')
+        logger.info('m=move_df_to_datalake, msg=to_s3 (clean)')
         file_path = '{0}/files/{1}/{1}.csv'.format('clean', tablename)
         self.s3_client.Object(self.s3_bucket, file_path).put(Body=csv_buffer.getvalue())
 

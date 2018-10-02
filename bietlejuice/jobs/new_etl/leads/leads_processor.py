@@ -2,13 +2,15 @@ import decimal
 import json
 
 import petl
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 from shapely import wkt
 from shapely.geometry import Point
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR
+
+logger = QuintoAndarLogger('LeadsProcessor')
 
 
 def decimal_default(obj):

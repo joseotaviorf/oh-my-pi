@@ -1,5 +1,8 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('OwnerLandingViews')
 
 
 class OwnerLandingViews(GrowthAmplitude):
