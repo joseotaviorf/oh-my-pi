@@ -1,9 +1,11 @@
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import SOURCE_QUERIES_TESTS_DIR
+
+logger = QuintoAndarLogger('DimSubDag')
 
 
 class DimSubDag(BaseSubDag):
