@@ -10,7 +10,7 @@ class StitchTransferRawTemplate(object):
     __metaclass__ = abc.ABCMeta
 
     @logger
-    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key):
+    def __init__(self, bucket, execution_date, integration, database, table, date_field):
         self.athena = AthenaClient(bucket)
         self.bucket = bucket
         self.execution_date = execution_date
@@ -18,7 +18,6 @@ class StitchTransferRawTemplate(object):
         self.database = database
         self.table = table
         self.date_field = date_field
-        self.source_key = source_key
 
     @abc.abstractmethod
     def build_query(self):

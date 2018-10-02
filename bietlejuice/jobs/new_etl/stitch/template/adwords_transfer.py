@@ -9,23 +9,27 @@ from bietlejuice.jobs.new_etl.stitch.stitch_transfer_template import StitchTrans
 
 
 class AdWordsTransfer(StitchTransferRawTemplate):
-    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key):
-        super(AdWordsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field,
-                                              source_key)
+    def __init__(self, bucket, execution_date, integration, database, table, date_field):
+        super(AdWordsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field)
         self.adwords_table = table
         self.table = "{}_{}".format(self.integration, self.table)
         self.base_query = """
             SELECT *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
             FROM {database}.{table}
+            WHERE dt = '{partition}'
         """
+        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
 
+    @logger
     def build_query(self):
         return self.base_query.format(
             date_field=self.date_field,
             database=self.database,
-            table=self.table
+            table=self.table,
+            partition=self.execution_date.strftime("%Y-%m-%d")
         )
 
+    @logger
     def build_key(self, _date, account):
         return self.source_key.format(
             integration=self.integration,
@@ -46,10 +50,10 @@ class AdWordsTransfer(StitchTransferRawTemplate):
     @logger(exclude='df')
     def __split_by_account(self, df):
         accounts = df['account'].unique()
-        date_group = df['created_at'].unique()
         _logger.info("m=copy_files, msg=splitting records into accounts and historical data")
         for account in accounts:
             account_df = df.query("account == '{}'".format(account))
+            date_group = account_df['created_at'].unique()
             normalized_account = self.__normalize_account_name(account)
             _logger.info("m=copy_files, account={}".format(normalized_account))
             self.__split_by_date(account_df, date_group, normalized_account)

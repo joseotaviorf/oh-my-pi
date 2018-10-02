@@ -9,15 +9,15 @@ from bietlejuice.jobs.new_etl.stitch.stitch_transfer_template import StitchTrans
 class FacebookAdsTransfer(StitchTransferRawTemplate):
 
     @logger
-    def __init__(self, bucket, execution_date, integration, database, table, date_field, source_key, accounts):
-        super(FacebookAdsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field,
-                                                  source_key)
+    def __init__(self, bucket, execution_date, integration, database, table, date_field, accounts):
+        super(FacebookAdsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field)
         self.accounts = accounts
         self.facebook_table = ""
         self.base_query = """
             SELECT '{account}' as account, *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
             FROM {database}.{table}
         """
+        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
 
     def build_query(self):
         queries = []
@@ -33,7 +33,7 @@ class FacebookAdsTransfer(StitchTransferRawTemplate):
         return "union all".join(queries)
 
     def build_key(self, _date, account):
-        return "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl".format(
+        return self.source_key.format(
             integration=self.integration,
             table=self.table,
             account=account,

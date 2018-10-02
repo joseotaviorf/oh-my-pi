@@ -18,7 +18,6 @@ class AdWordsSubDag(BaseSubDag):
             database=self.database,
             table=table,
             date_field=date_field,
-            source_key="raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
         )
         query = transfer.build_query()
         df = transfer.fetch_data(query)
@@ -38,7 +37,7 @@ class AdWordsSubDag(BaseSubDag):
             op_kwargs={
                 'bucket': self.bucket,
                 'table': 'campaign_performance_report',
-                'date_field': 'startdate'
+                'date_field': 'day'
             }
         )
 
@@ -50,7 +49,7 @@ class AdWordsSubDag(BaseSubDag):
             op_kwargs={
                 'bucket': self.bucket,
                 'table': 'keywords_performance_report',
-                'date_field': 'startdate'
+                'date_field': 'day'
             }
         )
 
@@ -62,7 +61,7 @@ class AdWordsSubDag(BaseSubDag):
             op_kwargs={
                 'bucket': self.bucket,
                 'table': 'click_performance_report',
-                'date_field': 'startdate'
+                'date_field': 'day'
             }
         )
 

@@ -19,8 +19,7 @@ class FacebookAdsSubDag(BaseSubDag):
             database=self.database,
             table=table,
             date_field=date_field,
-            accounts=self.accounts,
-            source_key="raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+            accounts=self.accounts
         )
         query = transfer.build_query()
         df = transfer.fetch_data(query)
