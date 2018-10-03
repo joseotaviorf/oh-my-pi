@@ -93,4 +93,3 @@ class QuintoAndarSlackPythonOperator(PythonOperator):
 class QuintoAndarPlugin(AirflowPlugin):
     name = "quintoandar"
     operators = [QuintoAndarPythonOperator, QuintoAndarSlackPythonOperator]
-
