@@ -1,5 +1,7 @@
+from bietlejuice.jobs.new_etl.crm.tasks.closing import CRMTasksClosing
 from bietlejuice.jobs.new_etl.crm.tasks.credit import CRMTasksCredit
 from bietlejuice.jobs.new_etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnum
+from bietlejuice.jobs.new_etl.crm.tasks.payment import CRMTasksPayment
 from bietlejuice.jobs.new_etl.crm.tasks.visit import CRMTasksVisit
 
 
@@ -21,5 +23,7 @@ class CRMTasksFactory(object):
     def __dispatch_dict(_class):
         return {
             CRMTasksTableEnum.CREDIT: CRMTasksCredit,
-            CRMTasksTableEnum.VISIT: CRMTasksVisit
+            CRMTasksTableEnum.VISIT: CRMTasksVisit,
+            CRMTasksTableEnum.CLOSING: CRMTasksClosing,
+            CRMTasksTableEnum.PAYMENT: CRMTasksPayment
         }.get(_class)
