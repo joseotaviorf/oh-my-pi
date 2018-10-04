@@ -15,32 +15,29 @@ from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
-TODAY = datetime.today()
-
 MAIN_DAG_NAME = 'skynet-recommender'
 MAIN_START_DATE = datetime(2018, 9, 30)
-MAIN_SCHEDULE_INTERVAL = '0 0 * * 1'
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * 1')
 
-SKYNET_BUCKET = '5a-skynet'
+DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
+SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
 SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
 SKYNET_RECOMMENDER_IMAGE = env.get_airflow_env_var('SKYNET_RECOMMENDER_IMAGE')
 SKYNET_RECOMMENDER_KWARGS = env.get_airflow_env_var('SKYNET_RECOMMENDER_KWARGS')
+
 TRAINING_PATH = 'listing2vec/training'
-INPUT_PATH = os.path.join(
-    'listing2vec/data/raw', 'dt={}'.format(TODAY.strftime('%Y-%m-%d')))
-RESULT_PATH = os.path.join(
-    'listing2vec/data/result', 'dt={}'.format(TODAY.strftime('%Y-%m-%d')))
-EMBEDDINGS_PATH = os.path.join(
-    'listing2vec/embeddings/', 'dt={}'.format(TODAY.strftime('%Y-%m-%d')))
+INPUT_PATH = 'listing2vec/data/raw/dt={}'
+RESULT_PATH = 'listing2vec/data/result/dt={}'
+EMBEDDINGS_PATH = 'listing2vec/embeddings/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
-athena = AthenaClient('5a-datalake')
+athena = AthenaClient(DATALAKE_BUCKET)
 
 
 def build_raw_data(**kwargs):
     week_span = kwargs.get('week_span', 12)
 
-    end_date = TODAY
+    end_date = kwargs.get('execution_date') + timedelta(days=7)
     start_date = end_date - timedelta(weeks=week_span)
 
     with open(os.path.join(
@@ -55,7 +52,8 @@ def build_raw_data(**kwargs):
             'm=build_raw_data, start_date={}, end_date={}, '
             'msg=querying raw_data'.format(start_date, end_date))
         rid = athena.execute_query_and_wait_for_results(
-            q, s3_bucket=SKYNET_BUCKET, bucket_folder_path=INPUT_PATH)
+            q, s3_bucket=SKYNET_BUCKET,
+            bucket_folder_path=INPUT_PATH.format(end_date.strftime('%Y-%m-%d')))
 
     with open(os.path.join(
             DATALAKE_QUERIES_DIR,
@@ -64,7 +62,8 @@ def build_raw_data(**kwargs):
 
         logger.info('m=build_raw_data, msg=querying house_info')
         hid = athena.execute_query_and_wait_for_results(
-            q, s3_bucket=SKYNET_BUCKET, bucket_folder_path=INPUT_PATH)
+            q, s3_bucket=SKYNET_BUCKET,
+            bucket_folder_path=INPUT_PATH.format(end_date.strftime('%Y-%m-%d')))
 
     xcom.xcom_push(kwargs.get('ti'), key='rid', k_value=rid)
     xcom.xcom_push(kwargs.get('ti'), key='hid', k_value=hid)
@@ -73,12 +72,13 @@ def build_raw_data(**kwargs):
 def train_model(**kwargs):
     rid = xcom.xcom_pull(kwargs.get('ti'), key='rid', dag_id=MAIN_DAG_NAME)
     hid = xcom.xcom_pull(kwargs.get('ti'), key='hid', dag_id=MAIN_DAG_NAME)
+    exec_date = kwargs.get('execution_date') + timedelta(days=7)
 
     params = kwargs.get('params')
     params.update(
         dict(raw_filename=rid + '.csv', house_info_filename=hid + '.csv'))
 
-    job_name = 'skynet-recommender-' + TODAY.strftime("%Y-%m-%d")
+    job_name = 'skynet-recommender-' + exec_date.strftime("%Y-%m-%d")
     logger.info(
         'm=train_model, job_name={}, params={}'.format(job_name, params))
 
@@ -91,16 +91,21 @@ def train_model(**kwargs):
         hyperparameters=params)
 
     logger.info('m=train_model, starting training...')
-    model.fit('s3://{}/{}'.format(SKYNET_BUCKET, INPUT_PATH), job_name=job_name)
+    model.fit(
+        's3://{}/{}'.format(
+            SKYNET_BUCKET,
+            INPUT_PATH.format(exec_date.strftime('%Y-%m-%d'))),
+        job_name=job_name)
 
     xcom.xcom_push(kwargs.get('ti'), key='job_name', k_value=job_name)
 
 
 def untar_output(**kwargs):
     bucket = boto3.resource('s3').Bucket(SKYNET_BUCKET)
-
     job_name = xcom.xcom_pull(
         kwargs.get('ti'), key='job_name', dag_id=MAIN_DAG_NAME)
+    exec_date = kwargs.get('execution_date') + timedelta(days=7)
+
     model_filename = os.path.join(
         TRAINING_PATH, job_name, 'output/model.tar.gz')
     model_obj = BytesIO(bucket.Object(model_filename).get()['Body'].read())
@@ -111,17 +116,28 @@ def untar_output(**kwargs):
         results = tar.extractfile('results.pkl').read()
 
     logger.info(
-        'm=untar_output, msg=saving embeddings to {}.'.format(EMBEDDINGS_PATH))
-    emb_filename = os.path.join(EMBEDDINGS_PATH, 'embeddings.json')
+        'm=untar_output, msg=saving embeddings to {}.'.format(
+            EMBEDDINGS_PATH.format(exec_date.strftime('%Y-%m-%d'))))
+    emb_filename = os.path.join(
+        EMBEDDINGS_PATH.format(exec_date.strftime('%Y-%m-%d')),
+        'embeddings.json')
     bucket.Object(emb_filename).put(Body=emb)
 
     logger.info(
-        'm=untar_output, msg=saving training result to {}.'.format(RESULT_PATH))
-    results_filename = os.path.join(RESULT_PATH, 'results.pkl')
+        'm=untar_output, msg=saving training result to {}.'.format(
+            RESULT_PATH.format(exec_date.strftime('%Y-%m-%d'))))
+    results_filename = os.path.join(
+        RESULT_PATH.format(exec_date.strftime('%Y-%m-%d')), 'results.pkl')
     bucket.Object(results_filename).put(Body=results)
 
-    athena.msck_repair_table(
-        database='skynet', table_name='listing2vec_embeddings')
+    athena.upsert_single_partition(
+        bucket_folder_path=os.path.join(
+            SKYNET_BUCKET, 'listing2vec/embeddings'),
+        database='skynet',
+        table='listing2vec_embeddings',
+        partition_name='dt',
+        partition_value=exec_date.strftime('%Y-%m-%d')
+    )
 
 
 dag = DAG(
