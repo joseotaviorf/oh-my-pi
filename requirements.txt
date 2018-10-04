@@ -1,6 +1,6 @@
 airflow[mysql,crypto,s3,slack]==1.8.0
-botocore==1.12.16
-boto3==1.9.16
+botocore>=1.12.16
+boto3>=1.9.16
 cffi==1.9.1
 createsend==4.2.6
 cryptography==1.7.1
