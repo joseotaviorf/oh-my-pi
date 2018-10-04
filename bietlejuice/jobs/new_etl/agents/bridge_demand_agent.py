@@ -1,7 +1,10 @@
 import boto3
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('Bridge')
 
 
 class Bridge(object):

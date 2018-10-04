@@ -1,8 +1,11 @@
 from itertools import combinations
 
-from base_etl import BaseETL
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
+
+from base_etl import BaseETL
+
+logger = QuintoAndarLogger('BaseTest')
 
 
 class BaseTest(object):
@@ -50,16 +53,16 @@ class BaseTest(object):
     @logger
     def compare_sources(acceptable_diff, sources_list):
         if sources_list is None:
-            _logger.error('m=compare_sources, msg=sources_list is none')
+            logger.error('m=compare_sources, msg=sources_list is none')
             raise Exception
 
         unique_sources_list = set([elem for elem in sources_list if elem is not None])
         for x, y in combinations(unique_sources_list, 2):
             if x == 0 or float(y) == 0:
-                _logger.warn('m=compare_sources, msg=empty source')
+                logger.warn('m=compare_sources, msg=empty source')
                 raise Exception
             if abs((float(x) / float(y)) - 1) > acceptable_diff:
-                _logger.warn('m=compare_sources, msg=sources are different')
+                logger.warn('m=compare_sources, msg=sources are different')
                 raise Exception
 
     @staticmethod
@@ -72,10 +75,10 @@ class BaseTest(object):
 
         # returns true if has more rows besides the header
         if len(output) > 1:
-            _logger.error('m=check_for_duplicates, msg={} has duplicates'.format(table))
+            logger.error('m=check_for_duplicates, msg={} has duplicates'.format(table))
             raise Exception
 
-        _logger.info('m=check_for_duplicates, msg={} is free from duplicates'.format(table))
+        logger.info('m=check_for_duplicates, msg={} is free from duplicates'.format(table))
 
     @staticmethod
     @logger
@@ -87,14 +90,14 @@ class BaseTest(object):
 
         # returns true if has more rows besides the header
         if output[1][0] == 0:
-            _logger.error('m=is_empty, msg={} is empty'.format(table))
+            logger.error('m=is_empty, msg={} is empty'.format(table))
             raise Exception
 
-        _logger.info('m=is_empty, msg={} is not empty'.format(table))
+        logger.info('m=is_empty, msg={} is not empty'.format(table))
 
     @staticmethod
     def are_counts_equal(_dict):
-        _logger.info('m=are_counts_equal, _dict={}'.format(_dict))
+        logger.info('m=are_counts_equal, _dict={}'.format(_dict))
 
         comparison_list = []
         for source in _dict['sources']:
@@ -114,7 +117,7 @@ class BaseTest(object):
             comparison_list.append(_return)
 
         BaseTest.compare_sources(_dict['acceptable_diff'], comparison_list)
-        _logger.info('m=__test_count, msg=counts are all equal')
+        logger.info('m=__test_count, msg=counts are all equal')
 
     @staticmethod
     def __get_query(source):

@@ -2,11 +2,13 @@
 
 from datetime import datetime, timedelta
 
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
+
+logger = QuintoAndarLogger('CrawlerCPFs')
 
 
 class CrawlerCPFs(CrawlerEntity):

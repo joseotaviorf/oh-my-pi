@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from airflow.models import DAG
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -14,6 +14,8 @@ env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
 MAIN_DAG_NAME = 'bi-sorting-hat'
 MAIN_START_DATE = datetime(2018, 1, 14, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 4 * * *'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 # functions

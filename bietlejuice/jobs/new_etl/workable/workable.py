@@ -6,12 +6,14 @@ from io import BytesIO
 
 import requests
 from enum import Enum
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('Workable')
 
 
 class Workable(object):
@@ -101,7 +103,7 @@ class Workable(object):
                 if sleep_seconds <= 0:
                     sleep_seconds = Workable.DEFAULT_WAITING_REQUEST_HIT
 
-                _logger.warn(
+                logger.warn(
                     'm=_extract_data, msg=exceeded rate limit, sleeping for {} seconds...'.format(sleep_seconds))
 
                 time.sleep(sleep_seconds)
@@ -124,7 +126,7 @@ class Workable(object):
             paging_index += 1
             time.sleep(Workable.DEFAULT_WAITING_REQUEST_HIT)
 
-            _logger.info('m=_extract_data, enum_value={}, page_number={}'.format(enum_value, paging_index))
+            logger.info('m=_extract_data, enum_value={}, page_number={}'.format(enum_value, paging_index))
 
         raise RuntimeError('m=_extract_data, enum_value={}, msg=exceeded paging limit'.format(enum_value))
 
@@ -143,20 +145,20 @@ class Workable(object):
             count += 1
 
         file_suffix = 'raw/workable/{}/data.gz'.format(enum_type.value)
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
         # clear obj allocation
         # only flushing does not clear the buffer
         gz_body.seek(0)
         gz_body.flush()
 
-        _logger.info('m=__save_to_s3, msg={} rows saved'.format(count))
+        logger.info('m=__save_to_s3, msg={} rows saved'.format(count))
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, enum_type, r_cols, c_cols):

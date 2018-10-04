@@ -1,12 +1,14 @@
 from datetime import datetime
 
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+
+logger = QuintoAndarLogger('VisitSubDag')
 
 
 class VisitSubDag(DimSubDag):

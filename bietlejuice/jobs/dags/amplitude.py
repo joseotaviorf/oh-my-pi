@@ -4,11 +4,13 @@ from datetime import datetime
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.amplitude_etl import AmplitudeETL
+
+logger = QuintoAndarLogger('bi-amplitude-etl')
 
 
 # functions
@@ -22,7 +24,7 @@ def load_data(**kwargs):
 
     df_raw = amplitude_etl.get_all_columns()
     if df_raw.empty:
-        _logger.warn('m=__main__, msg=empty dataframe')
+        logger.warn('m=__main__, msg=empty dataframe')
     else:
         df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
         df_raw_json['dt'] = df_raw['dt']

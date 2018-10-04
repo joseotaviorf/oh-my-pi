@@ -4,9 +4,12 @@ from airflow.models import DAG
 # from airflow.models import Variable
 # from airflow.operators.slack_operator import SlackAPIOperator
 from airflow.operators.python_operator import PythonOperator
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('bi-analytics-data-validation')
 
 
 @logger(exclude='kwargs')
