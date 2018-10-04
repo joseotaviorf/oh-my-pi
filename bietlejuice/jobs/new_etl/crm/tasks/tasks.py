@@ -66,9 +66,28 @@ class CRMTasks(object):
 
     # abstract methods
     @abstractmethod
-    def move_to_clean(self):
-        _logger.error('m=move_to_clean, msg=method not implemented')
-        raise NotImplementedError
+    def move_fact_to_staging(self):
+        raise NotImplementedError('m=move_fact_to_staging, msg=method not implemented')
+
+    @abstractmethod
+    def move_dim_to_staging(self):
+        raise NotImplementedError('m=move_dim_to_staging, msg=method not implemented')
+
+    @abstractmethod
+    def append_fact_to_dw(self):
+        raise NotImplementedError('m=append_fact_to_dw, msg=method not implemented')
+
+    @abstractmethod
+    def append_dim_to_dw(self):
+        raise NotImplementedError('m=append_dim_to_dw, msg=method not implemented')
+
+    @abstractmethod
+    def delete_staging_fact_entries(self):
+        raise NotImplementedError('m=delete_staging_fact_entries, msg=method not implemented')
+
+    @abstractmethod
+    def delete_staging_dim_entries(self):
+        raise NotImplementedError('m=delete_staging_dim_entries, msg=method not implemented')
 
     # instance methods
     @logger
