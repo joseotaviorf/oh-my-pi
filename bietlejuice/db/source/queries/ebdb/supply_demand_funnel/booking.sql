@@ -19,7 +19,7 @@ select
   a.criadoEm,
   a.atualizadoEm,
   a.slotDia,
-  m.motivo as reason,
+  replace(m.motivo, '\n', '') as reason,
   ap.name as reason_category,
   vo_update.nome as last_update_source,
   case
