@@ -1,8 +1,10 @@
 from ordereddict import OrderedDict
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.asterisk.asterisk import Asterisk
 from bietlejuice.jobs.new_etl.asterisk.asterisk_table_enum import AsteriskTableEnum
+
+logger = QuintoAndarLogger('AsteriskIVRDetails')
 
 
 class AsteriskIVRDetails(Asterisk):
@@ -51,10 +53,10 @@ class AsteriskIVRDetails(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('id', int),
+            ('id', str),
             ('name', str),
             ('description', str),
-            ('announcement', int),
+            ('announcement', str),
             ('direct_dial', str),
             ('invalid_loops', str),
             ('invalid_retry_recording', str),
@@ -62,15 +64,15 @@ class AsteriskIVRDetails(Asterisk):
             ('timeout_enabled', str),
             ('invalid_recording', str),
             ('retvm', str),
-            ('timeout_time', int),
+            ('timeout_time', str),
             ('timeout_recording', str),
             ('timeout_retry_recording', str),
             ('timeout_destination', str),
             ('timeout_loops', str),
-            ('timeout_append_announce', int),
-            ('invalid_append_announce', int),
-            ('timeout_ivr_ret', int),
-            ('invalid_ivr_ret', int),
+            ('timeout_append_announce', str),
+            ('invalid_append_announce', str),
+            ('timeout_ivr_ret', str),
+            ('invalid_ivr_ret', str),
             ('alert_info', str),
             ('r_volume', str)
         ])

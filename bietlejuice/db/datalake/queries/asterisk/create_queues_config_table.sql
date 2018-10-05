@@ -1,0 +1,26 @@
+select
+  extension,
+  descr,
+  grppre,
+  alertinfo,
+  ringing,
+  maxwait,
+  password,
+  ivr_id,
+  dest,
+  cwignore,
+  queuewait,
+  use_queue_context,
+  togglehint,
+  qnoanswer,
+  callconfirm,
+  callconfirm_id,
+  qregex,
+  agentannounce_id,
+  joinannounce_id,
+  monitor_type,
+  monitor_heard,
+  monitor_spoken,
+  callback_id
+from datalake_raw.asterisk_queues_config
+;

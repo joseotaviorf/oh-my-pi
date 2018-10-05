@@ -9,7 +9,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/growth/staging/queries')
+STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/dw/growth/staging/queries')
 env.set_airflow_var_to_local_env(
     'BI_DW',
     'BI_ODS',

@@ -3,10 +3,12 @@ from datetime import datetime
 
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('new-base-etl')
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
+QUERIES_DIR = os.path.join(dir_path, '../../db/datalake/queries')
 now = datetime.now()
 
 
@@ -17,13 +19,13 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
     if exec_date is not None:
         command = command.format(exec_date)
 
-    _logger.info("Start query: {}".format(datetime.now()))
+    logger.info("Start query: {}".format(datetime.now()))
     table = BaseETL.from_db_query(
         db_enum=EnumDB.QuintoAndar_ebdb,
         query=command
     )
 
-    _logger.info("To ODS: {}".format(datetime.now()))
+    logger.info("To ODS: {}".format(datetime.now()))
     table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
@@ -37,7 +39,7 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
 
 
 def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timestamp=False, copy_to_clean=True):
-    _logger.info("Start query: {}".format(now))
+    logger.info("Start query: {}".format(now))
     if add_timestamp:
         table = BaseETL.from_db_table(
             db_enum=EnumDB.QuintoAndar_ebdb,
@@ -51,7 +53,7 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
             generator=True
         )
 
-    _logger.info("To ODS: {}".format(datetime.now()))
+    logger.info("To ODS: {}".format(datetime.now()))
     table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
@@ -74,10 +76,10 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
 def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
     athena = AthenaClient(bucket)
     filename = '{}/{}.sql'.format(QUERIES_DIR, fname)
-    _logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), filename))
+    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), filename))
     data_frame = athena.execute_file_query_and_return_dataframe(filename)
 
-    _logger.info("START - To Staging: {}".format(datetime.utcnow()))
+    logger.info("START - To Staging: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
         enum_db=EnumDB.BI_ODS,
         df=data_frame,
@@ -85,7 +87,7 @@ def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
         encoding='utf-8',
         append=append
     )
-    _logger.info("END - To Staging: {}".format(datetime.utcnow()))
+    logger.info("END - To Staging: {}".format(datetime.utcnow()))
 
 
 def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, pre_command=None, post_command=None,
@@ -196,7 +198,7 @@ def load_athena_file_query_to_ods(table_name, file_name, bucket, append=False):
 
 
 def __df_to_db(enum_db, df, table_name, append=False):
-    _logger.info('m=__df_to_db, msg=sending data frame to db')
+    logger.info('m=__df_to_db, msg=sending data frame to db')
     BaseETL.dataframe_to_db(
         enum_db=enum_db,
         df=df,

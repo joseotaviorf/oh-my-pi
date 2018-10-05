@@ -1,11 +1,13 @@
 import re
 from collections import OrderedDict
 
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from invoice import Invoice
+
+logger = QuintoAndarLogger
 
 
 class Report(Invoice):
@@ -48,7 +50,7 @@ class Report(Invoice):
     def request_data(self, endpoint_suffix):
         request_result = self._request_data('{}/{}/{}/all'.format(endpoint_suffix, self.year, self.month))
 
-        _logger.info('m=request_data, request_result={}'.format(request_result.content))
+        logger.info('m=request_data, request_result={}'.format(request_result.content))
         return request_result.json()['file-url'], request_result.json()['status-url']
 
     @logger

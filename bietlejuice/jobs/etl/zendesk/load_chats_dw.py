@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 athena = AthenaClient('5a-datalake')
 table_name = 'zendesk.chats'
-file_name = './bietlejuice/db/2.datalake/queries/zendesk/chats.sql'
+file_name = './bietlejuice/db/datalake/queries/zendesk/chats.sql'
 
 if len(sys.argv) < 3:
     raise Exception('Missing Parameters')

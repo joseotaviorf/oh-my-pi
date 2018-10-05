@@ -148,7 +148,7 @@ class CampaignMonitor(object):
 
     @logger
     def deduplicate_homes_transactional_data(self):
-        deduplication_query = './bietlejuice/db/2.datalake/queries/transactional_messages.sql'
+        deduplication_query = './bietlejuice/db/datalake/queries/transactional_messages.sql'
         df = self.athena_client.execute_file_query_and_return_dataframe(deduplication_query, 'homes')
 
         self.athena_client.create_parquet_from_df(

@@ -1,12 +1,9 @@
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-DW_DIR = os.path.join(dir_path, '../../db/3.dw')
-DATALAKE_QUERIES_DIR = os.path.join(dir_path, '../../db/2.datalake/queries')
-SORTINGHAT_QUERIES_DIR = os.path.join(dir_path, '../../db/sorting_hat/queries')
-EBDB_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/ebdb/queries')
+DW_DIR = os.path.join(dir_path, '../../db/dw')
+DW_QUERIES_DIR = os.path.join(dir_path, '../../db/dw/queries')
+DATALAKE_QUERIES_DIR = os.path.join(dir_path, '../../db/datalake/queries')
 LEAD_VARIANT_CONFIG_DIR = os.path.join(dir_path, 'leads/variant_config')
-DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/public/queries')  # remove after refactoring
-NEW_DW_QUERIES_DIR = os.path.join(dir_path, '../../db/3.dw/queries')
-ODS_QUERIES_DIR = os.path.join(dir_path, '../../db/ODS/queries')
-SOURCE_QUERIES_DIR = os.path.join(dir_path, '../../db/1.source/queries')
+ODS_QUERIES_DIR = os.path.join(dir_path, '../../db/ods/queries')
+SOURCE_QUERIES_DIR = os.path.join(dir_path, '../../db/source/queries')

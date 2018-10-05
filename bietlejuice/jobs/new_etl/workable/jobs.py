@@ -1,7 +1,9 @@
 from ordereddict import OrderedDict
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.workable.workable import Workable
+
+logger = QuintoAndarLogger('WorkableJobs')
 
 
 class WorkableJobs(Workable):

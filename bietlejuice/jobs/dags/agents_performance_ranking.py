@@ -2,15 +2,17 @@ from datetime import datetime
 from datetime import timedelta
 
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger, logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
-from bietlejuice.jobs.dags import GROWTH_PROD_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+logger = QuintoAndarLogger('bi-agents-ranking')
 
 
 @logger
@@ -34,7 +36,7 @@ def load_agents_performance_ranking(dim_name, query_dir, filename=None, **kwargs
 @logger
 def clean_previous_data(dim_name, schema, date_column, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
-    _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
+    logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
 
     query = '''DELETE FROM {0}.{1}
                 USING public.dim_date ddate
@@ -80,7 +82,7 @@ tickets_whats = BaseDAG.build_quintoandar_python_operator(
     execution_timeout=timedelta(hours=3),
     provide_context=True,
     python_callable=load_agents_performance_ranking,
-    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': GROWTH_PROD_QUERIES_DIR}
+    op_kwargs={'dim_name': 'agents_performance_ranking', 'query_dir': '{}/growth/'.format(DW_QUERIES_DIR)}
 )
 
 clear_old_data >> tickets_whats

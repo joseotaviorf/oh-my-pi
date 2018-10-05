@@ -1,0 +1,248 @@
+select
+  i.id,
+  i.aluguel,
+  i.bairro,
+  i.cep,
+  i.cidade,
+  i.complemento,
+  i.condominio,
+  i.dataConstrucao as data_construcao,
+  i.elevador,
+  i.emailContato as email_contato,
+  i.emailSessaoFotos as email_sessao_fotos,
+  i.endereco,
+  i.estadoConservacao as estado_conservacao,
+  i.fotografoPreencheDados+0 as fotografo_preenche_dados,
+  i.iptu,
+  i.lat,
+  i.lng,
+  i.mobiliado+0 as mobiliado,
+  i.nivelAcabamento as nivel_acabamento,
+  i.numero,
+  i.numeroBanheiros as numero_banheiros,
+  i.numeroQuartos as numero_quartos,
+  i.numeroSuites as numero_suites,
+  i.numeroVagas as numero_vagas,
+  i.porcentagemCadastroCompleta as porcentagem_cadastro_completa,
+  i.prefereEmailSessaoFotos+0 as prefere_email_sessao_fotos,
+  i.status,
+  i.telefoneContato1 as tel_contato1,
+  i.telefoneContato2 as tel_contato2,
+  i.telefoneSessaoFotos	as tel_sessao_fotos,
+  i.tipo,
+  i.tipoPorteiro as tipo_porteiro,
+  i.tipoVagas as tipo_vagas,
+  i.verificado+0 as verificado,
+  i.usuario_id,
+  i.codigoPromocao as codigo_promocao,
+  i.cotarSeguro as cotar_seguro,
+  i.valorTotal as valor_total,
+  i.expirationDate as expiration_date,
+  i.firstPublication as first_publication,
+  i.notificacaoAnuncioIncompletoProprietario as notificacao_anuncio_incompleto_proprietario,
+  i.notificacaoAnuncioIncompletoAdmin as notificacao_anuncio_incompleto_admin,
+  i.shortUrl as short_url,
+  i.valorSeguro as valor_seguro,
+  i.instrucoesAgendamento as instrucoes_agendamento,
+  i.planoAceito as plano_aceito,
+  i.sugerirReajusteDePreco+0 as  sugerir_reajuste_de_preco,
+  i.permitePlacaAlugaSe+0 as permite_placa_aluga_se,
+  i.descricaoLead as descricao_lead,
+  i.prioridadeDestaqueClassificado as prioridade_destaque_classificado,
+  i.corretorAmigo as corretor_amigo,
+  i.porteiroAmigo as porteiro_amigo,
+  i.dadosAdministradoraCondominio as  dados_administradora_condominio,
+  i.referencias,
+  i.condominioIncluso+0 as condominio_incluso,
+  i.coordenadasManuais+0 as coordenadas_manuais,
+  i.iptuIncluso+0 as iptu_incluso,
+  i.followUpProprietarioSubirFotos+0 as followup_proprietario_subir_fotos,
+  i.dataPrimeiroVerificado as data_primeiro_verificado,
+  i.tipoColisaoLead as tipo_colisao_lead,
+  i.calculoPagamentoLeadCorretor  as calculo_pagamento_lead_corretor,
+  i.nomeImagemCapa as nome_imagem_capa,
+  i.geoHash as geo_hash,
+  i.tipoAnuncio as tipo_anuncio,
+  i.infosAdmin as infos_admin,
+  i.infosAdminInterna as infos_admin_interna,
+  i.historicoAgendamentoFotos as historico_agendamento_fotos,
+  i.calculoPagamentoLeadAfiliado as calculo_pagamento_lead_afiliado,
+  i.possuiBanheiroServico+0 as possui_banheiro_servico,
+  i.possuiQuartoServico+0 as possui_quarto_servico ,
+  i.bairroPadrao as bairro_padrao,
+  i.tipoCondominio as tipo_condominio,
+  i.tipoIptu as tipo_iptu,
+  i.disponivelAte as disponivel_ate,
+  i.flagVerificarPrecoComparandoComMedia+0 as flag_verificar_preco_comparando_com_media,
+  i.sempreconsultarproprietariovisita	 as sempre_consultar_proprietario_visita,
+  i.emailPublicacaoProprietarioEnviado+0	as email_publicacao_proprietario_enviado,
+  i.statusConversaoImovel	as status_conversao_imovel,
+  i.matricula	,
+  i.ultimoEmailDeConfirmacaoEnviado	as ultimo_email_de_confirmacao_enviado,
+  i.latlng,
+  i.ultimoUpdateIndice	as ultimo_update_indice,
+  i.titulo,
+  i.suspensoAte	as suspenso_ate,
+  i.externalId	as external_id,
+  i.emNegociacao as em_negociacao,
+  i.emNegociacaoExterna	as em_negociacao_externa,
+  i.entrouEmNegociacaoExterna	as entrou_em_negociacao_externa,
+  i.motivoRecusaCardiff	as motivo_recusa_cardiff,
+  i.recaptadoEm	as recaptado_em,
+  i.jobFotografoPendente as job_fotografo_pendente,
+  i.requisitouFotosProfissionais as requisitou_fotos_profissionais,
+  i.lastConfirmationAvailability	as last_confirmation_availability,
+  i.cartorio,
+  i.penalizationScore	as penalization_score,
+  i.receberCopiaContratoPadrao	as receber_copia_contrato_padrao,
+  i.rankScore	as rank_score,
+  i.ultimaPublicacao	as ultima_publicacao,
+  i.confirmadoInformacoesVisita+0	  as confirmado_informacoes_visita,
+  e.abreviacao as estado_abreviacao,
+  e.nome as estado_nome,
+  r.cidade as regiao_cidade,
+  r.macro_regiao as regiao_macro,
+  r.sub_regiao as regiao_sub,
+  i.regiao_id,
+  c.nome as condominio_nome,
+  l.nome as local_nome,
+  coalesce(iv.autorizacao_de_entrada,0) as info_visita_autorizacao_de_entrada,
+  coalesce(iv.proprietario_acompanha,0) as info_visita_proprietario_acompanha,
+  coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
+  coalesce(iv.prop_precisa_liberar,0) as info_visita_prop_precisa_liberar,
+  coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
+  i.dataCriacao as data_criacao,
+  i.atualizadoEm as atualizado_em,
+  i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
+  i.announcedBy is not null or i.announcedBy_id is not null as imovel_v3,
+  i.areaTotal as area_total,
+  i.areaTerreno as area_terreno,
+ case
+		when i.status <> 'despublicado'
+			then NULL
+		when i.unpublishedReason is not null
+			then i.unpublishedReason
+		when ure.motivo = 'Imóvel indisponível'
+			then 'HOUSE_NOT_AVAILABLE'
+		when ure.motivo = '[Auto] Proprietario confirmou indisponibilidade'
+			then 'AUTO_OWNER_CONFIRMED_UNAVAILABILITY'
+		when ure.motivo like '[AUTO][RESCISAO]%'
+			or ure.motivo like '[AUTO] [RESCISAO]%'
+			then 'AUTO_CONTRACT_END_DEPUBLICATION'
+		when ure.motivo like '%Não concordo%'
+			or ure.motivo like '%não concorda%'
+			or ure.motivo like '%nao concorda%'
+			then 'OWNER_DOESNT_AGREE'
+		when ure.motivo like '%Desisti%'
+			then 'OWNER_GAVE_UP_RENTING'
+		when ure.motivo like '%MissedNegotiations%'
+			then 'AUTO_OWNER_MISSED_NEGOTIATIONS_LIMIT_REACHED'
+		when ure.motivo like 'Imóvel alugado direto%'
+			or ure.motivo like '%Fechei com outro%'
+			then 'OWNER_RENTING_DIRECT_WITH_TENANT'
+		when ure.motivo like 'Aluguei por curta%'
+			then 'OWNER_RENTING_FOR_SHORT_PERIOD'
+		when ure.motivo = 'Imóvel alugado com imobiliária tradicional'
+			or ure.motivo = 'Já aluguei o imóvel'
+			then 'OWNER_RENTING_WITH_OTHER_COMPANY'
+		when ure.motivo = 'Vou vender o imóvel'
+			or ure.motivo like '%vendeu o %'
+			then 'OWNER_SELLING_HOUSE'
+		when ure.motivo like '%duplicado%'
+			or ure.motivo like '%Duplicado%'
+			then 'DUPLICATED_HOUSE'
+		when ure.motivo like '%falta de confirmação%'
+			or ure.motivo like '%falta de contato%'
+			or ure.motivo like 'PP não responde%'
+			then 'HOUSE_NOT_REACHABLE'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Estou reformando'
+			then 'APP_HOME_RENOVATION'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Outro motivo'
+			then 'APP_OTHER_REASON'
+		when ure.motivo = 'Despublicado pelo proprietário via App: Já aluguei'
+			then 'APP_OWNER_RENTING_WITH_OTHER_COMPANY'
+		when ure.motivo = 'Usuário despublicou pelo app.'
+			then 'APP_USER_DEPUBLISHED'
+		when ure.motivo like 'Usuário rejeitou%'
+			then 'USER_REJECTED_TERMS'
+		when ure.motivo is null
+			then 'UNKNOWN_NULL_VALUE'
+		else 'OTHER'
+	end as unpublished_reason,
+	(sc.id is not null and optedOutAt is null)+0 as exclusivity,
+	ot.name as house_occupant,
+    kt.name as key_type,
+    aat.name as key_location,
+    rt.name as visit_restriction
+from
+  Imovel i
+left join
+  Estado e
+  on e.id = i.estado_id
+left join
+  (
+    select
+      id as id_sub_regiao,
+      `macroId` as id_macro_regiao,
+      `cidadeId` as id_cidade,
+      `nome` as sub_regiao,
+      `macroNome` as macro_regiao,
+      `cidadeNome` as cidade
+    from
+      MapRegiao
+  ) r
+  on i.regiao_id = coalesce(r.id_sub_regiao, r.id_macro_regiao, r.id_cidade)
+left join
+  Condominio c
+  on c.id = i.condominioPai_id
+left join
+  Local l
+  on l.id = i.estacaoMaisProxima_id
+left join
+(
+    select
+        iv.Imovel_id,
+        sum(informacoesVisita='AUTORIZACAO_DE_ENTRADA') as autorizacao_de_entrada,
+        sum(informacoesVisita='PROPRIETARIO_ACOMPANHA') as proprietario_acompanha,
+        sum(informacoesVisita='ESTAMOS_LIBERADOS') as estamos_liberados,
+        sum(informacoesVisita='PROPRIETARIO_PRECISA_LIBERAR') as prop_precisa_liberar,
+        sum(informacoesVisita='CHAVE_CAIXA_QUINTOANDAR') as chave_box_quintoandar
+    from
+        Imovel_informacoesVisita iv
+    group by iv.Imovel_id
+) iv
+  on iv.Imovel_id = i.id
+left join
+	(select id, max(REV) as REV from Imovel_AUD where status_MOD = 1 group by id) ia_max
+	on ia_max.id = i.id
+left join
+	UsuarioRevisionEntity ure
+	on ia_max.REV = ure.id
+left join
+	(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
+	on maxsc.imovel_id = i.id
+left join
+	SpecialCondition sc
+	on sc.id = maxsc.id
+
+left join AccessType at
+  on at.imovel_id = i.id
+
+-- who lives in the house
+left join OccupantType ot
+  on at.occupant_id = ot.id
+
+-- key types (e.g., password, biometric, etc.)
+left join KeyType kt
+  on at.type_id = kt.id
+
+-- where is the key (e.g., owner, lockbox, etc.)
+left join AccessAuthorizationType aat
+  on at.authorization_id = aat.id
+
+-- restriction
+left join RestrictionType rt
+  on at.restriction_id = rt.id
+
+where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
+;

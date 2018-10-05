@@ -1,6 +1,8 @@
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.crm.tasks.tasks import CRMTasks
+
+logger = QuintoAndarLogger('CRMTasksCredit')
 
 
 class CRMTasksCredit(CRMTasks):

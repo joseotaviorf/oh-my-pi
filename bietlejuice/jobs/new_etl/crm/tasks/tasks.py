@@ -8,13 +8,15 @@ import boto3
 from botocore.exceptions import ClientError
 from ordereddict import OrderedDict
 from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, NEW_DW_QUERIES_DIR
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+
+logger = QuintoAndarLogger('CRMTasks')
 
 
 # TODO: move to generic wrapper
@@ -68,14 +70,14 @@ class CRMTasks(object):
     # abstract methods
     @abstractmethod
     def move_to_clean(self):
-        _logger.error('m=move_to_clean, msg=method not implemented')
+        logger.error('m=move_to_clean, msg=method not implemented')
         raise NotImplementedError
 
     # instance methods
     @logger
     def _data_existence_check(self, bucket_type):
         if bucket_type not in ('raw', 'clean'):
-            _logger.error('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            logger.error('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
             raise ValueError
 
         file_path = '{}/{}/dt={}/{}.gz'.format(bucket_type,
@@ -116,7 +118,7 @@ class CRMTasks(object):
         ).batch_size(10000)  # reduces the number of trips to the server
 
         total_count = collection_gen.count()
-        _logger.info('m=extract_and_load_data, msg=processing {} rows'.format(total_count))
+        logger.info('m=extract_and_load_data, msg=processing {} rows'.format(total_count))
         self.__save_to_s3(
             json_list=collection_gen,
             total_count=total_count
@@ -146,19 +148,19 @@ class CRMTasks(object):
                 'ResponseMetadata' not in response[0] or
                 'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
                 response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
-            _logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
+            logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
             raise Exception
 
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, total_count):
         if json_list is None or json_list.count() == 0:
-            _logger.info('m=__save_to_s3, msg=no results')
+            logger.info('m=__save_to_s3, msg=no results')
             return
 
         # use the method below if multiple files have to be saved into s3
         # self.__delete_old_files()
 
-        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        logger.info('m=__save_to_s3, msg=gzipping json_list')
 
         gz_body = BytesIO()
         for _json in json_list:
@@ -180,16 +182,16 @@ class CRMTasks(object):
         gz_body.seek(0)
         gz_body.flush()
 
-        _logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
+        logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
 
     def __obj_to_s3(self, obj_io, file_suffix):
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=obj_io,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
     @logger
     def _upsert_tasks_partition(self, bucket_type):
@@ -210,7 +212,7 @@ class CRMTasks(object):
     @logger
     def __upsert_partition(self, bucket_type, bucket_folder_suffix, table_name):
         if bucket_type not in ('raw', 'clean'):
-            _logger.error('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            logger.error('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
             raise ValueError
 
         self.athena_client.upsert_single_partition(
@@ -495,7 +497,7 @@ class CRMTasks(object):
         )
 
         upsert_query = BaseETL.get_query_from_file_name(
-            '{}/crm/insert_{}_table.sql'.format(NEW_DW_QUERIES_DIR, table_name))
+            '{}/crm/insert_{}_table.sql'.format(DW_QUERIES_DIR, table_name))
         self.__upsert_into_dw(
             upsert_query=upsert_query,
             schema=schema,
@@ -504,9 +506,9 @@ class CRMTasks(object):
 
     @logger
     def __append_to_dw(self, filename, schema, table_name):
-        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(NEW_DW_QUERIES_DIR, filename))
+        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(DW_QUERIES_DIR, filename))
         deletion_query = BaseETL.get_query_from_file_name(
-            file_name='{}/crm/delete_old_entries.sql'.format(NEW_DW_QUERIES_DIR))
+            file_name='{}/crm/delete_old_entries.sql'.format(DW_QUERIES_DIR))
 
         BaseETL.execute_command(
             command=deletion_query.format(table_name=table_name, partition_date=self.partition_date),
@@ -529,7 +531,7 @@ class CRMTasks(object):
             encoding='utf-8',
         )
 
-        _logger.info(
+        logger.info(
             '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(schema, table_name))
 
         BaseETL.bulk_insert(
@@ -542,7 +544,7 @@ class CRMTasks(object):
     @logger
     def _delete_staging_entries(self, table_name):
         query = BaseETL.get_query_from_file_name(
-            file_name='{}/crm/delete_staging_entries.sql'.format(NEW_DW_QUERIES_DIR))
+            file_name='{}/crm/delete_staging_entries.sql'.format(DW_QUERIES_DIR))
         BaseETL.execute_command(
             command=query.format(table_name=table_name, partition_date=self.partition_date),
             db_enum=EnumDB.BI_DW,

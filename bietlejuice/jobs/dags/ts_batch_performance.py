@@ -7,10 +7,10 @@ first ever computable date : 20180206
 from datetime import datetime
 
 import pandas as pd
+from qa_python_utils import QuintoAndarLogger
 # from airflow.models import DAG
 # from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
@@ -29,6 +29,8 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 start_date = env.get_airflow_env_var('ts_perfomance-batch-start-date')
 end_date = env.get_airflow_env_var('ts_perfomance-batch-end-date')  # comment for testing without airflow
 
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
+
 
 # bucket = '5a-datalake'  # for testing without airflow
 
@@ -46,7 +48,7 @@ def batch_performance():
     client = AthenaClient(bucket)
 
     # query athena
-    _logger.info('Querying athena')
+    logger.info('Querying athena')
     df_proposta_ebdb = import_ebdb_proposta(client)  # only to know which ones were decided by us
     df_contrato_aud_ebdb = import_ebdb_contrato_aud(client)
     df_payments = import_invoices(client)
@@ -61,7 +63,7 @@ def batch_performance():
     date_range = pd.date_range(start=pd.to_datetime(start_date), end=pd.to_datetime(end_date))
     performance_table = None
     for date in date_range:
-        _logger.info(date)
+        logger.info(date)
         performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, date)
         performance_table['date_computation'] = date
         performance_table['date_computation_30d_ago'] = date - pd.to_timedelta(30, unit='days')
@@ -73,7 +75,6 @@ def batch_performance():
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
-
 
 # if __name__ == "__main__":
 #     batch_performance()

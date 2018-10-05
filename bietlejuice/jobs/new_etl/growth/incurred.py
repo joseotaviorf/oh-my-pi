@@ -1,12 +1,15 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl import DW_DIR
-from qa_python_utils.default_logger import logger
+from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
+
+logger = QuintoAndarLogger('Growth')
 
 
 class Growth(object):
     SCHEMA = 'growth'
-    QUERIES_DIR = '{}/{}'.format(DW_DIR, 'growth/prod/queries')
+    QUERIES_DIR = '{}/growth'.format(DW_QUERIES_DIR)
     FACT_TABLE_NAME = 'fact_growth'
 
     @staticmethod
@@ -27,7 +30,7 @@ class Growth(object):
     @logger
     def load_fact(self):
         Growth.drop_table(table_name=Growth.FACT_TABLE_NAME)
-        Growth._execute_file_query('{}/public/queries/{}.sql'.format(DW_DIR, Growth.FACT_TABLE_NAME))
+        Growth._execute_file_query('{}/public/{}.sql'.format(DW_QUERIES_DIR, Growth.FACT_TABLE_NAME))
 
     @staticmethod
     @logger

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import requests
 from pytz import UTC, timezone
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -14,6 +14,8 @@ from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('EBDB')
 endpoint = env.get_airflow_env_var('LEADS_ENDPOINT')
+
+logger = QuintoAndarLogger('bi-dashboard-growth-leads')
 
 
 def fix_timezone(dt):
@@ -317,7 +319,7 @@ def __get_leads():
 
 
 def push_leads(endpoint):
-    _logger.info('get_leads')
+    logger.info('get_leads')
     leads = __get_leads()
     header = list(leads[0])
     values = list(leads[1])
@@ -330,7 +332,7 @@ def push_leads(endpoint):
     print output
 
     resp = requests.post(endpoint, json.dumps(output), timeout=30)
-    _logger.info('push_leads {}'.format(resp.content))
+    logger.info('push_leads {}'.format(resp.content))
 
 
 # create DAG definition

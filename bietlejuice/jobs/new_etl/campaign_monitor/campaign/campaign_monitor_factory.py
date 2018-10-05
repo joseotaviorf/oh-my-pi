@@ -1,4 +1,4 @@
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.bounces import CampaignBounces
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.clicks import CampaignClicks
@@ -7,6 +7,8 @@ from bietlejuice.jobs.new_etl.campaign_monitor.campaign.recipients import Campai
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.spam import CampaignSpam
 from bietlejuice.jobs.new_etl.campaign_monitor.campaign.unsubscribes import CampaignUnsubscribes
 
+logger = QuintoAndarLogger('CampaignMonitorCampaignFactory')
+
 
 class CampaignMonitorCampaignFactory(object):
 
@@ -14,7 +16,7 @@ class CampaignMonitorCampaignFactory(object):
     def factory(_class, s3_bucket, cm_auth, execution_date):
         __class = CampaignMonitorCampaignFactory.__dispatch_dict(_class)
         if _class is None:
-            _logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
+            logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
             raise Exception
 
         return __class(
