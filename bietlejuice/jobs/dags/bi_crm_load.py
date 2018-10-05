@@ -1,9 +1,10 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
-import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
+
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
@@ -319,6 +320,13 @@ tasks_closing_sub_dag = BaseSubDag.get_sub_dag_operator(
     _class=CRMTasksTableEnum.CLOSING
 )
 
+tasks_onboarding_tenant_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_onboarding_tenant',
+    sub_dag_func=class_sub_dag,
+    _class=CRMTasksTableEnum.ONBOARDING_TENANT
+)
+
 refresh_credit_task = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Credit_Task',
@@ -349,7 +357,14 @@ airflow_helpers.chain(
     clean_tasks_resolution_sub_dag_task
 )
 
-clean_tasks_resolution_sub_dag_task.set_downstream([tasks_credit_sub_dag, tasks_visit_sub_dag])
+clean_tasks_resolution_sub_dag_task.set_downstream(
+    [
+        tasks_credit_sub_dag,
+        tasks_visit_sub_dag,
+        tasks_closing_sub_dag,
+        tasks_onboarding_tenant_sub_dag
+    ]
+)
 tasks_credit_sub_dag >> refresh_credit_task
 tasks_visit_sub_dag >> refresh_visit_task
 tasks_closing_sub_dag >> refresh_closing_task
