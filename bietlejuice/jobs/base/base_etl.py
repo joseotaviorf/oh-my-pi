@@ -1,4 +1,5 @@
 import codecs
+import datetime
 import gzip
 import io
 import json
@@ -11,11 +12,11 @@ from io import BytesIO
 from logging import info as log
 
 import boto3
-import datetime
 import petl
+from petl.io.db import create_table
+
 from db_factory import DBFactory
 from enum_db import EnumDB
-from petl.io.db import create_table
 
 
 class BaseETL(object):
@@ -180,26 +181,27 @@ class BaseETL(object):
             conn.cursor().execute(command)
 
     @classmethod
-    def execute_file_query(cls, filename, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
+    def execute_file_query(cls, filename, db_enum=None, conn=None, encoding='LATIN1', commit=False,
                            return_value=False, show_logs=True, timeout=0):
         with open(filename) as f:
             command = f.read()
-        cls.execute_command(command, db_enum, conn, encoding, commit, in_iterator, return_value, show_logs, timeout)
+        cls.execute_command(command, db_enum, conn, encoding, commit, return_value, show_logs, timeout)
 
     @classmethod
-    def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False, in_iterator=False,
+    def execute_command(cls, command, db_enum=None, conn=None, encoding='LATIN1', commit=False,
                         return_value=False, show_logs=True, timeout=0):
         if not db_enum and not conn:
             raise AttributeError()
         if not conn:
             conn = cls.get_connection(db_enum, encoding, timeout)
-        if not in_iterator and conn.autocommit != commit:
-            conn.autocommit = commit
 
         if show_logs:
             print ('Start Execute Command at: {}'.format(cls.now()))
         cursor = conn.cursor()
         cursor.execute(command)
+
+        if commit:
+            conn.commit()
 
         if show_logs:
             print ('End Execute Command at: {}'.format(cls.now()))
@@ -308,7 +310,12 @@ class BaseETL(object):
 
     @classmethod
     def truncate_table(cls, db_enum, table_name, schema='public'):
-        cls.execute_command(command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name), db_enum=db_enum, timeout=30)
+        cls.execute_command(
+            command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name),
+            db_enum=db_enum,
+            timeout=30,
+            commit=True
+        )
 
     @classmethod
     def move_table_to_dw(cls, table_name, enum_db_source, enum_db_dest,
