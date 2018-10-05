@@ -6,12 +6,14 @@ from StringIO import StringIO
 
 import pandas
 import requests
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('Invoice')
 
 
 class Invoice(object):
@@ -54,7 +56,7 @@ class Invoice(object):
     @logger
     def _request_data(self, endpoint_complement):
         url = '{}/{}'.format(self.api_dict['endpoint'], endpoint_complement)
-        _logger.info('m=_request_data, url={}'.format(url))
+        logger.info('m=_request_data, url={}'.format(url))
 
         return requests.get(
             url=url,
@@ -73,7 +75,7 @@ class Invoice(object):
 
     @logger(exclude='data_frame')
     def convert_df_to_json(self, data_frame):
-        _logger.info('m=convert_csv_to_json')
+        logger.info('m=convert_csv_to_json')
 
         gz_body = io.BytesIO()
         with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -87,7 +89,7 @@ class Invoice(object):
     def save_into_s3_raw(self, _object, file_path_prefix, raw_table_name):
         year_month = '{}-{}'.format(self.year, self.month)
 
-        _logger.info(
+        logger.info(
             BaseETL.obj_to_s3(
                 obj_io=_object,
                 bucket=self.bucket,
@@ -131,7 +133,7 @@ class Invoice(object):
         year_month = '{}-{}'.format(self.year, self.month)
         data_frame = self.athena_client.execute_query_and_return_dataframe(query.format(year_month=year_month))
 
-        _logger.info(
+        logger.info(
             'm=load_into_ods, _type={}, year_month={}, msg=deleting from ods table'.format(self._type, year_month))
         BaseETL.execute_command(
             command="delete from invoice.{} where ym_partition = '{}'".format(self._type, year_month),
@@ -140,7 +142,7 @@ class Invoice(object):
             commit=True
         )
 
-        _logger.info('m=load_into_ods, _type={}, msg=sending dataframe to ods'.format(self._type))
+        logger.info('m=load_into_ods, _type={}, msg=sending dataframe to ods'.format(self._type))
         BaseETL.dataframe_to_ods(
             df=data_frame,
             table_name='invoice.{}'.format(self._type),

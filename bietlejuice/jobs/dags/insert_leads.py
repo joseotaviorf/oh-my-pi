@@ -2,11 +2,13 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
+
+logger = QuintoAndarLogger('crawling-houses-insert-leads')
 
 MAIN_DAG_NAME = 'crawling-houses-insert-leads'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -30,15 +32,15 @@ def insert_leads(**kwargs):
     leads = crawler_leads.leads(ws=ws, states=states, delta_days=delta_days)
 
     if leads.empty:
-        _logger.info(NO_LEADS_MSG)
+        logger.info(NO_LEADS_MSG)
         return None
 
-    _logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
-    _logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
+    logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
+    logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     leads_cleaned = crawler_leads.cleaning(leads)
     if leads_cleaned.empty:
-        _logger.info(NO_LEADS_MSG)
+        logger.info(NO_LEADS_MSG)
         return None
 
     phones = crawler_leads.check_known_phone(90)
@@ -49,11 +51,11 @@ def insert_leads(**kwargs):
     leads_cleaned['known'] = leads_cleaned.phone_number.isin(phones.phone_number)
     leads_filtered = leads_cleaned[~leads_cleaned.known].sort_values(by='updated_on')
     if leads_filtered.empty:
-        _logger.info(NO_LEADS_MSG)
+        logger.info(NO_LEADS_MSG)
         return None
 
-    _logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads_filtered)))
-    _logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads_filtered)))
+    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
 
     # enrich lat and lng with ceps
     info = crawler_leads.enrich(leads_filtered.query("""lat.isnull() or lng.isnull()""").cep.unique())
@@ -70,10 +72,10 @@ def insert_leads(**kwargs):
         (leads_enriched.regions > -1) &
         ((~leads_enriched.type.str.contains('casa')) | leads_enriched.regions.isin(crawler_leads.house_allowed))]
     if leads_filtered.empty:
-        _logger.info(NO_LEADS_MSG)
+        logger.info(NO_LEADS_MSG)
         return None
-    _logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads_filtered)))
-    _logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads_filtered)))
+    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
 
     crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 

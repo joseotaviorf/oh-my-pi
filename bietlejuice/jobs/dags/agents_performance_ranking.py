@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger, logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
@@ -11,6 +11,8 @@ from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+logger = QuintoAndarLogger('bi-agents-ranking')
 
 
 @logger
@@ -34,7 +36,7 @@ def load_agents_performance_ranking(dim_name, query_dir, filename=None, **kwargs
 @logger
 def clean_previous_data(dim_name, schema, date_column, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
-    _logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
+    logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, exec_date))
 
     query = '''DELETE FROM {0}.{1}
                 USING public.dim_date ddate

@@ -7,11 +7,13 @@ from datetime import datetime
 import fastparquet
 import pandas as pd
 import s3fs
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+
+logger = QuintoAndarLogger('AmplitudeETL')
 
 args = sys.argv
 today = datetime.strptime(args[2], '%Y-%m-%d %H:%M:%S').date()
@@ -33,21 +35,31 @@ class AmplitudeETL(object):
 
     @logger
     def get_all_columns(self):
-        _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
+        logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(today))
         add_partition_raw_query = './bietlejuice/db/datalake/queries/amplitude/add_partition_raw.sql'
-        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(
+            filename=add_partition_raw_query,
+            query_params={
+                'dt_partition': today,
+                's3_bucket': bucket_datalake
+            }
+        )
 
         raw_query = './bietlejuice/db/datalake/queries/amplitude/init_events_raw.sql'
-        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, today)
+        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(
+            filename=raw_query,
+            query_params={'dt_partition': today})
 
-        _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
+        logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(today))
         drop_partition_raw_query = './bietlejuice/db/datalake/queries/amplitude/drop_partition_raw.sql'
-        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, today, bucket_datalake)
+        self.athena_client.execute_file_query_and_wait_for_results(
+            filename=drop_partition_raw_query,
+            query_params={'dt_partition': today})
 
         return df_columns_raw
 
     def insert_new_columns(self, df, df_props, df_json, properties, prefix):
-        _logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
+        logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
 
         props_list = list(
             df_props[df_props[0].str.contains(prefix).fillna(False)][2].apply(lambda x: x.strip()))
@@ -70,12 +82,19 @@ class AmplitudeETL(object):
                 try:
                     type_mapping = TYPE_MAPPING[str_type]
                 except KeyError:
-                    _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
+                    logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
                 add_column_clean_query = './bietlejuice/db/datalake/queries/amplitude/add_column_clean.sql'
-                self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix,
-                                                                           formatted_up, 'string', up)
+                self.athena_client.execute_file_query_and_wait_for_results(
+                    filename=add_column_clean_query,
+                    query_params={
+                        'column_prefix': prefix,
+                        'column_formatted': formatted_up,
+                        'column_type': 'string',
+                        'original_column': up
+                    }
+                )
 
                 already_added_list.append(up)
 
@@ -111,15 +130,22 @@ class AmplitudeETL(object):
             key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(bucket_datalake, df_et[0], today_ym,
                                                                                  today, 'events')
 
-            _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
-                                                                                       'events'))
+            logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], today_ym, today,
+                                                                                      'events'))
             filtered_df = df[df['event_type'] == df_et[0]]
             filtered_df = filtered_df.fillna('').astype(str)
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
-            _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
+            logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], today_ym))
             add_partition_clean_query = './bietlejuice/db/datalake/queries/amplitude/add_partition_clean.sql'
-            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], today_ym, bucket_datalake)
+            self.athena_client.execute_file_query(
+                filename=add_partition_clean_query,
+                query_params={
+                    'et': df_et[0],
+                    'ym': today_ym,
+                    's3_bucket': bucket_datalake
+                }
+            )
 
     def get_properties_as_df(self):
         props_query = """describe datalake_clean.amplitude_events"""
@@ -245,7 +271,7 @@ if __name__ == '__main__':
         df_raw = amplitude_etl.get_all_columns()
 
         if df_raw.empty:
-            _logger.warn('m=__main__, msg=empty dataframe')
+            logger.warn('m=__main__, msg=empty dataframe')
         else:
             df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
             df_raw_json['dt'] = df_raw['dt']
@@ -270,4 +296,4 @@ if __name__ == '__main__':
     elif args[1] == 'merge_users':
         amplitude_etl.merge_user_ids()
     else:
-        _logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))
+        logger.info('m=__main__, msg=arg \'{}\' not recognized'.format(args[1]))

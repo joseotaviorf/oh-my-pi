@@ -1,7 +1,9 @@
 import json
 
 import requests
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('PowerBIClient')
 
 
 class PowerBIClient(object):
@@ -48,7 +50,7 @@ class PowerBIClient(object):
                 'm=trigger_refresh, exception={}, msg=Unable to get refresh history data from server.'.format(
                     e.message))
 
-        _logger.info('m=get_refresh_history, response_status={}, msg=Refresh history successfully gotten.'.format(
+        logger.info('m=get_refresh_history, response_status={}, msg=Refresh history successfully gotten.'.format(
             response.status_code))
 
         return response.json()
@@ -68,7 +70,7 @@ class PowerBIClient(object):
             raise Exception('m=trigger_refresh, response_status={}, msg=Could not trigger PowerBI refresh.'.format(
                 response.status_code))
 
-        _logger.info('m=trigger_refresh, response_status={}, msg=Refresh request sent to PowerBI webapp.'.format(
+        logger.info('m=trigger_refresh, response_status={}, msg=Refresh request sent to PowerBI webapp.'.format(
             response.status_code))
 
     @logger(exclude=['refresh_token', 'client_id', 'client_secret'])
@@ -86,6 +88,6 @@ class PowerBIClient(object):
         except Exception as e:
             raise Exception('m=__get_access_token, exception={}, msg=Unable to get access token.'.format(e.message))
 
-        _logger.info('m=__get_access_token, msg=Access token successfully gotten.')
+        logger.info('m=__get_access_token, msg=Access token successfully gotten.')
 
         return response.get('access_token')

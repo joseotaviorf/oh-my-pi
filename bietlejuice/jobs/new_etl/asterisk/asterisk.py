@@ -7,13 +7,15 @@ from io import BytesIO
 import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, SOURCE_QUERIES_DIR
+
+logger = QuintoAndarLogger('Asterisk')
 
 
 # TODO: move to generic wrapper
@@ -68,7 +70,7 @@ class Asterisk(object):
     @logger
     def __data_existence_check(self, bucket_type, _class, file_path):
         if bucket_type not in ('raw', 'clean'):
-            _logger.error('m=__data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            logger.error('m=__data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
             raise ValueError
 
         try:
@@ -127,10 +129,10 @@ class Asterisk(object):
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, _class, file_suffix):
         if json_list is None or len(json_list) == 0:
-            _logger.info('m=__save_to_s3, msg=no results')
+            logger.info('m=__save_to_s3, msg=no results')
             return
 
-        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        logger.info('m=__save_to_s3, msg=gzipping json_list')
         gz_body = BytesIO()
         for _json in json_list:
             with GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -147,16 +149,16 @@ class Asterisk(object):
         gz_body.seek(0)
         gz_body.flush()
 
-        _logger.info('m=__save_to_s3, msg={} rows saved'.format(len(json_list)))
+        logger.info('m=__save_to_s3, msg={} rows saved'.format(len(json_list)))
 
     def __obj_to_s3(self, obj_io, file_suffix):
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=obj_io,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
     @logger
     def _upsert_partition(self, bucket_type, _class):

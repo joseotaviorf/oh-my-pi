@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import petl
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -29,11 +29,13 @@ MAIN_DAG_NAME = 'bi-demand-forecast'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * 1'  # At 03:30:00am, on every Monday, every month
 
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
+
 # parameters of the script
 begin_pred = pd.to_datetime(date.today()) - pd.to_timedelta(date.today().weekday(),
                                                             unit='days')  # last monday # must be a monday pandas timestamp
 
-_logger.info(begin_pred)
+logger.info(begin_pred)
 end_pred = begin_pred + pd.to_timedelta(125, unit='days')  # must be a sunday
 n_training_days = 126  # hard limit on the days we do not want to consider for creating distributions
 n_recent_days = 60
@@ -62,7 +64,7 @@ def load_fact(begin_pred):
         query=query_demand
     )
     fact = petl.todataframe(table_demand)
-    _logger.info('end query')
+    logger.info('end query')
 
     preprocessor_demand = Preprocessor(steps)
     fact = preprocessor_demand.preprocess(fact)
@@ -182,7 +184,7 @@ def compute_all_predictions(fact_past_bookings):
 
     city = 'all'
     region = 'all'
-    _logger.info(city + ' ' + region)
+    logger.info(city + ' ' + region)
     fact_regional = fact_past_bookings.copy()
     bookings_pred = predict_bookings(fact_regional)
     write_to_s3(bucket_ds,
@@ -204,7 +206,7 @@ def compute_all_predictions(fact_past_bookings):
 
     for city in cities:
         region = 'all'
-        _logger.info(city + ' ' + region)
+        logger.info(city + ' ' + region)
         fact_regional = fact_past_bookings[fact_past_bookings.city_name == city]
         bookings_pred = predict_bookings(fact_regional)
         if bookings_pred is not None:
@@ -228,7 +230,7 @@ def compute_all_predictions(fact_past_bookings):
 
     for region in regions:
         city = geo_levels.set_index('region').loc[region, 'city']
-        _logger.info(city + ' ' + region)
+        logger.info(city + ' ' + region)
         fact_regional = fact_past_bookings[fact_past_bookings.region_code == region]
         bookings_pred = predict_bookings(fact_regional)
         if bookings_pred is not None:
@@ -268,31 +270,31 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
 
     city = 'all'
     region = 'all'
-    _logger.info('getting ' + city + ' ' + region)
+    logger.info('getting ' + city + ' ' + region)
     kpis_prediction = get_prediction(city, region, begin_pred)
     if kpis_prediction is not None:
         kpi_pred_demand = kpis_prediction
 
     for city in cities:
         region = 'all'
-        _logger.info('getting ' + city + ' ' + region)
+        logger.info('getting ' + city + ' ' + region)
         kpis_prediction = get_prediction(city, region, begin_pred)
         if kpis_prediction is not None:
             kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
 
     for region in regions:
         city = geo_levels.set_index('region').loc[region, 'city']
-        _logger.info('getting ' + city + ' ' + region)
+        logger.info('getting ' + city + ' ' + region)
         kpis_prediction = get_prediction(city, region, begin_pred)
         if kpis_prediction is not None:
             kpi_pred_demand = pd.concat([kpi_pred_demand, kpis_prediction])
 
     kpi_pred_demand = kpi_pred_demand.reset_index().set_index(['city', 'region', 'date'])
 
-    _logger.info('combine past and predictions')
+    logger.info('combine past and predictions')
     output = pd.concat([kpi_past_demand, kpi_pred_demand]).sort_index()
 
-    _logger.info('format the output')
+    logger.info('format the output')
     # names of columns
     count_cols = [step[3:] for step in steps.index.tolist()]  # remove dt_ from col names
     count_weekly_cols = [step + '_weekly_count' for step in count_cols]
@@ -403,17 +405,17 @@ def forecast_to_csv(fact_past_bookings, geo_levels, cities, regions):
     output = output[ddl + unused_cols]
 
     # finally, write the csv
-    _logger.info('writing csv in s3')
+    logger.info('writing csv in s3')
     write_to_s3(bucket_ds, output, 'demand_funnel_' + dt_timestamp.split(' ')[0], to_csv=True, to_pickle=False)
     write_to_s3(bucket_dl, output, 'demand_funnel', to_csv=True, to_pickle=False, path='raw/growth/demand_prediction/')
 
 
 def demand_forecast():
-    _logger.info('loading fact')
+    logger.info('loading fact')
     fact_past_bookings = load_fact(begin_pred)
-    _logger.info('computing predictions for all regions')
+    logger.info('computing predictions for all regions')
     geo_levels, cities, regions = compute_all_predictions(fact_past_bookings)  # writes in s3 (pickles)
-    _logger.info('writing predictions to csv')
+    logger.info('writing predictions to csv')
     forecast_to_csv(fact_past_bookings, geo_levels, cities, regions)  # reads in s3, formats, writes csv in s3
 
 

@@ -1,8 +1,10 @@
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.workable.candidates import WorkableCandidates
 from bietlejuice.jobs.new_etl.workable.jobs import WorkableJobs
 from bietlejuice.jobs.new_etl.workable.members import WorkableMembers
+
+logger = QuintoAndarLogger('WorkableFactory')
 
 
 class WorkableFactory(object):
@@ -11,7 +13,7 @@ class WorkableFactory(object):
     def factory(_class, s3_bucket, url_prefix, access_token):
         __class = WorkableFactory.__dispatch_dict(_class.value)
         if _class is None:
-            _logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
+            logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
             raise Exception
 
         return __class(

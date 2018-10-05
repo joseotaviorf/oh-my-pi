@@ -1,10 +1,12 @@
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
+
+logger = QuintoAndarLogger('invoice-unit-tests')
 
 
 @logger
@@ -48,7 +50,7 @@ def __test_count(**kwargs):
     )[1][0] if ods_query != '' else None
 
     BaseTest.compare_sources(kwargs['acceptable_diff'], [dl_raw_return, dl_clean_return, ods_return])
-    _logger.info('m=__test_count, msg=counts are all equal')
+    logger.info('m=__test_count, msg=counts are all equal')
 
 
 @logger

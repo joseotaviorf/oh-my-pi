@@ -1,16 +1,15 @@
 import io
-import logging
 import zipfile
+from datetime import datetime
 
 import boto3
-from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
-from qa_python_utils.default_logger import _logger, logger
 
-logging.getLogger('boto3').setLevel(logging.CRITICAL)
+logger = QuintoAndarLogger('AmplitudeEventsETL')
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -31,7 +30,7 @@ class AmplitudeEventsETL(BaseETL):
 
         date_partition = 'dt={}'.format(str(start))
         file_name = 'raw/amplitude/events/{}/{}_{}_{}_{}.json.gz'.format(date_partition, app, str(start), hour, extra)
-        _logger.info('m=dump_events_to_s3, pushing file to s3 bucket={} filename={}'.format('5a-datalake', file_name))
+        logger.info('m=dump_events_to_s3, pushing file to s3 bucket={} filename={}'.format('5a-datalake', file_name))
         self.s3.Bucket('5a-datalake').put_object(Body=f.getvalue(), Key=file_name)
 
     @logger
@@ -40,12 +39,12 @@ class AmplitudeEventsETL(BaseETL):
         end = end_date.strftime(AMPLITUDE_API_DATE_FORMAT)
 
         if start and end:
-            _logger.info('m=extract_from_api_to_s3, Param Start String: start={} end={}'.format(start, end))
+            logger.info('m=extract_from_api_to_s3, Param Start String: start={} end={}'.format(start, end))
             keys = props.get_keys()
             for key in keys:
-                _logger.info('m=extract_from_api_to_s3, processing {}'.format(key['app']))
+                logger.info('m=extract_from_api_to_s3, processing {}'.format(key['app']))
                 a = AmplitudeExportApi(key['app_key'], key['secret_key'])
-                _logger.info('dt={} m=extract_from_api_to_s3, get_files_from_extract_api'.format(datetime.now()))
+                logger.info('dt={} m=extract_from_api_to_s3, get_files_from_extract_api'.format(datetime.now()))
                 f = a.get_files_from_extract_api(start, end)
                 if f:
                     with zipfile.ZipFile(f, 'r') as zfile:
@@ -54,15 +53,15 @@ class AmplitudeEventsETL(BaseETL):
                             hour = name.split('#')[0].split('_')[-1]  # extract the hour from the file name
                             extra = name.split('#')[1].split('.')[0]  # putting the extra on the name for deduplication
                             self.dump_events_to_s3(hourly_gz, key['app'], start_date, hour, extra)
-                            _logger.info('dt={} m=extract_from_api_to_s3, object sent name={} app={} hour={} extra={}'.
-                                         format(datetime.now(), name, key['app'], hour, extra))
+                            logger.info('dt={} m=extract_from_api_to_s3, object sent name={} app={} hour={} extra={}'.
+                                        format(datetime.now(), name, key['app'], hour, extra))
 
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
 
 # if __name__ == '__main__':
-#     _logger.info('m=main debug, started program')
+#     logger.info('m=main debug, started program')
 #     start_date = datetime(2018, 5, 1)
 #     end_date = (start_date + timedelta(hours=23))
 #

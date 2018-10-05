@@ -7,12 +7,15 @@ import pandas as pd
 import petl
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from qa_python_utils.default_logger import logger, _logger
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+logger = QuintoAndarLogger('HelpCenter')
 
 
 class HelpCenter(object):
@@ -225,7 +228,7 @@ class HelpCenter(object):
             return
 
         for hit in hits:
-            _logger.info(hit['_source'])
+            logger.info(hit['_source'])
 
     @logger
     def clean_elasticsearch(self):
@@ -235,7 +238,7 @@ class HelpCenter(object):
                 response = self.es.delete_by_query(index='hc-users', body={'query': {'match_all': dict()}})
                 success = not response['timed_out'] and len(response['failures']) == 0
             except Exception as e:
-                _logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
+                logger.error('m=clean_elasticsearch, message_error={}'.format(e.message))
 
     @logger(exclude='df_user')
     def send_data_to_elasticsearch(self, df_user):
@@ -261,10 +264,10 @@ class HelpCenter(object):
             })
 
         result = helpers.bulk(self.es, actions)
-        _logger.error('m=send_data_to_elasticsearch, data_sent={}'.format(result[0]))
+        logger.error('m=send_data_to_elasticsearch, data_sent={}'.format(result[0]))
 
         if len(result[1]) > 0:
-            _logger.error('m=send_data_to_elasticsearch, errors={}'.format(result[1]))
+            logger.error('m=send_data_to_elasticsearch, errors={}'.format(result[1]))
 
     @classmethod
     def __split_and_filter(cls, field_list, regex_pattern=None, regex_replace=None):

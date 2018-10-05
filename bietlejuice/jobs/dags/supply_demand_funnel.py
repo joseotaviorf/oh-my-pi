@@ -320,12 +320,20 @@ refresh_demand = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Demand'}
 )
 
+refresh_booking = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Booking',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
+)
+
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                           user_dag, house_dag, ods_house_rent_flow])
 
 airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
 fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
+refresh_demand >> refresh_booking
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
 house_dag >> fact_house_status

@@ -18,4 +18,4 @@ select
 from
   datalake_raw.crm_tasks
 where
-  extracted_on = cast('{}' as date)
+  extracted_on = cast('{dt}' as date)
