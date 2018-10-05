@@ -75,7 +75,9 @@ def treat_cpfs_after_return(**kwargs):
 
     logger.info("m=treat_cpfs_after_return, getting crawled_cpfs: {}".format(datetime.now()))
     athena_client = AthenaClient(s3_bucket=s3_bucket)
-    df = athena_client.execute_file_query_and_return_dataframe(file_name, exec_date)
+    df = athena_client.execute_file_query_and_return_dataframe(
+        filename=file_name,
+        query_params={'dt': exec_date})
 
     df_table = treat_phones_df(df)
     BaseETL.to_s3(filename='{}.csv'.format(exec_date), data_table=df_table,

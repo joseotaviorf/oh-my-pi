@@ -38,14 +38,24 @@ class AmplitudeETL(object):
     def get_all_columns(self):
         logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
         add_partition_raw_query = self.__format_query_filename('add_partition_raw')
-        self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today, self.s3_bucket)
+        self.athena_client.execute_file_query_and_wait_for_results(
+            filename=add_partition_raw_query,
+            query_params={
+                'dt_partition': self.today,
+                's3_bucket': self.s3_bucket
+            }
+        )
 
         raw_query = self.__format_query_filename('init_events_raw')
-        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
+        df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(
+            filename=raw_query,
+            query_params={'dt_partition': self.today})
 
         logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
         drop_partition_raw_query = self.__format_query_filename('drop_partition_raw')
-        self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today, self.s3_bucket)
+        self.athena_client.execute_file_query_and_wait_for_results(
+            filename=drop_partition_raw_query,
+            query_params={'dt_partition': self.today})
 
         return df_columns_raw
 
@@ -77,8 +87,15 @@ class AmplitudeETL(object):
                     type_mapping = 'string'
 
                 add_column_clean_query = self.__format_query_filename('add_column_clean')
-                self.athena_client.execute_file_query_and_wait_for_results(add_column_clean_query, prefix, formatted_up,
-                                                                           'string', up)
+                self.athena_client.execute_file_query_and_wait_for_results(
+                    filename=add_column_clean_query,
+                    query_params={
+                        'column_prefix': prefix,
+                        'column_formatted': formatted_up,
+                        'column_type': 'string',
+                        'original_column': up
+                    }
+                )
 
                 already_added_list.append(up)
 
@@ -123,7 +140,14 @@ class AmplitudeETL(object):
 
             logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
             add_partition_clean_query = self.__format_query_filename('add_partition_clean')
-            self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym, self.s3_bucket)
+            self.athena_client.execute_file_query(
+                filename=add_partition_clean_query,
+                query_params={
+                    'et': df_et[0],
+                    'ym': self.today_ym,
+                    's3_bucket': self.s3_bucket
+                }
+            )
 
     def get_properties_as_df(self):
         props_query = """describe datalake_clean.amplitude_events"""

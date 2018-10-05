@@ -1,3 +1,3 @@
 alter table datalake_raw.amplitude_events
-  add if not exists partition (dt='{0}')
-    location 's3://{1}/raw/amplitude/events/dt={0}'
+  add if not exists partition (dt='{dt_partition}')
+    location 's3://{s3_bucket}/raw/amplitude/events/dt={dt_partition}'

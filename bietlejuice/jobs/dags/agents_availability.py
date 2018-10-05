@@ -41,7 +41,11 @@ def load_agents_slots(**kwargs):
     query = read_query(file_name)
 
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
-    data_frame = athena.execute_query_and_return_dataframe(query, False, 0, execution_date)
+    data_frame = athena.execute_query_and_return_dataframe(
+        sql=query,
+        paginate=False,
+        page_size=0,
+        query_params={'dt': execution_date})
 
     delete_old_entries(entity, execution_date)
 

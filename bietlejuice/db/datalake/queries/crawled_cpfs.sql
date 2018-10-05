@@ -31,6 +31,6 @@ left join datalake_clean.crawled_cpfs old_t
 	on s.cpf = old_t.cpf
 	and s.street_name = old_t.street_name
 	and s.street_number = cast(old_t.street_number as varchar)
-	and date(old_t.dt) < date('{0}')
+	and date(old_t.dt) < date('{dt}')
 where
     old_t.cpf is null
