@@ -19,7 +19,9 @@ logging.info("Reading from S3: {}".format(datetime.utcnow()))
 date = sys.argv[2]
 if len(date) >= 10:
     date = date[:10]
-data_frame = athena.execute_file_query_and_return_dataframe(file_name, '{}'.format(date))
+data_frame = athena.execute_file_query_and_return_dataframe(
+    filename=file_name,
+    query_params={'dt': '{}'.format(date)})
 
 logging.info("START - To DW: {}".format(datetime.utcnow()))
 BaseETL.dataframe_to_db(

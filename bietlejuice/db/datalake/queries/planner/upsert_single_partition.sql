@@ -1,4 +1,4 @@
-alter table {0}.planner_{1}
-  add if not exists partition (dt='{2}', {1}='{3}')
-  location 's3://{4}/{5}/planner/dt={2}/{1}={3}'
+alter table {schema}.planner_{enum_value}
+  add if not exists partition (dt='{dt_partition}', {enum_value}='{id_class}')
+  location 's3://{s3_bucket}/{bucket_type}/planner/dt={dt_partition}/{enum_value}={id_class}'
 ;
