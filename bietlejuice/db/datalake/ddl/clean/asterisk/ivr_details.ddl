@@ -1,9 +1,9 @@
 drop table if exists datalake_clean.asterisk_ivr_details;
 create external table if not exists datalake_clean.asterisk_ivr_details (
-  id integer,
+  id string,
   name string,
   description string,
-  announcement integer,
+  announcement string,
   direct_dial string,
   invalid_loops string,
   invalid_retry_recording string,
@@ -11,15 +11,15 @@ create external table if not exists datalake_clean.asterisk_ivr_details (
   timeout_enabled string,
   invalid_recording string,
   retvm string,
-  timeout_time integer,
+  timeout_time string,
   timeout_recording string,
   timeout_retry_recording string,
   timeout_destination string,
   timeout_loops string,
-  timeout_append_announce integer,
-  invalid_append_announce integer,
-  timeout_ivr_ret integer,
-  invalid_ivr_ret integer,
+  timeout_append_announce string,
+  invalid_append_announce string,
+  timeout_ivr_ret string,
+  invalid_ivr_ret string,
   alert_info string,
   r_volume string
 )

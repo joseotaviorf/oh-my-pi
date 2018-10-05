@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 import paramiko
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -19,13 +19,15 @@ MAIN_DAG_NAME = 'neoway-send-cpfs'
 MAIN_START_DATE = datetime(2018, 7, 9)
 MAIN_SCHEDULE_INTERVAL = '0 19 * * 1'
 
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
+
 
 def send_cpfs(limit, new):
     crawler_cpfs = CrawlerCPFs(s3_bucket=s3_bucket, google_maps_api_key=None)
     cpfs = crawler_cpfs.get_new_cpfs(new=new, limit=limit)
-    _logger.info('m=send_cpfs, msg=got {} cpfs.'.format(len(cpfs)))
+    logger.info('m=send_cpfs, msg=got {} cpfs.'.format(len(cpfs)))
 
-    _logger.info('m=send_cpfs, msg=connecting to sftp')
+    logger.info('m=send_cpfs, msg=connecting to sftp')
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -33,7 +35,7 @@ def send_cpfs(limit, new):
     k = paramiko.RSAKey(file_obj=private_key)
     client.connect('files.neoway.com.br', username='quintoandarsftp', pkey=k)
 
-    _logger.info('m=send_cpfs, msg=saving file to sftp')
+    logger.info('m=send_cpfs, msg=saving file to sftp')
     cpfs_fl = cStringIO.StringIO()
     cpfs.to_csv(cpfs_fl, header=False, index=False)
     cpfs_fl.seek(0)
@@ -44,10 +46,10 @@ def send_cpfs(limit, new):
     sftp.putfo(cpfs_fl, '/files/entrada/' + filename)
     sftp.close()
 
-    _logger.info('m=send_cpfs, msg=saving cpf list to s3')
+    logger.info('m=send_cpfs, msg=saving cpf list to s3')
     BaseETL.obj_to_s3(cpfs_fl, s3_bucket, 'raw/external/owners/sent/' + filename)
 
-    _logger.info('m=send_cpfs, msg=done!')
+    logger.info('m=send_cpfs, msg=done!')
 
 
 # main dag

@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -19,6 +19,8 @@ seubarriga_invoice_dict = json.loads(env.get_airflow_env_var('seubarriga'))['inv
 MAIN_DAG_NAME = 'bi-seu_barriga-invoice'
 MAIN_START_DATE = datetime(2015, 2, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 0 15 * *'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 # functions
@@ -42,7 +44,7 @@ def extract_table(**kwargs):
         data_frame = pd.read_json(_result)
         raw_table_name = 'seubarriga_invoice_fine'
     else:
-        _logger.error("m=extract_table, kwargs['_class']={}".format(kwargs['_class']))
+        logger.error("m=extract_table, kwargs['_class']={}".format(kwargs['_class']))
         raise Exception
 
     _object = _invoice.convert_df_to_json(data_frame=data_frame)
@@ -56,7 +58,7 @@ def extract_table(**kwargs):
 
 def __get_dataframe_from_invoice_result(_invoice, result):
     if len(result) == 0:
-        _logger.error('m=__get_dataframe_from_invoice_result, msg=result is empty')
+        logger.error('m=__get_dataframe_from_invoice_result, msg=result is empty')
         raise Exception
 
     # fines

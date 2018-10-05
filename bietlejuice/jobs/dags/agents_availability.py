@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from airflow import DAG
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
@@ -12,6 +12,8 @@ from bietlejuice.jobs.dags.util import environment as env
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 athena = AthenaClient('5a-datalake')
+
+logger = QuintoAndarLogger('bi-agents-availability')
 
 
 def read_query(file_name):
@@ -35,15 +37,19 @@ def load_agents_slots(**kwargs):
     entity = 'agents_slots'
 
     file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, entity)
-    _logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
+    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
     query = read_query(file_name)
 
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
-    data_frame = athena.execute_query_and_return_dataframe(query, False, 0, execution_date)
+    data_frame = athena.execute_query_and_return_dataframe(
+        sql=query,
+        paginate=False,
+        page_size=0,
+        query_params={'dt': execution_date})
 
     delete_old_entries(entity, execution_date)
 
-    _logger.info("START - To Staging: {}".format(datetime.utcnow()))
+    logger.info("START - To Staging: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
         enum_db=EnumDB.BI_DW,
         df=data_frame,
@@ -55,7 +61,7 @@ def load_agents_slots(**kwargs):
 
 def load_agents_scheduling(**kwargs):
     entity = 'agents_scheduling'
-    query = read_query('{}/staging/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
@@ -78,7 +84,7 @@ def load_agents_scheduling(**kwargs):
 
 def load_agents_signed_contracts():
     entity = 'agents_signed_contracts'
-    query = read_query('{}/staging/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
 
     data_table = BaseETL.from_db_query(
         db_enum=EnumDB.BI_DW,

@@ -1,14 +1,16 @@
 import logging
 from datetime import datetime, timedelta
 
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.agents.bridge_demand_agent import Bridge
 
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
@@ -27,7 +29,7 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 def create_bdg_demand_agent():
     bridge = Bridge(bucket_datalake)
-    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW)
+    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW, schema='public')
     bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDB.BI_DW)
     bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
 
@@ -37,6 +39,14 @@ def guarantee_data_integrity(**kwargs):
     bridge.guarantee_integrity(db_enum=kwargs['db_enum'], schema=kwargs['schema'], f_name=kwargs['f_name'],
                                f_column=kwargs['f_column'], dim_name=kwargs['dim_name'],
                                dim_column=kwargs['dim_column'], type=kwargs['type'])
+
+
+def refresh_powerbi(**kwargs):
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
+    powerbi_client.trigger_refresh()
 
 
 dag = DAG(
@@ -148,10 +158,13 @@ data_integrity_dim_agentreview_booking = BaseDAG.build_quintoandar_python_operat
                'type': 'delete'}
 )
 
-bdg_demand_agent_xcom_dependencies >> bdg_demand_agent
-bdg_demand_agent >> data_integrity_bdg_fact_agent
-data_integrity_bdg_fact_agent >> data_integrity_bdg_dim_date
-data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user
-data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking
-data_integrity_dim_agentreview_booking >> data_integrity_fact_demand_dim_booking
-data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand
+refresh_agents = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='Refresh_PowerBI_Agents',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Agents'}
+)
+
+(bdg_demand_agent_xcom_dependencies >> bdg_demand_agent >> data_integrity_bdg_fact_agent >>
+ data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking >>
+ data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand >> refresh_agents)

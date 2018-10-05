@@ -4,9 +4,11 @@ import os
 import psycopg2
 import psycopg2.extensions
 import pymysql
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from enum_db import EnumDBType
+
+logger = QuintoAndarLogger('DBFactory')
 
 
 class DBFactory(object):
@@ -54,5 +56,5 @@ class DBFactory(object):
             cur.execute('SET SQL_MODE=ANSI_QUOTES')
             return conn
 
-        _logger.error('m=get_connection, dbtype={}, msg=unrecognized dbtype'.format(dbtype))
+        logger.error('m=get_connection, dbtype={}, msg=unrecognized dbtype'.format(dbtype))
         return None

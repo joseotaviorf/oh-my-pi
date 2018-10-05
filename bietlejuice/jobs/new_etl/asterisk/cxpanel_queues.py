@@ -1,8 +1,10 @@
 from ordereddict import OrderedDict
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.asterisk.asterisk import Asterisk
 from bietlejuice.jobs.new_etl.asterisk.asterisk_table_enum import AsteriskTableEnum
+
+logger = QuintoAndarLogger('AsteriskCXPanelQueues')
 
 
 class AsteriskCXPanelQueues(Asterisk):
@@ -33,10 +35,10 @@ class AsteriskCXPanelQueues(Asterisk):
         ])
 
         c_cols = OrderedDict([
-            ('cxpanel_queue_id', int),
-            ('queue_id', int),
+            ('cxpanel_queue_id', str),
+            ('queue_id', str),
             ('display_name', str),
-            ('add_queue', int)
+            ('add_queue', str)
         ])
 
         self._move_to_clean_full(

@@ -3,8 +3,8 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import _logger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -14,6 +14,8 @@ from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 MAIN_DAG_NAME = 'crawler_houses'
 MAIN_START_DATE = datetime(2018, 8, 24)
 MAIN_SCHEDULE_INTERVAL = '0 0 1/3 * *'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
@@ -54,14 +56,14 @@ def crawl_houses(**kwargs):
 def start_crawler(cmd, **kwargs):
     source = kwargs.get('source')
 
-    _logger.info('m=start_crawler, source={0}, msg=starting job...'.format(source))
+    logger.info('m=start_crawler, source={0}, msg=starting job...'.format(source))
     r = BatchClient().start_batch_job(
         job_name='crawl-{0}'.format(source),
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         command=cmd
     )
-    _logger.info('m=start_crawler, status={}, job={}, msg=finished.'.format(r.get('status'), '-'.join(
+    logger.info('m=start_crawler, status={}, job={}, msg=finished.'.format(r.get('status'), '-'.join(
         [r.get('jobId'), r.get('jobName')])))
 
     return r

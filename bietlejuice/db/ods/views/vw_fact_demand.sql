@@ -85,6 +85,7 @@ with _fact as (
 	  hrf.visit_created_type,
 	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
 	  hrf.visit_last_updated_type,
+	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
 	  now()::timestamp as dt_timestamp
 	from house_rent_flow hrf
 	left join vw_dim_property vdh
@@ -106,6 +107,8 @@ with _fact as (
     on hrf.id_proposal = vdp.id_proposal
   left join contract c
     on hrf.id_contract = c.id
+  left join agent_review ar
+    on hrf.id_booking = ar.id_booking
 )
 select
   ods_id,
@@ -192,6 +195,7 @@ select
 	date_part('day', dt_contract_signed - dt_contract_created)::integer as days_contract_created_to_contract_signed,
 	date_part('day', dt_contract_signed - dt_house_listing)::integer as days_house_listing_to_contract_signed,
 	date_part('day', dt_visit - dt_house_listing)::integer as days_house_listing_to_visit,
-  dt_timestamp
+	sk_agent_review_rating_date,
+    dt_timestamp
 from _fact
 ;

@@ -1,9 +1,11 @@
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger
 
 from __init__ import QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+
+logger = QuintoAndarLogger('GrowthAmplitude')
 
 
 class GrowthAmplitude(object):

@@ -1,10 +1,12 @@
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from __init__ import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from dim_etl import DimensionETL
+
+logger = QuintoAndarLogger('BusinessDimensionETL')
 
 
 class BusinessDimensionETL(DimensionETL):
@@ -19,13 +21,13 @@ class BusinessDimensionETL(DimensionETL):
         if table_name is None:
             table_name = dim_name
 
-        _logger.info("Start query: {}".format(datetime.now()))
+        logger.info("Start query: {}".format(datetime.now()))
         table = BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_ebdb,
             query=command
         )
 
-        _logger.info("To ODS: {}".format(datetime.now()))
+        logger.info("To ODS: {}".format(datetime.now()))
         table = BaseETL.decode_table(table, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
@@ -40,7 +42,7 @@ class BusinessDimensionETL(DimensionETL):
     # TODO: Make some of those parameters decorators
     @logger
     def extract_table_dim_from_ebdb_to_ods(self, dim_name, table_name, add_timestamp=False, copy_to_clean=True):
-        _logger.info("Start query: {}".format(self.now))
+        logger.info("Start query: {}".format(self.now))
         if add_timestamp:
             table = BaseETL.from_db_table(
                 db_enum=EnumDB.QuintoAndar_ebdb,
@@ -54,7 +56,7 @@ class BusinessDimensionETL(DimensionETL):
                 generator=True
             )
 
-        _logger.info("To ODS: {}".format(datetime.now()))
+        logger.info("To ODS: {}".format(datetime.now()))
         table = BaseETL.decode_table(table, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
@@ -140,7 +142,7 @@ class BusinessDimensionETL(DimensionETL):
 
     @logger
     def __df_to_db(self, enum_db, df, table_name, append=False):
-        _logger.info('m=__df_to_db, msg=sending data frame to db')
+        logger.info('m=__df_to_db, msg=sending data frame to db')
         BaseETL.dataframe_to_db(
             enum_db=enum_db,
             df=df,
@@ -148,4 +150,4 @@ class BusinessDimensionETL(DimensionETL):
             encoding='utf-8',
             append=append
         )
-        _logger.info("END - To Staging: {}".format(datetime.utcnow()))
+        logger.info("END - To Staging: {}".format(datetime.utcnow()))

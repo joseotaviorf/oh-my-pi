@@ -6,11 +6,13 @@ from io import BytesIO
 
 import boto3
 import requests
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('Planner')
 
 
 class Planner(object):
@@ -81,13 +83,13 @@ class Planner(object):
             fp.write((json.dumps(_json, ensure_ascii=False)).encode('utf-8'))
 
         file_suffix = 'raw/planner/dt={}/{}={}/data.gz'.format(self.execution_date, enum_type.value, id_class)
-        _logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
         # clear obj allocation
         # only flushing does not clear the buffer
@@ -127,14 +129,16 @@ class Planner(object):
     @logger
     def __upsert_single_partition(self, enum_type, id_class, bucket_type):
         if bucket_type not in ('raw', 'clean'):
-            raise ValueError('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            raise ValueError('m=__upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.execute_file_query_and_wait_for_results(
-            '{}/planner/upsert_single_partition.sql'.format(DATALAKE_QUERIES_DIR),
-            'datalake_{}'.format(bucket_type),
-            enum_type.value,
-            self.execution_date,
-            id_class,
-            self.s3_bucket,
-            bucket_type
+            filename='{}/planner/upsert_single_partition.sql'.format(DATALAKE_QUERIES_DIR),
+            query_params={
+                'schema': 'datalake_{}'.format(bucket_type),
+                'enum_value': enum_type.value,
+                'dt_partition': self.execution_date,
+                'id_class': id_class,
+                's3_bucket': self.s3_bucket,
+                'bucket_type': bucket_type
+            }
         )

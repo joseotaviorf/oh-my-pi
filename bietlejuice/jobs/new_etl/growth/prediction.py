@@ -1,13 +1,16 @@
-from bietlejuice.jobs.new_etl import DW_DIR
-from bietlejuice.jobs.new_etl.growth.incurred import Growth
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
-from qa_python_utils.default_logger import logger, _logger
+from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
+from bietlejuice.jobs.new_etl.growth.incurred import Growth
+
+logger = QuintoAndarLogger('GrowthPrediction')
 
 
 class GrowthPrediction(Growth):
     DEMAND_FUNNEL = 'demand'
     SUPPLY_FUNNEL = 'supply'
-    PREDICTION_QUERIES_DIR = '{}/{}'.format(DW_DIR, 'growth/prod/queries/predictions')
+    PREDICTION_QUERIES_DIR = '{}/growth/predictions'.format(DW_QUERIES_DIR)
 
     @staticmethod
     @logger
@@ -81,7 +84,7 @@ class GrowthPrediction(Growth):
 
     @staticmethod
     def create_prediction_table(funnel, measure, _filter, period, placeholders):
-        _logger.info(
+        logger.info(
             'm=create_table, funnel={}, measure={}, _filter={}, period={}, placeholders={}'.format(funnel, measure,
                                                                                                    _filter, period,
                                                                                                    placeholders))
@@ -106,4 +109,4 @@ class GrowthPrediction(Growth):
     @logger
     def append_predictions_fact():
         GrowthPrediction._execute_file_query(
-            '{}/public/queries/predictions_{}.sql'.format(DW_DIR, GrowthPrediction.FACT_TABLE_NAME))
+            '{}/public/predictions_{}.sql'.format(DW_QUERIES_DIR, GrowthPrediction.FACT_TABLE_NAME))

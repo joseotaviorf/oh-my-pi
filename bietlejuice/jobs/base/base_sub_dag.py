@@ -1,8 +1,10 @@
 from airflow.operators.subdag_operator import SubDagOperator
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+
+logger = QuintoAndarLogger('BaseSubDag')
 
 
 class BaseSubDag(object):

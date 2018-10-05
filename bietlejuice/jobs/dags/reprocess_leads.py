@@ -3,8 +3,7 @@ import math
 import os
 from datetime import datetime
 
-from qa_python_utils.default_logger import _logger
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -14,6 +13,8 @@ from bietlejuice.jobs.new_etl.leads.leads_processor import LeadsProcessor
 MAIN_DAG_NAME = 'reprocess-leads'
 MAIN_START_DATE = datetime(2018, 7, 3)
 MAIN_SCHEDULE_INTERVAL = '@once'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 env.set_airflow_var_to_local_env('EBDB')
 
@@ -57,7 +58,7 @@ def reprocess_leads(variant):
 
     old_reprocessed = processor.get_reprocessed()
 
-    _logger.info('m=reprocess_leads, msg=filtering out already reprocessed leads.')
+    logger.info('m=reprocess_leads, msg=filtering out already reprocessed leads.')
     processed = leads.merge(old_reprocessed, on='id', how='left').query('reprocessed_at.isnull()')
 
     if contact_options:
@@ -68,7 +69,7 @@ def reprocess_leads(variant):
             statuses=contact_options.get('statuses'),
             reasons=contact_options.get('reasons'))
 
-        _logger.info('m=reprocess_leads, msg=filtering out already contacted phone numbers.')
+        logger.info('m=reprocess_leads, msg=filtering out already contacted phone numbers.')
         blacklist = set()
         for c_phone in [c for c in processed.columns if c.startswith('telefoneAnunciante')]:
             contacted = processed.merge(contacts, left_on=c_phone, right_on='phone', how='left')
@@ -80,7 +81,7 @@ def reprocess_leads(variant):
     if check_coverage:
         region_id = processed.apply(lambda row: processor.check_coverage(row.lat, row.lng), axis=1)
 
-        _logger.info('m=reprocess_leads, msg=filtering out locations outside coverage area.')
+        logger.info('m=reprocess_leads, msg=filtering out locations outside coverage area.')
         processed = processed[~region_id.isnull() & (region_id != -1)]
 
     processed['origem'] = 'Reprocessado'
@@ -91,13 +92,13 @@ def reprocess_leads(variant):
         processed['infosExtras'] = processed['infosExtras'] + ';' + buckets.astype(str) + lead_options.get('unit')
 
     if size_limit is not None and len(processed) > size_limit:
-        _logger.info('m=reprocess_leads, msg=apply limit to insertion ({}/{} new leads).'.format(
+        logger.info('m=reprocess_leads, msg=apply limit to insertion ({}/{} new leads).'.format(
             size_limit, len(processed)))
         processed = processed.sample(n=size_limit)
 
-    _logger.info('m=reprocess_leads, msg=sending {} new leads.'.format(len(processed)))
+    logger.info('m=reprocess_leads, msg=sending {} new leads.'.format(len(processed)))
     processor.send_leads(processed)
-    _logger.info('m=reprocess_leads, msg=done!')
+    logger.info('m=reprocess_leads, msg=done!')
 
 
 dag = BaseDAG.build_dag(

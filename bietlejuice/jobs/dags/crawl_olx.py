@@ -3,10 +3,12 @@ from datetime import datetime
 
 from airflow.models import DAG
 from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
+
+logger = QuintoAndarLogger('crawling-houses-olx')
 
 MAIN_DAG_NAME = 'crawling-houses-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
@@ -22,14 +24,14 @@ def submit_olx(**kwargs):
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
 
-    _logger.info('Starting job...')
+    logger.info('Starting job...')
     r = BatchClient().start_batch_job(
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         command=['./crawlers/olx.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
-    _logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+    logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
 
 
 dag = DAG(
