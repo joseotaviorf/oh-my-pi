@@ -1,6 +1,7 @@
 from bietlejuice.jobs.new_etl.crm.tasks.closing import CRMTasksClosing
 from bietlejuice.jobs.new_etl.crm.tasks.credit import CRMTasksCredit
 from bietlejuice.jobs.new_etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnum
+from bietlejuice.jobs.new_etl.crm.tasks.onboarding_tenant import CRMTasksOnboardingTenant
 from bietlejuice.jobs.new_etl.crm.tasks.payment import CRMTasksPayment
 from bietlejuice.jobs.new_etl.crm.tasks.visit import CRMTasksVisit
 
@@ -25,5 +26,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.CREDIT: CRMTasksCredit,
             CRMTasksTableEnum.VISIT: CRMTasksVisit,
             CRMTasksTableEnum.CLOSING: CRMTasksClosing,
+            CRMTasksTableEnum.ONBOARDING_TENANT: CRMTasksOnboardingTenant,
             CRMTasksTableEnum.PAYMENT: CRMTasksPayment
         }.get(_class)
