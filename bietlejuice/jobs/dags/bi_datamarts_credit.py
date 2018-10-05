@@ -15,7 +15,7 @@ env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-datamarts-credit'
-MAIN_START_DATE = datetime(2018, 10, 04)
+MAIN_START_DATE = datetime(2018, 10, 4)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
 
 logger = QuintoAndarLogger(MAIN_DAG_ID)
