@@ -4,12 +4,14 @@ import re
 import fastparquet
 import pandas as pd
 import s3fs
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from __init__ import QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+
+logger = QuintoAndarLogger('AmplitudeETL')
 
 
 class AmplitudeETL(object):
@@ -34,21 +36,21 @@ class AmplitudeETL(object):
 
     @logger
     def get_all_columns(self):
-        _logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
+        logger.info('m=get_all_columns, msg=adding partition \'dt={}\''.format(self.today))
         add_partition_raw_query = self.__format_query_filename('add_partition_raw')
         self.athena_client.execute_file_query_and_wait_for_results(add_partition_raw_query, self.today, self.s3_bucket)
 
         raw_query = self.__format_query_filename('init_events_raw')
         df_columns_raw = self.athena_client.execute_file_query_and_return_dataframe(raw_query, self.today)
 
-        _logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
+        logger.info('m=get_all_columns, msg=dropping partition \'dt={}\''.format(self.today))
         drop_partition_raw_query = self.__format_query_filename('drop_partition_raw')
         self.athena_client.execute_file_query_and_wait_for_results(drop_partition_raw_query, self.today, self.s3_bucket)
 
         return df_columns_raw
 
     def insert_new_columns(self, df, df_props, df_json, properties, prefix):
-        _logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
+        logger.info('m=insert_new_columns, properties={}, prefix={}'.format(properties, prefix))
 
         props_list = list(
             df_props[df_props[0].str.contains(prefix).fillna(False)][2].apply(lambda x: x.strip()))
@@ -71,7 +73,7 @@ class AmplitudeETL(object):
                 try:
                     type_mapping = AmplitudeETL.TYPE_MAPPING[str_type]
                 except KeyError:
-                    _logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
+                    logger.warn('m=insert_new_columns, str_type={}, msg=type not mapped'.format(str_type))
                     type_mapping = 'string'
 
                 add_column_clean_query = self.__format_query_filename('add_column_clean')
@@ -113,13 +115,13 @@ class AmplitudeETL(object):
             key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(self.s3_bucket, df_et[0],
                                                                                  self.today_ym, self.today, 'events')
 
-            _logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], self.today_ym,
-                                                                                       self.today, 'events'))
+            logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], self.today_ym,
+                                                                                      self.today, 'events'))
             filtered_df = df[df['event_type'] == df_et[0]]
             filtered_df = filtered_df.fillna('').astype(str)
             fastparquet.write(key, filtered_df, open_with=s3.open)
 
-            _logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
+            logger.info('m=create_parquets, msg=adding partition \'et={}\';\'ym={}\''.format(df_et[0], self.today_ym))
             add_partition_clean_query = self.__format_query_filename('add_partition_clean')
             self.athena_client.execute_file_query(add_partition_clean_query, df_et[0], self.today_ym, self.s3_bucket)
 

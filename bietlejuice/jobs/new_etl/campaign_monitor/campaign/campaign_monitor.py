@@ -6,10 +6,12 @@ from io import BytesIO
 
 import boto3
 from createsend import CreateSend, Client, Campaign
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
+
+logger = QuintoAndarLogger('CampaignMonitorCampaign')
 
 
 class CampaignMonitorCampaign(object):
@@ -36,12 +38,12 @@ class CampaignMonitorCampaign(object):
     # abstract methods
     @abstractmethod
     def request_campaign_data(self):
-        _logger.error('m=request_campaign_data, msg=method not implemented')
+        logger.error('m=request_campaign_data, msg=method not implemented')
         raise Exception
 
     @abstractmethod
     def get_json_fields(self):
-        _logger.error('m=get_json_fields, msg=method not implemented')
+        logger.error('m=get_json_fields, msg=method not implemented')
         raise Exception
 
     # static methods
@@ -95,7 +97,7 @@ class CampaignMonitorCampaign(object):
                     'ResponseMetadata' not in response[0] or
                     'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
                     response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
-                _logger.error('m=_exclude_old_files, key={}, msg=error deleting files from S3'.format(key))
+                logger.error('m=_exclude_old_files, key={}, msg=error deleting files from S3'.format(key))
                 raise Exception
 
     @logger(exclude='result_gen')
@@ -137,10 +139,10 @@ class CampaignMonitorCampaign(object):
     @logger(exclude='cm_obj')
     def __build_json_response(self, cm_obj, json_fields):
         if cm_obj is None:
-            _logger.error('m=__build_json_response, msg=cm_obj is none')
+            logger.error('m=__build_json_response, msg=cm_obj is none')
             raise Exception
 
-        _logger.info('m=__build_json_response, msg=building json item list')
+        logger.info('m=__build_json_response, msg=building json item list')
         _json = []
         for _obj in cm_obj.Results:
             json_item = self.__build_json_item(
@@ -149,7 +151,7 @@ class CampaignMonitorCampaign(object):
             )
             _json.append(json_item)
 
-        _logger.info('m=__build_json_response, msg=json item list built successfully')
+        logger.info('m=__build_json_response, msg=json item list built successfully')
         return _json
 
     def __build_json_item(self, _obj, json_fields):
@@ -161,7 +163,7 @@ class CampaignMonitorCampaign(object):
 
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, file_path):
-        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        logger.info('m=__save_to_s3, msg=gzipping json_list')
         gz_body = BytesIO()
         with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
             for row in json_list:
@@ -174,7 +176,7 @@ class CampaignMonitorCampaign(object):
             file_path=file_path
         )
 
-        _logger.info('m=__save_to_s3, file_path={}, msg=_json sent to s3'.format(file_path))
+        logger.info('m=__save_to_s3, file_path={}, msg=_json sent to s3'.format(file_path))
         gz_body.flush()
 
     @logger
@@ -195,7 +197,7 @@ class CampaignMonitorCampaign(object):
         result = getattr(campaign, self._type)(**params_dict)
 
         if result is None:
-            _logger.error(
+            logger.error(
                 'm=__get_campaign_obj_type_max_pages, campaign_id={}, params_dict={}, msg=result is none'.format(
                     campaign_id, params_dict))
             return -1
@@ -205,7 +207,7 @@ class CampaignMonitorCampaign(object):
     @logger
     def __request_campaign_data(self, params_dict):
         for client_campaign in self.client.campaigns():
-            _logger.info('m=request_campaign_data, campaign_id={}'.format(client_campaign.CampaignID))
+            logger.info('m=request_campaign_data, campaign_id={}'.format(client_campaign.CampaignID))
 
             campaign = Campaign(self.auth, client_campaign.CampaignID)
             max_pages = self.__get_campaign_max_pages_for_obj_type(
@@ -214,13 +216,13 @@ class CampaignMonitorCampaign(object):
             )
 
             if max_pages == -1:
-                _logger.error(
+                logger.error(
                     'm=__get_campaign_obj_type_max_pages, campaign_id={}, msg=result is none'.format(
                         campaign.campaign_id))
                 raise Exception
 
             if max_pages == 0:
-                _logger.info('m=__request_campaign_data, campaign_id={}, msg=empty result'.format(campaign.campaign_id))
+                logger.info('m=__request_campaign_data, campaign_id={}, msg=empty result'.format(campaign.campaign_id))
                 continue
 
             self.__save_campaign(client_campaign)

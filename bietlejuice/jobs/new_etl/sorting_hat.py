@@ -1,7 +1,10 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from qa_python_utils.default_logger import _logger, logger
 from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR
+
+logger = QuintoAndarLogger('SortingHat')
 
 
 class SortingHat(object):
@@ -17,7 +20,7 @@ class SortingHat(object):
 
     @logger(exclude='data_table')
     def load_table_to_s3(self, table_name, data_table, s3_bucket):
-        _logger.info('m=table_extraction_and_load, msg={} - to s3'.format(table_name))
+        logger.info('m=table_extraction_and_load, msg={} - to s3'.format(table_name))
         BaseETL.to_s3(
             filename='{}.csv'.format(table_name),
             data_table=data_table,

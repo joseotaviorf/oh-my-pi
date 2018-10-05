@@ -6,11 +6,13 @@ from io import BytesIO
 
 import boto3
 import requests
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('Planner')
 
 
 class Planner(object):
@@ -81,13 +83,13 @@ class Planner(object):
             fp.write((json.dumps(_json, ensure_ascii=False)).encode('utf-8'))
 
         file_suffix = 'raw/planner/dt={}/{}={}/data.gz'.format(self.execution_date, enum_type.value, id_class)
-        _logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=_save_into_s3_raw, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
         # clear obj allocation
         # only flushing does not clear the buffer

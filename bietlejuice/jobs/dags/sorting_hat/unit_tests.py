@@ -1,4 +1,4 @@
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -8,6 +8,8 @@ from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DI
 from bietlejuice.jobs.dags.sorting_hat import SORTINGHAT_TEST_QUERIES_DIR
 
 COUNT_CHECK_SQL_SUFFIX = 'count_check.sql'
+
+logger = QuintoAndarLogger('sorting-hat-unit-tests')
 
 
 @logger
@@ -50,7 +52,7 @@ def __test_count(**kwargs):
     )[1][0] if ods_query != '' else None
 
     BaseTest.compare_sources(kwargs['acceptable_diff'], [sh_return, dl_return, ods_return])
-    _logger.info('m=__test_count, msg=counts are all equal')
+    logger.info('m=__test_count, msg=counts are all equal')
 
 
 @logger

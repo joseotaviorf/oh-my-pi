@@ -6,12 +6,14 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import petl
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
+
+logger = QuintoAndarLogger('CrawlerLeads')
 
 
 class CrawlerLeads(CrawlerEntity):

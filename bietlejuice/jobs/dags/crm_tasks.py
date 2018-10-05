@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from pymongo import MongoClient
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -17,6 +17,8 @@ uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 MAIN_DAG_NAME = 'bi-crm-tasks'
 MAIN_START_DATE = datetime(2018, 5, 15, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 def parse_dt(dt):
@@ -38,8 +40,8 @@ def parse_dt(dt):
         locale.setlocale(locale.LC_ALL, '')
         return _dt
     except ValueError as e:
-        _logger.error('m=parse_dt, msg=bad date dt={} type={} 1={} 2={} 3={} e={}'.format(dt, type(dt), dt[:28],
-                                                                                          dt[29:31], dt[31:], e))
+        logger.error('m=parse_dt, msg=bad date dt={} type={} 1={} 2={} 3={} e={}'.format(dt, type(dt), dt[:28],
+                                                                                         dt[29:31], dt[31:], e))
         return None
 
 
@@ -78,12 +80,12 @@ def extract_lead_tasks(_uri, dt=None):
 
     tasks = list()
     count = 0
-    _logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
-    _logger.info('m=extract_conversion_tasks, msg=listing tasks')
+    logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
+    logger.info('m=extract_conversion_tasks, msg=listing tasks')
     for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
-            _logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
+            logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
         task_status = 'Open'
         task_id = row['_id']
         rep_id = row['assigneeId']
@@ -164,12 +166,12 @@ def extract_manual_tasks(_uri, dt=None):
 
     tasks = list()
     count = 0
-    _logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
-    _logger.info('m=extract_conversion_tasks, msg=listing tasks')
+    logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
+    logger.info('m=extract_conversion_tasks, msg=listing tasks')
     for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
-            _logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
+            logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
 
         task_id = row['_id']
         assignee_id = row['assigneeId']
@@ -218,7 +220,7 @@ def extract_manual_tasks(_uri, dt=None):
 
 def load_lead_tasks(_uri, table_name, _bucket, schema_name='crm'):
     df = extract_lead_tasks(_uri=_uri)
-    _logger.info('m=load_lead_tasks, msg=start saving to db')
+    logger.info('m=load_lead_tasks, msg=start saving to db')
     BaseETL.dataframe_to_db(
         df=df,
         enum_db=EnumDB.BI_ODS,
@@ -227,12 +229,12 @@ def load_lead_tasks(_uri, table_name, _bucket, schema_name='crm'):
         append=False,
         bucket_name='{}/raw/crm/{}'.format(_bucket, table_name)
     )
-    _logger.info('m=load_lead_tasks, msg=saved to db')
+    logger.info('m=load_lead_tasks, msg=saved to db')
 
 
 def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
     df = extract_manual_tasks(_uri=_uri)
-    _logger.info('m=load_manual_tasks, msg=start saving to db')
+    logger.info('m=load_manual_tasks, msg=start saving to db')
     BaseETL.dataframe_to_db(
         df=df,
         enum_db=EnumDB.BI_ODS,
@@ -242,7 +244,7 @@ def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
         bucket_name='{}/raw/crm/{}'.format(_bucket, table_name),
         int_columns=['id_task_opener', 'id_original_assignee']
     )
-    _logger.info('m=load_manual_tasks, msg=saved to db')
+    logger.info('m=load_manual_tasks, msg=saved to db')
 
 
 # create main DAG definition

@@ -1,7 +1,10 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl.amplitude import QUERIES_DIR
 from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('ListingsWithPageViews')
 
 
 class ListingsWithPageViews(GrowthAmplitude):

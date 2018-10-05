@@ -1,8 +1,11 @@
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
-from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import _logger
+
+from bietlejuice.jobs.dags.util import xcom as xcom
+
+logger = QuintoAndarLogger('QuintoAndarAWSBatchSensor')
 
 
 class QuintoAndarAWSBatchSensor(BaseSensorOperator):
@@ -25,9 +28,9 @@ class QuintoAndarAWSBatchSensor(BaseSensorOperator):
             self.xcom_job_id(task_instance=context['ti'])
 
         batch_client = BatchClient()
-        _logger.info('m=poke, job_id={}'.format(self.job_id))
+        logger.info('m=poke, job_id={}'.format(self.job_id))
         job_status = batch_client.get_job_status_by_id(job_id=self.job_id)
-        _logger.info('m=poke, job_id={}, job_status={}'.format(self.job_id, job_status))
+        logger.info('m=poke, job_id={}, job_status={}'.format(self.job_id, job_status))
 
         if job_status is None:
             raise Exception('Job not found')

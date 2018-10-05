@@ -68,7 +68,11 @@ CREATE TABLE public.lead
   utm_source character varying(100) DEFAULT NULL::character varying,
   usuario_que_indicou_id character varying(100) DEFAULT NULL::character varying,
   codigo_imobiliaria character varying(100) DEFAULT NULL::character varying,
-  reprocessed_lead_id  bigint
+  reprocessed_lead_id  bigint,
+  flg_city_served boolean,
+  flg_latlng_served boolean,
+  flg_location_served boolean,
+  flg_b2b boolean
 )
 WITH (
   OIDS=FALSE

@@ -8,13 +8,15 @@ import boto3
 from botocore.exceptions import ClientError
 from ordereddict import OrderedDict
 from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+
+logger = QuintoAndarLogger('CRMTasks')
 
 
 # TODO: move to generic wrapper
@@ -93,7 +95,7 @@ class CRMTasks(object):
     @logger
     def data_existence_check(self, bucket_type):
         if bucket_type not in ('raw', 'clean'):
-            _logger.error('m=data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            logger.error('m=data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
             raise ValueError
 
         file_path = '{}/{}/dt={}/{}.gz'.format(bucket_type,
@@ -134,7 +136,7 @@ class CRMTasks(object):
         ).batch_size(10000)  # reduces the number of trips to the server
 
         total_count = collection_gen.count()
-        _logger.info('m=_extract_and_load_data, msg=processing {} rows'.format(total_count))
+        logger.info('m=extract_and_load_data, msg=processing {} rows'.format(total_count))
         self.__save_to_s3(
             json_list=collection_gen,
             total_count=total_count
@@ -164,19 +166,19 @@ class CRMTasks(object):
                 'ResponseMetadata' not in response[0] or
                 'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
                 response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
-            _logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
+            logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
             raise Exception
 
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, total_count):
         if json_list is None or json_list.count() == 0:
-            _logger.info('m=__save_to_s3, msg=no results')
+            logger.info('m=__save_to_s3, msg=no results')
             return
 
         # use the method below if multiple files have to be saved into s3
         # self.__delete_old_files()
 
-        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        logger.info('m=__save_to_s3, msg=gzipping json_list')
 
         gz_body = BytesIO()
         for _json in json_list:
@@ -198,16 +200,16 @@ class CRMTasks(object):
         gz_body.seek(0)
         gz_body.flush()
 
-        _logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
+        logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
 
     def __obj_to_s3(self, obj_io, file_suffix):
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=obj_io,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
     @logger
     def upsert_tasks_partition(self, bucket_type):
@@ -228,7 +230,7 @@ class CRMTasks(object):
     @logger
     def __upsert_partition(self, bucket_type, bucket_folder_suffix, table_name):
         if bucket_type not in ('raw', 'clean'):
-            _logger.error('m=__upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            logger.error('m=__upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
             raise ValueError
 
         self.athena_client.upsert_single_partition(
@@ -487,7 +489,7 @@ class CRMTasks(object):
 
         df = self.athena_client.execute_query_and_return_dataframe(final_query)
 
-        _logger.info('m=__move_to_staging, table_name={}, msg=sending df to DW staging'.format(table_name))
+        logger.info('m=__move_to_staging, table_name={}, msg=sending df to DW staging'.format(table_name))
         BaseETL.dataframe_to_db(
             df=df,
             table_name='{}.{}'.format(CRMTasks.SCHEMA_NAMES['staging'], table_name),
@@ -537,14 +539,14 @@ class CRMTasks(object):
 
         empty = self.__is_prod_table_empty(table_name=table_name)
         if empty:
-            _logger.info(
+            logger.info(
                 'm=__append_to_dw, schema={}, table_name={}, msg=table already empty'.format(
                     CRMTasks.SCHEMA_NAMES['prod'], table_name))
         else:
             deletion_query = BaseETL.get_query_from_file_name(
                 file_name='{}/crm/delete_old_entries.sql'.format(DW_QUERIES_DIR))
 
-            _logger.info(
+            logger.info(
                 'm=__append_to_dw, schema={}, table_name={}, msg=deleting old entries'.format(
                     CRMTasks.SCHEMA_NAMES['prod'],
                     table_name))
@@ -568,7 +570,7 @@ class CRMTasks(object):
 
     @logger
     def __append_into_dw(self, upsert_query, schema, table_name):
-        _logger.info(
+        logger.info(
             'm=__append_into_dw, schema={}, table_name={}, msg=getting data from DW'.format(schema, table_name))
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
@@ -576,8 +578,8 @@ class CRMTasks(object):
             encoding='utf-8',
         )
 
-        _logger.info(
-            'm=__append_into_dw, schema={}, table_name={}, msg=bulk inserting data'.format(schema, table_name))
+        logger.info(
+            '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(schema, table_name))
 
         BaseETL.bulk_insert(
             table=table_data,

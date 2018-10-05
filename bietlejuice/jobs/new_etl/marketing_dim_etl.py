@@ -1,10 +1,14 @@
 from datetime import date
-from dim_etl import DimensionETL
+
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from marketing_costs.google_campaigns import GoogleCampaigns
-from marketing_costs.fb_campaigns import FacebookCampaigns
+from dim_etl import DimensionETL
 from marketing_costs.criteo_campaigns import CriteoCampaigns
-from qa_python_utils.default_logger import _logger
+from marketing_costs.fb_campaigns import FacebookCampaigns
+from marketing_costs.google_campaigns import GoogleCampaigns
+
+logger = QuintoAndarLogger('MarketingDimensionETL')
 
 
 class MarketingDimensionETL(DimensionETL):
@@ -24,7 +28,7 @@ class MarketingDimensionETL(DimensionETL):
             table = self.facebook.extract_marketing_campaigns(date(2016, 1, 1))
         elif dim_name == 'criteo':
             table = self.criteo.extract_marketing_campaigns(date(2017, 1, 1))
-        _logger.info('m=load_marketing_costs, inserting into db')
+        logger.info('m=load_marketing_costs, inserting into db')
         if table is not None:
             BaseETL.bulk_insert(
                 table=table,
@@ -35,7 +39,7 @@ class MarketingDimensionETL(DimensionETL):
                 commit=True,
                 bucket_name='{}/raw/ods/{}'.format(self.bucket, table_name)
             )
-            _logger.info('m=load_marketing_costs, putting to clean')
+            logger.info('m=load_marketing_costs, putting to clean')
             BaseETL.copy_file_between_s3_buckets(
                 bucket_source=self.bucket,
                 bucket_destination=self.bucket,
@@ -43,4 +47,4 @@ class MarketingDimensionETL(DimensionETL):
                 full_filename_dest='clean/ods/{0}/{0}.csv'.format(table_name)
             )
         else:
-            _logger.error("Failure to load marketing costs mc={} dt={}".format(dim_name, table_name.utcnow()))
+            logger.error("Failure to load marketing costs mc={} dt={}".format(dim_name, table_name.utcnow()))
