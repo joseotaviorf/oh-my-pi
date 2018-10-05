@@ -1,4 +1,4 @@
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.asterisk.asterisk_table_enum import AsteriskTableEnum
 from bietlejuice.jobs.new_etl.asterisk.cdr import AsteriskCDR
@@ -11,13 +11,15 @@ from bietlejuice.jobs.new_etl.asterisk.queues_config import AsteriskQueuesConfig
 from bietlejuice.jobs.new_etl.asterisk.queues_details import AsteriskQueuesDetails
 from bietlejuice.jobs.new_etl.asterisk.users import AsteriskUsers
 
+logger = QuintoAndarLogger('AsteriskFactory')
+
 
 class AsteriskFactory(object):
     @staticmethod
     def factory(_class, s3_bucket, execution_date):
         __class = AsteriskFactory.__dispatch_dict(_class)
         if _class is None:
-            _logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
+            logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
             raise Exception
 
         return __class(

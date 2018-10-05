@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.new_etl.kpi_forecast.holtwinters import linear
-from qa_python_utils.default_logger import _logger
+
+logger = QuintoAndarLogger('Ts_predictor')
 
 
 class Ts_predictor:
@@ -86,7 +89,7 @@ class Ts_predictor:
         # the sum of a normal week should be 7, not 7.02
         self.weekly_seasonality = self.weekly_seasonality / self.weekly_seasonality.sum() * 7
         if self.weekly_seasonality[self.weekly_seasonality.notnull()].shape[0] < 7:
-            _logger.info('Not enough data to compute weekly seasonality')
+            logger.info('Not enough data to compute weekly seasonality')
             return None
 
         # correct all the days by their weekly seasonality. if 80% of normal,
@@ -114,7 +117,7 @@ class Ts_predictor:
             if alpha == 0 or (not success):
                 pred, alpha, beta, rmse, [a, b, y], success = linear(tsw.tolist(), len(self.range_pred_week), a0=0, b0=0, y0=0, deltat=dt)
                 if alpha == 0 or (not success):
-                    _logger.info('second optimization failed')
+                    logger.info('second optimization failed')
                     pred_list.append(None)
                 else:
                     pred_list.append(pred[dt])

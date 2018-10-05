@@ -3,7 +3,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from qa_python_utils.default_logger import _logger, logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
@@ -21,13 +21,15 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
 
 DATAMARTS_SCHEMA = 'datamarts'
 
+logger = QuintoAndarLogger(MAIN_DAG_ID)
+
 
 # functions
 @logger
 def create_datamart(table_name, **kwargs):
     query = BaseETL.get_query_from_file_name('{}/datamarts/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
-    _logger.info('m=create_datamart, table_name={}, msg=Dropping table'.format(table_name))
+    logger.info('m=create_datamart, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
         command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
         db_enum=EnumDB.BI_DW,
@@ -35,7 +37,7 @@ def create_datamart(table_name, **kwargs):
         commit=True
     )
 
-    _logger.info('m=create_datamart, table_name={}, msg=Creating table'.format(table_name))
+    logger.info('m=create_datamart, table_name={}, msg=Creating table'.format(table_name))
     BaseETL.execute_command(
         command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query),
         db_enum=EnumDB.BI_DW,
@@ -66,11 +68,11 @@ for filename in os.listdir('{}/{}'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
     filename_split = filename.split('.')
 
     if len(filename_split) < 1:
-        _logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
+        logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
         continue
 
     if filename_split[1] != 'sql':
-        _logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
+        logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
         continue
 
     table_name = filename_split[0]

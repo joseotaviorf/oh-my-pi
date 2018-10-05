@@ -1,8 +1,10 @@
 from ordereddict import OrderedDict
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.asterisk.asterisk import Asterisk
 from bietlejuice.jobs.new_etl.asterisk.asterisk_table_enum import AsteriskTableEnum
+
+logger = QuintoAndarLogger('AsteriskUsers')
 
 
 class AsteriskUsers(Asterisk):

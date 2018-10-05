@@ -6,14 +6,16 @@ import googlemaps
 import numpy as np
 import pandas as pd
 import requests
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 from shapely import wkt
 from shapely.geometry import Point
 from unidecode import unidecode
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('CrawlerEntity')
 
 
 class CrawlerEntity(object):
@@ -191,7 +193,7 @@ class CrawlerEntity(object):
             number = self._get_long_name(addr, 'street_number')
             return route, number
         except Exception:
-            _logger.warning('m=reverse_geocode, maps api response has no address components')
+            logger.warning('m=reverse_geocode, maps api response has no address components')
 
     @staticmethod
     def _get_long_name(addr, addr_type):

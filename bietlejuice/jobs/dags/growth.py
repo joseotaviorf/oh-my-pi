@@ -1,8 +1,10 @@
 from datetime import datetime
 
-import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
+from qa_python_utils import QuintoAndarLogger
+
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
@@ -12,7 +14,6 @@ from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingV
 from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
-from qa_python_utils.default_logger import logger, _logger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -20,6 +21,8 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MAIN_DAG_NAME = 'bi-growth'
 PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
 PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 # create DAG definition
 main_dag = DAG(
@@ -122,7 +125,7 @@ def materialize_growth_measure_table_query(**kwargs):
 
 
 def materialize_growth_measure_prediction_table_query(**kwargs):
-    _logger.info('m=materialize_growth_measure_prediction_table_query, kwargs={}'.format(kwargs))
+    logger.info('m=materialize_growth_measure_prediction_table_query, kwargs={}'.format(kwargs))
 
     funnel = kwargs['funnel']
     measure = kwargs['measure']

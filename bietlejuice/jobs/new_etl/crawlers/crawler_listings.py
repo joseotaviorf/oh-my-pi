@@ -13,7 +13,9 @@ import s3fs
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
-from qa_python_utils.default_logger import _logger, logger
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('CrawlerListings')
 
 
 class CrawlerListings(CrawlerEntity):
@@ -52,7 +54,7 @@ class CrawlerListings(CrawlerEntity):
         self.page_count = 0
         self.page_size = 1000  # this is the APIs max allowed value
         if self.api_quota == 0:
-            _logger.warning('Number of daily requests reached the daily quota')
+            logger.warning('Number of daily requests reached the daily quota')
 
     def get_crawler_listings(self):
         return self.listings
@@ -136,7 +138,7 @@ class CrawlerListings(CrawlerEntity):
         info['location'] = None
 
         iter_count = self.api_quota
-        _logger.info('m=enrich, quota={}, entity_size={}, starting to call api'.format(self.api_quota, len(entity)))
+        logger.info('m=enrich, quota={}, entity_size={}, starting to call api'.format(self.api_quota, len(entity)))
         for l in itertools.islice(entity, self.api_quota):
             r = self._get_address(lat=l[0], lng=l[1]) if reverse else self._get_address(raw_address=l)
             iter_count -= 1
@@ -168,9 +170,9 @@ class CrawlerListings(CrawlerEntity):
                 info = info.append(s, ignore_index=True)
 
             if iter_count % 100 == 0:
-                _logger.info('m=enrich, iterated={}, continuing iteration'.format(self.api_quota - iter_count))
+                logger.info('m=enrich, iterated={}, continuing iteration'.format(self.api_quota - iter_count))
         self.api_quota = iter_count
-        _logger.info('m=enrich, quota_left={}, finished iterating'.format(self.api_quota))
+        logger.info('m=enrich, quota_left={}, finished iterating'.format(self.api_quota))
         info.gcep = info.gcep.astype(str).str.zfill(8)
         info.gcep = info.gcep.replace({'00000nan': None})
 
@@ -192,7 +194,7 @@ class CrawlerListings(CrawlerEntity):
                 ~self.listings['gaddress_flg'].astype(bool) &
                 ~self.listings['glat'].where(self.listings['glat'] != '', None).isnull()
             ][self.LOCATION_COLUMNS]
-        _logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(
+        logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(
             new_locations.shape, self.new_locations.shape))
         self.new_locations = self.new_locations.append(new_locations.where(~new_locations.isnull(), ''))
 
@@ -205,7 +207,7 @@ class CrawlerListings(CrawlerEntity):
             output = current_locations.append(self.new_locations).drop_duplicates()
 
             filename = 'crawler_locations'
-            _logger.info('m=persist_address_attribution, msg=merged new locations{} with current locations{}'.format(
+            logger.info('m=persist_address_attribution, msg=merged new locations{} with current locations{}'.format(
                 self.new_locations.shape, current_locations.shape))
             obj = output.to_csv(index=False, encoding='utf8', quoting=csv.QUOTE_NONNUMERIC)
             io = cStringIO.StringIO(obj)
@@ -215,7 +217,7 @@ class CrawlerListings(CrawlerEntity):
                 file_path='raw/{0}/{0}.csv'.format(filename)
             )
         else:
-            _logger.info('m=persist_address_attribution, msg=no new locations to persist')
+            logger.info('m=persist_address_attribution, msg=no new locations to persist')
 
     @logger
     def persist_clean_crawler_data(self):
@@ -224,13 +226,13 @@ class CrawlerListings(CrawlerEntity):
         for column in self.CLEAN_COLUMNS:
             self.listings[column] = self.listings[column].fillna('').astype(str)
         s3_fs = s3fs.S3FileSystem()
-        _logger.info('m=persist_clean_crawler_data, msg=ready to upload')
+        logger.info('m=persist_clean_crawler_data, msg=ready to upload')
         fp.write(
             '{}/{}'.format(self.bucket, file_path),
             self.listings[self.CLEAN_COLUMNS],
             open_with=s3_fs.open
         )
-        _logger.info('m=persist_clean_crawler_data, msg={} ready on s3'.format(file_path))
+        logger.info('m=persist_clean_crawler_data, msg={} ready on s3'.format(file_path))
 
     @logger
     def enrich_crawler_addresses(self):
@@ -257,9 +259,9 @@ class CrawlerListings(CrawlerEntity):
             current_batch_size += self.page_size
             batch_size = len(df) if i > 0 else len(df) + 1
             self.listings = self.listings.append(df)
-            _logger.info('m=iterate_crawler_data, msg=max batch size {}'.format(self.max_batch_size))
-            _logger.info('m=iterate_crawler_data, msg=current df size {}'.format(self.listings.shape))
-            _logger.info('m=iterate_crawler_data, msg=current batch size {}'.format(current_batch_size))
+            logger.info('m=iterate_crawler_data, msg=max batch size {}'.format(self.max_batch_size))
+            logger.info('m=iterate_crawler_data, msg=current df size {}'.format(self.listings.shape))
+            logger.info('m=iterate_crawler_data, msg=current batch size {}'.format(current_batch_size))
             if (current_batch_size >= self.max_batch_size) or (batch_size < self.page_size):
                 self.transform_crawler_data()
                 self.page_count += 1

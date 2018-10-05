@@ -7,6 +7,9 @@ from datetime import datetime
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
@@ -16,13 +19,14 @@ from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_propo
 from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
 from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
 from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
+
 
 # bucket = '5a-datalake'  # for testing without airflow
 
@@ -37,7 +41,7 @@ def daily_performance():
     yesterday = today - pd.to_timedelta(1, unit='days')
 
     # query athena
-    _logger.info('Querying athena')
+    logger.info('Querying athena')
     df_proposta_ebdb = import_ebdb_proposta(client)  # only to know which ones were decided by us
     df_contrato_aud_ebdb = import_ebdb_contrato_aud(client)
     df_payments = import_invoices(client)
@@ -49,11 +53,11 @@ def daily_performance():
     df_payments = df_payments[df_payments.contract_id.isin(contracts_screened_by_5a)]
 
     # compute the the raw performance table:
-    _logger.info('computing raw performance table')
+    logger.info('computing raw performance table')
     performance_table = compute_performance_table(df_contrato_aud_ebdb, df_payments, yesterday)
 
     # feed the performance table :
-    _logger.info('feed the performance folder in s3')
+    logger.info('feed the performance folder in s3')
     performance_table['date_computation'] = yesterday
     performance_table['date_computation_30d_ago'] = yesterday - pd.to_timedelta(30, unit='days')
     performance_table = format_performance_table(performance_table)
@@ -61,7 +65,7 @@ def daily_performance():
     write_to_s3(performance_table,
                 'performance/performance' + yesterday.strftime(format='%Y%m%d') + '.csv')  # writes an object after internally changing a copy of the object to string
 
-    _logger.info('generating performance queries')
+    logger.info('generating performance queries')
     athena_ddl, pbi_query = generate_queries(performance_table, 'performance')
     write_to_s3(athena_ddl, 'queries/athena_performance_ddl.txt')
     write_to_s3(pbi_query, 'queries/pbi_performance_query.txt')
