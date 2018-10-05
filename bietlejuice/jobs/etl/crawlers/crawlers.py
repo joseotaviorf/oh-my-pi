@@ -100,10 +100,14 @@ class Crawlers(object):
         )
 
         query_crawlers = './bietlejuice/db/datalake/queries/crawlers/transform_raw.sql'
-        df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(query_crawlers, today)
+        df_crawlers = self.athena_client.execute_file_query_and_return_dataframe(
+            filename=query_crawlers,
+            query_params={'started_on': today})
 
         neighs_cities_query = './bietlejuice/db/datalake/queries/crawlers/neighs_cities.sql'
-        df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(neighs_cities_query, today)
+        df_neighs_cities = self.athena_client.execute_file_query_and_return_dataframe(
+            filename=neighs_cities_query,
+            query_params={'started_on': today})
 
         df_crawlers = self.fill_neighs_cities_from_google(df_crawlers=df_crawlers, df_neighs_cities=df_neighs_cities)
         self.athena_client.create_parquet_from_df(

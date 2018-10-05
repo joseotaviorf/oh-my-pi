@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
@@ -14,6 +14,8 @@ env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
+PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
+PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 MAIN_DAG_ID = 'bi-crm-load'
 MAIN_START_DATE = datetime(2018, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
@@ -69,6 +71,14 @@ def exec_factory_method(_class, method, **kwargs):
     )
 
     getattr(crm_tasks, method)()
+
+
+def refresh_powerbi(**kwargs):
+    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
+                                           PWBI_SCHEMA,
+                                           kwargs['workspace_name'],
+                                           kwargs['dataset_name'])
+    powerbi_client.trigger_refresh()
 
 
 # dags
@@ -360,6 +370,20 @@ tasks_visit_sub_dag = BaseSubDag.get_sub_dag_operator(
     has_bridge=True
 )
 
+refresh_credit_task = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Credit_Task',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Scalability', 'dataset_name': 'CRM credit tasks'}
+)
+
+refresh_visit_task = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='Refresh_PowerBI_Visit_Task',
+    python_callable=refresh_powerbi,
+    op_kwargs={'workspace_name': 'Scalability', 'dataset_name': 'CRM visits tasks'}
+)
+
 # flow
 airflow_helpers.chain(
     extract_and_load_task,
@@ -370,6 +394,8 @@ airflow_helpers.chain(
 )
 
 clean_tasks_resolution_sub_dag_task.set_downstream([tasks_credit_sub_dag, tasks_visit_sub_dag])
+tasks_credit_sub_dag >> refresh_credit_task
+tasks_visit_sub_dag >> refresh_visit_task
 
 
 # past processing

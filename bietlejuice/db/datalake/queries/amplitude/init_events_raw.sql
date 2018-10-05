@@ -1,3 +1,4 @@
 select *
   from datalake_raw.amplitude_events
-where dt = '{}'
+where dt = '{dt_partition}'
+;

@@ -1,8 +1,10 @@
 from ordereddict import OrderedDict
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.asterisk.asterisk import Asterisk
 from bietlejuice.jobs.new_etl.asterisk.asterisk_table_enum import AsteriskTableEnum
+
+logger = QuintoAndarLogger('AsteriskCDR')
 
 
 class AsteriskCDR(Asterisk):
@@ -61,10 +63,10 @@ class AsteriskCDR(Asterisk):
             ('dst_channel', str),
             ('last_app', str),
             ('last_data', str),
-            ('duration', int),
-            ('bill_sec', int),
+            ('duration', str),
+            ('bill_sec', str),
             ('disposition', str),
-            ('ama_flags', int),
+            ('ama_flags', str),
             ('account_code', str),
             ('unique_id', str),
             ('user_field', str),

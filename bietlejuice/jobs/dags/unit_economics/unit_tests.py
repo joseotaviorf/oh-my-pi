@@ -1,4 +1,4 @@
-from qa_python_utils.default_logger import logger, _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -7,6 +7,8 @@ from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.unit_economics import UNIT_ECONOMICS_TEST_QUERIES_DIR
 
 DRE_VALUE_CHECK_SQL = 'dre_value_check.sql'
+
+logger = QuintoAndarLogger('unit-economics-unit-tests')
 
 
 @logger
@@ -40,7 +42,7 @@ def __test_query(**kwargs):
         blocking=kwargs['blocking'],
         assertion=kwargs['assertion'])
 
-    _logger.info('m=__test_file_query, _return={}'.format(_return))
+    logger.info('m=__test_file_query, _return={}'.format(_return))
 
 
 @logger
