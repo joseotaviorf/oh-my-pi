@@ -8,7 +8,7 @@ from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags import DATAMART_CREDIT_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
-from qa_python_utils.default_logger import _logger, logger
+from qa_python_utils import QuintoAndarLogger
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -18,6 +18,7 @@ MAIN_DAG_ID = 'bi-datamarts-credit'
 MAIN_START_DATE = datetime(2018, 10, 04)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
 
+logger = QuintoAndarLogger(MAIN_DAG_ID)
 
 # functions
 
