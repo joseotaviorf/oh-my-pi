@@ -129,14 +129,16 @@ class Planner(object):
     @logger
     def __upsert_single_partition(self, enum_type, id_class, bucket_type):
         if bucket_type not in ('raw', 'clean'):
-            raise ValueError('m=_data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            raise ValueError('m=__upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.execute_file_query_and_wait_for_results(
-            '{}/planner/upsert_single_partition.sql'.format(DATALAKE_QUERIES_DIR),
-            'datalake_{}'.format(bucket_type),
-            enum_type.value,
-            self.execution_date,
-            id_class,
-            self.s3_bucket,
-            bucket_type
+            filename='{}/planner/upsert_single_partition.sql'.format(DATALAKE_QUERIES_DIR),
+            query_params={
+                'schema': 'datalake_{}'.format(bucket_type),
+                'enum_value': enum_type.value,
+                'dt_partition': self.execution_date,
+                'id_class': id_class,
+                's3_bucket': self.s3_bucket,
+                'bucket_type': bucket_type
+            }
         )
