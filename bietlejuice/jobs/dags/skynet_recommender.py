@@ -95,7 +95,8 @@ def train_model(**kwargs):
         's3://{}/{}'.format(
             SKYNET_BUCKET,
             INPUT_PATH.format(exec_date.strftime('%Y-%m-%d'))),
-        job_name=job_name)
+        job_name=job_name,
+        logs=False)
 
     xcom.xcom_push(kwargs.get('ti'), key='job_name', k_value=job_name)
 
