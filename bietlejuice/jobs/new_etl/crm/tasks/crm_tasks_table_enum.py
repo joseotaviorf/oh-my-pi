@@ -4,3 +4,6 @@ from enum import Enum
 class CRMTasksTableEnum(Enum):
     CREDIT = 'credit'
     VISIT = 'visit'
+    CLOSING = 'closing'
+    ONBOARDING_TENANT = 'onboarding_tenant'
+    PAYMENT = 'payment'
