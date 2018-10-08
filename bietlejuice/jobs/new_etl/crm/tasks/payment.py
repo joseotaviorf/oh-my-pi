@@ -6,7 +6,14 @@ logger = QuintoAndarLogger('CRMTasksPayment')
 
 
 class CRMTasksPayment(CRMTasks):
-    MANUAL_TASK_WORKGROUP_IDS = ['']
+    QUEUES = ['BuscarPrimeiroBoleto']
+
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_FINANCEIRO_ID',
+        'DEP_PAYMENTS_SELFCONDO',
+        'DEP_OFFBOARDING_FINANCEIRO',
+        'DEP_ACORDOS_DESCONTOS_ID'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_payment_tasks',
@@ -25,6 +32,7 @@ class CRMTasksPayment(CRMTasks):
     def move_fact_to_staging(self):
         self._move_fact_to_staging(
             table_name=CRMTasksPayment.TABLE_NAMES['fact'],
+            queues=CRMTasksPayment.QUEUES,
             manual_task_workgroups=CRMTasksPayment.MANUAL_TASK_WORKGROUP_IDS
         )
 
@@ -32,6 +40,7 @@ class CRMTasksPayment(CRMTasks):
     def move_dim_to_staging(self):
         self._move_dim_to_staging(
             table_name=CRMTasksPayment.TABLE_NAMES['dim'],
+            queues=CRMTasksPayment.QUEUES,
             manual_task_workgroups=CRMTasksPayment.MANUAL_TASK_WORKGROUP_IDS
         )
 
