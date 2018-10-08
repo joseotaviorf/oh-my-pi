@@ -1,5 +1,5 @@
-drop table if exists crm.dim_credit_task;
-create table if not exists crm.dim_credit_task (
+drop table if exists staging.dim_onboarding_tenant_task;
+create table if not exists staging.dim_onboarding_tenant_task (
   sk_task varchar,
   flg_solved boolean,
   score_factor numeric(14,2),
@@ -11,6 +11,6 @@ create table if not exists crm.dim_credit_task (
   type varchar,
   title varchar,
   id_workgroup varchar,
-  dt_timestamp timestamp
+  dt_partition date
 )
 ;

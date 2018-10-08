@@ -1,5 +1,5 @@
-drop table if exists staging.fact_visit_tasks;
-create table if not exists staging.fact_visit_tasks (
+drop table if exists staging.fact_onboarding_tenant_tasks;
+create table if not exists staging.fact_onboarding_tenant_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,7 +17,7 @@ create table if not exists staging.fact_visit_tasks (
   dt_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
-  sk_booking bigint,
+  sk_contract bigint,
   sk_house_listing bigint,
   dt_partition date
 )

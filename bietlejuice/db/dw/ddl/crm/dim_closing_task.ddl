@@ -1,5 +1,5 @@
-drop table if exists crm.dim_credit_task;
-create table if not exists crm.dim_credit_task (
+drop table if exists crm.dim_closing_task;
+create table if not exists crm.dim_closing_task (
   sk_task varchar,
   flg_solved boolean,
   score_factor numeric(14,2),
