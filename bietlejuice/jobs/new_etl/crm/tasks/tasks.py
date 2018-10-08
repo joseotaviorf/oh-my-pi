@@ -465,7 +465,7 @@ class CRMTasks(object):
         else:
             where_clause = "trim(ct.type) in ('{types}')".format(types="', '".join(queue for queue in queues))
 
-            if not manual_task_workgroups:
+            if manual_task_workgroups:
                 where_clause = """({previous_clause} or (trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupid":"([^"]+)', 1) in ('{manual_workgroups}')))""".format(
                     previous_clause=where_clause,
                     manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
@@ -513,7 +513,7 @@ class CRMTasks(object):
             table_name=table_name,
             queues=queues,
             query_filename='create_staging_fact_table.sql',
-            manual_task_workgroup=manual_task_workgroups,
+            manual_task_workgroups=manual_task_workgroups,
             append_query_filename=append_query_filename
         )
 
