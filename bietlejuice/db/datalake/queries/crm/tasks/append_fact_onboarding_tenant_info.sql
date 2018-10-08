@@ -42,7 +42,7 @@ select
   c.task_user_type,
   c.task_user_resolve_hours,
   c.sk_contract,
-  chl.sk_house_listing,
+  coalesce(chl.sk_house_listing, -1) as sk_house_listing,
   c.dt_partition
 from contracts c
 left join contract_house_listing chl

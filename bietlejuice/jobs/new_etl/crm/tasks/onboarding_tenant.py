@@ -37,7 +37,8 @@ class CRMTasksOnboardingTenant(CRMTasks):
     }
 
     QUERY_FILENAMES = {
-        'fact': 'append_fact_onboarding_tenant_info.sql'
+        'staging': 'append_fact_onboarding_tenant_info.sql',
+        'prod': 'append_fact_onboarding_tenant_table.sql'
     }
 
     @logger(exclude='mongo_client_uri')
@@ -54,7 +55,7 @@ class CRMTasksOnboardingTenant(CRMTasks):
             table_name=CRMTasksOnboardingTenant.TABLE_NAMES['fact'],
             queues=CRMTasksOnboardingTenant.QUEUES,
             manual_task_workgroups=CRMTasksOnboardingTenant.MANUAL_TASK_WORKGROUP_IDS,
-            append_query_filename=CRMTasksOnboardingTenant.QUERY_FILENAMES['fact']
+            append_query_filename=CRMTasksOnboardingTenant.QUERY_FILENAMES['staging']
         )
 
     @logger
@@ -69,7 +70,7 @@ class CRMTasksOnboardingTenant(CRMTasks):
     def append_fact_to_dw(self):
         self._append_fact_to_dw(
             table_name=CRMTasksOnboardingTenant.TABLE_NAMES['fact'],
-            query_filename='append_fact_onboarding_tenant_table.sql'
+            query_filename=CRMTasksOnboardingTenant.QUERY_FILENAMES['prod']
         )
 
     @logger
