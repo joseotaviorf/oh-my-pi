@@ -78,7 +78,7 @@ def train_model(**kwargs):
     params.update(
         dict(raw_filename=rid + '.csv', house_info_filename=hid + '.csv'))
 
-    job_name = 'skynet-recommender-' + exec_date.strftime("%Y-%m-%d")
+    job_name = 'skynet-recommender-' + exec_date.strftime("%Y-%m-%d-%H-%M-S")
     logger.info(
         'm=train_model, job_name={}, params={}'.format(job_name, params))
 
