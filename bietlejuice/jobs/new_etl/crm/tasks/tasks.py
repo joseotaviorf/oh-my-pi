@@ -513,7 +513,7 @@ class CRMTasks(object):
             table_name=table_name,
             queues=queues,
             query_filename='create_staging_fact_table.sql',
-            manual_task_workgroup=manual_task_workgroups,
+            manual_task_workgroups=manual_task_workgroups,
             append_query_filename=append_query_filename
         )
 
