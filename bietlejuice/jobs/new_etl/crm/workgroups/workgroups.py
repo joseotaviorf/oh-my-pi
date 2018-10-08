@@ -6,12 +6,14 @@ from io import BytesIO
 import boto3
 from ordereddict import OrderedDict
 from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
 from unidecode import unidecode
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+
+logger = QuintoAndarLogger('CRMWorkgroups')
 
 
 # TODO: move to generic wrapper
@@ -47,7 +49,7 @@ class CRMWorkgroups(object):
         collection_gen = db.workgroups.find().batch_size(10000)  # reduces the number of trips to the server
 
         total_count = collection_gen.count()
-        _logger.info('m=extract_and_load_data, msg=processing {} rows'.format(total_count))
+        logger.info('m=extract_and_load_data, msg=processing {} rows'.format(total_count))
         self.__save_to_s3(
             json_list=collection_gen,
             total_count=total_count
@@ -78,20 +80,20 @@ class CRMWorkgroups(object):
                 'ResponseMetadata' not in response[0] or
                 'HTTPStatusCode' not in response[0]['ResponseMetadata'] or
                 response[0]['ResponseMetadata']['HTTPStatusCode'] != 200):
-            _logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
+            logger.error('m=__delete_old_files, key={}, msg=error deleting files from S3'.format(key))
             raise Exception
 
     # TODO: move to an s3 wrapper
     @logger(exclude='json_list')
     def __save_to_s3(self, json_list, total_count):
         if json_list is None or json_list.count() == 0:
-            _logger.info('m=__save_to_s3, msg=no results')
+            logger.info('m=__save_to_s3, msg=no results')
             return
 
         # use the method below if multiple files have to be saved into s3
         # self.__delete_old_files()
 
-        _logger.info('m=__save_to_s3, msg=gzipping json_list')
+        logger.info('m=__save_to_s3, msg=gzipping json_list')
 
         gz_body = BytesIO()
         for _json in json_list:
@@ -111,17 +113,17 @@ class CRMWorkgroups(object):
         gz_body.seek(0)
         gz_body.flush()
 
-        _logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
+        logger.info('m=__save_to_s3, msg={} rows saved'.format(total_count))
 
     # TODO: move to s3 wrapper
     def __obj_to_s3(self, obj_io, file_suffix):
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=obj_io,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
-        _logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
 
     @logger
     def move_workgroups_to_clean(self):

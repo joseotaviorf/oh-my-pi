@@ -341,13 +341,6 @@ refresh_visit_task = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'workspace_name': 'Scalability', 'dataset_name': 'CRM visits tasks'}
 )
 
-refresh_closing_task = BaseDAG.build_quintoandar_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Closing_Task',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Scalability', 'dataset_name': 'CRM closing tasks'}
-)
-
 # flow
 airflow_helpers.chain(
     extract_and_load_task,
@@ -367,6 +360,5 @@ clean_tasks_resolution_sub_dag_task.set_downstream(
 )
 tasks_credit_sub_dag >> refresh_credit_task
 tasks_visit_sub_dag >> refresh_visit_task
-tasks_closing_sub_dag >> refresh_closing_task
 
 # TODO: add unit tests
