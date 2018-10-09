@@ -213,7 +213,7 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
         provide_context=True,
         op_kwargs={
             'bucket_type': 'clean',
-            'method': '_upsert_tasks_partition'
+            'method': 'upsert_tasks_partition'
         }
     )
 
@@ -248,7 +248,7 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         provide_context=True,
         op_kwargs={
             'bucket_type': 'clean',
-            'method': '_upsert_tasks_resolution_partition'
+            'method': 'upsert_tasks_resolution_partition'
         }
     )
 
@@ -282,7 +282,7 @@ upsert_raw_partition_task = BaseDAG.build_quintoandar_python_operator(
     provide_context=True,
     op_kwargs={
         'bucket_type': 'raw',
-        'method': '_upsert_tasks_partition'
+        'method': 'upsert_tasks_partition'
     }
 )
 
