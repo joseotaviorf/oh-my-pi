@@ -78,7 +78,8 @@ def train_model(**kwargs):
     params.update(
         dict(raw_filename=rid + '.csv', house_info_filename=hid + '.csv'))
 
-    job_name = 'skynet-recommender-' + exec_date.strftime("%Y-%m-%d-%H-%M-%S")
+    job_name = 'skynet-recommender-' + datetime.now().strftime(
+        "%Y-%m-%d-%H-%M-%S")
     logger.info(
         'm=train_model, job_name={}, params={}'.format(job_name, params))
 
@@ -95,7 +96,8 @@ def train_model(**kwargs):
         's3://{}/{}'.format(
             SKYNET_BUCKET,
             INPUT_PATH.format(exec_date.strftime('%Y-%m-%d'))),
-        job_name=job_name)
+        job_name=job_name,
+        logs=False)
 
     xcom.xcom_push(kwargs.get('ti'), key='job_name', k_value=job_name)
 
