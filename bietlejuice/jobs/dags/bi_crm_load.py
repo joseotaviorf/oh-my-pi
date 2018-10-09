@@ -8,7 +8,8 @@ import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum
+from bietlejuice.jobs.new_etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum, CRMWorkgroups, \
+    CRMTaskTitles
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -43,7 +44,7 @@ def upsert_partition(bucket_type, method, **kwargs):
     getattr(crm_tasks, method)(bucket_type)
 
 
-def extract_and_load_data(**kwargs):
+def extract_and_load_tasks_data(**kwargs):
     crm_tasks = CRMTasks(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri,
@@ -51,6 +52,46 @@ def extract_and_load_data(**kwargs):
     )
 
     crm_tasks.extract_and_load_data()
+
+
+def extract_and_load_workgroups_data(**kwargs):
+    crm_workgroups = CRMWorkgroups(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_workgroups.extract_and_load_data()
+
+
+def move_workgroups_to_clean(**kwargs):
+    crm_workgroups = CRMWorkgroups(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_workgroups.move_workgroups_to_clean()
+
+
+def extract_and_load_task_titles_data(**kwargs):
+    crm_task_titles = CRMTaskTitles(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_task_titles.extract_and_load_data()
+
+
+def move_task_titles_to_clean(**kwargs):
+    crm_task_titles = CRMTaskTitles(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_task_titles.move_task_titles_to_clean()
 
 
 def exec_crm_method(method, **kwargs):
@@ -187,6 +228,62 @@ def class_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
+def workgroups_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    extract_and_load_workgroups_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='extract_and_load_workgroups',
+        python_callable=extract_and_load_workgroups_data,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    move_workgroups_to_clean_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='move_workgroups_to_clean',
+        python_callable=move_workgroups_to_clean,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    extract_and_load_workgroups_task >> move_workgroups_to_clean_task
+
+    return local_dag
+
+
+def task_titles_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    extract_and_load_task_titles_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='extract_and_load_task_titles',
+        python_callable=extract_and_load_task_titles_data,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    move_task_titles_to_clean_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='move_task_titles_to_clean',
+        python_callable=move_task_titles_to_clean,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    extract_and_load_task_titles_task >> move_task_titles_to_clean_task
+
+    return local_dag
+
+
 def clean_tasks_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
@@ -258,9 +355,9 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
 
 
 # operators
-extract_and_load_task = BaseDAG.build_quintoandar_python_operator(
-    task_id='extract_and_load',
-    python_callable=extract_and_load_data,
+extract_and_load_tasks_task = BaseDAG.build_quintoandar_python_operator(
+    task_id='extract_and_load_tasks',
+    python_callable=extract_and_load_tasks_data,
     dag=main_dag,
     provide_context=True
 )
@@ -286,6 +383,18 @@ upsert_raw_partition_task = BaseDAG.build_quintoandar_python_operator(
     }
 )
 
+workgroups_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='workgroups',
+    sub_dag_func=workgroups_sub_dag,
+)
+
+task_titles_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='task_titles',
+    sub_dag_func=task_titles_sub_dag,
+)
+
 clean_tasks_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='create_clean_tasks_table',
@@ -298,14 +407,14 @@ clean_tasks_resolution_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=clean_task_resolution_sub_dag,
 )
 
-tasks_credit_sub_dag = BaseSubDag.get_sub_dag_operator(
+tasks_credit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_credit',
     sub_dag_func=class_sub_dag,
     _class=CRMTasksTableEnum.CREDIT
 )
 
-tasks_visit_sub_dag = BaseSubDag.get_sub_dag_operator(
+tasks_visit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_visit',
     sub_dag_func=class_sub_dag,
@@ -313,21 +422,21 @@ tasks_visit_sub_dag = BaseSubDag.get_sub_dag_operator(
     has_bridge=True
 )
 
-tasks_closing_sub_dag = BaseSubDag.get_sub_dag_operator(
+tasks_closing_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_closing',
     sub_dag_func=class_sub_dag,
     _class=CRMTasksTableEnum.CLOSING
 )
 
-tasks_onboarding_tenant_sub_dag = BaseSubDag.get_sub_dag_operator(
+tasks_onboarding_tenant_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_onboarding_tenant',
     sub_dag_func=class_sub_dag,
     _class=CRMTasksTableEnum.ONBOARDING_TENANT
 )
 
-tasks_payment_sub_dag = BaseSubDag.get_sub_dag_operator(
+tasks_payment_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_payment',
     sub_dag_func=class_sub_dag,
@@ -350,7 +459,7 @@ refresh_visit_task = BaseDAG.build_quintoandar_python_operator(
 
 # flow
 airflow_helpers.chain(
-    extract_and_load_task,
+    extract_and_load_tasks_task,
     data_existence_check_task,
     upsert_raw_partition_task,
     clean_tasks_sub_dag_task,
@@ -359,14 +468,23 @@ airflow_helpers.chain(
 
 clean_tasks_resolution_sub_dag_task.set_downstream(
     [
-        tasks_credit_sub_dag,
-        tasks_visit_sub_dag,
-        tasks_closing_sub_dag,
-        tasks_onboarding_tenant_sub_dag,
-        tasks_payment_sub_dag
+        workgroups_sub_dag,
+        task_titles_sub_dag
     ]
 )
-tasks_credit_sub_dag >> refresh_credit_task
-tasks_visit_sub_dag >> refresh_visit_task
+
+tasks_tasks = [
+    tasks_credit_sub_dag_task,
+    tasks_visit_sub_dag_task,
+    tasks_closing_sub_dag_task,
+    tasks_onboarding_tenant_sub_dag_task,
+    tasks_payment_sub_dag_task
+]
+
+workgroups_sub_dag_task.set_downstream(tasks_tasks)
+task_titles_sub_dag_task.set_downstream(tasks_tasks)
+
+tasks_credit_sub_dag_task >> refresh_credit_task
+tasks_visit_sub_dag_task >> refresh_visit_task
 
 # TODO: add unit tests
