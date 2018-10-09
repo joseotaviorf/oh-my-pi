@@ -1,7 +1,7 @@
 , contracts as (
   select
     t.*,
-    cast(coalesce(dc.sk_contract, eo.contrato_id, ev.contrato_id, '-1') as bigint) as sk_contract
+    cast(coalesce(dc.sk_contract, eo.contrato_id, '-1') as bigint) as sk_contract
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
@@ -11,17 +11,15 @@
   left join datalake_raw.ebdb_onboarding eo
     on trim(ct.origin) = 'Onboarding'
       and cast(ct.id_origin as bigint) = cast(eo.id as bigint)
-  left join datalake_raw.ebdb_vistoria ev
-    on trim(ct.origin) = 'Vistoria'
-      and cast(ct.id_origin as bigint) = cast(ev.id as bigint)
 ),
 contract_house_listing as (
   select
     cast(sk_house as bigint) as sk_house_listing,
+    cast(sk_owner as bigint) as sk_owner,
     cast(sk_contract as bigint) as sk_contract
   from datalake_clean.ods_fact_demand
   where sk_contract != '-1'
-  group by 1, 2
+  group by 1, 2, 3
 )
 select
   c.sk_task,
@@ -43,6 +41,7 @@ select
   c.task_user_resolve_hours,
   c.sk_contract,
   coalesce(chl.sk_house_listing, -1) as sk_house_listing,
+  coalesce(chl.sk_owner, -1) as sk_owner,
   c.dt_partition
 from contracts c
 left join contract_house_listing chl
