@@ -6,8 +6,8 @@ WITH latest as (
      keywords.keyword as keyword_name,
      RANK() OVER (PARTITION BY keywords.day, keywordid
                     ORDER BY keywords._sdc_report_datetime DESC)
-    FROM stitch.googleads_keywords_performance_report keywords
-    WHERE keywords.dt = '{dt}'
+    FROM datalake_clean.marketing_googleads_keywords keywords
+    WHERE keywords.created_dt = '{dt}'
     GROUP BY 1, 2, 3, keywords.day, keywords._sdc_report_datetime
     ORDER BY day ASC
 )
