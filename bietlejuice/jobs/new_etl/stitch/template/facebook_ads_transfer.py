@@ -17,7 +17,7 @@ class FacebookAdsTransfer(StitchTransferRawTemplate):
             SELECT '{account}' as account, *, DATE(FROM_ISO8601_TIMESTAMP({date_field})) as created_at
             FROM {database}.{table}
         """
-        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/created_dt={date_partition}/{file_name}.jsonl"
 
     def build_query(self):
         queries = []

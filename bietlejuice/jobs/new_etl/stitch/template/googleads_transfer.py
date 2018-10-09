@@ -8,9 +8,9 @@ from qa_python_utils.default_logger import logger, _logger
 from bietlejuice.jobs.new_etl.stitch.stitch_transfer_template import StitchTransferRawTemplate
 
 
-class AdWordsTransfer(StitchTransferRawTemplate):
+class GoogleAdsTransfer(StitchTransferRawTemplate):
     def __init__(self, bucket, execution_date, integration, database, table, date_field):
-        super(AdWordsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field)
+        super(GoogleAdsTransfer, self).__init__(bucket, execution_date, integration, database, table, date_field)
         self.adwords_table = table
         self.table = "{}_{}".format(self.integration, self.table)
         self.base_query = """
@@ -18,7 +18,7 @@ class AdWordsTransfer(StitchTransferRawTemplate):
             FROM {database}.{table}
             WHERE dt = '{partition}'
         """
-        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/dt={date_partition}/{file_name}.jsonl"
+        self.source_key = "raw/marketing/{integration}/{table}/acc={account}/created_dt={date_partition}/{file_name}.jsonl"
 
     @logger
     def build_query(self):
