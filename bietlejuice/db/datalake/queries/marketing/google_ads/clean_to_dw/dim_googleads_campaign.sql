@@ -1,5 +1,5 @@
 -- CREATE GOOGLE ADS CAMPAIGN DIMENSION TABLE
-WITH t1 as (
+WITH latest as (
     SELECT
         campaignid as sk_campaign,
         campaign as campaign_name,
@@ -12,4 +12,5 @@ WITH t1 as (
     GROUP BY 1, 2, 3, 4, day, _sdc_report_datetime
     ORDER BY day ASC
 )
-SELECT * FROM t1 WHERE rank = 1
+SELECT * FROM latest
+WHERE rank = 1

@@ -1,5 +1,5 @@
 -- CREATE GOOGLE ADS KEYWORD DIMENSION TABLE
-WITH t1 as (
+WITH latest as (
     SELECT
      keywords.keywordid as sk_keyword,
      keywords.keywordid as keyword_id,
@@ -11,4 +11,5 @@ WITH t1 as (
     GROUP BY 1, 2, 3, keywords.day, keywords._sdc_report_datetime
     ORDER BY day ASC
 )
-SELECT * FROM t1 WHERE rank = 1
+SELECT * FROM latest
+WHERE rank = 1
