@@ -25,7 +25,7 @@ class UnidecodeHandler(json.JSONEncoder):
         if isinstance(obj, unicode):
             return unidecode(obj)
         if isinstance(obj, datetime):
-            return obj.strftime('%Y-%m-%d %H:%M:%S')
+            return obj.isoformat(' ') if obj.year >= 1900 else obj.replace(year=obj.year + 2000)
 
         return unidecode(unicode(str(obj)))
 
