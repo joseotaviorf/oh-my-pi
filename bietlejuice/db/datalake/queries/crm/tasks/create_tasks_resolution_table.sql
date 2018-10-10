@@ -10,7 +10,7 @@ actions as (
     ct.*,
     cast(json_extract(a.action, '$.username') as varchar) as action_user_name,
     cast(json_extract(a.action, '$.userid') as varchar) as id_user_action,
-    cast(cast(json_extract(a.action, '$.date') as varchar) as timestamp) as dt_action,
+    cast(regexp_extract(cast(json_extract(a.action, '$.date') as varchar), '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp) as dt_action,
     cast(json_extract(a.action, '$.type') as varchar) as action_type
   from actions_prev ct
   cross join unnest(action_array) as a (action)
