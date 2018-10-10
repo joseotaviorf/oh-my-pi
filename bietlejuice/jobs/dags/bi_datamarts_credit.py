@@ -8,7 +8,7 @@ from qa_python_utils import QuintoAndarLogger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.dags import DATAMART_CREDIT_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
@@ -30,7 +30,7 @@ def create_datamart(table_name, **kwargs):
     """
     """
     schema = "datamarts_credit"
-    query = BaseETL.get_query_from_file_name('{}/{}.sql'.format(DATAMART_CREDIT_QUERIES_DIR, table_name))
+    query = BaseETL.get_query_from_file_name('{}/datamarts_credit/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
     logger.info("m=create_datamart, table_name={}, msg=Dropping table".format(table_name))
     BaseETL.execute_command(
@@ -42,7 +42,7 @@ def create_datamart(table_name, **kwargs):
 
     logger.info("m=create_datamart, table_name={}, msg=Creating table".format(table_name))
     BaseETL.execute_command(
-        command='create table {}.{} as ({})'.format(schema, table_name, query),
+        command='create table {}.{} as ({})'.format(schema, table_name, query.replace(';', '')),
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
@@ -65,7 +65,7 @@ main_dag = DAG(
 
 # operators
 
-for filename in os.listdir(DATAMART_CREDIT_QUERIES_DIR):
+for filename in os.listdir('{}/datamarts_credit'.format(DW_QUERIES_DIR)):
 
     filename_split = filename.split(".")
 
