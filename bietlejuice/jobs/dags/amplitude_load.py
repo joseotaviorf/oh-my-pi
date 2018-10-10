@@ -6,7 +6,8 @@ from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsE
 
 
 def load_amplitude(**kwargs):
-    start_date = kwargs['execution_date']
+    start_date = kwargs['execution_date'].replace(hour=0, minute=0, second=0, microsecond=0)
+
     end_date = (start_date + timedelta(hours=23))
     a = AmplitudeEventsETL()
     a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
