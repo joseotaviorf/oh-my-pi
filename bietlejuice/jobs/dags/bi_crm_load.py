@@ -468,8 +468,8 @@ airflow_helpers.chain(
 
 clean_tasks_resolution_sub_dag_task.set_downstream(
     [
-        workgroups_sub_dag,
-        task_titles_sub_dag
+        workgroups_sub_dag_task,
+        task_titles_sub_dag_task
     ]
 )
 
