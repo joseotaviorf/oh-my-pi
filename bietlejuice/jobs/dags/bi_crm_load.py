@@ -299,7 +299,7 @@ def clean_tasks_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'method': '_move_tasks_to_clean'
+            'method': 'move_tasks_to_clean'
         }
     )
 
@@ -334,7 +334,7 @@ def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'method': '_move_tasks_resolution_to_clean'
+            'method': 'move_tasks_resolution_to_clean'
         }
     )
 
