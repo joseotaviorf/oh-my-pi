@@ -168,6 +168,7 @@ train_model_op = BaseDAG.build_quintoandar_python_operator(
     task_id='train_model',
     provide_context=True,
     python_callable=train_model,
+    execution_timeout=timedelta(hours=5),
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
