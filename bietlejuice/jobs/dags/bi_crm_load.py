@@ -57,8 +57,7 @@ def extract_and_load_tasks_data(**kwargs):
 def extract_and_load_workgroups_data(**kwargs):
     crm_workgroups = CRMWorkgroups(
         s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
+        mongo_client_uri=mongo_client_uri
     )
 
     crm_workgroups.extract_and_load_data()
@@ -67,8 +66,7 @@ def extract_and_load_workgroups_data(**kwargs):
 def move_workgroups_to_clean(**kwargs):
     crm_workgroups = CRMWorkgroups(
         s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
+        mongo_client_uri=mongo_client_uri
     )
 
     crm_workgroups.move_workgroups_to_clean()
@@ -77,8 +75,7 @@ def move_workgroups_to_clean(**kwargs):
 def extract_and_load_task_titles_data(**kwargs):
     crm_task_titles = CRMTaskTitles(
         s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
+        mongo_client_uri=mongo_client_uri
     )
 
     crm_task_titles.extract_and_load_data()
@@ -87,8 +84,7 @@ def extract_and_load_task_titles_data(**kwargs):
 def move_task_titles_to_clean(**kwargs):
     crm_task_titles = CRMTaskTitles(
         s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
+        mongo_client_uri=mongo_client_uri
     )
 
     crm_task_titles.move_task_titles_to_clean()
@@ -134,6 +130,7 @@ main_dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
+    orientation='TB',
     catchup=True
 )
 
@@ -240,15 +237,13 @@ def workgroups_sub_dag(sub_dag_name, **kwargs):
     extract_and_load_workgroups_task = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_and_load_workgroups',
         python_callable=extract_and_load_workgroups_data,
-        dag=local_dag,
-        provide_context=True
+        dag=local_dag
     )
 
     move_workgroups_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_workgroups_to_clean',
         python_callable=move_workgroups_to_clean,
-        dag=local_dag,
-        provide_context=True
+        dag=local_dag
     )
 
     extract_and_load_workgroups_task >> move_workgroups_to_clean_task
@@ -268,15 +263,13 @@ def task_titles_sub_dag(sub_dag_name, **kwargs):
     extract_and_load_task_titles_task = BaseDAG.build_quintoandar_python_operator(
         task_id='extract_and_load_task_titles',
         python_callable=extract_and_load_task_titles_data,
-        dag=local_dag,
-        provide_context=True
+        dag=local_dag
     )
 
     move_task_titles_to_clean_task = BaseDAG.build_quintoandar_python_operator(
         task_id='move_task_titles_to_clean',
         python_callable=move_task_titles_to_clean,
-        dag=local_dag,
-        provide_context=True
+        dag=local_dag
     )
 
     extract_and_load_task_titles_task >> move_task_titles_to_clean_task
