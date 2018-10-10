@@ -134,6 +134,7 @@ main_dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
+    orientation='TB',
     catchup=True
 )
 
