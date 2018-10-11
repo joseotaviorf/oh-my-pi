@@ -3,11 +3,10 @@ import zipfile
 from datetime import datetime
 
 import boto3
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('AmplitudeEventsETL')
 
@@ -59,11 +58,3 @@ class AmplitudeEventsETL(BaseETL):
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
-
-# if __name__ == '__main__':
-#     logger.info('m=main debug, started program')
-#     start_date = datetime(2018, 5, 1)
-#     end_date = (start_date + timedelta(hours=23))
-#
-#     a = AmplitudeEventsETL()
-#     a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
