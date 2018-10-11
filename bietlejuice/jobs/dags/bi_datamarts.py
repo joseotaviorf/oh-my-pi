@@ -39,7 +39,7 @@ def create_datamart(table_name, **kwargs):
 
     logger.info('m=create_datamart, table_name={}, msg=Creating table'.format(table_name))
     BaseETL.execute_command(
-        command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query),
+        command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', '')),
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
