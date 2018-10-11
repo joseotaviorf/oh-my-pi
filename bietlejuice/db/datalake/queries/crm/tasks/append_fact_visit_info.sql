@@ -12,12 +12,13 @@
   left join datalake_clean.ods_dim_property dp
     on trim(ct.origin) = 'Imovel'
       and cast(ct.id_origin as bigint) = cast(dp.id as bigint)
-      and cast(ct.dt_start as timestamp) between cast(regexp_extract(dp.min_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
-        and (case
-               when max_version_time = ''
-                 then now()
-               else cast(regexp_extract(max_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
-             end)
+      and cast(regexp_extract(ct.dt_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+        between cast(regexp_extract(dp.min_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+          and (case
+                 when max_version_time = ''
+                   then now()
+                 else cast(regexp_extract(max_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+               end)
 ),
 booking_house_listing as (
   select
