@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags.marketing.to_raw.facebook_ads_raw_subdag import Faceb
 from bietlejuice.jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'bi-marketing'
-MAIN_START_DATE = datetime(2018, 10, 2, 0, 0, 0)
+MAIN_START_DATE = datetime(2018, 01, 01, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 FACEBOOK_ADS_ACCOUNTS = ['demand_acqui2sition', 'social', 'demand_retargeting', 'supply_affiliates', 'supply_landlords']
@@ -111,7 +111,5 @@ googleads_raw_dag = BaseSubDag.get_sub_dag_operator(
 googleads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=googleads_clean_sub_dag,
-    sub_dag_name='raw-googleads-to-clean'
+    sub_dag_name='google-ads-raw-to-clean'
 )
-
-googleads_raw_dag >> googleads_clean_dag

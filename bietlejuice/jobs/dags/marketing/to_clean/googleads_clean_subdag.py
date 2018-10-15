@@ -15,7 +15,7 @@ class GoogleAdsCleanSubDag(BaseSubDag):
             accounts=accounts,
             execution_date=kwargs['execution_date']
         )
-        transfer.run()
+        getattr(transfer, 'move_keywords_to_clean')()
 
     def build_googleads_clean_tasks(self):
         googleads_clean_dag = self._build_local_dag()
@@ -23,28 +23,15 @@ class GoogleAdsCleanSubDag(BaseSubDag):
         return googleads_clean_dag
 
     def __build_clean_tasks(self, dag):
-        keywords_clean = BaseDAG.build_quintoandar_python_operator(
-            dag=dag,
-            task_id='googleads_clean_keywords_performance_report',
-            python_callable=self.transfer_googleads_clean_files,
-            provide_context=True,
-            op_kwargs={
-                'bucket': self.bucket,
-                'table': 'keyword',
-                'accounts': self.accounts
-            }
-        )
-
-        campaigns_clean = BaseDAG.build_quintoandar_python_operator(
-            dag=dag,
-            task_id='googleads_clean_campaigns_performance_report',
-            python_callable=self.transfer_googleads_clean_files,
-            provide_context=True,
-            op_kwargs={
-                'bucket': self.bucket,
-                'table': 'campaign',
-                'accounts': self.accounts
-            }
-        )
-
-        return keywords_clean, campaigns_clean
+        for account in self.accounts:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id=account,
+                python_callable=self.transfer_googleads_clean_files,
+                provide_context=True,
+                op_kwargs={
+                    'bucket': self.bucket,
+                    'table': 'keyword',
+                    'accounts': account
+                }
+            )
