@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from qa_python_utils import QuintoAndarLogger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('RegionSubDag')
 
@@ -69,7 +68,7 @@ class RegionSubDag(DimSubDag):
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'region',
-                'post_command': "update staging.dim_region set dt_timestamp = '{}', region_code = '-1' where sk_region = -1;".format(
+                'post_command': "update staging.dim_region set dt_timestamp = '{}', region_code = '-1', new_region_code = '-1' where sk_region = -1;".format(
                     datetime.now().strftime('%Y-%m-%d'))
             }
         )

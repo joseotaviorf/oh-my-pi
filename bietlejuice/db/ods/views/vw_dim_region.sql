@@ -10,6 +10,7 @@ SELECT
   r."cidadeId" as city_id,
   coalesce(ar."cidadeNome", r."cidadeNome") as city_name,
   ar."Nossa nomenclatura" as region_code,
+
   ar."Nova nomenclatura" as new_region_code,
 	ar."estado" as short_region_name,
 	ar."Long region name" as long_region_name,

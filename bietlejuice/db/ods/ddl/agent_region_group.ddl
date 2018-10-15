@@ -5,5 +5,7 @@ CREATE TABLE agent_region_group (
   "regioes" VARCHAR NOT NULL,
   "area" VARCHAR NOT NULL,
   "secondary_area" VARCHAR NULL,
+  "new_area" VARCHAR NOT NULL,
+  "new_secondary_area" VARCHAR NULL,
   PRIMARY KEY ("dt","dadosagente_id","area")
 )
