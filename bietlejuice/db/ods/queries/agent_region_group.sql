@@ -4,7 +4,8 @@ SELECT
 	DATE(TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS'))  AS dt,
 	t_out.dadosagente_id,
     t_out.regiao_id,
-    aux."Nossa nomenclatura"
+    aux."Nossa nomenclatura",
+    aux."Nova nomenclatura"
 FROM
 	public.agent_region_hist t_out
 LEFT join
@@ -24,7 +25,8 @@ SELECT DISTINCT
 	ag.available_date AS dt,
 	us.dados_agente_id AS dadosagente_id,
 	region_id AS regiao_id,
-	aux."Nossa nomenclatura"
+	aux."Nossa nomenclatura",
+	aux."Nova nomenclatura"
 FROM
 	public.agents_schedule ag
 LEFT JOIN public.usuario us
@@ -49,6 +51,18 @@ FROM i_union
 	i_union.dt,
 	i_union.dadosagente_id,
 	i_union."Nossa nomenclatura")
+, i_group_new AS
+(SELECT
+	i_union.dt,
+	i_union.dadosagente_id,
+	i_union."Nova nomenclatura",
+	count(i_union."Nova nomenclatura") AS times,
+	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union."Nova nomenclatura") DESC, i_union."Nova nomenclatura" ASC) ranking
+FROM i_union
+	GROUP BY
+	i_union.dt,
+	i_union.dadosagente_id,
+	i_union."Nova nomenclatura")
 SELECT
 	g.dt,
 	g.dadosagente_id,
@@ -61,7 +75,16 @@ SELECT
 			AND r2.dt = g.dt
 			AND r2.ranking = 2
 			AND r2.times = g.times
-	 ) AS secondary_area
+	 ) AS secondary_area,
+	 gn."Nova nomenclatura" as new_area,
+	 (
+        SELECT ng2."Nova nomenclatura"
+            FROM i_group_new ng2
+        WHERE ng2.dadosagente_id = g.dadosagente_id
+                AND ng2.dt = g.dt
+                AND ng2.ranking = 2
+                AND ng2.times = g.times
+	 ) AS new_secondary_area
 FROM i_group g
 LEFT JOIN
 	(SELECT
@@ -74,5 +97,8 @@ LEFT JOIN
 	 	arh.dt,
 		arh.dadosagente_id
 	) list
-ON list.dt = g.dt AND list.dadosagente_id = g.dadosagente_id
-WHERE ranking = 1;
+    ON list.dt = g.dt AND list.dadosagente_id = g.dadosagente_id
+LEFT JOIN
+    i_group_new gn
+    ON gn.dt = g.dt AND gn.dadosagente_id = g.dadosagente_id AND gn.ranking = 1
+WHERE g.ranking = 1;
