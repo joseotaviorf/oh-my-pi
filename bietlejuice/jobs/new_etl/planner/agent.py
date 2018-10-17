@@ -1,6 +1,8 @@
-from qa_python_utils.default_logger import logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.new_etl.planner.planner import Planner
+
+logger = QuintoAndarLogger('PlannerAgent')
 
 
 class PlannerAgent(Planner):

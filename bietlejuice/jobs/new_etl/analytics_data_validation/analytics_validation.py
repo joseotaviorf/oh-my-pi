@@ -9,8 +9,10 @@ from io import BytesIO
 import boto3
 import pandas as pd
 from jsonschema import Draft4Validator
+from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import logger, _logger
+
+logger = QuintoAndarLogger('SchemaValidator')
 
 
 class SchemaValidator(object):
@@ -27,7 +29,7 @@ class SchemaValidator(object):
 
         self.schema_dict = {}
 
-        _logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator._PATH_PREFIX))
+        logger.info('m=__init__, msg=reading dir: {}'.format(SchemaValidator._PATH_PREFIX))
         for root, dirs, files in os.walk(SchemaValidator._PATH_PREFIX):
             self.schema_dict[root] = files
 
@@ -103,23 +105,23 @@ class SchemaValidator(object):
     @logger
     def validate_events_and_save_into_s3(self):
         ts_start = datetime.now()
-        _logger.info('m=validate_events, msg=job started at {}'.format(ts_start))
+        logger.info('m=validate_events, msg=job started at {}'.format(ts_start))
 
         for app, ets in self.schema_dict.iteritems():
-            _logger.info('m=validate_events_and_save_into_s3, msg=processing app: {}'.format(app))
+            logger.info('m=validate_events_and_save_into_s3, msg=processing app: {}'.format(app))
 
             app = re.search('(\d+)', app)
             if not app or len(app.groups()) == 0:
-                _logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find app')
+                logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find app')
                 continue
 
             app = app.group(1)
             for et in ets:
-                _logger.info('m=validate_events_and_save_into_s3, msg=processing event: {} for app: {}'.format(et, app))
+                logger.info('m=validate_events_and_save_into_s3, msg=processing event: {} for app: {}'.format(et, app))
 
                 et = re.search('(.*)\.schema\.json', et)
                 if not et or len(et.groups()) == 0:
-                    _logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find event type')
+                    logger.warn('m=validate_events_and_save_into_s3, msg=couldn\'t find event type')
                     continue
 
                 et = et.group(1)
@@ -130,7 +132,7 @@ class SchemaValidator(object):
                 )
 
                 if response['KeyCount'] < 1:
-                    _logger.info('m=validate_events_and_save_into_s3, msg=response_key_count < 1;skipping...')
+                    logger.info('m=validate_events_and_save_into_s3, msg=response_key_count < 1;skipping...')
                     continue
 
                 # set schema path and file
@@ -138,7 +140,7 @@ class SchemaValidator(object):
                 json_schema_file = '{}.schema.json'.format(et)
 
                 for key in response['Contents']:
-                    _logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
+                    logger.info('m=validate_events_and_save_into_s3, msg=reading {}'.format(key['Key']))
 
                     json_file = key['Key']
                     obj = self.s3_client.get_object(Bucket=self.s3_bucket, Key=json_file)
@@ -153,8 +155,8 @@ class SchemaValidator(object):
                     with open(json_schema_path + json_schema_file) as json_schema:
                         schema = json.load(json_schema)
 
-                    _logger.info('m=validate_events_and_save_into_s3, et={}, dt={}, app={}, '
-                                 'msg=validating schema'.format(et, self.today, app))
+                    logger.info('m=validate_events_and_save_into_s3, et={}, dt={}, app={}, '
+                                'msg=validating schema'.format(et, self.today, app))
 
                     tbl = []
                     for line in result_final:
@@ -171,7 +173,7 @@ class SchemaValidator(object):
                     df = self.__build_data_frame(tbl)
                     self.__save_df_into_s3(df, et, json_file)
 
-                    _logger.info('m=validate_events_and_save_into_s3, msg=closing file')
+                    logger.info('m=validate_events_and_save_into_s3, msg=closing file')
                     result_obj.close()
 
     @logger(exclude='tbl')

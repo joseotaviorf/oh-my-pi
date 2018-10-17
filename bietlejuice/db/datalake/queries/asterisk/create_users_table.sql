@@ -3,7 +3,7 @@ select
   password,
   name,
   voicemail,
-  cast(ringtimer as integer) as ringtimer,
+  ringtimer,
   noanswer,
   recording,
   outboundcid,

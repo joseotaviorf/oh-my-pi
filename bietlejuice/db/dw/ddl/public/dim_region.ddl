@@ -1,4 +1,5 @@
 drop table public.dim_region;
+
 CREATE TABLE public.dim_region (
   sk_region INTEGER,
   id INTEGER,
@@ -9,6 +10,7 @@ CREATE TABLE public.dim_region (
   city_id INTEGER,
   city_name VARCHAR(100),
   region_code VARCHAR(10),
+  new_region_code VARCHAR(10),
   short_region_name VARCHAR(255),
   long_region_name VARCHAR(255),
   greater_region VARCHAR(100),
@@ -16,5 +18,7 @@ CREATE TABLE public.dim_region (
   dt_updated TIMESTAMP WITHOUT TIME ZONE,
   dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
   dt_first_property_created TIMESTAMP,
+  dt_first_booking TIMESTAMP,
+  days_from_first_booking INTEGER,
   CONSTRAINT dim_region_pkey PRIMARY KEY(sk_region)
 ) ;

@@ -1,6 +1,9 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('GodFather')
 
 
 class GodFather(object):

@@ -4,7 +4,7 @@ create external table if not exists datalake_clean.asterisk_users (
   password string,
   name string,
   voicemail string,
-  ring_timer integer,
+  ring_timer string,
   no_answer string,
   recording string,
   outbound_cid string,

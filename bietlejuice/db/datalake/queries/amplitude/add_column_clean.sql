@@ -1,2 +1,3 @@
 alter table datalake_clean.amplitude_events
-  add columns ({0}{1} {2} comment '{3}')
+  add columns ({column_prefix}{column_formatted} {column_type} comment '{original_column}')
+;

@@ -1,7 +1,10 @@
 import boto3
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.new_etl import DW_QUERIES_DIR
-from qa_python_utils.default_logger import logger
+
+logger = QuintoAndarLogger('Bridge')
 
 
 class Bridge(object):
@@ -11,8 +14,8 @@ class Bridge(object):
         self.s3_client = boto3.resource('s3')
 
     @logger
-    def get_data(self, f_name, db_enum):
-        filename = '{}/{}.sql'.format(DW_QUERIES_DIR, f_name)
+    def get_data(self, f_name, db_enum, schema):
+        filename = '{}/{}/{}.sql'.format(DW_QUERIES_DIR, schema, f_name)
 
         with open(filename) as f:
             raw_query = f.read()

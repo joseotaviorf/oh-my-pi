@@ -13,5 +13,6 @@ CREATE TABLE public.agent_review (
 	"flg_other_reason_negative" INTEGER NULL,
 	"flg_agent_late" INTEGER NULL,
 	"flg_agent_with_no_info" INTEGER,
+	"dt_rating" TIMESTAMP
   PRIMARY KEY ("id_booking")
 )

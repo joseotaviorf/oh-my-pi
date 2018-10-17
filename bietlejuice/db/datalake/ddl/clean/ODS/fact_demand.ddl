@@ -38,16 +38,16 @@ create external table datalake_clean.ods_fact_demand (
 	visit_created_type string,
 	flg_visit_last_updated_from_app string,
 	visit_last_updated_type string,
-  booking_to_visit string,
-  offer_submitted_to_internal_analyis string,
-  offer_approved_to_doc_first_sent string,
-  doc_first_sent_to_credit_processed string,
-  doc_first_sent_to_doc_completed string,
-  doc_completed_to_credit_processed string,
-  credit_approved_to_contract_created string,
-  credit_approved_to_contract_signed string,
-  contract_created_to_contract_signed string,
-  days_booking_to_contract_signed string,
+    booking_to_visit string,
+    offer_submitted_to_internal_analyis string,
+    offer_approved_to_doc_first_sent string,
+    doc_first_sent_to_credit_processed string,
+    doc_first_sent_to_doc_completed string,
+    doc_completed_to_credit_processed string,
+    credit_approved_to_contract_created string,
+    credit_approved_to_contract_signed string,
+    contract_created_to_contract_signed string,
+    days_booking_to_contract_signed string,
 	days_booking_to_visit string,
 	days_user_creation_to_visit string,
 	days_visit_to_contract_signed string,
@@ -66,7 +66,8 @@ create external table datalake_clean.ods_fact_demand (
 	days_contract_created_to_contract_signed string,
 	days_house_listing_to_contract_signed string,
 	days_house_listing_to_visit string,
-  dt_timestamp string
+	sk_agent_review_rating_date string,
+    dt_timestamp string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

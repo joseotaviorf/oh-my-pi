@@ -22,9 +22,10 @@ pipeline:
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
+      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+      - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
     when:
       branch: [ forno ]
@@ -40,9 +41,10 @@ pipeline:
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -Ur ~/bi/requirements.txt
+      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+      - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
     when:
       branch: [ master ]
@@ -71,12 +73,37 @@ pipeline:
     when:
       branch: [ master ]
 
+  load-plugins-forno:
+    group: deploy
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: plugins/*
+    target: /var/www/airflow/plugins
+    args: '--force -vI'
+    delete: true
+    secrets: [ rsync_key ]
+    when:
+      branch: [ forno ]
+
+  load-plugins-prod:
+    group: deploy
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: plugins/*
+    target: /var/www/airflow/plugins
+    args: '--force -vI'
+    delete: true
+    secrets: [ rsync_key ]
+    when:
+      branch: [ master ]
+
   publish:
-    image: quintoandar/drone-ecr
+    image: plugins/ecr
     pull: true
     repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
     tag: [ '${DRONE_BRANCH}-${DRONE_COMMIT:0:7}', '${DRONE_BRANCH}-latest' ]
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     when:
       branch: [ master, forno ]
 

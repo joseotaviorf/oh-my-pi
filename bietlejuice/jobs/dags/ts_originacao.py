@@ -7,7 +7,7 @@ import pandas as pd
 from airflow.models import DAG
 from airflow.operators import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import _logger
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
@@ -21,6 +21,8 @@ from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_originacao
 MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
+
+logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
 
@@ -38,7 +40,7 @@ def originacao():
     yesterday = today - pd.to_timedelta(1, unit='days')
 
     # query athena
-    _logger.info('Querying athena')
+    logger.info('Querying athena')
     df_proposta_ebdb = import_ebdb_proposta(client)
     df_proposal_sh = import_sortinghat_proposal(client)
     df_proponents_of_proposal = import_sortinghat_proponent(client)
@@ -46,13 +48,13 @@ def originacao():
     df_contrato_ebdb = import_ebdb_contrato(client)
 
     # compute the last version of the originacao table
-    _logger.info('Compute last version of originacao')
+    logger.info('Compute last version of originacao')
     output_originacao = compute_originacao_table(df_proposta_ebdb,
                                                  df_contrato_ebdb,
                                                  df_proposal_sh,
                                                  df_proponents_of_proposal,
                                                  df_api_last)
-    _logger.info('Format and write originacao in s3')
+    logger.info('Format and write originacao in s3')
     output_originacao = format_originacao_table(output_originacao)
     output_originacao = create_sk_dates(output_originacao)
 

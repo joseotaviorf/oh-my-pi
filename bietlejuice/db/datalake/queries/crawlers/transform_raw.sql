@@ -97,4 +97,4 @@ select
   end as lng,
   street, neighborhood, city, state, crawl_timestamp
 from datalake_raw.crawlers
-  where started_on = date '{0}'
+  where started_on = date '{started_on}'
