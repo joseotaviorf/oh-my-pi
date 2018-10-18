@@ -8,6 +8,24 @@ with bms as (
         bms.*
     from public.booking_media_sources bms
 ),
+taxonomy_demand as (
+	 select
+		td.app_type,
+		td.utm_source,
+		td.utm_medium,
+		td.branded,
+		td.first_update_source,
+		td.flg_via_reschedule::boolean,
+		td."Category" as mkt_category,
+		td."Flow" as mkt_flow,
+		td."Completion" as mkt_completion,
+		td."Channel" as mkt_channel,
+		td."Medium" as mkt_medium,
+		td."Source" as mkt_source,
+		td."Platform" as mkt_platform
+    from
+        files.taxonomy_demand td
+),
 bookings as
 (
 	select 
@@ -90,155 +108,76 @@ bookings as
 			and bms.visita_id is not null
 		) sources
 		on v.codigo = sources.visita_id
-),
-taxonomy_flow as
-(
+)
 select
-	sk_booking,
-	id_booking,
-	valid_bookings_not_rescheduled,
-	dt_booking,
-	type,
-	confirmed,
-	closed,
-	visit_follow_up,
-	dt_visit_follow_up,
-	rescheduled_from_id,
-	id_visitor,
-	id_visit,
-	id_property,
-	id_agent,
-	id_attendant,
-	id_rental_flow,
-	status,
-	slot_dia,
-	reason,
+	b.sk_booking,
+	b.id_booking,
+	b.valid_bookings_not_rescheduled,
+	b.dt_booking,
+	b.type,
+	b.confirmed,
+	b.closed,
+	b.visit_follow_up,
+	b.dt_visit_follow_up,
+	b.rescheduled_from_id,
+	b.id_visitor,
+	b.id_visit,
+	b.id_property,
+	b.id_agent,
+	b.id_attendant,
+	b.id_rental_flow,
+	b.status,
+	b.slot_dia,
+	b.reason,
 	coalesce
 	(
-		nullif(reason_category, 'Other'), 
+		nullif(b.reason_category, 'Other'),
 		'Unknown'
 	) as reason_category,
-	case 
-		when nullif(responsible, 'Other') is null then 'Unknown'
-		when responsible = 'Agent' then 'QuintoAndar'
-		else responsible
+	case
+		when nullif(b.responsible, 'Other') is null then 'Unknown'
+		when b.responsible = 'Agent' then 'QuintoAndar'
+		else b.responsible
 	end as responsible,
-	app_type,
-  	media_source,
-  	adjust_network,
-  	utm_source,
-  	utm_medium,
-  	utm_campaign,
-	cancel_timestamp,
-	dt_created,
-	dt_updated,
-	dt_timestamp,
-	last_update_source,
-	first_update_source,
-	visitor_arrived,
-    visitor_missing_reason,
-    agent_arrived,
-    agent_missing_reason,
-    owner_arrived,
-    owner_missing_reason,
-    successful_entrance,
-    troublesome_entrance,
-    checkin_status,
-    -- Demand Taxonomy
+	b.app_type,
+  	b.media_source,
+  	b.adjust_network,
+  	b.utm_source,
+  	b.utm_medium,
+  	b.utm_campaign,
+	b.cancel_timestamp,
+	b.dt_created,
+	b.dt_updated,
+	b.dt_timestamp,
+	b.last_update_source,
+	b.first_update_source,
+	b.visitor_arrived,
+    b.visitor_missing_reason,
+    b.agent_arrived,
+    b.agent_missing_reason,
+    b.owner_arrived,
+    b.owner_missing_reason,
+    b.successful_entrance,
+    b.troublesome_entrance,
+    b.checkin_status,
     case when UPPER(utm_campaign) like '%BRANDED%' or UPPER(utm_campaign) like '%INSTITUCIONAL%' then true
     	else false
     end as flg_branded,
     (rescheduled_from_id IS NOT NULL) as flg_via_reschedule,
-	cast('Inbound' as varchar(10)) as mkt_category,
-    case when lower(first_update_source) in ('admin', 'corretores') then 'Non Self-Service'
-    	 when lower(first_update_source) in ('cidadealerta', 'inquilinos', 'proprietarios', 'selfserviceweb') then 'Self-Service'
-    	 else 'Other'
-    end as mkt_flow
+    case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_channel end as mkt_channel,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_medium end as mkt_medium,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_source end as mkt_source,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_platform end as mkt_platform
 from
-	bookings
-),
-taxonomy_channel_type as
-(
-select
-	*,
-	case when mkt_flow = 'Self-Service' then 'Full Self-Service'
-    	 else mkt_flow
-    end as mkt_completion,
-    case when mkt_flow in ('Non Self-Service', 'Other') then null
-    	 when lower(app_type) = 'ios' then 'App iOS'
-    	 when lower(app_type) = 'android' then 'App Android'
-    	 when lower(app_type) = 'web_desktop' then 'Web Desktop'
-    	 when lower(app_type) = 'web_mobile' then 'Web Mobile'
-    	 when app_type is null then 'Lost Tracking'
-    	 else 'Other'
-    end as mkt_device,
-    case when lower(first_update_source) = 'corretores' then 'Agents'
-    	 when mkt_flow in ('Non Self-Service', 'Other') then 'Other'
-    	 -- Configuring Others - Lost Tracking
-    	 when lower(utm_source) = 'landing_prop' or lower(utm_medium) = 'header' then 'Other'
-    	 when flg_branded and app_type is null then 'Other'
-    	 when app_type is null and utm_source is null and utm_medium is null then 'Other'
-    	 -- Configuring Classifieds and one exception to Organics
-    	 when utm_medium like ('classified%') then 'Online Classifieds'
-    	 when lower(utm_medium) = 'cpc' and lower(utm_source) in ('mitulagroup', 'trovit', 'zap', 'vivareal') then 'Online Classifieds'
-    	 when lower(utm_medium) = 'email' and lower(utm_source) in ('email', 'quintoandar', 'emkt_visita') then 'Organic'
-    	 when lower(utm_medium) = 'email' then 'Online Classifieds'
-    	 -- Configuring Online Paid
-    	 when lower(utm_source) in ('facebook_post', 'email') then 'Organic'
-    	 when flg_branded and lower(utm_medium) = 'retargeting' then 'Online Paid'
-    	 when flg_branded and lower(utm_medium) = 'cpc' then 'Organic'
-    	 when not flg_branded and lower(utm_medium) in ('cpc', 'display', 'remarketing', 'retargeting') then 'Online Paid'
-    	 when not flg_branded and utm_medium is null and utm_source = 'google' then 'Online Paid'
-    	 -- Configuring Organics
-    	 when not flg_branded and utm_medium is null and utm_source is null then 'Organic'
-    	 when lower(utm_source) = 'alerta' then 'Organic'
-    	 when lower(utm_source) like 'facebook%' then 'Organic'
-    	 else 'Other'
-    end as mkt_channel_type
-from
-	taxonomy_flow
-),
- taxonomy_channel as
- (
-select
-	*,
-	case
-		when lower(mkt_channel_type) in ('agents', 'online classifieds') then mkt_channel_type
-		when lower(mkt_channel_type) = 'organic' and utm_source is null then 'Direct'
-		when lower(utm_medium) = 'display' then 'Display'
-		when lower(utm_source) in ('alerta', 'email', 'emkt_visita', 'quintoandar') then 'Notifications'
-		when lower(mkt_channel_type) = 'organic' and lower(utm_medium) = 'cpc' and flg_branded then 'SEM branded'
-		when lower(mkt_channel_type) = 'online paid' and lower(coalesce(utm_medium, 'cpc')) = 'cpc' and coalesce(utm_source, '') in ('', 'bing', 'google') then 'SEM non-branded'
-		when lower(mkt_channel_type) = 'organic' and lower(utm_source) like 'facebook%' then 'Social'
-		when lower(mkt_channel_type) = 'online paid' and lower(utm_medium) in ('cpc', 'remarketing', 'retargeting') then 'Retargeting'
-		-- Configuring Others
-		when lower(mkt_channel_type) = 'other' and lower(first_update_source) in ('admin', 'cidadealerta', 'inquilinos', 'proprietarios', 'selfserviceweb') then 'Lost Tracking'
-		when lower(mkt_channel_type) = 'other' and lower(coalesce(first_update_source, '')) in ('', 'proprietariosemail', 'sistema') then 'Other'
-		else 'Other'
-	end as mkt_channel
-from
-	taxonomy_channel_type
-)
-select
-	*,
-	case
-		when lower(first_update_source) = 'admin' and lower(mkt_channel) = 'lost tracking' then 'CX'
-		else mkt_channel
-	end as mkt_medium,
-	case
-		when lower(first_update_source) = 'admin' and lower(mkt_channel) = 'lost tracking' then 'CX'
-		when lower(mkt_channel) in ('agents', 'direct', 'lost tracking', 'other', '') then mkt_channel
-		when lower(utm_source) like 'fac%' then 'Facebook'
-		when lower(utm_source) like 'google%' then 'Google'
-		when lower(utm_source) in ('emkt_visita', 'quintoandar') then 'Non-subscribed'
-		when lower(utm_source) in ('alerta', 'email') then 'Subscribed'
-		when lower(mkt_channel) in ('sem branded', 'sem non-branded') then initcap(coalesce(utm_source,'google'))
-		when lower(utm_source) like ('ads%') then 'Other'
-		when lower(utm_source) in ('imovelweb') then initcap(utm_source)
-		when right(lower(utm_source), 1) = 'b' then initcap(regexp_replace(lower(utm_source), 'b$', ''))
-		when utm_source is not null then initcap(utm_source)
-		when utm_source is null then 'Other'
-		else 'Other'
-	end as mkt_source
-from
-	taxonomy_channel;
+	bookings b
+left join taxonomy_demand td
+on
+    coalesce(td.app_type,'') = coalesce(b.app_type,'')
+	and coalesce(td.utm_source,'') = coalesce(b.utm_source,'')
+	and coalesce(td.utm_medium,'') = coalesce(b.utm_medium,'')
+	and coalesce(td.branded,'') = coalesce(b.branded,'')
+	and coalesce(td.first_update_source,'') = coalesce(b.first_update_source,'')
+	and coalesce(td.flg_via_reschedule,false) = coalesce(b.flg_via_reschedule,false)
