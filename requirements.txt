@@ -1,6 +1,6 @@
 airflow[mysql,crypto,s3,slack]==1.8.0
-botocore==1.12.21
-boto3==1.9.21
+botocore>=1.12.16
+boto3>=1.9.16
 cffi==1.9.1
 createsend==4.2.6
 cryptography>=1.7.1
@@ -62,4 +62,4 @@ llvmlite==0.22.0
 numba==0.37.0
 xlrd # lib to process xls files in s3 - old_etl
 paramiko>=2.4.1
-sagemaker==1.11.2
+sagemaker>=1.11.0
