@@ -4,7 +4,9 @@ SELECT
 	dadosagente_id AS sk_dadosagente_id,
 	regioes,
 	area,
-	secondary_area
+	secondary_area,
+	new_area,
+	new_secondary_area
 FROM staging.agent_region_group r
 )
 SELECT
