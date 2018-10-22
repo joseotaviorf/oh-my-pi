@@ -29,6 +29,7 @@ TRAINING_PATH = 'listing2vec/training'
 INPUT_PATH = 'listing2vec/data/raw/dt={}'
 RESULT_PATH = 'listing2vec/data/result/dt={}'
 EMBEDDINGS_PATH = 'listing2vec/embeddings/dt={}'
+COLD_PATH = 'listing2vec/cold/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 athena = AthenaClient(DATALAKE_BUCKET)
@@ -116,6 +117,7 @@ def untar_output(**kwargs):
     with tarfile.open(fileobj=model_obj) as tar:
         emb = tar.extractfile('embeddings.json').read()
         results = tar.extractfile('results.pkl').read()
+        cold = tar.extractfile('cold.gz').read()
 
     logger.info(
         'm=untar_output, msg=saving embeddings to {}.'.format(
@@ -131,6 +133,13 @@ def untar_output(**kwargs):
     results_filename = os.path.join(
         RESULT_PATH.format(exec_date.strftime('%Y-%m-%d')), 'results.pkl')
     bucket.Object(results_filename).put(Body=results)
+
+    logger.info(
+        'm=untar_output, msg=saving cold embeddings model to {}.'.format(
+            COLD_PATH.format(exec_date.strftime('%Y-%m-%d'))))
+    cold_filename = os.path.join(
+        COLD_PATH.format(exec_date.strftime('%Y-%m-%d')), 'cold.gz')
+    bucket.Object(cold_filename).put(Body=cold)
 
     athena.upsert_single_partition(
         bucket_folder_path=os.path.join(
