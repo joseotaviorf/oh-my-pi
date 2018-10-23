@@ -1,2 +1,0 @@
-from bietlejuice.jobs.new_etl.stitch.template.googleads_transfer import GoogleAdsTransfer
-from bietlejuice.jobs.new_etl.stitch.template.facebook_ads_transfer import FacebookAdsTransfer

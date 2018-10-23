@@ -6,7 +6,7 @@ from bietlejuice.jobs.new_etl.marketing.marketing_enum import MarketingEnum
 class MarketingFactory(object):
 
     @staticmethod
-    def factory(_class, s3_bucket, account, execution_date):
+    def factory(_class, s3_bucket, execution_date, account=None):
         __class = MarketingFactory.__dispatch_dict(_class)
         if _class is None:
             raise Exception('m=factory, _class={}, msg=class type not found'.format(_class))
