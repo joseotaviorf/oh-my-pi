@@ -1,1 +1,1 @@
-from bietlejuice.jobs.dags.marketing.marketing_clean_subdag import MarketingCleanSubDag
+from bietlejuice.jobs.dags.marketing.marketing_subdag import MarketingSubDag
