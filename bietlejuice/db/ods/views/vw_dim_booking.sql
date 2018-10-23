@@ -94,7 +94,7 @@ bookings as
         s.troublesome_entrance,
         s.checkin_status,
         case when UPPER(sources.utm_campaign) like '%BRANDED%' or UPPER(sources.utm_campaign) like '%INSTITUCIONAL%' then 'Branded'
-    		else 'Other'
+    		else 'Outro'
     	end as branded,
     	(s."reagendadoDe_id" IS NOT NULL) as flg_via_reschedule
 	from
