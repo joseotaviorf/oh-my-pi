@@ -2,13 +2,12 @@ import locale
 from datetime import datetime, timedelta
 
 import pandas as pd
-from pymongo import MongoClient
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
+from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -116,10 +115,10 @@ def extract_lead_tasks(_uri, dt=None):
         task = {
             "task_id": task_id,
             "task_status": task_status,
-            "rep_id": rep_id,
+            "rep_id": int(rep_id),
             "lead_id": lead_id,
             "number_of_reschedules": number_of_reschedules,
-            "first_rep_id": first_rep_id,
+            "first_rep_id": int(first_rep_id),
             "dt_created": dt_created,
             "dt_closed": dt_closed
         }
