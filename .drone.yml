@@ -16,14 +16,14 @@ pipeline:
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
     source: .
-    target: ~/bi
+    target: ~/data
     include: [ 'requirements.txt', 'variables.json' ]
     exclude: [ '*' ]
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+      - data_venv/bin/pip install -I -Ur ~/data/requirements.txt
+      - data_venv/bin/airflow variables -i ~/data/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
@@ -35,14 +35,14 @@ pipeline:
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: .
-    target: ~/bi
+    target: ~/data
     include: [ 'requirements.txt', 'variables.json' ]
     exclude: [ '*' ]
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+      - data_venv/bin/pip install -I -Ur ~/data/requirements.txt
+      - data_venv/bin/airflow variables -i ~/data/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
