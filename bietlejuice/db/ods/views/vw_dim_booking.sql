@@ -92,7 +92,11 @@ bookings as
         s.owner_missing_reason,
         s.successful_entrance,
         s.troublesome_entrance,
-        s.checkin_status
+        s.checkin_status,
+        case when UPPER(sources.utm_campaign) like '%BRANDED%' or UPPER(sources.utm_campaign) like '%INSTITUCIONAL%' then 'Branded'
+    		else 'Other'
+    	end as branded,
+    	(s."reagendadoDe_id" IS NOT NULL) as flg_via_reschedule
 	from
 		public.booking s
 	left join
@@ -160,10 +164,8 @@ select
     b.successful_entrance,
     b.troublesome_entrance,
     b.checkin_status,
-    case when UPPER(utm_campaign) like '%BRANDED%' or UPPER(utm_campaign) like '%INSTITUCIONAL%' then true
-    	else false
-    end as flg_branded,
-    (rescheduled_from_id IS NOT NULL) as flg_via_reschedule,
+    b.branded = 'Branded' as flg_branded,
+    b.flg_via_reschedule,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
