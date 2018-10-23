@@ -39,7 +39,7 @@ pyOpenSSL>=16.2.0
 pypd==1.0.0
 PySocks==1.6.4
 python-dateutil==2.7.3
-pytz==2016.7
+pytz==2018.5
 PyYAML==3.12
 raven==6.3.0
 requests==2.11.1
