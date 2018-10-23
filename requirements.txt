@@ -64,3 +64,4 @@ xlrd # lib to process xls files in s3 - old_etl
 paramiko>=2.4.1
 sagemaker==1.11.1
 urllib3==1.23
+kubernetes==7.0.0

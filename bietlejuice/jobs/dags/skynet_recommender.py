@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import boto3
+import kubernetes.client as kube
 import sagemaker
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
@@ -22,8 +23,9 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * 1')
 DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
 SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
-SKYNET_RECOMMENDER_IMAGE = env.get_airflow_env_var('SKYNET_RECOMMENDER_IMAGE')
 SKYNET_RECOMMENDER_KWARGS = env.get_airflow_env_var('SKYNET_RECOMMENDER_KWARGS')
+SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
+KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
 
 TRAINING_PATH = 'listing2vec/training'
 INPUT_PATH = 'listing2vec/data/raw/dt={}'
@@ -85,10 +87,10 @@ def train_model(**kwargs):
         'm=train_model, job_name={}, params={}'.format(job_name, params))
 
     model = sagemaker.estimator.Estimator(
-        image_name=SKYNET_RECOMMENDER_IMAGE,
+        image_name=kwargs.get('image'),
         role=SAGEMAKER_ROLE,
         train_instance_count=1,
-        train_instance_type='ml.m5.2xlarge',
+        train_instance_type='ml.m5.xlarge',
         output_path='s3://{}/{}'.format(SKYNET_BUCKET, TRAINING_PATH),
         hyperparameters=params)
 
@@ -151,6 +153,34 @@ def untar_output(**kwargs):
     )
 
 
+def restart_service(**kwargs):
+    config = kube.Configuration()
+    config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
+    config.api_key_prefix['authorization'] = 'Bearer'
+    config.host = KUBERNETES_API_ENDPOINT
+    config.verify_ssl = False
+
+    api = kube.AppsV1Api(kube.ApiClient(config))
+    name = kwargs.get('deploy', {}).get('name')
+    namespace = kwargs.get('deploy', {}).get('namespace')
+    now = datetime.now().strftime('%s')
+    body = {
+        "spec": {
+            "template": {
+                "metadata": {
+                    "annotations": {
+                        "reload": now
+                    }
+                }
+            }
+        }
+    }
+
+    r = api.patch_namespaced_deployment(name, namespace, body)
+
+    logger.info('API response: {}'.format(r))
+
+
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -189,4 +219,11 @@ untar_output_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op
+restart_service_op = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='restart_service',
+    python_callable=restart_service,
+    op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
+)
+
+build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
