@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE datalake_raw.marketing_googleads_keywords(
+CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads_keywords (
   customerid varchar,
   adgroupid varchar,
   adgroupname varchar,

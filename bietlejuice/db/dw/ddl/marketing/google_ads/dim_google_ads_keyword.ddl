@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS staging.dim_google_ads_keyword (
+CREATE TABLE IF NOT EXISTS marketing.dim_google_ads_keyword (
 	sk_keyword BIGINT,
 	keyword_id BIGINT,
 	keyword_name VARCHAR,

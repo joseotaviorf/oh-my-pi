@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_keywords (
+CREATE TABLE IF NOT EXISTS marketing.fact_google_ads_daily_keywords (
 	sk_keyword BIGINT,
 	sk_date INTEGER,
 	keyword_id BIGINT,
