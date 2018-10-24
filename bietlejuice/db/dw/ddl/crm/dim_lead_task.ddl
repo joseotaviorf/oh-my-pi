@@ -1,5 +1,5 @@
-drop table if exists staging.dim_visit_task;
-create table if not exists staging.dim_visit_task (
+drop table if exists crm.dim_lead_task;
+create table if not exists crm.dim_lead_task (
   sk_task varchar,
   flg_solved boolean,
   score_factor numeric(14,2),
@@ -11,6 +11,6 @@ create table if not exists staging.dim_visit_task (
   type varchar,
   titles varchar,
   workgroups varchar,
-  dt_partition date
+  ts_load timestamp
 )
 ;

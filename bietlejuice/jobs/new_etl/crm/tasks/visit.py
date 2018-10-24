@@ -6,7 +6,10 @@ logger = QuintoAndarLogger('CRMTasksVisit')
 
 
 class CRMTasksVisit(CRMTasks):
-    QUEUES = ['ConfirmarAgendamento', 'ConfirmarCondicoesEntrada']
+    QUEUES = [
+        'ConfirmarAgendamento',
+        'ConfirmarCondicoesEntrada'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_visit_tasks',

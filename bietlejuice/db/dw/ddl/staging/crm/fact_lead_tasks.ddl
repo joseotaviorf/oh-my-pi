@@ -1,5 +1,5 @@
-drop table if exists staging.fact_credit_tasks;
-create table if not exists staging.fact_credit_tasks (
+drop table if exists staging.fact_lead_tasks;
+create table if not exists staging.fact_lead_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,6 +17,7 @@ create table if not exists staging.fact_credit_tasks (
   ts_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
+  sk_lead bigint,
   dt_partition date
 )
 ;

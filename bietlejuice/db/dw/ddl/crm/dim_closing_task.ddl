@@ -3,14 +3,14 @@ create table if not exists crm.dim_closing_task (
   sk_task varchar,
   flg_solved boolean,
   score_factor numeric(14,2),
-  dt_start timestamp,
-  dt_completed timestamp,
+  ts_start timestamp,
+  ts_completed timestamp,
   hours_task_start_to_completed numeric(14,2),
   version numeric(14,2),
   origin varchar,
   type varchar,
-  title varchar,
-  id_workgroup varchar,
-  dt_timestamp timestamp
+  titles varchar,
+  workgroups varchar,
+  ts_load timestamp
 )
 ;
