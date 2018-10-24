@@ -12,7 +12,7 @@
   left join datalake_clean.ods_dim_property dp
     on trim(ct.origin) = 'Imovel'
       and cast(ct.id_origin as bigint) = cast(dp.id as bigint)
-      and cast(regexp_extract(ct.dt_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+      and cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
         between cast(regexp_extract(dp.min_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
           and (case
                  when max_version_time = ''
@@ -38,12 +38,12 @@ select
   b.action_user_name,
   b.sk_user_action,
   b.sk_action_date,
-  b.dt_action,
+  b.ts_action,
   b.action_type,
   b.sk_task_user_start_date,
-  b.dt_task_user_start,
+  b.ts_task_user_start,
   b.sk_task_user_end_date,
-  b.dt_task_user_end,
+  b.ts_task_user_end,
   b.task_user_type,
   b.task_user_resolve_hours,
   b.sk_booking,

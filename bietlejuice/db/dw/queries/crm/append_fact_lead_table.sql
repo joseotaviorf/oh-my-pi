@@ -16,6 +16,7 @@ select
   ts_task_action_end,
   task_action_type,
   task_user_action_resolve_hours,
+  sk_lead,
   getdate() as ts_load
 from staging.{table_name}
 -- because the query can have another where clause (appended at runtime), a semicolon MUST NOT be added
