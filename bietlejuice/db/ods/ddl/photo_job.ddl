@@ -6,6 +6,7 @@ create table public.photo_job (
 	creation_origin varchar(20),
 	flexible_schedule int,
     same_day_listing int,
+    job_on_time int,
 	dt_photographer_accepted datetime,
 	dt_job_created datetime,
 	dt_job_issued datetime,
