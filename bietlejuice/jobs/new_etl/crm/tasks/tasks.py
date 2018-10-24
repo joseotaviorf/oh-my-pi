@@ -277,7 +277,7 @@ class CRMTasks(object):
             ('id_owner', str),
             ('id_receiver', str),
             ('id', str),
-            ('resolve', str)
+            ('resolved', str)
         ])
 
         self.__move_to_clean(
