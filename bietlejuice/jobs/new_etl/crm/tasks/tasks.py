@@ -250,7 +250,7 @@ class CRMTasks(object):
             ('ts_start', str),
             ('receiver_name', str),
             ('ts_completed', str),
-            ('`comment`', str),
+            ('comment', str),
             ('id_origin', str),
             ('id_assignee', str),
             ('score', str),
