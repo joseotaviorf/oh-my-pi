@@ -9,7 +9,7 @@ Airflow implementation and DAGs.
 #### Git hooks
 
 ```
-pip install --upgrade flake8 && flake8 --install-hook git && git config --bool flake8.strict true
+pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
 ```
 
 ### Airflow
