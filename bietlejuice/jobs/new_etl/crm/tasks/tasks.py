@@ -33,6 +33,7 @@ class UnidecodeHandler(json.JSONEncoder):
 class CRMTasks(object):
     DEFAULT_FIELDS_PROJECTION = {
         'metadata.inquilino.dataExpedicaoRg': False,
+        'metadata.proprietario.dataExpedicaoRg': False
     }
 
     BUCKET_FOLDER_SUFFIXES = {
