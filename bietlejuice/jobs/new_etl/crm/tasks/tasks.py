@@ -33,7 +33,6 @@ class UnidecodeHandler(json.JSONEncoder):
 class CRMTasks(object):
     DEFAULT_FIELDS_PROJECTION = {
         'metadata.inquilino.dataExpedicaoRg': False,
-        'metadata.proprietario.dataExpedicaoRg': False
     }
 
     BUCKET_FOLDER_SUFFIXES = {
@@ -243,189 +242,103 @@ class CRMTasks(object):
 
     @logger
     def move_tasks_to_clean(self):
-        r_cols = OrderedDict([
-            ('links', str),
-            ('score_factor', str),
-            ('fluxo_locacao_id', str),
-            ('actions', str),
-            ('data_inicio', str),
-            ('nome_destinatario', str),
-            ('realizada_em', str),
-            ('comentario', str),
-            ('origem_id', str),
-            ('assignee_id', str),
-            ('score', str),
-            ('origem', str),
-            ('data_visita', str),
-            ('type', str),
-            ('tipo_destinatario', str),
-            ('descricao', str),
-            ('fase', str),
-            ('silenciada_ate', str),
-            ('imovel_id', str),
-            ('assunto', str),
-            ('tags', str),
-            ('opened_by_id', str),
-            ('inquilino_id', str),
-            ('data_criacao', str),
-            ('negociacao_id', str),
-            ('origem_data', str),
-            ('gerente_id', str),
-            ('data_fup', str),
-            ('follow_up_visita', str),
-            ('metadata', str),
-            ('v', str),
-            ('proprietario_id', str),
-            ('destinatario_id', str),
-            ('id', str),
-            ('resolvida', str)
-        ])
-
-        c_cols = OrderedDict([
-            ('links', str),
-            ('score_factor', float),
-            ('id_rent_flow', float),
-            ('actions', str),
-            ('dt_start', str),
-            ('receiver_name', str),
-            ('dt_completed', str),
-            ('comment', str),
-            ('id_origin', float),
-            ('id_assignee', float),
-            ('score', str),
-            ('origin', str),
-            ('dt_visit', str),
-            ('type', str),
-            ('receiver_type', str),
-            ('description', str),
-            ('phase', str),
-            ('dt_silenced_until', str),
-            ('id_house', float),
-            ('subject', str),
-            ('tags', str),
-            ('id_opened_by', float),
-            ('id_tenant', float),
-            ('dt_created', str),
-            ('id_negotiation', float),
-            ('data_origin', str),
-            ('id_manager', str),
-            ('fup_date', str),
-            ('fup_visit', str),
-            ('metadata', str),
-            ('version', float),
-            ('id_owner', float),
-            ('id_receiver', float),
-            ('id', str),
-            ('solved', bool)
-        ])
-
-        self.__move_to_clean(
-            bucket_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES['tasks'],
-            sql_file_name='create_tasks_table.sql',
-            r_cols=r_cols,
-            c_cols=c_cols
-        )
-
-    @logger
-    def move_tasks_resolution_to_clean(self):
-        r_cols = OrderedDict([
-            ('links', str),
+        _cols = OrderedDict([
             ('score_factor', str),
             ('id_rent_flow', str),
             ('actions', str),
-            ('dt_start', str),
+            ('ts_start', str),
             ('receiver_name', str),
-            ('dt_completed', str),
-            ('comment', str),
+            ('ts_completed', str),
+            ('`comment`', str),
             ('id_origin', str),
             ('id_assignee', str),
             ('score', str),
             ('origin', str),
-            ('dt_visit', str),
+            ('ts_visit', str),
             ('type', str),
             ('receiver_type', str),
             ('description', str),
             ('phase', str),
-            ('dt_silenced_until', str),
+            ('ts_silenced_until', str),
             ('id_house', str),
             ('subject', str),
             ('tags', str),
             ('id_opened_by', str),
             ('id_tenant', str),
-            ('dt_created', str),
+            ('ts_created', str),
             ('id_negotiation', str),
-            ('data_origin', str),
+            ('ts_origin', str),
             ('id_manager', str),
-            ('fup_date', str),
-            ('fup_visit', str),
+            ('ts_fup', str),
+            ('visit_fup', str),
             ('metadata', str),
-            ('version', str),
+            ('v', str),
             ('id_owner', str),
             ('id_receiver', str),
             ('id', str),
-            ('solved', str),
-            ('action_user_name', str),
-            ('id_user_action', str),
-            ('dt_action', str),
-            ('action_type', str),
-            ('dt_task_user_start', str),
-            ('dt_task_user_end', str),
-            ('task_user_type', str),
-            ('task_user_resolve_hours', str)
+            ('resolve', str)
         ])
 
-        c_cols = OrderedDict([
-            ('links', str),
-            ('score_factor', float),
-            ('id_rent_flow', float),
+        self.__move_to_clean(
+            bucket_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES['tasks'],
+            sql_file_name='create_tasks_table.sql',
+            r_cols=_cols,
+            c_cols=_cols
+        )
+
+    @logger
+    def move_tasks_resolution_to_clean(self):
+        _cols = OrderedDict([
+            ('score_factor', str),
+            ('id_rent_flow', str),
             ('actions', str),
-            ('dt_start', str),
+            ('ts_start', str),
             ('receiver_name', str),
-            ('dt_completed', str),
+            ('ts_completed', str),
             ('comment', str),
-            ('id_origin', float),
-            ('id_assignee', float),
+            ('id_origin', str),
+            ('id_assignee', str),
             ('score', str),
             ('origin', str),
-            ('dt_visit', str),
+            ('ts_visit', str),
             ('type', str),
             ('receiver_type', str),
             ('description', str),
             ('phase', str),
-            ('dt_silenced_until', str),
-            ('id_house', float),
+            ('ts_silenced_until', str),
+            ('id_house', str),
             ('subject', str),
             ('tags', str),
-            ('id_opened_by', float),
-            ('id_tenant', float),
-            ('dt_created', str),
-            ('id_negotiation', float),
-            ('data_origin', str),
+            ('id_opened_by', str),
+            ('id_tenant', str),
+            ('ts_created', str),
+            ('id_negotiation', str),
+            ('ts_origin', str),
             ('id_manager', str),
-            ('fup_date', str),
-            ('fup_visit', str),
+            ('ts_fup', str),
+            ('visit_fup', str),
             ('metadata', str),
-            ('version', float),
-            ('id_owner', float),
-            ('id_receiver', float),
+            ('v', str),
+            ('id_owner', str),
+            ('id_receiver', str),
             ('id', str),
-            ('solved', bool),
+            ('resolved', str),
             ('action_user_name', str),
             ('id_user_action', str),
-            ('dt_action', str),
+            ('ts_action', str),
             ('action_type', str),
-            ('dt_task_user_start', str),
-            ('dt_task_user_end', str),
+            ('ts_task_user_start', str),
+            ('ts_task_user_end', str),
             ('task_user_type', str),
-            ('task_user_resolve_hours', float)
+            ('task_user_resolve_hours', str)
         ])
 
         self.__move_to_clean(
             bucket_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES['resolution'],
             queries_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES['tasks'],
             sql_file_name='create_tasks_resolution_table.sql',
-            r_cols=r_cols,
-            c_cols=c_cols
+            r_cols=_cols,
+            c_cols=_cols
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
@@ -460,13 +373,13 @@ class CRMTasks(object):
         )
 
         if queues is None:
-            where_clause = """(trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupid":"([^"]+)', 1) in ('{manual_workgroups}'))""".format(
+            where_clause = """(trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}'))""".format(
                 manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
         else:
             where_clause = "trim(ct.type) in ('{types}')".format(types="', '".join(queue for queue in queues))
 
             if manual_task_workgroups:
-                where_clause = """({previous_clause} or (trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupid":"([^"]+)', 1) in ('{manual_workgroups}')))""".format(
+                where_clause = """({previous_clause} or (trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}')))""".format(
                     previous_clause=where_clause,
                     manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
 
