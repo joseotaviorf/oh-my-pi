@@ -1,6 +1,6 @@
 airflow[mysql,crypto,s3,slack]==1.8.0
-botocore==1.12.21
 boto3==1.9.21
+botocore==1.12.21
 cffi==1.9.1
 createsend==4.2.6
 cryptography>=1.7.1
@@ -38,8 +38,8 @@ PyMySQL==0.7.9
 pyOpenSSL>=16.2.0
 pypd==1.0.0
 PySocks==1.6.4
-python-dateutil==2.5.3
-pytz==2016.7
+python-dateutil==2.7.3
+pytz==2018.5
 PyYAML==3.12
 raven==6.3.0
 requests==2.11.1
@@ -62,4 +62,6 @@ llvmlite==0.22.0
 numba==0.37.0
 xlrd # lib to process xls files in s3 - old_etl
 paramiko>=2.4.1
-sagemaker==1.11.2
+sagemaker==1.11.1
+urllib3==1.23
+kubernetes==7.0.0
