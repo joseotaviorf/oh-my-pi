@@ -28,7 +28,7 @@ booking_house_listing as (
   where sk_booking != '-1'
   group by 1, 2
 )
-select
+select distinct
   b.sk_task,
   b.sk_receiver,
   b.sk_start_date,
