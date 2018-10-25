@@ -6,7 +6,12 @@ logger = QuintoAndarLogger('CRMTasksClosing')
 
 
 class CRMTasksClosing(CRMTasks):
-    QUEUES = ['FrontEnd', 'CriarMinuta', 'AprovarMinuta', 'FollowUpAssinaturas']
+    QUEUES = [
+        'FrontEnd',
+        'CriarMinuta',
+        'AprovarMinuta',
+        'FollowUpAssinaturas'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_closing_tasks',

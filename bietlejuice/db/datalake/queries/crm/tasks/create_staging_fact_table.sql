@@ -15,12 +15,12 @@ tasks as (
     coalesce(cast(cast(ct.id_receiver as decimal) as bigint), -1) as sk_receiver,
     coalesce(
       cast(
-        replace(regexp_extract(cast(ct.dt_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+        replace(regexp_extract(cast(ct.ts_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
       ), -1) as sk_start_date,
     coalesce(
       cast(
-        replace(regexp_extract(cast(ct.dt_completed as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+        replace(regexp_extract(cast(ct.ts_completed as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
       ), -1) as sk_completed_date,
     coalesce(cast(cast(ct.id_origin as decimal) as bigint), -1) as sk_origin,
@@ -29,23 +29,23 @@ tasks as (
     coalesce(cast(cast(ct.id_user_action as decimal) as bigint), -1) as sk_user_action,
     coalesce(
       cast(
-        replace(regexp_extract(cast(ct.dt_action as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+        replace(regexp_extract(cast(ct.ts_action as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
       ), -1) as sk_action_date,
-    ct.dt_action,
+    ct.ts_action,
     ct.action_type,
     coalesce(
       cast(
-        replace(regexp_extract(cast(ct.dt_task_user_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+        replace(regexp_extract(cast(ct.ts_task_user_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
       ), -1) as sk_task_user_start_date,
-    dt_task_user_start,
+    ts_task_user_start,
     coalesce(
       cast(
-        replace(regexp_extract(cast(ct.dt_task_user_end as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+        replace(regexp_extract(cast(ct.ts_task_user_end as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
       ), -1) as sk_task_user_end_date,
-    ct.dt_task_user_end,
+    ct.ts_task_user_end,
     ct.task_user_type,
     ct.task_user_resolve_hours,
     cast(ct.dt as date) as dt_partition
@@ -56,4 +56,4 @@ tasks as (
   -- clause that represents the string of which will be replaced by all the automatic task types and manual workgroups
   where __WHERE_CLAUSE__
 )
--- append data mart specific CTEs in order to populate its fact table (sqls: append_fact_{data mart}
+-- append data mart specific CTEs in order to populate its fact table (sqls: append_fact_{data mart})

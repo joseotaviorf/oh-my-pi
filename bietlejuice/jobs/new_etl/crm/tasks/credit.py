@@ -6,7 +6,10 @@ logger = QuintoAndarLogger('CRMTasksCredit')
 
 
 class CRMTasksCredit(CRMTasks):
-    QUEUES = ['EnviarCardiff', 'AnalisarDocumentacaoProprietario']
+    QUEUES = [
+        'EnviarCardiff',
+        'AnalisarDocumentacaoProprietario'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_credit_tasks',
