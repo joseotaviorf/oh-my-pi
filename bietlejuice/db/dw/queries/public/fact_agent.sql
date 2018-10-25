@@ -2,8 +2,8 @@ WITH schedule AS
 (SELECT
 	t.agent_id AS sk_agent_id,
 	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
-	sum(case when t.available_slot = 1 AND coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS available_slots,
-	sum(case when t.available_slot = 1 AND coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS available_slots_0
+	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS available_slots,
+	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS available_slots_0
  FROM staging.agents_slots t
  WHERE DATE(t.slot_dt) = DATE('{0}')
 GROUP BY 1, 2
