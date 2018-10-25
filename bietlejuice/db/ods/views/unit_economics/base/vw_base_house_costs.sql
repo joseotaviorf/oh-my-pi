@@ -1,7 +1,7 @@
 drop view if exists unit_economics.vw_base_property_costs;
 create or replace view unit_economics.vw_base_property_costs as
 select
-  ((id || '00') || coalesce(version, 1))::bigint as sk_property,
+  ((id || '00') || coalesce(version, 1))::bigint as sk_house_listing,
   id as property_id,
   version,
   min_version_time as publication_date,

@@ -78,7 +78,7 @@ affiliate_filtered_base as (
 -- Divide all costs among versioned properties
 divided_costs as (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		case
             when affiliate_dt < publication_date

@@ -173,7 +173,8 @@ select
 	ot.name as house_occupant,
     kt.name as key_type,
     aat.name as key_location,
-    rt.name as visit_restriction
+    rt.name as visit_restriction,
+    i.predictedPrice as predicted_price
 from
   Imovel i
 left join

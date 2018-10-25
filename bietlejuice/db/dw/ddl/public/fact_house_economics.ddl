@@ -1,6 +1,6 @@
 drop table if exists public.fact_property_economics;
 create table if not exists public.fact_property_economics (
-    sk_property bigint not null,
+    sk_house_listing bigint not null,
     property_id bigint not null,
     sk_contract bigint not null,
     sk_cash_flow_date bigint not null,

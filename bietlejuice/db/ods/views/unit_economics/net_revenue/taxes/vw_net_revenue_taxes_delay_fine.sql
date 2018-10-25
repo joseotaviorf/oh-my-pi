@@ -56,7 +56,7 @@ fines as (
     and date_trunc('month',ff.paid_date) = c.dt
 )
 select
-    vbpc.sk_property,
+    vbpc.sk_house_listing,
   f.property_id,
 	coalesce(fine, gap_fill(av) over (partition by id order by dt)) as vl_delay_fine,
   f.dt::date as dt_cash_flow,

@@ -1,7 +1,7 @@
 drop table if exists unit_economics.net_revenue_revenues_mgmt_fee;
 
 CREATE TABLE unit_economics.net_revenue_revenues_mgmt_fee (
-	sk_property int8 NULL,
+	sk_house_listing int8 NULL,
 	property_id int8 NULL,
 	vl_management_fee numeric(14,4) NULL,
 	vl_rent_value numeric(14,4) NULL,

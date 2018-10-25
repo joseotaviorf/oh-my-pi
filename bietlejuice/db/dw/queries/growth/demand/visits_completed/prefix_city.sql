@@ -42,8 +42,8 @@ with all_dates as (
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
 			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
 			and f.sk_booking != -1
-	join dim_property dpr
-		on f.sk_house = dpr.sk_property
+	join dim_house_listing dpr
+		on f.sk_house_listing = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', db.dt_scheduling), date_part('month', db.dt_scheduling), date_part('week', db.dt_scheduling), date_part('day', db.dt_scheduling)
@@ -64,8 +64,8 @@ all_dates_last_month as (
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
 			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
 			and f.sk_booking != -1
-	join dim_property dpr
-  	on f.sk_house = dpr.sk_property
+	join dim_house_listing dpr
+  	on f.sk_house_listing = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', db.dt_scheduling) = date_part('year', add_months(current_date, -1))
@@ -86,8 +86,8 @@ all_dates_last_year as (
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
 			and db.dt_scheduling >= '2017-01-01' and db.dt_scheduling < current_date
 			and f.sk_booking != -1
-  join dim_property dpr
-  	on f.sk_house = dpr.sk_property
+  join dim_house_listing dpr
+  	on f.sk_house_listing = dpr.sk_house_listing
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', db.dt_scheduling) = date_part('year', add_months(current_date, -12))

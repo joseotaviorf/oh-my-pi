@@ -26,16 +26,16 @@ class HouseSubDag(DimSubDag):
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task, dim_property,
+        (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_house_listing_task, dim_house_listing,
          dim_status_over_period) = self.__build_data_tasks(house_dag)
 
         tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> property_task
-        staging_dim_property_task.set_upstream([rent_flow, property_listing, property_task])
-        staging_dim_property_task.set_downstream(tests_tasks)
-        dim_property.set_upstream(tests_tasks)
-        dim_property >> dim_status_over_period
+        staging_dim_house_listing_task.set_upstream([rent_flow, property_listing, property_task])
+        staging_dim_house_listing_task.set_downstream(tests_tasks)
+        dim_house_listing.set_upstream(tests_tasks)
+        dim_house_listing >> dim_status_over_period
 
         return house_dag
 
@@ -104,18 +104,18 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        staging_dim_property_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_house_listing_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='STAGING_dim_property',
+            task_id='STAGING_dim_house_listing',
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'property'
             }
         )
 
-        dim_property = BaseDAG.build_quintoandar_python_operator(
+        dim_house_listing = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='DW_dim_property',
+            task_id='DW_dim_house_listing',
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'property',
@@ -125,7 +125,7 @@ class HouseSubDag(DimSubDag):
 
         dim_status_over_period = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='DW_dim_property_status_over',
+            task_id='DW_dim_house_listing_status_over',
             python_callable=utils.load_dim_from_ods_to_dw,
             op_kwargs={
                 'dim_name': 'property_status_over_period',
@@ -134,5 +134,5 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task,
-                dim_property, dim_status_over_period)
+        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_house_listing_task,
+                dim_house_listing, dim_status_over_period)

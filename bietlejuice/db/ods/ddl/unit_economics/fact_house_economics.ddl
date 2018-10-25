@@ -1,7 +1,7 @@
 drop table if exists unit_economics.fact_property_economics;
 
 CREATE TABLE unit_economics.fact_property_economics (
-	sk_property int8 NOT NULL,
+	sk_house_listing int8 NOT NULL,
 	property_id int8 NOT NULL,
 	sk_contract int8 NOT NULL,
 	sk_cash_flow_date int8 NOT NULL,

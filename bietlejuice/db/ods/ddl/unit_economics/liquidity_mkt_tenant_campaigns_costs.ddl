@@ -1,7 +1,7 @@
 drop table unit_economics.liquidity_mkt_tenant_campaigns_costs;
 
 create table unit_economics.liquidity_mkt_tenant_campaigns_costs (
-	sk_property bigint,
+	sk_house_listing bigint,
 	property_id bigint,
 	dt_cash_flow date,
 	criteo_cost decimal(14,4),

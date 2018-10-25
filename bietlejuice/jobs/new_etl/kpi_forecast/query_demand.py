@@ -1,5 +1,5 @@
 query_demand = """select
-dpt.id as sk_house,
+dpt.id as sk_house_listing,
 dpt.min_version_time as dt_publication,
 f.sk_rent_flow,
 f.sk_booking,
@@ -56,8 +56,8 @@ dc.contract_status,
 dr.region_code,
 dr.city_name
 
-from dim_property dpt
-left join fact_demand f on dpt.sk_property = f.sk_house
+from dim_house_listing dpt
+left join fact_demand f on dpt.sk_house_listing = f.sk_house_listing
 left join dim_booking db on f.sk_booking = db.sk_booking
 left join dim_offer dof on f.sk_offer = dof.sk_offer
 left join dim_proposal dp on f.sk_proposal = dp.sk_proposal

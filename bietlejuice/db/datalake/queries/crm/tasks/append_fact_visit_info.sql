@@ -2,14 +2,14 @@
   select
     t.*,
     cast(coalesce(db.sk_booking, '-1') as bigint) as sk_booking,
-    cast(coalesce(dp.sk_property, '-1') as bigint) as sk_house_listing
+    cast(coalesce(dp.sk_house_listing, '-1') as bigint) as sk_house_listing
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_booking db
     on trim(ct.origin) = 'Agendamento'
       and cast(ct.id_origin as bigint) = cast(db.sk_booking as bigint)
-  left join datalake_clean.ods_dim_property dp
+  left join datalake_clean.ods_dim_house_listing dp
     on trim(ct.origin) = 'Imovel'
       and cast(ct.id_origin as bigint) = cast(dp.id as bigint)
       and cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
@@ -22,7 +22,7 @@
 ),
 booking_house_listing as (
   select
-    cast(sk_house as bigint) as sk_house_listing,
+    cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_booking as bigint) as sk_booking
   from datalake_clean.ods_fact_demand
   where sk_booking != '-1'

@@ -9,7 +9,7 @@ with cdre_bo_pre_sale as (
 ),
 filtered_contracts as (
     select distinct
-      vbpc.sk_property,
+      vbpc.sk_house_listing,
       c.property_id,
       c.created_date::date as created_date
     from unit_economics.vw_base_property_costs vbpc
@@ -31,7 +31,7 @@ filtered_contracts as (
 ),
 costs as (
     select
-      fc.sk_property,
+      fc.sk_house_listing,
       fc.property_id,
       fc.created_date,
       cps.dre_date as dt_cash_flow,
@@ -41,10 +41,10 @@ costs as (
       on cps.dre_date = (date_trunc('month', fc.created_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   c.property_id,
   c.dt_cash_flow,
   sum(c.vl_bo_pre_sale) as vl_bo_pre_sale
 from costs c
-group by c.property_id, c.dt_cash_flow, c.sk_property
+group by c.property_id, c.dt_cash_flow, c.sk_house_listing
 ;

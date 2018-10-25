@@ -1,34 +1,37 @@
-create or replace view public.vw_property_listing as
+drop view if exists vw_house_listing;
+create or replace view vw_house_listing as
 with filt as (
   select
 	id,
 	status_time,
 	status_history,
+	aluguel,
+	"tipoPorteiro" as tipo_porteiro,
 	row_number() over (partition by id order by status_time) as rn
 	from imovel_status_history
 	where status_history in ('despublicado', 'publicado', 'alugado', 'suspenso')
-)
---select * from filt
-, not_pub as (
+),
+not_pub as (
   select
     filt.id,
     'publicado'::varchar(255) as status_history,
-    date_trunc('seconds', i.first_publication) as status_time
-  from
-    filt
-  left join
-    imovel i
+    date_trunc('seconds', i.first_publication) as status_time,
+    filt.aluguel,
+    filt.tipo_porteiro
+  from filt
+  left join imovel i
    on i.id = filt.id
   where filt.rn = 1
     and date_trunc('seconds', i.first_publication) != date_trunc('seconds', filt.status_time)
-)
---select * from not_pub
-, aux_ish as (
+),
+aux_ish as (
   select
     id,
 	status_time,
 	status_history,
-  coalesce(lag(status_history) over (partition by id order by status_time) = status_history, false) as truncatable
+	aluguel,
+	tipo_porteiro,
+	coalesce(lag(status_history) over (partition by id order by status_time) = status_history, false) as truncatable
   from filt
   where case
           when status_history = 'despublicado'
@@ -40,20 +43,20 @@ with filt as (
     id,
 	status_time,
 	status_history,
+	aluguel,
+	tipo_porteiro,
 	false as truncatable
   from not_pub
-)
---select * from aux_ish;
-, contract_dates as (
+),
+contract_dates as (
     select id, imovel_id, least("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as l,
     greatest("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as g,
     "dataRescisao" as dt_end
     from contract
     where tipo = 'FullService'
       and status in ('Finalizado', 'Ativo')
-)
---select * from contract_dates
-, rent as (
+),
+rent as (
 	select distinct
 		ish.id,
 		ish.status_history,
@@ -62,6 +65,8 @@ with filt as (
 			then status_time
 			else c.g::timestamp
 		end as status_time,
+		aluguel,
+		tipo_porteiro,
 		c.g as contract_time,
 		c.id as contract_id,
 		c.dt_end,
@@ -72,33 +77,40 @@ with filt as (
 	join contract_dates c
 	  on ish.id = c.imovel_id
 	where ish.status_history = 'alugado' and ish.truncatable is false
-)
---select * from rent;
-, ish_rent as (
-	select * from aux_ish
+),
+ish_rent as (
+	select
+		id,
+		status_time,
+		status_history,
+		aluguel,
+		tipo_porteiro,
+		truncatable
+	from aux_ish
 	union all
 	select
 		id,
 		contract_time,
 		status_history,
+		aluguel,
+		tipo_porteiro,
 		false as truncatable
 	from rent where closest = true and true_line = false
-)
---select * from ish_rent;
-, ish as (
+),
+ish as (
   select
 		status_history as status,
     status_time,
     id,
+    aluguel,
+		tipo_porteiro,
     row_number() over (partition by id order by status_time) as rn,
     row_number() over (partition by id, status_history order by status_time) as rn_status
-  from
-		ish_rent
+  from ish_rent
   where truncatable is false
   order by status_time asc
-)
---select * from ish;
-, check_status as (
+),
+check_status as (
   select
     ds.*,
     case
@@ -123,21 +135,20 @@ with filt as (
     (ds.status = 'despublicado' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') or
     (ds.status = 'suspenso' and lag(ds.status) over w = 'alugado'	and lag(r.id) over w is not null and lead(ds.status) over w = 'publicado') as end_depub_rent,
     (ds.rn = max(ds.rn) over (partition by ds.id)) as end_last_status
-  from
-    ish ds
+  from ish ds
   left join rent r
    on ds.id = r.id
     and ds.status_time = r.status_time
     and closest = true
-  window
-  	w as (partition by ds.id order by ds.status_time)
-)
---select * from check_status ;
-, aux_times as (
+  window w as (partition by ds.id order by ds.status_time)
+),
+aux_times as (
   select distinct
     id,
     status,
     status_time,
+    aluguel,
+		tipo_porteiro,
     contract_id,
     contract_end,
     extract(day from status_time - lag(contract_end) over w) > 90 as recovered_after_rent,
@@ -177,19 +188,24 @@ with filt as (
 		case when end_last_status then 1 else 0 end as is_last_version,
 		end_last_status,
     (end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status) as _end
-  from
-    check_status
-  where
-    start_first_pub or start_pub_after_rent or start_after_depub_90 or start_after_depub_rent or
-    end_pub_after_rent or end_depub_90 or end_depub_rent or end_last_status
-window w as (partition by id order by status_time)
-)
---select * from aux_times;
-, times as (
+  from check_status
+  where start_first_pub
+  	or start_pub_after_rent
+  	or start_after_depub_90
+  	or start_after_depub_rent
+  	or end_pub_after_rent
+  	or end_depub_90
+  	or end_depub_rent
+  	or end_last_status
+	window w as (partition by id order by status_time)
+),
+times as (
 	select
 		id,
 		status,
 		status_time,
+		aluguel,
+		tipo_porteiro,
 		min_version_time,
 		max_version_time,
 		min(status_time) over w as first_publication_date,
@@ -203,29 +219,28 @@ window w as (partition by id order by status_time)
 		is_last_version,
 		contract_id,
 		_end
-	from
-		aux_times
-	window
-		w as (partition by id order by status_time)
+	from aux_times
+	window w as (partition by id order by status_time)
 	order by status_time
 )
 select
-	id,
-	status,
-	rank() over (partition by id order by status_time) as version,
-	min_version_time,
-	max_version_time,
-	nr_renting,
-	first_publication_date,
-	case
-		when status = 'despublicado' and coalesce(end_version_category <> 'Rented', true) then status_time
-		else null
-	end as depublished_date,
-	start_version_category,
-	end_version_category,
-	contract_id,
-	is_last_version
-from
-	times
+  id,
+  status,
+  aluguel,
+  tipo_porteiro,
+  rank() over (partition by id order by status_time) as version,
+  min_version_time,
+  max_version_time,
+  nr_renting,
+  first_publication_date,
+  case
+  	when status = 'despublicado' and coalesce(end_version_category <> 'Rented', true) then status_time
+  	else null
+  end as depublished_date,
+  start_version_category,
+  end_version_category,
+  contract_id,
+  is_last_version
+from times
 where _end is true
 ;

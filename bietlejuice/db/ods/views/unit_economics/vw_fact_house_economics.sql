@@ -9,7 +9,7 @@ drop view if exists unit_economics.vw_fact_property_economics;
 create or replace view unit_economics.vw_fact_property_economics as
 with unit_economics as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         sk_cash_flow_date,
         dt_cash_flow,
@@ -58,7 +58,7 @@ with unit_economics as (
     from
     (
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -108,7 +108,7 @@ with unit_economics as (
             unit_economics.liquidity_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -158,7 +158,7 @@ with unit_economics as (
             unit_economics.supply_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -208,7 +208,7 @@ with unit_economics as (
             unit_economics.mgmt_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -257,7 +257,7 @@ with unit_economics as (
         from
             unit_economics.net_revenue_costs
     ) tbl
-    group by sk_property, property_id, sk_cash_flow_date, dt_cash_flow
+    group by sk_house_listing, property_id, sk_cash_flow_date, dt_cash_flow
 ),
 contracts as (
 	select
@@ -275,9 +275,9 @@ contracts as (
 ),
 final_version as (
   select
-    ue.sk_property,
+    ue.sk_house_listing,
     ue.property_id,
-    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_property order by ue.sk_cash_flow_date asc), -1) as sk_contract,
+    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_house_listing order by ue.sk_cash_flow_date asc), -1) as sk_contract,
     ue.sk_cash_flow_date,
     ue.dt_cash_flow,
     ue.vl_owner_campaigns,
@@ -365,7 +365,7 @@ fact_contract as (
 ),
 fact_factor as (
     select
-        fc.sk_property,
+        fc.sk_house_listing,
         fc.property_id,
         fc.sk_contract,
         fc.sk_cash_flow_date,
@@ -383,71 +383,71 @@ fact_factor as (
         fc.vl_agent_hours,
         coalesce(fc.vl_st_pis_cofins * (1 - sum(cf.loss_factor)
                     filter (where fc.dt_cash_flow >= current_date)
-                        over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
+                        over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
         fc.flg_expected_sales_tax_pis_cofins,
         coalesce(fc.vl_st_iss * (1 - sum(cf.loss_factor)
                     filter (where fc.dt_cash_flow >= current_date)
-                        over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
+                        over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
         fc.flg_expected_sales_tax_iss,
         coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_affiliate_commission = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
         fc.flg_expected_affiliate_commission,
         coalesce(fc.vl_agent_commission * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_agent_commission = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
         fc.flg_expected_agent_commission,
         coalesce(fc.vl_delay_fine * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
         fc.flg_expected_delay_fine,
         fc.vl_termination_fine,
         coalesce(fc.vl_brokerage_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
         fc.flg_expected_brokerage_fee,
         coalesce(fc.vl_management_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
         fc.flg_expected_management_fee,
         fc.vl_rent_value,
         coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
         fc.flg_expected_cs_post_sale,
         coalesce(fc.vl_collection * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
         fc.flg_expected_collection,
         coalesce(fc.vl_bo_onboarding * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_bo_onboarding = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
         fc.flg_expected_bo_onboarding,
         coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
         fc.flg_expected_bo_ongoing,
         coalesce(fc.vl_bo_offboarding * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_bo_offboarding = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
         fc.flg_expected_bo_offboarding,
         coalesce(fc.vl_inspections * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_inspection = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
         fc.flg_expected_inspection,
         coalesce(fc.vl_default_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_default_fee) as vl_default_fee,
+                    over (partition by fc.sk_house_listing, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_default_fee) as vl_default_fee,
         coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
+                    over (partition by fc.sk_house_listing, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
         fc.flg_expected_insurance_fee
     from fact_contract fc
     left join unit_economics.contract_factor cf
         on cf.months_after_signature = fc.months_diff
 )
 select
-  sk_property,
+  sk_house_listing,
 	property_id,
 	sk_contract,
 	sk_cash_flow_date,

@@ -1,6 +1,6 @@
-drop table if exists datalake_clean.ods_dim_property;
-create external table if not exists datalake_clean.ods_dim_property (
-  sk_property string,
+drop table if exists datalake_clean.ods_dim_house_listing;
+create external table if not exists datalake_clean.ods_dim_house_listing (
+  sk_house_listing string,
   id string,
   version string,
   min_version_time string,

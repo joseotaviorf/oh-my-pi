@@ -40,8 +40,8 @@ base_contract as (
 ),
 incurred as (
     select distinct
-    	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
-        sk_property,
+    	row_number() over (partition by sk_house_listing, bc.contract_id order by bc.date_range) as rn,
+        sk_house_listing,
         property_id,
         bc.contract_id,
         bc.contract_init_date,
@@ -68,7 +68,7 @@ incurred as (
 ),
 incurred_diff as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         case
         	when (rn=1 and vl_management_fee is null)
@@ -91,18 +91,18 @@ incurred_diff as (
 ),
 incurred_plus_dates as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         vl_management_fee,
         dt_cash_flow,
         date_range,
         vl_rent_value,
-        max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
+        max(dt_cash_flow) over (partition by sk_house_listing) as max_dt_cash_flow
     from incurred_diff
 ),
 value_fill as (
     select distinct
-        sk_property,
+        sk_house_listing,
         property_id,
         vl_management_fee,
         case
@@ -112,12 +112,12 @@ value_fill as (
         end as dt_cash_flow,
         max_dt_cash_flow,
         vl_rent_value,
-        gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
+        gap_fill(vl_management_fee) over (partition by sk_house_listing order by dt_cash_flow asc) as gf
     from incurred_plus_dates
 ),
 result as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         dt_cash_flow,
         vl_rent_value,
@@ -132,7 +132,7 @@ result as (
     from value_fill
 )
 select
-    sk_property,
+    sk_house_listing,
     property_id,
     vl_management_fee,
     vl_rent_value,

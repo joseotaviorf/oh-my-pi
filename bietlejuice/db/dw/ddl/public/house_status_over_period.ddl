@@ -1,7 +1,7 @@
-drop table if exists dim_property_status_over_period;
-create table dim_property_status_over_period 
+drop table if exists dim_house_listing_status_over_period;
+create table dim_house_listing_status_over_period
 (
-	sk_property bigint NULL,
+	sk_house_listing bigint NULL,
 	id int NULL,
 	publication_date date NULL,
 	"version" int NULL,
@@ -11,5 +11,5 @@ create table dim_property_status_over_period
 );
 
 comment on 
-table dim_property_status_over_period
+table dim_house_listing_status_over_period
 is 'Contains each status version of properties over time. Used only in models that have status history'

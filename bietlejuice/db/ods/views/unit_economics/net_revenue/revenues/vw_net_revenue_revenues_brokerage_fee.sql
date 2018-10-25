@@ -7,7 +7,7 @@ drop view if exists unit_economics.vw_net_revenue_revenues_brokerage_fee;
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_fee as
 with base_contract as (
 select
-	vbpc.sk_property,
+	vbpc.sk_house_listing,
 	vbpc.property_id,
 	vbcc.id as contract_id,
 	vbcc.init_date,
@@ -26,7 +26,7 @@ where (vbcc.termination_date is not null
 ),
 brokerage_fill as (
 	select distinct
-		sk_property,
+		sk_house_listing,
 		property_id,
 		bc.contract_id,
 		bc.vl_rent_value,
@@ -55,7 +55,7 @@ brokerage_fill as (
 	    and _to = 'Contrato'
 )
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	vl_brokerage_fee,
 	vl_rent_value,

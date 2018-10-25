@@ -1,8 +1,8 @@
-drop view if exists vw_dim_property_status_over_period;
-create or replace view public.vw_dim_property_status_over_period as
+drop view if exists vw_dim_house_listing_status_over_period;
+create or replace view public.vw_dim_house_listing_status_over_period as
 with dup as (
   select
-    ((p.id || '00') || COALESCE(p.version, 1))::bigint AS sk_property,
+    ((p.id || '00') || COALESCE(p.version, 1))::bigint AS sk_house_listing,
     p.id,
     p.min_version_time::date as pub_date,
     p."version",
@@ -26,7 +26,7 @@ with dup as (
        )
 )
 select
-  sk_property,
+  sk_house_listing,
   id,
   pub_date,
   "version",

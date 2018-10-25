@@ -6,7 +6,7 @@ drop view if exists unit_economics.vw_supply_costs;
 ---
 create or replace view unit_economics.vw_supply_costs as
 select
-	coalesce(vsmc.sk_property, vsoc.sk_property, vsacc.sk_property) as sk_property,
+	coalesce(vsmc.sk_house_listing, vsoc.sk_house_listing, vsacc.sk_house_listing) as sk_house_listing,
 	coalesce(vsmc.property_id, vsoc.property_id, vsacc.property_id) as property_id,
 	coalesce(
     date_trunc('month', vsmc.dt_cash_flow)::date,
@@ -20,9 +20,9 @@ select
 from
 	unit_economics.supply_mkt_costs vsmc
 full outer join unit_economics.supply_ops_costs vsoc
-  	on vsmc.sk_property = vsoc.sk_property
+  	on vsmc.sk_house_listing = vsoc.sk_house_listing
 	and vsmc.dt_cash_flow = vsoc.dt_cash_flow
 full outer join unit_economics.supply_affiliate_bonus_costs vsacc
-	on vsacc.sk_property = coalesce(vsoc.sk_property, vsmc.sk_property)
+	on vsacc.sk_house_listing = coalesce(vsoc.sk_house_listing, vsmc.sk_house_listing)
 	and vsacc.dt_cash_flow = coalesce(vsoc.dt_cash_flow, vsmc.dt_cash_flow)
 ;

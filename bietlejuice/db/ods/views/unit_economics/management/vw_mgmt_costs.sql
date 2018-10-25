@@ -1,7 +1,7 @@
 drop view if exists unit_economics.vw_mgmt_costs;
 create or replace view unit_economics.vw_mgmt_costs as
 select
-  coalesce(ops.sk_property, ins.sk_property) as sk_property,
+  coalesce(ops.sk_house_listing, ins.sk_house_listing) as sk_house_listing,
   coalesce(ops.property_id, ins.property_id) as property_id,
   coalesce(date_trunc('month', ops.dt_cash_flow)::date, date_trunc('month', ins.dt_cash_flow)::date) as dt_cash_flow,
   coalesce(ops.vl_bo_offboarding, 0) as vl_bo_offboarding,
@@ -25,6 +25,6 @@ from
 	unit_economics.mgmt_ops_costs ops
 full outer join
 	unit_economics.mgmt_insurance ins
-	on ins.sk_property = ops.sk_property
+	on ins.sk_house_listing = ops.sk_house_listing
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;
