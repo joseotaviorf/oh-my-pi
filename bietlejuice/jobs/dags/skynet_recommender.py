@@ -12,7 +12,7 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
@@ -44,7 +44,7 @@ def build_raw_data(**kwargs):
     start_date = end_date - timedelta(weeks=week_span)
 
     with open(os.path.join(
-            DATALAKE_QUERIES_DIR, 'skynet/recommender/raw_data.sql'), 'r') as f:
+            SKYNET_QUERIES_DIR, 'recommender/raw_data.sql'), 'r') as f:
         q = f.read()
         q = (q.replace('__START_YM__', start_date.strftime('%Y-%m'))
              .replace('__END_YM__', end_date.strftime('%Y-%m'))
@@ -59,8 +59,7 @@ def build_raw_data(**kwargs):
             bucket_folder_path=INPUT_PATH.format(end_date.strftime('%Y-%m-%d')))
 
     with open(os.path.join(
-            DATALAKE_QUERIES_DIR,
-            'skynet/recommender/house_info.sql'), 'r') as f:
+            SKYNET_QUERIES_DIR, 'recommender/house_info.sql'), 'r') as f:
         q = f.read()
 
         logger.info('m=build_raw_data, msg=querying house_info')
