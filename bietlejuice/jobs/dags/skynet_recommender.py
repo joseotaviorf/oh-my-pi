@@ -59,8 +59,7 @@ def build_raw_data(**kwargs):
             bucket_folder_path=INPUT_PATH.format(end_date.strftime('%Y-%m-%d')))
 
     with open(os.path.join(
-            SKYNET_QUERIES_DIR,
-            'recommender/house_info.sql'), 'r') as f:
+            SKYNET_QUERIES_DIR, 'recommender/house_info.sql'), 'r') as f:
         q = f.read()
 
         logger.info('m=build_raw_data, msg=querying house_info')
