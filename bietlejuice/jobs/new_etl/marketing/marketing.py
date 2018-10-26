@@ -22,6 +22,13 @@ class Marketing(object):
         'prod': 'marketing'
     }
 
+    SK_FIELD_MAP = {
+        'dim_google_ads_keyword': 'sk_keyword',
+        'fact_google_ads_daily_keywords': 'sk_keyword',
+        'dim_facebook_ads_ads_insights': 'sk_ad',
+        'fact_facebook_ads_daily_ads_insights': 'sk_ad'
+    }
+
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
         self.s3_bucket = s3_bucket
         self.execution_date = execution_date
@@ -63,15 +70,19 @@ class Marketing(object):
             clean_columns=c_cols
         )
 
+    @logger(exclude='table_schema')
     def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema):
         clean_schema_name = 'datalake_clean'
-        pre_staging_query = "select * from {}.{}".format(clean_schema_name, clean_table)
+        pre_staging_query = "select distinct * from {}.{}".format(clean_schema_name, clean_table)
 
         empty = self.__is_prod_table_empty(prod_table)
         if empty:
             logger.info(
                 'm=load_to_staging, schema={}, table_name={}, msg=table already empty'.format(
                     Marketing.SCHEMA_NAMES['prod'], prod_table))
+
+            self.athena_client.execute_raw_query("msck repair table {}.{}".format(clean_schema_name, clean_table))
+
         else:
             delete_query = "DELETE FROM staging.{table_name} where dt_created = '{date_partition}'"
 
@@ -91,7 +102,7 @@ class Marketing(object):
 
         df = self.athena_client.execute_query_and_return_dataframe(sql=pre_staging_query)
 
-        logger.info("m=load_to_staging, schema={}, table_name, msg=inserting into staging table".format(
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=inserting into staging table".format(
             Marketing.SCHEMA_NAMES['staging'], clean_table))
 
         df_table = petl.fromdataframe(df=df)
@@ -108,6 +119,7 @@ class Marketing(object):
             commit=True,
         )
 
+    @logger
     def _load_to_staging(self, dw_table_name):
         staging_query = BaseETL.get_query_from_file_name(
             '{}/staging/marketing/{}.sql'.format(
@@ -135,8 +147,7 @@ class Marketing(object):
                 commit=True
             )
 
-            staging_query = staging_query.format(where_clause="dt_created = '{}'".format(self.partition_date))
-            # staging_query = '{}\nwhere dt_created = \'{}\';'.format(staging_query, self.partition_date)
+            staging_query = staging_query.format(where_clause="where dt_created = '{}'".format(self.partition_date))
 
         logger.info("m=load_to_staging, schema={}, table_name, msg=inserting into dw".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
@@ -215,8 +226,10 @@ class Marketing(object):
 
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
-            command=delete_query.format(table_name=table_name).replace(
-                Marketing.TABLE_PARTITION_DATE, self.partition_date),
+            command=delete_query.format(
+                table_name=table_name,
+                sk_field=Marketing.SK_FIELD_MAP[table_name]
+            ).replace(Marketing.TABLE_PARTITION_DATE, self.partition_date),
             commit=True,
             encoding='utf-8'
         )
