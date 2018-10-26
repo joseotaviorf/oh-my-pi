@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS marketing.dim_facebook_ads_ads_insights (
+    sk_ad BIGINT,
+    ad_id BIGINT,
+    ad_name VARCHAR,
+    adset_name VARCHAR,
+    campaign_name VARCHAR,
+    account_name VARCHAR,
+    dt_created VARCHAR,
+    ts_load TIMESTAMP
+);

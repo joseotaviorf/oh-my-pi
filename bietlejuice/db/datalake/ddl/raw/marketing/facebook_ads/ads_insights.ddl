@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE datalake_raw.marketing_facebookads_ads_insights (
+CREATE EXTERNAL TABLE datalake_raw.marketing_facebook_ads_ads_insights (
 	account_id varchar,
 	account_name varchar,
 	ad_id varchar,
@@ -13,7 +13,8 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_facebookads_ads_insights (
 	spend varchar,
 	impression_device varchar,
 	date_start varchar,
-	date_stop varchar)
+	date_stop varchar,
+	inline_link_clicks varchar)
 PARTITIONED BY (
   acc varchar,
   dt varchar)

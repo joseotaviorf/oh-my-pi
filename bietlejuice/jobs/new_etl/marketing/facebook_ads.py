@@ -11,30 +11,20 @@ class FacebookAds(Marketing):
     TABLE_PARTITION_ACCOUNT = '__PARTITION_ACCOUNT__'
 
     COLUMN_TYPE_MAP = {
-        'fact_google_ads_daily_keywords': {
-            'sk_keyword': long,
-            'account_id': long,
-            'campaign_id': long,
-            'adgroup_id': long,
-            'mobile_clicks': int,
-            'tablet_clicks': int,
-            'computer_clicks': int,
-            'total_clicks': int,
-            'total_cost': float,
-            'impressions': int,
-            'sk_date': int
-        },
-        'dim_google_ads_keyword': {
-            'sk_keyword': long,
-            'keyword_id': long
-        }
+        'ad_id': long,
+        'account_id': long,
+        'campaign_id': long,
+        'adset_id': long,
+        'reach': int,
+        'clicks': int,
+        'spend': float
     }
 
     def __init__(self, s3_bucket, execution_date, account=None):
         super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
 
     @logger
-    def move_ads_insights_to_clean(self):
+    def move_ads_to_clean(self):
         r_cols = OrderedDict([
             ('account_id', str),
             ('account_name', str),
