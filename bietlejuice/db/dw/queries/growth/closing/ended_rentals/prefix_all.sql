@@ -33,7 +33,7 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
   order by 1, 2, 3, 4
 ),
 all_dates_last_week as (
@@ -51,7 +51,7 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
   where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dc.dt_contract_annulment) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dc.dt_contract_annulment) < date_part('day', current_date)
@@ -69,7 +69,7 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
 	where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dc.dt_contract_annulment) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', dc.dt_contract_annulment) < date_part('day', add_months(current_date, -12)))

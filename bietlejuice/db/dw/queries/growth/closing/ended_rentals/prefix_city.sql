@@ -41,7 +41,7 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
   order by 6, 1, 2, 3, 4
@@ -61,7 +61,7 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -1))
@@ -81,7 +81,7 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_contract_annulment >= '2017-01-01' and dc.dt_contract_annulment < current_date
 			and f.sk_contract != -1
-			and dc.contract_status != 'Cancelado'
+			and dc.status != 'Cancelado'
   left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where date_part('year', dc.dt_contract_annulment) = date_part('year', add_months(current_date, -12))
