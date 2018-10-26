@@ -46,28 +46,9 @@ tablet_devices as (
     WHERE device = 'Tablets with full browsers'
     GROUP BY 1,2,3,4,5,6,7,11
 ),
-keywords as (
-    SELECT
-        id,
-        keyword_id,
-        account_id,
-        account_name,
-        campaign_id,
-        campaign_name,
-        adgroup_id,
-        adgroup_name,
-        criteria as keyword_name,
-        match_type,
-        sum((cast(cost as float) / 1000000)) as total_cost,
-        date as sk_date,
-        acc,
-        dt_created
-    FROM staging.marketing_google_ads_keywords
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,12,13,14
-),
 fact as (
     SELECT min(id) over (PARTITION BY keywords.keyword_id, keywords.account_id, keywords.campaign_id, keywords.adgroup_id) as id,
-        cast(replace(keywords.sk_date, '-', '') as integer) as sk_date,
+        cast(replace(keywords.date, '-', '') as integer) as sk_date,
         keywords.keyword_id,
         keywords.account_id,
         keywords.campaign_id,
@@ -82,27 +63,27 @@ fact as (
         (COALESCE(mobile_devices.total_clicks, 0) + COALESCE(tablet_devices.total_clicks, 0) + COALESCE(computer_devices.total_clicks, 0)) as total_clicks,
         (COALESCE(mobile_devices.total_cost, 0) + COALESCE(tablet_devices.total_cost, 0) + COALESCE(computer_devices.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices.impressions, 0) + COALESCE(tablet_devices.impressions, 0) + COALESCE(computer_devices.impressions, 0)) as impressions,
-        keywords.sk_date as dt_created,
+        keywords.dt_created,
         keywords.acc
-FROM keywords
+FROM staging.marketing_google_ads_keywords keywords
 LEFT JOIN computer_devices
     ON computer_devices.account_id = keywords.account_id
         AND computer_devices.campaign_id = keywords.campaign_id
         AND computer_devices.adgroup_id = keywords.adgroup_id
         AND computer_devices.keyword_id = keywords.keyword_id
-        AND computer_devices.date = keywords.sk_date
+        AND computer_devices.date = keywords.date
 LEFT JOIN mobile_devices
     ON mobile_devices.account_id = keywords.account_id
         AND mobile_devices.campaign_id = keywords.campaign_id
         AND mobile_devices.adgroup_id = keywords.adgroup_id
         AND mobile_devices.keyword_id = keywords.keyword_id
-        AND mobile_devices.date = keywords.sk_date
+        AND mobile_devices.date = keywords.date
 LEFT JOIN tablet_devices
     ON tablet_devices.account_id = keywords.account_id
         AND tablet_devices.campaign_id = keywords.campaign_id
         AND tablet_devices.adgroup_id = keywords.adgroup_id
         AND tablet_devices.keyword_id = keywords.keyword_id
-        AND tablet_devices.date = keywords.sk_date
+        AND tablet_devices.date = keywords.date
 )
 SELECT distinct
     coalesce(dim.sk_keyword, fact.id) as sk_keyword,

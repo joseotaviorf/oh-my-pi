@@ -7,9 +7,10 @@ WITH clean_table_common as (
         campaign_name,
         adgroup_name,
         match_type,
+        dt_created,
         getdate() as ts_load
     FROM staging.marketing_google_ads_keywords {where_clause}
-    group by 2,3,4,5,6,7
+    group by 2,3,4,5,6,7,8
 )
 SELECT clean_table_common.* FROM clean_table_common
 left join staging.dim_google_ads_keyword st_dim

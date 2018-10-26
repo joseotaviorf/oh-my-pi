@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS marketing.dim_google_ads_keyword (
 	campaign_name VARCHAR,
 	adgroup_name VARCHAR,
 	match_type VARCHAR,
+	dt_created VARCHAR,
 	ts_load TIMESTAMP
 )
