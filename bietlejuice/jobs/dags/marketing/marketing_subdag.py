@@ -19,6 +19,7 @@ class MarketingSubDag(BaseSubDag):
         self.integration = integration
         self.fact_table = fact_table
 
+    @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
         marketing_clazz = MarketingFactory.factory(
             _class=self.clazz,
@@ -28,6 +29,7 @@ class MarketingSubDag(BaseSubDag):
         )
         getattr(marketing_clazz, 'move_{}_to_clean'.format(datalake_table))()
 
+    @logger
     def transfer_to_pre_staging(self, bucket, clean_table, prod_table, **kwargs):
         marketing_clazz = MarketingFactory.factory(
             _class=self.clazz,
@@ -36,7 +38,8 @@ class MarketingSubDag(BaseSubDag):
         )
         marketing_clazz.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
 
-    def transfer_to_staging(self, bucket, dw_table, integration, **kwargs):
+    @logger
+    def transfer_to_staging(self, bucket, dw_table, **kwargs):
         marketing_clazz = MarketingFactory.factory(
             _class=self.clazz,
             s3_bucket=bucket,
@@ -44,6 +47,7 @@ class MarketingSubDag(BaseSubDag):
         )
         marketing_clazz._load_to_staging(dw_table_name=dw_table)
 
+    @logger
     def transfer_to_dw(self, bucket, dw_table, **kwargs):
         marketing_clazz = MarketingFactory.factory(
             _class=self.clazz,
@@ -52,6 +56,7 @@ class MarketingSubDag(BaseSubDag):
         )
         marketing_clazz._load_to_prod(table_name=dw_table)
 
+    @logger
     def build_tasks(self, task_name):
         marketing_clean_dag = self._build_local_dag()
         getattr(self, 'build_{}_tasks'.format(task_name))(marketing_clean_dag)
@@ -91,21 +96,20 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def build_staging_tasks(self, dag):
 
-        tables_task_dict = {}
+        task_tables = []
 
         for table in self.dw_tables:
-            tables_task_dict[table] = BaseDAG.build_python_operator(
+            task_tables.append(BaseDAG.build_python_operator(
                 dag=dag,
                 task_id=table,
                 python_callable=self.transfer_to_staging,
                 provide_context=True,
                 op_kwargs={
                     'bucket': self.bucket,
-                    'dw_table': table,
-                    'integration': self.integration
+                    'dw_table': table
                 }
-            )
-        tables_task_dict['dim_google_ads_keyword'] >> tables_task_dict['fact_google_ads_daily_keywords']
+            ))
+        task_tables[0] >> task_tables[1]
 
     @logger
     def build_dw_tasks(self, dag):
