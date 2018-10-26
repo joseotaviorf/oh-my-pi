@@ -6,7 +6,7 @@ select distinct
   coalesce(ecp.nome, nullif(dprop.nome, '')) as owner_name,
   coalesce(ecp.cpf, nullif(dprop.cpf, '')) as owner_cpf,
   sig."date" as dt_contract_signed,
-	c.contract_status,
+	c.status,
   p.short_id as short_id_property,
 	r.name as property_region,
 	(

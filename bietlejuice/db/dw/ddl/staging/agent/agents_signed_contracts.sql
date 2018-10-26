@@ -7,7 +7,7 @@ create table staging.agents_signed_contracts (
 	owner_name varchar(255),
 	owner_cpf varchar(255),
 	dt_contract_signed date,
-	contract_status varchar(50),
+	status varchar(50),
 	short_id_property integer,
 	property_region varchar(255),
 	number_of_agents_contract integer,
