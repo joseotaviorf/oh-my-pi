@@ -15,26 +15,26 @@ with all_dates as (
     	                                  date_part('year', dc.dt_annulment),
     																		date_part('month', dc.dt_annulment),
     																		date_part('week', dc.dt_annulment),
-    																		date_part('day', dc.dt_annulment) order by dc.id_contract desc)
+    																		date_part('day', dc.dt_annulment) order by dc.sk_contract desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dc.dt_annulment),
     																date_part('week', dc.dt_annulment) order by dc.id_contract asc)
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dc.dt_annulment),
-    																		date_part('week', dc.dt_annulment) order by dc.id_contract desc)
+    																		date_part('week', dc.dt_annulment) order by dc.sk_contract desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dc.dt_annulment),
     																date_part('month', dc.dt_annulment) order by dc.id_contract asc)
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dc.dt_annulment),
-    																		date_part('month', dc.dt_annulment) order by dc.id_contract desc)
+    																		date_part('month', dc.dt_annulment) order by dc.sk_contract desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.region_code, ''),
                                     date_part('year', dc.dt_annulment) order by dc.id_contract asc)
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
-    	                                  date_part('year', dc.dt_annulment) order by dc.id_contract desc)
+    	                                  date_part('year', dc.dt_annulment) order by dc.sk_contract desc)
 			- 1 as yearly_count
 	from fact_demand f
 	join dim_contract dc

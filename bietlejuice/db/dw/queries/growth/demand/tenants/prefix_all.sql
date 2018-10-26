@@ -13,20 +13,20 @@ with all_dates as (
     	+ dense_rank() over (partition by date_part('year', dc.ts_signature),
     																		date_part('month', dc.ts_signature),
     																		date_part('week', dc.ts_signature),
-    																		date_part('day', dc.ts_signature) order by dc.id_contract desc)
+    																		date_part('day', dc.ts_signature) order by dc.sk_contract desc)
 			- 1 as daily_count,
     dense_rank() over (partition by date_part('year', dc.ts_signature),
     																date_part('week', dc.ts_signature) order by dc.id_contract asc)
     	+ dense_rank() over (partition by date_part('year', dc.ts_signature),
-    																		date_part('week', dc.ts_signature) order by dc.id_contract desc)
+    																		date_part('week', dc.ts_signature) order by dc.sk_contract desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by date_part('year', dc.ts_signature),
     																date_part('month', dc.ts_signature) order by dc.id_contract asc)
     	+ dense_rank() over (partition by date_part('year', dc.ts_signature),
-    																		date_part('month', dc.ts_signature) order by dc.id_contract desc)
+    																		date_part('month', dc.ts_signature) order by dc.sk_contract desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by date_part('year', dc.ts_signature) order by dc.id_contract asc)
-    	+ dense_rank() over (partition by date_part('year', dc.ts_signature) order by dc.id_contract desc)
+    	+ dense_rank() over (partition by date_part('year', dc.ts_signature) order by dc.sk_contract desc)
 			- 1 as yearly_count
 	from fact_demand f
 	join dim_contract dc
