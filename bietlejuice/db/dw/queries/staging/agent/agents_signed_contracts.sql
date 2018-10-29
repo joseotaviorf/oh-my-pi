@@ -14,7 +14,7 @@ select distinct
 			+ dense_rank() over (partition by f.sk_contract order by f2.sk_user_agent desc)
 			- 1
 	) as number_of_agents_contract,
-	c.renting_value,
+	c.rent as renting_value,
 	visitor.nome as name_visitor,
 	case
 		when sig."date" < '2018-02-12'
