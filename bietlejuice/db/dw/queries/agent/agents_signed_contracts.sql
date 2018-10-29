@@ -6,7 +6,7 @@ select distinct
   coalesce(ecp.nome, nullif(dprop.nome, '')) as owner_name,
   coalesce(ecp.cpf, nullif(dprop.cpf, '')) as owner_cpf,
   sig."date" as dt_contract_signed,
-	c.contract_status,
+	c.status as contract_status,
   p.short_id as short_id_property,
 	r.name as property_region,
 	(
@@ -14,7 +14,7 @@ select distinct
 			+ dense_rank() over (partition by f.sk_contract order by f2.sk_user_agent desc)
 			- 1
 	) as number_of_agents_contract,
-	c.renting_value,
+	c.rent as renting_value,
 	visitor.nome as name_visitor,
 	case
 		when sig."date" < '2018-02-12'

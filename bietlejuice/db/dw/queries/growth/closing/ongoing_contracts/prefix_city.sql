@@ -41,21 +41,21 @@ with all_dates as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on case
-			   when dc.contract_status = 'Ativo' -- old contracts might not have signature date due to paper contract
+			   when dc.status = 'Ativo' -- old contracts might not have signature date due to paper contract
 			     then true
-			   else dc.dt_signature is not null
+			   else dc.ts_signature is not null
 			 end
-		  and dc.contract_type = 'FullService'
-		  and dd."date" between dc.dt_contract_start
+		  and dc.type = 'FullService'
+		  and dd."date" between dc.dt_start
 		                  and case
-                            when dc.contract_status != 'Ativo'
-                              then least(dc.dt_contract_annulment, dc.dt_contract_intended_end, current_date)
+                            when dc.status != 'Ativo'
+                              then least(dc.dt_annulment, dc.dt_intended_end, current_date)
                             else current_date
                           end
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
-		  		     then dc.contract_status = 'Ativo'
-		  		   else dc.contract_status != 'Cancelado'
+		  		     then dc.status = 'Ativo'
+		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
 	join dim_property dpr
@@ -80,21 +80,21 @@ all_dates_last_month as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on case
-			   when dc.contract_status = 'Ativo' -- old contracts might not have signature date due to paper contract
+			   when dc.status = 'Ativo' -- old contracts might not have signature date due to paper contract
 			     then true
-			   else dc.dt_signature is not null
+			   else dc.ts_signature is not null
 			 end
-		  and dc.contract_type = 'FullService'
-		  and dd."date" between dc.dt_contract_start
+		  and dc.type = 'FullService'
+		  and dd."date" between dc.dt_start
 		                  and case
-                            when dc.contract_status != 'Ativo'
-                              then least(dc.dt_contract_annulment, dc.dt_contract_intended_end, current_date)
+                            when dc.status != 'Ativo'
+                              then least(dc.dt_annulment, dc.dt_intended_end, current_date)
                             else current_date
                           end
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
-		  		     then dc.contract_status = 'Ativo'
-		  		   else dc.contract_status != 'Cancelado'
+		  		     then dc.status = 'Ativo'
+		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
 	join dim_property dpr
@@ -119,21 +119,21 @@ all_dates_last_year as (
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
 		on case
-			   when dc.contract_status = 'Ativo' -- old contracts might not have signature date due to paper contract
+			   when dc.status = 'Ativo' -- old contracts might not have signature date due to paper contract
 			     then true
-			   else dc.dt_signature is not null
+			   else dc.ts_signature is not null
 			 end
-		  and dc.contract_type = 'FullService'
-		  and dd."date" between dc.dt_contract_start
+		  and dc.type = 'FullService'
+		  and dd."date" between dc.dt_start
 		                  and case
-                            when dc.contract_status != 'Ativo'
-                              then least(dc.dt_contract_annulment, dc.dt_contract_intended_end, current_date)
+                            when dc.status != 'Ativo'
+                              then least(dc.dt_annulment, dc.dt_intended_end, current_date)
                             else current_date
                           end
 		  and (case
 		  		   when date_trunc('week', dd."date") = date_trunc('week', current_date)
-		  		     then dc.contract_status = 'Ativo'
-		  		   else dc.contract_status != 'Cancelado'
+		  		     then dc.status = 'Ativo'
+		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
   join dim_property dpr
