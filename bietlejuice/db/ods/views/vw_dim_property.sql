@@ -106,7 +106,7 @@ select
   i.first_publication,
   pl.min_version_time::date as publication_date,
   pl.de_publication_date,
-  (date_part('epoch', c."dataAssinado"::timestamp - pl.min_version_time) / 86400)::int8 as time_first_listing_to_contract_signed,
+  (date_part('epoch', c.ts_signature - pl.min_version_time) / 86400)::int8 as time_first_listing_to_contract_signed,
   (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 as time_listing_to_depublication,
   coalesce(pl.version,0) as nr_listing,
   coalesce(pl.nr_renting::bigint, 0) as nr_renting,
