@@ -1,5 +1,5 @@
-drop table if exists staging.agents_scheduling;
-create table if not exists staging.agents_scheduling (
+drop table if exists agent.agents_scheduling;
+create table if not exists agent.agents_scheduling (
 	agent_id varchar,
 	agent_name varchar,
 	planner_status integer,
