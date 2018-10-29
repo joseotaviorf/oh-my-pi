@@ -119,7 +119,7 @@ tasks as (
       and t.action_type = mrbu.action_type
   -- due to a bug in CRM, the status REALIZE can have no users attached to it
   -- that scenario should only be possible with the RESOLVE status.
-  where not(t.sk_user_action != -1
+  where not(t.sk_user_action = -1
       and t.task_user_type = 'REALIZE')
 )
 -- append data mart specific CTEs in order to populate its fact table (sqls: append_fact_{data mart})
