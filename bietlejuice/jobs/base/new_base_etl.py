@@ -1,9 +1,10 @@
 import os
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 logger = QuintoAndarLogger('new-base-etl')
 
@@ -22,7 +23,8 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
     logger.info("Start query: {}".format(datetime.now()))
     table = BaseETL.from_db_query(
         db_enum=EnumDB.QuintoAndar_ebdb,
-        query=command
+        query=command,
+        encoding='utf8mb4'
     )
 
     logger.info("To ODS: {}".format(datetime.now()))
@@ -44,13 +46,15 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         table = BaseETL.from_db_table(
             db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
-            generator=True
+            generator=True,
+            encoding='utf8mb4'
         ).addfield('dt_timestamp', now)
     else:
         table = BaseETL.from_db_table(
             db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
-            generator=True
+            generator=True,
+            encoding='utf8mb4'
         )
 
     logger.info("To ODS: {}".format(datetime.now()))
