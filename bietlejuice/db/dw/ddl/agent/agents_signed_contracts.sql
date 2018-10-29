@@ -1,5 +1,5 @@
-drop table if exists staging.agents_signed_contracts;
-create table staging.agents_signed_contracts (
+drop table if exists agent.agents_signed_contracts;
+create table agent.agents_signed_contracts (
 	sk_contract_signed_date integer,
 	sk_house integer,
 	sk_contract integer,

@@ -1,4 +1,4 @@
-CREATE TABLE staging.agents_slots (
+CREATE TABLE agent.agents_slots (
 	agent_id int8,
 	last_weekly_update timestamp,
 	last_specific_update timestamp,
