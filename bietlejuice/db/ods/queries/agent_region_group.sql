@@ -4,8 +4,8 @@ SELECT
 	DATE(TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS'))  AS dt,
 	t_out.dadosagente_id,
     t_out.regiao_id,
-    aux."Nossa nomenclatura",
-    aux."Nova nomenclatura"
+    aux.region_code,
+    aux.region_code_deprecated
 FROM
 	public.agent_region_hist t_out
 LEFT join
@@ -25,8 +25,8 @@ SELECT DISTINCT
 	ag.available_date AS dt,
 	us.dados_agente_id AS dadosagente_id,
 	region_id AS regiao_id,
-	aux."Nossa nomenclatura",
-	aux."Nova nomenclatura"
+	aux.region_code,
+	aux.region_code_deprecated
 FROM
 	public.agents_schedule ag
 LEFT JOIN public.usuario us
@@ -43,48 +43,48 @@ WHERE
 (SELECT
 	i_union.dt,
 	i_union.dadosagente_id,
-	i_union."Nossa nomenclatura",
-	count(i_union."Nossa nomenclatura") AS times,
-	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union."Nossa nomenclatura") DESC, i_union."Nossa nomenclatura" ASC) ranking
+	i_union.region_code,
+	count(i_union.region_code) AS times,
+	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union.region_code) DESC, i_union.region_code ASC) ranking
 FROM i_union
 	GROUP BY
 	i_union.dt,
 	i_union.dadosagente_id,
-	i_union."Nossa nomenclatura")
+	i_union.region_code)
 , i_group_new AS
 (SELECT
 	i_union.dt,
 	i_union.dadosagente_id,
-	i_union."Nova nomenclatura",
-	count(i_union."Nova nomenclatura") AS times,
-	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union."Nova nomenclatura") DESC, i_union."Nova nomenclatura" ASC) ranking
+	i_union.region_code_deprecated,
+	count(i_union.region_code_deprecated) AS times,
+	RANK() OVER (PARTITION BY i_union.dadosagente_id ORDER BY count(i_union.region_code_deprecated) DESC, i_union.region_code_deprecated ASC) ranking
 FROM i_union
 	GROUP BY
 	i_union.dt,
 	i_union.dadosagente_id,
-	i_union."Nova nomenclatura")
+	i_union.region_code_deprecated)
 SELECT
 	g.dt,
 	g.dadosagente_id,
 	list.regions,
-	g."Nossa nomenclatura" AS area,
+	g.region_code AS area,
 	(
-	SELECT r2."Nossa nomenclatura"
+	SELECT r2.region_code
 		FROM i_group r2
 	WHERE r2.dadosagente_id = g.dadosagente_id
 			AND r2.dt = g.dt
 			AND r2.ranking = 2
 			AND r2.times = g.times
 	 ) AS secondary_area,
-	 gn."Nova nomenclatura" as new_area,
+	 gn.region_code_deprecated as area_deprecated,
 	 (
-        SELECT ng2."Nova nomenclatura"
+        SELECT ng2.region_code_deprecated
             FROM i_group_new ng2
         WHERE ng2.dadosagente_id = g.dadosagente_id
                 AND ng2.dt = g.dt
                 AND ng2.ranking = 2
                 AND ng2.times = g.times
-	 ) AS new_secondary_area
+	 ) AS secondary_area_deprecated
 FROM i_group g
 LEFT JOIN
 	(SELECT

@@ -10,7 +10,7 @@ CREATE TABLE public.dim_region (
   city_id INTEGER,
   city_name VARCHAR(100),
   region_code VARCHAR(10),
-  new_region_code VARCHAR(10),
+  region_code_deprecated VARCHAR(10),
   short_region_name VARCHAR(255),
   long_region_name VARCHAR(255),
   greater_region VARCHAR(100),

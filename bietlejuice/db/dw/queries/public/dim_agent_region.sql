@@ -5,8 +5,8 @@ SELECT
 	regioes,
 	area,
 	secondary_area,
-	new_area,
-	new_secondary_area
+	area_deprecated,
+	secondary_area_deprecated
 FROM staging.agent_region_group r
 )
 SELECT
