@@ -8,5 +8,6 @@ DATALAKE_TEST_QUERIES_DIR = os.path.join(dir_path, '../../db/datalake/queries/te
 DATALAKE_QUERIES_DIR = os.path.join(dir_path, '../../db/datalake/queries')
 SOURCE_QUERIES_TESTS_DIR = os.path.join(dir_path, '../../db/source/queries/tests')
 SOURCE_QUERIES_DIR = os.path.join(dir_path, '../../db/source/queries')
+SKYNET_QUERIES_DIR = os.path.join(dir_path, '../../db/skynet/queries')
 
 DEFAULT_DAG_OWNER = 'Data Team'

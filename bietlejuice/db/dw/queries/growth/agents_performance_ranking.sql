@@ -28,12 +28,12 @@ with counts as (
 	left join
 		public.dim_contract c
 		on c.sk_contract = liq.sk_contract
-		and c.dt_signature::date < date(ddate.week_start)
+		and c.ts_signature::date < date(ddate.week_start)
 	where
 		sk_user_agent<>-1
 	and	v.day_visit >= date(ddate.week_start) - interval '6 weeks'
 	and v.day_visit < date(ddate.week_start) - interval '2 weeks'
-	and (c.dt_signature::date is not null or liq.sk_contract = -1)
+	and (c.ts_signature::date is not null or liq.sk_contract = -1)
 	group by sk_user_agent, agent_name, r.greater_region, ddate.week_start
 ),
 ratios as (

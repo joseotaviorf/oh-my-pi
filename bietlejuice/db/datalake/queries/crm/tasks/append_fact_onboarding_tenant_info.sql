@@ -23,7 +23,7 @@ contract_house_listing as (
   where sk_contract != '-1'
   group by 1, 2
 )
-select
+select distinct
   c.sk_task,
   c.sk_receiver,
   c.sk_start_date,

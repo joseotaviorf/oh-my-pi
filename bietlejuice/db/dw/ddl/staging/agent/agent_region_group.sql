@@ -5,7 +5,7 @@ CREATE TABLE staging.agent_region_group (
   "regioes" VARCHAR(512) NOT NULL,
   "area" VARCHAR NOT NULL,
   "secondary_area" VARCHAR NULL,
-  "new_area" VARCHAR NOT NULL,
-  "new_secondary_area" VARCHAR NULL,
+  "area_deprecated" VARCHAR NULL,
+  "secondary_area_deprecated" VARCHAR NULL,
   PRIMARY KEY ("dt","dadosagente_id","area")
 )

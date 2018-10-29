@@ -6,8 +6,8 @@ CREATE TABLE public.dim_agent_region (
   regions VARCHAR(512),
   area VARCHAR(10),
   secondary_area VARCHAR(10) NULL,
-  new_area VARCHAR(10),
-  new_secondary_area VARCHAR(10) NULL,
+  area_deprecated VARCHAR(10) NULL,
+  secondary_area_deprecated VARCHAR(10) NULL,
   dt_timestamp TIMESTAMP default getdate(),
   CONSTRAINT dim_agent_region_pkey PRIMARY KEY(sk_agent_region)
 );

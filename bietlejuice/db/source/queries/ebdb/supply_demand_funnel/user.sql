@@ -62,7 +62,7 @@ select
     daf.ultimoCalculoComissaoIndicado as dadosafiliado_ultim_calculo_comissao_indicado,
     daf.verificado+0 as dadosafiliado_verificado,
     daf.tipoAfiliado as dadosafiliado_tipo,
-    daf.cidadeAtuacao as dadosafiliado_cidade_atuacao,
+    coalesce(daf.cidadeAtuacao, dmn.workCity) as dadosafiliado_cidade_atuacao,
     daf.principaisBairrosAtuacao as dadosafiliado_principais_bairros_atuacao,
     daf.preferenciaPagamento as dadosafiliado_preferencia_pagamento,
     daf.numeroCreci as dadosafiliado_numero_creci,

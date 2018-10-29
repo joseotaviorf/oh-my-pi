@@ -7,13 +7,13 @@ CREATE VIEW vw_agent_contracts AS
                     liq.sk_contract,
                     agent.nome AS agent_name,
                     sig."date" AS dt_contract_signed,
-                    c.contract_status,
+                    c.status as contract_status,
                     CASE WHEN substring(p.id for 4) = '8927' THEN substring(p.id FROM 5)
                          WHEN substring(p.id FOR 4) = '8928' THEN concat('1',substring(p.id FROM 5))
                     END AS short_id_property,
                     r.NAME AS property_region,
                     (dense_rank() OVER (partition BY liq.sk_contract ORDER BY liq2.sk_user_agent ASC) +dense_rank() OVER (partition BY liq.sk_contract ORDER BY liq2.sk_user_agent DESC) - 1) AS number_of_agents_contract,
-                    c.renting_value,
+                    c.rent as renting_value,
                     visitor.nome AS name_visitor,
                     CASE WHEN sig."date" < '2018-02-12' THEN 0.2
                          ELSE COALESCE(ranking.commission,0.2)
