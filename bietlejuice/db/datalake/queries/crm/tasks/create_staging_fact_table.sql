@@ -117,7 +117,7 @@ tasks as (
     on t.sk_task = mrbu.sk_task
       and t.sk_user_action = mrbu.sk_user_action
       and t.action_type = mrbu.action_type
-  -- due to a bug in CRM, the status REALIZE can have no users attached to it
+  -- due to a bug in CRM, the status REALIZE can have no user attached to it
   -- that scenario should only be possible with the RESOLVE status.
   where not(t.sk_user_action = -1
       and t.task_user_type = 'REALIZE')
