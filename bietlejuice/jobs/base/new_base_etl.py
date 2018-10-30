@@ -28,7 +28,6 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
     )
 
     logger.info("To ODS: {}".format(datetime.now()))
-    table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
         table_name=table_name,
@@ -58,7 +57,6 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         )
 
     logger.info("To ODS: {}".format(datetime.now()))
-    table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
         table_name=dim_name,
