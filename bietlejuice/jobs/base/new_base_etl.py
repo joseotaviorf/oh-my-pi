@@ -23,11 +23,11 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
     logger.info("Start query: {}".format(datetime.now()))
     table = BaseETL.from_db_query(
         db_enum=EnumDB.QuintoAndar_ebdb,
-        query=command,
-        encoding='utf8mb4'
+        query=command
     )
 
     logger.info("To ODS: {}".format(datetime.now()))
+    table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
         table_name=table_name,
@@ -45,18 +45,17 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
         table = BaseETL.from_db_table(
             db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
-            generator=True,
-            encoding='utf8mb4'
+            generator=True
         ).addfield('dt_timestamp', now)
     else:
         table = BaseETL.from_db_table(
             db_enum=EnumDB.QuintoAndar_ebdb,
             table_name=table_name,
-            generator=True,
-            encoding='utf8mb4'
+            generator=True
         )
 
     logger.info("To ODS: {}".format(datetime.now()))
+    table = BaseETL.decode_table(table, 'LATIN-1')
     BaseETL.bulk_insert(
         table=table,
         table_name=dim_name,
