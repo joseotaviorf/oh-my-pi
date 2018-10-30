@@ -45,11 +45,11 @@ with filt as (
 )
 --select * from aux_ish;
 , contract_dates as (
-    select id, imovel_id, least("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as l,
-    greatest("dataAssinado", "dataInicio", "dataEntrada", "dataMinutaAprovada")::date as g,
-    "dataRescisao" as dt_end
+    select id, cast(id_house as bigint), least(date("ts_signature"), "dt_start", "dt_entrance", date("ts_draft_approved"))::date as l,
+    greatest(date("ts_signature"), "dt_start", "dt_entrance", date("ts_draft_approved"))::date as g,
+    "dt_annulment" as dt_end
     from contract
-    where tipo = 'FullService'
+    where type = 'FullService'
       and status in ('Finalizado', 'Ativo')
 )
 --select * from contract_dates
@@ -70,7 +70,7 @@ with filt as (
 		abs(extract(epoch from (ish.status_time - g))/60)::int = min(abs(extract(epoch from (ish.status_time - g))/60)::int) over (partition by ish.id, status_time) as true_line
 	from aux_ish ish
 	join contract_dates c
-	  on ish.id = c.imovel_id
+	  on ish.id = c.id_house
 	where ish.status_history = 'alugado' and ish.truncatable is false
 )
 --select * from rent;

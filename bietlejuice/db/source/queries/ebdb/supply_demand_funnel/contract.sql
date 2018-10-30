@@ -27,7 +27,8 @@ select
   c.criadoEm as ts_created,
   c.atualizadoEm as ts_updated,
   c_reasons.cancellation_reason,
-  c.proposta_id as id_proposal
+  c.proposta_id as id_proposal,
+  c.imovel_id as id_house
 from Contrato c
 left join (
   select
