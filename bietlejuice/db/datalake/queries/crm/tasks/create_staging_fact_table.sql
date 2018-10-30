@@ -12,39 +12,39 @@ prev_tasks as (
   -- because the incremental load might duplicate date, a distinct must be added
   select distinct
     ct.id as sk_task,
-    coalesce(cast(cast(ct.id_receiver as decimal) as bigint), -1) as sk_receiver,
+    coalesce(try(cast(try(cast(ct.id_receiver as decimal)) as bigint)), -1) as sk_receiver,
     coalesce(
-      cast(
-        replace(regexp_extract(cast(ct.ts_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+      try(cast(
+        replace(regexp_extract(try(cast(ct.ts_start as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
-      ), -1) as sk_start_date,
+      )), -1) as sk_start_date,
     coalesce(
-      cast(
-        replace(regexp_extract(cast(ct.ts_completed as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+      try(cast(
+        replace(regexp_extract(try(cast(ct.ts_completed as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
-      ), -1) as sk_completed_date,
-    coalesce(cast(cast(ct.id_origin as decimal) as bigint), -1) as sk_origin,
-    coalesce(cast(cast(ct.id_assignee as decimal) as bigint), -1) as sk_assignee,
+      )), -1) as sk_completed_date,
+    coalesce(try(cast(try(cast(ct.id_origin as decimal)) as bigint)), -1) as sk_origin,
+    coalesce(try(cast(try(cast(ct.id_assignee as decimal)) as bigint)), -1) as sk_assignee,
     ct.action_user_name,
-    coalesce(cast(cast(ct.id_user_action as decimal) as bigint), -1) as sk_user_action,
+    coalesce(try(cast(try(cast(ct.id_user_action as decimal)) as bigint)), -1) as sk_user_action,
     coalesce(
-      cast(
-        replace(regexp_extract(cast(ct.ts_action as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+      try(cast(
+        replace(regexp_extract(try(cast(ct.ts_action as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
-      ), -1) as sk_action_date,
+      )), -1) as sk_action_date,
     ct.ts_action,
     ct.action_type,
     coalesce(
-      cast(
-        replace(regexp_extract(cast(ct.ts_task_user_start as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+      try(cast(
+        replace(regexp_extract(try(cast(ct.ts_task_user_start as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
-      ), -1) as sk_task_user_start_date,
+      )), -1) as sk_task_user_start_date,
     ts_task_user_start,
     coalesce(
-      cast(
-        replace(regexp_extract(cast(ct.ts_task_user_end as varchar), '\d{4}-\d{2}-\d{2}'), '-', '')
+      try(cast(
+        replace(regexp_extract(try(cast(ct.ts_task_user_end as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '')
        as bigint
-      ), -1) as sk_task_user_end_date,
+       )), -1) as sk_task_user_end_date,
     ct.ts_task_user_end,
     ct.task_user_type,
     ct.task_user_resolve_hours,
@@ -117,5 +117,9 @@ tasks as (
     on t.sk_task = mrbu.sk_task
       and t.sk_user_action = mrbu.sk_user_action
       and t.action_type = mrbu.action_type
+  -- due to a bug in CRM, the status REALIZE can have no user attached to it
+  -- that scenario should only be possible with the RESOLVE status.
+  where not(t.sk_user_action = -1
+      and t.task_user_type = 'REALIZE')
 )
 -- append data mart specific CTEs in order to populate its fact table (sqls: append_fact_{data mart})

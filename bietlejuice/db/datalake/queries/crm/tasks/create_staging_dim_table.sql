@@ -9,7 +9,7 @@ with max_date as (
 )
 select distinct
   ct.id as sk_task,
-  cast(ct.resolved as boolean) as flg_solved,
+  try(cast(ct.resolved as boolean)) as flg_solved,
   ct.score_factor,
   ct.ts_start,
   ct.ts_completed,
