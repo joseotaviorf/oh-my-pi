@@ -5,8 +5,8 @@ select
   i.regiao_id as sk_region,
   coalesce(i.usuario_que_cadastrou_id, -1) as sk_user_registration,
   coalesce(c.id, -1) as sk_contract,
-  (date_part('epoch', c.ts_signature - pl.min_version_time) / 86400)::int8 as time_first_listing_to_contract_signed,
-  (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 as time_listing_to_depublication,
+  (date_part('epoch', c.ts_signature - pl.min_version_time) / 86400)::int8 as seconds_first_listing_to_contract_signed,
+  (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 as seconds_listing_to_depublication,
   coalesce(pl.nr_renting::bigint, 0) as nr_renting,
   now() as ts_load
 from imovel i
