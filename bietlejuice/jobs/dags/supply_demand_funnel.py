@@ -267,7 +267,7 @@ user_dag = BaseSubDag.get_sub_dag_operator(
 house_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=house_sub_dag,
-    sub_dag_name='Property'
+    sub_dag_name='House'
 )
 
 visit_dag = BaseSubDag.get_sub_dag_operator(
