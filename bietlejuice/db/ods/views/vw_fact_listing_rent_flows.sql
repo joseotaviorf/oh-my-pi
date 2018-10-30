@@ -6,11 +6,11 @@ with _fact as (
 	  coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house_listing,
 	  hrf.id_house,
 	  coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
-	  coalesce(to_char(vdh.min_version_time, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
-	  vdh.min_version_time as dt_house_listing,
-	  coalesce(to_char(vdh.de_publication_date, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
+	  coalesce(to_char(vdh.ts_listing_version_start, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
+	  vdh.ts_listing_version_start as dt_house_listing,
+	  coalesce(to_char(vdh.ts_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
 	  coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
-	  coalesce(vdh.regiao_id, -1) as sk_region,
+	  coalesce(vfhl.sk_region, -1) as sk_region,
 	  coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
 	  coalesce(hrf.id_booking, -1) as sk_booking,
 	  coalesce(to_char(hrf.dt_booking_created, 'YYYYMMDD')::integer, -1) as sk_booking_created_date,
@@ -88,10 +88,12 @@ with _fact as (
 	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
 	  now()::timestamp as dt_timestamp
 	from house_rent_flow hrf
-	left join vw_dim_property vdh
-	  on vdh.id = hrf.id_house
-	  	and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.min_version_time, '1900-01-01')
-		                                              and coalesce(vdh.max_version_time, now())
+	left join vw_dim_house_listing vdh
+	  on vdh.id_house = hrf.id_house
+	  	and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01')
+		                                              and coalesce(vdh.ts_listing_version_end, now())
+  left join vw_fact_house_listings vfhl
+    on vfhl.sk_house_listing = vdh.sk_house_listing
   left join vw_dim_offer vdo
     on vdo.sk_offer = case
                         when hrf.id_offer > 0
