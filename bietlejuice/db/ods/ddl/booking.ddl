@@ -6,7 +6,6 @@ CREATE TABLE public.booking (
   data DATE NOT NULL,
   status VARCHAR(50) NOT NULL,
   tipo VARCHAR(50) NOT NULL,
-  hash VARCHAR(100),
   confirmado VARCHAR(100),
   encerrado VARCHAR(100),
   "agenteFixo" VARCHAR(100),
