@@ -22,8 +22,8 @@ select distinct
 		else coalesce(ranking.commission, 0.2)
 	end as contract_commission,
 	p.endereco
-from public.fact_demand f
-left join public.fact_demand f2
+from public.fact_listing_rent_flows f
+left join public.fact_listing_rent_flows f2
 	on f2.sk_house_listing = f.sk_house
 		and f2.sk_client = f.sk_client
 left join public.dim_contract c

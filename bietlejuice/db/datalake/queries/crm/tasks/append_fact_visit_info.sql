@@ -24,7 +24,7 @@ booking_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_booking as bigint) as sk_booking
-  from datalake_clean.ods_fact_demand
+  from datalake_clean.ods_fact_listing_rent_flows
   where sk_booking != '-1'
   group by 1, 2
 )

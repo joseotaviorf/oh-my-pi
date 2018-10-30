@@ -69,7 +69,7 @@ bdg_demand_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     python_callable=xcom_dependencies,
-    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_demand'],
+    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_listing_rent_flows'],
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
@@ -119,26 +119,26 @@ data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_fact_demand = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='data_integrity_bdg_fact_demand',
+    task_id='data_integrity_bdg_fact_listing_rent_flows',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_demand_agent',
                'f_column': 'sk_demand',
-               'dim_name': 'fact_demand',
+               'dim_name': 'fact_listing_rent_flows',
                'dim_column': 'ods_id',
                'type': 'update'}
 )
 
-data_integrity_fact_demand_dim_booking = BaseDAG.build_quintoandar_python_operator(
+data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='data_integrity_fact_demand_dim_booking',
+    task_id='data_integrity_fact_listing_rent_flows_dim_booking',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'fact_demand',
+               'f_name': 'fact_listing_rent_flows',
                'f_column': 'sk_booking',
                'dim_name': 'dim_booking',
                'dim_column': 'sk_booking',
@@ -167,4 +167,4 @@ refresh_agents = BaseDAG.build_quintoandar_python_operator(
 
 (bdg_demand_agent_xcom_dependencies >> bdg_demand_agent >> data_integrity_bdg_fact_agent >>
  data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking >>
- data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand >> refresh_agents)
+ data_integrity_fact_listing_rent_flows_dim_booking >> data_integrity_bdg_fact_listing_rent_flows >> refresh_agents)

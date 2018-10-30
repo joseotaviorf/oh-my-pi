@@ -19,7 +19,7 @@ contract_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_contract as bigint) as sk_contract
-  from datalake_clean.ods_fact_demand
+  from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
   group by 1, 2
 )

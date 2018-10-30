@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.ods_fact_demand;
-create external table datalake_clean.ods_fact_demand (
+drop table if exists datalake_clean.ods_fact_listing_rent_flows;
+create external table datalake_clean.ods_fact_listing_rent_flows (
   ods_id string,
 	sk_house string,
 	sk_house_first_listing_date string,
