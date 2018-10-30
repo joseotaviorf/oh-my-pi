@@ -1,16 +1,31 @@
 from datetime import datetime, timedelta
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsETL
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('AmplitudeEvents')
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
+@logger(exclude='kwargs')
 def load_amplitude(**kwargs):
     start_date = kwargs['execution_date'].replace(hour=0, minute=0, second=0, microsecond=0)
 
     end_date = (start_date + timedelta(hours=23))
-    a = AmplitudeEventsETL()
+    a = AmplitudeEventsETL(s3_bucket=s3_bucket)
     a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
+
+
+@logger(exclude='kwargs')
+def merge_users(**kwargs):
+    execution_date = kwargs['execution_date']
+
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    amplitude_etl.merge_user_ids(ym=str(execution_date.strftime('%Y-%m')))
 
 
 dag = DAG(
@@ -25,9 +40,27 @@ dag = DAG(
     max_active_runs=3
 )
 
-load_events_data_to_clean_task = BaseDAG.build_quintoandar_python_operator(
+load_events_to_raw_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='load_events_data_to_clean',
+    task_id='load_events_to_raw',
     provide_context=True,
     python_callable=load_amplitude
 )
+
+# load_events_to_clean_task = BaseDAG.build_quintoandar_python_operator(
+#     dag=dag,
+#     task_id='load_events_to_clean',
+#     provide_context=True,
+#     python_callable=load_amplitude_clean
+# )
+
+merge_users_task = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='merge_users',
+    provide_context=True,
+    python_callable=merge_users
+)
+
+airflow_helpers.chain(load_events_to_raw_task,
+                      # load_events_to_clean_task,
+                      merge_users_task)
