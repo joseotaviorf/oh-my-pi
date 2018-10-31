@@ -132,7 +132,7 @@ full_costs as (
 ),
 result as (
     select
-      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      coalesce(vbpc.sk_house_listing, (c.property_id || '001')::bigint) as sk_house_listing,
       c.property_id,
       c.dt_cash_flow::date,
       c.vl_bo_onboarding,
@@ -170,7 +170,7 @@ last_value_gap_fill as (
     from last_value
 )
 select
-    r.sk_property,
+    r.sk_house_listing,
     r.property_id,
     r.dt_cash_flow,
     r.flg_expected_bo_onboarding,

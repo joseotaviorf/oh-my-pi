@@ -131,7 +131,7 @@ where
 -- For each property expose the published days
 property_daily_status as  (
 	select
-		base.sk_property,
+		base.sk_house_listing,
 		id as property_id,
 		"date" as dt_status
 	from
@@ -147,7 +147,7 @@ property_daily_status as  (
 -- Divide costs for published day
 daily_total as (
 	select
-		pds.sk_property as sk_property,
+		pds.sk_house_listing as sk_house_listing,
 		pds.property_id as property_id,
 		date_trunc('month', pds.dt_status + interval '2 month')::date as dt_cash_flow,
 		coalesce(dc.total,0) as total,
@@ -166,7 +166,7 @@ daily_total as (
 -- Get month total for each version with a proper cash flow date
 monthly_total_versioned as (
 	select
-		daily.sk_property,
+		daily.sk_house_listing,
 		daily.property_id,
 		daily.dt_cash_flow,
 		sum(daily.criteo_cost)::decimal(14,4) as criteo_cost,
@@ -178,7 +178,7 @@ monthly_total_versioned as (
 	from
 		daily_total daily
 	group by
-		daily.sk_property,
+		daily.sk_house_listing,
 		daily.property_id,
 		daily.dt_cash_flow
 )

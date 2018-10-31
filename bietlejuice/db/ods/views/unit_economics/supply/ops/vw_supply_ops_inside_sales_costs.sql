@@ -9,7 +9,7 @@ with cdre_inside_sales as (
 ),
 filtered_properties as (
 	select distinct
-	    sk_property,
+	    sk_house_listing,
 	    property_id,
 	    min_version_time::date as listing_date
 	from
@@ -23,7 +23,7 @@ filtered_properties as (
 ),
 costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.listing_date,
       cis.dre_date as dt_cash_flow,
@@ -33,7 +33,7 @@ costs as (
       on cis.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   dt_cash_flow as dt_cash_flow,
   vl_inside_sales

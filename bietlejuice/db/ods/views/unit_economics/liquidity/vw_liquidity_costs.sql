@@ -6,7 +6,7 @@ drop view if exists unit_economics.vw_liquidity_costs;
 ---
 create or replace view unit_economics.vw_liquidity_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_tenant_campaigns)::decimal(14,4) as vl_tenant_campaigns,
@@ -18,7 +18,7 @@ select
 from
 	(
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			vl_tenant_campaigns,
@@ -31,7 +31,7 @@ from
 			unit_economics.liquidity_mkt_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -44,7 +44,7 @@ from
 			unit_economics.liquidity_ab_agent_hours_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -57,7 +57,7 @@ from
 			unit_economics.liquidity_ops_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -69,5 +69,5 @@ from
 		from
 			unit_economics.liquidity_lockbox_costs
 	) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;

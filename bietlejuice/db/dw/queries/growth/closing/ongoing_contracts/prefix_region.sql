@@ -58,8 +58,8 @@ with all_dates as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_property dpr
-		on f.sk_house = dpr.sk_property
+	join dim_house_listing dpr
+		on f.sk_house_listing = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dd."date" < current_date
@@ -97,8 +97,8 @@ all_dates_last_month as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_property dpr
-		on f.sk_house = dpr.sk_property
+	join dim_house_listing dpr
+		on f.sk_house_listing = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dd."date" < current_date
@@ -136,8 +136,8 @@ all_dates_last_year as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_property dpr
-		on f.sk_house = dpr.sk_property
+	join dim_house_listing dpr
+		on f.sk_house_listing = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   where dd."date" < current_date

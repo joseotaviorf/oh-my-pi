@@ -46,7 +46,7 @@ unique_views as (
     fhs.sk_region
   from unique_views_prev uvp
   join datalake_clean.ods_fact_house_status fhs
-    on cast(uvp.house_id as varchar) = substr(fhs.sk_house, 1, 9)
+    on cast(uvp.house_id as varchar) = substr(fhs.sk_house_listing, 1, 9)
       and fhs.status_history = 'publicado'
       and uvp.dt_int between cast(fhs.sk_min_version_status_date as bigint) and cast(if(fhs.sk_max_status_date = '', date_format(current_date, '%Y%m%d'), fhs.sk_max_status_date) as bigint)
       and date_diff('day', date_parse(fhs.sk_min_version_status_date, '%Y%m%d'), if(fhs.sk_max_status_date = '', current_date, cast(date_parse(fhs.sk_max_status_date, '%Y%m%d') as date))) >= 7
