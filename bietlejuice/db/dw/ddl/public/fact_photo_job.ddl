@@ -2,7 +2,7 @@ drop table public.fact_photo_job;
 
 create table public.fact_photo_job(
   id_photo_job int8,
-  sk_property int8,
+  sk_house_listing int8,
   sk_region int8,
   sk_user_cancel int8,
   sk_user_photographer int8,

@@ -88,7 +88,7 @@ base_contract as (
 		and c.dt_end between base.min_version_time and base.max_version_time
 )
 select
-	max(sk_property)::bigint as sk_property,
+	max(sk_house_listing)::bigint as sk_house_listing,
 	bc.property_id,
 	bc.contract_id,
 	insurance_fee::decimal(14,4) as vl_insurance_fee,

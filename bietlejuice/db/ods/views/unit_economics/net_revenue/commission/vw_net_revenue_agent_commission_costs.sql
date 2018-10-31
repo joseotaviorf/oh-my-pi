@@ -81,7 +81,7 @@ updated_dates as (
   from all_contracts
 )
 select
-  vbpc.sk_property,
+  vbpc.sk_house_listing,
   ud.property_id,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission,

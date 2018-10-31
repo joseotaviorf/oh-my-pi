@@ -9,7 +9,7 @@ with cdre_photos as (
 ),
 filtered_properties as (
    select distinct
-      sk_property,
+      sk_house_listing,
       property_id,
       min_version_time::date as listing_date
     from unit_economics.vw_base_property_costs
@@ -17,7 +17,7 @@ filtered_properties as (
 ),
 costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.listing_date,
       cp.dre_date as dt_cash_flow,
@@ -27,7 +27,7 @@ costs as (
       on cp.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 5) as dt_cash_flow,
   vl_photos

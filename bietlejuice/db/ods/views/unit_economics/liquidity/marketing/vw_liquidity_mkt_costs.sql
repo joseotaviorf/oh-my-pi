@@ -6,7 +6,7 @@ drop view if exists unit_economics.vw_liquidity_mkt_costs;
 ---
 create or replace view unit_economics.vw_liquidity_mkt_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	dt_cash_flow,
 	vl_tenant_campaigns

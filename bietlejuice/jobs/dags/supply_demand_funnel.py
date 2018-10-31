@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
+
 import bietlejuice.jobs.base.new_base_etl as utils
 import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -190,7 +191,7 @@ def refresh_powerbi(**kwargs):
     powerbi_client.trigger_refresh()
 
 
-def xcom_fact_demand_task(**kwargs):
+def xcom_fact_listing_rent_flows_task(**kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     xcom.xcom_push(kwargs['ti'], exec_date)
 
@@ -224,11 +225,11 @@ fact_photo_job = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
-fact_demand = BaseDAG.build_quintoandar_python_operator(
+fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
-    task_id='DW_fact_demand',
+    task_id='DW_fact_listing_rent_flows',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'demand', 'is_fact': True, 'bucket': bucket}
+    op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
 )
 
 fact_house_status = BaseDAG.build_quintoandar_python_operator(
@@ -266,7 +267,7 @@ user_dag = BaseSubDag.get_sub_dag_operator(
 house_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=house_sub_dag,
-    sub_dag_name='Property'
+    sub_dag_name='House'
 )
 
 visit_dag = BaseSubDag.get_sub_dag_operator(
@@ -299,10 +300,10 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-xcom_fact_demand = BaseDAG.build_quintoandar_python_operator(
+xcom_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
-    task_id='XCom_fact_demand',
-    python_callable=xcom_fact_demand_task,
+    task_id='XCom_fact_listing_rent_flows',
+    python_callable=xcom_fact_listing_rent_flows_task,
     provide_context=True
 )
 
@@ -313,11 +314,11 @@ refresh_supply = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
 )
 
-refresh_demand = BaseDAG.build_quintoandar_python_operator(
+refresh_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
-    task_id='Refresh_PowerBI_Demand',
+    task_id='Refresh_PowerBI_Listing_Rent_Flows',
     python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Demand'}
+    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Rent Flow'}
 )
 
 refresh_booking = BaseDAG.build_quintoandar_python_operator(
@@ -328,12 +329,12 @@ refresh_booking = BaseDAG.build_quintoandar_python_operator(
 )
 
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
-fact_demand.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                          user_dag, house_dag, ods_house_rent_flow])
+fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+                                      user_dag, house_dag, ods_house_rent_flow])
 
 airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
-fact_demand.set_downstream([xcom_fact_demand, refresh_demand])
-refresh_demand >> refresh_booking
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_listing_rent_flows])
+refresh_listing_rent_flows >> refresh_booking
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
 house_dag >> fact_house_status

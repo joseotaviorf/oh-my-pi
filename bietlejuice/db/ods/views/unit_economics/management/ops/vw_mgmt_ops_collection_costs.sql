@@ -157,7 +157,7 @@ full_costs as (
       and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select distinct
-  coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
+  coalesce(vbpc.sk_house_listing, (fc.property_id || '001')::bigint) as sk_house_listing,
   fc.property_id,
   fc.dt_cash_flow::date,
   fc.vl_collection,
