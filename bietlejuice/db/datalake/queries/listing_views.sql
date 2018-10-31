@@ -30,6 +30,6 @@ left join
 	and uv.dt_view = v.dt_view
 left join
 	datalake_clean.ods_dim_house_listing p
-	on trim(p.id) = v.imovel_id
+	on trim(p.id_house) = v.imovel_id
 	and coalesce(cast(cast(regexp_extract(p.min_version_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date),date('1900-01-01')) <= v.dt_view
 	and coalesce(cast(cast(regexp_extract(p.max_version_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date),date('2300-01-01')) >= v.dt_view
