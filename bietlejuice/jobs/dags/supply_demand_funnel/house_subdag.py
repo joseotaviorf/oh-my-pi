@@ -41,16 +41,16 @@ class HouseSubDag(DimSubDag):
         return house_dag
 
     @logger
-    def get_property_query(self, **kwargs):
+    def get_house_query(self, **kwargs):
         exec_date = kwargs['execution_date']
-        dim = 'property'
+        dim = 'house'
 
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, dim)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
         utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
-                                                 table_name='imovel')
+                                                 table_name='house')
 
     @logger
     def __build_data_tasks(self, dag):
@@ -58,7 +58,7 @@ class HouseSubDag(DimSubDag):
             dag=dag,
             task_id='ODS_imovel',
             provide_context=True,
-            python_callable=self.get_property_query
+            python_callable=self.get_house_query
         )
 
         affiliate = BaseDAG.build_quintoandar_python_operator(
@@ -97,10 +97,10 @@ class HouseSubDag(DimSubDag):
 
         property_listing = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='ODS_property_listing',
+            task_id='ODS_house_listing',
             python_callable=utils.materialize_view_ods,
             op_kwargs={
-                'view_name': 'property_listing',
+                'view_name': 'house_listing',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
