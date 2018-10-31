@@ -10,7 +10,7 @@ with all_dates as (
                                     dd.year,
     																dd.month,
     																dd.calendar_week,
-    																dd.day order by f.sk_house asc)
+    																dd.day order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
     																		dd.month,
@@ -19,20 +19,20 @@ with all_dates as (
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     dd.year,
-    																dd.calendar_week order by f.sk_house asc)
+    																dd.calendar_week order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
     																		dd.calendar_week order by f.sk_house desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     dd.year,
-    																dd.month order by f.sk_house asc)
+    																dd.month order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
     																		dd.month order by f.sk_house desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year order by f.sk_house asc)
+                                    dd.year order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year order by f.sk_house desc)
 			- 1 as yearly_count

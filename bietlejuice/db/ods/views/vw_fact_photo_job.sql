@@ -10,7 +10,7 @@ with base_jobs as (
 )
 select
 	j1.id as id_photo_job,
-	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_property,
+	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_house_listing,
 	coalesce(i.regiao_id, -1) as sk_region,
 	coalesce(j1.user_cancel_id, -1) as sk_user_cancel,
 	coalesce(j1.photographer_id, -1) as sk_user_photographer,

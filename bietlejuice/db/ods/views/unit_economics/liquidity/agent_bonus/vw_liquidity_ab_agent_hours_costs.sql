@@ -12,7 +12,7 @@ with hour_costs as (
 ),
 filtered_daily_status as  (
 	select
-		base.sk_property,
+		base.sk_house_listing,
 		id as property_id,
 		"date" as dt_status,
 		row_number()
@@ -28,7 +28,7 @@ filtered_daily_status as  (
 ),
 property_daily_status as  (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_status
 	from
@@ -38,7 +38,7 @@ property_daily_status as  (
 ),
 all_costs as (
     select
-      pds.sk_property,
+      pds.sk_house_listing,
       pds.property_id,
       pds.dt_status,
       hc.dre_date as dt_cash_flow,
@@ -50,7 +50,7 @@ all_costs as (
       on hc.dre_date = (date_trunc('month', pds.dt_status) + interval '1 month')::date
 )
 select
-  ac.sk_property,
+  ac.sk_house_listing,
   ac.property_id,
   ac.dt_cash_flow::date,
   case
@@ -62,5 +62,5 @@ from all_costs ac
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
     and ac.dt_cash_flow between vbpc.min_version_time and vbpc.max_version_time
-group by ac.sk_property, ac.property_id, ac.dt_cash_flow
+group by ac.sk_house_listing, ac.property_id, ac.dt_cash_flow
 ;
