@@ -9,23 +9,23 @@ with all_dates as (
     dense_rank() over (partition by dd.year,
     																dd.month,
     																dd.calendar_week,
-    																dd.day order by f.sk_house_listing asc)
+    																dd.day order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
     																		dd.month,
     																		dd.calendar_week,
     																		dd.day order by f.sk_house desc)
 			- 1 as daily_count,
     dense_rank() over (partition by dd.year,
-    																dd.calendar_week order by f.sk_house_listing asc)
+    																dd.calendar_week order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
     																		dd.calendar_week order by f.sk_house desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by dd.year,
-    																dd.month order by f.sk_house_listing asc)
+    																dd.month order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year,
     																		dd.month order by f.sk_house desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by dd.year order by f.sk_house_listing asc)
+    dense_rank() over (partition by dd.year order by f.sk_house asc)
     	+ dense_rank() over (partition by dd.year order by f.sk_house desc)
 			- 1 as yearly_count
 	from fact_house_status f
