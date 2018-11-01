@@ -15,6 +15,7 @@ select
   pl.min_version_time::date as ts_publication,
   pl.de_publication_date as ts_de_publication,
   pl.aluguel as rent,
+  i.aluguel as house_rent,
   i.bairro as house_neighborhood,
   i.cep as house_zipcode,
   i.cidade as house_city,
