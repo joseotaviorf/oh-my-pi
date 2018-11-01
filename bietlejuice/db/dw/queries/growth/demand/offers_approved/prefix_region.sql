@@ -43,7 +43,7 @@ with all_dates as (
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_house = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by 5, 1, 2, 3, 4
@@ -65,7 +65,7 @@ all_dates_last_month as (
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
 	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_house = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_analysis) = date_part('year', add_months(current_date, -1))
@@ -87,7 +87,7 @@ all_dates_last_year as (
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
   join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_house = dpr.sk_house_listing
   left join dim_region dr
   	on dpr.regiao_id = dr.id
 	where date_part('year', dof.dt_analysis) = date_part('year', add_months(current_date, -12))
