@@ -38,10 +38,10 @@ with all_dates as (
 			- 1 as yearly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
-		  and f.sk_house_listing != -1
+		on f.sk_property = dp.sk_house_listing
+		  and f.sk_property != -1
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_property = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	join dim_lead dl
@@ -64,10 +64,10 @@ all_dates_last_month as (
     count(distinct dp.sk_house_listing) as monthly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
-		  and f.sk_house_listing != -1
+		on f.sk_property = dp.sk_house_listing
+		  and f.sk_property != -1
 	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_property = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	join dim_lead dl
@@ -90,10 +90,10 @@ all_dates_last_year as (
     count(distinct dp.sk_house_listing) as yearly_count
   from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
-		  and f.sk_house_listing != -1
+		on f.sk_property = dp.sk_house_listing
+		  and f.sk_property != -1
   join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_property = dpr.sk_house_listing
   left join dim_region dr
   	on dpr.regiao_id = dr.id
   join dim_lead dl

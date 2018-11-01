@@ -30,9 +30,9 @@ with all_dates as (
 			- 1 as yearly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
+		on f.sk_property = dp.sk_house_listing
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
-		  and f.sk_house_listing != -1
+		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 	where dl.origem = 'OwnerPWA' and dl.tipo <> 'Organic'
@@ -50,8 +50,8 @@ all_dates_last_month as (
   	count(distinct dp.sk_house_listing) as monthly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
-		  and f.sk_house_listing != -1
+		on f.sk_property = dp.sk_house_listing
+		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 		  and dl.criado_em >= '2017-01-01' and dl.criado_em < current_date
@@ -70,8 +70,8 @@ all_dates_last_year as (
   	count(distinct dp.sk_house_listing) as yearly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
-		  and f.sk_house_listing != -1
+		on f.sk_property = dp.sk_house_listing
+		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 		  and dl.criado_em >= '2017-01-01' and dl.criado_em < current_date

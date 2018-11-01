@@ -38,11 +38,11 @@ with all_dates as (
 			- 1 as yearly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
+		on f.sk_property = dp.sk_house_listing
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
-		  and f.sk_house_listing != -1
+		  and f.sk_property != -1
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_property = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   order by coalesce(dr.city_name, ''), date_part('year', dp.publication_date), date_part('month', dp.publication_date), date_part('week', dp.publication_date), date_part('day', dp.publication_date)
@@ -59,11 +59,11 @@ all_dates_last_month as (
     count(distinct dp.sk_house_listing) as monthly_count
 	from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
+		on f.sk_property = dp.sk_house_listing
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
-		  and f.sk_house_listing != -1
+		  and f.sk_property != -1
 	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_property = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where date_part('year', dp.publication_date) = date_part('year', add_months(current_date, -1))
@@ -80,11 +80,11 @@ all_dates_last_year as (
     count(distinct dp.sk_house_listing) as yearly_count
   from fact_supply f
 	join dim_house_listing dp
-		on f.sk_house_listing = dp.sk_house_listing
+		on f.sk_property = dp.sk_house_listing
 		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
-		  and f.sk_house_listing != -1
+		  and f.sk_property != -1
   join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  	on f.sk_property = dpr.sk_house_listing
   left join dim_region dr
   	on dpr.regiao_id = dr.id
   where date_part('year', dp.publication_date) = date_part('year', add_months(current_date, -12))
