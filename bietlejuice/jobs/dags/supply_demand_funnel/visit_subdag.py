@@ -61,13 +61,13 @@ class VisitSubDag(DimSubDag):
         )
 
         property_visit_information = BaseDAG.build_quintoandar_python_operator(
-            task_id='ODS_property_visit_information',
+            task_id='ODS_house_visit_information',
             dag=dag,
             python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
-                'table_name': 'property_visit_information',
+                'table_name': 'house_visit_information',
                 'append': True,
-                'file_name': 'property_visit_information.sql',
+                'file_name': 'house_visit_information.sql',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
