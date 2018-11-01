@@ -59,7 +59,7 @@ with all_dates as (
 		  		 end
 		  		)
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_house = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dd."date" < current_date
@@ -98,7 +98,7 @@ all_dates_last_month as (
 		  		 end
 		  		)
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_house = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
 	where dd."date" < current_date
@@ -137,7 +137,7 @@ all_dates_last_year as (
 		  		 end
 		  		)
 	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+		on f.sk_house = dpr.sk_house_listing
 	left join dim_region dr
 		on dpr.regiao_id = dr.id
   where dd."date" < current_date
