@@ -58,10 +58,10 @@ with all_dates as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_house_listing dpr
-		on f.sk_house = dpr.sk_house_listing
+	join fact_house_listings fhl
+		on f.sk_house = fhl.sk_house_listing
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
 	where dd."date" < current_date
   order by 5, 1, 2, 3, 4
 ),
@@ -97,10 +97,10 @@ all_dates_last_month as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_house_listing dpr
-		on f.sk_house = dpr.sk_house_listing
+	join fact_house_listings fhl
+		on f.sk_house = fhl.sk_house_listing
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
 	where dd."date" < current_date
 		and dd.year = date_part('year', add_months(current_date, -1))
   	and dd.month = date_part('month', add_months(current_date, -1))
@@ -136,10 +136,10 @@ all_dates_last_year as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_house_listing dpr
-		on f.sk_house = dpr.sk_house_listing
+	join fact_house_listings fhl
+		on f.sk_house = fhl.sk_house_listing
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
   where dd."date" < current_date
 		and dd.year = date_part('year', add_months(current_date, -12))
   		and ((dd.month = date_part('month', add_months(current_date, -12))
