@@ -10,7 +10,7 @@ listings as (
     ae.partial
   from all_events ae
   join datalake_clean.ods_dim_house_listing dhl
-    on ae.house_id = cast(dhl.id_house as integer)
+    on ae.house_id = try(cast(dhl.id_house as integer))
   join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing
   left join datalake_clean.ods_dim_region dr
