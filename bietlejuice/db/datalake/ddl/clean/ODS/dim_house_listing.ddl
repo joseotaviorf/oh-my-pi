@@ -35,7 +35,6 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   house_entrance string,
   house_garage_type string,
   is_house_registration_verified string,
-  id_house_owner string,
   house_total_value string,
   house_total_area string,
   house_construction_area string,

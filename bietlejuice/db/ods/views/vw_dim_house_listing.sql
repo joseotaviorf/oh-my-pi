@@ -36,7 +36,6 @@ select
   i.tipo_porteiro as house_entrance,
   i.tipo_vagas as house_garage_type,
   i.verificado::boolean as is_house_registration_verified,
-  i.usuario_id as id_house_owner,
   i.valor_total as house_total_value,
   i.area_total as house_total_area,
   i.area_terreno as house_construction_area,
