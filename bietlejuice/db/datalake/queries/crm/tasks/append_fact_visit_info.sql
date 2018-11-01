@@ -8,10 +8,10 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_booking db
     on trim(ct.origin) = 'Agendamento'
-      and cast(ct.id_origin as bigint) = cast(db.sk_booking as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(db.sk_booking as bigint))
   left join datalake_clean.ods_dim_house_listing dhl
     on trim(ct.origin) = 'Imovel'
-      and cast(ct.id_origin as bigint) = cast(dhl.id_house as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(dhl.id_house as bigint))
       and cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
         between cast(regexp_extract(dhl.ts_listing_version_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
           and (case

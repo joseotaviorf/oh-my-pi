@@ -10,12 +10,12 @@
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
     on trim(ct.origin) = 'Contrato'
-      and cast(ct.id_origin as bigint) = cast(ec.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(ec.id as bigint))
   left join datalake_raw.ebdb_imovel eci
     on eci.id = ec.imovel_id
   left join datalake_raw.ebdb_proposta ep
     on trim(ct.origin) = 'Proposta'
-      and cast(ct.id_origin as bigint) = cast(ep.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(ep.id as bigint))
   left join datalake_raw.ebdb_contrato epc
     on epc.proposta_id = ep.id
   left join datalake_raw.ebdb_imovel epi
