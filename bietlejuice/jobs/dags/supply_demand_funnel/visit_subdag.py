@@ -28,11 +28,11 @@ class VisitSubDag(DimSubDag):
     def build_visit_with_tests(self):
         visit_dag = self._build_local_dag()
 
-        visits, property_visit_information, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
+        visits, house_visit_information, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
 
         tests_tasks = self.build_tests_tasks(visit_dag)
 
-        property_visit_information >> visits
+        house_visit_information >> visits
         visits >> staging_dim_visit_task
         staging_dim_visit_task.set_downstream(tests_tasks)
         dim_visit.set_upstream(tests_tasks)
@@ -60,7 +60,7 @@ class VisitSubDag(DimSubDag):
             python_callable=self.get_visit_query
         )
 
-        property_visit_information = BaseDAG.build_quintoandar_python_operator(
+        house_visit_information = BaseDAG.build_quintoandar_python_operator(
             task_id='ODS_house_visit_information',
             dag=dag,
             python_callable=utils.load_athena_file_query_to_ods,
@@ -93,4 +93,4 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        return visits, property_visit_information, staging_dim_visit_task, dim_visit
+        return visits, house_visit_information, staging_dim_visit_task, dim_visit
