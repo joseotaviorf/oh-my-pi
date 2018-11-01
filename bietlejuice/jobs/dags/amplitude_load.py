@@ -14,10 +14,10 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 @logger(exclude='kwargs')
 def load_amplitude(**kwargs):
     start_date = kwargs['execution_date'].replace(hour=0, minute=0, second=0, microsecond=0)
-
     end_date = (start_date + timedelta(hours=23))
-    a = AmplitudeEventsETL(s3_bucket=s3_bucket)
-    a.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
+
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    amplitude_etl.extract_from_api_to_s3(start_date=start_date, end_date=end_date)
 
 
 @logger(exclude='kwargs')
@@ -26,6 +26,14 @@ def merge_users(**kwargs):
 
     amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
     amplitude_etl.merge_user_ids(ym=str(execution_date.strftime('%Y-%m')))
+
+
+@logger(exclude='kwargs')
+def load_amplitude_clean(**kwargs):
+    execution_date = kwargs['execution_date']
+
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    amplitude_etl.load_data_to_clean(execution_date=execution_date)
 
 
 dag = DAG(
@@ -47,12 +55,12 @@ load_events_to_raw_task = BaseDAG.build_quintoandar_python_operator(
     python_callable=load_amplitude
 )
 
-# load_events_to_clean_task = BaseDAG.build_quintoandar_python_operator(
-#     dag=dag,
-#     task_id='load_events_to_clean',
-#     provide_context=True,
-#     python_callable=load_amplitude_clean
-# )
+load_events_to_clean_task = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='load_events_to_clean',
+    provide_context=True,
+    python_callable=load_amplitude_clean
+)
 
 merge_users_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
@@ -62,5 +70,10 @@ merge_users_task = BaseDAG.build_quintoandar_python_operator(
 )
 
 airflow_helpers.chain(load_events_to_raw_task,
-                      # load_events_to_clean_task,
+                      load_events_to_clean_task,
                       merge_users_task)
+
+# df_raw_json = pd.DataFrame(df_raw.event_data.apply(json.loads).tolist())
+
+if __name__ == '__main__':
+    load_amplitude_clean(execution_date=datetime(2018, 10, 30, 0, 0, 0))
