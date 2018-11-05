@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dp.dt_proposal_approved) order by f.sk_client asc)
     	+ dense_rank() over (partition by date_part('year', dp.dt_proposal_approved) order by f.sk_client desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date
@@ -45,7 +45,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_client) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date
@@ -62,7 +62,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_client) as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date

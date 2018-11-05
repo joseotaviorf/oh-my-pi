@@ -9,7 +9,7 @@ with counts as (
 		count(distinct(nullif(c.sk_contract,-1)))::decimal(10,4) as signed_contracts,
 		count(distinct(nullif(v.day_visit,-1))) as days_worked
 	from
-		public.fact_demand liq
+		public.fact_listing_rent_flows liq
 	left join
 		public.dim_date ddate
 		on ddate.date = '{0}'
@@ -18,7 +18,7 @@ with counts as (
 		on v.sk_visit = liq.sk_visit
 	left join
 		public.dim_house_listing p
-		on p.sk_house_listing = liq.sk_house
+		on p.sk_house_listing = liq.sk_house_listing
 	left join
 		public.dim_region r
 		on r.sk_region = p.regiao_id
