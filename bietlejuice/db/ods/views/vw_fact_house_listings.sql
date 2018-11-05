@@ -2,8 +2,8 @@ drop view if exists vw_fact_house_listings;
 create or replace view vw_fact_house_listings as
 select
   ((i.id || '00') || coalesce(pl.version, 1))::bigint as sk_house_listing,
-  i.usuario_id as sk_owner,
-  i.regiao_id as sk_region,
+  coalesce(i.usuario_id, -1) as sk_owner,
+  coalesce(i.regiao_id, -1) as sk_region,
   coalesce(i.usuario_que_cadastrou_id, -1) as sk_user_registration,
   coalesce(c.id, -1) as sk_contract,
   (date_part('epoch', c.ts_signature - pl.min_version_time) / 86400)::int8 as days_first_listing_to_contract_signed,
