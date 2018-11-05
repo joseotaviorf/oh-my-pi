@@ -21,7 +21,7 @@ select distinct
 			then 0.2
 		else coalesce(ranking.commission, 0.2)
 	end as contract_commission,
-	p.endereco
+	p.house_address as endereco
 from public.fact_listing_rent_flows f
 left join public.fact_listing_rent_flows f2
 	on f2.sk_house_listing = f.sk_house
