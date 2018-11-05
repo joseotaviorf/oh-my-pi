@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dc.dt_annulment) order by dc.sk_contract desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_annulment >= '2017-01-01' and dc.dt_annulment < current_date
@@ -56,7 +56,7 @@ all_dates_last_month as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dc.id_contract) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_annulment >= '2017-01-01' and dc.dt_annulment < current_date
@@ -76,7 +76,7 @@ all_dates_last_year as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dc.id_contract) as yearly_count
-  from fact_demand f
+  from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 			and dc.dt_annulment >= '2017-01-01' and dc.dt_annulment < current_date

@@ -28,7 +28,7 @@ select
     end as score_5A,
     count(distinct dc.sk_contract) as contracts
 from dim_contract dc
-join fact_demand fd
+join fact_listing_rent_flows fd
     on dc.sk_contract = fd.sk_contract
 join datalake_raw.sortinghat_proposal sp
     on sp.id = fd.sk_proposal

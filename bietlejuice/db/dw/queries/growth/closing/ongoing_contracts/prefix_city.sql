@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year order by f.sk_contract desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -58,10 +58,10 @@ with all_dates as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+	join fact_house_listings fhl
+		on f.sk_house_listing = fhl.sk_house_listing
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
 	where dd."date" < current_date
   order by 6, 1, 2, 3, 4
 ),
@@ -75,7 +75,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -97,10 +97,10 @@ all_dates_last_month as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+	join fact_house_listings fhl
+		on f.sk_house_listing = fhl.sk_house_listing
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
 	where dd."date" < current_date
 		and dd.year = date_part('year', add_months(current_date, -1))
     and dd.month = date_part('month', add_months(current_date, -1))
@@ -114,7 +114,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_contract) as yearly_count
-  from fact_demand f
+  from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -136,10 +136,10 @@ all_dates_last_year as (
 		  		   else dc.status != 'Cancelado'
 		  		 end
 		  		)
-  join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
-  left join dim_region dr
-  	on dpr.regiao_id = dr.id
+  join fact_house_listings fhl
+		on f.sk_house_listing = fhl.sk_house_listing
+	left join dim_region dr
+		on fhl.sk_region = dr.sk_region
 	where dd."date" < current_date
     and dd.year = date_part('year', add_months(current_date, -12))
   		and ((dd.month = date_part('month', add_months(current_date, -12))

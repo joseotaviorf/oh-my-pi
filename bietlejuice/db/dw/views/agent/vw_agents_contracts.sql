@@ -20,10 +20,10 @@ CREATE VIEW vw_agent_contracts AS
                     END AS contract_commission,
                     p.endereco
     FROM
-        PUBLIC.fact_demand liq
+        PUBLIC.fact_listing_rent_flows liq
     LEFT JOIN
-        PUBLIC.fact_demand liq2
-        ON liq2.sk_house_listing = liq.sk_house
+        PUBLIC.fact_listing_rent_flows liq2
+        ON liq2.sk_house_listing = liq.sk_house_listing
         AND liq2.sk_client = liq.sk_client
     LEFT JOIN
         PUBLIC.dim_contract c
