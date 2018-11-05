@@ -4,11 +4,10 @@ from datetime import datetime
 import pandas as pd
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.amplitude_etl import AmplitudeETL
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('bi-amplitude-etl')
 
