@@ -57,7 +57,7 @@ dr.region_code,
 dr.city_name
 
 from dim_house_listing dpt
-left join fact_demand f on dpt.sk_house_listing = f.sk_house_listing
+left join fact_listing_rent_flows f on dpt.sk_house_listing = f.sk_house_listing
 left join dim_booking db on f.sk_booking = db.sk_booking
 left join dim_offer dof on f.sk_offer = dof.sk_offer
 left join dim_proposal dp on f.sk_proposal = dp.sk_proposal
