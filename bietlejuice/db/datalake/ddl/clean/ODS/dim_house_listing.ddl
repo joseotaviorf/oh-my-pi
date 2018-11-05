@@ -14,6 +14,7 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   ts_publication string,
   ts_de_publication string,
   rent string,
+  house_rent string,
   house_neighborhood string,
   house_zipcode string,
   house_city string,

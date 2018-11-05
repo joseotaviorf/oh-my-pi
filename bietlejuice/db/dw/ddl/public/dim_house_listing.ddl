@@ -14,6 +14,7 @@ create table dim_house_listing (
   ts_publication timestamp,
   ts_de_publication timestamp,
   rent numeric(14,2),
+  house_rent numeric(14,2),
   house_neighborhood varchar,
   house_zipcode varchar,
   house_city varchar,
