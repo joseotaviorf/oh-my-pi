@@ -18,7 +18,7 @@ with counts as (
 		on v.sk_visit = liq.sk_visit
 	left join
 		public.dim_house_listing p
-		on p.sk_house_listing = liq.sk_house
+		on p.sk_house_listing = liq.sk_house_listing
 	left join
 		public.dim_region r
 		on r.sk_region = p.regiao_id
