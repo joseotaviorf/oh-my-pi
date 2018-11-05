@@ -36,7 +36,6 @@ create table dim_house_listing (
   house_entrance varchar,
   house_garage_type varchar,
   is_house_registration_verified boolean,
-  id_house_owner bigint,
   house_total_value numeric(14,2),
   house_total_area numeric(14,2),
   house_construction_area numeric(14,2),
