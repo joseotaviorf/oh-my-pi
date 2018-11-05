@@ -50,7 +50,7 @@ def refresh_powerbi(**kwargs):
 
 
 dag = DAG(
-    dag_id='bi-load-bdg_listing_rent_flows_agent',
+    dag_id='bi-load-bdg_demand_agent',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
@@ -66,7 +66,7 @@ dag = DAG(
 # check the dependencies for bdg_listing_rent_flows_agent
 bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='bdg_listing_rent_flows_agent_xcom_dependencies',
+    task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_listing_rent_flows'],
@@ -75,7 +75,7 @@ bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_pytho
 
 bdg_listing_rent_flows_agent = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='bdg_listing_rent_flows_agent',
+    task_id='bdg_demand_agent',
     python_callable=create_bdg_listing_rent_flows_agent,
     op_kwargs=None
 )
@@ -121,7 +121,7 @@ data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
 
 data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='data_integrity_bdg_fact_listing_rent_flows',
+    task_id='data_integrity_bdg_fact_demand',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
@@ -134,7 +134,7 @@ data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_op
 
 data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
-    task_id='data_integrity_fact_listing_rent_flows_dim_booking',
+    task_id='data_integrity_fact_demand_dim_booking',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
