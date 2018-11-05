@@ -1,7 +1,7 @@
 drop table if exists agent.agents_signed_contracts;
 create table agent.agents_signed_contracts (
 	sk_contract_signed_date integer,
-	sk_house integer,
+	sk_house_listing integer,
 	sk_contract integer,
 	agent_name varchar(255),
 	owner_name varchar(255),

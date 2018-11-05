@@ -1,6 +1,6 @@
 select distinct
 	f.sk_contract_signed_date,
-  f.sk_house,
+  f.sk_house_listing as sk_house,
   f.sk_contract,
   agent.nome as agent_name,
   coalesce(ecp.nome, nullif(dprop.nome, '')) as owner_name,
@@ -24,7 +24,7 @@ select distinct
 	p.house_address as endereco
 from public.fact_listing_rent_flows f
 left join public.fact_listing_rent_flows f2
-	on f2.sk_house_listing = f.sk_house
+	on f2.sk_house_listing = f.sk_house_listing
 		and f2.sk_client = f.sk_client
 left join public.dim_contract c
 	on f.sk_contract = c.sk_contract
@@ -35,7 +35,7 @@ left join public.dim_user visitor
 left join public.dim_user agent
 	on f2.sk_user_agent = agent.sk_user
 left join public.dim_house_listing p
-	on f2.sk_house = p.sk_house_listing
+	on f2.sk_house_listing = p.sk_house_listing
 left join public.dim_user dprop
 	on dprop.sk_user = f.sk_owner
 left join datalake_raw.ebdb_contratopessoa ecp
