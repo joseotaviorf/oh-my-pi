@@ -42,10 +42,10 @@ with all_dates as (
 			and dof.dt_analysis between '2017-01-01' and current_date - 1
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
-	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
   order by 5, 1, 2, 3, 4
 ),
 all_dates_last_week as (
@@ -64,10 +64,10 @@ all_dates_last_month as (
 			and dof.dt_analysis between '2017-01-01' and current_date - 1
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
-	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', dof.dt_analysis) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dof.dt_analysis) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dof.dt_analysis) < date_part('day', current_date)
@@ -86,10 +86,10 @@ all_dates_last_year as (
 			and dof.dt_analysis between '2017-01-01' and current_date - 1
 			and dof.status = 'Aprovada'
 			and f.sk_offer != -1
-  join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
-  left join dim_region dr
-  	on dpr.regiao_id = dr.id
+  join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', dof.dt_analysis) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dof.dt_analysis) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', dof.dt_analysis) < date_part('day', add_months(current_date, -12)))

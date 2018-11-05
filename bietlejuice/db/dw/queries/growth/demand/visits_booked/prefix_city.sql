@@ -41,10 +41,10 @@ with all_dates as (
 		on f.sk_booking = db.sk_booking
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
-	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
   order by coalesce(dr.city_name, ''), date_part('year', db.dt_created), date_part('month', db.dt_created), date_part('week', db.dt_created), date_part('day', db.dt_created)
 ),
 all_dates_last_week as (
@@ -62,10 +62,10 @@ all_dates_last_month as (
 		on f.sk_booking = db.sk_booking
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
-	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -1))
   		and date_part('day', db.dt_created) < date_part('day', current_date)
@@ -83,10 +83,10 @@ all_dates_last_year as (
 		on f.sk_booking = db.sk_booking
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
-  join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
-  left join dim_region dr
-  	on dpr.regiao_id = dr.id
+  join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', db.dt_created) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', db.dt_created) < date_part('day', add_months(current_date, -12)))

@@ -2,27 +2,27 @@
   select
     t.*,
     cast(coalesce(db.sk_booking, '-1') as bigint) as sk_booking,
-    cast(coalesce(dp.sk_house_listing, '-1') as bigint) as sk_house_listing
+    cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_booking db
     on trim(ct.origin) = 'Agendamento'
-      and cast(ct.id_origin as bigint) = cast(db.sk_booking as bigint)
-  left join datalake_clean.ods_dim_house_listing dp
+      and cast(ct.id_origin as bigint) = try(cast(db.sk_booking as bigint))
+  left join datalake_clean.ods_dim_house_listing dhl
     on trim(ct.origin) = 'Imovel'
-      and cast(ct.id_origin as bigint) = cast(dp.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(dhl.id_house as bigint))
       and cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
-        between cast(regexp_extract(dp.min_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+        between cast(regexp_extract(dhl.ts_listing_version_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
           and (case
-                 when max_version_time = ''
+                 when dhl.ts_listing_version_end = ''
                    then now()
-                 else cast(regexp_extract(max_version_time, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+                 else cast(regexp_extract(dhl.ts_listing_version_end, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
                end)
 ),
 booking_house_listing as (
   select
-    cast(sk_house_listing as bigint) as sk_house_listing,
+    cast(sk_house as bigint) as sk_house_listing,
     cast(sk_booking as bigint) as sk_booking
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_booking != '-1'

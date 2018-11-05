@@ -41,10 +41,10 @@ with all_dates as (
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date
 			and f.sk_proposal != -1
-	join dim_house_listing dpr
-		on f.sk_house_listing = dpr.sk_house_listing
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
   order by coalesce(dr.city_name, ''), date_part('year', dp.dt_proposal_approved), date_part('month', dp.dt_proposal_approved), date_part('week', dp.dt_proposal_approved), date_part('day', dp.dt_proposal_approved)
 ),
 all_dates_last_week as (
@@ -62,10 +62,10 @@ all_dates_last_month as (
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date
 			and f.sk_proposal != -1
-	join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
 	left join dim_region dr
-		on dpr.regiao_id = dr.id
+		on fhl.sk_region = dr.sk_region
 	where date_part('year', dp.dt_proposal_approved) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dp.dt_proposal_approved) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dp.dt_proposal_approved) < date_part('day', current_date)
@@ -83,10 +83,10 @@ all_dates_last_year as (
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_proposal_approved >= '2017-01-01' and dp.dt_proposal_approved < current_date
 			and f.sk_proposal != -1
-  join dim_house_listing dpr
-  	on f.sk_house_listing = dpr.sk_house_listing
+  join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house
   left join dim_region dr
-  	on dpr.regiao_id = dr.id
+  	on fhl.sk_region = dr.sk_region
 	where date_part('year', dp.dt_proposal_approved) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dp.dt_proposal_approved) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', dp.dt_proposal_approved) < date_part('day', add_months(current_date, -12)))

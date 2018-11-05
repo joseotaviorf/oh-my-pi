@@ -218,6 +218,13 @@ fact_supply = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
+fact_house_listings = BaseDAG.build_quintoandar_python_operator(
+    dag=main_dag,
+    task_id='DW_Fact_House_Listings',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
 fact_photo_job = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
     task_id='DW_fact_photo_job',
@@ -337,4 +344,4 @@ fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_li
 refresh_listing_rent_flows >> refresh_booking
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
-house_dag >> fact_house_status
+house_dag.set_downstream([fact_house_status, fact_house_listings])

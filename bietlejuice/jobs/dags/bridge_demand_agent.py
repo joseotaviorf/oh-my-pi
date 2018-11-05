@@ -70,7 +70,7 @@ bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_pytho
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_listing_rent_flows'],
-               'dag_id': ['bi-load-agent_model', 'bi-supply-listing_rent_flows-etl']}
+               'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
 bdg_listing_rent_flows_agent = BaseDAG.build_quintoandar_python_operator(

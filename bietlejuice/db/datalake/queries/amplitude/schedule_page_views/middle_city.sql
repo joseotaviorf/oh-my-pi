@@ -9,8 +9,10 @@ listings as (
     trim(dr.city_name) as city,
     ae.partial
   from all_events ae
-  join datalake_clean.ods_dim_house_listing ei
-    on ae.house_id = cast(ei.id as integer)
+  join datalake_clean.ods_dim_house_listing dhl
+    on ae.house_id = try(cast(dhl.id_house as integer))
+  join datalake_clean.ods_fact_house_listings fhl
+    on dhl.sk_house_listing = fhl.sk_house_listing
   left join datalake_clean.ods_dim_region dr
-    on trim(ei.regiao_id) = cast(dr.id as varchar)
+    on fhl.sk_region = cast(dr.sk_region as varchar)
 )
