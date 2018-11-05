@@ -4,7 +4,7 @@ SELECT
 	d.sk_visit_date AS dt,
 	U.dados_agente_id AS sk_agent
 FROM
-public.fact_demand d
+public.fact_listing_rent_flows d
 JOIN public.dim_user u
 	ON d.sk_user_agent = u.id
 ),

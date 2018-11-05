@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', db.dt_scheduling) order by db.id_booking desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
@@ -58,7 +58,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct db.id_booking) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
@@ -80,7 +80,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct db.id_booking) as yearly_count
-  from fact_demand f
+  from fact_listing_rent_flows f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
 			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
