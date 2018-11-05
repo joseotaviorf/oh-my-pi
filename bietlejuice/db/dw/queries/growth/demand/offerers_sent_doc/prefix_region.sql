@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dp.dt_tenant_first_document_sent) order by f.sk_client desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -57,7 +57,7 @@ all_dates_last_month as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_client) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
@@ -78,7 +78,7 @@ all_dates_last_year as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_client) as yearly_count
-  from fact_demand f
+  from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
