@@ -5,7 +5,7 @@ from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
 
 mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
-logger = QuintoAndarLogger('Agent')
+logger = QuintoAndarLogger('Autodialer_ETL')
 dummy_dt = '2018-01-01'
 
 
@@ -53,7 +53,7 @@ class Autodialer_ETL(object):
         else:
             raise ValueError('m=connect, document_type={}, msg=Invalid document type.'.format(document_type))
 
-    @logger
+    @logger(exclude='mongo_db')
     def get_data(self, mongo_db, execution_date):
         filter = None if execution_date is not None else ''
 
