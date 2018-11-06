@@ -17,19 +17,19 @@ class Autodialer_ETL(object):
             self.client = MongoClient(mongo_client_uri)
             self.db = self.client.autodialer
         except Exception as ex:
-            raise Exception('m=,error={}, msg=Could not connect to mongo'.format(ex))
+            raise Exception('m=__init__,error={}, msg=Could not connect to mongo'.format(ex))
 
     # task references
     @logger
     def get_db_data(self, document_type, execution_date=None):
-        mongo_db = self.mongo_connect(document_type=document_type)
-        raw_data = self.get_data(mongo_db, execution_date)
+        mongo_db = self.__mongo_connect(document_type=document_type)
+        raw_data = self.__get_data(mongo_db, execution_date)
         return raw_data
 
     @logger(exclude='df')
     def dump_data_into_datalake(self, df, document_type, execution_date=None):
         dt = 'dt={}'.format(dummy_dt if execution_date is None else execution_date.strftime('%Y-%m-%d'))
-        self.df_to_s3(df, path='raw/autodialer/{0}/{1}/tr.csv'.format(document_type, dt))
+        self.__df_to_s3(df, path='raw/autodialer/{0}/{1}/tr.csv'.format(document_type, dt))
         logger.info("m=dump_data_into_datalake, document_type={0},"
                     " execution_date={1},"
                     " df_length={2}, "
@@ -37,13 +37,13 @@ class Autodialer_ETL(object):
                                                            str(execution_date) if execution_date else 'None',
                                                            str(len(df))))
 
-    # tools
+    # aux methods
     @logger(exclude='df')
-    def df_to_s3(self, df, path):
+    def __df_to_s3(self, df, path):
         BaseETL.csv_to_s3(data=df, bucket=self.bucket_datalake, filename=path)
 
     @logger
-    def mongo_connect(self, document_type):
+    def __mongo_connect(self, document_type):
         if document_type == 'task_references':
             return self.db.taskReferences
         if document_type == 'task_reference_inbound_event_histories':
@@ -54,7 +54,7 @@ class Autodialer_ETL(object):
             raise ValueError('m=connect, document_type={}, msg=Invalid document type.'.format(document_type))
 
     @logger(exclude='mongo_db')
-    def get_data(self, mongo_db, execution_date):
+    def __get_data(self, mongo_db, execution_date):
         filter = None if execution_date is not None else ''
 
         documents = mongo_db.find().sort("_id", ASCENDING)

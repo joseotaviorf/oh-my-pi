@@ -1,3 +1,5 @@
+DROP TABLE datalake_raw.task_references;
+
 CREATE EXTERNAL TABLE datalake_raw.task_references (
   `_class` string,
   `_id` string,
