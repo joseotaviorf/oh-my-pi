@@ -63,7 +63,8 @@ all_dates_last_month as (
 			and db.dt_created >= '2017-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
 	join fact_house_listings fhl
-	  on fhl.sk_house_listing = f.fhl    left join dim_region dr
+	  on fhl.sk_house_listing = f.sk_house_listing
+	left join dim_region dr
   	  on fhl.sk_region = dr.sk_region
 	where date_part('year', db.dt_created) = date_part('year', add_months(current_date, -1))
   		and date_part('month', db.dt_created) = date_part('month', add_months(current_date, -1))
