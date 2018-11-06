@@ -126,7 +126,7 @@ data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_op
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_listing_rent_flows_agent',
-               'f_column': 'sk_listing_rent_flows',
+               'f_column': 'sk_listing_rent_flow',
                'dim_name': 'fact_listing_rent_flows',
                'dim_column': 'ods_id',
                'type': 'update'}
