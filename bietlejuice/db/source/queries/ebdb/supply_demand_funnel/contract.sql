@@ -26,6 +26,7 @@ select
   c.statusClosing as closing_status,
   c.criadoEm as ts_created,
   c.atualizadoEm as ts_updated,
+  c_reasons.ts_canceled,
   c_reasons.cancellation_reason,
   c.proposta_id as id_proposal,
   c.imovel_id as id_house
@@ -75,7 +76,8 @@ left join (
       when ure.motivo regexp 'Propriet.rio n.o conseguiu entregar/sair do im.vel'
         then 'OWNER_UNABLE_TO_LEAVE'
       else 'OTHERS'
-    end as cancellation_reason
+    end as cancellation_reason,
+    from_unixtime(ure.`timestamp` / 1000) as ts_canceled
   from (
      select
        id,

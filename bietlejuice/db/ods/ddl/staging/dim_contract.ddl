@@ -28,6 +28,7 @@ create table staging.dim_contract (
   closing_status varchar,
   ts_created timestamp,
   ts_updated timestamp,
+  ts_canceled timestamp,
   cancellation_reason varchar,
   ts_load timestamp
 )
