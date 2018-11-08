@@ -27,6 +27,7 @@ create table if not exists contract (
   closing_status varchar,
   ts_created timestamp,
   ts_updated timestamp,
+  ts_canceled timestamp,
   cancellation_reason varchar,
   id_proposal bigint,
   id_house bigint

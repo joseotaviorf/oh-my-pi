@@ -24,7 +24,10 @@ create external table if not exists datalake_clean.ods_dim_proposal (
   dt_credit_analysis_init string,
   dt_credit_analysis_end string,
   status_sortinghat string,
-  flg_doc_reused string
+  flg_doc_reused string,
+  ts_processed string,
+  rejection_reason string,
+  ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

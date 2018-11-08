@@ -29,8 +29,9 @@ select
   closing_status,
   ts_created,
   ts_updated,
+  ts_canceled,
   cancellation_reason,
-  now() as ts_load
+  now()::timestamp as ts_load
 from contract
 ;
 
