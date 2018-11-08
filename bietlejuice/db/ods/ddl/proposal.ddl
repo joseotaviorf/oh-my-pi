@@ -26,6 +26,8 @@ create table if not exists proposal (
   tenant_auto_first_doc_sent public.datetime,
   credit_analysis_init_date timestamp,
   credit_analysis_end_date timestamp,
-  doc_reused integer
+  doc_reused integer,
+  ts_processed timestamp,
+  rejection_reason varchar
 )
 with (oids = false);
