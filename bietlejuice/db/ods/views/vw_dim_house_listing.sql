@@ -44,6 +44,7 @@ select
   h.tipo_iptu as house_iptu_type,
   h.data_criacao as ts_house_create,
   h.atualizado_em as ts_house_update,
+  h.registration_abandoned_reason as registration_abandoned_reason,
   h.unpublished_reason as house_unpublished_reason,
   pl.start_version_category as listing_category_start,
   pl.end_version_category as listing_category_end,

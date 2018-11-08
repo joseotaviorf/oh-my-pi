@@ -43,6 +43,7 @@ create table staging.dim_house_listing (
   house_iptu_type varchar,
   ts_house_create timestamp,
   ts_house_update timestamp,
+  registration_abandoned_reason varchar,
   house_unpublished_reason varchar,
   listing_category_start varchar,
   listing_category_end varchar,

@@ -174,7 +174,8 @@ select
     kt.name as key_type,
     aat.name as key_location,
     rt.name as visit_restriction,
-    i.predictedPrice as predicted_price
+    i.predictedPrice as predicted_price,
+    hrs.registrationAbandonedReason as registration_abandoned_reason
 from
   Imovel i
 left join
@@ -244,6 +245,10 @@ left join AccessAuthorizationType aat
 -- restriction
 left join RestrictionType rt
   on at.restriction_id = rt.id
+
+-- abandoned reason
+left join HouseRegistrationStatus hrs
+  on hrs.house_id = i.id
 
 where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
 ;
