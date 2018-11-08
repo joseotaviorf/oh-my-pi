@@ -1,4 +1,3 @@
-from datetime import datetime
 from qa_python_utils.default_logger import QuintoAndarLogger
 import requests
 
@@ -49,15 +48,6 @@ class GithubPRNotification(object):
         self.github_auth_token = github_auth_token
         self.github_slack_webhook_url = github_slack_webhook_url
         self.github_repo_names = github_repo_names
-
-    @staticmethod
-    @logger
-    def __is_work_datetime():
-        if datetime.today().weekday() >= 5 \
-                or datetime.now().hour < 9 or datetime.now().hour > 20:
-            return False
-
-        return True
 
     @staticmethod
     @logger(exclude='json_response')
@@ -117,9 +107,6 @@ class GithubPRNotification(object):
 
     @logger
     def send_notifications_to_slack(self):
-        if not GithubPRNotification.__is_work_datetime():
-            return
-
         for repo in self.github_repo_names:
             logger.info(
                 'm=send_notifications_to_slack, repository={}, msg=getting pull requests from github repository'.format(
