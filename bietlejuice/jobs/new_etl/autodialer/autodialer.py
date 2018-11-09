@@ -1,8 +1,11 @@
+import numpy as np
 import pandas as pd
+from __init__ import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 logger = QuintoAndarLogger('Autodialer_ETL')
@@ -11,7 +14,7 @@ dummy_dt = '2018-01-01'
 
 class Autodialer_ETL(object):
     def __init__(self, bucket_name):
-        self.bucket_datalake = bucket_name
+        self.s3_bucket = bucket_name
 
         try:
             self.client = MongoClient(mongo_client_uri)
@@ -21,9 +24,9 @@ class Autodialer_ETL(object):
 
     # task references
     @logger
-    def get_db_data(self, document_type, execution_date=None):
+    def get_mongo_data(self, document_type, execution_date=None):
         mongo_db = self.__mongo_connect(document_type=document_type)
-        raw_data = self.__get_data(mongo_db, execution_date)
+        raw_data = self.__get_mongo_data(mongo_db, execution_date)
         return raw_data
 
     @logger(exclude='df')
@@ -40,7 +43,7 @@ class Autodialer_ETL(object):
     # aux methods
     @logger(exclude='df')
     def __df_to_s3(self, df, path):
-        BaseETL.csv_to_s3(data=df, bucket=self.bucket_datalake, filename=path)
+        BaseETL.csv_to_s3(data=df, bucket=self.s3_bucket, filename=path)
 
     @logger
     def __mongo_connect(self, document_type):
@@ -54,21 +57,42 @@ class Autodialer_ETL(object):
             raise ValueError('m=connect, document_type={}, msg=Invalid document type.'.format(document_type))
 
     @logger(exclude='mongo_db')
-    def __get_data(self, mongo_db, execution_date):
+    def __get_mongo_data(self, mongo_db, execution_date):
         filter = None if execution_date is not None else ''
 
         documents = mongo_db.find().sort("_id", ASCENDING)
         return pd.DataFrame(list(documents))
 
+    @logger
+    def get_athena_data(self, filequery):
+        filequery = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, filequery)
+
+        athena_client = AthenaClient(self.s3_bucket)
+        return athena_client.execute_file_query_and_return_dataframe(filename=filequery)
+
+    @logger(exclude='df')
+    def move_data_to_clean(self, document_type):
+        # treat data
+        df = self.get_athena_data(document_type)
+        df.replace('', np.nan, inplace=True)
+
+        return df
+
 
 # document = task_references.find().sort("_id", DESCENDING).limit(1)
 # json_list = ast.literal_eval(task_references.find_one())
 
-
+# creating
 autodialer = Autodialer_ETL('5a-datalake')
-df = autodialer.get_db_data('task_references')
-autodialer.dump_data_into_datalake(df, 'task_references')
-df = autodialer.get_db_data('task_reference_inbound_event_histories')
-autodialer.dump_data_into_datalake(df, 'task_reference_inbound_event_histories')
-df = autodialer.get_db_data('task_reference_outbound_history')
-autodialer.dump_data_into_datalake(df, 'task_reference_outbound_history')
+
+# raw
+# df = autodialer.get_mongo_data('task_references')
+# autodialer.dump_data_into_datalake(df, 'task_references')
+# df = autodialer.get_mongo_data('task_reference_inbound_event_histories')
+# autodialer.dump_data_into_datalake(df, 'task_reference_inbound_event_histories')
+# df = autodialer.get_mongo_data('task_reference_outbound_history')
+# autodialer.dump_data_into_datalake(df, 'task_reference_outbound_history')
+
+# clean
+# df = autodialer.get_athena_data('task_references')
+autodialer.move_data_to_clean('task_references')
