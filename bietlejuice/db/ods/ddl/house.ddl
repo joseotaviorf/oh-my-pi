@@ -124,6 +124,7 @@ create table public.house (
   key_type varchar(50),
   key_location varchar(50),
   visit_restriction varchar(50),
-  predicted_price numeric(14,2)
+  predicted_price numeric(14,2),
+  registration_abandoned_reason varchar(200)
 )
 with (oids = false);
