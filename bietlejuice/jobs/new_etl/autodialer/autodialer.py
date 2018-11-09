@@ -1,6 +1,9 @@
+import json
+from os import listdir
+
 import numpy as np
 import pandas as pd
-from __init__ import DATALAKE_QUERIES_DIR
+from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from pymongo import MongoClient, ASCENDING
@@ -13,8 +16,9 @@ dummy_dt = '2018-01-01'
 
 
 class Autodialer_ETL(object):
-    def __init__(self, bucket_name):
+    def __init__(self, bucket_name, execution_date=None):
         self.s3_bucket = bucket_name
+        self.execution_date = execution_date
 
         try:
             self.client = MongoClient(mongo_client_uri)
@@ -24,20 +28,23 @@ class Autodialer_ETL(object):
 
     # task references
     @logger
-    def get_mongo_data(self, document_type, execution_date=None):
+    def get_mongo_data(self, document_type):
         mongo_db = self.__mongo_connect(document_type=document_type)
-        raw_data = self.__get_mongo_data(mongo_db, execution_date)
+        raw_data = self.__get_mongo_data(mongo_db)
         return raw_data
 
     @logger(exclude='df')
-    def dump_data_into_datalake(self, df, document_type, execution_date=None):
-        dt = 'dt={}'.format(dummy_dt if execution_date is None else execution_date.strftime('%Y-%m-%d'))
-        self.__df_to_s3(df, path='raw/autodialer/{0}/{1}/tr.csv'.format(document_type, dt))
-        logger.info("m=dump_data_into_datalake, document_type={0},"
-                    " execution_date={1},"
-                    " df_length={2}, "
-                    " msg=Df dumped into datalake!".format(document_type,
-                                                           str(execution_date) if execution_date else 'None',
+    def dump_data_into_datalake(self, df, datalake_folder, document_type):
+        dt = 'dt={}'.format(dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
+        self.__df_to_s3(df, path='{0}/autodialer/{1}/{2}/tr.csv'.format(datalake_folder, document_type, dt))
+        logger.info("m=dump_data_into_datalake, "
+                    " datalake_folder={0},"
+                    " document_type={1},"
+                    " execution_date={2},"
+                    " df_length={3}, "
+                    " msg=Df dumped into datalake!".format(datalake_folder,
+                                                           document_type,
+                                                           str(self.execution_date) if self.execution_date else 'None',
                                                            str(len(df))))
 
     # aux methods
@@ -57,26 +64,45 @@ class Autodialer_ETL(object):
             raise ValueError('m=connect, document_type={}, msg=Invalid document type.'.format(document_type))
 
     @logger(exclude='mongo_db')
-    def __get_mongo_data(self, mongo_db, execution_date):
-        filter = None if execution_date is not None else ''
+    def __get_mongo_data(self, mongo_db):
+        filter = None if self.execution_date is not None else ''
 
         documents = mongo_db.find().sort("_id", ASCENDING)
         return pd.DataFrame(list(documents))
 
     @logger
-    def get_athena_data(self, filequery):
-        filequery = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, filequery)
+    def get_athena_data(self, document_type, filequery):
+        filequery = '{}/{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, document_type, filequery)
 
         athena_client = AthenaClient(self.s3_bucket)
         return athena_client.execute_file_query_and_return_dataframe(filename=filequery)
 
     @logger(exclude='df')
     def move_data_to_clean(self, document_type):
-        # treat data
-        df = self.get_athena_data(document_type)
-        df.replace('', np.nan, inplace=True)
+        path, dir_files = self.get_files_list(document_type)
 
-        return df
+        if len(dir_files) > 0:
+            for i in dir_files:
+                df = self.get_athena_data(document_type=document_type, filequery=i)
+                logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
+
+                # treat data
+                df.replace('', np.nan, inplace=True)
+                print(df.head(10))
+
+                dt = 'dt={}'.format(
+                    dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
+                key = 'clean/autodialer/{0}/{1}/file.parq'.format(document_type, dt)
+                athena_client = AthenaClient(self.s3_bucket)
+                athena_client.create_parquet_from_df(key=key, df=df)
+                logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
+        else:
+            logger.error('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
+
+    @logger
+    def get_files_list(self, document_type):
+        path = '{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, document_type)
+        return path, listdir(path)
 
 
 # document = task_references.find().sort("_id", DESCENDING).limit(1)
@@ -86,12 +112,13 @@ class Autodialer_ETL(object):
 autodialer = Autodialer_ETL('5a-datalake')
 
 # raw
-# df = autodialer.get_mongo_data('task_references')
-# autodialer.dump_data_into_datalake(df, 'task_references')
+df = autodialer.get_mongo_data('task_references')
+df['contactInfo'] = df['contactInfo'].apply(json.dumps)
+autodialer.dump_data_into_datalake(df, 'raw', 'task_references')
 # df = autodialer.get_mongo_data('task_reference_inbound_event_histories')
-# autodialer.dump_data_into_datalake(df, 'task_reference_inbound_event_histories')
+# autodialer.dump_data_into_datalake(df, 'raw', 'task_reference_inbound_event_histories')
 # df = autodialer.get_mongo_data('task_reference_outbound_history')
-# autodialer.dump_data_into_datalake(df, 'task_reference_outbound_history')
+# autodialer.dump_data_into_datalake(df, 'raw', 'task_reference_outbound_history')
 
 # clean
 # df = autodialer.get_athena_data('task_references')
