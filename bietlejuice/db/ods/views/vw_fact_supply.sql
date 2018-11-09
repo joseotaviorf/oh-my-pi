@@ -74,6 +74,7 @@ potential_listings as (
 		coalesce(to_char(f.dt_qualified::date,'YYYYMMDD')::integer, -1) as sk_qualified_date,
 		coalesce(to_char(f.dt_opportunity::date,'YYYYMMDD')::integer, -1) as sk_opportunity_date,
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
+		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
 		case
 			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 			then 'Lead Flow'
@@ -205,6 +206,7 @@ select
 	pl.sk_qualified_date,
 	pl.sk_opportunity_date,
 	pl.sk_first_listing_date,
+	pl.sk_discard_date,
 	pl.flow,
 	pl.acquisition_method,
 	pl.acquisition_channel,
