@@ -16,6 +16,7 @@ select
 	dt_qualified,
 	dt_opportunity,
 	dt_first_listing,
+	dt_discarded,
 	flow,
 	acquisition_method,
 	acquisition_channel,
@@ -95,6 +96,7 @@ from
 		end as dt_qualified,
 		coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) as dt_opportunity,
 		i.firstPublication as dt_first_listing,
+		dt_discarded,
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
@@ -127,6 +129,7 @@ from
 				then from_unixtime(ure.timestamp/1000)
 				else i.dataCriacao
 			end as dt_qualified,
+			null as dt_discarded,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service Flow'
@@ -201,6 +204,7 @@ from
         when l.lead_reason in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada')
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
+      from_unixtime(dure.timestamp/1000) as dt_discarded,
       case
         when l.origem = 'OwnerPWA' then 'Self-Service Flow'
         else 'Lead Flow'
@@ -366,6 +370,7 @@ from
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_first_inside_sales_contact,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
+			null as dt_discarded,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			'Inside Sales' as acquisition_channel,

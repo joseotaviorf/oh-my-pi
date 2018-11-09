@@ -18,6 +18,7 @@ create table public.fact_supply (
 	dt_qualified timestamp without time zone,
 	dt_opportunity timestamp without time zone,
 	dt_first_listing timestamp without time zone,
+	dt_discarded timestamp without time zone,
 	flow character varying(255) DEFAULT NULL::character varying,
 	acquisition_method character varying(255) DEFAULT NULL::character varying,
 	acquisition_channel character varying(255) DEFAULT NULL::character varying,
