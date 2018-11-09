@@ -14,7 +14,7 @@ GITHUB_AUTH = json.loads(env.get_airflow_env_var('github_authorization'))
 # global vars
 MAIN_DAG_ID = 'bi-github-pr-notifications'
 MAIN_START_DATE = datetime(2018, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9-20 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9-20 * * 1-5')
 
 
 # functions
