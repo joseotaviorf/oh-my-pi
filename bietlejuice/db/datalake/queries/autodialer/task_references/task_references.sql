@@ -11,8 +11,9 @@ SELECT
     taskid as task_id,
     tasklink as task_link,
     tasktype as task_type,
-    updateddate as updated_date
-    -- contactinfo
-    -- dialstatus
+    updateddate as updated_date,
+    --contactinfo
+    dialstatus
 FROM
     datalake_raw.task_references
+LIMIT 10

@@ -6,6 +6,7 @@ import pandas as pd
 from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
+from pandas.io.json import json_normalize
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -87,14 +88,13 @@ class Autodialer_ETL(object):
                 logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
 
                 # treat data
-                df.replace('', np.nan, inplace=True)
-                print(df.head(10))
+                df_treated = self.normalize_json_columns(df)
 
                 dt = 'dt={}'.format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
                 key = 'clean/autodialer/{0}/{1}/file.parq'.format(document_type, dt)
                 athena_client = AthenaClient(self.s3_bucket)
-                athena_client.create_parquet_from_df(key=key, df=df)
+                athena_client.create_parquet_from_df(key=key, df=df_treated)
                 logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
         else:
             logger.error('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
@@ -104,6 +104,26 @@ class Autodialer_ETL(object):
         path = '{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, document_type)
         return path, listdir(path)
 
+    @logger(exclude='df')
+    def normalize_json_columns(self, df):
+        df.replace('', np.nan, inplace=True)
+
+        df_treatment = df.head(1)
+        df_treated = df
+
+        for column in df_treatment:
+            try:
+                df[column] = df[column].apply(json.loads)
+                df_concat = json_normalize(df[column])
+                df_treated = pd.concat([df_treated, df_concat], axis=1, sort=False)
+                df_treated.drop(column, axis=1, inplace=True)
+                del df_concat
+                logger.info('m=normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
+            except:
+                logger.info('m=normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
+
+        return df_treated
+
 
 # document = task_references.find().sort("_id", DESCENDING).limit(1)
 # json_list = ast.literal_eval(task_references.find_one())
@@ -112,9 +132,10 @@ class Autodialer_ETL(object):
 autodialer = Autodialer_ETL('5a-datalake')
 
 # raw
-df = autodialer.get_mongo_data('task_references')
-df['contactInfo'] = df['contactInfo'].apply(json.dumps)
-autodialer.dump_data_into_datalake(df, 'raw', 'task_references')
+# df = autodialer.get_mongo_data('task_references')
+# df['contactInfo'] = df['contactInfo'].apply(json.dumps)
+# df['dialStatus'] = df['dialStatus'].apply(json.dumps)
+# autodialer.dump_data_into_datalake(df, 'raw', 'task_references')
 # df = autodialer.get_mongo_data('task_reference_inbound_event_histories')
 # autodialer.dump_data_into_datalake(df, 'raw', 'task_reference_inbound_event_histories')
 # df = autodialer.get_mongo_data('task_reference_outbound_history')
