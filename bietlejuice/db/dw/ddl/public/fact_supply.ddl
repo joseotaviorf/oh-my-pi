@@ -5,7 +5,7 @@ create table public.fact_supply (
 	sk_lead integer,
 	sk_conversion integer,
 	sk_photo_job integer,
-	sk_house_listing bigint,
+	sk_property bigint,
 	sk_user_rep integer,
 	sk_user_sales_rep integer,
 	sk_user_affiliate integer,
