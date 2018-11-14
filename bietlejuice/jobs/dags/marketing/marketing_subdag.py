@@ -8,16 +8,15 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, clazz, bucket, sub_dag_name, dag_name, schedule_interval, start_date, dw_tables=None,
-                 integration=None,
-                 accounts=None, datalake_tables=None, fact_table=None):
+    def __init__(self, clazz, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
+                 accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.clazz = clazz
         self.accounts = accounts
-        self.dw_tables = dw_tables
-        self.datalake_tables = datalake_tables
+        self.dim_tables = []
+        self.fact_tables = []
+        self.datalake_tables = []
         self.integration = integration
-        self.fact_table = fact_table
 
     @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
@@ -45,7 +44,7 @@ class MarketingSubDag(BaseSubDag):
             s3_bucket=bucket,
             execution_date=kwargs['execution_date']
         )
-        marketing_clazz._load_to_staging(dw_table_name=dw_table)
+        marketing_clazz.load_to_staging(dw_table_name=dw_table)
 
     @logger
     def transfer_to_dw(self, bucket, dw_table, **kwargs):
@@ -54,7 +53,7 @@ class MarketingSubDag(BaseSubDag):
             s3_bucket=bucket,
             execution_date=kwargs['execution_date']
         )
-        marketing_clazz._load_to_prod(table_name=dw_table)
+        marketing_clazz.load_to_prod(table_name=dw_table)
 
     @logger
     def build_tasks(self, task_name):
@@ -64,6 +63,7 @@ class MarketingSubDag(BaseSubDag):
 
     @logger
     def build_clean_tasks(self, dag):
+        print self.datalake_tables
         for account in self.accounts:
             for table in self.datalake_tables:
                 BaseDAG.build_python_operator(
@@ -89,31 +89,14 @@ class MarketingSubDag(BaseSubDag):
                 op_kwargs={
                     'bucket': self.bucket,
                     'clean_table': table,
-                    'prod_table': self.fact_table
+                    'prod_table': self.fact_tables[0]
                 }
             )
 
     @logger
-    def build_staging_tasks(self, dag):
-
-        task_tables = []
-
-        for table in self.dw_tables:
-            task_tables.append(BaseDAG.build_python_operator(
-                dag=dag,
-                task_id=table,
-                python_callable=self.transfer_to_staging,
-                provide_context=True,
-                op_kwargs={
-                    'bucket': self.bucket,
-                    'dw_table': table
-                }
-            ))
-        task_tables[0] >> task_tables[1]
-
-    @logger
     def build_dw_tasks(self, dag):
-        for table in self.dw_tables:
+        dw_tables = self.dim_tables + self.fact_tables
+        for table in dw_tables:
             BaseDAG.build_python_operator(
                 dag=dag,
                 task_id=table,
@@ -124,3 +107,39 @@ class MarketingSubDag(BaseSubDag):
                     'dw_table': table,
                 }
             )
+
+    @logger
+    def build_staging_tasks(self, dag):
+        dim_tasks = self.build_dim_tasks(dag)
+        for table in self.fact_tables:
+            fact_task = self.build_fact_tasks(dag, table)
+            fact_task.set_upstream(dim_tasks)
+
+    @logger
+    def build_dim_tasks(self, dag):
+        tasks = []
+        for table in self.dim_tables:
+            tasks.append(BaseDAG.build_python_operator(
+                dag=dag,
+                task_id=table,
+                python_callable=self.transfer_to_staging,
+                provide_context=True,
+                op_kwargs={
+                    'bucket': self.bucket,
+                    'dw_table': table
+                }
+            ))
+        return tasks
+
+    @logger
+    def build_fact_tasks(self, dag, table):
+        return BaseDAG.build_python_operator(
+            dag=dag,
+            task_id=table,
+            python_callable=self.transfer_to_staging,
+            provide_context=True,
+            op_kwargs={
+                'bucket': self.bucket,
+                'dw_table': table
+            }
+        )
