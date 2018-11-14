@@ -8,7 +8,7 @@ from bietlejuice.jobs.new_etl.load_ebdb_into_datalake import EBDBDatalake
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-EBDB_PRIORITY_TABLES = json.loads(env.get_airflow_env_var('EBDB_MIGRATION_PRIORITY'))
+EBDB_PRIORITY_TABLES = json.loads(env.get_airflow_env_var('EBDB_PRIORITY_TABLES'))
 config_json = json.loads(env.get_airflow_env_var('ebdb_to_datalake'))
 
 
