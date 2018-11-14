@@ -6,13 +6,13 @@ WITH clean_table_common as (
         acc as account_name,
         campaign_name,
         adgroup_name,
-        match_type,
-        dt_created,
-        getdate() as ts_load
-    FROM staging.marketing_google_ads_keywords {where_clause}
-    group by 2,3,4,5,6,7,8
+        match_type
+    FROM staging.marketing_google_ads_keywords
+    group by 2,3,4,5,6,7
 )
-SELECT clean_table_common.* FROM clean_table_common
+SELECT clean_table_common.*,
+    getdate() as ts_load
+FROM clean_table_common
 left join staging.dim_google_ads_keyword st_dim
     on clean_table_common.keyword_id = st_dim.keyword_id
         and clean_table_common.account_name = st_dim.account_name
