@@ -13,6 +13,9 @@ from qa_python_utils.aws.athena import AthenaClient
 
 mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 logger = QuintoAndarLogger('Autodialer_ETL')
+
+# TODO
+# Create Dynamic data process
 dummy_dt = '2018-01-01'
 
 
@@ -130,6 +133,9 @@ class Autodialer_ETL(object):
 
 # creating
 autodialer = Autodialer_ETL('5a-datalake')
+
+# TODO
+# Dynamize the .apply(json.dumps) to json columns.
 
 # raw
 # df = autodialer.get_mongo_data('task_references')
