@@ -27,4 +27,4 @@ STORED AS INPUTFORMAT
 OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://5a-datalake/raw/marketing/facebook_ads/insights/'
+  's3://5a-datalake/raw/marketing/facebook_ads/ads_insights/'

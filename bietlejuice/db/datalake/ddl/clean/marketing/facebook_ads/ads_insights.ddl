@@ -14,7 +14,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_facebook_ads_ads_insights (
     impression_device varchar,
     date_start varchar,
     date_stop varchar,
-    inline_link_clicks varchar)
+    link_clicks varchar)
 PARTITIONED BY (
   acc varchar,
   dt_created varchar)

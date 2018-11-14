@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS staging.marketing_facebook_ads_ads_insights (
     impression_device varchar(65535),
     date_start varchar(65535),
     date_stop varchar(65535),
+    link_clicks varchar(65535),
     acc varchar(256),
     dt_created varchar(256)
 )

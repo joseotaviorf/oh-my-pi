@@ -5,6 +5,5 @@ CREATE TABLE IF NOT EXISTS staging.dim_facebook_ads_ads_insights (
     adset_name VARCHAR,
     campaign_name VARCHAR,
     account_name VARCHAR,
-    dt_created VARCHAR,
     ts_load TIMESTAMP
 );
