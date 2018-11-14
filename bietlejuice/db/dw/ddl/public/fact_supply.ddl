@@ -22,6 +22,7 @@ create table public.fact_supply (
 	sk_qualified_date integer,
 	sk_opportunity_date integer,
 	sk_first_listing_date integer,
+	sk_discard_date integer,
 	flow varchar(255),
 	acquisition_method varchar(255),
 	acquisition_channel varchar(255),

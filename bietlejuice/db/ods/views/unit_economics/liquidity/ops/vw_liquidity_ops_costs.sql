@@ -1,7 +1,7 @@
 drop view if exists unit_economics.vw_liquidity_ops_costs;
 create or replace view unit_economics.vw_liquidity_ops_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
@@ -10,7 +10,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_bo_pre_sale,
@@ -20,7 +20,7 @@ from
 		unit_economics.liquidity_ops_bo_pre_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_pre_sale,
@@ -30,7 +30,7 @@ from
 		unit_economics.liquidity_ops_cs_pre_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_pre_sale,
@@ -39,5 +39,5 @@ from
 	from
 		unit_economics.liquidity_ops_field_ops_costs
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;

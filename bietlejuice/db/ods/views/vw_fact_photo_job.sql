@@ -10,7 +10,7 @@ with base_jobs as (
 )
 select
 	j1.id as id_photo_job,
-	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_property,
+	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_house_listing,
 	coalesce(i.regiao_id, -1) as sk_region,
 	coalesce(j1.user_cancel_id, -1) as sk_user_cancel,
 	coalesce(j1.photographer_id, -1) as sk_user_photographer,
@@ -19,6 +19,7 @@ select
 	j1.creation_origin,
 	j1.flexible_schedule,
 	j1.same_day_listing,
+	j1.job_on_time::boolean,
 	coalesce(to_char(j1.dt_photographer_accepted::date,'YYYYMMDD')::integer, -1) as sk_date_photographer_accepted,
 	coalesce(to_char(j1.dt_job_created::date,'YYYYMMDD')::integer, -1) as sk_date_job_created,
 	coalesce(to_char(j1.dt_job_issued::date,'YYYYMMDD')::integer, -1) as sk_date_job_issued,

@@ -24,6 +24,9 @@ create table if not exists dim_proposal (
   dt_credit_analysis_init timestamp,
   dt_credit_analysis_end timestamp,
   status_sortinghat varchar(50),
-  flg_doc_reused integer
+  flg_doc_reused integer,
+  ts_processed timestamp,
+  rejection_reason varchar,
+  ts_load timestamp
 )
 ;

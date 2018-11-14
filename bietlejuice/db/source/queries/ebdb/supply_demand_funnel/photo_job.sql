@@ -19,7 +19,12 @@ select
         else 1
       end as flexible_schedule,
       -- same_day_listing applies to any publishing until 10 AM (7AM - due to UTC diff) of the next day after the photo shoot
-      (first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '10' hour) as same_day_listing,
+      coalesce((first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '10' hour), false) as same_day_listing,
+      -- job_on_time applies to any publishing until 10 AM (7AM - due to UTC diff) of the next day after the photo shoot scheduled date
+      -- OR jobs not published but with photos uploadeds on the same interval
+      coalesce((first_pub.nxt_pub <= date(f.dataAgendamento) + interval '1' day + interval '10' hour), false)
+      or
+      coalesce(first_pub.nxt_pub IS NULL AND (f.dataUploadFotos <= date(f.dataAgendamento) + interval '1' day + interval '10' hour), false) as job_on_time,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
@@ -117,7 +122,7 @@ select
       left join MudancaStatusImovel msi
         on msi.imovel_id = jf.imovel_id
         and msi.novoStatus = 'publicado'
-        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataAgendamento))
+        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataCriacao, jf.dataAgendamento))
       group by jf.id
     ) first_pub on first_pub.id = f.id
     left join

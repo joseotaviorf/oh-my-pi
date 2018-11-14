@@ -7,3 +7,5 @@ class CRMTasksTableEnum(Enum):
     CLOSING = 'closing'
     ONBOARDING_TENANT = 'onboarding_tenant'
     PAYMENT = 'payment'
+    INSPECTION = 'inspection'
+    LEAD = 'lead'

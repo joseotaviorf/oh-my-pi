@@ -18,7 +18,7 @@ with lockbox_dates as (
 	group by imovel_id
 )
 select
-	base.sk_property,
+	base.sk_house_listing,
 	base.property_id,
 	lock.dt_cash_flow,
 	56.00 as vl_lockbox

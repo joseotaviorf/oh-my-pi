@@ -10,7 +10,7 @@ with cdre_field_ops as (
 filtered_visits as (
     select
       b.id as visit_id,
-      vbpc.sk_property,
+      vbpc.sk_house_listing,
       b.imovel_id as property_id,
       b.data as dt
     from unit_economics.vw_base_property_costs vbpc
@@ -40,7 +40,7 @@ filtered_visits as (
 ),
 costs as (
     select
-      fv.sk_property,
+      fv.sk_house_listing,
       fv.property_id,
       fv.dt,
       cfo.dre_date as dt_cash_flow,
@@ -50,10 +50,10 @@ costs as (
       on cfo.dre_date = (date_trunc('month', fv.dt) + interval '1 month')::date
 )
 select
-  c.sk_property,
+  c.sk_house_listing,
   c.property_id,
   c.dt_cash_flow,
   sum(c.vl_field_ops) as vl_field_ops
 from costs c
-group by c.sk_property, c.property_id, c.dt_cash_flow
+group by c.sk_house_listing, c.property_id, c.dt_cash_flow
 ;

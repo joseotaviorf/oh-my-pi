@@ -2,9 +2,9 @@ WITH schedule AS
 (SELECT
 	t.agent_id AS sk_agent_id,
 	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
-	sum(case when t.available_slot = 1 AND coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS available_slots,
-	sum(case when t.available_slot = 1 AND coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS available_slots_0
- FROM staging.agents_slots t
+	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS available_slots,
+	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS available_slots_0
+ FROM agent.agents_slots t
  WHERE DATE(t.slot_dt) = DATE('{0}')
 GROUP BY 1, 2
 ),
@@ -20,7 +20,7 @@ available_next_days AS
 (SELECT
 	t.agent_id AS sk_agent_id,
 	case when sum(case when t.available_slot = 1 AND coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) end) > 0 then 1 else 0 end AS flg_available_next_days
- FROM staging.agents_slots t
+ FROM agent.agents_slots t
  WHERE DATE(t.slot_dt) BETWEEN DATEADD(DAY, 1, DATE('{0}')) AND DATEADD(DAY, 4, DATE('{0}'))
 GROUP BY 1
 )

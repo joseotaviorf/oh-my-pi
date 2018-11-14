@@ -36,15 +36,15 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  date_part('year', dp.dt_tenant_first_document_sent) order by dp.sk_proposal desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
 			and f.sk_proposal != -1
-	join dim_property dpr
-		on f.sk_house = dpr.sk_property
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house_listing
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
   order by coalesce(dr.city_name, ''), date_part('year', dp.dt_tenant_first_document_sent), date_part('month', dp.dt_tenant_first_document_sent), date_part('week', dp.dt_tenant_first_document_sent), date_part('day', dp.dt_tenant_first_document_sent)
 ),
 all_dates_last_week as (
@@ -57,15 +57,15 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dp.sk_proposal) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
 			and f.sk_proposal != -1
-	join dim_property dpr
-  	on f.sk_house = dpr.sk_property
-	left join dim_region dr
-		on dpr.regiao_id = dr.id
+	join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house_listing
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', dp.dt_tenant_first_document_sent) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dp.dt_tenant_first_document_sent) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dp.dt_tenant_first_document_sent) < date_part('day', current_date)
@@ -78,15 +78,15 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct dp.sk_proposal) as yearly_count
-  from fact_demand f
+  from fact_listing_rent_flows f
 	join dim_proposal dp
 		on f.sk_proposal = dp.sk_proposal
 			and dp.dt_tenant_first_document_sent >= '2017-01-01' and dp.dt_tenant_first_document_sent < current_date
 			and f.sk_proposal != -1
-  join dim_property dpr
-  	on f.sk_house = dpr.sk_property
-  left join dim_region dr
-  	on dpr.regiao_id = dr.id
+  join fact_house_listings fhl
+	  on fhl.sk_house_listing = f.sk_house_listing
+    left join dim_region dr
+  	  on fhl.sk_region = dr.sk_region
 	where date_part('year', dp.dt_tenant_first_document_sent) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dp.dt_tenant_first_document_sent) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', dp.dt_tenant_first_document_sent) < date_part('day', add_months(current_date, -12)))

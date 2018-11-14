@@ -125,8 +125,8 @@ inner join
 	      min(v.dia) filter (where b.status != 'Canceled') as first_visit_confirmed_date,
 	      min(pp."criadoEm") as first_pre_proposal_date,
 	      min(p."criadoEm") as first_proposal_accepted_date,
-	      min(c."criadoEm") as first_contract_date,
-	      min(c."dataAssinado") as first_signed_contract
+	      min(c.ts_created) as first_contract_date,
+	      min(c.ts_signature) as first_signed_contract
 	  from
 	      usuario  u
 	  left join
@@ -146,7 +146,7 @@ inner join
 	      on p."preProposta_id" = pp.id
 	  left join
 	      contract c
-	      on c.proposta_id = p.id
+	      on c.id_proposal = p.id
 	  group by
 	      u.id
 	) user_dates

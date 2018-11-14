@@ -28,7 +28,7 @@ calculated_qt as (
 ),
 filtered_properties_prev as (
     select distinct
-        sk_property,
+        sk_house_listing,
         property_id,
         publication_date::date,
         min_version_time::date,
@@ -45,7 +45,7 @@ filtered_properties_prev as (
 ),
 filtered_properties as (
   select distinct
-    fpp.sk_property,
+    fpp.sk_house_listing,
     fpp.property_id,
     cps.dre_date as dt
   from filtered_properties_prev fpp
@@ -63,7 +63,7 @@ ratio as (
 ),
 gen_contracts as (
 	select
-	    fp.sk_property,
+	    fp.sk_house_listing,
 		fp.property_id,
 		fp.dt,
 		r.qt as qt_gen
@@ -74,7 +74,7 @@ gen_contracts as (
 ),
 espec_gen_prev as (
   select
-    fp.sk_property,
+    fp.sk_house_listing,
     fp.property_id,
     cqt.dt as dt,
     cqt.qt as qt
@@ -89,17 +89,17 @@ espec_gen_prev as (
 ),
 espec_gen as (
 	select
-	    sk_property,
+	    sk_house_listing,
 		property_id,
 		dt,
 		sum(qt) as qt
 	from espec_gen_prev
 	group by
-		sk_property, property_id, dt
+		sk_house_listing, property_id, dt
 ),
 tt_costs as (
     select
-      eg.sk_property,
+      eg.sk_house_listing,
       eg.property_id,
       eg.dt,
       cps.dre_date as dt_cash_flow,
@@ -110,7 +110,7 @@ tt_costs as (
 ),
 property_costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.dt,
       cps.dre_date as dt_cash_flow,
@@ -121,7 +121,7 @@ property_costs as (
 ),
 full_costs as (
   select distinct
-    sk_property,
+    sk_house_listing,
     property_id,
     dt,
     dt_cash_flow,
@@ -132,7 +132,7 @@ full_costs as (
   union
 
   select distinct
-    sk_property,
+    sk_house_listing,
     property_id,
     dt,
     dt_cash_flow,
@@ -141,11 +141,11 @@ full_costs as (
   where dt = dt_cash_flow
 )
 select
-  vbpc.sk_property,
+  vbpc.sk_house_listing,
   fc.property_id,
   fc.dt_cash_flow,
   fc.vl_cs_pre_sale
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
-  on vbpc.sk_property = fc.sk_property
+  on vbpc.sk_house_listing = fc.sk_house_listing
 ;

@@ -101,7 +101,10 @@ select
   coalesce(shp.first_analysis_date, p.credit_analysis_init_date) as dt_credit_analysis_init,
   coalesce(shp.process_date, p.credit_analysis_end_date, shp.analysis_date) as dt_credit_analysis_end,
   nullif(shp.status, '') as status_sortinghat,
-  doc_reused as flg_doc_reused
+  doc_reused as flg_doc_reused,
+  p.ts_processed,
+  p.rejection_reason,
+  now()::timestamp as ts_load
 from proposal p
 left join sortinghat_prop shp
   on shp.id = p.id

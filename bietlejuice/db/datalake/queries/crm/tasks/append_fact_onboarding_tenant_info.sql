@@ -7,23 +7,23 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(ct.id_origin as bigint) = cast(dc.sk_contract as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(dc.sk_contract as bigint))
   left join datalake_raw.ebdb_onboarding eo
     on trim(ct.origin) = 'Onboarding'
-      and cast(ct.id_origin as bigint) = cast(eo.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(eo.id as bigint))
   left join datalake_raw.ebdb_vistoria ev
     on trim(ct.origin) = 'Vistoria'
-      and cast(ct.id_origin as bigint) = cast(ev.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(ev.id as bigint))
 ),
 contract_house_listing as (
   select
-    cast(sk_house as bigint) as sk_house_listing,
+    cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_contract as bigint) as sk_contract
-  from datalake_clean.ods_fact_demand
+  from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
   group by 1, 2
 )
-select
+select distinct
   c.sk_task,
   c.sk_receiver,
   c.sk_start_date,
@@ -33,12 +33,12 @@ select
   c.action_user_name,
   c.sk_user_action,
   c.sk_action_date,
-  c.dt_action,
+  c.ts_action,
   c.action_type,
   c.sk_task_user_start_date,
-  c.dt_task_user_start,
+  c.ts_task_user_start,
   c.sk_task_user_end_date,
-  c.dt_task_user_end,
+  c.ts_task_user_end,
   c.task_user_type,
   c.task_user_resolve_hours,
   c.sk_contract,

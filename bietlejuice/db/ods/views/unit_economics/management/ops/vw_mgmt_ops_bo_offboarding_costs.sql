@@ -130,7 +130,7 @@ last_3_avg as (
 ),
 coalesced_values as (
 	select
-		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		coalesce(vbpc.sk_house_listing, (lavg.property_id || '001')::bigint) as sk_house_listing,
 		lavg.property_id,
 		lavg.dt_cash_flow::date,
 		case

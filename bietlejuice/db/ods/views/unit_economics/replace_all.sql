@@ -47,7 +47,7 @@ drop view if exists unit_economics.vw_fact_property_economics cascade;
 
 create or replace view unit_economics.vw_base_property_costs as
 select
-  ((id || '00') || coalesce(version, 1))::bigint as sk_property,
+  ((id || '00') || coalesce(version, 1))::bigint as sk_house_listing,
   id as property_id,
   version,
   min_version_time as publication_date,
@@ -323,7 +323,7 @@ with cdre_inside_sales as (
 ),
 filtered_properties as (
 	select distinct
-	    sk_property,
+	    sk_house_listing,
 	    property_id,
 	    min_version_time::date as listing_date
 	from
@@ -337,7 +337,7 @@ filtered_properties as (
 ),
 costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.listing_date,
       cis.dre_date as dt_cash_flow,
@@ -347,7 +347,7 @@ costs as (
       on cis.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   dt_cash_flow as dt_cash_flow,
   vl_inside_sales
@@ -364,7 +364,7 @@ with cdre_photos as (
 ),
 filtered_properties as (
    select distinct
-      sk_property,
+      sk_house_listing,
       property_id,
       min_version_time::date as listing_date
     from unit_economics.vw_base_property_costs
@@ -372,7 +372,7 @@ filtered_properties as (
 ),
 costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.listing_date,
       cp.dre_date as dt_cash_flow,
@@ -382,7 +382,7 @@ costs as (
       on cp.dre_date = (date_trunc('month', fp.listing_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 5) as dt_cash_flow,
   vl_photos
@@ -391,14 +391,14 @@ from costs
 
 create or replace view unit_economics.vw_supply_ops_costs as
 select
-  coalesce(vsopc.sk_property, vsoisc.sk_property) as sk_property,
+  coalesce(vsopc.sk_house_listing, vsoisc.sk_house_listing) as sk_house_listing,
   coalesce(vsopc.property_id, vsoisc.property_id) as property_id,
   coalesce(vsopc.dt_cash_flow, vsoisc.dt_cash_flow) as dt_cash_flow,
   coalesce(vsopc.vl_photos, 0) as vl_photos,
   coalesce(vsoisc.vl_inside_sales, 0) as vl_inside_sales
 from unit_economics.supply_ops_photos_costs vsopc
 full outer join unit_economics.supply_ops_inside_sales_costs vsoisc
-  on vsoisc.sk_property = vsopc.sk_property
+  on vsoisc.sk_house_listing = vsopc.sk_house_listing
      and vsoisc.dt_cash_flow = vsopc.dt_cash_flow
 ;
 
@@ -476,7 +476,7 @@ affiliate_filtered_base as (
 -- Divide all costs among versioned properties
 divided_costs as (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		case
             when affiliate_dt < publication_date
@@ -571,7 +571,7 @@ ten_day_base as
 -- Divide all costs among versioned properties
 divided_costs as (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		date_trunc('month', base.ten_pub_date + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
@@ -587,7 +587,7 @@ divided_costs as (
 total as (
 	-- Remove rows where costs equal zero
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		sum(vl_owner_campaigns)::decimal(14,8) as vl_owner_campaigns
@@ -596,12 +596,12 @@ total as (
 	where
 		vl_owner_campaigns <> 0
 	group by
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow
 )
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	dt_cash_flow,
 	vl_owner_campaigns::decimal(14,4) as vl_owner_campaigns
@@ -611,7 +611,7 @@ from
 
 create or replace view unit_economics.vw_supply_mkt_costs as
 select
-	coalesce(affiliate.sk_property, owner.sk_property) as sk_property,
+	coalesce(affiliate.sk_house_listing, owner.sk_house_listing) as sk_house_listing,
 	coalesce(affiliate.property_id, owner.property_id) as property_id,
 	coalesce(affiliate.dt_cash_flow, owner.dt_cash_flow) as dt_cash_flow,
 	coalesce(vl_affiliate_campaigns, 0) as vl_affiliate_campaigns,
@@ -620,7 +620,7 @@ from
 	unit_economics.supply_mkt_affiliate_campaigns_costs affiliate
 full outer join
 	unit_economics.supply_mkt_owner_campaigns_costs owner
-	on affiliate.sk_property = owner.sk_property
+	on affiliate.sk_house_listing = owner.sk_house_listing
 	and affiliate.dt_cash_flow = owner.dt_cash_flow
 ;
 
@@ -642,7 +642,7 @@ with affiliate_filtered_base as (
 		and l.tipo='Afiliado'
 )
 select
-	base.sk_property,
+	base.sk_house_listing,
 	property_id,
 	payment_date::date as dt_cash_flow,
 	valor as vl_affiliate_bonus
@@ -659,7 +659,7 @@ and
 
 create or replace view unit_economics.vw_supply_costs as
 select
-	coalesce(vsmc.sk_property, vsoc.sk_property, vsacc.sk_property) as sk_property,
+	coalesce(vsmc.sk_house_listing, vsoc.sk_house_listing, vsacc.sk_house_listing) as sk_house_listing,
 	coalesce(vsmc.property_id, vsoc.property_id, vsacc.property_id) as property_id,
 	coalesce(
     date_trunc('month', vsmc.dt_cash_flow)::date,
@@ -673,10 +673,10 @@ select
 from
 	unit_economics.supply_mkt_costs vsmc
 full outer join unit_economics.supply_ops_costs vsoc
-  	on vsmc.sk_property = vsoc.sk_property
+  	on vsmc.sk_house_listing = vsoc.sk_house_listing
 	and vsmc.dt_cash_flow = vsoc.dt_cash_flow
 full outer join unit_economics.supply_affiliate_bonus_costs vsacc
-	on vsacc.sk_property = coalesce(vsoc.sk_property, vsmc.sk_property)
+	on vsacc.sk_house_listing = coalesce(vsoc.sk_house_listing, vsmc.sk_house_listing)
 	and vsacc.dt_cash_flow = coalesce(vsoc.dt_cash_flow, vsmc.dt_cash_flow)
 ;
 
@@ -698,7 +698,7 @@ with affiliate_filtered_base as (
 		and l.tipo='Afiliado'
 )
 select
-	base.sk_property,
+	base.sk_house_listing,
 	property_id,
 	payment_date::date as dt_cash_flow,
 	valor as vl_affiliate_commission,
@@ -796,7 +796,7 @@ updated_dates as (
   from all_contracts
 )
 select
-  vbpc.sk_property,
+  vbpc.sk_house_listing,
   ud.property_id,
   make_date(extract(year from ud.dt)::int, extract(month from ud.dt)::int, 7) as dt_cash_flow,
   ud.vl_agent_commission,
@@ -809,7 +809,7 @@ join unit_economics.vw_base_property_costs vbpc
 
 create or replace view unit_economics.vw_net_revenue_commission_costs as
 select
-    coalesce(affiliate.sk_property, agent.sk_property) as sk_property,
+    coalesce(affiliate.sk_house_listing, agent.sk_house_listing) as sk_house_listing,
     coalesce(affiliate.property_id, agent.property_id) as property_id,
     coalesce(affiliate.dt_cash_flow, agent.dt_cash_flow) as dt_cash_flow,
     coalesce(affiliate.vl_affiliate_commission, 0) as vl_affiliate_commission,
@@ -819,14 +819,14 @@ select
 from
     unit_economics.net_revenue_affiliate_commission_costs affiliate
 full outer join unit_economics.net_revenue_agent_commission_costs agent
-  on affiliate.sk_property = agent.sk_property
+  on affiliate.sk_house_listing = agent.sk_house_listing
      and affiliate.dt_cash_flow = agent.dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_fee as
 with base_contract as (
 select
-	vbpc.sk_property,
+	vbpc.sk_house_listing,
 	vbpc.property_id,
 	vbcc.id as contract_id,
 	vbcc.init_date,
@@ -845,7 +845,7 @@ where (vbcc.termination_date is not null
 ),
 brokerage_fill as (
 	select distinct
-		sk_property,
+		sk_house_listing,
 		property_id,
 		bc.contract_id,
 		bc.vl_rent_value,
@@ -874,7 +874,7 @@ brokerage_fill as (
 	    and _to = 'Contrato'
 )
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	vl_brokerage_fee,
 	vl_rent_value,
@@ -921,8 +921,8 @@ base_contract as (
 ),
 incurred as (
     select distinct
-    	row_number() over (partition by sk_property, bc.contract_id order by bc.date_range) as rn,
-        sk_property,
+    	row_number() over (partition by sk_house_listing, bc.contract_id order by bc.date_range) as rn,
+        sk_house_listing,
         property_id,
         bc.contract_id,
         bc.contract_init_date,
@@ -949,7 +949,7 @@ incurred as (
 ),
 incurred_diff as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         case
         	when (rn=1 and vl_management_fee is null)
@@ -972,18 +972,18 @@ incurred_diff as (
 ),
 incurred_plus_dates as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         vl_management_fee,
         dt_cash_flow,
         date_range,
         vl_rent_value,
-        max(dt_cash_flow) over (partition by sk_property) as max_dt_cash_flow
+        max(dt_cash_flow) over (partition by sk_house_listing) as max_dt_cash_flow
     from incurred_diff
 ),
 value_fill as (
     select distinct
-        sk_property,
+        sk_house_listing,
         property_id,
         vl_management_fee,
         case
@@ -993,12 +993,12 @@ value_fill as (
         end as dt_cash_flow,
         max_dt_cash_flow,
         vl_rent_value,
-        gap_fill(vl_management_fee) over (partition by sk_property order by dt_cash_flow asc) as gf
+        gap_fill(vl_management_fee) over (partition by sk_house_listing order by dt_cash_flow asc) as gf
     from incurred_plus_dates
 ),
 result as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         dt_cash_flow,
         vl_rent_value,
@@ -1013,7 +1013,7 @@ result as (
     from value_fill
 )
 select
-    sk_property,
+    sk_house_listing,
     property_id,
     vl_management_fee,
     vl_rent_value,
@@ -1026,7 +1026,7 @@ where vl_management_fee != 0
 
 create or replace view unit_economics.vw_net_revenue_revenues as
 select
-	coalesce(b_fee.sk_property, m_fee.sk_property) as sk_property,
+	coalesce(b_fee.sk_house_listing, m_fee.sk_house_listing) as sk_house_listing,
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
 	coalesce(date_trunc('month', b_fee.dt_cash_flow)::date, date_trunc('month', m_fee.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
@@ -1038,7 +1038,7 @@ from
 	unit_economics.net_revenue_revenues_brokerage_fee b_fee
 full outer join
 	unit_economics.net_revenue_revenues_mgmt_fee m_fee
-	on b_fee.sk_property = m_fee.sk_property
+	on b_fee.sk_house_listing = m_fee.sk_house_listing
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;
 
@@ -1102,7 +1102,7 @@ fines as (
     and date_trunc('month',ff.paid_date) = c.dt
 )
 select
-    vbpc.sk_property,
+    vbpc.sk_house_listing,
   f.property_id,
 	coalesce(fine, gap_fill(av) over (partition by id order by dt)) as vl_delay_fine,
   f.dt::date as dt_cash_flow,
@@ -1115,7 +1115,7 @@ join unit_economics.vw_base_property_costs vbpc
 
 create or replace view unit_economics.vw_net_revenue_revenues_brokerage_plus_mgmt_aux as
 select
-    coalesce(br.sk_property, mg.sk_property) as sk_property,
+    coalesce(br.sk_house_listing, mg.sk_house_listing) as sk_house_listing,
     coalesce(br.property_id, mg.property_id) as property_id,
     coalesce(br.vl_brokerage_fee, 0) + coalesce(mg.vl_management_fee, 0) as brokerage_plus_mgmt,
     coalesce(br.dt_cash_flow, mg.dt_cash_flow) as dt_cash_flow,
@@ -1123,7 +1123,7 @@ select
     coalesce(br.flg_expected_brokerage_fee, 0) as flg_expected_brokerage_fee
   from unit_economics.net_revenue_revenues_brokerage_fee br
   full outer join unit_economics.net_revenue_revenues_mgmt_fee mg
-    on br.sk_property = mg.sk_property
+    on br.sk_house_listing = mg.sk_house_listing
        and br.dt_cash_flow = mg.dt_cash_flow
   where br.vl_brokerage_fee > 0
     or mg.vl_management_fee > 0
@@ -1132,14 +1132,14 @@ select
 create or replace view unit_economics.vw_net_revenue_taxes_sales_tax_iss as
 with iss as (
   select
-    sk_property,
+    sk_house_listing,
     property_id,
     0.05 * brokerage_plus_mgmt as vl_st_iss,
     dt_cash_flow + interval '1 month' as dt_cash_flow
   from unit_economics.net_revenue_revenues_brokerage_plus_mgmt_aux
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   vl_st_iss,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 25) as dt_cash_flow,
@@ -1150,14 +1150,14 @@ from iss
 create or replace view unit_economics.vw_net_revenue_taxes_sales_tax_pis_cofins as
 with pis_cofins as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         0.0925 * brokerage_plus_mgmt as vl_st_pis_cofins,
         dt_cash_flow + interval '1 month' as dt_cash_flow
     from unit_economics.net_revenue_revenues_brokerage_plus_mgmt_aux
 )
 select
-  sk_property,
+  sk_house_listing,
   property_id,
   vl_st_pis_cofins,
   make_date(extract(year from dt_cash_flow)::int, extract(month from dt_cash_flow)::int, 10) as dt_cash_flow,
@@ -1167,7 +1167,7 @@ from pis_cofins
 
 create or replace view unit_economics.vw_net_revenue_taxes as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_st_iss) as vl_st_iss,
@@ -1179,7 +1179,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_st_iss,
@@ -1192,7 +1192,7 @@ from
 		unit_economics.net_revenue_taxes_sales_tax_iss
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_st_iss,
@@ -1205,7 +1205,7 @@ from
 		unit_economics.net_revenue_taxes_sales_tax_pis_cofins
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_st_iss,
@@ -1217,12 +1217,12 @@ from
 	from
 		unit_economics.net_revenue_taxes_delay_fine
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_net_revenue_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
@@ -1243,7 +1243,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_affiliate_commission,
@@ -1265,7 +1265,7 @@ from
 		unit_economics.net_revenue_commission_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
@@ -1287,7 +1287,7 @@ from
 		unit_economics.net_revenue_revenues
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
@@ -1308,7 +1308,7 @@ from
 	from
 		unit_economics.net_revenue_taxes
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;
 
 
@@ -1396,7 +1396,7 @@ base_contract as (
 		and c.dt_end between base.min_version_time and base.max_version_time
 )
 select
-	max(sk_property)::bigint as sk_property,
+	max(sk_house_listing)::bigint as sk_house_listing,
 	bc.property_id,
 	bc.contract_id,
 	insurance_fee::decimal(14,4) as vl_insurance_fee,
@@ -1549,7 +1549,7 @@ last_3_avg as (
 ),
 coalesced_values as (
 	select
-		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		coalesce(vbpc.sk_house_listing, (lavg.property_id || '001')::bigint) as sk_house_listing,
 		lavg.property_id,
 		lavg.dt_cash_flow::date,
 		case
@@ -1704,7 +1704,7 @@ full_costs as (
 ),
 result as (
     select
-      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      coalesce(vbpc.sk_house_listing, (c.property_id || '001')::bigint) as sk_house_listing,
       c.property_id,
       c.dt_cash_flow::date,
       c.vl_bo_onboarding,
@@ -1742,7 +1742,7 @@ last_value_gap_fill as (
     from last_value
 )
 select
-    r.sk_property,
+    r.sk_house_listing,
     r.property_id,
     r.dt_cash_flow,
     r.flg_expected_bo_onboarding,
@@ -1796,7 +1796,7 @@ costs as (
 ),
 result as (
     select
-      coalesce(vbpc.sk_property, (c.property_id || '001')::bigint) as sk_property,
+      coalesce(vbpc.sk_house_listing, (c.property_id || '001')::bigint) as sk_house_listing,
       c.property_id,
       c.dt_cash_flow::date,
       c.vl_bo_ongoing,
@@ -1834,7 +1834,7 @@ last_value_gap_fill as (
     from last_value
 )
 select
-    r.sk_property,
+    r.sk_house_listing,
     r.property_id,
     r.dt_cash_flow,
     r.flg_expected_bo_ongoing,
@@ -2002,7 +2002,7 @@ full_costs as (
       and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select distinct
-  coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
+  coalesce(vbpc.sk_house_listing, (fc.property_id || '001')::bigint) as sk_house_listing,
   fc.property_id,
   fc.dt_cash_flow::date,
   fc.vl_collection,
@@ -2174,7 +2174,7 @@ full_costs as (
       and tt.dt_cash_flow = cc.dt_cash_flow
 )
 select
-  coalesce(vbpc.sk_property, (fc.property_id || '001')::bigint) as sk_property,
+  coalesce(vbpc.sk_house_listing, (fc.property_id || '001')::bigint) as sk_house_listing,
   fc.property_id,
   fc.dt_cash_flow::date,
   fc.vl_cs_post_sale,
@@ -2252,7 +2252,7 @@ last_3_avg as (
 ),
 coalesced_values as (
 	select
-		coalesce(vbpc.sk_property, (lavg.property_id || '001')::bigint) as sk_property,
+		coalesce(vbpc.sk_house_listing, (lavg.property_id || '001')::bigint) as sk_house_listing,
 		lavg.property_id,
 		lavg.dt_cash_flow::date,
 		case
@@ -2276,7 +2276,7 @@ where
 
 create or replace view unit_economics.vw_mgmt_ops_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
@@ -2294,7 +2294,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_bo_offboarding,
@@ -2313,7 +2313,7 @@ from
 		unit_economics.mgmt_ops_bo_offboarding_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -2332,7 +2332,7 @@ from
 		unit_economics.mgmt_ops_bo_onboarding_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -2351,7 +2351,7 @@ from
 		unit_economics.mgmt_ops_bo_ongoing_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -2370,7 +2370,7 @@ from
 		unit_economics.mgmt_ops_collection_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -2389,7 +2389,7 @@ from
 		unit_economics.mgmt_ops_cs_post_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -2407,12 +2407,12 @@ from
 	from
 		unit_economics.mgmt_ops_inspection_costs
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_mgmt_insurance_pis_cofins as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	contract_id,
 	-(vl_insurance_fee * 0.0925) as vl_st_pis_cofins,
@@ -2424,7 +2424,7 @@ from
 
 create or replace view unit_economics.vw_mgmt_insurance as
 select
-	coalesce(i_fee.sk_property, i_pis.sk_property) as sk_property,
+	coalesce(i_fee.sk_house_listing, i_pis.sk_house_listing) as sk_house_listing,
 	coalesce(i_fee.property_id, i_pis.property_id) as property_id,
 	coalesce(i_fee.dt_cash_flow, i_pis.dt_cash_flow) as dt_cash_flow,
 	coalesce(i_fee.vl_insurance_fee, 0) as vl_insurance_fee,
@@ -2436,13 +2436,13 @@ from
 	unit_economics.mgmt_insurance_fee i_fee
 full outer join
 	unit_economics.mgmt_insurance_pis_cofins i_pis
-	on i_fee.sk_property = i_pis.sk_property
+	on i_fee.sk_house_listing = i_pis.sk_house_listing
 	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_mgmt_costs as
 select
-  coalesce(ops.sk_property, ins.sk_property) as sk_property,
+  coalesce(ops.sk_house_listing, ins.sk_house_listing) as sk_house_listing,
   coalesce(ops.property_id, ins.property_id) as property_id,
   coalesce(date_trunc('month', ops.dt_cash_flow)::date, date_trunc('month', ins.dt_cash_flow)::date) as dt_cash_flow,
   coalesce(ops.vl_bo_offboarding, 0) as vl_bo_offboarding,
@@ -2466,7 +2466,7 @@ from
 	unit_economics.mgmt_ops_costs ops
 full outer join
 	unit_economics.mgmt_insurance ins
-	on ins.sk_property = ops.sk_property
+	on ins.sk_house_listing = ops.sk_house_listing
      and ins.dt_cash_flow = ops.dt_cash_flow
 ;
 
@@ -2483,7 +2483,7 @@ with hour_costs as (
 ),
 filtered_daily_status as  (
 	select
-		base.sk_property,
+		base.sk_house_listing,
 		id as property_id,
 		"date" as dt_status,
 		row_number()
@@ -2499,7 +2499,7 @@ filtered_daily_status as  (
 ),
 property_daily_status as  (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_status
 	from
@@ -2509,7 +2509,7 @@ property_daily_status as  (
 ),
 all_costs as (
     select
-      pds.sk_property,
+      pds.sk_house_listing,
       pds.property_id,
       pds.dt_status,
       hc.dre_date as dt_cash_flow,
@@ -2521,7 +2521,7 @@ all_costs as (
       on hc.dre_date = (date_trunc('month', pds.dt_status) + interval '1 month')::date
 )
 select
-  ac.sk_property,
+  ac.sk_house_listing,
   ac.property_id,
   ac.dt_cash_flow::date,
   case
@@ -2533,7 +2533,7 @@ from all_costs ac
 join unit_economics.vw_base_property_costs vbpc
   on vbpc.property_id = ac.property_id
     and ac.dt_cash_flow between vbpc.min_version_time and vbpc.max_version_time
-group by ac.sk_property, ac.property_id, ac.dt_cash_flow
+group by ac.sk_house_listing, ac.property_id, ac.dt_cash_flow
 ;
 
 
@@ -2552,7 +2552,7 @@ with lockbox_dates as (
 	group by imovel_id
 )
 select
-	base.sk_property,
+	base.sk_house_listing,
 	base.property_id,
 	lock.dt_cash_flow,
 	56.00 as vl_lockbox
@@ -2692,7 +2692,7 @@ where
 -- For each property expose the published days
 property_daily_status as  (
 	select
-		base.sk_property,
+		base.sk_house_listing,
 		id as property_id,
 		"date" as dt_status
 	from
@@ -2708,7 +2708,7 @@ property_daily_status as  (
 -- Divide costs for published day
 daily_total as (
 	select
-		pds.sk_property as sk_property,
+		pds.sk_house_listing as sk_house_listing,
 		pds.property_id as property_id,
 		date_trunc('month', pds.dt_status + interval '2 month')::date as dt_cash_flow,
 		coalesce(dc.total,0) as total,
@@ -2727,7 +2727,7 @@ daily_total as (
 -- Get month total for each version with a proper cash flow date
 monthly_total_versioned as (
 	select
-		daily.sk_property,
+		daily.sk_house_listing,
 		daily.property_id,
 		daily.dt_cash_flow,
 		sum(daily.criteo_cost)::decimal(14,4) as criteo_cost,
@@ -2739,7 +2739,7 @@ monthly_total_versioned as (
 	from
 		daily_total daily
 	group by
-		daily.sk_property,
+		daily.sk_house_listing,
 		daily.property_id,
 		daily.dt_cash_flow
 )
@@ -2753,7 +2753,7 @@ where
 
 create or replace view unit_economics.vw_liquidity_mkt_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	dt_cash_flow,
 	vl_tenant_campaigns
@@ -2771,7 +2771,7 @@ with cdre_bo_pre_sale as (
 ),
 filtered_contracts as (
     select distinct
-      vbpc.sk_property,
+      vbpc.sk_house_listing,
       c.property_id,
       c.created_date::date as created_date
     from unit_economics.vw_base_property_costs vbpc
@@ -2793,7 +2793,7 @@ filtered_contracts as (
 ),
 costs as (
     select
-      fc.sk_property,
+      fc.sk_house_listing,
       fc.property_id,
       fc.created_date,
       cps.dre_date as dt_cash_flow,
@@ -2803,12 +2803,12 @@ costs as (
       on cps.dre_date = (date_trunc('month', fc.created_date) + interval '1 month')::date
 )
 select
-  sk_property,
+  sk_house_listing,
   c.property_id,
   c.dt_cash_flow,
   sum(c.vl_bo_pre_sale) as vl_bo_pre_sale
 from costs c
-group by c.property_id, c.dt_cash_flow, c.sk_property
+group by c.property_id, c.dt_cash_flow, c.sk_house_listing
 ;
 
 
@@ -2842,7 +2842,7 @@ calculated_qt as (
 ),
 filtered_properties_prev as (
     select distinct
-        sk_property,
+        sk_house_listing,
         property_id,
         publication_date::date,
         min_version_time::date,
@@ -2859,7 +2859,7 @@ filtered_properties_prev as (
 ),
 filtered_properties as (
   select distinct
-    fpp.sk_property,
+    fpp.sk_house_listing,
     fpp.property_id,
     cps.dre_date as dt
   from filtered_properties_prev fpp
@@ -2877,7 +2877,7 @@ ratio as (
 ),
 gen_contracts as (
 	select
-	    fp.sk_property,
+	    fp.sk_house_listing,
 		fp.property_id,
 		fp.dt,
 		r.qt as qt_gen
@@ -2888,7 +2888,7 @@ gen_contracts as (
 ),
 espec_gen_prev as (
   select
-    fp.sk_property,
+    fp.sk_house_listing,
     fp.property_id,
     cqt.dt as dt,
     cqt.qt as qt
@@ -2903,17 +2903,17 @@ espec_gen_prev as (
 ),
 espec_gen as (
 	select
-	    sk_property,
+	    sk_house_listing,
 		property_id,
 		dt,
 		sum(qt) as qt
 	from espec_gen_prev
 	group by
-		sk_property, property_id, dt
+		sk_house_listing, property_id, dt
 ),
 tt_costs as (
     select
-      eg.sk_property,
+      eg.sk_house_listing,
       eg.property_id,
       eg.dt,
       cps.dre_date as dt_cash_flow,
@@ -2924,7 +2924,7 @@ tt_costs as (
 ),
 property_costs as (
     select
-      fp.sk_property,
+      fp.sk_house_listing,
       fp.property_id,
       fp.dt,
       cps.dre_date as dt_cash_flow,
@@ -2935,7 +2935,7 @@ property_costs as (
 ),
 full_costs as (
   select distinct
-    sk_property,
+    sk_house_listing,
     property_id,
     dt,
     dt_cash_flow,
@@ -2946,7 +2946,7 @@ full_costs as (
   union
 
   select distinct
-    sk_property,
+    sk_house_listing,
     property_id,
     dt,
     dt_cash_flow,
@@ -2955,13 +2955,13 @@ full_costs as (
   where dt = dt_cash_flow
 )
 select
-  vbpc.sk_property,
+  vbpc.sk_house_listing,
   fc.property_id,
   fc.dt_cash_flow,
   fc.vl_cs_pre_sale
 from full_costs fc
 join unit_economics.vw_base_property_costs vbpc
-  on vbpc.sk_property = fc.sk_property
+  on vbpc.sk_house_listing = fc.sk_house_listing
 ;
 
 create or replace view unit_economics.vw_liquidity_ops_field_ops_costs as
@@ -2975,7 +2975,7 @@ with cdre_field_ops as (
 filtered_visits as (
     select
       b.id as visit_id,
-      vbpc.sk_property,
+      vbpc.sk_house_listing,
       b.imovel_id as property_id,
       b.data as dt
     from unit_economics.vw_base_property_costs vbpc
@@ -3005,7 +3005,7 @@ filtered_visits as (
 ),
 costs as (
     select
-      fv.sk_property,
+      fv.sk_house_listing,
       fv.property_id,
       fv.dt,
       cfo.dre_date as dt_cash_flow,
@@ -3015,17 +3015,17 @@ costs as (
       on cfo.dre_date = (date_trunc('month', fv.dt) + interval '1 month')::date
 )
 select
-  c.sk_property,
+  c.sk_house_listing,
   c.property_id,
   c.dt_cash_flow,
   sum(c.vl_field_ops) as vl_field_ops
 from costs c
-group by c.sk_property, c.property_id, c.dt_cash_flow
+group by c.sk_house_listing, c.property_id, c.dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_liquidity_ops_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_pre_sale) as vl_bo_pre_sale,
@@ -3034,7 +3034,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_bo_pre_sale,
@@ -3044,7 +3044,7 @@ from
 		unit_economics.liquidity_ops_bo_pre_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_pre_sale,
@@ -3054,7 +3054,7 @@ from
 		unit_economics.liquidity_ops_cs_pre_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_pre_sale,
@@ -3063,12 +3063,12 @@ from
 	from
 		unit_economics.liquidity_ops_field_ops_costs
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_liquidity_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_tenant_campaigns)::decimal(14,4) as vl_tenant_campaigns,
@@ -3080,7 +3080,7 @@ select
 from
 	(
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			vl_tenant_campaigns,
@@ -3093,7 +3093,7 @@ from
 			unit_economics.liquidity_mkt_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -3106,7 +3106,7 @@ from
 			unit_economics.liquidity_ab_agent_hours_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -3119,7 +3119,7 @@ from
 			unit_economics.liquidity_ops_costs
 		union all
 		select
-			sk_property,
+			sk_house_listing,
 			property_id,
 			dt_cash_flow,
 			0 as vl_tenant_campaigns,
@@ -3131,13 +3131,13 @@ from
 		from
 			unit_economics.liquidity_lockbox_costs
 	) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;
 
 create or replace view unit_economics.vw_fact_property_economics as
 with unit_economics as (
     select
-        sk_property,
+        sk_house_listing,
         property_id,
         sk_cash_flow_date,
         dt_cash_flow,
@@ -3186,7 +3186,7 @@ with unit_economics as (
     from
     (
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -3236,7 +3236,7 @@ with unit_economics as (
             unit_economics.liquidity_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -3286,7 +3286,7 @@ with unit_economics as (
             unit_economics.supply_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -3336,7 +3336,7 @@ with unit_economics as (
             unit_economics.mgmt_costs
         union all
         select
-            sk_property,
+            sk_house_listing,
             property_id,
             coalesce(replace(date_trunc('month',dt_cash_flow)::date::varchar, '-', '')::integer, -1) as sk_cash_flow_date,
             date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
@@ -3385,7 +3385,7 @@ with unit_economics as (
         from
             unit_economics.net_revenue_costs
     ) tbl
-    group by sk_property, property_id, sk_cash_flow_date, dt_cash_flow
+    group by sk_house_listing, property_id, sk_cash_flow_date, dt_cash_flow
 ),
 contracts as (
 	select
@@ -3403,9 +3403,9 @@ contracts as (
 ),
 final_version as (
   select
-    ue.sk_property,
+    ue.sk_house_listing,
     ue.property_id,
-    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_property order by ue.sk_cash_flow_date asc), -1) as sk_contract,
+    coalesce(gap_fill(c.sk_contract) over (partition by ue.sk_house_listing order by ue.sk_cash_flow_date asc), -1) as sk_contract,
     ue.sk_cash_flow_date,
     ue.dt_cash_flow,
     ue.vl_owner_campaigns,
@@ -3493,7 +3493,7 @@ fact_contract as (
 ),
 fact_factor as (
     select
-        fc.sk_property,
+        fc.sk_house_listing,
         fc.property_id,
         fc.sk_contract,
         fc.sk_cash_flow_date,
@@ -3511,71 +3511,71 @@ fact_factor as (
         fc.vl_agent_hours,
         coalesce(fc.vl_st_pis_cofins * (1 - sum(cf.loss_factor)
                     filter (where fc.dt_cash_flow >= current_date)
-                        over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
+                        over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_pis_cofins) as vl_st_pis_cofins,
         fc.flg_expected_sales_tax_pis_cofins,
         coalesce(fc.vl_st_iss * (1 - sum(cf.loss_factor)
                     filter (where fc.dt_cash_flow >= current_date)
-                        over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
+                        over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_st_iss) as vl_st_iss,
         fc.flg_expected_sales_tax_iss,
         coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_affiliate_commission = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_affiliate_commission) as vl_affiliate_commission,
         fc.flg_expected_affiliate_commission,
         coalesce(fc.vl_agent_commission * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_agent_commission = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_agent_commission) as vl_agent_commission,
         fc.flg_expected_agent_commission,
         coalesce(fc.vl_delay_fine * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_delay_fine) as vl_delay_fine,
         fc.flg_expected_delay_fine,
         fc.vl_termination_fine,
         coalesce(fc.vl_brokerage_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_brokerage_fee) as vl_brokerage_fee,
         fc.flg_expected_brokerage_fee,
         coalesce(fc.vl_management_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_management_fee) as vl_management_fee,
         fc.flg_expected_management_fee,
         fc.vl_rent_value,
         coalesce(fc.vl_cs_post_sale * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_cs_post_sale) as vl_cs_post_sale,
         fc.flg_expected_cs_post_sale,
         coalesce(fc.vl_collection * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_collection) as vl_collection,
         fc.flg_expected_collection,
         coalesce(fc.vl_bo_onboarding * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_bo_onboarding = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_onboarding) as vl_bo_onboarding,
         fc.flg_expected_bo_onboarding,
         coalesce(fc.vl_bo_ongoing * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_ongoing) as vl_bo_ongoing,
         fc.flg_expected_bo_ongoing,
         coalesce(fc.vl_bo_offboarding * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_bo_offboarding = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_bo_offboarding) as vl_bo_offboarding,
         fc.flg_expected_bo_offboarding,
         coalesce(fc.vl_inspections * (1 - sum(cf.loss_factor)
                 filter (where fc.flg_expected_inspection = 1)
-                    over (partition by fc.sk_property, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
+                    over (partition by fc.sk_house_listing, fc.sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_inspections) as vl_inspections,
         fc.flg_expected_inspection,
         coalesce(fc.vl_default_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_default_fee) as vl_default_fee,
+                    over (partition by fc.sk_house_listing, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_default_fee) as vl_default_fee,
         coalesce(fc.vl_insurance_fee * (1 - sum(cf.loss_factor)
                 filter (where fc.dt_cash_flow >= current_date)
-                    over (partition by fc.sk_property, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
+                    over (partition by fc.sk_house_listing, sk_contract order by months_diff rows between unbounded preceding and current row)), fc.vl_insurance_fee) as vl_insurance_fee,
         fc.flg_expected_insurance_fee
     from fact_contract fc
     left join unit_economics.contract_factor cf
         on cf.months_after_signature = fc.months_diff
 )
 select
-  sk_property,
+  sk_house_listing,
 	property_id,
 	sk_contract,
 	sk_cash_flow_date,

@@ -2,7 +2,7 @@ drop table public.fact_photo_job;
 
 create table public.fact_photo_job(
   id_photo_job int8,
-  sk_property int8,
+  sk_house_listing int8,
   sk_region int8,
   sk_user_cancel int8,
   sk_user_photographer int8,
@@ -11,6 +11,7 @@ create table public.fact_photo_job(
   creation_origin varchar(255),
   flexible_schedule int8,
   same_day_listing int8,
+  flg_job_on_time boolean,
   sk_date_photographer_accepted int8,
   sk_date_job_created int8,
   sk_date_job_issued int8,

@@ -6,11 +6,21 @@ logger = QuintoAndarLogger('CRMTasksClosing')
 
 
 class CRMTasksClosing(CRMTasks):
-    QUEUES = ['FrontEnd', 'CriarMinuta', 'AprovarMinuta', 'FollowUpAssinaturas']
+    QUEUES = [
+        'FrontEnd',
+        'CriarMinuta',
+        'AprovarMinuta',
+        'FollowUpAssinaturas'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_closing_tasks',
         'dim': 'dim_closing_task'
+    }
+
+    QUERY_FILENAMES = {
+        'staging': 'append_fact_closing_info.sql',
+        'prod': 'append_fact_closing_table.sql'
     }
 
     @logger(exclude='mongo_client_uri')
@@ -25,7 +35,8 @@ class CRMTasksClosing(CRMTasks):
     def move_fact_to_staging(self):
         self._move_fact_to_staging(
             table_name=CRMTasksClosing.TABLE_NAMES['fact'],
-            queues=CRMTasksClosing.QUEUES
+            queues=CRMTasksClosing.QUEUES,
+            append_query_filename=CRMTasksClosing.QUERY_FILENAMES['staging']
         )
 
     @logger
@@ -37,7 +48,10 @@ class CRMTasksClosing(CRMTasks):
 
     @logger
     def append_fact_to_dw(self):
-        self._append_fact_to_dw(table_name=CRMTasksClosing.TABLE_NAMES['fact'])
+        self._append_fact_to_dw(
+            table_name=CRMTasksClosing.TABLE_NAMES['fact'],
+            query_filename=CRMTasksClosing.QUERY_FILENAMES['prod']
+        )
 
     @logger
     def append_dim_to_dw(self):

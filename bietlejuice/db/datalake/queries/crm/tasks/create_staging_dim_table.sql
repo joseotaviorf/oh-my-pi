@@ -7,21 +7,21 @@ with max_date as (
   where __WHERE_CLAUSE__
   group by 1
 )
-select
+select distinct
   ct.id as sk_task,
-  cast(ct.solved as boolean) as flg_solved,
+  try(cast(ct.resolved as boolean)) as flg_solved,
   ct.score_factor,
-  ct.dt_start,
-  ct.dt_completed,
-  round(date_diff('minute', cast(regexp_extract(ct.dt_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp),
-                            cast(regexp_extract(ct.dt_completed, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
+  ct.ts_start,
+  ct.ts_completed,
+  round(date_diff('minute', cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp),
+                            cast(regexp_extract(ct.ts_completed, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
       ) / 60., 2) as hours_task_start_to_completed,
-  ct.version,
+  ct.v as version,
   ct.origin,
   ct.type,
-  coalesce(regexp_extract(ct.metadata, 'assunto":"([^"]+)', 1), cw.title) as title,
-  coalesce(regexp_extract(ct.metadata, 'workgroupid":"([^"]+)', 1), cw.id) as id_workgroup,
-  cast(ct.dt as date) as dt_partition
+  array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'assunto":"([^"]+)', 1), cw.title)) over (partition by ct.id)) as titles,
+  array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1), cw.id)) over (partition by ct.id)) as workgroups,
+  cast(ct.dt as date) as ts_partition
 from datalake_clean.crm_tasks ct
 join max_date md
   on ct.id = md.id

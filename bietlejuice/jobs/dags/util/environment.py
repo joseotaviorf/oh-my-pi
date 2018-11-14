@@ -90,7 +90,7 @@ def convert_to_utc_schedule(cron_expression, tz=pytz.timezone('America/Sao_Paulo
     sep = ' '
     exp = cron_expression.split(sep)
     local_now = datetime.now(tz)
-    offset = local_now.dst().seconds / 3600 + local_now.utcoffset().total_seconds() / 60 / 60
+    offset = local_now.utcoffset().total_seconds() / 60 / 60
     exp[1] = _change_digits(exp[1], offset)
     return sep.join(exp)
 
