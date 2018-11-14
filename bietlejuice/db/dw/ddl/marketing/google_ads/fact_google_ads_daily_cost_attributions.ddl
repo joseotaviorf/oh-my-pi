@@ -1,7 +1,9 @@
-CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_keywords (
-	sk_keyword BIGINT,
+CREATE TABLE IF NOT EXISTS marketing.fact_google_ads_daily_cost_attributions (
 	sk_date INTEGER,
+	sk_keyword BIGINT,
 	keyword_id BIGINT,
+	sk_ad BIGINT,
+	ad_id BIGINT,
 	account_id VARCHAR(65535),
 	campaign_id VARCHAR(65535),
 	adgroup_id VARCHAR(65535),
@@ -11,5 +13,5 @@ CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_keywords (
 	total_clicks INTEGER,
 	total_cost DOUBLE PRECISION,
 	impressions INTEGER,
-	dt_created VARCHAR
+	ts_load TIMESTAMP,
 );
