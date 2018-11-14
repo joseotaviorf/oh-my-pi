@@ -8,6 +8,7 @@ from bietlejuice.jobs.new_etl.load_ebdb_into_datalake import EBDBDatalake
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+EBDB_PRIORITY_TABLES = json.loads(env.get_airflow_env_var('EBDB_PRIORITY_TABLES'))
 config_json = json.loads(env.get_airflow_env_var('ebdb_to_datalake'))
 
 
@@ -20,7 +21,7 @@ def create_raw_external_tables():
 
 def move_ebdb_to_datalake(**kwargs):
     ebdb_datalake = EBDBDatalake(bucket, kwargs['execution_date'])
-    table_names = ebdb_datalake.get_table_names()
+    table_names = ebdb_datalake.get_table_names(priority_tables=EBDB_PRIORITY_TABLES)
 
     for table_name in table_names:
         ebdb_datalake.move_to_datalake(table_name[0])
