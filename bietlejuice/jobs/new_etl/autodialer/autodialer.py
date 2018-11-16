@@ -19,6 +19,10 @@ dummy_dt = '2018-01-01'
 
 
 class Autodialer_ETL(object):
+    DOCUMENT_JSON_MAP = {
+        'task_references': ['contactInfo', 'dialStatus']
+    }
+
     def __init__(self, bucket_name, execution_date=None):
         self.s3_bucket = bucket_name
         self.execution_date = execution_date
@@ -80,6 +84,15 @@ class Autodialer_ETL(object):
         athena_client = AthenaClient(self.s3_bucket)
         return athena_client.execute_file_query_and_return_dataframe(filename=filequery)
 
+    @logger
+    def move_data_to_raw(self, document_type):
+        df = self.get_mongo_data(document_type)
+
+        for field in Autodialer_ETL.DOCUMENT_JSON_MAP[document_type]:
+            df[field] = df[field].apply(json.dumps)
+
+        self.dump_data_into_datalake(df, 'raw', document_type)
+
     @logger(exclude='df')
     def move_data_to_clean(self, document_type):
         path, dir_files = self.get_files_list(document_type)
@@ -97,6 +110,8 @@ class Autodialer_ETL(object):
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
                 key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(document_type, table_name, dt)
                 athena_client = AthenaClient(self.s3_bucket)
+                athena_client.add_partition('datalake_raw', table_name,
+                                            "dt={}".format(self.execution_date.strftime('%Y-%m-%d')))
                 athena_client.create_parquet_from_df(key=key, df=df_treated)
                 logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
         else:
@@ -119,7 +134,6 @@ class Autodialer_ETL(object):
                 df[column] = df[column].apply(json.loads)
 
                 df_concat = pd.DataFrame([record for record in df[column]])
-
                 df_treated = pd.concat([df_treated, df_concat], axis=1)
                 df_treated.drop(column, axis=1, inplace=True)
                 del df_concat
