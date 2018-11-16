@@ -1,15 +1,14 @@
-import json
-from os import listdir
-
 import numpy as np
 import pandas as pd
-from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.dags.util import environment as env
-from pandas.io.json import json_normalize
+from os import listdir
+from pandas.io import json
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
+
+from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags.util import environment as env
 
 mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 logger = QuintoAndarLogger('Autodialer_ETL')
@@ -86,8 +85,9 @@ class Autodialer_ETL(object):
         path, dir_files = self.get_files_list(document_type)
 
         if len(dir_files) > 0:
-            for i in dir_files:
-                df = self.get_athena_data(document_type=document_type, filequery=i)
+            for _file in dir_files:
+                table_name = _file.split(".")[0]
+                df = self.get_athena_data(document_type=document_type, filequery=_file)
                 logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
 
                 # treat data
@@ -95,7 +95,7 @@ class Autodialer_ETL(object):
 
                 dt = 'dt={}'.format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
-                key = 'clean/autodialer/{0}/{1}/file.parq'.format(document_type, dt)
+                key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(document_type, table_name, dt)
                 athena_client = AthenaClient(self.s3_bucket)
                 athena_client.create_parquet_from_df(key=key, df=df_treated)
                 logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
@@ -117,8 +117,10 @@ class Autodialer_ETL(object):
         for column in df_treatment:
             try:
                 df[column] = df[column].apply(json.loads)
-                df_concat = json_normalize(df[column])
-                df_treated = pd.concat([df_treated, df_concat], axis=1, sort=False)
+
+                df_concat = pd.DataFrame([record for record in df[column]])
+
+                df_treated = pd.concat([df_treated, df_concat], axis=1)
                 df_treated.drop(column, axis=1, inplace=True)
                 del df_concat
                 logger.info('m=normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
