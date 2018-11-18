@@ -1,7 +1,9 @@
+import json
 import numpy as np
 import pandas as pd
+import re
 from os import listdir
-from pandas.io import json
+from pandas.io.json import json_normalize
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -15,17 +17,18 @@ logger = QuintoAndarLogger('Autodialer_ETL')
 
 # TODO
 # Create Dynamic data process
-dummy_dt = '2018-01-01'
+dummy_dt = '2010-01-01'
 
 
-class Autodialer_ETL(object):
+class AutoialerETL(object):
     DOCUMENT_JSON_MAP = {
-        'task_references': ['contactInfo', 'dialStatus']
+        'task_references': ['contactinfo', 'dialstatus']
     }
 
     def __init__(self, bucket_name, execution_date=None):
         self.s3_bucket = bucket_name
         self.execution_date = execution_date
+        self.athena_client = AthenaClient(self.s3_bucket)
 
         try:
             self.client = MongoClient(mongo_client_uri)
@@ -80,15 +83,13 @@ class Autodialer_ETL(object):
     @logger
     def get_athena_data(self, document_type, filequery):
         filequery = '{}/{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, document_type, filequery)
-
-        athena_client = AthenaClient(self.s3_bucket)
-        return athena_client.execute_file_query_and_return_dataframe(filename=filequery)
+        return self.athena_client.execute_file_query_and_return_dataframe(filename=filequery)
 
     @logger
     def move_data_to_raw(self, document_type):
         df = self.get_mongo_data(document_type)
 
-        for field in Autodialer_ETL.DOCUMENT_JSON_MAP[document_type]:
+        for field in AutoialerETL.DOCUMENT_JSON_MAP[document_type]:
             df[field] = df[field].apply(json.dumps)
 
         self.dump_data_into_datalake(df, 'raw', document_type)
@@ -97,23 +98,28 @@ class Autodialer_ETL(object):
     def move_data_to_clean(self, document_type):
         path, dir_files = self.get_files_list(document_type)
 
+        for _file in dir_files:
+            table_name = _file.split(".")[0]
+
+            self.athena_client.add_partition(
+                database='datalake_raw',
+                table_name=table_name,
+                partition="dt='{}'".format(
+                    dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
+
+            df = self.get_athena_data(document_type=document_type, filequery=_file)
+            logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
+
+            # treat data
+            df_treated = self.normalize_json_columns(df)
+
+            dt = 'dt={}'.format(
+                dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
+            key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(document_type, table_name, dt)
+            self.athena_client.create_parquet_from_df(key=key, df=df_treated)
+            logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
         if len(dir_files) > 0:
-            for _file in dir_files:
-                table_name = _file.split(".")[0]
-                df = self.get_athena_data(document_type=document_type, filequery=_file)
-                logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
-
-                # treat data
-                df_treated = self.normalize_json_columns(df)
-
-                dt = 'dt={}'.format(
-                    dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
-                key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(document_type, table_name, dt)
-                athena_client = AthenaClient(self.s3_bucket)
-                athena_client.add_partition('datalake_raw', table_name,
-                                            "dt={}".format(self.execution_date.strftime('%Y-%m-%d')))
-                athena_client.create_parquet_from_df(key=key, df=df_treated)
-                logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
+            pass
         else:
             logger.error('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
 
@@ -131,24 +137,42 @@ class Autodialer_ETL(object):
 
         for column in df_treatment:
             try:
-                df[column] = df[column].apply(json.loads)
+                df_json = [json.loads(record) for record in df[column]]
 
-                df_concat = pd.DataFrame([record for record in df[column]])
+                df_concat = json_normalize(df_json)
+
                 df_treated = pd.concat([df_treated, df_concat], axis=1)
                 df_treated.drop(column, axis=1, inplace=True)
                 del df_concat
                 logger.info('m=normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
-            except:
-                logger.info('m=normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
+            except Exception as e:
+                logger.info('m=normalize_json_columns, column={}, msg=Not Json, err={}'.format(str(column), e))
+
+        old_columns = df_treated.columns
+        snake_case_columns = self.__to_snake_case_columns(old_columns)
+        df_treated.rename(columns=snake_case_columns, inplace=True)
 
         return df_treated
+
+    def __to_snake_case_columns(self, old_columns):
+        _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
+        _underscorer2 = re.compile('([a-z0-9])([A-Z])')
+
+        new_columns = {}
+
+        for old_column in old_columns:
+            subbed = _underscorer1.sub(r'\1_\2', old_column)
+            new_column = _underscorer2.sub(r'\1_\2', subbed).lower()
+            new_columns.update({old_column: new_column})
+
+        return new_columns
 
 
 # document = task_references.find().sort("_id", DESCENDING).limit(1)
 # json_list = ast.literal_eval(task_references.find_one())
 
 # creating
-autodialer = Autodialer_ETL('5a-datalake')
+# autodialer = AutoialerETL('5a-datalake')
 
 # TODO
 # Dynamize the .apply(json.dumps) to json columns.
@@ -165,4 +189,5 @@ autodialer = Autodialer_ETL('5a-datalake')
 
 # clean
 # df = autodialer.get_athena_data('task_references')
-autodialer.move_data_to_clean('task_references')
+# autodialer.move_data_to_raw('task_references')
+# autodialer.move_data_to_clean('task_references')

@@ -16,4 +16,3 @@ SELECT
     dialstatus
 FROM
     datalake_raw.task_references
-LIMIT 10
