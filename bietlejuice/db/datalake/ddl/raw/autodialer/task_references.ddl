@@ -7,7 +7,7 @@ CREATE EXTERNAL TABLE datalake_raw.task_references (
   `agentid` string,
   `assignee` string,
   `autodialerresponse` string,
-  `contactinfo` string,
+  `contactinfo` varchar(1024),
   `createddate` string,
   `dialstatus` string,
   `score` string,
@@ -20,8 +20,7 @@ PARTITIONED BY (
   `dt` string)
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
+  'separatorChar' = ';'
 )
 LOCATION
   's3://5a-datalake/raw/autodialer/task_references/'
