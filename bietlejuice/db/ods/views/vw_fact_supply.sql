@@ -154,11 +154,11 @@ potential_listings as (
 		rep_leads bl
 		on bl.lead_id = f.lead_id
 	left join
-		imovel i
-		on f.imovel_id = i.id
+		house h
+		on f.imovel_id = h.id
 	left join
 		usuario us_cad
-	    on us_cad.id = i.usuario_que_cadastrou_id
+	    on us_cad.id = h.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
 ),
 taxonomy as (
