@@ -28,7 +28,7 @@ class AutodialerSubDag(BaseSubDag):
             for _file in dir_files:
                 BaseDAG.build_python_operator(
                     dag=autodialer_dag,
-                    task_id='{}_to_clean'.format(_file),
+                    task_id='{}_to_clean'.format(_file.split(".")[0]),
                     python_callable=self.dump_to_clean,
                     provide_context=True
                 )

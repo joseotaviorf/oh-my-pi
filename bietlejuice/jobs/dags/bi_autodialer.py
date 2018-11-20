@@ -1,14 +1,14 @@
-from airflow.models import DAG
 from datetime import datetime
 from os import listdir
-from qa_python_utils import QuintoAndarLogger
 
+from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
 # env vars
 from bietlejuice.jobs.new_etl.autodialer import AUTODIALER_DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.new_etl.autodialer.autodialer import AutoialerETL
+from bietlejuice.jobs.new_etl.autodialer.autodialer import AutodialerETL
+from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -54,7 +54,7 @@ def clean_sub_dag(sub_dag_name):
         for _file in dir_files:
             BaseDAG.build_python_operator(
                 dag=local_dag,
-                task_id='{}_to_clean'.format(_file),
+                task_id='{}_to_clean'.format(_file.split(".")[0]),
                 python_callable=clean_dag,
                 provide_context=True,
                 op_kwargs={
@@ -67,7 +67,7 @@ def clean_sub_dag(sub_dag_name):
 
 @logger
 def task_references_raw_dag(**kwargs):
-    autodialer = AutoialerETL(
+    autodialer = AutodialerETL(
         bucket_name=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -76,7 +76,7 @@ def task_references_raw_dag(**kwargs):
 
 @logger
 def clean_dag(document_type, **kwargs):
-    autodialer = AutoialerETL(
+    autodialer = AutodialerETL(
         bucket_name=s3_bucket,
         execution_date=kwargs['execution_date']
     )
