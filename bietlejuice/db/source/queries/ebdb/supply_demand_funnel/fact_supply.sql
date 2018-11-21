@@ -64,6 +64,9 @@ select
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days,
+  case when (dt_conversion is null and dt_discarded is null) then null else
+        round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, date('2099-12-31')),
+                                                    coalesce(dt_discarded, date('2099-12-31'))))/1440,1) end as lead_to_processing_diff_days,
   exclusivity+0 as exclusivity
 from
 (
