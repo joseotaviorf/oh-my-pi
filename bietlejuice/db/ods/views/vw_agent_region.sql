@@ -3,21 +3,21 @@ create view vw_agent_region as
 select
     date_part('year', coalesce(b."criadoEm", b.data)) as year,
     date_part('month', coalesce(b."criadoEm", b.data)) as month,
-    i.regiao_id,
+    h.regiao_id,
     b.agente_id
 from
 	booking b
 inner join
-	imovel i
-    on i.id = b.imovel_id
+	house h
+    on h.id = b.imovel_id
 where
 	coalesce(b."criadoEm", b.data) < date_trunc('month', current_date)
-    and i.regiao_id is not null
+    and h.regiao_id is not null
     and b.agente_id is not null
 group by
     date_part('year', coalesce(b."criadoEm", b.data)),
     date_part('month', coalesce(b."criadoEm", b.data)),
-	i.regiao_id,
+	h.regiao_id,
     b.agente_id
 
 union all
