@@ -330,10 +330,10 @@ final_version as (
 ,
 first_pubs as (
     select
-        i.id as property_id,
-        COALESCE(h.dt_first_publication, i.first_publication) AS first_publication
+        hou.id as property_id,
+        COALESCE(h.dt_first_publication, hou.first_publication) AS first_publication
     from
-        imovel i
+        house hou
     left join
         (
           select
@@ -343,7 +343,7 @@ first_pubs as (
           where a.published = 1
           group by a.id
         ) h
-        ON h.id = i.id
+        ON h.id = hou.id
 ),
 before_loss_factor as (
     select
