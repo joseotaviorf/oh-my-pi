@@ -1,27 +1,31 @@
+DROP TABLE datalake_clean.marketing_google_ads_ads;
+
 CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads_ads (
-   account_id varchar,
-    adgroup_id varchar,
-    adgroup_name varchar,
-    ad_type varchar,
-    campaign_id varchar,
-    campaign_name varchar,
-    clicks varchar,
-    click_type varchar,
-    cost varchar,
-    keyword_id varchar,
-    date varchar,
-    device varchar,
-    ad_id varchar,
-    impressions varchar,
-    labels varchar,
-    image_creative_name varchar,
-    account_name varchar,
-    description varchar,
-    description1 varchar,
-    description2 varchar)
+   account_id string,
+    adgroup_id string,
+    adgroup_name string,
+    ad_type string,
+    campaign_id string,
+    campaign_name string,
+    clicks string,
+    click_type string,
+    cost string,
+    keyword_id string,
+    date string,
+    device string,
+    ad_id string,
+    impressions string,
+    labels string,
+    image_creative_name string,
+    account_name string,
+    description string,
+    description1 string,
+    description2 string)
 PARTITIONED BY (
-  acc varchar,
-  dt_created varchar)
+  acc string,
+  dt_created string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/marketing/google_ads/marketing_google_ads_ads/'
+
+MSCK REPAIR TABLE datalake_clean.marketing_google_ads_ads;

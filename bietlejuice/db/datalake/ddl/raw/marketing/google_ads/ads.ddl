@@ -1,27 +1,29 @@
+DROP TABLE datalake_raw.marketing_google_ads_ads;
+
 CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads_ads (
-  customerid varchar,
-  adgroupid varchar,
-  adgroupname varchar,
-  adtype varchar,
-  campaignid varchar,
-  campaignname varchar,
-  clicks varchar,
-  clicktype varchar,
-  cost varchar,
-  keywordid varchar,
-  date varchar,
-  device varchar,
-  id varchar,
-  impressions varchar,
-  labels varchar,
-  imagecreativename varchar,
-  accountdescriptivename varchar,
-  description varchar,
-  description1 varchar,
-  description2 varchar)
+  customerid string,
+  adgroupid string,
+  adgroupname string,
+  adtype string,
+  campaignid string,
+  campaignname string,
+  clicks string,
+  clicktype string,
+  cost string,
+  keywordid string,
+  date string,
+  device string,
+  id string,
+  impressions string,
+  labels string,
+  imagecreativename string,
+  accountdescriptivename string,
+  description string,
+  description1 string,
+  description2 string)
 PARTITIONED BY (
-  acc varchar,
-  dt varchar)
+  acc string,
+  dt string)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
@@ -32,3 +34,5 @@ OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
   's3://5a-datalake/raw/marketing/google_ads/ads_performance_report/'
+
+MSCK REPAIR TABLE datalake_raw.marketing_google_ads_ads;
