@@ -11,8 +11,7 @@ PARTITIONED BY (
   `dt` string)
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
+  'separatorChar' = ';'
 )
 LOCATION
   's3://5a-datalake/raw/autodialer/task_reference_inbound_event_histories/'

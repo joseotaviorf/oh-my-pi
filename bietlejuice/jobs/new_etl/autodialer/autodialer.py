@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from bson import json_util
 from pandas.io.json import json_normalize
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
@@ -23,7 +24,8 @@ dummy_dt = '2010-01-01'
 
 class AutodialerETL(object):
     DOCUMENT_JSON_MAP = {
-        'task_references': ['contactInfo', 'dialStatus']
+        'task_references': ['contactInfo', 'dialStatus'],
+        'task_reference_inbound_event_histories': ['inboundEvents']
     }
 
     def __init__(self, bucket_name, execution_date=None):
@@ -68,7 +70,6 @@ class AutodialerETL(object):
             Body=csv_buffer.getvalue(),
             Key=path
         )
-        # BaseETL.csv_to_s3(data=df, bucket=self.s3_bucket, filename=path)
 
     @logger
     def __mongo_connect(self, document_type):
@@ -98,7 +99,7 @@ class AutodialerETL(object):
         df = self.get_mongo_data(document_type)
 
         for field in AutodialerETL.DOCUMENT_JSON_MAP[document_type]:
-            df[field] = df[field].apply(json.dumps)
+            df[field] = df[field].apply(json.dumps, default=json_util.default)
 
         self.dump_data_into_datalake(df, 'raw', document_type)
 
@@ -186,6 +187,7 @@ class AutodialerETL(object):
             new_columns.update({old_column: new_column})
 
         return new_columns
+
 
 # TODO
 # Dynamize the .apply(json.dumps) to json columns.
