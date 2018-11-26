@@ -95,7 +95,7 @@ class AutodialerETL(object):
         return self.athena_client.execute_file_query_and_return_dataframe(filename=filequery)
 
     @logger
-    def move_data_to_raw(self, document_type):
+    def _move_data_to_raw(self, document_type):
         df = self.get_mongo_data(document_type)
 
         for field in AutodialerETL.DOCUMENT_JSON_MAP[document_type]:
@@ -104,7 +104,7 @@ class AutodialerETL(object):
         self.dump_data_into_datalake(df, 'raw', document_type)
 
     @logger(exclude='df')
-    def move_data_to_clean(self, document_type):
+    def _move_data_to_clean(self, document_type, unnest_df=False, treat_df=False):
         path, dir_files = self.get_files_list(document_type)
 
         for _file in dir_files:
@@ -112,20 +112,25 @@ class AutodialerETL(object):
 
             self.athena_client.add_partition(
                 database='datalake_raw',
-                table_name=table_name,
+                table_name=document_type,
                 partition="dt='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
 
             df = self.get_athena_data(document_type=document_type, filequery=_file)
             logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
+            df_head = df.head(3)
 
             # treat data
-            df_treated = self.normalize_json_columns(df)
+            if unnest_df:
+                df = self.__unnest_list_columns(df)
+
+            if treat_df:
+                df = self.__normalize_json_columns(df)
 
             dt = 'dt={}'.format(
                 dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
             key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(document_type, table_name, dt)
-            self.athena_client.create_parquet_from_df(key=key, df=df_treated)
+            self.athena_client.create_parquet_from_df(key=key, df=df)
             logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
 
             self.athena_client.add_partition(
@@ -146,7 +151,7 @@ class AutodialerETL(object):
         return path, listdir(path)
 
     @logger(exclude='df')
-    def normalize_json_columns(self, df):
+    def __normalize_json_columns(self, df):
         df.replace('', np.nan, inplace=True)
 
         df_treatment = df.head(1)
@@ -175,6 +180,20 @@ class AutodialerETL(object):
 
         return df_treated
 
+    @logger(exclude='df')
+    def __unnest_list_columns(self, df):
+        # TODO
+        #  get lists
+
+        df_unnested = df['inbound_events'].apply(lambda x: json.loads(x)) \
+            .apply(pd.Series) \
+            .stack() \
+            .reset_index(level=1, drop=True) \
+            .to_frame('inbound_events') \
+            .join(df.drop(columns='inbound_events'), how='left')
+
+        return df_unnested
+
     def __to_snake_case_columns(self, old_columns):
         _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
@@ -189,13 +208,38 @@ class AutodialerETL(object):
         return new_columns
 
 
-# TODO
-# Dynamize the .apply(json.dumps) to json columns.
+class TaskReference(AutodialerETL):
+    def __init__(self, bucket_name, execution_date=None):
+        super(TaskReference, self).__init__(bucket_name, execution_date)
+        self.document_type = 'task_references'
+
+    @logger
+    def move_data_to_raw(self):
+        self._move_data_to_raw(document_type=self.document_type)
+
+    @logger
+    def move_data_to_clean(self):
+        self._move_data_to_clean(document_type=self.document_type, treat_df=True)
+
+
+class TaskReferenceInbound(AutodialerETL):
+    def __init__(self, bucket_name, execution_date=None):
+        super(TaskReferenceInbound, self).__init__(bucket_name, execution_date)
+        self.document_type = 'task_reference_inbound_event_histories'
+
+    @logger
+    def move_data_to_raw(self):
+        self._move_data_to_raw(document_type=self.document_type)
+
+    @logger
+    def move_data_to_clean(self):
+        self._move_data_to_clean(document_type=self.document_type, unnest_df=True, treat_df=True)
+
 
 # creating
-# autodialer = AutodialerETL('5a-datalake')
+autodialer = TaskReferenceInbound('5a-datalake')
 # raw
-# autodialer.move_data_to_raw('task_references')
+autodialer.move_data_to_clean()
 # clean
 # autodialer.move_data_to_clean('task_references')
 # task_references or task_reference_inbound_event_histories or task_reference_outbound_history
