@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS marketing.fact_facebook_ads_daily_cost_attribution (
+DROP TABLE marketing.fact_facebook_ads_daily_cost_attributions;
+
+CREATE TABLE IF NOT EXISTS marketing.fact_facebook_ads_daily_cost_attributions (
 	sk_ad BIGINT,
     ad_id BIGINT,
     sk_date INTEGER,
@@ -32,4 +34,3 @@ CREATE TABLE IF NOT EXISTS marketing.fact_facebook_ads_daily_cost_attribution (
     total_spend DOUBLE PRECISION,
     ts_load TIMESTAMP
 );
-

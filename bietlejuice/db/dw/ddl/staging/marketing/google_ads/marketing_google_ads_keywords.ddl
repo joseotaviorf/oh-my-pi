@@ -1,3 +1,5 @@
+DROP TABLE staging.marketing_google_ads_keywords;
+
 CREATE TABLE IF NOT EXISTS staging.marketing_google_ads_keywords (
     id bigint identity(0,1),
     account_id varchar(256),

@@ -1,3 +1,5 @@
+DROP TABLE marketing.fact_google_ads_daily_cost_attributions;
+
 CREATE TABLE IF NOT EXISTS marketing.fact_google_ads_daily_cost_attributions (
 	sk_date INTEGER,
 	sk_keyword BIGINT,

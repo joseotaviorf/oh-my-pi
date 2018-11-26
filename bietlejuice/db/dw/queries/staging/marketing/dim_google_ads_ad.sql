@@ -6,12 +6,9 @@ WITH clean_table_common as (
         campaign_name,
         adgroup_name,
         image_creative_name,
-        ad_type,
-        description,
-        description1,
-        description2
+        ad_type
     FROM staging.marketing_google_ads_ads
-    group by 2,3,4,5,6,7,8,9,10
+    group by 2,3,4,5,6,7
 )
 SELECT clean_table_common.*,
 		getdate() as ts_load

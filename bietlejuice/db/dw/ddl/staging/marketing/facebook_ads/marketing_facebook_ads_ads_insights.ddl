@@ -1,3 +1,5 @@
+DROP TABLE staging.marketing_facebook_ads_ads_insights;
+
 CREATE TABLE IF NOT EXISTS staging.marketing_facebook_ads_ads_insights (
     id bigint identity(0,1),
     account_id varchar(65535),

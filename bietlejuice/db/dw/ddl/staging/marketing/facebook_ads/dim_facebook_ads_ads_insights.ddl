@@ -1,3 +1,5 @@
+DROP TABLE staging.dim_facebook_ads_ads_insights;
+
 CREATE TABLE IF NOT EXISTS staging.dim_facebook_ads_ads_insights (
     sk_ad BIGINT,
     ad_id BIGINT,
