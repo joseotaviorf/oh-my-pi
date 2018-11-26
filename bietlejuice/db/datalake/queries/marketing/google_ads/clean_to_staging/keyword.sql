@@ -1,1 +1,0 @@
-SELECT * FROM datalake_clean.marketing_google_ads_keywords

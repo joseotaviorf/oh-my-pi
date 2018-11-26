@@ -1,1 +1,0 @@
-SELECT * FROM datalake_clean.marketing_facebook_ads_ads_insights
