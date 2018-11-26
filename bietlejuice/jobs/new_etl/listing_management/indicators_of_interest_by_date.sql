@@ -1,6 +1,6 @@
 with listing_versions as (
 	select distinct
-	cast(lv.sk_house_listing as bigint) as sk_property,
+	cast(lv.sk_house_listing as bigint) as sk_house_listing,
 	lv.id_house as house_id,
 	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
 	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
