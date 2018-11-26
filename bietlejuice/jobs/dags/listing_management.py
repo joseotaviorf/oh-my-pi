@@ -28,7 +28,7 @@ logger = QuintoAndarLogger('listing_mgmt')
 def load_listing_info():
     """
     returns a dataframe with
-    'sk_property',
+    'sk_house_listing',
     'publication_date'
     """
     dirname = os.path.realpath('.')

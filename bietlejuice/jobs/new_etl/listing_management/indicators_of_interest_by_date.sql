@@ -49,7 +49,7 @@ with listing_versions as (
 ),
 contract_signed as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	min(date(cast(case when c.dataassinado != '' then c.dataassinado end as timestamp))) as contract_signed
 	from datalake_raw.ebdb_contrato c
 	join listing_versions lv on lv.house_id = c.imovel_id 
@@ -82,7 +82,7 @@ first_schedule_viz as (
 ),
 users_listing_viz_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	flv.house_id,
 	date(flv.first_event_date) as event_date,
 	count(flv.amplitude_id) as count_unique_users
@@ -94,7 +94,7 @@ users_listing_viz_per_day as (
 ),
 users_schedule_viz_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	fsv.house_id,
 	date(fsv.first_event_date) as event_date,
 	count(fsv.amplitude_id) as count_unique_users
@@ -117,7 +117,7 @@ first_favorite_set as (
 ),
 users_favorites_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	ffs.house_id,
 	date(ffs.first_event_date) as event_date,
 	count(ffs.amplitude_id) as count_unique_users
@@ -140,7 +140,7 @@ first_discard as (
 ),
 users_discarded_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	fd.house_id,
 	date(fd.first_event_date) as event_date,
 	count(fd.amplitude_id) as count_unique_users
@@ -161,7 +161,7 @@ bookings as (
 ),
 users_bookings_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	b.house_id,
 	date(b.first_booking) as booking_date,
 	count(b.visitante_id) as count_unique_visitors
@@ -183,7 +183,7 @@ visits as (
 ),
 users_visits_per_day as (
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	v.house_id,
 	date(v.first_visit) as visit_date,
 	count(v.visitante_id) as count_unique_visitors
@@ -218,7 +218,7 @@ offers as ( -- for each imovel and each user, what is the date of first offer
 ),
 users_offers_per_day as ( -- for each apartment and each date, how many first offers are there
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	o.house_id,
 	date(o.first_offer) as offer_date,
 	count(o.user_id) as count_unique_offerers
@@ -267,7 +267,7 @@ offers_accepted as ( -- for each imovel and each user, what is the date of first
 ),
 users_offers_accepted_per_day as ( -- for each apartment and each date, how many first offers accepted are there?
 	select
-	lv.sk_property,
+	lv.sk_house_listing,
 	oa.house_id,
 	date(oa.first_offer_accepted) as offer_accepted_date,
 	count(oa.user_id) as count_unique_offerers_accepted
@@ -279,7 +279,7 @@ users_offers_accepted_per_day as ( -- for each apartment and each date, how many
 ),
 docs_first_sent as (
   select
-    cast(f.sk_house as bigint) as sk_property, -- f.sk_house as sk_property, -- cast(lv.sk_house_listing as bigint) as sk_property
+    cast(f.sk_house as bigint) as sk_house_listing, -- f.sk_house as sk_house_listing, -- cast(lv.sk_house_listing as bigint) as sk_house_listing
     date(regexp_extract(
       case 
         when dt_tenant_first_document_sent is null or dt_tenant_first_document_sent = ''
@@ -299,7 +299,7 @@ docs_first_sent as (
 ),
 docs_completed as (
   select
-    cast(f.sk_house as bigint) as sk_property,
+    cast(f.sk_house as bigint) as sk_house_listing,
     date(regexp_extract(dt_credit_analysis_init, '\d{4}-\d{2}-\d{2}')) as completed_date,
     count(f.sk_proposal) as docs_completed
   from datalake_clean.ods_dim_proposal dprop
@@ -311,7 +311,7 @@ docs_completed as (
 ),
 docs_approved as (
   select
-    cast(f.sk_house as bigint) as sk_property,
+    cast(f.sk_house as bigint) as sk_house_listing,
     date(regexp_extract(dt_credit_analysis_end, '\d{4}-\d{2}-\d{2}')) as approved_date,
     count(f.sk_proposal) as docs_approved
   from datalake_clean.ods_dim_proposal dprop
@@ -324,7 +324,7 @@ docs_approved as (
 ),
 lv_date_series as (
 	select 
-	lv.sk_property, 
+	lv.sk_house_listing, 
 	lv.house_id,
 	date(date_add('day', seq.n, lv.publication_date)) as date
 	from listing_versions lv 
@@ -336,7 +336,7 @@ imovel_status_rev as (
 	cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp) as rev_ts,
 	date(cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp)) as rev_date,
 	ia.rev,
-	lv.sk_property,
+	lv.sk_house_listing,
 	ia.status_mod = '1' as status_mod,
 	ia.aluguel_mod = '1' as aluguel_mod,
 	ia.iptu_mod = '1' as iptu_mod,
@@ -355,7 +355,7 @@ imovel_status_rev as (
 imovel_max_rev_day as (
 	select
 	rev_date,
-	sk_property,
+	sk_house_listing,
 	max(rev) as max_rev
 	from imovel_status_rev isr
 	group by 1, 2
@@ -363,7 +363,7 @@ imovel_max_rev_day as (
 imovel_status_per_day as (
 	select 
 	date(isr.rev_ts) as rev_date,
-	isr.sk_property,
+	isr.sk_house_listing,
 	max(isr.status_mod) as status_mod,
 	max(isr.aluguel_mod) as aluguel_mod,
 	max(isr.iptu_mod) as iptu_mod,
@@ -379,14 +379,14 @@ imovel_status_per_day as (
 	-- max(isr_l.condominio) as last_condominio,
 	-- max(isr_l.iptu) as last_iptu
 	from imovel_status_rev isr
-	left join imovel_max_rev_day imrd on imrd.rev_date = isr.rev_date and imrd.sk_property = isr.sk_property
-	left join imovel_status_rev isr_l on isr_l.rev = imrd.max_rev and isr_l.sk_property = imrd.sk_property
+	left join imovel_max_rev_day imrd on imrd.rev_date = isr.rev_date and imrd.sk_house_listing = isr.sk_house_listing
+	left join imovel_status_rev isr_l on isr_l.rev = imrd.max_rev and isr_l.sk_house_listing = imrd.sk_house_listing
 	group by 1, 2
 	order by 2, 1
 ),
 counts_per_day_lv as (
 	select distinct
-	ds.sk_property,
+	ds.sk_house_listing,
 	ds.date,
 	lviz.count_unique_users as cnt_listing_views,
 	fspd.count_unique_users as cnt_favorite_set,
@@ -414,20 +414,20 @@ counts_per_day_lv as (
 	-- ispd.last_condominio,
 	-- ispd.last_iptu,
 	from lv_date_series ds
-	left join users_listing_viz_per_day lviz on lviz.sk_property = ds.sk_property and lviz.event_date = ds.date
-	left join users_favorites_per_day fspd on fspd.sk_property = ds.sk_property and fspd.event_date = ds.date
-	left join users_discarded_per_day dpd on dpd.sk_property = ds.sk_property and dpd.event_date = ds.date
-	left join users_schedule_viz_per_day sviz on sviz.sk_property = ds.sk_property and sviz.event_date = ds.date
-	left join users_bookings_per_day bks on bks.sk_property = ds.sk_property and bks.booking_date = ds.date
-	left join users_visits_per_day uvd on uvd.sk_property = ds.sk_property and uvd.visit_date = ds.date
-	left join users_offers_per_day uod on uod.sk_property = ds.sk_property and uod.offer_date = ds.date
-	left join users_offers_accepted_per_day uoad on uoad.sk_property = ds.sk_property and uoad.offer_accepted_date = ds.date
-	left join imovel_status_per_day ispd on ispd.sk_property = ds.sk_property and ispd.rev_date = ds.date
-	-- left join pets_allowed_per_day papd on papd.sk_property = ds.sk_property and papd.rev_date = ds.date
-    left join docs_first_sent docs_s on docs_s.sk_property = ds.sk_property and docs_s.sent_date = ds.date
-    left join docs_completed docs_c on docs_c.sk_property = ds.sk_property and docs_c.completed_date = ds.date
-    left join docs_approved docs_a on docs_a.sk_property = ds.sk_property and docs_a.approved_date = ds.date
+	left join users_listing_viz_per_day lviz on lviz.sk_house_listing = ds.sk_house_listing and lviz.event_date = ds.date
+	left join users_favorites_per_day fspd on fspd.sk_house_listing = ds.sk_house_listing and fspd.event_date = ds.date
+	left join users_discarded_per_day dpd on dpd.sk_house_listing = ds.sk_house_listing and dpd.event_date = ds.date
+	left join users_schedule_viz_per_day sviz on sviz.sk_house_listing = ds.sk_house_listing and sviz.event_date = ds.date
+	left join users_bookings_per_day bks on bks.sk_house_listing = ds.sk_house_listing and bks.booking_date = ds.date
+	left join users_visits_per_day uvd on uvd.sk_house_listing = ds.sk_house_listing and uvd.visit_date = ds.date
+	left join users_offers_per_day uod on uod.sk_house_listing = ds.sk_house_listing and uod.offer_date = ds.date
+	left join users_offers_accepted_per_day uoad on uoad.sk_house_listing = ds.sk_house_listing and uoad.offer_accepted_date = ds.date
+	left join imovel_status_per_day ispd on ispd.sk_house_listing = ds.sk_house_listing and ispd.rev_date = ds.date
+	-- left join pets_allowed_per_day papd on papd.sk_house_listing = ds.sk_house_listing and papd.rev_date = ds.date
+    left join docs_first_sent docs_s on docs_s.sk_house_listing = ds.sk_house_listing and docs_s.sent_date = ds.date
+    left join docs_completed docs_c on docs_c.sk_house_listing = ds.sk_house_listing and docs_c.completed_date = ds.date
+    left join docs_approved docs_a on docs_a.sk_house_listing = ds.sk_house_listing and docs_a.approved_date = ds.date
 )
 select * from counts_per_day_lv
 -- where counts_per_day_lv.last_status_verion = 'publicado'
--- order by sk_property, date;
+-- order by sk_house_listing, date;
