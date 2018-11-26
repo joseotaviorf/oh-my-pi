@@ -37,7 +37,7 @@ class Marketing(object):
         self.partition_date = self.execution_date.strftime('%Y-%m-%d')
         self.athena_client = AthenaClient(self.s3_bucket)
         self.integration = integration
-        self.query_path = 'marketing/{integration}/raw_to_clean'.format(integration=self.integration)
+        self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(integration=self.integration)
         self.database = 'datalake_raw'
 
     @logger(exclude=['r_cols', 'c_cols'])
@@ -55,7 +55,7 @@ class Marketing(object):
         query = BaseETL.get_query_from_file_name(
             '{query_base_dir}/{query_path}/{file_name}'.format(
                 query_base_dir=DATALAKE_QUERIES_DIR,
-                query_path=self.query_path,
+                query_path=self.raw_query_path,
                 file_name=sql_file_name))
 
         self.athena_client.add_partition(
@@ -178,17 +178,15 @@ class Marketing(object):
     @logger(exclude='df')
     def __upsert_into_dw(self, upsert_query, table_name, schema):
         logger.info(
-            'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW'.format(schema, table_name))
-        logger.info(
-            'm=__upsert_into_dw, schema={}, table_name={}, query={}'.format(schema, table_name, upsert_query))
+            'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(schema,
+                                                                                                      table_name,
+                                                                                                      upsert_query))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
             query=upsert_query,
             encoding='utf-8',
         )
-
-        logger.info("m__upsert_into_dw, ")
 
         logger.info(
             '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(schema, table_name))

@@ -25,8 +25,6 @@ class GoogleAds(Marketing):
 
     def __init__(self, s3_bucket, execution_date, account=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
-        self.dim_tables = ["dim_google_ads_keyword", "dim_google_ads_ads"]
-        self.fact_tables = ["fact_google_ads_daily_cost_attributions"]
         self.datalake_tables = ["marketing_google_ads_keywords", "marketing_google_ads_ads"]
 
     @logger

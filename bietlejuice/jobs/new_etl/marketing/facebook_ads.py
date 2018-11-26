@@ -26,10 +26,7 @@ class FacebookAds(Marketing):
 
     def __init__(self, s3_bucket, execution_date, account=None):
         super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
-        self.dim_tables = ["dim_facebook_ads_ads_insights"]
-        self.fact_tables = ["fact_facebook_ads_daily_cost_attribution"]
         self.datalake_tables = ["marketing_facebook_ads_ads_insights"]
-        self.dw_tables = self.dim_tables + self.fact_tables
 
     @logger
     def move_ads_to_clean(self):
