@@ -185,6 +185,21 @@ class AutodialerETL(object):
         # TODO
         #  get lists
 
+        for column in df:
+            try:
+                # Remove escaped double double-quotes
+                df[column].replace('\"\"(?!,|}|])', '', inplace=True, regex=True)
+                logger.info('m=__unnest_list_columns, column={}, msg=Column treated'.format(str(column)))
+            except Exception:
+                logger.info('m=__unnest_list_columns, column={}, msg=Column not treated'.format(str(column)))
+
+        for item in df['inbound_events']:
+            try:
+                t = json.loads(item)
+                print t
+            except:
+                print 'a'
+
         df_unnested = df['inbound_events'].apply(lambda x: json.loads(x)) \
             .apply(pd.Series) \
             .stack() \
