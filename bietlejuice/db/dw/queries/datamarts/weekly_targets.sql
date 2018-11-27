@@ -3,7 +3,7 @@ SELECT
     city,
     channel,
     medium,
-    cast(opportunity_target as double) as opportunity_target,
-    cast(listing_target as double) as listing_target
+    cast(opportunity_target as numeric(10,2)) as opportunity_target,
+    cast(listing_target as numeric(10,2)) as listing_target
 FROM
     datalake_raw.weekly_targets
