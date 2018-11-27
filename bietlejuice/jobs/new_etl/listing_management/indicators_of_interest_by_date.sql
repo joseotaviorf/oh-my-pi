@@ -47,17 +47,6 @@ with listing_versions as (
 	-- left join price_predictions pp on pp.imovel_id = lv.id
 	where cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) >= date('2017-09-01')  
 ),
-contract_signed as (
-	select
-	lv.sk_house_listing,
-	min(date(cast(case when c.dataassinado != '' then c.dataassinado end as timestamp))) as contract_signed
-	from datalake_raw.ebdb_contrato c
-	join listing_versions lv on lv.house_id = c.imovel_id 
-		and lv.publication_date <= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
-		and coalesce(lv.max_version_time, now()) >= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
-	 	and c.status in ('Finalizado','Ativo')
-	group by 1
-),
 first_listing_viz as (
 	select 
 	trim(evt.e_house_id) as house_id,
