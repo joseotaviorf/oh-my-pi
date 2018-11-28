@@ -2,7 +2,10 @@ with listing_versions as (
 	select distinct
 	cast(lv.sk_house_listing as bigint) as sk_house_listing,
 	cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as publication_date,
-	cast(regexp_extract(trim(lv.de_publication_date), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date
+	cast(regexp_extract(trim(lv.ts_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
+	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
+	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
+	lv.status
 	-- valor total ?
 	-- aluguel ?
 	-- condo?
@@ -15,12 +18,17 @@ contract_signed as (
 	lv.sk_house_listing,
 	min(date(cast(case when c.dataassinado != '' then c.dataassinado end as timestamp))) as contract_signed
 	from datalake_raw.ebdb_contrato c
-	join listing_versions lv on lv.house_id = c.imovel_id 
+	join listing_versions lv on lv.sk_house_listing = cast(c.imovel_id as bigint)
 		and lv.publication_date <= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
 		and coalesce(lv.max_version_time, now()) >= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
 	 	and c.status in ('Finalizado','Ativo')
 	group by 1
 )
-select lv.*, cs.contract_signed
+select 
+lv.sk_house_listing,
+lv.publication_date,
+lv.de_publication_date,
+cs.contract_signed,
+lv.status
 from listing_versions lv
-left join contract_signed cs on cs.sk_property = lv.sk_property;
+left join contract_signed cs on cs.sk_house_listing = lv.sk_house_listing;
