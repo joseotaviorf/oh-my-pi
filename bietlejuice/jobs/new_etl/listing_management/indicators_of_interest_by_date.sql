@@ -363,8 +363,8 @@ imovel_status_per_day as (
 	-- avg(isr.valor_total) as avg_valortotal,
 	-- avg(isr.condominio) as avg_condominio,
 	-- avg(isr.iptu) as avg_iptu,
-	-- max(isr_l.aluguel) as last_aluguel,
-	-- max(isr_l.valor_total) as last_valortotal,
+	max(isr_l.aluguel) as last_aluguel,
+	max(isr_l.valor_total) as last_valortotal,
 	-- max(isr_l.condominio) as last_condominio,
 	-- max(isr_l.iptu) as last_iptu
 	from imovel_status_rev isr
@@ -392,14 +392,13 @@ counts_per_day_lv as (
 	ispd.aluguel_mod,
 	ispd.iptu_mod,
 	ispd.condominio_mod,
-	-- ispd.status,
-	ispd.last_status_day
+	ispd.last_status_day,
 	-- ispd.avg_aluguel,
 	-- ispd.avg_valortotal,
 	-- ispd.avg_condominio,
 	-- ispd.avg_iptu,
-	-- ispd.last_aluguel,
-	-- ispd.last_valortotal,
+	ispd.last_aluguel,
+	ispd.last_valortotal
 	-- ispd.last_condominio,
 	-- ispd.last_iptu,
 	from lv_date_series ds
