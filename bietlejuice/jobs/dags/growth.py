@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
 from qa_python_utils import QuintoAndarLogger
@@ -216,6 +217,7 @@ def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=No
                             materialize_func, placeholders, truncate_func),
         task_id=sub_dag_name,
         dag=main_dag,
+        executor=LocalExecutor()
     )
 
 

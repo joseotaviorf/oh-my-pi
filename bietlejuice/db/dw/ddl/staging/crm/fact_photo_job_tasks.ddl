@@ -1,5 +1,5 @@
-drop table if exists staging.fact_payment_tasks;
-create table if not exists staging.fact_payment_tasks (
+drop table if exists staging.fact_photo_job_tasks;
+create table if not exists staging.fact_photo_job_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,10 +17,10 @@ create table if not exists staging.fact_payment_tasks (
   ts_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
-  sk_contract bigint,
   sk_house_listing bigint,
   sk_house_owner bigint,
-  sk_tenant bigint,
+  sk_photo_job bigint,
+  sk_user_sales_rep bigint,
   dt_partition date
 )
 ;

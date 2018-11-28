@@ -9,12 +9,11 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.invoice import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.invoice import InvoiceFactory
+from bietlejuice.jobs.new_etl.seu_barriga import SeuBarrigaInvoiceFactory, SeuBarrigaTableEnum
 
 # env vars
-env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
-bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-seubarriga_invoice_dict = json.loads(env.get_airflow_env_var('seubarriga'))['invoice']
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+seu_barriga_invoice_dict = json.loads(env.get_airflow_env_var('seubarriga'))['invoice']
 
 MAIN_DAG_NAME = 'bi-seu_barriga-invoice'
 MAIN_START_DATE = datetime(2015, 2, 1, 0, 0, 0)
@@ -24,33 +23,33 @@ logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 # functions
-def extract_table(**kwargs):
-    _invoice = InvoiceFactory.factory(
-        _class=kwargs['_class'],
-        bucket=bucket,
-        api_dict=seubarriga_invoice_dict,
+def extract_table(_class, endpoint_suffix, **kwargs):
+    _invoice = SeuBarrigaInvoiceFactory.factory(
+        _class=_class,
+        s3_bucket=s3_bucket,
+        api_dict=seu_barriga_invoice_dict,
         execution_date=kwargs['execution_date']
     )
 
-    _result = _invoice.request_data(endpoint_suffix=kwargs['endpoint_suffix'])
-    if kwargs['_class'] == 'report':
+    _result = _invoice.request_data(endpoint_suffix=endpoint_suffix)
+    if _class == SeuBarrigaTableEnum.REPORT:
         job_url, status_url = _result[0], _result[1]
         _invoice.wait_for_results(status_url=status_url)
 
         content = _invoice.request_job_data(job_url=job_url)
         data_frame = _invoice.load_content_to_memory_as_csv(content=content)
-        raw_table_name = 'seubarriga_invoice'
-    elif kwargs['_class'] == 'fine':
+        raw_table_name = 'seu_barriga_invoice_report'
+    elif _class == SeuBarrigaTableEnum.FINE:
         data_frame = pd.read_json(_result)
-        raw_table_name = 'seubarriga_invoice_fine'
+        raw_table_name = 'seu_barriga_invoice_fine'
     else:
-        logger.error("m=extract_table, kwargs['_class']={}".format(kwargs['_class']))
+        logger.error("m=extract_table, _class={}".format(_class))
         raise Exception
 
     _object = _invoice.convert_df_to_json(data_frame=data_frame)
     _invoice.save_into_s3_raw(
         _object=_object,
-        file_path_prefix='raw/seubarriga/invoice/{}'.format(_invoice._type),
+        file_path_prefix='raw/seu_barriga/invoice/{}'.format(_invoice._type),
         raw_table_name=raw_table_name
     )
     _object.flush()
@@ -73,26 +72,15 @@ def __get_dataframe_from_invoice_result(_invoice, result):
     return _invoice.load_content_to_memory_as_csv(content=content)
 
 
-def transform_data(**kwargs):
-    _invoice = InvoiceFactory.factory(
-        _class=kwargs['_class'],
-        bucket=bucket,
-        api_dict=seubarriga_invoice_dict,
+def transform_data(_class, **kwargs):
+    _invoice = SeuBarrigaInvoiceFactory.factory(
+        _class=_class,
+        s3_bucket=s3_bucket,
+        api_dict=seu_barriga_invoice_dict,
         execution_date=kwargs['execution_date']
     )
 
     _invoice.transform_data()
-
-
-def load_data(**kwargs):
-    _invoice = InvoiceFactory.factory(
-        _class=kwargs['_class'],
-        bucket=bucket,
-        api_dict=seubarriga_invoice_dict,
-        execution_date=kwargs['execution_date']
-    )
-
-    _invoice.load_into_ods()
 
 
 # dags
@@ -111,7 +99,7 @@ main_dag = DAG(
 
 def table_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
-        bucket=bucket,
+        bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
@@ -124,7 +112,7 @@ def table_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': sub_dag_name,
+            '_class': kwargs['_class'],
             'endpoint_suffix': kwargs['endpoint_suffix']
         }
     )
@@ -134,18 +122,10 @@ def table_sub_dag(sub_dag_name, **kwargs):
         python_callable=transform_data,
         dag=local_dag,
         provide_context=True,
-        op_kwargs={'_class': sub_dag_name}
+        op_kwargs={'_class': kwargs['_class']}
     )
 
-    _load = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data',
-        python_callable=load_data,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={'_class': sub_dag_name}
-    )
-
-    _extract >> _transform >> _load
+    _extract >> _transform
 
     return local_dag
 
@@ -165,14 +145,16 @@ report_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='report',
     sub_dag_func=table_sub_dag,
-    endpoint_suffix='reports/invoice'
+    endpoint_suffix='reports/invoice',
+    _class=SeuBarrigaTableEnum.REPORT
 )
 
 fine_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='fine',
     sub_dag_func=table_sub_dag,
-    endpoint_suffix='invoices/fines'
+    endpoint_suffix='invoices/fines',
+    _class=SeuBarrigaTableEnum.FINE
 )
 
 # unit tests
@@ -180,14 +162,14 @@ report_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=unit_tests_sub_dag,
     sub_dag_name='report_unit_tests',
-    _class='report'
+    _class=SeuBarrigaTableEnum.REPORT
 )
 
 fine_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=unit_tests_sub_dag,
     sub_dag_name='fine_unit_tests',
-    _class='fine'
+    _class=SeuBarrigaTableEnum.FINE
 )
 
 # flow

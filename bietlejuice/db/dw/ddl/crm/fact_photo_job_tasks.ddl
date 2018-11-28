@@ -1,5 +1,5 @@
-drop table if exists crm.fact_credit_tasks;
-create table if not exists crm.fact_credit_tasks (
+drop table if exists crm.fact_photo_job_tasks;
+create table if not exists crm.fact_photo_job_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,10 +17,10 @@ create table if not exists crm.fact_credit_tasks (
   ts_task_user_end timestamp,
   task_user_type varchar,
   task_user_resolve_hours numeric(14,2),
-  sk_proposal bigint,
   sk_house_listing bigint,
   sk_house_owner bigint,
-  sk_proponent bigint,
+  sk_photo_job bigint,
+  sk_user_sales_rep bigint,
   ts_load timestamp
 )
 ;

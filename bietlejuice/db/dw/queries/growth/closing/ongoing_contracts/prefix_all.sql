@@ -38,7 +38,7 @@ with all_dates as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)
@@ -73,7 +73,7 @@ all_dates_last_month as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)
@@ -108,7 +108,7 @@ all_dates_last_year as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)

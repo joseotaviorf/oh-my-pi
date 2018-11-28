@@ -1,12 +1,12 @@
-drop table if exists datalake_clean.invoice;
-create external table datalake_clean.invoice (
-  contract_id bigint,
+drop table if exists datalake_clean.seu_barriga_invoice_report;
+create external table datalake_clean.seu_barriga_invoice_report (
+  contract_id string,
   version string,
-  blocked boolean,
+  blocked string,
   `_from` string,
   `_to` string,
   description string,
-  amount double,
+  amount string,
   item string,
   ref_item_ym string,
   due_date string,
@@ -16,14 +16,12 @@ create external table datalake_clean.invoice (
   landlord_due_date string,
   landlord_paid_date string,
   landlord_status string,
-  delayed_days double,
+  delayed_days string,
   purpose string
 )
 partitioned by (
   ym string
 )
 stored as parquet
-location 's3://5a-datalake/clean/seubarriga/invoice/report/'
+location 's3://5a-datalake/clean/seu_barriga/invoice/report/'
 ;
-
-msck repair table datalake_clean.invoice;
