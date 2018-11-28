@@ -10,6 +10,7 @@ import sagemaker
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.kafka.dispatcher import KafkaDispatcher
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
@@ -178,6 +179,10 @@ def restart_service(**kwargs):
     r = api.patch_namespaced_deployment(name, namespace, body)
 
     logger.info('API response: {}'.format(r))
+
+
+def notify_sucess():
+    dispatcher = KafkaDispatcher()
 
 
 dag = DAG(
