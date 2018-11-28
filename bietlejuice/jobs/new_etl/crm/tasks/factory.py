@@ -31,5 +31,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.ONBOARDING_TENANT: CRMTasksOnboardingTenant,
             CRMTasksTableEnum.PAYMENT: CRMTasksPayment,
             CRMTasksTableEnum.INSPECTION: CRMTasksInspection,
-            CRMTasksTableEnum.LEAD: CRMTasksLead
+            CRMTasksTableEnum.LEAD: CRMTasksLead,
+            CRMTasksTableEnum.CRMTasksPhotoJob: CRMTasksLead
         }.get(_class)
