@@ -407,6 +407,13 @@ tasks_credit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     _class=CRMTasksTableEnum.CREDIT
 )
 
+tasks_photo_job_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_photo_job',
+    sub_dag_func=class_sub_dag,
+    _class=CRMTasksTableEnum.PHOTO_JOB
+)
+
 tasks_visit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_visit',
@@ -482,6 +489,7 @@ clean_tasks_resolution_sub_dag_task.set_downstream(
 
 tasks_tasks = [
     tasks_credit_sub_dag_task,
+    tasks_photo_job_sub_dag_task,
     tasks_visit_sub_dag_task,
     tasks_closing_sub_dag_task,
     tasks_onboarding_tenant_sub_dag_task,
