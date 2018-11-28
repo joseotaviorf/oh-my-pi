@@ -24,7 +24,7 @@ pipeline:
       - cd /var/www/airflow/
       - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+      - mkdir -p /var/www/airflow/dags/bietlejuice && sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
     when:
