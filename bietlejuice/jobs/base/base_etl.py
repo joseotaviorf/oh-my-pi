@@ -13,10 +13,10 @@ from logging import info as log
 
 import boto3
 import petl
-from petl.io.db import create_table
-
 from db_factory import DBFactory
 from enum_db import EnumDB
+from petl.io.db import create_table
+from unidecode import unidecode
 
 
 class BaseETL(object):
@@ -266,7 +266,7 @@ class BaseETL(object):
     def from_db_query(cls, db_enum, query, encoding='LATIN1', server_cursor_postgres=None, conn=None, generator=False):
         if not conn:
             conn = cls.get_connection(db_enum, encoding)
-        print('Starting {} on {}. {}'.format(query, db_enum, datetime.datetime.now()))
+        print('Starting {} on {}. {}'.format(unidecode(query.decode('utf-8')), db_enum, datetime.datetime.now()))
 
         l = None
         if server_cursor_postgres:
