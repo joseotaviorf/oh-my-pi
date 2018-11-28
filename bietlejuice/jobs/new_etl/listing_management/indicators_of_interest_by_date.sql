@@ -358,13 +358,13 @@ imovel_status_per_day as (
 	max(isr.iptu_mod) as iptu_mod,
 	max(isr.condominio_mod) as condominio_mod,
 	-- case when (max(isr.status_mod) or max(isr.status) != 'publicado') then 'other' else 'publicado' end as status,
-	max(isr_l.status) as last_status_day
+	max(isr_l.status) as last_status_day,
 	-- avg(isr.aluguel) as avg_aluguel,
 	-- avg(isr.valor_total) as avg_valortotal,
 	-- avg(isr.condominio) as avg_condominio,
 	-- avg(isr.iptu) as avg_iptu,
 	max(isr_l.aluguel) as last_aluguel,
-	max(isr_l.valor_total) as last_valortotal,
+	max(isr_l.valor_total) as last_valortotal
 	-- max(isr_l.condominio) as last_condominio,
 	-- max(isr_l.iptu) as last_iptu
 	from imovel_status_rev isr
