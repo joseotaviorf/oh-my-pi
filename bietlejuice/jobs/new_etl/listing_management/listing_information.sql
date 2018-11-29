@@ -1,6 +1,7 @@
 with listing_versions as (
 	select distinct
 	cast(lv.sk_house_listing as bigint) as sk_house_listing,
+	case is_exclusive when 'True' then True else False end as is_exclusive,
 	cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as publication_date,
 	cast(regexp_extract(trim(lv.ts_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
 	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
