@@ -20,7 +20,7 @@ contract_house_listing as (
     cast(sk_client as bigint) as sk_tenant
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
-  group by 1, 2, 3
+  group by 1, 2, 3, 4
 )
 select distinct
   c.sk_task,
