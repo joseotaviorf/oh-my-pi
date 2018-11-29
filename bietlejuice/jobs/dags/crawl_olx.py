@@ -43,7 +43,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 BaseDAG.build_quintoandar_python_operator(
