@@ -19,7 +19,8 @@ create table if not exists crm.fact_payment_tasks (
   task_user_action_resolve_hours numeric(14,2),
   sk_contract bigint,
   sk_house_listing bigint,
-  sk_owner bigint,
+  sk_house_owner bigint,
+  sk_tenant bigint,
   ts_load timestamp
 )
 ;
