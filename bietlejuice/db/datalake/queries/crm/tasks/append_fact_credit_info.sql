@@ -3,7 +3,7 @@
     t.*,
     cast(coalesce(ep.id, '-1') as bigint) as sk_proposal,
     cast(coalesce(epi.usuario_id, '-1') as bigint) as sk_house_owner,
-    cast(coalesce(ep.proponente_id, '-1') as bigint) as sk_tenant
+    cast(coalesce(ep.proponente_id, '-1') as bigint) as sk_proponent
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
@@ -16,10 +16,11 @@
 proposal_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
-    cast(sk_proposal as bigint) as sk_proposal
+    cast(sk_proposal as bigint) as sk_proposal,
+    cast(sk_client as bigint) as sk_proponent
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_proposal != '-1'
-  group by 1, 2
+  group by 1, 2, 3
 )
 select distinct
   p.sk_task,
@@ -42,7 +43,7 @@ select distinct
   p.sk_proposal,
   coalesce(phl.sk_house_listing, -1) as sk_house_listing,
   p.sk_house_owner,
-  p.sk_tenant,
+  coalesce(phl.sk_proponent, p.sk_proponent) as sk_proponent,
   p.dt_partition
 from proposals p
 left join proposal_house_listing phl
