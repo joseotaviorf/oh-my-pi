@@ -219,7 +219,7 @@ from
       end as acquisition_method,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
-        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when (da.doormanAffiliateData_id is not null) and (dad.joinedProgramAt <= l.criadoEm) then 'Doorman'
         when l.tipo = 'Porteiro' then 'Doorman'
         when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
         when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
@@ -240,7 +240,7 @@ from
       end as acquisition_channel,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
-        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when (da.doormanAffiliateData_id is not null) and (dad.joinedProgramAt <= l.criadoEm) then 'Doorman'
         when l.tipo = 'Porteiro' then 'Doorman'
         when l.origem = 'Reprocessado' then 'Reprocessed'
         when l.tipo = 'Afiliado' then 'Affiliate'
@@ -322,6 +322,9 @@ from
     left join
       DadosAfiliado da
       on da.id = l.afiliadoQueIndicou_id
+    left join
+      DoormanAffiliateData dad
+      on da.doormanAffiliateData_id = dad.id
     left join
       Usuario uda
       on uda.dadosAfiliado_id = da.id
