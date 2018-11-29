@@ -3,7 +3,7 @@
     t.*,
     cast(coalesce(ep.id, ec.proposta_id, '-1') as bigint) as sk_proposal,
     cast(coalesce(ec.id, epc.id, '-1') as bigint) as sk_contract,
-    cast(coalesce(epi.usuario_id, eci.usuario_id, '-1') as bigint) as sk_owner,
+    cast(coalesce(epi.usuario_id, eci.usuario_id, '-1') as bigint) as sk_house_owner,
     cast(coalesce(ep.proponente_id, ec.usuario_id, '-1') as bigint) as sk_tenant
   from tasks t
   join datalake_clean.crm_tasks ct
@@ -52,7 +52,7 @@ select distinct
   pc.sk_proposal,
   pc.sk_contract,
   coalesce(proposal.sk_house_listing, contract.sk_house_listing, -1) as sk_house_listing,
-  pc.sk_owner,
+  pc.sk_house_owner,
   pc.sk_tenant,
   pc.dt_partition
 from proposals_contracts pc
