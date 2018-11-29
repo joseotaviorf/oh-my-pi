@@ -22,7 +22,7 @@ pipeline:
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I --force-reinstall -r ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - mkdir -p /var/www/airflow/dags/bietlejuice && sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
