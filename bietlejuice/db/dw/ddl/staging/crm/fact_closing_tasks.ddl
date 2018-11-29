@@ -20,7 +20,7 @@ create table if not exists staging.fact_closing_tasks (
   sk_proposal bigint,
   sk_contract bigint,
   sk_house_listing bigint,
-  sk_owner bigint,
+  sk_house_owner bigint,
   sk_tenant bigint,
   dt_partition date
 )
