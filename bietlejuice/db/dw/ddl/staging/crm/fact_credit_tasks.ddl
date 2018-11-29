@@ -17,6 +17,10 @@ create table if not exists staging.fact_credit_tasks (
   ts_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
+  sk_proposal bigint,
+  sk_house_listing bigint,
+  sk_house_owner bigint,
+  sk_tenant bigint,
   dt_partition date
 )
 ;
