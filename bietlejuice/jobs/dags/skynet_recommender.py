@@ -40,7 +40,8 @@ athena = AthenaClient(DATALAKE_BUCKET)
 env.set_airflow_var_to_local_env(
     'AWS_SECRET_ACCESS_KEY',
     'AWS_ACCESS_KEY_ID',
-    'AWS_DEFAULT_REGION'
+    'AWS_DEFAULT_REGION',
+    'KAFKA_BOOTSTRAP_SERVERS',
 )
 
 
@@ -187,8 +188,13 @@ def restart_service(**kwargs):
     logger.info('API response: {}'.format(r))
 
 
-def notify_sucess():
+def notify_sucess(**kwargs):
     dispatcher = KafkaDispatcher()
+    dispatcher.dispatch_message(
+        topic='SkynetRecommender',
+        event_name='EmbeddingsProcessingFinished',
+        payload={},
+        source='airflow')
 
 
 dag = DAG(
@@ -236,4 +242,11 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
+notify_success_op = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='notify success',
+    python_callable=notify_sucess,
+    op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
+)
+
+build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op >> notify_success_op
