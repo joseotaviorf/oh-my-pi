@@ -5,7 +5,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
-from invoice import SeuBarrigaInvoice
+from bietlejuice.jobs.new_etl.seu_barriga.invoice import SeuBarrigaInvoice
 
 logger = QuintoAndarLogger('SeuBarrigaFine')
 
