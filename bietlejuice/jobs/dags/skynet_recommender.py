@@ -37,6 +37,12 @@ COLD_PATH = 'listing2vec/cold/dt={}'
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 athena = AthenaClient(DATALAKE_BUCKET)
 
+env.set_airflow_var_to_local_env(
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION'
+)
+
 
 def build_raw_data(**kwargs):
     week_span = kwargs.get('week_span', 12)
