@@ -1,5 +1,7 @@
 import json
 import re
+from datetime import datetime
+from gzip import GzipFile
 from io import BytesIO
 from os import listdir
 
@@ -7,12 +9,13 @@ import boto3
 import numpy as np
 import pandas as pd
 from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bson import json_util
 from pandas.io.json import json_normalize
 from pymongo import MongoClient, ASCENDING
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
+from unidecode import unidecode
 
 mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 logger = QuintoAndarLogger('Autodialer_ETL')
@@ -23,10 +26,16 @@ dummy_dt = '2010-01-01'
 
 
 class AutodialerETL(object):
-    DOCUMENT_JSON_MAP = {
+    RAW_JSON_MAP = {
         'task_references': ['contactInfo', 'dialStatus'],
         'task_reference_inbound_event_histories': ['inboundEvents'],
         'task_reference_outbound_event_histories': ['taskReferenceOutboundEvents']
+    }
+
+    CLEAN_JSON_MAP = {
+        'task_references': ['contactInfo', 'dialStatus'],
+        'task_reference_inbound_event_histories': ['inbound_events'],
+        'task_reference_outbound_event_histories': ['outbound_events']
     }
 
     def __init__(self, bucket_name, execution_date=None):
@@ -50,6 +59,10 @@ class AutodialerETL(object):
     @logger(exclude='df')
     def dump_data_into_datalake(self, df, datalake_folder, document_type):
         dt = 'dt={}'.format(dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
+
+        # file = BaseETL.convert_dataframe_to_json_gzip(data_frame=df.head(100), encode='utf-8')
+        # BaseETL.obj_to_s3(file, self.s3_bucket, '{0}/autodialer_test/{1}/{2}/tr.csv'.format(datalake_folder, document_type, dt))
+
         self.__df_to_s3(df, path='{0}/autodialer/{1}/{2}/tr.csv'.format(datalake_folder, document_type, dt))
         logger.info("m=dump_data_into_datalake, "
                     " datalake_folder={0},"
@@ -65,7 +78,7 @@ class AutodialerETL(object):
     @logger(exclude='df')
     def __df_to_s3(self, df, path):
         csv_buffer = BytesIO()
-        df.to_csv(csv_buffer, index=False, encoding='utf8', sep=';')
+        df.to_csv(csv_buffer, index=False, encoding='utf-8', sep=';', escapechar='\\')
         s3 = boto3.resource('s3')
         s3.Bucket(self.s3_bucket).put_object(
             Body=csv_buffer.getvalue(),
@@ -84,11 +97,18 @@ class AutodialerETL(object):
             raise ValueError('m=connect, document_type={}, msg=Invalid document type.'.format(document_type))
 
     @logger(exclude='mongo_db')
-    def __get_mongo_data(self, mongo_db):
+    def __get_mongo_data_df(self, mongo_db):
         filter = None if self.execution_date is not None else ''
 
         documents = mongo_db.find().sort("_id", ASCENDING)
         return pd.DataFrame(list(documents))
+
+    @logger(exclude='mongo_db')
+    def __get_mongo_data(self, mongo_db):
+        filter = None if self.execution_date is not None else ''
+
+        documents = mongo_db.find().sort("_id", ASCENDING)
+        return documents
 
     @logger
     def get_athena_data(self, document_type, filequery):
@@ -99,10 +119,14 @@ class AutodialerETL(object):
     def _move_data_to_raw(self, document_type):
         df = self.get_mongo_data(document_type)
 
-        for field in AutodialerETL.DOCUMENT_JSON_MAP[document_type]:
-            df[field] = df[field].apply(json.dumps, default=json_util.default)
+        # for field in AutodialerETL.RAW_JSON_MAP[document_type]:
+        #         df[field] = df[field].apply(json.dumps, default=json_util.default)
+        # self.dump_data_into_datalake(df, 'raw', document_type)
 
-        self.dump_data_into_datalake(df, 'raw', document_type)
+        self.__save_to_s3(
+            document_type=document_type,
+            json_list=df
+        )
 
     @logger(exclude='df')
     def _move_data_to_clean(self, document_type, unnest_df=False, treat_df=False):
@@ -122,7 +146,7 @@ class AutodialerETL(object):
 
             # steps to treat data
             if unnest_df:
-                df = self.__unnest_list_columns(df)
+                df = self.__unnest_list_columns(df, document_type)
             if treat_df:
                 df = self.__normalize_json_columns(df, unnest_df)
 
@@ -190,35 +214,28 @@ class AutodialerETL(object):
         return df_unique_columns
 
     @logger(exclude='df')
-    def __unnest_list_columns(self, df):
-        # TODO
-        #  get lists
-
+    def __unnest_list_columns(self, df, document_type):
         for column in df:
             try:
                 # Remove escaped double double-quotes
-                df[column].replace('\"\"(?!,|}|])', '', inplace=True, regex=True)
+                df[column].replace('\"\"(?!,|}|])', '"', inplace=True, regex=True)
                 logger.info('m=__unnest_list_columns, column={}, msg=Column treated'.format(str(column)))
             except Exception:
                 logger.info('m=__unnest_list_columns, column={}, msg=Column not treated'.format(str(column)))
 
+        # TODO
+        # treat only one column
+
         # Treating empty values as a empty list
         df.replace('', '[]', inplace=True)
 
-        # debbug
-        # for item in df['inbound_events']:
-        #     try:
-        #         t = json.loads(item)
-        #         print t
-        #     except:
-        #         print 'a'
-
-        df_unnested = df['inbound_events'].apply(lambda x: json.loads(x)) \
-            .apply(pd.Series) \
-            .stack() \
-            .reset_index(level=1, drop=True) \
-            .to_frame('inbound_events') \
-            .join(df.drop(columns='inbound_events'), how='left')
+        for field in AutodialerETL.CLEAN_JSON_MAP[document_type]:
+            df_unnested = df[field].apply(lambda x: json.loads(x)) \
+                .apply(pd.Series) \
+                .stack() \
+                .reset_index(level=1, drop=True) \
+                .to_frame(field) \
+                .join(df.drop(columns=field), how='left')
 
         return df_unnested.reset_index()
 
@@ -232,10 +249,53 @@ class AutodialerETL(object):
             subbed = _underscorer1.sub(r'\1_\2', old_column)
             new_column = _underscorer2.sub(r'\1_\2', subbed).lower()
             # get only before dot
-            new_column = new_column.split('.')[0]
+            new_column = new_column.replace('.', '_')
             new_columns.update({old_column: new_column})
 
         return new_columns
+
+    @logger(exclude='json_list')
+    def __save_to_s3(self, document_type, json_list):
+        gz_body = BytesIO()
+        for _json in json_list:
+            with GzipFile(fileobj=gz_body, mode='w') as fp:
+                fp.write((json.dumps(_json, ensure_ascii=False, cls=UnidecodeHandler)).encode('utf-8'))
+                fp.write('\n')
+
+        # don't need to clear old entries since the data volume always grows big
+        file_suffix = 'raw/autodialer/{}/dt={}/{}.gz'.format(document_type,
+                                                             '2018-01-01',
+                                                             document_type)
+        self.__obj_to_s3(
+            obj_io=gz_body,
+            file_suffix=file_suffix
+        )
+
+        # clear obj allocation
+        # only flushing does not clear the buffer
+        gz_body.seek(0)
+        gz_body.flush()
+
+        logger.info('m=__save_to_s3, path={}, msg=file saved'.format(file_suffix))
+
+    def __obj_to_s3(self, obj_io, file_suffix):
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))
+        BaseETL.obj_to_s3(
+            obj_io=obj_io,
+            bucket=self.s3_bucket,
+            file_path=file_suffix
+        )
+        logger.info('m=__obj_to_s3, file_suffix={}, msg=sent to s3'.format(file_suffix))
+
+
+class UnidecodeHandler(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, unicode):
+            return unidecode(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat(' ') if obj.year >= 1900 else obj.replace(year=obj.year + 2000)
+
+        return unidecode(unicode(str(obj)))
 
 
 class TaskReference(AutodialerETL):
@@ -277,14 +337,14 @@ class TaskReferenceOutbound(AutodialerETL):
 
     @logger
     def move_data_to_clean(self):
-        self._move_data_to_clean(document_type=self.document_type, unnest_df=True, treat_df=True)
+        self._move_data_to_clean(document_type=self.document_type, unnest_df=False, treat_df=True)
 
 
 # creating
 autodialer = TaskReferenceOutbound('5a-datalake')
 # raw
-autodialer.move_data_to_raw()
-# autodialer.move_data_to_clean()
+# autodialer.move_data_to_raw()
+autodialer.move_data_to_clean()
 # clean
 # autodialer.move_data_to_clean('task_references')
 # task_references or task_reference_inbound_event_histories or task_reference_outbound_history
