@@ -1,3 +1,2 @@
-from bietlejuice.jobs.new_etl.invoice.fines import Fine
-from bietlejuice.jobs.new_etl.invoice.invoice_factory import InvoiceFactory
-from bietlejuice.jobs.new_etl.invoice.reports import Report
+from bietlejuice.jobs.new_etl.seu_barriga.invoice_factory import SeuBarrigaInvoiceFactory
+from bietlejuice.jobs.new_etl.seu_barriga.seu_barriga_table_enum import SeuBarrigaTableEnum
