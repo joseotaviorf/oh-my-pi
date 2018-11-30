@@ -12,16 +12,15 @@ logger = QuintoAndarLogger('SeuBarrigaFine')
 
 class SeuBarrigaFine(SeuBarrigaInvoice):
     """columns:
-    -----------------------------------------------------------------------------------
-    |           raw                 |          clean          |        ods            |
-    |table: seubarriga_invoice_fine |   table: invoice_fine   |  table: invoice.fine  |
-    -----------------------------------------------------------------------------------
-    |     contract-external-id      |       contract_id       |      contract_id      |
-    |            fine               |           fine          |         fine          |
-    |          due-date             |         due_date        |        due_date       |
-    |         paid-date             |        paid_date        |    tenant_paid_date   |
-    |             -                 |            -            |        year_month     |
-    -----------------------------------------------------------------------------------
+    ------------------------------------------------------------------------
+    |           raw                   |                   clean            |
+    | table: seu_barriga_invoice_fine |   table: seu_barriga_invoice_fine  |
+    ------------------------------------------------------------------------
+    |     contract-external-id        |               contract_id          |
+    |            fine                 |                   fine             |
+    |          due-date               |                 due_date           |
+    |         paid-date               |                 paid_date          |
+    ------------------------------------------------------------------------
     """
 
     def __init__(self, s3_bucket, api_dict, execution_date):
@@ -63,5 +62,5 @@ class SeuBarrigaFine(SeuBarrigaInvoice):
             query=query,
             raw_columns=r_cols,
             clean_columns=c_cols,
-            clean_table_name='seubarriga_invoice_fine'
+            clean_table_name='seu_barriga_invoice_fine'
         )
