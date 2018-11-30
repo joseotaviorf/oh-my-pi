@@ -1,21 +1,18 @@
 DROP TABLE datalake_raw.task_reference_outbound_event_histories;
 
-CREATE EXTERNAL TABLE datalake_raw.task_reference_outbound_event_histories (
-  `_class` string,
+CREATE EXTERNAL TABLE datalake_raw.task_reference_outbound_event_histories(
   `_id` string,
-  `createdAt` string,
-  `taskId` string,
-  `taskReferenceOutboundEvents` string,
-  `updatedAt` string)
+  taskReferenceOutboundEvents array<string>,
+  taskId string,
+  updatedAt string,
+  `_class` string,
+  createdAt string)
 PARTITIONED BY (
   `dt` string)
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ';'
-)
+ROW FORMAT SERDE
+  'org.openx.data.jsonserde.JsonSerDe'
 LOCATION
   's3://5a-datalake/raw/autodialer/task_reference_outbound_event_histories/'
-TBLPROPERTIES (
-  'skip.header.line.count'='1');
+
 
 msck repair table datalake_raw.task_reference_outbound_event_histories;
