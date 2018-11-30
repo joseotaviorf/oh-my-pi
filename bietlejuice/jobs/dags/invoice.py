@@ -12,7 +12,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.invoice import InvoiceFactory
 
 # env vars
-env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')
+env.set_airflow_var_to_local_env('SORTINGHAT')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 seubarriga_invoice_dict = json.loads(env.get_airflow_env_var('seubarriga'))['invoice']
 
@@ -39,10 +39,10 @@ def extract_table(**kwargs):
 
         content = _invoice.request_job_data(job_url=job_url)
         data_frame = _invoice.load_content_to_memory_as_csv(content=content)
-        raw_table_name = 'seubarriga_invoice'
+        raw_table_name = 'seu_barriga_invoice_report'
     elif kwargs['_class'] == 'fine':
         data_frame = pd.read_json(_result)
-        raw_table_name = 'seubarriga_invoice_fine'
+        raw_table_name = 'seu_barriga_invoice_fine'
     else:
         logger.error("m=extract_table, kwargs['_class']={}".format(kwargs['_class']))
         raise Exception
@@ -50,7 +50,7 @@ def extract_table(**kwargs):
     _object = _invoice.convert_df_to_json(data_frame=data_frame)
     _invoice.save_into_s3_raw(
         _object=_object,
-        file_path_prefix='raw/seubarriga/invoice/{}'.format(_invoice._type),
+        file_path_prefix='raw/seu_barriga/invoice/{}'.format(_invoice._type),
         raw_table_name=raw_table_name
     )
     _object.flush()
@@ -82,17 +82,6 @@ def transform_data(**kwargs):
     )
 
     _invoice.transform_data()
-
-
-def load_data(**kwargs):
-    _invoice = InvoiceFactory.factory(
-        _class=kwargs['_class'],
-        bucket=bucket,
-        api_dict=seubarriga_invoice_dict,
-        execution_date=kwargs['execution_date']
-    )
-
-    _invoice.load_into_ods()
 
 
 # dags
@@ -137,15 +126,7 @@ def table_sub_dag(sub_dag_name, **kwargs):
         op_kwargs={'_class': sub_dag_name}
     )
 
-    _load = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data',
-        python_callable=load_data,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={'_class': sub_dag_name}
-    )
-
-    _extract >> _transform >> _load
+    _extract >> _transform
 
     return local_dag
 
