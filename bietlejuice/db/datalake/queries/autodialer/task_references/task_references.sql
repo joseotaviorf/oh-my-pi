@@ -12,7 +12,7 @@ SELECT
     tasklink as task_link,
     tasktype as task_type,
     updateddate as updated_date,
-    cast(dialstatus as varchar) as dialstatus
+    dialstatus
 FROM
     datalake_raw.task_references
 WHERE createddate IS NOT NULL

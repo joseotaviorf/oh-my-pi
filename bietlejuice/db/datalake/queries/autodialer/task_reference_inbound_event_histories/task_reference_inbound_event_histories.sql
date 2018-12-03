@@ -2,7 +2,8 @@ select
 	_id as id,
 	_class as class,
 	createdat as created_at,
-	cast(inboundevents as varchar) as inbound_events,
+	inbound_events,
 	taskid as task_id,
 	updatedat as updated_at
 from datalake_raw.task_reference_inbound_event_histories
+CROSS JOIN UNNEST(inboundevents) as t(inbound_events)

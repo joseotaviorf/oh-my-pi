@@ -14,7 +14,7 @@ CREATE EXTERNAL TABLE datalake_clean.`autodialer_task_references`(
   `task_link` string,
   `task_type` string,
   `updated_date` string,
-  `contact_did_not_answer_counter` integer)
+  `contactdidnotanswercounter` string)
 PARTITIONED BY (
   `dt` string)
 ROW FORMAT SERDE

@@ -22,7 +22,7 @@ logger = QuintoAndarLogger('Autodialer_ETL')
 
 # TODO
 # Create Dynamic data process
-dummy_dt = '2010-01-01'
+dummy_dt = '2018-01-01'
 
 
 class AutodialerETL(object):
@@ -264,7 +264,7 @@ class AutodialerETL(object):
 
         # don't need to clear old entries since the data volume always grows big
         file_suffix = 'raw/autodialer/{}/dt={}/{}.gz'.format(document_type,
-                                                             '2018-01-01',
+                                                             dummy_dt,
                                                              document_type)
         self.__obj_to_s3(
             obj_io=gz_body,
@@ -323,7 +323,7 @@ class TaskReferenceInbound(AutodialerETL):
 
     @logger
     def move_data_to_clean(self):
-        self._move_data_to_clean(document_type=self.document_type, unnest_df=True, treat_df=True)
+        self._move_data_to_clean(document_type=self.document_type, unnest_df=False, treat_df=True)
 
 
 class TaskReferenceOutbound(AutodialerETL):
@@ -343,7 +343,7 @@ class TaskReferenceOutbound(AutodialerETL):
 # creating
 autodialer = TaskReferenceOutbound('5a-datalake')
 # raw
-# autodialer.move_data_to_raw()
+autodialer.move_data_to_raw()
 autodialer.move_data_to_clean()
 # clean
 # autodialer.move_data_to_clean('task_references')
