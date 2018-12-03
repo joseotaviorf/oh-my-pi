@@ -73,8 +73,3 @@ merge_users_task = BaseDAG.build_quintoandar_python_operator(
 airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task,
                       merge_users_task)
-
-# df_raw_json = pd.DataFrame(df_raw.event_data.apply(json.loads).tolist())
-
-if __name__ == '__main__':
-    load_amplitude_clean(execution_date=datetime(2018, 12, 2, 0, 0, 0))
