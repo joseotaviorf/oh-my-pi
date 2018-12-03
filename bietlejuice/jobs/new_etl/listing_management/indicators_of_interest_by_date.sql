@@ -50,11 +50,11 @@ with listing_versions as (
 first_listing_viz as (
 	select 
 	trim(evt.e_house_id) as house_id,
-	trim(evt.amplitude_id) as amplitude_id, 
+	trim(evt.amplitude_id) as amplitude_id,
 	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
 	from datalake_clean.amplitude_events evt
 	where trim(evt.et) = 'listing_page_viewed'
-	and trim(ym) between date_format(current_date - interval '98' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
+	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
 	and trim(app) = '170698'
 	group by 1, 2
 ),
@@ -65,7 +65,7 @@ first_schedule_viz as (
 	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
 	from datalake_clean.amplitude_events evt
 	where trim(evt.et) = 'schedule_page_viewed'
-	and trim(ym) between date_format(current_date - interval '98' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
+	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
 	and trim(app) = '170698'
 	group by 1, 2
 ),
@@ -100,7 +100,7 @@ first_favorite_set as (
 	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
 	from datalake_clean.amplitude_events evt
 	where trim(evt.et) = 'listing_favorite_set'
-	and trim(ym) between date_format(current_date - interval '98' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
+	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
 	and trim(app) = '170698'
 	group by 1, 2
 ),
@@ -123,7 +123,7 @@ first_discard as (
 	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
 	from datalake_clean.amplitude_events evt
 	where trim(evt.et) = 'listing_discard_confirmed'
-	and trim(ym) between date_format(current_date - interval '98' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
+	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
 	and trim(app) = '170698'
 	group by 1, 2
 ),
