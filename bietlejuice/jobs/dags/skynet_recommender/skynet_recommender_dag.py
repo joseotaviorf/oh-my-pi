@@ -10,10 +10,10 @@ import sagemaker
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.kafka.dispatcher import KafkaDispatcher
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
+from bietlejuice.jobs.dags.skynet_recommender.notify_success import notify_success
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
@@ -188,15 +188,6 @@ def restart_service(**kwargs):
     logger.info('API response: {}'.format(r))
 
 
-def notify_sucess(**kwargs):
-    dispatcher = KafkaDispatcher()
-    dispatcher.dispatch_message(
-        topic='SkynetRecommender',
-        event_name='EmbeddingsProcessingFinished',
-        payload={},
-        source='airflow')
-
-
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -245,7 +236,7 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
 notify_success_op = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='notify_success',
-    python_callable=notify_sucess,
+    python_callable=notify_success,
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
