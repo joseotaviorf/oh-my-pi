@@ -8,10 +8,6 @@ with listing_versions as (
 	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
 	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
 	lv.status
-	-- valor total ?
-	-- aluguel ?
-	-- condo?
-	-- iptu ?
 	from datalake_clean.ods_dim_house_listing as lv
 	where cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) >= date('2017-09-01')
 ),
