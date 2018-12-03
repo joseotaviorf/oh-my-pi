@@ -5,12 +5,13 @@ import zipfile
 from datetime import datetime
 
 import boto3
-import pandas as pd
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl.amplitude import DW_QUERIES_DIR, QUERIES_DIR
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
+from pandas import errors
+from pandas.io.json import json_normalize
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -76,7 +77,7 @@ class AmplitudeEventsETL(BaseETL):
 
         BaseETL.drop_table(db_enum=EnumDB.BI_DW, table_name=table_tmp, schema=schema)
 
-        logger.info("m=merge_user_ids, tabe={}, msg=creating table".format(table_tmp))
+        logger.info("m=merge_user_ids, table={}, msg=creating table".format(table_tmp))
         query_create = BaseETL.get_query_from_file_name(
             '{}/{}/{}.sql'.format(DW_QUERIES_DIR, schema, table_tmp))
 
@@ -114,15 +115,15 @@ class AmplitudeEventsETL(BaseETL):
         athena_client = AthenaClient(self.s3_bucket)
 
         df_raw = self.get_all_columns(athena_client, execution_date)
-        df_raw = df_raw.head(100)
-        if df_raw.empty:
-            logger.warn('m=__main__, msg=empty dataframe')
+
+        if len(df_raw) <= 0:
+            raise errors.EmptyDataError('m=load_data_to_clean, msg=empty dataframe')
         else:
-            # df_raw_json = pd.io.json.json_normalize(df_raw.event_data.apply(json.loads))
-            df_raw_json = pd.DataFrame(df_raw.event_data.apply(json.loads).tolist())
+            df_raw_json = json_normalize(df_raw.event_data.apply(json.loads))
+
             df_raw_json['dt'] = df_raw['dt']
 
-            df_properties = self.get_properties_as_df()
+            df_properties = self.get_properties_as_df(athena_client=athena_client)
             df_raw_json = self.expand_columns(
                 athena_client=athena_client,
                 df=df_raw,

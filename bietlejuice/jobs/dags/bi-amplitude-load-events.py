@@ -45,7 +45,8 @@ dag = DAG(
     },
     start_date=datetime(2018, 2, 6, 0, 0, 0),
     schedule_interval='30 3 * * *',
-    max_active_runs=3
+    max_active_runs=3,
+    catchup=False
 )
 
 load_events_to_raw_task = BaseDAG.build_quintoandar_python_operator(
@@ -76,4 +77,4 @@ airflow_helpers.chain(load_events_to_raw_task,
 # df_raw_json = pd.DataFrame(df_raw.event_data.apply(json.loads).tolist())
 
 if __name__ == '__main__':
-    load_amplitude_clean(execution_date=datetime(2018, 10, 30, 0, 0, 0))
+    load_amplitude_clean(execution_date=datetime(2018, 12, 2, 0, 0, 0))
