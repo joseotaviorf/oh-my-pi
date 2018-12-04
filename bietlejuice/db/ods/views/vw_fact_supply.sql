@@ -124,6 +124,7 @@ potential_listings as (
 		f.qualified_to_opportunity_diff_days,
 		f.opportunity_to_listing_diff_days,
 		f.lead_to_listing_diff_days,
+		f.lead_to_processing_diff_days,
 		f.exclusivity,
 		bl.lead_type,
 		bl.lead_origin,
@@ -154,11 +155,11 @@ potential_listings as (
 		rep_leads bl
 		on bl.lead_id = f.lead_id
 	left join
-		imovel i
-		on f.imovel_id = i.id
+		house h
+		on f.imovel_id = h.id
 	left join
 		usuario us_cad
-	    on us_cad.id = i.usuario_que_cadastrou_id
+	    on us_cad.id = h.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
 ),
 taxonomy as (
@@ -234,6 +235,7 @@ select
 	pl.qualified_to_opportunity_diff_days,
 	pl.opportunity_to_listing_diff_days,
 	pl.lead_to_listing_diff_days,
+	pl.lead_to_processing_diff_days,
 	pl.exclusivity,
 	pl.lead_type,
 	pl.lead_origin,

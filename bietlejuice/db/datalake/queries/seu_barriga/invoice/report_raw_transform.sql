@@ -20,7 +20,7 @@ with rent_delay as (
                      regexp_extract("tenant-paid-date", '(\d+)/\d+/\d+', 1)
                     ) as timestamp)
               ) as rent_delayed_days
-  from datalake_raw.seubarriga_invoice
+  from datalake_raw.seu_barriga_invoice_report
   where trim("from") = 'Inquilino'
     and trim(item) = 'Aluguel'
     and "tenant-due-date" != ''
@@ -46,7 +46,7 @@ select distinct
   inv."landlord-status",
   cast(rd.rent_delayed_days as integer) as delayed_days,
   inv.purpose
-from datalake_raw.seubarriga_invoice inv
+from datalake_raw.seu_barriga_invoice_report inv
 left join rent_delay rd
   on inv."contract-id" = rd."contract-id"
     and inv."year-month" = rd."year-month"

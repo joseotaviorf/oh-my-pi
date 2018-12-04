@@ -5,15 +5,15 @@ with published as
   select
     date_part('month', h.date) as period_month,
     date_part('year', h.date) as period_year,
-  	i.id,
+  	hou.id,
     p.version,
-    i.regiao_id,
+    hou.regiao_id,
 	count(distinct h.date) as qt_days_published
   from
-    imovel i
+    house hou
   inner join
     imovel_status_full_history h
-    on h.id = i.id
+    on h.id = hou.id
     and h.status_history = 'publicado'
     and h.last_position_date_flag
     
@@ -25,9 +25,9 @@ with published as
   group by
     date_part('month', h.date),
     date_part('year', h.date),
-  	i.id,
+  	hou.id,
     p.version,
-    i.regiao_id
+    hou.regiao_id
 )
 select
   date_part('month', c."Period") as month,

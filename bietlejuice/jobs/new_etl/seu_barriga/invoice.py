@@ -10,13 +10,11 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 logger = QuintoAndarLogger('Invoice')
 
 
-class Invoice(object):
+class SeuBarrigaInvoice(object):
     REGEX_MAPPING = {
         'float': {
             'regex': '(\d+),(\d+)',
@@ -28,9 +26,9 @@ class Invoice(object):
         }
     }
 
-    def __init__(self, bucket, _type, year, month, api_dict):
-        self.bucket = bucket
-        self.athena_client = AthenaClient(self.bucket)
+    def __init__(self, s3_bucket, _type, year, month, api_dict):
+        self.s3_bucket = s3_bucket
+        self.athena_client = AthenaClient(self.s3_bucket)
         self._type = _type
         self.year = year
         self.month = month
@@ -92,13 +90,13 @@ class Invoice(object):
         logger.info(
             BaseETL.obj_to_s3(
                 obj_io=_object,
-                bucket=self.bucket,
+                bucket=self.s3_bucket,
                 file_path='{}/ym={}/data.gz'.format(file_path_prefix, year_month)
             )
         )
 
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/raw/seubarriga/invoice/{}'.format(self.bucket, self._type),
+            bucket_folder_path='{}/raw/seu_barriga/invoice/{}'.format(self.s3_bucket, self._type),
             database='datalake_raw',
             table=raw_table_name,
             partition_name='ym',
@@ -108,7 +106,7 @@ class Invoice(object):
     @logger
     def _transform_data(self, query, raw_columns, clean_columns, clean_table_name):
         year_month = '{}-{}'.format(self.year, self.month)
-        key = 'clean/seubarriga/invoice/{}/ym={}/data.parq'.format(self._type, year_month)
+        key = 'clean/seu_barriga/invoice/{}/ym={}/data.parq'.format(self._type, year_month)
 
         self.athena_client.create_parquet_from_query(
             key=key,
@@ -118,33 +116,9 @@ class Invoice(object):
         )
 
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/clean/seubarriga/invoice/{}'.format(self.bucket, self._type),
+            bucket_folder_path='{}/clean/seu_barriga/invoice/{}'.format(self.s3_bucket, self._type),
             database='datalake_clean',
             table=clean_table_name,
             partition_name='ym',
             partition_value=year_month
-        )
-
-    @logger
-    def load_into_ods(self):
-        query = BaseETL.get_query_from_file_name(
-            '{}/invoice/{}_clean_load_ods.sql'.format(DATALAKE_QUERIES_DIR, self._type))
-
-        year_month = '{}-{}'.format(self.year, self.month)
-        data_frame = self.athena_client.execute_query_and_return_dataframe(query.format(year_month=year_month))
-
-        logger.info(
-            'm=load_into_ods, _type={}, year_month={}, msg=deleting from ods table'.format(self._type, year_month))
-        BaseETL.execute_command(
-            command="delete from invoice.{} where ym_partition = '{}'".format(self._type, year_month),
-            db_enum=EnumDB.BI_ODS,
-            encoding='utf-8',
-            commit=True
-        )
-
-        logger.info('m=load_into_ods, _type={}, msg=sending dataframe to ods'.format(self._type))
-        BaseETL.dataframe_to_ods(
-            df=data_frame,
-            table_name='invoice.{}'.format(self._type),
-            encoding='utf-8'
         )

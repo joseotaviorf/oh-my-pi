@@ -61,7 +61,7 @@ booking_aux as (
 ),
 all_user as (
     select
-        coalesce(up.email, ep.email_contato, b.email) as email,
+        coalesce(up.email, h_ep.email_contato, b.email) as email,
         coalesce(up.main_phone, b.telefone_principal) as main_phone,
         coalesce(up.secondary_phone, b.telefonesecundario) as secondary_phone,
         coalesce(up.commercial_phone, b.telefonecomercial) as commercial_phone,
@@ -69,11 +69,11 @@ all_user as (
         up.proposal_phone,
         up.contract_property_id,
         up.proposal_property_id,
-        ep.id as user_property_id,
+        h_ep.id as user_property_id,
         b.imovel_id as booking_property_id
     from users_prev up
-    full outer join imovel ep
-      on up.email = ep.email_contato
+    full outer join house h_ep
+      on up.email = h_ep.email_contato
     full outer join booking_aux b
       on b.email = up.email
 ),

@@ -1,5 +1,5 @@
-drop table if exists datalake_raw.seubarriga_invoice;
-create external table datalake_raw.seubarriga_invoice (
+drop table if exists datalake_raw.seu_barriga_invoice_report;
+create external table datalake_raw.seu_barriga_invoice_report (
   `contract-id` string,
   version string,
   blocked string,
@@ -22,7 +22,5 @@ partitioned by (
   ym string
 )
 row format serde 'org.openx.data.jsonserde.JsonSerDe'
-location 's3://5a-datalake/raw/seubarriga/invoice/report/'
+location 's3://5a-datalake/raw/seu_barriga/invoice/report/'
 ;
-
-msck repair table datalake_raw.seubarriga_invoice;

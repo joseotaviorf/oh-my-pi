@@ -9,3 +9,4 @@ class CRMTasksTableEnum(Enum):
     PAYMENT = 'payment'
     INSPECTION = 'inspection'
     LEAD = 'lead'
+    PHOTO_JOB = 'photo_job'
