@@ -1,6 +1,6 @@
-DROP TABLE datalake_clean.marketing_google_ads_ads;
+DROP TABLE datalake_clean.marketing_google_ads;
 
-CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads_ads (
+CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads (
    account_id string,
     adgroup_id string,
     adgroup_name string,
@@ -26,6 +26,6 @@ PARTITIONED BY (
   dt_created string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/google_ads/marketing_google_ads_ads/'
+  's3://5a-datalake/clean/marketing/google_ads/marketing_google_ads/'
 
-MSCK REPAIR TABLE datalake_clean.marketing_google_ads_ads;
+MSCK REPAIR TABLE datalake_clean.marketing_google_ads;

@@ -1,6 +1,6 @@
-DROP TABLE datalake_raw.marketing_google_ads_keywords;
+DROP TABLE datalake_raw.marketing_google_keywords;
 
-CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads_keywords (
+CREATE EXTERNAL TABLE datalake_raw.marketing_google_keywords (
   customerid string,
   adgroupid string,
   adgroupname string,
@@ -31,4 +31,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/marketing/google_ads/keywords_performance_report/'
 
-MSCK REPAIR TABLE datalake_raw.marketing_google_ads_keywords;
+MSCK REPAIR TABLE datalake_raw.marketing_google_keywords;

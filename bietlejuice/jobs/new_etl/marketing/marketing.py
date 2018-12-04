@@ -23,13 +23,14 @@ class Marketing(object):
     }
 
     SK_FIELD_MAP = {
-        'dim_google_ads_keyword': 'sk_keyword',
-        'dim_google_ads_ad': 'sk_ad',
+        'dim_google_keyword': 'sk_keyword',
+        'dim_google_ad': 'sk_ad',
         'fact_google_ads_daily_cost_attributions': 'sk_keyword || sk_ad',
-        'dim_facebook_ads_ads_insights': 'sk_ad',
-        'fact_facebook_ads_daily_cost_attribution': 'sk_ad'
+        'dim_facebook_ad': 'sk_ad',
+        'fact_facebook_ads_daily_cost_attributions': 'sk_ad'
     }
 
+    @logger
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
         self.s3_bucket = s3_bucket
         self.execution_date = execution_date
@@ -117,7 +118,7 @@ class Marketing(object):
     @logger(exclude="staging_query")
     def _load_to_staging(self, dw_table_name, staging_query):
 
-        logger.info("m=load_to_staging, schema={}, table_name, msg=truncating table".format(
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
         BaseETL.truncate_table(
@@ -126,7 +127,7 @@ class Marketing(object):
             schema=Marketing.SCHEMA_NAMES['staging']
         )
 
-        logger.info("m=load_to_staging, schema={}, table_name, msg=inserting into dw".format(
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=inserting into dw".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
         table_data = BaseETL.from_db_query(

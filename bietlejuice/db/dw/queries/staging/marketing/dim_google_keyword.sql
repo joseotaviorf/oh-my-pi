@@ -7,13 +7,13 @@ WITH clean_table_common as (
         campaign_name,
         adgroup_name,
         match_type
-    FROM staging.marketing_google_ads_keywords
+    FROM staging.marketing_google_keywords
     group by 2,3,4,5,6,7
 )
 SELECT clean_table_common.*,
     getdate() as ts_load
 FROM clean_table_common
-left join staging.dim_google_ads_keyword st_dim
+left join staging.dim_google_keyword st_dim
     on clean_table_common.keyword_id = st_dim.keyword_id
         and clean_table_common.account_name = st_dim.account_name
         and clean_table_common.adgroup_name = st_dim.adgroup_name

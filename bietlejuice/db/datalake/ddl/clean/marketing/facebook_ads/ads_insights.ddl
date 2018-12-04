@@ -1,6 +1,6 @@
-DROP TABLE datalake_clean.marketing_facebook_ads_ads_insights;
+DROP TABLE datalake_clean.marketing_facebook_ads;
 
-CREATE EXTERNAL TABLE datalake_clean.marketing_facebook_ads_ads_insights (
+CREATE EXTERNAL TABLE datalake_clean.marketing_facebook_ads (
     account_id string,
     account_name string,
     ad_id string,
@@ -24,4 +24,4 @@ STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/marketing/facebook_ads/ads_insights/'
 
-MSCK REPAIR TABLE datalake_clean.marketing_facebook_ads_ads_insights;
+MSCK REPAIR TABLE datalake_clean.marketing_facebook_ads;

@@ -1,6 +1,6 @@
-DROP TABLE staging.dim_google_ads_ad;
+DROP TABLE marketing.dim_google_ad;
 
-CREATE TABLE IF NOT EXISTS staging.dim_google_ads_ad (
+CREATE TABLE IF NOT EXISTS marketing.dim_google_ad (
 	sk_ad BIGINT,
 	ad_id BIGINT,
 	account_name VARCHAR,
