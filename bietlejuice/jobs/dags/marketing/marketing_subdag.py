@@ -73,7 +73,7 @@ class MarketingSubDag(BaseSubDag):
                     provide_context=True,
                     op_kwargs={
                         'bucket': self.bucket,
-                        'datalake_table': table.split("_")[3],
+                        'datalake_table': table.split("_")[2],
                         'account': account
                     }
                 )
