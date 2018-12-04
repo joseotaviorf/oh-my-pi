@@ -1,6 +1,4 @@
 import petl
-import time
-from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
@@ -50,7 +48,7 @@ class Marketing(object):
                 table_name=table_name,
                 acc_partition=self.account,
                 date_partition=self.partition_date,
-                file_name=int(time.mktime(datetime.now().timetuple())) * 1000
+                file_name=self.partition_date
             )
 
         query = BaseETL.get_query_from_file_name(
