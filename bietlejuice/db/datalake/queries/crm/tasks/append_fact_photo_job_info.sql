@@ -51,6 +51,6 @@ select distinct
   sk_photo_job,
   sk_user_sales_rep,
   dt_partition
-from photo_jobs pj
+from photo_jobs
 ;
 
