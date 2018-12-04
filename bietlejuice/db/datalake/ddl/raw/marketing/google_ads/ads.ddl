@@ -1,6 +1,6 @@
-DROP TABLE datalake_raw.marketing_google_ads_ads;
+DROP TABLE datalake_raw.marketing_google_ads;
 
-CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads_ads (
+CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads (
   customerid string,
   adgroupid string,
   adgroupname string,
@@ -10,7 +10,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads_ads (
   clicks string,
   clicktype string,
   cost string,
-  keywordid string,
+  criterionid string,
   date string,
   device string,
   id string,
@@ -35,4 +35,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/marketing/google_ads/ads_performance_report/'
 
-MSCK REPAIR TABLE datalake_raw.marketing_google_ads_ads;
+MSCK REPAIR TABLE datalake_raw.marketing_google_ads;

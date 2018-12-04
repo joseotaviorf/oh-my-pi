@@ -24,9 +24,10 @@ class FacebookAds(Marketing):
         'link_clicks': int
     }
 
+    @logger
     def __init__(self, s3_bucket, execution_date, account=None):
         super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
-        self.datalake_tables = ["marketing_facebook_ads_ads_insights"]
+        self.datalake_tables = ["marketing_facebook_ads"]
 
     @logger
     def move_ads_to_clean(self):
@@ -75,14 +76,17 @@ class FacebookAds(Marketing):
             c_cols=c_cols
         )
 
+    @logger
     def load_to_pre_staging(self, clean_table, prod_table, accounts):
         self._load_to_pre_staging(clean_table, prod_table, accounts, FacebookAds.COLUMN_TYPE_MAP)
 
+    @logger
     def load_to_staging(self, dw_table_name):
         query = self.__load_table(dw_table_name)
         logger.info("m=load_to_staging, query={}".format(query))
         self._load_to_staging(dw_table_name, query)
 
+    @logger
     def __load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)

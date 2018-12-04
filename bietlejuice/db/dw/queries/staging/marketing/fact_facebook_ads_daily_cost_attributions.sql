@@ -12,7 +12,7 @@ WITH android_smartphone as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'android_smartphone'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -30,7 +30,7 @@ android_tablet as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'android_tablet'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -48,7 +48,7 @@ desktop as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'desktop'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -66,7 +66,7 @@ ipad as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'ipad'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -84,7 +84,7 @@ iphone as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'iphone'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -102,7 +102,7 @@ ipod as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'ipod'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -121,7 +121,7 @@ other as (
         sum(coalesce(cast(spend as float), 0)) as spend,
         date_start,
         date_stop
-    from staging.marketing_facebook_ads_ads_insights
+    from staging.marketing_facebook_ads
     where impression_device = 'other'
     group by 1,2,3,4,5,6,7,12,13
 ),
@@ -162,7 +162,7 @@ fact as (
         ads.date_start,
         ads.date_stop,
         ads.acc
-    FROM staging.marketing_facebook_ads_ads_insights ads
+    FROM staging.marketing_facebook_ads ads
     LEFT JOIN android_smartphone
         ON android_smartphone.ad_id = ads.ad_id
             AND android_smartphone.account_id = ads.account_id
@@ -247,7 +247,7 @@ SELECT distinct
     fact.total_spend,
     getdate() as ts_load
 from fact
-left join staging.dim_facebook_ads_ads_insights dim
+left join staging.dim_facebook_ad dim
     on dim.ad_id = fact.ad_id
         and dim.account_name = fact.acc
         and dim.adset_name = fact.adset_name

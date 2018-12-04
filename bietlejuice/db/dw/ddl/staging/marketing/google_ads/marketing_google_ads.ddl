@@ -1,6 +1,6 @@
-DROP TABLE staging.marketing_google_ads_ads;
+DROP TABLE staging.marketing_google_ads;
 
-CREATE TABLE IF NOT EXISTS staging.marketing_google_ads_ads (
+CREATE TABLE IF NOT EXISTS staging.marketing_google_ads (
     id bigint identity(0,1),
     account_id varchar,
     adgroup_id varchar,

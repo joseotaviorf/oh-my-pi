@@ -1,6 +1,6 @@
-DROP TABLE datalake_clean.marketing_google_ads_keywords;
+DROP TABLE datalake_clean.marketing_google_keywords;
 
-CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads_keywords (
+CREATE EXTERNAL TABLE datalake_clean.marketing_google_keywords (
     account_id string,
     adgroup_id string,
     adgroup_name string,
@@ -24,4 +24,4 @@ STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/marketing/google_ads/keywords_performance_report/'
 
-MSCK REPAIR TABLE datalake_clean.marketing_google_ads_keywords;
+MSCK REPAIR TABLE datalake_clean.marketing_google_keywords;

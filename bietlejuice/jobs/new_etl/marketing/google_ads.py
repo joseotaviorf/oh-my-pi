@@ -23,9 +23,10 @@ class GoogleAds(Marketing):
         'keyword_id': long
     }
 
+    @logger
     def __init__(self, s3_bucket, execution_date, account=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
-        self.datalake_tables = ["marketing_google_ads_keywords", "marketing_google_ads_ads"]
+        self.datalake_tables = ["marketing_google_keywords", "marketing_google_ads"]
 
     @logger
     def move_keywords_to_clean(self):
@@ -68,7 +69,7 @@ class GoogleAds(Marketing):
         ])
 
         self._move_to_clean(
-            table_name='marketing_google_ads_keywords',
+            table_name='marketing_google_keywords',
             sql_file_name='keyword.sql',
             r_cols=r_cols,
             c_cols=c_cols
@@ -123,19 +124,22 @@ class GoogleAds(Marketing):
         ])
 
         self._move_to_clean(
-            table_name='marketing_google_ads_ads',
+            table_name='marketing_google_ads',
             sql_file_name='ad.sql',
             r_cols=r_cols,
             c_cols=c_cols
         )
 
+    @logger
     def load_to_pre_staging(self, clean_table, prod_table, accounts):
         self._load_to_pre_staging(clean_table, prod_table, accounts, GoogleAds.COLUMN_TYPE_MAP)
 
+    @logger
     def load_to_staging(self, dw_table_name):
         query = self.__load_table(dw_table_name)
         self._load_to_staging(dw_table_name, query)
 
+    @logger
     def __load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)

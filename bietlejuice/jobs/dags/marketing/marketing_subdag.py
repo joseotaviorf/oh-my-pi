@@ -8,6 +8,7 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
+    @logger
     def __init__(self, clazz, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)

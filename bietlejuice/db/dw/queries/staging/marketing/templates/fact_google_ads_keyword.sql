@@ -9,7 +9,7 @@ computer_devices_keywords as (
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
         date
-    FROM staging.marketing_google_ads_keywords
+    FROM staging.marketing_google_keywords
     WHERE device = 'Computers'
     GROUP BY 1,2,3,4,5,6,10
 ),
@@ -24,7 +24,7 @@ mobile_devices_keywords as (
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
         date
-    FROM staging.marketing_google_ads_keywords
+    FROM staging.marketing_google_keywords
     WHERE device = 'Mobile devices with full browsers'
     GROUP BY 1,2,3,4,5,6,10
 ),
@@ -39,7 +39,7 @@ tablet_devices_keywords as (
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
         date
-    FROM staging.marketing_google_ads_keywords
+    FROM staging.marketing_google_keywords
     WHERE device = 'Tablets with full browsers'
     GROUP BY 1,2,3,4,5,6,10
 ),
@@ -61,7 +61,7 @@ cte_keywords as (
         (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0) + COALESCE(computer_devices_keywords.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) as impressions,
         google_table.acc
-FROM staging.marketing_google_ads_keywords google_table
+FROM staging.marketing_google_keywords google_table
 LEFT JOIN computer_devices_keywords
     ON computer_devices_keywords.account_id = google_table.account_id
         AND computer_devices_keywords.campaign_id = google_table.campaign_id
@@ -99,7 +99,7 @@ final_cte_keywords as (
         cte_keywords.impressions,
         getdate() as ts_load
     from cte_keywords
-    left join staging.dim_google_ads_keyword dim
+    left join staging.dim_google_keyword dim
     on dim.keyword_id = cte_keywords.keyword_id
         and dim.account_name = cte_keywords.acc
         and dim.adgroup_name = cte_keywords.adgroup_name
