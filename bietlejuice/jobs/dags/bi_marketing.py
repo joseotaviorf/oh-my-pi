@@ -38,9 +38,9 @@ main_dag = DAG(
 )
 
 
-def clean_sub_dag(sub_dag_name, clazz, accounts):
+def clean_sub_dag(sub_dag_name, class_, accounts):
     sub_dag = MarketingSubDagFactory.factory(
-        clazz=clazz,
+        class_=class_,
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -52,9 +52,9 @@ def clean_sub_dag(sub_dag_name, clazz, accounts):
     return sub_dag.build_tasks('clean')
 
 
-def load_to_pre_staging_sub_dag(sub_dag_name, clazz, accounts):
+def load_to_pre_staging_sub_dag(sub_dag_name, class_, accounts):
     sub_dag = MarketingSubDagFactory.factory(
-        clazz=clazz,
+        class_=class_,
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -66,9 +66,9 @@ def load_to_pre_staging_sub_dag(sub_dag_name, clazz, accounts):
     return sub_dag.build_tasks('pre_staging')
 
 
-def load_to_staging_sub_dag(sub_dag_name, clazz):
+def load_to_staging_sub_dag(sub_dag_name, class_):
     sub_dag = MarketingSubDagFactory.factory(
-        clazz=clazz,
+        class_=class_,
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -79,9 +79,9 @@ def load_to_staging_sub_dag(sub_dag_name, clazz):
     return sub_dag.build_tasks('staging')
 
 
-def load_to_dw_sub_dag(sub_dag_name, clazz):
+def load_to_dw_sub_dag(sub_dag_name, class_):
     sub_dag = MarketingSubDagFactory.factory(
-        clazz=clazz,
+        class_=class_,
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -96,7 +96,7 @@ facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
     sub_dag_name="facebook-ads-raw-to-clean",
-    clazz=MarketingEnum.FACEBOOK_ADS,
+    class_=MarketingEnum.FACEBOOK_ADS,
     accounts=FACEBOOK_ADS_ACCOUNTS
 )
 
@@ -104,7 +104,7 @@ facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_pre_staging_sub_dag,
     sub_dag_name='facebook-ads-load-to-pre-staging',
-    clazz=MarketingEnum.FACEBOOK_ADS,
+    class_=MarketingEnum.FACEBOOK_ADS,
     accounts=FACEBOOK_ADS_ACCOUNTS
 )
 
@@ -112,21 +112,21 @@ facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
     sub_dag_name='facebook-ads-load-to-staging',
-    clazz=MarketingEnum.FACEBOOK_ADS
+    class_=MarketingEnum.FACEBOOK_ADS
 )
 
 facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
     sub_dag_name='facebook-ads-load-to-dw',
-    clazz=MarketingEnum.FACEBOOK_ADS
+    class_=MarketingEnum.FACEBOOK_ADS
 )
 
 google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
     sub_dag_name='google-ads-raw-to-clean',
-    clazz=MarketingEnum.GOOGLE_ADS,
+    class_=MarketingEnum.GOOGLE_ADS,
     accounts=GOOGLE_ADS_ACCOUNTS
 )
 
@@ -134,7 +134,7 @@ google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_pre_staging_sub_dag,
     sub_dag_name='google-ads-load-to-pre-staging',
-    clazz=MarketingEnum.GOOGLE_ADS,
+    class_=MarketingEnum.GOOGLE_ADS,
     accounts=GOOGLE_ADS_ACCOUNTS
 )
 
@@ -142,14 +142,14 @@ google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
     sub_dag_name='google-ads-load-to-staging',
-    clazz=MarketingEnum.GOOGLE_ADS,
+    class_=MarketingEnum.GOOGLE_ADS,
 )
 
 google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
     sub_dag_name='google-ads-load-to-dw',
-    clazz=MarketingEnum.GOOGLE_ADS,
+    class_=MarketingEnum.GOOGLE_ADS,
 )
 
 airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
