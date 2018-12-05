@@ -9,29 +9,29 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dl.criado_em),
     																date_part('month', dl.criado_em),
     																date_part('week', dl.criado_em),
-    																date_part('day', dl.criado_em) order by dp.sk_property asc)
+    																date_part('day', dl.criado_em) order by dhl.sk_house_listing asc)
     	+ dense_rank() over (partition by date_part('year', dl.criado_em),
     																		date_part('month', dl.criado_em),
     																		date_part('week', dl.criado_em),
-    																		date_part('day', dl.criado_em) order by dp.sk_property desc)
+    																		date_part('day', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as daily_count,
     dense_rank() over (partition by date_part('year', dl.criado_em),
-    																date_part('week', dl.criado_em) order by dp.sk_property asc)
+    																date_part('week', dl.criado_em) order by dhl.sk_house_listing asc)
     	+ dense_rank() over (partition by date_part('year', dl.criado_em),
-    																		date_part('week', dl.criado_em) order by dp.sk_property desc)
+    																		date_part('week', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by date_part('year', dl.criado_em),
-    																date_part('month', dl.criado_em) order by dp.sk_property asc)
+    																date_part('month', dl.criado_em) order by dhl.sk_house_listing asc)
     	+ dense_rank() over (partition by date_part('year', dl.criado_em),
-    																		date_part('month', dl.criado_em) order by dp.sk_property desc)
+    																		date_part('month', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as monthly_count,
-    dense_rank() over (partition by date_part('year', dl.criado_em) order by dp.sk_property asc)
-    	+ dense_rank() over (partition by date_part('year', dl.criado_em) order by dp.sk_property desc)
+    dense_rank() over (partition by date_part('year', dl.criado_em) order by dhl.sk_house_listing asc)
+    	+ dense_rank() over (partition by date_part('year', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as yearly_count
 	from fact_supply f
-	join dim_property dp
-		on f.sk_property = dp.sk_property
-		  and dp.publication_date >= '2017-01-01' and dp.publication_date < current_date
+	join dim_house_listing dhl
+		on f.sk_property = dhl.sk_house_listing
+		  and dhl.ts_publication >= '2017-01-01' and dhl.ts_publication < current_date
 		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
@@ -49,10 +49,10 @@ all_dates_last_month as (
 	  date_part('month', dl.criado_em) as _month,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct dp.sk_property) as monthly_count
+  	count(distinct dhl.sk_house_listing) as monthly_count
 	from fact_supply f
-	join dim_property dp
-		on f.sk_property = dp.sk_property
+	join dim_house_listing dhl
+		on f.sk_property = dhl.sk_house_listing
 		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
@@ -71,10 +71,10 @@ all_dates_last_year as (
 	 	date_part('year', dl.criado_em) as _year,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct dp.sk_property) as yearly_count
+  	count(distinct dhl.sk_house_listing) as yearly_count
 	from fact_supply f
-	join dim_property dp
-		on f.sk_property = dp.sk_property
+	join dim_house_listing dhl
+		on f.sk_property = dhl.sk_house_listing
 		  and f.sk_property != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead

@@ -234,7 +234,7 @@ class CRMTasks(object):
             raise ValueError
 
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/{}/{}/'.format(self.s3_bucket, bucket_type, bucket_folder_suffix),
+            bucket_folder_path='{}/{}/{}'.format(self.s3_bucket, bucket_type, bucket_folder_suffix),
             database='datalake_{}'.format(bucket_type),
             table=table_name,
             partition_name='dt',

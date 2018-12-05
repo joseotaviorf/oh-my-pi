@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by dd.year order by f.sk_contract asc)
     	+ dense_rank() over (partition by dd.year order by f.sk_contract desc)
 			- 1 as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -38,7 +38,7 @@ with all_dates as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)
@@ -63,7 +63,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_contract) as monthly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -73,7 +73,7 @@ all_dates_last_month as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)
@@ -98,7 +98,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_contract) as yearly_count
-	from fact_demand f
+	from fact_listing_rent_flows f
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
 	join dim_date dd
@@ -108,7 +108,7 @@ all_dates_last_year as (
 			   else dc.ts_signature is not null
 			 end
 		  and dc.type = 'FullService'
-		  and dd."date" between dc.dt_start
+		  and dd."date" between dc.ts_signature
 		                  and case
                             when dc.status != 'Ativo'
                               then least(dc.dt_annulment, dc.dt_intended_end, current_date)

@@ -2,7 +2,7 @@ drop view if exists unit_economics.vw_mgmt_insurance;
 
 create or replace view unit_economics.vw_mgmt_insurance as
 select
-	coalesce(i_fee.sk_property, i_pis.sk_property) as sk_property,
+	coalesce(i_fee.sk_house_listing, i_pis.sk_house_listing) as sk_house_listing,
 	coalesce(i_fee.property_id, i_pis.property_id) as property_id,
 	coalesce(i_fee.dt_cash_flow, i_pis.dt_cash_flow) as dt_cash_flow,
 	coalesce(i_fee.vl_insurance_fee, 0) as vl_insurance_fee,
@@ -14,6 +14,6 @@ from
 	unit_economics.mgmt_insurance_fee i_fee
 full outer join
 	unit_economics.mgmt_insurance_pis_cofins i_pis
-	on i_fee.sk_property = i_pis.sk_property
+	on i_fee.sk_house_listing = i_pis.sk_house_listing
 	and i_fee.dt_cash_flow = i_pis.dt_cash_flow
 ;

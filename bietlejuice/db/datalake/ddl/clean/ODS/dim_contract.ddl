@@ -28,6 +28,7 @@ create external table if not exists datalake_clean.ods_dim_contract (
   closing_status string,
   ts_created string,
   ts_updated string,
+  ts_canceled string,
   cancellation_reason string,
   ts_load string
 )

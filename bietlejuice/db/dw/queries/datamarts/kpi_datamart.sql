@@ -10,7 +10,7 @@ FROM
 		date_table.week_start as date_week,
 		'Visits' as metric_name,
 		count(1) as metric_value
-	FROM public.fact_demand as demand
+	FROM public.fact_listing_rent_flows as demand
 	left join public.dim_date as date_table
 	on demand.sk_visit_date=date_table.sk_date
 	

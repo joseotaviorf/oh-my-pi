@@ -106,8 +106,8 @@ _result as (
   -- joining status result with the house dimension to get the sk through min_version_time and max_version_time
 	select
 	  -- if no house is found in the dimension table, the sk gets concatenated with '000' so there will always be a "valid" integer sk
-		coalesce(sdp.sk_property, rpad(mm.id::varchar, 12, case when mm.status_history = 'publicado' then '001' else '0' end)::bigint) as sk_house,
-		coalesce(sdp.regiao_id, -1) as sk_region,
+		coalesce(sdp.sk_house_listing, rpad(mm.id::varchar, 12, case when mm.status_history = 'publicado' then '001' else '0' end)::bigint) as sk_house_listing,
+		coalesce(vfhl.sk_region, -1) as sk_region,
 		-- there are some cases where the house history says, for example, status = 'despublicado', but the house dimension/ebdb says the house is in another status
 		case
 			when mm.dt_max_status is null
@@ -117,14 +117,16 @@ _result as (
 		to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
 		to_char(mm.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date
 	from min_max mm
-	left join staging.dim_property sdp
-		on sdp.id = mm.id
-			and mm.dt_min_status >= sdp.min_version_time::date
-			and coalesce(mm.dt_max_status, now()) <= coalesce(sdp.max_version_time::date, now())
+	left join staging.dim_house_listing sdp
+		on sdp.id_house = mm.id
+			and mm.dt_min_status >= sdp.ts_listing_version_start::date
+			and coalesce(mm.dt_max_status, now()) <= coalesce(sdp.ts_listing_version_end::date, now())
+    join vw_fact_house_listings vfhl
+        on vfhl.sk_house_listing = sdp.sk_house_listing
 	where mm.valid is true
 )
 select
-	sk_house,
+	sk_house_listing,
 	sk_region,
 	status_history,
 	/*
@@ -153,7 +155,7 @@ select
 	 *  |   2018-07-18    |     null        | publicado | 123002 |       2018-07-18          |
 	 * ---------------------------------------------------------------------------------------
 	 */
-	min(sk_min_status_date) over (partition by sk_house, status_history order by sk_min_status_date) as sk_min_version_status_date,
+	min(sk_min_status_date) over (partition by sk_house_listing, status_history order by sk_min_status_date) as sk_min_version_status_date,
 	sk_min_status_date,
 	sk_max_status_date,
 	now() as dt_timestamp

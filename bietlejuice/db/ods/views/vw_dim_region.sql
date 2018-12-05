@@ -37,14 +37,14 @@ FROM
 left join
 	(
 		select
-	    	i.regiao_id,
-	        min(i.data_criacao) as dt_first_property_created
+	    	h.regiao_id,
+	        min(h.data_criacao) as dt_first_property_created
 	    from
-		    imovel i
+		    house h
 	    where
-	    	i.regiao_id is not null
+	    	h.regiao_id is not null
 	    group by
-	    	i.regiao_id
+	    	h.regiao_id
 	) i
   on i.regiao_id = r.id
 left join
@@ -53,17 +53,17 @@ left join
 left join
 	(
 		select
-			i.regiao_id,
+			h.regiao_id,
 			min(b."data") as dt_first_booking
 		from
 			booking b
 		left join
-			imovel i
-			on b.imovel_id = i.id
+			house h
+			on b.imovel_id = h.id
 		left join
 			region r
-			on r.id = i.regiao_id
-		group by i.regiao_id
+			on r.id = h.regiao_id
+		group by h.regiao_id
 	) age
 	on age.regiao_id = r.id
 ;

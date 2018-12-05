@@ -22,7 +22,7 @@ with affiliate_filtered_base as (
 		and l.tipo='Afiliado'
 )
 select
-	base.sk_property,
+	base.sk_house_listing,
 	property_id,
 	payment_date::date as dt_cash_flow,
 	valor as vl_affiliate_commission,

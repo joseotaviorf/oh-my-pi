@@ -3,7 +3,7 @@ DROP VIEW vw_agent_contracts;
 CREATE VIEW vw_agent_contracts AS
 (
     SELECT DISTINCT liq.sk_contract_signed_date,
-                    liq.sk_house,
+                    liq.sk_house_listing,
                     liq.sk_contract,
                     agent.nome AS agent_name,
                     sig."date" AS dt_contract_signed,
@@ -20,10 +20,10 @@ CREATE VIEW vw_agent_contracts AS
                     END AS contract_commission,
                     p.endereco
     FROM
-        PUBLIC.fact_demand liq
+        PUBLIC.fact_listing_rent_flows liq
     LEFT JOIN
-        PUBLIC.fact_demand liq2
-        ON liq2.sk_house = liq.sk_house
+        PUBLIC.fact_listing_rent_flows liq2
+        ON liq2.sk_house_listing = liq.sk_house_listing
         AND liq2.sk_client = liq.sk_client
     LEFT JOIN
         PUBLIC.dim_contract c
@@ -38,8 +38,8 @@ CREATE VIEW vw_agent_contracts AS
         PUBLIC.dim_user agent
         ON liq2.sk_user_agent = agent.sk_user
     LEFT JOIN
-        PUBLIC.dim_property p
-        ON liq2.sk_house = p.sk_property
+        PUBLIC.dim_house_listing p
+        ON liq2.sk_house_listing = p.sk_house_listing
     LEFT JOIN
         PUBLIC.dim_region r
         ON r.sk_region = p.regiao_id

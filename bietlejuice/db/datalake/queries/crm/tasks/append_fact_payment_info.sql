@@ -7,19 +7,20 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(ct.id_origin as bigint) = cast(dc.sk_contract as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(dc.sk_contract as bigint))
   left join datalake_raw.ebdb_onboarding eo
     on trim(ct.origin) = 'Onboarding'
-      and cast(ct.id_origin as bigint) = cast(eo.id as bigint)
+      and cast(ct.id_origin as bigint) = try(cast(eo.id as bigint))
 ),
 contract_house_listing as (
   select
-    cast(sk_house as bigint) as sk_house_listing,
-    cast(sk_owner as bigint) as sk_owner,
-    cast(sk_contract as bigint) as sk_contract
-  from datalake_clean.ods_fact_demand
+    cast(sk_house_listing as bigint) as sk_house_listing,
+    cast(sk_owner as bigint) as sk_house_owner,
+    cast(sk_contract as bigint) as sk_contract,
+    cast(sk_client as bigint) as sk_tenant
+  from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
-  group by 1, 2, 3
+  group by 1, 2, 3, 4
 )
 select distinct
   c.sk_task,
@@ -41,7 +42,8 @@ select distinct
   c.task_user_resolve_hours,
   c.sk_contract,
   coalesce(chl.sk_house_listing, -1) as sk_house_listing,
-  coalesce(chl.sk_owner, -1) as sk_owner,
+  coalesce(chl.sk_house_owner, -1) as sk_house_owner,
+  coalesce(chl.sk_tenant, -1) as sk_tenant,
   c.dt_partition
 from contracts c
 left join contract_house_listing chl
