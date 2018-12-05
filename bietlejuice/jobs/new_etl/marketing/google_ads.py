@@ -87,7 +87,7 @@ class GoogleAds(Marketing):
             ('clicks', str),
             ('clicktype', str),
             ('cost', str),
-            ('keywordid', str),
+            ('criterionid', str),
             ('date', str),
             ('device', str),
             ('id', str),
