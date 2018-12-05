@@ -5,6 +5,8 @@ import zipfile
 from datetime import datetime
 
 import boto3
+import numpy as np
+import pandas as pd
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
@@ -113,20 +115,28 @@ class AmplitudeEventsETL(BaseETL):
     @logger
     def load_data_to_clean(self, execution_date):
         athena_client = AthenaClient(self.s3_bucket)
+        chunks = 20
 
         df_raw = self.get_all_columns(athena_client, execution_date)
+        df_final = pd.DataFrame()
+        i = 1
 
         if len(df_raw) <= 0:
             raise errors.EmptyDataError('m=load_data_to_clean, msg=empty dataframe')
-        else:
-            df_raw_json = json_normalize(df_raw.event_data.apply(json.loads))
 
-            df_raw_json['dt'] = df_raw['dt']
+        logger.info('m=load_data_to_clean, chunks={}, msg=Starting to normalize df'.format(
+            str(round(len(df_raw) / chunks))))
+        for chunk in np.array_split(df_raw, chunks):
+            logger.info('m=load_data_to_clean, chunk={}, msg=Starting new batch'.format(str(i)))
+
+            df_raw_json = json_normalize(chunk.event_data.apply(json.loads))
+
+            df_raw_json['dt'] = chunk['dt']
 
             df_properties = self.get_properties_as_df(athena_client=athena_client)
             df_raw_json = self.expand_columns(
                 athena_client=athena_client,
-                df=df_raw,
+                df=chunk,
                 df_props=df_properties,
                 df_json=df_raw_json,
                 properties='user_properties',
@@ -134,14 +144,17 @@ class AmplitudeEventsETL(BaseETL):
             )
             df_raw_json = self.expand_columns(
                 athena_client=athena_client,
-                df=df_raw,
+                df=chunk,
                 df_props=df_properties,
                 df_json=df_raw_json,
                 properties='event_properties',
                 prefix='e_'
             )
 
-            self.create_parquets(df_raw_json)
+            df_final = df_final.append(df_raw_json)
+            i += 1
+
+        self.create_parquets(athena_client=athena_client, execution_date=execution_date, df=df_final)
 
     @logger
     def get_all_columns(self, athena_client, execution_date):
@@ -245,15 +258,15 @@ class AmplitudeEventsETL(BaseETL):
 
         return str_type, formatted_prop.lower()
 
-    @logger
+    @logger(exclude='df')
     def create_parquets(self, athena_client, execution_date, df):
         today = str(execution_date.strftime('%Y-%m-%d'))
         ym = str(execution_date.strftime('%Y-%m'))
 
         ets = df.groupby('event_type')
         for df_et in ets:
-            key = '{0}/clean/amplitude/events/et={1}/ym={2}/{3}_{4}.parq'.format(self.s3_bucket, df_et[0],
-                                                                                 ym, today, 'events')
+            key = 'clean/amplitude/events/et={0}/ym={1}/{2}_{3}.parq'.format(df_et[0],
+                                                                             ym, today, 'events')
 
             logger.info('m=create_parquets, et={}, ym={}, filename={}_{}.parq'.format(df_et[0], ym,
                                                                                       today, 'events'))
