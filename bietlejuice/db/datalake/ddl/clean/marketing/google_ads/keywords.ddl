@@ -22,6 +22,6 @@ PARTITIONED BY (
   dt_created string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/google_ads/keywords_performance_report/'
+  's3://5a-datalake/clean/marketing/google_ads/marketing_google_keywords/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_google_keywords;
