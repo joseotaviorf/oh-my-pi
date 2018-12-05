@@ -64,6 +64,5 @@ select distinct
 from photo_jobs pj
 left join photo_job_house_listing pjhl
  on pj.sk_house_listing = pjhl.sk_house_listing
-   and pj.sk_photo_job != -1
+   and pj.sk_photo_job = -1
 ;
-
