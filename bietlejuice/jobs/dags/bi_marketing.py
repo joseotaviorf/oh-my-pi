@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSu
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.marketing.marketing_enum import MarketingEnum
 
-MAIN_DAG_NAME = 'bi-marketing'
+MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 2, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 
