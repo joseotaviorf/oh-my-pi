@@ -11,6 +11,7 @@ elasticsearch==5.4.0
 enum==0.4.6
 enum34==1.1.6
 et-xmlfile==1.0.1
+facebookads==2.11.1
 fastparquet>=0.1.6
 futures==3.0.5
 git+git://github.com/quintoandar/python-utils.git@v0.3.4
@@ -33,7 +34,7 @@ oauth2client>=3.0.0
 openpyxl==2.3.5
 paramiko>=2.4.1
 petl==1.1.1
-psycopg2==2.6.2
+psycopg2>=2.6.2
 pyarrow==0.4.0
 pyasn1==0.1.9
 pyasn1-modules==0.0.8

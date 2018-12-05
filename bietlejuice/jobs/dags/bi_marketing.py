@@ -1,0 +1,158 @@
+import airflow.utils.helpers as airflow_helpers
+import json
+from airflow.models import DAG
+from datetime import datetime
+from qa_python_utils.aws.athena import AthenaClient
+
+from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSubDagFactory
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.marketing.marketing_enum import MarketingEnum
+
+MAIN_DAG_NAME = 'bi-marketing-costs'
+MAIN_START_DATE = datetime(2018, 12, 2, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
+
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
+
+athena_client = AthenaClient(s3_bucket)
+
+FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
+
+GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
+
+# dags
+main_dag = DAG(
+    dag_id=MAIN_DAG_NAME,
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    catchup=True,
+    max_active_runs=1
+)
+
+
+def clean_sub_dag(sub_dag_name, clazz, accounts):
+    sub_dag = MarketingSubDagFactory.factory(
+        clazz=clazz,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        accounts=accounts
+    )
+
+    return sub_dag.build_tasks('clean')
+
+
+def load_to_pre_staging_sub_dag(sub_dag_name, clazz, accounts):
+    sub_dag = MarketingSubDagFactory.factory(
+        clazz=clazz,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        accounts=accounts
+    )
+
+    return sub_dag.build_tasks('pre_staging')
+
+
+def load_to_staging_sub_dag(sub_dag_name, clazz):
+    sub_dag = MarketingSubDagFactory.factory(
+        clazz=clazz,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )
+
+    return sub_dag.build_tasks('staging')
+
+
+def load_to_dw_sub_dag(sub_dag_name, clazz):
+    sub_dag = MarketingSubDagFactory.factory(
+        clazz=clazz,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )
+
+    return sub_dag.build_tasks('dw')
+
+
+facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name="facebook-ads-raw-to-clean",
+    clazz=MarketingEnum.FACEBOOK_ADS,
+    accounts=FACEBOOK_ADS_ACCOUNTS
+)
+
+facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_pre_staging_sub_dag,
+    sub_dag_name='facebook-ads-load-to-pre-staging',
+    clazz=MarketingEnum.FACEBOOK_ADS,
+    accounts=FACEBOOK_ADS_ACCOUNTS
+)
+
+facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='facebook-ads-load-to-staging',
+    clazz=MarketingEnum.FACEBOOK_ADS
+)
+
+facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='facebook-ads-load-to-dw',
+    clazz=MarketingEnum.FACEBOOK_ADS
+)
+
+google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='google-ads-raw-to-clean',
+    clazz=MarketingEnum.GOOGLE_ADS,
+    accounts=GOOGLE_ADS_ACCOUNTS
+)
+
+google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_pre_staging_sub_dag,
+    sub_dag_name='google-ads-load-to-pre-staging',
+    clazz=MarketingEnum.GOOGLE_ADS,
+    accounts=GOOGLE_ADS_ACCOUNTS
+)
+
+google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='google-ads-load-to-staging',
+    clazz=MarketingEnum.GOOGLE_ADS,
+)
+
+google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='google-ads-load-to-dw',
+    clazz=MarketingEnum.GOOGLE_ADS,
+)
+
+airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
+                      google_ads_load_to_dw_dag)
+airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
+                      facebook_ads_load_to_dw_dag)
