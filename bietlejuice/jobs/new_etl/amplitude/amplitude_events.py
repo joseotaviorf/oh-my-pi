@@ -7,7 +7,7 @@ from datetime import datetime
 import boto3
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl.amplitude import DW_QUERIES_DIR, QUERIES_DIR
+from bietlejuice.jobs.new_etl import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.wrappers.amplitude import amplitude_props_reader as props
 from bietlejuice.jobs.wrappers.amplitude.amplitude_export_api import AmplitudeExportApi
 from pandas import errors
@@ -173,7 +173,7 @@ class AmplitudeEventsETL(BaseETL):
     @classmethod
     @logger
     def __format_query_filename(cls, filename):
-        return '{}/{}.sql'.format(QUERIES_DIR, filename)
+        return '{}/amplitude/{}.sql'.format(DATALAKE_QUERIES_DIR, filename)
 
     @logger
     def get_properties_as_df(self, athena_client):
