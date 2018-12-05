@@ -123,38 +123,38 @@ class AmplitudeEventsETL(BaseETL):
 
         if len(df_raw) <= 0:
             raise errors.EmptyDataError('m=load_data_to_clean, msg=empty dataframe')
-        else:
-            logger.info('m=load_data_to_clean, chunks={}, msg=Starting to normalize df'.format(
-                str(round(len(df_raw) / chunks))))
-            for chunk in np.array_split(df_raw, chunks):
-                logger.info('m=load_data_to_clean, chunk={}, msg=Starting new batch'.format(str(i)))
 
-                df_raw_json = json_normalize(chunk.event_data.apply(json.loads))
+        logger.info('m=load_data_to_clean, chunks={}, msg=Starting to normalize df'.format(
+            str(round(len(df_raw) / chunks))))
+        for chunk in np.array_split(df_raw, chunks):
+            logger.info('m=load_data_to_clean, chunk={}, msg=Starting new batch'.format(str(i)))
 
-                df_raw_json['dt'] = chunk['dt']
+            df_raw_json = json_normalize(chunk.event_data.apply(json.loads))
 
-                df_properties = self.get_properties_as_df(athena_client=athena_client)
-                df_raw_json = self.expand_columns(
-                    athena_client=athena_client,
-                    df=chunk,
-                    df_props=df_properties,
-                    df_json=df_raw_json,
-                    properties='user_properties',
-                    prefix='u_'
-                )
-                df_raw_json = self.expand_columns(
-                    athena_client=athena_client,
-                    df=chunk,
-                    df_props=df_properties,
-                    df_json=df_raw_json,
-                    properties='event_properties',
-                    prefix='e_'
-                )
+            df_raw_json['dt'] = chunk['dt']
 
-                df_final = df_final.append(df_raw_json)
-                i += 1
+            df_properties = self.get_properties_as_df(athena_client=athena_client)
+            df_raw_json = self.expand_columns(
+                athena_client=athena_client,
+                df=chunk,
+                df_props=df_properties,
+                df_json=df_raw_json,
+                properties='user_properties',
+                prefix='u_'
+            )
+            df_raw_json = self.expand_columns(
+                athena_client=athena_client,
+                df=chunk,
+                df_props=df_properties,
+                df_json=df_raw_json,
+                properties='event_properties',
+                prefix='e_'
+            )
 
-            self.create_parquets(athena_client=athena_client, execution_date=execution_date, df=df_final)
+            df_final = df_final.append(df_raw_json)
+            i += 1
+
+        self.create_parquets(athena_client=athena_client, execution_date=execution_date, df=df_final)
 
     @logger
     def get_all_columns(self, athena_client, execution_date):
