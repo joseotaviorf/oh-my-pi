@@ -13,6 +13,7 @@ from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
+from bietlejuice.jobs.dags.skynet_recommender.notify_success import notify_success
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
@@ -35,6 +36,13 @@ COLD_PATH = 'listing2vec/cold/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 athena = AthenaClient(DATALAKE_BUCKET)
+
+env.set_airflow_var_to_local_env(
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION',
+    'KAFKA_BOOTSTRAP_SERVERS',
+)
 
 
 def build_raw_data(**kwargs):
@@ -225,4 +233,11 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
+notify_success_op = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='notify_success',
+    python_callable=notify_success,
+    op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
+)
+
+build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op >> notify_success_op

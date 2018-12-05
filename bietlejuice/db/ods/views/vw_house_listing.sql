@@ -15,14 +15,14 @@ not_pub as (
   select
     filt.id,
     'publicado'::varchar(255) as status_history,
-    date_trunc('seconds', i.first_publication) as status_time,
+    date_trunc('seconds', h.first_publication) as status_time,
     filt.aluguel,
     filt.tipo_porteiro
   from filt
-  left join imovel i
-   on i.id = filt.id
+  left join house h
+   on h.id = filt.id
   where filt.rn = 1
-    and date_trunc('seconds', i.first_publication) != date_trunc('seconds', filt.status_time)
+    and date_trunc('seconds', h.first_publication) != date_trunc('seconds', filt.status_time)
 ),
 aux_ish as (
   select

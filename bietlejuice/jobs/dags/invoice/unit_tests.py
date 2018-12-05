@@ -3,10 +3,9 @@ from qa_python_utils import QuintoAndarLogger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR
 
-logger = QuintoAndarLogger('invoice-unit-tests')
+logger = QuintoAndarLogger('SeuBarriga_invoice-unit-tests')
 
 
 @logger
@@ -31,7 +30,6 @@ def build(sub_dag_name, dag_name, schedule_interval, start_date, entity):
 def __test_count(**kwargs):
     dl_raw_query = BaseETL.get_query_from_file_name(kwargs['dl_raw_file_path'])
     dl_clean_query = BaseETL.get_query_from_file_name(kwargs['dl_clean_file_path'])
-    ods_query = BaseETL.get_query_from_file_name(kwargs['ods_file_path'])
 
     year_month = '{}-{}'.format(kwargs['execution_date'].year, kwargs['execution_date'].strftime('%m'))
     dl_raw_return = BaseTest.get_query_result_for_comparison(
@@ -44,12 +42,7 @@ def __test_count(**kwargs):
         from_athena=True
     ).values[0][0] if dl_clean_query != '' else None
 
-    ods_return = BaseTest.get_query_result_for_comparison(
-        query=ods_query.format(year_month=year_month),
-        enum_db=EnumDB.BI_ODS
-    )[1][0] if ods_query != '' else None
-
-    BaseTest.compare_sources(kwargs['acceptable_diff'], [dl_raw_return, dl_clean_return, ods_return])
+    BaseTest.compare_sources(kwargs['acceptable_diff'], [dl_raw_return, dl_clean_return])
     logger.info('m=__test_count, msg=counts are all equal')
 
 
@@ -66,7 +59,6 @@ def __build_test_tasks(local_dag, entity):
                                                               count_check_sql_suffix),
             'dl_clean_file_path': '{}/invoice/{}_clean_{}'.format(DATALAKE_TEST_QUERIES_DIR, entity,
                                                                   count_check_sql_suffix),
-            'ods_file_path': '{}/invoice/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, count_check_sql_suffix),
             'acceptable_diff': .0
         }
     )

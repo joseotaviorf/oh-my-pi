@@ -1,3 +1,4 @@
+from airflow.executors.local_executor import LocalExecutor
 from airflow.operators.subdag_operator import SubDagOperator
 from qa_python_utils import QuintoAndarLogger
 
@@ -58,7 +59,8 @@ class BaseSubDag(object):
             execution_timeout=execution_timeout,
             retries=retries,
             retry_delay=retry_delay,
-            max_retry_delay=max_retry_delay
+            max_retry_delay=max_retry_delay,
+            executor=LocalExecutor()
         )
 
     @logger

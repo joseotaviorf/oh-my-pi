@@ -64,6 +64,10 @@ select
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days,
+  case when (dt_conversion is null and dt_discarded is null) then null else
+        round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, DATE_ADD(date(dt_discarded), INTERVAL 1 DAY)),
+                                                    coalesce(dt_discarded, DATE_ADD(date(dt_conversion), INTERVAL 1 DAY))))/1440,1)
+       end as lead_to_processing_diff_days,
   exclusivity+0 as exclusivity
 from
 (
@@ -215,7 +219,10 @@ from
       end as acquisition_method,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
-        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when da.doormanAffiliateData_id is not null
+            and dad.joinedProgramAt <= l.criadoEm
+            and da.affiliateType = 'Doorman'
+            then 'Doorman'
         when l.tipo = 'Porteiro' then 'Doorman'
         when l.tipo = 'Afiliado' and l.origem = 'App' then 'Affiliate App'
         when l.tipo = 'Afiliado' and l.origem = 'Form' then 'Affiliate Form'
@@ -236,7 +243,10 @@ from
       end as acquisition_channel,
       case
         when uda.id = 279289 and l.origem <> 'Reprocessado' then 'Doorman'
-        when (da.doormanAffiliateData_id is not null) then 'Doorman'
+        when da.doormanAffiliateData_id is not null
+            and dad.joinedProgramAt <= l.criadoEm
+            and da.affiliateType = 'Doorman'
+            then 'Doorman'
         when l.tipo = 'Porteiro' then 'Doorman'
         when l.origem = 'Reprocessado' then 'Reprocessed'
         when l.tipo = 'Afiliado' then 'Affiliate'
@@ -318,6 +328,9 @@ from
     left join
       DadosAfiliado da
       on da.id = l.afiliadoQueIndicou_id
+    left join
+      DoormanAffiliateData dad
+      on da.doormanAffiliateData_id = dad.id
     left join
       Usuario uda
       on uda.dadosAfiliado_id = da.id

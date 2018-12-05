@@ -50,6 +50,7 @@ create table public.fact_supply (
 	qualified_to_opportunity_diff_days decimal(10,1),
 	opportunity_to_listing_diff_days decimal(10,1),
 	lead_to_listing_diff_days decimal(10,1),
+	lead_to_processing_diff_days decimal(10,1),
 	exclusivity smallint,
 	lead_type varchar(255),
 	lead_origin varchar(255),
