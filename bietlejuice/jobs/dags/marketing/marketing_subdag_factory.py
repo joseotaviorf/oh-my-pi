@@ -10,13 +10,13 @@ logger = QuintoAndarLogger("MarketingSubDagFactory")
 class MarketingSubDagFactory(object):
     @staticmethod
     @logger
-    def factory(clazz, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None, accounts=None):
-        __clazz = MarketingSubDagFactory.__dispatch_dict(clazz)
-        if clazz is None:
-            raise Exception('m=factory, clazz={}, msg=class type not found'.format(clazz))
+    def factory(class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None, accounts=None):
+        class__ = MarketingSubDagFactory.__dispatch_dict(class_)
+        if class_ is None:
+            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
 
-        return __clazz(
-            clazz=clazz,
+        return class__(
+            class_=class_,
             bucket=bucket,
             sub_dag_name=sub_dag_name,
             dag_name=dag_name,
@@ -28,8 +28,8 @@ class MarketingSubDagFactory(object):
 
     @staticmethod
     @logger
-    def __dispatch_dict(clazz):
+    def __dispatch_dict(class_):
         return {
             MarketingEnum.GOOGLE_ADS: MarketingGoogleAdsSubDag,
             MarketingEnum.FACEBOOK_ADS: MarketingFacebookAdsSubDag
-        }.get(clazz)
+        }.get(class_)

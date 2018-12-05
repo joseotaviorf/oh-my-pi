@@ -9,10 +9,10 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 class MarketingSubDag(BaseSubDag):
     @logger
-    def __init__(self, clazz, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
-        self.clazz = clazz
+        self.class_ = class_
         self.accounts = accounts
         self.dim_tables = []
         self.fact_tables = []
@@ -21,40 +21,40 @@ class MarketingSubDag(BaseSubDag):
 
     @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
-        marketing_clazz = MarketingFactory.factory(
-            _class=self.clazz,
+        marketing_class = MarketingFactory.factory(
+            _class=self.class_,
             s3_bucket=bucket,
             account=account,
             execution_date=kwargs['execution_date']
         )
-        getattr(marketing_clazz, 'move_{}_to_clean'.format(datalake_table))()
+        getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()
 
     @logger
     def transfer_to_pre_staging(self, bucket, clean_table, prod_table, **kwargs):
-        marketing_clazz = MarketingFactory.factory(
-            _class=self.clazz,
+        marketing_class = MarketingFactory.factory(
+            _class=self.class_,
             s3_bucket=bucket,
             execution_date=kwargs['execution_date']
         )
-        marketing_clazz.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
+        marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
 
     @logger
     def transfer_to_staging(self, bucket, dw_table, **kwargs):
-        marketing_clazz = MarketingFactory.factory(
-            _class=self.clazz,
+        marketing_class = MarketingFactory.factory(
+            _class=self.class_,
             s3_bucket=bucket,
             execution_date=kwargs['execution_date']
         )
-        marketing_clazz.load_to_staging(dw_table_name=dw_table)
+        marketing_class.load_to_staging(dw_table_name=dw_table)
 
     @logger
     def transfer_to_dw(self, bucket, dw_table, **kwargs):
-        marketing_clazz = MarketingFactory.factory(
-            _class=self.clazz,
+        marketing_class = MarketingFactory.factory(
+            _class=self.class_,
             s3_bucket=bucket,
             execution_date=kwargs['execution_date']
         )
-        marketing_clazz.load_to_prod(table_name=dw_table)
+        marketing_class.load_to_prod(table_name=dw_table)
 
     @logger
     def build_tasks(self, task_name):
