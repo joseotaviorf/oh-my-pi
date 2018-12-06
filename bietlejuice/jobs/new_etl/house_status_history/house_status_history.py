@@ -5,6 +5,7 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.new_etl import ODS_QUERIES_DIR
 
 logger = QuintoAndarLogger('HouseStatusHistory')
 
@@ -19,19 +20,6 @@ class HouseStatusHistory(object):
     Note: The table name will follow the Data naming convention only when the code logic is updated
     """
     TABLE_NAME = 'imovel_status_history'
-
-    EXTRACT_QUERY = """
-            select
-                *,
-                now()
-            from v_ImovelStatusHistory
-            where id in (
-                select distinct id
-                from v_Imovel_AUD  a
-                where a.date_status_changed >= '{}'
-                  and a.date_status_changed < '{}'
-            )
-        """
 
     @staticmethod
     @logger
@@ -52,12 +40,15 @@ class HouseStatusHistory(object):
     @logger
     def load_data_into_ods_stg(self):
         max_loaded_date = HouseStatusHistory.__get_max_loaded_date()
-        query_extract = HouseStatusHistory.EXTRACT_QUERY.format(
-            max_loaded_date if max_loaded_date else '2012-01-01',
-            datetime.today().date()
-        )
 
-        houses = self.__extract_houses_data(query_extract)
+        query_extract = BaseETL.get_query_from_file_name(
+            '{}/house_status_history/house_status_history_extract.sql'.format(ODS_QUERIES_DIR))
+        houses = self.__extract_houses_data(
+            query=query_extract.format(
+                max_loaded_date if max_loaded_date else '2012-01-01',
+                datetime.today().date()
+            )
+        )
 
         logger.info(
             'm=load_data_into_ods, table_name={}, msg=bulk inserting into ODS'.format(HouseStatusHistory.TABLE_NAME))
