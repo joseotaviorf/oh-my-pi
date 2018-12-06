@@ -11,6 +11,13 @@ pipeline:
       - pip install -q flake8==3.5.0
       - flake8 .
 
+  test:
+    image: python:2.7.12
+    commands:
+      - AIRFLOW_GPL_UNIDECODE=yes pip install -q -r requirements.txt
+      - pip install -q mock==2.0.0 pytest==4.0.1
+      - pytest tests
+
   install-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
@@ -22,7 +29,7 @@ pipeline:
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
@@ -41,7 +48,7 @@ pipeline:
     args: '-vI'
     script:
       - cd /var/www/airflow/
-      - airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      

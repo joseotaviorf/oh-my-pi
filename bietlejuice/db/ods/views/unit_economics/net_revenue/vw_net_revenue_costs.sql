@@ -7,7 +7,7 @@ drop view if exists unit_economics.vw_net_revenue_costs;
 ---
 create or replace view unit_economics.vw_net_revenue_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_affiliate_commission) as vl_affiliate_commission,
@@ -28,7 +28,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_affiliate_commission,
@@ -50,7 +50,7 @@ from
 		unit_economics.net_revenue_commission_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
@@ -72,7 +72,7 @@ from
 		unit_economics.net_revenue_revenues
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_affiliate_commission,
@@ -93,5 +93,5 @@ from
 	from
 		unit_economics.net_revenue_taxes
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;

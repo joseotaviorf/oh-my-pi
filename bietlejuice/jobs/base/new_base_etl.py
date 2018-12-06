@@ -1,9 +1,10 @@
 import os
 from datetime import datetime
 
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 logger = QuintoAndarLogger('new-base-etl')
 

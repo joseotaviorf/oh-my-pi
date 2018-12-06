@@ -1,0 +1,20 @@
+CREATE TABLE agent.agents_slots (
+	agent_id int8,
+	last_weekly_update timestamp,
+	last_specific_update timestamp,
+	slot_dt timestamp,
+	dow int4,
+	slot_number int4,
+	ss_available_slot int4,
+	available_slot int4,
+	available_slot_24h int4,
+	specific_update bool,
+	time_window_update bool,
+	visit_update bool,
+	has_visit bool,
+	self_service_visit bool,
+	last_change_reason varchar(100),
+	history_status int4,
+	planner_status int4,
+	specific_slot int4
+) ;

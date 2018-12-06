@@ -3,27 +3,27 @@ DROP VIEW vw_agent_contracts;
 CREATE VIEW vw_agent_contracts AS
 (
     SELECT DISTINCT liq.sk_contract_signed_date,
-                    liq.sk_house,
+                    liq.sk_house_listing,
                     liq.sk_contract,
                     agent.nome AS agent_name,
                     sig."date" AS dt_contract_signed,
-                    c.contract_status,
+                    c.status as contract_status,
                     CASE WHEN substring(p.id for 4) = '8927' THEN substring(p.id FROM 5)
                          WHEN substring(p.id FOR 4) = '8928' THEN concat('1',substring(p.id FROM 5))
                     END AS short_id_property,
                     r.NAME AS property_region,
                     (dense_rank() OVER (partition BY liq.sk_contract ORDER BY liq2.sk_user_agent ASC) +dense_rank() OVER (partition BY liq.sk_contract ORDER BY liq2.sk_user_agent DESC) - 1) AS number_of_agents_contract,
-                    c.renting_value,
+                    c.rent as renting_value,
                     visitor.nome AS name_visitor,
                     CASE WHEN sig."date" < '2018-02-12' THEN 0.2
                          ELSE COALESCE(ranking.commission,0.2)
                     END AS contract_commission,
                     p.endereco
     FROM
-        PUBLIC.fact_demand liq
+        PUBLIC.fact_listing_rent_flows liq
     LEFT JOIN
-        PUBLIC.fact_demand liq2
-        ON liq2.sk_house = liq.sk_house
+        PUBLIC.fact_listing_rent_flows liq2
+        ON liq2.sk_house_listing = liq.sk_house_listing
         AND liq2.sk_client = liq.sk_client
     LEFT JOIN
         PUBLIC.dim_contract c
@@ -38,8 +38,8 @@ CREATE VIEW vw_agent_contracts AS
         PUBLIC.dim_user agent
         ON liq2.sk_user_agent = agent.sk_user
     LEFT JOIN
-        PUBLIC.dim_property p
-        ON liq2.sk_house = p.sk_property
+        PUBLIC.dim_house_listing p
+        ON liq2.sk_house_listing = p.sk_house_listing
     LEFT JOIN
         PUBLIC.dim_region r
         ON r.sk_region = p.regiao_id

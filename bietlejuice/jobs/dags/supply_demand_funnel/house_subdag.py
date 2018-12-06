@@ -19,37 +19,38 @@ class HouseSubDag(DimSubDag):
             schedule_interval=schedule_interval,
             start_date=start_date,
             ebdb_table_name='Imovel',
-            ods_stg_table_name='property'
+            ods_stg_table_name='house_listing'
         )
 
     @logger
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task, dim_property,
+        (house_task, affiliate, rent_flow, listing_views, house_listing, staging_dim_house_listing_task,
+         dim_house_listing,
          dim_status_over_period) = self.__build_data_tasks(house_dag)
 
         tests_tasks = self.build_tests_tasks(house_dag)
 
-        affiliate >> property_task
-        staging_dim_property_task.set_upstream([rent_flow, property_listing, property_task])
-        staging_dim_property_task.set_downstream(tests_tasks)
-        dim_property.set_upstream(tests_tasks)
-        dim_property >> dim_status_over_period
+        affiliate >> house_listing
+        staging_dim_house_listing_task.set_upstream([rent_flow, house_listing, house_task])
+        staging_dim_house_listing_task.set_downstream(tests_tasks)
+        dim_house_listing.set_upstream(tests_tasks)
+        dim_house_listing >> dim_status_over_period
 
         return house_dag
 
     @logger
-    def get_property_query(self, **kwargs):
+    def get_house_query(self, **kwargs):
         exec_date = kwargs['execution_date']
-        dim = 'property'
+        dim = 'house'
 
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, dim)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
         utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
-                                                 table_name='imovel')
+                                                 table_name='house')
 
     @logger
     def __build_data_tasks(self, dag):
@@ -57,7 +58,7 @@ class HouseSubDag(DimSubDag):
             dag=dag,
             task_id='ODS_imovel',
             provide_context=True,
-            python_callable=self.get_property_query
+            python_callable=self.get_house_query
         )
 
         affiliate = BaseDAG.build_quintoandar_python_operator(
@@ -96,43 +97,43 @@ class HouseSubDag(DimSubDag):
 
         property_listing = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='ODS_property_listing',
+            task_id='ODS_house_listing',
             python_callable=utils.materialize_view_ods,
             op_kwargs={
-                'view_name': 'property_listing',
+                'view_name': 'house_listing',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
 
-        staging_dim_property_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_house_listing_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='STAGING_dim_property',
+            task_id='STAGING_dim_house_listing',
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'property'
+                'dim_name': 'house_listing'
             }
         )
 
-        dim_property = BaseDAG.build_quintoandar_python_operator(
+        dim_house_listing = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='DW_dim_property',
+            task_id='DW_dim_house_listing',
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'property',
+                'dim_name': 'house_listing',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
 
         dim_status_over_period = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
-            task_id='DW_dim_property_status_over',
+            task_id='DW_dim_house_listing_status_over',
             python_callable=utils.load_dim_from_ods_to_dw,
             op_kwargs={
-                'dim_name': 'property_status_over_period',
+                'dim_name': 'house_listing_status_over_period',
                 'insert_dummy': False,
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
 
-        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_property_task,
-                dim_property, dim_status_over_period)
+        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_house_listing_task,
+                dim_house_listing, dim_status_over_period)

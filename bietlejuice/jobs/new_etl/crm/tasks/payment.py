@@ -6,7 +6,11 @@ logger = QuintoAndarLogger('CRMTasksPayment')
 
 
 class CRMTasksPayment(CRMTasks):
-    QUEUES = ['BuscarPrimeiroBoleto']
+    QUEUES = [
+        'BuscarPrimeiroBoleto',
+        'PedidoDeReembolso',
+        'ConfirmarBoletoCondominio'
+    ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
         'DEP_FINANCEIRO_ID',

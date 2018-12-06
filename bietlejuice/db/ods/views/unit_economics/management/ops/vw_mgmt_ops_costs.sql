@@ -1,7 +1,7 @@
 drop view if exists unit_economics.vw_mgmt_ops_costs;
 create or replace view unit_economics.vw_mgmt_ops_costs as
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	date_trunc('month', dt_cash_flow)::date as dt_cash_flow,
 	sum(vl_bo_offboarding) as vl_bo_offboarding,
@@ -19,7 +19,7 @@ select
 from
 (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		vl_bo_offboarding,
@@ -38,7 +38,7 @@ from
 		unit_economics.mgmt_ops_bo_offboarding_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -57,7 +57,7 @@ from
 		unit_economics.mgmt_ops_bo_onboarding_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -76,7 +76,7 @@ from
 		unit_economics.mgmt_ops_bo_ongoing_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -95,7 +95,7 @@ from
 		unit_economics.mgmt_ops_collection_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -114,7 +114,7 @@ from
 		unit_economics.mgmt_ops_cs_post_sale_costs
 	union all
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		0 as vl_bo_offboarding,
@@ -132,5 +132,5 @@ from
 	from
 		unit_economics.mgmt_ops_inspection_costs
 ) tbl
-group by sk_property, property_id, dt_cash_flow
+group by sk_house_listing, property_id, dt_cash_flow
 ;

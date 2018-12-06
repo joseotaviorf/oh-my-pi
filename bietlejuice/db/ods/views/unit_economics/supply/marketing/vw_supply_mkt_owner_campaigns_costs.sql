@@ -70,7 +70,7 @@ ten_day_base as
 -- Divide all costs among versioned properties
 divided_costs as (
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		date_trunc('month', base.ten_pub_date + interval '2 month')::date as dt_cash_flow,
 		(coalesce(mkt.cost, 0)/count(1) over (
@@ -86,7 +86,7 @@ divided_costs as (
 total as (
 	-- Remove rows where costs equal zero
 	select
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow,
 		sum(vl_owner_campaigns)::decimal(14,8) as vl_owner_campaigns
@@ -95,12 +95,12 @@ total as (
 	where
 		vl_owner_campaigns <> 0
 	group by
-		sk_property,
+		sk_house_listing,
 		property_id,
 		dt_cash_flow
 )
 select
-	sk_property,
+	sk_house_listing,
 	property_id,
 	dt_cash_flow,
 	vl_owner_campaigns::decimal(14,4) as vl_owner_campaigns

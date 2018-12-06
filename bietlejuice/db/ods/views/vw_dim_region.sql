@@ -4,20 +4,19 @@ SELECT
   r.id as sk_region,
   coalesce(r.id, ar.id) as id,
   r.nivel as level,
-  coalesce(r.nome,ar.nome) as name,
+  coalesce(r.nome,ar.neighbourhood) as name,
   r."macroId" as macro_id,
   r."macroNome" as macro_name,
   r."cidadeId" as city_id,
-  coalesce(ar."cidadeNome", r."cidadeNome") as city_name,
-  ar."Nossa nomenclatura" as region_code,
-
-  ar."Nova nomenclatura" as new_region_code,
-	ar."estado" as short_region_name,
-	ar."Long region name" as long_region_name,
+  coalesce(ar.city, r."cidadeNome") as city_name,
+  ar.region_code as region_code,
+  ar.region_code_deprecated as region_code_deprecated,
+	ar.state as short_region_name,
+	ar.long_region_name as long_region_name,
 	case
-		when coalesce(r."cidadeNome", ar."cidadeNome") in ('Rio de Janeiro') then coalesce(r."cidadeNome", ar."cidadeNome")
-		when coalesce(r."cidadeNome", ar."cidadeNome") in ('Campinas') then coalesce(r."cidadeNome", ar."cidadeNome")
-		when coalesce(r."cidadeNome", ar."cidadeNome") in
+		when coalesce(r."cidadeNome", ar.city) in ('Rio de Janeiro') then coalesce(r."cidadeNome", ar.city)
+		when coalesce(r."cidadeNome", ar.city) in ('Campinas') then coalesce(r."cidadeNome", ar.city)
+		when coalesce(r."cidadeNome", ar.city) in
 			('São Paulo',
 			'São Bernardo do Campo',
 			'São Caetano do Sul',
@@ -38,14 +37,14 @@ FROM
 left join
 	(
 		select
-	    	i.regiao_id,
-	        min(i.data_criacao) as dt_first_property_created
+	    	h.regiao_id,
+	        min(h.data_criacao) as dt_first_property_created
 	    from
-		    imovel i
+		    house h
 	    where
-	    	i.regiao_id is not null
+	    	h.regiao_id is not null
 	    group by
-	    	i.regiao_id
+	    	h.regiao_id
 	) i
   on i.regiao_id = r.id
 left join
@@ -54,17 +53,17 @@ left join
 left join
 	(
 		select
-			i.regiao_id,
+			h.regiao_id,
 			min(b."data") as dt_first_booking
 		from
 			booking b
 		left join
-			imovel i
-			on b.imovel_id = i.id
+			house h
+			on b.imovel_id = h.id
 		left join
 			region r
-			on r.id = i.regiao_id
-		group by i.regiao_id
+			on r.id = h.regiao_id
+		group by h.regiao_id
 	) age
 	on age.regiao_id = r.id
 ;

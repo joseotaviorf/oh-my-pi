@@ -1,13 +1,12 @@
 from datetime import datetime
 
 from airflow import DAG
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -23,8 +22,8 @@ def read_query(file_name):
 
 @logger
 def delete_old_entries(entity, execution_date=None):
-    query = ("delete from staging.{0} where date(slot_dt) >= date('{1}')".format(entity, execution_date)
-             if execution_date is not None else 'truncate staging.{0}'.format(entity))
+    query = ("delete from agent.{0} where date(slot_dt) >= date('{1}')".format(entity, execution_date)
+             if execution_date is not None else 'truncate agent.{0}'.format(entity))
 
     BaseETL.execute_command(
         command=query,
@@ -49,11 +48,11 @@ def load_agents_slots(**kwargs):
 
     delete_old_entries(entity, execution_date)
 
-    logger.info("START - To Staging: {}".format(datetime.utcnow()))
+    logger.info("START - To DW: {}".format(datetime.utcnow()))
     BaseETL.dataframe_to_db(
         enum_db=EnumDB.BI_DW,
         df=data_frame,
-        table_name='staging.{}'.format(entity),
+        table_name='agent.{}'.format(entity),
         encoding='utf-8',
         append=True
     )
@@ -61,7 +60,7 @@ def load_agents_slots(**kwargs):
 
 def load_agents_scheduling(**kwargs):
     entity = 'agents_scheduling'
-    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     data_table = BaseETL.from_db_query(
@@ -78,13 +77,13 @@ def load_agents_scheduling(**kwargs):
         table_name=entity,
         encoding='utf-8',
         append=True,
-        schema='staging'
+        schema='agent'
     )
 
 
 def load_agents_signed_contracts():
     entity = 'agents_signed_contracts'
-    query = read_query('{}/staging/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
+    query = read_query('{}/agent/{}.sql'.format(DW_QUERIES_DIR, entity))
 
     data_table = BaseETL.from_db_query(
         db_enum=EnumDB.BI_DW,
@@ -98,7 +97,7 @@ def load_agents_signed_contracts():
         table_name=entity,
         encoding='utf-8',
         append=False,
-        schema='staging'
+        schema='agent'
     )
 
 

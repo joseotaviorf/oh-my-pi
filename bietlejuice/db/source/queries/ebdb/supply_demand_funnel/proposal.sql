@@ -20,12 +20,14 @@ select
   p.offer_id,
   p.criadoEm,
   p.atualizadoEm,
-  aud.tenant_doc_sent_count,
-  aud.tenant_first_doc_sent,
-  if(aud.doc_reused, aud.added_rev_doc_row, null) as tenant_auto_first_doc_sent,
-  aud.credit_analysis_init_date,
-  aud.credit_analysis_end_date,
-  coalesce(aud.doc_reused, 0) as doc_reused
+  aud_analysis.tenant_doc_sent_count,
+  aud_analysis.tenant_first_doc_sent,
+  if(aud_analysis.doc_reused, aud_analysis.added_rev_doc_row, null) as tenant_auto_first_doc_sent,
+  aud_analysis.credit_analysis_init_date,
+  aud_analysis.credit_analysis_end_date,
+  coalesce(aud_analysis.doc_reused, 0) as doc_reused,
+  aud_status.ts_processed,
+  p.rejectionReason as rejection_reason
 from
   Proposta p
 left join (
@@ -44,6 +46,18 @@ left join (
 	where p_aud.statusDocumentacaoInq_MOD = 1
 		and p_aud.statusDocumentacaoInq != 'NaoEnviado'
 	group by p_aud.id
-) aud
-	on aud.id_aud = p.id
+) aud_analysis
+	on aud_analysis.id_aud = p.id
+left join (
+    select
+      p_aud.id as id_aud,
+      max(from_unixtime(ure.`timestamp` / 1000)) as ts_processed
+    from Proposta_AUD p_aud
+    join UsuarioRevisionEntity ure
+      on p_aud.REV = ure.id
+        and p_aud.status_MOD = 1
+        and p_aud.status in ('Aprovada', 'Rejeitada')
+    group by 1
+) aud_status
+  on aud_status.id_aud = p.id
 where date(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= date('{}')

@@ -10,8 +10,8 @@ with base_jobs as (
 )
 select
 	j1.id as id_photo_job,
-	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_property,
-	coalesce(i.regiao_id, -1) as sk_region,
+	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_house_listing,
+	coalesce(h.regiao_id, -1) as sk_region,
 	coalesce(j1.user_cancel_id, -1) as sk_user_cancel,
 	coalesce(j1.photographer_id, -1) as sk_user_photographer,
 	coalesce(j1.rep_id, -1) as sk_user_rep,
@@ -54,8 +54,8 @@ left join
 	and j1.rn = j2.rn -1
 	and j1.dt_job_created + interval '30 day' > j2.dt_job_created
 left join
-	imovel i
-	on i.id = j1.imovel_id
+	house h
+	on h.id = j1.imovel_id
 left join
 	property_listing pl
 	on pl.id = j1.imovel_id

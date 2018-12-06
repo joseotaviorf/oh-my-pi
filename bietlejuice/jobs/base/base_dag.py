@@ -1,8 +1,7 @@
-from datetime import timedelta
-
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.quintoandar import QuintoAndarPythonOperator
+from datetime import timedelta
 
 
 class BaseDAG(object):

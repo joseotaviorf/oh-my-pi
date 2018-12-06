@@ -5,8 +5,8 @@ import boto3
 import pandas as pd
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('EBDBDatalake')
 
@@ -178,16 +178,27 @@ class EBDBDatalake(object):
             self.create_external_table(table_name[0], EBDBDatalake.RAW_DDL_SUFFIX)
 
     @logger
-    def get_table_names(self, skip_header=True):
+    def get_table_names(self, skip_header=True, priority_tables=None):
+
+        if priority_tables:
+            tables = ', '.join(map(lambda x: "'" + str(x) + "'", priority_tables['tables']))
+            order_clause = """
+                            (CASE WHEN TABLE_NAME in ({}) THEN 0 ELSE 1 END)
+                           """.format(str(tables))
+
         sql_tables = """
-                        select TABLE_NAME
-                        from information_schema.TABLES
-                        where TABLE_SCHEMA = '{}'
-                            and (TABLE_TYPE = 'BASE TABLE'
-                                    or TABLE_NAME = 'MapRegiao'
-                            )
-                            and TABLE_NAME not in ('ENT_REVTYPE', 'REVCHANGES')
-                    """.format(EBDBDatalake.SCHEMA_NAME)
+                        select TABLE_NAME from (
+                            select {0}, TABLE_NAME
+                            from information_schema.TABLES
+                            where TABLE_SCHEMA = '{1}'
+                                and (TABLE_TYPE = 'BASE TABLE'
+                                        or TABLE_NAME = 'MapRegiao'
+                                )
+                                and TABLE_NAME not in ('ENT_REVTYPE', 'REVCHANGES')
+                            order by 1, 2
+                        ) t_names
+                    """.format(order_clause if priority_tables else "'dummy_column'", EBDBDatalake.SCHEMA_NAME)
+
         table_names = BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_ebdb,
             query=sql_tables

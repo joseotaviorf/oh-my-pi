@@ -1,6 +1,6 @@
 drop table if exists public.fact_market_index;
 create table public.fact_market_index (
-  sk_property bigint,
+  sk_house_listing bigint,
   sk_external_property bigint,
   sk_snapshot_date integer,
   sk_updated_on_date integer,

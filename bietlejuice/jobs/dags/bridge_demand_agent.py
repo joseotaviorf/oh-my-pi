@@ -7,7 +7,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.agents.bridge_demand_agent import Bridge
+from bietlejuice.jobs.new_etl.agents.bridge_listing_rent_flows_agent import Bridge
 
 PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
 PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
@@ -27,11 +27,11 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
     logging.info('All Requirements met')
 
 
-def create_bdg_demand_agent():
+def create_bdg_listing_rent_flows_agent():
     bridge = Bridge(bucket_datalake)
-    data = bridge.get_data(f_name='bdg_demand_agent', db_enum=EnumDB.BI_DW, schema='public')
-    bridge.clean_table(schema='public', table='bdg_demand_agent', enumdb=EnumDB.BI_DW)
-    bridge.create_table_dw(table_name='bdg_demand_agent', data=data)
+    data = bridge.get_data(f_name='bdg_listing_rent_flows_agent', db_enum=EnumDB.BI_DW, schema='public')
+    bridge.clean_table(schema='public', table='bdg_listing_rent_flows_agent', enumdb=EnumDB.BI_DW)
+    bridge.create_table_dw(table_name='bdg_listing_rent_flows_agent', data=data)
 
 
 def guarantee_data_integrity(**kwargs):
@@ -63,20 +63,20 @@ dag = DAG(
     max_active_runs=1
 )
 
-# check the dependencies for bdg_demand_agent
-bdg_demand_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
+# check the dependencies for bdg_listing_rent_flows_agent
+bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     python_callable=xcom_dependencies,
-    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_demand'],
+    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_listing_rent_flows'],
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
-bdg_demand_agent = BaseDAG.build_quintoandar_python_operator(
+bdg_listing_rent_flows_agent = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='bdg_demand_agent',
-    python_callable=create_bdg_demand_agent,
+    python_callable=create_bdg_listing_rent_flows_agent,
     op_kwargs=None
 )
 
@@ -86,7 +86,7 @@ data_integrity_bdg_fact_agent = BaseDAG.build_quintoandar_python_operator(
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'bdg_demand_agent',
+               'f_name': 'bdg_listing_rent_flows_agent',
                'f_column': 'sk_slot_date_agent',
                'dim_name': 'fact_agent',
                'dim_column': 'sk_slot_date_agent',
@@ -99,7 +99,7 @@ data_integrity_bdg_dim_date = BaseDAG.build_quintoandar_python_operator(
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'bdg_demand_agent',
+               'f_name': 'bdg_listing_rent_flows_agent',
                'f_column': 'sk_date',
                'dim_name': 'dim_date',
                'dim_column': 'sk_date',
@@ -112,33 +112,33 @@ data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'bdg_demand_agent',
+               'f_name': 'bdg_listing_rent_flows_agent',
                'f_column': 'sk_agent',
                'dim_name': 'dim_user',
                'dim_column': 'dados_agente_id',
                'type': 'update'}
 )
 
-data_integrity_bdg_fact_demand = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_demand',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'bdg_demand_agent',
-               'f_column': 'sk_demand',
-               'dim_name': 'fact_demand',
+               'f_name': 'bdg_listing_rent_flows_agent',
+               'f_column': 'sk_listing_rent_flow',
+               'dim_name': 'fact_listing_rent_flows',
                'dim_column': 'ods_id',
                'type': 'update'}
 )
 
-data_integrity_fact_demand_dim_booking = BaseDAG.build_quintoandar_python_operator(
+data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='data_integrity_fact_demand_dim_booking',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
-               'f_name': 'fact_demand',
+               'f_name': 'fact_listing_rent_flows',
                'f_column': 'sk_booking',
                'dim_name': 'dim_booking',
                'dim_column': 'sk_booking',
@@ -165,6 +165,6 @@ refresh_agents = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Agents'}
 )
 
-(bdg_demand_agent_xcom_dependencies >> bdg_demand_agent >> data_integrity_bdg_fact_agent >>
+(bdg_listing_rent_flows_agent_xcom_dependencies >> bdg_listing_rent_flows_agent >> data_integrity_bdg_fact_agent >>
  data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking >>
- data_integrity_fact_demand_dim_booking >> data_integrity_bdg_fact_demand >> refresh_agents)
+ data_integrity_fact_listing_rent_flows_dim_booking >> data_integrity_bdg_fact_listing_rent_flows >> refresh_agents)

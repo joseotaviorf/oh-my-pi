@@ -57,7 +57,7 @@ potential_listings as (
 		coalesce(f.lead_id, -1) as sk_lead,
 		coalesce(f.conversao_id, -1) as sk_conversion,
 		coalesce(f.photo_job_id, -1) as sk_photo_job,
-		coalesce(f.imovel_id || '001' , '-1') as sk_property,
+		coalesce(f.imovel_id || '001' , '-1') as sk_house_listing,
 		coalesce(f.rep_id, -1) as sk_user_rep,
 		coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
 		coalesce(f.affiliate_id, -1) as sk_user_affiliate,
@@ -74,6 +74,7 @@ potential_listings as (
 		coalesce(to_char(f.dt_qualified::date,'YYYYMMDD')::integer, -1) as sk_qualified_date,
 		coalesce(to_char(f.dt_opportunity::date,'YYYYMMDD')::integer, -1) as sk_opportunity_date,
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
+		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
 		case
 			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 			then 'Lead Flow'
@@ -123,6 +124,7 @@ potential_listings as (
 		f.qualified_to_opportunity_diff_days,
 		f.opportunity_to_listing_diff_days,
 		f.lead_to_listing_diff_days,
+		f.lead_to_processing_diff_days,
 		f.exclusivity,
 		bl.lead_type,
 		bl.lead_origin,
@@ -153,11 +155,11 @@ potential_listings as (
 		rep_leads bl
 		on bl.lead_id = f.lead_id
 	left join
-		imovel i
-		on f.imovel_id = i.id
+		house h
+		on f.imovel_id = h.id
 	left join
 		usuario us_cad
-	    on us_cad.id = i.usuario_que_cadastrou_id
+	    on us_cad.id = h.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
 ),
 taxonomy as (
@@ -188,7 +190,7 @@ select
 	pl.sk_lead,
 	pl.sk_conversion,
 	pl.sk_photo_job,
-	pl.sk_property,
+	pl.sk_house_listing,
 	pl.sk_user_rep,
 	pl.sk_user_sales_rep,
 	pl.sk_user_affiliate,
@@ -205,6 +207,7 @@ select
 	pl.sk_qualified_date,
 	pl.sk_opportunity_date,
 	pl.sk_first_listing_date,
+	pl.sk_discard_date,
 	pl.flow,
 	pl.acquisition_method,
 	pl.acquisition_channel,
@@ -232,6 +235,7 @@ select
 	pl.qualified_to_opportunity_diff_days,
 	pl.opportunity_to_listing_diff_days,
 	pl.lead_to_listing_diff_days,
+	pl.lead_to_processing_diff_days,
 	pl.exclusivity,
 	pl.lead_type,
 	pl.lead_origin,

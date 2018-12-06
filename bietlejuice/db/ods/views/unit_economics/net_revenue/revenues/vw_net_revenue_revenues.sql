@@ -7,7 +7,7 @@ drop view if exists unit_economics.vw_net_revenue_revenues;
 ---
 create or replace view unit_economics.vw_net_revenue_revenues as
 select
-	coalesce(b_fee.sk_property, m_fee.sk_property) as sk_property,
+	coalesce(b_fee.sk_house_listing, m_fee.sk_house_listing) as sk_house_listing,
 	coalesce(b_fee.property_id, m_fee.property_id) as property_id,
 	coalesce(date_trunc('month', b_fee.dt_cash_flow)::date, date_trunc('month', m_fee.dt_cash_flow)::date) as dt_cash_flow,
 	coalesce(m_fee.vl_management_fee, 0) as vl_management_fee,
@@ -19,6 +19,6 @@ from
 	unit_economics.net_revenue_revenues_brokerage_fee b_fee
 full outer join
 	unit_economics.net_revenue_revenues_mgmt_fee m_fee
-	on b_fee.sk_property = m_fee.sk_property
+	on b_fee.sk_house_listing = m_fee.sk_house_listing
 	and b_fee.dt_cash_flow = m_fee.dt_cash_flow
 ;

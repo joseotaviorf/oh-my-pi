@@ -3,7 +3,6 @@ select
   a.data,
   a.status,
   a.tipo,
-  a.hash,
   a.confirmado,
   a.encerrado,
   a.agenteFixo,
