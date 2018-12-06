@@ -78,7 +78,7 @@ class HouseStatusHistory(object):
 
         logger.info('m=delete_duplicated_entries, msg=deleting duplicated entries')
         BaseETL.execute_command(
-            command=delete_query.format(table_name=HouseStatusHistory.TABLE_NAME).replace('[', '(').replace(']', ')'),
+            command=delete_query.format(table_name=HouseStatusHistory.TABLE_NAME),
             db_enum=EnumDB.BI_ODS,
             encoding='utf-8',
             commit=True
