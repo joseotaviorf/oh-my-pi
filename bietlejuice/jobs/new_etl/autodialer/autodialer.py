@@ -212,10 +212,10 @@ class UnidecodeHandler(json.JSONEncoder):
 
 
 # creating
-autodialer = AutodialerETL('5a-datalake', document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS)
-# raw
-autodialer.move_data_to_raw()
-autodialer.move_data_to_clean()
-# clean
+# autodialer = AutodialerETL('5a-datalake', document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS)
+# # raw
+# autodialer.move_data_to_raw()
+# autodialer.move_data_to_clean()
+# # clean
 # autodialer.move_data_to_clean('task_references')
 # task_references or task_reference_inbound_event_histories or task_reference_outbound_history

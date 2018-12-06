@@ -1,19 +1,17 @@
 from datetime import datetime
-from os import listdir
 
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-# env vars
-from bietlejuice.jobs.new_etl.autodialer import AUTODIALER_DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.autodialer.autodialer import AutodialerETL
+from bietlejuice.jobs.new_etl.autodialer.autodialer_enum import AutodialerEnum
 from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-MAIN_DAG_NAME = 'bi-autodialer'
+MAIN_DAG_NAME = 'bi-autodialer-with-subdags'
 MAIN_START_DATE = datetime(2018, 11, 15, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
@@ -34,13 +32,7 @@ main_dag = DAG(
 )
 
 
-@logger
-def get_files_list(document_type):
-    path = '{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, document_type)
-    return path, listdir(path)
-
-
-def clean_sub_dag(sub_dag_name):
+def autodialer_sub_dag(sub_dag_name, document_type_enum):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -49,51 +41,62 @@ def clean_sub_dag(sub_dag_name):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    _, dir_files = get_files_list('task_references')
-    if len(dir_files) > 0:
-        for _file in dir_files:
-            BaseDAG.build_python_operator(
-                dag=local_dag,
-                task_id='{}_to_clean'.format(_file.split(".")[0]),
-                python_callable=clean_dag,
-                provide_context=True,
-                op_kwargs={
-                    'document_type': 'task_references'
-                }
-            )
+    raw_task = BaseDAG.build_python_operator(
+        dag=local_dag,
+        task_id='{}_to_raw'.format(document_type_enum.value),
+        python_callable=move_to_raw,
+        provide_context=True,
+        op_kwargs={'document_type_enum': document_type_enum}
+    )
+
+    clean_task = BaseDAG.build_python_operator(
+        dag=local_dag,
+        task_id='{}_to_clean'.format(document_type_enum.value),
+        python_callable=move_to_clean,
+        provide_context=True,
+        op_kwargs={'document_type_enum': document_type_enum}
+    )
+
+    raw_task >> clean_task
 
     return local_dag
 
 
-@logger
-def task_references_raw_dag(**kwargs):
+@logger(exclude='kwargs')
+def move_to_raw(**kwargs):
     autodialer = AutodialerETL(
         bucket_name=s3_bucket,
-        execution_date=kwargs['execution_date']
+        document_type_enum=kwargs['document_type_enum']
     )
-    autodialer.move_data_to_raw('task_references')
+    autodialer.move_data_to_raw()
 
 
-@logger
-def clean_dag(document_type, **kwargs):
+@logger(exclude='kwargs')
+def move_to_clean(**kwargs):
     autodialer = AutodialerETL(
         bucket_name=s3_bucket,
-        execution_date=kwargs['execution_date']
+        document_type_enum=kwargs['document_type_enum']
     )
-    autodialer.move_data_to_clean(document_type)
+    autodialer.move_data_to_clean()
 
 
-task_references_raw = BaseDAG.build_python_operator(
+task_references = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    task_id='task_references_raw',
-    python_callable=task_references_raw_dag,
-    provide_context=True,
+    sub_dag_func=autodialer_sub_dag,
+    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCES.value),
+    document_type_enum=AutodialerEnum.TASK_REFERENCES
 )
 
-task_references_clean = BaseSubDag.get_sub_dag_operator(
+task_reference_inbound_events = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='task_references_clean'
+    sub_dag_func=autodialer_sub_dag,
+    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS.value),
+    document_type_enum=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS
 )
 
-task_references_raw >> task_references_clean
+task_reference_outbound_events = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=autodialer_sub_dag,
+    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS.value),
+    document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS
+)
