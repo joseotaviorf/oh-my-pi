@@ -21,14 +21,6 @@ def load_amplitude(**kwargs):
 
 
 @logger(exclude='kwargs')
-def merge_users(**kwargs):
-    execution_date = kwargs['execution_date']
-
-    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
-    amplitude_etl.merge_user_ids(ym=str(execution_date.strftime('%Y-%m')))
-
-
-@logger(exclude='kwargs')
 def load_amplitude_clean(**kwargs):
     execution_date = kwargs['execution_date']
 
@@ -63,13 +55,5 @@ load_events_to_clean_task = BaseDAG.build_quintoandar_python_operator(
     python_callable=load_amplitude_clean
 )
 
-merge_users_task = BaseDAG.build_quintoandar_python_operator(
-    dag=dag,
-    task_id='merge_users',
-    provide_context=True,
-    python_callable=merge_users
-)
-
 airflow_helpers.chain(load_events_to_raw_task,
-                      load_events_to_clean_task,
-                      merge_users_task)
+                      load_events_to_clean_task)
