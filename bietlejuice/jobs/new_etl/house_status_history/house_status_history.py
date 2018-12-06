@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import petl
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -74,14 +73,12 @@ class HouseStatusHistory(object):
 
     @logger
     def delete_duplicated_entries(self):
-        delete_query = 'delete from {} where id in {}'.format(
-            HouseStatusHistory.TABLE_NAME,
-            list(petl.aggregate(HouseStatusHistory.TABLE_NAME, 'id')['id'])
-        ).replace('[', '(').replace(']', ')')
+        delete_query = BaseETL.get_query_from_file_name(
+            '{}/house_status_history/house_status_history_dedup.sql'.format(ODS_QUERIES_DIR))
 
         logger.info('m=delete_duplicated_entries, msg=deleting duplicated entries')
         BaseETL.execute_command(
-            command=delete_query,
+            command=delete_query.format(table_name=HouseStatusHistory.TABLE_NAME).replace('[', '(').replace(']', ')'),
             db_enum=EnumDB.BI_ODS,
             encoding='utf-8',
             commit=True
