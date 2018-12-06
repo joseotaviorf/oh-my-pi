@@ -80,10 +80,8 @@ class AutodialerETL(object):
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
             logger.info('m=move_data_to_clean, msg=Created partition in clean.'.format(key))
 
-        if len(dir_files) > 0:
-            pass
-        else:
-            logger.error('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
+        if len(dir_files) == 0:
+            raise Exception('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
 
     # aux methods
     @logger
@@ -94,10 +92,10 @@ class AutodialerETL(object):
             return self.db.taskReferenceInboundEventHistories
         if self.document_type_enum == AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS:
             return self.db.taskReferenceOutboundHistory
-        else:
-            raise ValueError(
-                'm=__mongo_connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
-                    self.document_type, self.document_type_enum))
+
+        raise ValueError(
+            'm=__mongo_connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
+                self.document_type, self.document_type_enum))
 
     @logger
     def get_mongo_data(self):

@@ -17,7 +17,6 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
-# dags
 main_dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
