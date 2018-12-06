@@ -1,6 +1,7 @@
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.new_etl import ODS_QUERIES_DIR
 
 logger = QuintoAndarLogger('HouseStatusFullHistory')
 
@@ -15,13 +16,6 @@ class HouseStatusFullHistory(object):
     """
 
     TABLE_NAME = 'imovel_status_full_history'
-
-    INSERT_QUERY = """
-        insert into {ods_table_name}
-            select *
-            from f_list_imovel_status_full_history({offset},{offset_increment})
-            where all_status_date_position_flag
-    """
 
     def __truncate_ods_table(self):
         BaseETL.truncate_table(
@@ -47,6 +41,9 @@ class HouseStatusFullHistory(object):
 
     @logger
     def load_data_into_ods(self):
+        insert_query = BaseETL.get_query_from_file_name(
+            '{}/house_status_history/house_status_full_history_insert.sql'.format(ODS_QUERIES_DIR))
+
         ids_count = HouseStatusFullHistory.__get_ids_count()
 
         offset = 0
@@ -58,9 +55,9 @@ class HouseStatusFullHistory(object):
                 HouseStatusFullHistory.TABLE_NAME))
             BaseETL.execute_command(
                 db_enum=EnumDB.BI_ODS,
-                command=HouseStatusFullHistory.INSERT_QUERY.format(ods_table_name=HouseStatusFullHistory.TABLE_NAME,
-                                                                   offset=offset,
-                                                                   offset_increment=offset_inc),
+                command=insert_query.format(ods_table_name=HouseStatusFullHistory.TABLE_NAME,
+                                            offset=offset,
+                                            offset_increment=offset_inc),
                 encoding='utf-8',
                 commit=True
             )
