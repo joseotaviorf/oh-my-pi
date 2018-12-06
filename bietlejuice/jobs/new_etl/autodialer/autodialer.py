@@ -7,9 +7,9 @@ from os import listdir
 
 import numpy as np
 import pandas as pd
-from __init__ import AUTODIALER_DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.autodialer.autodialer_enum import AutodialerEnum
 from pandas.io.json import json_normalize
 from pymongo import MongoClient, ASCENDING
@@ -49,7 +49,7 @@ class AutodialerETL(object):
 
     @logger(exclude='df')
     def move_data_to_clean(self):
-        path, dir_files = self.get_files_list()
+        path, dir_files = self.__get_files_list()
 
         for _file in dir_files:
             table_name = _file.split(".")[0]
@@ -60,7 +60,7 @@ class AutodialerETL(object):
                 partition="dt='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
 
-            df = self.get_athena_data(filequery=_file)
+            df = self.__get_athena_data(filequery=_file)
             logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
 
             # treat data
@@ -95,30 +95,28 @@ class AutodialerETL(object):
         if self.document_type_enum == AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS:
             return self.db.taskReferenceOutboundHistory
         else:
-            raise ValueError('m=connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
-                self.document_type, self.document_type_enum))
+            raise ValueError(
+                'm=__mongo_connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
+                    self.document_type, self.document_type_enum))
 
     @logger
     def get_mongo_data(self):
         mongo_db = self.__mongo_connect()
-        raw_data = self.__get_mongo_data(mongo_db)
-        return raw_data
-
-    @logger(exclude='mongo_db')
-    def __get_mongo_data(self, mongo_db):
+        # TODO
+        # Implement dynamic data filter
         filter = None if self.execution_date is not None else ''
 
-        documents = mongo_db.find().sort("_id", ASCENDING)
-        return documents
+        raw_data = mongo_db.find().sort("_id", ASCENDING)
+        return raw_data
 
     @logger
-    def get_athena_data(self, filequery):
-        filequery = '{}/{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, self.document_type, filequery)
+    def __get_athena_data(self, filequery):
+        filequery = '{}/autodialer/{}/{}'.format(DATALAKE_QUERIES_DIR, self.document_type, filequery)
         return self.athena_client.execute_file_query_and_return_dataframe(filename=filequery)
 
     @logger
-    def get_files_list(self):
-        path = '{}/{}'.format(AUTODIALER_DATALAKE_QUERIES_DIR, self.document_type)
+    def __get_files_list(self):
+        path = '{}/autodialer/{}'.format(DATALAKE_QUERIES_DIR, self.document_type)
         return path, listdir(path)
 
     @logger(exclude='df')
@@ -138,9 +136,9 @@ class AutodialerETL(object):
 
                 # Remove df from memory to use it again in the next iteration
                 del df_concat
-                logger.info('m=normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
+                logger.info('m=__normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
             except Exception:
-                logger.info('m=normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
+                logger.info('m=__normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
 
         old_columns = df_treated.columns
         snake_case_columns = self.__to_snake_case_columns(old_columns)
@@ -153,6 +151,7 @@ class AutodialerETL(object):
 
         return df_unique_columns
 
+    @logger(exclude='old_columns')
     def __to_snake_case_columns(self, old_columns):
         _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
@@ -209,13 +208,3 @@ class UnidecodeHandler(json.JSONEncoder):
             return obj.isoformat(' ') if obj.year >= 1900 else obj.replace(year=obj.year + 2000)
 
         return unidecode(unicode(str(obj)))
-
-
-# creating
-# autodialer = AutodialerETL('5a-datalake', document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS)
-# # raw
-# autodialer.move_data_to_raw()
-# autodialer.move_data_to_clean()
-# # clean
-# autodialer.move_data_to_clean('task_references')
-# task_references or task_reference_inbound_event_histories or task_reference_outbound_history

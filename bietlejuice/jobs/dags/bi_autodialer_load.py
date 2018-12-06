@@ -11,7 +11,7 @@ from qa_python_utils import QuintoAndarLogger
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-MAIN_DAG_NAME = 'bi-autodialer-with-subdags'
+MAIN_DAG_NAME = 'bi-autodialer-load'
 MAIN_START_DATE = datetime(2018, 11, 15, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
@@ -83,20 +83,20 @@ def move_to_clean(**kwargs):
 task_references = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
-    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCES.value),
+    sub_dag_name=AutodialerEnum.TASK_REFERENCES.value,
     document_type_enum=AutodialerEnum.TASK_REFERENCES
 )
 
 task_reference_inbound_events = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
-    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS.value),
+    sub_dag_name=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS.value,
     document_type_enum=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS
 )
 
 task_reference_outbound_events = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
-    sub_dag_name='{}_move_to_raw_and_clean'.format(AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS.value),
+    sub_dag_name=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS.value,
     document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS
 )
