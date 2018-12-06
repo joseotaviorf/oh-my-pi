@@ -72,7 +72,7 @@ class HouseStatusHistory(object):
 
     @logger
     def __extract_houses_data(self, query):
-        logger.info('m=__extract_houses_data', msg='querying ebdb database')
+        logger.info('m=__extract_houses_data, msg=querying ebdb database')
         houses = BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_ebdb,
             query=query
