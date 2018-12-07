@@ -15,13 +15,14 @@ from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
+from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
 MAIN_DAG_NAME = 'skynet-listing_mgmt'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
+MAIN_SCHEDULE_INTERVAL = '@once'  # '30 3 * * *'
 
 # {"params": 
 #     {"min_occurrence": 20, 
@@ -38,45 +39,43 @@ MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 #     {"name": "recommender", 
 #     "namespace": "prod"}}
 
-# todo: how to generalize this code so that it also runs locally?
-DATALAKE_BUCKET = env.env.get_airflow_env_var('bi-datalake-s3-bucket')
+DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
-OUTPUT_BUCKET = env.env.get_airflow_env_var('bi-data-science-s3-bucket')
 SKYNET_LISTMGMT_KWARGS = env.get_airflow_env_var('SKYNET_LISTMGMT_KWARGS')
 SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
 SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
 KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
 
 # output of fit # todo : for what?  we write there  the job_name/output/model.tar.gz ?
-TRAINING_PATH = 'list_mgmt/training'
-INPUT_PATH = 'list_mgmt/data/raw/dt={}'
-PREDICTIONS_PATH = 'list_mgmt/data/predictions/dt={}'
+# these are paths on S3 (s3 skynet_bucket path)
+INPUT_PATH = 'listing-mgmt/data/raw/dt={}'  # where on s3 to write the input data to give to fit (and copy inside the container to /opt/ml/input/data/training)
+TRAINING_PATH = 'listing-mgmt/training'  # where to put the output of train on s3 (from /opt/ml/output in the container)
+PREDICTIONS_PATH = 'listing-mgmt/data/predictions/dt={}'  # folder on s3 to untar the files found in TRAINING_PATH
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 athena = AthenaClient(DATALAKE_BUCKET)
 
 
 @logger
-def load_listing_info():
+def load_listing_info(exec_date):
     """
     returns a dataframe with
     'sk_house_listing',
     'publication_date'
     """
-    dirname = os.path.realpath('.')
     logger.info('Downloading the listing data per day of publication (indicators of interest, etc)')
     client = AthenaClient(DATALAKE_BUCKET)
-    relative_path = 'bietlejuice/jobs/new_etl/listing_management/listing_information.sql'
-    with open(os.path.join(dirname, relative_path), 'r') as fd:
+    path = os.path.join(SKYNET_QUERIES_DIR, 'listing_management/listing_information.sql')
+    with open(path, 'r') as fd:
         query = fd.read()
     lid = client.execute_query_and_wait_for_results(
-        query, s3_bucket=OUTPUT_BUCKET,
-        bucket_folder_path='listing-mgmt/data/raw')
+        query, s3_bucket=SKYNET_BUCKET,
+        bucket_folder_path=INPUT_PATH.format(exec_date))
     return lid
 
 
 @logger
-def load_historical_ioi():
+def load_historical_ioi(exec_date):
     """
     returns the name of the csv file on s3 containing a dataframe with,
      for each date, the number of events for each IOI
@@ -92,23 +91,23 @@ def load_historical_ioi():
     'condominio_mod'
     'last_status_day'
     """
-    dirname = os.path.realpath('.')
     logger.info('Downloading the listing data per day of publication (indicators of interest, etc)')
     client = AthenaClient(DATALAKE_BUCKET)
-    relative_path = 'bietlejuice/jobs/new_etl/listing_management/indicators_of_interest_by_date.sql'
-    with open(os.path.join(dirname, relative_path), 'r') as fd:
+    path = os.path.join(SKYNET_QUERIES_DIR, 'listing_management/indicators_of_interest_by_date.sql')
+    with open(path, 'r') as fd:
         query = fd.read()
     hid = client.execute_query_and_wait_for_results(
-        query, s3_bucket=OUTPUT_BUCKET,
-        bucket_folder_path='listing-mgmt/data/raw')
+        query, s3_bucket=SKYNET_BUCKET,
+        bucket_folder_path=INPUT_PATH.format(exec_date))
     return hid
 
 
 def build_raw_data(**kwargs):
-    lid = load_listing_info()
-    hid = load_historical_ioi()
+    logger.info('build_raw_data, kwargs={}'.format(kwargs))
+    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+    lid = load_listing_info(exec_date)
+    hid = load_historical_ioi(exec_date)
 
-    # todo : where is the key ti coming from?
     xcom.xcom_push(kwargs.get('ti'), key='lid', k_value=lid)
     xcom.xcom_push(kwargs.get('ti'), key='hid', k_value=hid)
 
@@ -118,18 +117,19 @@ def train_model(**kwargs):
     and creates a sagemaker instance to 'train' the model (in our case,
     to make predictions)
     """
+    logger.info('train_model, kwargs={}'.format(kwargs))
 
     lid = xcom.xcom_pull(kwargs.get('ti'), key='lid', dag_id=MAIN_DAG_NAME)
     hid = xcom.xcom_pull(kwargs.get('ti'), key='hid', dag_id=MAIN_DAG_NAME)
-    # todo : what should be the value ? now?
-    exec_date = kwargs.get('execution_date')
+
+    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
 
     params = kwargs.get('params')
     params.update(
         dict(raw_house_listing_file=lid + '.csv',
              raw_historical_data_file=hid + '.csv'))
 
-    job_name = 'skynet-list_mgmt-' + datetime.now().strftime(
+    job_name = 'skynet-listing-management-' + datetime.now().strftime(
         "%Y-%m-%d-%H-%M-%S")
     logger.info(
         'm=train_model, job_name={}, params={}'.format(job_name, params))
@@ -146,7 +146,7 @@ def train_model(**kwargs):
     model.fit(
         's3://{}/{}'.format(
             SKYNET_BUCKET,
-            INPUT_PATH.format(exec_date.strftime('%Y-%m-%d'))),
+            INPUT_PATH.format(exec_date)),
         job_name=job_name,
         logs=False)
 
@@ -156,12 +156,13 @@ def train_model(**kwargs):
 def untar_output(**kwargs):
     """untars the output of the training (in our case, the predictions)
     """
+    logger.info('untar_output, kwargs={}'.format(kwargs))
 
     bucket = boto3.resource('s3').Bucket(SKYNET_BUCKET)
     job_name = xcom.xcom_pull(
         kwargs.get('ti'), key='job_name', dag_id=MAIN_DAG_NAME)
-    # todo: which exec date?
-    exec_date = kwargs.get('execution_date')
+
+    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
 
     model_filename = os.path.join(
         TRAINING_PATH, job_name, 'output/model.tar.gz')
@@ -169,30 +170,25 @@ def untar_output(**kwargs):
 
     logger.info('m=untar_output, msg=model loaded, decompressing output...')
     with tarfile.open(fileobj=model_obj) as tar:
-        preds_json = tar.extractfile('preds.json').read()  # todo : currently files contain _date
-        preds_csv = tar.extractfile('preds.csv').read()
+        preds_json = tar.extractfile(
+            'preds_{}.json'.format(exec_date)).read()
 
     logger.info(
         'm=untar_output, msg=saving predictions to {}.'.format(
-            PREDICTIONS_PATH.format(exec_date.strftime('%Y-%m-%d'))))
+            PREDICTIONS_PATH.format(exec_date)))
     preds_json_filename = os.path.join(
-        PREDICTIONS_PATH.format(exec_date.strftime('%Y-%m-%d')),
+        PREDICTIONS_PATH.format(exec_date),
         'preds.json')
     bucket.Object(preds_json_filename).put(Body=preds_json)
-    preds_csv_filename = os.path.join(
-        PREDICTIONS_PATH.format(exec_date.strftime('%Y-%m-%d')),
-        'preds.json')
-    bucket.Object(preds_csv_filename).put(Body=preds_csv)
 
-    # todo : what are we doing here?
-    athena.upsert_single_partition(
-        bucket_folder_path=os.path.join(
-            SKYNET_BUCKET, 'list_mgmt/predictions'),
-        database='skynet',
-        table='listing_mgmt_csv',
-        partition_name='dt',
-        partition_value=exec_date.strftime('%Y-%m-%d')
-    )
+    # athena.upsert_single_partition(
+    #     bucket_folder_path=os.path.join(
+    #         SKYNET_BUCKET, 'list_mgmt/predictions'),
+    #     database='skynet',
+    #     table='listing_mgmt_csv',
+    #     partition_name='dt',
+    #     partition_value=exec_date
+    # )
 
 
 def restart_service(**kwargs):
@@ -244,8 +240,8 @@ build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='build_raw_data',
     python_callable=build_raw_data,
-    provide_context=True,  # todo means to give the kwargs ? 
-    op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)  # todo : what does it contain?
+    provide_context=True,
+    op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
 # calls the train function with the predict flag (on sagemaker)
@@ -276,4 +272,4 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
+build_raw_data_op >> train_model_op >> untar_output_op  # >> restart_service_op
