@@ -26,7 +26,33 @@ class GoogleAds(Marketing):
     @logger
     def __init__(self, s3_bucket, execution_date, account=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
-        self.datalake_tables = ["marketing_google_keywords", "marketing_google_ads"]
+        self.datalake_tables = ["marketing_google_keywords", "marketing_google_ads", "campaigns_performance_report"]
+
+    @logger
+    def move_campaigns_to_clean(self):
+        r_cols = OrderedDict([
+            ('customer_id', str),
+            ('campaign_id', str),
+            ('campaign_name', str),
+            ('clicks', str),
+            ('click_type', str),
+            ('cost', str),
+            ('date', str),
+            ('device', str),
+            ('impressions', str),
+            ('account_name', str),
+            ('hour_of_day', str),
+            ('month', str),
+            ('labels', str),
+            ('week', str),
+            ('year', str)
+        ])
+
+        self._move_to_clean(
+            table_name='marketing_google_campaigns',
+            sql_file_name='campaign.sql',
+            r_cols=r_cols
+        )
 
     @logger
     def move_keywords_to_clean(self):

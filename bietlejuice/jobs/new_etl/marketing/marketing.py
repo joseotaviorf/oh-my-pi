@@ -40,7 +40,7 @@ class Marketing(object):
         self.database = 'datalake_raw'
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols):
+    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
         key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/' \
               'dt_created={date_partition}/{file_name}.parquet' \
             .format(
