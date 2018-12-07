@@ -236,6 +236,7 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
 notify_success_op = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='notify_success',
+    provide_context=True,
     python_callable=notify_success,
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
