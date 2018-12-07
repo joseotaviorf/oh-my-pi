@@ -39,6 +39,10 @@ MAIN_SCHEDULE_INTERVAL = '@once'  # '30 3 * * *'
 #     {"name": "recommender",
 #     "namespace": "prod"}}
 
+env.set_airflow_var_to_local_env(
+    'AWS_SECRET_ACCESS_KEY', 'AWS_DEFAULT_REGION', 'AWS_ACCESS_KEY_ID',
+    'AWS_REGION', 'AWS_ENDPOINT_URL')
+
 DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
 SKYNET_LISTMGMT_KWARGS = env.get_airflow_env_var('SKYNET_LISTMGMT_KWARGS')
