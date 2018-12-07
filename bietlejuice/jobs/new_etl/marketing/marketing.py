@@ -1,4 +1,5 @@
 import petl
+from datetime import timedelta
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
@@ -31,7 +32,7 @@ class Marketing(object):
     @logger
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
         self.s3_bucket = s3_bucket
-        self.execution_date = execution_date
+        self.execution_date = execution_date - timedelta(1)
         self.account = account
         self.partition_date = self.execution_date.strftime('%Y-%m-%d')
         self.athena_client = AthenaClient(self.s3_bucket)
