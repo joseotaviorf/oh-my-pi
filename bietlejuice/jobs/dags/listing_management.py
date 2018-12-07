@@ -20,7 +20,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
 MAIN_DAG_NAME = 'skynet-listing-management'
-MAIN_START_DATE = datetime(2018, 12, 7)
+MAIN_START_DATE = datetime(2018, 1, 1)
 MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
 
 env.set_airflow_var_to_local_env(
@@ -60,12 +60,11 @@ def load_listing_info(exec_date):
         'exec_date={}, '
         'msg=downloading the listing data per day of publication '
         '(indicators of interest, etc)'.format(exec_date))
-    client = AthenaClient(DATALAKE_BUCKET)
     path = os.path.join(
         SKYNET_QUERIES_DIR, 'listing_management/listing_information.sql')
     with open(path, 'r') as fd:
         query = fd.read()
-    lid = client.execute_query_and_wait_for_results(
+    lid = athena.execute_query_and_wait_for_results(
         query, s3_bucket=SKYNET_BUCKET,
         bucket_folder_path=INPUT_PATH.format(exec_date))
     return lid
@@ -93,13 +92,12 @@ def load_historical_ioi(exec_date):
         'exec_date={}, '
         'msg=downloading the listing data per day of publication '
         '(indicators of interest, etc)'.format(exec_date))
-    client = AthenaClient(DATALAKE_BUCKET)
     path = os.path.join(
         SKYNET_QUERIES_DIR,
         'listing_management/indicators_of_interest_by_date.sql')
     with open(path, 'r') as fd:
         query = fd.read()
-    hid = client.execute_query_and_wait_for_results(
+    hid = athena.execute_query_and_wait_for_results(
         query, s3_bucket=SKYNET_BUCKET,
         bucket_folder_path=INPUT_PATH.format(exec_date))
     return hid
