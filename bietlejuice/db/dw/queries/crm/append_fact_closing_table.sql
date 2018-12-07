@@ -19,7 +19,7 @@ select
   sk_proposal,
   sk_contract,
   sk_house_listing,
-  sk_owner,
+  sk_house_owner,
   sk_tenant,
   getdate() as ts_load
 from staging.{table_name}

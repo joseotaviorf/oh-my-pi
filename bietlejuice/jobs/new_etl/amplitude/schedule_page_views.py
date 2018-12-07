@@ -1,7 +1,6 @@
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.new_etl.amplitude import QUERIES_DIR
 from bietlejuice.jobs.new_etl.amplitude.growth_amplitude import GrowthAmplitude
 
 logger = QuintoAndarLogger('SchedulePageViews')
@@ -32,7 +31,7 @@ class SchedulePageViews(GrowthAmplitude):
     @logger
     def __append(self, _filter, prefix):
         middle_query = BaseETL.get_query_from_file_name(
-            '{}/{}/middle_{}.sql'.format(QUERIES_DIR, self.measure, _filter))
+            '{}/{}/middle_{}.sql'.format(GrowthAmplitude.QUERIES_DIR, self.measure, _filter))
 
         df = self.get_df(prefix=prefix,
                          middle=middle_query,
