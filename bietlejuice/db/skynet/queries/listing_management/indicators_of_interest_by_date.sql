@@ -277,7 +277,7 @@ docs_first_sent as (
       end, '\d{4}-\d{2}-\d{2}')) as sent_date,
     count(f.sk_proposal) as docs_sent
   from datalake_clean.ods_dim_proposal dprop
-  join datalake_clean.ods_fact_demand f
+  join datalake_clean.ods_fact_listing_rent_flows f
     on dprop.sk_proposal = f.sk_proposal
   where (dprop.dt_tenant_first_document_sent is not null
       and dprop.dt_tenant_first_document_sent != '')
@@ -292,7 +292,7 @@ docs_completed as (
     date(regexp_extract(dt_credit_analysis_init, '\d{4}-\d{2}-\d{2}')) as completed_date,
     count(f.sk_proposal) as docs_completed
   from datalake_clean.ods_dim_proposal dprop
-  join datalake_clean.ods_fact_demand f
+  join datalake_clean.ods_fact_listing_rent_flows f
     on dprop.sk_proposal = f.sk_proposal
   where dprop.dt_credit_analysis_init is not null
     and dprop.dt_credit_analysis_init != ''
@@ -304,7 +304,7 @@ docs_approved as (
     date(regexp_extract(dt_credit_analysis_end, '\d{4}-\d{2}-\d{2}')) as approved_date,
     count(f.sk_proposal) as docs_approved
   from datalake_clean.ods_dim_proposal dprop
-  join datalake_clean.ods_fact_demand f
+  join datalake_clean.ods_fact_listing_rent_flows f
     on dprop.sk_proposal = f.sk_proposal
   where dprop.dt_credit_analysis_end is not null
     and dprop.dt_credit_analysis_end != ''
