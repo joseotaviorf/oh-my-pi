@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import boto3
-# import kubernetes.client as kube
 import sagemaker
 from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
@@ -21,23 +20,8 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
 MAIN_DAG_NAME = 'skynet-listing-management'
-MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '@once'  # '30 3 * * *'
-
-# {"params":
-#     {"min_occurrence": 20,
-#     "level": 2,
-#     "embedding_sz": 64,
-#     "learning_rate": 0.0001,
-#     "batch_size": 1000, "epochs":
-#     10, "to_shuffle": true,
-#     "k": 10,
-#     "window_sz": 3},
-# "week_span": 12,
-# "image": "632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/skynet:recommender-master-latest",
-# "deploy":
-#     {"name": "recommender",
-#     "namespace": "prod"}}
+MAIN_START_DATE = datetime(2018, 12, 7)
+MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
 
 env.set_airflow_var_to_local_env(
     'AWS_SECRET_ACCESS_KEY', 'AWS_DEFAULT_REGION', 'AWS_ACCESS_KEY_ID',
@@ -50,11 +34,15 @@ SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
 SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
 KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
 
-# output of fit # todo : for what?  we write there  the job_name/output/model.tar.gz ?
-# these are paths on S3 (s3 skynet_bucket path)
-INPUT_PATH = 'listing-mgmt/data/raw/dt={}'  # where on s3 to write the input data to give to fit (and copy inside the container to /opt/ml/input/data/training)
-TRAINING_PATH = 'listing-mgmt/training'  # where to put the output of train on s3 (from /opt/ml/output in the container)
-PREDICTIONS_PATH = 'listing-mgmt/data/predictions/dt={}'  # folder on s3 to untar the files found in TRAINING_PATH
+# where on s3 to write the input data to give to fit 
+# (and copy inside the container to /opt/ml/input/data/training)
+INPUT_PATH = 'listing-mgmt/data/raw/dt={}'
+
+# where to put the output of train on s3 (from /opt/ml/output in the container)
+TRAINING_PATH = 'listing-mgmt/training'
+
+# folder on s3 to untar the files found in TRAINING_PATH
+PREDICTIONS_PATH = 'listing-mgmt/data/predictions/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 athena = AthenaClient(DATALAKE_BUCKET)
@@ -68,7 +56,10 @@ def load_listing_info(exec_date):
     'publication_date'
     """
     logger.info(
-        'Downloading the listing data per day of publication (indicators of interest, etc)')
+        'm=load_listing_info'
+        'exec_date={}, '
+        'msg=downloading the listing data per day of publication '
+        '(indicators of interest, etc)'.format(exec_date))
     client = AthenaClient(DATALAKE_BUCKET)
     path = os.path.join(
         SKYNET_QUERIES_DIR, 'listing_management/listing_information.sql')
@@ -98,10 +89,14 @@ def load_historical_ioi(exec_date):
     'last_status_day'
     """
     logger.info(
-        'Downloading the listing data per day of publication (indicators of interest, etc)')
+        'm=load_historical_ioi'
+        'exec_date={}, '
+        'msg=downloading the listing data per day of publication '
+        '(indicators of interest, etc)'.format(exec_date))
     client = AthenaClient(DATALAKE_BUCKET)
     path = os.path.join(
-        SKYNET_QUERIES_DIR, 'listing_management/indicators_of_interest_by_date.sql')
+        SKYNET_QUERIES_DIR,
+        'listing_management/indicators_of_interest_by_date.sql')
     with open(path, 'r') as fd:
         query = fd.read()
     hid = client.execute_query_and_wait_for_results(
@@ -111,7 +106,7 @@ def load_historical_ioi(exec_date):
 
 
 def build_raw_data(**kwargs):
-    logger.info('build_raw_data, kwargs={}'.format(kwargs))
+    logger.info('m=build_raw_data, kwargs={}'.format(kwargs))
     exec_date = (
         kwargs.get('execution_date') + timedelta(days=1)
     ).strftime('%Y-%m-%d')
@@ -200,47 +195,6 @@ def untar_output(**kwargs):
         'preds.json')
     bucket.Object(preds_json_filename).put(Body=preds_json)
 
-    # athena.upsert_single_partition(
-    #     bucket_folder_path=os.path.join(
-    #         SKYNET_BUCKET, 'list_mgmt/predictions'),
-    #     database='skynet',
-    #     table='listing_mgmt_csv',
-    #     partition_name='dt',
-    #     partition_value=exec_date
-    # )
-
-
-# def restart_service(**kwargs):
-#     """tell kubernetes to restart the service
-#      (it will reload the data from athena)
-#     """
-
-#     config = kube.Configuration()
-#     config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
-#     config.api_key_prefix['authorization'] = 'Bearer'
-#     config.host = KUBERNETES_API_ENDPOINT
-#     config.verify_ssl = False
-
-#     api = kube.AppsV1Api(kube.ApiClient(config))
-#     name = kwargs.get('deploy', {}).get('name')
-#     namespace = kwargs.get('deploy', {}).get('namespace')
-#     now = datetime.now().strftime('%s')
-#     body = {
-#         "spec": {
-#             "template": {
-#                 "metadata": {
-#                     "annotations": {
-#                         "reload": now
-#                     }
-#                 }
-#             }
-#         }
-#     }
-
-#     r = api.patch_namespaced_deployment(name, namespace, body)
-
-#     logger.info('API response: {}'.format(r))
-
 
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
@@ -263,7 +217,6 @@ build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-# calls the train function with the predict flag (on sagemaker)
 train_model_op = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='train_model',
@@ -273,7 +226,6 @@ train_model_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-# untars the files left by sagemaker in ..
 untar_output_op = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='untar_output',
@@ -282,13 +234,4 @@ untar_output_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-# restarts the service in kubernetes
-#  (so it will reload the files that we just untarred)
-# restart_service_op = BaseDAG.build_quintoandar_python_operator(
-#     dag=dag,
-#     task_id='restart_service',
-#     python_callable=restart_service,
-#     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
-# )
-
-build_raw_data_op >> train_model_op >> untar_output_op  # >> restart_service_op
+build_raw_data_op >> train_model_op >> untar_output_op
