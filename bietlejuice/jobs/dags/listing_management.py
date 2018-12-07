@@ -20,7 +20,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
-MAIN_DAG_NAME = 'skynet-listing_mgmt'
+MAIN_DAG_NAME = 'skynet-listing-management'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '@once'  # '30 3 * * *'
 
@@ -191,36 +191,36 @@ def untar_output(**kwargs):
     # )
 
 
-def restart_service(**kwargs):
-    """tell kubernetes to restart the service
-     (it will reload the data from athena)
-    """
+# def restart_service(**kwargs):
+#     """tell kubernetes to restart the service
+#      (it will reload the data from athena)
+#     """
 
-    config = kube.Configuration()
-    config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
-    config.api_key_prefix['authorization'] = 'Bearer'
-    config.host = KUBERNETES_API_ENDPOINT
-    config.verify_ssl = False
+#     config = kube.Configuration()
+#     config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
+#     config.api_key_prefix['authorization'] = 'Bearer'
+#     config.host = KUBERNETES_API_ENDPOINT
+#     config.verify_ssl = False
 
-    api = kube.AppsV1Api(kube.ApiClient(config))
-    name = kwargs.get('deploy', {}).get('name')
-    namespace = kwargs.get('deploy', {}).get('namespace')
-    now = datetime.now().strftime('%s')
-    body = {
-        "spec": {
-            "template": {
-                "metadata": {
-                    "annotations": {
-                        "reload": now
-                    }
-                }
-            }
-        }
-    }
+#     api = kube.AppsV1Api(kube.ApiClient(config))
+#     name = kwargs.get('deploy', {}).get('name')
+#     namespace = kwargs.get('deploy', {}).get('namespace')
+#     now = datetime.now().strftime('%s')
+#     body = {
+#         "spec": {
+#             "template": {
+#                 "metadata": {
+#                     "annotations": {
+#                         "reload": now
+#                     }
+#                 }
+#             }
+#         }
+#     }
 
-    r = api.patch_namespaced_deployment(name, namespace, body)
+#     r = api.patch_namespaced_deployment(name, namespace, body)
 
-    logger.info('API response: {}'.format(r))
+#     logger.info('API response: {}'.format(r))
 
 
 dag = DAG(
@@ -265,11 +265,11 @@ untar_output_op = BaseDAG.build_quintoandar_python_operator(
 
 # restarts the service in kubernetes
 #  (so it will reload the files that we just untarred)
-restart_service_op = BaseDAG.build_quintoandar_python_operator(
-    dag=dag,
-    task_id='restart_service',
-    python_callable=restart_service,
-    op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
-)
+# restart_service_op = BaseDAG.build_quintoandar_python_operator(
+#     dag=dag,
+#     task_id='restart_service',
+#     python_callable=restart_service,
+#     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
+# )
 
 build_raw_data_op >> train_model_op >> untar_output_op  # >> restart_service_op
