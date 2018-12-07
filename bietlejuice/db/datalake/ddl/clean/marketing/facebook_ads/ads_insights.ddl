@@ -22,6 +22,6 @@ PARTITIONED BY (
   dt_created string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/facebook_ads/ads_insights/'
+  's3://5a-datalake/clean/marketing/facebook_ads/marketing_facebook_ads/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_facebook_ads;
