@@ -132,8 +132,13 @@ def train_model(**kwargs):
 
     params = kwargs.get('params')
     params.update(
-        dict(raw_house_listing_file=lid + '.csv',
-             raw_historical_data_file=hid + '.csv'))
+        dict(
+            raw_house_listing_file=lid + '.csv',
+            raw_historical_data_file=hid + '.csv',
+            begin_date=exec_date,
+            end_date=exec_date
+        )
+    )
 
     job_name = 'skynet-listing-management-' + datetime.now().strftime(
         "%Y-%m-%d-%H-%M-%S")
