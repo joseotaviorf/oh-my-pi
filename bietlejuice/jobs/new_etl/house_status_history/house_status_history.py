@@ -1,10 +1,10 @@
 from datetime import datetime
 
-import petl
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.new_etl import ODS_QUERIES_DIR
 
 logger = QuintoAndarLogger('HouseStatusHistory')
 
@@ -19,19 +19,6 @@ class HouseStatusHistory(object):
     Note: The table name will follow the Data naming convention only when the code logic is updated
     """
     TABLE_NAME = 'imovel_status_history'
-
-    EXTRACT_QUERY = """
-            select
-                *,
-                now()
-            from v_ImovelStatusHistory
-            where id in (
-                select distinct id
-                from v_Imovel_AUD  a
-                where a.date_status_changed >= '{}'
-                  and a.date_status_changed < '{}'
-            )
-        """
 
     @staticmethod
     @logger
@@ -52,12 +39,15 @@ class HouseStatusHistory(object):
     @logger
     def load_data_into_ods_stg(self):
         max_loaded_date = HouseStatusHistory.__get_max_loaded_date()
-        query_extract = HouseStatusHistory.EXTRACT_QUERY.format(
-            max_loaded_date if max_loaded_date else '2012-01-01',
-            datetime.today().date()
-        )
 
-        houses = self.__extract_houses_data(query_extract)
+        query_extract = BaseETL.get_query_from_file_name(
+            '{}/house_status_history/house_status_history_extract.sql'.format(ODS_QUERIES_DIR))
+        houses = self.__extract_houses_data(
+            query=query_extract.format(
+                max_loaded_date if max_loaded_date else '2012-01-01',
+                datetime.today().date()
+            )
+        )
 
         logger.info(
             'm=load_data_into_ods, table_name={}, msg=bulk inserting into ODS'.format(HouseStatusHistory.TABLE_NAME))
@@ -72,7 +62,7 @@ class HouseStatusHistory(object):
 
     @logger
     def __extract_houses_data(self, query):
-        logger.info('m=__extract_houses_data', msg='querying ebdb database')
+        logger.info('m=__extract_houses_data, msg=querying ebdb database')
         houses = BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_ebdb,
             query=query
@@ -83,14 +73,12 @@ class HouseStatusHistory(object):
 
     @logger
     def delete_duplicated_entries(self):
-        delete_query = 'delete from {} where id in {}'.format(
-            HouseStatusHistory.TABLE_NAME,
-            list(petl.aggregate(HouseStatusHistory.TABLE_NAME, 'id')['id'])
-        ).replace('[', '(').replace(']', ')')
+        delete_query = BaseETL.get_query_from_file_name(
+            '{}/house_status_history/house_status_history_dedup.sql'.format(ODS_QUERIES_DIR))
 
         logger.info('m=delete_duplicated_entries, msg=deleting duplicated entries')
         BaseETL.execute_command(
-            command=delete_query,
+            command=delete_query.format(table_name=HouseStatusHistory.TABLE_NAME),
             db_enum=EnumDB.BI_ODS,
             encoding='utf-8',
             commit=True
