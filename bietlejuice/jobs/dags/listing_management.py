@@ -109,7 +109,8 @@ def load_historical_ioi(exec_date):
 def build_raw_data(**kwargs):
     logger.info('build_raw_data, kwargs={}'.format(kwargs))
     exec_date = (
-        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+        kwargs.get('execution_date') + timedelta(days=1)
+    ).strftime('%Y-%m-%d')
     lid = load_listing_info(exec_date)
     hid = load_historical_ioi(exec_date)
 
@@ -128,7 +129,8 @@ def train_model(**kwargs):
     hid = xcom.xcom_pull(kwargs.get('ti'), key='hid', dag_id=MAIN_DAG_NAME)
 
     exec_date = (
-        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+        kwargs.get('execution_date') + timedelta(days=1)
+    ).strftime('%Y-%m-%d')
 
     params = kwargs.get('params')
     params.update(
@@ -174,7 +176,8 @@ def untar_output(**kwargs):
         kwargs.get('ti'), key='job_name', dag_id=MAIN_DAG_NAME)
 
     exec_date = (
-        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+        kwargs.get('execution_date') + timedelta(days=1)
+    ).strftime('%Y-%m-%d')
 
     model_filename = os.path.join(
         TRAINING_PATH, job_name, 'output/model.tar.gz')
