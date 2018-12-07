@@ -23,33 +23,29 @@ MAIN_DAG_NAME = 'skynet-listing_mgmt'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 
-RUN_LOCALLY = True
-if RUN_LOCALLY:
-    DATALAKE_BUCKET = '5a-datalake'
-    OUTPUT_BUCKET = '5a-data-science'
-    SKYNET_LISTMGMT_KWARGS = {}  # ?
-    # {"params": 
-    #     {"min_occurrence": 20, 
-    #     "level": 2, 
-    #     "embedding_sz": 64, 
-    #     "learning_rate": 0.0001, 
-    #     "batch_size": 1000, "epochs": 
-    #     10, "to_shuffle": true, 
-    #     "k": 10, 
-    #     "window_sz": 3}, 
-    # "week_span": 12, 
-    # "image": "632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/skynet:recommender-master-latest", 
-    # "deploy": 
-    #     {"name": "recommender", 
-    #     "namespace": "prod"}}
-else:  # todo: how to generalize this code so that it also runs locally?
-    DATALAKE_BUCKET = env.env.get_airflow_env_var('bi-datalake-s3-bucket')
-    SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
-    OUTPUT_BUCKET = env.env.get_airflow_env_var('bi-data-science-s3-bucket')
-    SKYNET_LISTMGMT_KWARGS = env.get_airflow_env_var('SKYNET_LISTMGMT_KWARGS')
-    SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
-    SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
-    KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
+# {"params": 
+#     {"min_occurrence": 20, 
+#     "level": 2, 
+#     "embedding_sz": 64, 
+#     "learning_rate": 0.0001, 
+#     "batch_size": 1000, "epochs": 
+#     10, "to_shuffle": true, 
+#     "k": 10, 
+#     "window_sz": 3}, 
+# "week_span": 12, 
+# "image": "632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/skynet:recommender-master-latest", 
+# "deploy": 
+#     {"name": "recommender", 
+#     "namespace": "prod"}}
+
+# todo: how to generalize this code so that it also runs locally?
+DATALAKE_BUCKET = env.env.get_airflow_env_var('bi-datalake-s3-bucket')
+SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
+OUTPUT_BUCKET = env.env.get_airflow_env_var('bi-data-science-s3-bucket')
+SKYNET_LISTMGMT_KWARGS = env.get_airflow_env_var('SKYNET_LISTMGMT_KWARGS')
+SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
+SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
+KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
 
 # output of fit # todo : for what?  we write there  the job_name/output/model.tar.gz ?
 TRAINING_PATH = 'list_mgmt/training'
@@ -73,7 +69,7 @@ def load_listing_info():
     relative_path = 'bietlejuice/jobs/new_etl/listing_management/listing_information.sql'
     with open(os.path.join(dirname, relative_path), 'r') as fd:
         query = fd.read()
-    lid = client.execute_query_and_wait_for_results(  # todo : no log of query
+    lid = client.execute_query_and_wait_for_results(
         query, s3_bucket=OUTPUT_BUCKET,
         bucket_folder_path='listing-mgmt/data/raw')
     return lid
@@ -281,4 +277,3 @@ restart_service_op = BaseDAG.build_quintoandar_python_operator(
 )
 
 build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
-# todo : where is the notify success operator ?
