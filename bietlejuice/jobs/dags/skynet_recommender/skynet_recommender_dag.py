@@ -19,7 +19,7 @@ from bietlejuice.jobs.dags.util import xcom
 
 MAIN_DAG_NAME = 'skynet-recommender'
 MAIN_START_DATE = datetime(2018, 9, 30)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * 1')
+MAIN_SCHEDULE_INTERVAL = '0 6 * * 1'
 
 DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
