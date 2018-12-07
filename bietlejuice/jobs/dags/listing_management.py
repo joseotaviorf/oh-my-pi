@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import boto3
-import kubernetes.client as kube
+# import kubernetes.client as kube
 import sagemaker
 from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
@@ -24,19 +24,19 @@ MAIN_DAG_NAME = 'skynet-listing-management'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '@once'  # '30 3 * * *'
 
-# {"params": 
-#     {"min_occurrence": 20, 
-#     "level": 2, 
-#     "embedding_sz": 64, 
-#     "learning_rate": 0.0001, 
-#     "batch_size": 1000, "epochs": 
-#     10, "to_shuffle": true, 
-#     "k": 10, 
-#     "window_sz": 3}, 
-# "week_span": 12, 
-# "image": "632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/skynet:recommender-master-latest", 
-# "deploy": 
-#     {"name": "recommender", 
+# {"params":
+#     {"min_occurrence": 20,
+#     "level": 2,
+#     "embedding_sz": 64,
+#     "learning_rate": 0.0001,
+#     "batch_size": 1000, "epochs":
+#     10, "to_shuffle": true,
+#     "k": 10,
+#     "window_sz": 3},
+# "week_span": 12,
+# "image": "632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/skynet:recommender-master-latest",
+# "deploy":
+#     {"name": "recommender",
 #     "namespace": "prod"}}
 
 DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -63,9 +63,11 @@ def load_listing_info(exec_date):
     'sk_house_listing',
     'publication_date'
     """
-    logger.info('Downloading the listing data per day of publication (indicators of interest, etc)')
+    logger.info(
+        'Downloading the listing data per day of publication (indicators of interest, etc)')
     client = AthenaClient(DATALAKE_BUCKET)
-    path = os.path.join(SKYNET_QUERIES_DIR, 'listing_management/listing_information.sql')
+    path = os.path.join(
+        SKYNET_QUERIES_DIR, 'listing_management/listing_information.sql')
     with open(path, 'r') as fd:
         query = fd.read()
     lid = client.execute_query_and_wait_for_results(
@@ -91,9 +93,11 @@ def load_historical_ioi(exec_date):
     'condominio_mod'
     'last_status_day'
     """
-    logger.info('Downloading the listing data per day of publication (indicators of interest, etc)')
+    logger.info(
+        'Downloading the listing data per day of publication (indicators of interest, etc)')
     client = AthenaClient(DATALAKE_BUCKET)
-    path = os.path.join(SKYNET_QUERIES_DIR, 'listing_management/indicators_of_interest_by_date.sql')
+    path = os.path.join(
+        SKYNET_QUERIES_DIR, 'listing_management/indicators_of_interest_by_date.sql')
     with open(path, 'r') as fd:
         query = fd.read()
     hid = client.execute_query_and_wait_for_results(
@@ -104,7 +108,8 @@ def load_historical_ioi(exec_date):
 
 def build_raw_data(**kwargs):
     logger.info('build_raw_data, kwargs={}'.format(kwargs))
-    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+    exec_date = (
+        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
     lid = load_listing_info(exec_date)
     hid = load_historical_ioi(exec_date)
 
@@ -122,7 +127,8 @@ def train_model(**kwargs):
     lid = xcom.xcom_pull(kwargs.get('ti'), key='lid', dag_id=MAIN_DAG_NAME)
     hid = xcom.xcom_pull(kwargs.get('ti'), key='hid', dag_id=MAIN_DAG_NAME)
 
-    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+    exec_date = (
+        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
 
     params = kwargs.get('params')
     params.update(
@@ -135,10 +141,10 @@ def train_model(**kwargs):
         'm=train_model, job_name={}, params={}'.format(job_name, params))
 
     model = sagemaker.estimator.Estimator(
-        image_name=kwargs.get('image'),  # todo : update
+        image_name=kwargs.get('image'),
         role=SAGEMAKER_ROLE,
         train_instance_count=1,
-        train_instance_type='ml.m5.2xlarge',  # todo : smaller. $0.538 per training hour
+        train_instance_type='ml.m5.xlarge',
         output_path='s3://{}/{}'.format(SKYNET_BUCKET, TRAINING_PATH),
         hyperparameters=params)
 
@@ -162,7 +168,8 @@ def untar_output(**kwargs):
     job_name = xcom.xcom_pull(
         kwargs.get('ti'), key='job_name', dag_id=MAIN_DAG_NAME)
 
-    exec_date = (kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
+    exec_date = (
+        kwargs.get('execution_date' + timedelta(days=1))).strftime('%Y-%m-%d')
 
     model_filename = os.path.join(
         TRAINING_PATH, job_name, 'output/model.tar.gz')
