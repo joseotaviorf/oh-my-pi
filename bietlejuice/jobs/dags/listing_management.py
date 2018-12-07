@@ -141,8 +141,8 @@ def train_model(**kwargs):
         dict(
             raw_house_listing_file=lid + '.csv',
             raw_historical_data_file=hid + '.csv',
-            begin_date=exec_date,
-            end_date=exec_date
+            date_begin=exec_date,
+            date_end=exec_date
         )
     )
 
