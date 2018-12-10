@@ -68,7 +68,7 @@ select
         round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, DATE_ADD(date(dt_discarded), INTERVAL 1 DAY)),
                                                     coalesce(dt_discarded, DATE_ADD(date(dt_conversion), INTERVAL 1 DAY))))/1440,1)
        end as lead_to_processing_diff_days,
-  exclusivity+0 as exclusivity
+  coalesce(exclusivity, 0) as exclusivity
 from
 (
 	select
@@ -105,7 +105,7 @@ from
 		base.acquisition_method,
 		base.acquisition_channel,
 		base.acquisition_source,
-		coalesce(sc.exclusivity, 0) as exclusivity,
+		sc.exclusivity as exclusivity,
 		l.cidade,
 		l.bairro
 	from
