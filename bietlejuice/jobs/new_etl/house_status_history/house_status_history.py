@@ -95,9 +95,10 @@ class HouseStatusHistory(object):
         )
 
     @logger
-    def load_data_into_data_lake(self):
+    def load_data_into_data_lake(self, s3_bucket):
         logger.info('m=load_data_into_data_lake, msg=dumping data from ods to data lake')
-        BaseETL.dump_ODS_to_datalake(
+        BaseETL.dump_ods_to_datalake(
             table_name=HouseStatusHistory.TABLE_NAME,
+            s3_bucket=s3_bucket,
             filename='property_status_history'
         )
