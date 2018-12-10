@@ -427,7 +427,7 @@ from
         (
             select
                 hsc.house_id,
-                hsc.specialCondition_id IS NOT NULL as exclusivity
+                hsc.specialCondition_id is not null as exclusivity
             from HouseSpecialCondition hsc
             join
                 SpecialCondition sc
