@@ -105,7 +105,7 @@ from
 		base.acquisition_method,
 		base.acquisition_channel,
 		base.acquisition_source,
-		(sc.id is not null and optedOutAt is null) as exclusivity,
+		coalesce(sc.exclusivity, 0) as exclusivity,
 		l.cidade,
 		l.bairro
 	from
@@ -418,11 +418,26 @@ from
 		Imovel i
 		on i.id = base.imovel_id
 	left join
-		(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
-		on maxsc.imovel_id = i.id
-	left join
-		SpecialCondition sc
-		on sc.id = maxsc.id
+	(
+	    -- there is a bug that there are multiple rows for some houses
+        select
+            house_id,
+            max(exclusivity) exclusivity
+        from
+        (
+            select
+                hsc.house_id,
+                hsc.specialCondition_id IS NOT NULL as exclusivity
+            from HouseSpecialCondition hsc
+            join
+                SpecialCondition sc
+                on sc.id = hsc.specialCondition_id
+                    and sc.specialConditionType = 'Exclusivity'
+                    and sc.specialConditionStatus in ('OptedIn', 'Applied')
+        ) special_c
+        group by 1
+	) sc
+	    on sc.house_id = i.id
 	left join
 		Lead l
 		on l.id = base.lead_id
