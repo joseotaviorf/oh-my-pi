@@ -53,6 +53,7 @@ create table dim_house_listing (
   key_type varchar,
   key_location varchar,
   has_visit_restriction boolean,
+  house_predicted_price numeric(14,2),
   ts_load timestamp
 )
 ;
