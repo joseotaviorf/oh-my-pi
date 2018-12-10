@@ -13,10 +13,11 @@ from logging import info as log
 
 import boto3
 import petl
-from db_factory import DBFactory
-from enum_db import EnumDB
 from petl.io.db import create_table
 from unidecode import unidecode
+
+from db_factory import DBFactory
+from enum_db import EnumDB
 
 
 class BaseETL(object):
@@ -468,19 +469,22 @@ class BaseETL(object):
         s3.Bucket(bucket).put_object(Body=obj_io.getvalue(), Key=file_path)
 
     @classmethod
-    def dump_ODS_to_datalake(cls, table_name, filename=None):
+    def dump_ods_to_datalake(cls, table_name, s3_bucket, filename=None):
+        if s3_bucket is None or len(s3_bucket) == 0:
+            raise AttributeError('m=dump_ods_to_datalake, table_name={}, s3_bucket={}, filename={}, msg=s3_bucket is '
+                                 'invalid')
+
         if not filename:
             filename = table_name
 
-        bucket_datalake = os.environ['bi-datalake-s3-bucket']
         BaseETL.to_s3(
             filename='{}.csv'.format(filename),
             data_table=BaseETL.from_db_table(db_enum=EnumDB.BI_ODS, table_name=table_name),
-            bucket_folder_path='{}/raw/ods/{}'.format(bucket_datalake, filename)
+            bucket_folder_path='{}/raw/ods/{}'.format(s3_bucket, filename)
         )
         BaseETL.copy_file_between_s3_buckets(
-            bucket_source=bucket_datalake,
-            bucket_destination=bucket_datalake,
+            bucket_source=s3_bucket,
+            bucket_destination=s3_bucket,
             full_filename_source='raw/ods/{0}/{0}.csv'.format(filename),
             full_filename_dest='clean/ods/{0}/{0}.csv'.format(filename)
         )
