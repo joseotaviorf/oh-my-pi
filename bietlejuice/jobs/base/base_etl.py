@@ -472,7 +472,7 @@ class BaseETL(object):
     def dump_ods_to_datalake(cls, table_name, s3_bucket, filename=None):
         if s3_bucket is None or len(s3_bucket) == 0:
             raise AttributeError('m=dump_ods_to_datalake, table_name={}, s3_bucket={}, filename={}, msg=s3_bucket is '
-                                 'invalid')
+                                 'invalid'.format(table_name, s3_bucket, filename))
 
         if not filename:
             filename = table_name
