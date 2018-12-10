@@ -18,9 +18,9 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0 * * *')
 
 
 # functions
-def execute_class_method(class_, method):
+def execute_class_method(class_, method, method_kwargs):
     class__ = class_()
-    getattr(class__, method)()
+    getattr(class__, method)(**method_kwargs)
 
 
 # dags
@@ -83,7 +83,8 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         op_kwargs={
             'class_': HouseStatusHistory,
-            'method': 'load_data_into_data_lake'
+            'method': 'load_data_into_data_lake',
+            'method_kwargs': {'s3_bucket': s3_bucket}
         }
     )
 
@@ -122,7 +123,8 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         op_kwargs={
             'class_': HouseStatusFullHistory,
-            'method': 'load_data_into_data_lake'
+            'method': 'load_data_into_data_lake',
+            'method_kwargs': {'s3_bucket': s3_bucket}
         }
     )
 
