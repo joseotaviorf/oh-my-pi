@@ -419,7 +419,7 @@ from
 		on i.id = base.imovel_id
 	left join
 	(
-	    -- there is a bug that there are multiple rows for some houses
+	    -- there is a known bug that creates multiple rows for some houses
         select
             house_id,
             max(exclusivity) exclusivity
