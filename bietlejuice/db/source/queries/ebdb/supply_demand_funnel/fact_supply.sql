@@ -68,7 +68,7 @@ select
         round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, DATE_ADD(date(dt_discarded), INTERVAL 1 DAY)),
                                                     coalesce(dt_discarded, DATE_ADD(date(dt_conversion), INTERVAL 1 DAY))))/1440,1)
        end as lead_to_processing_diff_days,
-  exclusivity+0 as exclusivity
+  coalesce(exclusivity, 0) as exclusivity
 from
 (
 	select
@@ -105,7 +105,7 @@ from
 		base.acquisition_method,
 		base.acquisition_channel,
 		base.acquisition_source,
-		(sc.id is not null and optedOutAt is null) as exclusivity,
+		sc.exclusivity as exclusivity,
 		l.cidade,
 		l.bairro
 	from
@@ -418,11 +418,26 @@ from
 		Imovel i
 		on i.id = base.imovel_id
 	left join
-		(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
-		on maxsc.imovel_id = i.id
-	left join
-		SpecialCondition sc
-		on sc.id = maxsc.id
+	(
+	    -- there is a known bug that creates multiple rows for some houses
+        select
+            house_id,
+            max(exclusivity) exclusivity
+        from
+        (
+            select
+                hsc.house_id,
+                hsc.specialCondition_id is not null as exclusivity
+            from HouseSpecialCondition hsc
+            join
+                SpecialCondition sc
+                on sc.id = hsc.specialCondition_id
+                    and sc.specialConditionType = 'Exclusivity'
+                    and sc.specialConditionStatus in ('OptedIn', 'Applied')
+        ) special_c
+        group by 1
+	) sc
+	    on sc.house_id = i.id
 	left join
 		Lead l
 		on l.id = base.lead_id
