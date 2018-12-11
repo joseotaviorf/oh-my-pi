@@ -23,12 +23,12 @@ class Marketing(object):
     SK_FIELD_MAP = {
         'dim_google_keyword': 'sk_keyword',
         'dim_google_ad': 'sk_ad',
+        'dim_google_campaign': 'sk_campaign',
         'fact_google_ads_daily_cost_attributions': 'sk_keyword || sk_ad',
         'dim_facebook_ad': 'sk_ad',
         'fact_facebook_ads_daily_cost_attributions': 'sk_ad'
     }
 
-    @logger
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
         self.s3_bucket = s3_bucket
         self.execution_date = execution_date
@@ -70,7 +70,7 @@ class Marketing(object):
             clean_columns=c_cols
         )
 
-    @logger(exclude='table_schema')
+    @logger(exclude=['table_schema', 'accounts'])
     def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema):
         clean_schema_name = 'datalake_clean'
 

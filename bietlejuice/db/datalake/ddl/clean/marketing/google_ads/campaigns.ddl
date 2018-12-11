@@ -1,7 +1,7 @@
 DROP TABLE datalake_clean.marketing_google_campaigns;
 
 CREATE EXTERNAL TABLE datalake_clean.marketing_google_campaigns (
-  customer_id string,
+  account_id string,
   campaign_id string,
   campaign_name string,
   clicks string,
@@ -18,16 +18,9 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_google_campaigns (
   year string)
 PARTITIONED BY (
   acc string,
-  dt string)
-ROW FORMAT SERDE
-  'org.openx.data.jsonserde.JsonSerDe'
-WITH SERDEPROPERTIES (
-'ignore.malformed.json' = 'true')
-STORED AS INPUTFORMAT
-  'org.apache.hadoop.mapred.TextInputFormat'
-OUTPUTFORMAT
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  dt_created string)
+STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/google_ads/campaigns_performance_report/'
+  's3://5a-datalake/clean/marketing/google_ads/marketing_google_campaigns/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_google_campaigns;

@@ -9,7 +9,6 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    @logger
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
@@ -37,7 +36,8 @@ class MarketingSubDag(BaseSubDag):
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(**kwargs)
         )
-        marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
+        marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table,
+                                            accounts=self.accounts[clean_table])
 
     @logger
     def transfer_to_staging(self, bucket, dw_table, **kwargs):

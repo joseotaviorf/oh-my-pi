@@ -88,6 +88,7 @@ final_cte_ads as (
         -1 as keyword_id,
         coalesce(dim.sk_ad, cte_ads.id) as sk_ad,
         cte_ads.ad_id,
+        -1 as sk_campaign,
         cte_ads.account_id,
         cte_ads.campaign_id,
         cte_ads.adgroup_id,

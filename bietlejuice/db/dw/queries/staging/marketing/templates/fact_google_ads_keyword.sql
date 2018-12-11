@@ -88,6 +88,7 @@ final_cte_keywords as (
         cte_keywords.keyword_id,
         -1 as sk_ad,
         -1 as ad_id,
+        -1 as sk_campaign,
         cte_keywords.account_id,
         cte_keywords.campaign_id,
         cte_keywords.adgroup_id,

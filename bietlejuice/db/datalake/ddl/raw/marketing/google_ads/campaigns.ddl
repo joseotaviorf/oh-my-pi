@@ -1,7 +1,7 @@
 DROP TABLE datalake_raw.marketing_google_campaigns;
 
 CREATE EXTERNAL TABLE datalake_raw.marketing_google_campaigns (
-  customer_id string,
+  account_id string,
   campaign_id string,
   campaign_name string,
   clicks string,

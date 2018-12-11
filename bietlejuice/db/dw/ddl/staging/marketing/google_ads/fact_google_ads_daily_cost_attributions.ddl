@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_cost_attributions (
 	keyword_id BIGINT,
 	sk_ad BIGINT,
 	ad_id BIGINT,
+	sk_campaign BIGINT,
 	account_id VARCHAR(65535),
 	campaign_id VARCHAR(65535),
 	adgroup_id VARCHAR(65535),

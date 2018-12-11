@@ -7,7 +7,6 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingGoogleAdsSubDag(MarketingSubDag):
-    @logger
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
                  accounts=None):
         super(MarketingGoogleAdsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
@@ -37,17 +36,3 @@ class MarketingGoogleAdsSubDag(MarketingSubDag):
                         'account': account
                     }
                 )
-
-        # for account in self.accounts:
-        #     for table in self.datalake_tables:
-        #         BaseDAG.build_python_operator(
-        #             dag=dag,
-        #             task_id='{}-{}'.format(table, account),
-        #             python_callable=self.transfer_files_to_clean,
-        #             provide_context=True,
-        #             op_kwargs={
-        #                 'bucket': self.bucket,
-        #                 'datalake_table': table.split("_")[2],
-        #                 'account': account
-        #             }
-        #         )
