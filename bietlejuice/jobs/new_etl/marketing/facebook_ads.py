@@ -24,10 +24,8 @@ class FacebookAds(Marketing):
         'link_clicks': int
     }
 
-    @logger
     def __init__(self, s3_bucket, execution_date, account=None):
         super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
-        self.datalake_tables = ["marketing_facebook_ads"]
 
     @logger
     def move_ads_to_clean(self):

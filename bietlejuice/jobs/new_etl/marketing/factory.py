@@ -10,7 +10,6 @@ logger = QuintoAndarLogger("MarketingFactory")
 class MarketingFactory(object):
 
     @staticmethod
-    @logger
     def factory(_class, s3_bucket, execution_date, account=None):
         __class = MarketingFactory.__dispatch_dict(_class)
         if _class is None:

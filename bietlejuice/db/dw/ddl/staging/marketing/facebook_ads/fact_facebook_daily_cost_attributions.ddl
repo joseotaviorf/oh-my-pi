@@ -1,6 +1,6 @@
-DROP TABLE staging.fact_facebook_ads_daily_cost_attributions;
+DROP TABLE staging.fact_facebook_daily_cost_attributions;
 
-CREATE TABLE IF NOT EXISTS staging.fact_facebook_ads_daily_cost_attributions (
+CREATE TABLE IF NOT EXISTS staging.fact_facebook_daily_cost_attributions (
 	sk_ad BIGINT,
     ad_id BIGINT,
     sk_date INTEGER,
