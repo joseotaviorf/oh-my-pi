@@ -66,10 +66,20 @@ class GithubPRNotification(object):
                 open_prs.append(pr_append)
                 continue
 
+            is_pr_approved = False
             for rev in prs['node']['reviews']['edges']:
                 if rev['node']['state'] == 'APPROVED':
                     approved_prs.append(pr_append)
+                    is_pr_approved = True
+                    continue
+
+                if rev['node']['state'] == 'CHANGES_REQUESTED':
+                    approved_prs.append(pr_append)
+                    is_pr_approved = False
                     break
+
+            if not is_pr_approved:
+                open_prs.append(pr_append)
 
         return open_prs, approved_prs
 

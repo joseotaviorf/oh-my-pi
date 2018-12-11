@@ -8,7 +8,7 @@ logger = QuintoAndarLogger('PlannerRegion')
 
 
 class PlannerRegion(Planner):
-    ENDPOINT = 'http://planner.quintoandar.com.br/schedules/region/{id_region}'
+    ENDPOINT = 'http://planner.quintoandar.com.br/schedules/bi/region/{id_region}'
 
     @logger
     def __init__(self, s3_bucket, execution_date):

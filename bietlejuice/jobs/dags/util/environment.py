@@ -1,14 +1,13 @@
 import base64
+import boto3
 import json
 import os
-from datetime import datetime
-from logging import info as log
-
-import boto3
 import pytz
 from airflow.exceptions import AirflowException
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
+from datetime import datetime
+from logging import info as log
 
 
 def __conn_to_json(conn):
@@ -91,7 +90,13 @@ def convert_to_utc_schedule(cron_expression, tz=pytz.timezone('America/Sao_Paulo
     exp = cron_expression.split(sep)
     local_now = datetime.now(tz)
     offset = local_now.utcoffset().total_seconds() / 60 / 60
-    exp[1] = _change_digits(exp[1], offset)
+
+    if len(exp[1]) > 1:
+        hour_expression = exp[1].split("/")
+        hour_expression[0] = _change_digits(hour_expression[0], offset)
+        exp[1] = "/".join(hour_expression)
+    else:
+        exp[1] = _change_digits(exp[1], offset)
     return sep.join(exp)
 
 
