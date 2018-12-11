@@ -200,13 +200,13 @@ class GoogleAds(Marketing):
         int_date = int(self.execution_date.strftime("%Y%m%d"))
 
         keywords_cte = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/templates/fact_google_ads_keyword.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/templates/fact_google_keyword.sql'.format(DW_QUERIES_DIR))
         ads_cte = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/templates/fact_google_ads_ad.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/templates/fact_google_ad.sql'.format(DW_QUERIES_DIR))
         campaign_cte = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/templates/fact_google_ads_campaign.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/templates/fact_google_campaign.sql'.format(DW_QUERIES_DIR))
         fact_query = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/fact_google_ads_daily_cost_attributions.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/fact_google_daily_cost_attributions.sql'.format(DW_QUERIES_DIR))
 
         empty = self._is_prod_table_empty(table_name)
         if empty:

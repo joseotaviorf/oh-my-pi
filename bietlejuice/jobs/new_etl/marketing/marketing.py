@@ -24,9 +24,9 @@ class Marketing(object):
         'dim_google_keyword': 'sk_keyword',
         'dim_google_ad': 'sk_ad',
         'dim_google_campaign': 'sk_campaign',
-        'fact_google_ads_daily_cost_attributions': 'sk_keyword || sk_ad',
+        'fact_google_daily_cost_attributions': 'sk_keyword || sk_ad',
         'dim_facebook_ad': 'sk_ad',
-        'fact_facebook_ads_daily_cost_attributions': 'sk_ad'
+        'fact_facebook_daily_cost_attributions': 'sk_ad'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):

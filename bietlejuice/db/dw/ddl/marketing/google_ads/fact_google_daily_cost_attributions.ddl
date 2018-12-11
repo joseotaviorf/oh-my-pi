@@ -1,6 +1,6 @@
-DROP TABLE staging.fact_google_ads_daily_cost_attributions;
+DROP TABLE marketing.fact_google_daily_cost_attributions;
 
-CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_cost_attributions (
+CREATE TABLE IF NOT EXISTS marketing.fact_google_daily_cost_attributions (
 	sk_date INTEGER,
 	sk_keyword BIGINT,
 	keyword_id BIGINT,
@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS staging.fact_google_ads_daily_cost_attributions (
 	total_clicks INTEGER,
 	total_cost DOUBLE PRECISION,
 	impressions INTEGER,
-	ts_load TIMESTAMP
+	ts_load TIMESTAMP,
 );
