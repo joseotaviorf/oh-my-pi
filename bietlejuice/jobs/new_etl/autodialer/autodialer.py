@@ -8,7 +8,6 @@ from os import listdir
 import numpy as np
 import pandas as pd
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.new_etl.autodialer.autodialer_enum import AutodialerEnum
 from pandas.io.json import json_normalize
@@ -17,7 +16,6 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from unidecode import unidecode
 
-mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 logger = QuintoAndarLogger('Autodialer_ETL')
 
 # TODO
@@ -26,7 +24,7 @@ dummy_dt = '2018-01-01'
 
 
 class AutodialerETL(object):
-    def __init__(self, bucket_name, document_type_enum, execution_date=None):
+    def __init__(self, mongo_client_uri, bucket_name, document_type_enum, execution_date=None):
         self.s3_bucket = bucket_name
         self.execution_date = execution_date
         self.athena_client = AthenaClient(self.s3_bucket)
@@ -50,6 +48,9 @@ class AutodialerETL(object):
     @logger(exclude='df')
     def move_data_to_clean(self):
         path, dir_files = self.__get_files_list()
+
+        if len(dir_files) == 0:
+            raise Exception('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
 
         for _file in dir_files:
             table_name = _file.split(".")[0]
@@ -79,9 +80,6 @@ class AutodialerETL(object):
                 partition="dt_extraction='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
             logger.info('m=move_data_to_clean, msg=Created partition in clean.'.format(key))
-
-        if len(dir_files) == 0:
-            raise Exception('m=move_data_to_clean, path={}, msg=No query file found.'.format(path))
 
     # aux methods
     @logger

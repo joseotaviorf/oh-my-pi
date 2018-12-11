@@ -4,12 +4,12 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.autodialer.autodialer import AutodialerETL
-from bietlejuice.jobs.new_etl.autodialer.autodialer_enum import AutodialerEnum
+from bietlejuice.jobs.new_etl.autodialer import AutodialerETL, AutodialerEnum
 from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+mongo_client_uri = env.get_airflow_env_var('MONGODB_AUTODIALER_URI')
 
 MAIN_DAG_NAME = 'bi-autodialer-load'
 MAIN_START_DATE = datetime(2018, 11, 15, 0, 0, 0)
@@ -43,17 +43,17 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
     raw_task = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='{}_to_raw'.format(document_type_enum.value),
-        python_callable=move_to_raw,
-        provide_context=True,
-        op_kwargs={'document_type_enum': document_type_enum}
+        python_callable=execute_method,
+        op_kwargs={'document_type_enum': document_type_enum,
+                   'method': 'move_data_to_raw'}
     )
 
     clean_task = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='{}_to_clean'.format(document_type_enum.value),
-        python_callable=move_to_clean,
-        provide_context=True,
-        op_kwargs={'document_type_enum': document_type_enum}
+        python_callable=execute_method,
+        op_kwargs={'document_type_enum': document_type_enum,
+                   'method': 'move_data_to_clean'}
     )
 
     raw_task >> clean_task
@@ -61,22 +61,14 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
     return local_dag
 
 
-@logger(exclude='kwargs')
-def move_to_raw(**kwargs):
+@logger
+def execute_method(document_type_enum, method):
     autodialer = AutodialerETL(
+        mongo_client_uri=mongo_client_uri,
         bucket_name=s3_bucket,
-        document_type_enum=kwargs['document_type_enum']
+        document_type_enum=document_type_enum
     )
-    autodialer.move_data_to_raw()
-
-
-@logger(exclude='kwargs')
-def move_to_clean(**kwargs):
-    autodialer = AutodialerETL(
-        bucket_name=s3_bucket,
-        document_type_enum=kwargs['document_type_enum']
-    )
-    autodialer.move_data_to_clean()
+    getattr(autodialer, method)()
 
 
 task_references = BaseSubDag.get_sub_dag_operator(
