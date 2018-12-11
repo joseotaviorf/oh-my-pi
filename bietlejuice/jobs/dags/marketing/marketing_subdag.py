@@ -146,7 +146,7 @@ class MarketingSubDag(BaseSubDag):
         )
 
     @logger
-    def __get_execution_date(self, kwargs):
-        if kwargs['prev_ds'] == kwargs['ds']:
-            return kwargs['execution_date'] - timedelta(1)
-        return kwargs['execution_date']
+    def __get_execution_date(self, prev_ds, ds, execution_date, **kwargs):
+        if prev_ds == ds:
+            return execution_date - timedelta(1)
+        return execution_date
