@@ -14,5 +14,5 @@ SELECT
     updateddate as updated_date,
     dialstatus
 FROM
-    datalake_raw.task_references
+    datalake_raw.autodialer_task_references
 WHERE createddate IS NOT NULL

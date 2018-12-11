@@ -39,10 +39,9 @@ CREATE EXTERNAL TABLE datalake_clean.autodialer_task_reference_outbound_event_hi
   taskreferenceeventorigin string,
   updated_at string)
 PARTITIONED BY (
-  dt string)
-ROW FORMAT SERDE
-  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+  dt_extraction string)
+STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/autodialer/task_reference_outbound_event_histories/task_reference_outbound_event_histories/'
+  's3://5a-datalake/clean/autodialer/task_reference_outbound_event_histories/'
 
 msck repair table datalake_clean.autodialer_task_reference_outbound_event_histories;

@@ -57,7 +57,7 @@ class AutodialerETL(object):
             self.athena_client.add_partition(
                 database='datalake_raw',
                 table_name=self.document_type,
-                partition="dt='{}'".format(
+                partition="dt_extraction='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
 
             df = self.__get_athena_data(filequery=_file)
@@ -67,16 +67,16 @@ class AutodialerETL(object):
             df = self.__normalize_json_columns(df)
 
             # save file
-            dt = 'dt={}'.format(
+            dt = 'dt_extraction={}'.format(
                 dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
-            key = 'clean/autodialer/{0}/{1}/{2}/file.parq'.format(self.document_type, table_name, dt)
+            key = 'clean/autodialer/{0}/{1}/file.parq'.format(table_name, dt)
             self.athena_client.create_parquet_from_df(key=key, df=df)
             logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
 
             self.athena_client.add_partition(
                 database='datalake_clean',
                 table_name='{}_{}'.format('autodialer', table_name),
-                partition="dt='{}'".format(
+                partition="dt_extraction='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
             logger.info('m=move_data_to_clean, msg=Created partition in clean.'.format(key))
 
@@ -173,9 +173,9 @@ class AutodialerETL(object):
                 fp.write((json.dumps(_json, ensure_ascii=False, cls=UnidecodeHandler)).encode('utf-8'))
                 fp.write('\n')
 
-        file_suffix = 'raw/autodialer/{}/dt={}/{}.gz'.format(self.document_type,
-                                                             dummy_dt,
-                                                             self.document_type)
+        file_suffix = 'raw/autodialer/{}/dt_extraction={}/{}.gz'.format(self.document_type,
+                                                                        dummy_dt,
+                                                                        self.document_type)
         self.__obj_to_s3(
             obj_io=gz_body,
             file_suffix=file_suffix
