@@ -1,3 +1,4 @@
+from datetime import timedelta
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -25,7 +26,7 @@ class MarketingSubDag(BaseSubDag):
             _class=self.class_,
             s3_bucket=bucket,
             account=account,
-            execution_date=kwargs['execution_date']
+            execution_date=self.__get_execution_date(**kwargs)
         )
         getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()
 
@@ -34,7 +35,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=kwargs['execution_date']
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
 
@@ -43,7 +44,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=kwargs['execution_date']
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_staging(dw_table_name=dw_table)
 
@@ -52,7 +53,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=kwargs['execution_date']
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_prod(table_name=dw_table)
 
@@ -143,3 +144,9 @@ class MarketingSubDag(BaseSubDag):
                 'dw_table': table
             }
         )
+
+    @logger
+    def __get_execution_date(self, prev_ds, ds, execution_date, **kwargs):
+        if prev_ds == ds:
+            return execution_date - timedelta(1)
+        return execution_date
