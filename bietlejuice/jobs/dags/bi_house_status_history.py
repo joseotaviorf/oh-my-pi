@@ -23,6 +23,11 @@ def execute_class_method(class_, method):
     getattr(class__, method)()
 
 
+def load_data_into_data_lake(class_):
+    class__ = class_()
+    class__.load_data_into_data_lake(s3_bucket=s3_bucket)
+
+
 # dags
 main_dag = DAG(
     dag_id=MAIN_DAG_ID,
@@ -79,12 +84,9 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
 
     load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
         task_id='load_data_into_data_lake',
-        python_callable=execute_class_method,
+        python_callable=load_data_into_data_lake,
         dag=local_dag,
-        op_kwargs={
-            'class_': HouseStatusHistory,
-            'method': 'load_data_into_data_lake'
-        }
+        op_kwargs={'class_': HouseStatusHistory}
     )
 
     airflow_helpers.chain(
@@ -118,12 +120,9 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
 
     load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
         task_id='load_data_into_data_lake',
-        python_callable=execute_class_method,
+        python_callable=load_data_into_data_lake,
         dag=local_dag,
-        op_kwargs={
-            'class_': HouseStatusFullHistory,
-            'method': 'load_data_into_data_lake'
-        }
+        op_kwargs={'class_': HouseStatusFullHistory}
     )
 
     airflow_helpers.chain(

@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+env2/
 build/
 develop-eggs/
 dist/
@@ -111,3 +112,5 @@ db/.dbeaver-data-sources.xml
 # Secrets file
 **/secrets.tfvars
 
+# vscode
+.vscode/*
