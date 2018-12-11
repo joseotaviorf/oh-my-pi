@@ -26,7 +26,7 @@ class MarketingSubDag(BaseSubDag):
             _class=self.class_,
             s3_bucket=bucket,
             account=account,
-            execution_date=self.__execution_date(kwargs)
+            execution_date=self.__get_execution_date(**kwargs)
         )
         getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()
 
@@ -35,7 +35,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__execution_date(kwargs)
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table, accounts=self.accounts)
 
@@ -44,7 +44,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__execution_date(kwargs)
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_staging(dw_table_name=dw_table)
 
@@ -53,7 +53,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__execution_date(kwargs)
+            execution_date=self.__get_execution_date(**kwargs)
         )
         marketing_class.load_to_prod(table_name=dw_table)
 
@@ -146,6 +146,7 @@ class MarketingSubDag(BaseSubDag):
         )
 
     @logger
-    def __execution_date(self, kwargs):
+    def __get_execution_date(self, kwargs):
         if kwargs['prev_ds'] == kwargs['ds']:
             return kwargs['execution_date'] - timedelta(1)
+        return kwargs['execution_date']
