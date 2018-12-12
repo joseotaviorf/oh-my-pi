@@ -457,6 +457,13 @@ tasks_inspection_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     _class=CRMTasksTableEnum.INSPECTION
 )
 
+tasks_repair_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_repair',
+    sub_dag_func=class_sub_dag,
+    _class=CRMTasksTableEnum.REPAIR
+)
+
 refresh_credit_task = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Credit_Task',
@@ -495,7 +502,8 @@ tasks_tasks = [
     tasks_onboarding_tenant_sub_dag_task,
     tasks_payment_sub_dag_task,
     tasks_lead_sub_dag_task,
-    tasks_inspection_sub_dag_task
+    tasks_inspection_sub_dag_task,
+    tasks_repair_sub_dag_task
 ]
 
 workgroups_sub_dag_task.set_downstream(tasks_tasks)
