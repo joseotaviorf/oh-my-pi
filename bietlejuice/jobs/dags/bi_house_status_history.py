@@ -81,19 +81,11 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
             'method': 'load_data_into_ods'
         }
     )
-
-    load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data_into_data_lake',
-        python_callable=load_data_into_data_lake,
-        dag=local_dag,
-        op_kwargs={'class_': HouseStatusHistory}
-    )
-
+    
     airflow_helpers.chain(
         load_data_into_ods_stg_task,
         delete_duplicated_entries_task,
-        load_data_into_ods_task,
-        load_data_into_data_lake_task
+        load_data_into_ods_task
     )
 
     return local_dag
@@ -116,18 +108,6 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
             'class_': HouseStatusFullHistory,
             'method': 'load_data_into_ods'
         }
-    )
-
-    load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data_into_data_lake',
-        python_callable=load_data_into_data_lake,
-        dag=local_dag,
-        op_kwargs={'class_': HouseStatusFullHistory}
-    )
-
-    airflow_helpers.chain(
-        load_data_into_ods_task,
-        load_data_into_data_lake_task
     )
 
     return local_dag
