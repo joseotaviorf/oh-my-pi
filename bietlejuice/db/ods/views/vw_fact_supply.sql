@@ -125,7 +125,7 @@ potential_listings as (
 		f.opportunity_to_listing_diff_days,
 		f.lead_to_listing_diff_days,
 		f.lead_to_processing_diff_days,
-		f.exclusivity,
+		h.exclusivity,
 		bl.lead_type,
 		bl.lead_origin,
 		bl.utm_source,
