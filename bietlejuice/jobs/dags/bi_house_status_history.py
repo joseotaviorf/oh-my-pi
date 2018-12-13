@@ -81,7 +81,7 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
             'method': 'load_data_into_ods'
         }
     )
-    
+
     airflow_helpers.chain(
         load_data_into_ods_stg_task,
         delete_duplicated_entries_task,
