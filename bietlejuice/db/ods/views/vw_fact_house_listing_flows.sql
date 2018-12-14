@@ -121,18 +121,18 @@ potential_listings as (
 		bl.lead_origin,
 		bl.utm_source,
 		bl.utm_medium,
-		bl.branded_lead,
-		bl.b2b_lead,
+		bl.branded_lead as is_branded,
+		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
 		case
 			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 			then true
 			else (f.acquisition_source = 'Doorman')
-		end as doorman_lead,
-		(acquisition_channel = 'Inside Sales') as isales_direct_register,
-		(acquisition_channel = 'Admin') as cx_direct_register,
-		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention,
-		(us_cad.id is not null) as flg_callcenter
+		end as is_doorman,
+		(acquisition_channel = 'Inside Sales') as is_isales_direct_register,
+		(acquisition_channel = 'Admin') as is_cx_direct_register,
+		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
+		(us_cad.id is not null) as is_call_center
 	from
 		fact_house_listing_flows f
 	left join
@@ -159,13 +159,13 @@ taxonomy as (
         ts.lead_origin,
         ts.lead_utm_source,
         ts.lead_utm_medium,
-        ts.flg_branded::int::boolean,
-        ts.flg_b2b::int::boolean,
-        ts.flg_doorman::int::boolean,
-        ts.flg_isales_direct_register::int::boolean,
-        ts.flg_cx_direct_register::int::boolean,
-        ts.flg_isales_intervention::int::boolean,
-        ts.flg_callcenter::int::boolean,
+        ts.is_branded::int::boolean,
+        ts.is_b2b::int::boolean,
+        ts.is_doorman::int::boolean,
+        ts.is_isales_direct_register::int::boolean,
+        ts.is_cx_direct_register::int::boolean,
+        ts.has_isales_intervention::int::boolean,
+        ts.is_call_center::int::boolean,
         ts.mkt_category,
         ts.mkt_flow,
         ts.mkt_completion,
@@ -219,15 +219,15 @@ select
 	pl.lead_origin,
 	pl.utm_source as lead_utm_source,
 	pl.utm_medium as lead_utm_medium,
-	pl.branded_lead as is_branded,
-	pl.b2b_lead as is_b2b,
-	pl.doorman_lead as is_doorman,
-	pl.isales_direct_register as is_isales_direct_register,
-	pl.cx_direct_register as is_cx_direct_register,
-	pl.isales_intervention as has_isales_intervention,
-	pl.flg_callcenter as is_call_center,
+	pl.is_branded,
+	pl.is_b2b,
+	pl.is_doorman,
+	pl.is_isales_direct_register,
+	pl.is_cx_direct_register,
+	pl.has_isales_intervention,
+	pl.is_call_center,
 	case
-        when pl.branded_lead then 'Branded'
+        when pl.is_branded then 'Branded'
         else 'Other'
 	end as mkt_branded,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_category end as mkt_category,
@@ -247,10 +247,10 @@ on
 	and coalesce(pl.lead_origin,'') = coalesce(t.lead_origin,'')
 	and coalesce(pl.utm_source,'') = coalesce(t.lead_utm_source,'')
 	and coalesce(pl.utm_medium,'') = coalesce(t.lead_utm_medium,'')
-	and coalesce(pl.branded_lead,false) = coalesce(t.flg_branded,false)
-	and coalesce(pl.b2b_lead,false) = coalesce(t.flg_b2b,false)
-	and coalesce(pl.doorman_lead,false) = coalesce(t.flg_doorman,false)
-	and coalesce(pl.isales_direct_register,false) = coalesce(t.flg_isales_direct_register,false)
-	and coalesce(pl.cx_direct_register,false) = coalesce(t.flg_cx_direct_register,false)
-	and coalesce(pl.isales_intervention,false) = coalesce(t.flg_isales_intervention,false)
-	and coalesce(pl.flg_callcenter,false) = coalesce(t.flg_callcenter,false)
+	and coalesce(pl.is_branded,false) = coalesce(t.is_branded,false)
+	and coalesce(pl.is_b2b,false) = coalesce(t.is_b2b,false)
+	and coalesce(pl.is_doorman,false) = coalesce(t.is_doorman,false)
+	and coalesce(pl.is_isales_direct_register,false) = coalesce(t.is_isales_direct_register,false)
+	and coalesce(pl.is_cx_direct_register,false) = coalesce(t.is_cx_direct_register,false)
+	and coalesce(pl.has_isales_intervention,false) = coalesce(t.has_isales_intervention,false)
+	and coalesce(pl.is_call_center,false) = coalesce(t.is_call_center,false)
