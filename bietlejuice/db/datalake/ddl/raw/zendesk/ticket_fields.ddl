@@ -1,6 +1,6 @@
-drop table datalake_raw.zendesk_tickets_fields;
+drop table datalake_raw.zendesk_ticket_fields;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_tickets_fields`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_fields`(
   `id` string,
   `title` string,
   `raw_title` string,
@@ -34,4 +34,4 @@ LOCATION
   's3://5a-datalake/raw/zendesk/tickets_fields/'
   ;
 
-msck repair table datalake_raw.zendesk_tickets_fields;
+msck repair table datalake_raw.zendesk_ticket_fields;

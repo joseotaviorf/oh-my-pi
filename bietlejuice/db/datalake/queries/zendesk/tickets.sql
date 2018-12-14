@@ -31,4 +31,3 @@ select
     status,
     requester_id
 from datalake_raw.zendesk_tickets
-limit 100
