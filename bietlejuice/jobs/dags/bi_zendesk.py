@@ -2,13 +2,17 @@ from airflow import DAG
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.zendesk.zendesk_subdag import ZendeskSubDag
 
 MAIN_DAG_NAME = 'bi-zendesk-flow'
-MAIN_START_DATE = datetime(2018, 12, 10, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 */6 * * *')
+MAIN_START_DATE = datetime(2018, 12, 1, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+ZENDESK_TABLES = env.get_airflow_env_var('bi-zendesk-tables')
 
 # dags
 main_dag = DAG(
@@ -24,12 +28,22 @@ main_dag = DAG(
     max_active_runs=1
 )
 
-# def clean_sub_dag(sub_dag_name, class_):
-#     sub_dag = ZendeskFactory.factory(
-#         class_=class_,
-#         bucket=s3_bucket,
-#         sub_dag_name=sub_dag_name,
-#         dag_name=MAIN_DAG_NAME,
-#         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-#         start_date=MAIN_START_DATE
-#     )
+
+def clean_sub_dag(sub_dag_name):
+    sub_dag = ZendeskSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        tables=ZENDESK_TABLES
+    )
+
+    return sub_dag.build_tasks('clean')
+
+
+clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='zendesk-clean-subdag'
+)
