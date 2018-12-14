@@ -4,9 +4,10 @@ from datetime import datetime
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
-from bietlejuice.jobs.dags.util import xcom as xcom
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
@@ -138,8 +139,8 @@ insert_leads = BaseDAG.build_quintoandar_python_operator(
 
 olx_success_test = QuintoAndarAWSBatchSensor(
     task_id='olx_success_test',
-    poke_interval=20*60,
-    timeout=5*3600,
+    poke_interval=20 * 60,
+    timeout=5 * 3600,
     provide_context=True,
     xcom_task_id='crawl-olx'
 )
