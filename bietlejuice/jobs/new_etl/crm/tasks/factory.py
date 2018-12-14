@@ -6,6 +6,7 @@ from bietlejuice.jobs.new_etl.crm.tasks.lead import CRMTasksLead
 from bietlejuice.jobs.new_etl.crm.tasks.onboarding_tenant import CRMTasksOnboardingTenant
 from bietlejuice.jobs.new_etl.crm.tasks.payment import CRMTasksPayment
 from bietlejuice.jobs.new_etl.crm.tasks.photo_job import CRMTasksPhotoJob
+from bietlejuice.jobs.new_etl.crm.tasks.repair import CRMTasksRepair
 from bietlejuice.jobs.new_etl.crm.tasks.visit import CRMTasksVisit
 
 
@@ -33,5 +34,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.PAYMENT: CRMTasksPayment,
             CRMTasksTableEnum.INSPECTION: CRMTasksInspection,
             CRMTasksTableEnum.LEAD: CRMTasksLead,
-            CRMTasksTableEnum.PHOTO_JOB: CRMTasksPhotoJob
+            CRMTasksTableEnum.PHOTO_JOB: CRMTasksPhotoJob,
+            CRMTasksTableEnum.REPAIR: CRMTasksRepair
         }.get(_class)
