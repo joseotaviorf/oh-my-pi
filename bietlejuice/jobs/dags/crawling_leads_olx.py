@@ -4,10 +4,11 @@ from datetime import datetime
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
-
+from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
+from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 env.set_airflow_var_to_local_env('EBDB')
 logger = QuintoAndarLogger('crawling-leads-olx')
@@ -98,6 +99,14 @@ def submit_olx(**kwargs):
     )
     logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
 
+    # get task instance
+    ti = kwargs.get('ti')
+
+    exec_date = str(datetime.date(kwargs.get('execution_date')))
+    xcom.xcom_push(ti,
+                   key='crawler_houses_olx_{}'.format(exec_date),
+                   k_value=r.get('jobId'))
+
 
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
@@ -127,4 +136,12 @@ insert_leads = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(insert_leads_params)
 )
 
-crawl_olx >> insert_leads
+olx_success_test = QuintoAndarAWSBatchSensor(
+    task_id='olx_success_test',
+    poke_interval=20*60,
+    timeout=5*3600,
+    provide_context=True,
+    xcom_task_id='crawl-olx'
+)
+
+crawl_olx >> olx_success_test >> insert_leads
