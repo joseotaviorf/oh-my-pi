@@ -62,7 +62,7 @@ affiliate_filtered_base as (
 	from
 		unit_economics.vw_base_property_costs base
 	left join
-		fact_supply f
+		fact_house_listing_flows f
 		on f.imovel_id = base.property_id
 	left join
 		lead l
