@@ -138,7 +138,7 @@ insert_leads = BaseDAG.build_quintoandar_python_operator(
 )
 
 olx_success_test = QuintoAndarAWSBatchSensor(
-    task_id='olx_success_test',
+    task_id='olx-success-test',
     poke_interval=20 * 60,
     timeout=5 * 3600,
     provide_context=True,
