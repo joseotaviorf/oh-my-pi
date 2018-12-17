@@ -65,8 +65,8 @@ class MarketingSubDag(BaseSubDag):
 
     @logger
     def build_clean_tasks(self, dag):
-        for account in self.accounts:
-            for table in self.datalake_tables:
+        for table in self.datalake_tables:
+            for account in self.accounts[table]:
                 BaseDAG.build_python_operator(
                     dag=dag,
                     task_id='{}-{}'.format(table, account),
