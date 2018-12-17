@@ -33,7 +33,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_tickets`(
     `status` string,
     `requester_id` string)
 PARTITIONED BY (
-  `dt_extraction_created` string)
+  `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/tickets/'

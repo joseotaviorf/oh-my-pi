@@ -23,7 +23,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_fields`(
     `tag` string,
     `title_in_portal` string)
 PARTITIONED BY (
-  `dt_extraction_created` string)
+  `dt_extraction` string)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 STORED AS PARQUET
