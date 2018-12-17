@@ -127,6 +127,7 @@ crawl_olx = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-olx',
     python_callable=submit_olx,
+    provide_context=True,
     op_kwargs=json.loads(crawler_params)
 )
 
@@ -134,6 +135,7 @@ insert_leads = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='insert-leads',
     python_callable=insert_leads,
+    provide_context=True,
     op_kwargs=json.loads(insert_leads_params)
 )
 
