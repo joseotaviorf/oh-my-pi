@@ -94,7 +94,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key="clean/zendesk/tickets/dt_created={dt}/{dt}.parquet".format(dt=self.execution_date),
+            key="clean/zendesk/tickets/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -154,7 +154,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/ticket_fields/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/ticket_fields/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -187,7 +187,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/ticket_events/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/ticket_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -226,7 +226,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/ticket_metric_events/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/ticket_metric_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -321,7 +321,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/users/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/users/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -352,7 +352,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/groups/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -419,7 +419,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/articles/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/articles/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
@@ -452,7 +452,7 @@ class ZendeskETL(object):
 
         self.__move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/group_memberships/dt_created={dt}/dt.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/group_memberships/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
             r_cols=r_cols,
             c_cols=c_cols
