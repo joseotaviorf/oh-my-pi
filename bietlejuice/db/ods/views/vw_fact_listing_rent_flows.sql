@@ -144,7 +144,7 @@ select
   sk_proposal,
   sk_proposal_approved_date,
   sk_proposal_processed_date,
-  coalesce(sk_tenant_auto_first_doc_sent_date, sk_tenant_manual_first_doc_sent_date) as sk_tenant_first_doc_sent_date,
+  case when sk_tenant_auto_first_doc_sent_date = -1 then sk_tenant_manual_first_doc_sent_date else sk_tenant_auto_first_doc_sent_date end as sk_tenant_first_doc_sent_date,
   sk_tenant_manual_first_doc_sent_date,
   sk_tenant_auto_first_doc_sent_date,
   sk_contract,
