@@ -49,9 +49,9 @@ with _fact as (
 	  hrf.dt_proposal_approved,
 	  coalesce(to_char(vdp.dt_tenant_first_document_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_manual_first_doc_sent_date,
 	  coalesce(to_char(vdp.dt_tenant_auto_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_auto_first_doc_sent_date,
-	  vdp.dt_tenant_manual_first_doc_sent,
+	  vdp.dt_tenant_first_document_sent as dt_tenant_manual_first_doc_sent,
 	  vdp.dt_tenant_auto_first_doc_sent,
-	  coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_manual_first_doc_sent) as dt_tenant_first_doc_sent,
+	  coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) as dt_tenant_first_doc_sent,
 	  case
       when vdp.status in ('Aprovada', 'Rejeitada')
        then vdp.dt_updated
@@ -236,9 +236,9 @@ select
   ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 1440 +
     date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 60 +
 		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
-  ((date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
-    date_part('hour', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
-		date_part('minute', coalesce(dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,
+  ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
+    date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
+		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,
 	sk_agent_review_rating_date,
     ts_load
 from _fact
