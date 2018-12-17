@@ -40,7 +40,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_users`(
     report_csv string,
     user_fields string)
 PARTITIONED BY (
-  `dt` string)
+  `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/users/'

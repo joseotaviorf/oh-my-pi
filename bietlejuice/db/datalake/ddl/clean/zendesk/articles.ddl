@@ -26,7 +26,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_articles`(
   `label_names` string,
   `body` string)
 PARTITIONED BY (
-  `dt` string)
+  `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/articles/';

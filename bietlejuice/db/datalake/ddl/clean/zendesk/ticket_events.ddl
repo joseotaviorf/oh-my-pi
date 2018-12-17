@@ -12,7 +12,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_events`(
   `timestamp` string,
   `via` string)
 PARTITIONED BY (
-  `dt` string)
+  `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/ticket_events'

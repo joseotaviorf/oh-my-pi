@@ -2,9 +2,9 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl.zendesk.zendesk_etl import ZendeskETL
+from bietlejuice.jobs.new_etl.zendesk import ZendeskETL
 
-logger = QuintoAndarLogger('ZendesSubDag')
+logger = QuintoAndarLogger('ZendeskSubDag')
 
 
 class ZendeskSubDag(BaseSubDag):

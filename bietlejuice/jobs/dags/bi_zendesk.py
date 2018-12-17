@@ -4,9 +4,9 @@ from datetime import datetime
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.dags.zendesk.zendesk_subdag import ZendeskSubDag
+from bietlejuice.jobs.dags.zendesk import ZendeskSubDag
 
-MAIN_DAG_NAME = 'bi-zendesk-flow'
+MAIN_DAG_NAME = 'bi-zendesk'
 MAIN_START_DATE = datetime(2018, 12, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 

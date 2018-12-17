@@ -8,7 +8,7 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_groups`(
   `created_at` string,
   `updated_at` string)
 PARTITIONED BY (
-  `dt` string)
+  `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/groups/'
