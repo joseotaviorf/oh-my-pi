@@ -12,7 +12,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-ZENDESK_TABLES = env.get_airflow_env_var('bi-zendesk-tables')
+ZENDESK_TABLES = env.get_airflow_env_var('bi-zendesk-tables').split(",")
 
 # dags
 main_dag = DAG(
