@@ -1,6 +1,6 @@
-drop view public.vw_fact_supply;
+drop view public.vw_fact_house_listing_flows;
 
-create or replace view public.vw_fact_supply as
+create or replace view public.vw_fact_house_listing_flows as
 with legacy_doorman as (
 	select
 		"Status" as status,
@@ -53,17 +53,15 @@ rep_leads as (
 ),
 potential_listings as (
 	select
-		f.id as ods_id,
+		f.id as sk_house_listing_flow,
 		coalesce(f.lead_id, -1) as sk_lead,
-		coalesce(f.conversao_id, -1) as sk_conversion,
-		coalesce(f.photo_job_id, -1) as sk_photo_job,
+		coalesce(f.conversao_id, -1) as sk_lead_conversion,
+		coalesce(f.photo_job_id, -1) as sk_first_photo_job,
 		coalesce(f.imovel_id || '001' , '-1') as sk_house_listing,
-		coalesce(f.rep_id, -1) as sk_user_rep,
+		coalesce(f.rep_id, -1) as sk_user_house_registrant,
 		coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
-		coalesce(f.affiliate_id, -1) as sk_user_affiliate,
+		coalesce(f.affiliate_id, -1) as sk_user_lead_affiliate,
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
-		coalesce(f.owner_id, -1) as sk_user_owner,
-		coalesce(f.photographer_id, -1) as sk_user_photographer,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
@@ -103,47 +101,40 @@ potential_listings as (
 			when f.dt_lead is not null then 'lead'
 		end::varchar(255) as funnel_step,
 		f.funnel_step as funnel_drop_reason,
-		f.lead_to_prospect_diff_minutes,
-		f.prospect_to_qualified_diff_minutes,
-		f.lead_to_first_inside_sales_contact_diff_minutes,
-		f.prospect_to_first_inside_sales_contact_diff_minutes,
-		f.qualified_to_opportunity_diff_minutes,
-		f.opportunity_to_listing_diff_minutes,
-		f.lead_to_listing_diff_minutes,
-		f.lead_to_prospect_diff_hours,
-		f.prospect_to_qualified_diff_hours,
-		f.lead_to_first_inside_sales_contact_diff_hours,
-		f.prospect_to_first_inside_sales_contact_diff_hours,
-		f.qualified_to_opportunity_diff_hours,
-		f.opportunity_to_listing_diff_hours,
-		f.lead_to_listing_diff_hours,
-		f.lead_to_prospect_diff_days,
-		f.prospect_to_qualified_diff_days,
-		f.lead_to_first_inside_sales_contact_diff_days,
-		f.prospect_to_first_inside_sales_contact_diff_days,
-		f.qualified_to_opportunity_diff_days,
-		f.opportunity_to_listing_diff_days,
-		f.lead_to_listing_diff_days,
-		f.lead_to_processing_diff_days,
-		h.exclusivity,
+		f.hours_lead_to_prospect,
+		f.hours_prospect_to_qualified,
+		f.hours_lead_to_first_inside_sales_contact,
+		f.hours_prospect_to_first_inside_sales_contact,
+		f.hours_qualified_to_opportunity,
+		f.hours_opportunity_to_listing,
+		f.hours_lead_to_listing,
+		f.days_lead_to_prospect,
+		f.days_prospect_to_qualified,
+		f.days_lead_to_first_inside_sales_contact,
+		f.days_prospect_to_first_inside_sales_contact,
+		f.days_qualified_to_opportunity,
+		f.days_opportunity_to_listing,
+		f.days_lead_to_listing,
+		f.days_lead_to_processing,
+		h.exclusivity as is_exclusive,
 		bl.lead_type,
 		bl.lead_origin,
 		bl.utm_source,
 		bl.utm_medium,
-		bl.branded_lead,
-		bl.b2b_lead,
+		bl.branded_lead as is_branded,
+		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
 		case
 			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
 			then true
 			else (f.acquisition_source = 'Doorman')
-		end as doorman_lead,
-		(acquisition_channel = 'Inside Sales') as isales_direct_register,
-		(acquisition_channel = 'Admin') as cx_direct_register,
-		(coalesce(f.rep_id, bt.rep_id) is not null) as isales_intervention,
-		(us_cad.id is not null) as flg_callcenter
+		end as is_doorman,
+		(acquisition_channel = 'Inside Sales') as is_isales_direct_register,
+		(acquisition_channel = 'Admin') as is_cx_direct_register,
+		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
+		(us_cad.id is not null) as is_call_center
 	from
-		fact_supply f
+		fact_house_listing_flows f
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
@@ -168,13 +159,13 @@ taxonomy as (
         ts.lead_origin,
         ts.lead_utm_source,
         ts.lead_utm_medium,
-        ts.is_branded::int::boolean as flg_branded,
-        ts.is_b2b::int::boolean as flg_b2b,
-        ts.is_doorman::int::boolean as flg_doorman,
-        ts.is_isales_direct_register::int::boolean as flg_isales_direct_register,
-        ts.is_cx_direct_register::int::boolean as flg_cx_direct_register,
-        ts.has_isales_intervention::int::boolean as flg_isales_intervention,
-        ts.is_call_center::int::boolean as flg_callcenter,
+        ts.is_branded::int::boolean,
+        ts.is_b2b::int::boolean,
+        ts.is_doorman::int::boolean,
+        ts.is_isales_direct_register::int::boolean,
+        ts.is_cx_direct_register::int::boolean,
+        ts.has_isales_intervention::int::boolean,
+        ts.is_call_center::int::boolean,
         ts.mkt_category,
         ts.mkt_flow,
         ts.mkt_completion,
@@ -186,17 +177,15 @@ taxonomy as (
         files.taxonomy_supply ts
 )
 select
-	pl.ods_id,
+	pl.sk_house_listing_flow,
 	pl.sk_lead,
-	pl.sk_conversion,
-	pl.sk_photo_job,
+	pl.sk_lead_conversion,
+	pl.sk_first_photo_job,
 	pl.sk_house_listing,
-	pl.sk_user_rep,
+	pl.sk_user_house_registrant,
 	pl.sk_user_sales_rep,
-	pl.sk_user_affiliate,
+	pl.sk_user_lead_affiliate,
 	pl.sk_user_task_assignee,
-	pl.sk_user_owner,
-	pl.sk_user_photographer,
 	pl.sk_region,
 	pl.sk_lead_date,
 	pl.sk_prospect_date,
@@ -208,48 +197,37 @@ select
 	pl.sk_opportunity_date,
 	pl.sk_first_listing_date,
 	pl.sk_discard_date,
-	pl.flow,
-	pl.acquisition_method,
-	pl.acquisition_channel,
-	pl.acquisition_source,
 	pl.funnel_step,
 	pl.funnel_drop_reason,
-	pl.lead_to_prospect_diff_minutes,
-	pl.prospect_to_qualified_diff_minutes,
-	pl.lead_to_first_inside_sales_contact_diff_minutes,
-	pl.prospect_to_first_inside_sales_contact_diff_minutes,
-	pl.qualified_to_opportunity_diff_minutes,
-	pl.opportunity_to_listing_diff_minutes,
-	pl.lead_to_listing_diff_minutes,
-	pl.lead_to_prospect_diff_hours,
-	pl.prospect_to_qualified_diff_hours,
-	pl.lead_to_first_inside_sales_contact_diff_hours,
-	pl.prospect_to_first_inside_sales_contact_diff_hours,
-	pl.qualified_to_opportunity_diff_hours,
-	pl.opportunity_to_listing_diff_hours,
-	pl.lead_to_listing_diff_hours,
-	pl.lead_to_prospect_diff_days,
-	pl.prospect_to_qualified_diff_days,
-	pl.lead_to_first_inside_sales_contact_diff_days,
-	pl.prospect_to_first_inside_sales_contact_diff_days,
-	pl.qualified_to_opportunity_diff_days,
-	pl.opportunity_to_listing_diff_days,
-	pl.lead_to_listing_diff_days,
-	pl.lead_to_processing_diff_days,
-	pl.exclusivity,
+	pl.hours_lead_to_prospect,
+	pl.hours_prospect_to_qualified,
+	pl.hours_lead_to_first_inside_sales_contact,
+	pl.hours_prospect_to_first_inside_sales_contact,
+	pl.hours_qualified_to_opportunity,
+	pl.hours_opportunity_to_listing,
+	pl.hours_lead_to_listing,
+	pl.days_lead_to_prospect,
+	pl.days_prospect_to_qualified,
+	pl.days_lead_to_first_inside_sales_contact,
+	pl.days_prospect_to_first_inside_sales_contact,
+	pl.days_qualified_to_opportunity,
+	pl.days_opportunity_to_listing,
+	pl.days_lead_to_listing,
+	pl.days_lead_to_processing,
+	pl.is_exclusive,
 	pl.lead_type,
 	pl.lead_origin,
 	pl.utm_source as lead_utm_source,
 	pl.utm_medium as lead_utm_medium,
-	pl.branded_lead as flg_branded,
-	pl.b2b_lead as flg_b2b,
-	pl.doorman_lead as flg_doorman,
-	pl.isales_direct_register as flg_isales_direct_register,
-	pl.cx_direct_register as flg_cx_direct_register,
-	pl.isales_intervention as flg_isales_intervention,
-	pl.flg_callcenter,
+	pl.is_branded,
+	pl.is_b2b,
+	pl.is_doorman,
+	pl.is_isales_direct_register,
+	pl.is_cx_direct_register,
+	pl.has_isales_intervention,
+	pl.is_call_center,
 	case
-        when pl.branded_lead then 'Branded'
+        when pl.is_branded then 'Branded'
         else 'Other'
 	end as mkt_branded,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_category end as mkt_category,
@@ -259,7 +237,7 @@ select
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_platform end as mkt_platform,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_medium end as mkt_medium,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_source end as mkt_source,
-    now() as dt_timestamp
+    now() as ts_load
 from
     potential_listings pl
 left join
@@ -269,11 +247,10 @@ on
 	and coalesce(pl.lead_origin,'') = coalesce(t.lead_origin,'')
 	and coalesce(pl.utm_source,'') = coalesce(t.lead_utm_source,'')
 	and coalesce(pl.utm_medium,'') = coalesce(t.lead_utm_medium,'')
-	and coalesce(pl.branded_lead,false) = coalesce(t.flg_branded,false)
-	and coalesce(pl.b2b_lead,false) = coalesce(t.flg_b2b,false)
-	and coalesce(pl.doorman_lead,false) = coalesce(t.flg_doorman,false)
-	and coalesce(pl.isales_direct_register,false) = coalesce(t.flg_isales_direct_register,false)
-	and coalesce(pl.cx_direct_register,false) = coalesce(t.flg_cx_direct_register,false)
-	and coalesce(pl.isales_intervention,false) = coalesce(t.flg_isales_intervention,false)
-	and coalesce(pl.flg_callcenter,false) = coalesce(t.flg_callcenter,false)
-
+	and coalesce(pl.is_branded,false) = coalesce(t.is_branded,false)
+	and coalesce(pl.is_b2b,false) = coalesce(t.is_b2b,false)
+	and coalesce(pl.is_doorman,false) = coalesce(t.is_doorman,false)
+	and coalesce(pl.is_isales_direct_register,false) = coalesce(t.is_isales_direct_register,false)
+	and coalesce(pl.is_cx_direct_register,false) = coalesce(t.is_cx_direct_register,false)
+	and coalesce(pl.has_isales_intervention,false) = coalesce(t.has_isales_intervention,false)
+	and coalesce(pl.is_call_center,false) = coalesce(t.is_call_center,false)
