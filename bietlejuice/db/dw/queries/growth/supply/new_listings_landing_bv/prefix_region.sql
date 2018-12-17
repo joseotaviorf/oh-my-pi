@@ -36,7 +36,7 @@ with all_dates as (
     	+ dense_rank() over (partition by coalesce(dr.region_code, ''),
     	                                  date_part('year', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as yearly_count
-	from dim_house_listing_flows f
+	from fact_house_listing_flows f
 	join dim_house_listing dhl
 		on f.sk_house_listing = dhl.sk_house_listing
 		  and f.sk_house_listing != -1
@@ -60,7 +60,7 @@ all_dates_last_month as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dhl.sk_house_listing) as monthly_count
-	from dim_house_listing_flows f
+	from fact_house_listing_flows f
 	join dim_house_listing dhl
 		on f.sk_house_listing = dhl.sk_house_listing
 		  and f.sk_house_listing != -1
@@ -84,7 +84,7 @@ all_dates_last_year as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct dhl.sk_house_listing) as yearly_count
-  from dim_house_listing_flows f
+  from fact_house_listing_flows f
 	join dim_house_listing dhl
 		on f.sk_house_listing = dhl.sk_house_listing
 		  and f.sk_house_listing != -1
