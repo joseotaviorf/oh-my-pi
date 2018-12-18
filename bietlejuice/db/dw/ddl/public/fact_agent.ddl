@@ -10,5 +10,6 @@ CREATE TABLE public.fact_agent (
   sk_slot_date_agent BIGINT,
   dt_first_visit TIMESTAMP,
   flg_available_next_days BOOLEAN,
+  sk_contract_type INTEGER,
   dt_timestamp TIMESTAMP default getdate()
 );
