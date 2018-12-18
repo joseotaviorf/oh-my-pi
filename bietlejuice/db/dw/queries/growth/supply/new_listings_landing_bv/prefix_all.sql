@@ -28,11 +28,11 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dl.criado_em) order by dhl.sk_house_listing asc)
     	+ dense_rank() over (partition by date_part('year', dl.criado_em) order by dhl.sk_house_listing desc)
 			- 1 as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dhl
-		on f.sk_property = dhl.sk_house_listing
+		on f.sk_house_listing = dhl.sk_house_listing
 		  and dhl.ts_publication >= '2017-01-01' and dhl.ts_publication < current_date
-		  and f.sk_property != -1
+		  and f.sk_house_listing != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 	where dl.origem = 'OwnerPWA' and dl.tipo <> 'Organic'
@@ -48,10 +48,10 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dhl.sk_house_listing) as monthly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dhl
-		on f.sk_property = dhl.sk_house_listing
-		  and f.sk_property != -1
+		on f.sk_house_listing = dhl.sk_house_listing
+		  and f.sk_house_listing != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 		  and dl.criado_em >= '2017-01-01' and dl.criado_em < current_date
@@ -68,10 +68,10 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dhl.sk_house_listing) as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dhl
-		on f.sk_property = dhl.sk_house_listing
-		  and f.sk_property != -1
+		on f.sk_house_listing = dhl.sk_house_listing
+		  and f.sk_house_listing != -1
 	join dim_lead dl
 		on f.sk_lead = dl.sk_lead
 		  and dl.criado_em >= '2017-01-01' and dl.criado_em < current_date
