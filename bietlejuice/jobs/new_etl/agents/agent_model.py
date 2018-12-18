@@ -108,7 +108,7 @@ class Agent(object):
     @logger
     def create_table_dw(self, table_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean', schema='public'):
         logger.info('m=create_table_dw, table_name = {}, msg=start query to create table'.format(table_name))
-        table = self.get_agent_data(f_name=table_name, db_enum=enumdb, dt=dt)
+        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt)
 
         logger.info('m=create_table_dw, msg=to DW')
         self.move_data_to_destination(data=table, table_name=table_name, enumdb=enumdb, bucket=bucket, append=append,

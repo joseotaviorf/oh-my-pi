@@ -36,8 +36,10 @@ def create_dim_agent_region_dw():
 def create_agent_contract_dw():
     ar = Agent(bucket_datalake)
     ar.truncate_table(schema='agent', table='agent_contract', enumdb=EnumDB.BI_DW)
-    ar.create_table_dw(table_name='agent_contract', append=False, enumdb=EnumDB.QuintoAndar_ebdb, bucket='clean',
-                       schema='agent')
+    data = ar.get_agent_data(table_name='agent_contract', db_enum=EnumDB.QuintoAndar_ebdb)
+    ar.move_data_to_destination(data=data, table_name='agent_contract', enumdb=EnumDB.BI_DW, bucket='clean',
+                                append=False,
+                                schema='agent')
 
 
 def create_fact_agent(**kwargs):
@@ -96,7 +98,8 @@ dag = DAG(
     },
     start_date=datetime(2018, 7, 10, 0, 0, 0),
     schedule_interval='0 8 * * *',
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 # Get ODS data of Agent_Region per day and groups into ODS
