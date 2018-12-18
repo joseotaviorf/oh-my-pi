@@ -6,13 +6,11 @@ select
 	imovel_id,
 	rep_id,
 	affiliate_id,
-	owner_id,
 	region_id,
-	photographer_id,
 	dt_lead,
 	dt_prospect,
 	dt_first_inside_sales_contact,
-	dt_conversion, -- for inside sales analysis
+	dt_conversion,
 	dt_qualified,
 	dt_opportunity,
 	dt_first_listing,
@@ -43,31 +41,24 @@ select
 		when (flow = 'Organic Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
 		else 'NotMapped'
 	end as funnel_step,
-	TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect) as lead_to_prospect_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified) as prospect_to_qualified_diff_minutes,
-	TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact) as lead_to_first_inside_sales_contact_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact) as prospect_to_first_inside_sales_contact_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity) as qualified_to_opportunity_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing) as opportunity_to_listing_diff_minutes,
-  TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing) as lead_to_listing_diff_minutes,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/60,1) as lead_to_prospect_diff_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/60,1) as prospect_to_qualified_diff_hours,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/60,1) as lead_to_first_inside_sales_contact_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/60,1) as prospect_to_first_inside_sales_contact_diff_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/60,1) as qualified_to_opportunity_diff_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/60,1) as opportunity_to_listing_diff_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/60,1) as lead_to_listing_diff_hours,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/1440,1) as lead_to_prospect_diff_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/1440,1) as prospect_to_qualified_diff_days,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/1440,1) as lead_to_first_inside_sales_contact_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/1440,1) as prospect_to_first_inside_sales_contact_diff_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as qualified_to_opportunity_diff_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as opportunity_to_listing_diff_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as lead_to_listing_diff_days,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/60,1) as hours_lead_to_prospect,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/60,1) as hours_prospect_to_qualified,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/60,1) as hours_lead_to_first_inside_sales_contact_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/60,1) as hours_prospect_to_first_inside_sales_contact,
+  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/60,1) as hours_qualified_to_opportunity,
+  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/60,1) as hours_opportunity_to_listing,
+  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/60,1) as hours_lead_to_listing,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/1440,1) as days_lead_to_prospect,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/1440,1) as days_prospect_to_qualified,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/1440,1) as days_lead_to_first_inside_sales_contact_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/1440,1) as days_prospect_to_first_inside_sales_contact,
+  round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as days_qualified_to_opportunity,
+  round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as days_opportunity_to_listing,
+  round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as days_lead_to_listing,
   case when (dt_conversion is null and dt_discarded is null) then null else
         round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, DATE_ADD(date(dt_discarded), INTERVAL 1 DAY)),
                                                     coalesce(dt_discarded, DATE_ADD(date(dt_conversion), INTERVAL 1 DAY))))/1440,1)
-       end as lead_to_processing_diff_days
+       end as days_lead_to_processing
 from
 (
 	select

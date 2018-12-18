@@ -1,10 +1,9 @@
-from qa_python_utils import QuintoAndarLogger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('HouseSubDag')
 
@@ -27,8 +26,7 @@ class HouseSubDag(DimSubDag):
         house_dag = self._build_local_dag()
 
         (house_task, affiliate, rent_flow, listing_views, house_listing, staging_dim_house_listing_task,
-         dim_house_listing,
-         dim_status_over_period) = self.__build_data_tasks(house_dag)
+         dim_house_listing) = self.__build_data_tasks(house_dag)
 
         tests_tasks = self.build_tests_tasks(house_dag)
 
@@ -36,7 +34,6 @@ class HouseSubDag(DimSubDag):
         staging_dim_house_listing_task.set_upstream([rent_flow, house_listing, house_task])
         staging_dim_house_listing_task.set_downstream(tests_tasks)
         dim_house_listing.set_upstream(tests_tasks)
-        dim_house_listing >> dim_status_over_period
 
         return house_dag
 
@@ -124,16 +121,5 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        dim_status_over_period = BaseDAG.build_quintoandar_python_operator(
-            dag=dag,
-            task_id='DW_dim_house_listing_status_over',
-            python_callable=utils.load_dim_from_ods_to_dw,
-            op_kwargs={
-                'dim_name': 'house_listing_status_over_period',
-                'insert_dummy': False,
-                'bucket': DimSubDag.S3_BUCKET
-            }
-        )
-
         return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_house_listing_task,
-                dim_house_listing, dim_status_over_period)
+                dim_house_listing)

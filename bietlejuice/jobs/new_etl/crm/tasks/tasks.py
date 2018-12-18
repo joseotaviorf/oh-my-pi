@@ -449,7 +449,7 @@ class CRMTasks(object):
 
     @logger
     def __append_to_dw(self, schema, table_name, query_filename):
-        upsert_query = BaseETL.get_query_from_file_name('{}/crm/{}'.format(DW_QUERIES_DIR, query_filename))
+        upsert_query = BaseETL.get_query_from_file_name('{}/staging/crm/{}'.format(DW_QUERIES_DIR, query_filename))
 
         empty = self.__is_prod_table_empty(table_name=table_name)
         if empty:

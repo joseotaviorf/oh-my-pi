@@ -3,18 +3,22 @@ from datetime import datetime
 
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.batch import BatchClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
-
-logger = QuintoAndarLogger('crawling-houses-insert-leads')
-
-MAIN_DAG_NAME = 'crawling-houses-insert-leads'
-MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 9 1/1 * *'
+from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 env.set_airflow_var_to_local_env('EBDB')
+logger = QuintoAndarLogger('crawling-leads-olx')
+
+MAIN_DAG_NAME = 'crawling-leads-olx'
+MAIN_START_DATE = datetime(2018, 3, 20)
+MAIN_SCHEDULE_INTERVAL = '0 2 1/1 * *'
+
+crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
@@ -80,6 +84,31 @@ def insert_leads(**kwargs):
     crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
 
+def submit_olx(**kwargs):
+    max_crawl = kwargs.get('max_crawl', 1000000)
+    states = kwargs.get('states')
+
+    assert isinstance(max_crawl, int)
+    assert isinstance(states, list)
+
+    logger.info('Starting job...')
+    r = BatchClient().start_batch_job(
+        job_name='crawl-olx',
+        job_queue='crawling-houses',
+        job_definition='crawling-houses:10',
+        command=['./crawlers/olx.py', '--max_crawl', str(max_crawl), '--states'] + states
+    )
+    logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+
+    # get task instance
+    ti = kwargs.get('ti')
+
+    exec_date = str(datetime.date(kwargs.get('execution_date')))
+    xcom.xcom_push(ti,
+                   key='crawler_houses_olx_{}'.format(exec_date),
+                   k_value=r.get('jobId'))
+
+
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -94,9 +123,28 @@ dag = DAG(
 )
 
 # operators
-BaseDAG.build_quintoandar_python_operator(
+crawl_olx = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='crawl-olx',
+    python_callable=submit_olx,
+    provide_context=True,
+    op_kwargs=json.loads(crawler_params)
+)
+
+insert_leads = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='insert-leads',
     python_callable=insert_leads,
+    provide_context=True,
     op_kwargs=json.loads(insert_leads_params)
 )
+
+olx_success_test = QuintoAndarAWSBatchSensor(
+    task_id='olx-success-test',
+    poke_interval=20 * 60,
+    timeout=5 * 3600,
+    provide_context=True,
+    xcom_task_id='crawl-olx'
+)
+
+crawl_olx >> olx_success_test >> insert_leads

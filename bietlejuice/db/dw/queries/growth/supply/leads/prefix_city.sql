@@ -36,9 +36,9 @@ with all_dates_prev as (
     	+ rank() over (partition by coalesce(dr.city_name, ''),
                               date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join fact_house_listings fhl
-	  on fhl.sk_house_listing = f.sk_property
+	  on fhl.sk_house_listing = f.sk_house_listing
 	left join dim_region dr
 		on fhl.sk_region = dr.sk_region
 	where f.sk_lead_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')::integer
@@ -68,9 +68,9 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.sk_lead_date) as monthly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join fact_house_listings fhl
-	  on fhl.sk_house_listing = f.sk_property
+	  on fhl.sk_house_listing = f.sk_house_listing
 	left join dim_region dr
 		on fhl.sk_region = dr.sk_region
 	where f.sk_lead_date between to_char(add_months(date_trunc('month', current_date), -1), 'YYYYMMDD')::integer
@@ -84,9 +84,9 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(f.sk_lead_date) as yearly_count
-  from fact_supply f
+  from fact_house_listing_flows f
   join fact_house_listings fhl
-	  on fhl.sk_house_listing = f.sk_property
+	  on fhl.sk_house_listing = f.sk_house_listing
 	left join dim_region dr
 		on fhl.sk_region = dr.sk_region
   where f.sk_lead_date between to_char(add_months(date_trunc('year', current_date), -12), 'YYYYMMDD')::integer
