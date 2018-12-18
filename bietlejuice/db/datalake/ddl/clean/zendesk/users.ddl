@@ -1,6 +1,6 @@
-drop table datalake_raw.zendesk_users;
+drop table datalake_clean.zendesk_users;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_users`(
+CREATE EXTERNAL TABLE datalake_clean.`zendesk_users`(
     id string,
     url string,
     name string,
@@ -40,15 +40,10 @@ CREATE EXTERNAL TABLE datalake_raw.`zendesk_users`(
     report_csv string,
     user_fields string)
 PARTITIONED BY (
-  `dt` string)
-ROW FORMAT SERDE
-  'org.openx.data.jsonserde.JsonSerDe'
-STORED AS INPUTFORMAT
-  'org.apache.hadoop.mapred.TextInputFormat'
-OUTPUTFORMAT
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  `dt_extraction` string)
+STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/raw/zendesk/users/'
+  's3://5a-datalake/clean/zendesk/users/'
 ;
 
-msck repair table datalake_raw.zendesk_users;
+msck repair table datalake_clean.zendesk_users;
