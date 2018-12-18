@@ -2,7 +2,6 @@ import datetime as dt
 from datetime import datetime
 
 from airflow.models import DAG
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags.util import environment as env
@@ -18,7 +17,7 @@ def group_agent_region(**kwargs):
     ar = Agent(bucket_datalake)
     ar.clean_daily_data_in_table(enum=EnumDB.BI_ODS, schema='public', dim_name='agent_region_group', date_column='dt',
                                  dt=exec_date, format='YYYY-MM-DD')
-    group_data = ar.get_agent_data(f_name='agent_region_group', db_enum=EnumDB.BI_ODS, dt=exec_date)
+    group_data = ar.get_agent_data(table_name='agent_region_group', db_enum=EnumDB.BI_ODS, dt=exec_date)
     ar.move_data_to_destination(data=group_data, table_name='agent_region_group')
 
 
@@ -30,8 +29,15 @@ def load_group_agent_region_dw():
 def create_dim_agent_region_dw():
     ar = Agent(bucket_datalake)
     ar.truncate_table(schema='public', table='dim_agent_region', enumdb=EnumDB.BI_DW)
-    ar.create_dim_or_fact_dw(dim_name='dim_agent_region', append=False)
+    ar.create_table_dw(table_name='dim_agent_region', append=False)
     ar.insert_dummy(table_name='dim_agent_region', key_column='sk_agent_region', previous_check=True)
+
+
+def create_agent_contract_dw():
+    ar = Agent(bucket_datalake)
+    ar.truncate_table(schema='agent', table='agent_contract', enumdb=EnumDB.BI_DW)
+    ar.create_table_dw(table_name='agent_contract', append=False, enumdb=EnumDB.QuintoAndar_ebdb, bucket='clean',
+                       schema='agent')
 
 
 def create_fact_agent(**kwargs):
@@ -39,7 +45,7 @@ def create_fact_agent(**kwargs):
     ar = Agent(bucket_datalake)
     ar.clean_daily_data_in_table(enum=EnumDB.BI_DW, schema='public', dim_name='fact_agent', date_column='sk_slot_date',
                                  dt=exec_date, format='YYYYMMDD')
-    ar.create_dim_or_fact_dw(dim_name='fact_agent', append=True, dt=exec_date)
+    ar.create_table_dw(table_name='fact_agent', append=True, dt=exec_date)
     ar.insert_dummy(table_name='fact_agent', key_column='sk_slot_date_agent', previous_check=True)
 
 
@@ -47,7 +53,7 @@ def create_dim_agent_review(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent(bucket_datalake)
     ar.truncate_table(schema='public', table='agent_review', enumdb=EnumDB.BI_ODS)
-    rev_data = ar.get_agent_data(f_name='agent_review', db_enum=EnumDB.QuintoAndar_ebdb, dt=exec_date)
+    rev_data = ar.get_agent_data(table_name='agent_review', db_enum=EnumDB.QuintoAndar_ebdb, dt=exec_date)
     ar.move_data_to_destination(data=rev_data, table_name='agent_review')
 
 
@@ -74,10 +80,10 @@ def upd_agent_region(**kwargs):
 
     ar.reprocess_old_records(exec_dt=exec_date)
 
-    new_data = ar.get_agent_data(f_name='etl_agent_region_daily', db_enum=EnumDB.QuintoAndar_ebdb, dt=exec_date,
+    new_data = ar.get_agent_data(table_name='etl_agent_region_daily', db_enum=EnumDB.QuintoAndar_ebdb, dt=exec_date,
                                  dtmax=exec_date_max)
     inserted_data, updated_data = ar.split_new_rows(new_data=new_data, dt=exec_date)
-    ar.move_data_to_destination(inserted_data, 'agent_region_hist')
+    ar.move_data_to_destination(table=inserted_data, table_name='agent_region_hist')
     ar.update_data(data=updated_data, db='public', table='agent_region_hist', enumdb=EnumDB.BI_ODS, date=exec_date)
 
 
@@ -115,6 +121,14 @@ create_dim_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='create_dim_agent_region_dw',
     python_callable=create_dim_agent_region_dw,
+    op_kwargs=None
+)
+
+# Creates agent_contract in DW staging
+create_agent_contract_dw = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='create_agent_contract_dw',
+    python_callable=create_agent_contract_dw,
     op_kwargs=None
 )
 
@@ -164,6 +178,6 @@ update_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_dim_agent_region_dw >> create_fact_agent
+create_fact_agent.set_upstream([create_dim_agent_region_dw, create_agent_contract_dw])
 create_fact_agent >> xcom_fact_agent
 create_dim_agent_review >> load_dim_agent_review_dw
