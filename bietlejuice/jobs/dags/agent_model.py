@@ -85,7 +85,7 @@ def upd_agent_region(**kwargs):
     new_data = ar.get_agent_data(table_name='etl_agent_region_daily', db_enum=EnumDB.QuintoAndar_ebdb, dt=exec_date,
                                  dtmax=exec_date_max)
     inserted_data, updated_data = ar.split_new_rows(new_data=new_data, dt=exec_date)
-    ar.move_data_to_destination(table=inserted_data, table_name='agent_region_hist')
+    ar.move_data_to_destination(data=inserted_data, table_name='agent_region_hist')
     ar.update_data(data=updated_data, db='public', table='agent_region_hist', enumdb=EnumDB.BI_ODS, date=exec_date)
 
 
@@ -99,7 +99,7 @@ dag = DAG(
     start_date=datetime(2018, 7, 10, 0, 0, 0),
     schedule_interval='0 8 * * *',
     max_active_runs=1,
-    catchup=False
+    orientation='TB'
 )
 
 # Get ODS data of Agent_Region per day and groups into ODS
