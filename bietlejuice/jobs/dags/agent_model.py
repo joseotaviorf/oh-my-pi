@@ -1,4 +1,5 @@
 import datetime as dt
+import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -10,6 +11,9 @@ from bietlejuice.jobs.new_etl.agents.agent_model import Agent
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
+GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
+GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
+GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('GOOGLE_SHEETS_FILES'))
 
 
 def group_agent_region(**kwargs):
@@ -40,6 +44,18 @@ def create_agent_contract_dw():
     ar.move_data_to_destination(data=data, table_name='agent_contract', enumdb=EnumDB.BI_DW, bucket='clean',
                                 append=False,
                                 schema='agent')
+
+
+def create_dim_agent_contract_type():
+    ar = Agent('5a-datalake')
+    ar.move_sheets_data_to_datalake(google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
+                                    google_api_scope=GOOGLE_API_SCOPE,
+                                    google_sheets_files=GOOGLE_SHEETS_FILES,
+                                    filename='[Agent] Contracts_Hours',
+                                    path='agent_contract_type')
+    table = ar.get_agent_data(table_name='dim_agent_contract_type', db_enum=EnumDB.BI_DW, schema='agent')
+    ar.move_data_to_destination(data=table, table_name='dim_agent_contract_type', enumdb=EnumDB.BI_DW, append=False,
+                                schema='agent', decode=False)
 
 
 def create_fact_agent(**kwargs):
@@ -127,11 +143,18 @@ create_dim_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=None
 )
 
-# Creates agent_contract in DW staging
+# Creates agent_contract in DW
 create_agent_contract_dw = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='create_agent_contract_dw',
     python_callable=create_agent_contract_dw,
+    op_kwargs=None
+)
+
+create_dim_agent_contract_type_dw = BaseDAG.build_quintoandar_python_operator(
+    dag=dag,
+    task_id='create_dim_agent_contract_type_dw',
+    python_callable=create_dim_agent_contract_type,
     op_kwargs=None
 )
 
@@ -181,6 +204,7 @@ update_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_fact_agent.set_upstream([create_dim_agent_region_dw, create_agent_contract_dw])
+create_agent_contract_dw >> create_dim_agent_contract_type_dw
+create_fact_agent.set_upstream([create_dim_agent_region_dw, create_dim_agent_contract_type_dw])
 create_fact_agent >> xcom_fact_agent
 create_dim_agent_review >> load_dim_agent_review_dw
