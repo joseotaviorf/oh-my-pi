@@ -56,6 +56,7 @@ def create_dim_agent_contract_type():
     table = ar.get_agent_data(table_name='dim_agent_contract_type', db_enum=EnumDB.BI_DW, schema='agent')
     ar.move_data_to_destination(data=table, table_name='dim_agent_contract_type', enumdb=EnumDB.BI_DW, append=False,
                                 schema='agent', decode=False)
+    ar.insert_dummy(table_name='agent.dim_agent_contract_type', key_column='sk_agent_contract_type')
 
 
 def create_fact_agent(**kwargs):
