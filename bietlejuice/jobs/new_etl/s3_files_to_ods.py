@@ -13,8 +13,8 @@ logger = QuintoAndarLogger('S3ToODS')
 
 class S3ToODS(object):
     @logger
-    def __init__(self, s3_bucket, xls_s3_bucket):
-        self.files = S3FileReader().get_files_from_bucket(xls_s3_bucket)
+    def __init__(self, s3_bucket, xls_s3_bucket=None):
+        self.files = S3FileReader().get_files_from_bucket(xls_s3_bucket) if xls_s3_bucket else ''
         self.schema = 'files'
         self.s3_bucket = s3_bucket
         self.s3_client = boto3.resource('s3')
