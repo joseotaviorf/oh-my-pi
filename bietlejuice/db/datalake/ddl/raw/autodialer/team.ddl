@@ -1,4 +1,4 @@
-DROP TABLE datalake_raw.autodialer_team_gz;
+DROP TABLE datalake_raw.autodialer_team;
 
 CREATE EXTERNAL TABLE datalake_raw.autodialer_team (
   id int, 
