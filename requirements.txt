@@ -71,3 +71,4 @@ win-inet-pton==1.0.1
 xlrd # lib to process xls files in s3 - old_etl
 xmltodict==0.10.2
 snakebite==2.11.0
+pandas==0.20.1
