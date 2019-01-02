@@ -1,10 +1,9 @@
 from datetime import datetime
 
 import petl
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Agent')
 
@@ -26,8 +25,8 @@ class Agent(object):
         return '{}/{}.sql'.format(dir, filename)
 
     @logger
-    def get_agent_data(self, f_name, db_enum, dt=None, dtmax=None):
-        filename = self.__format_query_filename(f_name, db_enum)
+    def get_agent_data(self, table_name, db_enum, dt=None, dtmax=None):
+        filename = self.__format_query_filename(table_name, db_enum)
         with open(filename) as f:
             raw_query = f.read()
 
@@ -56,13 +55,14 @@ class Agent(object):
         )
 
     @logger(exclude='data')
-    def move_data_to_destination(self, data, table_name, enumdb=EnumDB.BI_ODS, bucket='raw', append=True):
-        logger.info("m=move_data_to_destination, To Destination: {}".format(datetime.now()))
+    def move_data_to_destination(self, data, table_name, enumdb=EnumDB.BI_ODS, bucket='raw', append=True,
+                                 schema='public'):
+        logger.info("m=move_data_to_destination, msg=to destination: {}".format(datetime.now()))
 
         table = BaseETL.decode_table(data, 'LATIN-1')
         BaseETL.bulk_insert(
             table=table,
-            table_name=table_name,
+            table_name='{}.{}'.format(schema, table_name),
             db_enum=enumdb,
             encoding='UTF8',
             append=append,
@@ -106,16 +106,17 @@ class Agent(object):
                 )
 
     @logger
-    def create_dim_or_fact_dw(self, dim_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean'):
-        logger.info('m=create_dim_or_fact_dw, Start query to create {}: {}'.format(dim_name, datetime.now()))
-        table = self.get_agent_data(f_name=dim_name, db_enum=enumdb, dt=dt)
+    def create_table_dw(self, table_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean', schema='public'):
+        logger.info('m=create_table_dw, table_name = {}, msg=start query to create table'.format(table_name))
+        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt)
 
-        logger.info('m=create_dim_or_fact_dw, To DW: {}'.format(datetime.now()))
-        self.move_data_to_destination(data=table, table_name=dim_name, enumdb=enumdb, bucket=bucket, append=append)
+        logger.info('m=create_table_dw, msg=to DW')
+        self.move_data_to_destination(data=table, table_name=table_name, enumdb=enumdb, bucket=bucket, append=append,
+                                      schema=schema)
 
     @logger
     def clean_daily_data_in_table(self, enum, schema, dim_name, date_column, dt, format):
-        logger.info('m=clean_daily_data_in_table, Start query to clean {}: {}'.format(dim_name, str(dt)))
+        logger.info('m=clean_daily_data_in_table, dim_name={}, msg=start query to clean.'.format(dim_name))
 
         if format == 'YYYY-MM-DD':
             date_column = 'date({})'.format(date_column)

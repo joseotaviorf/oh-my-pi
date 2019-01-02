@@ -13,7 +13,7 @@ bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 def load_agent_region(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent(bucket_datalake)
-    data = ar.get_agent_data(f_name='etl_agent_region', dt=exec_date, db_enum=EnumDB.QuintoAndar_ebdb)
+    data = ar.get_agent_data(table_name='etl_agent_region', dt=exec_date, db_enum=EnumDB.QuintoAndar_ebdb)
     ar.move_data_to_destination(data, 'agent_region_hist')
 
 
