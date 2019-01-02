@@ -63,6 +63,7 @@ select
         when uc.dadosFotografo_id is not null then 'Fotografo'
         when uc.dadosVendedor_id is not null then 'InsideSales'
         when uc.email like ('%quintoandar%') then 'Admin'
+        when ure.id is null then null
         else 'Prop'
       end as user_cancel_type,
       case
