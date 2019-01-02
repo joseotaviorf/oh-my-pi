@@ -4,7 +4,7 @@ create table public.fact_house_listing_flows (
 	sk_house_listing_flow bigint NOT NULL,
 	sk_lead integer,
 	sk_lead_conversion integer,
-	sk_fisrt_photo_job integer,
+	sk_first_photo_job integer,
 	sk_house_listing bigint,
 	sk_user_house_registrant integer,
 	sk_user_sales_rep integer,
