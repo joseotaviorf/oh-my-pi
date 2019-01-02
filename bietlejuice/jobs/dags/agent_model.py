@@ -47,7 +47,7 @@ def create_agent_contract_dw():
 
 
 def create_dim_agent_contract_type():
-    ar = Agent('5a-datalake')
+    ar = Agent(bucket_datalake)
     ar.move_sheets_data_to_datalake(google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                                     google_api_scope=GOOGLE_API_SCOPE,
                                     google_sheets_files=GOOGLE_SHEETS_FILES,
@@ -152,7 +152,7 @@ create_agent_contract_dw = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=None
 )
 
-create_dim_agent_contract_type_dw = BaseDAG.build_quintoandar_python_operator(
+create_dim_agent_contract_type_dw_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='create_dim_agent_contract_type_dw',
     python_callable=create_dim_agent_contract_type,
@@ -205,7 +205,7 @@ update_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_agent_contract_dw >> create_dim_agent_contract_type_dw
-create_fact_agent.set_upstream([create_dim_agent_region_dw, create_dim_agent_contract_type_dw])
+create_agent_contract_dw >> create_dim_agent_contract_type_dw_task
+create_fact_agent.set_upstream([create_dim_agent_region_dw, create_dim_agent_contract_type_dw_task])
 create_fact_agent >> xcom_fact_agent
 create_dim_agent_review >> load_dim_agent_review_dw

@@ -194,7 +194,7 @@ class Agent(object):
                 return df_gsheets
 
         raise ValueError(
-            'm=get_google_sheets_data, filename={}, msg=no filename found in json google sheets schema.'.format(
+            'm=__get_google_sheets_data, filename={}, msg=no filename found in json google sheets schema.'.format(
                 filename))
 
     @logger(exclude=['google_s_a_credentials', 'google_api_scope', 'google_sheets_files'])
