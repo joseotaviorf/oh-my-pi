@@ -39,6 +39,7 @@ create table public.fact_house_listing_flows (
 	days_lead_to_listing decimal(10,1),
 	days_lead_to_processing decimal(10,1),
 	is_exclusive smallint,
+	first_isales_intervention varchar(50),
 	lead_type varchar(255),
 	lead_origin varchar(255),
 	lead_utm_source varchar(255),

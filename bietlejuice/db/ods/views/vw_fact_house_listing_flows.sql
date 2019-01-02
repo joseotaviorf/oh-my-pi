@@ -117,6 +117,9 @@ potential_listings as (
 		f.days_lead_to_listing,
 		f.days_lead_to_processing,
 		h.exclusivity as is_exclusive,
+		case when bt.rep_id is not null then 'Lead'
+		     when f.rep_id is not null then 'Photojob'
+		end as first_isales_intervention,
 		bl.lead_type,
 		bl.lead_origin,
 		bl.utm_source,
@@ -215,6 +218,7 @@ select
 	pl.days_lead_to_listing,
 	pl.days_lead_to_processing,
 	pl.is_exclusive,
+	pl.first_isales_intervention,
 	pl.lead_type,
 	pl.lead_origin,
 	pl.utm_source as lead_utm_source,
