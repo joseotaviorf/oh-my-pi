@@ -1,8 +1,10 @@
+import petl
 from collections import OrderedDict
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
 
 logger = QuintoAndarLogger("ZendeskETL")
@@ -13,6 +15,8 @@ class ZendeskETL(object):
         'raw': 'datalake_raw',
         'clean': 'datalake_clean'
     }
+
+    TABLE_PARTITION_DATE = '__DATE_PARTITION__'
 
     def __init__(self, bucket, execution_date=None):
         self.s3_bucket = bucket
@@ -467,7 +471,7 @@ class ZendeskETL(object):
 
             self.athena_client.add_partition(
                 database=ZendeskETL.SCHEMAS['raw'],
-                table_name=table_name,
+                table_name="zendesk_{}".format(table_name),
                 partition="dt='{}'".format(self.execution_date)
             )
 
@@ -476,6 +480,12 @@ class ZendeskETL(object):
             query=query,
             raw_columns=r_cols,
             clean_columns=c_cols
+        )
+
+        self.athena_client.add_partition(
+            database=ZendeskETL.SCHEMAS['clean'],
+            table_name="zendesk_{}".format(table_name),
+            partition="dt_extraction='{}'".format(self.execution_date)
         )
 
     @logger
@@ -489,3 +499,104 @@ class ZendeskETL(object):
                     .format(table_name, empty))
 
         return empty
+
+    @logger
+    def build_staging_table(self, table_name):
+        query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/zendesk/{file_name}.sql'.format(
+                query_base_dir=DATALAKE_QUERIES_DIR,
+                file_name=table_name))
+
+        empty = self.__is_prod_table_empty(table_name)
+        logger.info('m=build_staging_table, table_name={}, empyt={}'.format(table_name, empty))
+        if not empty:
+            logger.info(
+                'm=build_staging_table, table_name={}, msg=production table is not empty'.format(
+                    table_name))
+
+            query = "{} \n where dt_extraction='{}'".format(query, self.execution_date)
+
+        df = self.athena_client.execute_query_and_return_dataframe(query)
+        table_data = petl.fromdataframe(df)
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            table_name='staging.zendesk_{}'.format(table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=False,
+            commit=True
+        )
+
+    @logger
+    def build_prod_table(self, table_name):
+        upsert_query = "SELECT DISTINCT * FROM staging.{}".format(table_name)
+
+        delete_query = """
+            delete from zendesk.{table_name}
+            where sk_ticket in (
+                select sk_ticket
+                from staging.zendesk_{table_name}
+                where sk_date = '__PARTITION_DATE__'
+            ) and sk_date = '__PARTITION_DATE__'
+        """
+
+        empty = self.__is_prod_table_empty(table_name)
+        if empty:
+            logger.info(
+                'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
+                    table_name))
+        else:
+            self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+
+            upsert_query = "{} \nwhere sk_date = {};".format(upsert_query, self.execution_date.strftime('%Y%m%d'))
+
+        self.__upsert_data(upsert_query, table_name)
+
+    @logger(exclude='df')
+    def __upsert_data(self, upsert_query, table_name):
+        logger.info(
+            'm=__upsert_data, table_name={}, msg=getting data from DW, query={}'.format(table_name,
+                                                                                        upsert_query))
+
+        table_data = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query=upsert_query,
+            encoding='utf-8',
+        )
+
+        logger.info(
+            '__upsert_data, table_name={}, msg=bulk inserting...'.format(table_name))
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            table_name='zendesk.{}'.format(table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=True,
+            commit=True
+        )
+
+        logger.info(
+            '__upsert_data, table_name={}, msg=ready to reading data!'.format(table_name))
+
+    @logger
+    def __is_prod_table_empty(self, table_name):
+        result = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from zendesk.{} limit 1".format(table_name),
+            encoding='utf-8'
+        )
+
+        return len(result) == 1
+
+    @logger
+    def __delete_old_entries(self, table_name, delete_query):
+        BaseETL.execute_command(
+            db_enum=EnumDB.BI_DW,
+            command=delete_query.format(
+                table_name=table_name,
+            ).replace(ZendeskETL.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%d%m')),
+            commit=True,
+            encoding='utf-8'
+        )
