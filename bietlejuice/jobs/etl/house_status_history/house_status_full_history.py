@@ -17,7 +17,8 @@ class HouseStatusFullHistory(object):
 
     TABLE_NAME = 'imovel_status_full_history'
 
-    def __truncate_ods_table(self):
+    @logger
+    def truncate_ods_table(self):
         BaseETL.truncate_table(
             db_enum=EnumDB.BI_ODS,
             table_name=HouseStatusFullHistory.TABLE_NAME
