@@ -39,6 +39,7 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	days_lead_to_listing string,
 	days_lead_to_processing string,
 	is_exclusive string,
+	first_isales_intervention string,
 	lead_type string,
 	lead_origin string,
 	lead_utm_source string,
