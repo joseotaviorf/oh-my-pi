@@ -63,6 +63,7 @@ potential_listings as (
 		coalesce(f.affiliate_id, -1) as sk_user_lead_affiliate,
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
+		coalesce(dr.city_id, r.id, -1) as sk_city,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
 		coalesce(to_char(bt.dt_created::date, 'YYYYMMDD')::integer, -1) as sk_task_created_date,
@@ -155,6 +156,17 @@ potential_listings as (
 		usuario us_cad
 	    on us_cad.id = h.usuario_que_cadastrou_id
 	    and us_cad.email like '%@hargos.com.br' -- Registered emails to callcenter company Hargos
+	left join
+	    staging.dim_region dr
+	    on dr.sk_region = f.region_id
+	left join
+	    lead l
+	    on f.lead_id = l.id
+	left join
+	    region r
+        on  r.nivel = 'Cidade' and
+		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g') =
+	    regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g')
 ),
 taxonomy as (
     select
@@ -190,6 +202,7 @@ select
 	pl.sk_user_lead_affiliate,
 	pl.sk_user_task_assignee,
 	pl.sk_region,
+	pl.sk_city,
 	pl.sk_lead_date,
 	pl.sk_prospect_date,
 	pl.sk_task_created_date,
