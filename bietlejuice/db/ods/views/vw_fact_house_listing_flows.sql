@@ -161,12 +161,13 @@ potential_listings as (
 	    on dr.sk_region = f.region_id
 	left join
 	    lead l
-	    on f.lead_id = l.id
+	    on coalesce(f.region_id, -1) = -1 and
+	    f.lead_id = l.id
 	left join
 	    region r
-        on  r.nivel = 'Cidade' and
-		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g') =
-	    regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g')
+        on r.nivel = 'Cidade' and
+        regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g') =
+		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
 ),
 taxonomy as (
     select
