@@ -2,7 +2,7 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
-import bietlejuice.jobs.new_etl.powerbi as powerbi
+import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag

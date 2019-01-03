@@ -7,7 +7,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.sorting_hat import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.sorting_hat import SortingHat
+from bietlejuice.jobs.etl.sorting_hat import SortingHat
 
 # env vars
 env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS')

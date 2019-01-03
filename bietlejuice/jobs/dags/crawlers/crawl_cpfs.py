@@ -8,7 +8,7 @@ from qa_python_utils.aws.batch import BatchClient
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.crawlers.crawler_cpfs import CrawlerCPFs
+from bietlejuice.jobs.etl.crawlers.crawler_cpfs import CrawlerCPFs
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 crawl_cpfs_params = env.get_airflow_env_var('crawl_cpfs_params')
