@@ -52,6 +52,7 @@ with _fact as (
 	  vdp.dt_tenant_first_document_sent as dt_tenant_manual_first_doc_sent,
 	  vdp.dt_tenant_auto_first_doc_sent,
 	  coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) as dt_tenant_first_doc_sent,
+	  dt_owner_document_sent as dt_owner_document_sent,
 	  case
       when vdp.status in ('Aprovada', 'Rejeitada')
        then vdp.dt_updated
@@ -173,6 +174,9 @@ select
   ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
     date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
 		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
+  ((date_part('day', dt_owner_document_sent - dt_offer_approved) * 1440 +
+    date_part('hour', dt_owner_document_sent - dt_offer_approved) * 60 +
+		date_part('minute', dt_owner_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_owner_doc_sent,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 60 +
 		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_doc_first_sent_to_credit_processed,
