@@ -5,6 +5,7 @@ import locale
 from datetime import datetime, timedelta
 
 import numpy as np
+import pandas as pd
 import petl
 from qa_python_utils import QuintoAndarLogger
 
@@ -96,6 +97,7 @@ class CrawlerLeads(CrawlerEntity):
         leads['origem'] = CrawlerLeads.ORIGIN
         leads['tipo'] = CrawlerLeads.SOURCE_TYPE[ws]
         leads['complementary_info'] = leads.apply(lambda row: ' - '.join([str(row.id), str(row.url)]), axis=1)
+        leads = leads.where((pd.notnull(leads)), None)
 
         to_send = leads.rename(columns=CrawlerLeads.COLUMN_MAPPER)[CrawlerLeads.INFOS_TO_SEND]
 
