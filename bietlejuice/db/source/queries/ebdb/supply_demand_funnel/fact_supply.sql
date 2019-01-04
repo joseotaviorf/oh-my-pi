@@ -67,8 +67,7 @@ select
   case when (dt_conversion is null and dt_discarded is null) then null else
         round(TIMESTAMPDIFF(MINUTE, dt_lead, least(coalesce(dt_conversion, DATE_ADD(date(dt_discarded), INTERVAL 1 DAY)),
                                                     coalesce(dt_discarded, DATE_ADD(date(dt_conversion), INTERVAL 1 DAY))))/1440,1)
-       end as lead_to_processing_diff_days,
-  exclusivity+0 as exclusivity
+       end as lead_to_processing_diff_days
 from
 (
 	select
@@ -105,7 +104,6 @@ from
 		base.acquisition_method,
 		base.acquisition_channel,
 		base.acquisition_source,
-		(sc.id is not null and optedOutAt is null) as exclusivity,
 		l.cidade,
 		l.bairro
 	from
@@ -417,12 +415,6 @@ from
 	left join
 		Imovel i
 		on i.id = base.imovel_id
-	left join
-		(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
-		on maxsc.imovel_id = i.id
-	left join
-		SpecialCondition sc
-		on sc.id = maxsc.id
 	left join
 		Lead l
 		on l.id = base.lead_id

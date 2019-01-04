@@ -14,19 +14,61 @@ class GoogleAds(Marketing):
     TABLE_PARTITION_ACCOUNT = '__PARTITION_ACCOUNT__'
 
     COLUMN_TYPE_MAP = {
-        'account_id': long,
-        'campaign_id': long,
-        'adgroup_id': long,
-        'clicks': int,
-        'cost': float,
-        'impressions': int,
-        'keyword_id': long
+        'marketing_google_ads': {
+            'account_id': long,
+            'campaign_id': long,
+            'adgroup_id': long,
+            'clicks': int,
+            'cost': float,
+            'impressions': int,
+            'keyword_id': long
+        },
+        'marketing_google_keywords': {
+            'account_id': long,
+            'campaign_id': long,
+            'adgroup_id': long,
+            'clicks': int,
+            'cost': float,
+            'impressions': int,
+            'keyword_id': long
+        },
+        'marketing_google_campaigns': {
+            'account_id': long,
+            'campaign_id': long,
+            'clicks': int,
+            'cost': float,
+            'impressions': int
+        }
     }
 
-    @logger
     def __init__(self, s3_bucket, execution_date, account=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
-        self.datalake_tables = ["marketing_google_keywords", "marketing_google_ads"]
+
+    @logger
+    def move_campaigns_to_clean(self):
+        r_cols = OrderedDict([
+            ('account_id', str),
+            ('campaign_id', str),
+            ('campaign_name', str),
+            ('clicks', str),
+            ('click_type', str),
+            ('cost', str),
+            ('date', str),
+            ('device', str),
+            ('impressions', str),
+            ('account_name', str),
+            ('hour_of_day', str),
+            ('month', str),
+            ('labels', str),
+            ('week', str),
+            ('year', str)
+        ])
+
+        self._move_to_clean(
+            table_name='marketing_google_campaigns',
+            sql_file_name='campaign.sql',
+            r_cols=r_cols
+        )
 
     @logger
     def move_keywords_to_clean(self):
@@ -130,9 +172,9 @@ class GoogleAds(Marketing):
             c_cols=c_cols
         )
 
-    @logger
+    @logger(exclude='accounts')
     def load_to_pre_staging(self, clean_table, prod_table, accounts):
-        self._load_to_pre_staging(clean_table, prod_table, accounts, GoogleAds.COLUMN_TYPE_MAP)
+        self._load_to_pre_staging(clean_table, prod_table, accounts, GoogleAds.COLUMN_TYPE_MAP[clean_table])
 
     @logger
     def load_to_staging(self, dw_table_name):
@@ -158,11 +200,13 @@ class GoogleAds(Marketing):
         int_date = int(self.execution_date.strftime("%Y%m%d"))
 
         keywords_cte = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/templates/fact_google_ads_keyword.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/templates/fact_google_keyword.sql'.format(DW_QUERIES_DIR))
         ads_cte = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/templates/fact_google_ads_ad.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/templates/fact_google_ad.sql'.format(DW_QUERIES_DIR))
+        campaign_cte = BaseETL.get_query_from_file_name(
+            '{}/staging/marketing/templates/fact_google_campaign.sql'.format(DW_QUERIES_DIR))
         fact_query = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/fact_google_ads_daily_cost_attributions.sql'.format(DW_QUERIES_DIR))
+            '{}/staging/marketing/fact_google_daily_cost_attributions.sql'.format(DW_QUERIES_DIR))
 
         empty = self._is_prod_table_empty(table_name)
         if empty:
@@ -198,7 +242,8 @@ class GoogleAds(Marketing):
 
         final_query = fact_query.format(
             keywords_cte=keywords_cte,
-            ads_cte=ads_cte
+            ads_cte=ads_cte,
+            campaign_cte=campaign_cte
         )
 
         return final_query

@@ -17,6 +17,7 @@ futures==3.0.5
 git+git://github.com/quintoandar/python-utils.git@v0.3.4
 google-api-python-client==1.6.1
 googlemaps==2.5.1
+gspread==3.1.0
 httplib2==0.9.2
 idna==2.1
 ipaddress==1.0.17
@@ -70,3 +71,4 @@ urllib3==1.23
 win-inet-pton==1.0.1
 xlrd # lib to process xls files in s3 - old_etl
 xmltodict==0.10.2
+snakebite==2.11.0

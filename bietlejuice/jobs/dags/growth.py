@@ -1,11 +1,9 @@
 from datetime import datetime
 
+import bietlejuice.jobs.new_etl.powerbi as powerbi
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
-from qa_python_utils import QuintoAndarLogger
-
-import bietlejuice.jobs.new_etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
@@ -15,6 +13,7 @@ from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingV
 from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.new_etl.growth.incurred import Growth
 from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
+from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')

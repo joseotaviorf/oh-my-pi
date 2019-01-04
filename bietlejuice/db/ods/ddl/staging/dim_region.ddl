@@ -9,6 +9,7 @@ CREATE TABLE staging.dim_region (
 	macro_name varchar(100),
 	city_id int4,
 	city_name varchar(100),
+	city_group varchar(100),
 	region_code varchar(10),
 	region_code_deprecated varchar(10),
 	short_region_name varchar(255),

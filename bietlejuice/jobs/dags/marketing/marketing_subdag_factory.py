@@ -9,8 +9,8 @@ logger = QuintoAndarLogger("MarketingSubDagFactory")
 
 class MarketingSubDagFactory(object):
     @staticmethod
-    @logger
     def factory(class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None, accounts=None):
+        logger.info("m=factory, msg=creating class instance, class={}".format(class_))
         class__ = MarketingSubDagFactory.__dispatch_dict(class_)
         if class_ is None:
             raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))

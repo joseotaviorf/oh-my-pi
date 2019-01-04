@@ -106,14 +106,6 @@ pipeline:
     when:
       branch: [ master ]
 
-  publish:
-    image: plugins/ecr
-    pull: true
-    repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-    tag: [ '${DRONE_BRANCH}-${DRONE_COMMIT:0:7}', '${DRONE_BRANCH}-latest' ]
-    when:
-      branch: [ master, forno ]
-
   notify:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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
