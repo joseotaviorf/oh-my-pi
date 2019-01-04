@@ -268,7 +268,7 @@ users_offers_accepted_per_day as ( -- for each apartment and each date, how many
 ),
 docs_first_sent as (
   select
-    cast(f.sk_house as bigint) as sk_house_listing, -- f.sk_house as sk_house_listing, -- cast(lv.sk_house_listing as bigint) as sk_house_listing
+    cast(f.sk_house_listing as bigint) as sk_house_listing, -- f.sk_house as sk_house_listing, -- cast(lv.sk_house_listing as bigint) as sk_house_listing
     date(regexp_extract(
       case 
         when dt_tenant_first_document_sent is null or dt_tenant_first_document_sent = ''
@@ -288,7 +288,7 @@ docs_first_sent as (
 ),
 docs_completed as (
   select
-    cast(f.sk_house as bigint) as sk_house_listing,
+    cast(f.sk_house_listing as bigint) as sk_house_listing,
     date(regexp_extract(dt_credit_analysis_init, '\d{4}-\d{2}-\d{2}')) as completed_date,
     count(f.sk_proposal) as docs_completed
   from datalake_clean.ods_dim_proposal dprop
@@ -300,7 +300,7 @@ docs_completed as (
 ),
 docs_approved as (
   select
-    cast(f.sk_house as bigint) as sk_house_listing,
+    cast(f.sk_house_listing as bigint) as sk_house_listing,
     date(regexp_extract(dt_credit_analysis_end, '\d{4}-\d{2}-\d{2}')) as approved_date,
     count(f.sk_proposal) as docs_approved
   from datalake_clean.ods_dim_proposal dprop
