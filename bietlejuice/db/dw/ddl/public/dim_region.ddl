@@ -9,6 +9,7 @@ CREATE TABLE public.dim_region (
   macro_name VARCHAR(100),
   city_id INTEGER,
   city_name VARCHAR(100),
+  city_group VARCHAR(100),
   region_code VARCHAR(10),
   region_code_deprecated VARCHAR(10),
   short_region_name VARCHAR(255),
