@@ -8,7 +8,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSubDagFactory
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.marketing.marketing_enum import MarketingEnum
+from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 10, 0, 0, 0)

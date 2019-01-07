@@ -3,10 +3,10 @@ from datetime import datetime
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 
-import bietlejuice.jobs.new_etl.powerbi as powerbi
+import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.crawlers.crawler_listings import CrawlerListings
+from bietlejuice.jobs.etl.crawlers.crawler_listings import CrawlerListings
 
 MAIN_DAG_NAME = 'bi-crawler-listings'
 MAIN_START_DATE = datetime(2018, 7, 30)

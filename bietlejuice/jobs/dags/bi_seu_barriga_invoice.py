@@ -9,7 +9,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.invoice import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.seu_barriga import SeuBarrigaInvoiceFactory, SeuBarrigaTableEnum
+from bietlejuice.jobs.etl.seu_barriga import SeuBarrigaInvoiceFactory, SeuBarrigaTableEnum
 
 # env vars
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
