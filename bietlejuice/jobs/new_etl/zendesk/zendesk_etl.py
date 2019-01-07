@@ -5,7 +5,7 @@ from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger("ZendeskETL")
 
@@ -531,9 +531,11 @@ class ZendeskETL(object):
 
     @logger
     def build_prod_table(self, table_name):
-        upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
+        upsert_query = "SELECT distinct * FROM staging.zendesk_{}".format(table_name)
 
-        delete_query = getattr(self, "build_{}_delete_query".format(table_name.split("_")[0]))(table_name)
+        delete_query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
+                query_base_dir=DW_QUERIES_DIR))
 
         empty = self.__is_prod_table_empty(table_name)
         if empty:
@@ -593,28 +595,4 @@ class ZendeskETL(object):
             command=delete_query,
             commit=True,
             encoding='utf-8'
-        )
-
-    @logger
-    def build_fact_delete_query(self, table):
-        return """
-            delete from zendesk.{table_name}
-            where sk_ticket in (
-                select sk_ticket
-                from staging.zendesk_{table_name}
-                where sk_extraction_date = __PARTITION_DATE__
-            ) and sk_extraction_date = __PARTITION_DATE__
-        """.format(
-            table_name=table,
-        ).replace(ZendeskETL.TABLE_PARTITION_DATE, self.execution_datetime.strftime('%Y%d%m'))
-
-    @logger
-    def build_dim_delete_query(self, table):
-        return """
-            delete from zendesk.{table_name}
-            where sk_ticket in (
-                select sk_ticket from staging.zendesk_{table_name}
-            )
-        """.format(
-            table_name=table,
         )
