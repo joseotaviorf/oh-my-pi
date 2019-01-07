@@ -5,7 +5,7 @@ from airflow.models import DAG
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.github_pr_notification import GithubPRNotification
+from bietlejuice.jobs.etl.github_pr_notification import GithubPRNotification
 
 # env vars
 GITHUB_REPOS = json.loads(env.get_airflow_env_var('github_repos'))

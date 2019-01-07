@@ -34,9 +34,9 @@ SELECT
 SELECT
 	s.*,
 	CASE d.week_day
-		WHEN 0 THEN 0	-- Sunday
-		WHEN 6 THEN 20	-- Saturday
-		ELSE 36			-- Other days
+		WHEN 0 THEN 0	                            -- Sunday
+		WHEN 6 THEN COALESCE(slots_per_saturday, 0)	-- Saturday
+		ELSE COALESCE(slots_per_weekday, 0)			-- Other days
 	END AS total_slots,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
@@ -57,4 +57,6 @@ LEFT JOIN available_next_days av
     ON av.sk_agent_id = s.sk_agent_id
 LEFT JOIN agent_contract_rank acr
     ON acr.agent_id = s.sk_agent_id AND acr."rank" = 1
+LEFT JOIN agent.dim_agent_contract_type dact
+    ON dact.sk_agent_contract_type = acr.workcontract_id
 ORDER BY s.sk_date;

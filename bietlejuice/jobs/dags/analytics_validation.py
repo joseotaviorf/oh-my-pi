@@ -7,7 +7,7 @@ from airflow.operators.python_operator import PythonOperator
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.analytics_data_validation.analytics_validation import SchemaValidator
+from bietlejuice.jobs.etl.analytics_data_validation.analytics_validation import SchemaValidator
 
 logger = QuintoAndarLogger('bi-analytics-data-validation')
 

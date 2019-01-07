@@ -9,6 +9,7 @@ SELECT
   r."macroNome" as macro_name,
   r."cidadeId" as city_id,
   coalesce(ar.city, r."cidadeNome") as city_name,
+  ar.city_group,
   ar.region_code as region_code,
   ar.region_code_deprecated as region_code_deprecated,
 	ar.state as short_region_name,
