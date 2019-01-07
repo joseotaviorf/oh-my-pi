@@ -5,7 +5,7 @@ from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger("ZendeskETL")
 
