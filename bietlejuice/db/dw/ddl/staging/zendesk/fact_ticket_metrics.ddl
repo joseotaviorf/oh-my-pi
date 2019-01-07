@@ -9,6 +9,7 @@ create table if not exists staging.zendesk_fact_ticket_metrics(
     sk_assingee bigint,
     sk_created_date integer,
     sk_solved_date integer,
+    sk_extraction_date integer,
     minutes_first_reply_time varchar,
     minutes_first_resolution_time varchar,
     minutes_requester_wait_time varchar,

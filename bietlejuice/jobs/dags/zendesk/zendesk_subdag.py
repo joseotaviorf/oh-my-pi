@@ -45,6 +45,27 @@ class ZendeskSubDag(BaseSubDag):
                 }
             )
 
+    @logger
+    def build_prod_tasks(self, dag):
+        for table in self.zendesk_dw_tables:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id=table,
+                python_callable=self.__to_prod,
+                provide_context=True,
+                op_kwargs={
+                    'table_name': table
+                }
+            )
+
+    @logger(exclude='kwargs')
+    def __to_prod(self, table_name, **kwargs):
+        zendesk_etl = ZendeskETL(
+            bucket=self.bucket,
+            execution_date=kwargs['execution_date']
+        )
+        zendesk_etl.build_prod_table(table_name)
+
     @logger(exclude='kwargs')
     def __to_staging(self, table_name, **kwargs):
         zendesk_etl = ZendeskETL(

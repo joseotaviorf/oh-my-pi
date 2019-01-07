@@ -16,11 +16,12 @@ class ZendeskETL(object):
         'clean': 'datalake_clean'
     }
 
-    TABLE_PARTITION_DATE = '__DATE_PARTITION__'
+    TABLE_PARTITION_DATE = '__PARTITION_DATE__'
 
     def __init__(self, bucket, execution_date=None):
         self.s3_bucket = bucket
         self.athena_client = AthenaClient(self.s3_bucket)
+        self.execution_datetime = execution_date
         self.execution_date = execution_date.strftime("%Y-%m-%d")
 
     @logger
@@ -530,16 +531,9 @@ class ZendeskETL(object):
 
     @logger
     def build_prod_table(self, table_name):
-        upsert_query = "SELECT DISTINCT * FROM staging.{}".format(table_name)
+        upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
 
-        delete_query = """
-            delete from zendesk.{table_name}
-            where sk_ticket in (
-                select sk_ticket
-                from staging.zendesk_{table_name}
-                where sk_date = '__PARTITION_DATE__'
-            ) and sk_date = '__PARTITION_DATE__'
-        """
+        delete_query = getattr(self, "build_{}_delete_query".format(table_name.split("_")[0]))(table_name)
 
         empty = self.__is_prod_table_empty(table_name)
         if empty:
@@ -547,9 +541,11 @@ class ZendeskETL(object):
                 'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
                     table_name))
         else:
-            self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+            self.__delete_old_entries(delete_query)
 
-            upsert_query = "{} \nwhere sk_date = {};".format(upsert_query, self.execution_date.strftime('%Y%m%d'))
+            if table_name.split("_")[0] == 'fact':
+                upsert_query = "{} \nwhere sk_extraction_date = {};".format(upsert_query,
+                                                                            self.execution_datetime.strftime('%Y%m%d'))
 
         self.__upsert_data(upsert_query, table_name)
 
@@ -591,12 +587,34 @@ class ZendeskETL(object):
         return len(result) == 1
 
     @logger
-    def __delete_old_entries(self, table_name, delete_query):
+    def __delete_old_entries(self, delete_query):
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
-            command=delete_query.format(
-                table_name=table_name,
-            ).replace(ZendeskETL.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%d%m')),
+            command=delete_query,
             commit=True,
             encoding='utf-8'
+        )
+
+    @logger
+    def build_fact_delete_query(self, table):
+        return """
+            delete from zendesk.{table_name}
+            where sk_ticket in (
+                select sk_ticket
+                from staging.zendesk_{table_name}
+                where sk_extraction_date = __PARTITION_DATE__
+            ) and sk_extraction_date = __PARTITION_DATE__
+        """.format(
+            table_name=table,
+        ).replace(ZendeskETL.TABLE_PARTITION_DATE, self.execution_datetime.strftime('%Y%d%m'))
+
+    @logger
+    def build_dim_delete_query(self, table):
+        return """
+            delete from zendesk.{table_name}
+            where sk_ticket in (
+                select sk_ticket from staging.zendesk_{table_name}
+            )
+        """.format(
+            table_name=table,
         )
