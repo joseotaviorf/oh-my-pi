@@ -3,13 +3,16 @@ from datetime import datetime
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.new_etl.leads.leads_reprocessor import LeadsReprocessor
 
-env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('EBDB')
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
+config_json = env.get_airflow_env_var('REPROCESS_LEADS_CONFIG_FILE')
 
 
 def reprocess_leads(**kwargs):
     exec_date = kwargs['execution_date']
+    lr = LeadsReprocessor(config_json=config_json)
 
 
 dag = DAG(
