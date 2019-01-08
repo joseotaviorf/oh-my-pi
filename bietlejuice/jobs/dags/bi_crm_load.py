@@ -7,7 +7,7 @@ from airflow.operators.python_operator import ShortCircuitOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum, CRMWorkgroups, \
+from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum, CRMWorkgroups, \
     CRMTaskTitles
 
 # env vars

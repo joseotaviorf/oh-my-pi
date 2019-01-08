@@ -11,14 +11,14 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import create_sk_dates
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import generate_queries
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato_aud
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_invoices
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_performance_table
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import format_performance_table
+from bietlejuice.jobs.etl.ts_monitoring.helpers import create_sk_dates
+from bietlejuice.jobs.etl.ts_monitoring.helpers import generate_queries
+from bietlejuice.jobs.etl.ts_monitoring.helpers import write_to_s3
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_ebdb_contrato_aud
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_invoices
+from bietlejuice.jobs.etl.ts_monitoring.processing import compute_performance_table
+from bietlejuice.jobs.etl.ts_monitoring.processing import format_performance_table
 
 MAIN_DAG_NAME = 'tenantScreening-performance'
 MAIN_START_DATE = datetime(2018, 3, 20)

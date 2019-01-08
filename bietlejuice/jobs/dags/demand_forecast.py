@@ -10,13 +10,13 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.kpi_forecast.funnel import Funnel
-from bietlejuice.jobs.new_etl.kpi_forecast.helpers import get_count, write_to_s3, get_file_from_s3, get_prediction, \
+from bietlejuice.jobs.etl.kpi_forecast.funnel import Funnel
+from bietlejuice.jobs.etl.kpi_forecast.helpers import get_count, write_to_s3, get_file_from_s3, get_prediction, \
     get_kpis
-from bietlejuice.jobs.new_etl.kpi_forecast.preprocessor import Preprocessor
-from bietlejuice.jobs.new_etl.kpi_forecast.query_demand import query_demand
-from bietlejuice.jobs.new_etl.kpi_forecast.steps_demand import steps
-from bietlejuice.jobs.new_etl.kpi_forecast.ts_predictor import Ts_predictor
+from bietlejuice.jobs.etl.kpi_forecast.preprocessor import Preprocessor
+from bietlejuice.jobs.etl.kpi_forecast.query_demand import query_demand
+from bietlejuice.jobs.etl.kpi_forecast.steps_demand import steps
+from bietlejuice.jobs.etl.kpi_forecast.ts_predictor import Ts_predictor
 
 bucket_ds = env.get_airflow_env_var('bi-data-science-s3-bucket')  # comment for testing without airflow
 bucket_dl = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for testing without airflow
