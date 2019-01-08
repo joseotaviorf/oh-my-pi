@@ -18,6 +18,8 @@ logger = QuintoAndarLogger('CrawlerLeads')
 
 
 class CrawlerLeads(CrawlerEntity):
+    LOGGER_CLASSNAME = "CrawlerLeads"
+
     QUEUE = 'CrawlerLeads'
 
     SOURCE_TYPE = {
@@ -87,7 +89,13 @@ class CrawlerLeads(CrawlerEntity):
         leads = leads.drop(labels=['cep'], axis=1)
 
         leads = leads.drop_duplicates(subset=['phone_number'])
+        logger.info(
+            'm={}.send_leads, msg={} remaining leads after removing duplicate phone numbers.'.format(
+                self.LOGGER_CLASSNAME, len(leads)))
         leads = leads[leads.phone_number.str.len() >= 11]
+        logger.info(
+            'm={}.send_leads, msg={} remaining leads after checking size of the phone number.'.format(
+                self.LOGGER_CLASSNAME, len(leads)))
 
         locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         leads.rent = leads.rent.apply(lambda p: locale.currency(p) if not np.isnan(p) else None)
@@ -102,5 +110,13 @@ class CrawlerLeads(CrawlerEntity):
         to_send = leads.rename(columns=CrawlerLeads.COLUMN_MAPPER)[CrawlerLeads.INFOS_TO_SEND]
 
         messages = [json.dumps(j) for j in to_send.reset_index(drop=True).to_dict('records')]
+
+        logger.info(
+            'm={}.send_leads, msg=sending the following {} leads to the CrawlerLeads SQS.'.format(
+                self.LOGGER_CLASSNAME, len(messages)))
+        for message in messages:
+            logger.info(
+                'm={}.send_leads, msg={}.'.format(
+                    self.LOGGER_CLASSNAME, message))
 
         BaseETL.publish_messages(messages=messages, queue_name=CrawlerLeads.QUEUE)
