@@ -32,6 +32,7 @@ newrelic==2.98.0.81
 numba==0.37.0
 numpy==1.13.0
 oauth2client>=3.0.0
+oauthlib==2.1.0
 openpyxl==2.3.5
 paramiko>=2.4.1
 petl==1.1.1
