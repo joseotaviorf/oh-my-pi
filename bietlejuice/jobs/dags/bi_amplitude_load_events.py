@@ -4,7 +4,7 @@ import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.amplitude.amplitude_events import AmplitudeEventsETL
+from bietlejuice.jobs.etl.amplitude.amplitude_events import AmplitudeEventsETL
 from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('AmplitudeEvents')

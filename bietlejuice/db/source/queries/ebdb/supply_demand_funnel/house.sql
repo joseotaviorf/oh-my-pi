@@ -169,7 +169,7 @@ select
 			then 'UNKNOWN_NULL_VALUE'
 		else 'OTHER'
 	end as unpublished_reason,
-	(sc.id is not null and optedOutAt is null)+0 as exclusivity,
+	coalesce(sc.exclusivity, 0) as exclusivity,
 	ot.name as house_occupant,
     kt.name as key_type,
     aat.name as key_location,
@@ -221,11 +221,26 @@ left join
 	UsuarioRevisionEntity ure
 	on ia_max.REV = ure.id
 left join
-	(select max(id) as id, imovel_id from SpecialCondition group by imovel_id) maxsc
-	on maxsc.imovel_id = i.id
-left join
-	SpecialCondition sc
-	on sc.id = maxsc.id
+	(
+	    -- there is a known bug that creates multiple rows for some houses
+        select
+            house_id,
+            max(exclusivity) as exclusivity
+        from
+        (
+            select
+                hsc.house_id,
+                hsc.specialCondition_id is not null as exclusivity
+            from HouseSpecialCondition hsc
+            join
+                SpecialCondition sc
+                on sc.id = hsc.specialCondition_id
+                    and sc.specialConditionType = 'Exclusivity'
+                    and sc.specialConditionStatus in ('OptedIn', 'Applied')
+        ) special_c
+        group by 1
+	) sc
+	    on sc.house_id = i.id
 
 left join AccessType at
   on at.imovel_id = i.id

@@ -8,11 +8,11 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSubDagFactory
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.marketing.marketing_enum import MarketingEnum
+from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 MAIN_DAG_NAME = 'bi-marketing-costs'
-MAIN_START_DATE = datetime(2018, 12, 2, 6, 30, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 6/6 * * *')
+MAIN_START_DATE = datetime(2018, 12, 10, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 */6 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))

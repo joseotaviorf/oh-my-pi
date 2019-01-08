@@ -1,5 +1,5 @@
 -- returns distance in meters between a pair of lat/lon points
--- parameters are lat1, lon1, lat2, lon2
+-- parameters are lat1, lng1, lat2, lng2
 CREATE OR REPLACE FUNCTION f_geodesical_distance (Float, Float, Float, Float)
    RETURNS FLOAT
  IMMUTABLE

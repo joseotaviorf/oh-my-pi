@@ -54,6 +54,7 @@ select
   h.key_type,
   h.key_location,
   coalesce(h.visit_restriction = 'Restriction', false) as has_visit_restriction,
+  h.predicted_price as house_predicted_price,
   now() as ts_load
 from house h
 left join house_listing pl

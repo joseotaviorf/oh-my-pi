@@ -5,7 +5,7 @@ from airflow.models import DAG
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.campaign_monitor.campaign import CampaignMonitorCampaignFactory
+from bietlejuice.jobs.etl.campaign_monitor.campaign import CampaignMonitorCampaignFactory
 
 # env vars
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')

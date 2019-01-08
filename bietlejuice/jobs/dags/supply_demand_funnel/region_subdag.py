@@ -2,6 +2,8 @@ from datetime import datetime
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from qa_python_utils import QuintoAndarLogger
 
@@ -52,12 +54,9 @@ class RegionSubDag(DimSubDag):
         region = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_region',
-            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
+            python_callable=self.__extract_query_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'region',
-                'table_name': 'MapRegiao',
-                'add_timestamp': True,
-                'copy_to_clean': False,
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
@@ -84,3 +83,10 @@ class RegionSubDag(DimSubDag):
         )
 
         return agent_region, region, dim_region, load_region
+
+    @logger
+    def __extract_query_dim_from_ebdb_to_ods(self, dim_name, bucket):
+        command = BaseETL.get_query_from_file_name(
+            file_name='{0}/ebdb/supply_demand_funnel/{1}.sql'.format(SOURCE_QUERIES_DIR, dim_name))
+
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=bucket, command=command)

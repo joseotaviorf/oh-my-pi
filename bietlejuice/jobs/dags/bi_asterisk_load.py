@@ -7,7 +7,7 @@ from airflow.operators.python_operator import ShortCircuitOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.asterisk import AsteriskFactory, AsteriskTableEnum
+from bietlejuice.jobs.etl.asterisk import AsteriskFactory, AsteriskTableEnum
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW', 'ASTERISK')

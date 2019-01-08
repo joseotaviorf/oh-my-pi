@@ -7,8 +7,8 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl import LEAD_VARIANT_CONFIG_DIR
-from bietlejuice.jobs.new_etl.leads.leads_processor import LeadsProcessor
+from bietlejuice.jobs.etl import LEAD_VARIANT_CONFIG_DIR
+from bietlejuice.jobs.etl.leads.leads_processor import LeadsProcessor
 
 MAIN_DAG_NAME = 'reprocess-leads'
 MAIN_START_DATE = datetime(2018, 7, 3)
