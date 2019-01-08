@@ -10,8 +10,7 @@ bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 config_json = env.get_airflow_env_var('REPROCESS_LEADS_CONFIG_FILE')
 
 
-def reprocess_leads(**kwargs):
-    exec_date = kwargs['execution_date']
+def reprocess_leads():
     lr = LeadsReprocessor(config_json=config_json)
 
 
@@ -31,7 +30,6 @@ dag = DAG(
 reprocess_leads_task = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='reprocess_leads_task',
-    provide_context=True,
     python_callable=reprocess_leads,
     op_kwargs=None
 )
