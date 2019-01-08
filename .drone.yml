@@ -96,7 +96,7 @@ pipeline:
   load-plugins-prod:
     group: deploy
     image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: plugins/*
     target: /var/www/airflow/plugins
