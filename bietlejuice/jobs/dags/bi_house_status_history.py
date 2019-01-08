@@ -6,7 +6,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
+from bietlejuice.jobs.etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
 
 # env vars
 env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
@@ -100,6 +100,16 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
+    truncate_ods_table_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='truncate_ods_table',
+        python_callable=execute_class_method,
+        dag=local_dag,
+        op_kwargs={
+            'class_': HouseStatusFullHistory,
+            'method': 'truncate_ods_table'
+        }
+    )
+
     load_data_into_ods_task = BaseDAG.build_quintoandar_python_operator(
         task_id='load_data_into_ods',
         python_callable=execute_class_method,
@@ -109,6 +119,8 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
             'method': 'load_data_into_ods'
         }
     )
+
+    truncate_ods_table_task >> load_data_into_ods_task
 
     return local_dag
 

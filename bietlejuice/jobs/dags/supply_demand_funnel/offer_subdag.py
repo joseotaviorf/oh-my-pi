@@ -7,7 +7,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from bietlejuice.jobs.new_etl.godfather import GodFather
+from bietlejuice.jobs.etl.godfather import GodFather
 
 logger = QuintoAndarLogger('OfferSubDag')
 

@@ -6,7 +6,7 @@ from airflow.operators.quintoandar import QuintoAndarPythonOperator
 
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.dim_utils import load_dim_from_ods_to_dw
+from bietlejuice.jobs.etl.dim_utils import load_dim_from_ods_to_dw
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 STAGING_QUERIES_DIR = os.path.join(dir_path, '../../db/dw/growth/staging/queries')

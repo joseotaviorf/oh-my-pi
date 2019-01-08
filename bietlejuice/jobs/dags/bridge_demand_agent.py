@@ -1,13 +1,13 @@
 import logging
 from datetime import datetime, timedelta
 
-import bietlejuice.jobs.new_etl.powerbi as powerbi
+import bietlejuice.jobs.etl.powerbi as powerbi
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.agents.bridge_listing_rent_flows_agent import Bridge
+from bietlejuice.jobs.etl.agents.bridge_listing_rent_flows_agent import Bridge
 
 PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
 PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')

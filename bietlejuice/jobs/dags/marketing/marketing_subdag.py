@@ -3,7 +3,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.new_etl.marketing.factory import MarketingFactory
+from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
 
 logger = QuintoAndarLogger('MarketingSubDag')
 

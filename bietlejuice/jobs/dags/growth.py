@@ -1,18 +1,18 @@
 from datetime import datetime
 
-import bietlejuice.jobs.new_etl.powerbi as powerbi
+import bietlejuice.jobs.etl.powerbi as powerbi
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.amplitude.active_users import ActiveUsers
-from bietlejuice.jobs.new_etl.amplitude.engaged_users import EngagedUsers
-from bietlejuice.jobs.new_etl.amplitude.listings_unique_page_views import ListingsWithPageViews
-from bietlejuice.jobs.new_etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
-from bietlejuice.jobs.new_etl.amplitude.schedule_page_views import SchedulePageViews
-from bietlejuice.jobs.new_etl.growth.incurred import Growth
-from bietlejuice.jobs.new_etl.growth.prediction import GrowthPrediction
+from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
+from bietlejuice.jobs.etl.amplitude.engaged_users import EngagedUsers
+from bietlejuice.jobs.etl.amplitude.listings_unique_page_views import ListingsWithPageViews
+from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
+from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
+from bietlejuice.jobs.etl.growth.incurred import Growth
+from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
 from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')

@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.s3_files_to_ods import S3ToODS
+from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 
 # env vars
 env.set_airflow_var_to_local_env('BI_ODS')
