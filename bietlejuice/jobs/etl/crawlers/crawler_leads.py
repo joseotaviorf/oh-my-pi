@@ -103,4 +103,12 @@ class CrawlerLeads(CrawlerEntity):
 
         messages = [json.dumps(j) for j in to_send.reset_index(drop=True).to_dict('records')]
 
+        logger.info(
+            'm={}.send_leads, msg=sending the following leads to the CrawlerLeads SQS.'.format(
+                self.LOGGER_CLASSNAME))
+        for message in messages:
+            logger.info(
+                'm={}.send_leads, msg={}.'.format(
+                    self.LOGGER_CLASSNAME, message))
+
         BaseETL.publish_messages(messages=messages, queue_name=CrawlerLeads.QUEUE)
