@@ -363,10 +363,6 @@ class CRMTasks(object):
     @logger
     def __move_to_staging(self, table_name, queues, query_filename, manual_task_workgroups,
                           append_query_filename=None):
-        if not queues and not manual_task_workgroups:
-            raise ValueError(
-                'm=__move_to_staging, queues={}, manual_task_workgroups={}, msg=at least one must be not none')
-
         query = BaseETL.get_query_from_file_name(
             '{}/{}/{}'.format(DATALAKE_QUERIES_DIR,
                               CRMTasks.BUCKET_FOLDER_SUFFIXES['tasks'],
@@ -374,8 +370,13 @@ class CRMTasks(object):
         )
 
         if queues is None:
-            where_clause = """(trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}'))""".format(
-                manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
+            where_clause = """(trim(ct.type) = 'Manual' """
+
+            if manual_task_workgroups:
+                where_clause += """and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}'))""".format(
+                    manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
+            else:
+                where_clause += """and ct.metadata not like '%workgroupId%')"""
         else:
             where_clause = "trim(ct.type) in ('{types}')".format(types="', '".join(queue for queue in queues))
 
