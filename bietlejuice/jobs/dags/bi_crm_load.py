@@ -97,9 +97,9 @@ def exec_crm_method(method, **kwargs):
     getattr(crm_tasks, method)()
 
 
-def exec_factory_method(_class, method, **kwargs):
+def exec_factory_method(class_, method, **kwargs):
     crm_tasks = CRMTasksFactory.factory(
-        _class=_class,
+        class_=class_,
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri,
         execution_date=kwargs['execution_date']
@@ -139,7 +139,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'move_dim_to_staging'
         }
     )
@@ -150,7 +150,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'move_fact_to_staging'
         }
     )
@@ -161,7 +161,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'append_dim_to_dw'
         }
     )
@@ -172,7 +172,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'append_fact_to_dw'
         }
     )
@@ -183,7 +183,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'delete_staging_fact_entries'
         }
     )
@@ -194,7 +194,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'delete_staging_dim_entries'
         }
     )
@@ -393,21 +393,21 @@ tasks_credit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_credit',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.CREDIT
+    class_=CRMTasksTableEnum.CREDIT
 )
 
 tasks_photo_job_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_photo_job',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.PHOTO_JOB
+    class_=CRMTasksTableEnum.PHOTO_JOB
 )
 
 tasks_visit_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_visit',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.VISIT,
+    class_=CRMTasksTableEnum.VISIT,
     has_bridge=True
 )
 
@@ -415,42 +415,42 @@ tasks_closing_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_closing',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.CLOSING
+    class_=CRMTasksTableEnum.CLOSING
 )
 
 tasks_onboarding_tenant_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_onboarding_tenant',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.ONBOARDING_TENANT
+    class_=CRMTasksTableEnum.ONBOARDING_TENANT
 )
 
 tasks_payment_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_payment',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.PAYMENT
+    class_=CRMTasksTableEnum.PAYMENT
 )
 
 tasks_lead_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_lead',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.LEAD
+    class_=CRMTasksTableEnum.LEAD
 )
 
 tasks_inspection_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_inspection',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.INSPECTION
+    class_=CRMTasksTableEnum.INSPECTION
 )
 
 tasks_repair_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tasks_repair',
     sub_dag_func=class_sub_dag,
-    _class=CRMTasksTableEnum.REPAIR
+    class_=CRMTasksTableEnum.REPAIR
 )
 
 # flow
