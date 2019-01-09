@@ -453,6 +453,14 @@ tasks_repair_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=CRMTasksTableEnum.REPAIR
 )
 
+tasks_ungrouped_manual_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_ungrouped_manual',
+    sub_dag_func=class_sub_dag,
+    class_=CRMTasksTableEnum.UNGROUPED_MANUAL
+)
+
+
 # flow
 airflow_helpers.chain(
     extract_and_load_tasks_task,
@@ -478,7 +486,8 @@ tasks_tasks = [
     tasks_payment_sub_dag_task,
     tasks_lead_sub_dag_task,
     tasks_inspection_sub_dag_task,
-    tasks_repair_sub_dag_task
+    tasks_repair_sub_dag_task,
+    tasks_ungrouped_manual_sub_dag_task
 ]
 
 workgroups_sub_dag_task.set_downstream(tasks_tasks)
