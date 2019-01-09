@@ -17,7 +17,7 @@ class CRMTasksFactory(object):
     def factory(class_, s3_bucket, mongo_client_uri, execution_date):
         __class = CRMTasksFactory._dispatch_dict(class_)
         if class_ is None:
-            raise Exception('m=factory, _class={}, msg=class type not found'.format(class_))
+            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
 
         return __class(
             s3_bucket=s3_bucket,
