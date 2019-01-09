@@ -37,11 +37,9 @@ class LeadsReprocessor(object):
 
     @logger
     def get_leads(self):
-        df_ids = self.__get_lead_ids_from_query()
-        leads = self.__get_lead_infos_from_ids(df_leads=df_ids)
-        # treated_leads = self.__treat_leads(leads)
-        treated_leads = ''
-        return leads
+        df_leads = self.__get_lead_ids_from_query()
+        treated_leads = self.__treat_leads(df_leads)
+        return treated_leads
 
     @logger(exclude='json_list')
     def send_leads(self, json_list, queue='CrawlerLeads'):
@@ -65,33 +63,24 @@ class LeadsReprocessor(object):
 
     @logger
     def __get_lead_ids_from_query(self):
-        lead_ids = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb, query=self.query)
-
-        # Remove header
-        del lead_ids[0]
-
-        # Convert to df
-        df_leads = pd.DataFrame({'id': lead_ids})
-        return df_leads
-
-    @logger(exclude='df_leads')
-    def __get_lead_infos_from_ids(self, df_leads):
         # Treat columns
         list_columns = self.defaultColumns
         columns_comma_separated = ','.join(list_columns).encode('UTF8')
 
-        # Treat where clause
-        list_leads = [str(elem[0]) for elem in df_leads['id']]
-        leads_comma_separated = ','.join(list_leads).encode('UTF8')
-
         base_query = BaseETL.get_query_from_file_name(
             '{}/ebdb/leads/get_leads_to_reprocess.sql'.format(SOURCE_QUERIES_DIR))
+        lead_ids = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb,
+                                         query=base_query.format(columns=columns_comma_separated,
+                                                                 where_clause=self.query))
 
-        leads = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb,
-                                      query=base_query.format(columns=columns_comma_separated,
-                                                              where_clause=leads_comma_separated))
+        # Remove header
+        lead_header = lead_ids[0]
+        del lead_ids[0]
 
-        return leads
+        # Convert to df
+        df_leads = pd.DataFrame(lead_ids[:10])
+        df_leads.columns = lead_header
+        return df_leads
 
     @logger
     def __treat_leads(self):
