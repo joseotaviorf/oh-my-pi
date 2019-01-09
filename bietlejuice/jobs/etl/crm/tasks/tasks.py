@@ -361,8 +361,8 @@ class CRMTasks(object):
         )
 
     @logger
-    def __move_to_staging(self, table_name, queues, query_filename, manual_task_workgroups,
-                          append_query_filename=None):
+    def _move_to_staging(self, table_name, queues, query_filename, manual_task_workgroups,
+                         append_query_filename=None):
         query = BaseETL.get_query_from_file_name(
             '{}/{}/{}'.format(DATALAKE_QUERIES_DIR,
                               CRMTasks.BUCKET_FOLDER_SUFFIXES['tasks'],
@@ -385,7 +385,7 @@ class CRMTasks(object):
                     previous_clause=where_clause,
                     manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
 
-        empty = self.__is_prod_table_empty(table_name=table_name)
+        empty = self._is_prod_table_empty(table_name=table_name)
         if not empty:
             where_clause = """{previous_clause}
                                 and dt = '{dt_partition}'""".format(previous_clause=where_clause,
@@ -404,7 +404,7 @@ class CRMTasks(object):
 
         df = self.athena_client.execute_query_and_return_dataframe(final_query)
 
-        logger.info('m=__move_to_staging, table_name={}, msg=sending df to DW staging'.format(table_name))
+        logger.info('m=_move_to_staging, table_name={}, msg=sending df to DW staging'.format(table_name))
         BaseETL.dataframe_to_db(
             df=df,
             table_name='{}.{}'.format(CRMTasks.SCHEMA_NAMES['staging'], table_name),
@@ -414,7 +414,7 @@ class CRMTasks(object):
         )
 
     def _move_dim_to_staging(self, table_name, queues=None, manual_task_workgroups=None):
-        self.__move_to_staging(
+        self._move_to_staging(
             table_name=table_name,
             queues=queues,
             query_filename='create_staging_dim_table.sql',
@@ -424,7 +424,7 @@ class CRMTasks(object):
     @logger
     def _move_fact_to_staging(self, table_name, queues=None, manual_task_workgroups=None,
                               append_query_filename='append_fact_default_info.sql'):
-        self.__move_to_staging(
+        self._move_to_staging(
             table_name=table_name,
             queues=queues,
             query_filename='create_staging_fact_table.sql',
@@ -452,7 +452,7 @@ class CRMTasks(object):
     def __append_to_dw(self, schema, table_name, query_filename):
         upsert_query = BaseETL.get_query_from_file_name('{}/staging/crm/{}'.format(DW_QUERIES_DIR, query_filename))
 
-        empty = self.__is_prod_table_empty(table_name=table_name)
+        empty = self._is_prod_table_empty(table_name=table_name)
         if empty:
             logger.info(
                 'm=__append_to_dw, schema={}, table_name={}, msg=table already empty'.format(
@@ -512,7 +512,7 @@ class CRMTasks(object):
         )
 
     @logger
-    def __is_prod_table_empty(self, table_name):
+    def _is_prod_table_empty(self, table_name):
         result = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
             query='select 1 from {}.{} limit 1'.format(CRMTasks.SCHEMA_NAMES['prod'], table_name)
