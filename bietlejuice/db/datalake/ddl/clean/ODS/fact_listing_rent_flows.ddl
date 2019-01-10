@@ -62,6 +62,7 @@ create external table datalake_clean.ods_fact_listing_rent_flows (
   days_offer_submitted_to_offer_approved string,
   days_offer_approved_to_credit_init string,
   days_offer_submitted_to_contract_signed string,
+  days_offer_approved_to_contract_signed string,
   days_tenant_doc_completed_to_credit_approved string,
   days_tenant_doc_sent_to_doc_completed string,
   days_house_listing_to_contract_signed string,

@@ -225,6 +225,9 @@ select
   ((date_part('day', dt_contract_signed - dt_offer_submitted) * 1440 +
     date_part('hour', dt_contract_signed - dt_offer_submitted) * 60 +
 		date_part('minute', dt_contract_signed - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_contract_signed,
+  ((date_part('day', dt_contract_signed - dt_offer_approved) * 1440 +
+    date_part('hour', dt_contract_signed - dt_offer_approved) * 60 +
+		date_part('minute', dt_contract_signed - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_contract_signed,
   ((date_part('day', dt_credit_analysis_approved - dt_credit_analysis_init) * 1440 +
     date_part('hour', dt_credit_analysis_approved - dt_credit_analysis_init) * 60 +
 		date_part('minute', dt_credit_analysis_approved - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_tenant_doc_completed_to_credit_approved,
