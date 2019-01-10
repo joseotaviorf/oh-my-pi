@@ -6,7 +6,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
+from bietlejuice.jobs.etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
 
 # env vars
 env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
@@ -21,6 +21,11 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0 * * *')
 def execute_class_method(class_, method):
     class__ = class_()
     getattr(class__, method)()
+
+
+def load_data_into_data_lake(class_):
+    class__ = class_()
+    class__.load_data_into_data_lake(s3_bucket=s3_bucket)
 
 
 # dags
@@ -77,21 +82,10 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data_into_data_lake',
-        python_callable=execute_class_method,
-        dag=local_dag,
-        op_kwargs={
-            'class_': HouseStatusHistory,
-            'method': 'load_data_into_data_lake'
-        }
-    )
-
     airflow_helpers.chain(
         load_data_into_ods_stg_task,
         delete_duplicated_entries_task,
-        load_data_into_ods_task,
-        load_data_into_data_lake_task
+        load_data_into_ods_task
     )
 
     return local_dag
@@ -106,6 +100,16 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
+    truncate_ods_table_task = BaseDAG.build_quintoandar_python_operator(
+        task_id='truncate_ods_table',
+        python_callable=execute_class_method,
+        dag=local_dag,
+        op_kwargs={
+            'class_': HouseStatusFullHistory,
+            'method': 'truncate_ods_table'
+        }
+    )
+
     load_data_into_ods_task = BaseDAG.build_quintoandar_python_operator(
         task_id='load_data_into_ods',
         python_callable=execute_class_method,
@@ -116,20 +120,7 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    load_data_into_data_lake_task = BaseDAG.build_quintoandar_python_operator(
-        task_id='load_data_into_data_lake',
-        python_callable=execute_class_method,
-        dag=local_dag,
-        op_kwargs={
-            'class_': HouseStatusFullHistory,
-            'method': 'load_data_into_data_lake'
-        }
-    )
-
-    airflow_helpers.chain(
-        load_data_into_ods_task,
-        load_data_into_data_lake_task
-    )
+    truncate_ods_table_task >> load_data_into_ods_task
 
     return local_dag
 

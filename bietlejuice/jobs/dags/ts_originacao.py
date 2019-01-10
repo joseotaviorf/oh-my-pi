@@ -10,13 +10,13 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_api
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_contrato
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_ebdb_proposta
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_sortinghat_proponent
-from bietlejuice.jobs.new_etl.ts_monitoring.import_data import import_sortinghat_proposal
-from bietlejuice.jobs.new_etl.ts_monitoring.processing import compute_originacao_table, format_originacao_table
+from bietlejuice.jobs.etl.ts_monitoring.helpers import write_to_s3, generate_queries, create_sk_dates
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_api
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_ebdb_contrato
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_ebdb_proposta
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_sortinghat_proponent
+from bietlejuice.jobs.etl.ts_monitoring.import_data import import_sortinghat_proposal
+from bietlejuice.jobs.etl.ts_monitoring.processing import compute_originacao_table, format_originacao_table
 
 MAIN_DAG_NAME = 'tenantScreening-originacao'
 MAIN_START_DATE = datetime(2018, 3, 20)

@@ -28,11 +28,11 @@ with all_dates as (
     dense_rank() over (partition by date_part('year', dp.ts_publication) order by dp.sk_house_listing asc)
     	+ dense_rank() over (partition by date_part('year', dp.ts_publication) order by dp.sk_house_listing desc)
 			- 1 as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dp
-		on f.sk_property = dp.sk_house_listing
+		on f.sk_house_listing = dp.sk_house_listing
 		  and dp.ts_publication >= '2017-01-01' and dp.ts_publication < current_date
-		  and f.sk_property != -1
+		  and f.sk_house_listing != -1
   order by date_part('year', dp.ts_publication), date_part('month', dp.ts_publication), date_part('week', dp.ts_publication), date_part('day', dp.ts_publication)
 ),
 all_dates_last_week as (
@@ -45,11 +45,11 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dp.sk_house_listing) as monthly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dp
-		on f.sk_property = dp.sk_house_listing
+		on f.sk_house_listing = dp.sk_house_listing
 		  and dp.ts_publication >= '2017-01-01' and dp.ts_publication < current_date
-		  and f.sk_property != -1
+		  and f.sk_house_listing != -1
   where date_part('year', dp.ts_publication) = date_part('year', add_months(current_date, -1))
   		and date_part('month', dp.ts_publication) = date_part('month', add_months(current_date, -1))
   		and date_part('day', dp.ts_publication) < date_part('day', current_date)
@@ -62,11 +62,11 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(distinct dp.sk_house_listing) as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	join dim_house_listing dp
-		on f.sk_property = dp.sk_house_listing
+		on f.sk_house_listing = dp.sk_house_listing
 		  and dp.ts_publication >= '2017-01-01' and dp.ts_publication < current_date
-		  and f.sk_property != -1
+		  and f.sk_house_listing != -1
   where date_part('year', dp.ts_publication) = date_part('year', add_months(current_date, -12))
   		and ((date_part('month', dp.ts_publication) = date_part('month', add_months(current_date, -12))
   		      and date_part('day', dp.ts_publication) < date_part('day', add_months(current_date, -12)))

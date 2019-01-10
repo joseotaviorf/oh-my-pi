@@ -96,7 +96,7 @@ pipeline:
   load-plugins-prod:
     group: deploy
     image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: plugins/*
     target: /var/www/airflow/plugins
@@ -105,14 +105,6 @@ pipeline:
     secrets: [ rsync_key ]
     when:
       branch: [ master ]
-
-  publish:
-    image: plugins/ecr
-    pull: true
-    repo: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-    tag: [ '${DRONE_BRANCH}-${DRONE_COMMIT:0:7}', '${DRONE_BRANCH}-latest' ]
-    when:
-      branch: [ master, forno ]
 
   notify:
     image: plugins/slack

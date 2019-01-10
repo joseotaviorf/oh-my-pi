@@ -1,2 +1,0 @@
-from bietlejuice.jobs.new_etl.seu_barriga.invoice_factory import SeuBarrigaInvoiceFactory
-from bietlejuice.jobs.new_etl.seu_barriga.seu_barriga_table_enum import SeuBarrigaTableEnum

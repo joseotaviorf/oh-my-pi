@@ -2,13 +2,13 @@ import cStringIO
 import json
 from datetime import datetime
 
-import bietlejuice.jobs.new_etl.powerbi as powerbi
+import bietlejuice.jobs.etl.powerbi as powerbi
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl import DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.new_etl.crawlers.crawler_entity import CrawlerEntity
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
 
 MAIN_DAG_NAME = 'crawling-check-exclusives'
 MAIN_START_DATE = datetime(2018, 6, 12)

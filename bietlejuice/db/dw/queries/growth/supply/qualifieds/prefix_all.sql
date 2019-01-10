@@ -28,7 +28,7 @@ with all_dates_prev as (
     rank() over (partition by date_part('year', to_date(f.sk_qualified_date::varchar, 'YYYYMMDD')) order by f.sk_lead asc)
     	+ rank() over (partition by date_part('year', to_date(f.sk_qualified_date::varchar, 'YYYYMMDD')) order by f.sk_lead desc)
 			- 1 as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	where f.sk_qualified_date between 20170101 and to_char(current_date - 1, 'YYYYMMDD')::integer
   order by 1, 2, 3, 4
 ),
@@ -56,7 +56,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(f.sk_qualified_date) as monthly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	where f.sk_qualified_date between to_char(add_months(date_trunc('month', current_date), -1), 'YYYYMMDD')::integer
     and to_char(add_months(current_date - 1, -1), 'YYYYMMDD')::integer
   group by 1, 2
@@ -68,7 +68,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
   	count(f.sk_qualified_date) as yearly_count
-	from fact_supply f
+	from fact_house_listing_flows f
 	where f.sk_qualified_date between to_char(add_months(date_trunc('year', current_date), -12), 'YYYYMMDD')::integer
     and to_char(add_months(current_date - 1, -12), 'YYYYMMDD')::integer
   group by 1
