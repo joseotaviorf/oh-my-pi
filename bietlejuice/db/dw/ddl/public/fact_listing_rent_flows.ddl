@@ -62,6 +62,7 @@ create table fact_listing_rent_flows (
   days_offer_submitted_to_offer_approved numeric(14,2),
   days_offer_approved_to_credit_init numeric(14,2),
   days_offer_submitted_to_contract_signed numeric(14,2),
+  days_offer_approved_to_contract_signed numeric(14,2),
   days_tenant_doc_completed_to_credit_approved numeric(14,2),
   days_tenant_doc_sent_to_doc_completed numeric(14,2),
   days_house_listing_to_contract_signed numeric(14,2),
