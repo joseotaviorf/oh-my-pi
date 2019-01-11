@@ -7,8 +7,9 @@ from airflow.operators.python_operator import ShortCircuitOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum, CRMWorkgroups, \
-    CRMTaskTitles
+from bietlejuice.jobs.etl.crm.task_titles import CRMTaskTitles
+from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum
+from bietlejuice.jobs.etl.crm.workgroups import CRMWorkgroups
 
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
@@ -459,7 +460,6 @@ tasks_ungrouped_manual_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=class_sub_dag,
     class_=CRMTasksTableEnum.UNGROUPED_MANUAL
 )
-
 
 # flow
 airflow_helpers.chain(
