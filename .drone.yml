@@ -17,7 +17,7 @@ pipeline:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
       - pip install -q -r requirements.txt
-      - pip install -q mock==2.0.0 pytest==4.0.1
+      - pip install -q -r requirements_test.txt
       - pytest --cov-report term --cov-fail-under=0 --cov-config .coveragerc tests
 
   install-forno:
