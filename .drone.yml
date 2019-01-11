@@ -14,7 +14,7 @@ pipeline:
   test:
     image: python:2.7.12
     commands:
-      - AIRFLOW_GPL_UNIDECODE=yes pip install -q -r requirements.txt
+      - AIRFLOW_GPL_UNIDECODE=yes AWS_DEFAULT_REGION=us-east-1 pip install -q -r requirements.txt
       - pip install -q mock==2.0.0 pytest==4.0.1
       - pytest tests
 
