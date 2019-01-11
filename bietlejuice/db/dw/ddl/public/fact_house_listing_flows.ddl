@@ -11,6 +11,7 @@ create table public.fact_house_listing_flows (
 	sk_user_lead_affiliate integer,
 	sk_user_task_assignee integer,
 	sk_region integer,
+	sk_city integer,
 	sk_lead_date integer,
 	sk_prospect_date integer,
 	sk_task_created_date integer,

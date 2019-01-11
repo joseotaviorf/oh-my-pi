@@ -8,7 +8,7 @@ from qa_python_utils.aws.batch import BatchClient
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from bietlejuice.jobs.new_etl.crawlers.crawler_leads import CrawlerLeads
+from bietlejuice.jobs.etl.crawlers.crawler_leads import CrawlerLeads
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 env.set_airflow_var_to_local_env('EBDB')

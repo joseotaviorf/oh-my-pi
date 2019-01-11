@@ -4,7 +4,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.new_etl.agents.agent_model import Agent
+from bietlejuice.jobs.etl.agents.agent_model import Agent
 
 env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')

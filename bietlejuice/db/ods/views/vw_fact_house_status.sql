@@ -109,11 +109,7 @@ _result as (
 		coalesce(sdp.sk_house_listing, rpad(mm.id::varchar, 12, case when mm.status_history = 'publicado' then '001' else '0' end)::bigint) as sk_house_listing,
 		coalesce(vfhl.sk_region, -1) as sk_region,
 		-- there are some cases where the house history says, for example, status = 'despublicado', but the house dimension/ebdb says the house is in another status
-		case
-			when mm.dt_max_status is null
-				then coalesce(sdp.status, mm.status_history)
-			else mm.status_history
-		end as status_history,
+		mm.status_history,
 		to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
 		to_char(mm.dt_max_status, 'YYYYMMDD')::integer as sk_max_status_date
 	from min_max mm
