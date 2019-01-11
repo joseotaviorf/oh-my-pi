@@ -1,13 +1,25 @@
-from bietlejuice.jobs.etl.crm.tasks import CRMTasksTableEnum, CRMTasksUngroupedManual
+import pytest
+
+from bietlejuice.jobs.etl.crm.tasks import CRMTasksTableEnum, CRMTasksUngroupedManual, CRMTasksRepair, CRMTasksPhotoJob, \
+    CRMTasksClosing, CRMTasksCredit, CRMTasksInspection, CRMTasksLead, CRMTasksVisit, CRMTasksOnboardingTenant, \
+    CRMTasksPayment
 
 
 class TestCRMTasksFactory(object):
-    def test_move_fact_to_staging(self, factory):
-        # arrange
-        class_ = CRMTasksTableEnum.UNGROUPED_MANUAL
-
+    @pytest.mark.parametrize('class_, expected',
+                             [(CRMTasksTableEnum.UNGROUPED_MANUAL, CRMTasksUngroupedManual),
+                              (CRMTasksTableEnum.REPAIR, CRMTasksRepair),
+                              (CRMTasksTableEnum.PHOTO_JOB, CRMTasksPhotoJob),
+                              (CRMTasksTableEnum.CLOSING, CRMTasksClosing),
+                              (CRMTasksTableEnum.CREDIT, CRMTasksCredit),
+                              (CRMTasksTableEnum.INSPECTION, CRMTasksInspection),
+                              (CRMTasksTableEnum.LEAD, CRMTasksLead),
+                              (CRMTasksTableEnum.VISIT, CRMTasksVisit),
+                              (CRMTasksTableEnum.ONBOARDING_TENANT, CRMTasksOnboardingTenant),
+                              (CRMTasksTableEnum.PAYMENT, CRMTasksPayment)])
+    def test__dispatch_dict(self, factory, class_, expected):
         # act
         result = factory._dispatch_dict(class_=class_)
 
         # assert
-        assert result == CRMTasksUngroupedManual
+        assert result == expected
