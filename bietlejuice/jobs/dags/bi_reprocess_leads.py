@@ -12,6 +12,8 @@ config_json = env.get_airflow_env_var('REPROCESS_LEADS_CONFIG_FILE')
 
 def reprocess_leads():
     lr = LeadsReprocessor(config_json=config_json)
+    json_leads = lr.get_leads()
+    lr.send_leads(json_list=json_leads)
 
 
 dag = DAG(
