@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pandas as pd
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.new_etl import SOURCE_QUERIES_DIR
+from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('LeadsReprocessor')
