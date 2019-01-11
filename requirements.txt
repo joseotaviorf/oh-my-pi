@@ -51,7 +51,7 @@ PySocks==1.6.4
 python-dateutil==2.7.3
 python-slugify==1.1.4
 pytz==2018.5
-PyYAML==3.12
+pyyaml==4.2b1
 raven==6.3.0
 requests>=2.20.0
 rsa==3.4.2
