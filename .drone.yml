@@ -5,16 +5,18 @@ clone:
 
 pipeline:
 
-  flake8-web:
+  linter:
     image: python:2.7.12
     commands:
       - pip install -q flake8==3.5.0
-      - flake8 .
+      - flake8 --max-line-length=120 .
 
   test:
     image: python:2.7.12
     commands:
-      - AIRFLOW_GPL_UNIDECODE=yes AWS_DEFAULT_REGION=us-east-1 pip install -q -r requirements.txt
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - pip install -q -r requirements.txt
       - pip install -q mock==2.0.0 pytest==4.0.1
       - pytest tests
 
