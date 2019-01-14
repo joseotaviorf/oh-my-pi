@@ -7,16 +7,17 @@ from bietlejuice.jobs.etl.crm.tasks.onboarding_tenant import CRMTasksOnboardingT
 from bietlejuice.jobs.etl.crm.tasks.payment import CRMTasksPayment
 from bietlejuice.jobs.etl.crm.tasks.photo_job import CRMTasksPhotoJob
 from bietlejuice.jobs.etl.crm.tasks.repair import CRMTasksRepair
+from bietlejuice.jobs.etl.crm.tasks.ungrouped_manual import CRMTasksUngroupedManual
 from bietlejuice.jobs.etl.crm.tasks.visit import CRMTasksVisit
 
 
 class CRMTasksFactory(object):
 
     @staticmethod
-    def factory(_class, s3_bucket, mongo_client_uri, execution_date):
-        __class = CRMTasksFactory.__dispatch_dict(_class)
-        if _class is None:
-            raise Exception('m=factory, _class={}, msg=class type not found'.format(_class))
+    def factory(class_, s3_bucket, mongo_client_uri, execution_date):
+        __class = CRMTasksFactory._dispatch_dict(class_)
+        if class_ is None:
+            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
 
         return __class(
             s3_bucket=s3_bucket,
@@ -25,7 +26,7 @@ class CRMTasksFactory(object):
         )
 
     @staticmethod
-    def __dispatch_dict(_class):
+    def _dispatch_dict(class_):
         return {
             CRMTasksTableEnum.CREDIT: CRMTasksCredit,
             CRMTasksTableEnum.VISIT: CRMTasksVisit,
@@ -35,5 +36,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.INSPECTION: CRMTasksInspection,
             CRMTasksTableEnum.LEAD: CRMTasksLead,
             CRMTasksTableEnum.PHOTO_JOB: CRMTasksPhotoJob,
-            CRMTasksTableEnum.REPAIR: CRMTasksRepair
-        }.get(_class)
+            CRMTasksTableEnum.REPAIR: CRMTasksRepair,
+            CRMTasksTableEnum.UNGROUPED_MANUAL: CRMTasksUngroupedManual
+        }.get(class_)
