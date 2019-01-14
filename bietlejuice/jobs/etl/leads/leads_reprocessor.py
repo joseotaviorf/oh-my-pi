@@ -40,7 +40,7 @@ class LeadsReprocessor(object):
     @logger
     def get_leads(self):
         df_leads = self._get_lead_ids_from_query()
-        treated_leads = self._treat_leads(df_leads)
+        treated_leads = self._treat_leads(df_leads=df_leads)
         return treated_leads
 
     @logger(exclude='json_list')
@@ -107,21 +107,13 @@ class LeadsReprocessor(object):
         # Change origin
         df_to_be_treated['origem'] = 'Reprocessado'
 
-        json_leads = df_to_be_treated.to_json(orient='records', force_ascii=False)
-
-        return json_leads
+        return self._df_to_json(df_to_be_treated)
 
     @logger(exclude='list')
     def _split_into_chunks(self, list, chunk_size):
         for i in range(0, len(list), chunk_size):
             yield list[i:i + chunk_size]
-#
-#
-# if __name__ == '__main__':
-#     from bietlejuice.jobs.dags.util import environment as env
-#
-#     env.set_airflow_var_to_local_env('EBDB')
-#     config_json = env.get_airflow_env_var('REPROCESS_LEADS_CONFIG_FILE')
-#     lr = LeadsReprocessor(config_json=config_json)
-#     json_leads = lr.get_leads()
-#     lr.send_leads(json_list=json_leads)
+
+    @logger(exclude='df')
+    def _df_to_json(self, df):
+        return df.to_json(orient='records', force_ascii=False)
