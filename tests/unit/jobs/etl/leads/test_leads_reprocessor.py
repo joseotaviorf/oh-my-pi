@@ -1,4 +1,3 @@
-import json
 import time
 
 import mock
@@ -66,14 +65,14 @@ class TestLeadsReprocessor(object):
                              [(pd.DataFrame(data=[[1, 'test', '']], columns=['id', 'infosExtras', 'origem']),
                                '[{"infosExtras":"infosExtras test; id_origin_lead=1","origem":"Reprocessado"}]'),
                               (pd.DataFrame(data=[[1, '']], columns=['id', 'origem']),
-                               '[{"infosExtras":"infosExtras; id_origin_lead=1","origem":"Reprocessado"}]')])
+                               '[{"origem":"Reprocessado","infosExtras":"infosExtras; id_origin_lead=1"}]')])
     def test__treat_leads_with_id(self, lead_reprocessor, input, expected):
         # arrange
         lead_reprocessor.infosExtras = 'infosExtras'
-        expected_result = json.loads(expected)
+        expected_result = expected
 
         # act
-        result = json.loads(lead_reprocessor._treat_leads(df_leads=input))
+        result = lead_reprocessor._treat_leads(df_leads=input)
 
         # assert
         assert result == expected_result
@@ -108,10 +107,11 @@ class TestLeadsReprocessor(object):
     def test__df_to_json(self, lead_reprocessor):
         # arrange
         df = pd.DataFrame(data=[1], columns=['id'])
-        expected_result = json.dumps('[{"id":1}]')
+        expected_result = '[{"id":1}]'
 
         # act
-        result = json.dumps(lead_reprocessor._df_to_json(df=df))
+        result = lead_reprocessor._df_to_json(df=df)
 
         # assert
+        # asserting string since pd.to_json returns a json string
         assert result == expected_result
