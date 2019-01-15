@@ -137,21 +137,21 @@ class ZendeskETL(object):
             ('id', str),
             ('title', str),
             ('raw_title', str),
-            ('collapsed_for_agents', str),
-            ('visible_in_portal', str),
+            ('is_collapsed_for_agents', str),
+            ('is_visible_in_portal', str),
             ('description', str),
-            ('active', str),
+            ('is_active', str),
             ('raw_title_in_portal', str),
             ('created_at', str),
             ('type', str),
             ('raw_description', str),
-            ('required', str),
-            ('editable_in_portal', str),
-            ('required_in_portal', str),
+            ('is_required', str),
+            ('is_editable_in_portal', str),
+            ('is_required_in_portal', str),
             ('updated_at', str),
             ('system_field_options', str),
-            ('removable', str),
-            ('regexp_for_validation', str),
+            ('is_removable', str),
+            ('validation_regexp', str),
             ('position', str),
             ('tag', str),
             ('title_in_portal', str)
@@ -160,7 +160,7 @@ class ZendeskETL(object):
         self.__move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_fields/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -509,13 +509,13 @@ class ZendeskETL(object):
                 file_name=table_name))
 
         empty = self.__is_prod_table_empty(table_name)
-        logger.info('m=build_staging_table, table_name={}, empyt={}'.format(table_name, empty))
+        logger.info('m=build_staging_table, table_name={}, empty={}'.format(table_name, empty))
         if not empty:
             logger.info(
                 'm=build_staging_table, table_name={}, msg=production table is not empty'.format(
                     table_name))
 
-            query = "{} \n where dt_extraction='{}'".format(query, self.execution_date)
+            query = "{} \n where t.dt_extraction='{}'".format(query, self.execution_date)
 
         df = self.athena_client.execute_query_and_return_dataframe(query)
         table_data = petl.fromdataframe(df)
@@ -531,7 +531,7 @@ class ZendeskETL(object):
 
     @logger
     def build_prod_table(self, table_name):
-        upsert_query = "SELECT distinct * FROM staging.zendesk_{}".format(table_name)
+        upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
 
         delete_query = BaseETL.get_query_from_file_name(
             '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
@@ -543,7 +543,7 @@ class ZendeskETL(object):
                 'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
                     table_name))
         else:
-            self.__delete_old_entries(delete_query)
+            self.__delete_old_entries(delete_query.format(table_name=table_name))
 
             if table_name.split("_")[0] == 'fact':
                 upsert_query = "{} \nwhere sk_extraction_date = {};".format(upsert_query,

@@ -1,10 +1,13 @@
+with distinct_data as (
+    select distinct * from datalake_raw.zendesk_tickets
+)
 select
     subject,
     created_at,
     description,
     external_id,
     type,
-    json_extract(via, '$.channel') as channel,
+    replace(cast(json_extract(via, '$.channel') as varchar), '"') as channel,
     json_extract(via, '$.source') as source,
     updated_at,
     problem_id,
@@ -30,4 +33,4 @@ select
     has_incidents,
     status,
     requester_id
-from datalake_raw.zendesk_tickets
+from distinct_data
