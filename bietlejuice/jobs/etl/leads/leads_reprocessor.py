@@ -97,7 +97,7 @@ class LeadsReprocessor(object):
         df_to_be_treated = df_leads
 
         # Add infosExtras to Lead
-        df_to_be_treated['infosExtras'] = (self.infosExtras +
+        df_to_be_treated['infosExtras'] = (str(self.infosExtras) +
                                            (' ' + df_to_be_treated['infosExtras'].astype(
                                                str) if 'infosExtras' in df_leads.columns else '') +
                                            '; id_origin_lead=' +
