@@ -9,7 +9,7 @@ from bietlejuice.jobs.etl.leads.leads_reprocessor import LeadsReprocessor
 
 class TestLeadsReprocessor(object):
 
-    def test__check_required_params(self, lead_reprocessor):
+    def test__check_required_params_with_missing_required_column(self, lead_reprocessor):
         # arrange
         config_dict = [{"id"}]
         required_columns = ['id', 'query']
@@ -18,7 +18,7 @@ class TestLeadsReprocessor(object):
         with pytest.raises(ValueError):
             lead_reprocessor._check_required_params(config_dict=config_dict, required_columns=required_columns)
 
-    def test__check_config_json(self, lead_reprocessor):
+    def test__check_config_json_with_config_json_null(self, lead_reprocessor):
         # arrange
         config_json = None
 
@@ -77,10 +77,14 @@ class TestLeadsReprocessor(object):
         # assert
         assert result == expected_result
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select 1 as id, 2 as id2 from dummy')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name',
+                       return_value='select {columns} from dummy where id in ({where_clause})')
     @mock.patch.object(BaseETL, 'from_db_query', return_value=[('id', 'id2'), (1, 2)])
     def test__get_lead_ids_from_query(self, mock_from_db_query, mock_get_query_from_file_name, lead_reprocessor):
         # arrange
+        lead_reprocessor.defaultColumns = {"id": "unsigned", "id2": "unsigned"}
+        lead_reprocessor.query = 'select 1 from dummy'
+        formatted_query = 'select cast(id2 as unsigned) as id2, cast(id as unsigned) as id from dummy where id in (select 1 from dummy)'
         expected_result = pd.DataFrame(data=[[1, 2]], columns=['id', 'id2'])
 
         # act
@@ -89,6 +93,7 @@ class TestLeadsReprocessor(object):
         # assert
         assert mock_get_query_from_file_name.call_count == 1
         assert mock_from_db_query.call_count == 1
+        assert mock_from_db_query.call_args[1].get('query') == formatted_query
         assert expected_result.equals(result)
 
     def test__split_into_chunks(self, lead_reprocessor):

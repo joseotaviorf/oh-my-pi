@@ -29,9 +29,9 @@ class LeadsReprocessor(object):
 
         # Setting up
         # Optional
-        self.sleep = config_dict['sleep'] if 'sleep' in config_dict else 10
-        self.batchSize = config_dict['batchSize'] if 'batchSize' in config_dict else 10
-        self.additionalColumns = config_dict['additionalColumns'] if 'additionalColumns' in config_dict else None
+        self.sleep = config_dict.get('sleep', 10)
+        self.batchSize = config_dict.get('batchSize', 100)
+        self.additionalColumns = config_dict.get('additionalColumns')
         # Required
         self.query = config_dict['query']
         self.defaultColumns = config_dict['defaultColumns']
@@ -94,20 +94,18 @@ class LeadsReprocessor(object):
         if 'id' not in df_leads.columns:
             raise ValueError('m=_treat_leads, msg=Query must provide an id column.')
 
-        df_to_be_treated = df_leads
-
         # Add infosExtras to Lead
-        df_to_be_treated['infosExtras'] = (str(self.infosExtras) +
-                                           (' ' + df_to_be_treated['infosExtras'].astype(
-                                               str) if 'infosExtras' in df_leads.columns else '') +
-                                           '; id_origin_lead=' +
-                                           df_to_be_treated['id'].astype(str)).str.strip()
-        df_to_be_treated.drop(columns=['id'], inplace=True)
+        df_leads['infosExtras'] = (str(self.infosExtras) +
+                                   (' ' + df_leads['infosExtras'].astype(
+                                       str) if 'infosExtras' in df_leads.columns else '') +
+                                   '; id_origin_lead=' +
+                                   df_leads['id'].astype(str)).str.strip()
+        df_leads.drop(columns=['id'], inplace=True)
 
         # Change origin
-        df_to_be_treated['origem'] = 'Reprocessado'
+        df_leads['origem'] = 'Reprocessado'
 
-        return self._df_to_json(df_to_be_treated)
+        return self._df_to_json(df_leads)
 
     @logger(exclude='list')
     def _split_into_chunks(self, list, chunk_size):
