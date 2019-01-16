@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksUngroupedManual
+from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksUngroupedManual, CRMTasksFactory
 
 S3_BUCKET = 's3_bucket'
 MONGO_CLIENT_URI = 'mongo_client_uri'
@@ -25,3 +25,8 @@ def ungrouped_manual():
         mongo_client_uri=MONGO_CLIENT_URI,
         execution_date=EXECUTION_DATE
     )
+
+
+@pytest.fixture(scope='session')
+def factory():
+    return CRMTasksFactory()
