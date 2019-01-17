@@ -1,4 +1,5 @@
 drop table if exists usuario;
+
 CREATE TABLE usuario (
   id bigint NOT NULL PRIMARY KEY,
   nome varchar(255) DEFAULT NULL,
