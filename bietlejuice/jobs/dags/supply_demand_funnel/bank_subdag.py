@@ -42,8 +42,8 @@ class BankSubDag(DimSubDag):
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
-                'dim_name': 'bank',
-                'table_name': 'Banco',
+                'dim_name': self.ods_stg_table_name,
+                'table_name': self.ebdb_table_name,
                 'copy_to_clean': False,
                 'bucket': DimSubDag.S3_BUCKET
             }
@@ -54,7 +54,7 @@ class BankSubDag(DimSubDag):
             task_id='STAGING_dim_bank',
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'bank',
+                'dim_name': self.ods_stg_table_name,
                 'post_command': "update staging.dim_bank set ts_load = '{}' where sk_bank = -1;".format(
                     datetime.now().strftime('%Y-%m-%d'))
             }
@@ -65,9 +65,9 @@ class BankSubDag(DimSubDag):
             task_id='DW_dim_bank',
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'bank',
+                'dim_name': self.ods_stg_table_name,
                 'bucket': DimSubDag.S3_BUCKET,
-                'schema_dest': 'bank'
+                'schema_dest': self.ods_stg_table_name
             }
         )
 
