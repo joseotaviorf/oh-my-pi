@@ -5,13 +5,13 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from qa_python_utils import QuintoAndarLogger
 
-logger = QuintoAndarLogger('FinanceSubDag')
+logger = QuintoAndarLogger('BankSubDag')
 
 
-class FinanceSubDag(DimSubDag):
+class BankSubDag(DimSubDag):
 
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
-        super(FinanceSubDag, self).__init__(
+        super(BankSubDag, self).__init__(
             bucket=bucket,
             sub_dag_name=sub_dag_name,
             dag_name=dag_name,
@@ -22,18 +22,18 @@ class FinanceSubDag(DimSubDag):
         )
 
     @logger
-    def build_finance_with_tests(self):
-        finance_dag = self._build_local_dag()
+    def build_bank_with_tests(self):
+        bank_dag = self._build_local_dag()
 
-        ods_bank_task, dim_bank_staging_task, dim_bank_dw_task = self.__build_data_tasks(finance_dag)
+        ods_bank_task, dim_bank_staging_task, dim_bank_dw_task = self.__build_data_tasks(bank_dag)
 
-        tests_tasks = self.build_tests_tasks(finance_dag)
+        tests_tasks = self.build_tests_tasks(bank_dag)
 
         ods_bank_task >> dim_bank_staging_task
         dim_bank_staging_task.set_downstream(tests_tasks)
         dim_bank_dw_task.set_upstream(tests_tasks)
 
-        return finance_dag
+        return bank_dag
 
     @logger
     def __build_data_tasks(self, dag):
