@@ -1,4 +1,4 @@
-DROP TABLE public.bank;
+DROP TABLE IF EXISTS public.bank;
 CREATE TABLE public.bank (
   "id" BIGINT NOT NULL,
   "atualizadoEm" TIMESTAMP,

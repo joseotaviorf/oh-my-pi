@@ -7,16 +7,9 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
-from bietlejuice.jobs.dags.supply_demand_funnel.booking_subdag import BookingSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.offer_subdag import OfferSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJobSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.proposal_subdag import ProposalSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
+    HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
+    VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
@@ -182,6 +175,18 @@ def booking_sub_dag(sub_dag_name):
     return sub_dag.build_booking_with_tests()
 
 
+def bank_sub_dag(sub_dag_name):
+    sub_dag = BankSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_bank_with_tests()
+
+
 def refresh_powerbi(**kwargs):
     powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
                                            PWBI_SCHEMA,
@@ -322,6 +327,12 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
+bank_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=bank_sub_dag,
+    sub_dag_name='Bank'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -369,3 +380,4 @@ house_dag.set_downstream([fact_house_status, fact_house_listings])
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows, refresh_house_listing_flows)
+user_dag >> bank_dag
