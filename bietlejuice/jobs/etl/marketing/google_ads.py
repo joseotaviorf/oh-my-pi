@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
