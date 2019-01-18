@@ -1,6 +1,6 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.etl.marketing.criteo_ads import CriteoAds
+from bietlejuice.jobs.etl.marketing.criteo_campaigns import CriteoCampaigns
 from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
@@ -29,5 +29,5 @@ class MarketingFactory(object):
         return {
             MarketingEnum.GOOGLE_ADS: GoogleAds,
             MarketingEnum.FACEBOOK_ADS: FacebookAds,
-            MarketingEnum.CRITEO: CriteoAds
+            MarketingEnum.CRITEO: CriteoCampaigns
         }.get(_class)
