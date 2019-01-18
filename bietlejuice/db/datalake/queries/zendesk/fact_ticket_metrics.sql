@@ -83,6 +83,7 @@ left join datalake_clean.ods_dim_house_listing dhl
               end)
 left join datalake_clean.ods_dim_contract dc
     on c.cols['Código do Contrato'] = dc.sk_contract
+where t.channel != 'api'
 )
 select
     t.sk_ticket,

@@ -1,1 +1,1 @@
-select * from datalake_raw.zendesk_ticket_events
+select distinct * from datalake_raw.zendesk_ticket_events

@@ -1,3 +1,6 @@
+with distinct_data as (
+    select distinct * from datalake_raw.zendesk_ticket_fields
+)
 select
     id,
     title,
@@ -20,4 +23,4 @@ select
     position,
     tag,
     title_in_portal
-from datalake_raw.zendesk_ticket_fields
+from distinct_data
