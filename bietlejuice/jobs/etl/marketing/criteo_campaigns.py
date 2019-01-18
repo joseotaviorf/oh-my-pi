@@ -1,16 +1,15 @@
-from collections import OrderedDict
+import json
+from ast import literal_eval
+from gzip import GzipFile
+from io import BytesIO
+
+import requests
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
-import requests
-import json
-from ast import literal_eval
-import pandas as pd
-from io import BytesIO
-from gzip import GzipFile
 
 logger = QuintoAndarLogger('CriteoCampaigns')
 
@@ -21,9 +20,9 @@ class CriteoCampaigns(Marketing):
     COLUMN_TYPE_MAP = {
         'marketing_criteo_campaigns': {
             'advertiser_name': str,
-            'campaign_id': long,
+            'campaign_id': int,
             'campaign_name': str,
-            'day': long,
+            'day': int,
             'currency': str,
             'clicks': int,
             'cost': float,
@@ -89,7 +88,8 @@ class CriteoCampaigns(Marketing):
             fp.write((json.dumps(raw_json_data, ensure_ascii=False)).encode('utf-8'))
             fp.write('\n')
 
-        file_suffix = 'raw/marketing/criteo_campaigns/dt_extraction={}/data.gz'.format(self.execution_date.strftime('%Y-%m-%d'))
+        file_suffix = 'raw/marketing/criteo_campaigns/dt_extraction={}/data.gz'.format(
+            self.execution_date.strftime('%Y-%m-%d'))
 
         BaseETL.obj_to_s3(
             obj_io=gz_body,
@@ -101,9 +101,6 @@ class CriteoCampaigns(Marketing):
         # only flushing does not clear the buffer
         gz_body.seek(0)
         gz_body.flush()
-
-
-
 
     @logger
     def _load_fact_to_staging(self, table_name):
