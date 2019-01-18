@@ -41,7 +41,7 @@ class GoogleAds(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, account=None):
+    def __init__(self, s3_bucket, execution_date, account=None, auth=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
 
     @logger
