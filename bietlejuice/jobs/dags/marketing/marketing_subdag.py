@@ -9,7 +9,7 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth, integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.class_ = class_
@@ -18,6 +18,17 @@ class MarketingSubDag(BaseSubDag):
         self.fact_tables = []
         self.datalake_tables = []
         self.integration = integration
+        self.auth = auth
+
+    @logger
+    def transfer_files_to_raw(self, bucket, **kwargs):
+        marketing_class = MarketingFactory.factory(
+            _class=self.class_,
+            s3_bucket=bucket,
+            execution_date=self.__get_execution_date(**kwargs),
+            auth=self.auth
+        )
+        getattr(marketing_class, 'move_{}_to_raw'.format())(self.class_)
 
     @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
@@ -62,6 +73,18 @@ class MarketingSubDag(BaseSubDag):
         marketing_clean_dag = self._build_local_dag()
         getattr(self, 'build_{}_tasks'.format(task_name))(marketing_clean_dag)
         return marketing_clean_dag
+
+    @logger
+    def build_raw_tasks(self, dag):
+        BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='{}-{}'.format(self.class_),
+            python_callable=self.transfer_files_to_raw,
+            provide_context=True,
+            op_kwargs={
+                'bucket': self.bucket
+            }
+        )
 
     @logger
     def build_clean_tasks(self, dag):

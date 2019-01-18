@@ -16,12 +16,16 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,6,12,18 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
+auth = json.loads(env.get_airflow_env_var('criteo_login'))
 
 athena_client = AthenaClient(s3_bucket)
 
 FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
 
 GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
+
+CRITEO_CLIENT_ID = auth['client_id']
+CRITEO_CLIENT_SECRET = auth['client_secret']
 
 # dags
 main_dag = DAG(
@@ -36,6 +40,20 @@ main_dag = DAG(
     catchup=False,
     max_active_runs=1
 )
+
+
+def raw_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=auth
+    )
+
+    return sub_dag.build_tasks('raw')
 
 
 def clean_sub_dag(sub_dag_name, class_, accounts):
@@ -152,7 +170,15 @@ google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.GOOGLE_ADS,
 )
 
+criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name='criteo',
+    class_=MarketingEnum.CRITEO
+)
+
 airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
                       google_ads_load_to_dw_dag)
 airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
                       facebook_ads_load_to_dw_dag)
+airflow_helpers.chain(criteo_raw_dag)
