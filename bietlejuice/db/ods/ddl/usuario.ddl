@@ -87,6 +87,7 @@ CREATE TABLE usuario (
   last_dt_document_sent timestamp,
   first_dt_sent_to_insurance timestamp,
   criado_em timestamp DEFAULT NULL ,
-  atualizado_em timestamp DEFAULT NULL
+  atualizado_em timestamp DEFAULT NULL,
+  contaCorrente_id integer
 )
 ;
