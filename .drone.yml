@@ -18,7 +18,7 @@ pipeline:
       - export AWS_DEFAULT_REGION=us-east-1
       - pip install -q -r requirements.txt
       - pip install -q -r requirements_test.txt
-      - pytest --cov-report term --cov-fail-under=0 --cov-config .coveragerc tests
+      - pytest --cov=bietlejuice --cov-report html:html --cov-fail-under=5 --cov-config .coveragerc tests
 
   install-forno:
     image: drillster/drone-rsync
