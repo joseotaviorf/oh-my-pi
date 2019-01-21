@@ -24,8 +24,6 @@ FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
 
 GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
 
-CRITEO_CLIENT_ID = auth['client_id']
-CRITEO_CLIENT_SECRET = auth['client_secret']
 
 # dags
 main_dag = DAG(
