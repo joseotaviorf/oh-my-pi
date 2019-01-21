@@ -251,12 +251,10 @@ from
         select
           le.*,
           coalesce(lr.reason, le.reason) as lead_reason,
-          case
-            when SUBSTRING_INDEX(le.infosExtras,';',1) REGEXP '^-?[0-9]+$'
-            then SUBSTRING_INDEX(le.infosExtras,';',1)
-          else NULL
-        end as old_id
+          rl.id_origin_lead as old_id
       from Lead le
+      left join reprocessed_lead rl
+        on rl.id = le.id
       left join vw_lead_reason lr
       	on le.reason = lr.reason_detail
       where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}') order by 1 asc
