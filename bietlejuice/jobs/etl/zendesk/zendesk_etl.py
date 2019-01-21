@@ -97,7 +97,7 @@ class ZendeskETL(object):
             ('requester_id', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key="clean/zendesk/tickets/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -157,7 +157,7 @@ class ZendeskETL(object):
             ('title_in_portal', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_fields/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
@@ -190,7 +190,7 @@ class ZendeskETL(object):
             ('sla', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -229,7 +229,7 @@ class ZendeskETL(object):
             ('via', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_metric_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -324,7 +324,7 @@ class ZendeskETL(object):
             ('user_fields', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/users/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -355,7 +355,7 @@ class ZendeskETL(object):
             ('updated_at', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -422,7 +422,7 @@ class ZendeskETL(object):
             ('body', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/articles/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -455,7 +455,7 @@ class ZendeskETL(object):
             ('updated_at', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/group_memberships/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -464,8 +464,8 @@ class ZendeskETL(object):
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def __move_to_clean(self, table_name, key, query, r_cols, c_cols=None):
-        empty = self.__is_clean_table_empty(table_name)
+    def _move_to_clean(self, table_name, key, query, r_cols, c_cols=None):
+        empty = self._is_clean_table_empty(table_name)
 
         if not empty:
             query = "{} \n where dt='{}'".format(query, self.execution_date)
@@ -490,13 +490,13 @@ class ZendeskETL(object):
         )
 
     @logger
-    def __is_clean_table_empty(self, table_name):
+    def _is_clean_table_empty(self, table_name):
         result = self.athena_client.execute_query_and_return_dataframe(
             "select 1 from {}.zendesk_{} limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
 
         empty = len(result) == 0
 
-        logger.info("m=__is_clean_table_empty, table={}, empty={}"
+        logger.info("m=_is_clean_table_empty, table={}, empty={}"
                     .format(table_name, empty))
 
         return empty
