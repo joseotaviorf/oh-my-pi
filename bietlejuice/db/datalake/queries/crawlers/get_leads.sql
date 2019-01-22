@@ -30,6 +30,12 @@ select distinct
     c.phones,
     c.street,
     c.neighborhood,
+    c.iput,
+    c.condominium,
+    c.bedrooms,
+    c.toilets,
+    c.useful_area,
+    c.neighborhood,
     c.city,
     c.state,
     c.cep,
@@ -46,7 +52,6 @@ select distinct
         )
     ) updated_on,
     c.url,
-    gp.n_listings
 from
     datalake_raw.crawlers c
 cross join
