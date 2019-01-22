@@ -73,7 +73,6 @@ CREATE VIEW public.vw_dim_lead as
   flg_city_served,
   flg_latlng_served,
   flg_location_served,
-  rl.id_origin_lead,
   now() as load_timestamp
 FROM
   public.lead l
