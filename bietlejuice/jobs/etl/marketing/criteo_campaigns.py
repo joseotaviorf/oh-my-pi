@@ -34,8 +34,8 @@ class CriteoCampaigns(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, auth, account=None):
-        super(CriteoCampaigns, self).__init__(s3_bucket, execution_date, 'criteo_campaigns', account)
+    def __init__(self, s3_bucket, execution_date, auth):
+        super(CriteoCampaigns, self).__init__(s3_bucket, execution_date, 'criteo_campaigns', auth)
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
 
