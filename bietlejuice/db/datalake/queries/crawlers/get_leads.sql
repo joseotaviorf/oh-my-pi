@@ -20,7 +20,7 @@ with good_phones as(
     group by
         phone
     having
-        count( distinct id ) <= 3
+        count( distinct id ) <= 5
 )
 select distinct
     c.id,
