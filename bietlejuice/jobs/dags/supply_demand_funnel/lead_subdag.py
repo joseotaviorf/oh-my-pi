@@ -39,9 +39,10 @@ class LeadSubDag(DimSubDag):
         return lead_dag
 
     @logger
-    def __move_query_results_from_ebdb_to_ods(self, dim_name):
+    def __move_query_results_from_ebdb_to_ods(self, dim_name, **kwargs):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, dim_name)
-        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        query = str(BaseETL.get_query_from_file_name(file_name=file_path))
+        query = query.format(str(kwargs.get('execution_date')))
 
         utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=DimSubDag.S3_BUCKET, command=query,
                                                  table_name=None)
@@ -60,6 +61,7 @@ class LeadSubDag(DimSubDag):
         ods_lead = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='ODS_lead',
+            provide_context=True,
             python_callable=self.__move_query_results_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'lead'

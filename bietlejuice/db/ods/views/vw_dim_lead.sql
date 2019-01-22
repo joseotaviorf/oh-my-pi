@@ -3,8 +3,8 @@ DROP VIEW if exists public.vw_dim_lead;
 CREATE VIEW public.vw_dim_lead as
  select
   distinct
-  l.id as sk_lead,
-  l.id,
+  id as sk_lead,
+  id,
   anuncio_criado_em,
   area_total,
   bairro,
@@ -76,9 +76,6 @@ CREATE VIEW public.vw_dim_lead as
   now() as load_timestamp
 FROM
   public.lead l
-left join
-    reprocessed_lead rl
-    on rl.id = l.id
 left join lateral
 (
   select 
