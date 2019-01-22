@@ -53,6 +53,24 @@ rep_leads as (
 		base_leads old_bl
 		on old_bl.lead_id = bl.old_lead_id
 ),
+fact_with_acq_channel as (
+    -- Treating acq channel of reprocessed leads
+    select
+        fhlf.*,
+        case when l.origem = 'Reprocessado' and lr.origem = 'Landing' then 'Reprocessed Landing'
+            when l.origem = 'Reprocessado' and lr.tipo = 'Afiliado' then 'Reprocessed Affiliate'
+            when l.origem = 'Reprocessado' then 'Reprocessed Others'
+            else acquisition_channel end
+        as new_acquisition_channel
+        from
+        fact_house_listing_flows fhlf
+        left join lead l
+            on l.id = fhlf.lead_id
+        left join reprocessed_lead rl
+            on rl.id = fhlf.lead_id
+        left join lead lr
+            on lr.id = rl.id_origin_lead
+),
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
@@ -77,22 +95,22 @@ potential_listings as (
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
 		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and new_acquisition_channel not like ('Reprocessed%')
 			then 'Lead Flow'
 			else f.flow
 		end as flow,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and new_acquisition_channel not like ('Reprocessed%')
 			then 'Non-Self Service'
 			else f.acquisition_method
 		end as acquisition_method,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and new_acquisition_channel not like ('Reprocessed%')
 			then 'Doorman'
-			else f.acquisition_channel
+			else f.new_acquisition_channel
 		end as acquisition_channel,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and new_acquisition_channel not like ('Reprocessed%')
 			then 'Doorman'
 			else f.acquisition_source
 		end as acquisition_source,
@@ -131,16 +149,16 @@ potential_listings as (
 		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and new_acquisition_channel not like ('Reprocessed%')
 			then true
 			else (f.acquisition_source = 'Doorman')
 		end as is_doorman,
-		(acquisition_channel = 'Inside Sales') as is_isales_direct_register,
-		(acquisition_channel = 'Admin') as is_cx_direct_register,
+		(new_acquisition_channel = 'Inside Sales') as is_isales_direct_register,
+		(new_acquisition_channel = 'Admin') as is_cx_direct_register,
 		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
 		(us_cad.id is not null) as is_call_center
 	from
-		fact_house_listing_flows f
+		fact_with_acq_channel f
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
