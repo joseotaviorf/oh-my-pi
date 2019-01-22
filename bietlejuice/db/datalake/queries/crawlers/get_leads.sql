@@ -30,7 +30,7 @@ select distinct
     c.phones,
     c.street,
     c.neighborhood,
-    c.iput,
+    c.iptu,
     c.condominium,
     c.bedrooms,
     c.toilets,

@@ -5,7 +5,6 @@ import re
 import googlemaps
 import numpy as np
 import pandas as pd
-import requests
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from shapely import wkt
@@ -20,7 +19,7 @@ logger = QuintoAndarLogger('CrawlerEntity')
 
 class CrawlerEntity(object):
 
-    def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True, get_house_allowed=True):
+    def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True):
         self.athena_client = AthenaClient(s3_bucket)
         self.bucket = s3_bucket
         if google_maps_api_key is not None:
@@ -48,10 +47,6 @@ class CrawlerEntity(object):
         if get_polygons is True:
             self.polygons = self.__get_polygons()
 
-        if get_house_allowed is True:
-            q = BaseETL.get_query_from_file_name('{}/crawlers/get_house_allowed_ids.sql'.format(DATALAKE_QUERIES_DIR))
-            self.house_allowed = self.athena_client.execute_query_and_return_dataframe(q).id.tolist()
-
     def _get_address(self, lat=None, lng=None, cep=None, raw_address=None):
         r = None
         if lat is not None and lng is not None:
@@ -63,8 +58,7 @@ class CrawlerEntity(object):
 
         return r
 
-    @staticmethod
-    def sanitize_text(s):
+    def __sanitize_text(self, s):
         if s is not None:
             u = unidecode(unicode(s))
             return '-'.join(re.sub("[^\w]", " ", u).split()).lower()
@@ -92,8 +86,8 @@ class CrawlerEntity(object):
 
         polygons = self.athena_client.execute_query_and_return_dataframe(q)
 
-        polygons.region = polygons.region.apply(self.sanitize_text)
-        polygons.city = polygons.city.apply(self.sanitize_text)
+        polygons.region = polygons.region.apply(self.__sanitize_text)
+        polygons.city = polygons.city.apply(self.__sanitize_text)
         polygons.poly = polygons.poly.apply(wkt.loads)
 
         return polygons
@@ -106,7 +100,7 @@ class CrawlerEntity(object):
             text_columns = ['type', 'advertiser_name', 'street', 'neighborhood', 'city', 'state', 'listing_type']
         for c in text_columns:
             if c in entity:
-                entity[c] = entity[c].apply(self.sanitize_text)
+                entity[c] = entity[c].apply(self.__sanitize_text)
 
         if 'cep' in entity:
             entity.cep = entity.cep.astype(str).str.zfill(8)
@@ -115,7 +109,7 @@ class CrawlerEntity(object):
         if 'listing_type' in entity:
             entity.listing_type = entity.listing_type.replace(self.map_types)
 
-        num_columns = ['rent', 'lat', 'lng']
+        num_columns = ['rent', 'lat', 'lng', 'iptu', 'condominium']
         for c in num_columns:
             if c in entity:
                 if any([isinstance(v, basestring) for v in entity[c]]):
@@ -134,7 +128,7 @@ class CrawlerEntity(object):
         return -1
 
     @logger(exclude='entity')
-    def enrich(self, entity, cep=True, location_type=False):
+    def get_geolocation_info(self, entity, cep=True):
         cols = ['location', 'gcep', 'glat', 'glng', 'gstreet', 'gstreet_number', 'gneighbourhood', 'gcity', 'gstate']
         info = pd.DataFrame([], columns=cols)
 
@@ -168,35 +162,3 @@ class CrawlerEntity(object):
             info.location = info.location.astype(int).astype(str).str.zfill(8)
 
         return info
-
-    @staticmethod
-    @logger
-    def _search_pattern(string, pattern, group=0):
-        try:
-            return pattern.search(string).group(group)
-        except Exception:
-            return None
-
-    @logger
-    def reverse_geocode(self, lat, lng):
-        params = {
-            'key': self.google_maps_api_key,
-            'latlng': "%f,%f" % (lat, lng),
-            'sensor': 'false',
-            'result_type': 'street_address|street_number',
-            'location_type': 'ROOFTOP'
-        }
-        page = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=params).json()
-        try:
-            addr = page['results'][0]['address_components']
-            route = self._get_long_name(addr, 'route')
-            number = self._get_long_name(addr, 'street_number')
-            return route, number
-        except Exception:
-            logger.warning('m=reverse_geocode, maps api response has no address components')
-
-    @staticmethod
-    def _get_long_name(addr, addr_type):
-        for component in addr:
-            if addr_type in component['types']:
-                return component['long_name']

@@ -32,7 +32,7 @@ def insert_leads(**kwargs):
     delta_days = kwargs.get('since')
 
     crawler_leads = CrawlerLeads(s3_bucket=s3_bucket, google_maps_api_key=data_google_api_key)
-    leads = crawler_leads.leads(ws=ws, states=states, delta_days=delta_days)
+    leads = crawler_leads.get_leads(ws=ws, states=states, delta_days=delta_days)
 
     if leads.empty:
         logger.info(NO_LEADS_MSG)
@@ -41,8 +41,9 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
-    leads_cleaned = crawler_leads.cleaning(leads)
-    if leads_cleaned.empty:
+    leads = crawler_leads.cleaning(leads)
+    logger.info('m=insert_leads, got {} leads after cleaning'.format(len(leads)))
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
 
@@ -50,37 +51,50 @@ def insert_leads(**kwargs):
     regex_phone = r'(?P<code>\+\d{2})?(?P<number>\d+)'
     phones.phone_number = phones.phone_number.str.extract(regex_phone, expand=False).number
 
-    leads_cleaned['phone_number'] = leads_cleaned.phones.apply(lambda p: eval(p)[0]).astype(str)
-    leads_cleaned['known'] = leads_cleaned.phone_number.isin(phones.phone_number)
-    leads_filtered = leads_cleaned[~leads_cleaned.known].sort_values(by='updated_on')
-    if leads_filtered.empty:
+    leads['phone_number'] = leads.phones.apply(lambda p: eval(p)[0]).astype(str)
+    leads['known'] = leads.phone_number.isin(phones.phone_number)
+    leads = leads[~leads.known].sort_values(by='updated_on')
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
 
-    logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads_filtered)))
-    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, got {} leads with new phone numbers'.format(len(leads)))
+    logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
-    info = crawler_leads.enrich(leads_filtered.query("""lat.isnull() or lng.isnull()""").cep.unique())
-    leads_enriched = leads_filtered.merge(info, how='left', left_on='cep', right_on='location')
-    leads_enriched.lat = leads_enriched.lat.combine_first(leads_enriched.glat)
-    leads_enriched.lng = leads_enriched.lng.combine_first(leads_enriched.glng)
-    leads_enriched = leads_enriched.dropna(subset=['lat', 'lng'])
+    info = crawler_leads.get_geolocation_info(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
+    leads = leads.merge(info, how='left', left_on='cep', right_on='location')
+    leads.lat = leads.lat.combine_first(leads.glat)
+    leads.lng = leads.lng.combine_first(leads.glng)
 
-    # get to which region each lead belongs
-    leads_enriched['regions'] = leads_enriched.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
+    leads = leads.dropna(subset=['lat', 'lng'])
+    logger.info('m=insert_leads, got {} leads after getting lat e lng'.format(len(leads)))
+    leads.gcity = leads.gcity.combine_first(leads.city)
+    leads.gneighbourhood = leads.gneighbourhood.combine_first(leads.neighborhood)
+    leads.gstreet_number = leads.gstreet_number.where(
+        ~leads.gstreet_number.isnull(), None).astype(str).str.slice(stop=-2)
+    leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
 
-    # filter out units outside our coverage area
-    leads_filtered = leads_enriched[
-        (leads_enriched.regions > -1) &
-        ((~leads_enriched.type.str.contains('casa')) | leads_enriched.regions.isin(crawler_leads.house_allowed))]
-    if leads_filtered.empty:
+    # filter out units outside our coverage area. It's assumed that we are allowing houses in all regions
+    # TODO --- In the future I'll need to query this info in a database
+    leads = leads[leads.regions > -1]
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
-    logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads_filtered)))
-    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, got {} leads after filtering regions'.format(len(leads)))
+    logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
-    crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
+    leads = leads.drop_duplicates(subset=['phone_number'])
+    logger.info(
+        'm=insert_leads, msg=got {} leads after removing duplicate phone numbers.'.format(
+            len(leads)))
+
+    leads = leads[leads.phone_number.str.len() >= 11]
+    logger.info(
+        'm=insert_leads, msg=got {} leads after checking size of the phone number.'.format(
+            len(leads)))
+
+    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
 
 def submit_olx(**kwargs):
