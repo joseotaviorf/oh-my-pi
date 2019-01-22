@@ -39,12 +39,11 @@ class CriteoCampaigns(Marketing):
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
 
-    @logger
-    def move_criteo_campaings_to_raw(self):
+    def move_criteo_campaigns_to_raw(self):
         self.__save_to_s3(self.client_id, self.client_secret)
 
-    @logger
     def __get_token(self, client_id, client_secret):
+        logger.info('m=__get_token')
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
@@ -61,8 +60,8 @@ class CriteoCampaigns(Marketing):
         auth_token = 'Bearer ' + dic['access_token']
         return auth_token
 
-    @logger
     def __make_request(self, client_id, client_secret):
+        logger.info('m=__make_request')
         auth_token = self.__get_token(client_id, client_secret)
 
         headers = {
@@ -70,18 +69,21 @@ class CriteoCampaigns(Marketing):
             'Accept': 'application/octet-stream',
             'Authorization': auth_token,
         }
-        data = '{"reportType": "CampaignPerformance", "startDate": {}, \
-                "endDate": {},"dimensions": ["CampaignId", "Day"], \
-                "metrics": ["Clicks", "Displays", "Audience", "AdvertiserCost","SalesAllPc",\
-                "RevenueGeneratedPc", "OverallCompetitionWin", "ECpc"], "format": "json", \
-                "timezone": "GMT"}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T00:00:59.000Z',
-                                           self.execution_date.strftime('%Y-%m-%d') + 'T23:59:00.000Z')
 
+        body = {'reportType': 'CampaignPerformance',
+                'startDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T00:00:59.000Z'),
+                'endDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T23:59:00.000Z'),
+                'dimensions': ['CampaignId', 'Day'],
+                'metrics': ['Clicks', 'Displays', 'Audience', 'AdvertiserCost', 'SalesAllPc', 'RevenueGeneratedPc',
+                            'OverallCompetitionWin', 'ECpc'],
+                'format': 'json', 'timezone': 'GMT'}
+
+        data = json.dumps(body)
         response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
         return response.text
 
-    @logger
     def __save_to_s3(self, client_id, client_secret):
+        logger.info('m=__save_to_s3, client_id={}'.format(client_id))
         raw_json_data = self.__make_request(client_id, client_secret)
 
         gz_body = BytesIO()
