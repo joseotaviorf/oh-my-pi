@@ -1,9 +1,10 @@
-from datetime import datetime
-
-import bietlejuice.jobs.etl.powerbi as powerbi
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
+from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
+
+import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
@@ -13,7 +14,6 @@ from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews
 from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.etl.growth.incurred import Growth
 from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
-from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -221,7 +221,7 @@ def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=No
 
 
 def build_python_operator(task_id, python_callable, dag, op_kwargs=None):
-    return BaseDAG.build_quintoandar_python_operator(
+    return BaseDAG.build_python_operator(
         dag=dag,
         task_id=task_id,
         python_callable=python_callable,
@@ -633,7 +633,7 @@ prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with
                                                   placeholders=get_tenants_placeholders()
                                                   )
 
-refresh_growth = BaseDAG.build_quintoandar_python_operator(
+refresh_growth = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Growth',
     python_callable=refresh_powerbi,

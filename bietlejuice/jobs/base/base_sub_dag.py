@@ -112,7 +112,7 @@ class BaseSubDag(object):
         :param source_command: command string for calling source data retrieval method
         :return: the main tasks related to the etl step
         """
-        entity_task = BaseDAG.build_quintoandar_python_operator(
+        entity_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_{}'.format(entity),
             provide_context=True,
@@ -125,7 +125,7 @@ class BaseSubDag(object):
             }
         )
 
-        staging_dim_entity_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_entity_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_{}'.format(entity),
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -134,7 +134,7 @@ class BaseSubDag(object):
             }
         )
 
-        load_entity_task = BaseDAG.build_quintoandar_python_operator(
+        load_entity_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='DW_dim_{}'.format(entity),
             python_callable=utils.load_dim_from_staging_to_dw,
@@ -156,7 +156,7 @@ class BaseSubDag(object):
         """
         tests_tasks = []
         for _test in tests:
-            test_task = BaseDAG.build_quintoandar_python_operator(
+            test_task = BaseDAG.build_python_operator(
                 dag=dag,
                 task_id='TEST_{}'.format(_test[0]),
                 python_callable=_test[1]

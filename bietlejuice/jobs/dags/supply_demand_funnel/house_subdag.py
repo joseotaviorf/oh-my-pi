@@ -1,9 +1,10 @@
+from qa_python_utils import QuintoAndarLogger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('HouseSubDag')
 
@@ -51,14 +52,14 @@ class HouseSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        property_task = BaseDAG.build_quintoandar_python_operator(
+        property_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_imovel',
             provide_context=True,
             python_callable=self.get_house_query
         )
 
-        affiliate = BaseDAG.build_quintoandar_python_operator(
+        affiliate = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_affiliate_payments',
             python_callable=utils.load_athena_file_query_to_ods,
@@ -69,7 +70,7 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        rent_flow = BaseDAG.build_quintoandar_python_operator(
+        rent_flow = BaseDAG.build_python_operator(
             task_id='ODS_rent_flow',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -81,7 +82,7 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        listing_views = BaseDAG.build_quintoandar_python_operator(
+        listing_views = BaseDAG.build_python_operator(
             task_id='ODS_listing_views',
             dag=dag,
             python_callable=utils.load_athena_file_query_to_ods,
@@ -92,7 +93,7 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        property_listing = BaseDAG.build_quintoandar_python_operator(
+        property_listing = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_house_listing',
             python_callable=utils.materialize_view_ods,
@@ -102,7 +103,7 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        staging_dim_house_listing_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_house_listing_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_house_listing',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -111,7 +112,7 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        dim_house_listing = BaseDAG.build_quintoandar_python_operator(
+        dim_house_listing = BaseDAG.build_python_operator(
             dag=dag,
             task_id='DW_dim_house_listing',
             python_callable=utils.load_dim_from_staging_to_dw,

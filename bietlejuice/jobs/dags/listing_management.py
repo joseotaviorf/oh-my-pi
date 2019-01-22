@@ -1,21 +1,19 @@
 # coding: utf-8
 
+import boto3
 import json
 import os
-import tarfile
-from datetime import datetime, timedelta
-from io import BytesIO
-
-import boto3
 import sagemaker
-from datetime import datetime
-from qa_python_utils.aws.athena import AthenaClient
+import tarfile
 from airflow.models import DAG
+from datetime import datetime
+from datetime import timedelta
+from io import BytesIO
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
-from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
@@ -207,7 +205,7 @@ dag = DAG(
     catchup=True
 )
 
-build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
+build_raw_data_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='build_raw_data',
     python_callable=build_raw_data,
@@ -215,7 +213,7 @@ build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-train_model_op = BaseDAG.build_quintoandar_python_operator(
+train_model_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='train_model',
     provide_context=True,
@@ -224,7 +222,7 @@ train_model_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-untar_output_op = BaseDAG.build_quintoandar_python_operator(
+untar_output_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='untar_output',
     provide_context=True,
