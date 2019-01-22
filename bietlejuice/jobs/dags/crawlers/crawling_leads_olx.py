@@ -15,7 +15,7 @@ logger = QuintoAndarLogger('crawling-leads-olx')
 
 MAIN_DAG_NAME = 'crawling-leads-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 2 1/1 * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
 
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 
@@ -95,9 +95,9 @@ def submit_olx(**kwargs):
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/olx.py', '--max_crawl', str(max_crawl), '--states'] + states
+        command=['./crawlers/olx_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
-    logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+    logger.info('Job status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
 
     # get task instance
     ti = kwargs.get('ti')
@@ -141,7 +141,7 @@ insert_leads = BaseDAG.build_python_operator(
 olx_success_test = QuintoAndarAWSBatchSensor(
     task_id='olx-success-test',
     poke_interval=20 * 60,
-    timeout=5 * 3600,
+    timeout=22 * 3600,
     provide_context=True,
     xcom_task_id='crawl-olx'
 )
