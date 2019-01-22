@@ -2,7 +2,7 @@ import pytest
 
 from bietlejuice.jobs.etl.crm.tasks import CRMTasksTableEnum, CRMTasksUngroupedManual, CRMTasksRepair, CRMTasksPhotoJob, \
     CRMTasksClosing, CRMTasksCredit, CRMTasksInspection, CRMTasksLead, CRMTasksVisit, CRMTasksOnboardingTenant, \
-    CRMTasksPayment
+    CRMTasksPayment, CRMTasksOffboarding
 
 
 class TestCRMTasksFactory(object):
@@ -16,7 +16,8 @@ class TestCRMTasksFactory(object):
                               (CRMTasksTableEnum.LEAD, CRMTasksLead),
                               (CRMTasksTableEnum.VISIT, CRMTasksVisit),
                               (CRMTasksTableEnum.ONBOARDING_TENANT, CRMTasksOnboardingTenant),
-                              (CRMTasksTableEnum.PAYMENT, CRMTasksPayment)])
+                              (CRMTasksTableEnum.PAYMENT, CRMTasksPayment),
+                              (CRMTasksTableEnum.OFFBOARDING, CRMTasksOffboarding)])
     def test__dispatch_dict(self, factory, class_, expected):
         # act
         result = factory._dispatch_dict(class_=class_)

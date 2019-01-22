@@ -1,8 +1,7 @@
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -461,6 +460,13 @@ tasks_ungrouped_manual_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=CRMTasksTableEnum.UNGROUPED_MANUAL
 )
 
+tasks_offboarding_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_offboarding',
+    sub_dag_func=class_sub_dag,
+    class_=CRMTasksTableEnum.OFFBOARDING
+)
+
 # flow
 airflow_helpers.chain(
     extract_and_load_tasks_task,
@@ -487,7 +493,8 @@ tasks_tasks = [
     tasks_lead_sub_dag_task,
     tasks_inspection_sub_dag_task,
     tasks_repair_sub_dag_task,
-    tasks_ungrouped_manual_sub_dag_task
+    tasks_ungrouped_manual_sub_dag_task,
+    tasks_offboarding_sub_dag_task
 ]
 
 workgroups_sub_dag_task.set_downstream(tasks_tasks)

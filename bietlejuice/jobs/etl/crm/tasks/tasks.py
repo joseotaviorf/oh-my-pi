@@ -57,7 +57,7 @@ class CRMTasks(object):
     @logger(exclude='mongo_client_uri')
     def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
         self.s3_bucket = s3_bucket
-        self.mongo_client = MongoClient(mongo_client_uri) if mongo_client_uri is not None else None
+        self.mongo_client = self._get_mongo_client(mongo_client_uri)
         self.execution_date_from = execution_date.replace(hour=0, minute=0, second=0, microsecond=0)
         self.partition_date = self.execution_date_from.strftime('%Y-%m-%d')
         self.execution_date_to = execution_date.replace(hour=23, minute=59, second=59, microsecond=59)
@@ -518,3 +518,10 @@ class CRMTasks(object):
         )
 
         return len(result) == 1
+
+    @logger(exclude='mongo_client_uri')
+    def _get_mongo_client(self, mongo_client_uri):
+        if mongo_client_uri:
+            return MongoClient(mongo_client_uri)
+        else:
+            return None
