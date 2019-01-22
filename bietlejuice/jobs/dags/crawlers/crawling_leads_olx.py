@@ -1,6 +1,7 @@
 import json
-from airflow.models import DAG
 from datetime import datetime
+
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
@@ -62,6 +63,7 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
+    # TODO -- the google api is not sending the geo info for most ceps
     info = crawler_leads.get_geolocation_info(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
     leads = leads.merge(info, how='left', left_on='cep', right_on='location')
     leads.lat = leads.lat.combine_first(leads.glat)
@@ -76,7 +78,7 @@ def insert_leads(**kwargs):
     leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
 
     # filter out units outside our coverage area. It's assumed that we are allowing houses in all regions
-    # TODO --- In the future I'll need to query this info in a database
+    # TODO --- In the future I'll need to query this info in a database o maybe the main already does this
     leads = leads[leads.regions > -1]
     if leads.empty:
         logger.info(NO_LEADS_MSG)
@@ -136,7 +138,7 @@ dag = DAG(
 )
 
 # operators
-crawl_olx = BaseDAG.build_python_operator(
+crawl_olx = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='crawl-olx',
     python_callable=submit_olx,
@@ -144,7 +146,7 @@ crawl_olx = BaseDAG.build_python_operator(
     op_kwargs=json.loads(crawler_params)
 )
 
-insert_leads = BaseDAG.build_python_operator(
+insert_leads = BaseDAG.build_quintoandar_python_operator(
     dag=dag,
     task_id='insert-leads',
     python_callable=insert_leads,

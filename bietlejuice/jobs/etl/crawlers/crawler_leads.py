@@ -45,7 +45,9 @@ class CrawlerLeads(CrawlerEntity):
         'useful_area': 'areaTotal'
     }
 
-    INFOS_TO_SEND = COLUMN_MAPPER.values + ['tipo', 'origem', 'cep', 'lat', 'lng', 'iptu']
+    INFOS_TO_SEND = ['telefoneAnunciante', 'nomeAnunciante', 'numero', 'numeroQuartos', 'bairro', 'valor',
+                     'numeroBanheiros', 'cidade', 'areaTotal', 'endereco', 'condominio', 'captadoEm',
+                     'infosExtras', 'tipo', 'origem', 'cep', 'lat', 'lng', 'iptu']
 
     def __init__(self, s3_bucket, google_maps_api_key):
         super(CrawlerLeads, self).__init__(s3_bucket=s3_bucket, google_maps_api_key=google_maps_api_key)
