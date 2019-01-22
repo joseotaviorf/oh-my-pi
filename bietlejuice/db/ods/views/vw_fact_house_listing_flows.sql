@@ -53,7 +53,7 @@ rep_leads as (
 		base_leads old_bl
 		on old_bl.lead_id = bl.old_lead_id
 ),
-fact_with_acq_channel as (
+fact_with_reproc as (
     -- Treating acq channel of reprocessed leads
     select
         fhlf.*,
@@ -61,7 +61,8 @@ fact_with_acq_channel as (
             when l.origem = 'Reprocessado' and lr.tipo = 'Afiliado' then 'Reprocessed Affiliate'
             when l.origem = 'Reprocessado' then 'Reprocessed Others'
             else acquisition_channel end
-        as acquisition_channel_rep
+        as acquisition_channel_rep,
+        lr.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id
         from
         fact_house_listing_flows fhlf
         left join lead l
@@ -80,7 +81,7 @@ potential_listings as (
 		coalesce(f.imovel_id || '001' , '-1') as sk_house_listing,
 		coalesce(f.rep_id, -1) as sk_user_house_registrant,
 		coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
-		coalesce(f.affiliate_id, -1) as sk_user_lead_affiliate,
+		coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id, -1) as sk_user_lead_affiliate,
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
@@ -158,7 +159,7 @@ potential_listings as (
 		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
 		(us_cad.id is not null) as is_call_center
 	from
-		fact_with_acq_channel f
+		fact_with_reproc f
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
