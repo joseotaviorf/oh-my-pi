@@ -1,9 +1,8 @@
-from datetime import date
-from datetime import datetime
-
 import pandas as pd
 import petl
 from airflow.models import DAG
+from datetime import date
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -437,7 +436,7 @@ dag = DAG(
     catchup=False
 )
 
-BaseDAG.build_quintoandar_python_operator(
+BaseDAG.build_python_operator(
     dag=dag,
     task_id='demand_forecast',
     python_callable=demand_forecast

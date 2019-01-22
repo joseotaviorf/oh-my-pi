@@ -2,7 +2,6 @@ import json
 import math
 import os
 from datetime import datetime
-
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -111,7 +110,7 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.build_quintoandar_python_operator(
+BaseDAG.build_python_operator(
     dag=dag,
     task_id='reprocess-leads',
     python_callable=reprocess_leads,

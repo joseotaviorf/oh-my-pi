@@ -1,8 +1,8 @@
 import logging
+from airflow.models import DAG
 from datetime import datetime, timedelta
 
 import bietlejuice.jobs.etl.powerbi as powerbi
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -64,7 +64,7 @@ dag = DAG(
 )
 
 # check the dependencies for bdg_listing_rent_flows_agent
-bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_python_operator(
+bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_python_operator(
     dag=dag,
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
@@ -73,14 +73,14 @@ bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_quintoandar_pytho
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
-bdg_listing_rent_flows_agent = BaseDAG.build_quintoandar_python_operator(
+bdg_listing_rent_flows_agent = BaseDAG.build_python_operator(
     dag=dag,
     task_id='bdg_demand_agent',
     python_callable=create_bdg_listing_rent_flows_agent,
     op_kwargs=None
 )
 
-data_integrity_bdg_fact_agent = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_fact_agent = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_agent',
     python_callable=guarantee_data_integrity,
@@ -93,7 +93,7 @@ data_integrity_bdg_fact_agent = BaseDAG.build_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_date = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_dim_date = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_date',
     python_callable=guarantee_data_integrity,
@@ -106,7 +106,7 @@ data_integrity_bdg_dim_date = BaseDAG.build_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_dim_user = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_dim_user',
     python_callable=guarantee_data_integrity,
@@ -119,7 +119,7 @@ data_integrity_bdg_dim_user = BaseDAG.build_quintoandar_python_operator(
                'type': 'update'}
 )
 
-data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
+data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_bdg_fact_demand',
     python_callable=guarantee_data_integrity,
@@ -132,7 +132,7 @@ data_integrity_bdg_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_op
                'type': 'update'}
 )
 
-data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_quintoandar_python_operator(
+data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_fact_demand_dim_booking',
     python_callable=guarantee_data_integrity,
@@ -145,7 +145,7 @@ data_integrity_fact_listing_rent_flows_dim_booking = BaseDAG.build_quintoandar_p
                'type': 'update'}
 )
 
-data_integrity_dim_agentreview_booking = BaseDAG.build_quintoandar_python_operator(
+data_integrity_dim_agentreview_booking = BaseDAG.build_python_operator(
     dag=dag,
     task_id='data_integrity_dim_agentreview_booking',
     python_callable=guarantee_data_integrity,
@@ -158,7 +158,7 @@ data_integrity_dim_agentreview_booking = BaseDAG.build_quintoandar_python_operat
                'type': 'delete'}
 )
 
-refresh_agents = BaseDAG.build_quintoandar_python_operator(
+refresh_agents = BaseDAG.build_python_operator(
     dag=dag,
     task_id='Refresh_PowerBI_Agents',
     python_callable=refresh_powerbi,

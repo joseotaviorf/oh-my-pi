@@ -1,8 +1,7 @@
-import json
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
+import json
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
@@ -82,7 +81,7 @@ dag = DAG(
     catchup=True
 )
 
-crawl_proxies = BaseDAG.build_quintoandar_python_operator(
+crawl_proxies = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-proxies',
     python_callable=crawl_proxy,
@@ -90,7 +89,7 @@ crawl_proxies = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'source': 'proxies'}
 )
 
-crawl_imovelweb = BaseDAG.build_quintoandar_python_operator(
+crawl_imovelweb = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-imovelweb',
     python_callable=crawl_houses,
@@ -98,7 +97,7 @@ crawl_imovelweb = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=dict(dict_params.items() + ({'source': 'imovelweb'}).items())
 )
 
-crawl_vivareal = BaseDAG.build_quintoandar_python_operator(
+crawl_vivareal = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-vivareal',
     python_callable=crawl_houses,
@@ -106,7 +105,7 @@ crawl_vivareal = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=dict(dict_params.items() + ({'source': 'vivareal'}).items())
 )
 
-crawl_zap = BaseDAG.build_quintoandar_python_operator(
+crawl_zap = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
     python_callable=crawl_houses,
