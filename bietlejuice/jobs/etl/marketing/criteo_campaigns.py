@@ -79,8 +79,11 @@ class CriteoCampaigns(Marketing):
                 'format': 'json', 'timezone': 'GMT'}
 
         data = json.dumps(body)
-        response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
-        return response.text
+        try:
+            response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
+            return response.text
+        except requests.exceptions.RequestException as e:
+            logger.error('m=__make_request, error message={}'.format(e))
 
     def __save_to_s3(self, client_id, client_secret):
         logger.info('m=__save_to_s3, client_id={}'.format(client_id))
