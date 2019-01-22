@@ -9,11 +9,11 @@ import fastparquet as fp
 import numpy as np
 import pandas as pd
 import s3fs
+from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('CrawlerListings')
 
@@ -37,8 +37,7 @@ class CrawlerListings(CrawlerEntity):
         super(CrawlerListings, self).__init__(
             s3_bucket=s3_bucket,
             google_maps_api_key=google_maps_api_key,
-            get_polygons=True,
-            get_house_allowed=False
+            get_polygons=True
         )
         self.max_batch_size = int(max_batch_size)
         self.google_maps_daily_quota = google_maps_daily_quota
@@ -122,12 +121,12 @@ class CrawlerListings(CrawlerEntity):
             self.listings['latlng_flg'].astype('bool') &
             ~self.listings['full_address_flg'].astype(bool) &
             ~self.listings['gaddress_flg'].astype(bool)
-        ][['lat', 'lng']].drop_duplicates()
+            ][['lat', 'lng']].drop_duplicates()
         self.addresses = self.listings[
             ~self.listings['latlng_flg'].astype('bool') &
             ~self.listings['full_address_flg'].astype(bool) &
             ~self.listings['gaddress_flg'].astype(bool)
-        ]['full_address'].drop_duplicates()
+            ]['full_address'].drop_duplicates()
 
     @logger(exclude='entity')
     def enrich(self, entity, cep=False, location_type=False, reverse=True):
@@ -193,7 +192,7 @@ class CrawlerListings(CrawlerEntity):
                 ~self.listings['full_address_flg'].astype(bool) &
                 ~self.listings['gaddress_flg'].astype(bool) &
                 ~self.listings['glat'].where(self.listings['glat'] != '', None).isnull()
-            ][self.LOCATION_COLUMNS]
+                ][self.LOCATION_COLUMNS]
         logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(
             new_locations.shape, self.new_locations.shape))
         self.new_locations = self.new_locations.append(new_locations.where(~new_locations.isnull(), ''))
