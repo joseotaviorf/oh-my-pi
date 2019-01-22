@@ -35,7 +35,6 @@ select distinct
     c.bedrooms,
     c.toilets,
     c.useful_area,
-    c.neighborhood,
     c.city,
     c.state,
     c.cep,
@@ -51,7 +50,7 @@ select distinct
             )
         )
     ) updated_on,
-    c.url,
+    c.url
 from
     datalake_raw.crawlers c
 cross join
