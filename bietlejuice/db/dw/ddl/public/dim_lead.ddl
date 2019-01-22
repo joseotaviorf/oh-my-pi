@@ -70,5 +70,6 @@ CREATE TABLE public.dim_lead (
   flg_city_served boolean,
   flg_latlng_served boolean,
   flg_location_served boolean,
+  reprocessed_from_lead_id bigint,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE
 ) ;
