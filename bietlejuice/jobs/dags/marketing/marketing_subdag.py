@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -9,7 +10,8 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth, integration=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth=None,
+                 integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.class_ = class_
@@ -20,15 +22,15 @@ class MarketingSubDag(BaseSubDag):
         self.integration = integration
         self.auth = auth
 
-    @logger
     def transfer_files_to_raw(self, bucket, **kwargs):
+        logger('m=transfer_files_to_raw, bucket={}'.format(bucket))
         marketing_class = MarketingFactory.factory(
             _class=self.class_,
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(**kwargs),
             auth=self.auth
         )
-        getattr(marketing_class, 'move_{}_to_raw'.format())(self.class_)
+        getattr(marketing_class, 'move_{}_to_raw'.format(self.class_.value))()
 
     @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
@@ -78,7 +80,7 @@ class MarketingSubDag(BaseSubDag):
     def build_raw_tasks(self, dag):
         BaseDAG.build_python_operator(
             dag=dag,
-            task_id='{}-{}'.format(self.class_),
+            task_id='{}_task'.format(self.class_.value),
             python_callable=self.transfer_files_to_raw,
             provide_context=True,
             op_kwargs={

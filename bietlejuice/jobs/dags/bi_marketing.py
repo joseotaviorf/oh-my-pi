@@ -1,7 +1,8 @@
-import airflow.utils.helpers as airflow_helpers
 import json
-from airflow.models import DAG
 from datetime import datetime
+
+import airflow.utils.helpers as airflow_helpers
+from airflow.models import DAG
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -24,7 +25,6 @@ FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
 
 GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
 
-
 # dags
 main_dag = DAG(
     dag_id=MAIN_DAG_NAME,
@@ -35,7 +35,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    catchup=False,
+    catchup=True,
     max_active_runs=1
 )
 
@@ -171,7 +171,7 @@ google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
 criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
-    sub_dag_name='criteo',
+    sub_dag_name=MarketingEnum.CRITEO.value,
     class_=MarketingEnum.CRITEO
 )
 
@@ -179,4 +179,3 @@ airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, 
                       google_ads_load_to_dw_dag)
 airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
                       facebook_ads_load_to_dw_dag)
-airflow_helpers.chain(criteo_raw_dag)
