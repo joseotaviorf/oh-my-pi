@@ -508,7 +508,7 @@ class ZendeskETL(object):
                 query_base_dir=DATALAKE_QUERIES_DIR,
                 file_name=table_name))
 
-        empty = self.__is_prod_table_empty(table_name)
+        empty = self._is_prod_table_empty(table_name)
         logger.info('m=build_staging_table, table_name={}, empty={}'.format(table_name, empty))
         if not empty:
             logger.info(
@@ -537,25 +537,25 @@ class ZendeskETL(object):
             '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
                 query_base_dir=DW_QUERIES_DIR))
 
-        empty = self.__is_prod_table_empty(table_name)
+        empty = self._is_prod_table_empty(table_name)
         if empty:
             logger.info(
                 'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
                     table_name))
         else:
-            self.__delete_old_entries(delete_query.format(table_name=table_name))
+            self._delete_old_entries(delete_query.format(table_name=table_name))
 
             if table_name.split("_")[0] == 'fact':
                 upsert_query = "{} \nwhere sk_extraction_date = {};".format(upsert_query,
                                                                             self.execution_datetime.strftime('%Y%m%d'))
 
-        self.__upsert_data(upsert_query, table_name)
+        self._upsert_data(upsert_query, table_name)
 
     @logger(exclude='df')
-    def __upsert_data(self, upsert_query, table_name):
+    def _upsert_data(self, upsert_query, table_name):
         logger.info(
-            'm=__upsert_data, table_name={}, msg=getting data from DW, query={}'.format(table_name,
-                                                                                        upsert_query))
+            'm=_upsert_data, table_name={}, msg=getting data from DW, query={}'.format(table_name,
+                                                                                       upsert_query))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
@@ -564,7 +564,7 @@ class ZendeskETL(object):
         )
 
         logger.info(
-            '__upsert_data, table_name={}, msg=bulk inserting...'.format(table_name))
+            '_upsert_data, table_name={}, msg=bulk inserting...'.format(table_name))
 
         BaseETL.bulk_insert(
             table=table_data,
@@ -576,10 +576,10 @@ class ZendeskETL(object):
         )
 
         logger.info(
-            '__upsert_data, table_name={}, msg=ready to reading data!'.format(table_name))
+            '_upsert_data, table_name={}, msg=ready to reading data!'.format(table_name))
 
     @logger
-    def __is_prod_table_empty(self, table_name):
+    def _is_prod_table_empty(self, table_name):
         result = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
             query="select 1 from zendesk.{} limit 1".format(table_name),
@@ -589,7 +589,7 @@ class ZendeskETL(object):
         return len(result) == 1
 
     @logger
-    def __delete_old_entries(self, delete_query):
+    def _delete_old_entries(self, delete_query):
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
             command=delete_query,
