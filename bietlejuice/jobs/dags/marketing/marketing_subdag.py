@@ -11,7 +11,6 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 class MarketingSubDag(BaseSubDag):
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth=None,
-                 integration=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.class_ = class_
@@ -19,7 +18,6 @@ class MarketingSubDag(BaseSubDag):
         self.dim_tables = []
         self.fact_tables = []
         self.datalake_tables = []
-        self.integration = integration
         self.auth = auth
 
     def transfer_files_to_raw(self, bucket, **kwargs):
