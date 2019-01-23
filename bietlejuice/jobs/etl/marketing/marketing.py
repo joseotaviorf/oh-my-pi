@@ -41,15 +41,14 @@ class Marketing(object):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
-        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/' \
-              'dt_created={date_partition}/{file_name}.parquet' \
-            .format(
-                integration=self.integration,
-                table_name=table_name,
-                acc_partition=self.account,
-                date_partition=self.partition_date,
-                file_name=self.partition_date
-            )
+        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/ \
+              dt_created={date_partition}/{file_name}.parquet'.format(
+            integration=self.integration,
+            table_name=table_name,
+            acc_partition=self.account,
+            date_partition=self.partition_date,
+            file_name=self.partition_date
+        )
 
         query = BaseETL.get_query_from_file_name(
             '{query_base_dir}/{query_path}/{file_name}'.format(

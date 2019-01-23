@@ -7,7 +7,7 @@ logger = QuintoAndarLogger('MarketingFacebookAdsSubDag')
 
 class MarketingFacebookAdsSubDag(MarketingSubDag):
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
-                 accounts=None):
+                 accounts=None, auth=None):
         super(MarketingFacebookAdsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
                                                          start_date, integration, accounts)
         self.dim_tables = ["dim_facebook_ad"]
