@@ -37,7 +37,7 @@ class Marketing(object):
         self.athena_client = AthenaClient(self.s3_bucket)
         self.integration = integration
         self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(integration=self.integration)
-        self.database = 'datalake_raw'
+        self.database = 'datalake_raw',
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):

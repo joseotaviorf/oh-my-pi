@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -41,8 +42,8 @@ class GoogleAds(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, account=None):
-        super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
+    def __init__(self, s3_bucket, execution_date, accounts, auth=None):
+        super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', accounts)
 
     @logger
     def move_campaigns_to_clean(self):
