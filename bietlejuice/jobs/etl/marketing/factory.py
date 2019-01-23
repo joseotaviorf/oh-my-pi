@@ -31,4 +31,3 @@ class MarketingFactory(object):
             MarketingEnum.FACEBOOK_ADS: FacebookAds,
             MarketingEnum.CRITEO: CriteoCampaigns
         }.get(class_)
-
