@@ -81,7 +81,7 @@ potential_listings as (
 		coalesce(f.imovel_id || '001' , '-1') as sk_house_listing,
 		coalesce(f.rep_id, -1) as sk_user_house_registrant,
 		coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
-		coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id, -1) as sk_user_lead_affiliate,
+		coalesce(f.affiliate_id, cast(f.origin_lead_usuario_que_indicou_id as integer), -1) as sk_user_lead_affiliate,
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
