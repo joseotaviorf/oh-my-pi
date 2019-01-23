@@ -26,7 +26,7 @@ class CriteoCampaigns(Marketing):
             'cost': float,
             'impressions': int,
             'Sales': int,
-            'Audiencia': float,
+            'Audience': float,
             'Revenue': int,
             'comp_win': float,
             'cpc': float,
