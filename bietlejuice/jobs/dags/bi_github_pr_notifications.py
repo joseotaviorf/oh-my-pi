@@ -1,7 +1,6 @@
 import json
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -43,7 +42,7 @@ main_dag = DAG(
 )
 
 # operators
-github_pr_notification_task = BaseDAG.build_quintoandar_python_operator(
+github_pr_notification_task = BaseDAG.build_python_operator(
     task_id='send_notifications_to_slack',
     python_callable=send_notifications_to_slack,
     dag=main_dag

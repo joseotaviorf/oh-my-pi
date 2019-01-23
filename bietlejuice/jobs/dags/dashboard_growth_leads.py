@@ -1,9 +1,8 @@
 # -*- coding: latin-1 -*-
 
 import json
-from datetime import datetime
-
 import requests
+from datetime import datetime
 from pytz import UTC, timezone
 from qa_python_utils import QuintoAndarLogger
 
@@ -343,7 +342,7 @@ dag = BaseDAG.build_dag(
     schedule_interval=env.convert_to_utc_schedule('0/5 * * * *')
 )
 
-contacts_and_prospects = BaseDAG.build_quintoandar_python_operator(
+contacts_and_prospects = BaseDAG.build_python_operator(
     dag=dag,
     task_id='push_potential_listing_data',
     python_callable=push_leads,

@@ -1,9 +1,9 @@
 # coding=utf-8
 import cStringIO
-import json
-from datetime import datetime
 
+import json
 import paramiko
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -60,7 +60,7 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.build_quintoandar_python_operator(
+BaseDAG.build_python_operator(
     dag=dag,
     task_id='neoway-send-cpfs',
     python_callable=send_cpfs,

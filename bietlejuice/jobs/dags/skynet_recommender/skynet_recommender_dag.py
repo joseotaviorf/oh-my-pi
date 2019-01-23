@@ -1,13 +1,12 @@
+import boto3
 import json
+import kubernetes.client as kube
 import os
+import sagemaker
 import tarfile
+from airflow.models import DAG
 from datetime import datetime, timedelta
 from io import BytesIO
-
-import boto3
-import kubernetes.client as kube
-import sagemaker
-from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -201,7 +200,7 @@ dag = DAG(
     catchup=False
 )
 
-build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
+build_raw_data_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='build_raw_data',
     provide_context=True,
@@ -209,7 +208,7 @@ build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-train_model_op = BaseDAG.build_quintoandar_python_operator(
+train_model_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='train_model',
     provide_context=True,
@@ -218,7 +217,7 @@ train_model_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-untar_output_op = BaseDAG.build_quintoandar_python_operator(
+untar_output_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='untar_output',
     provide_context=True,
@@ -226,14 +225,14 @@ untar_output_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-restart_service_op = BaseDAG.build_quintoandar_python_operator(
+restart_service_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='restart_service',
     python_callable=restart_service,
     op_kwargs=json.loads(SKYNET_RECOMMENDER_KWARGS)
 )
 
-notify_success_op = BaseDAG.build_quintoandar_python_operator(
+notify_success_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='notify_success',
     provide_context=True,
