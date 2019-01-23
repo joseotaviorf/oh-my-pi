@@ -1,4 +1,5 @@
 import airflow.utils.helpers as airflow_helpers
+
 from datetime import datetime
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -8,6 +9,7 @@ from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.booking_subdag import BookingSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.condo_subdag import CondoSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
@@ -182,6 +184,18 @@ def booking_sub_dag(sub_dag_name):
     return sub_dag.build_booking_with_tests()
 
 
+def condo_sub_dag(sub_dag_name):
+    sub_dag = CondoSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_condo_with_tests()
+
+
 def refresh_powerbi(**kwargs):
     powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
                                            PWBI_SCHEMA,
@@ -322,6 +336,12 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
+condo_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=condo_sub_dag,
+    sub_dag_name='Condo'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -357,15 +377,16 @@ refresh_booking = BaseDAG.build_python_operator(
     op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
 )
 
-ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
+ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                      user_dag, house_dag, ods_house_rent_flow])
+                                      user_dag, house_dag, ods_house_rent_flow, condo_dag])
 airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_listing_rent_flows])
 refresh_listing_rent_flows >> refresh_booking
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
+condo_dag >> fact_house_listings
 house_dag.set_downstream([fact_house_status, fact_house_listings])
 # new 'supply' flow
-ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
+ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows, refresh_house_listing_flows)
