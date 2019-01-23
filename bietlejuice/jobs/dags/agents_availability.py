@@ -1,12 +1,12 @@
-from datetime import datetime
-
 from airflow import DAG
+from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -116,21 +116,21 @@ dag = DAG(
 )
 
 # operators
-agents_slots = BaseDAG.build_quintoandar_python_operator(
+agents_slots = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_agents_slots',
     python_callable=load_agents_slots,
     provide_context=True
 )
 
-agents_scheduling = BaseDAG.build_quintoandar_python_operator(
+agents_scheduling = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_agents_scheduling',
     python_callable=load_agents_scheduling,
     provide_context=True
 )
 
-agents_signed_contracts = BaseDAG.build_quintoandar_python_operator(
+agents_signed_contracts = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_agents_signed_contracts',
     python_callable=load_agents_signed_contracts

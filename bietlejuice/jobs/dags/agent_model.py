@@ -1,8 +1,8 @@
 import datetime as dt
 import json
+from airflow.models import DAG
 from datetime import datetime
 
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
 from bietlejuice.jobs.dags.util import environment as env
@@ -120,7 +120,7 @@ dag = DAG(
 )
 
 # Get ODS data of Agent_Region per day and groups into ODS
-group_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
+group_agent_region_ods = BaseDAG.build_python_operator(
     dag=dag,
     task_id='group_agent_region_ods',
     provide_context=True,
@@ -129,7 +129,7 @@ group_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Get ODS grouped data to DW
-load_group_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
+load_group_agent_region_dw = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_group_agent_region_dw',
     python_callable=load_group_agent_region_dw,
@@ -137,7 +137,7 @@ load_group_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Creates dim_agent_region in DW
-create_dim_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
+create_dim_agent_region_dw = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_dim_agent_region_dw',
     python_callable=create_dim_agent_region_dw,
@@ -145,14 +145,14 @@ create_dim_agent_region_dw = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Creates agent_contract in DW
-create_agent_contract_dw = BaseDAG.build_quintoandar_python_operator(
+create_agent_contract_dw = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_agent_contract_dw',
     python_callable=create_agent_contract_dw,
     op_kwargs=None
 )
 
-create_dim_agent_contract_type_dw_task = BaseDAG.build_quintoandar_python_operator(
+create_dim_agent_contract_type_dw_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_dim_agent_contract_type_dw',
     python_callable=create_dim_agent_contract_type,
@@ -160,7 +160,7 @@ create_dim_agent_contract_type_dw_task = BaseDAG.build_quintoandar_python_operat
 )
 
 # Creates dim_agent_region in DW
-create_fact_agent = BaseDAG.build_quintoandar_python_operator(
+create_fact_agent = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_fact_agent',
     provide_context=True,
@@ -169,7 +169,7 @@ create_fact_agent = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Creates dim_agent_review in ODS
-create_dim_agent_review = BaseDAG.build_quintoandar_python_operator(
+create_dim_agent_review = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_dim_agent_review',
     provide_context=True,
@@ -178,7 +178,7 @@ create_dim_agent_review = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Moves dim_agent_review from ODS to DW
-load_dim_agent_review_dw = BaseDAG.build_quintoandar_python_operator(
+load_dim_agent_review_dw = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_dim_agent_review_dw',
     python_callable=load_dim_agent_review_dw,
@@ -186,7 +186,7 @@ load_dim_agent_review_dw = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Creates push xcom
-xcom_fact_agent = BaseDAG.build_quintoandar_python_operator(
+xcom_fact_agent = BaseDAG.build_python_operator(
     dag=dag,
     task_id='XCom_fact_agent',
     provide_context=True,
@@ -194,7 +194,7 @@ xcom_fact_agent = BaseDAG.build_quintoandar_python_operator(
 )
 
 # Get EBDB data of Agent_Region per day and updates into ODS
-update_agent_region_ods = BaseDAG.build_quintoandar_python_operator(
+update_agent_region_ods = BaseDAG.build_python_operator(
     dag=dag,
     task_id='update_agent_region_ods',
     provide_context=True,

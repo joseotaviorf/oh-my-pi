@@ -1,7 +1,6 @@
 import json
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
@@ -46,7 +45,7 @@ dag = DAG(
     max_active_runs=1
 )
 
-BaseDAG.build_quintoandar_python_operator(
+BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
     python_callable=submit_zap,

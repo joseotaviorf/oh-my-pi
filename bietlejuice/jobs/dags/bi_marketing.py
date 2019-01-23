@@ -1,7 +1,8 @@
-import airflow.utils.helpers as airflow_helpers
 import json
-from airflow.models import DAG
 from datetime import datetime
+
+import airflow.utils.helpers as airflow_helpers
+from airflow.models import DAG
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -16,6 +17,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,6,12,18 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
+auth = json.loads(env.get_airflow_env_var('criteo_login'))
 
 athena_client = AthenaClient(s3_bucket)
 
@@ -36,6 +38,20 @@ main_dag = DAG(
     catchup=False,
     max_active_runs=1
 )
+
+
+def raw_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=auth
+    )
+
+    return sub_dag.build_tasks('raw')
 
 
 def clean_sub_dag(sub_dag_name, class_, accounts):
@@ -150,6 +166,13 @@ google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=load_to_dw_sub_dag,
     sub_dag_name='google-ads-load-to-dw',
     class_=MarketingEnum.GOOGLE_ADS,
+)
+
+criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name=MarketingEnum.CRITEO.value,
+    class_=MarketingEnum.CRITEO
 )
 
 airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,

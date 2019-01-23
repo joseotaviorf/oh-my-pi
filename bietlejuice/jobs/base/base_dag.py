@@ -1,6 +1,5 @@
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from airflow.operators.quintoandar import QuintoAndarPythonOperator
 from datetime import timedelta
 
 
@@ -48,28 +47,6 @@ class BaseDAG(object):
             python_callable=python_callable,
             op_kwargs=op_kwargs,
             provide_context=provide_context,
-            execution_timeout=execution_timeout,
-            retries=retries,
-            retry_delay=retry_delay,
-            max_retry_delay=max_retry_delay
-        )
-
-    @staticmethod
-    def build_quintoandar_python_operator(task_id,
-                                          python_callable,
-                                          dag,
-                                          op_kwargs=None,
-                                          provide_context=False,
-                                          execution_timeout=EXECUTION_TIMEOUT,
-                                          retries=OPERATOR_RETRIES['retries'],
-                                          retry_delay=OPERATOR_RETRIES['retry_delay'],
-                                          max_retry_delay=OPERATOR_RETRIES['max_retry_delay']):
-        return QuintoAndarPythonOperator(
-            dag=dag,
-            task_id=task_id,
-            provide_context=provide_context,
-            python_callable=python_callable,
-            op_kwargs=op_kwargs,
             execution_timeout=execution_timeout,
             retries=retries,
             retry_delay=retry_delay,
