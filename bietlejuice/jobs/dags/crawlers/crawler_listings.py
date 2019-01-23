@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.etl.powerbi as powerbi
@@ -53,7 +52,7 @@ dag = DAG(
     catchup=False
 )
 
-crawler_listings = BaseDAG.build_quintoandar_python_operator(
+crawler_listings = BaseDAG.build_python_operator(
     dag=dag,
     task_id='transform-crawler-data',
     python_callable=transform_crawler_data,
@@ -61,7 +60,7 @@ crawler_listings = BaseDAG.build_quintoandar_python_operator(
                'max_batch_size': _max_batch_size}
 )
 
-refresh_market_index = BaseDAG.build_quintoandar_python_operator(
+refresh_market_index = BaseDAG.build_python_operator(
     dag=dag,
     task_id='Refresh_PowerBI_MarketIndex',
     python_callable=refresh_powerbi,

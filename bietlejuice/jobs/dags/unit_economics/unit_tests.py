@@ -47,7 +47,7 @@ def __test_query(**kwargs):
 
 @logger
 def __build_test_tasks(local_dag):
-    # FIXME: change to build_quintoandar_python_operator after testing
+    # FIXME: change to build_python_operator after testing
     test_dre_onboarding = BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_DRE_onboarding',

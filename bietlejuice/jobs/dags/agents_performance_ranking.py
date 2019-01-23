@@ -1,7 +1,6 @@
+from airflow.models import DAG
 from datetime import datetime
 from datetime import timedelta
-
-from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -68,7 +67,7 @@ dag = DAG(
     max_active_runs=1
 )
 
-clear_old_data = BaseDAG.build_quintoandar_python_operator(
+clear_old_data = BaseDAG.build_python_operator(
     dag=dag,
     task_id='clean_previous_data',
     provide_context=True,
@@ -76,7 +75,7 @@ clear_old_data = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'dim_name': 'agents_performance_ranking', 'schema': 'growth', 'date_column': 'sk_date'}
 )
 
-tickets_whats = BaseDAG.build_quintoandar_python_operator(
+tickets_whats = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_agents_performance_ranking',
     execution_timeout=timedelta(hours=3),
