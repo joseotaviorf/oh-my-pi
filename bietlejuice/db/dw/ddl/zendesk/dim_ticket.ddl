@@ -8,6 +8,7 @@ create table if not exists zendesk.dim_ticket (
     box varchar,
     priority varchar,
     recipient varchar(65535),
+    tags varchar(65535),
     satisfaction_rating varchar(65535),
     request_type varchar,
     client_type varchar,

@@ -29,6 +29,7 @@ select distinct
        zg.name as box,
        t.priority,
        t.recipient,
+       t.tags,
        t.satisfaction_rating,
        c.cols['Tipo de Solicitação'] as request_type,
        c.cols['Tipo de Cliente'] as client_type,
