@@ -5,8 +5,8 @@ as
 select
   id as sk_bank,
   id as id_bank,
-  "atualizadoEm" as updated_at,
-  "criadoEm" as created_at,
+  "atualizadoEm" as ts_updated,
+  "criadoEm" as ts_created,
   codigo as code,
   nome as name,
   "nomeFebraban" as febraban_name,
