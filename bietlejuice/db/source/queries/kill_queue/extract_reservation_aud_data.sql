@@ -1,0 +1,16 @@
+SELECT id,
+  rev,
+  revtype,
+  revend,
+  attempt,
+  attempt_mod,
+  mundipagg_token,
+  mundipagg_token_mod,
+  rent_flow_id,
+  status,
+  status_mod,
+  tenant_id,
+  value,
+  value_mod,
+  house_id
+FROM reservation_aud;
