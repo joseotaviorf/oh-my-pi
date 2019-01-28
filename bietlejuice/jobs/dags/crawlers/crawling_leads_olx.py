@@ -107,14 +107,15 @@ def submit_olx(**kwargs):
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
 
-    logger.info('Starting job...')
+    logger.info('m=submit_olx, msg=Starting job...')
     r = BatchClient().start_batch_job(
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         command=['./crawlers/olx_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
-    logger.info('Job status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+    logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
+                                                                           r.get('jobName')])), r.get('status'))
 
     # get task instance
     ti = kwargs.get('ti')
