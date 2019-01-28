@@ -6,8 +6,8 @@ CREATE TABLE staging.dim_bank_account (
   account_number VARCHAR(255),
   account_type VARCHAR(255),
   agency_number VARCHAR(255),
-  updated_at TIMESTAMP,
-  created_at TIMESTAMP,
+  ts_updated TIMESTAMP,
+  ts_created TIMESTAMP,
   ts_load TIMESTAMP
 )
 WITH (oids = false);

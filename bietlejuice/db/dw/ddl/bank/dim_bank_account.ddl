@@ -6,8 +6,8 @@ create table if not exists bank.dim_bank_account (
   account_number varchar,
   account_type varchar,
   agency_number varchar,
-  updated_at timestamp,
-  created_at timestamp,
+  ts_updated timestamp,
+  ts_created timestamp,
   ts_load timestamp
 )
 ;

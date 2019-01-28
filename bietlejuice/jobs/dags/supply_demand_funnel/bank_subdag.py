@@ -67,7 +67,7 @@ class BankSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': self.ods_stg_table_name,
                 'bucket': DimSubDag.S3_BUCKET,
-                'schema_dest': self.ods_stg_table_name
+                'schema_dest': 'bank'
             }
         )
 
