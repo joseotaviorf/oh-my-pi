@@ -191,8 +191,8 @@ class CrawlerListings(CrawlerEntity):
                 ~self.listings['gaddress_flg'].astype(bool) &
                 ~self.listings['glat'].where(self.listings['glat'] != '', None).isnull()
                 ][self.LOCATION_COLUMNS]
-        logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(new_locations.shape,
-                                                                                               self.new_locations.shape))
+        logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(
+            new_locations.shape, self.new_locations.shape))
 
         self.new_locations = self.new_locations.append(new_locations.where(~new_locations.isnull(), ''))
 
