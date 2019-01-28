@@ -115,7 +115,7 @@ def submit_olx(**kwargs):
         command=['./crawlers/olx_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
     logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
-                                                                           r.get('jobName')])), r.get('status'))
+                                                                           r.get('jobName')]), r.get('status')))
 
     # get task instance
     ti = kwargs.get('ti')
