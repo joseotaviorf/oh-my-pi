@@ -193,6 +193,7 @@ class CrawlerListings(CrawlerEntity):
                 ][self.LOCATION_COLUMNS]
         logger.info('m=merge_new_addresses, msg=merging {} new locations to {} current'.format(new_locations.shape,
                                                                                                self.new_locations.shape))
+
         self.new_locations = self.new_locations.append(new_locations.where(~new_locations.isnull(), ''))
 
     @logger
