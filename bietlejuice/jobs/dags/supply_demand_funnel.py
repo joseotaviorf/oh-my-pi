@@ -19,6 +19,9 @@ from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('SupplyDemandFunnel')
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -63,6 +66,21 @@ def load_dim_from_ods_to_dw(**kwargs):
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
         post_command=None if 'post_command' not in kwargs else kwargs['post_command']
     )
+
+
+@logger(exclude='kwargs')
+def xcom_dependencies(task_id, dag_id, **kwargs):
+    exec_date = str(datetime.date(kwargs['execution_date']))
+
+    status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=task_id, dag_id=dag_id)
+    if not status:
+        raise ValueError(
+            'm=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=The process have not finished yet'.format(
+                exec_date, dag_id, task_id))
+
+    logger.info('m=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=REQUIREMENT MET'.format(exec_date,
+                                                                                                       dag_id,
+                                                                                                       task_id))
 
 
 def lead_sub_dag(sub_dag_name):
@@ -195,14 +213,14 @@ def xcom_fact_listing_rent_flows_task(**kwargs):
     xcom.xcom_push(kwargs['ti'], exec_date)
 
 
-ods_house_rent_flow = BaseDAG.build_quintoandar_python_operator(
+ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
     python_callable=extract_query_dim_from_ebdb_to_ods,
     op_kwargs={'table_name': 'house_rent_flow'}
 )
 
-ods_supply = BaseDAG.build_quintoandar_python_operator(
+ods_supply = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='ODS_supply',
     provide_context=True,
@@ -210,35 +228,35 @@ ods_supply = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'table_name': 'fact_supply'}
 )
 
-fact_supply = BaseDAG.build_quintoandar_python_operator(
+fact_supply = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_Supply',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
-fact_house_listings = BaseDAG.build_quintoandar_python_operator(
+fact_house_listings = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_House_Listings',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
-fact_photo_job = BaseDAG.build_quintoandar_python_operator(
+fact_photo_job = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_fact_photo_job',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
-fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
+fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_fact_listing_rent_flows',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
 )
 
-fact_house_status = BaseDAG.build_quintoandar_python_operator(
+fact_house_status = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_fact_house_status',
     python_callable=load_dim_from_ods_to_dw,
@@ -246,7 +264,7 @@ fact_house_status = BaseDAG.build_quintoandar_python_operator(
 )
 
 # new 'supply' flow
-ods_house_listing_flows = BaseDAG.build_quintoandar_python_operator(
+ods_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
@@ -254,7 +272,7 @@ ods_house_listing_flows = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 
-dw_fact_house_listing_flows = BaseDAG.build_quintoandar_python_operator(
+dw_fact_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_House_Listing_Flows',
     python_callable=load_dim_from_ods_to_dw,
@@ -322,41 +340,52 @@ booking_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Booking'
 )
 
-xcom_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
+xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
     python_callable=xcom_fact_listing_rent_flows_task,
     provide_context=True
 )
 
-refresh_supply = BaseDAG.build_quintoandar_python_operator(
+refresh_supply = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Supply',
     python_callable=refresh_powerbi,
     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
 )
 
-refresh_house_listing_flows = BaseDAG.build_quintoandar_python_operator(
+refresh_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_House_Listing_Flows',
     python_callable=refresh_powerbi,
     op_kwargs={'workspace_name': 'Data', 'dataset_name': 'House Listing Flow'}
 )
 
-refresh_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
+refresh_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Listing_Rent_Flows',
     python_callable=refresh_powerbi,
     op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Rent Flow'}
 )
 
-refresh_booking = BaseDAG.build_quintoandar_python_operator(
+refresh_booking = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Refresh_PowerBI_Booking',
     python_callable=refresh_powerbi,
     op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
 )
 
+# check the dependency of amplitude_load_events
+supply_demand_funnel_xcom_dependencies_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='bdg_demand_agent_xcom_dependencies',
+    provide_context=True,
+    python_callable=xcom_dependencies,
+    op_kwargs={'task_id': 'XCom_amplitude_load_events',
+               'dag_id': 'bi-amplitude-load-events'}
+)
+
+airflow_helpers.chain(supply_demand_funnel_xcom_dependencies_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow])

@@ -9,7 +9,7 @@
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
-    on trim(ct.origin) = 'Contrato'
+    on trim(ct.origin) in ('Contrato', 'ContratoFull')
       and cast(ct.id_origin as bigint) = try(cast(ec.id as bigint))
   left join datalake_raw.ebdb_imovel eci
     on eci.id = ec.imovel_id
@@ -49,8 +49,8 @@ select distinct
   pc.ts_task_user_end,
   pc.task_user_type,
   pc.task_user_resolve_hours,
-  pc.sk_proposal,
-  pc.sk_contract,
+  coalesce(pc.sk_proposal, contract.sk_proposal) as sk_proposal,
+  coalesce(pc.sk_contract, proposal.sk_contract) as sk_contract,
   coalesce(proposal.sk_house_listing, contract.sk_house_listing, -1) as sk_house_listing,
   pc.sk_house_owner,
   pc.sk_tenant,

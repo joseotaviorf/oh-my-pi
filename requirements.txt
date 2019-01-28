@@ -4,7 +4,7 @@ boto3==1.9.21
 botocore==1.12.21
 cffi==1.9.1
 createsend==4.2.6
-cryptography>=1.7.1
+cryptography==2.4
 Cython==0.25.2
 docutils==0.12
 elasticsearch==5.4.0
@@ -51,7 +51,7 @@ PySocks==1.6.4
 python-dateutil==2.7.3
 python-slugify==1.1.4
 pytz==2018.5
-PyYAML==3.12
+pyyaml==4.2b1
 raven==6.3.0
 requests>=2.20.0
 rsa==3.4.2
