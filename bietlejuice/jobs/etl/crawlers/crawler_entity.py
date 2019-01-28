@@ -155,6 +155,11 @@ class CrawlerEntity(object):
                         s.gstate = component.get('short_name', '').replace('-', '')
 
                 info = info.append(s, ignore_index=True)
+            else:
+                logger.info(
+                    'm={}.get_geolocation_info, cep={}, msg=google api cannot return geolocation info for this '
+                    'entity'.format(
+                        self.__class__.__name__, l))
 
         info.location = loc
         info.gcep = info.gcep.astype(str).str.zfill(8)
