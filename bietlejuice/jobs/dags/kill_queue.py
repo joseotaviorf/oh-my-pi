@@ -8,7 +8,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.kill_queue.kill_queue import KillQueue
 
 env.set_airflow_var_to_local_env('KILLQUEUE')
-logger = QuintoAndarLogger('kill')
+logger = QuintoAndarLogger('kill_queue')
 
 MAIN_DAG_NAME = 'kill-queue-etl'
 MAIN_START_DATE = datetime(2019, 1, 28)
@@ -20,12 +20,9 @@ params = {'tables': ['reservation', 'reservation_aud']}
 
 
 def extract_data_and_move_to_raw(**kwargs):
-
     kill_queue = KillQueue(s3_bucket)
-    logger.info('m=extract_data_and_move_to_raw, msg=start to extract data and move to raw')
-    tables_to_extract = params.get('tables')
-    for table in tables_to_extract:
-        kill_queue.extract_data_and_move_to_raw(table)
+    table = kwargs.get('table')
+    kill_queue.extract_data_and_move_to_raw(table)
 
 
 dag = DAG(
