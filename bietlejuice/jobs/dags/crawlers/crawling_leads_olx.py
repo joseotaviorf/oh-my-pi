@@ -38,11 +38,11 @@ def insert_leads(**kwargs):
         logger.info(NO_LEADS_MSG)
         return None
 
-    logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads from crawlers'.format(len(leads)))
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     leads = crawler_leads.cleaning(leads)
-    logger.info('m=insert_leads, got {} leads after cleaning'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads after cleaning'.format(len(leads)))
     if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
@@ -58,7 +58,7 @@ def insert_leads(**kwargs):
         logger.info(NO_LEADS_MSG)
         return None
 
-    logger.info('m=insert_leads, got {} leads with new phone numbers'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads with new phone numbers'.format(len(leads)))
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
@@ -71,7 +71,7 @@ def insert_leads(**kwargs):
     leads.lng = leads.lng.combine_first(leads.glng)
 
     leads = leads.dropna(subset=['lat', 'lng'])
-    logger.info('m=insert_leads, got {} leads after getting lat e lng'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads after getting lat e lng'.format(len(leads)))
     leads.gcity = leads.gcity.combine_first(leads.city)
     leads.gneighbourhood = leads.gneighbourhood.combine_first(leads.neighborhood)
     leads.gstreet_number = leads.gstreet_number.where(
@@ -84,7 +84,7 @@ def insert_leads(**kwargs):
     if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
-    logger.info('m=insert_leads, got {} leads after filtering regions'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads after filtering regions'.format(len(leads)))
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     leads = leads.drop_duplicates(subset=['phone_number'])
