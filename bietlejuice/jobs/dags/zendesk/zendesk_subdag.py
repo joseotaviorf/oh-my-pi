@@ -11,7 +11,7 @@ class ZendeskSubDag(BaseSubDag):
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, tables=None):
         super(ZendeskSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.zendesk_tables = tables
-        self.zendesk_dw_tables = ['fact_ticket_metrics', 'dim_ticket']
+        self.zendesk_dw_tables = ['fact_ticket_metrics', 'dim_ticket', 'dim_zendesk_user']
 
     @logger
     def build_tasks(self, task_name):
