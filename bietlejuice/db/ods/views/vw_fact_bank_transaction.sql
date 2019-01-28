@@ -4,13 +4,16 @@ create view vw_fact_bank_transaction
 as
 select
 	bt.id as sk_bank_transaction,
-	bt.id as id_bank_transaction,
-	bt."dataOperacao" as ts_trasaction,
+	bt."dataOperacao" as ts_transaction,
+	cast(to_char(bt."dataOperacao", 'YYYYMMDD') as bigint) as sk_transaction_date,
 	bt.valor as "value",
 	bt."contaCorrente_id" as sk_bank_account,
-	bt.imovel_id as house_id,
-	COALESCE(u.id, -1) as sk_user,
+	bt.imovel_id as id_house,
+	COALESCE(u.id, -1) as sk_user_recipient,
 	COALESCE(b.id, -1) as sk_bank,
+	bt.tipo as "type",
+	bt."atualizadoEm" as updated_at,
+	bt."dataCriacao" as created_at,
 	now() as ts_load
 from
 	bank_transaction bt

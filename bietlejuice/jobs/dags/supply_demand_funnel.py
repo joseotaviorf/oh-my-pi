@@ -208,7 +208,7 @@ def bank_transaction_sub_dag(sub_dag_name):
         start_date=MAIN_START_DATE
     )
 
-    return sub_dag.build_bank_transaction_with_tests()
+    return sub_dag.build_bank_transaction()
 
 
 def refresh_powerbi(**kwargs):

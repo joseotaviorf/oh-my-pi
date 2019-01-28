@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
@@ -22,18 +20,12 @@ class BankTransactionSubDag(DimSubDag):
         )
 
     @logger
-    def build_bank_transaction_with_tests(self):
+    def build_bank_transaction(self):
         bank_transaction_dag = self._build_local_dag()
 
-        ods_bank_transaction_task, dim_bank_transaction_staging_task, dim_bank_transaction_dw_task, \
-            fact_bank_transaction_task = self.__build_data_tasks(bank_transaction_dag)
+        ods_bank_transaction_task, fact_bank_transaction_task = self.__build_data_tasks(bank_transaction_dag)
 
-        tests_tasks = self.build_tests_tasks(bank_transaction_dag)
-
-        ods_bank_transaction_task >> dim_bank_transaction_staging_task
-        dim_bank_transaction_staging_task.set_downstream(tests_tasks)
-        dim_bank_transaction_dw_task.set_upstream(tests_tasks)
-        dim_bank_transaction_dw_task >> fact_bank_transaction_task
+        ods_bank_transaction_task >> fact_bank_transaction_task
 
         return bank_transaction_dag
 
@@ -51,29 +43,6 @@ class BankTransactionSubDag(DimSubDag):
             }
         )
 
-        dim_bank_transaction_staging_task = BaseDAG.build_quintoandar_python_operator(
-            dag=dag,
-            task_id='STAGING_dim_bank_transaction',
-            python_callable=utils.load_dim_from_ods_to_staging,
-            op_kwargs={
-                'dim_name': self.ods_stg_table_name,
-                'post_command': "update staging.dim_bank_transaction "
-                                "set ts_load = '{}' "
-                                "where sk_bank_transaction = -1;".format(datetime.now().strftime('%Y-%m-%d'))
-            }
-        )
-
-        dim_bank_transaction_dw_task = BaseDAG.build_quintoandar_python_operator(
-            dag=dag,
-            task_id='DW_dim_bank_transaction',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': self.ods_stg_table_name,
-                'bucket': DimSubDag.S3_BUCKET,
-                'schema_dest': 'bank'
-            }
-        )
-
         fact_bank_transaction_task = BaseDAG.build_quintoandar_python_operator(
             dag=dag,
             task_id='DW_fact_bank_transaction',
@@ -84,8 +53,7 @@ class BankTransactionSubDag(DimSubDag):
             }
         )
 
-        return ods_bank_transaction_task, dim_bank_transaction_staging_task, dim_bank_transaction_dw_task, \
-            fact_bank_transaction_task
+        return ods_bank_transaction_task, fact_bank_transaction_task
 
     @logger
     def __build_fact_bank_transaction(self, fact_name, schema_dest):
