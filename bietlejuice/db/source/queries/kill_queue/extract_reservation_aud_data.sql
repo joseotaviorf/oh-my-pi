@@ -1,4 +1,5 @@
-SELECT id,
+SELECT
+  id,
   rev,
   revtype,
   revend,

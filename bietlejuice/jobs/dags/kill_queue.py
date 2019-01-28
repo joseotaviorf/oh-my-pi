@@ -16,7 +16,7 @@ MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-params = {'tables': ['reservation', 'reservation_aud']}
+params = env.get_airflow_env_var('KILLQUEUE_PARAMS')
 
 
 def extract_data_and_move_to_raw(**kwargs):
