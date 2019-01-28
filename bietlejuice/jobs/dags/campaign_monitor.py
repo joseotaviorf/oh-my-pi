@@ -1,7 +1,6 @@
 import json
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
@@ -42,7 +41,7 @@ main_dag = DAG(
 )
 
 # operators
-task_opens = BaseDAG.build_quintoandar_python_operator(
+task_opens = BaseDAG.build_python_operator(
     task_id='opens',
     provide_context=True,
     python_callable=get_campaign_data,
@@ -50,7 +49,7 @@ task_opens = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'_class': 'opens'}
 )
 
-task_bounces = BaseDAG.build_quintoandar_python_operator(
+task_bounces = BaseDAG.build_python_operator(
     task_id='bounces',
     provide_context=True,
     python_callable=get_campaign_data,
@@ -58,7 +57,7 @@ task_bounces = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'_class': 'bounces'}
 )
 
-task_clicks = BaseDAG.build_quintoandar_python_operator(
+task_clicks = BaseDAG.build_python_operator(
     task_id='clicks',
     provide_context=True,
     python_callable=get_campaign_data,
@@ -66,7 +65,7 @@ task_clicks = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'_class': 'clicks'}
 )
 
-task_spams = BaseDAG.build_quintoandar_python_operator(
+task_spams = BaseDAG.build_python_operator(
     task_id='spams',
     provide_context=True,
     python_callable=get_campaign_data,
@@ -74,7 +73,7 @@ task_spams = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'_class': 'spam'}
 )
 
-task_recipients = BaseDAG.build_quintoandar_python_operator(
+task_recipients = BaseDAG.build_python_operator(
     task_id='recipients',
     provide_context=True,
     python_callable=get_campaign_data,
@@ -82,7 +81,7 @@ task_recipients = BaseDAG.build_quintoandar_python_operator(
     op_kwargs={'_class': 'recipients'}
 )
 
-task_unsubscribes = BaseDAG.build_quintoandar_python_operator(
+task_unsubscribes = BaseDAG.build_python_operator(
     task_id='unsubscribes',
     provide_context=True,
     python_callable=get_campaign_data,

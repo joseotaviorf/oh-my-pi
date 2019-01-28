@@ -1,7 +1,6 @@
 # coding=utf-8
 import json
 from datetime import datetime
-
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
@@ -59,7 +58,7 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-BaseDAG.build_quintoandar_python_operator(
+BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-cpfs',
     python_callable=crawl_cpfs,

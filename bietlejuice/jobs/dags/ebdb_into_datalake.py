@@ -1,7 +1,7 @@
 import json
+from airflow.models import DAG
 from datetime import datetime, timedelta
 
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.load_ebdb_into_datalake import EBDBDatalake
@@ -45,7 +45,7 @@ dag = DAG(
 )
 
 # operators
-move = BaseDAG.build_quintoandar_python_operator(
+move = BaseDAG.build_python_operator(
     task_id='move_ebdb_to_datalake',
     provide_context=True,
     python_callable=move_ebdb_to_datalake,
@@ -53,7 +53,7 @@ move = BaseDAG.build_quintoandar_python_operator(
     execution_timeout=timedelta(hours=10)
 )
 
-create_raw = BaseDAG.build_quintoandar_python_operator(
+create_raw = BaseDAG.build_python_operator(
     task_id='create_raw_external_tables',
     python_callable=create_raw_external_tables,
     dag=dag

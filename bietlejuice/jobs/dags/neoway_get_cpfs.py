@@ -1,12 +1,12 @@
 # coding=utf-8
 import cStringIO
-import os
-from datetime import datetime
-from datetime import timedelta
 
+import os
 import pandas as pd
 import paramiko
 import petl
+from datetime import datetime
+from datetime import timedelta
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -106,20 +106,20 @@ dag = BaseDAG.build_dag(
 )
 
 # operators
-neoway_get_cpfs = BaseDAG.build_quintoandar_python_operator(
+neoway_get_cpfs = BaseDAG.build_python_operator(
     dag=dag,
     task_id='neoway-get-cpfs',
     python_callable=get_cpfs
 )
 
-treat_data_to_callcenter = BaseDAG.build_quintoandar_python_operator(
+treat_data_to_callcenter = BaseDAG.build_python_operator(
     dag=dag,
     task_id='treat_data_to_callcenter',
     provide_context=True,
     python_callable=treat_cpfs_after_return
 )
 
-add_partition_to_athena = BaseDAG.build_quintoandar_python_operator(
+add_partition_to_athena = BaseDAG.build_python_operator(
     dag=dag,
     task_id='add_partition_to_athena',
     provide_context=True,

@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -52,7 +51,7 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    load_data_into_ods_stg_task = BaseDAG.build_quintoandar_python_operator(
+    load_data_into_ods_stg_task = BaseDAG.build_python_operator(
         task_id='load_data_into_ods_stg',
         python_callable=execute_class_method,
         dag=local_dag,
@@ -62,7 +61,7 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_duplicated_entries_task = BaseDAG.build_quintoandar_python_operator(
+    delete_duplicated_entries_task = BaseDAG.build_python_operator(
         task_id='delete_duplicated_entries',
         python_callable=execute_class_method,
         dag=local_dag,
@@ -72,7 +71,7 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    load_data_into_ods_task = BaseDAG.build_quintoandar_python_operator(
+    load_data_into_ods_task = BaseDAG.build_python_operator(
         task_id='load_data_into_ods',
         python_callable=execute_class_method,
         dag=local_dag,
@@ -100,7 +99,7 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    truncate_ods_table_task = BaseDAG.build_quintoandar_python_operator(
+    truncate_ods_table_task = BaseDAG.build_python_operator(
         task_id='truncate_ods_table',
         python_callable=execute_class_method,
         dag=local_dag,
@@ -110,7 +109,7 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    load_data_into_ods_task = BaseDAG.build_quintoandar_python_operator(
+    load_data_into_ods_task = BaseDAG.build_python_operator(
         task_id='load_data_into_ods',
         python_callable=execute_class_method,
         dag=local_dag,

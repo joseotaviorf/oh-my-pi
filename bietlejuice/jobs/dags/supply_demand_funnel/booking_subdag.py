@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -54,14 +53,14 @@ class BookingSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        booking = BaseDAG.build_quintoandar_python_operator(
+        booking = BaseDAG.build_python_operator(
             task_id='ODS_booking',
             dag=dag,
             provide_context=True,
             python_callable=self.get_booking_query
         )
 
-        booking_media_sources_task = BaseDAG.build_quintoandar_python_operator(
+        booking_media_sources_task = BaseDAG.build_python_operator(
             task_id='ODS_booking_media_sources',
             dag=dag,
             python_callable=utils.load_athena_file_query_to_ods,
@@ -72,7 +71,7 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        staging_dim_booking_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_booking_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_booking',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -83,7 +82,7 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        dim_booking_task = BaseDAG.build_quintoandar_python_operator(
+        dim_booking_task = BaseDAG.build_python_operator(
             task_id='DW_dim_booking',
             dag=dag,
             python_callable=utils.load_dim_from_staging_to_dw,
