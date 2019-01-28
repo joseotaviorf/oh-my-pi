@@ -8,9 +8,10 @@ logger = QuintoAndarLogger('ZendeskSubDag')
 
 
 class ZendeskSubDag(BaseSubDag):
-    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, tables):
+    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, tables=None):
         super(ZendeskSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.zendesk_tables = tables
+        self.zendesk_dw_tables = ['fact_ticket_metrics', 'dim_ticket', 'dim_zendesk_user']
 
     @logger
     def build_tasks(self, task_name):
@@ -30,6 +31,48 @@ class ZendeskSubDag(BaseSubDag):
                     'table_name': table
                 }
             )
+
+    @logger
+    def build_staging_tasks(self, dag):
+        for table in self.zendesk_dw_tables:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id=table,
+                python_callable=self.__to_staging,
+                provide_context=True,
+                op_kwargs={
+                    'table_name': table
+                }
+            )
+
+    @logger
+    def build_prod_tasks(self, dag):
+        for table in self.zendesk_dw_tables:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id=table,
+                python_callable=self.__to_prod,
+                provide_context=True,
+                op_kwargs={
+                    'table_name': table
+                }
+            )
+
+    @logger(exclude='kwargs')
+    def __to_prod(self, table_name, **kwargs):
+        zendesk_etl = ZendeskETL(
+            bucket=self.bucket,
+            execution_date=kwargs['execution_date']
+        )
+        zendesk_etl.build_prod_table(table_name)
+
+    @logger(exclude='kwargs')
+    def __to_staging(self, table_name, **kwargs):
+        zendesk_etl = ZendeskETL(
+            bucket=self.bucket,
+            execution_date=kwargs['execution_date']
+        )
+        zendesk_etl.build_staging_table(table_name)
 
     @logger(exclude='kwargs')
     def __to_clean(self, table_name, **kwargs):
