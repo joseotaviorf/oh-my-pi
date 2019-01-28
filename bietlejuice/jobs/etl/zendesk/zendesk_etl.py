@@ -576,7 +576,7 @@ class ZendeskETL(object):
         )
 
         logger.info(
-            '_upsert_data, table_name={}, msg=ready to reading data!'.format(table_name))
+            'm=_upsert_data, table_name={}, msg=ready to read data!'.format(table_name))
 
     @logger
     def _is_prod_table_empty(self, table_name):
