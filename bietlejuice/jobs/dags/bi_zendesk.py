@@ -11,6 +11,7 @@ MAIN_DAG_NAME = 'bi-zendesk'
 MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
+env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 ZENDESK_CLEAN_TABLES = env.get_airflow_env_var('bi-zendesk-tables').split(",")
