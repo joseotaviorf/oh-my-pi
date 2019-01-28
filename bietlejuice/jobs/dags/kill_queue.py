@@ -20,9 +20,10 @@ params = {'tables': ['reservation', 'reservation_aud']}
 
 
 def extract_data_and_move_to_raw(**kwargs):
-    tables_to_extract = kwargs.get('tables')
+
     kill_queue = KillQueue(s3_bucket)
     logger.info('m=extract_data_and_move_to_raw, msg=start to extract data and move to raw')
+    tables_to_extract = params.get('tables')
     for table in tables_to_extract:
         kill_queue.extract_data_and_move_to_raw(table)
 
@@ -46,7 +47,6 @@ extract_data_and_move_to_raw = BaseDAG.build_python_operator(
     task_id='extract-data-and-move-to-raw',
     python_callable=extract_data_and_move_to_raw,
     provide_context=True,
-    op_kwargs=params
 )
 
 extract_data_and_move_to_raw

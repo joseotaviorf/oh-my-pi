@@ -18,7 +18,7 @@ class KillQueue(object):
         # self.athena_client = AthenaClient(self.s3_bucket)
         # self.s3_resource = boto3.resource('s3')
 
-    @logger
+    # @logger
     def extract_data_and_move_to_raw(self, table):
         query = BaseETL.get_query_from_file_name(
             '{}/kill_queue/extract_{}_data.sql'.format(SOURCE_QUERIES_DIR, table))
