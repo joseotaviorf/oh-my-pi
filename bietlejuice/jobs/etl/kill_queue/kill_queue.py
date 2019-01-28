@@ -50,4 +50,4 @@ class KillQueue(object):
 
 if __name__ == "__main__":
     kq = KillQueue('5a-datalake')
-    kq.extract_data_and_move_to_raw('kill_queue')
+    kq.extract_data_and_move_to_raw('reservation')
