@@ -24,11 +24,9 @@ CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_fields`(
     `title_in_portal` string)
 PARTITIONED BY (
   `dt_extraction` string)
-ROW FORMAT SERDE
-  'org.openx.data.jsonserde.JsonSerDe'
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/zendesk/tickets_fields/'
+  's3://5a-datalake/clean/zendesk/ticket_fields/'
   ;
 
 msck repair table datalake_clean.zendesk_ticket_fields;

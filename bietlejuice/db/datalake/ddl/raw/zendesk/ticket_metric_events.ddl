@@ -6,6 +6,7 @@ CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_metric_events`(
   `metric` string,
   `instance_id` string,
   `type` string,
+  `status` string,
   `time` string,
   `sla` string)
 PARTITIONED BY (
