@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -60,7 +59,7 @@ def unit_tests_sub_dag(sub_dag_name, **kwargs):
 
 
 # operators
-proposal_task = BaseDAG.build_quintoandar_python_operator(
+proposal_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='extract_proposal_table',
     python_callable=extract_table,
@@ -71,7 +70,7 @@ proposal_task = BaseDAG.build_quintoandar_python_operator(
     }
 )
 
-proposalversion_task = BaseDAG.build_quintoandar_python_operator(
+proposalversion_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='extract_proposal_version_table',
     python_callable=extract_table,
@@ -82,7 +81,7 @@ proposalversion_task = BaseDAG.build_quintoandar_python_operator(
     }
 )
 
-proponent_task = BaseDAG.build_quintoandar_python_operator(
+proponent_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='extract_proponent_table',
     python_callable=extract_table,

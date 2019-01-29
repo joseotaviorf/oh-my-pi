@@ -1,6 +1,6 @@
+from airflow.models import DAG
 from datetime import datetime
 
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -35,7 +35,7 @@ dag = DAG(
 )
 
 # Get EBDB data of Agent_Region and dumps into ODS
-load_agent_region_to_ods = BaseDAG.build_quintoandar_python_operator(
+load_agent_region_to_ods = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_agent_region_to_ods',
     provide_context=True,
@@ -43,7 +43,7 @@ load_agent_region_to_ods = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=None
 )
 
-clean_agent_region_to_ods = BaseDAG.build_quintoandar_python_operator(
+clean_agent_region_to_ods = BaseDAG.build_python_operator(
     dag=dag,
     task_id='clean_agent_region_to_ods',
     python_callable=clean_agent_region,

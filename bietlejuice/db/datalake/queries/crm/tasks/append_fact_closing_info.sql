@@ -9,7 +9,7 @@
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
-    on trim(ct.origin) = 'Contrato'
+    on trim(ct.origin) in ('Contrato', 'ContratoFull')
       and cast(ct.id_origin as bigint) = try(cast(ec.id as bigint))
   left join datalake_raw.ebdb_imovel eci
     on eci.id = ec.imovel_id
