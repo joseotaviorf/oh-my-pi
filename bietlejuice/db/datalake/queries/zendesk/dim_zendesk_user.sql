@@ -1,0 +1,20 @@
+select
+    id as sk_zendesk_user,
+    url,
+    name,
+    email,
+    phone,
+    time_zone,
+    shared_phone_number,
+    locale,
+    organization_id,
+    verified,
+    external_id,
+    tags,
+    role,
+    active,
+    default_group_id as group_id,
+    last_login_at,
+    created_at,
+    updated_at
+from datalake_raw.zendesk_users

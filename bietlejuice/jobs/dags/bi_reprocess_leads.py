@@ -1,6 +1,6 @@
+from airflow.models import DAG
 from datetime import datetime
 
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.leads import LeadsReprocessor
@@ -29,7 +29,7 @@ dag = DAG(
 )
 
 # Get and treat leads to be reprocessed
-reprocess_leads_task = BaseDAG.build_quintoandar_python_operator(
+reprocess_leads_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='reprocess_leads',
     python_callable=reprocess_leads,

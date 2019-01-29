@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -65,7 +64,7 @@ class OfferSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        offer_to_s3_task = BaseDAG.build_quintoandar_python_operator(
+        offer_to_s3_task = BaseDAG.build_python_operator(
             task_id='offer_to_s3',
             dag=dag,
             python_callable=OfferSubDag.__to_s3,
@@ -74,7 +73,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        topic_to_s3_task = BaseDAG.build_quintoandar_python_operator(
+        topic_to_s3_task = BaseDAG.build_python_operator(
             task_id='offer_topic_to_s3',
             dag=dag,
             python_callable=OfferSubDag.__to_s3,
@@ -83,7 +82,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        offer_to_ods_task = BaseDAG.build_quintoandar_python_operator(
+        offer_to_ods_task = BaseDAG.build_python_operator(
             task_id='offer_to_ods',
             dag=dag,
             python_callable=utils.load_athena_query_to_ods,
@@ -95,14 +94,14 @@ class OfferSubDag(DimSubDag):
 
         )
 
-        pre_proposal_task = BaseDAG.build_quintoandar_python_operator(
+        pre_proposal_task = BaseDAG.build_python_operator(
             task_id='ODS_pre_proposal',
             dag=dag,
             provide_context=True,
             python_callable=self.get_pre_proposal_query
         )
 
-        pre_proposta_aud_task = BaseDAG.build_quintoandar_python_operator(
+        pre_proposta_aud_task = BaseDAG.build_python_operator(
             task_id='ODS_pre_proposal_aud',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -114,7 +113,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        condicao_proposta_task = BaseDAG.build_quintoandar_python_operator(
+        condicao_proposta_task = BaseDAG.build_python_operator(
             task_id='ODS_condition',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -126,7 +125,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        pre_proposta_condicao_proposta_task = BaseDAG.build_quintoandar_python_operator(
+        pre_proposta_condicao_proposta_task = BaseDAG.build_python_operator(
             task_id='ODS_pre_proposal_condition',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -138,7 +137,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        staging_dim_offer_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_offer_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_offer',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -149,7 +148,7 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        dim_offer_task = BaseDAG.build_quintoandar_python_operator(
+        dim_offer_task = BaseDAG.build_python_operator(
             task_id='DW_dim_offer',
             dag=dag,
             python_callable=utils.load_dim_from_staging_to_dw,

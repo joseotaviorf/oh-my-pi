@@ -1,11 +1,11 @@
 from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('RegionSubDag')
 
@@ -39,7 +39,7 @@ class RegionSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        agent_region = BaseDAG.build_quintoandar_python_operator(
+        agent_region = BaseDAG.build_python_operator(
             task_id='ODS_agent_region',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -51,7 +51,7 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        region = BaseDAG.build_quintoandar_python_operator(
+        region = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_region',
             python_callable=self.__extract_query_dim_from_ebdb_to_ods,
@@ -61,7 +61,7 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        dim_region = BaseDAG.build_quintoandar_python_operator(
+        dim_region = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_region',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -72,7 +72,7 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        load_region = BaseDAG.build_quintoandar_python_operator(
+        load_region = BaseDAG.build_python_operator(
             dag=dag,
             task_id='DW_dim_region',
             python_callable=utils.load_dim_from_staging_to_dw,
