@@ -16,5 +16,6 @@ CREATE EXTERNAL TABLE datalake_raw.`killqueue_house`(
   `floor`               string,
   `reservation_fee`     string,
   `region_id`           string,
-  `owner_id`            string)
+  `owner_id`            string
+)
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe' LOCATION 's3://5a-datalake/raw/kill_queue/house/';
