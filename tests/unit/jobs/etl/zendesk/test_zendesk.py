@@ -116,7 +116,7 @@ class TestZendeskETL(object):
                                                                        mock__upsert_data, mock_get_query_from_file_name,
                                                                        zendesk):
         # arrange
-        table_name = 'fact_table'
+        table_name = 'fact_ticket_metrics'
         upsert_query = "SELECT * FROM staging.zendesk_{} \nwhere sk_extraction_date = {};".format(table_name,
                                                                                                   '20180101')
         delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
@@ -142,7 +142,7 @@ class TestZendeskETL(object):
                                                                       mock__upsert_data, mock_get_query_from_file_name,
                                                                       zendesk):
         # arrange
-        table_name = 'dim_table'
+        table_name = 'dim_zendesk_user'
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
         delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
 
