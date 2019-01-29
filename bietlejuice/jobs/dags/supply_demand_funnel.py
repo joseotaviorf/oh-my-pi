@@ -9,7 +9,7 @@ from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
-    VisitSubDag, BankAccountSubDag
+    VisitSubDag, BankAccountSubDag, BankTransactionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
@@ -199,6 +199,18 @@ def bank_account_sub_dag(sub_dag_name):
     return sub_dag.build_bank_account_with_tests()
 
 
+def bank_transaction_sub_dag(sub_dag_name):
+    sub_dag = BankTransactionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_bank_transaction()
+
+
 def refresh_powerbi(**kwargs):
     powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
                                            PWBI_SCHEMA,
@@ -351,6 +363,12 @@ bank_account_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='BankAccount'
 )
 
+bank_transaction_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=bank_transaction_sub_dag,
+    sub_dag_name='BankTransaction'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_quintoandar_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -400,3 +418,4 @@ ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_
 airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows, refresh_house_listing_flows)
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
+bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
