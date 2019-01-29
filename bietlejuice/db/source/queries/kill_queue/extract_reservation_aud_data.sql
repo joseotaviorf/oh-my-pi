@@ -2,7 +2,7 @@ SELECT
   id,
   rev,
   revtype,
-  revend,
+  cast(revend as char) as revend,
   attempt,
   attempt_mod,
   mundipagg_token,

@@ -11,8 +11,8 @@ SELECT
   state,
   reservation_allowed,
   rent_price,
-  floor,
+  cast(floor as CHAR) as floor,
   reservation_fee,
-  region_id,
-  owner_id
+  cast(region_id as CHAR) as region_id,
+  cast(owner_id as CHAR) as owner_id
 FROM house;
