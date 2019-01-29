@@ -16,6 +16,12 @@ class ZendeskETL(object):
         'clean': 'datalake_clean'
     }
 
+    SK_FIELDS = {
+        'fact_ticket_metrics': 'sk_ticket',
+        'dim_ticket': 'sk_ticket',
+        'dim_zendesk_user': 'sk_zendesk_user'
+    }
+
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
 
     def __init__(self, bucket, execution_date=None):
@@ -543,7 +549,8 @@ class ZendeskETL(object):
                 'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
                     table_name))
         else:
-            self._delete_old_entries(delete_query.format(table_name=table_name))
+            self._delete_old_entries(
+                delete_query.format(table_name=table_name, sk_field=ZendeskETL.SK_FIELDS[table_name]))
 
             if table_name.split("_")[0] == 'fact':
                 upsert_query = "{} \nwhere sk_extraction_date = {};".format(upsert_query,
