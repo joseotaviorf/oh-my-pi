@@ -4,14 +4,14 @@ SELECT
   revtype,
   cast(revend as char) as revend,
   attempt,
-  attempt_mod,
+  cast(coalesce(attempt_mod,0) as unsigned) as attempt_mod,
   mundipagg_token,
-  mundipagg_token_mod,
+  cast(coalesce(mundipagg_token_mod,0) as unsigned) as mundipagg_token_mod,
   rent_flow_id,
   status,
-  status_mod,
+  cast(coalesce(status_mod,0) as unsigned) as status_mod,
   tenant_id,
   value,
-  value_mod,
+  cast(coalesce(value_mod,0) as unsigned) as value_mod,
   house_id
 FROM reservation_aud;

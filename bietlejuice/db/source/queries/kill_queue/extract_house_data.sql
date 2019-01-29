@@ -9,7 +9,7 @@ SELECT
   complement,
   city,
   state,
-  reservation_allowed,
+  cast(reservation_allowed as UNSIGNED) as reservation_allowed,
   rent_price,
   cast(floor as CHAR) as floor,
   reservation_fee,

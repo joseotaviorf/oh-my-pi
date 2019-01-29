@@ -10,5 +10,5 @@ SELECT
   value,
   house_id,
   mundipagg_token,
-  cast(is_ongoing as CHAR) as is_ongoing
+  cast(coalesce(is_ongoing, 0) as unsigned) as is_ongoing
 FROM reservation;
