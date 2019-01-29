@@ -38,7 +38,7 @@ class BankAccountSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        ods_bank_account_task = BaseDAG.build_pyton_operator(
+        ods_bank_account_task = BaseDAG.build_python_operator(
             task_id='ODS_bank_account',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -50,7 +50,7 @@ class BankAccountSubDag(DimSubDag):
             }
         )
 
-        dim_bank_account_staging_task = BaseDAG.build_pyton_operator(
+        dim_bank_account_staging_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_bank_account',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -61,7 +61,7 @@ class BankAccountSubDag(DimSubDag):
             }
         )
 
-        dim_bank_account_dw_task = BaseDAG.build_pyton_operator(
+        dim_bank_account_dw_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='DW_dim_bank_account',
             python_callable=utils.load_dim_from_staging_to_dw,
