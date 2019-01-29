@@ -19,6 +19,16 @@ pipeline:
       - pip install -q -r requirements.txt
       - pip install -q -r requirements_test.txt
       - pytest --cov=bietlejuice --cov-report html:html --cov-fail-under=5 --cov-config .coveragerc tests
+  
+  publish-coverage:
+    image: plugins/s3
+    acl: public-read
+    bucket: 5a-coverage
+    source: coverage/*.svg
+    strip_prefix: coverage/
+    target: /bi-etl-e-juice
+    when:
+      branch: [ master ]
 
   install-forno:
     image: drillster/drone-rsync
