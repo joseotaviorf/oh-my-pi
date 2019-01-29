@@ -17,4 +17,4 @@ select
     last_login_at,
     created_at,
     updated_at
-from datalake_raw.zendesk_users
+from datalake_clean.zendesk_users

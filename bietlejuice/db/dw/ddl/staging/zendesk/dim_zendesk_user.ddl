@@ -1,7 +1,7 @@
-drop table if exists staging.dim_zendesk_user;
+drop table if exists staging.zendesk_dim_zendesk_user;
 
-create table if not exists staging.dim_zendesk_user (
-    sk_zendesk_user int,
+create table if not exists staging.zendesk_dim_zendesk_user (
+    sk_zendesk_user bigint,
     url varchar,
     name varchar,
     email varchar,
