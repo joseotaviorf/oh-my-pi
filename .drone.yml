@@ -26,7 +26,7 @@ pipeline:
     bucket: 5a-coverage
     source: coverage/*.svg
     strip_prefix: coverage/
-    target: /bi-etl-e-juice
+    target: /bi-etl-ejuice
     when:
       branch: [ master ]
 
