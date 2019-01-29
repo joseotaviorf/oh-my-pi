@@ -376,16 +376,16 @@ refresh_booking = BaseDAG.build_python_operator(
 )
 
 # check the dependency of amplitude_load_events
-supply_demand_funnel_xcom_dependencies_task = BaseDAG.build_python_operator(
+xcom_booking_amplitude_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='bdg_demand_agent_xcom_dependencies',
+    task_id='xcom_booking_amplitude',
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
                'dag_id': 'bi-amplitude-load-events'}
 )
 
-airflow_helpers.chain(supply_demand_funnel_xcom_dependencies_task, booking_dag)
+airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow])
