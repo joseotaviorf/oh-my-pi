@@ -1,3 +1,4 @@
+import decimal
 import time
 
 import mock
@@ -5,6 +6,7 @@ import pandas as pd
 import pytest
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl.leads.leads_reprocessor import LeadsReprocessor
+from bietlejuice.jobs.etl.leads.leads_reprocessor import decimal_default
 
 
 class TestLeadsReprocessor(object):
@@ -120,3 +122,32 @@ class TestLeadsReprocessor(object):
         # assert
         # asserting string since pd.to_json returns a json string
         assert result == expected_result
+
+    def test_decimal_default_not_none(self):
+        # arrange
+        str_decimal = decimal.Decimal(20.90)
+        expected_result = float(20.9)
+
+        # act
+        result = decimal_default(str_decimal)
+
+        # assert
+        assert result == expected_result
+
+    def test_decimal_default_str(self):
+        # arrange
+        str_decimal = '20.90'
+        expected_result = float(20.9)
+
+        # act & assert
+        with pytest.raises(TypeError):
+            result = decimal_default(str_decimal)
+
+    def test_decimal_default_none(self):
+        # arrange
+        str_decimal = None
+        expected_result = float(0)
+
+        # act & assert
+        with pytest.raises(TypeError):
+            result = decimal_default(str_decimal)
