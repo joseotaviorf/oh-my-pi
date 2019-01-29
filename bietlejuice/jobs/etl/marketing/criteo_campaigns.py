@@ -1,5 +1,6 @@
 import json
 from ast import literal_eval
+from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
 
@@ -79,9 +80,14 @@ class CriteoCampaigns(Marketing):
                 'format': 'json', 'timezone': 'GMT'}
 
         data = json.dumps(body)
+
         try:
             response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
-            return response.text
+            loaded = json.loads(response.text)
+            response_without_total = json.dumps(loaded["Rows"])
+            # The json returned by the API has 2 tables ("Total" and "Rows"), one with all the necessary vars,
+            # and the other with just the sum of everything. This way, we're sending only the necessary table to DL
+            return response_without_total
         except requests.exceptions.RequestException as e:
             logger.error('m=__make_request, error message={}'.format(e))
 
@@ -105,3 +111,44 @@ class CriteoCampaigns(Marketing):
 
         gz_body.seek(0)
         gz_body.flush()
+
+    @logger
+    def move_ads_to_clean(self):
+        r_cols = OrderedDict([
+            ('Advertiser Name', str),
+            ('Campaign ID', str),
+            ('Campaign Name', str),
+            ('Day', str),
+            ('Currency', str),
+            ('Clicks', str),
+            ('Impressions', str),
+            ('Audience', str),
+            ('Cost', str),
+            ('All Sales', str),
+            ('Revenue', str),
+            ('Comp. Win', str),
+            ('CPC', str)
+        ])
+
+        c_cols = OrderedDict([
+            ('advertiser_name', str),
+            ('campaign_id', str),
+            ('campaign_name', str),
+            ('day', str),
+            ('currency', str),
+            ('clicks', str),
+            ('impressions', str),
+            ('audience', str),
+            ('cost', str),
+            ('all_sales', str),
+            ('revenue', str),
+            ('composition_win', str),
+            ('cpc', str)
+        ])
+
+        self._move_to_clean(
+            table_name='marketing_criteo_campaigns',
+            sql_file_name='criteo_campaigns.sql',
+            r_cols=r_cols,
+            c_cols=c_cols
+        )
