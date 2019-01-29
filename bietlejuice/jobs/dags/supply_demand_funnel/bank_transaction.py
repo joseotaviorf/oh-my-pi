@@ -31,7 +31,7 @@ class BankTransactionSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        ods_bank_transaction_task = BaseDAG.build_quintoandar_python_operator(
+        ods_bank_transaction_task = BaseDAG.build_pyton_operator(
             task_id='ODS_bank_transaction',
             dag=dag,
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
@@ -43,7 +43,7 @@ class BankTransactionSubDag(DimSubDag):
             }
         )
 
-        fact_bank_transaction_task = BaseDAG.build_quintoandar_python_operator(
+        fact_bank_transaction_task = BaseDAG.build_pyton_operator(
             dag=dag,
             task_id='DW_fact_bank_transaction',
             python_callable=self.__build_fact_bank_transaction,
