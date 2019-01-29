@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from airflow.models import DAG
@@ -11,7 +12,7 @@ env.set_airflow_var_to_local_env('KILLQUEUE')
 logger = QuintoAndarLogger('kill_queue')
 
 MAIN_DAG_NAME = 'kill-queue-etl'
-MAIN_START_DATE = datetime(2019, 1, 28)
+MAIN_START_DATE = datetime(2019, 1, 27)
 MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -39,11 +40,15 @@ dag = DAG(
 )
 
 # operators
-extract_data_and_move_to_raw = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='extract-data-and-move-to-raw',
-    python_callable=extract_data_and_move_to_raw,
-    provide_context=True,
-)
+tables = json.loads(params).get("tables")
 
-extract_data_and_move_to_raw
+extract_data_ops = []
+for table in tables:
+    extract_data_op = BaseDAG.build_python_operator(
+        dag=dag,
+        task_id='extract-data-{}'.format(table),
+        python_callable=extract_data_and_move_to_raw,
+        provide_context=True,
+        op_kwargs={'table': table}
+    )
+    extract_data_ops.append(extract_data_and_move_to_raw)

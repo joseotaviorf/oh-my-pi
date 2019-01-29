@@ -26,11 +26,12 @@ class KillQueue(object):
         )
         logger.info('m=extract_data_and_move_to_raw, table={}, msg=data extracted from db'.format(table))
         df = DataFrame(table_data[1:], columns=table_data[0])
-        df_json = df.to_json(orient='records', date_format='iso', force_ascii=False)
 
         gz_body = BytesIO()
         with GzipFile(fileobj=gz_body, mode='w') as fp:
-            fp.write(df_json.encode('utf-8'))
+            for _, row in df.iterrows():
+                row.to_json(fp, date_format='iso', date_unit='ms', force_ascii=False)
+                fp.write('\n')
 
         BaseETL.obj_to_s3(
             obj_io=gz_body,
@@ -44,8 +45,3 @@ class KillQueue(object):
 
     def move_data_from_clean_to_dw(self):
         raise NotImplementedError()
-
-
-if __name__ == "__main__":
-    kq = KillQueue('5a-datalake')
-    kq.extract_data_and_move_to_raw('reservation')
