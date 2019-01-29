@@ -15,9 +15,9 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_criteo_campaigns (
   composition_win string,
   cpc string)
 PARTITIONED BY (
-  dt_extraction string)
+  dt_cost_attribution string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/criteo_campaigns/criteo_campaigns/'
+  's3://5a-datalake/clean/marketing/criteo_campaigns/criteo_all/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_criteo_campaigns;
