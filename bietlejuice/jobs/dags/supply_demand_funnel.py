@@ -1,6 +1,6 @@
-import airflow.utils.helpers as airflow_helpers
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -19,6 +19,9 @@ from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+
+logger = QuintoAndarLogger('SupplyDemandFunnel')
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -63,6 +66,21 @@ def load_dim_from_ods_to_dw(**kwargs):
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
         post_command=None if 'post_command' not in kwargs else kwargs['post_command']
     )
+
+
+@logger(exclude='kwargs')
+def xcom_dependencies(task_id, dag_id, **kwargs):
+    exec_date = str(datetime.date(kwargs['execution_date']))
+
+    status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=task_id, dag_id=dag_id)
+    if not status:
+        raise ValueError(
+            'm=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=The process have not finished yet'.format(
+                exec_date, dag_id, task_id))
+
+    logger.info('m=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=REQUIREMENT MET'.format(exec_date,
+                                                                                                       dag_id,
+                                                                                                       task_id))
 
 
 def lead_sub_dag(sub_dag_name):
@@ -357,6 +375,17 @@ refresh_booking = BaseDAG.build_python_operator(
     op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
 )
 
+# check the dependency of amplitude_load_events
+supply_demand_funnel_xcom_dependencies_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='bdg_demand_agent_xcom_dependencies',
+    provide_context=True,
+    python_callable=xcom_dependencies,
+    op_kwargs={'task_id': 'XCom_amplitude_load_events',
+               'dag_id': 'bi-amplitude-load-events'}
+)
+
+airflow_helpers.chain(supply_demand_funnel_xcom_dependencies_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow])

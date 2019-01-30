@@ -1,12 +1,12 @@
 import json
-from airflow.models import DAG
 from datetime import datetime
+
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.dags.util import xcom as xcom
+from bietlejuice.jobs.dags.util import environment as env, xcom as xcom
 from bietlejuice.jobs.etl.crawlers.crawler_leads import CrawlerLeads
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
@@ -15,7 +15,7 @@ logger = QuintoAndarLogger('crawling-leads-olx')
 
 MAIN_DAG_NAME = 'crawling-leads-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 2 1/1 * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
 
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 
@@ -32,17 +32,18 @@ def insert_leads(**kwargs):
     delta_days = kwargs.get('since')
 
     crawler_leads = CrawlerLeads(s3_bucket=s3_bucket, google_maps_api_key=data_google_api_key)
-    leads = crawler_leads.leads(ws=ws, states=states, delta_days=delta_days)
+    leads = crawler_leads.get_leads(ws=ws, states=states, delta_days=delta_days)
 
     if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
 
-    logger.info('m=insert_leads, got {} leads from crawlers'.format(len(leads)))
+    logger.info('m=insert_leads, msg=got {} leads from crawlers'.format(len(leads)))
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
-    leads_cleaned = crawler_leads.cleaning(leads)
-    if leads_cleaned.empty:
+    leads = crawler_leads.cleaning(leads)
+    logger.info('m=insert_leads, msg=got {} leads after cleaning'.format(len(leads)))
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
 
@@ -50,37 +51,53 @@ def insert_leads(**kwargs):
     regex_phone = r'(?P<code>\+\d{2})?(?P<number>\d+)'
     phones.phone_number = phones.phone_number.str.extract(regex_phone, expand=False).number
 
-    leads_cleaned['phone_number'] = leads_cleaned.phones.apply(lambda p: eval(p)[0]).astype(str)
-    leads_cleaned['known'] = leads_cleaned.phone_number.isin(phones.phone_number)
-    leads_filtered = leads_cleaned[~leads_cleaned.known].sort_values(by='updated_on')
-    if leads_filtered.empty:
+    leads['phone_number'] = leads.phones.apply(lambda p: eval(p)[0]).astype(str)
+    leads['known'] = leads.phone_number.isin(phones.phone_number)
+    leads = leads[~leads.known].sort_values(by='updated_on')
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
 
-    logger.info('m=insert_leads, {} leads with new phone numbers'.format(len(leads_filtered)))
-    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, msg=got {} leads with new phone numbers'.format(len(leads)))
+    logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
-    info = crawler_leads.enrich(leads_filtered.query("""lat.isnull() or lng.isnull()""").cep.unique())
-    leads_enriched = leads_filtered.merge(info, how='left', left_on='cep', right_on='location')
-    leads_enriched.lat = leads_enriched.lat.combine_first(leads_enriched.glat)
-    leads_enriched.lng = leads_enriched.lng.combine_first(leads_enriched.glng)
-    leads_enriched = leads_enriched.dropna(subset=['lat', 'lng'])
+    # TODO -- the google api is not sending the geo info for some ceps. The idea is to query the EBDB cep table to
+    #  get street and additional information. It's also needed to configure a memory cache to save answers from google
+    #  api.
+    info = crawler_leads.get_geolocation_info(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
+    leads = leads.merge(info, how='left', left_on='cep', right_on='location')
+    leads.lat = leads.lat.combine_first(leads.glat)
+    leads.lng = leads.lng.combine_first(leads.glng)
 
-    # get to which region each lead belongs
-    leads_enriched['regions'] = leads_enriched.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
+    leads = leads.dropna(subset=['lat', 'lng'])
+    logger.info('m=insert_leads, msg=got {} leads after getting lat e lng'.format(len(leads)))
+    leads.gcity = leads.gcity.combine_first(leads.city)
+    leads.gneighbourhood = leads.gneighbourhood.combine_first(leads.neighborhood)
+    leads.gstreet_number = leads.gstreet_number.where(
+        ~leads.gstreet_number.isnull(), None).astype(str).str.slice(stop=-2)
+    leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
 
-    # filter out units outside our coverage area
-    leads_filtered = leads_enriched[
-        (leads_enriched.regions > -1) &
-        ((~leads_enriched.type.str.contains('casa')) | leads_enriched.regions.isin(crawler_leads.house_allowed))]
-    if leads_filtered.empty:
+    # filter out units outside our coverage area. It's assumed that we are allowing houses in all regions
+    # TODO --- In the future, it's needed to query the types of houses that are allowed in each region
+    leads = leads[leads.regions > -1]
+    if leads.empty:
         logger.info(NO_LEADS_MSG)
         return None
-    logger.info('m=insert_leads, {} leads after filtering regions'.format(len(leads_filtered)))
-    logger.info('m=insert_leads, state_size={}'.format(leads_filtered.groupby('state').size()))
+    logger.info('m=insert_leads, msg=got {} leads after filtering regions'.format(len(leads)))
+    logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
-    crawler_leads.send_leads(leads_filtered.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
+    leads = leads.drop_duplicates(subset=['phone_number'])
+    logger.info(
+        'm=insert_leads, msg=got {} leads after removing duplicate phone numbers.'.format(
+            len(leads)))
+
+    leads = leads[leads.phone_number.str.len() >= 11]
+    logger.info(
+        'm=insert_leads, msg=got {} leads after checking size of the phone number.'.format(
+            len(leads)))
+
+    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
 
 
 def submit_olx(**kwargs):
@@ -90,14 +107,15 @@ def submit_olx(**kwargs):
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
 
-    logger.info('Starting job...')
+    logger.info('m=submit_olx, msg=Starting job...')
     r = BatchClient().start_batch_job(
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/olx.py', '--max_crawl', str(max_crawl), '--states'] + states
+        command=['./crawlers/olx_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
-    logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+    logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
+                                                                           r.get('jobName')]), r.get('status')))
 
     # get task instance
     ti = kwargs.get('ti')
@@ -141,7 +159,7 @@ insert_leads = BaseDAG.build_python_operator(
 olx_success_test = QuintoAndarAWSBatchSensor(
     task_id='olx-success-test',
     poke_interval=20 * 60,
-    timeout=5 * 3600,
+    timeout=22 * 3600,
     provide_context=True,
     xcom_task_id='crawl-olx'
 )

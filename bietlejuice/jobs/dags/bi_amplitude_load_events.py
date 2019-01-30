@@ -1,14 +1,21 @@
+from datetime import datetime, timedelta
+
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from datetime import datetime, timedelta
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.etl.amplitude.amplitude_events import AmplitudeEventsETL
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+
+
+@logger(exclude='kwargs')
+def xcom_amplitude_load_events(**kwargs):
+    exec_date = str(datetime.date(kwargs['execution_date']))
+    xcom.xcom_push(kwargs['ti'], exec_date)
 
 
 @logger(exclude='kwargs')
@@ -55,5 +62,13 @@ load_events_to_clean_task = BaseDAG.build_python_operator(
     python_callable=load_amplitude_clean
 )
 
+xcom_amplitude_load_events_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='XCom_amplitude_load_events',
+    python_callable=xcom_amplitude_load_events,
+    provide_context=True
+)
+
 airflow_helpers.chain(load_events_to_raw_task,
-                      load_events_to_clean_task)
+                      load_events_to_clean_task,
+                      xcom_amplitude_load_events_task)
