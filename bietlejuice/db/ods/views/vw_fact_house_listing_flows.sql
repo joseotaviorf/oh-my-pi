@@ -151,7 +151,7 @@ potential_listings as (
 		rep_leads bl
 		on bl.lead_id = f.lead_id
 	left join
-		house_franca h
+		house h
 		on f.imovel_id = h.id
 	left join
 		usuario us_cad
