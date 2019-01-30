@@ -1,37 +1,35 @@
-import json
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.etl.kill_queue.killqueue import KillQueue
+from bietlejuice.jobs.etl.kill_queue.killqueue_factory import KillQueueFactory
+from bietlejuice.jobs.etl.kill_queue.killqueue_table_enum import KillQueueTableEnum
+
+logger = QuintoAndarLogger('kill_queue_dag')
 
 env.set_airflow_var_to_local_env('KILLQUEUE')
-logger = QuintoAndarLogger('kill_queue')
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'kill-queue-etl'
 MAIN_START_DATE = datetime(2019, 1, 27)
 MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
 
-s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-params = env.get_airflow_env_var('KILLQUEUE_PARAMS')
-kill_queue = KillQueue(s3_bucket)
-
-
-def extract_data_and_move_to_raw(**kwargs):
-    table = kwargs.get('table')
-    kill_queue.extract_data_and_move_to_raw(table)
+def run_factory_method(table, method):
+    kill_queue_obj = KillQueueFactory.get_object(
+        table=table,
+        s3_bucket=s3_bucket
+    )
+    getattr(kill_queue_obj, method)()
 
 
-def move_data_from_raw_to_clean(**kwargs):
-    table = kwargs.get('table')
-    kill_queue.move_data_from_raw_to_clean(table)
-
-
-dag = DAG(
+# dags
+main_dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
@@ -44,27 +42,71 @@ dag = DAG(
     catchup=False
 )
 
+
+def get_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    extract_data_and_move_to_raw = BaseDAG.build_python_operator(
+        task_id='extract_data_and_move_to_raw',
+        python_callable=run_factory_method,
+        dag=local_dag,
+        provide_context=False,
+        op_kwargs={
+            'table': kwargs['table'],
+            'method': 'extract_data_and_move_to_raw'
+        }
+    )
+
+    move_data_from_raw_to_clean = BaseDAG.build_python_operator(
+        task_id='move_data_from_raw_to_clean',
+        python_callable=run_factory_method,
+        dag=local_dag,
+        provide_context=False,
+        op_kwargs={
+            'table': kwargs['table'],
+            'method': 'move_data_from_raw_to_clean'
+        }
+    )
+
+    airflow_helpers.chain(
+        extract_data_and_move_to_raw,
+        move_data_from_raw_to_clean
+    )
+
+    return local_dag
+
+
 # operators
-tables = json.loads(params).get("tables")
+house_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='house',
+    sub_dag_func=get_sub_dag,
+    table=KillQueueTableEnum.HOUSE
+)
 
-extract_data_ops = []
-move_data_to_clean_ops = []
-for table in tables:
-    extract_data_op = BaseDAG.build_python_operator(
-        dag=dag,
-        task_id='extract-data-{}'.format(table),
-        python_callable=extract_data_and_move_to_raw,
-        provide_context=True,
-        op_kwargs={'table': table}
-    )
-    # extract_data_ops.append(extract_data_and_move_to_raw)
+rent_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='rent-flow',
+    sub_dag_func=get_sub_dag,
+    table=KillQueueTableEnum.RENT_FLOW
+)
 
-    move_data_to_clean_op = BaseDAG.build_python_operator(
-        dag=dag,
-        task_id='move-data-to-clean-{}'.format(table),
-        python_callable=move_data_from_raw_to_clean,
-        provide_context=True,
-        op_kwargs={'table': table}
-    )
-    move_data_to_clean_op.set_upstream(extract_data_op)
-    move_data_to_clean_ops.append(move_data_to_clean_op)
+reservation_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='reservation',
+    sub_dag_func=get_sub_dag,
+    table=KillQueueTableEnum.RESERVATION
+)
+
+house_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='reservation-aud',
+    sub_dag_func=get_sub_dag,
+    table=KillQueueTableEnum.RESERVATION_AUD
+)
