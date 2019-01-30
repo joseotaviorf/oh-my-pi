@@ -1,4 +1,4 @@
-SELECT (
+SELECT
   advertiser_name,
   campaign_id,
   campaign_name,
@@ -11,7 +11,6 @@ SELECT (
   all_sales,
   revenue,
   composition_win,
-  cpc,
-)
+  cpc
 FROM datalake_raw.marketing_criteo_campaigns
 WHERE dt_extraction  = '{dt_extraction}'
