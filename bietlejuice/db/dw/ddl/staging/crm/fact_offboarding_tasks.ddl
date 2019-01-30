@@ -21,6 +21,6 @@ create table if not exists staging.fact_offboarding_tasks (
   sk_house_listing bigint,
   sk_house_owner bigint,
   sk_tenant bigint,
-  ts_load timestamp
+  dt_partition timestamp
 )
 ;

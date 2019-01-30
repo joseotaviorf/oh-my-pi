@@ -11,6 +11,6 @@ create table if not exists staging.dim_offboarding_task (
   type varchar,
   titles varchar,
   workgroups varchar,
-  ts_load timestamp
+  dt_partition timestamp
 )
 ;

@@ -22,8 +22,9 @@ class CRMTasksOffboarding(CRMTasks):
         'prod': 'append_fact_offboarding_table.sql'
     }
 
+    # TODO remove mongo_client_uri from child classes
     @logger
-    def __init__(self, s3_bucket, execution_date):
+    def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
         super(CRMTasksOffboarding, self).__init__(
             s3_bucket=s3_bucket,
             execution_date=execution_date

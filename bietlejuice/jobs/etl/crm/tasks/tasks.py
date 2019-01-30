@@ -522,6 +522,8 @@ class CRMTasks(object):
     @logger(exclude='mongo_client_uri')
     def _get_mongo_client(self, mongo_client_uri):
         if mongo_client_uri:
+            logger.info('m=_get_mong_client, msg=Creating mongodb connection')
             return MongoClient(mongo_client_uri)
-        else:
-            return None
+
+        logger.info('m=_get_mongo_client, mongo_client_uri=None')
+        return None
