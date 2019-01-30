@@ -3,6 +3,12 @@
 import boto3
 import json
 import os
+import tarfile
+from datetime import datetime, timedelta
+from io import BytesIO
+
+import boto3
+import kubernetes.client as kube
 import sagemaker
 import tarfile
 from airflow.models import DAG
@@ -192,6 +198,34 @@ def untar_output(**kwargs):
     bucket.Object(preds_json_filename).put(Body=preds_json)
 
 
+def restart_service(**kwargs):
+    config = kube.Configuration()
+    config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
+    config.api_key_prefix['authorization'] = 'Bearer'
+    config.host = KUBERNETES_API_ENDPOINT
+    config.verify_ssl = False
+
+    api = kube.AppsV1Api(kube.ApiClient(config))
+    name = kwargs.get('deploy', {}).get('name')
+    namespace = kwargs.get('deploy', {}).get('namespace')
+    now = datetime.now().strftime('%s')
+    body = {
+        "spec": {
+            "template": {
+                "metadata": {
+                    "annotations": {
+                        "reload": now
+                    }
+                }
+            }
+        }
+    }
+
+    r = api.patch_namespaced_deployment(name, namespace, body)
+
+    logger.info('API response: {}'.format(r))
+
+
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -230,4 +264,11 @@ untar_output_op = BaseDAG.build_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op
+restart_service_op = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='restart_service',
+    python_callable=restart_service,
+    op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
+)
+
+build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op
