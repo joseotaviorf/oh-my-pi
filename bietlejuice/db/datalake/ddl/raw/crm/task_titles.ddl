@@ -1,4 +1,4 @@
-drop table if exists datalake_raw.crm_task_titles;
+  drop table if exists datalake_raw.crm_task_titles;
 create external table if not exists datalake_raw.crm_task_titles (
   id string,
   description string,
