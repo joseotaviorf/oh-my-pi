@@ -12,12 +12,12 @@ logger = QuintoAndarLogger('KillQueueRentFlow')
 class KillQueueRentFlow(KillQueue):
 
     def __init__(self, s3_bucket):
-        super(KillQueue, self).__init__(s3_bucket=s3_bucket)
-        self.table_name = KillQueueTableEnum.RENT_FLOW
+        super(KillQueueRentFlow, self).__init__(s3_bucket=s3_bucket)
+        self.table_name = KillQueueTableEnum.RENT_FLOW.value
 
     @logger
     def extract_data_and_move_to_raw(self):
-        self._extract_data_and_move_to_raw(table=self.table_name)
+        self._extract_data_and_move_to_raw(self.table_name)
 
     @logger
     def move_data_from_raw_to_clean(self):

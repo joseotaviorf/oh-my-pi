@@ -11,10 +11,10 @@ logger = QuintoAndarLogger('KillQueueFactory')
 
 class KillQueueFactory(object):
     @staticmethod
-    def factory(class_type, s3_bucket):
-        __class = KillQueueFactory.__dispatch_dict(class_type)
-        if class_type is None:
-            logger.error('m=factory, _class={}, msg=class type not found'.format(class_type))
+    def get_object(table, s3_bucket):
+        __class = KillQueueFactory.__dispatch_dict(table)
+        if not __class:
+            logger.error('m=get_object, _class={}, msg=class type not found'.format(table))
             raise Exception
 
         return __class(
@@ -22,10 +22,10 @@ class KillQueueFactory(object):
         )
 
     @staticmethod
-    def __dispatch_dict(_class):
+    def __dispatch_dict(table):
         return {
             KillQueueTableEnum.HOUSE: KillQueueHouse,
             KillQueueTableEnum.RESERVATION: KillQueueReservation,
             KillQueueTableEnum.RESERVATION_AUD: KillQueueReservationAud,
             KillQueueTableEnum.RENT_FLOW: KillQueueRentFlow,
-        }.get(_class)
+        }.get(table)
