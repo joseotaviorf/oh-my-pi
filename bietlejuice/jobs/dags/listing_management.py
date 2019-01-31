@@ -264,7 +264,7 @@ untar_output_op = BaseDAG.build_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-restart_service_op = BaseDAG.build_quintoandar_python_operator(
+restart_service_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='restart_service',
     python_callable=restart_service,
