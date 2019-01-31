@@ -24,7 +24,7 @@ class CriteoCampaigns(Marketing):
         self.client_secret = auth['client_secret']
 
     def move_criteo_campaigns_to_raw(self):
-        self.__save_to_s3(self.client_id, self.client_secret)
+        self._save_to_s3(self.client_id, self.client_secret)
 
     def __get_token(self, client_id, client_secret):
         logger.info('m=__get_token')
@@ -74,8 +74,8 @@ class CriteoCampaigns(Marketing):
         except requests.exceptions.RequestException as e:
             logger.error('m=__make_request, error message={}'.format(e))
 
-    def __save_to_s3(self, client_id, client_secret):
-        logger.info('m=__save_to_s3, client_id={}'.format(client_id))
+    def _save_to_s3(self, client_id, client_secret):
+        logger.info('m=_save_to_s3, client_id={}'.format(client_id))
         raw_json_data = self.__make_request(client_id, client_secret)
 
         gz_body = BytesIO()

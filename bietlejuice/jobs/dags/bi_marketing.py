@@ -11,7 +11,7 @@ from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSu
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
-MAIN_DAG_NAME = 'bi-marketing-costs'
+MAIN_DAG_NAME = 'bi-criteo-test4433'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,6,12,18 * * *')
 
@@ -35,7 +35,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    catchup=False,
+    catchup=True,
     max_active_runs=1
 )
 
@@ -108,66 +108,6 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('dw')
 
 
-facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name="facebook-ads-raw-to-clean",
-    class_=MarketingEnum.FACEBOOK_ADS,
-    accounts=FACEBOOK_ADS_ACCOUNTS
-)
-
-facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_pre_staging_sub_dag,
-    sub_dag_name='facebook-ads-load-to-pre-staging',
-    class_=MarketingEnum.FACEBOOK_ADS,
-    accounts=FACEBOOK_ADS_ACCOUNTS
-)
-
-facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='facebook-ads-load-to-staging',
-    class_=MarketingEnum.FACEBOOK_ADS
-)
-
-facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='facebook-ads-load-to-dw',
-    class_=MarketingEnum.FACEBOOK_ADS
-)
-
-google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='google-ads-raw-to-clean',
-    class_=MarketingEnum.GOOGLE_ADS,
-    accounts=GOOGLE_ADS_ACCOUNTS
-)
-
-google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_pre_staging_sub_dag,
-    sub_dag_name='google-ads-load-to-pre-staging',
-    class_=MarketingEnum.GOOGLE_ADS,
-    accounts=GOOGLE_ADS_ACCOUNTS
-)
-
-google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='google-ads-load-to-staging',
-    class_=MarketingEnum.GOOGLE_ADS,
-)
-
-google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='google-ads-load-to-dw',
-    class_=MarketingEnum.GOOGLE_ADS,
-)
-
 criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
@@ -197,8 +137,4 @@ criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
 )
 
-airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
-                      google_ads_load_to_dw_dag)
-airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
-                      facebook_ads_load_to_dw_dag)
 airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)
