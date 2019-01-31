@@ -1,7 +1,7 @@
 drop table if exists zendesk.dim_zendesk_user;
 
 create table if not exists zendesk.dim_zendesk_user (
-    sk_zendesk_user int,
+    sk_zendesk_user bigint,
     url varchar,
     name varchar,
     email varchar,
