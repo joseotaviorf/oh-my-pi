@@ -1,1 +1,26 @@
-select * from datalake_raw.zendesk_ticket_fields
+with distinct_data as (
+    select distinct * from datalake_raw.zendesk_ticket_fields
+)
+select
+    id,
+    title,
+    raw_title,
+    case collapsed_for_agents when 'false' then '0' when 'true' then '1' end as collapsed_for_agents,
+    case visible_in_portal when 'false' then '0' when 'true' then '1' end as visible_in_portal,
+    description,
+    case active when 'false' then '0' when 'true' then '1' end as active,
+    raw_title_in_portal,
+    created_at,
+    type,
+    raw_description,
+    case required when 'false' then '0' when 'true' then '1' end as required,
+    case editable_in_portal when 'false' then '0' when 'true' then '1' end as editable_in_portal,
+    case required_in_portal when 'false' then '0' when 'true' then '1' end as required_in_portal,
+    updated_at,
+    system_field_options,
+    case removable when 'false' then '0' when 'true' then '1' end as removable,
+    regexp_for_validation,
+    position,
+    tag,
+    title_in_portal
+from distinct_data

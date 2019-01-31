@@ -1,9 +1,11 @@
+import petl
 from collections import OrderedDict
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger("ZendeskETL")
 
@@ -14,9 +16,18 @@ class ZendeskETL(object):
         'clean': 'datalake_clean'
     }
 
+    SK_FIELDS = {
+        'fact_ticket_metrics': 'sk_ticket',
+        'dim_ticket': 'sk_ticket',
+        'dim_zendesk_user': 'sk_zendesk_user'
+    }
+
+    TABLE_PARTITION_DATE = '__PARTITION_DATE__'
+
     def __init__(self, bucket, execution_date=None):
         self.s3_bucket = bucket
         self.athena_client = AthenaClient(self.s3_bucket)
+        self.execution_datetime = execution_date
         self.execution_date = execution_date.strftime("%Y-%m-%d")
 
     @logger
@@ -92,7 +103,7 @@ class ZendeskETL(object):
             ('requester_id', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key="clean/zendesk/tickets/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -132,30 +143,30 @@ class ZendeskETL(object):
             ('id', str),
             ('title', str),
             ('raw_title', str),
-            ('collapsed_for_agents', str),
-            ('visible_in_portal', str),
+            ('is_collapsed_for_agents', str),
+            ('is_visible_in_portal', str),
             ('description', str),
-            ('active', str),
+            ('is_active', str),
             ('raw_title_in_portal', str),
             ('created_at', str),
             ('type', str),
             ('raw_description', str),
-            ('required', str),
-            ('editable_in_portal', str),
-            ('required_in_portal', str),
+            ('is_required', str),
+            ('is_editable_in_portal', str),
+            ('is_required_in_portal', str),
             ('updated_at', str),
             ('system_field_options', str),
-            ('removable', str),
-            ('regexp_for_validation', str),
+            ('is_removable', str),
+            ('validation_regexp', str),
             ('position', str),
             ('tag', str),
             ('title_in_portal', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_fields/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -185,7 +196,7 @@ class ZendeskETL(object):
             ('sla', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -224,7 +235,7 @@ class ZendeskETL(object):
             ('via', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_metric_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -319,7 +330,7 @@ class ZendeskETL(object):
             ('user_fields', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/users/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -350,7 +361,7 @@ class ZendeskETL(object):
             ('updated_at', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -417,7 +428,7 @@ class ZendeskETL(object):
             ('body', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/articles/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -450,7 +461,7 @@ class ZendeskETL(object):
             ('updated_at', str)
         ])
 
-        self.__move_to_clean(
+        self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/group_memberships/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query.format(dt=self.execution_date),
@@ -459,15 +470,15 @@ class ZendeskETL(object):
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def __move_to_clean(self, table_name, key, query, r_cols, c_cols=None):
-        empty = self.__is_clean_table_empty(table_name)
+    def _move_to_clean(self, table_name, key, query, r_cols, c_cols=None):
+        empty = self._is_clean_table_empty(table_name)
 
         if not empty:
             query = "{} \n where dt='{}'".format(query, self.execution_date)
 
             self.athena_client.add_partition(
                 database=ZendeskETL.SCHEMAS['raw'],
-                table_name=table_name,
+                table_name="zendesk_{}".format(table_name),
                 partition="dt='{}'".format(self.execution_date)
             )
 
@@ -478,14 +489,117 @@ class ZendeskETL(object):
             clean_columns=c_cols
         )
 
+        self.athena_client.add_partition(
+            database=ZendeskETL.SCHEMAS['clean'],
+            table_name="zendesk_{}".format(table_name),
+            partition="dt_extraction='{}'".format(self.execution_date)
+        )
+
     @logger
-    def __is_clean_table_empty(self, table_name):
+    def _is_clean_table_empty(self, table_name):
         result = self.athena_client.execute_query_and_return_dataframe(
             "select 1 from {}.zendesk_{} limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
 
         empty = len(result) == 0
 
-        logger.info("m=__is_clean_table_empty, table={}, empty={}"
+        logger.info("m=_is_clean_table_empty, table={}, empty={}"
                     .format(table_name, empty))
 
         return empty
+
+    @logger
+    def build_staging_table(self, table_name):
+        query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/zendesk/{file_name}.sql'.format(
+                query_base_dir=DATALAKE_QUERIES_DIR,
+                file_name=table_name))
+
+        empty = self._is_prod_table_empty(table_name)
+        logger.info('m=build_staging_table, table_name={}, empty={}'.format(table_name, empty))
+        if not empty:
+            logger.info(
+                'm=build_staging_table, table_name={}, msg=production table is not empty'.format(
+                    table_name))
+
+            query = "{} \n where t.dt_extraction='{}'".format(query, self.execution_date)
+
+        df = self.athena_client.execute_query_and_return_dataframe(query)
+        table_data = petl.fromdataframe(df)
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            table_name='staging.zendesk_{}'.format(table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=False,
+            commit=True
+        )
+
+    @logger
+    def build_prod_table(self, table_name):
+        upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
+
+        delete_query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
+                query_base_dir=DW_QUERIES_DIR))
+
+        empty = self._is_prod_table_empty(table_name)
+        if empty:
+            logger.info(
+                'm=build_staging_table, schema=staging, table_name={}, msg=production table is empty, executing first load!'.format(
+                    table_name))
+        else:
+            self._delete_old_entries(
+                delete_query.format(table_name=table_name, sk_field=ZendeskETL.SK_FIELDS[table_name]))
+
+            if table_name.split("_")[0] == 'fact':
+                upsert_query = "{} \nwhere sk_extraction_date = {};".format(upsert_query,
+                                                                            self.execution_datetime.strftime('%Y%m%d'))
+
+        self._upsert_data(upsert_query, table_name)
+
+    @logger(exclude='df')
+    def _upsert_data(self, upsert_query, table_name):
+        logger.info(
+            'm=_upsert_data, table_name={}, msg=getting data from DW, query={}'.format(table_name,
+                                                                                       upsert_query))
+
+        table_data = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query=upsert_query,
+            encoding='utf-8',
+        )
+
+        logger.info(
+            '_upsert_data, table_name={}, msg=bulk inserting...'.format(table_name))
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            table_name='zendesk.{}'.format(table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=True,
+            commit=True
+        )
+
+        logger.info(
+            'm=_upsert_data, table_name={}, msg=ready to read data!'.format(table_name))
+
+    @logger
+    def _is_prod_table_empty(self, table_name):
+        result = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from zendesk.{} limit 1".format(table_name),
+            encoding='utf-8'
+        )
+
+        return len(result) == 1
+
+    @logger
+    def _delete_old_entries(self, delete_query):
+        BaseETL.execute_command(
+            db_enum=EnumDB.BI_DW,
+            command=delete_query,
+            commit=True,
+            encoding='utf-8'
+        )

@@ -1,13 +1,13 @@
 import locale
-from datetime import datetime, timedelta
-
 import pandas as pd
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
-from pymongo import MongoClient
-from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -254,14 +254,14 @@ main_dag = BaseDAG.build_dag(
     schedule_interval=MAIN_SCHEDULE_INTERVAL
 )
 
-lead_tasks = BaseDAG.build_quintoandar_python_operator(
+lead_tasks = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='load_lead_tasks',
     python_callable=load_lead_tasks,
     op_kwargs={'table_name': 'lead_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
 )
 
-manual_tasks = BaseDAG.build_quintoandar_python_operator(
+manual_tasks = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='load_manual_tasks',
     python_callable=load_manual_tasks,
