@@ -18,6 +18,6 @@ PARTITIONED BY (
   dt_cost_attribution string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/criteo_campaigns/criteo_all/'
+  's3://5a-datalake/clean/marketing/criteo_campaigns/all/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_criteo_campaigns;
