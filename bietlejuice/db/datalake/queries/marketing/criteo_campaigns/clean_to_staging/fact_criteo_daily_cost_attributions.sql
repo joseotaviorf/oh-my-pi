@@ -1,5 +1,4 @@
 SELECT
-    advertiser_name,
     cast(campaign_id as integer) as sk_criteo_campaign,
     cast(date_format(cast(cost_attribution_date as date), '%Y%m%d') as integer) as sk_cost_attribution_date,
     currency,
