@@ -49,7 +49,7 @@ class LeadSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        ods_reprocessed_lead_task = BaseDAG.build_quintoandar_python_operator(
+        ods_reprocessed_lead_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_reprocessed_lead',
             python_callable=self.__move_query_results_from_ebdb_to_ods,
@@ -58,7 +58,7 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        ods_lead = BaseDAG.build_quintoandar_python_operator(
+        ods_lead = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_lead',
             provide_context=True,
@@ -68,7 +68,7 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        staging_dim_lead_task = BaseDAG.build_quintoandar_python_operator(
+        staging_dim_lead_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_lead',
             python_callable=utils.load_dim_from_ods_to_staging,
@@ -79,7 +79,7 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        dw_dim_lead_task = BaseDAG.build_quintoandar_python_operator(
+        dw_dim_lead_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='DW_dim_lead',
             python_callable=utils.load_dim_from_staging_to_dw,
