@@ -18,25 +18,6 @@ logger = QuintoAndarLogger('CriteoCampaigns')
 class CriteoCampaigns(Marketing):
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
 
-    COLUMN_TYPE_MAP = {
-        'marketing_criteo_campaigns': {
-            'advertiser_name': str,
-            'campaign_id': int,
-            'campaign_name': str,
-            'day': int,
-            'currency': str,
-            'clicks': int,
-            'cost': float,
-            'impressions': int,
-            'Sales': int,
-            'Audience': float,
-            'Revenue': int,
-            'comp_win': float,
-            'cpc': float,
-
-        }
-    }
-
     def __init__(self, s3_bucket, execution_date, auth, account=None):
         super(CriteoCampaigns, self).__init__(s3_bucket, execution_date, 'criteo_campaigns', auth)
         self.client_id = auth['client_id']
@@ -132,27 +113,10 @@ class CriteoCampaigns(Marketing):
             ('CPC', str)
         ])
 
-        c_cols = OrderedDict([
-            ('advertiser_name', str),
-            ('campaign_id', str),
-            ('campaign_name', str),
-            ('cost_attribution_date', str),
-            ('currency', str),
-            ('clicks', str),
-            ('impressions', str),
-            ('audience', str),
-            ('cost', str),
-            ('all_sales', str),
-            ('revenue', str),
-            ('composition_win', str),
-            ('cpc', str)
-        ])
-
         self._move_to_clean(
             table_name='marketing_criteo_campaigns',
             sql_file_name='criteo_campaigns.sql',
-            r_cols=r_cols,
-            c_cols=c_cols
+            r_cols=r_cols
         )
 
     @logger

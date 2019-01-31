@@ -15,7 +15,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_criteo_campaigns (
   composition_win string,
   cpc string)
 PARTITIONED BY (
-  dt_cost_attribution string)
+  dt_extraction string)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
@@ -39,6 +39,6 @@ STORED AS INPUTFORMAT
 OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://5a-datalake/raw/marketing/criteo_campaigns/criteo_all/'
+  's3://5a-datalake/raw/marketing/criteo_campaigns/all/'
 
 MSCK REPAIR TABLE datalake_raw.marketing_criteo_campaigns;
