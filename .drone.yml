@@ -5,20 +5,20 @@ clone:
 
 pipeline:
 
-  linter:
+  lint:
     image: python:2.7.12
     commands:
       - pip install -q flake8==3.5.0
       - flake8 --max-line-length=120 .
 
-  test:
+  unit-test:
     image: python:2.7.12
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
       - pip install -q -r requirements.txt
       - pip install -q -r requirements_test.txt
-      - pytest --cov=bietlejuice --cov-report html:html --cov-fail-under=5 --cov-config .coveragerc tests
+      - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=5 --cov-config .coveragerc tests
   
   publish-coverage:
     image: plugins/s3
