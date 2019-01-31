@@ -86,7 +86,8 @@ select
     p.last_dt_document_sent,
     i.first_dt_sent_to_insurance,
     u.criadoEm as criado_em,
-    u.atualizadoEm as atualizado_em
+    u.atualizadoEm as atualizado_em,
+    u.contaCorrente_id
   from
     Usuario u
   left join

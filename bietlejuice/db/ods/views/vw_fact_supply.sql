@@ -21,7 +21,7 @@ base_tasks as (
 ),
 base_leads as (
 	select
-		id as lead_id,
+		lead.id as lead_id,
 		tipo as lead_type,
 		origem as lead_origin,
 		utm_source,
@@ -29,11 +29,13 @@ base_leads as (
 		coalesce((lower(trim(utm_campaign))  ~* '(institucional)|(branded)'), false) as branded_lead,
 		(codigo_imobiliaria is not null or flg_b2b) as b2b_lead,
 		case
-			when origem='Reprocessado' then reprocessed_lead_id
+			when origem='Reprocessado' then rl.id_origin_lead
 			else null
 		end as old_lead_id
 	from
 		lead
+	left join reprocessed_lead rl
+	on lead.id = rl.id
 ), -- reprocessed leads being merged to their original ones
 rep_leads as (
 	select

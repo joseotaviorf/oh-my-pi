@@ -20,8 +20,8 @@ base_tasks as (
 		crm.lead_tasks
 ),
 base_leads as (
-	select
-		id as lead_id,
+    select
+		lead.id as lead_id,
 		tipo as lead_type,
 		origem as lead_origin,
 		utm_source,
@@ -29,11 +29,13 @@ base_leads as (
 		coalesce((lower(trim(utm_campaign))  ~* '(institucional)|(branded)'), false) as branded_lead,
 		(codigo_imobiliaria is not null or flg_b2b) as b2b_lead,
 		case
-			when origem='Reprocessado' then reprocessed_lead_id
+			when origem='Reprocessado' then rl.id_origin_lead
 			else null
 		end as old_lead_id
 	from
 		lead
+	left join reprocessed_lead rl
+	on lead.id = rl.id
 ), -- reprocessed leads being merged to their original ones
 rep_leads as (
 	select
@@ -51,6 +53,25 @@ rep_leads as (
 		base_leads old_bl
 		on old_bl.lead_id = bl.old_lead_id
 ),
+fact_with_reproc as (
+    -- Treating acq channel of reprocessed leads
+    select
+        fhlf.*,
+        case when l.origem = 'Reprocessado' and lr.origem = 'Landing' then 'Reprocessed Landing'
+            when l.origem = 'Reprocessado' and lr.tipo = 'Afiliado' then 'Reprocessed Affiliate'
+            when l.origem = 'Reprocessado' then 'Reprocessed Others'
+            else acquisition_channel end
+        as acquisition_channel_rep,
+        lr.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id
+        from
+        fact_house_listing_flows fhlf
+        left join lead l
+            on l.id = fhlf.lead_id
+        left join reprocessed_lead rl
+            on rl.id = fhlf.lead_id
+        left join lead lr
+            on lr.id = rl.id_origin_lead
+),
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
@@ -60,7 +81,7 @@ potential_listings as (
 		coalesce(f.imovel_id || '001' , '-1') as sk_house_listing,
 		coalesce(f.rep_id, -1) as sk_user_house_registrant,
 		coalesce(f.rep_id, bt.rep_id, -1) as sk_user_sales_rep,
-		coalesce(f.affiliate_id, -1) as sk_user_lead_affiliate,
+		coalesce(f.affiliate_id, cast(f.origin_lead_usuario_que_indicou_id as integer), -1) as sk_user_lead_affiliate,
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
@@ -75,22 +96,22 @@ potential_listings as (
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
 		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Lead Flow'
 			else f.flow
 		end as flow,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Non-Self Service'
 			else f.acquisition_method
 		end as acquisition_method,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Doorman'
-			else f.acquisition_channel
+			else f.acquisition_channel_rep
 		end as acquisition_channel,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Doorman'
 			else f.acquisition_source
 		end as acquisition_source,
@@ -129,16 +150,16 @@ potential_listings as (
 		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
 		case
-			when d.imovel_id is not null and acquisition_channel not like ('Reprocessed%')
+			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then true
 			else (f.acquisition_source = 'Doorman')
 		end as is_doorman,
-		(acquisition_channel = 'Inside Sales') as is_isales_direct_register,
-		(acquisition_channel = 'Admin') as is_cx_direct_register,
+		(acquisition_channel_rep = 'Inside Sales') as is_isales_direct_register,
+		(acquisition_channel_rep = 'Admin') as is_cx_direct_register,
 		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
 		(us_cad.id is not null) as is_call_center
 	from
-		fact_house_listing_flows f
+		fact_with_reproc f
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
