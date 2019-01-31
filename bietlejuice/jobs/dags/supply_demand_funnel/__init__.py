@@ -1,3 +1,4 @@
+from bietlejuice.jobs.dags.supply_demand_funnel.affiliate_subdag import AffiliateSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.bank_account_subdag import BankAccountSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.bank_subdag import BankSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.bank_transaction import BankTransactionSubDag
