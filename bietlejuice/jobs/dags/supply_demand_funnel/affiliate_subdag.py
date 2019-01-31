@@ -20,7 +20,7 @@ class AffiliateSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='DadosAfiliados',
+            ebdb_table_name='DadosAfiliado',
             ods_stg_table_name='affiliate'
         )
 
@@ -64,7 +64,7 @@ class AffiliateSubDag(DimSubDag):
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'affiliate',
-                'post_command': "update staging.dim_affiliate set load_timestamp = '{}' where sk_affiliate = -1;".format(
+                'post_command': "update staging.dim_affiliate set ts_load = '{}' where sk_affiliate = -1;".format(
                     datetime.now().strftime('%Y-%m-%d'))
             }
         )
