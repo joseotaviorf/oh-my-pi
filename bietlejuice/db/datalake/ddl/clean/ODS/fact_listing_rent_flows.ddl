@@ -7,6 +7,7 @@ create external table datalake_clean.ods_fact_listing_rent_flows (
   sk_house_de_publication_date string,
   sk_house_first_offer_submitted_date string,
   sk_region string,
+  sk_condo bigint,
   sk_rent_flow string,
   sk_booking string,
   sk_booking_created_date string,
