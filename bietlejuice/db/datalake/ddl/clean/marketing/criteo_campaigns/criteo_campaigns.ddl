@@ -4,7 +4,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_criteo_campaigns (
   advertiser_name string,
   campaign_id string,
   campaign_name string,
-  day string,
+  cost_attribution_date string,
   currency string,
   clicks string,
   impressions string,

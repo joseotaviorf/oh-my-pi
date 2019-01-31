@@ -180,11 +180,25 @@ criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=clean_sub_dag,
     sub_dag_name='criteo-raw-to-clean',
     class_=MarketingEnum.CRITEO,
-    accounts='criteo'
+    accounts='default'
+)
+
+criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='criteo-load-to-staging',
+    class_=MarketingEnum.CRITEO,
+)
+
+criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='criteo-load-to-dw',
+    class_=MarketingEnum.CRITEO,
 )
 
 airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
                       google_ads_load_to_dw_dag)
 airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
                       facebook_ads_load_to_dw_dag)
-airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag)
+airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)
