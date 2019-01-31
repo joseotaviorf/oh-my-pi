@@ -11,7 +11,7 @@ select
   (date_part('epoch', pl.de_publication_date - pl.min_version_time) / 86400)::int8 as days_listing_to_depublication,
   coalesce(pl.nr_renting::bigint, 0) as nr_renting,
   now()::timestamp as ts_load
-from house_franca h
+from house h
 left join house_listing pl
   on pl.id = h.id
 left join contract c
