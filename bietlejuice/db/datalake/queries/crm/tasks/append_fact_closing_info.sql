@@ -9,7 +9,7 @@
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
-    on trim(ct.origin) = 'Contrato'
+    on trim(ct.origin) in ('Contrato', 'ContratoFull')
       and cast(ct.id_origin as bigint) = try(cast(ec.id as bigint))
   left join datalake_raw.ebdb_imovel eci
     on eci.id = ec.imovel_id
@@ -25,11 +25,13 @@ contract_proposal_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_proposal as bigint) as sk_proposal,
-    cast(sk_contract as bigint) as sk_contract
+    cast(sk_contract as bigint) as sk_contract,
+    cast(sk_owner as bigint) as sk_house_owner,
+    cast(sk_client as bigint) as sk_tenant
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
     or sk_proposal != '-1'
-  group by 1, 2, 3
+  group by 1, 2, 3, 4, 5
 )
 select distinct
   pc.sk_task,
@@ -49,11 +51,11 @@ select distinct
   pc.ts_task_user_end,
   pc.task_user_type,
   pc.task_user_resolve_hours,
-  coalesce(pc.sk_proposal, contract.sk_proposal) as sk_proposal,
-  coalesce(pc.sk_contract, proposal.sk_contract) as sk_contract,
+  coalesce(contract.sk_proposal, pc.sk_proposal) as sk_proposal,
+  coalesce(proposal.sk_contract, pc.sk_contract) as sk_contract,
   coalesce(proposal.sk_house_listing, contract.sk_house_listing, -1) as sk_house_listing,
-  pc.sk_house_owner,
-  pc.sk_tenant,
+  coalesce(contract.sk_house_owner, proposal.sk_house_owner, pc.sk_house_owner) as sk_house_owner,
+  coalesce(contract.sk_tenant, proposal.sk_tenant, pc.sk_tenant) as sk_tenant,
   pc.dt_partition
 from proposals_contracts pc
 left join contract_proposal_house_listing proposal

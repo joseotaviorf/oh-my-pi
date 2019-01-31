@@ -1,9 +1,10 @@
 import cStringIO
+
 import json
+from airflow.models import DAG
 from datetime import datetime
 
 import bietlejuice.jobs.etl.powerbi as powerbi
-from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
@@ -91,14 +92,14 @@ dag = DAG(
 )
 
 # operators
-exclusives = BaseDAG.build_quintoandar_python_operator(
+exclusives = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawling-check-exclusives',
     python_callable=check_exclusives,
     op_kwargs=json.loads(check_exclusive_rules)
 )
 
-refresh_exclusives = BaseDAG.build_quintoandar_python_operator(
+refresh_exclusives = BaseDAG.build_python_operator(
     dag=dag,
     task_id='Refresh_PowerBI_Exclusives',
     python_callable=refresh_powerbi,

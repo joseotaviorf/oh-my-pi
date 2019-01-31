@@ -1,8 +1,7 @@
 import json
-from datetime import datetime
-
 import pandas as pd
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -106,7 +105,7 @@ def table_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    _extract = BaseDAG.build_quintoandar_python_operator(
+    _extract = BaseDAG.build_python_operator(
         task_id='extract_table',
         python_callable=extract_table,
         dag=local_dag,
@@ -117,7 +116,7 @@ def table_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    _transform = BaseDAG.build_quintoandar_python_operator(
+    _transform = BaseDAG.build_python_operator(
         task_id='transform_data',
         python_callable=transform_data,
         dag=local_dag,

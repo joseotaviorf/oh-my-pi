@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import boto3
 import json
 import os
 import tarfile
@@ -7,15 +8,18 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import boto3
+import kubernetes.client as kube
 import sagemaker
-from datetime import datetime
-from qa_python_utils.aws.athena import AthenaClient
+import tarfile
 from airflow.models import DAG
+from datetime import datetime
+from datetime import timedelta
+from io import BytesIO
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
-from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.dags import SKYNET_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom
 
@@ -194,6 +198,34 @@ def untar_output(**kwargs):
     bucket.Object(preds_json_filename).put(Body=preds_json)
 
 
+def restart_service(**kwargs):
+    config = kube.Configuration()
+    config.api_key['authorization'] = SKYNET_KUBERNETES_TOKEN
+    config.api_key_prefix['authorization'] = 'Bearer'
+    config.host = KUBERNETES_API_ENDPOINT
+    config.verify_ssl = False
+
+    api = kube.AppsV1Api(kube.ApiClient(config))
+    name = kwargs.get('deploy', {}).get('name')
+    namespace = kwargs.get('deploy', {}).get('namespace')
+    now = datetime.now().strftime('%s')
+    body = {
+        "spec": {
+            "template": {
+                "metadata": {
+                    "annotations": {
+                        "reload": now
+                    }
+                }
+            }
+        }
+    }
+
+    r = api.patch_namespaced_deployment(name, namespace, body)
+
+    logger.info('API response: {}'.format(r))
+
+
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -207,7 +239,7 @@ dag = DAG(
     catchup=True
 )
 
-build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
+build_raw_data_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='build_raw_data',
     python_callable=build_raw_data,
@@ -215,7 +247,7 @@ build_raw_data_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-train_model_op = BaseDAG.build_quintoandar_python_operator(
+train_model_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='train_model',
     provide_context=True,
@@ -224,7 +256,7 @@ train_model_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-untar_output_op = BaseDAG.build_quintoandar_python_operator(
+untar_output_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='untar_output',
     provide_context=True,
@@ -232,4 +264,11 @@ untar_output_op = BaseDAG.build_quintoandar_python_operator(
     op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
 )
 
-build_raw_data_op >> train_model_op >> untar_output_op
+restart_service_op = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='restart_service',
+    python_callable=restart_service,
+    op_kwargs=json.loads(SKYNET_LISTMGMT_KWARGS)
+)
+
+build_raw_data_op >> train_model_op >> untar_output_op >> restart_service_op

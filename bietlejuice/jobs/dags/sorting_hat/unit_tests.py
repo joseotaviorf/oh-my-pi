@@ -57,7 +57,7 @@ def __test_count(**kwargs):
 
 @logger
 def __build_test_tasks(local_dag, entity):
-    return BaseDAG.build_quintoandar_python_operator(
+    return BaseDAG.build_python_operator(
         dag=local_dag,
         task_id='TEST_{}_count'.format(entity),
         python_callable=__test_count,

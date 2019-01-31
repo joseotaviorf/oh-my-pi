@@ -20,7 +20,7 @@ with good_phones as(
     group by
         phone
     having
-        count( distinct id ) <= 3
+        count( distinct id ) <= 5
 )
 select distinct
     c.id,
@@ -30,6 +30,11 @@ select distinct
     c.phones,
     c.street,
     c.neighborhood,
+    c.iptu,
+    c.condominium,
+    c.bedrooms,
+    c.toilets,
+    c.useful_area,
     c.city,
     c.state,
     c.cep,
@@ -45,8 +50,7 @@ select distinct
             )
         )
     ) updated_on,
-    c.url,
-    gp.n_listings
+    c.url
 from
     datalake_raw.crawlers c
 cross join
