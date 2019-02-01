@@ -19,6 +19,7 @@ pipeline:
       - pip install -q -r requirements.txt
       - pip install -q -r requirements_test.txt
       - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=5 --cov-config .coveragerc tests
+      - coverage-badge -o badge-lines.svg
   
   publish-coverage:
     image: plugins/s3
