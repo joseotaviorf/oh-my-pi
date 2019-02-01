@@ -27,11 +27,12 @@ class AffiliateSubDag(DimSubDag):
     def build_affiliate_with_tests(self):
         affiliate_dag = self._build_local_dag()
 
-        ods_affiliate_task, staging_dim_affiliate_task, dw_dim_affiliate_task = self.__build_data_tasks(affiliate_dag)
+        ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task, \
+            dw_dim_affiliate_task = self.__build_data_tasks(affiliate_dag)
 
         tests_tasks = self.build_tests_tasks(affiliate_dag)
 
-        airflow_helpers.chain(ods_affiliate_task, staging_dim_affiliate_task)
+        airflow_helpers.chain(ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task)
         staging_dim_affiliate_task.set_downstream(tests_tasks)
         dw_dim_affiliate_task.set_upstream(tests_tasks)
 
@@ -48,7 +49,18 @@ class AffiliateSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        ods_affiliate = BaseDAG.build_python_operator(
+        ods_affiliate_origin_task = BaseDAG.build_python_operator(
+            task_id='ODS_user_affiliate_origin',
+            dag=dag,
+            python_callable=utils.load_athena_file_query_to_ods,
+            op_kwargs={
+                'table_name': 'user_affiliate_origin',
+                'file_name': 'user_affiliate_origin.sql',
+                'bucket': DimSubDag.S3_BUCKET
+            }
+        )
+
+        ods_affiliate_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_user_affiliate',
             provide_context=True,
@@ -79,4 +91,4 @@ class AffiliateSubDag(DimSubDag):
             }
         )
 
-        return ods_affiliate, staging_dim_affiliate_task, dw_dim_affiliate_task
+        return ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task, dw_dim_affiliate_task
