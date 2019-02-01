@@ -27,6 +27,8 @@ pipeline:
     bucket: 5a-coverage
     source: badge-lines.svg
     target: /bi-etl-ejuice
+    when:
+      branch: [ master ]
     
   install-forno:
     image: drillster/drone-rsync
