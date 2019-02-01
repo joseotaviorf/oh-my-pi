@@ -195,18 +195,8 @@ class TestLeadsProcessor(object):
         # assert
         assert result == expected_result
 
-    def test_decimal_default_str(self):
-        # arrange
-        str_decimal = '20.90'
-
-        # act & assert
-        with pytest.raises(TypeError):
-            result = decimal_default(str_decimal)
-
-    def test_decimal_default_none(self):
-        # arrange
-        str_decimal = None
-
+    @pytest.mark.parametrize('str_decimal', ['20.90', None])
+    def test_decimal_default_str(self, str_decimal):
         # act & assert
         with pytest.raises(TypeError):
             result = decimal_default(str_decimal)
