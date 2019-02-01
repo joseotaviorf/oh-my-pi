@@ -91,7 +91,7 @@ class Marketing(object):
             self.athena_client.execute_raw_query("msck repair table {}.{}".format(clean_schema_name, clean_table))
 
         else:
-            self.__update_table_partitions(clean_schema_name, clean_table, accounts)
+            self._update_table_partitions(clean_schema_name, clean_table, accounts)
             pre_staging_query = '{}\nwhere dt_created = \'{}\';'.format(pre_staging_query, self.partition_date)
 
         df = self.athena_client.execute_query_and_return_dataframe(sql=pre_staging_query)
@@ -225,7 +225,7 @@ class Marketing(object):
         )
 
     @logger
-    def __update_table_partitions(self, schema_name, table, accounts):
+    def _update_table_partitions(self, schema_name, table, accounts):
         for acc in accounts:
             self.athena_client.add_partition(
                 database=schema_name,
