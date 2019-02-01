@@ -8,6 +8,7 @@ SELECT
 	da.criadoEm,
 	da.numeroCreci,
 	da.origin,
-	da.affiliateType
+	da.affiliateType,
+    da.usuario_id
 FROM
 	DadosAfiliado da

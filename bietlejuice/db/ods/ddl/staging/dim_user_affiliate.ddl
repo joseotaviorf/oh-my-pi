@@ -12,6 +12,13 @@ CREATE TABLE staging.dim_user_affiliate (
     creci_number VARCHAR(255),
     origin VARCHAR(255),
     type VARCHAR(255),
+    tracking_source VARCHAR(255),
+    tracking_medium VARCHAR(255),
+    tracking_platform VARCHAR(255),
+    tracking_device_type VARCHAR(255),
+    tracking_country VARCHAR(255),
+    tracking_state VARCHAR(255),
+    tracking_city VARCHAR(255),
     ts_load TIMESTAMP
 )
 WITH (oids = false);

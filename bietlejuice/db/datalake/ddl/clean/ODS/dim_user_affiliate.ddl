@@ -11,6 +11,13 @@ create external table if not exists datalake_clean.ods_dim_user_affiliate (
     creci_number string,
     origin string,
     type string,
+    tracking_source string,
+    tracking_medium string,
+    tracking_platform string,
+    tracking_device_type string,
+    tracking_country string,
+    tracking_state string,
+    tracking_city string,
     ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

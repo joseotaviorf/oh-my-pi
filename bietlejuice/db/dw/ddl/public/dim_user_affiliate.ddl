@@ -12,5 +12,12 @@ create table public.dim_user_affiliate (
     creci_number varchar(62),
     origin varchar(24),
     type varchar(62),
+    tracking_source varchar(255),
+    tracking_medium varchar(255),
+    tracking_platform varchar(255),
+    tracking_device_type varchar(255),
+    tracking_country varchar(255),
+    tracking_state varchar(255),
+    tracking_city varchar(255),
     ts_load timestamp without time zone
 );

@@ -11,7 +11,8 @@ atualizadoEm timestamp,
 criadoEm timestamp,
 numeroCreci varchar(24),
 origin varchar(24),
-affiliateType varchar(62)
+affiliateType varchar(62),
+user_id bigint
 )
 WITH (
   OIDS=FALSE

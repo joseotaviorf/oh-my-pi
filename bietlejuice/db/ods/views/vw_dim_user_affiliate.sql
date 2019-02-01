@@ -2,19 +2,27 @@ DROP VIEW if exists public.vw_dim_user_affiliate;
 
 CREATE VIEW public.vw_dim_user_affiliate as
  select
- 	id as sk_user_affiliate,
- 	id as id_user_affiliate,
-	inicioAtuacao as ts_joined_program,
-	tipoAfiliado as category,
-	cidadeAtuacao  as work_city,
-	ativo as is_active,
-	atualizadoEm as ts_updated,
-	criadoEm as ts_created,
-	numeroCreci as creci_number,
-	origin as origin,
-	affiliateType as "type",
+ 	ua.id as sk_user_affiliate,
+ 	ua.id as id_user_affiliate,
+	ua.inicioAtuacao as ts_joined_program,
+	ua.tipoAfiliado as category,
+	ua.cidadeAtuacao  as work_city,
+	ua.ativo as is_active,
+	ua.atualizadoEm as ts_updated,
+	ua.criadoEm as ts_created,
+	ua.numeroCreci as creci_number,
+	ua.origin as origin,
+	ua.affiliateType as "type",
+	uao.u_utm_source as tracking_source,
+	uao.u_utm_medium as tracking_medium,
+	uao.u_platform as tracking_platform,
+	uao.device_type as tracking_device_type,
+	uao.country as tracking_country,
+	uao.region as tracking_state,
+	uao.city as tracking_city,
 	now() as ts_load
- from user_affiliate
+ from user_affiliate ua
+ left join
+ 	  user_affiliate_origin uao on ua.user_id = uao.user_id
 ;
-
   
