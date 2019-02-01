@@ -11,6 +11,7 @@ CREATE TABLE staging.dim_user_doorman (
     ts_updated TIMESTAMP,
     ts_created TIMESTAMP,
     ts_joined_program TIMESTAMP,
+    sk_user_affiliate BIGINT,
     ts_load TIMESTAMP
 )
 WITH (oids = false);

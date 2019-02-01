@@ -10,7 +10,8 @@ workCity varchar(255),
 code varchar(255),
 atualizadoEm timestamp,
 criadoEm timestamp,
-joinedProgramAt timestamp
+joinedProgramAt timestamp,
+id_dados_afiliado bigint
 )
 WITH (
   OIDS=FALSE

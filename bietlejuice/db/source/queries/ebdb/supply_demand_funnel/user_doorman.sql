@@ -7,6 +7,10 @@ SELECT
 	dad.code,
 	dad.atualizadoEm,
 	dad.criadoEm,
-	dad.joinedProgramAt
+	dad.joinedProgramAt,
+	da.id
 FROM
 	DoormanAffiliateData dad
+LEFT JOIN
+	DadosAfiliado da
+	ON da.doormanAffiliateData_id = dad.id

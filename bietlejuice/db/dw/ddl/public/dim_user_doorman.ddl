@@ -11,5 +11,6 @@ create table public.dim_user_doorman(
     ts_updated timestamp,
     ts_created timestamp,
     ts_joined_program timestamp,
+    sk_user_affiliate bigint,
     ts_load timestamp without time zone
 );
