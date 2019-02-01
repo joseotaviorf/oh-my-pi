@@ -1,7 +1,7 @@
 drop table if exists datalake_clean.ods_dim_user_affiliate;
 create external table if not exists datalake_clean.ods_dim_user_affiliate (
-    sk_affiliate string,
-    id_affiliate string,
+    sk_user_affiliate string,
+    id_user_affiliate string,
     ts_joined_program string,
     category string,
     work_city string,

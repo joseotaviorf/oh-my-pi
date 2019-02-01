@@ -1,8 +1,8 @@
 drop table if exists dim_user_affiliate;
 
 create table public.dim_user_affiliate (
-    sk_affiliate bigint primary key,
-    id_affiliate bigint,
+    sk_user_affiliate bigint primary key,
+    id_user_affiliate bigint,
     ts_joined_program timestamp,
     category varchar(62),
     work_city varchar(255),
