@@ -2,8 +2,8 @@ DROP VIEW if exists public.vw_dim_user_affiliate;
 
 CREATE VIEW public.vw_dim_user_affiliate as
  select
- 	id as sk_affiliate,
- 	id as id_affiliate,
+ 	id as sk_user_affiliate,
+ 	id as id_user_affiliate,
 	inicioAtuacao as ts_joined_program,
 	tipoAfiliado as category,
 	cidadeAtuacao  as work_city,

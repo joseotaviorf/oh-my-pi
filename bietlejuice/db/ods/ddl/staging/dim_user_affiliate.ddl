@@ -1,8 +1,8 @@
 DROP TABLE staging.dim_user_affiliate;
 
 CREATE TABLE staging.dim_user_affiliate (
-    sk_affiliate BIGINT NOT NULL,
-    id_affiliate BIGINT,
+    sk_user_affiliate BIGINT NOT NULL,
+    id_user_affiliate BIGINT,
     ts_joined_program TIMESTAMP,
     category VARCHAR(255),
     work_city VARCHAR(255),
