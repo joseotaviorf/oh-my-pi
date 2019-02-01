@@ -19,17 +19,17 @@ pipeline:
       - pip install -q -r requirements.txt
       - pip install -q -r requirements_test.txt
       - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=5 --cov-config .coveragerc tests
+      - coverage-badge -o badge-lines.svg
   
   publish-coverage:
     image: plugins/s3
     acl: public-read
     bucket: 5a-coverage
-    source: coverage/*.svg
-    strip_prefix: coverage/
+    source: badge-lines.svg
     target: /bi-etl-ejuice
     when:
       branch: [ master ]
-
+    
   install-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
