@@ -25,12 +25,9 @@ pipeline:
     image: plugins/s3
     acl: public-read
     bucket: 5a-coverage
-    source: coverage/*.svg
-    strip_prefix: coverage/
+    source: badge-lines.svg
     target: /bi-etl-ejuice
-    when:
-      branch: [ master ]
-
+    
   install-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
