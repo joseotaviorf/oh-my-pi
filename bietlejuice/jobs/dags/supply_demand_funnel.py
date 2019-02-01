@@ -9,7 +9,7 @@ from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
-    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag
+    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from qa_python_utils import QuintoAndarLogger
@@ -254,6 +254,18 @@ def affiliate_sub_dag(sub_dag_name):
     return sub_dag.build_affiliate_with_tests()
 
 
+def doorman_sub_dag(sub_dag_name):
+    sub_dag = DoormanSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_doorman_with_tests()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -405,6 +417,12 @@ affiliate_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Affiliate'
 )
 
+doorman_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=doorman_sub_dag,
+    sub_dag_name='Doorman'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -453,7 +471,7 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                      user_dag, house_dag, ods_house_rent_flow, affiliate_dag])
+                                      user_dag, house_dag, ods_house_rent_flow, affiliate_dag, doorman_dag])
 airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_listing_rent_flows])
 refresh_listing_rent_flows >> refresh_booking
