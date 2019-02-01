@@ -1,6 +1,6 @@
-DROP VIEW if exists public.vw_dim_affiliate;
+DROP VIEW if exists public.vw_dim_user_affiliate;
 
-CREATE VIEW public.vw_dim_affiliate as
+CREATE VIEW public.vw_dim_user_affiliate as
  select
  	id as sk_affiliate,
  	id as id_affiliate,
@@ -14,7 +14,7 @@ CREATE VIEW public.vw_dim_affiliate as
 	origin as origin,
 	affiliateType as "type",
 	now() as ts_load
- from affiliate
+ from user_affiliate
 ;
 
   

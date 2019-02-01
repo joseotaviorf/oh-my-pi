@@ -1,6 +1,6 @@
-DROP TABLE staging.dim_affiliate;
+DROP TABLE staging.dim_user_affiliate;
 
-CREATE TABLE staging.dim_affiliate (
+CREATE TABLE staging.dim_user_affiliate (
     sk_affiliate BIGINT NOT NULL,
     id_affiliate BIGINT,
     ts_joined_program TIMESTAMP,

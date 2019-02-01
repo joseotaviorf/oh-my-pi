@@ -1,6 +1,6 @@
-DROP TABLE if exists public.affiliate;
+DROP TABLE if exists public.user_affiliate;
 
-CREATE TABLE public.affiliate
+CREATE TABLE public.user_affiliate
 (
 id bigint NOT NULL,
 inicioAtuacao timestamp,

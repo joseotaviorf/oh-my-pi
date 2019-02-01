@@ -1,6 +1,6 @@
-drop table if exists dim_affiliate;
+drop table if exists dim_user_affiliate;
 
-create table public.dim_affiliate (
+create table public.dim_user_affiliate (
     sk_affiliate bigint primary key,
     id_affiliate bigint,
     ts_joined_program timestamp,

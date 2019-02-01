@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.ods_dim_affiliate;
-create external table if not exists datalake_clean.ods_dim_affiliate (
+drop table if exists datalake_clean.ods_dim_user_affiliate;
+create external table if not exists datalake_clean.ods_dim_user_affiliate (
     sk_affiliate string,
     id_affiliate string,
     ts_joined_program string,
@@ -18,7 +18,7 @@ with serdeproperties (
   'separatorChar' = ',',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/clean/ods/affiliate'
+location 's3://5a-datalake/clean/ods/user_affiliate'
 tblproperties (
   'skip.header.line.count' = '1'
 )

@@ -21,7 +21,7 @@ class AffiliateSubDag(DimSubDag):
             schedule_interval=schedule_interval,
             start_date=start_date,
             ebdb_table_name='DadosAfiliado',
-            ods_stg_table_name='affiliate'
+            ods_stg_table_name='user_affiliate'
         )
 
     def build_affiliate_with_tests(self):
@@ -50,31 +50,31 @@ class AffiliateSubDag(DimSubDag):
     def __build_data_tasks(self, dag):
         ods_affiliate = BaseDAG.build_python_operator(
             dag=dag,
-            task_id='ODS_affiliate',
+            task_id='ODS_user_affiliate',
             provide_context=True,
             python_callable=self.__move_query_results_from_ebdb_to_ods,
             op_kwargs={
-                'dim_name': 'affiliate'
+                'dim_name': self.ods_stg_table_name
             }
         )
 
         staging_dim_affiliate_task = BaseDAG.build_python_operator(
             dag=dag,
-            task_id='STAGING_dim_affiliate',
+            task_id='STAGING_dim_user_affiliate',
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
-                'dim_name': 'affiliate',
-                'post_command': "update staging.dim_affiliate set ts_load = '{}' where sk_affiliate = -1;".format(
+                'dim_name': self.ods_stg_table_name,
+                'post_command': "update staging.dim_user_affiliate set ts_load = '{}' where sk_affiliate = -1;".format(
                     datetime.now().strftime('%Y-%m-%d'))
             }
         )
 
         dw_dim_affiliate_task = BaseDAG.build_python_operator(
             dag=dag,
-            task_id='DW_dim_affiliate',
+            task_id='DW_dim_user_affiliate',
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
-                'dim_name': 'affiliate',
+                'dim_name': self.ods_stg_table_name,
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
