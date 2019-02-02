@@ -123,7 +123,7 @@ pipeline:
     commands:
       - |-
         sonar-scanner \
-          -Dsonar.projectName=Linhadireta \
+          -Dsonar.projectName=Bietlejuice \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=. \
