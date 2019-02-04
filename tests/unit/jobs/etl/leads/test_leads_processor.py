@@ -1,7 +1,6 @@
 import decimal
 
 import mock
-import numpy as np
 import pandas as pd
 import petl
 import pytest
@@ -159,24 +158,16 @@ class TestLeadsProcessor(object):
     def test__build_leads_list_with_key_matching(self, leads_processor):
         # arrange
         leads = pd.DataFrame(
-            data=[['lorem ipsum', np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
-                  np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]],
-            columns=['origem', 'tipo', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'complemento',
-                     'lat', 'lng',
-                     'valor', 'nomeAnunciante', 'telefoneAnunciante', 'telefoneAnuncianteDois',
-                     'telefoneAnuncianteTres',
-                     'email', 'infosExtras', 'referencia'])
-        expected_result = '{\"referencia\": NaN, \"complemento\": NaN, \"tipo\": NaN, \"bairro\": NaN, ' \
-                          '"cidade\": NaN, \"origem\": \"lorem ipsum\", \"numero\": NaN, \"telefoneAnunciante\": NaN,' \
-                          ' "infosExtras\": NaN, \"telefoneAnuncianteDois\": NaN, \"nomeAnunciante\": NaN, ' \
-                          '"valor\": NaN, \"cep\": NaN, \"lat\": NaN, \"endereco\": NaN, \"lng\": NaN, ' \
-                          '"email\": NaN, \"telefoneAnuncianteTres\": NaN}'
+            data=[['lorem', 'ipsum']],
+            columns=['origem', 'tipo'])
 
         # act
         result = leads_processor._build_leads_list(leads)
 
         # assert
-        assert result[0] == expected_result
+        for index, row in leads.iterrows():
+            for i, v in row.items():
+                assert '"{}": "{}"'.format(i, v) in result[0]
 
     @mock.patch.object(BaseETL, 'publish_messages')
     @mock.patch.object(LeadsProcessor, '_build_leads_list', return_value='[{id:1}]')
