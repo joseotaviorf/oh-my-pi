@@ -12,5 +12,6 @@ tenant_id bigint default null,
 value decimal(19, 2)default null,
 house_id bigint default null,
 mundipagg_token varchar(255)default null,
-is_ongoing boolean default null
+is_ongoing int default null,
+CONSTRAINT reservation_pkey PRIMARY KEY(id)
 );

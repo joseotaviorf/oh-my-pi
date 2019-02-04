@@ -10,5 +10,4 @@ SELECT
   status,
   value,
   is_ongoing
-FROM
-  public.reservation;
+FROM public.reservation;
