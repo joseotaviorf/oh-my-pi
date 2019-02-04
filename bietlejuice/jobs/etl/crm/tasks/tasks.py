@@ -1,11 +1,10 @@
+import boto3
 import json
 from abc import abstractmethod
+from botocore.exceptions import ClientError
 from datetime import datetime
 from gzip import GzipFile
 from io import BytesIO
-
-import boto3
-from botocore.exceptions import ClientError
 from ordereddict import OrderedDict
 from pymongo import MongoClient
 from qa_python_utils import QuintoAndarLogger
@@ -56,9 +55,9 @@ class CRMTasks(object):
     TABLE_PARTITION_PARAM = '__PARTITION_DATE__'
 
     @logger(exclude='mongo_client_uri')
-    def __init__(self, s3_bucket, mongo_client_uri, execution_date):
+    def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
         self.s3_bucket = s3_bucket
-        self.mongo_client = MongoClient(mongo_client_uri)
+        self.mongo_client = self._get_mongo_client(mongo_client_uri)
         self.execution_date_from = execution_date.replace(hour=0, minute=0, second=0, microsecond=0)
         self.partition_date = self.execution_date_from.strftime('%Y-%m-%d')
         self.execution_date_to = execution_date.replace(hour=23, minute=59, second=59, microsecond=59)
@@ -519,3 +518,12 @@ class CRMTasks(object):
         )
 
         return len(result) == 1
+
+    @logger(exclude='mongo_client_uri')
+    def _get_mongo_client(self, mongo_client_uri):
+        if mongo_client_uri:
+            logger.info('m=_get_mongo_client, msg=Creating mongodb connection')
+            return MongoClient(mongo_client_uri)
+
+        logger.info('m=_get_mongo_client, mongo_client_uri=None')
+        return None

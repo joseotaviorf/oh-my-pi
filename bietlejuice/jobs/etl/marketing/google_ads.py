@@ -1,10 +1,10 @@
 from collections import OrderedDict
-from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('GoogleAds')
 
