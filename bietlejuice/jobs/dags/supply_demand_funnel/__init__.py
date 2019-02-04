@@ -2,6 +2,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.bank_account_subdag import BankA
 from bietlejuice.jobs.dags.supply_demand_funnel.bank_subdag import BankSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.bank_transaction import BankTransactionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.booking_subdag import BookingSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.condo_subdag import CondoSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
