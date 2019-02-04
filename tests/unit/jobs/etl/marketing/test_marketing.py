@@ -112,3 +112,23 @@ class TestMarketing(object):
         assert mock_bulk_insert.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_args[1]['sql'] == expect_pre_staging_query
+
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    @mock.patch.object(BaseETL, 'from_db_query', return_value=pd.DataFrame(['a', 'b']))
+    @mock.patch.object(BaseETL, 'truncate_table')
+    def test__load_to_staging(self, mock_truncate_table, mock_from_db_query, mock_bulk_insert, marketing):
+        # arrange
+        dw_table_name = 'datawarehouse_table'
+        staging_query = 'select * from staging.datawarehouse_table'
+
+        # act
+        marketing._load_to_staging(dw_table_name, staging_query)
+
+        # assert
+        assert mock_truncate_table.call_count == 1
+        assert mock_from_db_query.call_count == 1
+        assert mock_bulk_insert.call_count == 1
+        assert mock_truncate_table.call_args[1]['table_name'] == dw_table_name
+        assert mock_truncate_table.call_args[1]['schema'] == 'staging'
+        assert mock_from_db_query.call_args[1]['query'] == staging_query
+        assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.{}'.format(dw_table_name)
