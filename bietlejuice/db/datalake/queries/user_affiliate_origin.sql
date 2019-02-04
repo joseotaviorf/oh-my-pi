@@ -9,7 +9,7 @@ select
 	region,
 	city,
 	client_event_time,
-	rank() over (partition by user_id order by client_event_time) as event_order
+	rank() over (partition by user_id order by event_time, client_event_time) as event_order
 from datalake_clean.amplitude_events
 where et in ('login_confirmation_viewed', 'home_page_viewed')
 and app='205027'

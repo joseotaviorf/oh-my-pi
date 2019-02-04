@@ -10,7 +10,7 @@ create external table if not exists datalake_clean.ods_dim_user_doorman (
     ts_updated string,
     ts_created string,
     ts_joined_program string,
-    sk_user_affiliate bigint,
+    sk_user_affiliate string,
     ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
