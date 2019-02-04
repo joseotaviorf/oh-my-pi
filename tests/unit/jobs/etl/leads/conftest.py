@@ -12,12 +12,12 @@ config_json = """
 
 
 @pytest.fixture(scope='session')
-def lead_reprocessor():
+def leads_reprocessor():
     return LeadsReprocessor(
         config_json=config_json
     )
 
 
 @pytest.fixture(scope='session')
-def lead_processor():
+def leads_processor():
     return LeadsProcessor()
