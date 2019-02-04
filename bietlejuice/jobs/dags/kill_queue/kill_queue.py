@@ -6,6 +6,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.dags.kill_queue.reservation_subdag import ReservationSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
@@ -14,7 +15,7 @@ logger = QuintoAndarLogger('kill_queue_dag')
 env.set_airflow_var_to_local_env('KILLQUEUE')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-MAIN_DAG_NAME = 'kill-queue-etl'
+MAIN_DAG_NAME = 'kill-queue-etl3'
 MAIN_START_DATE = datetime(2019, 1, 27)
 MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
@@ -42,7 +43,7 @@ main_dag = DAG(
 )
 
 
-def get_sub_dag(sub_dag_name, **kwargs):
+def create_datalake_sub_dag(sub_dag_name, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -81,31 +82,53 @@ def get_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
+def reservation_sub_dag(sub_dag_name):
+    sub_dag = ReservationSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_tasks_with_tests()
+
+
 # operators
-house_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+house_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='house',
-    sub_dag_func=get_sub_dag,
+    sub_dag_name='house-to-datalake',
+    sub_dag_func=create_datalake_sub_dag,
     table=KillQueueTableEnum.HOUSE
 )
 
-rent_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+rent_flow_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='rent-flow',
-    sub_dag_func=get_sub_dag,
+    sub_dag_name='rent-flow-to-datalake',
+    sub_dag_func=create_datalake_sub_dag,
     table=KillQueueTableEnum.RENT_FLOW
 )
 
-reservation_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+reservation_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='reservation',
-    sub_dag_func=get_sub_dag,
+    sub_dag_name='reservation-to-datalake',
+    sub_dag_func=create_datalake_sub_dag,
     table=KillQueueTableEnum.RESERVATION
 )
 
-house_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+reservation_aud_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='reservation-aud',
-    sub_dag_func=get_sub_dag,
+    sub_dag_name='reservation-aud-to-datalake',
+    sub_dag_func=create_datalake_sub_dag,
     table=KillQueueTableEnum.RESERVATION_AUD
 )
+
+reservation_to_ods_to_dw_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='reservation-to-ods-to-dw',
+    sub_dag_func=reservation_sub_dag
+
+)
+
+reservation_to_ods_to_dw_task.set_upstream(
+    [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task,
+     reservation_aud_to_datalake_task])
