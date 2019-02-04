@@ -24,6 +24,7 @@ CREATE EXTERNAL TABLE datalake_raw.`zendesk_tickets`(
   `tags` string,
   `brand_id` string,
   `metric_set` string,
+  `metric_events` string,
   `group_id` string,
   `organization_id` string,
   `recipient` string,

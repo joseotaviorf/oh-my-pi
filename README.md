@@ -1,4 +1,5 @@
 [![Build Status](https://drone.quintoandar.com.br/api/badges/quintoandar/bi-etl-ejuice/status.svg)](http://drone.quintoandar.com.br/quintoandar/bi-etl-ejuice)
+![Coverage](https://s3.amazonaws.com/5a-coverage/bi-etl-ejuice/badge-lines.svg)
 
 # Bi-etl-ejuice
 <img src="https://cdn.apps.joltteam.com/brikbuild/beetlejuice-pixel-art-8bit-beetlejuice-ghost-pixel-pixel-art-warner-bros-5a24f9adf6c96a8d29720595.brickImg.jpg" width="300" height="300">

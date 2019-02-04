@@ -1,4 +1,5 @@
 import mock
+from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
@@ -38,3 +39,39 @@ class TestCRMTasks(object):
         assert mock_dataframe_to_db.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_args[0][0] == final_query
+
+    @mock.patch.object(CRMTasks, '_get_mongo_client')
+    def test_init_with_mongo_uri(self, mock_get_mongo_client):
+        # arrange
+        s3_bucket = 'BUCKET'
+        mongo_client_uri = 'MONGO_URI'
+        execution_date = datetime.now()
+
+        # act
+        tasks = CRMTasks(
+            s3_bucket=s3_bucket,
+            mongo_client_uri=mongo_client_uri,
+            execution_date=execution_date
+        )
+
+        # assert
+        assert tasks.mongo_client is not None
+        assert mock_get_mongo_client.call_count == 1
+        assert mock_get_mongo_client.call_args[0][0] == mongo_client_uri
+
+    @mock.patch.object(CRMTasks, '_get_mongo_client')
+    def test_init_without_mongo_uri(self, mock_get_mongo_client):
+        # arrange
+        s3_bucket = 'BUCKET'
+        execution_date = datetime.now()
+
+        # act
+        tasks = CRMTasks(
+            s3_bucket=s3_bucket,
+            execution_date=execution_date
+        )
+
+        # assert
+        assert tasks.mongo_client is not None
+        assert mock_get_mongo_client.call_count == 1
+        assert mock_get_mongo_client.call_args[0][0] is None
