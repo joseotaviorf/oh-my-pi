@@ -66,11 +66,6 @@ select  -- count(1)
   l.utmSource as utm_source,
   ua.id as usuario_que_indicou_id,
   l.codigoImobiliaria as codigo_imobiliaria,
-  case
-    when SUBSTRING_INDEX(infosExtras,';',1) REGEXP '^-?[0-9]+$'
-    then SUBSTRING_INDEX(infosExtras,';',1)
-    else NULL
-  end as reprocessed_lead_id,
   (region.city is not null) as flg_city_served,
   (poligons.id is not null) as flg_latlng_served,
   case  when date(coalesce(l.criadoEm, '1900-01-01 00:00:00')) < date('2018-08-01') then 1
