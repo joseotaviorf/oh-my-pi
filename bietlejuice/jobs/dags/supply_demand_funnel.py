@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -429,7 +429,9 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
-               'dag_id': 'bi-amplitude-load-events'}
+               'dag_id': 'bi-amplitude-load-events'},
+    retry_delay=timedelta(minutes=10),
+    max_retry_delay=timedelta(minutes=10)
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
