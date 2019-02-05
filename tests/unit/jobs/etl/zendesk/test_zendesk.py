@@ -183,7 +183,7 @@ class TestZendeskETL(object):
         assert mock__upsert_data.call_args[0][0] == upsert_query
         assert mock__upsert_data.call_args[0][1] == table_name
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select * from table')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value="select * from table t.channel != 'api'")
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
     @mock.patch.object(ZendeskETL, '_is_prod_table_empty', return_value=True)
@@ -203,11 +203,12 @@ class TestZendeskETL(object):
         assert mock__is_prod_table_empty.call_count == 1
         assert mock__is_prod_table_empty.call_args[0][0] == table_name
         assert mock_execute_query_and_return_dataframe.call_count == 1
-        assert mock_execute_query_and_return_dataframe.call_args[0][0] == 'select * from table'
+        assert mock_execute_query_and_return_dataframe.call_args[0][0] == "select * from table t.channel != 'api'"
         assert mock_bulk_insert.call_count == 1
         assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_table'
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select * from table')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name',
+                       return_value="select * from table where t.channel != 'api' {where_clause}")
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
     @mock.patch.object(ZendeskETL, '_is_prod_table_empty', return_value=False)
@@ -217,7 +218,7 @@ class TestZendeskETL(object):
         # arrange
         table_name = 'table'
         query_path = '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name)
-        query = "select * from table \n where t.dt_extraction='2018-01-01'"
+        query = "select * from table where t.channel != 'api' and t.dt_extraction='2018-01-01'"
 
         # act
         zendesk.build_staging_table(table_name)
