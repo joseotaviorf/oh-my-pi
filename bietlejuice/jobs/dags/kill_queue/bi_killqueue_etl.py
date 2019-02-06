@@ -15,9 +15,9 @@ logger = QuintoAndarLogger('kill_queue_dag')
 env.set_airflow_var_to_local_env('KILLQUEUE')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-MAIN_DAG_NAME = 'kill-queue-etl3'
+MAIN_DAG_NAME = 'bi-killqueue-etl'
 MAIN_START_DATE = datetime(2019, 1, 27)
-MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 
 def run_factory_method(table, method):
@@ -37,7 +37,7 @@ main_dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     catchup=False
 )
@@ -122,13 +122,13 @@ reservation_aud_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     table=KillQueueTableEnum.RESERVATION_AUD
 )
 
-reservation_to_ods_to_dw_task = BaseSubDag.get_sub_dag_operator(
+reservation_subdag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='reservation-to-ods-to-dw',
+    sub_dag_name='reservation',
     sub_dag_func=reservation_sub_dag
 
 )
 
-reservation_to_ods_to_dw_task.set_upstream(
+reservation_subdag.set_upstream(
     [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task,
      reservation_aud_to_datalake_task])

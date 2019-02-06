@@ -16,7 +16,7 @@ class CondoSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='Condominio',
+            table_name='Condominio',
             ods_stg_table_name='condo'
         )
 
