@@ -7,8 +7,7 @@ from qa_python_utils import QuintoAndarLogger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.etl.kill_queue.killqueue_factory import KillQueueFactory
-from bietlejuice.jobs.etl.kill_queue.killqueue_table_enum import KillQueueTableEnum
+from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
 logger = QuintoAndarLogger('kill_queue_dag')
 
@@ -17,7 +16,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'kill-queue-etl'
 MAIN_START_DATE = datetime(2019, 1, 27)
-MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
 
 def run_factory_method(table, method):
