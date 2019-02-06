@@ -6,6 +6,7 @@ select
   i.cidade,
   i.complemento,
   i.condominio,
+  i.condominioPai_id as condo_id,
   i.dataConstrucao as data_construcao,
   i.elevador,
   i.emailContato as email_contato,

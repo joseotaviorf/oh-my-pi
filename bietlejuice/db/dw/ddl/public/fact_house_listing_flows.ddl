@@ -2,6 +2,7 @@ drop table public.fact_house_listing_flows;
 
 create table public.fact_house_listing_flows (
 	sk_house_listing_flow bigint NOT NULL,
+	sk_condo bigint,
 	sk_lead integer,
 	sk_lead_conversion integer,
 	sk_first_photo_job integer,

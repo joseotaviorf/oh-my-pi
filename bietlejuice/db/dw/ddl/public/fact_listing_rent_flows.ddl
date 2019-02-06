@@ -7,6 +7,7 @@ create table fact_listing_rent_flows (
   sk_house_de_publication_date integer,
   sk_house_first_offer_submitted_date integer,
   sk_region integer,
+  sk_condo bigint,
   sk_rent_flow integer,
   sk_booking integer,
   sk_booking_created_date integer,
