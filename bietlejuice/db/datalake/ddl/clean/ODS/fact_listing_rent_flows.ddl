@@ -71,10 +71,10 @@ create external table datalake_clean.ods_fact_listing_rent_flows(
   days_credit_approved_to_closing_processed    string,
   days_offer_approved_to_doc_contact           string,
   sk_agent_review_rating_date                  string,
-  ts_load                                      string,
   sk_reservation                               string,
   sk_reservation_created_date                  string,
-  nb_reserv_attempts                           string
+  reservation_attempts                         string,
+  ts_load                                      string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde' with serdeproperties (
 'separatorChar' = ',',

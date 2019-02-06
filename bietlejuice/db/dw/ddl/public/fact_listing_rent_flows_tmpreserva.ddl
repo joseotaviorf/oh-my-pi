@@ -70,9 +70,9 @@ days_house_listing_to_visit numeric(14, 2),
 days_credit_approved_to_closing_processed numeric(14, 2),
 days_offer_approved_to_doc_contact numeric(14, 2),
 sk_agent_review_rating_date integer,
-ts_load timestamp without time zone,
 sk_reservation bigint,
 sk_reservation_created_date int,
-nb_reserv_attempts int
+reservation_attempts int,
+ts_load timestamp without time zone
 )
 with oids;

@@ -5,12 +5,12 @@ _reservation as (
    select
        r1.id as id,
        r1.created_at as created_at,
-       r1.house_id as house_id,
-       r1.tenant_id as tenant_id,
-       r2.nb_reserv_attempts as nb_reserv_attempts
+       r1.house_id as id_house,
+       r1.tenant_id as id_tenant,
+       r2.reservation_attempts as reservation_attempts
     from reservation r1
     inner join
-    (select house_id, tenant_id, max(created_at) as max_created_at, count(*) as nb_reserv_attempts
+    (select house_id, tenant_id, max(created_at) as max_created_at, count(*) as reservation_attempts
     from reservation
     group by house_id, tenant_id) as r2
     on r1.house_id = r2.house_id and r1.tenant_id = r2.tenant_id and r1.created_at = r2.max_created_at
@@ -110,10 +110,9 @@ _fact as (
 	  hrf.visit_last_updated_type,
 	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
 	  now()::timestamp as ts_load,
---    check here (do the join from the view or from ods.public)
     coalesce(rs.id, -1) as sk_reservation,
     coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
-    rs.nb_reserv_attempts as nb_reserv_attempts
+    rs.reservation_attempts as reservation_attempts
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -139,7 +138,7 @@ _fact as (
   left join agent_review ar
     on hrf.id_booking = ar.id_booking
  left join _reservation rs
-    on hrf.id_house = rs.house_id and hrf.id_client = tenant_id and vdo.status = 'Aprovada'
+    on hrf.id_house = rs.id_house and hrf.id_client = id_tenant and vdo.status = 'Aprovada'
 )
 select
   ods_id,
@@ -268,9 +267,9 @@ select
     date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
 		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,
 	sk_agent_review_rating_date,
-    ts_load,
     sk_reservation,
     sk_reservation_created_date,
-    nb_reserv_attempts
+    reservation_attempts,
+    ts_load
 from _fact
 ;
