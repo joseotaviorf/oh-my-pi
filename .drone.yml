@@ -150,8 +150,8 @@ pipeline:
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,bietlejuice/tests/**,scripts/** \
-          -Dsonar.tests=./bietlejuice/tests \
+          -Dsonar.exclusions=kube/**,tests/**,scripts/** \
+          -Dsonar.tests=./tests \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.host.url=https://sonar.quintoandar.com.br \
