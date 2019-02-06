@@ -25,19 +25,20 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__get_execution_date(**kwargs),
+            execution_date=self.__get_execution_date(kwargs['execution_date']),
             auth=self.auth
         )
         getattr(marketing_class, 'move_{}_to_raw'.format(self.class_.value))()
 
-    @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
             account=account,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
+
         getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()
 
     @logger
@@ -55,6 +56,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_staging(dw_table_name=dw_table)
@@ -64,6 +66,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_prod(table_name=dw_table)
@@ -168,6 +171,6 @@ class MarketingSubDag(BaseSubDag):
             }
         )
 
-    @logger
+    @logger(exclude='execution_date')
     def __get_execution_date(self, execution_date):
         return execution_date - timedelta(1)

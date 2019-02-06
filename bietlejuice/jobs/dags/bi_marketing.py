@@ -11,7 +11,7 @@ from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSu
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
-MAIN_DAG_NAME = 'bi-criteo-test4433'
+MAIN_DAG_NAME = 'bi-marketing-final'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,6,12,18 * * *')
 
@@ -62,7 +62,8 @@ def clean_sub_dag(sub_dag_name, class_, accounts):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        accounts=accounts
+        accounts=accounts,
+        auth=auth
     )
 
     return sub_dag.build_tasks('clean')
@@ -90,6 +91,7 @@ def load_to_staging_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        auth=auth
     )
 
     return sub_dag.build_tasks('staging')
@@ -103,6 +105,7 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        auth=auth
     )
 
     return sub_dag.build_tasks('dw')
@@ -122,7 +125,7 @@ criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
     accounts='default'
 )
-
+print("---log 1---\n")
 criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
@@ -130,11 +133,12 @@ criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
 )
 
+print("---log 2---\n")
 criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
     sub_dag_name='criteo-load-to-dw',
     class_=MarketingEnum.CRITEO,
 )
-
+print("---log 3---\n")
 airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)

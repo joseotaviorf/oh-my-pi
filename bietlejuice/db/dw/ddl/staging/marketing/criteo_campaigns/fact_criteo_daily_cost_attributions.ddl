@@ -1,5 +1,5 @@
-DROP TABLE if EXISTS marketing.fact_criteo_daily_cost_attributions;
-CREATE TABLE if NOT EXISTS marketing.fact_criteo_daily_cost_attributions (
+DROP TABLE if EXISTS staging.fact_criteo_daily_cost_attributions;
+CREATE TABLE if NOT EXISTS staging.fact_criteo_daily_cost_attributions (
     sk_criteo_campaign INTEGER,
     sk_cost_attribution_date INTEGER,
     currency VARCHAR(65535),
@@ -10,6 +10,6 @@ CREATE TABLE if NOT EXISTS marketing.fact_criteo_daily_cost_attributions (
     all_sales INTEGER,
     revenue INTEGER,
     composition_win DOUBLE,
-    cpc DOUBLE,
+    cpc DOUBLE
 )
 ;

@@ -11,4 +11,4 @@ SELECT
     cast(composition_win as double) as composition_win,
     cast(cpc as double) as cpc
 FROM datalake_clean.marketing_criteo_campaigns
-WHERE dt_cost_attribution  = '{dt_cost_attribution}'
+WHERE dt_created  = '{date}' and acc = '{account}'

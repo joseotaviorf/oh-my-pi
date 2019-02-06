@@ -11,6 +11,9 @@ class MarketingCriteoCampaignsSubDag(MarketingSubDag):
                  accounts=None):
         super(MarketingCriteoCampaignsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
                                                              start_date, auth, integration)
+        self.dim_tables = ["dim_criteo_campaign"]
+        self.fact_tables = ["fact_criteo_daily_cost_attributions"]
+        self.datalake_tables = ["marketing_criteo_campaigns"]
 
     @logger
     def build_clean_tasks(self, dag):

@@ -4,12 +4,13 @@ from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
 
+import petl
 import requests
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags import DW_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
 
 logger = QuintoAndarLogger('CriteoCampaigns')
@@ -19,7 +20,7 @@ class CriteoCampaigns(Marketing):
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
 
     def __init__(self, s3_bucket, execution_date, auth, account=None):
-        super(CriteoCampaigns, self).__init__(s3_bucket, execution_date, 'criteo_campaigns', auth)
+        super(CriteoCampaigns, self).__init__(s3_bucket, execution_date, 'criteo_campaigns', account)
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
 
@@ -67,7 +68,7 @@ class CriteoCampaigns(Marketing):
         try:
             response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
             loaded = json.loads(response.text)
-            response_without_total = json.dumps(loaded["Rows"])
+            response_without_total = loaded["Rows"]
             # The json returned by the API has 2 tables ("Total" and "Rows"), one with all the necessary vars,
             # and the other with just the sum of everything. This way, we're sending only the necessary table to DL
             return response_without_total
@@ -75,15 +76,17 @@ class CriteoCampaigns(Marketing):
             logger.error('m=__make_request, error message={}'.format(e))
 
     def _save_to_s3(self, client_id, client_secret):
+
         logger.info('m=_save_to_s3, client_id={}'.format(client_id))
-        raw_json_data = self.__make_request(client_id, client_secret)
+        raw_dict_data = self.__make_request(client_id, client_secret)
 
         gz_body = BytesIO()
-        with GzipFile(fileobj=gz_body, mode='w') as fp:
-            fp.write((json.dumps(raw_json_data, ensure_ascii=False)).encode('utf-8'))
-            fp.write('\n')
+        for _dict in raw_dict_data:
+            with GzipFile(fileobj=gz_body, mode='w') as fp:
+                fp.write((json.dumps(_dict, ensure_ascii=False)).encode('utf-8'))
+                fp.write('\n')
 
-        file_suffix = 'raw/marketing/criteo_campaigns/dt_extraction={}/data.gz'.format(
+        file_suffix = 'raw/marketing/criteo_campaigns/acc=default/dt={}/data.gz'.format(
             self.execution_date.strftime('%Y-%m-%d'))
 
         BaseETL.obj_to_s3(
@@ -98,54 +101,73 @@ class CriteoCampaigns(Marketing):
     @logger
     def move_criteo_campaigns_to_clean(self):
         r_cols = OrderedDict([
-            ('Advertiser Name', str),
-            ('Campaign ID', str),
-            ('Campaign Name', str),
-            ('Day', str),
-            ('Currency', str),
-            ('Clicks', str),
-            ('Impressions', str),
-            ('Audience', str),
-            ('Cost', str),
-            ('All Sales', str),
-            ('Revenue', str),
-            ('Comp. Win', str),
-            ('CPC', str)
+            ('advertiser name', str),
+            ('campaign id', str),
+            ('campaign name', str),
+            ('cost_attribution_date', str),
+            ('currency', str),
+            ('clicks', str),
+            ('impressions', str),
+            ('audience', str),
+            ('cost', str),
+            ('all sales', str),
+            ('revenue', str),
+            ('comp. win', str),
+            ('cpc', str)
+        ])
+
+        c_cols = OrderedDict([
+            ('advertiser_name', str),
+            ('campaign_id', str),
+            ('campaign_name', str),
+            ('cost_attribution_date', str),
+            ('currency', str),
+            ('clicks', str),
+            ('impressions', str),
+            ('audience', str),
+            ('cost', str),
+            ('all_sales', str),
+            ('revenue', str),
+            ('composition_win', str),
+            ('cpc', str)
         ])
 
         self._move_to_clean(
             table_name='marketing_criteo_campaigns',
             sql_file_name='criteo_campaigns.sql',
-            r_cols=r_cols
+            r_cols=r_cols,
+            c_cols=c_cols
         )
 
-    @logger
     def load_to_staging(self, dw_table_name):
         query = self.__load_table(dw_table_name)
+        query = query.format(date=self.partition_date, account='default')
         logger.info("m=load_to_staging, query={}".format(query))
+        print("\nDW TABLE NAME: ", dw_table_name)
         self._load_to_staging(dw_table_name, query)
 
-    @logger
     def __load_table(self, table_name):
         table_type = table_name.split('_')[0]
+        print("\nTABLE TYPE: ", table_type)
+        print("\nTABLE NAME: ", table_name)
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 
-    @logger
     def _load_dim_to_staging(self, table_name):
         dim_query = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/{}.sql'.format(
-                DW_QUERIES_DIR,
+            '{}/marketing/{}/clean_to_staging/{}.sql'.format(
+                DATALAKE_QUERIES_DIR,
+                'criteo_campaigns',
                 table_name))
 
         return dim_query
 
-    @logger
     def _load_fact_to_staging(self, table_name):
         int_date = int(self.execution_date.strftime("%Y%m%d"))
 
         fact_query = BaseETL.get_query_from_file_name(
-            '{}/staging/marketing/{}.sql'.format(
-                DW_QUERIES_DIR,
+            '{}/marketing/{}/clean_to_staging/{}.sql'.format(
+                DATALAKE_QUERIES_DIR,
+                'criteo_campaigns',
                 table_name))
 
         empty = self._is_prod_table_empty(table_name)
@@ -178,6 +200,27 @@ class CriteoCampaigns(Marketing):
 
         return fact_query
 
-    @logger
+    @logger(exclude="staging_query")
+    def _load_to_staging(self, dw_table_name, staging_query):
+
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
+            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+
+        df = self.athena_client.execute_query_and_return_dataframe(sql=staging_query)
+
+        logger.info("m=_load_to_staging, schema={}, table_name={}, msg=inserting into staging table".format(
+            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+
+        df_table = petl.fromdataframe(df=df)
+
+        BaseETL.bulk_insert(
+            table=df_table,
+            table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=False,
+            commit=True,
+        )
+
     def load_to_prod(self, table_name):
         self._load_to_prod(table_name)

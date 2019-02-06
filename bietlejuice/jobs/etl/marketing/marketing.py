@@ -26,7 +26,9 @@ class Marketing(object):
         'dim_google_campaign': 'sk_campaign',
         'fact_google_daily_cost_attributions': 'sk_keyword || sk_ad',
         'dim_facebook_ad': 'sk_ad',
-        'fact_facebook_daily_cost_attributions': 'sk_ad'
+        'fact_facebook_daily_cost_attributions': 'sk_ad',
+        'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
+        'dim_criteo_campaign': 'sk_criteo_campaign'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -37,12 +39,11 @@ class Marketing(object):
         self.athena_client = AthenaClient(self.s3_bucket)
         self.integration = integration
         self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(integration=self.integration)
-        self.database = 'datalake_raw',
+        self.database = 'datalake_raw'
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
-        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/ \
-              dt_created={date_partition}/{file_name}.parquet'.format(
+        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/dt_created={date_partition}/{file_name}.parquet'.format(
             integration=self.integration,
             table_name=table_name,
             acc_partition=self.account,
@@ -56,11 +57,15 @@ class Marketing(object):
                 query_path=self.raw_query_path,
                 file_name=sql_file_name))
 
+        print('pre partition\n\n\n')
         self.athena_client.add_partition(
             database=self.database,
             table_name=table_name,
             partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
+        print('post partition\n\n\n')
+        print(r_cols)
+        print(key)
 
         self.athena_client.create_parquet_from_query(
             key=key,
@@ -68,6 +73,7 @@ class Marketing(object):
             raw_columns=r_cols,
             clean_columns=c_cols
         )
+        print('end eeee\n\n\n')
 
     @logger(exclude=['table_schema', 'accounts'])
     def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema):
@@ -117,13 +123,13 @@ class Marketing(object):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
-
+        print("--log 1--\n")
         BaseETL.truncate_table(
             db_enum=EnumDB.BI_DW,
             table_name=dw_table_name,
             schema=Marketing.SCHEMA_NAMES['staging']
         )
-
+        print("--log 2--\n")
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=inserting into dw".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
@@ -132,7 +138,7 @@ class Marketing(object):
             query=staging_query,
             encoding='utf-8',
         )
-
+        print("--log 3--\n")
         BaseETL.bulk_insert(
             table=table_data,
             table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
@@ -140,6 +146,7 @@ class Marketing(object):
             encoding='utf-8',
             commit=True,
         )
+        print("--log 4--\n")
 
     @logger
     def _load_to_prod(self, table_name):
