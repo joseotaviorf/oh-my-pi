@@ -5,11 +5,12 @@ clone:
 
 pipeline:
 
-  lint:
+  progressive-lint:
     image: python:2.7.12
     commands:
       - pip install -q flake8==3.5.0
-      - flake8 --max-line-length=120 .
+      - export FILES_CHANGED=$(git diff --name-only master | grep '.py$' || true)
+      - flake8 --max-line-length=120 $FILES_CHANGED
 
   unit-test:
     image: python:2.7.12
@@ -28,6 +29,7 @@ pipeline:
     source: badge-lines.svg
     target: /bi-etl-ejuice
     when:
+      event: push
       branch: [ master ]
     
   install-forno:
@@ -47,6 +49,7 @@ pipeline:
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ forno ]
 
   install-production:
@@ -66,6 +69,7 @@ pipeline:
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ master ]
 
   load-dags-forno:
@@ -78,6 +82,7 @@ pipeline:
     delete: true
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ forno ]
 
   load-dags-production:
@@ -90,6 +95,7 @@ pipeline:
     delete: true
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ master ]
 
   load-plugins-forno:
@@ -103,6 +109,7 @@ pipeline:
     delete: true
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ forno ]
 
   load-plugins-prod:
@@ -116,6 +123,7 @@ pipeline:
     delete: true
     secrets: [ rsync_key ]
     when:
+      event: push
       branch: [ master ]
 
   notify:
