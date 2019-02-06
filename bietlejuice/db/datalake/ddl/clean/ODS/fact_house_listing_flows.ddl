@@ -2,6 +2,7 @@ drop table if exists datalake_clean.ods_fact_house_listing_flows;
 
 create external table datalake_clean.ods_fact_house_listing_flows (
 	sk_house_listing_flow string,
+	sk_condo string,
 	sk_lead string,
 	sk_lead_conversion string,
 	sk_first_photo_job string,
