@@ -57,5 +57,5 @@ left join datalake_clean.ods_dim_house_listing dhl
               end)
 left join datalake_clean.zendesk_groups zg
     on zg.id = t.group_id
-{where_clause}
+__WHERE_CLAUSE__
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14

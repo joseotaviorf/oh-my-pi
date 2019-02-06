@@ -115,4 +115,4 @@ left join c c1
     on t.sk_contract = c1.sk_contract
 left join c c2
     on t.sk_house_listing = c2.sk_house_listing
-{where_clause}
+__WHERE_CLAUSE__

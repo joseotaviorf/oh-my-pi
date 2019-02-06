@@ -18,4 +18,4 @@ select
     t.created_at,
     t.updated_at
 from datalake_clean.zendesk_users t
-{where_clause}
+__WHERE_CLAUSE__
