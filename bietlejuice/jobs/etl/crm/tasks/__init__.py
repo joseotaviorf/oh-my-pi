@@ -4,6 +4,7 @@ from bietlejuice.jobs.etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnu
 from bietlejuice.jobs.etl.crm.tasks.factory import CRMTasksFactory
 from bietlejuice.jobs.etl.crm.tasks.inspection import CRMTasksInspection
 from bietlejuice.jobs.etl.crm.tasks.lead import CRMTasksLead
+from bietlejuice.jobs.etl.crm.tasks.offboarding import CRMTasksOffboarding
 from bietlejuice.jobs.etl.crm.tasks.onboarding_tenant import CRMTasksOnboardingTenant
 from bietlejuice.jobs.etl.crm.tasks.payment import CRMTasksPayment
 from bietlejuice.jobs.etl.crm.tasks.photo_job import CRMTasksPhotoJob

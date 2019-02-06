@@ -2,13 +2,12 @@ import decimal
 import json
 
 import petl
-from qa_python_utils import QuintoAndarLogger
-from shapely import wkt
-from shapely.geometry import Point
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR
+from qa_python_utils import QuintoAndarLogger
+from shapely import wkt
+from shapely.geometry import Point
 
 logger = QuintoAndarLogger('LeadsProcessor')
 
@@ -23,20 +22,20 @@ class LeadsProcessor(object):
     QUEUE = 'CrawlerLeads'
 
     def __init__(self):
-        self.__poly = None
+        self._poly = None
         self.__unit_d = None
 
     @logger
     def get_polygons(self):
-        if self.__poly is None:
+        if self._poly is None:
             q = BaseETL.get_query_from_file_name('{}/ebdb/leads/get_polygons.sql'.format(SOURCE_QUERIES_DIR))
             poly = BaseETL.from_db_query(db_enum=EnumDB.QuintoAndar_ebdb, query=q, encoding='utf8mb4')
             poly = petl.todataframe(poly)
 
             poly.polygon = poly.polygon.apply(wkt.loads)
-            self.__poly = poly
+            self._poly = poly
 
-        return self.__poly
+        return self._poly
 
     @logger
     def get_unit_divisor(self, unit=None):
@@ -98,13 +97,13 @@ class LeadsProcessor(object):
         return petl.todataframe(contacts)
 
     @staticmethod
-    def __build_categorical_filter(column, categories):
+    def _build_categorical_filter(column, categories):
         if categories is None or not isinstance(categories, list):
             return None
 
         return """{} in ('{}')\n""".format(column, "', '".join(categories))
 
-    def __build_time_interval_filter(self, column, interval, unit):
+    def _build_time_interval_filter(self, column, interval, unit):
         u = self.get_unit_divisor(unit)
         if u is None:
             return None
@@ -120,10 +119,10 @@ class LeadsProcessor(object):
         q = """select * from Lead\n"""
 
         filters = [
-            self.__build_categorical_filter('origem', origin),
-            self.__build_categorical_filter('status', status),
-            self.__build_categorical_filter('reason', reason),
-            self.__build_time_interval_filter('atualizadoEm', interval, unit)
+            self._build_categorical_filter('origem', origin),
+            self._build_categorical_filter('status', status),
+            self._build_categorical_filter('reason', reason),
+            self._build_time_interval_filter('atualizadoEm', interval, unit)
         ]
 
         where = 'and '.join(filter(lambda x: x is not None, filters))
@@ -135,7 +134,7 @@ class LeadsProcessor(object):
         return petl.todataframe(leads)
 
     @staticmethod
-    def __build_leads_list(leads):
+    def _build_leads_list(leads):
         columns = ['origem', 'tipo', 'cep', 'cidade', 'bairro', 'endereco', 'numero', 'complemento', 'lat', 'lng',
                    'valor', 'nomeAnunciante', 'telefoneAnunciante', 'telefoneAnuncianteDois', 'telefoneAnuncianteTres',
                    'email', 'infosExtras', 'referencia']
@@ -146,7 +145,7 @@ class LeadsProcessor(object):
 
     @logger(exclude=['leads'])
     def send_leads(self, leads):
-        json_list = self.__build_leads_list(leads)
+        json_list = self._build_leads_list(leads)
         BaseETL.publish_messages(
             messages=json_list,
             queue_name=self.QUEUE

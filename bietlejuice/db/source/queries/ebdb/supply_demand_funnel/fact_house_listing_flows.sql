@@ -221,9 +221,6 @@ from
         when l.origem = 'Facebook' then 'Facebook'
         when l.origem = 'Landing' then 'Landing Page Leads' -- BrokenOpenLink goes here also
         when l.origem = 'Crawling' then 'Crawling'
-        when l.origem = 'Reprocessado' and old_lead.origem = 'Landing' then 'Reprocessed Landing'
-        when l.origem = 'Reprocessado' and old_lead.tipo = 'Afiliado' then 'Reprocessed Affiliate'
-        when l.origem = 'Reprocessado' then 'Reprocessed Others'
         when l.origem = 'OwnerPWA' and l.tipo = 'BrokenOpenLink' then 'Direct Referral'
         when l.origem = 'OwnerPWA' and l.tipo = 'LandingMarketing' then 'Landing Owner App'
         when l.origem = 'OwnerPWA' and l.tipo = 'LandingOpenLink' then 'Direct Referral'
@@ -250,17 +247,12 @@ from
       (
         select
           le.*,
-          coalesce(lr.reason, le.reason) as lead_reason,
-          case
-            when SUBSTRING_INDEX(le.infosExtras,';',1) REGEXP '^-?[0-9]+$'
-            then SUBSTRING_INDEX(le.infosExtras,';',1)
-          else NULL
-        end as old_id
+          coalesce(lr.reason, le.reason) as lead_reason
       from Lead le
       left join vw_lead_reason lr
       	on le.reason = lr.reason_detail
       where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}') order by 1 asc
-    ) l -- all data from Lead table plus a reprocessed Extra Field
+    ) l
     left join
       ConversaoLead cl
       on cl.leadConvertido_id = l.id
@@ -329,10 +321,6 @@ from
     left join
       Usuario reg
       on reg.id = i.usuarioQueCadastrou_id
-    left join
-      Lead old_lead
-      on old_lead.id = l.old_id
-      AND DATE(coalesce(old_lead.criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
