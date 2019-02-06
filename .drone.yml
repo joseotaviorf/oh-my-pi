@@ -159,9 +159,6 @@ pipeline:
           -Dsonar.login=user \
           -Dsonar.password=$${SONAR_PASSWORD}
     secrets: [ sonar_password, github_access_token ]
-    when:
-      event: push
-      branch: [ master ]
   
   notify:
     image: plugins/slack
