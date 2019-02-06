@@ -138,7 +138,10 @@ _fact as (
   left join agent_review ar
     on hrf.id_booking = ar.id_booking
  left join _reservation rs
-    on hrf.id_house = rs.id_house and hrf.id_client = id_tenant and vdo.status = 'Aprovada'
+    on hrf.id_house = rs.id_house
+        and hrf.id_client = id_tenant
+        and vdo.status = 'Aprovada'
+        and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
 )
 select
   ods_id,
