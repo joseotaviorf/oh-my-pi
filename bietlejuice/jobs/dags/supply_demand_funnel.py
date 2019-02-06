@@ -428,6 +428,7 @@ condo_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=condo_sub_dag,
     sub_dag_name='Condo'
+)
 
 affiliate_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
