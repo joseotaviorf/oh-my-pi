@@ -14,12 +14,12 @@ class BaseSubDag(object):
     """
 
     @logger
-    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name=None):
+    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, table_name=None):
         self.sub_dag_name = sub_dag_name
         self.dag_name = dag_name
         self.schedule_interval = schedule_interval
         self.start_date = start_date
-        self.ebdb_table_name = ebdb_table_name
+        self.table_name = table_name
         self.bucket = bucket
 
     @logger
