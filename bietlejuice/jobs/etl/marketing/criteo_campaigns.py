@@ -143,13 +143,10 @@ class CriteoCampaigns(Marketing):
         query = self.__load_table(dw_table_name)
         query = query.format(date=self.partition_date, account='default')
         logger.info("m=load_to_staging, query={}".format(query))
-        print("\nDW TABLE NAME: ", dw_table_name)
         self._load_to_staging(dw_table_name, query)
 
     def __load_table(self, table_name):
         table_type = table_name.split('_')[0]
-        print("\nTABLE TYPE: ", table_type)
-        print("\nTABLE NAME: ", table_name)
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 
     def _load_dim_to_staging(self, table_name):

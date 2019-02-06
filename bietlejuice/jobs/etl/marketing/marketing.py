@@ -123,13 +123,13 @@ class Marketing(object):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
-        print("--log 1--\n")
+
         BaseETL.truncate_table(
             db_enum=EnumDB.BI_DW,
             table_name=dw_table_name,
             schema=Marketing.SCHEMA_NAMES['staging']
         )
-        print("--log 2--\n")
+
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=inserting into dw".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
@@ -138,7 +138,7 @@ class Marketing(object):
             query=staging_query,
             encoding='utf-8',
         )
-        print("--log 3--\n")
+
         BaseETL.bulk_insert(
             table=table_data,
             table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
@@ -146,7 +146,6 @@ class Marketing(object):
             encoding='utf-8',
             commit=True,
         )
-        print("--log 4--\n")
 
     @logger
     def _load_to_prod(self, table_name):

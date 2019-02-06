@@ -125,7 +125,7 @@ criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
     accounts='default'
 )
-print("---log 1---\n")
+
 criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
@@ -133,12 +133,11 @@ criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
 )
 
-print("---log 2---\n")
 criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
     sub_dag_name='criteo-load-to-dw',
     class_=MarketingEnum.CRITEO,
 )
-print("---log 3---\n")
+
 airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)
