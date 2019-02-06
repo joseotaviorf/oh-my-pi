@@ -150,7 +150,7 @@ pipeline:
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,tests/**,scripts/** \
+          -Dsonar.exclusions=kube/**,covhtml/**,scripts/** \
           -Dsonar.tests=./tests \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
