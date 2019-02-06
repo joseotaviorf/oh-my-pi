@@ -27,7 +27,7 @@ class ReservationSubDag(BaseSubDag):
         reservation_dag = self._build_local_dag()
 
         reservation_to_ods_task = BaseDAG.build_python_operator(
-            task_id='reservation_to_ods',
+            task_id='reservation-to-ods',
             dag=reservation_dag,
             python_callable=utils.load_athena_query_to_ods,
             op_kwargs={
@@ -38,7 +38,7 @@ class ReservationSubDag(BaseSubDag):
         )
         staging_dim_reservation_task = BaseDAG.build_python_operator(
             dag=reservation_dag,
-            task_id='STAGING_dim_reservation',
+            task_id='staging-dim-reservation',
             python_callable=utils.load_dim_from_ods_to_staging,
             op_kwargs={
                 'dim_name': 'reservation',
@@ -51,7 +51,7 @@ class ReservationSubDag(BaseSubDag):
         )
 
         dim_reservation_task = BaseDAG.build_python_operator(
-            task_id='DW_dim_reservation',
+            task_id='dw-dim-reservation',
             dag=reservation_dag,
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
