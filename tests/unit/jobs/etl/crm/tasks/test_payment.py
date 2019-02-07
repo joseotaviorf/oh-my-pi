@@ -14,7 +14,8 @@ class TestCRMTasksPayment(object):
         'DEP_FINANCEIRO_ID',
         'DEP_PAYMENTS_SELFCONDO',
         'DEP_OFFBOARDING_FINANCEIRO',
-        'DEP_ACORDOS_DESCONTOS_ID'
+        'DEP_ACORDOS_DESCONTOS_ID',
+        'DEP_ONBOARDING_FINANCEIRO'
     ]
 
     TABLE_NAMES = {
