@@ -44,7 +44,7 @@ class BankAccountSubDag(DimSubDag):
             python_callable=utils.extract_table_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': self.ods_stg_table_name,
-                'table_name': self.ebdb_table_name,
+                'table_name': self.table_name,
                 'copy_to_clean': False,
                 'bucket': DimSubDag.S3_BUCKET
             }
