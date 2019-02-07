@@ -20,7 +20,7 @@ class AffiliateSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='DadosAfiliado',
+            table_name='DadosAfiliado',
             ods_stg_table_name='user_affiliate'
         )
 
