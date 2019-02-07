@@ -75,6 +75,7 @@ fact_with_reproc as (
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
+		coalesce(h.condo_id, -1) as sk_condo,
 		coalesce(f.lead_id, -1) as sk_lead,
 		coalesce(f.conversao_id, -1) as sk_lead_conversion,
 		coalesce(f.photo_job_id, -1) as sk_first_photo_job,
@@ -215,6 +216,7 @@ taxonomy as (
 )
 select
 	pl.sk_house_listing_flow,
+	pl.sk_condo,
 	pl.sk_lead,
 	pl.sk_lead_conversion,
 	pl.sk_first_photo_job,

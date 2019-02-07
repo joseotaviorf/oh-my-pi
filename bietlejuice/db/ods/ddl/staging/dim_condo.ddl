@@ -1,9 +1,9 @@
 drop table if exists staging.dim_condo;
 create table staging.dim_condo(
   sk_condo bigint,
-  id bigint,
-  ts_updated date,
-  ts_created date,
+  id_condo bigint,
+  dt_updated date,
+  dt_created date,
   neighborhood varchar(200),
   zipcode varchar(200),
   city varchar(200),
