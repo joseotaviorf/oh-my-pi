@@ -15,7 +15,7 @@ logger = QuintoAndarLogger('crawling-leads-olx')
 
 MAIN_DAG_NAME = 'crawling-leads-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 1 1/1 * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 
@@ -92,7 +92,7 @@ def insert_leads(**kwargs):
         'm=insert_leads, msg=got {} leads after removing duplicate phone numbers.'.format(
             len(leads)))
 
-    leads = leads[leads.phone_number.str.len() >= 11]
+    leads = leads[leads.phone_number.str.len() >= 8]
     logger.info(
         'm=insert_leads, msg=got {} leads after checking size of the phone number.'.format(
             len(leads)))
