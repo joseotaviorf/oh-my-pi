@@ -17,7 +17,7 @@ class BankSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='Banco',
+            table_name='Banco',
             ods_stg_table_name='bank'
         )
 
