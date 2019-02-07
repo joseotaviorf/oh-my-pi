@@ -1,8 +1,8 @@
 with parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '.*{\\"id\\":(\d+)', 1) as field_id,
-        replace(regexp_extract(f1.field, '.*"value\\":(.+)}"}', 1), '\"') as value
+        regexp_extract(f1.field, '.*{\\?"id\\?":(\d+)', 1) as field_id,
+        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from datalake_clean.zendesk_tickets zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
 ),
@@ -20,23 +20,28 @@ last_rows as (
         max(dt_extraction) as dt
     from datalake_clean.zendesk_tickets
     group by 1
+),
+ticket_without_api as (
+    select * from datalake_clean.zendesk_tickets
+    where channel != 'api'
 )
-select distinct
-       t.id as sk_ticket,
-       t.subject,
-       t.description,
-       t.channel,
-       zg.name as box,
-       t.priority,
-       t.recipient,
-       t.tags,
-       t.satisfaction_rating,
-       c.cols['Tipo de Solicitação'] as request_type,
-       c.cols['Tipo de Cliente'] as client_type,
-       date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-       t.created_at,
-       current_timestamp as ts_load
-from datalake_clean.zendesk_tickets t
+select
+   t.id as sk_ticket,
+   t.subject,
+   t.description,
+   t.channel,
+   zg.name as box,
+   t.priority,
+   t.recipient,
+   t.tags,
+   t.satisfaction_rating,
+   c.cols['Tipo de Solicitação'] as request_type,
+   c.cols['Tipo de Cliente'] as client_type,
+   date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
+   t.created_at,
+   current_timestamp as ts_load,
+   max(t.updated_at)
+from ticket_without_api t
 join last_rows lr
     on lr.id = t.id and lr.dt = t.dt_extraction
 left join fields_map c
@@ -52,3 +57,5 @@ left join datalake_clean.ods_dim_house_listing dhl
               end)
 left join datalake_clean.zendesk_groups zg
     on zg.id = t.group_id
+__WHERE_CLAUSE__
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
