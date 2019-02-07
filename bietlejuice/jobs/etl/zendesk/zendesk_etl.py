@@ -11,6 +11,8 @@ logger = QuintoAndarLogger("ZendeskETL")
 
 
 class ZendeskETL(object):
+    WHERE_CLAUSE = '__WHERE_CLAUSE__'
+
     SCHEMAS = {
         'raw': 'datalake_raw',
         'clean': 'datalake_clean'
@@ -520,8 +522,11 @@ class ZendeskETL(object):
             logger.info(
                 'm=build_staging_table, table_name={}, msg=production table is not empty'.format(
                     table_name))
-
-            query = "{} \n where t.dt_extraction='{}'".format(query, self.execution_date)
+            where_clause = "where t.dt_extraction='{}'".format(self.execution_date)
+            query = query.replace(ZendeskETL.WHERE_CLAUSE, where_clause)
+        else:
+            # for full load
+            query.replace(ZendeskETL.WHERE_CLAUSE, '')
 
         df = self.athena_client.execute_query_and_return_dataframe(query)
         table_data = petl.fromdataframe(df)

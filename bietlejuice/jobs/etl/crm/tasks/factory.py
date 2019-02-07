@@ -16,11 +16,14 @@ class CRMTasksFactory(object):
 
     @staticmethod
     def factory(class_, s3_bucket, mongo_client_uri, execution_date):
-        __class = CRMTasksFactory._dispatch_dict(class_)
         if class_ is None:
-            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
+            raise ValueError('m=factory, class_={}, msg=invalid class'.format(class_))
 
-        return __class(
+        _class = CRMTasksFactory._dispatch_dict(class_)
+        if _class is None:
+            raise RuntimeError('m=factory, class_={}, msg=class type not found'.format(class_))
+
+        return _class(
             s3_bucket=s3_bucket,
             mongo_client_uri=mongo_client_uri,
             execution_date=execution_date
