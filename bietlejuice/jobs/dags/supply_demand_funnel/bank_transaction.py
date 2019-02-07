@@ -15,7 +15,7 @@ class BankTransactionSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='OperacaoContaCorrente',
+            table_name='OperacaoContaCorrente',
             ods_stg_table_name='bank_transaction'
         )
 
