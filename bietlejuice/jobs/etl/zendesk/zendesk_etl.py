@@ -525,6 +525,7 @@ class ZendeskETL(object):
             where_clause = "where t.dt_extraction='{}'".format(self.execution_date)
             query = query.replace(ZendeskETL.WHERE_CLAUSE, where_clause)
         else:
+            # for full load
             query.replace(ZendeskETL.WHERE_CLAUSE, '')
 
         df = self.athena_client.execute_query_and_return_dataframe(query)
