@@ -53,6 +53,7 @@ create table public.fact_house_listing_flows (
 	is_cx_direct_register boolean,
 	has_isales_intervention boolean,
 	is_call_center boolean,
+	is_lead_reprocessed boolean,
 	mkt_branded varchar(255),
 	mkt_category varchar(255),
 	mkt_flow varchar(255),
