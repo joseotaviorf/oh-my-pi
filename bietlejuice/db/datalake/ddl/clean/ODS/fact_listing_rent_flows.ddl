@@ -19,6 +19,9 @@ create external table datalake_clean.ods_fact_listing_rent_flows(
   sk_client_sign_up_date                       string,
   sk_visit                                     string,
   sk_offer                                     string,
+  sk_reservation                               string,
+  sk_reservation_created_date                  string,
+  reservation_attempts                         string,
   sk_offer_submitted_date                      string,
   sk_min_offer_submitted_date                  string,
   sk_offer_approved_date                       string,
@@ -71,9 +74,6 @@ create external table datalake_clean.ods_fact_listing_rent_flows(
   days_credit_approved_to_closing_processed    string,
   days_offer_approved_to_doc_contact           string,
   sk_agent_review_rating_date                  string,
-  sk_reservation                               string,
-  sk_reservation_created_date                  string,
-  reservation_attempts                         string,
   ts_load                                      string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde' with serdeproperties (

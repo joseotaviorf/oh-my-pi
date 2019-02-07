@@ -1,8 +1,8 @@
-DROP TABLE staging.dim_reservation;
+DROP TABLE if exists staging.dim_reservation;
 
 CREATE TABLE staging.dim_reservation(
 sk_reservation bigint not null,
-id bigint,
+id_reservation bigint,
 ts_created timestamp,
 ts_updated timestamp,
 version int4,

@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags.kill_queue.reservation_subdag import ReservationSubDa
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
-logger = QuintoAndarLogger('kill_queue_dag')
+logger = QuintoAndarLogger('bi-killqueue-etl')
 
 env.set_airflow_var_to_local_env('KILLQUEUE')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
