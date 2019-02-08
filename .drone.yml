@@ -126,8 +126,7 @@ pipeline:
           -Dsonar.projectName=Bietlejuice \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,tests/**,htmlcov/**,scripts/** \
+          -Dsonar.sources=./bietlejuice \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.analysis.mode=preview \
           -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
@@ -158,6 +157,9 @@ pipeline:
           -Dsonar.login=user \
           -Dsonar.password=$${SONAR_PASSWORD}
     secrets: [ sonar_password, github_access_token ]
+    when:
+      event: push
+      branch: [ master ]
   
   notify:
     image: plugins/slack
