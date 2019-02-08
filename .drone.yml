@@ -145,15 +145,14 @@ pipeline:
     image: newtmitch/sonar-scanner
     commands:
       - |-
-        sonar-scanner -X \
+        sonar-scanner \
           -Dsonar.projectName=Bietlejuice \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,htmlcov/**,scripts/** \
-          -Dsonar.tests=./tests \
+          -Dsonar.sources=./bietlejuice \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.tests=./tests \
           -Dsonar.host.url=https://sonar.quintoandar.com.br \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.login=user \
