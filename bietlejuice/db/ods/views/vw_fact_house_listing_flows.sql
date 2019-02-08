@@ -267,6 +267,7 @@ select
 	pl.is_cx_direct_register,
 	pl.has_isales_intervention,
 	pl.is_call_center,
+	pl.reprocessed_flg as is_lead_reprocessed,
 	case
         when pl.is_branded then 'Branded'
         else 'Other'
