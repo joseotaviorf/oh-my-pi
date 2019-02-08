@@ -16,7 +16,7 @@ class ProposalSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='Proposta',
+            table_name='Proposta',
             ods_stg_table_name='proposal'
         )
 

@@ -1,8 +1,8 @@
 with parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '.*{\\"id\\":(\d+)', 1) as field_id,
-        replace(regexp_extract(f1.field, '.*"value\\":(.+)}"}', 1), '\"') as value
+        regexp_extract(f1.field, '.*{\\?"id\\?":(\d+)', 1) as field_id,
+        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from datalake_clean.zendesk_tickets zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
 ),
@@ -115,3 +115,4 @@ left join c c1
     on t.sk_contract = c1.sk_contract
 left join c c2
     on t.sk_house_listing = c2.sk_house_listing
+__WHERE_CLAUSE__
