@@ -127,7 +127,7 @@ pipeline:
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,bietlejuice/tests/**,scripts/** \
+          -Dsonar.exclusions=kube/**,tests/**,htmlcov/**,scripts/** \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.analysis.mode=preview \
           -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
@@ -150,7 +150,7 @@ pipeline:
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
           -Dsonar.sources=. \
-          -Dsonar.exclusions=kube/**,tests/**,htmlcov/**,scripts/** \
+          -Dsonar.exclusions=kube/**,htmlcov/**,scripts/** \
           -Dsonar.tests=./tests \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
