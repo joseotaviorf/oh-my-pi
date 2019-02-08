@@ -1,35 +1,33 @@
-DROP TABLE datalake_raw.marketing_criteo_campaigns;
+DROP TABLE datalake_raw.marketing_rtb_campaigns;
 
-CREATE EXTERNAL TABLE datalake_raw.marketing_criteo_campaigns (
-  day string,
-  impressions string,
-  clicks string,
-  ctr string,
-  conversions_count string,
-  conversions_rate string,
-  cpc string,
-  ecc string,
-  roas string,
-  conversions_value
-  )
+CREATE EXTERNAL TABLE datalake_raw.marketing_rtb_campaigns (
+    status string,
+    hash string,
+    name string,
+    currency string,
+    url string,
+    day string,
+    impscount string,
+    clickscount string,
+    ctr string,
+    campaigncost string,
+    conversionscount string,
+    conversionsrate string,
+    cpc string
+)
 PARTITIONED BY (
-  dt_extraction string)
+  acc string,
+  dt string)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
-'ignore.malformed.json'    = 'true',
-'mapping.day'              = 'day',
-'mapping.impressions'      = 'impsCount',
-'mapping.clicks'           = 'clicksCount',
-'mapping.conversions_count'= 'conversionsCount',
-'mapping.conversions_rate' = 'conversionsRate',
-'mapping.conversions_value'= 'conversionsValue',
+'ignore.malformed.json'   = 'true'
 )
 STORED AS INPUTFORMAT
   'org.apache.hadoop.mapred.TextInputFormat'
 OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://5a-datalake/raw/marketing/rtb_campaigns/all/'
+  's3://5a-datalake/raw/marketing/rtb_campaigns/'
 
-MSCK REPAIR TABLE datalake_raw.marketing_criteo_campaigns;
+MSCK REPAIR TABLE datalake_raw.marketing_rtb_campaigns;

@@ -1,15 +1,14 @@
 DROP TABLE if EXISTS staging.fact_criteo_daily_cost_attributions;
 CREATE TABLE if NOT EXISTS staging.fact_criteo_daily_cost_attributions (
-    sk_criteo_campaign INTEGER,
+    sk_rtb_campaign INTEGER,
     sk_date INTEGER,
     currency VARCHAR(100),
     clicks INTEGER,
     impressions DOUBLE PRECISION,
-    audience DOUBLE PRECISION,
+    ctr DOUBLE PRECISION,
     cost DOUBLE PRECISION,
-    all_sales INTEGER,
-    revenue INTEGER,
-    composition_win DOUBLE PRECISION,
+    conversions_count DOUBLE PRECISION,
+    conversions_rate DOUBLE PRECISION,
     cpc DOUBLE PRECISION
 )
 ;

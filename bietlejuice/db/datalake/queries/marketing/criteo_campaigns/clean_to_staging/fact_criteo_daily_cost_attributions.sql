@@ -1,6 +1,6 @@
 SELECT
     cast(campaign_id as integer) as sk_criteo_campaign,
-    cast(date_format(cast(cost_attribution_date as date), '%Y%m%d') as integer) as sk_cost_attribution_date,
+    cast(date_format(cast(cost_attribution_date as date), '%Y%m%d') as integer) as sk_date,
     currency,
     cast(clicks as integer) as clicks,
     cast(impressions as double) as impressions,

@@ -25,7 +25,9 @@ class Marketing(object):
         'dim_facebook_ad': 'sk_ad',
         'fact_facebook_daily_cost_attributions': 'sk_ad',
         'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
-        'dim_criteo_campaign': 'sk_criteo_campaign'
+        'dim_criteo_campaign': 'sk_criteo_campaign',
+        'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
+        'dim_rtb_campaign': 'sk_rtb_campaign'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -54,15 +56,11 @@ class Marketing(object):
                 query_path=self.raw_query_path,
                 file_name=sql_file_name))
 
-        print('pre partition\n\n\n')
         self.athena_client.add_partition(
             database=self.database,
             table_name=table_name,
             partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
-        print('post partition\n\n\n')
-        print(r_cols)
-        print(key)
 
         self.athena_client.create_parquet_from_query(
             key=key,
@@ -70,7 +68,12 @@ class Marketing(object):
             raw_columns=r_cols,
             clean_columns=c_cols
         )
-        print('end eeee\n\n\n')
+
+        self.athena_client.add_partition(
+            database='datalake_clean',
+            table_name=table_name,
+            partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
+        )
 
     @logger(exclude=['table_schema', 'accounts'])
     def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema):

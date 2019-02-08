@@ -11,6 +11,9 @@ class MarketingRtbCampaignsSubDag(MarketingSubDag):
                  accounts=None):
         super(MarketingRtbCampaignsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
                                                           start_date, auth, integration)
+        self.dim_tables = ["dim_rtb_campaign"]
+        self.fact_tables = ["fact_rtb_daily_cost_attributions"]
+        self.datalake_tables = ["marketing_rtb_campaigns"]
 
     @logger
     def build_clean_tasks(self, dag):
