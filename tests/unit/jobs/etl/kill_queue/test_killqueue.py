@@ -20,7 +20,7 @@ class TestKillQueue(object):
         # arrange
         table = 'table'
         file_query = '{}/kill_queue/extract_{}_data.sql'.format(SOURCE_QUERIES_DIR, table)
-        query = 'select 1 from dummy'
+        query = 'select 1 as foo from dummy'
         mock_get_query_from_file_name.return_value = query
         db_enum = EnumDB.QuintoAndar_killqueue
         out_file_path = 'raw/kill_queue/{}/data.gz'.format(table)
@@ -46,7 +46,7 @@ class TestKillQueue(object):
         r_cols = OrderedDict({'id': str})
         c_cols = deepcopy(r_cols)
         query_filename = '{}/kill_queue/{}.sql'.format(DATALAKE_QUERIES_DIR, table)
-        query = 'select 1 from dummy'
+        query = 'select 1 as foo from dummy'
         mock_get_query_from_filename.return_value = query
         out_file_path = 'clean/kill_queue/{}/data.parq'.format(table)
 
