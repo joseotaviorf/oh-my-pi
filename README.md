@@ -7,13 +7,7 @@
 Airflow implementation and DAGs.
 
 ### Post-clone
-#### Git hooks
-
-```
-pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
-```
-
-### Configuration Settings
+#### Configuration Settings
 
 Export `AIRFLOW_GPL_UNIDECODE` variable
 
@@ -43,6 +37,12 @@ Configure path folder/file which Airflow will run the Dags
 - Go to the airflow program folder (probably will be at /home/[YOUR_USERNAME])
 - Open file airflow.cfg with an editor
 - Edit line with variable `dags_folder`, assigning your right path
+
+#### Git hooks
+
+```
+pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
+```
 
 ### Airflow
 
