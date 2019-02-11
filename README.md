@@ -9,12 +9,6 @@ Airflow implementation and DAGs.
 ### Post-clone
 #### Configuration Settings
 
-Export `AIRFLOW_GPL_UNIDECODE` variable
-
-```
-export AIRFLOW_GPL_UNIDECODE=yes
-```
-
 Install `requirements.txt` in a virtualenv:
 - To create a virtual environment (inside bi-etl-ejuice directory):
 ```
@@ -24,6 +18,12 @@ virtualenv [ENVIRONMENT_NAME]
 - To activate a virtual environment:
 ```
 source [ENVIRONMENT_NAME]/bin/activate
+```
+
+Export `AIRFLOW_GPL_UNIDECODE` variable
+
+```
+export AIRFLOW_GPL_UNIDECODE=yes
 ```
 
 - Install requirements.txt
