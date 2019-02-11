@@ -7,8 +7,8 @@ from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.zendesk import ZendeskSubDag
 
-MAIN_DAG_NAME = 'bi-zendesk-models'
-MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
+MAIN_DAG_NAME = 'bi-zendesk-etl'
+MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -26,7 +26,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    catchup=True,
+    catchup=False,
     max_active_runs=1
 )
 
