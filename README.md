@@ -7,6 +7,37 @@
 Airflow implementation and DAGs.
 
 ### Post-clone
+#### Configuration Settings
+
+Install `requirements.txt` in a virtualenv:
+- To create a virtual environment (inside bi-etl-ejuice directory):
+```
+virtualenv [ENVIRONMENT_NAME]
+```
+
+- To activate a virtual environment:
+```
+source [ENVIRONMENT_NAME]/bin/activate
+```
+
+Export `AIRFLOW_GPL_UNIDECODE` variable
+
+```
+export AIRFLOW_GPL_UNIDECODE=yes
+```
+
+- Install requirements.txt
+
+```
+pip install -r requirements.txt
+```
+
+Configure path folder/file which Airflow will run the Dags
+
+- Go to the airflow program folder (probably will be at /home/[YOUR_USERNAME])
+- Open file airflow.cfg with an editor
+- Edit line with variable `dags_folder`, assigning your right path
+
 #### Git hooks
 
 ```
@@ -16,6 +47,23 @@ pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool f
 ### Airflow
 
 Deployment configuration is available within the [terraform](terraform) folder. The new production server is accessible at https://airflow.quintoandar.com.br.
+
+#### Running local Airflow
+
+Initialize the metadata database
+```
+airflow initdb
+```
+
+Start a Airflow webserver instance. Will open Airflow UI on [http://localhost:8080](http://localhost:8080) by default
+```
+airflow webserver
+```
+
+To run the jobs call scheduler
+```
+airflow scheduler
+```
 
 ### Architecture
 
