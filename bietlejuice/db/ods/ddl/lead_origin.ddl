@@ -2,7 +2,7 @@ drop table if exists lead_origin;
 create table lead_origin (
     id_lead integer,
     firestore_id varchar(255),
-    device_id varchar(255),
+    e_formfield_lead_uuid varchar(255),
     rule_num integer,
     rule varchar(50),
     event_time varchar(50),
