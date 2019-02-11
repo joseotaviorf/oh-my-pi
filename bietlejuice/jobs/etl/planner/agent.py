@@ -16,3 +16,20 @@ class PlannerAgent(Planner):
         )
 
     # TODO: implement agent planner ELT
+    def get_class_ids(self):
+        raise NotImplementedError('m=get_class_ids, msg=method not implemented')
+
+    def extract_data(self, id_class):
+        raise NotImplementedError('m=extract_data, msg=method not implemented')
+
+    def save_into_s3_raw(self, _json, id_class):
+        raise NotImplementedError('m=save_into_s3_raw, msg=method not implemented')
+
+    def upsert_single_raw_partition(self, id_class):
+        raise NotImplementedError('m=upsert_single_raw_partition, msg=method not implemented')
+
+    def upsert_single_clean_partition(self, id_class):
+        raise NotImplementedError('m=upsert_single_clean_partition, msg=method not implemented')
+
+    def move_to_clean(self, id_class):
+        raise NotImplementedError('m=move_to_clean, msg=method not implemented')
