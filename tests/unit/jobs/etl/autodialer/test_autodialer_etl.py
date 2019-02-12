@@ -54,3 +54,12 @@ class TestLeadsReprocessor(object):
         # act & assert
         with pytest.raises(ValueError):
             result = autodialer_etl._mongo_connect()
+
+    @pytest.mark.parametrize('old_columns, expected', [(['LoremIpsum'], {'LoremIpsum': 'lorem_ipsum'}),
+                                                       (['Lorem.Ipsum'], {'Lorem.Ipsum': 'lorem__ipsum'})])
+    def test__to_snake_case_columns(self, old_columns, expected, autodialer_etl):
+        # act
+        result = autodialer_etl._to_snake_case_columns(old_columns=old_columns)
+
+        # assert
+        assert result == expected
