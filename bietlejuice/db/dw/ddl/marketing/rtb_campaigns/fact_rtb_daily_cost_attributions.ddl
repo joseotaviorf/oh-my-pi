@@ -1,5 +1,5 @@
-DROP TABLE if EXISTS marketing.fact_criteo_daily_cost_attributions;
-CREATE TABLE if NOT EXISTS marketing.fact_criteo_daily_cost_attributions (
+DROP TABLE if EXISTS marketing.fact_rtb_daily_cost_attributions;
+CREATE TABLE if NOT EXISTS marketing.fact_rtb_daily_cost_attributions (
     sk_rtb_campaign INTEGER,
     sk_date INTEGER,
     currency VARCHAR(100),

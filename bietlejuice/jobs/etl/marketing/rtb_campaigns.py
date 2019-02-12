@@ -20,8 +20,8 @@ class RtbCampaigns(Marketing):
 
     def __init__(self, s3_bucket, execution_date, auth, account=None):
         super(RtbCampaigns, self).__init__(s3_bucket, execution_date, 'rtb_campaigns', account)
-        self.client_id = 'guilherme.alvares'
-        self.client_secret = 'quinto@perf1149'
+        self.client_id = auth['client_id']
+        self.client_secret = auth['client_secret']
 
     def move_rtb_campaigns_to_raw(self):
         self._save_to_s3(self.client_id, self.client_secret)
@@ -32,7 +32,7 @@ class RtbCampaigns(Marketing):
         stats = api.get_campaign_stats_total(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
                                              self.execution_date.strftime('%Y-%m-%d'), ['day'])
         # stats are the total number of clicks, costs etc
-        # advertisers is the information about our campaign (currency, start date etc)
+        # advertisers are the information about our campaign (currency, start date etc)
         return stats, advertisers
 
     def _save_to_s3(self, client_id, client_secret):

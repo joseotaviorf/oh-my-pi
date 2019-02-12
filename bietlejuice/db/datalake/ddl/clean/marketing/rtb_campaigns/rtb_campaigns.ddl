@@ -17,7 +17,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_rtb_campaigns (
   )
 PARTITIONED BY (
   acc string,
-  dt string)
+  dt_created string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/marketing/rtb_campaigns/marketing_rtb_campaigns/'

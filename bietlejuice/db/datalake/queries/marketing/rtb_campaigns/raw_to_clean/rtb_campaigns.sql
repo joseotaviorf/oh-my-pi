@@ -13,4 +13,4 @@ SELECT
   conversionsrate,
   cpc
 FROM datalake_raw.marketing_rtb_campaigns
-WHERE dt  = '{date}' and acc = '{account}'
+WHERE dt_created  = '{date}' and acc = '{account}'

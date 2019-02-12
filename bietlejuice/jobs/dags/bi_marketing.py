@@ -11,7 +11,7 @@ from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSu
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
-MAIN_DAG_NAME = 'bi-rtb-2-try'
+MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 15, 2, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,6,12,18 * * *')
 
@@ -19,7 +19,12 @@ env.set_airflow_var_to_local_env('BI_DW')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
-auth = json.loads(env.get_airflow_env_var('criteo_login'))
+
+# API auth
+auth = {
+    MarketingEnum.RTB: json.loads(env.get_airflow_env_var('rtb_login')),
+    MarketingEnum.CRITEO: json.loads(env.get_airflow_env_var('criteo_login'))
+}
 
 athena_client = AthenaClient(s3_bucket)
 
@@ -50,7 +55,7 @@ def raw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=auth
+        auth=auth[class_]
     )
 
     return sub_dag.build_tasks('raw')
@@ -65,7 +70,7 @@ def clean_sub_dag(sub_dag_name, class_, accounts):
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
         accounts=accounts,
-        auth=auth
+        auth=auth[class_]
     )
 
     return sub_dag.build_tasks('clean')
@@ -93,7 +98,7 @@ def load_to_staging_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=auth
+        auth=auth[class_]
     )
 
     return sub_dag.build_tasks('staging')
@@ -107,14 +112,12 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=auth
+        auth=auth[class_]
     )
 
     return sub_dag.build_tasks('dw')
 
-
 '''
-
 facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
@@ -174,12 +177,12 @@ google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='google-ads-load-to-dw',
     class_=MarketingEnum.GOOGLE_ADS,
 )
-
+'''
 criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
     sub_dag_name='criteo-load-to-raw',
-    class_=MarketingEnum.CRITEO
+    class_=MarketingEnum.CRITEO,
 )
 
 criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
@@ -232,11 +235,12 @@ rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='rtb-load-to-dw',
     class_=MarketingEnum.RTB,
 )
-'''
+
 airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, google_ads_load_to_staging_dag,
                       google_ads_load_to_dw_dag)
 airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
                       facebook_ads_load_to_dw_dag)
+'''
+airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)
 
-airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)'''
-airflow_helpers.chain(rtb_raw_dag, rtb_clean_dag, rtb_load_to_staging_dag, rtb_load_to_dw_dag)
+#airflow_helpers.chain(rtb_raw_dag, rtb_clean_dag, rtb_load_to_staging_dag, rtb_load_to_dw_dag)
