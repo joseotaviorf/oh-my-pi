@@ -1,1 +1,1 @@
-select distinct * from datalake_raw.zendesk_groups
+select * from datalake_raw.zendesk_groups

@@ -1,7 +1,3 @@
-with distinct_data as (
-    select distinct * from datalake_raw.zendesk_tickets
-    where replace(cast(json_extract(via, '$.channel') as varchar), '"') != 'api'
-)
 select
     subject,
     created_at,
@@ -34,4 +30,4 @@ select
     has_incidents,
     status,
     requester_id
-from distinct_data
+from datalake_raw.zendesk_tickets

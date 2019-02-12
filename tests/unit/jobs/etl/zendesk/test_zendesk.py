@@ -1,4 +1,5 @@
 import mock
+import pytest
 from collections import OrderedDict
 from pandas import DataFrame
 from qa_python_utils.aws.athena import AthenaClient
@@ -9,7 +10,6 @@ from bietlejuice.jobs.etl.zendesk import ZendeskETL
 
 
 class TestZendeskETL(object):
-
     @mock.patch.object(AthenaClient, 'add_partition')
     @mock.patch.object(AthenaClient, 'create_parquet_from_query')
     @mock.patch.object(ZendeskETL, '_is_clean_table_empty', return_value=True)
@@ -183,7 +183,7 @@ class TestZendeskETL(object):
         assert mock__upsert_data.call_args[0][0] == upsert_query
         assert mock__upsert_data.call_args[0][1] == table_name
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select * from table')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value="select * from table t.channel != 'api'")
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
     @mock.patch.object(ZendeskETL, '_is_prod_table_empty', return_value=True)
@@ -203,34 +203,81 @@ class TestZendeskETL(object):
         assert mock__is_prod_table_empty.call_count == 1
         assert mock__is_prod_table_empty.call_args[0][0] == table_name
         assert mock_execute_query_and_return_dataframe.call_count == 1
-        assert mock_execute_query_and_return_dataframe.call_args[0][0] == 'select * from table'
+        assert mock_execute_query_and_return_dataframe.call_args[0][0] == "select * from table t.channel != 'api'"
         assert mock_bulk_insert.call_count == 1
         assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_table'
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select * from table')
+    @pytest.mark.parametrize('table', ['dim_ticket', 'fact_ticket_metrics', 'dim_zendesk_user'])
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
     @mock.patch.object(ZendeskETL, '_is_prod_table_empty', return_value=False)
     def test_build_staging_table_with_prod_table_not_empty(self, mock__is_prod_table_empty,
                                                            mock_execute_query_and_return_dataframe,
-                                                           mock_bulk_insert, mock_get_query_file_name, zendesk):
+                                                           mock_bulk_insert, mock_get_query_from_file_name, table,
+                                                           zendesk):
         # arrange
-        table_name = 'table'
+        table_name = table
+        table_where_clause_dict = {
+            'fact_ticket_metrics': 'and t.dt_extraction=\'{}\'',
+            'dim_ticket': 'and t.dt_extraction=\'{}\'',
+            'dim_zendesk_user': 'where t.dt_extraction=\'{}\''
+        }
+        table_mock_queries = {
+            'fact_ticket_metrics': "select * from fact_ticket_metrics where channel != 'api' __WHERE_CLAUSE__",
+            'dim_ticket': "select * from dim_ticket where channel != 'api' __WHERE_CLAUSE__",
+            'dim_zendesk_user': "select * from dim_zendesk_user __WHERE_CLAUSE__"
+        }
+        mock_get_query_from_file_name.return_value = table_mock_queries[table_name]
+        expect_table_name = 'staging.zendesk_{}'.format(table_name)
         query_path = '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name)
-        query = "select * from table \n where t.dt_extraction='2018-01-01'"
+        query = table_mock_queries[table_name].format(table_name).replace('__WHERE_CLAUSE__',
+                                                                          table_where_clause_dict[table_name].format(
+                                                                              '2018-01-01'))
 
         # act
         zendesk.build_staging_table(table_name)
 
         # assert
-        assert mock_get_query_file_name.call_count == 1
-        assert mock_get_query_file_name.call_args[0][0] == query_path
+        assert mock_get_query_from_file_name.call_count == 1
+        assert mock_get_query_from_file_name.call_args[0][0] == query_path
         assert mock__is_prod_table_empty.call_count == 1
         assert mock__is_prod_table_empty.call_args[0][0] == table_name
         assert mock_execute_query_and_return_dataframe.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_args[0][0] == query
         assert mock_bulk_insert.call_count == 1
-        assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_table'
+        assert mock_bulk_insert.call_args[1]['table_name'] == expect_table_name
+
+    @pytest.mark.parametrize('table', ['dim_ticket', 'fact_ticket_metrics', 'dim_zendesk_user'])
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name',
+                       return_value='select 1 from staging.zendesk_{} __WHERE_CLAUSE__')
+    @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
+    @mock.patch.object(ZendeskETL, '_is_prod_table_empty', return_value=False)
+    def test_build_staging_table_with_dim_ticket_not_empty(self, mock__is_prod_table_empty,
+                                                           mock_execute_query_and_return_dataframe,
+                                                           mock_get_query_from_file_name,
+                                                           mock_bulk_insert, table, zendesk):
+        # arrange
+        expect_query_path = '{query_base_dir}/zendesk/{table_name}.sql'.format(
+            query_base_dir=DATALAKE_QUERIES_DIR, table_name=table)
+        expect_staging_table_name = 'staging.zendesk_{}'.format(table)
+        expect_query = 'select 1 from staging.zendesk_{} __WHERE_CLAUSE__'.format(table) \
+            .replace('__WHERE_CLAUSE__', "where t.dt_extraction='2018-01-01'")
+        mock_get_query_from_file_name.return_value = expect_query
+
+        # act
+        zendesk.build_staging_table(table)
+
+        # assert
+        assert mock__is_prod_table_empty.call_count == 1
+        assert mock__is_prod_table_empty.call_args[0][0] == table
+        assert mock_execute_query_and_return_dataframe.call_count == 1
+        assert mock_execute_query_and_return_dataframe.call_args[0][0] == expect_query
+        assert mock_get_query_from_file_name.call_count == 1
+        assert mock_get_query_from_file_name.call_args[0][0] == expect_query_path
+        assert mock_bulk_insert.call_count == 1
+        assert mock_bulk_insert.call_args[1]['table_name'] == expect_staging_table_name
 
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(BaseETL, 'from_db_query')

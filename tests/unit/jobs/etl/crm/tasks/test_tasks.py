@@ -1,5 +1,9 @@
-import mock
 from datetime import datetime
+
+import boto3
+import mock
+import pytest
+from mock import Mock
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
@@ -43,9 +47,9 @@ class TestCRMTasks(object):
     @mock.patch.object(CRMTasks, '_get_mongo_client')
     def test_init_with_mongo_uri(self, mock_get_mongo_client):
         # arrange
-        s3_bucket = 'BUCKET'
-        mongo_client_uri = 'MONGO_URI'
-        execution_date = datetime.now()
+        s3_bucket = mock.ANY
+        mongo_client_uri = mock.ANY
+        execution_date = Mock(datetime)
 
         # act
         tasks = CRMTasks(
@@ -62,8 +66,8 @@ class TestCRMTasks(object):
     @mock.patch.object(CRMTasks, '_get_mongo_client')
     def test_init_without_mongo_uri(self, mock_get_mongo_client):
         # arrange
-        s3_bucket = 'BUCKET'
-        execution_date = datetime.now()
+        s3_bucket = mock.ANY
+        execution_date = Mock(datetime)
 
         # act
         tasks = CRMTasks(
@@ -75,3 +79,34 @@ class TestCRMTasks(object):
         assert tasks.mongo_client is not None
         assert mock_get_mongo_client.call_count == 1
         assert mock_get_mongo_client.call_args[0][0] is None
+
+    def test_data_existence_check_with_invalid_bucket_type(self, tasks):
+        # arrange
+        bucket_type = 'bucket_type'
+
+        # act & assert
+        with pytest.raises(ValueError):
+            tasks.data_existence_check(bucket_type=bucket_type)
+
+    @mock.patch.object(boto3, 'resource')
+    def test_data_existence(self, mock_resource, tasks):
+        # arrange
+        bucket_type = 'raw'
+        partition_date = tasks.partition_date
+        s3_bucket = 's3_bucket'
+        crm_bucket_suffix = tasks.BUCKET_FOLDER_SUFFIXES['tasks']
+        s3_file_name = tasks.S3_FILE_NAME
+        file_path = '{}/{}/dt={}/{}.gz'.format(bucket_type,
+                                               crm_bucket_suffix,
+                                               partition_date,
+                                               s3_file_name)
+        s3_resource = mock_resource('s3')
+        tasks.s3_resource = s3_resource
+
+        # act
+        result = tasks.data_existence_check(bucket_type=bucket_type)
+
+        assert tasks.s3_resource.Object.call_count == 1
+        assert tasks.s3_resource.Object.call_args[0] == (s3_bucket, file_path)
+        assert tasks.s3_resource.Object(s3_bucket, file_path).load.call_count == 1
+        assert result is True
