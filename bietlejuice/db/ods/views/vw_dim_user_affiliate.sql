@@ -15,6 +15,7 @@ CREATE VIEW public.vw_dim_user_affiliate as
 	ua.affiliateType as "type",
 	uao.utm_source as tracking_source,
 	uao.utm_medium as tracking_medium,
+	uao.utm_campaign as tracking_campaign,
 	uao.platform as tracking_platform,
 	uao.device_type as tracking_device_type,
 	uao.country as tracking_country,

@@ -1,8 +1,9 @@
 with amplitude_affiliate_tracking as(
 select
 	user_id,
-	u_utm_source,
-	u_utm_medium,
+	u_initial_utm_source,
+	u_initial_utm_medium,
+	u_initial_utm_campaign,
 	u_platform,
 	device_type,
 	country,
@@ -17,8 +18,9 @@ and user_id <> ''
 )
 select
 	user_id,
-	u_utm_source,
-	u_utm_medium,
+	u_initial_utm_source,
+	u_initial_utm_medium,
+	u_initial_utm_campaign,
 	u_platform,
 	device_type,
 	country,
