@@ -7,9 +7,12 @@ class PlannerFactory(object):
 
     @staticmethod
     def factory(_class, s3_bucket, execution_date):
-        __class = PlannerFactory.__dispatch_dict(_class)
         if _class is None:
-            raise Exception('m=factory, _class={}, msg=class type not found'.format(_class))
+            raise ValueError('m=factory, msg=class type cannot be None')
+        __class = PlannerFactory.__dispatch_dict(_class)
+
+        if not __class:
+            raise RuntimeError('m=factory, class={}, msg=class type must be valid'.format(_class))
 
         return __class(
             s3_bucket=s3_bucket,
