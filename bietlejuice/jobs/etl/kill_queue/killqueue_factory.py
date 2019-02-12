@@ -14,11 +14,11 @@ class KillQueueFactory(object):
     def get_object(table, s3_bucket):
         if not table:
             raise ValueError('m=get_object, table={}, msg=table cannot be none'.format(table))
-        _class = KillQueueFactory.__dispatch_dict(table)
-        if not _class:
+        class_ = KillQueueFactory.__dispatch_dict(table)
+        if not class_:
             raise RuntimeError('m=get_object, table={}, msg=class type not found'.format(table))
 
-        return _class(
+        return class_(
             s3_bucket=s3_bucket,
         )
 
