@@ -6,15 +6,15 @@ from bietlejuice.jobs.etl.planner.region import PlannerRegion
 class PlannerFactory(object):
 
     @staticmethod
-    def factory(_class, s3_bucket, execution_date):
-        if _class is None:
+    def factory(entity, s3_bucket, execution_date):
+        if entity is None:
             raise ValueError('m=factory, msg=class type cannot be None')
-        __class = PlannerFactory.__dispatch_dict(_class)
+        class_ = PlannerFactory.__dispatch_dict(entity)
 
-        if not __class:
-            raise RuntimeError('m=factory, class={}, msg=class type must be valid'.format(_class))
+        if not class_:
+            raise RuntimeError('m=factory, class={}, msg=class type must be valid'.format(entity))
 
-        return __class(
+        return class_(
             s3_bucket=s3_bucket,
             execution_date=execution_date
         )
