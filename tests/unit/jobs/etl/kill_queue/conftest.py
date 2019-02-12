@@ -18,20 +18,20 @@ def kill_queue():
 
 
 @pytest.fixture(scope='session')
-def house():
+def killqueue_house():
     return KillQueueHouse(S3_BUCKET)
 
 
 @pytest.fixture(scope='session')
-def rent_flow():
+def killqueue_rent_flow():
     return KillQueueRentFlow(S3_BUCKET)
 
 
 @pytest.fixture(scope='session')
-def reservation():
+def killqueue_reservation():
     return KillQueueReservation(S3_BUCKET)
 
 
 @pytest.fixture(scope='session')
-def reservation_aud():
+def killqueue_reservation_aud():
     return KillQueueReservationAud(S3_BUCKET)
