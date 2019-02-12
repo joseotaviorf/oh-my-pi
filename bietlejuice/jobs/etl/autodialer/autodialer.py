@@ -137,7 +137,7 @@ class AutodialerETL(object):
                 logger.info('m=__normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
 
         old_columns = df_treated.columns
-        snake_case_columns = self.__to_snake_case_columns(old_columns)
+        snake_case_columns = self._to_snake_case_columns(old_columns)
         df_treated.rename(columns=snake_case_columns, inplace=True)
 
         # final treatment
@@ -148,7 +148,7 @@ class AutodialerETL(object):
         return df_unique_columns
 
     @logger(exclude='old_columns')
-    def __to_snake_case_columns(self, old_columns):
+    def _to_snake_case_columns(self, old_columns):
         _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 
