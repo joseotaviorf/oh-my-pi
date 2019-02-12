@@ -14,5 +14,6 @@ create table if not exists staging.zendesk_dim_ticket (
     client_type varchar,
     chat_started_at varchar,
     created_at varchar,
-    ts_load varchar
+    ts_load varchar,
+    updated_at varchar
 )
