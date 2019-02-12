@@ -1,7 +1,8 @@
 select
   dd.date as date_in_publication,
   hs.sk_house,
-  dhl.id_house as house_id
+  dhl.id_house as house_id,
+  dhl.house_city
 from fact_house_status hs
 join dim_house_listing dhl
 	on dhl.sk_house_listing = hs.sk_house

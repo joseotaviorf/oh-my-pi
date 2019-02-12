@@ -90,7 +90,8 @@ left join
 		SELECT
 			A.id as agendamento_id,
 			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Tenant' limit 1) as inquilinoCompareceu,
-			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Tenant' limit 1) as motivoInquilino,
+			(if((SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Agent' limit 1)='Absent', NULL,
+			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Tenant' limit 1))) as motivoInquilino,
 			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Agent' limit 1) as agenteCompareceu,
 			(SELECT absenceReason FROM ebdb.Visitor v where v.agendamento_id=A.id and type='Agent' limit 1) as motivoAgente,
 			(SELECT attended FROM ebdb.Visitor v where v.agendamento_id=A.id and type='LandLord' limit 1) as prorietarioCompareceu,
