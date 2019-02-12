@@ -17,7 +17,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_rtb_campaigns (
 )
 PARTITIONED BY (
   acc string,
-  dt_created string)
+  dt string)
 ROW FORMAT SERDE
   'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (

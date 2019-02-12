@@ -16,7 +16,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_criteo_campaigns (
   cpc string)
 PARTITIONED BY (
   acc string,
-  dt string)
+  dt_created string)
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/marketing/criteo_campaigns/marketing_criteo_campaigns/'
