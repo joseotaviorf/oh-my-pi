@@ -12,7 +12,7 @@ from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
 logger = QuintoAndarLogger('bi-killqueue-etl')
 
-env.set_airflow_var_to_local_env('KILLQUEUE')
+env.set_airflow_var_to_local_env('KILLQUEUE', 'BI_ODS')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-killqueue-etl'
