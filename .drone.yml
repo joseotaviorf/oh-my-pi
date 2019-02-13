@@ -126,6 +126,49 @@ pipeline:
       event: push
       branch: [ master ]
 
+  sonar-preview:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Bietlejuice \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./bietlejuice \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.analysis.mode=preview \
+          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
+          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
+          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: pull_request
+      branch: [ master ]
+  
+  sonar-report:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Bietlejuice \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./bietlejuice \
+          -Dsonar.python.coverage.reportPath=coverage.xml \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.tests=./tests \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: push
+      branch: [ master ]
+  
   notify:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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

@@ -14,7 +14,7 @@ logger = QuintoAndarLogger('KillQueue')
 
 class KillQueue(object):
 
-    def __init__(self, s3_bucket=''):
+    def __init__(self, s3_bucket):
         self.s3_bucket = s3_bucket
         self.athena_client = AthenaClient(self.s3_bucket)
 
