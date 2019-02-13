@@ -29,7 +29,7 @@ class PlannerRegion(Planner):
             id_region=id_class
         )
 
-    @logger
+    @logger(exclude='_json')
     def save_into_s3_raw(self, _json, id_class):
         # since the response json returns schedules for the next 10 days,
         # we have to filter the ones with the current execution date
