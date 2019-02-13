@@ -24,10 +24,13 @@ pipeline:
   
   publish-coverage:
     image: plugins/s3
+    pull: true
     acl: public-read
     bucket: 5a-coverage
     source: badge-lines.svg
     target: /bi-etl-ejuice
+    content_type: image/svg+xml
+    cache_control: no-cache
     when:
       event: push
       branch: [ master ]
