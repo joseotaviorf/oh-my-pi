@@ -4,7 +4,7 @@ from gzip import GzipFile
 from io import BytesIO
 
 import boto3
-from ordereddict import OrderedDict
+from collections import OrderedDict
 from pymongo import MongoClient
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
