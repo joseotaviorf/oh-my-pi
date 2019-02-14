@@ -3,7 +3,7 @@ CREATE TABLE crm.manual_tasks (
 	id_task varchar(255),
 	id_task_opener integer,
 	id_assignee integer,
-	id_original_assignee varchar(255),
+	id_original_assignee integer,
 	id_workgroup varchar(255),
 	task_done boolean,
 	description varchar(255),
