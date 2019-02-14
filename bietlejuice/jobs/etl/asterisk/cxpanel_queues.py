@@ -1,4 +1,4 @@
-from ordereddict import OrderedDict
+from collections import OrderedDict
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.etl.asterisk.asterisk import Asterisk
