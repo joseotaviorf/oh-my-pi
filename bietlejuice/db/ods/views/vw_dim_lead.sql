@@ -73,6 +73,7 @@ CREATE VIEW public.vw_dim_lead as
   l.flg_city_served,
   l.flg_latlng_served,
   l.flg_location_served,
+  lsf.score_factor,
   now() as load_timestamp
 FROM
   public.lead l
@@ -82,6 +83,9 @@ LEFT JOIN
 LEFT JOIN
     public.lead lo
     on lo.id = rl.id_origin_lead
+LEFT JOIN
+    public.lead_score_factor lsf
+    on lsf.lead_id = l.id
 left join lateral
 (
   select 
