@@ -1,7 +1,7 @@
 with t_dates as (
 	select
 		id_origin,
-		max(dt) as dt
+		min(dt) as dt
 	from
 		datalake_clean.crm_tasks
 	where origin = 'Lead'
