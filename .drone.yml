@@ -1,5 +1,5 @@
 clone:
-  clone:
+  git-clone:
     image: plugins/git
     depth: 20
 
@@ -11,6 +11,8 @@ pipeline:
       - pip install -q flake8==3.5.0
       - export FILES_CHANGED=$(git diff --name-only master | grep '.py$' || true)
       - flake8 --max-line-length=120 $FILES_CHANGED
+    when:
+      event: push
 
   unit-test:
     image: python:2.7.12
@@ -21,6 +23,8 @@ pipeline:
       - pip install -q -r requirements_test.txt
       - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=10 --cov-config .coveragerc tests
       - coverage-badge -o badge-lines.svg
+    when:
+      event: push
   
   publish-coverage:
     image: plugins/s3
@@ -44,7 +48,6 @@ pipeline:
     script:
       - cd /var/www/airflow/
       - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
       - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
     secrets: [ rsync_key ]
@@ -126,6 +129,49 @@ pipeline:
       event: push
       branch: [ master ]
 
+  sonar-preview:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Bietlejuice \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./bietlejuice \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.analysis.mode=preview \
+          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
+          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
+          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: pull_request
+      branch: [ master ]
+  
+  sonar-report:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Bietlejuice \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./bietlejuice \
+          -Dsonar.python.coverage.reportPath=coverage.xml \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.tests=./tests \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: push
+      branch: [ master ]
+  
   notify:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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
