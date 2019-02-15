@@ -6,7 +6,7 @@ S3_BUCKET = 's3_bucket'
 
 
 @pytest.fixture(scope='session')
-def agents():
+def agent():
     return Agent(
         bucket_name=S3_BUCKET
     )

@@ -11,19 +11,19 @@ class TestAgents(object):
                                               (EnumDB.BI_DW, '{}/public'.format(DW_QUERIES_DIR)),
                                               ('', ''),
                                               ])
-    def test__format_query_filename(self, db_enum, dir, agents):
+    def test__format_query_filename(self, db_enum, dir, agent):
         # arrange
-        filename = 'f'
+        filename = mock.ANY
         expected = '{}/{}.sql'.format(dir, filename)
 
         # act
-        result = agents._format_query_filename(filename=filename, db_enum=db_enum)
+        result = agent._format_query_filename(filename=filename, db_enum=db_enum)
 
         # assert
         assert result == expected
 
     @mock.patch.object(BaseETL, 'execute_command')
-    def test_truncate_table(self, mock_execute_command, agents):
+    def test_truncate_table(self, mock_execute_command, agent):
         # arrange
         schema = mock.ANY
         table = mock.ANY
@@ -31,24 +31,58 @@ class TestAgents(object):
         expected = 'TRUNCATE TABLE {}.{}'.format(schema, table)
 
         # act
-        agents.truncate_table(schema=schema, table=table, enumdb=enumdb)
+        agent.truncate_table(schema=schema, table=table, enumdb=enumdb)
 
         # assert
         assert mock_execute_command.call_count == 1
         assert mock_execute_command.call_args[1].get('db_enum') == enumdb
         assert mock_execute_command.call_args[1].get('command') == expected
 
+    @mock.patch.object(BaseETL, 'decode_table', return_value=mock.ANY)
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    def test_move_data_to_destination_decode_true(self, mock_bulk_insert, mock_decode_table, agent):
+        # arrange
+        decode = False
+        data = mock.ANY
+        table_name = mock.ANY
+
+        # act
+        agent.move_data_to_destination(data=data, table_name=table_name, decode=decode)
+
+        # assert
+        assert mock_decode_table.call_count == 0
+        assert mock_bulk_insert.call_count == 1
+        assert mock_bulk_insert.call_args[1].get('table') == data
+        assert mock_bulk_insert.call_args[1].get('table_name') == table_name
+
+    @mock.patch.object(BaseETL, 'decode_table', return_value=mock.ANY)
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    def test_move_data_to_destination_decode_true(self, mock_bulk_insert, mock_decode_table, agent):
+        # arrange
+        decode = True
+        data = mock.ANY
+        table_name = mock.ANY
+
+        # act
+        agent.move_data_to_destination(data=data, table_name=table_name, decode=decode)
+
+        # assert
+        assert mock_decode_table.call_count == 1
+        assert mock_bulk_insert.call_count == 1
+        assert mock_bulk_insert.call_args[1].get('table') == mock_decode_table.return_value
+        assert mock_bulk_insert.call_args[1].get('table_name') == table_name
+
     @pytest.mark.parametrize('decode, call_count', [(True, 1), (False, 0)])
     @mock.patch.object(BaseETL, 'decode_table', return_value=mock.ANY)
     @mock.patch.object(BaseETL, 'bulk_insert')
-    def test_move_data_to_destination(self, mock_bulk_insert, mock_decode_table, decode, call_count, agents):
+    def test_move_data_to_destination(self, mock_bulk_insert, mock_decode_table, decode, call_count, agent):
         # arrange
         data = mock.ANY
         table_name = mock.ANY
         expected_table = mock_decode_table.return_value if decode else data
 
         # act
-        agents.move_data_to_destination(data=data, table_name=table_name, decode=decode)
+        agent.move_data_to_destination(data=data, table_name=table_name, decode=decode)
 
         # assert
         assert mock_decode_table.call_count == call_count
@@ -56,19 +90,19 @@ class TestAgents(object):
         assert mock_bulk_insert.call_args[1].get('table') == expected_table
         assert mock_bulk_insert.call_args[1].get('table_name') == table_name
 
-    def test__to_snake_case_columns(self, agents):
+    def test__to_snake_case_columns(self, agent):
         # arrange
         old_columns = ['LoremIpsum']
         expected = {'LoremIpsum': 'lorem_ipsum'}
 
         # act
-        result = agents._to_snake_case_columns(old_columns=old_columns)
+        result = agent._to_snake_case_columns(old_columns=old_columns)
 
         # assert
         assert result == expected
 
     @mock.patch.object(BaseETL, 'from_db_query', return_value=['', [1]])
-    def test_check_dummy_exists_with_dummy(self, mock_from_db_query, agents):
+    def test_check_dummy_exists_with_dummy(self, mock_from_db_query, agent):
         # arrange
         enumdb = mock.ANY
         schema = mock.ANY
@@ -77,24 +111,26 @@ class TestAgents(object):
         expected = True
 
         # act
-        result = agents.check_dummy_exists(enumdb=enumdb, schema=schema, table_name=table_name, key_column=key_column)
+        result = agent.check_dummy_exists(enumdb=enumdb, schema=schema, table_name=table_name, key_column=key_column)
 
         # assert
         assert mock_from_db_query.call_count == 1
         assert result == expected
 
     @mock.patch.object(BaseETL, 'from_db_query', return_value=['', [0]])
-    def test_check_dummy_exists_without_dummy(self, mock_from_db_query, agents):
+    def test_check_dummy_exists_without_dummy(self, mock_from_db_query, agent):
         # arrange
         enumdb = mock.ANY
         schema = mock.ANY
         table_name = mock.ANY
         key_column = mock.ANY
+        query = 'SELECT count(1) FROM {}.{} WHERE {} = -1;'.format(schema, table_name, key_column)
         expected = False
 
         # act
-        result = agents.check_dummy_exists(enumdb=enumdb, schema=schema, table_name=table_name, key_column=key_column)
+        result = agent.check_dummy_exists(enumdb=enumdb, schema=schema, table_name=table_name, key_column=key_column)
 
         # assert
         assert mock_from_db_query.call_count == 1
+        assert mock_from_db_query.call_args[1].get('query') == query
         assert result == expected
