@@ -40,7 +40,7 @@ class TestAgents(object):
 
     @mock.patch.object(BaseETL, 'decode_table', return_value=mock.ANY)
     @mock.patch.object(BaseETL, 'bulk_insert')
-    def test_move_data_to_destination_decode_true(self, mock_bulk_insert, mock_decode_table, agent):
+    def test_move_data_to_destination_decode_false(self, mock_bulk_insert, mock_decode_table, agent):
         # arrange
         decode = False
         data = mock.ANY
