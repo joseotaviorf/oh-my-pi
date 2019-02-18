@@ -52,7 +52,6 @@ class TestLeadsReprocessor(object):
 
         # assert
         assert mock_publish_messages.call_count == 3
-        assert mock_sleep.call_count == 3
         assert mock_sleep.call_args[0][0] == 2
 
     def test__treat_leads_without_id(self, leads_reprocessor):
