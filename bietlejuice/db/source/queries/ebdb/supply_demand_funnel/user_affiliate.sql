@@ -2,7 +2,6 @@ SELECT
 	da.id,
 	da.inicioAtuacao,
 	da.tipoAfiliado,
-	da.cidadeAtuacao,
 	coalesce(da.ativo,0) as ativo,
 	da.atualizadoEm,
 	da.criadoEm,

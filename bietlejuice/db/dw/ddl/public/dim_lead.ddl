@@ -57,7 +57,6 @@ CREATE TABLE public.dim_lead (
   dados_gerente_contas_email VARCHAR(200),
   dados_afiliado_tipo_afiliado VARCHAR(255),
   dados_afiliado_inicio_atuacao TIMESTAMP WITHOUT TIME ZONE,
-  dados_afiliado_cidade_atuacao VARCHAR(100),
   region_id INTEGER,
   atualizado_em TIMESTAMP WITHOUT TIME ZONE,
   criado_em TIMESTAMP WITHOUT TIME ZONE,

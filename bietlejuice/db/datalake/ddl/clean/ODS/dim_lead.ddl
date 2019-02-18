@@ -58,7 +58,6 @@ create external table if not exists datalake_clean.ods_dim_lead (
   dados_gerente_contas_email string,
   dados_afiliado_tipo_afiliado string,
   dados_afiliado_inicio_atuacao string,
-  dados_afiliado_cidade_atuacao string,
   region_id string,
   atualizado_em string,
   criado_em string,

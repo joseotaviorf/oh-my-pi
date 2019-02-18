@@ -5,7 +5,6 @@ create table public.dim_user_affiliate (
     id_user_affiliate bigint,
     ts_joined_program timestamp,
     category varchar(62),
-    work_city varchar(255),
     is_active boolean,
     ts_updated timestamp,
     ts_created timestamp,
