@@ -197,6 +197,15 @@ def untar_output(**kwargs):
         'preds.json')
     bucket.Object(preds_json_filename).put(Body=preds_json)
 
+    athena.upsert_single_partition(
+        bucket_folder_path=os.path.join(
+            SKYNET_BUCKET, 'listing-mgmt/data/predictions'),
+        database='skynet',
+        table='listing_management_predictions',
+        partition_name='dt',
+        partition_value=exec_date
+    )
+
 
 def restart_service(**kwargs):
     config = kube.Configuration()
