@@ -27,12 +27,13 @@ class LeadSubDag(DimSubDag):
     def build_lead_with_tests(self):
         lead_dag = self._build_local_dag()
 
-        ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead_task, staging_dim_lead_task, \
-            dw_dim_lead_task = self.__build_data_tasks(lead_dag)
+        ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead_task, \
+            staging_dim_lead_task, dw_dim_lead_task = self.__build_data_tasks(lead_dag)
 
         tests_tasks = self.build_tests_tasks(lead_dag)
 
-        ods_lead_task.set_upstream([ods_lead_origin_task, ods_reprocessed_lead_task])
+        airflow_helpers.chain(ods_lead_origin_task, ods_lead_first_event_tracking_task)
+        ods_lead_task.set_upstream([ods_lead_first_event_tracking_task, ods_reprocessed_lead_task])
         airflow_helpers.chain(ods_lead_task, staging_dim_lead_task)
         staging_dim_lead_task.set_downstream(tests_tasks)
         dw_dim_lead_task.set_upstream(tests_tasks)
@@ -70,6 +71,16 @@ class LeadSubDag(DimSubDag):
             }
         )
 
+        ods_lead_first_event_tracking_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_lead_first_event_tracking_task',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': DimSubDag.S3_BUCKET,
+                'view_name': 'lead_first_event_tracking'
+            }
+        )
+
         ods_lead = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_lead',
@@ -101,4 +112,5 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        return ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead, staging_dim_lead_task, dw_dim_lead_task
+        return ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead, \
+            staging_dim_lead_task, dw_dim_lead_task

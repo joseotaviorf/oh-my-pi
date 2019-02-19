@@ -1,3 +1,4 @@
+with t_all as (
 select  cast(regexp_extract(e_lead_id, '(^\d+)') as bigint) as id_lead,
         null as firestore_id,
         null as e_formfield_lead_uuid,
@@ -82,3 +83,19 @@ from datalake_clean.amplitude_events ae
         and ym >= '2018-01'
         and trim(app) = '183047'
         AND trim(ae.e_formfield_lead_uuid) <> '' -- 50154 rows
+)
+select
+	id_lead,
+    firestore_id,
+    e_formfield_lead_uuid,
+    rule_num,
+    event_time,
+    u_initial_utm_campaign,
+    u_initial_utm_medium,
+    u_initial_utm_source,
+    u_platform,
+    region,
+    city,
+    uuid
+from t_all
+where rn = 1 
