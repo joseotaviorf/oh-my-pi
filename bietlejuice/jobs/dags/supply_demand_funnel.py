@@ -1,7 +1,7 @@
 import airflow.utils.helpers as airflow_helpers
 from datetime import datetime, timedelta
+from qa_python_utils import QuintoAndarLogger
 
-import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -13,7 +13,6 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 
@@ -25,7 +24,7 @@ PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '0 5 * * *'
+MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
 
 # create main DAG definition
 main_dag = BaseDAG.build_dag(
