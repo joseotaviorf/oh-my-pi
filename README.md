@@ -48,6 +48,29 @@ pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool f
 
 Deployment configuration is available within the [terraform](terraform) folder. The new production server is accessible at https://airflow.quintoandar.com.br.
 
+#### Configuring Airflow
+
+In your local Airflow configuration file, typically located at `/home/YOUR_USERNAME/airflow/airflow.cfg`, edit the `dags_folder` variable to point to your bi-etl dags folder, for example
+```
+dags_folder = /home/YOUR_USERNAME/PycharmProjects/bi-etl-ejuice/bietlejuice/jobs/dags/`.
+```
+
+#### Export `PYTHONPATH`
+
+You might have to export your `PYTHONPATH` to point to your `bi-etl-ejuice` folder, example:
+
+```
+export PYTHONPATH=:/home/YOUR_USERNAME/PycharmProjects/bi-etl-ejuice
+```
+
+#### Copy env vars
+
+#### Setup connections
+
+#### Configure AWS
+
+https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+
 #### Running local Airflow
 
 Initialize the metadata database
