@@ -33,7 +33,6 @@ SELECT
   recebeu_busca_guiada,
   dadosagente_email_coordinator,
   dadosagente_cidade,
-  dadosagente_atuacao,
   dadosagente_perfil,
   dadosagente_numero_creci,
   dadosagente_ativo,

@@ -28,7 +28,6 @@ CREATE TABLE dim_user (
   recebeu_busca_guiada integer DEFAULT NULL,
   dadosagente_email_coordinator varchar(255) DEFAULT NULL,
   dadosagente_cidade varchar(255) DEFAULT NULL,
-  dadosagente_atuacao varchar(100) DEFAULT NULL,
   dadosagente_perfil varchar(255) DEFAULT NULL,
   dadosagente_numero_creci varchar(255) DEFAULT NULL,
   dadosagente_ativo integer DEFAULT NULL,
