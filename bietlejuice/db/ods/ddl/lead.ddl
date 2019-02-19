@@ -58,6 +58,7 @@ CREATE TABLE public.lead
   dados_gerente_contas_email character varying(200) DEFAULT NULL::character varying,
   dados_afiliado_tipo_afiliado character varying(255) DEFAULT NULL::character varying,
   dados_afiliado_inicio_atuacao timestamp without time zone,
+  dados_afiliado_cidade_atuacao character varying(100) DEFAULT NULL::character varying,
   region_id integer,
   atualizado_em timestamp without time zone,
   criado_em timestamp without time zone,
