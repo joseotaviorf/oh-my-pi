@@ -60,6 +60,7 @@ CREATE VIEW public.vw_dim_lead as
   l.dados_gerente_contas_email,
   coalesce(lo.dados_afiliado_tipo_afiliado, l.dados_afiliado_tipo_afiliado) as dados_afiliado_tipo_afiliado,
   coalesce(lo.dados_afiliado_inicio_atuacao, l.dados_afiliado_inicio_atuacao) as dados_afiliado_inicio_atuacao,
+  coalesce(lo.dados_afiliado_cidade_atuacao, l.dados_afiliado_cidade_atuacao) as dados_afiliado_cidade_atuacao,
   l.region_id,
   l.atualizado_em,
   l.criado_em,
