@@ -5,6 +5,7 @@ CREATE TABLE public.user_affiliate
 id bigint NOT NULL,
 inicioAtuacao timestamp,
 tipoAfiliado varchar(62),
+cidadeAtuacao varchar(255),
 ativo boolean,
 atualizadoEm timestamp,
 criadoEm timestamp,

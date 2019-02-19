@@ -13,6 +13,7 @@ CREATE VIEW public.vw_dim_user_affiliate as
  	ua.id as id_user_affiliate,
 	ua.inicioAtuacao as ts_joined_program,
 	ua.tipoAfiliado as category,
+	ua.cidadeAtuacao  as work_city,
 	ua.ativo as is_active,
 	ua.atualizadoEm as ts_updated,
 	ua.criadoEm as ts_created,
