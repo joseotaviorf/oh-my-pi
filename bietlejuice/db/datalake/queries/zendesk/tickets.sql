@@ -4,7 +4,7 @@ with distinct_data as (
 	        t.*,
 	        row_number() over (partition by id, dt order by updated_at desc) as rn
 	    from datalake_raw.zendesk_tickets t
-	    where replace(cast(json_extract(via, '$.channel') as varchar), '"') != 'api'
+	    __WHERE_CLAUSE__
 	)
 	select
 		*
