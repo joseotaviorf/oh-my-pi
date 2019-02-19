@@ -32,7 +32,9 @@ create external table datalake_clean.iptu_bldgs_doormen_data (
   doorman_active string,
   doorman_joined_date string,
   has_doorman string,
-  has_active_doorman string
+  has_active_doorman string,
+  latest_doorman_joined_date string,
+  earliest_doorman_joined_date string
 )
 stored as parquet
 location 's3://5a-datalake/clean/external/iptu_bldgs_doormen_data/'

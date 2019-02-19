@@ -66,7 +66,10 @@ doorman AS (
     a.lng,
     u.telefone_principal,
     u.nome,
-    u.dadosafiliado_ativo
+    u.dadosafiliado_ativo,
+    CASE WHEN d.ts_joined_program != '' AND d.ts_joined_program IS NOT NULL THEN
+      CAST(d.ts_joined_program as timestamp)
+    ELSE NULL END AS ts_joined_program_timestamp
   FROM datalake_clean.ods_dim_user_doorman d
   LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = a.id_user_doorman
   JOIN datalake_clean.ods_dim_user u ON CAST(d.sk_user_affiliate AS VARCHAR) = u.dados_afiliado_id
@@ -80,6 +83,8 @@ SELECT
   bldgs_doormen.doorman_name,
   bldgs_doormen.doorman_active,
   bldgs_doormen.doorman_joined_date,
+  bldgs_doormen.latest_doorman_joined_date,
+  bldgs_doormen.earliest_doorman_joined_date,
   CASE WHEN bldgs_doormen.doorman_ct > 0 THEN true ELSE false END AS has_doorman,
   contains(bldgs_doormen.doorman_active, '1') AS has_active_doorman
 FROM bldgs_stats
@@ -90,7 +95,9 @@ LEFT JOIN
     array_agg(telefone_principal) AS doorman_phone,
     array_agg(TRIM(nome)) AS doorman_name,
     array_agg(dadosafiliado_ativo) AS doorman_active,
-    array_agg(ts_joined_program) AS doorman_joined_date
+    array_agg(ts_joined_program) AS doorman_joined_date,
+    MAX(ts_joined_program_timestamp) AS latest_doorman_joined_date,
+    MIN(ts_joined_program_timestamp) AS earliest_doorman_joined_date
   FROM doorman AS d
   JOIN bldgs_stats AS b
   ON
