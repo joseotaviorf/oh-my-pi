@@ -1,2 +1,27 @@
-select t.* from datalake_raw.zendesk_articles t
+select
+    t.id,
+    t.url,
+    t.html_url,
+    t.author_id,
+    t.comments_disabled,
+    t.draft,
+    t.promoted,
+    t.position,
+    t.vote_sum,
+    t.vote_count,
+    t.section_id,
+    t.created_at,
+    t.updated_at,
+    t.name,
+    t.title,
+    t.source_locale,
+    t.locale,
+    t.outdated,
+    t.outdated_locales,
+    t.edited_at,
+    t.user_segment_id,
+    t.permission_group_id,
+    t.label_names,
+    t.body
+from datalake_raw.zendesk_articles t
 __WHERE_CLAUSE__
