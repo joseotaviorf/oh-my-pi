@@ -13,6 +13,7 @@ CREATE VIEW public.vw_dim_user_doorman as
         criadoEm as ts_created,
         joinedProgramAt as ts_joined_program,
         coalesce(id_dados_afiliado, -1) as sk_user_affiliate,
+        is_active,
         now() as ts_load
     from
         user_doorman
