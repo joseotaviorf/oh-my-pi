@@ -18,7 +18,7 @@ select
     external_id,
     type,
     replace(cast(json_extract(via, '$.channel') as varchar), '"') as channel,
-    replace(cast(json_extract(via, '$.source') as varchar), '\') as source,
+    json_extract(via, '$.source') as source,
     updated_at,
     problem_id,
     due_at,
