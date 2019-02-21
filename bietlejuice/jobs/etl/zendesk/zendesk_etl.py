@@ -482,7 +482,7 @@ class ZendeskETL(object):
         empty = self._is_clean_table_empty(table_name)
 
         if not empty:
-            query = "{} \n where dt='{}'".format(query, self.execution_date)
+            query = query.replace('__WHERE_CLAUSE__', "where t.dt='{}'".format(self.execution_date))
 
             self.athena_client.add_partition(
                 database=ZendeskETL.SCHEMAS['raw'],

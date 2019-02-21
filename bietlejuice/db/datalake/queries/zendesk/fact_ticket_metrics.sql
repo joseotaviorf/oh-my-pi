@@ -1,4 +1,4 @@
-with tickets_sep as (
+with tickets_filter as (
 	select t.* from datalake_clean.zendesk_tickets t
 	where t.channel != 'api'
 	__WHERE_CLAUSE__
@@ -6,9 +6,9 @@ with tickets_sep as (
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '.*{\\?"id\\?":(\d+)', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":(\d+)', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
-    from tickets_sep zt
+    from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
 ),
 fields_map as (
@@ -18,38 +18,6 @@ fields_map as (
     left join datalake_clean.zendesk_ticket_fields cf
        on cf.id = f.field_id
     group by f.id
-),
-cast_datetime as (
-  select
-   id,
-   channel,
-   date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at
-  from tickets_sep
-  where channel = '"chat"'
-),
-last_rows as (
-    select
-	  t.id,
-	  t.subject,
-	  t.description,
-	  t.channel,
-	  t.priority,
-	  t.recipient,
-	  t.tags,
-	  t.satisfaction_rating,
-	  date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-	  t.created_at,
-	  t.group_id,
-	  t.requester_id,
-	  t.submitter_id,
-	  t.assignee_id,
-	  t.metric_set,
-      t.dt_extraction,
-	  t.is_public,
-	  t.status,
-	  max(t.updated_at) as updated_at
-   from tickets_sep t
-   group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 tickets as (
     select
@@ -74,9 +42,8 @@ tickets as (
 	    cast(json_extract(t.metric_set, '$.replies') as varchar) as replies,
 	    t.is_public as has_public_comments,
 	    t.status,
-	    current_timestamp as ts_load,
 	    t.dt_extraction
-	from last_rows t
+	from tickets_filter t
 	left join fields_map c
 	    on c.id = t.id
 	left join datalake_clean.ods_dim_house_listing dhl
@@ -137,7 +104,7 @@ select
     t.replies,
     t.has_public_comments,
     t.status,
-    t.ts_load
+    current_timestamp as ts_load
 from tickets t
 left join contract c
     on t.sk_contract = c.sk_contract

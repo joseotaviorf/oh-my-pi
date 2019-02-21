@@ -26,7 +26,7 @@ last_ticket_groups as (
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '.*{\\?"id\\?":(\d+)', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":(\d+)', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
@@ -38,23 +38,6 @@ fields_map as (
     left join datalake_clean.zendesk_ticket_fields cf
        on cf.id = f.field_id
     group by f.id
-),
-last_fields as (
-	select
-	  t.id,
-	  t.subject,
-	  t.description,
-	  t.channel,
-	  t.priority,
-	  t.recipient,
-	  t.tags,
-	  t.satisfaction_rating,
-	  date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-	  t.created_at,
-	  t.group_id,
-	  max(t.updated_at) as updated_at
-   from tickets_filter t
-   group by 1,2,3,4,5,6,7,8,9,10,11
 )
 select
    t.id as sk_ticket,
@@ -69,10 +52,10 @@ select
    c.cols['Tipo de Solicitação'] as request_type,
    c.cols['Tipo de Cliente'] as client_type,
    date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-   t.created_at,
-   current_timestamp as ts_load,
-   t.updated_at
-from last_fields t
+   cast(from_iso8601_timestamp(t.created_at) as timestamp) as created_at,
+   cast(from_iso8601_timestamp(t.updated_at) as timestamp) as updated_at,
+   current_timestamp as ts_load
+from tickets_filter t
 left join fields_map c
     on c.id = t.id
 left join last_ticket_groups zg
