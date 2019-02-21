@@ -19,9 +19,9 @@ class CARTO_API(object):
         pass
 
     @staticmethod
-    def run_sql(sql):
+    def run_sql(sql, data_format='JSON'):
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}'.format(BASE_URL_SQL, url_params_encoded, CARTO_API_KEY)
+        url = '{}?q={}&api_key={}&format={}'.format(BASE_URL_SQL, url_params_encoded, CARTO_API_KEY, data_format)
         r = requests.get(url)
         return r.content
 
