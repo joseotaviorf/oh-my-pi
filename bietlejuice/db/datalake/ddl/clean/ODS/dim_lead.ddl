@@ -71,6 +71,7 @@ create external table if not exists datalake_clean.ods_dim_lead (
   flg_city_served string,
   flg_latlng_served string,
   flg_location_served string,
+  score_factor string,
   load_timestamp string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
