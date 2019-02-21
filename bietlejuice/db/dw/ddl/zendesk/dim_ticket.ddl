@@ -12,8 +12,8 @@ create table if not exists zendesk.dim_ticket (
     satisfaction_rating varchar(65535),
     request_type varchar,
     client_type varchar,
-    chat_started_at timestamp,
-    created_at timestamp,
-    updated_at timestamp,
-    ts_load varchar
+    ts_chat_started timestamp,
+    ts_created timestamp,
+    ts_updated timestamp,
+    ts_load timestamp
 )

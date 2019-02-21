@@ -76,11 +76,10 @@ tickets as (
 	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.on_hold_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_on_hold_time_business,
 	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_full_resolution_time_calendar,
 	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_full_resolution_time_business,
-	    cast(json_extract(t.metric_set, '$.reopens') as varchar) as reopens,
-	    cast(json_extract(t.metric_set, '$.replies') as varchar) as replies,
-	    t.is_public as has_public_comments,
+	    cast(json_extract(t.metric_set, '$.reopens') as integer) as reopens,
+	    cast(json_extract(t.metric_set, '$.replies') as integer) as replies,
+	    cast(t.is_public as boolean) as has_public_comments,
 	    t.status,
-	    current_timestamp as ts_load,
 	    t.dt_extraction
 	from last_rows t
 	left join fields_map c
@@ -143,7 +142,7 @@ select
     t.replies,
     t.has_public_comments,
     t.status,
-    t.ts_load
+    current_timestamp as ts_load
 from tickets t
 left join contract c
     on t.sk_contract = c.sk_contract
