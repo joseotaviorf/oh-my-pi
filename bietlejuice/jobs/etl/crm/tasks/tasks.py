@@ -159,7 +159,7 @@ class CRMTasks(object):
 
     @logger(exclude='json_list')
     def _save_to_s3(self, json_list, total_count):
-        if json_list is None:
+        if json_list is None or total_count == 0:
             logger.info('m=_save_to_s3, msg=no results')
             return
 
