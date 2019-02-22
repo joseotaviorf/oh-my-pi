@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import boto3
@@ -13,12 +14,12 @@ from bietlejuice.jobs.etl.crm.tasks import CRMTasks
 class TestCRMTasks(object):
 
     @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='select 1 from dummy where __WHERE_CLAUSE__')
-    @mock.patch.object(CRMTasks, '_is_prod_table_empty', return_value=True)
+    @mock.patch.object(CRMTasks, '_is_table_empty', return_value=True)
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe')
     @mock.patch.object(BaseETL, 'dataframe_to_db')
     def test__move_to_staging_without_queues_and_manual_task_workgroups(self, mock_dataframe_to_db,
                                                                         mock_execute_query_and_return_dataframe,
-                                                                        mock__is_prod_table_empty,
+                                                                        mock__is_table_empty,
                                                                         mock_get_query_from_file_name, tasks):
         # arrange
         final_query = """select 1 from dummy where (trim(ct.type) = 'Manual' and ct.metadata not like '%workgroupId%')"""
@@ -39,7 +40,7 @@ class TestCRMTasks(object):
 
         # assert
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock__is_prod_table_empty.call_count == 1
+        assert mock__is_table_empty.call_count == 1
         assert mock_dataframe_to_db.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_count == 1
         assert mock_execute_query_and_return_dataframe.call_args[0][0] == final_query
@@ -110,3 +111,122 @@ class TestCRMTasks(object):
         assert tasks.s3_resource.Object.call_args[0] == (s3_bucket, file_path)
         assert tasks.s3_resource.Object(s3_bucket, file_path).load.call_count == 1
         assert result is True
+
+    @mock.patch.object(BaseETL, 'from_db_query')
+    @pytest.mark.parametrize('from_db_return, expected', [([], False), ([1], True)])
+    def test__is_table_empty_false(self, mock_from_db_query, tasks, from_db_return, expected):
+        # arrange
+        mock_from_db_query.return_value = from_db_return
+
+        # act
+        result = tasks._is_table_empty(
+            schema=mock.ANY,
+            table_name=mock.ANY
+        )
+
+        # assert
+        assert result == expected
+
+    @mock.patch.object(CRMTasks, '_move_to_clean')
+    def test_move_tasks_resolution_to_clean(self, mock__move_to_clean, tasks):
+        # act
+        tasks.move_tasks_resolution_to_clean()
+
+        # assert
+        for _, value in mock__move_to_clean.call_args[1]['r_cols'].items():
+            assert value == str
+
+    @mock.patch.object(CRMTasks, '_move_to_clean')
+    def test_move_tasks_to_clean(self, mock__move_to_clean, tasks):
+        # act
+        tasks.move_tasks_to_clean()
+
+        # assert
+        for _, value in mock__move_to_clean.call_args[1]['r_cols'].items():
+            assert value == str
+
+    def test__upsert_partition_invalid_bucket_type(self, tasks):
+        # arrange
+        bucket_type = 'invalid'
+
+        # act & assert
+        with pytest.raises(ValueError):
+            tasks._upsert_partition(bucket_type, mock.ANY, mock.ANY)
+
+    @mock.patch.object(BaseETL, 'obj_to_s3')
+    def test__save_to_s3(self, mock_obj_to_s3, tasks):
+        # arrange
+        json_list = iter([{'field': 'value'}])
+        total_count = 1
+
+        # act
+        tasks._save_to_s3(json_list, total_count)
+
+        # assert
+        assert re.match('raw\/[^\/]+\/[^\/]+\/dt=[^\/]+\/[^\.]+\.gz', mock_obj_to_s3.call_args[1]['file_path'])
+
+    def test__save_to_s3_list_none(self, tasks):
+        # arrange
+        json_list = None
+
+        # act
+        result = tasks._save_to_s3(json_list, mock.ANY)
+
+        # assert
+        assert result is None
+
+    @mock.patch.object(AthenaClient, 'create_parquet_from_query')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    def test__move_to_clean(self,
+                            mock_get_query_from_file_name,
+                            mock_create_parquet_from_query,
+                            tasks):
+        # act
+        tasks._move_to_clean(mock.ANY, mock.ANY, mock.ANY, mock.ANY)
+
+        # assert
+        assert re.match('clean\/[^\/]+\/dt=[^\/]+\/[^\.]+\.parq',
+                        mock_create_parquet_from_query.call_args[1]['key'])
+
+    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='__WHERE_CLAUSE__')
+    @mock.patch.object(CRMTasks, '_is_table_empty', return_value=True)
+    @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe')
+    @mock.patch.object(BaseETL, 'dataframe_to_db')
+    @pytest.mark.parametrize('table_empty, queues, manual_task_workgroups, append_query_filename, final_query_expected',
+                             [(True, None, ['w0'], None,
+                               '(trim(ct.type) = \'Manual\' and regexp_extract(ct.metadata, \'workgroupId":"([^"]+)\', 1) in (\'w0\'))'),
+                              (True, None, None, None,
+                               '(trim(ct.type) = \'Manual\' and ct.metadata not like \'%workgroupId%\')'),
+                              (True, ['q0'], ['w0'], None,
+                               '(trim(ct.type) in (\'q0\') or (trim(ct.type) = \'Manual\' and regexp_extract(ct.metadata, \'workgroupId":"([^"]+)\', 1) in (\'w0\')))'),
+                              (True, ['q0'], None, None,
+                               'trim(ct.type) in (\'q0\')'),
+                              (True, ['q0'], None, 'append',
+                               'trim(ct.type) in (\'q0\')\n__WHERE_CLAUSE__'),
+                              (False, ['q0'], None, None,
+                               'trim(ct.type) in (\'q0\') and dt = \'2019-01-02\'')])
+    def test__move_to_staging(self,
+                              mock_dataframe_to_db,
+                              mock_execute_query_and_return_dataframe,
+                              mock__is_table_empty,
+                              mock_get_query_from_file_name,
+                              tasks,
+                              table_empty,
+                              queues,
+                              manual_task_workgroups,
+                              append_query_filename,
+                              final_query_expected):
+        # arrange
+        mock__is_table_empty.return_value = table_empty
+
+        # act
+        tasks._move_to_staging(
+            mock.ANY,
+            queues,
+            mock.ANY,
+            manual_task_workgroups,
+            append_query_filename
+        )
+
+        # assert
+        assert mock_execute_query_and_return_dataframe.call_args[0][0] == final_query_expected
