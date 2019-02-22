@@ -165,12 +165,11 @@ class TestCRMTasks(object):
         # assert
         assert re.match('raw\/[^\/]+\/[^\/]+\/dt=[^\/]+\/[^\.]+\.gz', mock_obj_to_s3.call_args[1]['file_path'])
 
-    def test__save_to_s3_list_none(self, tasks):
-        # arrange
-        json_list = None
-
+    @pytest.mark.parametrize('json_list, total_count',
+                             [(None, mock.ANY), (iter([{'field': 'value'}]), 0)])
+    def test__save_to_s3_no_results(self, tasks, json_list, total_count):
         # act
-        result = tasks._save_to_s3(json_list, mock.ANY)
+        result = tasks._save_to_s3(json_list, total_count)
 
         # assert
         assert result is None
