@@ -23,6 +23,7 @@ create table public.fact_house_listing_flows (
 	sk_opportunity_date integer,
 	sk_first_listing_date integer,
 	sk_discard_date integer,
+	sk_user_lead_first_discarder integer,
 	funnel_step varchar(255),
 	funnel_drop_reason varchar(255),
 	hours_lead_to_prospect decimal(10,1),

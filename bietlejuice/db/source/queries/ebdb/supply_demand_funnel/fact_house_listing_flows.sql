@@ -15,6 +15,7 @@ select
 	dt_opportunity,
 	dt_first_listing,
 	dt_discarded,
+	user_id_lead_first_discarder,
 	flow,
 	acquisition_method,
 	acquisition_channel,
@@ -91,6 +92,7 @@ from
 		coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) as dt_opportunity,
 		i.firstPublication as dt_first_listing,
 		dt_discarded,
+		user_id_lead_first_discarder,
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
@@ -123,6 +125,7 @@ from
 				else i.dataCriacao
 			end as dt_qualified,
 			null as dt_discarded,
+			null as user_id_lead_first_discarder,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service Flow'
@@ -198,6 +201,7 @@ from
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
       from_unixtime(dure.timestamp/1000) as dt_discarded,
+      ure_disc.usuario_id as user_id_lead_first_discarder,
       case
         when l.origem = 'OwnerPWA' then 'Self-Service Flow'
         else 'Lead Flow'
@@ -251,7 +255,7 @@ from
       from Lead le
       left join vw_lead_reason lr
       	on le.reason = lr.reason_detail
-      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}') order by 1 asc
+      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) = DATE('2019-01-01') order by 1 asc
     ) l
     left join
       ConversaoLead cl
@@ -259,7 +263,7 @@ from
     left join
       Imovel i
       on i.id = cl.imovel_id
-      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
+      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) = DATE('2019-01-01')
     left join
       (
         select
@@ -321,6 +325,22 @@ from
     left join
       Usuario reg
       on reg.id = i.usuarioQueCadastrou_id
+    left join
+    (	SELECT
+	    	laud.id,
+	    	min(ure.id) as min_id
+	    FROM Lead_AUD laud
+	    join UsuarioRevisionEntity ure
+	    	on laud.REV = ure.id
+   		 where laud.status_MOD = 1
+   		    and laud.status = 'Descartado'
+   		    and laud.reason not in('ForaArea', 'DUPLICATED_LEAD')
+    	group by laud.id
+    ) d_ure
+    	on d_ure.id = l.id
+    left join
+    	UsuarioRevisionEntity ure_disc
+    	on ure_disc.id = d_ure.min_id
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
@@ -361,6 +381,7 @@ from
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
 			null as dt_discarded,
+			null as user_id_lead_first_discarder,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			'Inside Sales' as acquisition_channel,
