@@ -1,24 +1,29 @@
-import json
-from airflow.models import DAG
+import re
+from collections import OrderedDict
 from datetime import datetime
+
+import pandas as pd
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
-from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags.util import environment as env, xcom
+from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 0 1/3 * *'
+MAIN_SCHEDULE_INTERVAL = '0 0 1/23 * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket') or '5a-datalake'
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
+data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
 def submit_iw(**kwargs):
     max_crawl = kwargs.get('max_crawl', 1000000)
     states = kwargs.get('states')
+    start_dt = datetime.today().date()
 
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
@@ -28,26 +33,130 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/imovelweb.py', '--max_crawl', str(max_crawl), '--states'] + states
+        command=['./crawlers/imovelweb.py', '--max_crawl', str(max_crawl), '--start_dt', str(start_dt),
+                 '--states'] + states
     )
-    logger.info('Finished with status {}. {}'.format(r.get('status'), '-'.join([r.get('jobId'), r.get('jobName')])))
+    logger.info('m=submit_iw, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
+                                                                          r.get('jobName')]), r.get('status')))
+
+    # get task instance
+    ti = kwargs.get('ti')
+
+    exec_date = str(datetime.date(kwargs.get('execution_date')))
+    xcom.xcom_push(ti,
+                   key='crawler_houses_iw_{}'.format(exec_date),
+                   k_value=r.get('jobId'))
 
 
-dag = DAG(
-    dag_id=MAIN_DAG_NAME,
-    default_args={
-        'owner': BaseDAG.DEFAULT_OWNER,
-        'wait_for_downstream': False,
-        'depends_on_past': False
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1
-)
+def enrich_and_move_to_clean():
+    ws = 'imovelweb'
+    query = "select * from datalake_raw.crawlers where " \
+            "started_on = date '{started_on}' and ws = '{ws}';"
+    crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
+    last_crawling_date = crawler_entity.get_last_crawling_date(ws)
+    query = query.format(started_on=last_crawling_date,
+                         ws=ws)
+    leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
 
-BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='crawl-imovelweb',
-    python_callable=submit_iw,
-    op_kwargs=json.loads(crawler_params)
-)
+    if leads.empty:
+        logger.info("m=enrich_and_move_to_clean, msg=there are no leads to process")
+    else:
+        logger.info("m=enrich_and_move_to_clean, msg=got {} leads from datalake raw".format(len(leads)))
+        leads = crawler_entity.cleaning(leads)
+        regex = "^(.*)-(\d+)\D*$"
+        leads['nb_street'] = leads['street'].apply(
+            lambda st: re.search(regex, str(st)).group(2) if re.search(regex, str(st)) else
+            None)
+
+        leads = leads.where((pd.notnull(leads)), None)
+
+        r_cols = OrderedDict([
+            ('id', str),
+            ('website', str),
+            ('url', str),
+            ('http_status', str),
+            ('crawled_on', str),
+            ('updated_on', str),
+            ('business', str),
+            ('type', str),
+            ('advertiser_name', str),
+            ('advertiser_type', str),
+            ('advertiser_id', str),
+            ('phones', str),
+            ('price', str),
+            ('rent', str),
+            ('condominium', str),
+            ('iptu', str),
+            ('total_area', str),
+            ('useful_area', str),
+            ('bedrooms', str),
+            ('suites', str),
+            ('toilets', str),
+            ('garages', str),
+            ('photos', str),
+            ('description', str),
+            ('unit_features', str),
+            ('common_features', str),
+            ('complementary_info', str),
+            ('year_building', str),
+            ('cep', str),
+            ('lat', str),
+            ('lng', str),
+            ('street', str),
+            ('nb_street', str),
+            ('neighborhood', str),
+            ('city', str),
+            ('state', str),
+            ('crawl_timestamp', str)
+        ])
+
+        crawler_entity.athena_client.create_parquet_from_df(
+            key='clean/crawlers/ws={}/started_on={}/data.parq'.format(ws, last_crawling_date),
+            df=leads, raw_columns=r_cols, clean_columns=r_cols)
+
+        q = "alter table datalake_clean.crawlers add if not exists partition (ws='imovelweb', started_on='{}')".format(
+            last_crawling_date)
+        try:
+            crawler_entity.athena_client.execute_query_and_wait_for_results(q)
+        except Exception as e:
+            logger.error("m=enrich_and_move_to_clean, msg=couldn't create partition, e={}.".format(e))
+
+
+# dag = DAG(
+#     dag_id=MAIN_DAG_NAME,
+#     default_args={
+#         'owner': BaseDAG.DEFAULT_OWNER,
+#         'wait_for_downstream': False,
+#         'depends_on_past': False
+#     },
+#     start_date=MAIN_START_DATE,
+#     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
+#     max_active_runs=1
+# )
+#
+# crawl_iw = BaseDAG.build_python_operator(
+#     dag=dag,
+#     task_id='crawl-iw',
+#     python_callable=submit_iw,
+#     provide_context=True,
+#     op_kwargs=json.loads(crawler_params)
+# )
+#
+# iw_success_test = QuintoAndarAWSBatchSensor(
+#     task_id='iw-success-test',
+#     poke_interval=5 * 60,
+#     timeout=22 * 3600,
+#     provide_context=True,
+#     xcom_task_id='crawl-iw'
+# )
+#
+# move_to_clean = BaseDAG.build_python_operator(
+#     dag=dag,
+#     task_id='move-to-clean',
+#     python_callable=enrich_and_move_to_clean,
+# )
+#
+# crawl_iw >> iw_success_test >> move_to_clean
+
+if __name__ == "__main__":
+    enrich_and_move_to_clean()
