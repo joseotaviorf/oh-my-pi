@@ -1,17 +1,21 @@
+import json
 import re
 from collections import OrderedDict
 from datetime import datetime
 
 import pandas as pd
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env, xcom
 from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
+from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 0 1/23 * *'
+MAIN_SCHEDULE_INTERVAL = '0 0 * * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -21,7 +25,7 @@ data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
 def submit_iw(**kwargs):
-    max_crawl = kwargs.get('max_crawl', 1000000)
+    max_crawl = kwargs.get('max_crawl', 100000)
     states = kwargs.get('states')
     start_dt = datetime.today().date()
 
@@ -49,6 +53,7 @@ def submit_iw(**kwargs):
 
 
 def enrich_and_move_to_clean():
+    print(datetime.today())
     ws = 'imovelweb'
     query = "select * from datalake_raw.crawlers where " \
             "started_on = date '{started_on}' and ws = '{ws}';"
@@ -122,41 +127,38 @@ def enrich_and_move_to_clean():
             logger.error("m=enrich_and_move_to_clean, msg=couldn't create partition, e={}.".format(e))
 
 
-# dag = DAG(
-#     dag_id=MAIN_DAG_NAME,
-#     default_args={
-#         'owner': BaseDAG.DEFAULT_OWNER,
-#         'wait_for_downstream': False,
-#         'depends_on_past': False
-#     },
-#     start_date=MAIN_START_DATE,
-#     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-#     max_active_runs=1
-# )
-#
-# crawl_iw = BaseDAG.build_python_operator(
-#     dag=dag,
-#     task_id='crawl-iw',
-#     python_callable=submit_iw,
-#     provide_context=True,
-#     op_kwargs=json.loads(crawler_params)
-# )
-#
-# iw_success_test = QuintoAndarAWSBatchSensor(
-#     task_id='iw-success-test',
-#     poke_interval=5 * 60,
-#     timeout=22 * 3600,
-#     provide_context=True,
-#     xcom_task_id='crawl-iw'
-# )
-#
-# move_to_clean = BaseDAG.build_python_operator(
-#     dag=dag,
-#     task_id='move-to-clean',
-#     python_callable=enrich_and_move_to_clean,
-# )
-#
-# crawl_iw >> iw_success_test >> move_to_clean
+dag = DAG(
+    dag_id=MAIN_DAG_NAME,
+    default_args={
+        'owner': BaseDAG.DEFAULT_OWNER,
+        'wait_for_downstream': False,
+        'depends_on_past': False
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
+    max_active_runs=1
+)
 
-if __name__ == "__main__":
-    enrich_and_move_to_clean()
+crawl_iw = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='crawl-iw',
+    python_callable=submit_iw,
+    provide_context=True,
+    op_kwargs=json.loads(crawler_params)
+)
+
+iw_success_test = QuintoAndarAWSBatchSensor(
+    task_id='iw-success-test',
+    poke_interval=5 * 60,
+    timeout=22 * 3600,
+    provide_context=True,
+    xcom_task_id='crawl-iw'
+)
+
+move_to_clean = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='move-to-clean',
+    python_callable=enrich_and_move_to_clean,
+)
+
+crawl_iw >> iw_success_test >> move_to_clean
