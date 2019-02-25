@@ -54,29 +54,29 @@ class Planner(object):
     def _get_class_ids(self, enum_type):
         ids_df = self.athena_client.execute_file_query_and_return_dataframe(
             filename='{}/planner/{}_ids.sql'.format(DATALAKE_QUERIES_DIR, enum_type.value))
-        if ids_df is None:
-            raise RuntimeError('m=_get_class_ids_as_json, msg=ids_df is None')
-
-        return ids_df['id'].tolist()
+        result = []
+        if ids_df is not None:
+            try:
+                result = ids_df['id'].tolist()
+            except Exception:
+                raise RuntimeError(
+                    'm=_get_class_ids, class={}, msg=resulting dataframe does not contain column id'.format(enum_type))
+        return result
 
     @logger
     def _extract_data(self, endpoint, **params):
         response = requests.get(url=endpoint.format(**params))
-        if response.status_code != 200:
+        if not response.ok:
             raise RuntimeError(
                 'm=_extract_data, response_status_code={}, response_content={}'.format(response.status_code,
                                                                                        response.content))
 
-        json_response = response.json()
-        if json_response is None:
-            raise RuntimeError('m=_extract_data, msg=json_response is None')
+        return response.json()
 
-        return json_response
-
-    @logger
+    @logger(exclude=['_json'])
     def _save_into_s3_raw(self, _json, enum_type, id_class):
         if _json is None:
-            raise AttributeError('m=_save_into_s3_raw, msg=_json is none')
+            raise ValueError('m=_save_into_s3_raw, msg=_json is none')
 
         gz_body = BytesIO()
         with GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -128,8 +128,6 @@ class Planner(object):
 
     @logger
     def __upsert_single_partition(self, enum_type, id_class, bucket_type):
-        if bucket_type not in ('raw', 'clean'):
-            raise ValueError('m=__upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.execute_file_query_and_wait_for_results(
             filename='{}/planner/upsert_single_partition.sql'.format(DATALAKE_QUERIES_DIR),

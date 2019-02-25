@@ -15,7 +15,7 @@ class Agent(object):
     def __init__(self, bucket_name):
         self.bucket_datalake = bucket_name
 
-    def __format_query_filename(self, filename, db_enum, schema='public'):
+    def _format_query_filename(self, filename, db_enum, schema='public'):
         if db_enum == EnumDB.QuintoAndar_ebdb:
             dir = '{}/ebdb'.format(SOURCE_QUERIES_DIR)
         elif db_enum == EnumDB.BI_ODS:
@@ -29,7 +29,7 @@ class Agent(object):
 
     @logger
     def get_agent_data(self, table_name, db_enum, dt=None, dtmax=None, schema='public'):
-        filename = self.__format_query_filename(table_name, db_enum, schema=schema)
+        filename = self._format_query_filename(table_name, db_enum, schema=schema)
         with open(filename) as f:
             raw_query = f.read()
 
@@ -183,31 +183,31 @@ class Agent(object):
         return dummy_exists
 
     @logger(exclude=['google_s_a_credentials', 'google_api_scope', 'google_sheets_files'])
-    def __get_google_sheets_data(self, google_s_a_credentials, google_api_scope, google_sheets_files, filename):
+    def _get_google_sheets_data(self, google_s_a_credentials, google_api_scope, google_sheets_files, filename):
         gsheets = GoogleSheetsClient(google_s_a_credentials, google_api_scope)
 
         for item in google_sheets_files['files']:
             if item['fileName'] == filename:
                 df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'], sheet_id=item['sheetId'])
-                snake_case_columns = self.__to_snake_case_columns(df_gsheets.columns)
+                snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
                 df_gsheets.rename(columns=snake_case_columns, inplace=True)
                 return df_gsheets
 
         raise ValueError(
-            'm=__get_google_sheets_data, filename={}, msg=no filename found in json google sheets schema.'.format(
+            'm=_get_google_sheets_data, filename={}, msg=no filename found in json google sheets schema.'.format(
                 filename))
 
     @logger(exclude=['google_s_a_credentials', 'google_api_scope', 'google_sheets_files'])
     def move_sheets_data_to_datalake(self, google_s_a_credentials, google_api_scope, google_sheets_files, filename,
                                      path):
-        df = self.__get_google_sheets_data(google_s_a_credentials=google_s_a_credentials,
-                                           google_api_scope=google_api_scope, google_sheets_files=google_sheets_files,
-                                           filename=filename)
+        df = self._get_google_sheets_data(google_s_a_credentials=google_s_a_credentials,
+                                          google_api_scope=google_api_scope, google_sheets_files=google_sheets_files,
+                                          filename=filename)
         s3 = S3ToODS(s3_bucket=self.bucket_datalake)
         s3.move_df_to_datalake(df=df, tablename=path)
 
     @logger(exclude='old_columns')
-    def __to_snake_case_columns(self, old_columns):
+    def _to_snake_case_columns(self, old_columns):
         _underscorer1 = re.compile(r'(\S)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 

@@ -11,10 +11,9 @@ logger = QuintoAndarLogger('DimSubDag')
 class DimSubDag(BaseSubDag):
     S3_BUCKET = '5a-datalake'
 
-    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name,
+    def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, table_name,
                  ods_stg_table_name):
-        super(DimSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, ebdb_table_name)
-        self.ebdb_table_name = ebdb_table_name
+        super(DimSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, table_name)
         self.ods_stg_table_name = ods_stg_table_name
 
     @logger
@@ -68,7 +67,7 @@ class DimSubDag(BaseSubDag):
                     'enum_db': EnumDB.BI_ODS
                 },
                 {
-                    'file_path': '{}/ebdb/{}_count_check.sql'.format(SOURCE_QUERIES_TESTS_DIR, self.ebdb_table_name),
+                    'file_path': '{}/ebdb/{}_count_check.sql'.format(SOURCE_QUERIES_TESTS_DIR, self.table_name),
                     'enum_db': EnumDB.QuintoAndar_ebdb,
                     'encoding': 'LATIN1'
                 }
@@ -86,7 +85,7 @@ class DimSubDag(BaseSubDag):
                 },
                 {
                     'schema': 'ebdb',
-                    'table_name': self.ebdb_table_name,
+                    'table_name': self.table_name,
                     'enum_db': EnumDB.QuintoAndar_ebdb,
                     'encoding': 'LATIN1'
                 }

@@ -21,7 +21,7 @@ select
   c.seguroResidencial_valor as home_insurance_value,
   c.taxacomissaoprimeiroaluguel as first_rental_commission,
   c.valorCondominio as condo,
-  c.valorIptu as iptu,
+  c.iptu_valor as iptu,
   c.tipoAssinatura as signature_type,
   c.statusClosing as closing_status,
   c.criadoEm as ts_created,

@@ -1,6 +1,6 @@
 import pytest
 
-from bietlejuice.jobs.etl.leads.leads_reprocessor import LeadsReprocessor
+from bietlejuice.jobs.etl.leads import LeadsReprocessor, LeadsProcessor
 
 config_json = """
                 {
@@ -12,7 +12,12 @@ config_json = """
 
 
 @pytest.fixture(scope='session')
-def lead_reprocessor():
+def leads_reprocessor():
     return LeadsReprocessor(
         config_json=config_json
     )
+
+
+@pytest.fixture(scope='session')
+def leads_processor():
+    return LeadsProcessor()
