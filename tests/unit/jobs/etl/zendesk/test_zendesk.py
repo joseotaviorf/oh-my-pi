@@ -52,8 +52,8 @@ class TestZendeskETL(object):
         # arrange
         table_name = 'table'
         key = 'raw/zendesk/class/dt=1999-01-01'
-        query = 'select field_one, field_two, field_three from {}'
-        final_query = query + " \n where dt='2018-01-01'"
+        query = 'select t.field_one, t.field_two, t.field_three from {} t __WHERE_CLAUSE__'
+        final_query = query.replace('__WHERE_CLAUSE__', "where t.dt='2018-01-01'")
         raw_columns = OrderedDict([
             ('field_one', str),
             ('field_two', str),
