@@ -4,12 +4,9 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger('Marketing')
-
-env.set_airflow_var_to_local_env('BI_DW')
 
 
 class Marketing(object):
