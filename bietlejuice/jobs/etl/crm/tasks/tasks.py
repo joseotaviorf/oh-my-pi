@@ -373,7 +373,7 @@ class CRMTasks(object):
                     previous_clause=where_clause,
                     manual_workgroups="', '".join(workgroup for workgroup in manual_task_workgroups))
 
-        empty = self._is_table_empty(schema=CRMTasks.SCHEMA_NAMES['prod'], table_name=table_name)
+        empty = CRMTasks._is_table_empty(schema=CRMTasks.SCHEMA_NAMES['prod'], table_name=table_name)
         if not empty:
             where_clause = """{previous_clause} and dt = '{dt_partition}'""".format(previous_clause=where_clause,
                                                                                     dt_partition=self.partition_date)
@@ -447,7 +447,7 @@ class CRMTasks(object):
     def __append_to_dw(self, schema, table_name, query_filename):
         upsert_query = BaseETL.get_query_from_file_name('{}/staging/crm/{}'.format(DW_QUERIES_DIR, query_filename))
 
-        empty = self._is_table_empty(schema=CRMTasks.SCHEMA_NAMES['prod'], table_name=table_name)
+        empty = CRMTasks._is_table_empty(schema=CRMTasks.SCHEMA_NAMES['prod'], table_name=table_name)
         if empty:
             logger.info(
                 'm=__append_to_dw, schema={}, table_name={}, msg=table already empty'.format(
@@ -506,8 +506,9 @@ class CRMTasks(object):
             table_name=table_name
         )
 
+    @staticmethod
     @logger
-    def _is_table_empty(self, schema, table_name):
+    def _is_table_empty(schema, table_name):
         result = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
             query='select 1 from {}.{} limit 1'.format(schema, table_name)
