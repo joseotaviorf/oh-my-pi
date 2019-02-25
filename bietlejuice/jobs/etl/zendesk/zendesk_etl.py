@@ -114,7 +114,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key="clean/zendesk/tickets/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -207,7 +207,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -246,7 +246,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/ticket_metric_events/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -341,7 +341,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/users/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -372,7 +372,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -439,7 +439,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/articles/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -472,7 +472,7 @@ class ZendeskETL(object):
         self._move_to_clean(
             table_name=table_name,
             key='clean/zendesk/group_memberships/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
-            query=query.format(dt=self.execution_date),
+            query=query,
             r_cols=r_cols,
             c_cols=c_cols
         )
@@ -482,13 +482,15 @@ class ZendeskETL(object):
         empty = self._is_clean_table_empty(table_name)
 
         if not empty:
-            query = "{} \n where dt='{}'".format(query, self.execution_date)
+            query = query.replace('__WHERE_CLAUSE__', "where t.dt='{}'".format(self.execution_date))
 
             self.athena_client.add_partition(
                 database=ZendeskETL.SCHEMAS['raw'],
                 table_name="zendesk_{}".format(table_name),
                 partition="dt='{}'".format(self.execution_date)
             )
+        else:
+            query = query.replace('__WHERE_CLAUSE__', '')
 
         self.athena_client.create_parquet_from_query(
             key=key,
