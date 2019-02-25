@@ -10,10 +10,10 @@ logger = QuintoAndarLogger("MarketingFactory")
 class MarketingFactory(object):
 
     @staticmethod
-    def factory(_class, s3_bucket, execution_date, account=None):
-        __class = MarketingFactory.__dispatch_dict(_class)
-        if _class is None:
-            raise Exception('m=factory, _class={}, msg=class type not found'.format(_class))
+    def factory(class_, s3_bucket, execution_date, account=None):
+        __class = MarketingFactory.__dispatch_dict(class_)
+        if class_ is None:
+            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
 
         return __class(
             s3_bucket=s3_bucket,
@@ -23,8 +23,8 @@ class MarketingFactory(object):
 
     @staticmethod
     @logger
-    def __dispatch_dict(_class):
+    def __dispatch_dict(class_):
         return {
             MarketingEnum.GOOGLE_ADS: GoogleAds,
             MarketingEnum.FACEBOOK_ADS: FacebookAds
-        }.get(_class)
+        }.get(class_)

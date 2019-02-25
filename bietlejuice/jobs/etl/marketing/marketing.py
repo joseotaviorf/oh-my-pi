@@ -158,13 +158,13 @@ class Marketing(object):
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_fact_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
                 upsert_query = "{} \nwhere sk_date = {};".format(upsert_query, self.execution_date.strftime('%Y%m%d'))
             else:
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_dim_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
                 upsert_query = """
                     SELECT * FROM staging.{dim_table}
                     WHERE {sk_field} not in (
@@ -172,10 +172,10 @@ class Marketing(object):
                     )
                 """.format(sk_field=Marketing.SK_FIELD_MAP[table_name], dim_table=table_name)
 
-        self.__upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
+        self._upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
 
     @logger(exclude='df')
-    def __upsert_into_dw(self, upsert_query, table_name, schema):
+    def _upsert_into_dw(self, upsert_query, table_name, schema):
         logger.info(
             'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(schema,
                                                                                                       table_name,
@@ -212,8 +212,8 @@ class Marketing(object):
 
         return len(result) == 1
 
-    @logger
-    def __delete_old_entries(self, table_name, delete_query):
+    @logger(exclude='delete_query')
+    def _delete_old_entries(self, table_name, delete_query):
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
             command=delete_query.format(
