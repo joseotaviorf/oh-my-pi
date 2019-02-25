@@ -334,7 +334,7 @@ from
 	    	on laud.REV = ure.id
    		 where laud.status_MOD = 1
    		    and laud.status = 'Descartado'
-   		    and laud.reason not in('ForaArea', 'DUPLICATED_LEAD')
+                    and laud.automaticallyDiscarded = 0
     	group by laud.id
     ) d_ure
     	on d_ure.id = l.id
