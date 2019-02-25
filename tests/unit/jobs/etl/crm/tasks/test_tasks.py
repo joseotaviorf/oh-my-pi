@@ -158,12 +158,13 @@ class TestCRMTasks(object):
         # arrange
         json_list = iter([{'field': 'value'}])
         total_count = 1
+        regex_file_path = 'raw\/[^\/]+\/[^\/]+\/dt=[^\/]+\/[^\.]+\.gz'
 
         # act
         tasks._save_to_s3(json_list, total_count)
 
         # assert
-        assert re.match('raw\/[^\/]+\/[^\/]+\/dt=[^\/]+\/[^\.]+\.gz', mock_obj_to_s3.call_args[1]['file_path'])
+        assert re.match(regex_file_path, mock_obj_to_s3.call_args[1]['file_path'])
 
     @pytest.mark.parametrize('json_list, total_count',
                              [(None, mock.ANY), (iter([{'field': 'value'}]), 0)])
@@ -180,12 +181,14 @@ class TestCRMTasks(object):
                             mock_get_query_from_file_name,
                             mock_create_parquet_from_query,
                             tasks):
+        # arrange
+        regex_key = 'clean\/[^\/]+\/dt=[^\/]+\/[^\.]+\.parq'
+
         # act
         tasks._move_to_clean(mock.ANY, mock.ANY, mock.ANY, mock.ANY)
 
         # assert
-        assert re.match('clean\/[^\/]+\/dt=[^\/]+\/[^\.]+\.parq',
-                        mock_create_parquet_from_query.call_args[1]['key'])
+        assert re.match(regex_key, mock_create_parquet_from_query.call_args[1]['key'])
 
     @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value='__WHERE_CLAUSE__')
     @mock.patch.object(CRMTasks, '_is_table_empty', return_value=True)
