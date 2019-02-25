@@ -255,7 +255,7 @@ from
       from Lead le
       left join vw_lead_reason lr
       	on le.reason = lr.reason_detail
-      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) = DATE('2019-01-01') order by 1 asc
+      where DATE(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{0}') order by 1 asc
     ) l
     left join
       ConversaoLead cl
@@ -263,7 +263,7 @@ from
     left join
       Imovel i
       on i.id = cl.imovel_id
-      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) = DATE('2019-01-01')
+      AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
     left join
       (
         select
