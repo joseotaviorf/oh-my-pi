@@ -1,7 +1,7 @@
 import json
 import re
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from airflow.models import DAG
@@ -9,7 +9,9 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env, xcom
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
@@ -27,7 +29,7 @@ data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 def submit_iw(**kwargs):
     max_crawl = kwargs.get('max_crawl', 100000)
     states = kwargs.get('states')
-    start_dt = datetime.today().date()
+    start_dt = datetime.today().date() - timedelta(days=1)
 
     assert isinstance(max_crawl, int)
     assert isinstance(states, list)
@@ -55,8 +57,9 @@ def submit_iw(**kwargs):
 def enrich_and_move_to_clean():
     print(datetime.today())
     ws = 'imovelweb'
-    query = "select * from datalake_raw.crawlers where " \
-            "started_on = date '{started_on}' and ws = '{ws}';"
+    query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
+    if not query:
+        return None
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
     last_crawling_date = crawler_entity.get_last_crawling_date(ws)
     query = query.format(started_on=last_crawling_date,
