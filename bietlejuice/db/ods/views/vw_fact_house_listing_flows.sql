@@ -145,8 +145,9 @@ potential_listings as (
 		end as first_isales_intervention,
 		bl.lead_type,
 		bl.lead_origin,
-		bl.utm_source,
-		bl.utm_medium,
+		coalesce(lfet.tracking_source, bl.utm_source) as utm_source,
+		coalesce(lfet.tracking_medium, bl.utm_medium) as utm_medium,
+		lfet.tracking_platform,
 		bl.branded_lead as is_branded,
 		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
@@ -161,6 +162,9 @@ potential_listings as (
 		(us_cad.id is not null) as is_call_center
 	from
 		fact_with_reproc f
+	left join
+	    lead_first_event_tracking lfet
+	    on lfet.id_lead = f.lead_id
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
@@ -258,8 +262,9 @@ select
 	pl.first_isales_intervention,
 	pl.lead_type,
 	pl.lead_origin,
-	pl.utm_source as lead_utm_source,
-	pl.utm_medium as lead_utm_medium,
+	pl.utm_source as lead_tracking_source,
+	pl.utm_medium as lead_tracking_medium,
+	pl.tracking_platform as lead_tracking_platform,
 	pl.is_branded,
 	pl.is_b2b,
 	pl.is_doorman,

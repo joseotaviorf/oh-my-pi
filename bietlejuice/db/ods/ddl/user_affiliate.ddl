@@ -9,7 +9,7 @@ cidadeAtuacao varchar(255),
 ativo boolean,
 atualizadoEm timestamp,
 criadoEm timestamp,
-numeroCreci varchar(24),
+numeroCreci varchar(100),
 origin varchar(24),
 affiliateType varchar(62),
 user_id bigint

@@ -65,14 +65,18 @@ CREATE VIEW public.vw_dim_lead as
   l.atualizado_em,
   l.criado_em,
   l.url_source,
-  l.utm_source,
-  l.utm_medium,
-  l.utm_campaign,
+  coalesce(lfet.tracking_source, l.utm_source) as utm_source,
+  coalesce(lfet.tracking_medium, l.utm_medium) as utm_medium,
+  coalesce(lfet.tracking_campaign, l.utm_campaign) as utm_campaign,
+  lfet.tracking_platform,
+  lfet.tracking_region,
+  lfet.tracking_city,
   coalesce(l.utm_source, an.network) as network, -- add the network of the campaign (currenlty only present for leads from the landing page), or network of the afiliado (if the lead was recommended by an affiliate)
   coalesce(lo.usuario_que_indicou_id, l.usuario_que_indicou_id) as usuario_que_indicou_id,
   l.flg_city_served,
   l.flg_latlng_served,
   l.flg_location_served,
+  lsf.score_factor,
   now() as load_timestamp
 FROM
   public.lead l
@@ -82,6 +86,12 @@ LEFT JOIN
 LEFT JOIN
     public.lead lo
     on lo.id = rl.id_origin_lead
+left join
+	public.lead_first_event_tracking lfet
+	on lfet.id_lead = l.id
+LEFT JOIN
+    public.lead_score_factor lsf
+    on lsf.lead_id = l.id
 left join lateral
 (
   select 
