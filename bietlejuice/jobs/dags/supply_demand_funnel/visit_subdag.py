@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -19,7 +20,7 @@ class VisitSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            ebdb_table_name='Visita',
+            table_name='Visita',
             ods_stg_table_name='visit'
         )
 

@@ -41,7 +41,7 @@ class AutodialerETL(object):
     def move_data_to_raw(self):
         df = self.get_mongo_data()
 
-        self.__save_to_s3(
+        self._save_to_s3(
             json_list=df
         )
 
@@ -83,7 +83,7 @@ class AutodialerETL(object):
 
     # aux methods
     @logger
-    def __mongo_connect(self):
+    def _mongo_connect(self):
         if self.document_type_enum == AutodialerEnum.TASK_REFERENCES:
             return self.db.taskReferences
         if self.document_type_enum == AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS:
@@ -92,12 +92,12 @@ class AutodialerETL(object):
             return self.db.taskReferenceOutboundHistory
 
         raise ValueError(
-            'm=__mongo_connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
+            'm=_mongo_connect, document_type={}, document_type_enum={}, msg=Invalid document type.'.format(
                 self.document_type, self.document_type_enum))
 
     @logger
     def get_mongo_data(self):
-        mongo_db = self.__mongo_connect()
+        mongo_db = self._mongo_connect()
         # TODO
         # Implement dynamic data filter
         filter = None if self.execution_date is not None else ''
@@ -137,7 +137,7 @@ class AutodialerETL(object):
                 logger.info('m=__normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
 
         old_columns = df_treated.columns
-        snake_case_columns = self.__to_snake_case_columns(old_columns)
+        snake_case_columns = self._to_snake_case_columns(old_columns)
         df_treated.rename(columns=snake_case_columns, inplace=True)
 
         # final treatment
@@ -148,7 +148,7 @@ class AutodialerETL(object):
         return df_unique_columns
 
     @logger(exclude='old_columns')
-    def __to_snake_case_columns(self, old_columns):
+    def _to_snake_case_columns(self, old_columns):
         _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 
@@ -164,7 +164,7 @@ class AutodialerETL(object):
         return new_columns
 
     @logger(exclude='json_list')
-    def __save_to_s3(self, json_list):
+    def _save_to_s3(self, json_list):
         gz_body = BytesIO()
         for _json in json_list:
             with GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -184,7 +184,7 @@ class AutodialerETL(object):
         gz_body.seek(0)
         gz_body.flush()
 
-        logger.info('m=__save_to_s3, path={}, msg=file saved'.format(file_suffix))
+        logger.info('m=_save_to_s3, path={}, msg=file saved'.format(file_suffix))
 
     def __obj_to_s3(self, obj_io, file_suffix):
         logger.info('m=__obj_to_s3, file_suffix={}, msg=sending to s3'.format(file_suffix))

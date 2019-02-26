@@ -1,4 +1,4 @@
-select  -- count(1)
+select distinct
   l.id,
   l.anuncioCriadoEm as anuncio_criado_em,
   l.areaTotal as area_total,

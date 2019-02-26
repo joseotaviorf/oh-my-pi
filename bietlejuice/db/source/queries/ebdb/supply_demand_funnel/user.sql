@@ -25,7 +25,6 @@ select
     u.recebeuBuscaGuiada+0 as recebeu_busca_guiada,
     da.coordinateId as dadosagente_email_coordinator ,
     m.nomeMunicipio as dadosagente_cidade,
-    da.cidadeAtuacao as dadosagente_atuacao,
     da.perfil as dadosagente_perfil,
     da.numeroCRECI as dadosagente_numero_creci,
     da.ativo+0 as dadosagente_ativo,
