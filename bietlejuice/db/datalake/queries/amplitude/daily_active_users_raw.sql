@@ -27,8 +27,8 @@ rn as (
 	from sessions_raw
 )
 select
-    event_date,
-    session_start_ts,
+    cast(event_date as varchar) as event_date,
+    cast(session_start_ts as varchar) as session_start_ts,
     amplitude_id,
     session_id,
     country,

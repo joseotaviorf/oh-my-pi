@@ -5,8 +5,10 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.amplitude.amplitude_events import AmplitudeEventsETL
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -33,6 +35,13 @@ def load_amplitude_clean(**kwargs):
 
     amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
     amplitude_etl.load_data_to_clean(execution_date=execution_date)
+
+
+@logger(exclude='kwargs')
+def athena_execute_file_query_and_wait_for_results(**kwargs):
+    a = AthenaClient(s3_bucket=s3_bucket, bucket_folder_path=kwargs.get('bucket_folder_path'))
+    query_id = a.execute_file_query_and_wait_for_results(
+        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')))
 
 
 dag = DAG(
@@ -69,6 +78,28 @@ xcom_amplitude_load_events_task = BaseDAG.build_python_operator(
     provide_context=True
 )
 
+load_daily_active_users_raw_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_daily_active_users_raw',
+    provide_context=True,
+    python_callable=athena_execute_file_query_and_wait_for_results,
+    op_kwargs={'filename': 'amplitude/daily_active_users_raw.sql',
+               'bucket_folder_path': 'raw/amplitude/daily_active_users'}
+
+)
+
+load_daily_active_users_clean_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_daily_active_users_clean',
+    provide_context=True,
+    python_callable=athena_execute_file_query_and_wait_for_results,
+    op_kwargs={'filename': 'amplitude/daily_active_users_clean.sql',
+               'bucket_folder_path': 'clean/amplitude/daily_active_users'}
+
+)
+
 airflow_helpers.chain(load_events_to_raw_task,
-                      load_events_to_clean_task,
-                      xcom_amplitude_load_events_task)
+                      load_events_to_clean_task)
+load_events_to_clean_task.set_downstream([xcom_amplitude_load_events_task,
+                                          load_daily_active_users_raw_task])
+airflow_helpers.chain(load_daily_active_users_raw_task, load_daily_active_users_clean_task)
