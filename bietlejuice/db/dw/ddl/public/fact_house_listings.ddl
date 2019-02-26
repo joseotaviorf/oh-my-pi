@@ -8,6 +8,9 @@ create table if not exists fact_house_listings (
   sk_condo bigint,
   days_first_listing_to_contract_signed integer,
   days_listing_to_depublication integer,
+  days_ended_rental_to_relisting,
+  days_relisting_to_re_rental,
+  days_ended_rental_to_re_rented,
   nr_renting smallint,
   ts_load timestamp
 )
