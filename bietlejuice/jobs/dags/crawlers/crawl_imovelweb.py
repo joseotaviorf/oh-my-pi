@@ -21,7 +21,7 @@ MAIN_SCHEDULE_INTERVAL = '0 0 * * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
-s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket') or '5a-datalake'
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
