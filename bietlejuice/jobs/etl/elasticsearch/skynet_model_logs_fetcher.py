@@ -46,7 +46,9 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
         self.index = self.INDEX_NAME.format(
             date_.strftime(self.INDEX_DATE_FORMAT))
 
-        logs = (self
-                .build_query(message_level=message_level)
-                .fetch_all(step_size=step_size, max_size=max_size))
-        return logs
+        logs_paginator = (
+            self
+            .build_query(message_level=message_level)
+            .fetch_all(step_size=step_size, max_size=max_size)
+        )
+        return logs_paginator

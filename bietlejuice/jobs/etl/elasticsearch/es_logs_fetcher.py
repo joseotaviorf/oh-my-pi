@@ -51,18 +51,8 @@ class ESLogsFetcher(object):
         total_size = min(search_result['hits']['total'], max_size)
         starting_from = 0
 
-        logs = []
-        iterator = self.__paginate_results(
+        return self.__paginate_results(
             starting_from=starting_from,
             total_size=total_size,
             step_size=step_size
         )
-
-        for log in iterator:
-            hits = log['hits']['hits']
-            logger.info(
-                'm=ESLogsFetcher.fetch_all, msg=hits.length={}'.format(
-                    len(hits)))
-            logs += hits
-
-        return logs
