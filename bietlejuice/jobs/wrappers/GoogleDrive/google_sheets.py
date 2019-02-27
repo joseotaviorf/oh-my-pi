@@ -4,10 +4,10 @@ from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
-logger = QuintoAndarLogger('GSheets')
+logger = QuintoAndarLogger('GoogleSheets')
 
 
-class GSheets(object):
+class GoogleSheets(object):
     def __init__(self, s3_bucket):
         self.s3_bucket = s3_bucket
 
