@@ -28,8 +28,8 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
             'query': {
                 'bool': {
                     'must': [
-                        {'match': {'app': 'skynet'}},
-                        {'match': {'env': 'prod'}},
+                        {'term': {'app': 'skynet'}},
+                        {'term': {'env': 'prod'}},
                         {'match': {'message': message_q}}
                     ]
                 }
