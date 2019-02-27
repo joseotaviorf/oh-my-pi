@@ -16,7 +16,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 seu_barriga_invoice_dict = json.loads(env.get_airflow_env_var('seubarriga'))['invoice']
 
 MAIN_DAG_NAME = 'bi-seu-barriga'
-MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0)
+MAIN_START_DATE = datetime(2015, 2, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '30 3 * * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
