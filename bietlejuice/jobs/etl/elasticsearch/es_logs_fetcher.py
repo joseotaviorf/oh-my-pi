@@ -17,11 +17,11 @@ class ESLogsFetcher(object):
 
     @abstractmethod
     def build_query(self):
-        return NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def run(self):
-        return NotImplemented
+        raise NotImplementedError
 
     @logger
     def __search(self, from_=0, size=10):
