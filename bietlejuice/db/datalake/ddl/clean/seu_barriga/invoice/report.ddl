@@ -16,6 +16,7 @@ create external table datalake_clean.seu_barriga_invoice_report (
   landlord_due_date string,
   landlord_paid_date string,
   landlord_status string,
+  delayed_days string,
   purpose string,
   tenant_invoice_created_at string,
   landlord_invoice_created_at string
