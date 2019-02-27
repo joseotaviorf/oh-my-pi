@@ -44,10 +44,10 @@ class ESLogsFetcher(object):
 
     @logger
     def fetch_all(self, step_size=10, max_size=None):
+        # first search sets total amount of hits
         search_result = self.__search()
         logger.info('m=ESLogsFetcher.fetch_all, hits_total={}'.format(
             search_result['hits']['total']))
-
         total_size = min(search_result['hits']['total'], max_size)
         starting_from = 0
 

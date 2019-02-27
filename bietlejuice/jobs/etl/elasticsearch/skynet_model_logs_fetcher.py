@@ -16,6 +16,12 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
 
     @logger
     def build_query(self, message_level):
+        """
+            Build a body query for elasticsearch api to match:
+                app:"skynet" AND
+                env:"prod" AND
+                message:"{message_level}:{model_logger_name}"
+        """
         message_q = '{}:{}'.format(message_level, self.model_logger_name)
 
         q = {
@@ -36,6 +42,7 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
 
     @logger
     def run(self, date_, message_level, step_size=1000, max_size=None):
+        # use date_ index
         self.index = self.INDEX_NAME.format(
             date_.strftime(self.INDEX_DATE_FORMAT))
 
