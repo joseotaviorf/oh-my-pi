@@ -102,6 +102,11 @@ _fact as (
     end as dt_credit_analysis_approved,
     coalesce(to_char(vdp.ts_processed, 'YYYYMMDD')::integer, -1) as sk_proposal_processed_date,
     vdp.ts_processed as ts_proposal_processed,
+    case
+    when vdp.status = 'Rejeitada'
+      then vdp.ts_processed
+    else null::timestamp
+    end as ts_proposal_rejected,
     vdp.status as proposal_status,
     vdp.tenant_document_sent as has_tenant_sent_doc,
 	  hrf.visit_created_from_app as flg_visit_created_from_app,
@@ -267,9 +272,9 @@ select
   ((date_part('day', dt_visit - dt_house_listing) * 1440 +
     date_part('hour', dt_visit - dt_house_listing) * 60 +
 		date_part('minute', dt_visit - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_visit,
-  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
+  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 1440 +
+    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 60 +
+		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
   ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
     date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
 		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,

@@ -8,7 +8,7 @@ from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksUngroupedManual, CR
 
 S3_BUCKET = 's3_bucket'
 MONGO_CLIENT_URI = 'mongo_client_uri'
-EXECUTION_DATE = datetime.today()
+EXECUTION_DATE = datetime(2019, 1, 2)
 
 
 @pytest.fixture(scope='session')
