@@ -76,6 +76,7 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
             ('landlord_due_date', str),
             ('landlord_paid_date', str),
             ('landlord_status', str),
+            ('delayed_days', str),
             ('purpose', str),
             ('tenant_invoice_created_at', str),
             ('landlord_invoice_created_at', str)
