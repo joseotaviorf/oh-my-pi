@@ -8,6 +8,9 @@ create external table if not exists datalake_clean.ods_fact_house_listings (
   sk_condo string,
   days_first_listing_to_contract_signed string,
   days_listing_to_depublication string,
+  days_ended_rental_to_relisting string,
+  days_relisting_to_re_rental string,
+  days_ended_rental_to_re_rented string,
   nr_renting string,
   ts_load string
 )
