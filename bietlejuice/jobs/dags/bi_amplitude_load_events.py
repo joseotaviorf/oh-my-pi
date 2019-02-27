@@ -88,18 +88,7 @@ load_daily_active_users_raw_task = BaseDAG.build_python_operator(
 
 )
 
-load_daily_active_users_clean_task = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_daily_active_users_clean',
-    provide_context=True,
-    python_callable=athena_execute_file_query_and_wait_for_results,
-    op_kwargs={'filename': 'amplitude/daily_active_users_clean.sql',
-               'bucket_folder_path': 'clean/amplitude/daily_active_users'}
-
-)
-
 airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task)
 load_events_to_clean_task.set_downstream([xcom_amplitude_load_events_task,
                                           load_daily_active_users_raw_task])
-airflow_helpers.chain(load_daily_active_users_raw_task, load_daily_active_users_clean_task)
