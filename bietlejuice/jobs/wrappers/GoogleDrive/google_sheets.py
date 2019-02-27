@@ -40,8 +40,9 @@ class GoogleSheets(object):
                                          google_sheets_files=google_sheets_files,
                                          filename=item)
 
+    @staticmethod
     @logger(exclude='old_columns')
-    def _to_snake_case_columns(self, old_columns):
+    def _to_snake_case_columns(old_columns):
         _underscorer1 = re.compile(r'(\S)([A-Z][a-z]+)')
         _underscorer2 = re.compile('([a-z0-9])([A-Z])')
 
