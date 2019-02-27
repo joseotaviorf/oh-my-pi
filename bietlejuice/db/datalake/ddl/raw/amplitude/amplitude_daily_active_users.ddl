@@ -3,8 +3,8 @@ drop table datalake_raw.amplitude_daily_active_users;
 CREATE EXTERNAL TABLE datalake_raw.amplitude_daily_active_users (
   event_date string,
   session_start_ts string,
-  amplitude_id bigint,
-  session_id bigint,
+  amplitude_id string,
+  session_id string,
   country string,
   city string,
   region string,
