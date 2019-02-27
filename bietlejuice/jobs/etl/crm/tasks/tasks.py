@@ -1,11 +1,10 @@
+import boto3
 import json
 from abc import abstractmethod
+from botocore.exceptions import ClientError
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-
-import boto3
-from botocore.exceptions import ClientError
 from pymongo import MongoClient
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -215,7 +214,7 @@ class CRMTasks(object):
                           bucket_type,
                           bucket_folder_suffix,
                           table_name,
-                          database_prefix='datalake_',
+                          database_prefix='datalake',
                           partition_name='dt'):
         if bucket_type not in ('raw', 'clean'):
             logger.error('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
