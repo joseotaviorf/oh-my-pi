@@ -10,13 +10,13 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
     DOC_TYPE = 'flb_type'
 
     @logger
-    def __init__(self, es_logs__hostname, app_logger_name):
+    def __init__(self, es_logs__hostname, model_logger_name):
         super(SkynetModelLogsFetcher, self).__init__(es_logs__hostname)
-        self.app_logger_name = app_logger_name
+        self.model_logger_name = model_logger_name
 
     @logger
     def build_query(self, message_level):
-        message_q = '{}:{}'.format(message_level, self.app_logger_name)
+        message_q = '{}:{}'.format(message_level, self.model_logger_name)
 
         q = {
             'query': {
