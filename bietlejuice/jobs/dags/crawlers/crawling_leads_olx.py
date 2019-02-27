@@ -51,7 +51,7 @@ def insert_leads(**kwargs):
     regex_phone = r'(?P<code>\+\d{2})?(?P<number>\d+)'
     phones.phone_number = phones.phone_number.str.extract(regex_phone, expand=False).number
 
-    leads['phone_number'] = leads.phones.apply(lambda p: eval(p)[0]).astype(str)
+    leads['phone_number'] = leads.phones.astype(str)
     leads['known'] = leads.phone_number.isin(phones.phone_number)
     leads = leads[~leads.known].sort_values(by='updated_on')
     if leads.empty:
