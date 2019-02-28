@@ -8,7 +8,7 @@ with views as (
 	where et = 'listing_page_viewed'
 	and trim(app) = '170698'
 	-- remove inconsistent house_ids that come from amplitude
-	and length(e_house_id) < 13
+	and length(e_house_id) <= 13
 ),
 unique_viewers as (
 	select
