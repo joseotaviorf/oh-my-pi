@@ -64,9 +64,6 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
-    # TODO -- the google api is not sending the geo info for some ceps. The idea is to query the EBDB cep table to
-    #  get street and additional information. It's also needed to configure a memory cache to save answers from google
-    #  api.
     ceps = leads.query("""lat.isnull() or lng.isnull()""").cep.unique()
     q = BaseETL.get_query_from_file_name('{}/crawlers/get_cep_info.sql'.format(DATALAKE_QUERIES_DIR))
     q = q.format(ceps=' '.join(str(cep) for cep in ceps))
@@ -86,7 +83,6 @@ def insert_leads(**kwargs):
     leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
 
     # filter out units outside our coverage area. It's assumed that we are allowing houses in all regions
-    # TODO --- In the future, it's needed to query the types of houses that are allowed in each region
     leads = leads[leads.regions > -1]
     if leads.empty:
         logger.info(NO_LEADS_MSG)
