@@ -5,7 +5,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.elasticsearch_logs import skynet_logs_to_s3
 
-MAIN_DAG_NAME = 'skynet-model-logs-closing-predictor'
+MAIN_DAG_NAME = 'closing-predictor-logs'
 MAIN_START_DATE = '2019-02-26'
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 
