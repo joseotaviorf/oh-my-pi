@@ -1,6 +1,6 @@
 SELECT
   case when name='BR_QuintoAndar' then 1 else 0 end as sk_rtb_campaign,
-  name as id_campaign,
+  name as campaign_name,
   status,
   hash,
   url

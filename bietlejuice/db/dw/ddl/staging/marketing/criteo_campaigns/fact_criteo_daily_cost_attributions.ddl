@@ -10,6 +10,7 @@ CREATE TABLE if NOT EXISTS staging.fact_criteo_daily_cost_attributions (
     all_sales INTEGER,
     revenue INTEGER,
     composition_win DOUBLE PRECISION,
-    cpc DOUBLE PRECISION
+    cpc DOUBLE PRECISION,
+    ts_load timestamp
 )
 ;

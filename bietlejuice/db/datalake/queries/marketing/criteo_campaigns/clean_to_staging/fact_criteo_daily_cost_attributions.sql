@@ -9,6 +9,7 @@ SELECT
     cast(all_sales as integer) as all_sales,
     cast(revenue as integer) as revenue,
     cast(composition_win as double) as composition_win,
-    cast(cpc as double) as cpc
+    cast(cpc as double) as cpc,
+    current_timestamp  as ts_load
 FROM datalake_clean.marketing_criteo_campaigns
 WHERE dt_created  = '{date}' and acc = '{account}'

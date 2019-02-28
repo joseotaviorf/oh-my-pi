@@ -1,9 +1,8 @@
 import json
+import petl
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-
-import petl
 from qa_python_utils.default_logger import QuintoAndarLogger
 from rtbhouse_sdk.reports_api import ReportsApiSession
 

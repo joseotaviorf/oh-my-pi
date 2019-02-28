@@ -1,8 +1,7 @@
-import json
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
+import json
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -23,7 +22,9 @@ accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
 # API auth
 auth = {
     MarketingEnum.RTB: json.loads(env.get_airflow_env_var('rtb_login')),
-    MarketingEnum.CRITEO: json.loads(env.get_airflow_env_var('criteo_login'))
+    MarketingEnum.CRITEO: json.loads(env.get_airflow_env_var('criteo_login')),
+    MarketingEnum.FACEBOOK_ADS: None,
+    MarketingEnum.GOOGLE_ADS: None
 }
 
 athena_client = AthenaClient(s3_bucket)
@@ -117,7 +118,7 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
 
     return sub_dag.build_tasks('dw')
 
-'''
+
 facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
@@ -177,7 +178,7 @@ google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='google-ads-load-to-dw',
     class_=MarketingEnum.GOOGLE_ADS,
 )
-'''
+
 criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
@@ -206,7 +207,7 @@ criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='criteo-load-to-dw',
     class_=MarketingEnum.CRITEO,
 )
-'''
+
 rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
@@ -240,7 +241,5 @@ airflow_helpers.chain(google_ads_clean_dag, google_ads_load_to_pre_staging_dag, 
                       google_ads_load_to_dw_dag)
 airflow_helpers.chain(facebook_ads_clean_dag, facebook_ads_load_to_pre_staging_dag, facebook_ads_load_to_staging_dag,
                       facebook_ads_load_to_dw_dag)
-'''
 airflow_helpers.chain(criteo_raw_dag, criteo_clean_dag, criteo_load_to_staging_dag, criteo_load_to_dw_dag)
-
-#airflow_helpers.chain(rtb_raw_dag, rtb_clean_dag, rtb_load_to_staging_dag, rtb_load_to_dw_dag)
+airflow_helpers.chain(rtb_raw_dag, rtb_clean_dag, rtb_load_to_staging_dag, rtb_load_to_dw_dag)

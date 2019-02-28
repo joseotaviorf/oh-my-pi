@@ -1,5 +1,4 @@
 from datetime import timedelta
-
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -49,7 +48,7 @@ class MarketingSubDag(BaseSubDag):
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table,
-                                            accounts=self.accounts[clean_table])
+                                            account=self.accounts[clean_table])
 
     @logger
     def transfer_to_staging(self, bucket, dw_table, **kwargs):

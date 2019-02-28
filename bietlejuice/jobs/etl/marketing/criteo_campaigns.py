@@ -1,12 +1,12 @@
 import json
+import petl
+import requests
 from ast import literal_eval
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-
-import petl
-import requests
 from qa_python_utils.default_logger import QuintoAndarLogger
+from requests import RequestException
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
@@ -25,9 +25,11 @@ class CriteoCampaigns(Marketing):
         self.client_secret = auth['client_secret']
 
     # wrapper method
+    @logger
     def move_criteo_campaigns_to_raw(self):
         self._save_to_s3(self.client_id, self.client_secret)
 
+    @logger(exclude='client_secret')
     # get token from criteo, this has to be done every request, since the token expires in 5 minutes
     def __get_token(self, client_id, client_secret):
         logger.info('m=__get_token')
@@ -43,13 +45,20 @@ class CriteoCampaigns(Marketing):
         }
 
         response = requests.post('https://api.criteo.com/marketing/oauth2/token', headers=headers, data=data)
+
+        if response.status_code != 200:
+            logger.error('m=__get_token, msg=Could not get the access token')
+            raise RequestException()
+
         dic = literal_eval(response.text)
         # this is hard coded because criteo expects this word before the access token string
         auth_token = 'Bearer ' + dic['access_token']
+        logger.info('m=__get_token, msg=Return the access token!')
         return auth_token
 
     # make te request from criteo api, extracting the data from the day we want
     # you must pass the token generated before and the variables you want to compute
+    @logger(exclude='client_secret')
     def __make_request(self, client_id, client_secret):
         logger.info('m=__make_request')
         auth_token = self.__get_token(client_id, client_secret)
@@ -60,27 +69,33 @@ class CriteoCampaigns(Marketing):
             'Authorization': auth_token,
         }
         # the body must be passed to the API call with the wanted columns and date time
-        body = {'reportType': 'CampaignPerformance',
-                'startDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T00:00:59.000Z'),
-                'endDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T23:59:00.000Z'),
-                'dimensions': ['CampaignId', 'Day'],
-                'metrics': ['Clicks', 'Displays', 'Audience', 'AdvertiserCost', 'SalesAllPc', 'RevenueGeneratedPc',
-                            'OverallCompetitionWin', 'ECpc'],
-                'format': 'json', 'timezone': 'GMT'}
+        body = {
+            'reportType': 'CampaignPerformance',
+            'startDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T00:00:59.000Z'),
+            'endDate': '{}'.format(self.execution_date.strftime('%Y-%m-%d') + 'T23:59:00.000Z'),
+            'dimensions': ['CampaignId', 'Day'],
+            'metrics': ['Clicks', 'Displays', 'Audience', 'AdvertiserCost', 'SalesAllPc', 'RevenueGeneratedPc',
+                        'OverallCompetitionWin', 'ECpc'],
+            'format': 'json', 'timezone': 'GMT'
+        }
 
         data = json.dumps(body)
 
+        logger.info('m=__make_request, msg=Getting data from Criteo API')
         # this is a simple try except in case the request fails
         try:
-            response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers, data=data)
-            loaded = json.loads(response.text)
-            response_without_total = loaded["Rows"]
+            response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers,
+                                     data=data).json()
+            # loaded = json.loads(response.text)
+            response_without_total = response["Rows"]
             # The json returned by the API has 2 tables ("Total" and "Rows"), one with all the necessary vars,
             # and the other with just the sum of everything. This way, we're sending only the necessary table to DL
+            logger.info('m=__make_response, msg=Returning data')
             return response_without_total
         except requests.exceptions.RequestException as e:
             logger.error('m=__make_request, error message={}'.format(e))
 
+    @logger(exclude='client_secret')
     # this method saves the json as compacted gz and also breaks every row in lines, so that Athena will compute
     def _save_to_s3(self, client_id, client_secret):
 
@@ -97,11 +112,14 @@ class CriteoCampaigns(Marketing):
         file_suffix = 'raw/marketing/criteo_campaigns/acc=default/dt={}/data.gz'.format(
             self.execution_date.strftime('%Y-%m-%d'))
 
+        logger.info('m=_save_to_s3, msg=Saving data into s3 bucket, dest={}'.format(file_suffix))
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=self.s3_bucket,
             file_path=file_suffix
         )
+
+        logger.info('m=_save_to_s3, msg=Save with success!')
         # always flush after using!
         gz_body.seek(0)
         gz_body.flush()
@@ -152,6 +170,7 @@ class CriteoCampaigns(Marketing):
 
     # this method calls the query for both fact and dim tables
     # the load table method will select if dim or fact
+    @logger
     def load_to_staging(self, dw_table_name):
         query = self.__load_table(dw_table_name)
         # this line will pass the attributes to the called query and format correctly
@@ -159,11 +178,13 @@ class CriteoCampaigns(Marketing):
         logger.info("m=load_to_staging, query={}".format(query))
         self._load_to_staging(dw_table_name, query)
 
+    @logger
     def __load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 
     # this is the method that returns the dim query
+    @logger
     def _load_dim_to_staging(self, table_name):
         dim_query = BaseETL.get_query_from_file_name(
             '{}/marketing/{}/clean_to_staging/{}.sql'.format(
@@ -174,6 +195,7 @@ class CriteoCampaigns(Marketing):
         return dim_query
 
     # this is the method that returns the fact query
+    @logger
     def _load_fact_to_staging(self, table_name):
         int_date = int(self.execution_date.strftime("%Y%m%d"))
 
@@ -240,5 +262,6 @@ class CriteoCampaigns(Marketing):
 
     # this is a simple method that select and copy all the table from staging to dw
     # the select is not a separate query, it's just a select distinct * hard-coded
+    @logger
     def load_to_prod(self, table_name):
         self._load_to_prod(table_name)

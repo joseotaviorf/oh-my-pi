@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -25,8 +24,8 @@ class FacebookAds(Marketing):
         'link_clicks': int
     }
 
-    def __init__(self, s3_bucket, execution_date, accounts, auth=None):
-        super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', accounts)
+    def __init__(self, s3_bucket, execution_date, account, auth=None):
+        super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
 
     @logger
     def move_ads_to_clean(self):
@@ -76,8 +75,8 @@ class FacebookAds(Marketing):
         )
 
     @logger
-    def load_to_pre_staging(self, clean_table, prod_table, accounts):
-        self._load_to_pre_staging(clean_table, prod_table, accounts, FacebookAds.COLUMN_TYPE_MAP)
+    def load_to_pre_staging(self, clean_table, prod_table, account):
+        self._load_to_pre_staging(clean_table, prod_table, account, FacebookAds.COLUMN_TYPE_MAP)
 
     @logger
     def load_to_staging(self, dw_table_name):
