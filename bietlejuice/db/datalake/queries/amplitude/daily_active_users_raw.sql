@@ -1,7 +1,7 @@
 with sessions_raw as (
     select
 	    amplitude_id,
-	    date(cast(regexp_extract(trim(event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp)) as event_date,
+	    date(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as event_date,
 	    session_id,
 	    u_utm_source,
 	    u_utm_medium,
@@ -13,9 +13,10 @@ with sessions_raw as (
 	    region,
 	    u_platform,
 	    app,
-	    min(cast(regexp_extract(trim(event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp)) as session_start_ts
+	    min(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as session_start_ts
     from datalake_clean.amplitude_events
-    where ym >= '2018-01'
+    where ym = '2019-01'
+    and date(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
     and session_id != '-1'
     and (app = '170698' or app ='183047')
     group by 1,2,3,4,5,6,7,8,9,10,11,12,13

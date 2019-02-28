@@ -2,6 +2,8 @@ import io
 import json
 import re
 import zipfile
+from collections import OrderedDict
+from copy import deepcopy
 from datetime import datetime
 
 import boto3
@@ -295,6 +297,28 @@ class AmplitudeEventsETL(BaseETL):
                                                                      query_params={'dt': date_param})
 
     def move_daily_active_users_to_clean(self, df, execution_date):
+        r_cols = OrderedDict([
+            ('event_date', str),
+            ('amplitude_id', str),
+            ('session_id', str),
+            ('city', str),
+            ('region', str),
+            ('platform', str),
+            ('utm_source', str),
+            ('utm_medium', str),
+            ('utm_campaign', str),
+            ('utm_content', str),
+            ('utm_term', str),
+            ('mkt_category', str),
+            ('mkt_flow', str),
+            ('mkt_completion', str),
+            ('mkt_channel', str),
+            ('mkt_medium', str),
+            ('mkt_source', str),
+            ('mkt_platform', str)
+        ])
+        c_cols = deepcopy(r_cols)
+
         athena_client = AthenaClient(self.s3_bucket)
         exec_date = str(execution_date.strftime('%Y-%m-%d'))
 
@@ -309,7 +333,8 @@ class AmplitudeEventsETL(BaseETL):
 
             filtered_df = df[df['app'] == df_group[0]]
             filtered_df = filtered_df.drop(['app'], axis=1)
-            athena_client.create_parquet_from_df(key=key, df=filtered_df.astype(str))
+            athena_client.create_parquet_from_df(key=key, df=filtered_df.astype(str), raw_columns=r_cols,
+                                                 clean_columns=c_cols)
 
             logger.info(
                 'm=move_daily_active_users_to_clean, app={}, ym={}, msg=adding partition'.format(df_group[0], ym))
