@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
@@ -39,9 +40,15 @@ def load_amplitude_clean(**kwargs):
 
 @logger(exclude='kwargs')
 def athena_execute_file_query_and_wait_for_results(**kwargs):
-    a = AthenaClient(s3_bucket=s3_bucket, bucket_folder_path=kwargs.get('bucket_folder_path'))
-    query_id = a.execute_file_query_and_wait_for_results(
-        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')))
+    a = AthenaClient(s3_bucket=s3_bucket)
+    return_df = a.execute_file_query_and_return_dataframe(
+        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')),
+        query_params={'ym': str(kwargs.get('execution_date').strftime('%Y-%m')),
+                      'dt': str(kwargs.get('execution_date'))})
+
+    suffix = '{}.csv'.format(str(kwargs.get('execution_date')))
+    filename = '{}/{}'.format(kwargs.get('bucket_folder_path'), suffix)
+    BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=filename)
 
 
 def load_daily_active_users_clean(**kwargs):
@@ -107,4 +114,5 @@ airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task)
 load_events_to_clean_task.set_downstream([xcom_amplitude_load_events_task,
                                           load_daily_active_users_raw_task])
+
 airflow_helpers.chain(load_daily_active_users_raw_task, load_daily_active_users_clean_task)

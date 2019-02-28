@@ -1,7 +1,6 @@
 drop table datalake_clean.amplitude_daily_active_users;
 
 CREATE EXTERNAL TABLE datalake_clean.amplitude_daily_active_users(
-  index bigint,
   event_date string,
   amplitude_id string,
   session_id string,

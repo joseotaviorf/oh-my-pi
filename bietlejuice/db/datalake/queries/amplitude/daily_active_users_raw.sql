@@ -15,7 +15,7 @@ with sessions_raw as (
 	    app,
 	    min(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as session_start_ts
     from datalake_clean.amplitude_events
-    where ym = '2019-01'
+    where ym = '{ym}'
     and date(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
     and session_id != '-1'
     and (app = '170698' or app ='183047')

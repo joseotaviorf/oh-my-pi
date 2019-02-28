@@ -24,6 +24,7 @@ where try(date(event_date)) = date('{dt}')
 	and trim(adau.country) = 'Brazil'
 )
 select
+    distinct
     dau.app,
 	dau.event_date,
 	dau.amplitude_id,
