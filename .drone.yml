@@ -133,7 +133,7 @@ pipeline:
       branch: [ master ]
 
   sonar-preview:
-    image: newtmitch/sonar-scanner
+    image: eliasscosta/sonar-scanner
     commands:
       - |-
         sonar-scanner \
@@ -155,7 +155,7 @@ pipeline:
       branch: [ master ]
   
   sonar-report:
-    image: newtmitch/sonar-scanner
+    image: eliasscosta/sonar-scanner
     commands:
       - |-
         sonar-scanner \
