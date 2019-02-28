@@ -1,12 +1,13 @@
 import os
 from airflow.models import DAG
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.elasticsearch_logs import skynet_logs_to_s3
 
 MAIN_DAG_NAME = 'closing-predictor-logs'
-MAIN_START_DATE = '2019-02-26'
+MAIN_START_DATE = datetime(2019, 2, 26)
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 
 env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
@@ -25,8 +26,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1,
-    catchup=False
+    max_active_runs=1
 )
 
 dump_logs_to_datalake_raw_op = BaseDAG.build_python_operator(
