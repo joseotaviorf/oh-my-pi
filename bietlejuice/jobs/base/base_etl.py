@@ -460,6 +460,18 @@ class BaseETL(object):
             return None
         return bucket_folder_path, filename
 
+    def json_to_s3(self, dict_list, s3_bucket, s3_key):
+        gz_body = BytesIO()
+        with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
+            json_list = map(json.dumps, dict_list)
+            fp.write('\n'.join(json_list))
+
+        self.obj_to_s3(
+            obj_io=gz_body,
+            bucket=s3_bucket,
+            file_path=s3_key
+        )
+
     @classmethod
     def obj_to_s3(cls, obj_io, bucket, file_path):
         if not obj_io or not bucket or not file_path:
