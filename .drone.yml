@@ -133,7 +133,8 @@ pipeline:
       branch: [ master ]
 
   sonar-preview:
-    image: quintohub/sonar-scanner
+    image: gcr.io/quintohub/sonar-scanner
+    pull: true
     commands:
       - |-
         sonar-scanner \
@@ -155,7 +156,8 @@ pipeline:
       branch: [ master ]
   
   sonar-report:
-    image: quintohub/sonar-scanner
+    image: gcr.io/quintohub/sonar-scanner
+    pull: true
     commands:
       - |-
         sonar-scanner \
