@@ -44,7 +44,7 @@ def athena_execute_file_query_and_wait_for_results(**kwargs):
     return_df = a.execute_file_query_and_return_dataframe(
         filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')),
         query_params={'ym': str(kwargs.get('execution_date').strftime('%Y-%m')),
-                      'dt': str(kwargs.get('execution_date'))})
+                      'dt': str(kwargs.get('execution_date').strftime('%Y-%m-%d'))})
 
     suffix = '{}.csv'.format(str(kwargs.get('execution_date')))
     filename = '{}/{}'.format(kwargs.get('bucket_folder_path'), suffix)
