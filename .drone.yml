@@ -133,7 +133,7 @@ pipeline:
       branch: [ master ]
 
   sonar-preview:
-    image: eliasscosta/sonar-scanner
+    image: quintohub/sonar-scanner
     commands:
       - |-
         sonar-scanner \
@@ -155,7 +155,7 @@ pipeline:
       branch: [ master ]
   
   sonar-report:
-    image: eliasscosta/sonar-scanner
+    image: quintohub/sonar-scanner
     commands:
       - |-
         sonar-scanner \
