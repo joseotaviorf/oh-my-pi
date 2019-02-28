@@ -5,9 +5,9 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.elasticsearch_logs import skynet_logs_to_s3
 
-MAIN_DAG_NAME = 'skynet-model-logs-offer-predictor'
+MAIN_DAG_NAME = 'offer-predictor-logs'
 MAIN_START_DATE = '2019-02-26'
-MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am every day
+MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 
 env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
