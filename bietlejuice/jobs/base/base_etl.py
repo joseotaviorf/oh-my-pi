@@ -472,8 +472,6 @@ class BaseETL(object):
             file_path=s3_key
         )
 
-        gz_body.flush()
-
     @classmethod
     def obj_to_s3(cls, obj_io, bucket, file_path):
         if not obj_io or not bucket or not file_path:
