@@ -285,6 +285,44 @@ class AmplitudeEventsETL(BaseETL):
                 }
             )
 
+    @logger
+    def get_daily_active_users_treated(self, execution_date):
+        date_param = str(execution_date.strftime('%Y-%m-%d'))
+        dau_clean_file = '{}/{}'.format(DATALAKE_QUERIES_DIR, 'amplitude/daily_active_users_clean.sql')
+
+        athena_client = AthenaClient(self.s3_bucket)
+        return athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
+                                                                     query_params={'dt': date_param})
+
+    def move_daily_active_users_to_clean(self, df, execution_date):
+        athena_client = AthenaClient(self.s3_bucket)
+        exec_date = str(execution_date.strftime('%Y-%m-%d'))
+
+        df_app = df.groupby('app')
+        for df_group in df_app:
+            ym = str(execution_date.strftime('%Y-%m'))
+            key = 'clean/amplitude/daily_active_users/app={0}/ym={1}/{2}.parq'.format(df_group[0],
+                                                                                      ym, exec_date)
+
+            logger.info('m=move_daily_active_users_to_clean, app={}, ym={}, filename={}.parq'.format(df_group[0], ym,
+                                                                                                     exec_date))
+
+            filtered_df = df[df['app'] == df_group[0]]
+            filtered_df = filtered_df.drop(['app'], axis=1)
+            athena_client.create_parquet_from_df(key=key, df=filtered_df.astype(str))
+
+            logger.info(
+                'm=move_daily_active_users_to_clean, app={}, ym={}, msg=adding partition'.format(df_group[0], ym))
+            add_partition_clean_query = self.__format_query_filename('add_partition_daily_active_users')
+            athena_client.execute_file_query(
+                filename=add_partition_clean_query,
+                query_params={
+                    'app': df_group[0],
+                    'ym': ym,
+                    's3_bucket': self.s3_bucket
+                }
+            )
+
 
 def convert_date(date_str):
     return datetime.strptime(date_str, DEFAULT_DATETIME_FORMAT)
