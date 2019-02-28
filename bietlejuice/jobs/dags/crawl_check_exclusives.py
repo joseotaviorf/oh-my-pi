@@ -1,10 +1,9 @@
 import cStringIO
-
 import json
-from airflow.models import DAG
 from datetime import datetime
 
-import bietlejuice.jobs.etl.powerbi as powerbi
+from airflow.models import DAG
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
@@ -14,8 +13,6 @@ from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
 MAIN_DAG_NAME = 'crawling-check-exclusives'
 MAIN_START_DATE = datetime(2018, 6, 12)
 MAIN_SCHEDULE_INTERVAL = '0 6 1/1 * *'
-PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
-PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 check_exclusive_rules = env.get_airflow_env_var('check_exclusive_rules')
@@ -70,14 +67,6 @@ def check_exclusives(**kwargs):
     BaseETL.obj_to_s3(io, s3_bucket, filename)
 
 
-def refresh_powerbi(**kwargs):
-    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
-                                           PWBI_SCHEMA,
-                                           kwargs['workspace_name'],
-                                           kwargs['dataset_name'])
-    powerbi_client.trigger_refresh()
-
-
 dag = DAG(
     dag_id=MAIN_DAG_NAME,
     default_args={
@@ -98,12 +87,3 @@ exclusives = BaseDAG.build_python_operator(
     python_callable=check_exclusives,
     op_kwargs=json.loads(check_exclusive_rules)
 )
-
-refresh_exclusives = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='Refresh_PowerBI_Exclusives',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Top-of-Funnel', 'dataset_name': 'Exclusives'}
-)
-
-exclusives >> refresh_exclusives

@@ -133,11 +133,14 @@ class CrawlerEntity(object):
         info = pd.DataFrame([], columns=cols)
 
         loc = []
-        for l in entity:
-            r = self._get_address(cep=l) if cep else self._get_address(lat=l[0], lng=l[1])
+        for _, l in entity.iterrows():
+            raw_address = '{} {} {} {} {} cep {}'.format(l['tplogradouro'], l['logradouro'], l['bairro'],
+                                                         l['cidade'],
+                                                         l['estado'], l['cep']).strip()
+            r = self._get_address(raw_address=raw_address) if cep else self._get_address(lat=l[0], lng=l[1])
             if r:
                 s = pd.Series(index=cols)
-                loc.append(l)
+                loc.append(l['cep'])
                 s.glat = r[0].get('geometry', dict()).get('location', dict()).get('lat')
                 s.glng = r[0].get('geometry', dict()).get('location', dict()).get('lng')
                 for component in r[0].get('address_components', []):
@@ -159,7 +162,7 @@ class CrawlerEntity(object):
                 logger.info(
                     'm={}.get_geolocation_info, cep={}, msg=google api cannot return geolocation info for this '
                     'entity'.format(
-                        self.__class__.__name__, l))
+                        self.__class__.__name__, raw_address))
 
         info.location = loc
         info.gcep = info.gcep.astype(str).str.zfill(8)
