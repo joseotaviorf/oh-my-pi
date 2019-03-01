@@ -7,8 +7,6 @@ class PlannerFactory(object):
 
     @staticmethod
     def factory(entity, s3_bucket, execution_date):
-        if entity is None:
-            raise ValueError('m=factory, msg=class type cannot be None')
         class_ = PlannerFactory.__dispatch_dict(entity)
 
         if not class_:

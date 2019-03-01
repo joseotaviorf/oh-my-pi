@@ -23,16 +23,6 @@ class TestPlannerFactory(object):
         # assert
         assert isinstance(result, expected)
 
-    def test_factory_with_table_none(self):
-        # arrange
-        table = None
-        s3_bucket = mock.ANY
-        execution_date = mock.ANY
-
-        # act
-        with pytest.raises(ValueError):
-            PlannerFactory.factory(table, s3_bucket, execution_date)
-
     def test_factory_with_invalid_table(self):
         # arrange
         table = mock.ANY
