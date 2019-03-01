@@ -46,11 +46,17 @@ class ESLogsFetcher(object):
     def fetch_all(self, step_size=10, max_size=None):
         # first search sets total amount of hits
         search_result = self.__search()
-        logger.info('m=ESLogsFetcher.fetch_all, hits_total={}'.format(
-            search_result['hits']['total']))
-        total_size = min(search_result['hits']['total'], max_size)
-        starting_from = 0
+        total_size = search_result['hits']['total']
 
+        logger.info(
+            'm=ESLogsFetcher.fetch_all, hits_total={}'.format(total_size))
+
+        # limit total_size with max_size
+        if max_size is None:
+            max_size = total_size
+        total_size = min(total_size, max_size)
+
+        starting_from = 0
         return self.__paginate_results(
             starting_from=starting_from,
             total_size=total_size,
