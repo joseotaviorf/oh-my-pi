@@ -16,13 +16,12 @@ logger = QuintoAndarLogger('AsteriskFactory')
 
 class AsteriskFactory(object):
     @staticmethod
-    def factory(_class, s3_bucket, execution_date):
-        __class = AsteriskFactory.__dispatch_dict(_class)
-        if _class is None:
-            logger.error('m=factory, _class={}, msg=class type not found'.format(_class))
-            raise Exception
+    def factory(class_, s3_bucket, execution_date):
+        class__ = AsteriskFactory.__dispatch_dict(class_)
+        if class__ is None:
+            raise RuntimeError('m=factory, _class={}, msg=class type not found'.format(class_))
 
-        return __class(
+        return class__(
             s3_bucket=s3_bucket,
             execution_date=execution_date
         )

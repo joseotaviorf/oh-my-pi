@@ -19,11 +19,11 @@ class AsteriskUsers(Asterisk):
 
     @logger
     def extract_and_load_data(self):
-        self._extract_and_load_data_full(_class=AsteriskUsers.CLASS_ENUM)
+        self._extract_and_load_data_full(class_=AsteriskUsers.CLASS_ENUM)
 
     @logger
     def data_existence_check(self, bucket_type):
-        return self._data_existence_check_full(bucket_type=bucket_type, _class=AsteriskUsers.CLASS_ENUM)
+        return self._data_existence_check_full(bucket_type=bucket_type, class_=AsteriskUsers.CLASS_ENUM)
 
     @logger
     def move_to_clean(self):
@@ -62,11 +62,11 @@ class AsteriskUsers(Asterisk):
             ('no_answer_destination', str),
             ('busy_destination', str),
             ('channel_unavailable_destination', str),
-            ('moh_class', str)
+            ('mohclass_', str)
         ])
 
         self._move_to_clean_full(
-            _class=AsteriskUsers.CLASS_ENUM,
+            class_=AsteriskUsers.CLASS_ENUM,
             r_cols=r_cols,
             c_cols=c_cols
         )

@@ -19,11 +19,11 @@ class AsteriskQueuesDetails(Asterisk):
 
     @logger
     def extract_and_load_data(self):
-        self._extract_and_load_data_full(_class=AsteriskQueuesDetails.CLASS_ENUM)
+        self._extract_and_load_data_full(class_=AsteriskQueuesDetails.CLASS_ENUM)
 
     @logger
     def data_existence_check(self, bucket_type):
-        return self._data_existence_check_full(bucket_type=bucket_type, _class=AsteriskQueuesDetails.CLASS_ENUM)
+        return self._data_existence_check_full(bucket_type=bucket_type, class_=AsteriskQueuesDetails.CLASS_ENUM)
 
     @logger
     def move_to_clean(self):
@@ -42,7 +42,7 @@ class AsteriskQueuesDetails(Asterisk):
         ])
 
         self._move_to_clean_full(
-            _class=AsteriskQueuesDetails.CLASS_ENUM,
+            class_=AsteriskQueuesDetails.CLASS_ENUM,
             r_cols=r_cols,
             c_cols=c_cols
         )
