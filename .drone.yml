@@ -133,7 +133,8 @@ pipeline:
       branch: [ master ]
 
   sonar-preview:
-    image: newtmitch/sonar-scanner
+    image: quintoandar/sonar-scanner
+    pull: true
     commands:
       - |-
         sonar-scanner \
@@ -155,7 +156,8 @@ pipeline:
       branch: [ master ]
   
   sonar-report:
-    image: newtmitch/sonar-scanner
+    image: quintoandar/sonar-scanner
+    pull: true
     commands:
       - |-
         sonar-scanner \

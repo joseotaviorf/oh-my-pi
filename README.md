@@ -38,6 +38,14 @@ Configure path folder/file which Airflow will run the Dags
 - Open file airflow.cfg with an editor
 - Edit line with variable `dags_folder`, assigning your right path
 
+#### Export `PYTHONPATH`
+
+You might have to export your `PYTHONPATH` to point to your `bi-etl-ejuice` folder, example: 
+
+```
+export PYTHONPATH=:/home/YOUR_USERNAME/PycharmProjects/bi-etl-ejuice
+```
+
 #### Git hooks
 
 ```
