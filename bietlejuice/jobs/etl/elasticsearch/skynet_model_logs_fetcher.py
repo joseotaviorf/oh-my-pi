@@ -21,6 +21,7 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
                 app:"skynet" AND
                 env:"prod" AND
                 message:"{message_level}:{model_logger_name}"
+            ordered by timestamp.
         """
         message_q = '{}:{}'.format(message_level, self.model_logger_name)
 
@@ -33,7 +34,10 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
                         {'match': {'message': message_q}}
                     ]
                 }
-            }
+            },
+            'sort': [
+                {'@timestamp': 'asc'}
+            ]
         }
 
         self.body = q
@@ -41,7 +45,14 @@ class SkynetModelLogsFetcher(ESLogsFetcher):
         return self
 
     @logger
-    def run(self, date_, message_level, step_size=1000, max_size=None):
+    def run(
+        self,
+        date_,
+        message_level,
+        step_size=1000,
+        max_size=None,
+        scroll=None
+    ):
         # use date_ index
         self.index = self.INDEX_NAME.format(
             date_.strftime(self.INDEX_DATE_FORMAT))
