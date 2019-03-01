@@ -1,7 +1,7 @@
 import mock
 import pytest
 
-from bietlejuice.jobs.etl.kill_queue import KillQueueHouse, KillQueueRentFlow, KillQueueReservation, \
+from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueHouse, KillQueueRentFlow, KillQueueReservation, \
     KillQueueReservationAud, KillQueueTableEnum
 
 
@@ -13,30 +13,21 @@ class TestKillQueueFactory(object):
         (KillQueueTableEnum.RESERVATION, KillQueueReservation),
         (KillQueueTableEnum.RESERVATION_AUD, KillQueueReservationAud)
     ])
-    def test_get_object(self, table, expected, factory):
+    def test_factory(self, table, expected):
         # arrange
         s3_bucket = mock.ANY
 
         # act
-        result = factory.get_object(table, s3_bucket)
+        result = KillQueueFactory.factory(table, s3_bucket)
 
         # assert
         assert isinstance(result, expected)
 
-    def test_get_object_with_table_none(self, factory):
-        # arrange
-        table = None
-        s3_bucket = mock.ANY
-
-        # act
-        with pytest.raises(ValueError):
-            factory.get_object(table, s3_bucket)
-
-    def test_get_object_with_invalid_table_none(self, factory):
+    def test_factory_with_invalid_table(self):
         # arrange
         table = mock.ANY
         s3_bucket = mock.ANY
 
         # act
         with pytest.raises(RuntimeError):
-            factory.get_object(table, s3_bucket)
+            KillQueueFactory.factory(table, s3_bucket)
