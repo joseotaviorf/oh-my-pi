@@ -4,9 +4,12 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger('Marketing')
+
+env.set_airflow_var_to_local_env('BI_DW')
 
 
 class Marketing(object):
@@ -27,7 +30,9 @@ class Marketing(object):
         'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
         'dim_criteo_campaign': 'sk_criteo_campaign',
         'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
-        'dim_rtb_campaign': 'sk_rtb_campaign'
+        'dim_rtb_campaign': 'sk_rtb_campaign',
+        'dim_classified': 'sk_classified',
+        'fact_daily_classifieds_costs': 'sk_classified'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -42,13 +47,15 @@ class Marketing(object):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
-        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/dt_created={date_partition}/{file_name}.parquet'.format(
-            integration=self.integration,
-            table_name=table_name,
-            acc_partition=self.account,
-            date_partition=self.partition_date,
-            file_name=self.partition_date
-        )
+        key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/' \
+              'dt_created={date_partition}/{file_name}.parquet' \
+            .format(
+                integration=self.integration,
+                table_name=table_name,
+                acc_partition=self.account,
+                date_partition=self.partition_date,
+                file_name=self.partition_date
+            )
 
         query = BaseETL.get_query_from_file_name(
             '{query_base_dir}/{query_path}/{file_name}'.format(
@@ -119,7 +126,7 @@ class Marketing(object):
         )
 
     @logger(exclude="staging_query")
-    def _load_to_staging(self, dw_table_name, staging_query):
+    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
@@ -177,10 +184,10 @@ class Marketing(object):
                     )
                 """.format(sk_field=Marketing.SK_FIELD_MAP[table_name], dim_table=table_name)
 
-        self.__upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
+        self._upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
 
     @logger(exclude='df')
-    def __upsert_into_dw(self, upsert_query, table_name, schema):
+    def _upsert_into_dw(self, upsert_query, table_name, schema):
         logger.info(
             'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(schema,
                                                                                                       table_name,

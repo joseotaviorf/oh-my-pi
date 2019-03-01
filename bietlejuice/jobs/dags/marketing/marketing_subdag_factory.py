@@ -1,5 +1,6 @@
 from qa_python_utils import QuintoAndarLogger
 
+from bietlejuice.jobs.dags.marketing.marketing_classifieds_costs_subdag import MarketingClassifiedsCostsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_criteo_campaigns_subdag import MarketingCriteoCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import MarketingFacebookAdsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import MarketingGoogleAdsSubDag
@@ -36,5 +37,6 @@ class MarketingSubDagFactory(object):
             MarketingEnum.GOOGLE_ADS: MarketingGoogleAdsSubDag,
             MarketingEnum.FACEBOOK_ADS: MarketingFacebookAdsSubDag,
             MarketingEnum.CRITEO: MarketingCriteoCampaignsSubDag,
-            MarketingEnum.RTB: MarketingRtbCampaignsSubDag
+            MarketingEnum.RTB: MarketingRtbCampaignsSubDag,
+            MarketingEnum.CLASSIFIEDS_COSTS: MarketingClassifiedsCostsSubDag
         }.get(class_)

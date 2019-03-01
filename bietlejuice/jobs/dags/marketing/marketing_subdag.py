@@ -11,7 +11,7 @@ logger = QuintoAndarLogger('MarketingSubDag')
 class MarketingSubDag(BaseSubDag):
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth=None,
                  accounts=None):
-        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
+        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth)
         self.class_ = class_
         self.accounts = accounts
         self.dim_tables = []
