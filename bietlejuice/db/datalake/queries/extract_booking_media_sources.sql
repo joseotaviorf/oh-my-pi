@@ -11,6 +11,8 @@ with cross_platform as (
 		u_utm_source as utm_source,
 		u_utm_medium as utm_medium,
 		u_utm_campaign as utm_campaign,
+		u_utm_content as utm_content,
+        u_utm_term as utm_term,
 		u_adjust_network as adjust_network,
 		case
 			when u_platform in ('web_desktop','web_mobile')
@@ -36,6 +38,8 @@ ios as (
 		u_utm_source as utm_source,
 		u_utm_medium as utm_medium,
 		u_utm_campaign as utm_campaign,
+		u_utm_content as utm_content,
+        u_utm_term as utm_term,
 		u_adjust_network as adjust_network,
 		u_adjust_network as media_source
 	from
@@ -62,6 +66,8 @@ web as (
 		coalesce(u_utm_source,'organic') as utm_source,
 		u_utm_medium as utm_medium,
 		u_utm_campaign as utm_campaign,
+		u_utm_content as utm_content,
+        u_utm_term as utm_term,
 		u_adjust_network as adjust_network,
 		coalesce(u_utm_source,'organic') as media_source
 	from
@@ -85,6 +91,8 @@ android as (
 		u_utm_source as utm_source,
 		u_utm_medium as utm_medium,
 		u_utm_campaign as utm_campaign,
+		u_utm_content as utm_content,
+        u_utm_term as utm_term,
 		u_adjust_network as adjust_network,
 		u_adjust_network as media_source
 	from
@@ -162,8 +170,10 @@ merged_web as (
 		utm_source,
 		utm_campaign,
 		utm_medium,
-		row_number() over ( 
-			partition by visit_code 
+		utm_content,
+        utm_term,
+		row_number() over (
+			partition by visit_code
 			order by cast(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date)
 		) as rn
 	from
@@ -187,7 +197,9 @@ select
 	adjust_network,
 	utm_source,
 	utm_campaign,
-	utm_medium
+	utm_medium,
+	utm_content,
+    utm_term
 from
 	total
 where 

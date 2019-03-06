@@ -1,8 +1,8 @@
-from airflow.models import DAG
 from datetime import datetime
+
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 
-import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.crawlers.crawler_listings import CrawlerListings
@@ -10,8 +10,6 @@ from bietlejuice.jobs.etl.crawlers.crawler_listings import CrawlerListings
 MAIN_DAG_NAME = 'bi-crawler-listings'
 MAIN_START_DATE = datetime(2018, 7, 30)
 MAIN_SCHEDULE_INTERVAL = '0 2 * * 1-6'
-PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
-PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -29,14 +27,6 @@ def transform_crawler_data(bucket, api_key=None, api_daily_quota=30000, max_batc
     crawled_listings = CrawlerListings(bucket, api_key, api_daily_quota, max_batch_size)
     crawled_listings.iterate_crawler_data()
     logger.info('m=transform_crawler_data, finished execution'.format(api_daily_quota))
-
-
-def refresh_powerbi(**kwargs):
-    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
-                                           PWBI_SCHEMA,
-                                           kwargs['workspace_name'],
-                                           kwargs['dataset_name'])
-    powerbi_client.trigger_refresh()
 
 
 dag = DAG(
@@ -59,12 +49,3 @@ crawler_listings = BaseDAG.build_python_operator(
     op_kwargs={'bucket': s3_bucket, 'api_key': data_google_api_key, 'api_daily_quota': google_maps_max_calls,
                'max_batch_size': _max_batch_size}
 )
-
-refresh_market_index = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='Refresh_PowerBI_MarketIndex',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Top-of-Funnel', 'dataset_name': 'Market Index'}
-)
-
-crawler_listings >> refresh_market_index

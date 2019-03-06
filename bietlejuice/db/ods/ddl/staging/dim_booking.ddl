@@ -27,6 +27,8 @@ CREATE TABLE staging.dim_booking (
   utm_source VARCHAR(255),
   utm_medium VARCHAR(255),
   utm_campaign VARCHAR(255),
+  utm_content VARCHAR(255),
+  utm_term VARCHAR(255),
   dt_cancel TIMESTAMP WITHOUT TIME ZONE,
   dt_created TIMESTAMP WITHOUT TIME ZONE,
   dt_updated TIMESTAMP WITHOUT TIME ZONE,

@@ -65,6 +65,8 @@ CREATE TABLE public.dim_lead (
   utm_source VARCHAR(255),
   utm_medium VARCHAR(255),
   utm_campaign VARCHAR(255),
+  utm_content VARCHAR(255),
+  utm_term VARCHAR(255),
   tracking_platform VARCHAR(255),
   tracking_region VARCHAR(255),
   tracking_city VARCHAR(255),
