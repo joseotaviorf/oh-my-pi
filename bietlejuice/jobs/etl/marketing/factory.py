@@ -13,7 +13,7 @@ class MarketingFactory(object):
     def factory(class_, s3_bucket, execution_date, account=None):
         __class = MarketingFactory.__dispatch_dict(class_)
         if class_ is None:
-            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
+            raise TypeError('m=factory, class_={}, msg=class type not found'.format(class_))
 
         return __class(
             s3_bucket=s3_bucket,

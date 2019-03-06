@@ -18,5 +18,5 @@ class TestMarketingFactory(object):
 
     def test_factory_with_exception(self, factory):
         # act
-        with pytest.raises(Exception):
+        with pytest.raises(TypeError):
             factory.factory(None, 's3_bucket', datetime(2018, 1, 1))
