@@ -1,9 +1,9 @@
-import airflow.utils.helpers as airflow_helpers
 from datetime import datetime, timedelta
+
+import airflow.utils.helpers as airflow_helpers
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
-import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,9 +18,6 @@ logger = QuintoAndarLogger('SupplyDemandFunnel')
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-
-PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
-PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
@@ -203,14 +200,6 @@ def condo_sub_dag(sub_dag_name):
     )
 
     return sub_dag.build_condo_with_tests()
-
-
-def refresh_powerbi(**kwargs):
-    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
-                                           PWBI_SCHEMA,
-                                           kwargs['workspace_name'],
-                                           kwargs['dataset_name'])
-    powerbi_client.trigger_refresh()
 
 
 def xcom_fact_listing_rent_flows_task(**kwargs):
@@ -448,34 +437,6 @@ xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     provide_context=True
 )
 
-refresh_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Supply',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
-)
-
-refresh_house_listing_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_House_Listing_Flows',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Data', 'dataset_name': 'House Listing Flow'}
-)
-
-refresh_listing_rent_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Listing_Rent_Flows',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Rent Flow'}
-)
-
-refresh_booking = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Booking',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
-)
-
 # check the dependency of amplitude_load_events
 xcom_booking_amplitude_task = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -492,16 +453,15 @@ airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag])
-airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_listing_rent_flows])
-refresh_listing_rent_flows >> refresh_booking
+airflow_helpers.chain(ods_supply, fact_supply)
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
 condo_dag >> fact_house_listings
 house_dag.set_downstream([fact_house_status, fact_house_listings])
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
-airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows, refresh_house_listing_flows)
+airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
