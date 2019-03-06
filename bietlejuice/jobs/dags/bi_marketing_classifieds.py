@@ -30,8 +30,6 @@ auth = {
     'sheet_id': MANUAL_COST_SHEET_ID
 }
 
-print auth
-
 # dags
 main_dag = DAG(
     dag_id=MAIN_DAG_NAME,

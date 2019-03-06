@@ -1,10 +1,11 @@
-with month_dates as (
-    select
-		cast(regexp_extract(trim(date), '(\d\d\d\d-\d\d-\d\d)', 1) as date) as dd_date,
-		date_trunc('month', cast(regexp_extract(trim(date), '(\d\d\d\d-\d\d-\d\d)', 1) as date)) as dd_month,
-	  	count(cast(regexp_extract(trim(date), '(\d\d\d\d-\d\d-\d\d)', 1) as date)) over
-	  			(partition by date_trunc('month', cast(regexp_extract(trim(date), '(\d\d\d\d-\d\d-\d\d)', 1) as date))) as total_days
-		from datalake_clean.ods_dim_date dd)
+with month_days as (
+	select
+		distinct sk_date,
+		date_format(cast(date as date), '%Y-%m') as ym,
+		count("date") over (partition by year, month) qtd_days
+	from datalake_clean.ods_dim_date
+	where sk_date != '-1'
+)
 SELECT
   cast(CASE source
     WHEN 'Zap Imóveis' THEN 1
@@ -16,10 +17,11 @@ SELECT
     WHEN '123i' THEN 7
     ELSE -1
   END as SMALLINT) as sk_classified,
-  cast(date_format(month_dates.dd_date, '%Y%m%d') as bigint) as sk_cost_date,
-  round((cast(REPLACE(cost, ',', '') as decimal(14,2))/month_dates.total_days),2) as cost,
+  cast(dd.sk_date as bigint) as sk_cost_date,
+  cast(replace(cost, ',', '.') as decimal(14,2)) / dd.qtd_days as cost,
   current_timestamp as ts_load
-FROM datalake_clean.marketing_classifieds_costs mcc
-inner join month_dates
-on date_trunc('month',cast(mcc.dt_created as date)) = month_dates.dd_month
+FROM datalake_clean.marketing_classifieds_costs
+left join month_days dd
+	on date_format(cast(dt_created as date), '%Y-%m') = dd.ym
 WHERE dt_created  = '{date}' and acc = '{account}'
+and dd.sk_date != '-1'
