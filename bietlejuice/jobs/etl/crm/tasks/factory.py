@@ -3,6 +3,7 @@ from bietlejuice.jobs.etl.crm.tasks.credit import CRMTasksCredit
 from bietlejuice.jobs.etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnum
 from bietlejuice.jobs.etl.crm.tasks.inspection import CRMTasksInspection
 from bietlejuice.jobs.etl.crm.tasks.lead import CRMTasksLead
+from bietlejuice.jobs.etl.crm.tasks.linhadireta_chat import CRMTasksChatLinhaDireta
 from bietlejuice.jobs.etl.crm.tasks.offboarding import CRMTasksOffboarding
 from bietlejuice.jobs.etl.crm.tasks.onboarding_tenant import CRMTasksOnboardingTenant
 from bietlejuice.jobs.etl.crm.tasks.payment import CRMTasksPayment
@@ -42,5 +43,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.PHOTO_JOB: CRMTasksPhotoJob,
             CRMTasksTableEnum.REPAIR: CRMTasksRepair,
             CRMTasksTableEnum.UNGROUPED_MANUAL: CRMTasksUngroupedManual,
-            CRMTasksTableEnum.OFFBOARDING: CRMTasksOffboarding
+            CRMTasksTableEnum.OFFBOARDING: CRMTasksOffboarding,
+            CRMTasksTableEnum.LINHADIRETA_CHAT: CRMTasksChatLinhaDireta
         }.get(class_)

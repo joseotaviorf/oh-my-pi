@@ -39,7 +39,7 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        command=['./crawlers/imovelweb.py', '--max_crawl', str(max_crawl), '--start_dt', str(start_dt),
+        command=['./crawlers/imovelweb_crawler.py', '--max_crawl', str(max_crawl), '--start_dt', str(start_dt),
                  '--states'] + states
     )
     logger.info('m=submit_iw, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
