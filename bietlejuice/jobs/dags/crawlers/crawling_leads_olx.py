@@ -44,6 +44,7 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     leads = crawler_leads.cleaning(leads)
+    leads['rent'] = leads.rent.astype(str)
     logger.info('m=insert_leads, msg=got {} leads after cleaning'.format(len(leads)))
     if leads.empty:
         logger.info(NO_LEADS_MSG)
