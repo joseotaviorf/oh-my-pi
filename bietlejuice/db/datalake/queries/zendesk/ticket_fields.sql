@@ -1,26 +1,24 @@
-with distinct_data as (
-    select distinct * from datalake_raw.zendesk_ticket_fields
-)
 select
-    id,
-    title,
-    raw_title,
-    case collapsed_for_agents when 'false' then '0' when 'true' then '1' end as collapsed_for_agents,
-    case visible_in_portal when 'false' then '0' when 'true' then '1' end as visible_in_portal,
-    description,
-    case active when 'false' then '0' when 'true' then '1' end as active,
-    raw_title_in_portal,
-    created_at,
-    type,
-    raw_description,
-    case required when 'false' then '0' when 'true' then '1' end as required,
-    case editable_in_portal when 'false' then '0' when 'true' then '1' end as editable_in_portal,
-    case required_in_portal when 'false' then '0' when 'true' then '1' end as required_in_portal,
-    updated_at,
-    system_field_options,
-    case removable when 'false' then '0' when 'true' then '1' end as removable,
-    regexp_for_validation,
-    position,
-    tag,
-    title_in_portal
-from distinct_data
+    t.id,
+    t.title,
+    t.raw_title,
+    case t.collapsed_for_agents when 'false' then '0' when 'true' then '1' end as collapsed_for_agents,
+    case t.visible_in_portal when 'false' then '0' when 'true' then '1' end as visible_in_portal,
+    t.description,
+    case t.active when 'false' then '0' when 'true' then '1' end as active,
+    t.raw_title_in_portal,
+    t.created_at,
+    t.type,
+    t.raw_description,
+    case t.required when 'false' then '0' when 'true' then '1' end as required,
+    case t.editable_in_portal when 'false' then '0' when 'true' then '1' end as editable_in_portal,
+    case t.required_in_portal when 'false' then '0' when 'true' then '1' end as required_in_portal,
+    t.updated_at,
+    t.system_field_options,
+    case t.removable when 'false' then '0' when 'true' then '1' end as removable,
+    t.regexp_for_validation,
+    t.position,
+    t.tag,
+    t.title_in_portal
+from datalake_raw.zendesk_ticket_fields t
+__WHERE_CLAUSE__

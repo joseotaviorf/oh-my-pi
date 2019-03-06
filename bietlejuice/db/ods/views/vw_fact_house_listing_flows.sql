@@ -75,6 +75,7 @@ fact_with_reproc as (
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
+		coalesce(h.condo_id, -1) as sk_condo,
 		coalesce(f.lead_id, -1) as sk_lead,
 		coalesce(f.conversao_id, -1) as sk_lead_conversion,
 		coalesce(f.photo_job_id, -1) as sk_first_photo_job,
@@ -95,6 +96,7 @@ potential_listings as (
 		coalesce(to_char(f.dt_opportunity::date,'YYYYMMDD')::integer, -1) as sk_opportunity_date,
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
 		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
+		coalesce(user_id_lead_first_discarder, -1) as sk_user_lead_first_discarder,
 		case
 			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Lead Flow'
@@ -144,8 +146,9 @@ potential_listings as (
 		end as first_isales_intervention,
 		bl.lead_type,
 		bl.lead_origin,
-		bl.utm_source,
-		bl.utm_medium,
+		coalesce(lfet.tracking_source, bl.utm_source) as utm_source,
+		coalesce(lfet.tracking_medium, bl.utm_medium) as utm_medium,
+		lfet.tracking_platform,
 		bl.branded_lead as is_branded,
 		bl.b2b_lead as is_b2b,
 		bl.reprocessed_flg,
@@ -160,6 +163,9 @@ potential_listings as (
 		(us_cad.id is not null) as is_call_center
 	from
 		fact_with_reproc f
+	left join
+	    lead_first_event_tracking lfet
+	    on lfet.id_lead = f.lead_id
 	left join
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
@@ -215,6 +221,7 @@ taxonomy as (
 )
 select
 	pl.sk_house_listing_flow,
+	pl.sk_condo,
 	pl.sk_lead,
 	pl.sk_lead_conversion,
 	pl.sk_first_photo_job,
@@ -235,6 +242,7 @@ select
 	pl.sk_opportunity_date,
 	pl.sk_first_listing_date,
 	pl.sk_discard_date,
+	pl.sk_user_lead_first_discarder,
 	pl.funnel_step,
 	pl.funnel_drop_reason,
 	pl.hours_lead_to_prospect,
@@ -256,8 +264,9 @@ select
 	pl.first_isales_intervention,
 	pl.lead_type,
 	pl.lead_origin,
-	pl.utm_source as lead_utm_source,
-	pl.utm_medium as lead_utm_medium,
+	pl.utm_source as lead_tracking_source,
+	pl.utm_medium as lead_tracking_medium,
+	pl.tracking_platform as lead_tracking_platform,
 	pl.is_branded,
 	pl.is_b2b,
 	pl.is_doorman,
@@ -265,6 +274,7 @@ select
 	pl.is_cx_direct_register,
 	pl.has_isales_intervention,
 	pl.is_call_center,
+	pl.reprocessed_flg as is_lead_reprocessed,
 	case
         when pl.is_branded then 'Branded'
         else 'Other'

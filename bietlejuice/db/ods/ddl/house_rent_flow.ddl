@@ -2,7 +2,7 @@ drop table if exists house_rent_flow;
 create table house_rent_flow (
   id_house_rent_flow bigint,
   id_house integer not null,
-	dt_house_first_listing timestamp,
+  dt_house_first_listing timestamp,
   id_booking integer,
   dt_booking_created timestamp,
   dt_visit timestamp,

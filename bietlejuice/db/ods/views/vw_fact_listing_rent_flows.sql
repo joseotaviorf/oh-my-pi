@@ -1,6 +1,20 @@
 drop view if exists vw_fact_listing_rent_flows;
 create or replace view vw_fact_listing_rent_flows as
-with _fact as (
+with _reservation as (
+   select
+       r1.id as id,
+       r1.created_at as created_at,
+       r1.house_id as id_house,
+       r1.tenant_id as id_tenant,
+       r2.reservation_attempts as reservation_attempts
+    from reservation r1
+    inner join
+    (select house_id, tenant_id, max(created_at) as max_created_at, count(*) as reservation_attempts
+    from reservation
+    group by house_id, tenant_id) as r2
+    on r1.house_id = r2.house_id and r1.tenant_id = r2.tenant_id and r1.created_at = r2.max_created_at
+),
+_fact as (
 	select
 	  hrf.id_house_rent_flow as ods_id,
 	  coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house_listing,
@@ -11,6 +25,7 @@ with _fact as (
 	  coalesce(to_char(vdh.ts_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
 	  coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
 	  coalesce(vfhl.sk_region, -1) as sk_region,
+	  coalesce(vfhl.sk_condo, -1) as sk_condo,
 	  coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
 	  coalesce(hrf.id_booking, -1) as sk_booking,
 	  coalesce(to_char(hrf.dt_booking_created, 'YYYYMMDD')::integer, -1) as sk_booking_created_date,
@@ -87,6 +102,11 @@ with _fact as (
     end as dt_credit_analysis_approved,
     coalesce(to_char(vdp.ts_processed, 'YYYYMMDD')::integer, -1) as sk_proposal_processed_date,
     vdp.ts_processed as ts_proposal_processed,
+    case
+    when vdp.status = 'Rejeitada'
+      then vdp.ts_processed
+    else null::timestamp
+    end as ts_proposal_rejected,
     vdp.status as proposal_status,
     vdp.tenant_document_sent as has_tenant_sent_doc,
 	  hrf.visit_created_from_app as flg_visit_created_from_app,
@@ -94,7 +114,10 @@ with _fact as (
 	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
 	  hrf.visit_last_updated_type,
 	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
-	  now()::timestamp as ts_load
+	  now()::timestamp as ts_load,
+    coalesce(rs.id, -1) as sk_reservation,
+    coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
+    rs.reservation_attempts as reservation_attempts
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -119,6 +142,11 @@ with _fact as (
     on hrf.id_contract = c.id_contract
   left join agent_review ar
     on hrf.id_booking = ar.id_booking
+ left join _reservation rs
+    on hrf.id_house = rs.id_house
+        and hrf.id_client = id_tenant
+        and vdo.status = 'Aprovada'
+        and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
 )
 select
   ods_id,
@@ -128,6 +156,7 @@ select
   sk_house_listing_de_publication_date,
   sk_house_listing_first_offer_submitted_date,
   sk_region,
+  sk_condo,
   sk_rent_flow,
   sk_booking,
   sk_booking_created_date,
@@ -142,6 +171,9 @@ select
   sk_offer_submitted_date,
   min(sk_offer_submitted_date) filter (where sk_offer_submitted_date != -1) over (partition by id_house) as sk_min_offer_submitted_date,
   sk_offer_approved_date,
+  sk_reservation,
+  sk_reservation_created_date,
+  reservation_attempts,
   sk_proposal,
   sk_proposal_approved_date,
   sk_proposal_processed_date,
@@ -240,9 +272,9 @@ select
   ((date_part('day', dt_visit - dt_house_listing) * 1440 +
     date_part('hour', dt_visit - dt_house_listing) * 60 +
 		date_part('minute', dt_visit - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_visit,
-  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
+  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 1440 +
+    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 60 +
+		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
   ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
     date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
 		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,

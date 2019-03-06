@@ -16,6 +16,11 @@ class CRMTasksVisit(CRMTasks):
         'dim': 'dim_visit_task'
     }
 
+    QUERY_FILENAMES = {
+        'staging': 'append_fact_visit_info.sql',
+        'prod': 'append_fact_visit_table.sql'
+    }
+
     @logger(exclude='mongo_client_uri')
     def __init__(self, s3_bucket, mongo_client_uri, execution_date):
         super(CRMTasksVisit, self).__init__(
@@ -29,7 +34,7 @@ class CRMTasksVisit(CRMTasks):
         self._move_fact_to_staging(
             table_name=CRMTasksVisit.TABLE_NAMES['fact'],
             queues=CRMTasksVisit.QUEUES,
-            append_query_filename='append_fact_visit_info.sql'
+            append_query_filename=CRMTasksVisit.QUERY_FILENAMES['staging']
         )
 
     @logger
@@ -43,7 +48,7 @@ class CRMTasksVisit(CRMTasks):
     def append_fact_to_dw(self):
         self._append_fact_to_dw(
             table_name=CRMTasksVisit.TABLE_NAMES['fact'],
-            query_filename='append_fact_visit_table.sql'
+            query_filename=CRMTasksVisit.QUERY_FILENAMES['prod']
         )
 
     @logger

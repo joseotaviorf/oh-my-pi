@@ -7,6 +7,7 @@ create table public.house (
   cidade varchar(200) default null::character varying,
   complemento varchar(200) default null::character varying,
   condominio integer,
+  condo_id bigint,
   data_construcao varchar(255) default null::character varying,
   elevador smallint,
   email_contato varchar(200) default null::character varying,
