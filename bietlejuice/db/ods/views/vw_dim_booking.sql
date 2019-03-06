@@ -177,9 +177,9 @@ from
 	bookings b
 left join taxonomy_demand td
 on
-    coalesce(td.app_type,'') = coalesce(b.app_type,'')
-	and coalesce(td.utm_source,'') = coalesce(b.utm_source,'')
-	and coalesce(td.utm_medium,'') = coalesce(b.utm_medium,'')
-	and coalesce(td.branded,'') = coalesce(b.branded,'')
-	and coalesce(td.first_update_source,'') = coalesce(b.first_update_source,'')
+    lower(coalesce(td.app_type,'')) = lower(coalesce(b.app_type,''))
+	and lower(coalesce(td.utm_source,'')) = lower(coalesce(b.utm_source,''))
+	and lower(coalesce(td.utm_medium,'')) = lower(coalesce(b.utm_medium,''))
+	and lower(coalesce(td.branded,'')) = lower(coalesce(b.branded,''))
+	and lower(coalesce(td.first_update_source,'')) = lower(coalesce(b.first_update_source,''))
 	and coalesce(td.flg_via_reschedule,false) = coalesce(b.flg_via_reschedule,false)
