@@ -86,7 +86,6 @@ class CriteoCampaigns(Marketing):
         try:
             response = requests.post('https://api.criteo.com/marketing/v1/statistics', headers=headers,
                                      data=data).json()
-            # loaded = json.loads(response.text)
             response_without_total = response["Rows"]
             # The json returned by the API has 2 tables ("Total" and "Rows"), one with all the necessary vars,
             # and the other with just the sum of everything. This way, we're sending only the necessary table to DL
