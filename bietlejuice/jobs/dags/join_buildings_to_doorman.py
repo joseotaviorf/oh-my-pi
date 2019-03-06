@@ -41,9 +41,9 @@ def load_building_doorman_data(**kwargs):
     if len(df) > 0:
         # upload CSV to CARTO
         carto_table_name = 'iptu_bldgs_doormen_data'
-        CARTO_API.run_sql('TRUNCATE TABLE {}'.format(carto_table_name))
-        CARTO_API.upload_csv(csv_file_path, carto_table_name)
-        CARTO_API.run_sql('UPDATE {} SET the_geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326) WHERE the_geom IS NULL'.format(carto_table_name))
+        print(CARTO_API.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
+        print(CARTO_API.upload_csv(csv_file_path, carto_table_name))
+        print(CARTO_API.run_sql('UPDATE {} SET the_geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326) WHERE the_geom IS NULL'.format(carto_table_name)))
         # write result to S3
         df_export = df
         cols = df_export.columns.values.tolist()

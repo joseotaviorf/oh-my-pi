@@ -101,37 +101,39 @@ def geocode_addresses(addresses, address_col, id_col, folder_path, geopy_geocode
 
 def geocode_doorman(**kwargs):
     df_door = load_doorman()
-    df_door.to_csv('tmp/df_door.csv', index=False, encoding='utf-8')
-    df_door = pd.read_csv('tmp/df_door.csv', encoding='utf-8')
-    # drop null
-    df_door = df_door[df_door.formatted_address.notna()]
-    # df_door['formatted_address'] = df_door['formatted_address'].str.encode('utf-8')
-    # format address to reduce need for geocoding
-    df_door['geocode'] = df_door.formatted_address.str.upper().str.encode('utf-8')
-    # generate hash for file name and joins
-    df_door['geocode_hash'] = df_door['geocode'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
-    # FIXME: will eventually be all cities
-    df_door = df_door[df_door['work_city'].str.encode('utf-8') == 'São Paulo']
-    df_address = df_door[df_door.geocode.notna()][['geocode', 'geocode_hash']]
-    df_address = df_address.drop_duplicates('geocode')
-    # FIXME: load from S3 here
-    data_folder = 'tmp/geocode_doorman/'
-    # geocode
-    # FIXME: api key
-    GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY')
-    geopy_geocoder = geopy.geocoders.GoogleV3(api_key=GOOGLE_MAPS_API_KEY, timeout=20)
-    # FIXME: test
-    geocode_addresses(df_address, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
-    df_geocoded_data = load_geocoded_addresses(data_folder)
-    df_address_geocoded = join_geocoded_addresses_to_df(df_address, df_geocoded_data)
-    df_door_geocoded = df_door.merge(df_address_geocoded.drop('geocode', axis=1), how='left', on='geocode_hash')
-    cols = ['id_user_doorman', 'geocode_hash', 'google_formatted_address', 'lat', 'lng', 'location_type', 'place_id', 'types']
-    df_export = df_door_geocoded[df_door_geocoded.google_formatted_address.notna()][cols]
-    df_export.to_csv('tmp/geocoded_doorman.csv', index=False, encoding='utf-8')
-    # write results to S3
-    df_export[cols] = df_export[cols].astype(str)
-    key = 'raw/external/doorman_geocoded_addresses/doorman_geocoded_addresses.parq'
-    athena.create_parquet_from_df(key=key, df=df_export)
+    if len(df_door) == 0:
+        print('--->no doorman loaded. Interrupting task.')
+    else:
+        df_door.to_csv('tmp/df_door.csv', index=False, encoding='utf-8')
+        df_door = pd.read_csv('tmp/df_door.csv', encoding='utf-8')
+        # drop null
+        df_door = df_door[df_door.formatted_address.notna()]
+        # df_door['formatted_address'] = df_door['formatted_address'].str.encode('utf-8')
+        # format address to reduce need for geocoding
+        df_door['geocode'] = df_door.formatted_address.str.upper().str.encode('utf-8')
+        # generate hash for file name and joins
+        df_door['geocode_hash'] = df_door['geocode'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
+        # FIXME: will eventually be all cities
+        df_door = df_door[df_door['work_city'].str.encode('utf-8') == 'São Paulo']
+        df_address = df_door[df_door.geocode.notna()][['geocode', 'geocode_hash']]
+        df_address = df_address.drop_duplicates('geocode')
+        # FIXME: load from S3 here
+        data_folder = 'tmp/geocode_doorman/'
+        # geocode
+        # FIXME: add variables to airflow
+        GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY')
+        geopy_geocoder = geopy.geocoders.GoogleV3(api_key=GOOGLE_MAPS_API_KEY, timeout=20)
+        geocode_addresses(df_address, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
+        df_geocoded_data = load_geocoded_addresses(data_folder)
+        df_address_geocoded = join_geocoded_addresses_to_df(df_address, df_geocoded_data)
+        df_door_geocoded = df_door.merge(df_address_geocoded.drop('geocode', axis=1), how='left', on='geocode_hash')
+        cols = ['id_user_doorman', 'geocode_hash', 'google_formatted_address', 'lat', 'lng', 'location_type', 'place_id', 'types']
+        df_export = df_door_geocoded[df_door_geocoded.google_formatted_address.notna()][cols]
+        df_export.to_csv('tmp/geocoded_doorman.csv', index=False, encoding='utf-8')
+        # write results to S3
+        df_export[cols] = df_export[cols].astype(str)
+        key = 'raw/external/doorman_geocoded_addresses/doorman_geocoded_addresses.parq'
+        athena.create_parquet_from_df(key=key, df=df_export)
 
 
 dag = DAG(
