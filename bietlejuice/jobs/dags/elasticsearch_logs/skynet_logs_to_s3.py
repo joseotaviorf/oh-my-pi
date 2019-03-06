@@ -10,7 +10,7 @@ def skynet_logs_to_s3(**kwargs):
     # required arguments
     es_logs__hostname = kwargs['ES_LOGS__HOSTNAME']
     model_name = kwargs['MODEL_NAME']
-    execution_time = kwargs['execution_time']
+    execution_date = kwargs['execution_date']
 
     # optional arguments
     logging_levels = kwargs.get(
@@ -40,7 +40,7 @@ def skynet_logs_to_s3(**kwargs):
         logger.info(
             'm=skynet_logs_to_s3, msg=querying for {}'.format(level_name))
         logs_paginator = es_extractor.run(
-            date_=execution_time.date(),
+            date_=execution_date,
             message_level=level_name,
             step_size=step_size,
             max_size=max_size
@@ -52,7 +52,7 @@ def skynet_logs_to_s3(**kwargs):
 
             key = base_key.format(
                 model_name=model_name,
-                dt=execution_time.strftime('%Y-%m-%d'),
+                dt=execution_date.strftime('%Y-%m-%d'),
                 logging_level=level_name,
                 filename=page
             )
