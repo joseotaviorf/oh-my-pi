@@ -1,18 +1,17 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
-from qa_python_utils import QuintoAndarLogger
-
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 
@@ -48,13 +47,19 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
 
 
 def load_dim_from_ods_to_dw(**kwargs):
+    if 'post_command_file' in kwargs:
+        file_path = '{}/public/post_command_{}.sql'.format(DW_QUERIES_DIR, kwargs['dim_name'])
+        post_command = BaseETL.get_query_from_file_name(file_name=file_path)
+    else:
+        post_command = None if 'post_command' not in kwargs else kwargs['post_command']
+
     utils.load_dim_from_ods_to_dw(
         dim_name=kwargs['dim_name'],
         bucket=bucket,
         insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
-        post_command=None if 'post_command' not in kwargs else kwargs['post_command']
+        post_command=post_command
     )
 
 
@@ -333,6 +338,13 @@ dw_fact_house_listing_flows = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'house_listing_flows', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
 )
 
+dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_Rent_Flow_Taxonomy',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'rent_flow_taxonomy', 'bucket': bucket, 'insert_dummy': True, 'post_command_file': True}
+)
+
 # flow
 lead_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -452,7 +464,8 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                      user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag])
+                                      user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
+                                      dw_rent_flow_taxonomy_task])
 airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag >> fact_photo_job

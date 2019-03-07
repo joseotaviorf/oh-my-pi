@@ -109,7 +109,7 @@ class CrawlerEntity(object):
         if 'listing_type' in entity:
             entity.listing_type = entity.listing_type.replace(self.map_types)
 
-        num_columns = ['rent', 'lat', 'lng', 'iptu', 'condominium']
+        num_columns = ['lat', 'lng']
         for c in num_columns:
             if c in entity:
                 if any([isinstance(v, basestring) for v in entity[c]]):
@@ -160,7 +160,7 @@ class CrawlerEntity(object):
                 info = info.append(s, ignore_index=True)
             else:
                 logger.info(
-                    'm={}.get_geolocation_info, cep={}, msg=google api cannot return geolocation info for this '
+                    'm={}.get_geolocation_info, address={}, msg=google api cannot return geolocation info for this '
                     'entity'.format(
                         self.__class__.__name__, raw_address))
 

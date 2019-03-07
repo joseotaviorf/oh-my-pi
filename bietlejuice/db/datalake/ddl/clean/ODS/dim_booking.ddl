@@ -27,6 +27,8 @@ create external table if not exists datalake_clean.ods_dim_booking (
   utm_source string,
   utm_medium string,
   utm_campaign string,
+  utm_content string,
+  utm_term string,
   dt_cancel string,
   dt_created string,
   dt_updated string,
