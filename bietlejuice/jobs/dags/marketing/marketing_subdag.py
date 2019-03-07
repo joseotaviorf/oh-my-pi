@@ -22,7 +22,7 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             account=account,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
@@ -32,7 +32,7 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def transfer_to_pre_staging(self, bucket, clean_table, prod_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
@@ -42,7 +42,7 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def transfer_to_staging(self, bucket, dw_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
@@ -51,7 +51,7 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def transfer_to_dw(self, bucket, dw_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )

@@ -11,11 +11,11 @@ class MarketingFactory(object):
 
     @staticmethod
     def factory(class_, s3_bucket, execution_date, account=None):
-        __class = MarketingFactory.__dispatch_dict(class_)
+        class__ = MarketingFactory.__dispatch_dict(class_)
         if class_ is None:
             raise TypeError('m=factory, class_={}, msg=class type not found'.format(class_))
 
-        return __class(
+        return class__(
             s3_bucket=s3_bucket,
             account=account,
             execution_date=execution_date
