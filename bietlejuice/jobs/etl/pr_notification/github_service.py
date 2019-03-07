@@ -58,8 +58,9 @@ class GithubService(object):
 
         return _json_response
 
+    @staticmethod
     @logger(exclude='json_response')
-    def extract_pull_requests(self, json_response):
+    def extract_pull_requests(json_response):
         open_prs = []
         approved_prs = []
         repo = json_response['data']['repositoryOwner']['repository']

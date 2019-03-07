@@ -32,7 +32,7 @@ def send_notifications_to_slack():
     }
     for repo_name in github_service.repo_names:
         json_response = github_service.get_json_response(repo_name=repo_name)
-        open_prs, approved_prs = github_service.extract_pull_requests(json_response=json_response)
+        open_prs, approved_prs = GithubService.extract_pull_requests(json_response=json_response)
 
         if len(open_prs) > 0:
             all_prs['open'].append({
@@ -47,11 +47,11 @@ def send_notifications_to_slack():
             })
 
     # build slack messages for opened and approved Github PRs
-    full_message += slack_service.build_slack_message(
+    full_message += SlackService.build_slack_message(
         pull_requests=all_prs['open'],
         message_title=SlackService.SLACK_MESSAGE_TITLES['open']
     )
-    full_message += slack_service.build_slack_message(
+    full_message += SlackService.build_slack_message(
         pull_requests=all_prs['approved'],
         message_title=SlackService.SLACK_MESSAGE_TITLES['approved'])
 

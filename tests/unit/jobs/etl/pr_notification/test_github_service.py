@@ -1,7 +1,7 @@
-import mock
-import pytest
 import requests
 from requests import Request
+
+from conftest import pytest, mock, GithubService
 
 
 class TestGithubService(object):
@@ -46,7 +46,7 @@ class TestGithubService(object):
         with pytest.raises(Exception):
             github_service.get_json_response(repo_name)
 
-    def test_extract_pull_requests_with_empty_edges(self, github_service):
+    def test_extract_pull_requests_with_empty_edges(self):
         # arrange
         json_response = {
             'data': {
@@ -61,7 +61,7 @@ class TestGithubService(object):
         }
 
         # act
-        open_prs, approved_prs = github_service.extract_pull_requests(json_response=json_response)
+        open_prs, approved_prs = GithubService.extract_pull_requests(json_response=json_response)
 
         # assert
         assert len(open_prs) == len(approved_prs) == 0
@@ -70,7 +70,7 @@ class TestGithubService(object):
                              [[[], 0],
                               [[{'node': {'state': 'COMMENT'}}], 0],
                               [[{'node': {'state': 'CHANGES_REQUESTED'}}], 1]])
-    def test_extract_pull_requests_with_no_approved_prs(self, github_service, review_edges, approved_prs_length):
+    def test_extract_pull_requests_with_no_approved_prs(self, review_edges, approved_prs_length):
         # arrange
         json_response = {
             'data': {
@@ -96,13 +96,13 @@ class TestGithubService(object):
         }
 
         # act
-        open_prs, approved_prs = github_service.extract_pull_requests(json_response=json_response)
+        open_prs, approved_prs = GithubService.extract_pull_requests(json_response=json_response)
 
         # assert
         assert len(open_prs) > 0
         assert len(approved_prs) == approved_prs_length
 
-    def test_extract_pull_requests_with_approved_prs(self, github_service):
+    def test_extract_pull_requests_with_approved_prs(self):
         # arrange
         json_response = {
             'data': {
@@ -132,7 +132,7 @@ class TestGithubService(object):
         }
 
         # act
-        open_prs, approved_prs = github_service.extract_pull_requests(json_response=json_response)
+        open_prs, approved_prs = GithubService.extract_pull_requests(json_response=json_response)
 
         # assert
         assert len(open_prs) == 0

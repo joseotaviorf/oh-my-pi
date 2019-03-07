@@ -13,10 +13,11 @@ class SlackService(object):
     def __init__(self, webhook_url):
         self.webhook_url = webhook_url
 
+    @staticmethod
     @logger(exclude='pull_requests')
-    def build_slack_message(self, pull_requests, message_title):
+    def build_slack_message(pull_requests, message_title):
         if pull_requests is None or len(pull_requests) == 0:
-            logger.info('m=build_slack_messages, msg=no pull requests to send')
+            logger.info('m=build_slack_message, msg=no pull requests to send')
             return
 
         message = message_title
