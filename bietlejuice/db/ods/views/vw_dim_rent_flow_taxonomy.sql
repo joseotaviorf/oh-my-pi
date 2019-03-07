@@ -2,6 +2,7 @@ drop view if exists vw_dim_rent_flow_taxonomy;
 create view vw_dim_rent_flow_taxonomy as
 select
 	cast(id as bigint) as sk_rent_flow_taxonomy,
+	cast(id as bigint) as id_rent_flow_taxonomy,
 	"Category" as mkt_category,
 	"Flow" as mkt_flow,
 	"Completion" as mkt_completion,
