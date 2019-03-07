@@ -9,6 +9,10 @@ class TestSlackService(object):
         # arrange
         message_title = 'message_title'
         pull_requests = [{'repo': 'repo', 'prs': ['first_pr', 'second_pr']}]
+        formatted_message = '{}\n*{}*\n> {}> {}'.format(message_title,
+                                                        pull_requests[0]['repo'],
+                                                        pull_requests[0]['prs'][0],
+                                                        pull_requests[0]['prs'][1])
 
         # act
         result = slack_service.build_slack_message(
@@ -17,10 +21,7 @@ class TestSlackService(object):
         )
 
         # assert
-        assert result == '{}\n*{}*\n> {}> {}'.format(message_title,
-                                                     pull_requests[0]['repo'],
-                                                     pull_requests[0]['prs'][0],
-                                                     pull_requests[0]['prs'][1])
+        assert result == formatted_message
 
     @pytest.mark.parametrize('pull_requests', [None, []])
     def test_build_slack_message_with_no_pull_requests(self, slack_service, pull_requests):
@@ -55,13 +56,13 @@ class TestSlackService(object):
         # arrange
         json_field = 'text'
         message = mock.ANY
-        post_url = mock.ANY
+        mock_requests_post_call_args = {
+            'url': mock.ANY,
+            'json': {json_field: message}
+        }
 
         # act
         slack_service.send_notifications_to_slack(message)
 
         # assert
-        assert mock_requests_post.call_args[1] == {
-            'url': post_url,
-            'json': {json_field: message}
-        }
+        assert mock_requests_post.call_args[1] == mock_requests_post_call_args
