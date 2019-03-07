@@ -9,6 +9,7 @@ CREATE TABLE if NOT EXISTS staging.fact_rtb_daily_cost_attributions (
     cost DOUBLE PRECISION,
     conversions_count DOUBLE PRECISION,
     conversions_rate DOUBLE PRECISION,
-    cpc DOUBLE PRECISION
+    cpc DOUBLE PRECISION,
+    ts_load timestamp
 )
 ;

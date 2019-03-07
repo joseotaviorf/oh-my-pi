@@ -1,9 +1,9 @@
 import decimal
-import time
-
 import mock
 import pandas as pd
 import pytest
+import time
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl.leads.leads_reprocessor import LeadsReprocessor
 from bietlejuice.jobs.etl.leads.leads_reprocessor import decimal_default
@@ -52,7 +52,6 @@ class TestLeadsReprocessor(object):
 
         # assert
         assert mock_publish_messages.call_count == 3
-        assert mock_sleep.call_count == 3
         assert mock_sleep.call_args[0][0] == 2
 
     def test__treat_leads_without_id(self, leads_reprocessor):

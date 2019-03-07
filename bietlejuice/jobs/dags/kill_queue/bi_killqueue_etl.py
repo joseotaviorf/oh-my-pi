@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -12,7 +11,7 @@ from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
 logger = QuintoAndarLogger('bi-killqueue-etl')
 
-env.set_airflow_var_to_local_env('KILLQUEUE')
+env.set_airflow_var_to_local_env('KILLQUEUE', 'BI_ODS', 'BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-killqueue-etl'

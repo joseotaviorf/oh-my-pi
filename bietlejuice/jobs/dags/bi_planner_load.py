@@ -20,7 +20,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6,7,8 * * *')
 # functions
 def extract_and_load_data(_class, **kwargs):
     planner = PlannerFactory.factory(
-        _class=_class,
+        entity=_class,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -33,7 +33,7 @@ def extract_and_load_data(_class, **kwargs):
 
 def exec_class_method(_class, method, **kwargs):
     planner = PlannerFactory.factory(
-        _class=_class,
+        entity=_class,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )

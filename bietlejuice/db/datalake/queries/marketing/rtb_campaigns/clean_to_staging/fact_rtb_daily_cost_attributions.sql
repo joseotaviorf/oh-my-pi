@@ -8,6 +8,7 @@ SELECT
     cast(campaign_cost as double) as cost,
     cast(conversions_count as double) as conversions_count,
     cast(conversions_rate as double) as conversions_rate,
-    cast(cpc as double) as cpc
+    cast(cpc as double) as cpc,
+    current_timestamp as ts_load
 FROM datalake_clean.marketing_rtb_campaigns
 WHERE dt_created  = '{date}' and acc = '{account}'

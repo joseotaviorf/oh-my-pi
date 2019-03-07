@@ -1,14 +1,14 @@
-from datetime import datetime
-
 import pytest
+from datetime import datetime
 
 from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksUngroupedManual, CRMTasksFactory, CRMTasksOffboarding, \
     CRMTasksClosing, CRMTasksRepair, CRMTasksInspection, CRMTasksLead, CRMTasksOnboardingTenant, CRMTasksPayment, \
     CRMTasksPhotoJob, CRMTasksVisit, CRMTasksCredit
+from bietlejuice.jobs.etl.crm.tasks.linhadireta_chat import CRMTasksChatLinhaDireta
 
 S3_BUCKET = 's3_bucket'
 MONGO_CLIENT_URI = 'mongo_client_uri'
-EXECUTION_DATE = datetime.today()
+EXECUTION_DATE = datetime(2019, 1, 2)
 
 
 @pytest.fixture(scope='session')
@@ -114,6 +114,15 @@ def inspection():
     return CRMTasksInspection(
         s3_bucket=S3_BUCKET,
         mongo_client_uri=MONGO_CLIENT_URI,
+        execution_date=EXECUTION_DATE
+    )
+
+
+@pytest.fixture(scope='session')
+def linhadireta_chat():
+    return CRMTasksChatLinhaDireta(
+        s3_bucket=S3_BUCKET,
+        mongo_client_uri=None,
         execution_date=EXECUTION_DATE
     )
 
