@@ -16,13 +16,13 @@ taxonomy_demand as (
 		td.branded,
 		td.first_update_source,
 		td.flg_via_reschedule::boolean,
-		td."Category" as mkt_category,
-		td."Flow" as mkt_flow,
-		td."Completion" as mkt_completion,
-		td."Channel" as mkt_channel,
-		td."Medium" as mkt_medium,
-		td."Source" as mkt_source,
-		td."Platform" as mkt_platform
+		td.Category as mkt_category,
+		td.Flow as mkt_flow,
+		td.Completion as mkt_completion,
+		td.Channel as mkt_channel,
+		td.Medium as mkt_medium,
+		td.Source as mkt_source,
+		td.Platform as mkt_platform
     from
         files.taxonomy_demand td
 ),
