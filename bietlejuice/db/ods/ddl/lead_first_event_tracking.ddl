@@ -4,6 +4,8 @@ create table lead_first_event_tracking (
     tracking_campaign varchar(255),
     tracking_medium varchar(255),
     tracking_source varchar(255),
+    tracking_content varchar(255),
+    tracking_term varchar(255),
     tracking_platform varchar(255),
     tracking_region varchar(255),
     tracking_city varchar(255)

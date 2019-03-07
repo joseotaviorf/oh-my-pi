@@ -38,6 +38,8 @@ select
 	u_initial_utm_campaign as tracking_campaign,
 	u_initial_utm_medium as tracking_medium,
 	u_initial_utm_source as tracking_source,
+	u_initial_utm_content as tracking_content,
+	u_initial_utm_term as tracking_term,
 	u_platform as tracking_platform,
 	region as tracking_region,
 	city as tracking_city
