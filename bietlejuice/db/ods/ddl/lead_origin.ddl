@@ -8,6 +8,8 @@ create table lead_origin (
     u_initial_utm_campaign varchar(255),
     u_initial_utm_medium varchar(255),
     u_initial_utm_source varchar(255),
+    u_initial_utm_content varchar(255),
+    u_initial_utm_term varchar(255),
     u_platform varchar(255),
     region varchar(255),
     city varchar(255),

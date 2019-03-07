@@ -68,6 +68,8 @@ CREATE VIEW public.vw_dim_lead as
   coalesce(lfet.tracking_source, l.utm_source) as utm_source,
   coalesce(lfet.tracking_medium, l.utm_medium) as utm_medium,
   coalesce(lfet.tracking_campaign, l.utm_campaign) as utm_campaign,
+  lfet.tracking_content as utm_content,
+  lfet.tracking_term as utm_term,
   lfet.tracking_platform,
   lfet.tracking_region,
   lfet.tracking_city,
