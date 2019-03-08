@@ -38,8 +38,6 @@ class GithubPullRequests(GithubService):
             }"""
     }
 
-    GITHUB_GRAPHQL_ENDPOINT = 'https://api.github.com/graphql'
-
     def __init__(self, auth_token, repo_names):
         super(GithubPullRequests, self).__init__(auth_token)
         self.repo_names = repo_names
