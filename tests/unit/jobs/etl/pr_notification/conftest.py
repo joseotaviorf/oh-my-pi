@@ -29,5 +29,5 @@ def slack_pull_requests():
 def github_pull_requests():
     return GithubPullRequests(
         auth_token=mock.ANY,
-        repo_names=mock.ANY
+        repo_name='repo_name'
     )
