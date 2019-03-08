@@ -17,7 +17,7 @@ class SlackPullRequests(SlackService):
     @staticmethod
     @logger(exclude='pull_requests')
     def build_slack_message(pull_requests, message_title):
-        if pull_requests is None or len(pull_requests) == 0:
+        if not pull_requests:
             logger.info('m=build_slack_message, msg=no pull requests to send')
             return
 
