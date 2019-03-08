@@ -4,12 +4,9 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger('Marketing')
-
-env.set_airflow_var_to_local_env('BI_DW')
 
 
 class Marketing(object):
@@ -91,7 +88,7 @@ class Marketing(object):
             self.athena_client.execute_raw_query("msck repair table {}.{}".format(clean_schema_name, clean_table))
 
         else:
-            self.__update_table_partitions(clean_schema_name, clean_table, accounts)
+            self._update_table_partitions(clean_schema_name, clean_table, accounts)
             pre_staging_query = '{}\nwhere dt_created = \'{}\';'.format(pre_staging_query, self.partition_date)
 
         df = self.athena_client.execute_query_and_return_dataframe(sql=pre_staging_query)
@@ -158,13 +155,13 @@ class Marketing(object):
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_fact_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
                 upsert_query = "{} \nwhere sk_date = {};".format(upsert_query, self.execution_date.strftime('%Y%m%d'))
             else:
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_dim_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
                 upsert_query = """
                     SELECT * FROM staging.{dim_table}
                     WHERE {sk_field} not in (
@@ -172,10 +169,10 @@ class Marketing(object):
                     )
                 """.format(sk_field=Marketing.SK_FIELD_MAP[table_name], dim_table=table_name)
 
-        self.__upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
+        self._upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
 
     @logger(exclude='df')
-    def __upsert_into_dw(self, upsert_query, table_name, schema):
+    def _upsert_into_dw(self, upsert_query, table_name, schema):
         logger.info(
             'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(schema,
                                                                                                       table_name,
@@ -212,8 +209,8 @@ class Marketing(object):
 
         return len(result) == 1
 
-    @logger
-    def __delete_old_entries(self, table_name, delete_query):
+    @logger(exclude='delete_query')
+    def _delete_old_entries(self, table_name, delete_query):
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
             command=delete_query.format(
@@ -225,7 +222,7 @@ class Marketing(object):
         )
 
     @logger
-    def __update_table_partitions(self, schema_name, table, accounts):
+    def _update_table_partitions(self, schema_name, table, accounts):
         for acc in accounts:
             self.athena_client.add_partition(
                 database=schema_name,

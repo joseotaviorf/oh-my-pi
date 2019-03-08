@@ -1,6 +1,7 @@
 drop table if exists datalake_raw.taxonomy_demand;
 
 create external table datalake_raw.taxonomy_demand (
+  id string,
   app_type string,
   utm_source string,
   utm_medium string,

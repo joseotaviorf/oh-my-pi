@@ -17,6 +17,7 @@ create table public.fact_house_listing_flows (
 	dt_opportunity timestamp without time zone,
 	dt_first_listing timestamp without time zone,
 	dt_discarded timestamp without time zone,
+	user_id_lead_first_discarder integer,
 	flow character varying(255) DEFAULT NULL::character varying,
 	acquisition_method character varying(255) DEFAULT NULL::character varying,
 	acquisition_channel character varying(255) DEFAULT NULL::character varying,

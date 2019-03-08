@@ -1,10 +1,10 @@
 from collections import OrderedDict
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
-from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('GoogleAds')
 
@@ -178,11 +178,11 @@ class GoogleAds(Marketing):
 
     @logger
     def load_to_staging(self, dw_table_name):
-        query = self.__load_table(dw_table_name)
+        query = self._load_table(dw_table_name)
         self._load_to_staging(dw_table_name, query)
 
     @logger
-    def __load_table(self, table_name):
+    def _load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 
