@@ -65,7 +65,7 @@ class GithubPullRequests(GithubService):
 
             pr_append = '*<{}|{}>* ({})\n'.format(_url, _title, _author)
 
-            if len(prs['node']['reviews']['edges']) <= 0:
+            if not prs['node']['reviews']['edges']:
                 open_prs.append(pr_append)
                 continue
 
