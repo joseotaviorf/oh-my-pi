@@ -19,21 +19,18 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9-20/3 * * 1-5')
 
 # functions
 def send_notifications_to_slack():
-    github_service = GithubPullRequests(
-        auth_token=PR_NOTIFICATION_AUTH['github_auth']['token'],
-        repo_names=GITHUB_REPOS['names']
-    )
-    slack_service = SlackPullRequests(webhook_url=PR_NOTIFICATION_AUTH['github_auth']['slack_webhook'])
-
     full_message = ''
     all_prs = {
         'open': [],
         'approved': []
     }
-    for repo_name in github_service.repo_names:
-        json_response = github_service.get_json_response(repo_name=repo_name)
-        open_prs, approved_prs = GithubPullRequests.extract_pull_requests(json_response=json_response)
+    for repo_name in GITHUB_REPOS['names']:
+        github_pull_requests = GithubPullRequests(
+            auth_token=PR_NOTIFICATION_AUTH['github_auth']['token'],
+            repo_name=repo_name
+        )
 
+        open_prs, approved_prs = github_pull_requests.extract_pull_requests()
         if open_prs:
             all_prs['open'].append({
                 'repo': repo_name,
@@ -56,6 +53,7 @@ def send_notifications_to_slack():
         message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['approved'])
 
     # send only one message to Slack
+    slack_service = SlackPullRequests(webhook_url=PR_NOTIFICATION_AUTH['github_auth']['slack_webhook'])
     slack_service.send_notifications_to_slack(full_message)
 
 
