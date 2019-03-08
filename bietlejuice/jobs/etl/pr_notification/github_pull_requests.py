@@ -38,26 +38,24 @@ class GithubPullRequests(GithubService):
             }"""
     }
 
-    def __init__(self, auth_token, repo_names):
+    def __init__(self, auth_token, repo_name):
         super(GithubPullRequests, self).__init__(auth_token)
-        self.repo_names = repo_names
+        self.repo_name = repo_name
+        self.graphql_query = {
+            'query': GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)
+        }
 
     @logger
-    def get_json_response(self, repo_name):
-        graphql_query = {'query': GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)}
-        json_response = self._get_json_response(graphql_query)
-
-        if json_response['data']['repositoryOwner']['repository'] is None:
-            raise RuntimeError('m=get_json_response, repository={}, msg=no data for repository'.format(repo_name))
-
-        return json_response
-
-    @staticmethod
-    @logger(exclude='json_response')
-    def extract_pull_requests(json_response):
+    def extract_pull_requests(self):
         open_prs = []
         approved_prs = []
+
+        json_response = self.get_json_response(self.graphql_query)
         repo = json_response['data']['repositoryOwner']['repository']
+        if repo is None:
+            raise RuntimeError(
+                'm=extract_pull_requests, repository={}, msg=no data for repository'.format(self.repo_name))
+
         for prs in repo['pullRequests']['edges']:
             _title = prs['node']['title']
             _author = prs['node']['author']['login']

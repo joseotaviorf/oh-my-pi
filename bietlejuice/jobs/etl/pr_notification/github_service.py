@@ -10,7 +10,7 @@ class GithubService(object):
     def __init__(self, auth_token):
         self.auth_token = auth_token
 
-    def _get_json_response(self, graphql_query):
+    def get_json_response(self, graphql_query):
         github_response = requests.post(
             url=GithubService.GITHUB_GRAPHQL_ENDPOINT,
             headers={'Authorization': 'bearer {}'.format(self.auth_token)},

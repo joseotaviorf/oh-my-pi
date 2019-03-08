@@ -17,13 +17,13 @@ class SlackPullRequests(SlackService):
     @staticmethod
     @logger(exclude='pull_requests')
     def build_slack_message(pull_requests, message_title):
-        if not pull_requests:
+        if pull_requests is None or not pull_requests:
             logger.info('m=build_slack_message, msg=no pull requests to send')
             return
 
         message = message_title
         for pr_entry in pull_requests:
-            if len(pr_entry['prs']) == 0:
+            if not pr_entry['prs']:
                 logger.info(
                     'm=build_slack_message, github_repo={}, msg=no pull requests in repository'.format(
                         pr_entry['repo']))
