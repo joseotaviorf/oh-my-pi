@@ -10,6 +10,7 @@ with bms as (
 ),
 taxonomy_demand as (
 	 select
+	    cast(td.id as bigint) as id,
 		td.app_type,
 		td.utm_source,
 		td.utm_medium,
@@ -170,6 +171,7 @@ select
     b.checkin_status,
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
+    case when td.mkt_flow is null then -1 else td.id end as sk_rent_flow_taxonomy,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
