@@ -80,12 +80,12 @@ class FacebookAds(Marketing):
 
     @logger
     def load_to_staging(self, dw_table_name):
-        query = self.__load_table(dw_table_name)
+        query = self._load_table(dw_table_name)
         logger.info("m=load_to_staging, query={}".format(query))
         self._load_to_staging(dw_table_name, query)
 
     @logger
-    def __load_table(self, table_name):
+    def _load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 

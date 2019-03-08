@@ -1,5 +1,6 @@
 drop table if exists files.taxonomy_demand;
 create table files.taxonomy_demand (
+    id varchar(8),
     app_type varchar(255),
     utm_source varchar(255),
     utm_medium varchar(255),

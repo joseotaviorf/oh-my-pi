@@ -9,7 +9,7 @@ create table public.dim_user_affiliate (
     is_active boolean,
     ts_updated timestamp,
     ts_created timestamp,
-    creci_number varchar(62),
+    creci_number varchar(100),
     origin varchar(24),
     type varchar(62),
     is_inspector BOOLEAN,
