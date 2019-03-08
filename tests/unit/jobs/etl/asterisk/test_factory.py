@@ -36,8 +36,18 @@ class TestAsteriskFactory(object):
         # arrange
         s3_bucket = mock.ANY
         execution_date = datetime.today()
-        class_ = mock.ANY
+        class_ = 'dummy'
 
         # act & assert
         with pytest.raises(RuntimeError):
+            AsteriskFactory.factory(class_, s3_bucket, execution_date)
+
+    def test_factory_with_none_class(self):
+        # arrange
+        s3_bucket = mock.ANY
+        execution_date = datetime.today()
+        class_ = None
+
+        # act & assert
+        with pytest.raises(ValueError):
             AsteriskFactory.factory(class_, s3_bucket, execution_date)

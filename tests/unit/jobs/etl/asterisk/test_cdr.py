@@ -1,10 +1,11 @@
 import mock
 
-from bietlejuice.jobs.etl.asterisk import AsteriskCDR, AsteriskTableEnum
+from bietlejuice.jobs.etl.asterisk import Asterisk, AsteriskCDR, AsteriskTableEnum
 
 
 class TestAsteriskCDR(object):
-    @mock.patch.object(AsteriskCDR, '_extract_and_load_data_partitioned')
+
+    @mock.patch.object(Asterisk, '_extract_and_load_data_partitioned')
     def test_extract_and_load_data(self, mock_extract_load_data, asterisk_cdr):
         # arrange
         class_ = AsteriskTableEnum.CDR
@@ -19,7 +20,7 @@ class TestAsteriskCDR(object):
     def test_data_existence_check(self, mock_data_existence, asterisk_cdr):
         # arrange
         class_ = AsteriskTableEnum.CDR
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
 
         # act
         asterisk_cdr.data_existence_check(bucket_type)

@@ -16,18 +16,19 @@ logger = QuintoAndarLogger('AsteriskFactory')
 
 class AsteriskFactory(object):
     @staticmethod
-    def factory(class_, s3_bucket, execution_date):
-        class__ = AsteriskFactory.__dispatch_dict(class_)
-        if class__ is None:
-            raise RuntimeError('m=factory, _class={}, msg=class type not found'.format(class_))
-
-        return class__(
-            s3_bucket=s3_bucket,
-            execution_date=execution_date
-        )
+    def factory(entity, s3_bucket, execution_date):
+        if entity is None:
+            raise ValueError('m=factory, class_={}, msg=entity cannot be None')
+        class_ = AsteriskFactory.__dispatch_dict(entity)
+        if class_:
+            return class_(
+                s3_bucket=s3_bucket,
+                execution_date=execution_date)
+        else:
+            raise RuntimeError('m=factory, entity={}, msg=class type for entity not found'.format(entity))
 
     @staticmethod
-    def __dispatch_dict(_class):
+    def __dispatch_dict(entity):
         return {
             AsteriskTableEnum.IVR_DETAILS: AsteriskIVRDetails,
             AsteriskTableEnum.IVR_ENTRIES: AsteriskIVREntries,
@@ -38,4 +39,4 @@ class AsteriskFactory(object):
             AsteriskTableEnum.CXPANEL_QUEUES: AsteriskCXPanelQueues,
             AsteriskTableEnum.CXPANEL_USERS: AsteriskCXPanelUsers,
             AsteriskTableEnum.CDR: AsteriskCDR,
-        }.get(_class)
+        }.get(entity)

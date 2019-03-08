@@ -16,15 +16,14 @@ from bietlejuice.jobs.etl.asterisk import AsteriskTableEnum
 
 class TestAsterisk(object):
 
+    @pytest.mark.parametrize('bucket_type', ['raw', 'clean'])
     @mock.patch.object(boto3, 'resource')
-    def test__data_existence_check_partitioned_successfully(self, mock_resource, asterisk):
+    def test__data_existence_check_partitioned_successfully(self, mock_resource, bucket_type, asterisk):
         # arrange
-        bucket_type = 'raw'
         class_ = AsteriskTableEnum.CDR
         file_path = '{}/asterisk/{}/dt={}/data.gz'.format(bucket_type, class_.value, asterisk.partition_date)
         s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        asterisk.s3_resource = mock_resource('s3')
         expected = True
 
         # act
@@ -37,12 +36,11 @@ class TestAsterisk(object):
     @mock.patch.object(boto3, 'resource')
     def test__data_existence_check_partitioned_invalid_path(self, mock_resource, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
-        file_path = '{}/asterisk/{}/dt={}/data.gz'.format(bucket_type, class_.value, asterisk.partition_date)
-        s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        file_path = mock.ANY
+        s3_bucket = mock.ANY
+        asterisk.s3_resource = mock_resource('s3')
         asterisk.s3_resource.Object(s3_bucket, file_path).load.side_effect = ClientError(
             error_response={'Error': {'Message': 'Not Found', 'Code': '404'}},
             operation_name='HeadObject')
@@ -57,12 +55,11 @@ class TestAsterisk(object):
     @mock.patch.object(boto3, 'resource')
     def test__data_existence_check_partitioned_error_s3(self, mock_resource, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
-        file_path = '{}/asterisk/{}/dt={}/data.gz'.format(bucket_type, class_.value, asterisk.partition_date)
-        s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        file_path = mock.ANY
+        s3_bucket = mock.ANY
+        asterisk.s3_resource = mock_resource('s3')
         asterisk.s3_resource.Object(s3_bucket, file_path).load.side_effect = ClientError(
             error_response={'Error': {'Message': 'Internal Error', 'Code': '500'}},
             operation_name='HeadObject')
@@ -71,15 +68,23 @@ class TestAsterisk(object):
         with pytest.raises(ClientError):
             asterisk._data_existence_check_partitioned(bucket_type, class_)
 
-    @mock.patch.object(boto3, 'resource')
-    def test__data_existence_check_full_successfully(self, mock_resource, asterisk):
+    def test__data_existence_check_partitioned_invalid_bucket(self, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = 'dummy'
+        class_ = AsteriskTableEnum.CDR
+
+        # act & assert
+        with pytest.raises(ValueError):
+            asterisk._data_existence_check_partitioned(bucket_type, class_)
+
+    @pytest.mark.parametrize('bucket_type', ['raw', 'clean'])
+    @mock.patch.object(boto3, 'resource')
+    def test__data_existence_check_full_successfully(self, mock_resource, bucket_type, asterisk):
+        # arrange
         class_ = AsteriskTableEnum.CDR
         file_path = '{}/asterisk/{}/data.gz'.format(bucket_type, class_.value)
         s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        asterisk.s3_resource = mock_resource('s3')
         expected = True
 
         # act
@@ -92,12 +97,11 @@ class TestAsterisk(object):
     @mock.patch.object(boto3, 'resource')
     def test__data_existence_check_full_invalid_path(self, mock_resource, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
-        file_path = '{}/asterisk/{}/data.gz'.format(bucket_type, class_.value)
-        s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        file_path = mock.ANY
+        s3_bucket = mock.ANY
+        asterisk.s3_resource = mock_resource('s3')
         asterisk.s3_resource.Object(s3_bucket, file_path).load.side_effect = ClientError(
             error_response={'Error': {'Message': 'Not Found', 'Code': '404'}},
             operation_name='HeadObject')
@@ -112,18 +116,26 @@ class TestAsterisk(object):
     @mock.patch.object(boto3, 'resource')
     def test__data_existence_check_full_error_s3(self, mock_resource, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
-        file_path = '{}/asterisk/{}/data.gz'.format(bucket_type, class_.value, asterisk.partition_date)
-        s3_bucket = asterisk.s3_bucket
-        mock_s3_resource = mock_resource('s3')
-        asterisk.s3_resource = mock_s3_resource
+        file_path = mock.ANY
+        s3_bucket = mock.ANY
+        asterisk.s3_resource = mock_resource('s3')
         asterisk.s3_resource.Object(s3_bucket, file_path).load.side_effect = ClientError(
             error_response={'Error': {'Message': 'Internal Error', 'Code': '500'}},
             operation_name='HeadObject')
 
         # act & assert
         with pytest.raises(ClientError):
+            asterisk._data_existence_check_full(bucket_type, class_)
+
+    def test__data_existence_check_full_invalid_bucket(self, asterisk):
+        # arrange
+        bucket_type = 'dummy'
+        class_ = AsteriskTableEnum.CDR
+
+        # act & assert
+        with pytest.raises(ValueError):
             asterisk._data_existence_check_full(bucket_type, class_)
 
     @mock.patch.object(BaseETL, 'obj_to_s3')
@@ -175,7 +187,7 @@ class TestAsterisk(object):
     @mock.patch.object(AthenaClient, 'upsert_single_partition')
     def test__upsert_partition(self, mock_upsert_partition, asterisk):
         # arrange
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
         s3_bucket = asterisk.s3_bucket
         folder_path = '{}/{}/asterisk/{}'.format(s3_bucket, bucket_type, class_.value)

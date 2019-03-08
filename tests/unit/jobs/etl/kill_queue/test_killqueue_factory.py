@@ -31,3 +31,12 @@ class TestKillQueueFactory(object):
         # act
         with pytest.raises(RuntimeError):
             KillQueueFactory.factory(table, s3_bucket)
+
+    def test_factory_with_none_table(self):
+        # arrange
+        table = None
+        s3_bucket = mock.ANY
+
+        # act
+        with pytest.raises(ValueError):
+            KillQueueFactory.factory(table, s3_bucket)

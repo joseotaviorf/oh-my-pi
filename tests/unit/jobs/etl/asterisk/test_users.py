@@ -1,6 +1,6 @@
 import mock
 
-from bietlejuice.jobs.etl.asterisk import AsteriskUsers, AsteriskTableEnum
+from bietlejuice.jobs.etl.asterisk import AsteriskTableEnum, AsteriskUsers
 
 
 class TestAsteriskUsers(object):
@@ -20,7 +20,7 @@ class TestAsteriskUsers(object):
     def test_data_existence_check(self, mock_data_existence, asterisk_users):
         # arrange
         class_ = AsteriskTableEnum.USERS
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
 
         # act
         asterisk_users.data_existence_check(bucket_type)

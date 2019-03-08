@@ -62,7 +62,7 @@ class AsteriskUsers(Asterisk):
             ('no_answer_destination', str),
             ('busy_destination', str),
             ('channel_unavailable_destination', str),
-            ('mohclass_', str)
+            ('moh_class', str)
         ])
 
         self._move_to_clean_full(

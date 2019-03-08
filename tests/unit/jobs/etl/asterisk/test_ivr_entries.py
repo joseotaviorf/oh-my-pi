@@ -20,7 +20,7 @@ class TestAsteriskIVREntries(object):
     def test_data_existence_check(self, mock_data_existence, asterisk_ivr_entries):
         # arrange
         class_ = AsteriskTableEnum.IVR_ENTRIES
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
 
         # act
         asterisk_ivr_entries.data_existence_check(bucket_type)

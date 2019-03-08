@@ -7,10 +7,12 @@ class PlannerFactory(object):
 
     @staticmethod
     def factory(entity, s3_bucket, execution_date):
+        if entity is None:
+            raise ValueError('m=factory, msg=entity cannot be None'.format(entity))
         class_ = PlannerFactory.__dispatch_dict(entity)
 
         if not class_:
-            raise RuntimeError('m=factory, class={}, msg=class type must be valid'.format(entity))
+            raise RuntimeError('m=factory, entity={}, msg=class type for entity not found'.format(entity))
 
         return class_(
             s3_bucket=s3_bucket,
@@ -18,8 +20,8 @@ class PlannerFactory(object):
         )
 
     @staticmethod
-    def __dispatch_dict(_class):
+    def __dispatch_dict(entity):
         return {
             PlannerTableEnum.AGENT: PlannerAgent,
             PlannerTableEnum.REGION: PlannerRegion
-        }.get(_class)
+        }.get(entity)

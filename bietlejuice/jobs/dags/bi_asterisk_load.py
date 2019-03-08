@@ -21,7 +21,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 # functions
 def data_existence_check(class_, bucket_type, **kwargs):
     asterisk = AsteriskFactory.factory(
-        class_=class_,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -31,7 +31,7 @@ def data_existence_check(class_, bucket_type, **kwargs):
 
 def upsert_partition(class_, bucket_type, **kwargs):
     asterisk = AsteriskFactory.factory(
-        class_=class_,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -45,7 +45,7 @@ def upsert_partition(class_, bucket_type, **kwargs):
 
 def exec_factory_method(class_, method, **kwargs):
     asterisk = AsteriskFactory.factory(
-        class_=class_,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )

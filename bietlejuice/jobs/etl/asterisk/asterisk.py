@@ -46,15 +46,17 @@ class Asterisk(object):
     @logger
     def _data_existence_check_partitioned(self, bucket_type, class_):
         file_path = '{}/asterisk/{}/dt={}/data.gz'.format(bucket_type, class_.value, self.partition_date)
-        return self.__data_existence_check(file_path)
+        return self.__data_existence_check(bucket_type, file_path)
 
     @logger
     def _data_existence_check_full(self, bucket_type, class_):
         file_path = '{}/asterisk/{}/data.gz'.format(bucket_type, class_.value)
-        return self.__data_existence_check(file_path)
+        return self.__data_existence_check(bucket_type, file_path)
 
     @logger
-    def __data_existence_check(self, file_path):
+    def __data_existence_check(self, bucket_type, file_path):
+        if bucket_type not in ('raw', 'clean'):
+            raise ValueError(('m=__data_existence_check, bucket_type={}, msg=invalid bucket type'.format(bucket_type)))
         try:
             self.s3_resource.Object(self.s3_bucket, file_path).load()
         except ClientError as e:

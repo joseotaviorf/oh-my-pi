@@ -20,7 +20,7 @@ class TestAsteriskCXPanelUsers(object):
     def test_data_existence_check(self, mock_data_existence, asterisk_cx_panel_users):
         # arrange
         class_ = AsteriskTableEnum.CXPANEL_USERS
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
 
         # act
         asterisk_cx_panel_users.data_existence_check(bucket_type)

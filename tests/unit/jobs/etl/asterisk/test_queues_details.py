@@ -20,7 +20,7 @@ class TestAsteriskQueuesDetails(object):
     def test_data_existence_check(self, mock_data_existence, asterisk_queues_details):
         # arrange
         class_ = AsteriskTableEnum.QUEUES_DETAILS
-        bucket_type = 'raw'
+        bucket_type = mock.ANY
 
         # act
         asterisk_queues_details.data_existence_check(bucket_type)
