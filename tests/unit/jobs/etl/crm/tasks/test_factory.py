@@ -1,12 +1,11 @@
-from datetime import datetime
-
 import mock
 import pytest
+from datetime import datetime
 from mock import Mock
 
 from bietlejuice.jobs.etl.crm.tasks import CRMTasksTableEnum, CRMTasksUngroupedManual, CRMTasksRepair, CRMTasksPhotoJob, \
     CRMTasksClosing, CRMTasksCredit, CRMTasksInspection, CRMTasksLead, CRMTasksVisit, CRMTasksOnboardingTenant, \
-    CRMTasksPayment, CRMTasksOffboarding, CRMTasksFactory
+    CRMTasksPayment, CRMTasksOffboarding, CRMTasksFactory, CRMTasksChatLinhaDireta
 
 
 class TestCRMTasksFactory(object):
@@ -21,7 +20,8 @@ class TestCRMTasksFactory(object):
                               (CRMTasksTableEnum.VISIT, CRMTasksVisit),
                               (CRMTasksTableEnum.ONBOARDING_TENANT, CRMTasksOnboardingTenant),
                               (CRMTasksTableEnum.PAYMENT, CRMTasksPayment),
-                              (CRMTasksTableEnum.OFFBOARDING, CRMTasksOffboarding)])
+                              (CRMTasksTableEnum.OFFBOARDING, CRMTasksOffboarding),
+                              (CRMTasksTableEnum.LINHADIRETA_CHAT, CRMTasksChatLinhaDireta)])
     def test__dispatch_dict(self, factory, class_, expected):
         # act
         result = factory._dispatch_dict(class_=class_)
@@ -41,7 +41,8 @@ class TestCRMTasksFactory(object):
                               (CRMTasksTableEnum.VISIT, CRMTasksVisit),
                               (CRMTasksTableEnum.ONBOARDING_TENANT, CRMTasksOnboardingTenant),
                               (CRMTasksTableEnum.PAYMENT, CRMTasksPayment),
-                              (CRMTasksTableEnum.OFFBOARDING, CRMTasksOffboarding)])
+                              (CRMTasksTableEnum.OFFBOARDING, CRMTasksOffboarding),
+                              (CRMTasksTableEnum.LINHADIRETA_CHAT, CRMTasksChatLinhaDireta)])
     def test_factory(self, mock__dispatch_dict, factory, class_, expected):
         # arrange
         mock__dispatch_dict.return_value = Mock(class_)

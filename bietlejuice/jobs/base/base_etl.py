@@ -8,8 +8,10 @@ import re
 import sys
 import zipfile
 from decimal import Decimal
+from functools import partial
 from io import BytesIO
 from logging import info as log
+from StringIO import StringIO
 
 import boto3
 import petl
@@ -459,6 +461,20 @@ class BaseETL(object):
             sys.stdout.flush()
             return None
         return bucket_folder_path, filename
+
+    def json_to_s3(self, dict_list, s3_bucket, s3_key):
+        json_list = map(partial(json.dumps, ensure_ascii=False), dict_list)
+        json_lines = u'\n'.join(json_list).encode('utf-8')
+
+        body = StringIO()
+        with gzip.GzipFile(fileobj=body, mode='wt') as gz_file:
+            gz_file.write(json_lines)
+
+        self.obj_to_s3(
+            obj_io=body,
+            bucket=s3_bucket,
+            file_path=s3_key
+        )
 
     @classmethod
     def obj_to_s3(cls, obj_io, bucket, file_path):

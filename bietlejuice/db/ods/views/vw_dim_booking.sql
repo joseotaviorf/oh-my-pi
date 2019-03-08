@@ -10,19 +10,20 @@ with bms as (
 ),
 taxonomy_demand as (
 	 select
+	    cast(td.id as bigint) as id,
 		td.app_type,
 		td.utm_source,
 		td.utm_medium,
 		td.branded,
 		td.first_update_source,
 		td.flg_via_reschedule::boolean,
-		td."Category" as mkt_category,
-		td."Flow" as mkt_flow,
-		td."Completion" as mkt_completion,
-		td."Channel" as mkt_channel,
-		td."Medium" as mkt_medium,
-		td."Source" as mkt_source,
-		td."Platform" as mkt_platform
+		td.Category as mkt_category,
+		td.Flow as mkt_flow,
+		td.Completion as mkt_completion,
+		td.Channel as mkt_channel,
+		td.Medium as mkt_medium,
+		td.Source as mkt_source,
+		td.Platform as mkt_platform
     from
         files.taxonomy_demand td
 ),
@@ -84,6 +85,8 @@ bookings as
 		sources.utm_source,
 		sources.utm_medium,
 		sources.utm_campaign,
+		sources.utm_content,
+		sources.utm_term,
 		s.visitor_arrived,
         s.visitor_missing_reason,
         s.agent_arrived,
@@ -149,6 +152,8 @@ select
   	b.utm_source,
   	b.utm_medium,
   	b.utm_campaign,
+  	b.utm_content,
+  	b.utm_term,
 	b.cancel_timestamp,
 	b.dt_created,
 	b.dt_updated,
@@ -166,6 +171,7 @@ select
     b.checkin_status,
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
+    case when td.mkt_flow is null then -1 else td.id end as sk_rent_flow_taxonomy,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
@@ -177,9 +183,9 @@ from
 	bookings b
 left join taxonomy_demand td
 on
-    coalesce(td.app_type,'') = coalesce(b.app_type,'')
-	and coalesce(td.utm_source,'') = coalesce(b.utm_source,'')
-	and coalesce(td.utm_medium,'') = coalesce(b.utm_medium,'')
-	and coalesce(td.branded,'') = coalesce(b.branded,'')
-	and coalesce(td.first_update_source,'') = coalesce(b.first_update_source,'')
+    lower(coalesce(td.app_type,'')) = lower(coalesce(b.app_type,''))
+	and lower(coalesce(td.utm_source,'')) = lower(coalesce(b.utm_source,''))
+	and lower(coalesce(td.utm_medium,'')) = lower(coalesce(b.utm_medium,''))
+	and lower(coalesce(td.branded,'')) = lower(coalesce(b.branded,''))
+	and lower(coalesce(td.first_update_source,'')) = lower(coalesce(b.first_update_source,''))
 	and coalesce(td.flg_via_reschedule,false) = coalesce(b.flg_via_reschedule,false)
