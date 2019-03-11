@@ -41,9 +41,7 @@ class GithubPullRequests(GithubService):
     def __init__(self, auth_token, repo_name):
         super(GithubPullRequests, self).__init__(auth_token)
         self.repo_name = repo_name
-        self.graphql_query = {
-            'query': GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)
-        }
+        self.graphql_query = GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)
 
     @logger
     def extract_pull_requests(self):
@@ -83,3 +81,11 @@ class GithubPullRequests(GithubService):
                 open_prs.append(pr_append)
 
         return open_prs, approved_prs
+
+
+github_pull_requests = GithubPullRequests(
+    auth_token='74f5d3c01aaa90659cebd69584ec4f9165fa6d5d',
+    repo_name='bi-etl-ejuice'
+)
+
+github_pull_requests.extract_pull_requests()

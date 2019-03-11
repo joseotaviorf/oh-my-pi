@@ -10,7 +10,12 @@ class GithubService(object):
     def __init__(self, auth_token):
         self.auth_token = auth_token
 
+    @logger(exclude='graphql_query')
     def get_json_response(self, graphql_query):
+        if not isinstance(graphql_query, str):
+            raise RuntimeError('m=get_json_response, graphql_query_type={}, msg=graphql query must be a string'.format(
+                type(graphql_query)))
+
         github_response = requests.post(
             url=GithubService.GITHUB_GRAPHQL_ENDPOINT,
             headers={'Authorization': 'bearer {}'.format(self.auth_token)},
