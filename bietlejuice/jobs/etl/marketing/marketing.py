@@ -23,7 +23,13 @@ class Marketing(object):
         'dim_google_campaign': 'sk_campaign',
         'fact_google_daily_cost_attributions': 'sk_keyword || sk_ad',
         'dim_facebook_ad': 'sk_ad',
-        'fact_facebook_daily_cost_attributions': 'sk_ad'
+        'fact_facebook_daily_cost_attributions': 'sk_ad',
+        'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
+        'dim_criteo_campaign': 'sk_criteo_campaign',
+        'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
+        'dim_rtb_campaign': 'sk_rtb_campaign',
+        'dim_classified': 'sk_classified',
+        'fact_daily_classifieds_costs': 'sk_classified'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -65,6 +71,12 @@ class Marketing(object):
             query=query.format(date=self.partition_date, account=self.account),
             raw_columns=r_cols,
             clean_columns=c_cols
+        )
+
+        self.athena_client.add_partition(
+            database='datalake_clean',
+            table_name=table_name,
+            partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
 
     @logger(exclude=['table_schema', 'accounts'])
@@ -111,7 +123,7 @@ class Marketing(object):
         )
 
     @logger(exclude="staging_query")
-    def _load_to_staging(self, dw_table_name, staging_query):
+    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))

@@ -2,13 +2,8 @@
 
 import boto3
 import json
-import os
-import tarfile
-from datetime import datetime, timedelta
-from io import BytesIO
-
-import boto3
 import kubernetes.client as kube
+import os
 import sagemaker
 import tarfile
 from airflow.models import DAG

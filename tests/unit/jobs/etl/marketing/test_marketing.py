@@ -23,7 +23,7 @@ class TestMarketing(object):
         ])
         expect_key = 'clean/marketing/integration/table/acc=account/dt_created=2018-01-01/2018-01-01.parquet'
         expect_query_path = '/marketing/integration/raw_to_clean/sql'
-        expect_dt_partition = "dt='2018-01-01', acc='account'"
+        expect_dt_partition = "dt_created='2018-01-01', acc='account'"
 
         # act
         mkt_acc_integration._move_to_clean(table_name, sql_file_name, r_cols)
@@ -32,7 +32,7 @@ class TestMarketing(object):
         assert expect_query_path in mock_get_query_from_file_name.call_args[0][0]
         assert mock_get_query_from_file_name.call_count == 1
         assert mock_add_partition.call_args[1]['partition'] == expect_dt_partition
-        assert mock_add_partition.call_count == 1
+        assert mock_add_partition.call_count == 2
         assert mock_create_parquet_from_query.call_args[1]['key'] == expect_key
         assert mock_create_parquet_from_query.call_count == 1
 

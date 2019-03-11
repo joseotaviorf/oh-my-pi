@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG

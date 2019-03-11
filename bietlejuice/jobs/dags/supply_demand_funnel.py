@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
-
 import airflow.utils.helpers as airflow_helpers
+from datetime import datetime, timedelta
+from qa_python_utils import QuintoAndarLogger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -11,7 +12,6 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 

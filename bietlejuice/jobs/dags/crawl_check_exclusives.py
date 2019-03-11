@@ -1,8 +1,8 @@
 import cStringIO
-import json
-from datetime import datetime
 
+import json
 from airflow.models import DAG
+from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
