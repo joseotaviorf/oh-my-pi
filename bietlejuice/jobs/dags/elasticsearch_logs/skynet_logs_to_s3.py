@@ -19,6 +19,7 @@ def skynet_logs_to_s3(**kwargs):
     )
     step_size = kwargs.get('step_size', 1000)
     max_size = kwargs.get('max_size')
+    scroll = kwargs.get('scroll', '5m')
 
     # build base s3 key
     base_key = (
@@ -27,7 +28,7 @@ def skynet_logs_to_s3(**kwargs):
         'model={model_name}/' +
         'logging_level={logging_level}/' +
         'dt={dt}/' +
-        '{filename}.gzip'
+        '{filename}.gz'
     )
 
     es_extractor = SkynetModelLogsFetcher(
@@ -43,25 +44,23 @@ def skynet_logs_to_s3(**kwargs):
             date_=execution_date,
             message_level=level_name,
             step_size=step_size,
-            max_size=max_size
+            max_size=max_size,
+            scroll=scroll
         )
 
-        logs = []
         for page, log in enumerate(logs_paginator):
-            logs += log['hits']['hits']
-
             key = base_key.format(
                 model_name=model_name,
                 dt=execution_date.strftime('%Y-%m-%d'),
                 logging_level=level_name,
-                filename=page
+                filename='search_page_{}'.format(str(page).zfill(5))
             )
 
             logger.info(
                 'm=skynet_logs_to_s3, msg=writing file {}'.format(key))
 
             BaseETL().json_to_s3(
-                dict_list=logs,
+                dict_list=log['hits']['hits'],
                 s3_bucket='5a-datalake',
                 s3_key=key
             )
