@@ -81,11 +81,3 @@ class GithubPullRequests(GithubService):
                 open_prs.append(pr_append)
 
         return open_prs, approved_prs
-
-
-github_pull_requests = GithubPullRequests(
-    auth_token='74f5d3c01aaa90659cebd69584ec4f9165fa6d5d',
-    repo_name='bi-etl-ejuice'
-)
-
-github_pull_requests.extract_pull_requests()
