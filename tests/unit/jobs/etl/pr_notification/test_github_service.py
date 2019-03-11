@@ -14,9 +14,9 @@ class TestGithubService(object):
             github_service.get_json_response(graphql_query)
 
     @mock.patch.object(requests, 'post')
-    def test_get_json_response(self, mock_requests_post, github_service):
+    @pytest.mark.parametrize('graphql_query', ['graphql_query', u'graphql_query'])
+    def test_get_json_response(self, mock_requests_post, github_service, graphql_query):
         # arrange
-        graphql_query = 'graphql_query'
         graphql_post = {
             'url': mock.ANY,
             'headers': {'Authorization': 'bearer {}'.format(mock.ANY)},

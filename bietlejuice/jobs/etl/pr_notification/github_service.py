@@ -12,7 +12,7 @@ class GithubService(object):
 
     @logger(exclude='graphql_query')
     def get_json_response(self, graphql_query):
-        if not isinstance(graphql_query, str):
+        if not isinstance(graphql_query, (str, unicode)):
             raise RuntimeError('m=get_json_response, graphql_query_type={}, msg=graphql query must be a string'.format(
                 type(graphql_query)))
 
