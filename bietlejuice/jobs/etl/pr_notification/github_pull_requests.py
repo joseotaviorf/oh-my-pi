@@ -41,9 +41,7 @@ class GithubPullRequests(GithubService):
     def __init__(self, auth_token, repo_name):
         super(GithubPullRequests, self).__init__(auth_token)
         self.repo_name = repo_name
-        self.graphql_query = {
-            'query': GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)
-        }
+        self.graphql_query = GithubPullRequests.PULL_REQUESTS_QUERY['query'].replace('__REPO_NAME__', repo_name)
 
     @logger
     def extract_pull_requests(self):

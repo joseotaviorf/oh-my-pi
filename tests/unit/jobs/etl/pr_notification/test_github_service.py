@@ -5,10 +5,18 @@ from conftest import pytest, mock
 
 class TestGithubService(object):
 
+    def test_get_json_response_with_invalid_graphql_query_type(self, github_service):
+        # arrange
+        graphql_query = mock.ANY
+
+        # act & assert
+        with pytest.raises(RuntimeError):
+            github_service.get_json_response(graphql_query)
+
     @mock.patch.object(requests, 'post')
     def test_get_json_response(self, mock_requests_post, github_service):
         # arrange
-        graphql_query = mock.ANY
+        graphql_query = 'graphql_query'
         graphql_post = {
             'url': mock.ANY,
             'headers': {'Authorization': 'bearer {}'.format(mock.ANY)},
