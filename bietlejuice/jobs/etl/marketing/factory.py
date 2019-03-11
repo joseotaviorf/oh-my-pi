@@ -13,12 +13,11 @@ logger = QuintoAndarLogger("MarketingFactory")
 class MarketingFactory(object):
 
     @staticmethod
-    def factory(class_, s3_bucket, execution_date, auth=None, account=None):
+    def factory(class_, s3_bucket, execution_date, account=None):
+        class__ = MarketingFactory.__dispatch_dict(class_)
         if class_ is None:
             raise TypeError('m=factory, _class={}, msg=class type not found'.format(class_))
-
-        class__ = MarketingFactory.__dispatch_dict(class_)
-
+            
         return class__(
             s3_bucket=s3_bucket,
             execution_date=execution_date,

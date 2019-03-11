@@ -47,6 +47,7 @@ CREATE TABLE dim_booking (
   checkin_status varchar(255),
   flg_branded boolean,
   flg_via_reschedule boolean,
+  sk_rent_flow_taxonomy bigint,
   mkt_category varchar(255),
   mkt_flow varchar(255),
   mkt_completion varchar(255),

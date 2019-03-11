@@ -117,7 +117,11 @@ _fact as (
 	  now()::timestamp as ts_load,
     coalesce(rs.id, -1) as sk_reservation,
     coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
-    rs.reservation_attempts as reservation_attempts
+    rs.reservation_attempts as reservation_attempts,
+    vdb.sk_rent_flow_taxonomy,
+    vdb.utm_campaign as booking_utm_campaign,
+    vdb.utm_content as booking_utm_content,
+  	vdb.utm_term as booking_utm_term
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -142,11 +146,13 @@ _fact as (
     on hrf.id_contract = c.id_contract
   left join agent_review ar
     on hrf.id_booking = ar.id_booking
- left join _reservation rs
+  left join _reservation rs
     on hrf.id_house = rs.id_house
         and hrf.id_client = id_tenant
         and vdo.status = 'Aprovada'
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
+  left join vw_dim_booking vdb
+    on vdb.sk_booking = hrf.id_booking
 )
 select
   ods_id,
@@ -194,6 +200,10 @@ select
   visit_created_type,
   flg_visit_last_updated_from_app,
   visit_last_updated_type,
+  sk_rent_flow_taxonomy,
+  booking_utm_campaign,
+  booking_utm_content,
+  booking_utm_term,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +
 		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_visit,
