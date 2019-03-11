@@ -71,4 +71,5 @@ send_adjust_search_offline_conversions_data_task = SFTPOperator(
     dag=main_dag
 )
 
+#flow
 execute_adjust_search_offline_conversions_query_task >> send_adjust_search_offline_conversions_data_task
