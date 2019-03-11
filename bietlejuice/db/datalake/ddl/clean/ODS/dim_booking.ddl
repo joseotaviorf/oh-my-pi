@@ -46,6 +46,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   checkin_status string,
   flg_branded string,
   flg_via_reschedule string,
+  sk_rent_flow_taxonomy string,
   mkt_category string,
   mkt_flow string,
   mkt_completion string,
