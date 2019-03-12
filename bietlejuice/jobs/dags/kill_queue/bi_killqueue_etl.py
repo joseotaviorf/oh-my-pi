@@ -20,8 +20,8 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 
 def run_factory_method(table, method):
-    kill_queue_obj = KillQueueFactory.get_object(
-        table=table,
+    kill_queue_obj = KillQueueFactory.factory(
+        entity=table,
         s3_bucket=s3_bucket
     )
     getattr(kill_queue_obj, method)()

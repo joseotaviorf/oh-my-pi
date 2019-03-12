@@ -1,15 +1,10 @@
 import pytest
 
 from bietlejuice.jobs.etl.kill_queue import KillQueue
-from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueHouse, KillQueueRentFlow, KillQueueReservation, \
+from bietlejuice.jobs.etl.kill_queue import KillQueueHouse, KillQueueRentFlow, KillQueueReservation, \
     KillQueueReservationAud
 
 S3_BUCKET = 's3-bucket'
-
-
-@pytest.fixture(scope='session')
-def factory():
-    return KillQueueFactory()
 
 
 @pytest.fixture(scope='session')
