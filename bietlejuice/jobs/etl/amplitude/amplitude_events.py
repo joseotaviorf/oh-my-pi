@@ -299,6 +299,7 @@ class AmplitudeEventsETL(BaseETL):
     def move_active_user_sessions_to_clean(self, df, execution_date):
         r_cols = OrderedDict([
             ('event_date', str),
+            ('server_upload_time', str),
             ('amplitude_id', str),
             ('session_id', str),
             ('city', str),
@@ -328,8 +329,9 @@ class AmplitudeEventsETL(BaseETL):
             key = 'clean/amplitude/active_user_sessions/app={0}/ym={1}/{2}.parq'.format(df_group[0],
                                                                                         ym, exec_date)
 
-            logger.info('m=move_active_user_sessions_to_clean, app={}, ym={}, filename={}.parq'.format(df_group[0], ym,
-                                                                                                       exec_date))
+            logger.info('m=move_active_user_sessions_to_clean, app={}, ym={}, filename={}.parq'.format(
+                df_group[0], ym,
+                exec_date))
 
             filtered_df = df[df['app'] == df_group[0]]
             filtered_df = filtered_df.drop(['app'], axis=1)
@@ -337,7 +339,8 @@ class AmplitudeEventsETL(BaseETL):
                                                  clean_columns=c_cols)
 
             logger.info(
-                'm=move_active_user_sessions_to_clean, app={}, ym={}, msg=adding partition'.format(df_group[0], ym))
+                'm=move_active_user_sessions_to_clean, app={}, ym={}, msg=adding partition'.format(
+                    df_group[0], ym))
             add_partition_clean_query = self.__format_query_filename('add_partition_amplitude_active_user_sessions')
             athena_client.execute_file_query(
                 filename=add_partition_clean_query,

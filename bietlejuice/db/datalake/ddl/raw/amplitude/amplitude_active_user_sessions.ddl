@@ -2,6 +2,7 @@ drop table datalake_raw.amplitude_active_user_sessions;
 
 CREATE EXTERNAL TABLE datalake_raw.amplitude_active_user_sessions (
   event_date string,
+  server_upload_time string,
   session_start_ts string,
   amplitude_id string,
   session_id string,

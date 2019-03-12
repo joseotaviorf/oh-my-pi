@@ -1,6 +1,7 @@
 with t_dau as (
 select
 	aaus.event_date,
+	aaus.server_upload_time,
 	aaus.amplitude_id,
 	aaus.session_id,
 	aaus.city,
@@ -19,7 +20,7 @@ select
 		when aaus.app = '183047' then 'supply'
 	end as app
 from datalake_raw.amplitude_active_user_sessions aaus
-where try(date(event_date)) = date('{dt}')
+where try(date(server_upload_time)) = date('{dt}')
 	and nullif(aaus.app,'') is not null
 	and trim(aaus.country) = 'Brazil'
 )
@@ -27,6 +28,7 @@ select
     distinct
     dau.app,
 	dau.event_date,
+	dau.server_upload_time,
 	dau.amplitude_id,
 	dau.session_id,
 	dau.city,
