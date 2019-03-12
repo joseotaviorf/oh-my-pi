@@ -47,10 +47,7 @@ select
       af.email as photographer_email,
       df.criadoEm as dt_photographer_start,
       f.tipoContrato as photographer_contract_type,
-      case
-        when f.problema is not null then f.problema
-        else f.problema
-      end as job_problem_reason,
+      f.problema as job_problem_reason,
       ure.motivo as cancel_reason,
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
