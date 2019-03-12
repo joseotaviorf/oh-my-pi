@@ -18,9 +18,9 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6,7,8 * * *')
 
 
 # functions
-def extract_and_load_data(_class, **kwargs):
+def extract_and_load_data(class_, **kwargs):
     planner = PlannerFactory.factory(
-        entity=_class,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -31,9 +31,9 @@ def extract_and_load_data(_class, **kwargs):
         planner.save_into_s3_raw(_json=_data, id_class=_id)
 
 
-def exec_class_method(_class, method, **kwargs):
+def exec_class_method(class_, method, **kwargs):
     planner = PlannerFactory.factory(
-        entity=_class,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -73,7 +73,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class']
+            'class_': kwargs['class_']
         }
     )
 
@@ -83,7 +83,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'upsert_single_raw_partition'
         }
     )
@@ -94,7 +94,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'move_to_clean'
         }
     )
@@ -105,7 +105,7 @@ def class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'upsert_single_clean_partition'
         }
     )
@@ -125,7 +125,7 @@ region_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name=PlannerTableEnum.REGION.value,
     sub_dag_func=class_sub_dag,
-    _class=PlannerTableEnum.REGION
+    class_=PlannerTableEnum.REGION
 )
 
 # flow

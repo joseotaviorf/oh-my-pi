@@ -19,11 +19,11 @@ class AsteriskCDR(Asterisk):
 
     @logger
     def extract_and_load_data(self):
-        self._extract_and_load_data_partitioned(_class=AsteriskCDR.CLASS_ENUM)
+        self._extract_and_load_data_partitioned(class_=AsteriskCDR.CLASS_ENUM)
 
     @logger
     def data_existence_check(self, bucket_type):
-        return self._data_existence_check_partitioned(bucket_type=bucket_type, _class=AsteriskCDR.CLASS_ENUM)
+        return self._data_existence_check_partitioned(bucket_type=bucket_type, class_=AsteriskCDR.CLASS_ENUM)
 
     @logger
     def move_to_clean(self):
@@ -80,7 +80,7 @@ class AsteriskCDR(Asterisk):
         ])
 
         self._move_to_clean_partitioned(
-            _class=AsteriskCDR.CLASS_ENUM,
+            class_=AsteriskCDR.CLASS_ENUM,
             r_cols=r_cols,
             c_cols=c_cols
         )
