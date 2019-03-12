@@ -49,8 +49,6 @@ select
       f.tipoContrato as photographer_contract_type,
       case
         when f.problema is not null then f.problema
-        when ure.motivo like 'Cancelada pelo proprie%' then 'ProprietarioCancelou'
-        when ure.motivo like 'Outro' then 'Outros'
         else f.problema
       end as job_problem_reason,
       ure.motivo as cancel_reason,
