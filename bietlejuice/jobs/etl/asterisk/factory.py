@@ -20,12 +20,11 @@ class AsteriskFactory(object):
         if entity is None:
             raise ValueError('m=factory, class_={}, msg=entity cannot be None')
         class_ = AsteriskFactory.__dispatch_dict(entity)
-        if class_:
-            return class_(
-                s3_bucket=s3_bucket,
-                execution_date=execution_date)
-        else:
+        if not class_:
             raise RuntimeError('m=factory, entity={}, msg=class type for entity not found'.format(entity))
+        return class_(
+            s3_bucket=s3_bucket,
+            execution_date=execution_date)
 
     @staticmethod
     def __dispatch_dict(entity):
