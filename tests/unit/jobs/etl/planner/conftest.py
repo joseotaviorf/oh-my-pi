@@ -1,6 +1,5 @@
-from datetime import datetime
-
 import pytest
+from datetime import datetime
 
 from bietlejuice.jobs.etl.planner import Planner, PlannerAgent, PlannerRegion
 

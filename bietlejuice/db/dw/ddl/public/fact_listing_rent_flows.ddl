@@ -46,6 +46,7 @@ create table fact_listing_rent_flows(
   flg_visit_last_updated_from_app      integer,
   visit_last_updated_type              varchar(14),
   sk_rent_flow_taxonomy                bigint,
+  booking_utm_campaign                 varchar(255),
   booking_utm_content                  varchar(255),
   booking_utm_term                     varchar(255),
   days_booking_to_visit                numeric(14, 2),
