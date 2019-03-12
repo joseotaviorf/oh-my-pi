@@ -73,3 +73,4 @@ xlrd # lib to process xls files in s3 - old_etl
 xmltodict==0.10.2
 snakebite==2.11.0
 rtbhouse-sdk==3.3.5
+sshtunnel==0.1.4
