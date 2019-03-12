@@ -1,10 +1,9 @@
 import json
+import pandas as pd
 import re
+from airflow.models import DAG
 from collections import OrderedDict
 from datetime import datetime, timedelta
-
-import pandas as pd
-from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 

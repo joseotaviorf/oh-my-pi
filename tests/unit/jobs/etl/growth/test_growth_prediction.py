@@ -1,4 +1,5 @@
 import mock
+
 from bietlejuice.jobs.etl.growth import GrowthPrediction
 
 

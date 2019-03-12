@@ -1,7 +1,6 @@
 import json
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 

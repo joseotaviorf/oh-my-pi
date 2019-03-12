@@ -1,10 +1,9 @@
 # coding=utf-8
 
-import re
-
 import googlemaps
 import numpy as np
 import pandas as pd
+import re
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from shapely import wkt

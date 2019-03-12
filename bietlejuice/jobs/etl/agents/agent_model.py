@@ -1,12 +1,12 @@
+import petl
 import re
 from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
-import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
 from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 logger = QuintoAndarLogger('Agent')
 
