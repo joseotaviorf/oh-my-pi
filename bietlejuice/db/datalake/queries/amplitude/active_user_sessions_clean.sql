@@ -1,27 +1,27 @@
 with t_dau as (
 select
-	adau.event_date,
-	adau.amplitude_id,
-	adau.session_id,
-	adau.city,
-	adau.region,
-	adau.platform,
-	adau.utm_source,
-	adau.utm_medium,
-	adau.utm_campaign,
-	case when lower(adau.utm_campaign) like '%branded%' then 'Branded'
-		 when lower(adau.utm_campaign) like '%institucional%' then 'Branded'
+	aaus.event_date,
+	aaus.amplitude_id,
+	aaus.session_id,
+	aaus.city,
+	aaus.region,
+	aaus.platform,
+	aaus.utm_source,
+	aaus.utm_medium,
+	aaus.utm_campaign,
+	case when lower(aaus.utm_campaign) like '%branded%' then 'Branded'
+		 when lower(aaus.utm_campaign) like '%institucional%' then 'Branded'
 		 else 'Outro' end as branded,
-	adau.utm_content,
-	adau.utm_term,
+	aaus.utm_content,
+	aaus.utm_term,
 	case
-		when adau.app = '170698' then 'demand'
-		when adau.app = '183047' then 'supply'
+		when aaus.app = '170698' then 'demand'
+		when aaus.app = '183047' then 'supply'
 	end as app
-from datalake_raw.amplitude_daily_active_users adau
+from datalake_raw.amplitude_active_user_sessions aaus
 where try(date(event_date)) = date('{dt}')
-	and nullif(adau.app,'') is not null
-	and trim(adau.country) = 'Brazil'
+	and nullif(aaus.app,'') is not null
+	and trim(aaus.country) = 'Brazil'
 )
 select
     distinct

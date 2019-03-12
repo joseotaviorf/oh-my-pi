@@ -1,6 +1,6 @@
-drop table datalake_raw.amplitude_daily_active_users;
+drop table datalake_raw.amplitude_active_user_sessions;
 
-CREATE EXTERNAL TABLE datalake_raw.amplitude_daily_active_users (
+CREATE EXTERNAL TABLE datalake_raw.amplitude_active_user_sessions (
   event_date string,
   session_start_ts string,
   amplitude_id string,
@@ -21,6 +21,6 @@ with serdeproperties (
   'quoteChar' = '\"'
 )
 LOCATION
-  's3://5a-datalake/raw/amplitude/daily_active_users/'
+  's3://5a-datalake/raw/amplitude/active_user_sessions/'
 TBLPROPERTIES (
   'skip.header.line.count'='1')

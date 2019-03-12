@@ -51,12 +51,12 @@ def athena_execute_file_query_and_wait_for_results(**kwargs):
     BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=filename)
 
 
-def load_daily_active_users_clean(**kwargs):
+def load_active_user_sessions_clean(**kwargs):
     execution_date = kwargs['execution_date']
 
     amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
-    df = amplitude_etl.get_daily_active_users_treated(execution_date=execution_date)
-    amplitude_etl.move_daily_active_users_to_clean(df=df, execution_date=execution_date)
+    df = amplitude_etl.get_active_user_sessions_treated(execution_date=execution_date)
+    amplitude_etl.move_active_user_sessions_to_clean(df=df, execution_date=execution_date)
 
 
 dag = DAG(
@@ -93,26 +93,25 @@ xcom_amplitude_load_events_task = BaseDAG.build_python_operator(
     provide_context=True
 )
 
-load_daily_active_users_raw_task = BaseDAG.build_python_operator(
+load_active_user_sessions_raw_task = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='load_daily_active_users_raw',
+    task_id='load_active_user_sessions_raw',
     provide_context=True,
     python_callable=athena_execute_file_query_and_wait_for_results,
-    op_kwargs={'filename': 'amplitude/daily_active_users_raw.sql',
-               'bucket_folder_path': 'raw/amplitude/daily_active_users'}
+    op_kwargs={'filename': 'amplitude/active_user_sessions_raw.sql',
+               'bucket_folder_path': 'raw/amplitude/active_user_sessions'}
 
 )
 
-load_daily_active_users_clean_task = BaseDAG.build_python_operator(
+load_active_user_sessions_clean_task = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='load_daily_active_users_clean',
+    task_id='load_active_user_sessions_clean',
     provide_context=True,
-    python_callable=load_daily_active_users_clean
+    python_callable=load_active_user_sessions_clean
 )
 
 airflow_helpers.chain(load_events_to_raw_task,
-                      load_events_to_clean_task)
-load_events_to_clean_task.set_downstream([xcom_amplitude_load_events_task,
-                                          load_daily_active_users_raw_task])
-
-airflow_helpers.chain(load_daily_active_users_raw_task, load_daily_active_users_clean_task)
+                      load_events_to_clean_task,
+                      load_active_user_sessions_raw_task,
+                      load_active_user_sessions_clean_task,
+                      xcom_amplitude_load_events_task)

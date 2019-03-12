@@ -1,6 +1,6 @@
-drop table datalake_clean.amplitude_daily_active_users;
+drop table datalake_clean.amplitude_active_user_sessions;
 
-CREATE EXTERNAL TABLE datalake_clean.amplitude_daily_active_users(
+CREATE EXTERNAL TABLE datalake_clean.amplitude_active_user_sessions (
   event_date string,
   amplitude_id string,
   session_id string,
@@ -23,6 +23,6 @@ partitioned by (
   app string, 
   ym string)
 stored as parquet
-location 's3://5a-datalake/clean/amplitude/daily_active_users/';
+location 's3://5a-datalake/clean/amplitude/active_user_sessions/';
 
-msck repair table datalake_clean.amplitude_daily_active_users;
+msck repair table datalake_clean.amplitude_active_user_sessions;
