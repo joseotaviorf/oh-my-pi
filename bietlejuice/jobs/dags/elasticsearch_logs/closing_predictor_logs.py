@@ -3,8 +3,8 @@ from airflow.models import DAG
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.elasticsearch_logs import skynet_logs_to_s3
+from bietlejuice.jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'closing-predictor-logs'
 MAIN_START_DATE = datetime(2019, 2, 26)

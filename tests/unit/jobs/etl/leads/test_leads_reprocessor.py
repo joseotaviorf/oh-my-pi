@@ -1,9 +1,9 @@
 import decimal
-import time
-
 import mock
 import pandas as pd
 import pytest
+import time
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl.leads.leads_reprocessor import LeadsReprocessor
 from bietlejuice.jobs.etl.leads.leads_reprocessor import decimal_default

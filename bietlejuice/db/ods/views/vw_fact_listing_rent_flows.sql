@@ -119,8 +119,9 @@ _fact as (
     coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
     rs.reservation_attempts as reservation_attempts,
     vdb.sk_rent_flow_taxonomy,
-    vdb.booking_utm_content,
-  	vdb.booking_utm_term
+    vdb.utm_campaign as booking_utm_campaign,
+    vdb.utm_content as booking_utm_content,
+  	vdb.utm_term as booking_utm_term
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -200,6 +201,7 @@ select
   flg_visit_last_updated_from_app,
   visit_last_updated_type,
   sk_rent_flow_taxonomy,
+  booking_utm_campaign,
   booking_utm_content,
   booking_utm_term,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +

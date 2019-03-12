@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import mock
 import pytest
+from datetime import datetime
 
 from bietlejuice.jobs.etl.planner import PlannerAgent, PlannerFactory, PlannerRegion, PlannerTableEnum
 
