@@ -1,5 +1,5 @@
-drop table if exists sortinghat.proposalversion;
-create table sortinghat.proposalversion (
+drop table if exists sortinghat.proposal_version;
+create table sortinghat.proposal_version (
   id bigint not null,
   proposal_id bigint not null,
   imovel_id bigint,
