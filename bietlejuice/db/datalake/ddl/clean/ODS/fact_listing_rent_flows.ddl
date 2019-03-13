@@ -50,7 +50,7 @@ create external table datalake_clean.ods_fact_listing_rent_flows (
   booking_utm_content string,
   booking_utm_term string,
   days_booking_created_to_visit string,
-  days_user_created_to_visit,
+  days_user_created_to_visit string,
   days_offer_submitted_to_internal_analysis string,
   days_offer_approved_to_doc_first_sent string,
   days_offer_approved_to_owner_doc_sent string,
