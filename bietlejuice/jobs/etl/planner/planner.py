@@ -1,11 +1,10 @@
+import boto3
 import json
+import requests
 from abc import abstractmethod
 from datetime import timedelta
 from gzip import GzipFile
 from io import BytesIO
-
-import boto3
-import requests
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 

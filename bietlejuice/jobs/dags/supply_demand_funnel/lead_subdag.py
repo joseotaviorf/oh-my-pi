@@ -1,12 +1,12 @@
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
+from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('LeadSubDag')
 
@@ -27,12 +27,13 @@ class LeadSubDag(DimSubDag):
     def build_lead_with_tests(self):
         lead_dag = self._build_local_dag()
 
-        ods_reprocessed_lead_task, ods_lead_score_factor_task, ods_lead_task, staging_dim_lead_task, \
-            dw_dim_lead_task = self.__build_data_tasks(lead_dag)
+        ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead_task, \
+            staging_dim_lead_task, dw_dim_lead_task = self.__build_data_tasks(lead_dag)
 
         tests_tasks = self.build_tests_tasks(lead_dag)
 
-        ods_lead_task.set_upstream([ods_lead_score_factor_task, ods_reprocessed_lead_task])
+        airflow_helpers.chain(ods_lead_origin_task, ods_lead_first_event_tracking_task)
+        ods_lead_task.set_upstream([ods_lead_first_event_tracking_task, ods_reprocessed_lead_task])
         airflow_helpers.chain(ods_lead_task, staging_dim_lead_task)
         staging_dim_lead_task.set_downstream(tests_tasks)
         dw_dim_lead_task.set_upstream(tests_tasks)
@@ -59,14 +60,24 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        ods_lead_score_factor_task = BaseDAG.build_python_operator(
+        ods_lead_origin_task = BaseDAG.build_python_operator(
+            task_id='ODS_lead_origin',
             dag=dag,
-            task_id='ODS_lead_score_factor',
             python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
-                'table_name': 'lead_score_factor',
-                'file_name': 'lead/lead_score_factor.sql',
+                'table_name': 'lead_origin',
+                'file_name': 'lead_origin.sql',
                 'bucket': DimSubDag.S3_BUCKET
+            }
+        )
+
+        ods_lead_first_event_tracking_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_lead_first_event_tracking_task',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': DimSubDag.S3_BUCKET,
+                'view_name': 'lead_first_event_tracking'
             }
         )
 
@@ -101,4 +112,5 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        return ods_reprocessed_lead_task, ods_lead_score_factor_task, ods_lead, staging_dim_lead_task, dw_dim_lead_task
+        return ods_reprocessed_lead_task, ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead, \
+            staging_dim_lead_task, dw_dim_lead_task

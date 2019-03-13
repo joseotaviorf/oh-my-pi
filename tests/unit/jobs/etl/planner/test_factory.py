@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import mock
 import pytest
+from datetime import datetime
 
 from bietlejuice.jobs.etl.planner import PlannerAgent, PlannerFactory, PlannerRegion, PlannerTableEnum
 
@@ -23,16 +22,6 @@ class TestPlannerFactory(object):
         # assert
         assert isinstance(result, expected)
 
-    def test_factory_with_table_none(self):
-        # arrange
-        table = None
-        s3_bucket = mock.ANY
-        execution_date = mock.ANY
-
-        # act
-        with pytest.raises(ValueError):
-            PlannerFactory.factory(table, s3_bucket, execution_date)
-
     def test_factory_with_invalid_table(self):
         # arrange
         table = mock.ANY
@@ -41,4 +30,14 @@ class TestPlannerFactory(object):
 
         # act
         with pytest.raises(RuntimeError):
+            PlannerFactory.factory(table, s3_bucket, execution_date)
+
+    def test_factory_with_none_table(self):
+        # arrange
+        table = None
+        s3_bucket = mock.ANY
+        execution_date = mock.ANY
+
+        # act
+        with pytest.raises(ValueError):
             PlannerFactory.factory(table, s3_bucket, execution_date)

@@ -1,9 +1,8 @@
-from copy import deepcopy
-
 import mock
 import pandas as pd
 import pytest
 import requests
+from copy import deepcopy
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL

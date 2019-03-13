@@ -1,7 +1,8 @@
+from datetime import datetime
+
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
-from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,9 +19,9 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 
 # functions
-def data_existence_check(_class, bucket_type, **kwargs):
+def data_existence_check(class_, bucket_type, **kwargs):
     asterisk = AsteriskFactory.factory(
-        _class=_class,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -28,23 +29,23 @@ def data_existence_check(_class, bucket_type, **kwargs):
     return asterisk.data_existence_check(bucket_type)
 
 
-def upsert_partition(_class, bucket_type, **kwargs):
+def upsert_partition(class_, bucket_type, **kwargs):
     asterisk = AsteriskFactory.factory(
-        _class=_class,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
 
     asterisk._upsert_partition(
-        _class=_class,
+        class_=class_,
         bucket_type=bucket_type
 
     )
 
 
-def exec_factory_method(_class, method, **kwargs):
+def exec_factory_method(class_, method, **kwargs):
     asterisk = AsteriskFactory.factory(
-        _class=_class,
+        entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
@@ -81,7 +82,7 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'extract_and_load_data'
         }
     )
@@ -92,7 +93,7 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'bucket_type': 'raw'
         }
     )
@@ -103,7 +104,7 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'bucket_type': 'raw'
         }
     )
@@ -114,7 +115,7 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'move_to_clean'
         }
     )
@@ -125,7 +126,7 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'bucket_type': 'clean'
         }
     )
@@ -156,7 +157,7 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'extract_and_load_data'
         }
     )
@@ -167,7 +168,7 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'bucket_type': 'raw'
         }
     )
@@ -178,7 +179,7 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            '_class': kwargs['_class'],
+            'class_': kwargs['class_'],
             'method': 'move_to_clean'
         }
     )
@@ -197,63 +198,63 @@ cdr_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cdr',
     sub_dag_func=partitioned_class_sub_dag,
-    _class=AsteriskTableEnum.CDR
+    class_=AsteriskTableEnum.CDR
 )
 
 cxpanel_queues_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cxpanel_queues',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.CXPANEL_QUEUES
+    class_=AsteriskTableEnum.CXPANEL_QUEUES
 )
 
 cxpanel_users_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cxpanel_users',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.CXPANEL_USERS
+    class_=AsteriskTableEnum.CXPANEL_USERS
 )
 
 devices_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='devices',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.DEVICES
+    class_=AsteriskTableEnum.DEVICES
 )
 
 ivr_details_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='ivr_details',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.IVR_DETAILS
+    class_=AsteriskTableEnum.IVR_DETAILS
 )
 
 ivr_entries_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='ivr_entries',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.IVR_ENTRIES
+    class_=AsteriskTableEnum.IVR_ENTRIES
 )
 
 queues_config_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='queues_config',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.QUEUES_CONFIG
+    class_=AsteriskTableEnum.QUEUES_CONFIG
 )
 
 queues_details_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='queues_details',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.QUEUES_DETAILS
+    class_=AsteriskTableEnum.QUEUES_DETAILS
 )
 
 users_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='users',
     sub_dag_func=full_class_sub_dag,
-    _class=AsteriskTableEnum.USERS
+    class_=AsteriskTableEnum.USERS
 )
 
 # flow

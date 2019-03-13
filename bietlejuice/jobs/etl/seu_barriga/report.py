@@ -1,6 +1,4 @@
-import re
 from collections import OrderedDict
-
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -58,58 +56,34 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
     def transform_data(self):
         query = BaseETL.get_query_from_file_name(
             '{}/seu_barriga/invoice/report_raw_transform.sql'.format(DATALAKE_QUERIES_DIR))
-        r_cols = OrderedDict([
-            ('contract-id', str),
+
+        # TODO: add clean columns types after Spark migration
+        _cols = OrderedDict([
+            ('id_contract', str),
             ('version', str),
             ('blocked', str),
-            ('from', str),
-            ('to', str),
+            ('item_from', str),
+            ('item_to', str),
             ('description', str),
             ('amount', str),
             ('item', str),
-            ('year-month', str),
-            ('due-date', str),
-            ('tenant-due-date', str),
-            ('tenant-paid-date', str),
-            ('tenant-status', str),
-            ('landlord-due-date', str),
-            ('landlord-paid-date', str),
-            ('landlord-status', str),
-            ('delayed_days', int),
-            ('purpose', str)
-        ])
-
-        c_cols = OrderedDict([
-            ('contract_id', str),
-            ('version', str),
-            ('blocked', str),
-            ('_from', str),
-            ('_to', str),
-            ('description', str),
-            ('amount', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['float']['regex']),
-                        SeuBarrigaInvoice.REGEX_MAPPING['float']['group']]),
-            ('item', str),
             ('ref_item_ym', str),
-            ('due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                          SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                 SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_paid_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                  SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_status', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                               SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('landlord_due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                   SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('landlord_paid_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                    SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
+            ('due_date', str),
+            ('tenant_due_date', str),
+            ('tenant_paid_date', str),
+            ('tenant_status', str),
+            ('landlord_due_date', str),
+            ('landlord_paid_date', str),
             ('landlord_status', str),
             ('delayed_days', str),
             ('purpose', str),
+            ('tenant_invoice_created_at', str),
+            ('landlord_invoice_created_at', str)
         ])
 
         self._transform_data(
             query=query,
-            raw_columns=r_cols,
-            clean_columns=c_cols,
+            raw_columns=_cols,
+            clean_columns=_cols,
             clean_table_name='seu_barriga_invoice_report'
         )

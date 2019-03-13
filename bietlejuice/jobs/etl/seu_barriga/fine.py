@@ -1,6 +1,4 @@
-import re
 from collections import OrderedDict
-
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -41,26 +39,18 @@ class SeuBarrigaFine(SeuBarrigaInvoice):
     def transform_data(self):
         query = BaseETL.get_query_from_file_name(
             '{}/seu_barriga/invoice/fine_raw_transform.sql'.format(DATALAKE_QUERIES_DIR))
-        r_cols = OrderedDict([
-            ('contract-external-id', str),
-            ('fine', str),
-            ('due-date', str),
-            ('paid-date', str)
-        ])
 
-        c_cols = OrderedDict([
-            ('contract_id', str),
-            ('fine', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['float']['regex']),
-                      SeuBarrigaInvoice.REGEX_MAPPING['float']['group']]),
-            ('due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                          SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('paid_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                           SeuBarrigaInvoice.REGEX_MAPPING['date']['group']])
+        # TODO: add clean columns types after Spark migration
+        _cols = OrderedDict([
+            ('external_id_contract', str),
+            ('fine', str),
+            ('due_date', str),
+            ('paid_date', str)
         ])
 
         self._transform_data(
             query=query,
-            raw_columns=r_cols,
-            clean_columns=c_cols,
+            raw_columns=_cols,
+            clean_columns=_cols,
             clean_table_name='seu_barriga_invoice_fine'
         )
