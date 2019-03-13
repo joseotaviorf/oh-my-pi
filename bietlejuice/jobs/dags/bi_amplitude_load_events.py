@@ -116,8 +116,16 @@ load_active_user_sessions_clean_task = BaseDAG.build_python_operator(
     python_callable=load_active_user_sessions_clean
 )
 
+xcom_active_user_sessions_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='XCom_active_user_sessions',
+    python_callable=xcom_amplitude_load_events,
+    provide_context=True
+)
+
 airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task,
                       load_active_user_sessions_raw_task,
-                      load_active_user_sessions_clean_task)
+                      load_active_user_sessions_clean_task,
+                      xcom_active_user_sessions_task)
 airflow_helpers.chain(load_events_to_clean_task, xcom_amplitude_load_events_task)
