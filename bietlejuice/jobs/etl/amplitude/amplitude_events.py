@@ -293,8 +293,32 @@ class AmplitudeEventsETL(BaseETL):
         dau_clean_file = '{}/{}'.format(DATALAKE_QUERIES_DIR, 'amplitude/active_user_sessions_clean.sql')
 
         athena_client = AthenaClient(self.s3_bucket)
-        return athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
-                                                                     query_params={'dt': date_param})
+
+        # add partition
+        logger.info("m=get_active_user_sessions_treated, msg=adding partition 'dt={}'".format(date_param))
+        athena_client.execute_file_query_and_wait_for_results(
+            filename=self.__format_query_filename('add_partition_raw_amplitude_active_user_sessions'),
+            query_params={
+                'dt': date_param,
+                's3_bucket': self.s3_bucket
+            }
+        )
+
+        # get data
+        df = athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
+                                                                   query_params={'dt': date_param})
+
+        # remove partition
+        logger.info("m=get_active_user_sessions_treated, msg=removing partition 'dt={}'".format(date_param))
+        athena_client.execute_file_query_and_wait_for_results(
+            filename=self.__format_query_filename('drop_partition_raw_amplitude_active_user_sessions'),
+            query_params={
+                'dt': date_param,
+                's3_bucket': self.s3_bucket
+            }
+        )
+
+        return df
 
     def move_active_user_sessions_to_clean(self, df, execution_date):
         r_cols = OrderedDict([
@@ -341,7 +365,8 @@ class AmplitudeEventsETL(BaseETL):
             logger.info(
                 'm=move_active_user_sessions_to_clean, app={}, ym={}, msg=adding partition'.format(
                     df_group[0], ym))
-            add_partition_clean_query = self.__format_query_filename('add_partition_amplitude_active_user_sessions')
+            add_partition_clean_query = self.__format_query_filename(
+                'add_partition_clean_amplitude_active_user_sessions')
             athena_client.execute_file_query(
                 filename=add_partition_clean_query,
                 query_params={

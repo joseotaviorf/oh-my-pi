@@ -20,7 +20,7 @@ select
 		when aaus.app = '183047' then 'supply'
 	end as app
 from datalake_raw.amplitude_active_user_sessions aaus
-where try(date(server_upload_time)) = date('{dt}')
+where try(date(dt)) = date('{dt}')
 	and nullif(aaus.app,'') is not null
 	and trim(aaus.country) = 'Brazil'
 )

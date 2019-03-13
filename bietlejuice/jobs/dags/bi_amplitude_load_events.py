@@ -41,13 +41,19 @@ def load_amplitude_clean(**kwargs):
 @logger(exclude='kwargs')
 def athena_execute_file_query_and_wait_for_results(**kwargs):
     a = AthenaClient(s3_bucket=s3_bucket)
+
+    bucket_folder_path = kwargs.get('bucket_folder_path').format(
+        dt=str(kwargs.get('execution_date').strftime('%Y-%m-%d'))) if '{dt}' in kwargs.get(
+        'bucket_folder_path') else kwargs.get(
+        'bucket_folder_path')
+
     return_df = a.execute_file_query_and_return_dataframe(
         filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')),
         query_params={'ym': str(kwargs.get('execution_date').strftime('%Y-%m')),
                       'dt': str(kwargs.get('execution_date').strftime('%Y-%m-%d'))})
 
     suffix = '{}.csv'.format(str(kwargs.get('execution_date')))
-    filename = '{}/{}'.format(kwargs.get('bucket_folder_path'), suffix)
+    filename = '{}/{}'.format(bucket_folder_path, suffix)
     BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=filename)
 
 
@@ -99,7 +105,7 @@ load_active_user_sessions_raw_task = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=athena_execute_file_query_and_wait_for_results,
     op_kwargs={'filename': 'amplitude/active_user_sessions_raw.sql',
-               'bucket_folder_path': 'raw/amplitude/active_user_sessions'}
+               'bucket_folder_path': 'raw/amplitude/active_user_sessions/dt={dt}'}
 
 )
 
@@ -113,5 +119,5 @@ load_active_user_sessions_clean_task = BaseDAG.build_python_operator(
 airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task,
                       load_active_user_sessions_raw_task,
-                      load_active_user_sessions_clean_task,
-                      xcom_amplitude_load_events_task)
+                      load_active_user_sessions_clean_task)
+airflow_helpers.chain(load_events_to_clean_task, xcom_amplitude_load_events_task)

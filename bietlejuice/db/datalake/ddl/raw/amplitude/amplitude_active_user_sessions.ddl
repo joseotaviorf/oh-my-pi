@@ -16,6 +16,8 @@ CREATE EXTERNAL TABLE datalake_raw.amplitude_active_user_sessions (
   utm_content string,
   utm_term string,
   app string)
+partitioned by (
+  dt string)
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ',',
