@@ -9,7 +9,7 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag
+    PartnerSubDag, PartnerAgentSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from qa_python_utils import QuintoAndarLogger
@@ -194,6 +194,18 @@ def partner_sub_dag(sub_dag_name):
     )
 
     return sub_dag.build_partner_with_tests()
+
+
+def partner_agent_sub_dag(sub_dag_name):
+    sub_dag = PartnerAgentSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_partner_agent_with_tests()
 
 
 def booking_sub_dag(sub_dag_name):
@@ -419,6 +431,12 @@ partner_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Partner'
 )
 
+partner_agent_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=partner_agent_sub_dag,
+    sub_dag_name='PartnerAgent'
+)
+
 booking_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=booking_sub_dag,
@@ -489,7 +507,7 @@ airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
-fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag])
+fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag, partner_agent_dag])
 house_dag >> fact_house_status
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
