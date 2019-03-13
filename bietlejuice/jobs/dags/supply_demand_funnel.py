@@ -507,7 +507,7 @@ airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag >> fact_photo_job
 photo_job_dag >> fact_photo_job
-fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag, partner_agent_dag])
+fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag])
 house_dag >> fact_house_status
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
