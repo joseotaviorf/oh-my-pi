@@ -48,7 +48,7 @@ select
   h.unpublished_reason as house_unpublished_reason,
   pl.start_version_category as listing_category_start,
   pl.end_version_category as listing_category_end,
-  pl.is_last_version::boolean,
+  pl.is_last_version::integer::boolean,
   h.exclusivity::integer::boolean as is_exclusive,
   h.house_occupant as who_is_living,
   h.key_type,
