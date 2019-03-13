@@ -206,13 +206,13 @@ select
   booking_utm_term,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +
-		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_visit,
+		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_visit,
   ((date_part('day', dt_visit - dt_client_sign_up) * 1440 +
     date_part('hour', dt_visit - dt_client_sign_up) * 60 +
-		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_creation_to_visit,
+		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_created_to_visit,
   ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
     date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
-		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analyis,
+		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analysis,
   ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
     date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
 		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
@@ -239,7 +239,7 @@ select
 		date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as days_contract_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_booking_created) * 1440 +
     date_part('hour', dt_contract_signed - dt_booking_created) * 60 +
-		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_contract_signed,
+		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_visit) * 1440 +
     date_part('hour', dt_contract_signed - dt_visit) * 60 +
 		date_part('minute', dt_contract_signed - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_contract_signed,
