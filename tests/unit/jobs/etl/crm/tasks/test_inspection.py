@@ -21,7 +21,9 @@ class TestCRMTasksInspection(object):
     MANUAL_TASK_WORKGROUP_IDS = [
         'EXIT_INSPECTION_TEAM',
         'DEP_VISTORIA_ID',
-        'REVISIT_POSTCONTRACT_TEAM'
+        'REVISIT_POSTCONTRACT_TEAM',
+        'DEP_VISTORIA_LAUDO',
+        'DEP_VISTORIA_OFFBOARDING'
     ]
 
     TABLE_NAMES = {

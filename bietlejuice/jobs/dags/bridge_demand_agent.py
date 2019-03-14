@@ -1,7 +1,6 @@
 import logging
-from datetime import datetime, timedelta
-
 from airflow.models import DAG
+from datetime import datetime, timedelta
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB

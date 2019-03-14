@@ -1,5 +1,6 @@
 import logging
 from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl.elasticsearch import SkynetModelLogsFetcher
 

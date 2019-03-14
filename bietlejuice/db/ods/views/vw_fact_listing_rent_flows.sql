@@ -119,8 +119,9 @@ _fact as (
     coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
     rs.reservation_attempts as reservation_attempts,
     vdb.sk_rent_flow_taxonomy,
-    vdb.booking_utm_content,
-  	vdb.booking_utm_term
+    vdb.utm_campaign as booking_utm_campaign,
+    vdb.utm_content as booking_utm_content,
+  	vdb.utm_term as booking_utm_term
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -200,17 +201,18 @@ select
   flg_visit_last_updated_from_app,
   visit_last_updated_type,
   sk_rent_flow_taxonomy,
+  booking_utm_campaign,
   booking_utm_content,
   booking_utm_term,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +
-		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_visit,
+		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_visit,
   ((date_part('day', dt_visit - dt_client_sign_up) * 1440 +
     date_part('hour', dt_visit - dt_client_sign_up) * 60 +
-		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_creation_to_visit,
+		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_created_to_visit,
   ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
     date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
-		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analyis,
+		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analysis,
   ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
     date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
 		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
@@ -237,7 +239,7 @@ select
 		date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as days_contract_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_booking_created) * 1440 +
     date_part('hour', dt_contract_signed - dt_booking_created) * 60 +
-		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_contract_signed,
+		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_visit) * 1440 +
     date_part('hour', dt_contract_signed - dt_visit) * 60 +
 		date_part('minute', dt_contract_signed - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_contract_signed,

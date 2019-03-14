@@ -1,12 +1,12 @@
-from datetime import datetime
-
 import airflow.utils.helpers as airflow_helpers
+from datetime import datetime
+from qa_python_utils import QuintoAndarLogger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('LeadSubDag')
 

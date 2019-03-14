@@ -1,20 +1,20 @@
+import sys
+
+import boto3
 import codecs
 import datetime
 import gzip
 import io
 import json
 import os
+import petl
 import re
-import sys
 import zipfile
+from StringIO import StringIO
 from decimal import Decimal
 from functools import partial
 from io import BytesIO
 from logging import info as log
-from StringIO import StringIO
-
-import boto3
-import petl
 from petl.io.db import create_table
 from unidecode import unidecode
 

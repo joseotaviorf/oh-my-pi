@@ -35,7 +35,7 @@ from
 )
 select
 	id_lead,
-	u_initial_utm_campaign as tracking_campaign,
+	REPLACE(u_initial_utm_campaign, '–', '-') as tracking_campaign,
 	u_initial_utm_medium as tracking_medium,
 	u_initial_utm_source as tracking_source,
 	u_initial_utm_content as tracking_content,

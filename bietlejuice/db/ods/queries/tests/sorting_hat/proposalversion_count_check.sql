@@ -1,3 +1,3 @@
 select count(*)
-from sortinghat.proposalversion
+from sortinghat.proposal_version
 ;

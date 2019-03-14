@@ -1,9 +1,8 @@
-import re
-from datetime import datetime
-
 import boto3
 import mock
 import pytest
+import re
+from datetime import datetime
 from mock import Mock
 from qa_python_utils.aws.athena import AthenaClient
 
