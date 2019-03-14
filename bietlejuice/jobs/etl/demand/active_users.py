@@ -10,7 +10,7 @@ logger = QuintoAndarLogger('ActiveUsers_ETL')
 
 class ActiveUsersETL(DemandETL):
     R_COLS = OrderedDict([
-        ('event_date', str),
+        ('date', str),
         ('amplitude_id', str),
         ('app', str),
         ('city', str),
@@ -29,12 +29,11 @@ class ActiveUsersETL(DemandETL):
     C_COLS = deepcopy(R_COLS)
     TABLE_NAME = DemandEnum.ACTIVE_USERS.value
 
-    @logger
+    @logger(exclude='df')
     def move_to_datalake(self, df, period):
-        table_name = '{}_{}'.format(period, self.TABLE_NAME)
-        self._move_to_datalake(df=df, table_name=table_name, raw_columns=self.R_COLS, clean_columns=self.C_COLS)
+        self._move_to_datalake(df=df, table_name=self.TABLE_NAME, period=period, raw_columns=self.R_COLS,
+                               clean_columns=self.C_COLS)
 
     @logger
     def extract_data(self, period):
-        table_name = '{}_{}'.format(period, self.TABLE_NAME)
-        return self._extract_data(table_name=table_name)
+        return self._extract_data(table_name=self.TABLE_NAME, period=period)

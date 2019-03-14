@@ -1,9 +1,8 @@
-DROP TABLE datalake_clean.daily_active_user_sessions;
+DROP TABLE datalake_clean.weekly_active_users;
 
-CREATE EXTERNAL TABLE datalake_clean.daily_active_user_sessions (
+CREATE EXTERNAL TABLE datalake_clean.weekly_active_users (
 	date string,
 	amplitude_id string,
-	session_id string,
 	app string,
 	city string,
 	region string,
@@ -14,10 +13,10 @@ CREATE EXTERNAL TABLE datalake_clean.daily_active_user_sessions (
 	mkt_medium string,
 	mkt_source string,
 	mkt_platform string,
-	utm_campaign string,
+    utm_campaign string,
 	utm_content string,
 	utm_term string
 )
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/demand/daily_active_user_sessions/'
+  's3://5a-datalake/clean/demand/weekly_active_users/'

@@ -1,7 +1,7 @@
 DROP TABLE datalake_clean.daily_active_users;
 
 CREATE EXTERNAL TABLE datalake_clean.daily_active_users (
-	event_date string,
+	date string,
 	amplitude_id string,
 	app string,
 	city string,

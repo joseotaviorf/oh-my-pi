@@ -11,16 +11,29 @@ class DemandETL(object):
         self.athena_client = AthenaClient(self.s3_bucket)
 
     @logger
-    def _extract_data(self, table_name):
+    def _extract_data(self, table_name, period):
+        dt_param = self._get_dt_param(period=period)
         filename = self._format_query_filename(filename=table_name)
-        return self.athena_client.execute_file_query_and_return_dataframe(filename)
+        return self.athena_client.execute_file_query_and_return_dataframe(filename=filename,
+                                                                          query_params={'dt_column': dt_param})
 
-    @logger
-    def _move_to_datalake(self, df, table_name, raw_columns, clean_columns):
-        s3_file_path = 'clean/demand/{0}/{0}.parq'.format(table_name)
+    @logger(exclude=['df', 'raw_columns', 'clean_columns'])
+    def _move_to_datalake(self, df, table_name, period, raw_columns, clean_columns):
+        s3_file_path = 'clean/demand/{0}/{0}.parq'.format('{}_{}'.format(period, table_name))
         self.athena_client.create_parquet_from_df(key=s3_file_path, df=df, raw_columns=raw_columns,
                                                   clean_columns=clean_columns)
 
     @logger
     def _format_query_filename(self, filename):
         return '{}/demand/{}.sql'.format(DATALAKE_QUERIES_DIR, filename)
+
+    @logger
+    def _get_dt_param(self, period):
+        if period == 'daily':
+            return 'date'
+        elif period == 'weekly':
+            return 'week_start'
+        elif period == 'monthly':
+            return 'month_start'
+        else:
+            raise ValueError('No period found')
