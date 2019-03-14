@@ -13,7 +13,10 @@ CREATE EXTERNAL TABLE datalake_clean.daily_active_user_sessions (
 	mkt_channel string,
 	mkt_medium string,
 	mkt_source string,
-	mkt_platform string
+	mkt_platform string,
+	utm_campaign string,
+	utm_content string,
+	utm_term string
 )
 STORED AS PARQUET
 LOCATION

@@ -10,8 +10,11 @@ select
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
-	mkt_platform
+	mkt_platform,
+	utm_campaign,
+	utm_content,
+	utm_term
 from
 	datalake_clean.amplitude_active_user_sessions
 group by
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
