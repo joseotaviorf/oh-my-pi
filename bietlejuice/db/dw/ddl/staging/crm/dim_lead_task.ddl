@@ -9,7 +9,7 @@ create table if not exists staging.dim_lead_task (
   version numeric(14,2),
   origin varchar,
   type varchar,
-  titles varchar,
+  titles varchar(2000),
   workgroups varchar,
   dt_partition date
 )
