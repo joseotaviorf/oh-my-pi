@@ -1,5 +1,6 @@
-from airflow.models import DAG
 from datetime import datetime
+
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -70,7 +71,7 @@ proposal_task = BaseDAG.build_python_operator(
     }
 )
 
-proposalversion_task = BaseDAG.build_python_operator(
+proposal_version_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='extract_proposal_version_table',
     python_callable=extract_table,
@@ -91,6 +92,16 @@ proponent_task = BaseDAG.build_python_operator(
     }
 )
 
+external_score_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='extract_external_score',
+    python_callable=extract_table,
+    op_kwargs={
+        'table_name': 'ExternalScore',
+        'query_file_path_suffix': 'external_score.sql'
+    }
+)
+
 # unit tests
 proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -106,14 +117,22 @@ proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     entity='proponent'
 )
 
-proposalversion_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+proposal_version_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='proposalversion_unit_tests',
-    entity='proposalversion'
+    sub_dag_name='proposal_version_unit_tests',
+    entity='proposal_version'
+)
+
+external_score_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='external_score_unit_tests',
+    entity='external_score'
 )
 
 # flow
 proposal_task >> proposal_unit_tests_dag
-proposalversion_task >> proposalversion_unit_tests_dag
+proposal_version_task >> proposal_version_unit_tests_dag
 proponent_task >> proponent_unit_tests_dag
+external_score_task >> external_score_unit_tests_dag

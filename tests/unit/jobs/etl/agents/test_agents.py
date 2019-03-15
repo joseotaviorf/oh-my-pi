@@ -1,5 +1,6 @@
 import mock
 import pytest
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_etl import EnumDB
 from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR

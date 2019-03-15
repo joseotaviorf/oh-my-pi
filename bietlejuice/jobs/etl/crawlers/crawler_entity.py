@@ -1,10 +1,9 @@
 # coding=utf-8
 
-import re
-
 import googlemaps
 import numpy as np
 import pandas as pd
+import re
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from shapely import wkt
@@ -109,7 +108,7 @@ class CrawlerEntity(object):
         if 'listing_type' in entity:
             entity.listing_type = entity.listing_type.replace(self.map_types)
 
-        num_columns = ['rent', 'lat', 'lng', 'iptu', 'condominium']
+        num_columns = ['lat', 'lng']
         for c in num_columns:
             if c in entity:
                 if any([isinstance(v, basestring) for v in entity[c]]):
@@ -133,11 +132,14 @@ class CrawlerEntity(object):
         info = pd.DataFrame([], columns=cols)
 
         loc = []
-        for l in entity:
-            r = self._get_address(cep=l) if cep else self._get_address(lat=l[0], lng=l[1])
+        for _, l in entity.iterrows():
+            raw_address = '{} {} {} {} {} cep {}'.format(l['tplogradouro'], l['logradouro'], l['bairro'],
+                                                         l['cidade'],
+                                                         l['estado'], l['cep']).strip()
+            r = self._get_address(raw_address=raw_address) if cep else self._get_address(lat=l[0], lng=l[1])
             if r:
                 s = pd.Series(index=cols)
-                loc.append(l)
+                loc.append(l['cep'])
                 s.glat = r[0].get('geometry', dict()).get('location', dict()).get('lat')
                 s.glng = r[0].get('geometry', dict()).get('location', dict()).get('lng')
                 for component in r[0].get('address_components', []):
@@ -157,9 +159,9 @@ class CrawlerEntity(object):
                 info = info.append(s, ignore_index=True)
             else:
                 logger.info(
-                    'm={}.get_geolocation_info, cep={}, msg=google api cannot return geolocation info for this '
+                    'm={}.get_geolocation_info, address={}, msg=google api cannot return geolocation info for this '
                     'entity'.format(
-                        self.__class__.__name__, l))
+                        self.__class__.__name__, raw_address))
 
         info.location = loc
         info.gcep = info.gcep.astype(str).str.zfill(8)

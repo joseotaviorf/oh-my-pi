@@ -9,6 +9,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel.doorman_subdag import DoormanSub
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.offer_subdag import OfferSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.partner_subdag import PartnerSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.partner_agent_subdag import PartnerAgentSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJobSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.proposal_subdag import ProposalSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag

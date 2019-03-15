@@ -1,10 +1,10 @@
 from collections import OrderedDict
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
-from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('GoogleAds')
 
@@ -41,7 +41,7 @@ class GoogleAds(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, account=None):
+    def __init__(self, s3_bucket, execution_date, account, auth=None):
         super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
 
     @logger
@@ -172,17 +172,17 @@ class GoogleAds(Marketing):
             c_cols=c_cols
         )
 
-    @logger(exclude='accounts')
-    def load_to_pre_staging(self, clean_table, prod_table, accounts):
-        self._load_to_pre_staging(clean_table, prod_table, accounts, GoogleAds.COLUMN_TYPE_MAP[clean_table])
+    @logger(exclude='account')
+    def load_to_pre_staging(self, clean_table, prod_table, account):
+        self._load_to_pre_staging(clean_table, prod_table, account, GoogleAds.COLUMN_TYPE_MAP[clean_table])
 
     @logger
     def load_to_staging(self, dw_table_name):
-        query = self.__load_table(dw_table_name)
+        query = self._load_table(dw_table_name)
         self._load_to_staging(dw_table_name, query)
 
     @logger
-    def __load_table(self, table_name):
+    def _load_table(self, table_name):
         table_type = table_name.split('_')[0]
         return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
 

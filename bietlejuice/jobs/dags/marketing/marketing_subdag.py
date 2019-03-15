@@ -9,7 +9,7 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth=None,
                  accounts=None):
         super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
         self.class_ = class_
@@ -17,33 +17,45 @@ class MarketingSubDag(BaseSubDag):
         self.dim_tables = []
         self.fact_tables = []
         self.datalake_tables = []
-        self.integration = integration
+        self.auth = auth
 
-    @logger
+    def transfer_files_to_raw(self, bucket, **kwargs):
+        logger('m=transfer_files_to_raw, bucket={}'.format(bucket))
+        marketing_class = MarketingFactory.factory(
+            class_=self.class_,
+            s3_bucket=bucket,
+            execution_date=self.__get_execution_date(kwargs['execution_date']),
+            auth=self.auth
+        )
+        getattr(marketing_class, 'move_{}_to_raw'.format(self.class_.value))()
+
     def transfer_files_to_clean(self, bucket, account, datalake_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             account=account,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
+
         getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()
 
     @logger
     def transfer_to_pre_staging(self, bucket, clean_table, prod_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table,
-                                            accounts=self.accounts[clean_table])
+                                            account=self.accounts[clean_table])
 
     @logger
     def transfer_to_staging(self, bucket, dw_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_staging(dw_table_name=dw_table)
@@ -51,8 +63,9 @@ class MarketingSubDag(BaseSubDag):
     @logger
     def transfer_to_dw(self, bucket, dw_table, **kwargs):
         marketing_class = MarketingFactory.factory(
-            _class=self.class_,
+            class_=self.class_,
             s3_bucket=bucket,
+            auth=self.auth,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_prod(table_name=dw_table)
@@ -62,6 +75,18 @@ class MarketingSubDag(BaseSubDag):
         marketing_clean_dag = self._build_local_dag()
         getattr(self, 'build_{}_tasks'.format(task_name))(marketing_clean_dag)
         return marketing_clean_dag
+
+    @logger
+    def build_raw_tasks(self, dag):
+        BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='{}_task'.format(self.class_.value),
+            python_callable=self.transfer_files_to_raw,
+            provide_context=True,
+            op_kwargs={
+                'bucket': self.bucket
+            }
+        )
 
     @logger
     def build_clean_tasks(self, dag):
@@ -145,6 +170,6 @@ class MarketingSubDag(BaseSubDag):
             }
         )
 
-    @logger
+    @logger(exclude='execution_date')
     def __get_execution_date(self, execution_date):
         return execution_date - timedelta(1)

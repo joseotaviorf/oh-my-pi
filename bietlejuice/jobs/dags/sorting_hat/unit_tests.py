@@ -4,8 +4,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags import DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
-from bietlejuice.jobs.dags.sorting_hat import SORTINGHAT_TEST_QUERIES_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_TESTS_DIR, DATALAKE_TEST_QUERIES_DIR, ODS_TEST_QUERIES_DIR
 
 COUNT_CHECK_SQL_SUFFIX = 'count_check.sql'
 
@@ -62,7 +61,7 @@ def __build_test_tasks(local_dag, entity):
         task_id='TEST_{}_count'.format(entity),
         python_callable=__test_count,
         op_kwargs={
-            'sh_file_path': '{}/sorting_hat/{}_{}'.format(SORTINGHAT_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
+            'sh_file_path': '{}/sorting_hat/{}_{}'.format(SOURCE_QUERIES_TESTS_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
             'dl_file_path': '{}/sorting_hat/{}_raw_{}'.format(DATALAKE_TEST_QUERIES_DIR, entity,
                                                               COUNT_CHECK_SQL_SUFFIX),
             'ods_file_path': '{}/sorting_hat/{}_{}'.format(ODS_TEST_QUERIES_DIR, entity, COUNT_CHECK_SQL_SUFFIX),
