@@ -2,19 +2,18 @@ from datetime import datetime
 
 import mock
 import pytest
+
 from bietlejuice.jobs.etl.seu_barriga import SeuBarrigaReport, SeuBarrigaInvoiceFactory, SeuBarrigaFine, \
     SeuBarrigaInvoice
 
-S3_BUCKET = '5a-datalake'
-API_DICT = """
-    {
-    "invoice": {"token": "LoremIpsum",
-        "endpoint": "http://seubarriga.quintoandar.com.br/",
-        "job-waiting-time": 60
-        }
-    }
-    """
-EXECUTION_DATE = datetime.now()
+S3_BUCKET = 's3_bucket'
+TYPE_ = 'type_'
+EXECUTION_DATE = datetime(2019, 1, 1)
+API_DICT = {
+    "token": "token",
+    "endpoint": "endpoint",
+    "job-waiting-time": 60
+}
 
 
 @pytest.fixture(scope='session')
@@ -44,8 +43,8 @@ def seu_barriga_fine():
 def seu_barriga_invoice():
     return SeuBarrigaInvoice(
         s3_bucket=S3_BUCKET,
-        _type=mock.ANY,
-        year=2019,
-        month=01,
+        type_=mock.ANY,
+        year=EXECUTION_DATE.year,
+        month=EXECUTION_DATE.month,
         api_dict=API_DICT
     )
