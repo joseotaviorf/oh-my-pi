@@ -1,10 +1,6 @@
-import gzip
-import io
 import json
 import time
-from StringIO import StringIO
 
-import pandas
 import requests
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -26,26 +22,32 @@ class SeuBarrigaInvoice(object):
         }
     }
 
-    def __init__(self, s3_bucket, _type, year, month, api_dict):
+    def __init__(self, s3_bucket, type_, year, month, api_dict):
         self.s3_bucket = s3_bucket
         self.athena_client = AthenaClient(self.s3_bucket)
-        self._type = _type
+        self.type_ = type_
         self.year = year
         self.month = month
+        self.year_month = '{}-{}'.format(self.year, self.month)
         self.api_dict = api_dict
 
     @logger
     def is_job_finished(self, status_url):
-        response = json.loads(self.__request_get(url=status_url))
+        request_response = self.request_job_data(job_url=status_url)
+        if request_response is None or not request_response:
+            raise RuntimeError('m=is_job_finished, status_url={}, msg=response is invalid'.format(status_url))
+
+        response = json.loads(request_response)
+        if response['status'] is None:
+            raise RuntimeError(
+                'm=is_job_finished, status_url={}, response_status={}'.format(status_url, response['status']))
+
         return 'process-running.status/success' in response['status']
 
     @logger
     def request_job_data(self, job_url):
-        return self.__request_get(url=job_url)
-
-    def __request_get(self, url):
         job_result = requests.get(
-            url=url,
+            url=job_url,
             headers={'jwt-token': self.api_dict['token']}
         )
 
@@ -63,62 +65,46 @@ class SeuBarrigaInvoice(object):
 
     @logger
     def wait_for_results(self, status_url):
-        while not self.is_job_finished(status_url=status_url):
+        max_wait_count = 2
+        wait_count = 0
+        while not self.is_job_finished(status_url=status_url) and wait_count < max_wait_count:
             time.sleep(self.api_dict['job-waiting-time'])
+            wait_count += 1
 
-    @logger(exclude='content')
-    def load_content_to_memory_as_csv(self, content):
-        memory_content = StringIO(content)
-        return pandas.read_csv(memory_content)
-
-    @logger(exclude='data_frame')
-    def convert_df_to_json(self, data_frame):
-        logger.info('m=convert_csv_to_json')
-
-        gz_body = io.BytesIO()
-        with gzip.GzipFile(fileobj=gz_body, mode='w') as fp:
-            for row in data_frame.iterrows():
-                fp.write(row[1].to_json().encode('utf-8'))
-                fp.write('\n')
-
-        return gz_body
+        if wait_count == max_wait_count:
+            raise RuntimeError('m=wait_for_results, msg=wait for job timed out')
 
     @logger(exclude='_object')
-    def save_into_s3_raw(self, _object, file_path_prefix, raw_table_name):
-        year_month = '{}-{}'.format(self.year, self.month)
-
-        logger.info(
-            BaseETL.obj_to_s3(
-                obj_io=_object,
-                bucket=self.s3_bucket,
-                file_path='{}/ym={}/data.gz'.format(file_path_prefix, year_month)
-            )
+    def save_into_s3_raw(self, object_, file_path_prefix, raw_table_name):
+        BaseETL.obj_to_s3(
+            obj_io=object_,
+            bucket=self.s3_bucket,
+            file_path='{}/ym={}/data.gz'.format(file_path_prefix, self.year_month)
         )
 
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/raw/seu_barriga/invoice/{}'.format(self.s3_bucket, self._type),
+            bucket_folder_path='{}/raw/seu_barriga/invoice/{}'.format(self.s3_bucket, self.type_),
             database='datalake_raw',
             table=raw_table_name,
             partition_name='ym',
-            partition_value=year_month
+            partition_value=self.year_month
         )
 
     @logger
     def _transform_data(self, query, raw_columns, clean_columns, clean_table_name):
-        year_month = '{}-{}'.format(self.year, self.month)
-        key = 'clean/seu_barriga/invoice/{}/ym={}/data.parq'.format(self._type, year_month)
+        key = 'clean/seu_barriga/invoice/{}/ym={}/data.parq'.format(self.type_, self.year_month)
 
         self.athena_client.create_parquet_from_query(
             key=key,
-            query=query.format(year_month=year_month),
+            query=query.format(year_month=self.year_month),
             raw_columns=raw_columns,
             clean_columns=clean_columns
         )
 
         self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/clean/seu_barriga/invoice/{}'.format(self.s3_bucket, self._type),
+            bucket_folder_path='{}/clean/seu_barriga/invoice/{}'.format(self.s3_bucket, self.type_),
             database='datalake_clean',
             table=clean_table_name,
             partition_name='ym',
-            partition_value=year_month
+            partition_value=self.year_month
         )
