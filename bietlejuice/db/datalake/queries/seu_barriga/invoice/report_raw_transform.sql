@@ -34,20 +34,20 @@ select distinct
   inv.item_from,
   inv.item_to,
   inv.description,
-  inv.amount,
+  replace(inv.amount, ',', '.') as amount,
   inv.item,
   inv.ref_item_ym,
-  inv.due_date,
-  inv.tenant_due_date,
-  inv.tenant_paid_date,
+  date(date_parse(inv.due_date, '%d/%m/%Y')) as dt_due,
+  date(date_parse(inv.tenant_due_date, '%d/%m/%Y')) as dt_tenant_due,
+  date(date_parse(inv.tenant_paid_date, '%d/%m/%Y')) as dt_tenant_paid,
   inv.tenant_status,
-  inv.landlord_due_date,
-  inv.landlord_paid_date,
+  date(date_parse(inv.landlord_due_date, '%d/%m/%Y')) as dt_landlord_due,
+  date(date_parse(inv.landlord_paid_date, '%d/%m/%Y')) as dt_landlord_paid,
   inv.landlord_status,
-  cast(rd.rent_delayed_days as integer) as delayed_days,
+  cast(rd.rent_delayed_days as integer) as days_delayed,
   inv.purpose,
-  inv.tenant_invoice_created_at,
-  inv.landlord_invoice_created_at
+  date(date_parse(inv.tenant_invoice_created_at, '%d/%m/%Y')) as dt_tenant_invoice_created,
+  date(date_parse(inv.landlord_invoice_created_at, '%d/%m/%Y')) as dt_landlord_invoice_created
 from datalake_raw.seu_barriga_invoice_report inv
 left join rent_delay rd
   on inv.id_contract = rd.id_contract
