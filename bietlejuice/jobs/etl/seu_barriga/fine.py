@@ -16,8 +16,8 @@ class SeuBarrigaFine(SeuBarrigaInvoice):
     ------------------------------------------------------------------------
     |     contract-external-id        |               contract_id          |
     |            fine                 |                   fine             |
-    |          due-date               |                 due_date           |
-    |         paid-date               |                 paid_date          |
+    |          due-date               |                 dt_due             |
+    |         paid-date               |                 dt_paid            |
     ------------------------------------------------------------------------
     """
 
@@ -44,8 +44,8 @@ class SeuBarrigaFine(SeuBarrigaInvoice):
         _cols = OrderedDict([
             ('external_id_contract', str),
             ('fine', str),
-            ('due_date', str),
-            ('paid_date', str)
+            ('dt_due', str),
+            ('dt_paid', str)
         ])
 
         self._transform_data(
