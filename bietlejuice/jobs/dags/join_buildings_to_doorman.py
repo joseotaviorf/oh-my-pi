@@ -53,6 +53,32 @@ def load_building_doorman_data(**kwargs):
         athena.create_parquet_from_df(key=key, df=df_export)
 
 
+def load_region_polygons(**kwargs):
+    sql_filename = 'extract_region_polygons'
+
+    file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
+    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
+    query = read_query(file_name)
+
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+    df = athena.execute_query_and_return_dataframe(
+        sql=query,
+        paginate=False,
+        page_size=0,
+        query_params={'dt': execution_date})
+
+    # FIXME: tmp folder
+    csv_file_path = 'tmp/region_polygons.csv'
+    df.to_csv(csv_file_path, index=False, encoding='utf-8')
+    # FIXME: log carto actions below
+    if len(df) > 0:
+        # upload CSV to CARTO
+        carto_table_name = 'qa_subregions'
+        print(CARTO_API.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
+        print(CARTO_API.upload_csv(csv_file_path, carto_table_name))
+        print(CARTO_API.run_sql('UPDATE {} SET the_geom = ST_GeomFromText(geometry, 4326)'.format(carto_table_name)))
+
+
 dag = DAG(
     dag_id='join-buildings-to-doorman',
     description='Join buildings to doorman and upload to CARTO',
@@ -75,3 +101,13 @@ building_doorman_data = BaseDAG.build_python_operator(
     python_callable=load_building_doorman_data,
     provide_context=True
 )
+
+regions_data = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_region_polygons',
+    python_callable=load_region_polygons,
+    provide_context=True
+)
+
+# flow
+building_doorman_data >> regions_data
