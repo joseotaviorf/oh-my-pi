@@ -92,14 +92,14 @@ select
       )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
-        (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j
-        on max_j.id = f.id
+        (select id, min(REV) as REV from JobFotografo_AUD where status in ('ComProblema', 'Cancelado') and status_MOD = 1 group by id) f_cancel_revision
+        on f_cancel_revision.id = f.id
         and f.status in ('Cancelado','ComProblema')
     left join
         (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
         on comp.id = f.id
         and f.status = 'Cancelado'
-    left join UsuarioRevisionEntity ure on ure.id = max_j.REV
+    left join UsuarioRevisionEntity ure on ure.id = f_cancel_revision.REV
     left join Usuario uc on uc.id = ure.usuario_id
     left join Usuario af on af.dadosFotografo_id = f.dadosFotografo_id
     left join DadosFotografo df on df.id = f.dadosFotografo_id
