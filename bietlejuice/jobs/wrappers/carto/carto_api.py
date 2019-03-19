@@ -7,6 +7,7 @@ import json
 
 from bietlejuice.jobs.dags.util import environment as env
 
+# FIXME: add variables to airflow
 CARTO_CREDENTIALS = json.loads(env.get_airflow_env_var('CARTO_CREDENTIALS'))
 CARTO_API_KEY = CARTO_CREDENTIALS['api_key']
 BASE_URL = CARTO_CREDENTIALS['base_url']
