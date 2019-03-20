@@ -13,13 +13,11 @@ class Growth(object):
 
     @staticmethod
     @logger
-    def get_measure_taxonomy_all_query():
-        return BaseETL.get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
-
-    @staticmethod
-    @logger
-    def get_measure_taxonomy_all_query():
-        return BaseETL.get_query_from_file_name('{}/taxonomy/measure_all.sql'.format(Growth.QUERIES_DIR))
+    def get_measure_all_query(is_taxonomy=False):
+        if not is_taxonomy:
+            return BaseETL.get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
+        else:
+            return BaseETL.get_query_from_file_name('{}/taxonomy/measure_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
@@ -47,25 +45,16 @@ class Growth(object):
 
     @staticmethod
     @logger
-    def create_table(funnel, measure, _filter, period):
+    def create_table(funnel, measure, _filter, period, is_taxonomy):
         prefix_file = BaseETL.get_query_from_file_name(
             '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
-        suffix_file = BaseETL.get_query_from_file_name('{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, period))
+        suffix_file = BaseETL.get_query_from_file_name('{}/suffix_{}.sql'.format(
+            (Growth.QUERIES_DIR if not is_taxonomy else '{}/{}'.format(Growth.QUERIES_DIR, funnel)), period))
 
         Growth.execute_command(
-            'create table {}.{}_{}_{} as\n{}'.format(Growth.SCHEMA, measure, _filter, period,
-                                                     prefix_file + suffix_file))
-
-    @staticmethod
-    @logger
-    def create_table_taxonomy(funnel, measure, _filter, period):
-        prefix_file = BaseETL.get_query_from_file_name(
-            '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
-        suffix_file = BaseETL.get_query_from_file_name('{}/{}/suffix_{}.sql'.format(Growth.QUERIES_DIR, funnel, period))
-
-        Growth.execute_command(
-            'create table {}.{}_{}_{}_{} as\n{}'.format(Growth.SCHEMA, funnel, measure, _filter, period,
-                                                        prefix_file + suffix_file))
+            'create table {}.{}_{}_{} as\n{}'.format(
+                Growth.SCHEMA, (measure if not is_taxonomy else '{}_{}'.format(funnel, measure)), _filter, period,
+                prefix_file + suffix_file))
 
     @staticmethod
     @logger
