@@ -7,41 +7,33 @@ from qa_python_utils.aws.athena import AthenaClient
 
 class TestDemandETL(object):
 
-    def test__format_query_filename(self, demand_etl):
+    def test_format_query_filename(self, demand_etl):
         # arrange
         filename = mock.ANY
         expected_result = 'demand/{}.sql'.format(filename)
 
         # act
-        result = demand_etl._format_query_filename(filename=filename)
+        result = demand_etl.format_query_filename(filename=filename)
 
         # assert
         assert expected_result in result
 
-    def test__get_dt_param_error(self, demand_etl):
-        # arrange
-        period = ''
-
-        # act & assert
-        with pytest.raises(ValueError):
-            result = demand_etl._get_dt_param(period=period)
-
     @pytest.mark.parametrize('period, expected', [('daily', 'date'),
                                                   ('weekly', 'week_start'),
                                                   ('monthly', 'month_start')])
-    def test__get_dt_param(self, period, expected, demand_etl):
+    def test_get_dt_param(self, period, expected, demand_etl):
         # act
-        result = demand_etl._get_dt_param(period=period)
+        result = demand_etl.get_dt_param(period=period)
 
         # assert
         assert result == expected
 
-    @mock.patch.object(DemandETL, '_get_dt_param', return_value='date')
-    @mock.patch.object(DemandETL, '_format_query_filename', return_value='daily')
+    @mock.patch.object(DemandETL, 'get_dt_param', return_value='date')
+    @mock.patch.object(DemandETL, 'format_query_filename', return_value='daily')
     @mock.patch.object(AthenaClient, 'execute_file_query_and_return_dataframe',
                        return_value=pd.DataFrame(data=[1], columns=['id']))
-    def test__extract_data(self, mock_execute_file_query_and_return_dataframe, mock__format_query_filename,
-                           mock__get_dt_param, demand_etl):
+    def test__extract_data(self, mock_execute_file_query_and_return_dataframe, mock_format_query_filename,
+                           mock_get_dt_param, demand_etl):
         # arrange
         table_name = mock.ANY
         period = mock.ANY
@@ -53,13 +45,22 @@ class TestDemandETL(object):
 
         # assert
         assert mock_execute_file_query_and_return_dataframe.call_count == 1
-        assert mock__format_query_filename.call_count == 1
-        assert mock__get_dt_param.call_count == 1
-        assert mock__get_dt_param.call_args[1].get('period') == period
-        assert mock__format_query_filename.call_args[1].get('filename') == mock.ANY
+        assert mock_format_query_filename.call_count == 1
+        assert mock_get_dt_param.call_count == 1
+        assert mock_get_dt_param.call_args[1].get('period') == period
+        assert mock_format_query_filename.call_args[1].get('filename') == mock.ANY
         assert mock_execute_file_query_and_return_dataframe.call_args[1].get('filename') == 'daily'
         assert mock_execute_file_query_and_return_dataframe.call_args[1].get('query_params') == expected_dict
         assert result.equals(expected_result)
+
+    def test__extract_data_with_dt_param_none(self, demand_etl):
+        # arrange
+        table_name = mock.ANY
+        period = mock.ANY
+
+        # act & assert
+        with pytest.raises(ValueError):
+            result = demand_etl._extract_data(table_name=table_name, period=period)
 
     @mock.patch.object(AthenaClient, 'create_parquet_from_df')
     def test__move_to_datalake(self, mock_create_parquet_from_df, demand_etl):

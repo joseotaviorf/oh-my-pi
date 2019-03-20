@@ -16,7 +16,7 @@ select
 	aaus.utm_term
 from
 	datalake_clean.amplitude_active_user_sessions aaus
-left join
+join
 	datalake_clean.ods_dim_date dd
 	on dd."date" = aaus.event_date
 group by

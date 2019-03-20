@@ -12,11 +12,11 @@ MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * *')
 
 
-def extract_data_and_move_to_datalake(**kwargs):
-    demand_etl = DemandFactory.factory(class_=kwargs.get('table'),
+def extract_data_and_move_to_datalake(table, period):
+    demand_etl = DemandFactory.factory(class_=table,
                                        s3_bucket=bucket_datalake)
-    df = demand_etl.extract_data(period=kwargs.get('period'))
-    demand_etl.move_to_datalake(df=df, period=kwargs.get('period'))
+    df = demand_etl.extract_data(period=period)
+    demand_etl.move_to_datalake(df=df, period=period)
 
 
 dag = DAG(

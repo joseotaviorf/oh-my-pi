@@ -5,7 +5,7 @@ from bietlejuice.jobs.etl.demand.demand import DemandETL
 from bietlejuice.jobs.etl.demand.demand_enum import DemandEnum
 from qa_python_utils import QuintoAndarLogger
 
-logger = QuintoAndarLogger('ActiveUsers_ETL')
+logger = QuintoAndarLogger('ActiveUsersETL')
 
 
 class ActiveUsersETL(DemandETL):

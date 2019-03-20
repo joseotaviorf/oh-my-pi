@@ -12,8 +12,12 @@ class DemandETL(object):
 
     @logger
     def _extract_data(self, table_name, period):
-        dt_param = self._get_dt_param(period=period)
-        filename = self._format_query_filename(filename=table_name)
+        dt_param = DemandETL.get_dt_param(period=period)
+
+        if dt_param is None:
+            raise ValueError('No period found')
+
+        filename = self.format_query_filename(filename=table_name)
         return self.athena_client.execute_file_query_and_return_dataframe(filename=filename,
                                                                           query_params={'dt_column': dt_param})
 
@@ -23,17 +27,16 @@ class DemandETL(object):
         self.athena_client.create_parquet_from_df(key=s3_file_path, df=df, raw_columns=raw_columns,
                                                   clean_columns=clean_columns)
 
+    @staticmethod
     @logger
-    def _format_query_filename(self, filename):
+    def format_query_filename(filename):
         return '{}/demand/{}.sql'.format(DATALAKE_QUERIES_DIR, filename)
 
+    @staticmethod
     @logger
-    def _get_dt_param(self, period):
-        if period == 'daily':
-            return 'date'
-        elif period == 'weekly':
-            return 'week_start'
-        elif period == 'monthly':
-            return 'month_start'
-        else:
-            raise ValueError('No period found')
+    def get_dt_param(period):
+        return {
+            'daily': 'date',
+            'weekly': 'week_start',
+            'monthly': 'month_start'
+        }.get(period)

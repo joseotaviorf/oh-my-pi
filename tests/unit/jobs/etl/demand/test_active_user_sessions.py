@@ -23,6 +23,10 @@ class TestActiveUserSessionsETL(object):
         assert mock__move_to_datalake.call_args[1].get('period') == period
         assert len(mock__move_to_datalake.call_args[1].get('raw_columns')) == expected_cols_length
         assert len(mock__move_to_datalake.call_args[1].get('clean_columns')) == expected_cols_length
+        for item in mock__move_to_datalake.call_args[1].get('raw_columns'):
+            assert isinstance(item, str)
+        for item in mock__move_to_datalake.call_args[1].get('clean_columns'):
+            assert isinstance(item, str)
 
     @mock.patch.object(ActiveUserSessionsETL, '_extract_data')
     def test_extract_data(self, mock__extract_data, active_user_sessions_etl):
