@@ -283,7 +283,10 @@ select
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_flow end as mkt_flow,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_completion end as mkt_completion,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel end as mkt_channel,
-	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_platform end as mkt_platform,
+	case when t.mkt_flow is null then 'Not Mapped'
+	     when t.mkt_platform is null and pl.tracking_platform = 'web_mobile' then 'Web Mobile'
+	     when t.mkt_platform is null and pl.tracking_platform = 'web_desktop' then 'Web Desktop'
+	     else t.mkt_platform end as mkt_platform,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_medium end as mkt_medium,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_source end as mkt_source,
     now() as ts_load
