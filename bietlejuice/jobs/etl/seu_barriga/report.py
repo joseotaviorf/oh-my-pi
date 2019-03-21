@@ -23,16 +23,17 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
     |           amount                    |              amount               |
     |            item                     |               item                |
     |          year-month                 |             year_month            |
-    |          due-date                   |              due_date             |
-    |       tenant-due-date               |           tenant_due_date         |
-    |      tenant-paid-date               |          tenant_paid_date         |
+    |          due-date                   |              dt_due               |
+    |       tenant-due-date               |           dt_tenant_due           |
+    |      tenant-paid-date               |          dt_tenant_paid           |
     |        tenant-status                |            tenant_status          |
-    |      landlord-due-date              |          landlord_due_date        |
-    |      landlord-paid-date             |          landlord_paid_date       |
+    |      landlord-due-date              |          dt_landlord_due          |
+    |      landlord-paid-date             |          dt_landlord_paid         |
     |       landlord-status               |           landlord_status         |
-    |           purpose                   |            delayed_days           |
-    |             -                       |               purpose             |
-    |             -                       |                 -                 |
+    |              -                      |            days_delayed           |
+    |           purpose                   |               purpose             |
+    |    tenant_invoice_created_at        |        dt_tenant_invoice_created  |
+    |    landlord_invoice_created_at      |       dt_landlord_invoice_created |
     ---------------------------------------------------------------------------
     """
 
@@ -68,17 +69,17 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
             ('amount', str),
             ('item', str),
             ('ref_item_ym', str),
-            ('due_date', str),
-            ('tenant_due_date', str),
-            ('tenant_paid_date', str),
+            ('dt_due', str),
+            ('dt_tenant_due', str),
+            ('dt_tenant_paid', str),
             ('tenant_status', str),
-            ('landlord_due_date', str),
-            ('landlord_paid_date', str),
+            ('dt_landlord_due', str),
+            ('dt_landlord_paid', str),
             ('landlord_status', str),
-            ('delayed_days', str),
+            ('days_delayed', str),
             ('purpose', str),
-            ('tenant_invoice_created_at', str),
-            ('landlord_invoice_created_at', str)
+            ('dt_tenant_invoice_created', str),
+            ('dt_landlord_invoice_created', str)
         ])
 
         self._transform_data(
