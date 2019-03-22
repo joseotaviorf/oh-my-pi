@@ -8,24 +8,26 @@ logger = QuintoAndarLogger('Demand_ETL')
 class DemandETL(object):
     def __init__(self, s3_bucket):
         self.s3_bucket = s3_bucket
-        self.athena_client = AthenaClient(self.s3_bucket)
 
     @logger
     def _extract_data(self, table_name, period):
         dt_param = DemandETL.get_dt_param(period=period)
+        athena_client = AthenaClient(self.s3_bucket)
 
         if dt_param is None:
             raise ValueError('No period found')
 
         filename = self.format_query_filename(filename=table_name)
-        return self.athena_client.execute_file_query_and_return_dataframe(filename=filename,
-                                                                          query_params={'dt_column': dt_param})
+        return athena_client.execute_file_query_and_return_dataframe(filename=filename,
+                                                                     query_params={'dt_column': dt_param})
 
     @logger(exclude=['df', 'raw_columns', 'clean_columns'])
     def _move_to_datalake(self, df, table_name, period, raw_columns, clean_columns):
+        athena_client = AthenaClient(self.s3_bucket)
+
         s3_file_path = 'clean/demand/{0}/{0}.parq'.format('{}_{}'.format(period, table_name))
-        self.athena_client.create_parquet_from_df(key=s3_file_path, df=df, raw_columns=raw_columns,
-                                                  clean_columns=clean_columns)
+        athena_client.create_parquet_from_df(key=s3_file_path, df=df, raw_columns=raw_columns,
+                                             clean_columns=clean_columns)
 
     @staticmethod
     @logger

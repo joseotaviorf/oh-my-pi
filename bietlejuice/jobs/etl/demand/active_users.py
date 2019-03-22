@@ -11,7 +11,7 @@ logger = QuintoAndarLogger('ActiveUsersETL')
 class ActiveUsersETL(DemandETL):
     R_COLS = OrderedDict([
         ('date', str),
-        ('amplitude_id', str),
+        ('id_amplitude', str),
         ('app', str),
         ('city', str),
         ('region', str),
