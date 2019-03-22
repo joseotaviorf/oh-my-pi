@@ -22,7 +22,7 @@ select
   coalesce(cd.id, -1) as sk_condo,
   coalesce(pa.user_id, -1) as sk_user_partner_agent,
   coalesce(pa.partner_id, -1) as sk_partner,
-  coalesce(to_char(a.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
+  coalesce(to_char(st.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
   (date_part('epoch', hlc.ts_contract_signed - hl.min_version_time) / 86400)::integer as days_first_listing_to_contract_signed,
   (date_part('epoch', hl.de_publication_date - hl.min_version_time) / 86400)::integer as days_listing_to_depublication,
   (date_part('epoch', hl.max_version_time - hlc.dt_contract_annulment) / 86400)::integer as days_ended_rental_to_relisting,
