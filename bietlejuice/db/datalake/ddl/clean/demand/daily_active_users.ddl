@@ -1,8 +1,8 @@
-DROP TABLE datalake_clean.daily_active_users;
+DROP TABLE datalake_clean.amplitude_daily_active_users;
 
-CREATE EXTERNAL TABLE datalake_clean.daily_active_users (
+CREATE EXTERNAL TABLE datalake_clean.amplitude_daily_active_users (
 	date string,
-	amplitude_id string,
+	id_amplitude string,
 	app string,
 	city string,
 	region string,

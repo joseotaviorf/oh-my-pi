@@ -1,7 +1,7 @@
 select
 	dd.{dt_column} as date,
-	cast(aaus.amplitude_id as varchar) as amplitude_id,
-	cast(session_id as varchar) as session_id,
+	cast(aaus.id_amplitude as varchar) as id_amplitude,
+	cast(id_session as varchar) as id_session,
 	aaus.app,
 	aaus.city,
 	aaus.region,
@@ -19,6 +19,6 @@ from
 	datalake_clean.amplitude_active_user_sessions aaus
 join
 	datalake_clean.ods_dim_date dd
-	on dd."date" = aaus.event_date
+	on dd."date" = aaus.dt_event
 group by
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
