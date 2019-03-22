@@ -39,22 +39,24 @@ def load_amplitude_clean(**kwargs):
 
 
 @logger(exclude='kwargs')
-def athena_execute_file_query_and_wait_for_results(**kwargs):
+def athena_execute_file_query_and_wait_for_results(filename, execution_date, bucket_folder_path, **kwargs):
     a = AthenaClient(s3_bucket=s3_bucket)
 
-    bucket_folder_path = kwargs.get('bucket_folder_path').format(
-        dt=str(kwargs.get('execution_date').strftime('%Y-%m-%d'))) if '{dt}' in kwargs.get(
-        'bucket_folder_path') else kwargs.get(
-        'bucket_folder_path')
+    bucket_folder_path = bucket_folder_path.format(
+        dt=str(execution_date.strftime('%Y-%m-%d'))) if '{dt}' in bucket_folder_path else bucket_folder_path
 
     return_df = a.execute_file_query_and_return_dataframe(
-        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, kwargs.get('filename')),
-        query_params={'ym': str(kwargs.get('execution_date').strftime('%Y-%m')),
-                      'dt': str(kwargs.get('execution_date').strftime('%Y-%m-%d'))})
+        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, filename),
+        query_params={'ym': str(execution_date.strftime('%Y-%m')),
+                      'dt': str(execution_date.strftime('%Y-%m-%d'))})
 
-    suffix = '{}.csv'.format(str(kwargs.get('execution_date')))
-    filename = '{}/{}'.format(bucket_folder_path, suffix)
-    BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=filename)
+    suffix = '{}.csv'.format(str(execution_date))
+    full_filename = '{}/{}'.format(bucket_folder_path, suffix)
+    BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=full_filename)
+
+    # adding partition
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    amplitude_etl.add_partition_active_user_sessions(execution_date=execution_date)
 
 
 def load_active_user_sessions_clean(**kwargs):

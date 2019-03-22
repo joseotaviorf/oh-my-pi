@@ -1,10 +1,10 @@
 drop table datalake_clean.amplitude_active_user_sessions;
 
 CREATE EXTERNAL TABLE datalake_clean.amplitude_active_user_sessions (
-  event_date string,
-  server_upload_time string,
-  amplitude_id string,
-  session_id string,
+  dt_event string,
+  ts_server_upload string,
+  id_amplitude string,
+  id_session string,
   city string,
   region string,
   platform string,

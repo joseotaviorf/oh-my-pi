@@ -22,15 +22,15 @@ select
 from datalake_raw.amplitude_active_user_sessions aaus
 where try(date(dt)) = date('{dt}')
 	and nullif(aaus.app,'') is not null
-	and trim(aaus.country) = 'Brazil'
+	and aaus.country = 'Brazil'
 )
 select
     distinct
     dau.app,
-	dau.event_date,
-	dau.server_upload_time,
-	dau.amplitude_id,
-	dau.session_id,
+	dau.event_date as dt_event,
+	dau.server_upload_time as ts_server_upload,
+	dau.amplitude_id as id_amplitude,
+	dau.session_id as id_session,
 	dau.city,
 	dau.region,
 	dau.platform,

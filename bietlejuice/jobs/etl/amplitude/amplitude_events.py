@@ -294,6 +294,16 @@ class AmplitudeEventsETL(BaseETL):
 
         athena_client = AthenaClient(self.s3_bucket)
 
+        # get data
+        df = athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
+                                                                   query_params={'dt': date_param})
+
+        return df
+
+    def add_partition_active_user_sessions(self, execution_date):
+        date_param = str(execution_date.strftime('%Y-%m-%d'))
+        athena_client = AthenaClient(self.s3_bucket)
+
         # add partition
         logger.info("m=get_active_user_sessions_treated, msg=adding partition 'dt={}'".format(date_param))
         athena_client.execute_file_query_and_wait_for_results(
@@ -304,28 +314,12 @@ class AmplitudeEventsETL(BaseETL):
             }
         )
 
-        # get data
-        df = athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
-                                                                   query_params={'dt': date_param})
-
-        # remove partition
-        logger.info("m=get_active_user_sessions_treated, msg=removing partition 'dt={}'".format(date_param))
-        athena_client.execute_file_query_and_wait_for_results(
-            filename=self.__format_query_filename('drop_partition_raw_amplitude_active_user_sessions'),
-            query_params={
-                'dt': date_param,
-                's3_bucket': self.s3_bucket
-            }
-        )
-
-        return df
-
     def move_active_user_sessions_to_clean(self, df, execution_date):
         r_cols = OrderedDict([
-            ('event_date', str),
-            ('server_upload_time', str),
-            ('amplitude_id', str),
-            ('session_id', str),
+            ('dt_event', str),
+            ('ts_server_upload', str),
+            ('id_amplitude', str),
+            ('id_session', str),
             ('city', str),
             ('region', str),
             ('platform', str),

@@ -12,7 +12,8 @@ CREATE EXTERNAL TABLE datalake_raw.taxonomy_supply_dau(
   branded string,
   qnt string,
   utm_medium string,
-  utm_source string)row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  utm_source string)
+row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"')
