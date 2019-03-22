@@ -114,8 +114,6 @@ select
 	t.minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
-    t.has_public_comments,
-    t.status,
     current_timestamp as ts_load
 from tickets t
 left join contract c

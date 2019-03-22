@@ -28,7 +28,5 @@ create table if not exists staging.zendesk_fact_ticket_metrics(
 	minutes_full_resolution_time_business integer,
     reopens integer,
     replies integer,
-    has_public_comments boolean,
-    status varchar,
     ts_load timestamp
 );
