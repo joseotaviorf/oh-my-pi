@@ -15,6 +15,6 @@ select
 from agent.agents_slots t
 join datalake_raw.ebdb_usuario u
 	on u.dadosagente_id = t.agent_id
-where date(t.slot_dt) = date('{}')
+where date(t.slot_dt) = date('{}') and t.agent_type = 'Visita'
 group by 1, 2, 3, 4, 5, 6
 ;

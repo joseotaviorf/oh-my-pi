@@ -1,11 +1,12 @@
-from airflow import DAG
 from datetime import datetime
+
+from airflow import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import EnumDB, BaseETL
-from bietlejuice.jobs.dags import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -22,8 +23,9 @@ def read_query(file_name):
 
 @logger
 def delete_old_entries(entity, execution_date=None):
-    query = ("delete from agent.{0} where date(slot_dt) >= date('{1}')".format(entity, execution_date)
-             if execution_date is not None else 'truncate agent.{0}'.format(entity))
+    query = ("delete from agent.{0} where date(slot_dt) >= date('{1}')".format(
+        entity, execution_date) if execution_date is not None
+        else 'truncate agent.{0}'.format(entity))
 
     BaseETL.execute_command(
         command=query,
@@ -36,7 +38,8 @@ def load_agents_slots(**kwargs):
     entity = 'agents_slots'
 
     file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, entity)
-    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
+    logger.info(
+        "Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
     query = read_query(file_name)
 
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
