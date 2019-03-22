@@ -13,8 +13,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(amplitude_id) as daily_count
-from datalake_clean.daily_active_users dau
+	count(id_amplitude) as daily_count
+from datalake_clean.amplitude_daily_active_users dau
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ), weekly as (
 select
@@ -31,8 +31,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(amplitude_id) as weekly_count
-from datalake_clean.weekly_active_users dau
+	count(id_amplitude) as weekly_count
+from datalake_clean.amplitude_weekly_active_users dau
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ), monthly as (
 select
@@ -49,8 +49,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(amplitude_id) as monthly_count
-from datalake_clean.monthly_active_users dau
+	count(id_amplitude) as monthly_count
+from datalake_clean.amplitude_monthly_active_users dau
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 dim_date as (

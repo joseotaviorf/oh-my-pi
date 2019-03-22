@@ -31,7 +31,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking asc)
+                                    order by db.sk_booking asc)
     	+ dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
                                     date_part('month', db.dt_created),
@@ -47,7 +47,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking desc)
+                                    order by db.sk_booking desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
@@ -62,7 +62,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking asc)
+                                    order by db.sk_booking asc)
     	+ dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
                                     date_part('week', db.dt_created),
@@ -76,7 +76,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking desc)
+                                    order by db.sk_booking desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
@@ -91,7 +91,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking asc)
+                                    order by db.sk_booking asc)
     	+ dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
                                     date_part('month', db.dt_created),
@@ -105,7 +105,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking desc)
+                                    order by db.sk_booking desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
@@ -119,7 +119,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking asc)
+                                    order by db.sk_booking asc)
     	+ dense_rank() over (partition by coalesce(dr.city_group, ''),
                                     date_part('year', db.dt_created),
                                     db.mkt_category,
@@ -132,7 +132,7 @@ with all_dates as (
                                     db.utm_campaign,
                                     db.utm_content,
                                     db.utm_term
-                                    order by db.id_booking desc)
+                                    order by db.sk_booking desc)
 			- 1 as yearly_count
 	from fact_listing_rent_flows f
 	join dim_booking db

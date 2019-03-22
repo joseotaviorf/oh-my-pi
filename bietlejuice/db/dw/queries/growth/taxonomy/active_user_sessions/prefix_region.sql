@@ -13,8 +13,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(session_id) as daily_count
-from datalake_clean.daily_active_user_sessions daus
+	count(id_session) as daily_count
+from datalake_clean.amplitude_daily_active_user_sessions daus
 left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
@@ -34,8 +34,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(session_id) as weekly_count
-from datalake_clean.weekly_active_user_sessions daus
+	count(id_session) as weekly_count
+from datalake_clean.amplitude_weekly_active_user_sessions daus
 left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
@@ -55,8 +55,8 @@ select
 	utm_campaign,
 	utm_content,
 	utm_term,
-	count(session_id) as monthly_count
-from datalake_clean.monthly_active_user_sessions daus
+	count(id_session) as monthly_count
+from datalake_clean.amplitude_monthly_active_user_sessions daus
 left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
