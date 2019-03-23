@@ -10,6 +10,7 @@ create table if not exists staging.zendesk_fact_ticket_metrics(
     sk_zendesk_submitter_user bigint,
     sk_zendesk_assignee_user bigint,
     sk_created_date integer,
+    sk_updated_date integer,
     sk_solved_date integer,
     sk_extraction_date integer,
     sk_chat_started_date integer,
@@ -28,5 +29,11 @@ create table if not exists staging.zendesk_fact_ticket_metrics(
 	minutes_full_resolution_time_business integer,
     reopens integer,
     replies integer,
+    ts_created timestamp,
+    ts_created_utc timestamp,
+    ts_updated timestamp,
+    ts_updated_utc timestamp,
+    ts_solved timestamp,
+    ts_solved_utc timestamp,
     ts_load timestamp
 );

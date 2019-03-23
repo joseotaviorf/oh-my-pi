@@ -18,7 +18,5 @@ create table if not exists zendesk.dim_ticket (
     request_type varchar,
     client_type varchar,
     ts_chat_started timestamp,
-    ts_created timestamp,
-    ts_updated timestamp,
     ts_load timestamp
 )

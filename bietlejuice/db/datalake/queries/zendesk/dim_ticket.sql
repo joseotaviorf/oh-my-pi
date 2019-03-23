@@ -57,8 +57,6 @@ select
    c.cols['Tipo de Solicitação'] as request_type,
    c.cols['Tipo de Cliente'] as client_type,
    date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-   cast(from_iso8601_timestamp(t.created_at) as timestamp) as created_at,
-   cast(from_iso8601_timestamp(t.updated_at) as timestamp) as updated_at,
    current_timestamp as ts_load
 from tickets_filter t
 left join fields_map c
