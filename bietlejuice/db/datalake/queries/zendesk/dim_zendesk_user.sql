@@ -1,3 +1,8 @@
+with distinct_data as (
+    select distinct t.*
+    from datalake_clean.zendesk_users t
+    __WHERE_CLAUSE__
+)
 select
     t.id as sk_zendesk_user,
     t.url,
@@ -17,5 +22,4 @@ select
     t.last_login_at,
     t.created_at,
     t.updated_at
-from datalake_clean.zendesk_users t
-__WHERE_CLAUSE__
+from distinct_data t
