@@ -1,6 +1,6 @@
 with tickets_filter as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where t.tags not like '%hsm%' or t.subject != 'SCRUBBED'
 	__WHERE_CLAUSE__
 ),
 max_ticket_groups as (
@@ -49,7 +49,7 @@ select
    t.recipient,
    t.tags,
    t.status,
-   t.has_public_comments,
+   cast(t.is_public as boolean) as has_public_comments,
    json_format(cast(c.cols as JSON)) as custom_fields,
    replace(json_format(json_extract(t.satisfaction_rating, '$.score')), '"') as score,
    replace(json_format(json_extract(t.satisfaction_rating, '$.reason')), '"') as reason,

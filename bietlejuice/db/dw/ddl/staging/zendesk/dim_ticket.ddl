@@ -11,7 +11,7 @@ create table if not exists staging.zendesk_dim_ticket (
     tags varchar(65535),
     status varchar,
     has_public_comments boolean,
-    custom_fields varchar(3000),
+    custom_fields varchar(10000),
     score varchar,
     reason varchar,
     comment varchar(2000),

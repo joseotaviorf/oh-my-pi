@@ -1,6 +1,6 @@
 with tickets_filter as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where t.tags not like '%hsm%' or t.subject != 'SCRUBBED'
 	__WHERE_CLAUSE__
 ),
 parse_fields as (
@@ -47,13 +47,12 @@ tickets as (
 	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_full_resolution_time_business,
 	    cast(json_extract(t.metric_set, '$.reopens') as integer) as reopens,
 	    cast(json_extract(t.metric_set, '$.replies') as integer) as replies,
-	    from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East' as ts_created,
+	    date_format(from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_created,
 	    from_iso8601_timestamp(t.created_at) as ts_created_utc,
-        from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East' as ts_updated,
+        date_format(from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_updated,
         from_iso8601_timestamp(t.updated_at) as ts_updated_utc,
-	    from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East' as ts_solved,
+	    date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_solved,
 	    from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) as ts_solved_utc,
-	    cast(t.is_public as boolean) as has_public_comments,
 	    t.status,
 	    t.dt_extraction
 	from tickets_filter t
