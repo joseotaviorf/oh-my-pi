@@ -27,14 +27,17 @@ taxonomy_demand as (
     from
         files.taxonomy_demand td
 ),
+reschedules as (
+    select "reagendadoDe_id" as id_reschedule
+    from booking
+    where "reagendadoDe_id" is not null
+)	
 bookings as
 (
 	select 
-		  s.id as sk_booking,
-	    -- coalesce(r2.id, r.id, s.id) as id_booking,
-	    coalesce(s."reagendadoDe_id", s.id) as id_booking,
-	    -- coalesce(r2.id, r.id, s.id) = s.id as valid_bookings_not_rescheduled,
-	    max(s.id) over (partition by coalesce(s."reagendadoDe_id", s.id)) = s.id as valid_bookings_not_rescheduled,
+	    s.id as sk_booking,
+	    s.id as id_booking,
+	    r.id_reschedule is not null as is_rescheduled,
 	    s.data 
 				+ (("slotDia" * 15 / 60)+8) * interval '1 hour' 
 				+ ("slotDia" * 15 % 60) * interval '1 minute' 				
@@ -115,6 +118,8 @@ bookings as
 			and bms.visita_id is not null
 		) sources
 		on v.codigo = sources.visita_id
+	left join reschedules r
+	    on s.id = id_reschedule
 )
 select
 	b.sk_booking,
