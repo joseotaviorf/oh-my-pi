@@ -68,7 +68,6 @@ def prod_sub_dag(sub_dag_name):
     return sub_dag.build_tasks('prod')
 
 
-#
 # clean_dag = BaseSubDag.get_sub_dag_operator(
 #     dag=main_dag,
 #     sub_dag_func=clean_sub_dag,
