@@ -220,7 +220,7 @@ create_dim_agent_contract_type_dw_task = BaseDAG.build_python_operator(
 )
 
 # Creates fact_agent in DW
-create_fact_agent = BaseDAG.build_python_operator(
+create_fact_agent_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_fact_agent',
     provide_context=True,
@@ -231,7 +231,7 @@ create_fact_agent = BaseDAG.build_python_operator(
 )
 
 # Creates fact_photographer in DW
-create_fact_photographer = BaseDAG.build_python_operator(
+create_fact_photographer_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_fact_photographer',
     provide_context=True,
@@ -278,9 +278,9 @@ update_agent_region_ods = BaseDAG.build_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_dim_agent_region_dw >> create_fact_photographer
+create_dim_agent_region_dw >> create_fact_photographer_task
 create_agent_contract_dw >> create_dim_agent_contract_type_dw_task
-create_fact_agent.set_upstream(
+create_fact_agent_task.set_upstream(
     [create_dim_agent_region_dw, create_dim_agent_contract_type_dw_task])
-create_fact_agent >> xcom_fact_agent
+create_fact_agent_task >> xcom_fact_agent
 create_dim_agent_review >> load_dim_agent_review_dw
