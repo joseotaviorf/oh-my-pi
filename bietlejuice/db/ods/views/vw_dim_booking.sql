@@ -31,6 +31,7 @@ reschedules as (
     select "reagendadoDe_id" as id_reschedule
     from booking
     where "reagendadoDe_id" is not null
+    group by 1 -- guaranteeing there are no future duplication on Product
 )	
 bookings as
 (
