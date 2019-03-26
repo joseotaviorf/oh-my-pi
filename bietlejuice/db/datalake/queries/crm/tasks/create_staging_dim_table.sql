@@ -13,6 +13,7 @@ select distinct
   ct.score_factor,
   ct.ts_start,
   ct.ts_completed,
+  ct.ts_silenced_until,
   round(date_diff('minute', cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp),
                             cast(regexp_extract(ct.ts_completed, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
       ) / 60., 2) as hours_task_start_to_completed,

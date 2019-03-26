@@ -4,6 +4,7 @@ select
   score_factor,
   ts_start,
   ts_completed,
+  ts_silenced_until,
   hours_task_start_to_completed,
   version,
   origin,
