@@ -3,8 +3,7 @@ drop view if exists vw_lead_first_event_tracking;
 create view vw_lead_first_event_tracking as
 with t_union as (
 	select
-		lo_external_id.*,
-		l.id as id_from_lead
+		lo_external_id.*
 	from lead l
 	join
 		public.lead_origin lo_external_id
@@ -12,8 +11,7 @@ with t_union as (
 			and lo_external_id.e_formfield_lead_uuid is not null
 union all
 	select
-		lo_firestore_id.*,
-		l.id as id_from_lead
+		lo_firestore_id.*
 	from lead l
 	join
 		public.lead_origin lo_firestore_id
@@ -21,8 +19,7 @@ union all
 			and lo_firestore_id.firestore_id is not null
 union all
 	select
-		lo_lead_id.*,
-		l.id as id_from_lead
+		lo_lead_id.*
 	from lead l
 	join
 		public.lead_origin lo_lead_id
@@ -32,19 +29,19 @@ union all
 t_rn as (
 select
 	*,
-	row_number() over (partition by id_from_lead order by rule_num desc) as lead_rn
+	row_number() over (partition by id_lead order by rule_num desc) as lead_rn
 from
 	t_union
 )
 select
-	id_from_lead as id_lead,
+	id_lead,
 	REPLACE(u_initial_utm_campaign, '–', '-') as tracking_campaign,
 	u_initial_utm_medium as tracking_medium,
 	u_initial_utm_source as tracking_source,
 	u_initial_utm_content as tracking_content,
 	u_initial_utm_term as tracking_term,
 	u_platform as tracking_platform,
-	replace_not_latin_chars(region) as tracking_region,
-	replace_not_latin_chars(city) as tracking_city
+	region as tracking_region,
+	city as tracking_city
 from t_rn
-where id_from_lead is not null and lead_rn = 1
+where id_lead is not null and lead_rn = 1
