@@ -91,32 +91,15 @@ def create_dim_agent_contract_type():
 
 def create_fact_agent(**kwargs):
     exec_date = kwargs['execution_date']
+    table_name = kwargs['table_name']
     ar = Agent(bucket_datalake)
-    ar.clean_daily_data_in_table(enum=EnumDB.BI_DW,
-                                 schema='public',
-                                 dim_name='fact_agent',
-                                 date_column='sk_slot_date',
-                                 dt=exec_date,
-                                 format='YYYYMMDD')
-    ar.create_table_dw(table_name='fact_agent', append=True, dt=exec_date)
-    ar.insert_dummy(table_name='fact_agent',
-                    key_column='sk_slot_date_agent',
-                    previous_check=True)
-
-
-def create_fact_photographer(**kwargs):
-    exec_date = kwargs['execution_date']
-    ar = Agent(bucket_datalake)
-    table_name = 'fact_photographer'
     ar.clean_daily_data_in_table(enum=EnumDB.BI_DW,
                                  schema='public',
                                  dim_name=table_name,
                                  date_column='sk_slot_date',
                                  dt=exec_date,
                                  format='YYYYMMDD')
-    ar.create_table_dw(table_name=table_name,
-                       append=True,
-                       dt=exec_date)
+    ar.create_table_dw(table_name=table_name, append=True, dt=exec_date)
     ar.insert_dummy(table_name=table_name,
                     key_column='sk_slot_date_agent',
                     previous_check=True)
@@ -242,7 +225,9 @@ create_fact_agent = BaseDAG.build_python_operator(
     task_id='create_fact_agent',
     provide_context=True,
     python_callable=create_fact_agent,
-    op_kwargs=None
+    op_kwargs={
+        'table_name': 'fact_agent'
+    }
 )
 
 # Creates fact_photographer in DW
@@ -250,8 +235,10 @@ create_fact_photographer = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_fact_photographer',
     provide_context=True,
-    python_callable=create_fact_photographer,
-    op_kwargs=None
+    python_callable=create_fact_agent,
+    op_kwargs={
+        'table_name': 'fact_photographer'
+    }
 )
 
 # Creates dim_agent_review in ODS
@@ -291,7 +278,7 @@ update_agent_region_ods = BaseDAG.build_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_fact_photographer >> create_dim_agent_region_dw
+create_dim_agent_region_dw >> create_fact_photographer
 create_agent_contract_dw >> create_dim_agent_contract_type_dw_task
 create_fact_agent.set_upstream(
     [create_dim_agent_region_dw, create_dim_agent_contract_type_dw_task])
