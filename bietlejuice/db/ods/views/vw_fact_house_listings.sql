@@ -15,11 +15,14 @@ with house_listing_contracts as (
 )
 select
   ((h.id || '00') || coalesce(hl.version, 1))::bigint as sk_house_listing,
-  coalesce(h.usuario_id, -1) as sk_owner,
+  coalesce(nullif(h.usuario_id, pa.user_id), -1) as sk_owner,
   coalesce(h.regiao_id, -1) as sk_region,
   coalesce(h.usuario_que_cadastrou_id, -1) as sk_user_registration,
   coalesce(hlc.id_contract, -1) as sk_contract,
   coalesce(cd.id, -1) as sk_condo,
+  coalesce(pa.user_id, -1) as sk_user_partner_agent,
+  coalesce(pa.partner_id, -1) as sk_partner,
+  coalesce(to_char(st.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
   (date_part('epoch', hlc.ts_contract_signed - hl.min_version_time) / 86400)::integer as days_first_listing_to_contract_signed,
   (date_part('epoch', hl.de_publication_date - hl.min_version_time) / 86400)::integer as days_listing_to_depublication,
   (date_part('epoch', hl.max_version_time - hlc.dt_contract_annulment) / 86400)::integer as days_ended_rental_to_relisting,
@@ -35,4 +38,8 @@ left join house_listing_contracts hlc
     and hl.version = hlc.house_version
 left join condo cd
   on h.condo_id = cd.id
+left join partner_agent pa
+  on h.usuario_id = pa.user_id
+left join vw_stranded_house_listings st
+  on ((hl.id || '00') || coalesce(hl.version, 1))::bigint = st.sk_house
 ;

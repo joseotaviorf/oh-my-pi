@@ -107,7 +107,7 @@ _result as (
 	select
 	  -- if no house is found in the dimension table, the sk gets concatenated with '000' so there will always be a "valid" integer sk
 		coalesce(sdp.sk_house_listing, rpad(mm.id::varchar, 12, case when mm.status_history = 'publicado' then '001' else '0' end)::bigint) as sk_house_listing,
-		coalesce(vfhl.sk_region, -1) as sk_region,
+		coalesce(hs.regiao_id, -1) as sk_region,
 		-- there are some cases where the house history says, for example, status = 'despublicado', but the house dimension/ebdb says the house is in another status
 		mm.status_history,
 		to_char(mm.dt_min_status, 'YYYYMMDD')::integer as sk_min_status_date,
@@ -117,8 +117,10 @@ _result as (
 		on sdp.id_house = mm.id
 			and mm.dt_min_status >= sdp.ts_listing_version_start::date
 			and coalesce(mm.dt_max_status, now()) <= coalesce(sdp.ts_listing_version_end::date, now())
-    join vw_fact_house_listings vfhl
-        on vfhl.sk_house_listing = sdp.sk_house_listing
+    join house_listing hl
+        on ((hl.id || '00') || coalesce(hl.version, 1))::bigint = sdp.sk_house_listing
+    join house hs
+        on hl.id = hs.id
 	where mm.valid is true
 )
 select
