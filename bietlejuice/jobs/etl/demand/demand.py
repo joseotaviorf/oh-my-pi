@@ -15,7 +15,7 @@ class DemandETL(object):
         athena_client = AthenaClient(self.s3_bucket)
 
         if dt_param is None:
-            raise ValueError('No period found')
+            raise ValueError('m=_extract_data, dt_param=None, msg=no period found')
 
         filename = self.format_query_filename(filename=table_name)
         return athena_client.execute_file_query_and_return_dataframe(filename=filename,
