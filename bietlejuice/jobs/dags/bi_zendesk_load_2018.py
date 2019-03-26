@@ -68,11 +68,11 @@ def prod_sub_dag(sub_dag_name):
     return sub_dag.build_tasks('prod')
 
 
-clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='zendesk-clean-sub-dag'
-)
+# clean_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=clean_sub_dag,
+#     sub_dag_name='zendesk-clean-sub-dag'
+# )
 
 staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -86,4 +86,4 @@ prod_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='zendesk-production-sub-dag'
 )
 
-airflow_helpers.chain(clean_dag, staging_dag, prod_dag)
+airflow_helpers.chain(staging_dag, prod_dag)
