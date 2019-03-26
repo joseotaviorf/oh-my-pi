@@ -1,6 +1,6 @@
 with tickets_filter as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where t.tags not like '%hsm%' or t.subject != 'SCRUBBED'
 	__WHERE_CLAUSE__
 ),
 max_ticket_groups as (
@@ -48,12 +48,15 @@ select
    t.priority,
    t.recipient,
    t.tags,
-   t.satisfaction_rating,
+   t.status,
+   cast(t.is_public as boolean) as has_public_comments,
+   json_format(cast(c.cols as JSON)) as custom_fields,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.score')), '"') as score,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.reason')), '"') as reason,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.comment')), '"') as comment,
    c.cols['Tipo de Solicitação'] as request_type,
    c.cols['Tipo de Cliente'] as client_type,
    date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-   cast(from_iso8601_timestamp(t.created_at) as timestamp) as created_at,
-   cast(from_iso8601_timestamp(t.updated_at) as timestamp) as updated_at,
    current_timestamp as ts_load
 from tickets_filter t
 left join fields_map c
