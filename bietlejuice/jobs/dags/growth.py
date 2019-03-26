@@ -670,15 +670,25 @@ taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
                                                  'listings',
                                                  'taxonomy')
 
-taxonomy_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
-                                                             materialize_growth_measure_table_query,
-                                                             'active_user_sessions',
-                                                             'taxonomy')
+taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                                    materialize_growth_measure_table_query,
+                                                                    'demand_active_user_sessions',
+                                                                    'taxonomy')
 
-taxonomy_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
-                                                     materialize_growth_measure_table_query,
-                                                     'active_users',
-                                                     'taxonomy')
+taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                            materialize_growth_measure_table_query,
+                                                            'demand_active_users',
+                                                            'taxonomy')
+
+taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                                    materialize_growth_measure_table_query,
+                                                                    'supply_active_user_sessions',
+                                                                    'taxonomy')
+
+taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+                                                            materialize_growth_measure_table_query,
+                                                            'supply_active_users',
+                                                            'taxonomy')
 
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
@@ -689,7 +699,8 @@ amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
 amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views_sub_dag
 
 # measures with taxonomy flow
-(taxonomy_active_users_sub_dag >> taxonomy_active_user_sessions_sub_dag >> taxonomy_leads_sub_dag >>
+(taxonomy_supply_active_users_sub_dag >> taxonomy_supply_active_user_sessions_sub_dag >>
+ taxonomy_demand_active_users_sub_dag >> taxonomy_demand_active_user_sessions_sub_dag >> taxonomy_leads_sub_dag >>
  taxonomy_listings_sub_dag >> taxonomy_visits_booked_sub_dag >> taxonomy_visits_completed_sub_dag >>
  taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag)
 

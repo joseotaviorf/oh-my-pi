@@ -2,6 +2,7 @@ with daily as (
 select
 	date,
 	replace(daus.date,'-','')::bigint as sk_date,
+	city,
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
@@ -14,11 +15,13 @@ select
 	utm_term,
 	count(id_session) as daily_count
 from datalake_clean.amplitude_daily_active_user_sessions daus
-group by 1,2,3,4,5,6,7,8,9,10,11,12
+where app = 'supply'
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ), weekly as (
 select
 	date,
 	replace(daus.date,'-','')::bigint as sk_date,
+	city,
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
@@ -31,11 +34,13 @@ select
 	utm_term,
 	count(id_session) as weekly_count
 from datalake_clean.amplitude_weekly_active_user_sessions daus
-group by 1,2,3,4,5,6,7,8,9,10,11,12
+where app = 'supply'
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ), monthly as (
 select
 	date,
 	replace(daus.date,'-','')::bigint as sk_date,
+	city,
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
@@ -48,7 +53,8 @@ select
 	utm_term,
 	count(id_session) as monthly_count
 from datalake_clean.amplitude_monthly_active_user_sessions daus
-group by 1,2,3,4,5,6,7,8,9,10,11,12
+where app = 'supply'
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 dim_date as (
 SELECT
@@ -69,6 +75,7 @@ WHERE sk_date > 20180101
     	on daily.sk_date = dd.sk_date
     left join weekly
         on  dd.sk_week_start = weekly.sk_date and
+            daily.city = weekly.city and
             daily.mkt_category = weekly.mkt_category and
             daily.mkt_flow = weekly.mkt_flow and
             daily.mkt_completion = weekly.mkt_completion and
@@ -81,6 +88,7 @@ WHERE sk_date > 20180101
             coalesce(daily.utm_term, '') = coalesce(weekly.utm_term, '')
     left join monthly
         on  dd.sk_month_start = monthly.sk_date and
+            daily.city = monthly.city and
             daily.mkt_category = monthly.mkt_category and
             daily.mkt_flow = monthly.mkt_flow and
             daily.mkt_completion = monthly.mkt_completion and
@@ -99,7 +107,7 @@ all_dates as (
     date_part('week', to_date(tu.date::varchar, 'YYYY-MM-DD')) as _week,
     date_part('day', to_date(tu.date::varchar, 'YYYY-MM-DD')) as _day,
     'QuintoAndar'::varchar as city_group,
-    'QuintoAndar'::varchar as city,
+    city::varchar as city,
     mkt_category,
 	mkt_flow,
 	mkt_completion,
