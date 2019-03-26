@@ -8,5 +8,5 @@ CREATE TABLE public.fact_photographer(
   total_slots       INTEGER,
   area              VARCHAR(10),
   sk_agent_region   VARCHAR(20),
-  dt_timestamp      TIMESTAMP default getdate()
+  ts_load           TIMESTAMP default getdate()
 );

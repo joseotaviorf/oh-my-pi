@@ -21,7 +21,7 @@ SELECT
 	END AS total_slots,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	getdate() as dt_timestamp
+	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
