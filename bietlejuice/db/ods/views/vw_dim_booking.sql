@@ -124,7 +124,7 @@ bookings as
 select
 	b.sk_booking,
 	b.id_booking,
-	b.valid_bookings_not_rescheduled,
+	b.is_rescheduled,
 	b.dt_booking,
 	b.type,
 	b.confirmed,
