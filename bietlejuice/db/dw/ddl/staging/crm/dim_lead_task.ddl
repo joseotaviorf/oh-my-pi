@@ -5,11 +5,12 @@ create table if not exists staging.dim_lead_task (
   score_factor numeric(14,2),
   ts_start timestamp,
   ts_completed timestamp,
+  ts_silenced_until timestamp,
   hours_task_start_to_completed numeric(14,2),
   version numeric(14,2),
   origin varchar,
   type varchar,
-  titles varchar,
+  titles varchar(2000),
   workgroups varchar,
   dt_partition date
 )

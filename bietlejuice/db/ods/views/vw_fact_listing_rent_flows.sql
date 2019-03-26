@@ -221,10 +221,10 @@ select
 		date_part('minute', dt_owner_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_owner_doc_sent,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_doc_first_sent_to_credit_processed,
+		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_credit_processed,
   ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_doc_first_sent_to_doc_completed,
+		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_doc_completed,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
 		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_doc_completed_to_credit_processed,
@@ -251,13 +251,13 @@ select
 		date_part('minute', dt_offer_submitted - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_offer_submitted,
   ((date_part('day', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_doc_sent_to_insurance_approval,
+		date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_insurance_approved,
   ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
     date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
-		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approval_to_contract_signed,
-  ((date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_doc_sent,
+		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approved_to_contract_signed,
+  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
+    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
+		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_first_doc_sent,
   ((date_part('day', dt_offer_approved - dt_offer_submitted) * 1440 +
     date_part('hour', dt_offer_approved - dt_offer_submitted) * 60 +
 		date_part('minute', dt_offer_approved - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_offer_approved,
@@ -275,7 +275,7 @@ select
 		date_part('minute', dt_credit_analysis_approved - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_tenant_doc_completed_to_credit_approved,
   ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_doc_sent_to_doc_completed,
+		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_doc_completed,
   ((date_part('day', dt_contract_signed - dt_house_listing) * 1440 +
     date_part('hour', dt_contract_signed - dt_house_listing) * 60 +
 		date_part('minute', dt_contract_signed - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_contract_signed,
