@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag, PartnerAgentSubDag
+    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
@@ -297,6 +297,17 @@ def doorman_sub_dag(sub_dag_name):
     return sub_dag.build_doorman_with_tests()
 
 
+def polygon_region_sub_dag(sub_dag_name):
+    sub_dag = PolygonRegionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_polygon_region_with_tests()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -477,6 +488,12 @@ doorman_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=doorman_sub_dag,
     sub_dag_name='Doorman'
+)
+
+polygon_region_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=polygon_region_sub_dag,
+    sub_dag_name='PolygonRegion'
 )
 
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
