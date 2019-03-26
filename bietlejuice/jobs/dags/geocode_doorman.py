@@ -114,7 +114,7 @@ def geocode_doorman(**kwargs):
         # generate hash for file name and joins
         df_door['geocode_hash'] = df_door['geocode'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
         # FIXME: will eventually be all cities
-        df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Rio de Janeiro'])]
+        df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Santo André', 'São Bernardo do Campo', 'São Bernardo', 'São Caetano do Sul', 'São Caetano', 'Rio de Janeiro'])]
         df_address = df_door[df_door.geocode.notna()][['geocode', 'geocode_hash']]
         df_address = df_address.drop_duplicates('geocode')
         # FIXME: load from S3 here
