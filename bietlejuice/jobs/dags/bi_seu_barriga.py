@@ -1,11 +1,13 @@
 import json
+from datetime import datetime
+
 import pandas as pd
 from airflow.models import DAG
-from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.base.data_frame_service import DataFrameCSVService, DataFrameJsonService
 from bietlejuice.jobs.dags.invoice import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.seu_barriga import SeuBarrigaInvoiceFactory, SeuBarrigaTableEnum
@@ -27,9 +29,11 @@ def __extract_report_table(data, invoice_obj):
     invoice_obj.wait_for_results(status_url=status_url)
 
     content = invoice_obj.request_job_data(job_url=job_url)
-    data_frame = invoice_obj.load_content_to_memory_as_csv(content=content)
-    raw_table_name = 'seu_barriga_invoice_report'
 
+    df_csv_service = DataFrameCSVService()
+    data_frame = df_csv_service.unicode_to_df(csv_content=content)
+
+    raw_table_name = 'seu_barriga_invoice_report'
     return data_frame, raw_table_name
 
 
@@ -57,9 +61,10 @@ def extract_table(class_, endpoint_suffix, **kwargs):
 
 
 def __save_data_to_s3_raw(invoice_obj, data_frame, raw_table_name):
-    object_ = invoice_obj.convert_df_to_json(data_frame=data_frame)
+    df_json_service = DataFrameJsonService(df=data_frame)
+    object_ = df_json_service.to_json_bytes(data_frame=data_frame)
     invoice_obj.save_into_s3_raw(
-        _object=object_,
+        object_=object_,
         file_path_prefix='raw/seu_barriga/invoice/{}'.format(invoice_obj._type),
         raw_table_name=raw_table_name,
     )
@@ -80,7 +85,8 @@ def __get_dataframe_from_invoice_result(_invoice, result):
     _invoice.wait_for_results(status_url=status_url)
 
     content = _invoice.request_job_data(job_url=job_url)
-    return _invoice.load_content_to_memory_as_csv(content=content)
+    df_csv_service = DataFrameCSVService()
+    return df_csv_service.unicode_to_df(csv_content=content)
 
 
 def transform_data(class_, **kwargs):
