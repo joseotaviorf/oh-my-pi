@@ -9,7 +9,7 @@ from bietlejuice.jobs.etl.demand import DemandFactory, DemandEnum
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_START_DATE = datetime(2019, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 7 * * *')
 
 
 def extract_data_and_move_to_datalake(table, period):
