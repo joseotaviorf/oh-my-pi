@@ -1,6 +1,6 @@
 with tickets_filter as (
 	select distinct t.* from datalake_clean.zendesk_tickets t
-	where t.tags not like '%hsm%' or t.subject != 'SCRUBBED'
+	where (t.tags not like '%hsm%' or t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
 max_ticket_groups as (

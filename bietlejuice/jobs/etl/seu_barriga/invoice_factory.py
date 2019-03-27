@@ -7,8 +7,8 @@ class SeuBarrigaInvoiceFactory(object):
 
     @staticmethod
     def factory(class_, s3_bucket, api_dict, execution_date):
-        if class_ is None:
-            raise ValueError('m=factory, class_={}, msg=invalid class'.format(class_))
+        if class_ is None or not class_:
+            raise TypeError('m=factory, class_={}, msg=invalid class'.format(class_))
 
         _class = SeuBarrigaInvoiceFactory.__dispatch_dict(class_)
         if _class is None:

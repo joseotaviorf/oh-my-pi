@@ -9,6 +9,7 @@ select
   version,
   origin,
   type,
+  description,
   titles,
   workgroups,
   getdate() as ts_load
