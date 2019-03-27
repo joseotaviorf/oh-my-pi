@@ -6,18 +6,39 @@ ids_calls as (
     SELECT
         regexp_extract(content,'VERBOSE\[[0-9]+\]\[C-(\w+)\]', 1) as id_call
     FROM asterisk_data
-    WHERE content like '%[C-000063b1]%'
+   -- WHERE content like '%[C-000063b1]%'
     GROUP by
      1
 ),
 events_ura as (
   SELECT
-        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/3001-(\w+)", "(NOW|QUEUEJOINTIME)=(\d+)"', 2) as id_call,
-        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/3001-(\w+)", "(NOW|QUEUEJOINTIME)=(\d+)"', 3) as id_ura,
-        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/3001-(\w+)", "NOW=(\d+)"', 1) as ts_start_ura,
-        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/3001-(\w+)", "QUEUEJOINTIME=(\d+)"', 1) as ts_end_ura
+        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)"', 2) as id_call,
+        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)"', 3) as id_ura,
+        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "NOW=(\d+)"', 1) as ts_start_ura,
+        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "QUEUEJOINTIME=(\d+)"', 1) as ts_end_ura
   FROM asterisk_data
-  WHERE content like '%[C-000063b1]%'
+  GROUP BY 1,2,3,4
+),
+
+-- [2019-03-18 08:47:16] VERBOSE[27307][C-000063b1] file.c: <SIP/3001-0000510b> Playing 'custom/URA_HELP_NEW.gsm' (language 'en')
+-- [2019-03-18 08:47:28] DTMF[27307][C-000063b1] channel.c: DTMF begin '3' received on SIP/3001-0000510b
+events_typed as (
+  SELECT 
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on SIP/\d+-(\w+)', 2) as id_call,  
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on SIP/\d+-(\w+)', 4) as id_ura,          
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on SIP/\d+-(\w+)', 3) as typed_answer,
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on SIP/\d+-(\w+)', 1) as ts_start_typed_answer
+  FROM asterisk_data
+  GROUP BY 1,2,3,4
+),
+
+events_audio_message as (
+  SELECT
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<SIP/\d+-(\w+)> Playing .custom/(\w+).gsm.+', 2) as id_call,
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<SIP/\d+-(\w+)> Playing .custom/(\w+).gsm.+', 3) as id_ura,
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<SIP/\d+-(\w+)> Playing .custom/(\w+).gsm.+', 4) as audio_message,
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<SIP/\d+-(\w+)> Playing .custom/(\w+).gsm.+', 1) as ts_start_audio_message
+  FROM asterisk_data
   GROUP BY 1,2,3,4
 ),
 
@@ -29,7 +50,6 @@ events_queue as (
     regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/(\d+)@from-queue-(\w+);\d", "QAGENT=(\d+)"', 1) as ts_start_queue
     --regexp_extract(content,'VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/(\d+)@from-queue-(\w+);\d", "NOW=(\d+)"', 4) as ts_start_queue,
   FROM asterisk_data
-  WHERE content like '%[C-000063b1]%'
   GROUP BY 1,2,3,4     
 ),
 -- [2019-03-18 08:47:32] VERBOSE[29930][C-000063b1] app_dial.c: PJSIP/8667-00007b7d answered Local/8667@from-queue-00003d78;2
@@ -66,14 +86,35 @@ events_hangup as (
     group by 1,2,3,4,5
 ),
 
+URA_HELP AS (
+    SELECT 
+      m.id_call,
+      m.id_ura,
+      m.ts_start_audio_message,
+      min(cast(ty.ts_start_typed_answer as timestamp)) as ts_min_start_typed_answer
+    FROM  events_audio_message m
+    LEFT JOIN events_typed ty ON (ty.id_call = m.id_call and ty.id_ura = m.id_ura)  
+    WHERE 
+        m.audio_message LIKE 'URA_HELP_NEW%' 
+        AND (ty.typed_answer like '2' OR ty.typed_answer like '3')
+        AND cast(m.ts_start_audio_message as timestamp) <= cast(ty.ts_start_typed_answer as timestamp)
+    GROUP BY 1,2,3
+),
+
 URA AS (
     SELECT 
-       id_call,
-       id_ura,
-       max(ts_start_ura) as ts_start_ura,
-       max(ts_end_ura) as ts_end_ura
-    FROM events_ura
-    GROUP BY 1,2
+       e.id_call,
+       e.id_ura,
+       CASE 
+        WHEN ty.typed_answer='2' THEN 'True'
+        WHEN ty.typed_answer='3' THEN 'False'
+       END is_URA_HELP_solved,
+       max(e.ts_start_ura) as ts_start_ura,
+       max(e.ts_end_ura) as ts_end_ura
+    FROM events_ura e
+    LEFT JOIN URA_HELP uh ON (uh.id_call = e.id_call and uh.id_ura = e.id_ura)
+    LEFT JOIN events_typed ty ON (ty.id_call = uh.id_call and ty.id_ura = uh.id_ura and cast(ty.ts_start_typed_answer as timestamp)=uh.ts_min_start_typed_answer)  
+    GROUP BY 1,2,3
 ),
 
 QUEUES as (
@@ -108,6 +149,7 @@ SELECT
     u.id_ura,
     u.ts_start_ura,
     u.ts_end_ura,
+    cast(u.is_URA_HELP_solved as boolean) as is_URA_HELP_solved,
     q.id_queue,
     q.id_caller,
     q.ts_start_queue,
@@ -126,4 +168,4 @@ LEFT JOIN QUEUES q ON id_c.id_call=q.id_call
 LEFT JOIN URA u ON id_c.id_call=u.id_call
 LEFT JOIN events_attendance a ON id_c.id_call=a.id_call and q.id_caller = a.id_caller -- and q.id_queue = a.id_queue
 WHERE id_c.id_call IS NOT NULL and q.ts_end_queue IS NOT NULL --and q.ts_start_queue IS NOT NULL
-ORDER BY q.ts_start_queue
+ORDER BY id_c.id_call
