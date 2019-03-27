@@ -6,7 +6,7 @@ ids_calls as (
     SELECT
         regexp_extract(content,'VERBOSE\[[0-9]+\]\[C-(\w+)\]', 1) as id_call
     FROM asterisk_data
-   -- WHERE content like '%[C-000063b1]%'
+    WHERE content like '%[C-0000632c]%'
     GROUP by
      1
 ),
@@ -86,6 +86,22 @@ events_hangup as (
     group by 1,2,3,4,5
 ),
 
+events_source as (
+    SELECT
+        regexp_extract(content, 'VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set(".+", "__CRM_SOURCE=(\d+)") in new stack', 1) as id_call,
+        regexp_extract(content, 'VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set(".+", "__CRM_SOURCE=(\d+)") in new stack', 2) as source_number 
+    FROM asterisk_data
+    group by 1,2
+),
+
+events_destination as (
+    SELECT
+        regexp_extract(content, 'VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set(".+", "__CRM_DESTINATION=(\d+)") in new stack', 1) as id_call,
+        regexp_extract(content, 'VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set(".+", "__CRM_DESTINATION=(\d+)") in new stack', 2) as destination_number, 
+    FROM asterisk_data
+    group by 1,2    
+)
+
 URA_HELP AS (
     SELECT 
       m.id_call,
@@ -151,14 +167,12 @@ SELECT
     u.ts_end_ura,
     cast(u.is_URA_HELP_solved as boolean) as is_URA_HELP_solved,
     q.id_queue,
-    q.id_caller,
+    q.id_caller, -- RAMAL
     q.ts_start_queue,
     q.ts_end_queue,
-    --q.ts_end_queue,
     a.id_attendance,
     a.ts_start_attendance,
     q.ts_end_attendance,
-    --q.ts_queue_join_time,
     date_diff('second', cast(u.ts_start_ura as timestamp), cast(u.ts_end_ura as timestamp)) as seconds_time_ura,
     date_diff('second', cast(q.ts_start_queue as timestamp), cast(q.ts_end_queue as timestamp)) as seconds_time_queue,
     date_diff('second', cast(a.ts_start_attendance as timestamp), cast(q.ts_end_attendance as timestamp)) as seconds_time_attendance
