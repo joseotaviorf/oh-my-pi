@@ -10,6 +10,7 @@ create table if not exists staging.dim_closing_task (
   version numeric(14,2),
   origin varchar,
   type varchar,
+  description varchar(2000),
   titles varchar,
   workgroups varchar,
   dt_partition date
