@@ -104,36 +104,40 @@ def geocode_doorman(**kwargs):
     if len(df_door) == 0:
         print('--->no doorman loaded. Interrupting task.')
     else:
-        df_door.to_csv('tmp/df_door.csv', index=False, encoding='utf-8')
-        df_door = pd.read_csv('tmp/df_door.csv', encoding='utf-8')
-        # drop null
-        df_door = df_door[df_door.formatted_address.notna()]
-        # df_door['formatted_address'] = df_door['formatted_address'].str.encode('utf-8')
+        df_door.to_csv('/var/tmp/df_door.csv', index=False, encoding='utf-8')
+        # this looks useless but it is not, it acutally fixes python 2 stupid encoding issues
+        df_door = pd.read_csv('/var/tmp/df_door.csv', encoding='utf-8')
+        # FIXME: will eventually be all cities
+        df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Santo André', 'São Bernardo do Campo', 'São Bernardo', 'São Caetano do Sul', 'São Caetano', 'Rio de Janeiro'])]
         # format address to reduce need for geocoding
         df_door['geocode'] = df_door.formatted_address.str.upper().str.encode('utf-8')
         # generate hash for file name and joins
         df_door['geocode_hash'] = df_door['geocode'].apply(lambda x: hashlib.sha1(x.encode('utf-8')).hexdigest())
-        # FIXME: will eventually be all cities
-        df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Santo André', 'São Bernardo do Campo', 'São Bernardo', 'São Caetano do Sul', 'São Caetano', 'Rio de Janeiro'])]
-        df_address = df_door[df_door.geocode.notna()][['geocode', 'geocode_hash']]
+        df_address = df_door[(df_door.geocode.notna()) & (df_door.google_formatted_address.isna())][['geocode', 'geocode_hash']]
         df_address = df_address.drop_duplicates('geocode')
-        # FIXME: load from S3 here
-        data_folder = 'tmp/geocode_doorman/'
-        # geocode
-        # FIXME: add variables to airflow
-        GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY')
-        geopy_geocoder = geopy.geocoders.GoogleV3(api_key=GOOGLE_MAPS_API_KEY, timeout=20)
-        geocode_addresses(df_address, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
-        df_geocoded_data = load_geocoded_addresses(data_folder)
-        df_address_geocoded = join_geocoded_addresses_to_df(df_address, df_geocoded_data)
-        df_door_geocoded = df_door.merge(df_address_geocoded.drop('geocode', axis=1), how='left', on='geocode_hash')
-        cols = ['id_user_doorman', 'geocode_hash', 'google_formatted_address', 'lat', 'lng', 'location_type', 'place_id', 'types']
-        df_export = df_door_geocoded[df_door_geocoded.google_formatted_address.notna()][cols]
-        df_export.to_csv('tmp/geocoded_doorman.csv', index=False, encoding='utf-8')
-        # write results to S3
-        df_export[cols] = df_export[cols].astype(str)
-        key = 'raw/external/doorman_geocoded_addresses/doorman_geocoded_addresses.parq'
-        athena.create_parquet_from_df(key=key, df=df_export)
+        if len(df_address) > 0:
+            date_formatted = datetime.now().strftime('%Y-%m-%d')
+            data_folder = '/var/tmp/{}_geocode_doorman/'.format(date_formatted)
+            if os.path.isdir(data_folder) is False:
+                Path(data_folder).mkdir(parents=True)
+            # geocode
+            # FIXME: add variables to airflow
+            GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY')
+            geopy_geocoder = geopy.geocoders.GoogleV3(api_key=GOOGLE_MAPS_API_KEY, timeout=20)
+            geocode_addresses(df_address, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
+            # load geocoded data
+            df_geocoded_data = load_geocoded_addresses(data_folder)
+            df_address_geocoded = join_geocoded_addresses_to_df(df_address, df_geocoded_data)
+            df_door_geocoded = df_door.drop('google_formatted_address', axis=1).merge(df_address_geocoded.drop('geocode', axis=1), how='inner', on='geocode_hash')
+            cols = ['id_user_doorman', 'geocode_hash', 'google_formatted_address', 'lat', 'lng', 'location_type', 'place_id', 'types']
+            df_export = df_door_geocoded[df_door_geocoded.google_formatted_address.notna()][cols]
+            df_export.to_csv('/var/tmp/geocoded_doorman_export.csv', index=False, encoding='utf-8')
+            # write results to S3
+            df_export[cols] = df_export[cols].astype(str)
+            key = 'raw/external/doorman_geocoded_addresses/{}_doorman_geocoded_addresses.parq'.format(date_formatted)
+            athena.create_parquet_from_df(key=key, df=df_export)
+        else:
+            print('---> no addresses to geocode.')
 
 
 dag = DAG(
