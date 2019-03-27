@@ -1,6 +1,6 @@
 with tickets_filter as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where (t.tags not like '%hsm%' or t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
 parse_fields as (
@@ -27,8 +27,9 @@ tickets as (
 	    coalesce(t.requester_id, '-1') as sk_zendesk_requester_user,
 	    coalesce(t.submitter_id, '-1') as sk_zendesk_submitter_user,
 	    coalesce(t.assignee_id, '-1') as sk_zendesk_assignee_user,
-	    cast(date_format(from_iso8601_timestamp(t.created_at), '%Y%m%d') as integer) as sk_created_date,
-	    cast(coalesce(date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')), '%Y%m%d'), '-1') as integer) as sk_solved_date,
+	    cast(date_format(from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East', '%Y%m%d') as integer) as sk_created_date,
+	    cast(date_format(from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East', '%Y%m%d') as integer) as sk_updated_date,
+	    cast(coalesce(date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East', '%Y%m%d'), '-1') as integer) as sk_solved_date,
 	    cast(date_format(from_iso8601_timestamp(t.dt_extraction), '%Y%m%d') as integer) as sk_extraction_date,
 	    coalesce(date_format(date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p'), '%Y%m%d'), '-1') as sk_chat_started_date,
 	    coalesce(date_format(date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p'), '%H:%i'), '-1') as sk_chat_started_time,
@@ -46,7 +47,12 @@ tickets as (
 	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_full_resolution_time_business,
 	    cast(json_extract(t.metric_set, '$.reopens') as integer) as reopens,
 	    cast(json_extract(t.metric_set, '$.replies') as integer) as replies,
-	    cast(t.is_public as boolean) as has_public_comments,
+	    date_format(from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_created,
+	    from_iso8601_timestamp(t.created_at) as ts_created_utc,
+        date_format(from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_updated,
+        from_iso8601_timestamp(t.updated_at) as ts_updated_utc,
+	    date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_solved,
+	    from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) as ts_solved_utc,
 	    t.status,
 	    t.dt_extraction
 	from tickets_filter t
@@ -96,6 +102,7 @@ select
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
     t.sk_created_date,
+    t.sk_updated_date,
     t.sk_solved_date,
     t.sk_extraction_date,
     t.sk_chat_started_date,
@@ -114,8 +121,12 @@ select
 	t.minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
-    t.has_public_comments,
-    t.status,
+    t.ts_created,
+    t.ts_created_utc,
+    t.ts_updated,
+    t.ts_updated_utc,
+    t.ts_solved,
+    t.ts_solved_utc,
     current_timestamp as ts_load
 from tickets t
 left join contract c

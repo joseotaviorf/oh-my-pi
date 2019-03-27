@@ -13,12 +13,14 @@ select distinct
   ct.score_factor,
   ct.ts_start,
   ct.ts_completed,
+  ct.ts_silenced_until,
   round(date_diff('minute', cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp),
                             cast(regexp_extract(ct.ts_completed, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
       ) / 60., 2) as hours_task_start_to_completed,
   ct.v as version,
   ct.origin,
   ct.type,
+  ct.description,
   array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'assunto":"([^"]+)', 1), cw.title)) over (partition by ct.id)) as titles,
   array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1), cw.id)) over (partition by ct.id)) as workgroups,
   cast(ct.dt as date) as ts_partition
