@@ -2,6 +2,8 @@ from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 logger = QuintoAndarLogger('PolygonRegionSubDag')
@@ -28,17 +30,23 @@ class PolygonRegionSubDag(DimSubDag):
         return polygon_region_dag
 
     @logger
+    def get_house_query(self):
+        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, self.ods_stg_table_name)
+        query = BaseETL.get_query_from_file_name(file_name=file_path)
+
+        utils.extract_query_dim_from_ebdb_to_ods(
+            dim_name=self.ods_stg_table_name,
+            bucket=DimSubDag.S3_BUCKET,
+            command=query,
+            table_name=self.ods_stg_table_name
+        )
+
+    @logger
     def __build_data_tasks(self, dag):
         ods_polygon_region_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_polygon_region',
-            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': self.ods_stg_table_name,
-                'table_name': self.table_name,
-                'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
-            }
+            python_callable=self.get_house_query
         )
 
         return ods_polygon_region_task
