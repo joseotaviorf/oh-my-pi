@@ -2,6 +2,8 @@ import io
 import json
 import re
 import zipfile
+from collections import OrderedDict
+from copy import deepcopy
 from datetime import datetime
 
 import boto3
@@ -280,6 +282,89 @@ class AmplitudeEventsETL(BaseETL):
                 filename=add_partition_clean_query,
                 query_params={
                     'et': df_et[0],
+                    'ym': ym,
+                    's3_bucket': self.s3_bucket
+                }
+            )
+
+    @logger
+    def get_active_user_sessions_treated(self, execution_date):
+        date_param = str(execution_date.strftime('%Y-%m-%d'))
+        dau_clean_file = '{}/{}'.format(DATALAKE_QUERIES_DIR, 'amplitude/active_user_sessions_clean.sql')
+
+        athena_client = AthenaClient(self.s3_bucket)
+
+        # get data
+        df = athena_client.execute_file_query_and_return_dataframe(filename=dau_clean_file,
+                                                                   query_params={'dt': date_param})
+
+        return df
+
+    def add_partition_active_user_sessions(self, execution_date):
+        date_param = str(execution_date.strftime('%Y-%m-%d'))
+        athena_client = AthenaClient(self.s3_bucket)
+
+        # add partition
+        logger.info("m=get_active_user_sessions_treated, msg=adding partition 'dt={}'".format(date_param))
+        athena_client.execute_file_query_and_wait_for_results(
+            filename=self.__format_query_filename('add_partition_raw_amplitude_active_user_sessions'),
+            query_params={
+                'dt': date_param,
+                's3_bucket': self.s3_bucket
+            }
+        )
+
+    def move_active_user_sessions_to_clean(self, df, execution_date):
+        r_cols = OrderedDict([
+            ('dt_event', str),
+            ('ts_server_upload', str),
+            ('id_amplitude', str),
+            ('id_session', str),
+            ('city', str),
+            ('region', str),
+            ('platform', str),
+            ('utm_source', str),
+            ('utm_medium', str),
+            ('utm_campaign', str),
+            ('utm_content', str),
+            ('utm_term', str),
+            ('mkt_category', str),
+            ('mkt_flow', str),
+            ('mkt_completion', str),
+            ('mkt_channel', str),
+            ('mkt_medium', str),
+            ('mkt_source', str),
+            ('mkt_platform', str)
+        ])
+        c_cols = deepcopy(r_cols)
+
+        athena_client = AthenaClient(self.s3_bucket)
+        exec_date = str(execution_date.strftime('%Y-%m-%d'))
+
+        df_app = df.groupby('app')
+        for df_group in df_app:
+            ym = str(execution_date.strftime('%Y-%m'))
+            key = 'clean/amplitude/active_user_sessions/app={0}/ym={1}/{2}.parq'.format(df_group[0],
+                                                                                        ym, exec_date)
+
+            logger.info('m=move_active_user_sessions_to_clean, app={}, ym={}, filename={}.parq'.format(
+                df_group[0], ym,
+                exec_date))
+
+            filtered_df = df[df['app'] == df_group[0]]
+            filtered_df = filtered_df.drop(['app'], axis=1)
+            athena_client.create_parquet_from_df(key=key, df=filtered_df.astype(str), raw_columns=r_cols,
+                                                 clean_columns=c_cols)
+
+            logger.info(
+                'm=move_active_user_sessions_to_clean, app={}, ym={}, msg=adding partition'.format(
+                    df_group[0], ym))
+            add_partition_clean_query = self.__format_query_filename(
+                'add_partition_clean_amplitude_active_user_sessions')
+            athena_client.execute_file_query(
+                filename=add_partition_clean_query,
+                query_params={
+                    'app': df_group[0],
                     'ym': ym,
                     's3_bucket': self.s3_bucket
                 }

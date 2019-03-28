@@ -3,10 +3,13 @@ from datetime import datetime, timedelta
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.amplitude.amplitude_events import AmplitudeEventsETL
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -33,6 +36,35 @@ def load_amplitude_clean(**kwargs):
 
     amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
     amplitude_etl.load_data_to_clean(execution_date=execution_date)
+
+
+@logger(exclude='kwargs')
+def athena_execute_file_query_and_wait_for_results(filename, execution_date, bucket_folder_path, **kwargs):
+    a = AthenaClient(s3_bucket=s3_bucket)
+
+    bucket_folder_path = bucket_folder_path.format(
+        dt=str(execution_date.strftime('%Y-%m-%d'))) if '{dt}' in bucket_folder_path else bucket_folder_path
+
+    return_df = a.execute_file_query_and_return_dataframe(
+        filename='{}/{}'.format(DATALAKE_QUERIES_DIR, filename),
+        query_params={'ym': str(execution_date.strftime('%Y-%m')),
+                      'dt': str(execution_date.strftime('%Y-%m-%d'))})
+
+    suffix = '{}.csv'.format(str(execution_date))
+    full_filename = '{}/{}'.format(bucket_folder_path, suffix)
+    BaseETL.csv_to_s3(data=return_df, bucket=s3_bucket, filename=full_filename)
+
+    # adding partition
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    amplitude_etl.add_partition_active_user_sessions(execution_date=execution_date)
+
+
+def load_active_user_sessions_clean(**kwargs):
+    execution_date = kwargs['execution_date']
+
+    amplitude_etl = AmplitudeEventsETL(s3_bucket=s3_bucket)
+    df = amplitude_etl.get_active_user_sessions_treated(execution_date=execution_date)
+    amplitude_etl.move_active_user_sessions_to_clean(df=df, execution_date=execution_date)
 
 
 dag = DAG(
@@ -69,6 +101,33 @@ xcom_amplitude_load_events_task = BaseDAG.build_python_operator(
     provide_context=True
 )
 
+load_active_user_sessions_raw_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_active_user_sessions_raw',
+    provide_context=True,
+    python_callable=athena_execute_file_query_and_wait_for_results,
+    op_kwargs={'filename': 'amplitude/active_user_sessions_raw.sql',
+               'bucket_folder_path': 'raw/amplitude/active_user_sessions/dt={dt}'}
+
+)
+
+load_active_user_sessions_clean_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_active_user_sessions_clean',
+    provide_context=True,
+    python_callable=load_active_user_sessions_clean
+)
+
+xcom_active_user_sessions_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='XCom_active_user_sessions',
+    python_callable=xcom_amplitude_load_events,
+    provide_context=True
+)
+
 airflow_helpers.chain(load_events_to_raw_task,
                       load_events_to_clean_task,
-                      xcom_amplitude_load_events_task)
+                      load_active_user_sessions_raw_task,
+                      load_active_user_sessions_clean_task,
+                      xcom_active_user_sessions_task)
+airflow_helpers.chain(load_events_to_clean_task, xcom_amplitude_load_events_task)

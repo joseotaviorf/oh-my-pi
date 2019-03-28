@@ -5,10 +5,12 @@ create table if not exists crm.dim_linhadireta_chat_task (
   score_factor numeric(14,2),
   ts_start timestamp,
   ts_completed timestamp,
+  ts_silenced_until timestamp,
   hours_task_start_to_completed numeric(14,2),
   version numeric(14,2),
   origin varchar,
   type varchar,
+  description varchar(2000),
   titles varchar,
   workgroups varchar,
   ts_load timestamp

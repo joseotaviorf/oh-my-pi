@@ -1,5 +1,6 @@
 CREATE TABLE agent.agents_slots (
 	agent_id int8,
+	agent_type varchar(30),
 	last_weekly_update timestamp,
 	last_specific_update timestamp,
 	slot_dt timestamp,
