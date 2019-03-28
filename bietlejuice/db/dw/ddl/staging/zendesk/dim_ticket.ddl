@@ -14,7 +14,7 @@ create table if not exists staging.zendesk_dim_ticket (
     custom_fields varchar(10000),
     score varchar,
     reason varchar,
-    comment varchar(2000),
+    comment varchar(10000),
     request_type varchar,
     client_type varchar,
     ts_chat_started timestamp,

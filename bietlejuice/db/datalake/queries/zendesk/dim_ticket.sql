@@ -1,7 +1,11 @@
-with tickets_filter as (
+with tickets_discard as (
 	select distinct t.* from datalake_clean.zendesk_tickets t
-	where (t.channel = 'api' and t.tags not like '%hsm%') or (t.subject != 'SCRUBBED')
+	where (t.channel = 'api' and t.tags not like '%hsm%')
 	__WHERE_CLAUSE__
+),
+tickets_filter as (
+    select distinct t.* from tickets_discard t
+    where t.subject != 'SCRUBBED'
 ),
 max_ticket_groups as (
 	select
