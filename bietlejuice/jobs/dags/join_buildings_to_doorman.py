@@ -35,7 +35,7 @@ def load_building_doorman_data(**kwargs):
         query_params={'dt': execution_date})
 
     # FIXME: tmp folder
-    csv_file_path = 'tmp/doorman_data.csv'
+    csv_file_path = '/var/tmp/doorman_data.csv'
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     # FIXME: log carto actions below
     if len(df) > 0:
@@ -68,7 +68,7 @@ def load_building_doorman_data_cnpj(**kwargs):
         query_params={'dt': execution_date})
 
     # FIXME: tmp folder
-    csv_file_path = 'tmp/doorman_data_cnpj.csv'
+    csv_file_path = '/var/tmp/doorman_data_cnpj.csv'
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     # FIXME: log carto actions below
     if len(df) > 0:
@@ -101,7 +101,7 @@ def load_region_polygons(**kwargs):
         query_params={'dt': execution_date})
 
     # FIXME: tmp folder
-    csv_file_path = 'tmp/region_polygons.csv'
+    csv_file_path = '/var/tmp/region_polygons.csv'
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     # FIXME: log carto actions below
     if len(df) > 0:
