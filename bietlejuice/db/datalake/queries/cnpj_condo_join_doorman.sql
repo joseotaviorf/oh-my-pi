@@ -91,6 +91,7 @@ doorman AS (
          FROM datalake_clean.ods_dim_user
          WHERE dados_afiliado_id IS NOT NULL) AS dim_user_affiliate ON fact_house_listing_flows_affiliates.sk_user_lead_affiliate = dim_user_affiliate.sk_user
       LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows_affiliates.sk_lead_date
+      WHERE fact_house_listing_flows_affiliates.sk_lead_date != '-1'
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
