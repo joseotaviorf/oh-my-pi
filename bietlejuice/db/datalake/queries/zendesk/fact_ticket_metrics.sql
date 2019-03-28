@@ -1,11 +1,7 @@
-with tickets_discard as (
+with tickets_filter as (
 	select distinct t.* from datalake_clean.zendesk_tickets t
-	where (t.channel = 'api' and t.tags not like '%hsm%')
+	where (t.channel = 'api' and t.tags not like '%hsm%') and (t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
-),
-tickets_filter as (
-    select distinct t.* from tickets_discard t
-    where t.subject != 'SCRUBBED'
 ),
 parse_fields as (
     select zt.id,
