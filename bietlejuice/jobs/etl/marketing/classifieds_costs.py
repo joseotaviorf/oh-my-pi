@@ -1,9 +1,10 @@
 import json
-import petl
 from collections import OrderedDict
 from datetime import timedelta
 from gzip import GzipFile
 from io import BytesIO
+
+import petl
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
@@ -31,7 +32,9 @@ class ClassifiedsCosts(Marketing):
     def __init__(self, s3_bucket, execution_date, account=None, auth=None):
         self.auth = auth
         self.google_api_scope = 'https://www.googleapis.com/auth/spreadsheets.readonly'
-        self.sheet_name = (execution_date + timedelta(1)).strftime('%Y-%m-%d')
+        # add the day that was subtracted before in the marketing_subdag
+        execution_date = execution_date + timedelta(1)
+        self.sheet_name = execution_date.strftime('%Y-%m-%d')
         super(ClassifiedsCosts, self).__init__(s3_bucket, execution_date, 'classifieds_costs', account)
 
     @logger(exclude='sheet_id')
