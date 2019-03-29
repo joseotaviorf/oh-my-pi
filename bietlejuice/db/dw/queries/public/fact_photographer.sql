@@ -19,7 +19,7 @@ SELECT
 		WHEN 6 THEN 36	-- Saturday
 		ELSE 32			-- Other days
 	END AS total_slots,
-	COALESCE(a.area, '-1') AS area,
+	COALESCE(a.area_deprecated, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	getdate() as ts_load
 FROM schedule s
