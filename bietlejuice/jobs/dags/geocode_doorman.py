@@ -108,7 +108,7 @@ def geocode_doorman(**kwargs):
         # this looks useless but it is not, it acutally fixes python 2 stupid encoding issues
         df_door = pd.read_csv('/var/tmp/df_door.csv', encoding='utf-8')
         # FIXME: will eventually be all cities
-        df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Santo André', 'São Bernardo do Campo', 'São Bernardo', 'São Caetano do Sul', 'São Caetano', 'Rio de Janeiro'])]
+        # df_door = df_door[df_door['work_city'].str.encode('utf-8').isin(['São Paulo', 'Santo André', 'São Bernardo do Campo', 'São Bernardo', 'São Caetano do Sul', 'São Caetano', 'Rio de Janeiro'])]
         # format address to reduce need for geocoding
         df_door['geocode'] = df_door.formatted_address.str.upper().str.encode('utf-8')
         # generate hash for file name and joins
