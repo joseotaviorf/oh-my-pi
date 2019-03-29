@@ -38,7 +38,7 @@ select
     satisfaction_rating,
     submitter_id,
     priority,
-    replace(collaborator_ids, '"', '') as colaborator_ids,
+    replace(collaborator_ids, '"', '') as collaborator_ids,
     cast(regexp_extract_all(tags, '(?!"i"|","|":")"([^"]+)"', 1) as JSON) as tags,
     brand_id,
     metric_set,
