@@ -1,7 +1,6 @@
-import airflow.utils.helpers as airflow_helpers
 from datetime import datetime, timedelta
-from qa_python_utils import QuintoAndarLogger
 
+import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -13,6 +12,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 
@@ -364,6 +364,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
+    execution_timeout=timedelta(hours=4),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 
@@ -524,7 +525,8 @@ airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag.set_downstream([fact_photo_job, fact_house_status])
 photo_job_dag >> fact_photo_job
-fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
+fact_house_listings.set_upstream(
+    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
