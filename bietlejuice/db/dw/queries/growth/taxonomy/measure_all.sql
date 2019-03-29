@@ -46,18 +46,6 @@ from (
 	union all
 	select *
 	from growth.{0}_city_year
---	union all
---	select *
---	from growth.{0}_region_day
---	union all
---	select *
---	from growth.{0}_region_week
---	union all
---	select *
---	from growth.{0}_region_month
---	union all
---	select *
---	from growth.{0}_region_year
 )
 group by sk_date,
     sk_week_start_date,
