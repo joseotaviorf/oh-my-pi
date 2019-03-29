@@ -20,7 +20,7 @@ select distinct
   ct.v as version,
   ct.origin,
   ct.type,
-  ct.description,
+  json_format(json_extract(ct.metadata, '$.descricao')) as description,
   array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'assunto":"([^"]+)', 1), cw.title)) over (partition by ct.id)) as titles,
   array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1), cw.id)) over (partition by ct.id)) as workgroups,
   cast(ct.dt as date) as ts_partition
