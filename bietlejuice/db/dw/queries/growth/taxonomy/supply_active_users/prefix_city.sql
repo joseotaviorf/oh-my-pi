@@ -2,6 +2,7 @@ with daily as (
 select
 	date,
 	replace(dau.date,'-','')::bigint as sk_date,
+	coalesce(dr.city_group, 'Not Mapped') as city_group,
 	city,
 	mkt_category,
 	mkt_flow,
@@ -15,12 +16,16 @@ select
 	utm_term,
 	count(id_amplitude) as daily_count
 from datalake_clean.amplitude_daily_active_users dau
+left join datalake_clean.ods_dim_region dr
+    on dau.city = dr.name
+    and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ), weekly as (
 select
 	date,
 	replace(dau.date,'-','')::bigint as sk_date,
+	coalesce(dr.city_group, 'Not Mapped') as city_group,
 	city,
 	mkt_category,
 	mkt_flow,
@@ -34,12 +39,16 @@ select
 	utm_term,
 	count(id_amplitude) as weekly_count
 from datalake_clean.amplitude_weekly_active_users dau
+left join datalake_clean.ods_dim_region dr
+    on dau.city = dr.name
+    and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ), monthly as (
 select
 	date,
 	replace(dau.date,'-','')::bigint as sk_date,
+	coalesce(dr.city_group, 'Not Mapped') as city_group,
 	city,
 	mkt_category,
 	mkt_flow,
@@ -53,8 +62,11 @@ select
 	utm_term,
 	count(id_amplitude) as monthly_count
 from datalake_clean.amplitude_monthly_active_users dau
+left join datalake_clean.ods_dim_region dr
+    on dau.city = dr.name
+    and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 dim_date as (
 SELECT
@@ -106,8 +118,8 @@ all_dates as (
     date_part('month', to_date(tu.date::varchar, 'YYYY-MM-DD')) as _month,
     date_part('week', to_date(tu.date::varchar, 'YYYY-MM-DD')) as _week,
     date_part('day', to_date(tu.date::varchar, 'YYYY-MM-DD')) as _day,
-    'QuintoAndar'::varchar as city_group,
-    city::varchar as city,
+    city_group as city_group,
+    city as city,
     mkt_category,
 	mkt_flow,
 	mkt_completion,
