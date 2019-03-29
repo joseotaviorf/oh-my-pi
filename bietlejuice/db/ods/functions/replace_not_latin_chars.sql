@@ -2,8 +2,8 @@
   RETURNS text AS
  $BODY$
  Select translate($1,
- 'ẐẑẒẓẔẕŹźŻżŽžȤȥⱫⱬƵƶẊẋẌẍẎẏỾỿỲỳỴỵỶỷỸỹŶŷƳƴŸÿŞşṠṡṢṣŠšȘș',
- 'ZzZzZzZzZzZzZzZzZzXxXxYyYyYyYyYyYyYyYyYySsSsSsSsSs'
+ 'ÅåÄäĀāĄąȦȧÆæǢǣḂḃĆćĊċČčĘęËëȨȩḞḟĠġǦǧḦḧḨḩḰḱĹĺŁłḾḿṀṁØøÖöȮȯŔŕṘṙŚśŜŝẐẑẒẓẔẕŹźŻżŽžȤȥⱫⱬƵƶẊẋẌẍẎẏỾỿỲỳỴỵỶỷỸỹŶŷƳƴŸÿŞşṠṡṢṣŠšȘș',
+ 'AaAaAaAaAaAaAaBbCcCcCcEeEeEeFfGgGgHhHhKkLlLlMmMmOoOoOoRrRrSsSsZzZzZzZzZzZzZzZzZzXxXxYyYyYyYyYyYyYyYyYySsSsSsSsSs'
   );
  $BODY$
  LANGUAGE sql
