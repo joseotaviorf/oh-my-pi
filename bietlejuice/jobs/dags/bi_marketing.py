@@ -153,123 +153,123 @@ def scrap_trovit_data(**kwargs):
     logger.info('m={}, msg=Job {} ended successfully'.format('scrap_trovit_data', r.get('jobName')))
 
 
-# facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=clean_sub_dag,
-#     sub_dag_name="facebook-ads-raw-to-clean",
-#     class_=MarketingEnum.FACEBOOK_ADS,
-#     accounts=FACEBOOK_ADS_ACCOUNTS
-# )
-#
-# facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_pre_staging_sub_dag,
-#     sub_dag_name='facebook-ads-load-to-pre-staging',
-#     class_=MarketingEnum.FACEBOOK_ADS,
-#     accounts=FACEBOOK_ADS_ACCOUNTS
-# )
-#
-# facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_staging_sub_dag,
-#     sub_dag_name='facebook-ads-load-to-staging',
-#     class_=MarketingEnum.FACEBOOK_ADS
-# )
-#
-# facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_dw_sub_dag,
-#     sub_dag_name='facebook-ads-load-to-dw',
-#     class_=MarketingEnum.FACEBOOK_ADS
-# )
-#
-# google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=clean_sub_dag,
-#     sub_dag_name='google-ads-raw-to-clean',
-#     class_=MarketingEnum.GOOGLE_ADS,
-#     accounts=GOOGLE_ADS_ACCOUNTS
-# )
-#
-# google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_pre_staging_sub_dag,
-#     sub_dag_name='google-ads-load-to-pre-staging',
-#     class_=MarketingEnum.GOOGLE_ADS,
-#     accounts=GOOGLE_ADS_ACCOUNTS
-# )
-#
-# google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_staging_sub_dag,
-#     sub_dag_name='google-ads-load-to-staging',
-#     class_=MarketingEnum.GOOGLE_ADS,
-# )
-#
-# google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_dw_sub_dag,
-#     sub_dag_name='google-ads-load-to-dw',
-#     class_=MarketingEnum.GOOGLE_ADS,
-# )
-#
-# criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=raw_sub_dag,
-#     sub_dag_name='criteo-load-to-raw',
-#     class_=MarketingEnum.CRITEO,
-# )
-#
-# criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=clean_sub_dag,
-#     sub_dag_name='criteo-raw-to-clean',
-#     class_=MarketingEnum.CRITEO,
-#     accounts='default'
-# )
-#
-# criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_staging_sub_dag,
-#     sub_dag_name='criteo-load-to-staging',
-#     class_=MarketingEnum.CRITEO,
-# )
-#
-# criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_dw_sub_dag,
-#     sub_dag_name='criteo-load-to-dw',
-#     class_=MarketingEnum.CRITEO,
-# )
-#
-# rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=raw_sub_dag,
-#     sub_dag_name='rtb-load-to-raw',
-#     class_=MarketingEnum.RTB
-# )
-#
-# rtb_clean_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=clean_sub_dag,
-#     sub_dag_name='rtb-raw-to-clean',
-#     class_=MarketingEnum.RTB,
-#     accounts='default'
-# )
-#
-# rtb_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_staging_sub_dag,
-#     sub_dag_name='rtb-load-to-staging',
-#     class_=MarketingEnum.RTB,
-# )
-#
-# rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_dw_sub_dag,
-#     sub_dag_name='rtb-load-to-dw',
-#     class_=MarketingEnum.RTB,
-# )
+facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name="facebook-ads-raw-to-clean",
+    class_=MarketingEnum.FACEBOOK_ADS,
+    accounts=FACEBOOK_ADS_ACCOUNTS
+)
+
+facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_pre_staging_sub_dag,
+    sub_dag_name='facebook-ads-load-to-pre-staging',
+    class_=MarketingEnum.FACEBOOK_ADS,
+    accounts=FACEBOOK_ADS_ACCOUNTS
+)
+
+facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='facebook-ads-load-to-staging',
+    class_=MarketingEnum.FACEBOOK_ADS
+)
+
+facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='facebook-ads-load-to-dw',
+    class_=MarketingEnum.FACEBOOK_ADS
+)
+
+google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='google-ads-raw-to-clean',
+    class_=MarketingEnum.GOOGLE_ADS,
+    accounts=GOOGLE_ADS_ACCOUNTS
+)
+
+google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_pre_staging_sub_dag,
+    sub_dag_name='google-ads-load-to-pre-staging',
+    class_=MarketingEnum.GOOGLE_ADS,
+    accounts=GOOGLE_ADS_ACCOUNTS
+)
+
+google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='google-ads-load-to-staging',
+    class_=MarketingEnum.GOOGLE_ADS,
+)
+
+google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='google-ads-load-to-dw',
+    class_=MarketingEnum.GOOGLE_ADS,
+)
+
+criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name='criteo-load-to-raw',
+    class_=MarketingEnum.CRITEO,
+)
+
+criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='criteo-raw-to-clean',
+    class_=MarketingEnum.CRITEO,
+    accounts='default'
+)
+
+criteo_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='criteo-load-to-staging',
+    class_=MarketingEnum.CRITEO,
+)
+
+criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='criteo-load-to-dw',
+    class_=MarketingEnum.CRITEO,
+)
+
+rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name='rtb-load-to-raw',
+    class_=MarketingEnum.RTB
+)
+
+rtb_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='rtb-raw-to-clean',
+    class_=MarketingEnum.RTB,
+    accounts='default'
+)
+
+rtb_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='rtb-load-to-staging',
+    class_=MarketingEnum.RTB,
+)
+
+rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='rtb-load-to-dw',
+    class_=MarketingEnum.RTB,
+)
 
 trovit_data_to_raw = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -301,22 +301,22 @@ trovit_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.TROVIT
 )
 
-# airflow_helpers.chain(google_ads_clean_dag,
-#                       google_ads_load_to_pre_staging_dag,
-#                       google_ads_load_to_staging_dag,
-#                       google_ads_load_to_dw_dag)
-# airflow_helpers.chain(facebook_ads_clean_dag,
-#                       facebook_ads_load_to_pre_staging_dag,
-#                       facebook_ads_load_to_staging_dag,
-#                       facebook_ads_load_to_dw_dag)
-# airflow_helpers.chain(criteo_raw_dag,
-#                       criteo_clean_dag,
-#                       criteo_load_to_staging_dag,
-#                       criteo_load_to_dw_dag)
-# airflow_helpers.chain(rtb_raw_dag,
-#                       rtb_clean_dag,
-#                       rtb_load_to_staging_dag,
-#                       rtb_load_to_dw_dag)
+airflow_helpers.chain(google_ads_clean_dag,
+                      google_ads_load_to_pre_staging_dag,
+                      google_ads_load_to_staging_dag,
+                      google_ads_load_to_dw_dag)
+airflow_helpers.chain(facebook_ads_clean_dag,
+                      facebook_ads_load_to_pre_staging_dag,
+                      facebook_ads_load_to_staging_dag,
+                      facebook_ads_load_to_dw_dag)
+airflow_helpers.chain(criteo_raw_dag,
+                      criteo_clean_dag,
+                      criteo_load_to_staging_dag,
+                      criteo_load_to_dw_dag)
+airflow_helpers.chain(rtb_raw_dag,
+                      rtb_clean_dag,
+                      rtb_load_to_staging_dag,
+                      rtb_load_to_dw_dag)
 airflow_helpers.chain(trovit_data_to_raw,
                       trovit_clean_dag,
                       trovit_load_to_staging_dag,
