@@ -25,7 +25,7 @@ class MarketingSubDagFactory(object):
         logger.info(
             "m=factory, msg=creating class instance, class={}".format(class_))
         class__ = MarketingSubDagFactory.__dispatch_dict(class_)
-        if class_ is None:
+        if class__ is None:
             raise Exception(
                 'm=factory, class_={}, msg=class type not found'.format(class_))
 
