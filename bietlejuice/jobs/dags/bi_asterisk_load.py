@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
 
@@ -76,8 +75,6 @@ def raw_sub_dag(sub_dag_name, storage_format, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    tasks = []
-
     extract_and_load_data_task = BaseDAG.build_python_operator(
         task_id='extract_and_load_data',
         python_callable=exec_factory_method,
@@ -88,7 +85,6 @@ def raw_sub_dag(sub_dag_name, storage_format, **kwargs):
             'method': 'extract_and_load_data'
         }
     )
-    tasks.append(extract_and_load_data_task)
 
     data_existence_check_task = ShortCircuitOperator(
         task_id='raw_data_existence_check',
@@ -100,13 +96,12 @@ def raw_sub_dag(sub_dag_name, storage_format, **kwargs):
             'bucket_type': 'raw'
         }
     )
-    tasks.append(data_existence_check_task)
+    extract_and_load_data_task >> data_existence_check_task
 
     if (storage_format == 'partitioned'):
         upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
-        tasks.append(upsert_raw_partition_task)
+        data_existence_check_task >> upsert_raw_partition_task
 
-    airflow_helpers.chain(tasks)
     return local_dag
 
 
@@ -119,8 +114,6 @@ def clean_sub_dag(sub_dag_name, storage_format, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    tasks = []
-
     move_to_clean_task = BaseDAG.build_python_operator(
         task_id='move_to_clean',
         python_callable=exec_factory_method,
@@ -131,19 +124,17 @@ def clean_sub_dag(sub_dag_name, storage_format, **kwargs):
             'method': 'move_to_clean'
         }
     )
-    tasks.append(move_to_clean_task)
 
     if (storage_format == 'partitioned'):
         upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
-        tasks.append(upsert_clean_partition_task)
+        move_to_clean_task >> upsert_clean_partition_task
 
-    airflow_helpers.chain(tasks)
     return local_dag
 
 
 def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
     upsert_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_{}_partition'.format(bucket_type),
+        task_id='upsert_{}_partition'.format(sub_dag_name),
         python_callable=upsert_partition,
         dag=local_dag,
         provide_context=True,
@@ -154,6 +145,21 @@ def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
     )
 
     return upsert_partition_task
+
+
+def upsert_single_table_partitioned(table_name, local_dag, bucket_type, **kwargs):
+    upsert_single_table_partition_task = BaseDAG.build_python_operator(
+        task_id='upsert_{}_partition'.format(table_name),
+        python_callable=upsert_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': bucket_type
+        }
+    )
+
+    return upsert_single_table_partition_task
 
 
 # operators
@@ -171,6 +177,21 @@ cdr_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     storage_format='partitioned',
     sub_dag_func=clean_sub_dag,
     class_=AsteriskTableEnum.CDR
+)
+
+logs_full_raw_partition_task = upsert_partitioned(
+    sub_dag_name='logs_full_raw',
+    local_dag=main_dag,
+    bucket_type='raw',
+    class_=AsteriskTableEnum.LOGS_FULL
+)
+
+calls_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='calls_details_clean',
+    storage_format='partitioned',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.CALLS_DETAILS
 )
 
 cxpanel_queues_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
@@ -302,6 +323,7 @@ users_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
 )
 
 # flow
+logs_full_raw_partition_task >> calls_details_clean_sub_dag_task
 cdr_raw_sub_dag_task >> cdr_clean_sub_dag_task
 cxpanel_queues_raw_sub_dag_task >> cxpanel_queues_clean_sub_dag_task
 cxpanel_users_raw_sub_dag_task >> cxpanel_users_clean_sub_dag_task
