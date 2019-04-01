@@ -20,7 +20,7 @@ class TestAsteriskFactory(object):
         (AsteriskTableEnum.CXPANEL_QUEUES, AsteriskCXPanelQueues),
         (AsteriskTableEnum.CXPANEL_USERS, AsteriskCXPanelUsers),
         (AsteriskTableEnum.CDR, AsteriskCDR),
-        (AsteriskTableEnum.CALLS_DETAILS, AsteriskCallsDetails)
+        (AsteriskTableEnum.CALLS_DETAILS, AsteriskCallsDetails),
         (AsteriskTableEnum.LOGS_FULL, AsteriskLogsFull)
     ])
     def test_factory(self, class_, expected):
