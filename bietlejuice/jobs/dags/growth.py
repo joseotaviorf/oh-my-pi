@@ -324,12 +324,10 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
 
 def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
                               placeholders, truncate_func):
-    # taxonomy arrangements
-    is_taxonomy = (funnel == 'taxonomy')
     full_sub_dag_name = '{}_{}'.format(funnel, sub_dag_name)
 
     local_dag = DAG(
-        '{}.{}'.format(main_dag_name, sub_dag_name if not is_taxonomy else full_sub_dag_name),
+        '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
         start_date=start_date
     )
@@ -350,10 +348,41 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
                                                python_callable=consolidate_with_filters,
                                                dag=local_dag,
                                                op_kwargs={
-                                                   'measure': sub_dag_name if not is_taxonomy else full_sub_dag_name,
-                                                   'is_taxonomy': is_taxonomy}
+                                                   'measure': sub_dag_name
+                                               }
                                                )
     consolidation_task.set_upstream(region_tasks)
+
+    return local_dag
+
+
+def sub_dag_func_taxonomy(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
+                          placeholders, truncate_func):
+    full_sub_dag_name = '{}_{}'.format(funnel, sub_dag_name)
+
+    local_dag = DAG(
+        '{}.{}'.format(main_dag_name, full_sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date
+    )
+
+    # all
+    no_filter_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders)
+
+    # city
+    city_tasks = get_filter_tasks('city', funnel, local_dag, sub_dag_name, materialize_func, placeholders)
+
+    for i in range(0, 4):
+        no_filter_tasks[i] >> city_tasks[i]
+
+    consolidation_task = build_python_operator(task_id='consolidate',
+                                               python_callable=consolidate_with_filters,
+                                               dag=local_dag,
+                                               op_kwargs={
+                                                   'measure': full_sub_dag_name,
+                                                   'is_taxonomy': True}
+                                               )
+    consolidation_task.set_upstream(city_tasks)
 
     return local_dag
 
@@ -637,55 +666,55 @@ prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with
 fact_append_task = build_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
 
 # measures with taxonomy detail
-taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                               materialize_growth_measure_table_query, 'leads',
                                               'taxonomy')
-taxonomy_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                       materialize_growth_measure_table_query,
                                                       'visits_booked',
                                                       'taxonomy')
 
-taxonomy_visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                          materialize_growth_measure_table_query,
                                                          'visits_completed',
                                                          'taxonomy')
 
-taxonomy_offers_submitted_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_offers_submitted_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                          materialize_growth_measure_table_query,
                                                          'offers_submitted',
                                                          'taxonomy')
 
-taxonomy_offers_approved_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_offers_approved_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                         materialize_growth_measure_table_query,
                                                         'offers_approved',
                                                         'taxonomy')
 
-taxonomy_contracts_signed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_contracts_signed_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                          materialize_growth_measure_table_query,
                                                          'contracts_signed',
                                                          'taxonomy')
 
-taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                  materialize_growth_measure_table_query,
                                                  'listings',
                                                  'taxonomy')
 
-taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                                     materialize_growth_measure_table_query,
                                                                     'demand_active_user_sessions',
                                                                     'taxonomy')
 
-taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                             materialize_growth_measure_table_query,
                                                             'demand_active_users',
                                                             'taxonomy')
 
-taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                                     materialize_growth_measure_table_query,
                                                                     'supply_active_user_sessions',
                                                                     'taxonomy')
 
-taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                             materialize_growth_measure_table_query,
                                                             'supply_active_users',
                                                             'taxonomy')
