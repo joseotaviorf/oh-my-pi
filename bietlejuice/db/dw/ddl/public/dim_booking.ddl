@@ -3,7 +3,7 @@ CREATE TABLE dim_booking (
   sk_booking INTEGER,
   id_booking INTEGER,
   -- id_booking_original integer,
-  valid_bookings_not_rescheduled boolean,
+  is_rescheduled boolean,
   dt_scheduling TIMESTAMP,
   type VARCHAR(50),
   confirmed VARCHAR(100),
