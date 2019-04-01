@@ -1,6 +1,8 @@
+import time
 from collections import OrderedDict
 from copy import deepcopy
 
+from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -16,6 +18,32 @@ class TrovitCampaigns(Marketing):
     def __init__(self, s3_bucket, execution_date, auth, account=None):
         super(TrovitCampaigns, self).__init__(s3_bucket, execution_date,
                                               'trovit_campaigns', account)
+
+    @logger
+    def move_trovit_campaigns_to_raw(self):
+        logger.info('m={}, msg={}'.format('move_trovit_campaigns_to_raw', 'Starting job...'))
+        start_date = self.execution_date.strftime(
+            '%Y-%m-%d')
+        batch_client = BatchClient()
+        job_name = 'scrap-trovit-data'
+        job_queue = 'scrap-marketing-data'
+        r = batch_client.start_batch_job(
+            job_name=job_name,
+            job_queue=job_queue,
+            job_definition='scrap-marketing-data:1',
+            command=['scrapy', 'crawl', 'trovit', '-a', 'start_date={}'.format(start_date), '-a',
+                     'end_date={}'.format(start_date)]
+        )
+
+        while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
+            time.sleep(30)
+
+        final_status = batch_client.get_job_info_by_id(r.get('jobId')).get('status')
+
+        if final_status == 'FAILED':
+            raise RuntimeError('m={}, msg={}'.format('scrap_trovit_data', 'Job {} failed.'.format(r.get('jobName'))))
+
+        logger.info('m={}, msg=Job {} ended successfully'.format('scrap_trovit_data', r.get('jobName')))
 
     @logger
     def move_marketing_trovit_campaigns_to_clean(self):

@@ -1,11 +1,9 @@
 import json
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.aws.batch import BatchClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -127,32 +125,6 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('dw')
 
 
-def scrap_trovit_data(**kwargs):
-    logger.info('m={}, msg={}'.format('scrap_trovit_data', 'Starting job...'))
-    start_date = (kwargs['execution_date'] - timedelta(days=1)).strftime(
-        '%Y-%m-%d')
-    batch_client = BatchClient()
-    job_name = 'scrap-trovit-data'
-    job_queue = 'scrap-marketing-data'
-    r = batch_client.start_batch_job(
-        job_name=job_name,
-        job_queue=job_queue,
-        job_definition='scrap-marketing-data:1',
-        command=['scrapy', 'crawl', 'trovit', '-a', 'start_date={}'.format(start_date), '-a',
-                 'end_date={}'.format(start_date)]
-    )
-
-    while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
-        time.sleep(30)
-
-    final_status = batch_client.get_job_info_by_id(r.get('jobId')).get('status')
-
-    if final_status == 'FAILED':
-        raise RuntimeError('m={}, msg={}'.format('scrap_trovit_data', 'Job {} failed.'.format(r.get('jobName'))))
-
-    logger.info('m={}, msg=Job {} ended successfully'.format('scrap_trovit_data', r.get('jobName')))
-
-
 facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
@@ -271,12 +243,11 @@ rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.RTB,
 )
 
-trovit_data_to_raw = BaseDAG.build_python_operator(
+trovit_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    task_id='scrap-trovit-data',
-    python_callable=scrap_trovit_data,
-    provide_context=True,
-    op_kwargs=None
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name='trovit-load-to-raw',
+    class_=MarketingEnum.TROVIT
 )
 
 trovit_clean_dag = BaseSubDag.get_sub_dag_operator(
@@ -317,7 +288,7 @@ airflow_helpers.chain(rtb_raw_dag,
                       rtb_clean_dag,
                       rtb_load_to_staging_dag,
                       rtb_load_to_dw_dag)
-airflow_helpers.chain(trovit_data_to_raw,
+airflow_helpers.chain(trovit_raw_dag,
                       trovit_clean_dag,
                       trovit_load_to_staging_dag,
                       trovit_load_to_dw_dag)
