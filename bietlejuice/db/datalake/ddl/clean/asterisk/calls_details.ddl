@@ -6,7 +6,7 @@ create external table if not exists datalake_clean.asterisk_calls_details (
     id_ura string,
     ts_start_ura string,
     ts_end_ura string,
-    is_URA_HELP_solved string,
+    is_ura_help_solved string,
     id_queue string,
     id_caller string,
     ts_start_queue string,

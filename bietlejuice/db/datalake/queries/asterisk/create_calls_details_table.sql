@@ -107,10 +107,10 @@ URA AS (
        e.id_call,
        e.id_ura,
        case 
-        when ty.typed_answer='2' then 'true'
-        when ty.typed_answer='3' then 'false'
+        when ty.typed_answer='2' then 'True'
+        when ty.typed_answer='3' then 'False'
         else NULL
-       end as is_URA_HELP_solved,
+       end as is_ura_help_solved,
        max(e.ts_start_ura) as ts_start_ura,
        max(e.ts_end_ura) as ts_end_ura
     FROM events_ura e
@@ -146,7 +146,7 @@ SELECT
     u.id_ura,
     u.ts_start_ura,
     u.ts_end_ura,
-    u.is_URA_HELP_solved,
+    u.is_ura_help_solved,
     q.id_queue,
     q.id_caller, -- RAMAL
     q.ts_start_queue,
@@ -169,5 +169,4 @@ left join events_destination d
 on id_c.id_call=d.id_call
 left join events_attendance a 
 on id_c.id_call=a.id_call and q.id_caller = a.id_caller
-where id_c.id_call is not null
-order by id_c.id_call;
+where id_c.id_call is not null;
