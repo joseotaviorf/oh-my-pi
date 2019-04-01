@@ -2,6 +2,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.etl.asterisk.asterisk_table_enum import AsteriskTableEnum
 from bietlejuice.jobs.etl.asterisk.cdr import AsteriskCDR
+from bietlejuice.jobs.etl.asterisk.calls_details import AsteriskCallsDetails
 from bietlejuice.jobs.etl.asterisk.cxpanel_queues import AsteriskCXPanelQueues
 from bietlejuice.jobs.etl.asterisk.cxpanel_users import AsteriskCXPanelUsers
 from bietlejuice.jobs.etl.asterisk.devices import AsteriskDevices
@@ -38,4 +39,5 @@ class AsteriskFactory(object):
             AsteriskTableEnum.CXPANEL_QUEUES: AsteriskCXPanelQueues,
             AsteriskTableEnum.CXPANEL_USERS: AsteriskCXPanelUsers,
             AsteriskTableEnum.CDR: AsteriskCDR,
+            AsteriskTableEnum.CALLS_DETAILS: AsteriskCallsDetails,
         }.get(entity)
