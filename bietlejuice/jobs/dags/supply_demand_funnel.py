@@ -1,7 +1,6 @@
-import airflow.utils.helpers as airflow_helpers
 from datetime import datetime, timedelta
-from qa_python_utils import QuintoAndarLogger
 
+import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -10,9 +9,10 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag, PartnerAgentSubDag
+    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 
@@ -297,6 +297,17 @@ def doorman_sub_dag(sub_dag_name):
     return sub_dag.build_doorman_with_tests()
 
 
+def polygon_region_sub_dag(sub_dag_name):
+    sub_dag = PolygonRegionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_polygon_region_with_tests()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -353,6 +364,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
+    execution_timeout=timedelta(hours=4),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 
@@ -479,6 +491,12 @@ doorman_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Doorman'
 )
 
+polygon_region_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=polygon_region_sub_dag,
+    sub_dag_name='PolygonRegion'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -507,7 +525,8 @@ airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag.set_downstream([fact_photo_job, fact_house_status])
 photo_job_dag >> fact_photo_job
-fact_house_listings.set_upstream([condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
+fact_house_listings.set_upstream(
+    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)

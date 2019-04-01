@@ -24,7 +24,7 @@ class SeuBarrigaFine(SeuBarrigaInvoice):
     def __init__(self, s3_bucket, api_dict, execution_date):
         super(SeuBarrigaFine, self).__init__(
             s3_bucket=s3_bucket,
-            _type='fine',
+            type_='fine',
             year=execution_date.strftime('%Y'),
             month=execution_date.strftime('%m'),
             api_dict=api_dict
