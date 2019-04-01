@@ -142,13 +142,14 @@ class TestAgents(object):
                        return_value=pd.DataFrame(data=[1], columns=['id']))
     def test_get_datalake_data_from_filequery(self, mock_execute_file_query_and_return_dataframe, agent):
         # arrange
-        table = [['id'], [1]]
-        expected_result = petl.setheader(table, ['id'])
-        file_name = mock.ANY
+        expected_df = pd.DataFrame(data=[1], columns=['id'])
+        file_name = 'lorem'
 
         # act
         result = agent.get_datalake_data_from_filequery(file_name=file_name)
 
         # assert
-        # Comparing petl objects by extracting a list
-        assert list(expected_result) == list(result)
+        # Comparing petl objects by converting to df
+        assert expected_df.equals(petl.todataframe(result))
+        assert mock_execute_file_query_and_return_dataframe.call_count == 1
+        assert file_name in mock_execute_file_query_and_return_dataframe.call_args[1].get('filename')

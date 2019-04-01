@@ -3,4 +3,4 @@ pytest==4.0.1
 pytest-cov==2.6.0
 coverage-badge==0.2.0
 petl==1.1.1
-numpy==1.13.0
+
