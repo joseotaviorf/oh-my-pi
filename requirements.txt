@@ -11,7 +11,8 @@ enum==0.4.6
 enum34==1.1.6
 et-xmlfile==1.0.1
 facebookads==2.11.1
-fastparquet>=0.1.6
+numpy==1.13.0
+fastparquet==0.2.1
 futures==3.0.5
 git+git://github.com/quintoandar/python-utils.git@v0.3.4
 google-api-python-client>=1.6.2
@@ -29,7 +30,6 @@ kubernetes==7.0.0
 llvmlite==0.22.0
 newrelic==2.98.0.81
 numba==0.37.0
-numpy==1.13.0
 oauth2client>=3.0.0
 oauthlib==2.1.0
 openpyxl==2.3.5
