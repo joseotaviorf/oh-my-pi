@@ -11,7 +11,7 @@ enum==0.4.6
 enum34==1.1.6
 et-xmlfile==1.0.1
 facebookads==2.11.1
-fastparquet==0.3.0
+fastparquet==0.2.1
 futures==3.0.5
 git+git://github.com/quintoandar/python-utils.git@v0.3.4
 google-api-python-client>=1.6.2
