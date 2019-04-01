@@ -98,7 +98,56 @@ doorman AS (
   WHERE a.lat IS NOT NULL
 )
 SELECT
-  bldgs.*,
+  bldgs.tipo_registro,
+  bldgs.indicador_full_diario,
+  bldgs.tipo_atualizacao,
+  bldgs.cnpj,
+  bldgs.matriz_filial,
+  bldgs.razao_social,
+  bldgs.nome_fantasia,
+  bldgs.situacao_cadastral,
+  bldgs.dt_situacao_cadastral,
+  bldgs.motivo_situacao_cadastral,
+  bldgs.nm_cidade_exterior,
+  bldgs.cod_pais,
+  bldgs.nm_pais,
+  bldgs.cod_natureza_juridica,
+  bldgs.dt_inicio_atividade,
+  bldgs.cnae_fiscal,
+  bldgs.tipo_logradouro,
+  bldgs.logradouro,
+  bldgs.numero,
+  bldgs.extracted_number,
+  bldgs.complemento,
+  bldgs.bairro,
+  bldgs.cep,
+  bldgs.uf,
+  bldgs.cod_municipio,
+  bldgs.municipio,
+  bldgs.telefone_1,
+  bldgs.telefone_2,
+  bldgs.fax,
+  bldgs.email,
+  bldgs.quali_responsavel,
+  bldgs.capital_social,
+  bldgs.porte_empresa,
+  bldgs.opcao_simples,
+  bldgs.dt_opcao_simples,
+  bldgs.dt_exclusao_simples,
+  bldgs.opcao_mei,
+  bldgs.situacao_especial,
+  bldgs.dt_situacao_especial,
+  bldgs.formatted_address,
+  bldgs.comercial,
+  bldgs.sem_numero,
+  bldgs.hash,
+  bldgs.geocode,
+  bldgs.geocode_hash,
+  bldgs.google_formatted_address,
+  COALESCE(bldgs.lat, bldgs_doormen.doorman_lat[1]) AS lat,
+  COALESCE(bldgs.lng, bldgs_doormen.doorman_lng[1]) AS lng,
+  bldgs.place_id,
+  bldgs.types,
   bldgs_doormen.doorman_ct,
   bldgs_doormen.doorman_phone,
   bldgs_doormen.doorman_name,
@@ -123,18 +172,22 @@ SELECT
     WHEN contains(bldgs_doormen.doorman_active, 'no referral') THEN 'no referral'
   END AS most_active_doorman
 FROM bldgs
-LEFT JOIN
+FULL OUTER JOIN
   (SELECT
-    b.hash,
+    COALESCE(b.hash,
+      CAST(ROUND(CAST(d.lng AS double), 4) AS varchar) || ',' || CAST(ROUND(CAST(d.lat AS double), 4) AS varchar) || ',' || d.extracted_work_house_number
+    ) as hash,
     COUNT(*) AS doorman_ct,
     array_agg(telefone_principal) AS doorman_phone,
     array_agg(TRIM(nome)) AS doorman_name,
     array_agg(lead_activity) AS doorman_active,
     array_agg(ts_joined_program) AS doorman_joined_date,
     MAX(ts_joined_program_timestamp) AS latest_doorman_joined_date,
-    MIN(ts_joined_program_timestamp) AS earliest_doorman_joined_date
+    MIN(ts_joined_program_timestamp) AS earliest_doorman_joined_date,
+    array_agg(d.lng) AS doorman_lng,
+    array_agg(d.lat) AS doorman_lat
   FROM doorman AS d
-  JOIN bldgs AS b
+  LEFT JOIN bldgs AS b
   ON
     ST_WITHIN(
       ST_POINT(CAST(b.lng AS double), CAST(b.lat AS DOUBLE)),
@@ -147,6 +200,6 @@ LEFT JOIN
     AND CAST(b.extracted_number AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
     -- leading zero issue here?
     -- also: guarantee only 1 bldg match per doorman (nearest?)
-  GROUP BY b.hash) AS bldgs_doormen
+  GROUP BY 1) AS bldgs_doormen
 ON bldgs.hash = bldgs_doormen.hash
 ;
