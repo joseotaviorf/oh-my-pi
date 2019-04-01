@@ -19,6 +19,7 @@ pipeline:
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
+      - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install -r requirements_test.txt
       - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=25 --cov-config .coveragerc tests
