@@ -32,7 +32,7 @@ reschedules as (
     from booking
     where "reagendadoDe_id" is not null
     group by 1 -- guaranteeing there are no future duplication on Product
-)	
+),	
 bookings as
 (
 	select 
