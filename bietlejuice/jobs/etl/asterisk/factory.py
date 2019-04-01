@@ -8,6 +8,7 @@ from bietlejuice.jobs.etl.asterisk.cxpanel_users import AsteriskCXPanelUsers
 from bietlejuice.jobs.etl.asterisk.devices import AsteriskDevices
 from bietlejuice.jobs.etl.asterisk.ivr_details import AsteriskIVRDetails
 from bietlejuice.jobs.etl.asterisk.ivr_entries import AsteriskIVREntries
+from bietlejuice.jobs.etl.asterisk.logs_full import AsteriskLogsFull
 from bietlejuice.jobs.etl.asterisk.queues_config import AsteriskQueuesConfig
 from bietlejuice.jobs.etl.asterisk.queues_details import AsteriskQueuesDetails
 from bietlejuice.jobs.etl.asterisk.users import AsteriskUsers
@@ -40,4 +41,5 @@ class AsteriskFactory(object):
             AsteriskTableEnum.CXPANEL_USERS: AsteriskCXPanelUsers,
             AsteriskTableEnum.CDR: AsteriskCDR,
             AsteriskTableEnum.CALLS_DETAILS: AsteriskCallsDetails,
+            AsteriskTableEnum.LOGS_FULL: AsteriskLogsFull,
         }.get(entity)
