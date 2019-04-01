@@ -17,6 +17,6 @@ select
         else 'Suspended'
         end as status,
     date(ts_rev) as start_date,
-    coalesce(date(lead(ts_rev) over (partition by id order by ts_rev)), date('2099-12-31')) as end_date
+    date(lead(ts_rev) over (partition by id order by ts_rev)) as end_date
 from agent_changes
 where has_changed = true
