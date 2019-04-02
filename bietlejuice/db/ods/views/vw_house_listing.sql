@@ -10,6 +10,9 @@ with filt as (
 	row_number() over (partition by id order by status_time) as rn
 	from imovel_status_history
 	where status_history in ('despublicado', 'publicado', 'alugado', 'suspenso')
+	  -- house with two contracts with the same dt_entrance value
+	  -- FIXME: generalize house listing rules
+	  and id != 892856128 
 ),
 not_pub as (
   select

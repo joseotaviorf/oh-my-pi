@@ -102,6 +102,11 @@ _fact as (
     end as dt_credit_analysis_approved,
     coalesce(to_char(vdp.ts_processed, 'YYYYMMDD')::integer, -1) as sk_proposal_processed_date,
     vdp.ts_processed as ts_proposal_processed,
+    case
+    when vdp.status = 'Rejeitada'
+      then vdp.ts_processed
+    else null::timestamp
+    end as ts_proposal_rejected,
     vdp.status as proposal_status,
     vdp.tenant_document_sent as has_tenant_sent_doc,
 	  hrf.visit_created_from_app as flg_visit_created_from_app,
@@ -112,7 +117,11 @@ _fact as (
 	  now()::timestamp as ts_load,
     coalesce(rs.id, -1) as sk_reservation,
     coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
-    rs.reservation_attempts as reservation_attempts
+    rs.reservation_attempts as reservation_attempts,
+    vdb.sk_rent_flow_taxonomy,
+    vdb.utm_campaign as booking_utm_campaign,
+    vdb.utm_content as booking_utm_content,
+  	vdb.utm_term as booking_utm_term
 	from house_rent_flow hrf
 	left join vw_dim_house_listing vdh
 	  on vdh.id_house = hrf.id_house
@@ -137,11 +146,13 @@ _fact as (
     on hrf.id_contract = c.id_contract
   left join agent_review ar
     on hrf.id_booking = ar.id_booking
- left join _reservation rs
+  left join _reservation rs
     on hrf.id_house = rs.id_house
         and hrf.id_client = id_tenant
         and vdo.status = 'Aprovada'
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
+  left join vw_dim_booking vdb
+    on vdb.sk_booking = hrf.id_booking
 )
 select
   ods_id,
@@ -189,15 +200,19 @@ select
   visit_created_type,
   flg_visit_last_updated_from_app,
   visit_last_updated_type,
+  sk_rent_flow_taxonomy,
+  booking_utm_campaign,
+  booking_utm_content,
+  booking_utm_term,
   ((date_part('day', dt_visit - dt_booking_created) * 1440 +
     date_part('hour', dt_visit - dt_booking_created) * 60 +
-		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_visit,
+		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_visit,
   ((date_part('day', dt_visit - dt_client_sign_up) * 1440 +
     date_part('hour', dt_visit - dt_client_sign_up) * 60 +
-		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_creation_to_visit,
+		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_created_to_visit,
   ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
     date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
-		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analyis,
+		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analysis,
   ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
     date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
 		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
@@ -206,10 +221,10 @@ select
 		date_part('minute', dt_owner_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_owner_doc_sent,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_doc_first_sent_to_credit_processed,
+		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_credit_processed,
   ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_doc_first_sent_to_doc_completed,
+		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_doc_completed,
   ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
     date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
 		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_doc_completed_to_credit_processed,
@@ -224,7 +239,7 @@ select
 		date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as days_contract_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_booking_created) * 1440 +
     date_part('hour', dt_contract_signed - dt_booking_created) * 60 +
-		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_to_contract_signed,
+		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_contract_signed,
   ((date_part('day', dt_contract_signed - dt_visit) * 1440 +
     date_part('hour', dt_contract_signed - dt_visit) * 60 +
 		date_part('minute', dt_contract_signed - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_contract_signed,
@@ -236,13 +251,13 @@ select
 		date_part('minute', dt_offer_submitted - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_offer_submitted,
   ((date_part('day', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_doc_sent_to_insurance_approval,
+		date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_insurance_approved,
   ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
     date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
-		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approval_to_contract_signed,
-  ((date_part('day', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(dt_tenant_auto_first_doc_sent, dt_offer_approved) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_doc_sent,
+		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approved_to_contract_signed,
+  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
+    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
+		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_first_doc_sent,
   ((date_part('day', dt_offer_approved - dt_offer_submitted) * 1440 +
     date_part('hour', dt_offer_approved - dt_offer_submitted) * 60 +
 		date_part('minute', dt_offer_approved - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_offer_approved,
@@ -260,16 +275,16 @@ select
 		date_part('minute', dt_credit_analysis_approved - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_tenant_doc_completed_to_credit_approved,
   ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
     date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_doc_sent_to_doc_completed,
+		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_doc_completed,
   ((date_part('day', dt_contract_signed - dt_house_listing) * 1440 +
     date_part('hour', dt_contract_signed - dt_house_listing) * 60 +
 		date_part('minute', dt_contract_signed - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_contract_signed,
   ((date_part('day', dt_visit - dt_house_listing) * 1440 +
     date_part('hour', dt_visit - dt_house_listing) * 60 +
 		date_part('minute', dt_visit - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_visit,
-  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_processed) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
+  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 1440 +
+    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 60 +
+		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
   ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
     date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
 		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,

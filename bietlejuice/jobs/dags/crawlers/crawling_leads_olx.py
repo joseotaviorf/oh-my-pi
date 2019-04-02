@@ -1,12 +1,13 @@
 import json
-from datetime import datetime
-
 from airflow.models import DAG
+from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env, xcom as xcom
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.crawlers.crawler_leads import CrawlerLeads
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
@@ -42,6 +43,7 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     leads = crawler_leads.cleaning(leads)
+    leads['rent'] = leads.rent.astype(str)
     logger.info('m=insert_leads, msg=got {} leads after cleaning'.format(len(leads)))
     if leads.empty:
         logger.info(NO_LEADS_MSG)
@@ -51,7 +53,7 @@ def insert_leads(**kwargs):
     regex_phone = r'(?P<code>\+\d{2})?(?P<number>\d+)'
     phones.phone_number = phones.phone_number.str.extract(regex_phone, expand=False).number
 
-    leads['phone_number'] = leads.phones.apply(lambda p: eval(p)[0]).astype(str)
+    leads['phone_number'] = leads.phones.astype(str)
     leads['known'] = leads.phone_number.isin(phones.phone_number)
     leads = leads[~leads.known].sort_values(by='updated_on')
     if leads.empty:
@@ -62,13 +64,15 @@ def insert_leads(**kwargs):
     logger.info('m=insert_leads, state_size={}'.format(leads.groupby('state').size()))
 
     # enrich lat and lng with ceps
-    # TODO -- the google api is not sending the geo info for some ceps. The idea is to query the EBDB cep table to
-    #  get street and additional information. It's also needed to configure a memory cache to save answers from google
-    #  api.
-    info = crawler_leads.get_geolocation_info(leads.query("""lat.isnull() or lng.isnull()""").cep.unique())
+    ceps = leads.query("""lat.isnull() or lng.isnull()""").cep.unique()
+    q = BaseETL.get_query_from_file_name('{}/crawlers/get_cep_info.sql'.format(DATALAKE_QUERIES_DIR))
+    q = q.format(ceps=' '.join(str(cep) for cep in ceps))
+    cep_info = crawler_leads.athena_client.execute_query_and_return_dataframe(q)
+
+    info = crawler_leads.get_geolocation_info(cep_info)
     leads = leads.merge(info, how='left', left_on='cep', right_on='location')
-    leads.lat = leads.lat.combine_first(leads.glat)
-    leads.lng = leads.lng.combine_first(leads.glng)
+    leads.lat = leads.glat.combine_first(leads.lat)
+    leads.lng = leads.glng.combine_first(leads.lng)
 
     leads = leads.dropna(subset=['lat', 'lng'])
     logger.info('m=insert_leads, msg=got {} leads after getting lat e lng'.format(len(leads)))
@@ -79,7 +83,6 @@ def insert_leads(**kwargs):
     leads['regions'] = leads.apply(lambda row: crawler_leads.check_coverage(row.lat, row.lng), axis=1)
 
     # filter out units outside our coverage area. It's assumed that we are allowing houses in all regions
-    # TODO --- In the future, it's needed to query the types of houses that are allowed in each region
     leads = leads[leads.regions > -1]
     if leads.empty:
         logger.info(NO_LEADS_MSG)
@@ -97,7 +100,7 @@ def insert_leads(**kwargs):
         'm=insert_leads, msg=got {} leads after checking size of the phone number.'.format(
             len(leads)))
 
-    crawler_leads.send_leads(leads.iloc[:kwargs.get('max_leads')], ws=kwargs.get('ws'))
+    crawler_leads.send_leads(leads, ws=kwargs.get('ws'))
 
 
 def submit_olx(**kwargs):

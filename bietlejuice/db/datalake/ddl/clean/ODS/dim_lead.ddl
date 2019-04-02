@@ -66,11 +66,17 @@ create external table if not exists datalake_clean.ods_dim_lead (
   utm_source string,
   utm_medium string,
   utm_campaign string,
+  utm_content string,
+  utm_term string,
+  tracking_platform string,
+  tracking_region string,
+  tracking_city string,
   network string,
   usuario_que_indicou_id string,
   flg_city_served string,
   flg_latlng_served string,
   flg_location_served string,
+  score_factor string,
   load_timestamp string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

@@ -11,7 +11,8 @@ code varchar(255),
 atualizadoEm timestamp,
 criadoEm timestamp,
 joinedProgramAt timestamp,
-id_dados_afiliado bigint
+id_dados_afiliado bigint,
+is_active boolean
 )
 WITH (
   OIDS=FALSE

@@ -65,10 +65,16 @@ CREATE TABLE staging.dim_lead (
   utm_source VARCHAR(255),
   utm_medium VARCHAR(255),
   utm_campaign VARCHAR(255),
+  utm_content VARCHAR(255),
+  utm_term VARCHAR(255),
+  tracking_platform VARCHAR(255),
+  tracking_region VARCHAR(255),
+  tracking_city VARCHAR(255),
   network VARCHAR(255),
   usuario_que_indicou_id VARCHAR(255),
   flg_city_served boolean,
   flg_latlng_served boolean,
   flg_location_served boolean,
+  score_factor bigint,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE
 ) ;

@@ -1,18 +1,20 @@
+import sys
+
+import boto3
 import codecs
 import datetime
 import gzip
 import io
 import json
 import os
+import petl
 import re
-import sys
 import zipfile
+from StringIO import StringIO
 from decimal import Decimal
+from functools import partial
 from io import BytesIO
 from logging import info as log
-
-import boto3
-import petl
 from petl.io.db import create_table
 from unidecode import unidecode
 
@@ -459,6 +461,20 @@ class BaseETL(object):
             sys.stdout.flush()
             return None
         return bucket_folder_path, filename
+
+    def json_to_s3(self, dict_list, s3_bucket, s3_key):
+        json_list = map(partial(json.dumps, ensure_ascii=False), dict_list)
+        json_lines = u'\n'.join(json_list).encode('utf-8')
+
+        body = StringIO()
+        with gzip.GzipFile(fileobj=body, mode='wt') as gz_file:
+            gz_file.write(json_lines)
+
+        self.obj_to_s3(
+            obj_io=body,
+            bucket=s3_bucket,
+            file_path=s3_key
+        )
 
     @classmethod
     def obj_to_s3(cls, obj_io, bucket, file_path):

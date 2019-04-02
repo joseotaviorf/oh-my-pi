@@ -1,9 +1,9 @@
 drop table if exists datalake_clean.seu_barriga_invoice_fine;
 create external table datalake_clean.seu_barriga_invoice_fine (
-  contract_id bigint,
-  fine double,
-  due_date string,
-  paid_date string
+  external_id_contract string,
+  fine string,
+  dt_due string,
+  dt_paid string
 )
 partitioned by (
   ym string

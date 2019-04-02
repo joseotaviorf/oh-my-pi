@@ -4,6 +4,7 @@ with weekly_schedule_prev as (
 		agente_id as agent_id,
 		diadasemana as dow,
 		value as available_slot,
+		dat.tipos as agent_type,
 		key as slot_number
 	from
 		datalake_raw.ebdb_horariosemanalagente_aud hsa
@@ -27,7 +28,6 @@ with weekly_schedule_prev as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
-	where dat.tipos = 'Visita'
 ), weekly_schedule as (
 	select
 		*,
@@ -108,6 +108,7 @@ with weekly_schedule_prev as (
 ), schedule_versions as (
 	select
 		agent_id,
+		agent_type,
 		dt_update,
 		cast(dow as bigint) as dow,
 		available_slot,
@@ -121,6 +122,7 @@ with weekly_schedule_prev as (
 , base_schedule as (
 	select
 		agent_id,
+		agent_type,
 		su.dt_update,
 		dd.dt as slot_dt,
 		su.dow,
@@ -144,6 +146,7 @@ with weekly_schedule_prev as (
 , specific_updates as (
 	select
 		bs.agent_id,
+		bs.agent_type,
 		bs.dt_update as last_weekly_update,
 		case
 			when ss.available_slot is not null and ss.available_slot <> bs.available_slot then ss.dt_update
@@ -178,6 +181,7 @@ with weekly_schedule_prev as (
 ), time_window_updates as (
 	select
 		sc.agent_id,
+		sc.agent_type,
 		sc.last_weekly_update,
 		sc.last_specific_update,
 		sc.slot_dt,
@@ -212,6 +216,7 @@ with weekly_schedule_prev as (
 , visits_updates as (
 	select
 		tw.agent_id,
+		tw.agent_type,
 		tw.last_weekly_update,
 		tw.last_specific_update,
 		tw.slot_dt,
@@ -297,6 +302,7 @@ with weekly_schedule_prev as (
 )
 select
 	vu.agent_id,
+	vu.agent_type,
 	vu.last_weekly_update,
 	vu.last_specific_update,
 	vu.slot_dt,
@@ -324,7 +330,7 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
-where date(vu.slot_dt) between date('{dt}') and date('{dt}') + interval '4' day
+where date(vu.slot_dt) between date('{dt}') and date('{dt}') + interval '14' day
    and ah.status = '1'
 order by vu.slot_dt
 ;

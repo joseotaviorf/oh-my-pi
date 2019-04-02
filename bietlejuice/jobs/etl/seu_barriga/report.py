@@ -1,6 +1,4 @@
-import re
 from collections import OrderedDict
-
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -25,23 +23,24 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
     |           amount                    |              amount               |
     |            item                     |               item                |
     |          year-month                 |             year_month            |
-    |          due-date                   |              due_date             |
-    |       tenant-due-date               |           tenant_due_date         |
-    |      tenant-paid-date               |          tenant_paid_date         |
+    |          due-date                   |              dt_due               |
+    |       tenant-due-date               |           dt_tenant_due           |
+    |      tenant-paid-date               |          dt_tenant_paid           |
     |        tenant-status                |            tenant_status          |
-    |      landlord-due-date              |          landlord_due_date        |
-    |      landlord-paid-date             |          landlord_paid_date       |
+    |      landlord-due-date              |          dt_landlord_due          |
+    |      landlord-paid-date             |          dt_landlord_paid         |
     |       landlord-status               |           landlord_status         |
-    |           purpose                   |            delayed_days           |
-    |             -                       |               purpose             |
-    |             -                       |                 -                 |
+    |              -                      |            days_delayed           |
+    |           purpose                   |               purpose             |
+    |    tenant_invoice_created_at        |        dt_tenant_invoice_created  |
+    |    landlord_invoice_created_at      |       dt_landlord_invoice_created |
     ---------------------------------------------------------------------------
     """
 
     def __init__(self, s3_bucket, api_dict, execution_date):
         super(SeuBarrigaReport, self).__init__(
             s3_bucket=s3_bucket,
-            _type='report',
+            type_='report',
             year=execution_date.strftime('%Y'),
             month=execution_date.strftime('%m'),
             api_dict=api_dict
@@ -58,58 +57,34 @@ class SeuBarrigaReport(SeuBarrigaInvoice):
     def transform_data(self):
         query = BaseETL.get_query_from_file_name(
             '{}/seu_barriga/invoice/report_raw_transform.sql'.format(DATALAKE_QUERIES_DIR))
-        r_cols = OrderedDict([
-            ('contract-id', str),
+
+        # TODO: add clean columns types after Spark migration
+        _cols = OrderedDict([
+            ('id_contract', str),
             ('version', str),
             ('blocked', str),
-            ('from', str),
-            ('to', str),
+            ('item_from', str),
+            ('item_to', str),
             ('description', str),
             ('amount', str),
             ('item', str),
-            ('year-month', str),
-            ('due-date', str),
-            ('tenant-due-date', str),
-            ('tenant-paid-date', str),
-            ('tenant-status', str),
-            ('landlord-due-date', str),
-            ('landlord-paid-date', str),
-            ('landlord-status', str),
-            ('delayed_days', int),
-            ('purpose', str)
-        ])
-
-        c_cols = OrderedDict([
-            ('contract_id', str),
-            ('version', str),
-            ('blocked', str),
-            ('_from', str),
-            ('_to', str),
-            ('description', str),
-            ('amount', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['float']['regex']),
-                        SeuBarrigaInvoice.REGEX_MAPPING['float']['group']]),
-            ('item', str),
             ('ref_item_ym', str),
-            ('due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                          SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                 SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_paid_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                  SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('tenant_status', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                               SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('landlord_due_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                   SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
-            ('landlord_paid_date', [str, re.compile(SeuBarrigaInvoice.REGEX_MAPPING['date']['regex']),
-                                    SeuBarrigaInvoice.REGEX_MAPPING['date']['group']]),
+            ('dt_due', str),
+            ('dt_tenant_due', str),
+            ('dt_tenant_paid', str),
+            ('tenant_status', str),
+            ('dt_landlord_due', str),
+            ('dt_landlord_paid', str),
             ('landlord_status', str),
-            ('delayed_days', str),
+            ('days_delayed', str),
             ('purpose', str),
+            ('dt_tenant_invoice_created', str),
+            ('dt_landlord_invoice_created', str)
         ])
 
         self._transform_data(
             query=query,
-            raw_columns=r_cols,
-            clean_columns=c_cols,
+            raw_columns=_cols,
+            clean_columns=_cols,
             clean_table_name='seu_barriga_invoice_report'
         )

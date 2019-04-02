@@ -10,30 +10,35 @@ with bms as (
 ),
 taxonomy_demand as (
 	 select
+	    cast(td.id as bigint) as id,
 		td.app_type,
 		td.utm_source,
 		td.utm_medium,
 		td.branded,
 		td.first_update_source,
 		td.flg_via_reschedule::boolean,
-		td."Category" as mkt_category,
-		td."Flow" as mkt_flow,
-		td."Completion" as mkt_completion,
-		td."Channel" as mkt_channel,
-		td."Medium" as mkt_medium,
-		td."Source" as mkt_source,
-		td."Platform" as mkt_platform
+		td.Category as mkt_category,
+		td.Flow as mkt_flow,
+		td.Completion as mkt_completion,
+		td.Channel as mkt_channel,
+		td.Medium as mkt_medium,
+		td.Source as mkt_source,
+		td.Platform as mkt_platform
     from
         files.taxonomy_demand td
 ),
+reschedules as (
+    select "reagendadoDe_id" as id_reschedule
+    from booking
+    where "reagendadoDe_id" is not null
+    group by 1 -- guaranteeing there are no future duplication on Product
+),	
 bookings as
 (
 	select 
-		  s.id as sk_booking,
-	    -- coalesce(r2.id, r.id, s.id) as id_booking,
-	    coalesce(s."reagendadoDe_id", s.id) as id_booking,
-	    -- coalesce(r2.id, r.id, s.id) = s.id as valid_bookings_not_rescheduled,
-	    max(s.id) over (partition by coalesce(s."reagendadoDe_id", s.id)) = s.id as valid_bookings_not_rescheduled,
+	    s.id as sk_booking,
+	    s.id as id_booking,
+	    r.id_reschedule is not null as is_rescheduled,
 	    s.data 
 				+ (("slotDia" * 15 / 60)+8) * interval '1 hour' 
 				+ ("slotDia" * 15 % 60) * interval '1 minute' 				
@@ -84,6 +89,8 @@ bookings as
 		sources.utm_source,
 		sources.utm_medium,
 		sources.utm_campaign,
+		sources.utm_content,
+		sources.utm_term,
 		s.visitor_arrived,
         s.visitor_missing_reason,
         s.agent_arrived,
@@ -112,11 +119,13 @@ bookings as
 			and bms.visita_id is not null
 		) sources
 		on v.codigo = sources.visita_id
+	left join reschedules r
+	    on s.id = id_reschedule
 )
 select
 	b.sk_booking,
 	b.id_booking,
-	b.valid_bookings_not_rescheduled,
+	b.is_rescheduled,
 	b.dt_booking,
 	b.type,
 	b.confirmed,
@@ -149,6 +158,8 @@ select
   	b.utm_source,
   	b.utm_medium,
   	b.utm_campaign,
+  	b.utm_content,
+  	b.utm_term,
 	b.cancel_timestamp,
 	b.dt_created,
 	b.dt_updated,
@@ -166,6 +177,7 @@ select
     b.checkin_status,
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
+    case when td.mkt_flow is null then -1 else td.id end as sk_rent_flow_taxonomy,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
@@ -177,9 +189,9 @@ from
 	bookings b
 left join taxonomy_demand td
 on
-    coalesce(td.app_type,'') = coalesce(b.app_type,'')
-	and coalesce(td.utm_source,'') = coalesce(b.utm_source,'')
-	and coalesce(td.utm_medium,'') = coalesce(b.utm_medium,'')
-	and coalesce(td.branded,'') = coalesce(b.branded,'')
-	and coalesce(td.first_update_source,'') = coalesce(b.first_update_source,'')
+    lower(coalesce(td.app_type,'')) = lower(coalesce(b.app_type,''))
+	and lower(coalesce(td.utm_source,'')) = lower(coalesce(b.utm_source,''))
+	and lower(coalesce(td.utm_medium,'')) = lower(coalesce(b.utm_medium,''))
+	and lower(coalesce(td.branded,'')) = lower(coalesce(b.branded,''))
+	and lower(coalesce(td.first_update_source,'')) = lower(coalesce(b.first_update_source,''))
 	and coalesce(td.flg_via_reschedule,false) = coalesce(b.flg_via_reschedule,false)

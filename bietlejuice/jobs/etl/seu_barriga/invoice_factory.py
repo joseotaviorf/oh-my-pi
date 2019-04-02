@@ -6,9 +6,15 @@ from bietlejuice.jobs.etl.seu_barriga.seu_barriga_table_enum import SeuBarrigaTa
 class SeuBarrigaInvoiceFactory(object):
 
     @staticmethod
-    def factory(_class, s3_bucket, api_dict, execution_date):
-        __class = SeuBarrigaInvoiceFactory.__dispatch_dict(_class)
-        return __class(
+    def factory(class_, s3_bucket, api_dict, execution_date):
+        if class_ is None or not class_:
+            raise TypeError('m=factory, class_={}, msg=invalid class'.format(class_))
+
+        _class = SeuBarrigaInvoiceFactory.__dispatch_dict(class_)
+        if _class is None:
+            raise RuntimeError('m=factory, class_={}, msg=class type not found'.format(class_))
+
+        return _class(
             s3_bucket=s3_bucket,
             api_dict=api_dict,
             execution_date=execution_date

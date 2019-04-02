@@ -1,23 +1,25 @@
 drop table if exists datalake_clean.seu_barriga_invoice_report;
 create external table datalake_clean.seu_barriga_invoice_report (
-  contract_id string,
+  id_contract string,
   version string,
   blocked string,
-  `_from` string,
-  `_to` string,
+  item_from string,
+  item_to string,
   description string,
   amount string,
   item string,
   ref_item_ym string,
-  due_date string,
-  tenant_due_date string,
-  tenant_paid_date string,
+  dt_due string,
+  dt_tenant_due string,
+  dt_tenant_paid string,
   tenant_status string,
-  landlord_due_date string,
-  landlord_paid_date string,
+  dt_landlord_due string,
+  dt_landlord_paid string,
   landlord_status string,
-  delayed_days string,
-  purpose string
+  days_delayed string,
+  purpose string,
+  dt_tenant_invoice_created string,
+  dt_landlord_invoice_created string,
 )
 partitioned by (
   ym string

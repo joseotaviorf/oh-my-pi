@@ -12,7 +12,7 @@ select
   replace(json_format(json_extract(task_entry, '$.nomeDestinatario')), '"') as receiver_name,
   replace(json_format(json_extract(task_entry, '$.realizadaEm')), '"') as ts_completed,
   replace(json_format(json_extract(task_entry, '$.comentario')), '"') as "comment",
-  cast(cast(json_extract(task_entry, '$.origemId') as double) as bigint) as id_origin,
+  cast(cast(replace(replace(json_format(json_extract(task_entry, '$.origemId')), '"'), '\') as double) as bigint) as id_origin,
   cast(cast(json_extract(task_entry, '$.assigneeId') as double) as bigint) as id_assignee,
   json_format(json_extract(task_entry, '$.score')) as score,
   replace(json_format(json_extract(task_entry, '$.origem')), '"') as origin,

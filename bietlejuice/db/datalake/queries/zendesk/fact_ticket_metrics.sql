@@ -1,14 +1,14 @@
-with tickets_sep as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+with tickets_filter as (
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where (t.channel<>'api' or (t.channel='api' and t.tags not like '%hsm%')) and (t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '.*{\\?"id\\?":(\d+)', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":"(\d+)"', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
-    from tickets_sep zt
+    from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
 ),
 fields_map as (
@@ -17,39 +17,8 @@ fields_map as (
     from parse_fields f
     left join datalake_clean.zendesk_ticket_fields cf
        on cf.id = f.field_id
+    where f.value is not null
     group by f.id
-),
-cast_datetime as (
-  select
-   id,
-   channel,
-   date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at
-  from tickets_sep
-  where channel = '"chat"'
-),
-last_rows as (
-    select
-	  t.id,
-	  t.subject,
-	  t.description,
-	  t.channel,
-	  t.priority,
-	  t.recipient,
-	  t.tags,
-	  t.satisfaction_rating,
-	  date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-	  t.created_at,
-	  t.group_id,
-	  t.requester_id,
-	  t.submitter_id,
-	  t.assignee_id,
-	  t.metric_set,
-      t.dt_extraction,
-	  t.is_public,
-	  t.status,
-	  max(t.updated_at) as updated_at
-   from tickets_sep t
-   group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 tickets as (
     select
@@ -59,24 +28,35 @@ tickets as (
 	    coalesce(t.requester_id, '-1') as sk_zendesk_requester_user,
 	    coalesce(t.submitter_id, '-1') as sk_zendesk_submitter_user,
 	    coalesce(t.assignee_id, '-1') as sk_zendesk_assignee_user,
-	    cast(date_format(from_iso8601_timestamp(t.created_at), '%Y%m%d') as integer) as sk_created_date,
-	    cast(coalesce(date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')), '%Y%m%d'), '-1') as integer) as sk_solved_date,
+	    cast(date_format(from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East', '%Y%m%d') as integer) as sk_created_date,
+	    cast(date_format(from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East', '%Y%m%d') as integer) as sk_updated_date,
+	    cast(coalesce(date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East', '%Y%m%d'), '-1') as integer) as sk_solved_date,
 	    cast(date_format(from_iso8601_timestamp(t.dt_extraction), '%Y%m%d') as integer) as sk_extraction_date,
 	    coalesce(date_format(date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p'), '%Y%m%d'), '-1') as sk_chat_started_date,
 	    coalesce(date_format(date_parse(regexp_extract(description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p'), '%H:%i'), '-1') as sk_chat_started_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.reply_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_first_reply_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.first_resolution_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_first_resolution_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.requester_wait_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_requester_wait_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.agent_wait_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_agent_wait_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.on_hold_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_on_hold_time,
-	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_full_resolution_time,
-	    cast(json_extract(t.metric_set, '$.reopens') as varchar) as reopens,
-	    cast(json_extract(t.metric_set, '$.replies') as varchar) as replies,
-	    t.is_public as has_public_comments,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.reply_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_first_reply_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.reply_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_first_reply_time_business,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.first_resolution_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_first_resolution_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.first_resolution_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_first_resolution_time_business,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.requester_wait_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_requester_wait_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.requester_wait_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_requester_wait_time_business,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.agent_wait_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_agent_wait_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.agent_wait_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_agent_wait_time_business,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.on_hold_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_on_hold_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.on_hold_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_on_hold_time_business,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.calendar') as varchar), '-1') as minutes_full_resolution_time_calendar,
+	    coalesce(cast(json_extract(cast(json_extract(t.metric_set, '$.full_resolution_time_in_minutes') as varchar), '$.business') as varchar), '-1') as minutes_full_resolution_time_business,
+	    cast(json_extract(t.metric_set, '$.reopens') as integer) as reopens,
+	    cast(json_extract(t.metric_set, '$.replies') as integer) as replies,
+	    date_format(from_iso8601_timestamp(t.created_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_created,
+	    from_iso8601_timestamp(t.created_at) as ts_created_utc,
+        date_format(from_iso8601_timestamp(t.updated_at) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_updated,
+        from_iso8601_timestamp(t.updated_at) as ts_updated_utc,
+	    date_format(from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) at time zone 'Brazil/East', '%Y-%m-%d %H:%i:%s') as ts_solved,
+	    from_iso8601_timestamp(nullif(cast(json_extract(t.metric_set, '$.solved_at') as varchar), 'null')) as ts_solved_utc,
 	    t.status,
-	    current_timestamp as ts_load,
 	    t.dt_extraction
-	from last_rows t
+	from tickets_filter t
 	left join fields_map c
 	    on c.id = t.id
 	left join datalake_clean.ods_dim_house_listing dhl
@@ -123,21 +103,32 @@ select
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
     t.sk_created_date,
+    t.sk_updated_date,
     t.sk_solved_date,
     t.sk_extraction_date,
     t.sk_chat_started_date,
     t.sk_chat_started_time,
-    t.minutes_first_reply_time,
-    t.minutes_first_resolution_time,
-    t.minutes_requester_wait_time,
-    t.minutes_agent_wait_time,
-    t.minutes_on_hold_time,
-    t.minutes_full_resolution_time,
+    t.minutes_first_reply_time_calendar,
+	t.minutes_first_reply_time_business,
+	t.minutes_first_resolution_time_calendar,
+	t.minutes_first_resolution_time_business,
+	t.minutes_requester_wait_time_calendar,
+	t.minutes_requester_wait_time_business,
+	t.minutes_agent_wait_time_calendar,
+	t.minutes_agent_wait_time_business,
+	t.minutes_on_hold_time_calendar,
+	t.minutes_on_hold_time_business,
+	t.minutes_full_resolution_time_calendar,
+	t.minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
-    t.has_public_comments,
-    t.status,
-    t.ts_load
+    t.ts_created,
+    t.ts_created_utc,
+    t.ts_updated,
+    t.ts_updated_utc,
+    t.ts_solved,
+    t.ts_solved_utc,
+    current_timestamp as ts_load
 from tickets t
 left join contract c
     on t.sk_contract = c.sk_contract

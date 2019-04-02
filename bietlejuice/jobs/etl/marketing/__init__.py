@@ -1,0 +1,6 @@
+from bietlejuice.jobs.etl.marketing.classifieds_costs import ClassifiedsCosts
+from bietlejuice.jobs.etl.marketing.criteo_campaigns import CriteoCampaigns
+from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
+from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
+from bietlejuice.jobs.etl.marketing.marketing import Marketing
+from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns

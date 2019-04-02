@@ -18,13 +18,13 @@ select
         then 0
         else 1
       end as flexible_schedule,
-      -- same_day_listing applies to any publishing until 10 AM (7AM - due to UTC diff) of the next day after the photo shoot
-      coalesce((first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '10' hour), false) as same_day_listing,
-      -- job_on_time applies to any publishing until 10 AM (7AM - due to UTC diff) of the next day after the photo shoot scheduled date
+      -- same_day_listing applies to any publishing until 8 AM (5AM - due to UTC diff) of the next day after the photo shoot
+      coalesce((first_pub.nxt_pub <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '8' hour), false) as same_day_listing,
+      -- job_on_time applies to any publishing until 8 AM (5AM - due to UTC diff) of the next day after the photo shoot scheduled date
       -- OR jobs not published but with photos uploadeds on the same interval
-      coalesce((first_pub.nxt_pub <= date(f.dataAgendamento) + interval '1' day + interval '10' hour), false)
+      coalesce((first_pub.nxt_pub <= date(f.dataAgendamento) + interval '1' day + interval '8' hour), false)
       or
-      coalesce(first_pub.nxt_pub IS NULL AND (f.dataUploadFotos <= date(f.dataAgendamento) + interval '1' day + interval '10' hour), false) as job_on_time,
+      coalesce(first_pub.nxt_pub IS NULL AND (f.dataUploadFotos <= date(f.dataAgendamento) + interval '1' day + interval '8' hour), false) as job_on_time,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
@@ -47,12 +47,7 @@ select
       af.email as photographer_email,
       df.criadoEm as dt_photographer_start,
       f.tipoContrato as photographer_contract_type,
-      case
-        when f.problema is not null then f.problema
-        when ure.motivo like 'Cancelada pelo proprie%' then 'ProprietarioCancelou'
-        when ure.motivo like 'Outro' then 'Outros'
-        else f.problema
-      end as job_problem_reason,
+      f.problema as job_problem_reason,
       ure.motivo as cancel_reason,
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
@@ -97,14 +92,14 @@ select
       )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
-        (select id, max(REV) as REV from JobFotografo_AUD group by id) max_j
-        on max_j.id = f.id
+        (select id, min(REV) as REV from JobFotografo_AUD where status in ('ComProblema', 'Cancelado') and status_MOD = 1 group by id) f_cancel_revision
+        on f_cancel_revision.id = f.id
         and f.status in ('Cancelado','ComProblema')
     left join
         (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
         on comp.id = f.id
         and f.status = 'Cancelado'
-    left join UsuarioRevisionEntity ure on ure.id = max_j.REV
+    left join UsuarioRevisionEntity ure on ure.id = f_cancel_revision.REV
     left join Usuario uc on uc.id = ure.usuario_id
     left join Usuario af on af.dadosFotografo_id = f.dadosFotografo_id
     left join DadosFotografo df on df.id = f.dadosFotografo_id

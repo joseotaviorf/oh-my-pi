@@ -9,11 +9,14 @@ create table if not exists staging.zendesk_dim_ticket (
     priority varchar,
     recipient varchar(65535),
     tags varchar(65535),
-    satisfaction_rating varchar(65535),
+    status varchar,
+    has_public_comments boolean,
+    custom_fields varchar(10000),
+    score varchar,
+    reason varchar,
+    comment varchar(10000),
     request_type varchar,
     client_type varchar,
-    chat_started_at varchar,
-    created_at varchar,
-    ts_load varchar,
-    updated_at varchar
+    ts_chat_started timestamp,
+    ts_load timestamp
 )

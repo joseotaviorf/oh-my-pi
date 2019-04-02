@@ -1,16 +1,15 @@
-import airflow.utils.helpers as airflow_helpers
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
-import bietlejuice.jobs.etl.powerbi as powerbi
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
-    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag
+    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
+    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from qa_python_utils import QuintoAndarLogger
@@ -20,12 +19,9 @@ logger = QuintoAndarLogger('SupplyDemandFunnel')
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-PWBI_AUTH = env.get_airflow_env_var('PWBI_AUTH')
-PWBI_SCHEMA = env.get_airflow_env_var('PWBI_SCHEMA')
-
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '0 5 * * *'
+MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
 
 # create main DAG definition
 main_dag = BaseDAG.build_dag(
@@ -52,13 +48,19 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
 
 
 def load_dim_from_ods_to_dw(**kwargs):
+    if 'post_command_file' in kwargs:
+        file_path = '{}/public/post_command_{}.sql'.format(DW_QUERIES_DIR, kwargs['dim_name'])
+        post_command = BaseETL.get_query_from_file_name(file_name=file_path)
+    else:
+        post_command = None if 'post_command' not in kwargs else kwargs['post_command']
+
     utils.load_dim_from_ods_to_dw(
         dim_name=kwargs['dim_name'],
         bucket=bucket,
         insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
-        post_command=None if 'post_command' not in kwargs else kwargs['post_command']
+        post_command=post_command
     )
 
 
@@ -182,6 +184,30 @@ def contract_sub_dag(sub_dag_name):
     return sub_dag.build_contract_with_tests()
 
 
+def partner_sub_dag(sub_dag_name):
+    sub_dag = PartnerSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_partner_with_tests()
+
+
+def partner_agent_sub_dag(sub_dag_name):
+    sub_dag = PartnerAgentSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_partner_agent_with_tests()
+
+
 def booking_sub_dag(sub_dag_name):
     sub_dag = BookingSubDag(
         bucket=bucket,
@@ -204,14 +230,6 @@ def condo_sub_dag(sub_dag_name):
     )
 
     return sub_dag.build_condo_with_tests()
-
-
-def refresh_powerbi(**kwargs):
-    powerbi_client = powerbi.PowerBIClient(PWBI_AUTH,
-                                           PWBI_SCHEMA,
-                                           kwargs['workspace_name'],
-                                           kwargs['dataset_name'])
-    powerbi_client.trigger_refresh()
 
 
 def xcom_fact_listing_rent_flows_task(**kwargs):
@@ -279,6 +297,17 @@ def doorman_sub_dag(sub_dag_name):
     return sub_dag.build_doorman_with_tests()
 
 
+def polygon_region_sub_dag(sub_dag_name):
+    sub_dag = PolygonRegionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_polygon_region_with_tests()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -335,6 +364,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
+    execution_timeout=timedelta(hours=4),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 
@@ -343,6 +373,13 @@ dw_fact_house_listing_flows = BaseDAG.build_python_operator(
     task_id='DW_Fact_House_Listing_Flows',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'house_listing_flows', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_Rent_Flow_Taxonomy',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'rent_flow_taxonomy', 'bucket': bucket, 'insert_dummy': True, 'post_command_file': True}
 )
 
 # flow
@@ -400,6 +437,18 @@ contract_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Contract'
 )
 
+partner_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=partner_sub_dag,
+    sub_dag_name='Partner'
+)
+
+partner_agent_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=partner_agent_sub_dag,
+    sub_dag_name='PartnerAgent'
+)
+
 booking_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=booking_sub_dag,
@@ -442,39 +491,17 @@ doorman_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Doorman'
 )
 
+polygon_region_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=polygon_region_sub_dag,
+    sub_dag_name='PolygonRegion'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
     python_callable=xcom_fact_listing_rent_flows_task,
     provide_context=True
-)
-
-refresh_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Supply',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Supply'}
-)
-
-refresh_house_listing_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_House_Listing_Flows',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Data', 'dataset_name': 'House Listing Flow'}
-)
-
-refresh_listing_rent_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Listing_Rent_Flows',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'QuintoAndar', 'dataset_name': 'Rent Flow'}
-)
-
-refresh_booking = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='Refresh_PowerBI_Booking',
-    python_callable=refresh_powerbi,
-    op_kwargs={'workspace_name': 'Conversion', 'dataset_name': 'Booking'}
 )
 
 # check the dependency of amplitude_load_events
@@ -492,17 +519,17 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
-                                      user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag])
-airflow_helpers.chain(ods_supply, fact_supply, refresh_supply)
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows, refresh_listing_rent_flows])
-refresh_listing_rent_flows >> refresh_booking
-house_dag >> fact_photo_job
+                                      user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
+                                      dw_rent_flow_taxonomy_task])
+airflow_helpers.chain(ods_supply, fact_supply)
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
+house_dag.set_downstream([fact_photo_job, fact_house_status])
 photo_job_dag >> fact_photo_job
-condo_dag >> fact_house_listings
-house_dag.set_downstream([fact_house_status, fact_house_listings])
+fact_house_listings.set_upstream(
+    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
 # new 'supply' flow
 ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
-airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows, refresh_house_listing_flows)
+airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
