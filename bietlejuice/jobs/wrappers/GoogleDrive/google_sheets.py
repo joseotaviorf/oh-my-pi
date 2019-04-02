@@ -27,7 +27,9 @@ class GoogleSheets(object):
                                                           sheet_id=item['sheetId'])
             if df_gsheets is None:
                 raise ValueError(
-                    'm=move_sheets_data_to_datalake, file={}, msg=no data found in google sheets.'.format(item))
+                    "m=move_sheets_data_to_datalake, sheet_id={}, sheet_name={}, "
+                    "msg=no data found in google sheets.".format(
+                        item['sheetId'], item['sheetName']))
 
             snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
             df_gsheets.rename(columns=snake_case_columns, inplace=True)
