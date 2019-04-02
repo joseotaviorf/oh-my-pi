@@ -1,4 +1,3 @@
-# coding=utf-8
 import pandas as pd
 
 from airflow.models import DAG
@@ -7,8 +6,8 @@ from datetime import datetime, timedelta
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 
-from bietlejuice.jobs.wrappers.carto.carto_api import CARTO_API
-from bietlejuice.jobs.wrappers.geocoding.geocoding_api import GEOCODING_API
+from bietlejuice.jobs.wrappers.carto.carto_api import CartoApi
+from bietlejuice.jobs.wrappers.geocoding.geocoding_api import GeocodingApi
 
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -50,7 +49,7 @@ def geocode_doorman(**kwargs):
             date_formatted = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
             data_folder = '/var/tmp/{}_geocode_doorman/'.format(date_formatted)
             df_address = df_door[(df_door.formatted_address.notna()) & (df_door.google_formatted_address.isna())].drop('google_formatted_address', axis=1)
-            geocoding_api = GEOCODING_API()
+            geocoding_api = GeocodingApi()
             df_door_geocoded = geocoding_api.geocode(df=df_address, address_col='formatted_address', data_folder=data_folder)
             if isinstance(df_door_geocoded, pd.DataFrame):
                 cols = ['id_user_doorman', 'geocode_hash', 'google_formatted_address', 'lat', 'lng', 'location_type', 'place_id', 'types']
@@ -81,9 +80,9 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     if len(df) > 0:
         # upload CSV to CARTO
-        print(CARTO_API.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
-        print(CARTO_API.upload_csv(csv_file_path, carto_table_name))
-        print(CARTO_API.run_sql(final_sql))
+        print(CartoApi.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
+        print(CartoApi.upload_csv(csv_file_path, carto_table_name))
+        print(CartoApi.run_sql(final_sql))
         # write result to S3
         df_export = df
         cols = df_export.columns.values.tolist()

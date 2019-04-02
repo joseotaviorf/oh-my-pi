@@ -1,4 +1,3 @@
-# coding=utf-8
 import pandas as pd
 import geopy
 import json
@@ -14,7 +13,7 @@ from bietlejuice.jobs.dags.util import environment as env
 GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY_DATA')
 
 
-class GEOCODING_API(object):
+class GeocodingApi(object):
     def __init__(self, *args, **kwargs):
         pass
 
