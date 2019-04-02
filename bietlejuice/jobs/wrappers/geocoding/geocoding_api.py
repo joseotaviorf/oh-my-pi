@@ -73,7 +73,8 @@ class GeocodingApi(object):
                     print(e)
         print('--->done.')
 
-    def geocode(self, df, address_col, data_folder, use_slugify=False):
+    @staticmethod
+    def geocode(df, address_col, data_folder, use_slugify=False):
         geopy_geocoder = geopy.geocoders.GoogleV3(api_key=GOOGLE_MAPS_API_KEY, timeout=20)
 
         # drop null
