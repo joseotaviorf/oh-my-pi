@@ -62,7 +62,7 @@ def extract_table(class_, endpoint_suffix, **kwargs):
 
 def __save_data_to_s3_raw(invoice_obj, data_frame, raw_table_name):
     df_json_service = DataFrameJsonService(df=data_frame)
-    object_ = df_json_service.to_json_bytes(data_frame=data_frame)
+    object_ = df_json_service.to_json_bytes()
     invoice_obj.save_into_s3_raw(
         object_=object_,
         file_path_prefix='raw/seu_barriga/invoice/{}'.format(invoice_obj._type),
