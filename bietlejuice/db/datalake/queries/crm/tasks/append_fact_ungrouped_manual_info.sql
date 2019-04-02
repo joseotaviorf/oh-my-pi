@@ -15,7 +15,7 @@
   left join datalake_raw.ebdb_proposta ep
     on cast(epp.id as bigint) = try(cast(ep.preproposta_id as bigint))
   left join datalake_raw.ebdb_contrato ec
-    on cast(epp.id as bigint) = try(cast(ec.proposta_id as bigint))
+    on cast(ep.id as bigint) = try(cast(ec.proposta_id as bigint))
   left join datalake_raw.ebdb_offer eof
     on trim(ct.origin) = 'Offer'
         and cast(ct.id_origin as bigint) = try(cast(eof.id as bigint))
