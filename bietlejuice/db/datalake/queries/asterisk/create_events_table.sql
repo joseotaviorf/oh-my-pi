@@ -149,9 +149,21 @@ event_key_typed as (
         regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 1) as time_ocurred
   from asterisk_data
   group by 1,2,3,4,5,6
+),
+event_audio_message as (
+  select
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 2) as id_call,
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 4) as id_stage,
+	case 
+		when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 3)='SIP' then 'ura'
+		when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 3)='PJSIP' then 'attendance' 
+	end as desc_stage,
+	'audio_message_started' as desc_event, 
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 6) as event_value,
+    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 1) as time_ocurred
+  from asterisk_data
+  group by 1,2,3,4,5,6
 )
-
-
 select * from event_start_call where id_call is not null 
 union select * from event_end_call where id_call is not null  
 union select * from event_start_ura where id_call is not null and id_stage is not null 
@@ -161,4 +173,5 @@ union select * from event_start_attendance where id_call is not null and id_stag
 union select * from event_answered_attendance where id_call is not null and id_stage is not null
 union select * from event_key_typed where id_call is not null and id_stage is not null
 union select * from event_set_destination where id_call is not null and id_stage is not null and event_value is not null
+union select * from event_audio_message where id_call is not null and id_stage is not null and event_value is not null
 ;
