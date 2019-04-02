@@ -55,17 +55,53 @@ event_start_ura as (
 	where content like '%__CRM_SOURCE%' and content like '%SIP%'
 	group by 1,2,3,4,5,6
 ),
+
+events_queue as (
+	select
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 3) as id_stage,
+		'queue' as desc_stage,  
+		'queue_started' as desc_event,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 4) as value_event,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 1) as time_ocurred
+	from asterisk_data
+	where content like '%Local%'
+	group by 1,2,3,4,5,6
+),
 event_start_queue as (
+	select
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 3) as id_stage,
+		'queue' as desc_stage,  
+		'queue_started' as desc_event,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 4) as value_event,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 1) as time_ocurred
+	from asterisk_data
+	where content like '%QAGENT%'
+	group by 1,2,3,4,5,6
+),
+event_set_num_queue as (
 	select
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 2) as id_call,
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 3) as id_stage,
 		'queue' as desc_stage,  
-		'queue_started' as desc_event,
+		'queue_number_setted' as desc_event,
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 4) as value_event,
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 1) as time_ocurred
 	from asterisk_data
-	where content like '%QAGENT%'
+	where content like '%QUEUENUM%'
 	group by 1,2,3,4,5,6
+),
+event_set_destination as ( -- only to calls made by agents
+    select
+        regexp_extract(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("PJSIP/\d+-(\w+)", "(__CRM_DESTINATION=\d+)"\) in new stack', 2) as id_call,
+        regexp_extract(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("PJSIP/\d+-(\w+)", "(__CRM_DESTINATION=\d+)"\) in new stack', 3) as id_stage,
+		'attendance' as desc_stage,
+		'dest_number_setted' as desc_event,
+		regexp_extract(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("PJSIP/\d+-(\w+)", "(__CRM_DESTINATION=\d+)"\) in new stack', 4) as event_value,
+		regexp_extract(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("PJSIP/\d+-(\w+)", "(__CRM_DESTINATION=\d+)"\) in new stack', 1) as time_ocurred
+    from asterisk_data
+    group by 1,2    
 ),
 events_attendance as (
 	select 
@@ -120,7 +156,9 @@ select * from event_start_call where id_call is not null
 union select * from event_end_call where id_call is not null  
 union select * from event_start_ura where id_call is not null and id_stage is not null 
 union select * from event_start_queue where id_call is not null and id_stage is not null
+union select * from event_set_num_queue where id_call is not null and id_stage is not null and event_value is not null
 union select * from event_start_attendance where id_call is not null and id_stage is not null 
 union select * from event_answered_attendance where id_call is not null and id_stage is not null
 union select * from event_key_typed where id_call is not null and id_stage is not null
+union select * from event_set_destination where id_call is not null and id_stage is not null and event_value is not null
 ;
