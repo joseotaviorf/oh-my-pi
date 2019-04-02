@@ -17,10 +17,7 @@ GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('GOOGLE_SHEETS_FILES'))
 def load_google_sheet_files():
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
-    gs.move_sheets_data_to_datalake(google_sheets_files=GOOGLE_SHEETS_FILES,
-                                    list_filenames=['DAU Taxonomy'])
-    # TODO
-    # get dynamically all files from GOOGLE_SHEETS_FILES
+    gs.move_sheets_data_to_datalake(google_sheets_files=GOOGLE_SHEETS_FILES)
 
 
 dag = DAG(
