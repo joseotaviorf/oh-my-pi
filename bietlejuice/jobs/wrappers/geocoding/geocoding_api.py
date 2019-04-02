@@ -11,7 +11,7 @@ import hashlib
 
 from bietlejuice.jobs.dags.util import environment as env
 
-GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY')
+GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY_DATA')
 
 
 class GEOCODING_API(object):
@@ -47,11 +47,9 @@ class GEOCODING_API(object):
             i += 1
             address = row[address_col]
             pkey = str(row[id_col])
-            # print(pkey)
             file = Path(folder_path + pkey + ".json")
             if file.exists():
                 pass
-                # print('--->file already exists, skipping')
             else:
                 print(str(i) + '/' + str(len(addresses)) + ' || ' + pkey + ': ', address)
                 print('--->making API request')
