@@ -1,6 +1,6 @@
-drop table if exists datalake_clean.taxonomy_mkt_cost;
+drop table if exists datalake_raw.taxonomy_mkt_cost;
 
-create external table datalake_clean.taxonomy_mkt_cost (
+create external table datalake_raw.taxonomy_mkt_cost (
     account_name string,
 	classificados string,
     fact_cost string,
@@ -16,7 +16,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/clean/files/taxonomy_mkt_cost/'
+location 's3://5a-datalake/raw/files/taxonomy_mkt_cost/'
 tblproperties (
   'skip.header.line.count' = '1'
 )
