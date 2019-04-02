@@ -19,6 +19,10 @@ class GoogleSheets(object):
         s3 = S3ToODS(s3_bucket=self.s3_bucket)
         found = 0
 
+        if not google_sheets_files['files']:
+            raise ValueError(
+                'm=move_sheets_data_to_datalake, msg=no files set in json google sheets schema.')
+
         for item in google_sheets_files['files']:
             found += 1
             df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'],
