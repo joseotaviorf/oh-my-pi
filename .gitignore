@@ -114,7 +114,3 @@ db/.dbeaver-data-sources.xml
 
 # vscode
 .vscode/*
-
-bi-etl/
-start_local_bpl.sh
-tmp/
