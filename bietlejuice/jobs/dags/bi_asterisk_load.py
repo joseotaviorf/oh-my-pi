@@ -194,6 +194,14 @@ calls_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=AsteriskTableEnum.CALLS_DETAILS
 )
 
+events_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='events_clean',
+    storage_format='partitioned',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.EVENTS
+)
+
 cxpanel_queues_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cxpanel_queues_raw',
@@ -323,7 +331,7 @@ users_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
 )
 
 # flow
-logs_full_raw_partition_task >> calls_details_clean_sub_dag_task
+logs_full_raw_partition_task.set_downstream([calls_details_clean_sub_dag_task, events_clean_sub_dag_task])
 cdr_raw_sub_dag_task >> cdr_clean_sub_dag_task
 cxpanel_queues_raw_sub_dag_task >> cxpanel_queues_clean_sub_dag_task
 cxpanel_users_raw_sub_dag_task >> cxpanel_users_clean_sub_dag_task

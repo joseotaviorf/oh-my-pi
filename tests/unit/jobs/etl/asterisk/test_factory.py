@@ -5,7 +5,7 @@ import pytest
 
 from bietlejuice.jobs.etl.asterisk import AsteriskCDR, AsteriskCXPanelQueues, AsteriskCXPanelUsers, AsteriskDevices, \
     AsteriskFactory, AsteriskIVRDetails, AsteriskIVREntries, AsteriskQueuesConfig, AsteriskQueuesDetails, \
-    AsteriskTableEnum, AsteriskUsers, AsteriskCallsDetails, AsteriskLogsFull
+    AsteriskTableEnum, AsteriskUsers, AsteriskCallsDetails, AsteriskLogsFull, AsteriskEvents
 
 
 class TestAsteriskFactory(object):
@@ -21,6 +21,7 @@ class TestAsteriskFactory(object):
         (AsteriskTableEnum.CXPANEL_USERS, AsteriskCXPanelUsers),
         (AsteriskTableEnum.CDR, AsteriskCDR),
         (AsteriskTableEnum.CALLS_DETAILS, AsteriskCallsDetails),
+        (AsteriskTableEnum.EVENTS, AsteriskEvents),
         (AsteriskTableEnum.LOGS_FULL, AsteriskLogsFull)
     ])
     def test_factory(self, class_, expected):
