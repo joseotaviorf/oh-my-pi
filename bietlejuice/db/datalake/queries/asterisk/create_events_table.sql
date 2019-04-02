@@ -57,12 +57,12 @@ event_start_ura as (
 ),
 event_start_queue as (
 	select
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 2) as id_call,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 3) as id_stage,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 3) as id_stage,
 		'queue' as desc_stage,  
 		'queue_started' as desc_event,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 4) as value_event,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 1) as time_ocurred
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 4) as value_event,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 1) as time_ocurred
 	from asterisk_data
 	where content like '%QAGENT%'
 	group by 1,2,3,4,5,6
