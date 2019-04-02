@@ -17,7 +17,8 @@ class GeocodingApi(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def _load_geocoded_addresses(self, path_to_folder):
+    @staticmethod
+    def load_geocoded_addresses(path_to_folder):
         json_files = glob.glob(path_to_folder + '*.json')
         frames = []
         for f in json_files:
@@ -32,13 +33,15 @@ class GeocodingApi(object):
             geocoded_data = None
         return geocoded_data
 
-    def _join_geocoded_addresses_to_df(self, df, geocoded_data):
+    @staticmethod
+    def join_geocoded_addresses_to_df(df, geocoded_data):
         cols = ['geocode_hash', 'formatted_address', 'geometry.location.lat', 'geometry.location.lng', 'geometry.location_type', 'place_id', 'types']
         df_geo = df.merge(geocoded_data[cols], how='left', on='geocode_hash')
         df_geo.rename(columns={'geometry.location.lat': 'lat', 'geometry.location.lng': 'lng', 'geometry.location_type': 'location_type', 'formatted_address': 'google_formatted_address'}, inplace=True)
         return df_geo
 
-    def _geocode_addresses(self, addresses, address_col, id_col, folder_path, geopy_geocoder):
+    @staticmethod
+    def geocode_addresses(addresses, address_col, id_col, folder_path, geopy_geocoder):
         i = 0
         addresses.is_copy = False  # to stop SettingWithCopyWarning
         print('--->geocoding ' + str(len(addresses)) + ' addresses.')
@@ -47,9 +50,7 @@ class GeocodingApi(object):
             address = row[address_col]
             pkey = str(row[id_col])
             file = Path(folder_path + pkey + ".json")
-            if file.exists():
-                pass
-            else:
+            if not file.exists():
                 print(str(i) + '/' + str(len(addresses)) + ' || ' + pkey + ': ', address)
                 print('--->making API request')
                 try:
@@ -103,12 +104,12 @@ class GeocodingApi(object):
         # geocode
         if os.path.isdir(data_folder) is False:
             Path(data_folder).mkdir(parents=True)
-        self._geocode_addresses(not_geo, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
+        GeocodingApi.geocode_addresses(not_geo, 'geocode', 'geocode_hash', data_folder, geopy_geocoder)
 
         # join back on original df and return
-        df_geocoded_data = self._load_geocoded_addresses(data_folder)
+        df_geocoded_data = GeocodingApi.load_geocoded_addresses(data_folder)
         if isinstance(df_geocoded_data, pd.DataFrame):
-            df_address_geocoded = self._join_geocoded_addresses_to_df(df_address, df_geocoded_data)
+            df_address_geocoded = GeocodingApi.join_geocoded_addresses_to_df(df_address, df_geocoded_data)
             df_geocoded = df.merge(df_address_geocoded.drop('geocode', axis=1), how='left', on='geocode_hash')
         else:
             df_geocoded = None
