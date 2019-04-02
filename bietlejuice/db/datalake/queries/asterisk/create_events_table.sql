@@ -98,11 +98,29 @@ event_answered_attendance as (
 		time_ocurred
 	from events_attendance
 	group by 1,2,3,4,5,6
+),
+event_key_typed as (
+  select 
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 2) as id_call,  
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 6) as id_stage, 
+		case 
+			when regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 4)='SIP' then 'ura'
+			when regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 4)='Local' then 'queue'
+			when regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 4)='PJSIP' then 'attendance'
+		end as desc_stage,	
+		'key_typed'as desc_event,          
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 3) as value_event,
+        regexp_extract(content,'\[(.+)\] DTMF\[[0-9]+\]\[C-(\w+)\] channel.c: DTMF begin .(\d). received on (SIP|PJSIP|Local)/\d+(@from-queue)?-(\w+)', 1) as time_ocurred
+  from asterisk_data
+  group by 1,2,3,4,5,6
 )
+
+
 select * from event_start_call where id_call is not null 
 union select * from event_end_call where id_call is not null  
 union select * from event_start_ura where id_call is not null and id_stage is not null 
 union select * from event_start_queue where id_call is not null and id_stage is not null
 union select * from event_start_attendance where id_call is not null and id_stage is not null 
 union select * from event_answered_attendance where id_call is not null and id_stage is not null
+union select * from event_key_typed where id_call is not null and id_stage is not null
 ;
