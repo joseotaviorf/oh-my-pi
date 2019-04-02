@@ -65,9 +65,44 @@ event_start_queue as (
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QAGENT=\d+)"', 1) as time_ocurred
 	from asterisk_data
 	where content like '%QAGENT%'
+	group by 1,2,3,4,5,6
+),
+events_attendance as (
+	select 
+	    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] app_dial.c: PJSIP/(\d+)-(\w+) answered Local/\d+@from-queue-(\w+);\d',2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] app_dial.c: PJSIP/(\d+)-(\w+) answered Local/\d+@from-queue-(\w+);\d',3) as id_agent,
+        regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] app_dial.c: PJSIP/(\d+)-(\w+) answered Local/\d+@from-queue-(\w+);\d',4) as id_attendance,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] app_dial.c: PJSIP/(\d+)-(\w+) answered Local/\d+@from-queue-(\w+);\d',5) as id_queue,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] app_dial.c: PJSIP/(\d+)-(\w+) answered Local/\d+@from-queue-(\w+);\d',1) as time_ocurred	    
+    from asterisk_data   
+    group by 1,2,3,4,5
+),
+event_start_attendance as (
+	select
+		id_call,
+		id_attendance as id_stage,
+		'attendance' as desc_stage,
+		'attendance_started' as desc_event,
+		concat('ID_QUEUE=',id_queue) as value_event,
+		time_ocurred
+	from events_attendance
+	group by 1,2,3,4,5,6
+),
+event_answered_attendance as (
+	select
+		id_call,
+		id_attendance as id_stage,
+		'attendance' as desc_stage,
+		'agent_answered' as desc_event,
+		concat('QAGENT=',id_agent) as value_event,
+		time_ocurred
+	from events_attendance
+	group by 1,2,3,4,5,6
 )
 select * from event_start_call where id_call is not null 
 union select * from event_end_call where id_call is not null  
 union select * from event_start_ura where id_call is not null and id_stage is not null 
 union select * from event_start_queue where id_call is not null and id_stage is not null
+union select * from event_start_attendance where id_call is not null and id_stage is not null 
+union select * from event_answered_attendance where id_call is not null and id_stage is not null
 ;
