@@ -354,6 +354,20 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
+    def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
+        df_columns = df.columns.values.tolist()
+        if len(df_columns) == 0:
+            raise AttributeError('m=create_table_from_dataframe, table_name={}, msg=dataframe has no '
+                                 'columns'.format(table_name))
+        df_columns_text = ' varchar, '.join(df_columns) + ' varchar'
+        BaseETL.execute_command(
+            command='create table {} ({})'.format(table_name, df_columns_text),
+            db_enum=enum_db,
+            encoding=encoding,
+            commit=True
+        )
+
+    @classmethod
     def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True, bucket_name=None,
                         int_columns=None):
         df_table = petl.fromdataframe(df=df)
