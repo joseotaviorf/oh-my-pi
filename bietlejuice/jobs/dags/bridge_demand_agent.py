@@ -58,7 +58,7 @@ bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_python_operator(
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     python_callable=xcom_dependencies,
-    op_kwargs={'task_id': ['XCom_fact_agent', 'XCom_fact_listing_rent_flows'],
+    op_kwargs={'task_id': ['XCom_fact_agent_daily_allocations', 'XCom_fact_listing_rent_flows'],
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
@@ -69,15 +69,15 @@ bdg_listing_rent_flows_agent = BaseDAG.build_python_operator(
     op_kwargs=None
 )
 
-data_integrity_bdg_fact_agent = BaseDAG.build_python_operator(
+data_integrity_bdg_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='data_integrity_bdg_fact_agent',
+    task_id='data_integrity_bdg_fact_agent_daily_allocations',
     python_callable=guarantee_data_integrity,
     op_kwargs={'db_enum': EnumDB.BI_DW,
                'schema': 'public',
                'f_name': 'bdg_listing_rent_flows_agent',
                'f_column': 'sk_slot_date_agent',
-               'dim_name': 'fact_agent',
+               'dim_name': 'agent.fact_agent_daily_allocations',
                'dim_column': 'sk_slot_date_agent',
                'type': 'update'}
 )
@@ -147,6 +147,6 @@ data_integrity_dim_agentreview_booking = BaseDAG.build_python_operator(
                'type': 'delete'}
 )
 
-(bdg_listing_rent_flows_agent_xcom_dependencies >> bdg_listing_rent_flows_agent >> data_integrity_bdg_fact_agent >>
+(bdg_listing_rent_flows_agent_xcom_dependencies >> bdg_listing_rent_flows_agent >> data_integrity_bdg_fact_agent_daily_allocations >>
  data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user >> data_integrity_dim_agentreview_booking >>
  data_integrity_fact_listing_rent_flows_dim_booking >> data_integrity_bdg_fact_listing_rent_flows)

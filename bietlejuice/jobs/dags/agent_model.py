@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -88,17 +89,15 @@ def create_dim_agent_contract_type():
                     key_column='sk_agent_contract_type')
 
 
-def create_fact_agent(**kwargs):
-    exec_date = kwargs['execution_date']
-    table_name = 'fact_agent'
+def create_fact_agent_allocations(table_name, execution_date, **kwargs):
     ar = Agent(bucket_datalake)
     ar.clean_daily_data_in_table(enum=EnumDB.BI_DW,
-                                 schema='public',
+                                 schema='agent',
                                  dim_name=table_name,
                                  date_column='sk_slot_date',
-                                 dt=exec_date,
+                                 dt=execution_date,
                                  format='YYYYMMDD')
-    ar.create_table_dw(table_name=table_name, append=True, dt=exec_date)
+    ar.create_table_dw(table_name=table_name, append=True, dt=execution_date)
     ar.insert_dummy(table_name=table_name,
                     key_column='sk_slot_date_agent',
                     previous_check=True)
@@ -144,7 +143,7 @@ def load_dim_agent_review_dw():
                     value='-1,-1')
 
 
-def xcom_fact_agent(**kwargs):
+def xcom_fact_agent_daily_allocations(**kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     xcom.xcom_push(kwargs['ti'], exec_date)
 
@@ -239,13 +238,26 @@ create_dim_agent_contract_type_dw_task = BaseDAG.build_python_operator(
     op_kwargs=None
 )
 
-# Creates fact_agent in DW
-create_fact_agent = BaseDAG.build_python_operator(
+# Creates fact_agent_daily_allocations in DW
+create_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='create_fact_agent',
+    task_id='create_fact_agent_daily_allocations',
     provide_context=True,
-    python_callable=create_fact_agent,
-    op_kwargs=None
+    python_callable=create_fact_agent_allocations,
+    op_kwargs={
+        'table_name': 'fact_agent_daily_allocations'
+    }
+)
+
+# Creates fact_agent_hourly_allocations in DW
+create_fact_agent_hourly_allocations = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='create_fact_agent_hourly_allocations',
+    provide_context=True,
+    python_callable=create_fact_agent_allocations,
+    op_kwargs={
+        'table_name': 'fact_agent_hourly_allocations'
+    }
 )
 
 # Creates fact_photographer in DW
@@ -275,11 +287,11 @@ load_dim_agent_review_dw = BaseDAG.build_python_operator(
 )
 
 # Creates push xcom
-xcom_fact_agent = BaseDAG.build_python_operator(
+xcom_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='XCom_fact_agent',
+    task_id='XCom_fact_agent_daily_allocations',
     provide_context=True,
-    python_callable=xcom_fact_agent
+    python_callable=xcom_fact_agent_daily_allocations
 )
 
 # Get EBDB data of Agent_Region per day and updates into ODS
@@ -300,10 +312,9 @@ agent_status_history_task = BaseDAG.build_python_operator(
 update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
-create_dim_agent_region_dw >> create_fact_photographer
-create_agent_contract_dw >> create_dim_agent_contract_type_dw_task
-create_fact_agent.set_upstream(
-    [create_dim_agent_region_dw, create_dim_agent_contract_type_dw_task])
-create_fact_agent >> xcom_fact_agent
+create_dim_agent_region_dw.set_downstream(
+    [create_fact_photographer, create_fact_agent_daily_allocations, create_fact_agent_hourly_allocations])
+create_agent_contract_dw >> create_dim_agent_contract_type_dw_task >> create_fact_agent_daily_allocations
+create_fact_agent_daily_allocations >> xcom_fact_agent_daily_allocations
 create_dim_agent_review >> load_dim_agent_review_dw
-agent_status_history_task.set_downstream([create_fact_agent, create_fact_photographer])
+agent_status_history_task.set_downstream([create_fact_agent_daily_allocations, create_fact_photographer])
