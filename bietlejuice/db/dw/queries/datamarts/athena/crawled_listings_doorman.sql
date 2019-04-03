@@ -122,7 +122,6 @@ SELECT
   l.toilets,
   l.garages,
   l.photos,
-  l.description,
   l.unit_features,
   l.common_features,
   l.complementary_info,
