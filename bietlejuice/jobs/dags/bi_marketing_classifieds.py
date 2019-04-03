@@ -1,7 +1,8 @@
-import airflow.utils.helpers as airflow_helpers
 import json
-from airflow.models import DAG
 from datetime import datetime
+
+import airflow.utils.helpers as airflow_helpers
+from airflow.models import DAG
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
