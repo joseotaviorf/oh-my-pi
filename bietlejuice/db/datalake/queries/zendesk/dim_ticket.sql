@@ -26,7 +26,7 @@ last_ticket_groups as (
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '{\\?"id\\?":"(\d+)"', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":"?(\d+)"?', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
