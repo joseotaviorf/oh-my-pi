@@ -7,6 +7,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.etl.amplitude.engaged_users import EngagedUsers
+from bietlejuice.jobs.etl.amplitude.growth_amplitude import GrowthAmplitude
 from bietlejuice.jobs.etl.amplitude.listings_unique_page_views import ListingsWithPageViews
 from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
 from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
@@ -719,6 +720,20 @@ taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonom
                                                             'supply_active_users',
                                                             'taxonomy')
 
+create_conversion_points_supply_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_supply',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_supply', 'sub_level': 'taxonomy'}
+)
+
+create_conversion_points_demand_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_demand',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_demand', 'sub_level': 'taxonomy'}
+)
+
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
@@ -731,7 +746,8 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
 (taxonomy_supply_active_users_sub_dag >> taxonomy_supply_active_user_sessions_sub_dag >>
  taxonomy_demand_active_users_sub_dag >> taxonomy_demand_active_user_sessions_sub_dag >> taxonomy_leads_sub_dag >>
  taxonomy_listings_sub_dag >> taxonomy_visits_booked_sub_dag >> taxonomy_visits_completed_sub_dag >>
- taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag)
+ taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag >>
+ create_conversion_points_supply_task >> create_conversion_points_demand_task)
 
 # link from taxonomy to default measures
 (taxonomy_contracts_signed_sub_dag >> leads_sub_dag)

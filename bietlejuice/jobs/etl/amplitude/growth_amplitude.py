@@ -1,17 +1,18 @@
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('GrowthAmplitude')
 
 
 class GrowthAmplitude(object):
     SCHEMA = 'growth_staging'
+    DW_SCHEMA = 'growth'
 
     QUERIES_DIR = '{}/amplitude'.format(DATALAKE_QUERIES_DIR)
+    DW_QUERIES_DIR_GROWTH = '{}/growth'.format(DW_QUERIES_DIR)
 
     @logger
     def __init__(self, measure, s3_bucket):
@@ -52,6 +53,32 @@ class GrowthAmplitude(object):
     def _truncate_table(table_name):
         BaseETL.execute_command(
             command='truncate table {}.{};'.format(GrowthAmplitude.SCHEMA, table_name),
+            commit=True,
+            db_enum=EnumDB.BI_DW
+        )
+
+    @staticmethod
+    @logger
+    def _drop_table(table_name):
+        BaseETL.execute_command(
+            command='drop table if exists {}.{};'.format(GrowthAmplitude.SCHEMA, table_name),
+            commit=True,
+            db_enum=EnumDB.BI_DW
+        )
+
+    @staticmethod
+    @logger
+    def create_table_as_file_query(table_name, sub_level=None):
+        query = BaseETL.get_query_from_file_name(
+            '{0}/{1}{2}/{2}.sql'.format(GrowthAmplitude.DW_QUERIES_DIR_GROWTH, sub_level + '/' if sub_level else '',
+                                        table_name))
+
+        GrowthAmplitude._drop_table(table_name)
+
+        query = 'CREATE TABLE {}.{} AS {}'.format(GrowthAmplitude.DW_SCHEMA, table_name, query)
+
+        BaseETL.execute_command(
+            command=query,
             commit=True,
             db_enum=EnumDB.BI_DW
         )
