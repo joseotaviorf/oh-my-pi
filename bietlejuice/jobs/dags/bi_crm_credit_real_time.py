@@ -22,6 +22,7 @@ MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('10 * * * *')
 
 # env vars
+env.set_airflow_var_to_local_env('EBDB')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
