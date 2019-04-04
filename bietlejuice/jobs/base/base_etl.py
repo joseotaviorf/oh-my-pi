@@ -21,6 +21,11 @@ from unidecode import unidecode
 from db_factory import DBFactory
 from enum_db import EnumDB
 
+from bietlejuice.jobs.dags.util import environment as env
+
+AWS_ACCESS_KEY_ID = env.get_airflow_env_var('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env.get_airflow_env_var('AWS_SECRET_ACCESS_KEY')
+
 
 class BaseETL(object):
     def __init__(self, *args, **kwargs):
@@ -412,8 +417,8 @@ class BaseETL(object):
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
                                   append=True, commit=True, encoding='LATIN1', f_cursor=None):
-        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        aws_access_key_id = AWS_ACCESS_KEY_ID
+        aws_secret_access_key = AWS_SECRET_ACCESS_KEY
         forno = os.environ.get('forno')
         con = cls.get_connection(enum_db_dest, encoding)
         file = 's3://{}/{}'.format(bucket_name, filename)
