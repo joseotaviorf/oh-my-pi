@@ -17,6 +17,7 @@ create table if not exists staging.fact_ungrouped_manual_tasks (
   ts_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
+  sk_contract bigint,
   dt_partition date
 )
 ;
