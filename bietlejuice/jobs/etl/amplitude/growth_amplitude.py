@@ -61,7 +61,7 @@ class GrowthAmplitude(object):
     @logger
     def _drop_table(table_name):
         BaseETL.execute_command(
-            command='drop table if exists {}.{};'.format(GrowthAmplitude.SCHEMA, table_name),
+            command='drop table if exists {}.{};'.format(GrowthAmplitude.DW_SCHEMA, table_name),
             commit=True,
             db_enum=EnumDB.BI_DW
         )
