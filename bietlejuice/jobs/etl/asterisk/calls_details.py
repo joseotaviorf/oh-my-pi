@@ -23,43 +23,25 @@ class AsteriskCallsDetails(Asterisk):
             ('call_source_number', str),
             ('call_destination_number', str),
             ('id_ura', str),
-            ('ts_start_ura', str),
-            ('ts_end_ura', str),
+            ('ts_ura_started', str),
+            ('ts_ura_ended', str),
+            ('audio_message', str),
+            ('typed_answer', str),
             ('is_ura_help_solved', str),
             ('id_queue', str),
             ('id_caller', str),
-            ('ts_start_queue', str),
-            ('ts_end_queue', str),
+            ('ts_queue_started', str),
+            ('ts_queue_ended', str),
             ('id_attendance', str),
-            ('ts_start_attendance', str),
-            ('ts_end_attendance', str),
-            ('sec_time_duration_ura', str),
-            ('sec_time_duration_queue', str),
-            ('sec_time_duration_attendance', str)
-        ])
-
-        c_cols = OrderedDict([
-            ('id_call', str),
-            ('call_source_number', str),
-            ('call_destination_number', str),
-            ('id_ura', str),
-            ('ts_start_ura', str),
-            ('ts_end_ura', str),
-            ('is_ura_help_solved', str),
-            ('id_queue', str),
-            ('id_caller', str),
-            ('ts_start_queue', str),
-            ('ts_end_queue', str),
-            ('id_attendance', str),
-            ('ts_start_attendance', str),
-            ('ts_end_attendance', str),
-            ('sec_time_duration_ura', str),
-            ('sec_time_duration_queue', str),
-            ('sec_time_duration_attendance', str)
+            ('ts_attendance_started', str),
+            ('ts_attendance_ended', str),
+            ('seconds_duration_ura', str),
+            ('seconds_duration_queue', str),
+            ('seconds_duration_attendance', str)
         ])
 
         self._move_to_clean_partitioned(
             class_=AsteriskCallsDetails.CLASS_ENUM,
             r_cols=r_cols,
-            c_cols=c_cols
+            c_cols=r_cols
         )
