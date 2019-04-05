@@ -48,8 +48,7 @@ doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE work_city = 'São Paulo'
-    AND a.lat IS NOT NULL
+  WHERE a.lat IS NOT NULL
 ),
 listings_join_doorman AS
 (
