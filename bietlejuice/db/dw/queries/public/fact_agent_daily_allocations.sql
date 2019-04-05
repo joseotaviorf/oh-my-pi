@@ -29,7 +29,7 @@ SELECT
 		WHEN 0 THEN 0	                                    -- Sunday
 		WHEN 6 THEN COALESCE(dact.slots_per_saturday, 0)	-- Saturday
 		ELSE COALESCE(dact.slots_per_weekday, 0)			-- Other days
-	END AS allocation_available,
+	END AS max_slots_allocation_available,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,

@@ -2,6 +2,7 @@ drop table if exists agent.fact_agent_hourly_allocations ;
 create table agent.fact_agent_hourly_allocations (
   sk_agent integer,
   sk_slot_date integer,
+  slot_hour_ts timestamp,
   allocated_slots integer,
   allocated_slots_0 integer,
   is_allocation_available integer,
