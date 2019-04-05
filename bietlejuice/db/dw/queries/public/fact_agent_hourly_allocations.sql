@@ -30,23 +30,23 @@ SELECT
 		WHEN 0 THEN 0	                           -- Sunday
 		WHEN 6 THEN                                -- Saturday
             CASE date_part('h', s.slot_hour_ts)
-                WHEN  9 THEN coalesce(cast(achd.saturday_09 as integer),0)
-                WHEN 10 THEN coalesce(cast(achd.saturday_10 as integer),0)
-                WHEN 11 THEN coalesce(cast(achd.saturday_11 as integer),0)
-                WHEN 12 THEN coalesce(cast(achd.saturday_12 as integer),0)
-                WHEN 13 THEN coalesce(cast(achd.saturday_13 as integer),0)
+                WHEN  9 THEN coalesce(cast(achd.is_saturday_available_at_09 as integer),0)
+                WHEN 10 THEN coalesce(cast(achd.is_saturday_available_at_10 as integer),0)
+                WHEN 11 THEN coalesce(cast(achd.is_saturday_available_at_11 as integer),0)
+                WHEN 12 THEN coalesce(cast(achd.is_saturday_available_at_12 as integer),0)
+                WHEN 13 THEN coalesce(cast(achd.is_saturday_available_at_13 as integer),0)
             END
 		ELSE                                       -- Weekdays
 		    CASE date_part('h', s.slot_hour_ts)
-		        WHEN  8 THEN coalesce(cast(achd.weekday_08 as integer),0)
-		        WHEN  9 THEN coalesce(cast(achd.weekday_09 as integer),0)
-		        WHEN 10 THEN coalesce(cast(achd.weekday_10 as integer),0)
-		        WHEN 11 THEN coalesce(cast(achd.weekday_11 as integer),0)
-		        WHEN 12 THEN coalesce(cast(achd.weekday_12 as integer),0)
-		        WHEN 13 THEN coalesce(cast(achd.weekday_13 as integer),0)
-		        WHEN 14 THEN coalesce(cast(achd.weekday_14 as integer),0)
-		        WHEN 15 THEN coalesce(cast(achd.weekday_15 as integer),0)
-		        WHEN 16 THEN coalesce(cast(achd.weekday_16 as integer),0)
+		        WHEN  8 THEN coalesce(cast(achd.is_weekday_available_at_08 as integer),0)
+		        WHEN  9 THEN coalesce(cast(achd.is_weekday_available_at_09 as integer),0)
+		        WHEN 10 THEN coalesce(cast(achd.is_weekday_available_at_10 as integer),0)
+		        WHEN 11 THEN coalesce(cast(achd.is_weekday_available_at_11 as integer),0)
+		        WHEN 12 THEN coalesce(cast(achd.is_weekday_available_at_12 as integer),0)
+		        WHEN 13 THEN coalesce(cast(achd.is_weekday_available_at_13 as integer),0)
+		        WHEN 14 THEN coalesce(cast(achd.is_weekday_available_at_14 as integer),0)
+		        WHEN 15 THEN coalesce(cast(achd.is_weekday_available_at_15 as integer),0)
+		        WHEN 16 THEN coalesce(cast(achd.is_weekday_available_at_16 as integer),0)
 		        ELSE 0
 		    END
 	END = 1 AS is_allocation_available,
