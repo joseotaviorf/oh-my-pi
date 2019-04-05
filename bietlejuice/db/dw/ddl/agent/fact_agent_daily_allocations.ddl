@@ -4,7 +4,7 @@ create table agent.fact_agent_daily_allocations (
   sk_slot_date integer,
   allocated_slots integer,
   allocated_slots_0 integer,
-  allocation_available integer,
+  max_slots_allocation_available integer,
   area varchar(10),
   sk_agent_region varchar(20),
   sk_slot_date_agent bigint,

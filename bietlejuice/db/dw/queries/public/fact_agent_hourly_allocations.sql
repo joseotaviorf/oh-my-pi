@@ -49,7 +49,7 @@ SELECT
 		        WHEN 16 THEN coalesce(cast(achd.weekday_16 as integer),0)
 		        ELSE 0
 		    END
-	END AS is_allocation_available,
+	END = 1 AS is_allocation_available,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
