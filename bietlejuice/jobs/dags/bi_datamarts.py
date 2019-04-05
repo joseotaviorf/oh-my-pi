@@ -15,7 +15,6 @@ from bietlejuice.jobs.dags.util import environment as env
 # env vars
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-athena = AthenaClient('5a-datalake')
 
 MAIN_DAG_ID = 'bi-datamarts'
 MAIN_START_DATE = datetime(2018, 8, 22)
@@ -28,11 +27,6 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 
 # functions
 @logger
-def read_query(file_name):
-    with open(file_name) as f:
-        return f.read()
-
-
 def create_datamart_from_dw(table_name, **kwargs):
     query = BaseETL.get_query_from_file_name('{}/datamarts/dw/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
@@ -54,7 +48,8 @@ def create_datamart_from_dw(table_name, **kwargs):
 
 
 def create_datamart_from_athena(table_name, **kwargs):
-    query = read_query('{}/datamarts/athena/{}.sql'.format(DW_QUERIES_DIR, table_name))
+    athena = AthenaClient('5a-datalake')
+    query = BaseETL.get_query_from_file_name('{}/datamarts/athena/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
@@ -65,11 +60,12 @@ def create_datamart_from_athena(table_name, **kwargs):
     )
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     df = athena.execute_query_and_return_dataframe(
         sql=query,
         paginate=False,
         page_size=0,
-        query_params={'dt': datetime.utcnow().strftime('%Y-%m-%d')}
+        query_params={'dt': execution_date}
     )
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Creating table in datamart'.format(table_name))

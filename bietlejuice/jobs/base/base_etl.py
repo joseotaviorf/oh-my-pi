@@ -21,11 +21,6 @@ from unidecode import unidecode
 from db_factory import DBFactory
 from enum_db import EnumDB
 
-from bietlejuice.jobs.dags.util import environment as env
-
-AWS_ACCESS_KEY_ID = env.get_airflow_env_var('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = env.get_airflow_env_var('AWS_SECRET_ACCESS_KEY')
-
 
 class BaseETL(object):
     def __init__(self, *args, **kwargs):
@@ -362,8 +357,8 @@ class BaseETL(object):
     def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
         df_columns = df.columns.values.tolist()
         if len(df_columns) == 0:
-            raise AttributeError('m=create_table_from_dataframe, table_name={}, msg=dataframe has no '
-                                 'columns'.format(table_name))
+            raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has no '
+                             'columns'.format(table_name))
         df_columns_text = ' varchar, '.join(df_columns) + ' varchar'
         BaseETL.execute_command(
             command='create table {} ({})'.format(table_name, df_columns_text),
@@ -417,8 +412,8 @@ class BaseETL(object):
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
                                   append=True, commit=True, encoding='LATIN1', f_cursor=None):
-        aws_access_key_id = AWS_ACCESS_KEY_ID
-        aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         forno = os.environ.get('forno')
         con = cls.get_connection(enum_db_dest, encoding)
         file = 's3://{}/{}'.format(bucket_name, filename)
