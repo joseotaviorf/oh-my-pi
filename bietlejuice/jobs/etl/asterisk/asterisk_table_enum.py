@@ -12,4 +12,5 @@ class AsteriskTableEnum(Enum):
     CXPANEL_USERS = 'cxpanel_users'
     CDR = 'cdr'
     CALLS_DETAILS = 'calls_details'
+    EVENTS = 'events'
     LOGS_FULL = 'logs_full'
