@@ -24,18 +24,6 @@ select
 	sum(yearly_count) as yearly_count
 from (
 	select *
-	from growth.{0}_all_day
-	union all
-	select *
-	from growth.{0}_all_week
-	union all
-	select *
-	from growth.{0}_all_month
-	union all
-	select *
-	from growth.{0}_all_year
-	union all
-	select *
 	from growth.{0}_city_day
 	union all
 	select *

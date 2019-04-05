@@ -367,14 +367,8 @@ def sub_dag_func_taxonomy(main_dag_name, sub_dag_name, funnel, start_date, sched
         start_date=start_date
     )
 
-    # all
-    no_filter_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders)
-
     # city
     city_tasks = get_filter_tasks('city', funnel, local_dag, sub_dag_name, materialize_func, placeholders)
-
-    for i in range(0, 4):
-        no_filter_tasks[i] >> city_tasks[i]
 
     consolidation_task = build_python_operator(task_id='consolidate',
                                                python_callable=consolidate_with_filters,
