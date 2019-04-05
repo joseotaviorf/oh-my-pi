@@ -29,7 +29,9 @@ class Marketing(object):
         'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
         'dim_rtb_campaign': 'sk_rtb_campaign',
         'dim_classified': 'sk_classified',
-        'fact_daily_classifieds_costs': 'sk_classified'
+        'fact_daily_classifieds_costs': 'sk_classified',
+        'dim_trovit_campaign': 'sk_trovit_campaign',
+        'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):

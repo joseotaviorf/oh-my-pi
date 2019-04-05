@@ -19,13 +19,13 @@ pipeline:
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
-      - pip install -q -r requirements.txt
-      - pip install -q -r requirements_test.txt
+      - pip install -r requirements.txt
+      - pip install -r requirements_test.txt
       - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=25 --cov-config .coveragerc tests
       - coverage-badge -o badge-lines.svg
     when:
       event: push
-  
+
   publish-coverage:
     image: plugins/s3
     pull: true
@@ -38,7 +38,7 @@ pipeline:
     when:
       event: push
       branch: [ master ]
-    
+
   install-forno:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
@@ -52,7 +52,7 @@ pipeline:
       - cd /var/www/airflow/
       - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
+      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       event: push
@@ -72,7 +72,7 @@ pipeline:
       - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
       - airflow_venv/bin/airflow variables -i ~/bi/variables.json
       - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete      
+      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
     secrets: [ rsync_key ]
     when:
       event: push
@@ -154,7 +154,7 @@ pipeline:
     when:
       event: pull_request
       branch: [ master ]
-  
+
   sonar-report:
     image: quintoandar/sonar-scanner
     pull: true
@@ -176,7 +176,7 @@ pipeline:
     when:
       event: push
       branch: [ master ]
-  
+
   notify:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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

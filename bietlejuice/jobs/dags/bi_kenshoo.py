@@ -4,7 +4,6 @@ from datetime import datetime
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.contrib.operators.sftp_operator import SFTPOperator, SFTPOperation
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -54,7 +53,7 @@ ssh_hook = SSHHook(
 )
 
 # operators
-execute_adjust_search_offline_conversions_query_task = PythonOperator(
+execute_adjust_search_offline_conversions_query_task = BaseDAG.build_python_operator(
     task_id='execute_adjust_search_offline_conversions_query',
     python_callable=execute_query,
     provide_context=True,

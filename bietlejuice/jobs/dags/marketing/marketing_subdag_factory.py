@@ -1,10 +1,17 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.dags.marketing.marketing_classifieds_costs_subdag import MarketingClassifiedsCostsSubDag
-from bietlejuice.jobs.dags.marketing.marketing_criteo_campaigns_subdag import MarketingCriteoCampaignsSubDag
-from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import MarketingFacebookAdsSubDag
-from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import MarketingGoogleAdsSubDag
-from bietlejuice.jobs.dags.marketing.marketing_rtb_campaigns_subdag import MarketingRtbCampaignsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_classifieds_costs_subdag import \
+    MarketingClassifiedsCostsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_criteo_campaigns_subdag import \
+    MarketingCriteoCampaignsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import \
+    MarketingFacebookAdsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import \
+    MarketingGoogleAdsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_rtb_campaigns_subdag import \
+    MarketingRtbCampaignsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_trovit_campaigns_subdag import \
+    MarketingTrovitCampaignsSubDag
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 logger = QuintoAndarLogger("MarketingSubDagFactory")
@@ -12,12 +19,15 @@ logger = QuintoAndarLogger("MarketingSubDagFactory")
 
 class MarketingSubDagFactory(object):
     @staticmethod
-    def factory(class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, accounts=None,
+    def factory(class_, bucket, sub_dag_name, dag_name, schedule_interval,
+                start_date, accounts=None,
                 auth=None):
-        logger.info("m=factory, msg=creating class instance, class={}".format(class_))
+        logger.info(
+            "m=factory, msg=creating class instance, class={}".format(class_))
         class__ = MarketingSubDagFactory.__dispatch_dict(class_)
-        if class_ is None:
-            raise Exception('m=factory, class_={}, msg=class type not found'.format(class_))
+        if class__ is None:
+            raise Exception(
+                'm=factory, class_={}, msg=class type not found'.format(class_))
 
         return class__(
             class_=class_,
@@ -38,5 +48,6 @@ class MarketingSubDagFactory(object):
             MarketingEnum.FACEBOOK_ADS: MarketingFacebookAdsSubDag,
             MarketingEnum.CRITEO: MarketingCriteoCampaignsSubDag,
             MarketingEnum.RTB: MarketingRtbCampaignsSubDag,
-            MarketingEnum.CLASSIFIEDS_COSTS: MarketingClassifiedsCostsSubDag
+            MarketingEnum.CLASSIFIEDS_COSTS: MarketingClassifiedsCostsSubDag,
+            MarketingEnum.TROVIT: MarketingTrovitCampaignsSubDag
         }.get(class_)

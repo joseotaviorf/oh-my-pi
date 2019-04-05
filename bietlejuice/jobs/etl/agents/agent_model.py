@@ -1,12 +1,13 @@
-import petl
 import re
 from datetime import datetime
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
+import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
+from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 logger = QuintoAndarLogger('Agent')
 
@@ -220,3 +221,10 @@ class Agent(object):
             new_columns.update({old_column: new_column})
 
         return new_columns
+
+    @logger
+    def get_datalake_data_from_filequery(self, file_name):
+        a = AthenaClient(s3_bucket=self.bucket_datalake)
+        df = a.execute_file_query_and_return_dataframe(
+            filename='{}/agent/{}.sql'.format(DATALAKE_QUERIES_DIR, file_name))
+        return petl.fromdataframe(df)
