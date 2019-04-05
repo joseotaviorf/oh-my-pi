@@ -38,12 +38,12 @@ from
 )
 select
 	id_from_lead as id_lead,
-	REPLACE(u_initial_utm_campaign, '–', '-') as tracking_campaign,
-	u_initial_utm_medium as tracking_medium,
-	u_initial_utm_source as tracking_source,
-	u_initial_utm_content as tracking_content,
-	u_initial_utm_term as tracking_term,
-	u_platform as tracking_platform,
+	replace_not_latin_chars(u_initial_utm_campaign) as tracking_campaign,
+	replace_not_latin_chars(u_initial_utm_medium) as tracking_medium,
+	replace_not_latin_chars(u_initial_utm_source) as tracking_source,
+	replace_not_latin_chars(u_initial_utm_content) as tracking_content,
+	replace_not_latin_chars(u_initial_utm_term) as tracking_term,
+	replace_not_latin_chars(u_platform) as tracking_platform,
 	replace_not_latin_chars(region) as tracking_region,
 	replace_not_latin_chars(city) as tracking_city
 from t_rn
