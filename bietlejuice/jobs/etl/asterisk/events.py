@@ -24,7 +24,8 @@ class AsteriskEvents(Asterisk):
             ('phase', str),
             ('name', str),
             ('params', str),
-            ('ts_ocurred', str)
+            ('ts_created', str),
+            ('ts_load', str)
         ])
 
         self._move_to_clean_partitioned(

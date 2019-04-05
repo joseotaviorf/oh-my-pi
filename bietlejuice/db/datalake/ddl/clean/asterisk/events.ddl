@@ -5,7 +5,8 @@ create external table if not exists datalake_clean.asterisk_events (
   phase string,
   name string,
   params string,
-  ts_ocurred string
+  ts_created string,
+  ts_load string
 )
 partitioned by (
   dt string
