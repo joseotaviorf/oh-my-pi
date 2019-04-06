@@ -2,7 +2,7 @@ DROP TABLE IF exists staging.dim_booking;
 CREATE TABLE staging.dim_booking (
   sk_booking INTEGER,
   id_booking INTEGER,
-  valid_bookings_not_rescheduled boolean,
+  is_rescheduled boolean,
   dt_scheduling TIMESTAMP,
   type VARCHAR(50),
   confirmed VARCHAR(100),

@@ -6,6 +6,7 @@ from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns
+from bietlejuice.jobs.etl.marketing.trovit_campaigns import TrovitCampaigns
 
 logger = QuintoAndarLogger("MarketingFactory")
 
@@ -14,10 +15,11 @@ class MarketingFactory(object):
 
     @staticmethod
     def factory(class_, s3_bucket, execution_date, auth=None, account=None):
-        if class_ is None:
-            raise TypeError('m=factory, _class={}, msg=class type not found'.format(class_))
-
         class__ = MarketingFactory.__dispatch_dict(class_)
+
+        if class__ is None:
+            raise TypeError(
+                'm=factory, _class={}, msg=class type not found'.format(class_))
 
         return class__(
             s3_bucket=s3_bucket,
@@ -34,5 +36,6 @@ class MarketingFactory(object):
             MarketingEnum.FACEBOOK_ADS: FacebookAds,
             MarketingEnum.CRITEO: CriteoCampaigns,
             MarketingEnum.RTB: RtbCampaigns,
-            MarketingEnum.CLASSIFIEDS_COSTS: ClassifiedsCosts
+            MarketingEnum.CLASSIFIEDS_COSTS: ClassifiedsCosts,
+            MarketingEnum.TROVIT: TrovitCampaigns
         }.get(class_)

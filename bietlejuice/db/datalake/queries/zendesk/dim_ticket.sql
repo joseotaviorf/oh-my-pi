@@ -1,6 +1,6 @@
 with tickets_filter as (
-	select t.* from datalake_clean.zendesk_tickets t
-	where t.channel != 'api'
+	select distinct t.* from datalake_clean.zendesk_tickets t
+	where (t.channel<>'api' or (t.channel='api' and t.tags not like '%hsm%')) and (t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
 max_ticket_groups as (
@@ -26,7 +26,7 @@ last_ticket_groups as (
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '{\\?"id\\?":(\d+)', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":"?(\d+)"?', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
@@ -37,6 +37,7 @@ fields_map as (
     from parse_fields f
     left join datalake_clean.zendesk_ticket_fields cf
        on cf.id = f.field_id
+    where f.value is not null
     group by f.id
 )
 select
@@ -48,12 +49,15 @@ select
    t.priority,
    t.recipient,
    t.tags,
-   t.satisfaction_rating,
+   t.status,
+   cast(t.is_public as boolean) as has_public_comments,
+   json_format(cast(c.cols as JSON)) as custom_fields,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.score')), '"') as score,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.reason')), '"') as reason,
+   replace(json_format(json_extract(t.satisfaction_rating, '$.comment')), '"') as comment,
    c.cols['Tipo de Solicitação'] as request_type,
    c.cols['Tipo de Cliente'] as client_type,
    date_parse(regexp_extract(t.description, 'Chat started: (\d+.\d+.\d+ \d+:\d+ \wM)', 1), '%Y-%m-%d %h:%i %p') as chat_started_at,
-   cast(from_iso8601_timestamp(t.created_at) as timestamp) as created_at,
-   cast(from_iso8601_timestamp(t.updated_at) as timestamp) as updated_at,
    current_timestamp as ts_load
 from tickets_filter t
 left join fields_map c

@@ -1,9 +1,11 @@
 import mock
+import pandas as pd
+import petl
 import pytest
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_etl import EnumDB
 from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR
+from qa_python_utils.aws.athena import AthenaClient
 
 
 class TestAgents(object):
@@ -135,3 +137,19 @@ class TestAgents(object):
         assert mock_from_db_query.call_count == 1
         assert mock_from_db_query.call_args[1].get('query') == query
         assert result == expected
+
+    @mock.patch.object(AthenaClient, 'execute_file_query_and_return_dataframe',
+                       return_value=pd.DataFrame(data=[1], columns=['id']))
+    def test_get_datalake_data_from_filequery(self, mock_execute_file_query_and_return_dataframe, agent):
+        # arrange
+        expected_df = pd.DataFrame(data=[1], columns=['id'])
+        file_name = 'lorem'
+
+        # act
+        result = agent.get_datalake_data_from_filequery(file_name=file_name)
+
+        # assert
+        # Comparing petl objects by converting to df
+        assert expected_df.equals(petl.todataframe(result))
+        assert mock_execute_file_query_and_return_dataframe.call_count == 1
+        assert file_name in mock_execute_file_query_and_return_dataframe.call_args[1].get('filename')
