@@ -202,6 +202,14 @@ events_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=AsteriskTableEnum.EVENTS
 )
 
+events_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='events_clean',
+    storage_format='partitioned',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.EVENTS
+)
+
 cxpanel_queues_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cxpanel_queues_raw',
