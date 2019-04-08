@@ -173,10 +173,12 @@ terminate_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=terminate_job_flow_sub_dag
 )
 
+# flow
 airflow_helpers.chain(
     create_job_flow_sub_dag_task,
     data_preparation_sub_dag_task,
     visits_learning_sub_dag_task,
-    agents_optimization_sub_dag_task,
-    terminate_job_flow_sub_dag_task
+    agents_optimization_sub_dag_task
 )
+
+agents_optimization_sub_dag_task.set_downstream([add_new_table_partition_task, terminate_job_flow_sub_dag_task])
