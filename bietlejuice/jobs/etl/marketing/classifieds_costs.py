@@ -4,7 +4,6 @@ from datetime import timedelta
 from gzip import GzipFile
 from io import BytesIO
 
-import petl
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
@@ -25,7 +24,7 @@ class ClassifiedsCosts(Marketing):
     COLUMN_TYPE_MAP = {
         'marketing_classifieds_costs': {
             'source': str,
-            'cost': long
+            'cost': str
         }
     }
 
@@ -43,7 +42,6 @@ class ClassifiedsCosts(Marketing):
             self.auth['sheet_credentials'],
             self.google_api_scope
         )
-
         return g_sheets.get_dataframe_from_sheet(self.sheet_name, str(sheet_id))
 
     @logger(exclude='df')
@@ -54,6 +52,7 @@ class ClassifiedsCosts(Marketing):
 
         # Delete the useless "medium" column from the dataframe
         df = df.drop("medium", axis=1)
+        df = df.applymap(str)
         json_list = df.to_dict(orient='records')
         logger.info('m=_save_to_s3, msg=gzipping json')
         gz_body = BytesIO()
@@ -147,54 +146,21 @@ class ClassifiedsCosts(Marketing):
                 'm=load_to_staging, schema={}, table_name={}, msg=table already empty'.format(
                     Marketing.SCHEMA_NAMES['prod'], table_name))
         else:
-            delete_query = "DELETE FROM {schema}.{table_name} where sk_cost_date = {date_partition}"
-
-            BaseETL.execute_command(
-                command=delete_query.format(
-                    schema=Marketing.SCHEMA_NAMES['staging'],
-                    table_name=table_name,
-                    date_partition=int_date),
-                db_enum=EnumDB.BI_DW,
-                encoding='utf-8',
-                commit=True
-            )
+            delete_query = "DELETE FROM {schema}.{table_name} where sk_cost_date between {date_partition} and {date_end_month}"
 
             BaseETL.execute_command(
                 command=delete_query.format(
                     schema=Marketing.SCHEMA_NAMES['prod'],
                     table_name=table_name,
-                    date_partition=int_date),
+                    date_partition=int_date,
+                    date_end_month=int_date + 30
+                ),
                 db_enum=EnumDB.BI_DW,
                 encoding='utf-8',
                 commit=True
             )
 
         return fact_query, [{'column': 'sk_classified', 'type': int}, {'column': 'sk_cost_date', 'type': int}]
-
-    @logger(exclude=['staging_query', 'column_types'])
-    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
-
-        logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
-            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
-
-        df = self.athena_client.execute_query_and_return_dataframe(sql=staging_query)
-
-        logger.info("m=_load_to_staging, schema={}, table_name={}, msg=inserting into staging table".format(
-            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
-
-        df_table = petl.fromdataframe(df=df)
-
-        for ct in column_types:
-            df_table = petl.convert(df_table, ct['column'], ct['type'])
-
-        BaseETL.bulk_insert(
-            table=df_table,
-            table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
-            db_enum=EnumDB.BI_DW,
-            encoding='utf-8',
-            append=False,
-            commit=True,
-        )
 
     @logger
     def load_to_prod(self, table_name):
@@ -203,7 +169,6 @@ class ClassifiedsCosts(Marketing):
     @logger
     def _load_to_prod(self, table_name):
         table_type = table_name.split("_")[0]
-
         upsert_query = "SELECT DISTINCT * FROM {}.{}".format(Marketing.SCHEMA_NAMES['staging'], table_name)
 
         empty = self._is_prod_table_empty(table_name)
@@ -216,14 +181,13 @@ class ClassifiedsCosts(Marketing):
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/classifieds_costs/delete_fact_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
-                upsert_query = "{} \nwhere sk_cost_date = {};".format(upsert_query,
-                                                                      self.execution_date.strftime('%Y%m%d'))
+                self.__delete_old_entries(delete_query=delete_query)
+
             else:
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/classifieds_costs/delete_dim_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self.__delete_old_entries(table_name=table_name, delete_query=delete_query)
+                self.__delete_old_entries(delete_query=delete_query)
                 upsert_query = """
                         SELECT * FROM staging.{dim_table}
                         WHERE {sk_field} not in (
@@ -234,10 +198,14 @@ class ClassifiedsCosts(Marketing):
         self._upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
 
     @logger
-    def __delete_old_entries(self, table_name, delete_query):
+    def __delete_old_entries(self, delete_query):
+        begin_date = self.execution_date.strftime('%Y%d%m')
+        end_date = int(begin_date) + 30
+        query = delete_query.replace('__BEGIN_DATE__', begin_date).replace('__END_DATE__', str(end_date))
+
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
-            command=delete_query.replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%d%m')),
+            command=query,
             commit=True,
             encoding='utf-8'
         )
