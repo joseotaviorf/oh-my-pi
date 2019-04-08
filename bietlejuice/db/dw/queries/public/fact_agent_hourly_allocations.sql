@@ -2,7 +2,7 @@ WITH schedule AS
 (SELECT
 	t.agent_id AS sk_agent,
 	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_slot_date,
-	date_trunc('h', t.slot_dt) AS slot_hour_ts,
+	date_trunc('h', t.slot_dt) AS ts_slot_hour,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS allocated_slots,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS allocated_slots_0
  FROM agent.agents_slots t
@@ -12,7 +12,7 @@ GROUP BY 1, 2, 3
 first_visits AS
 (SELECT
 	id_agent,
-	min(dt_scheduling) as dt_first_visit
+	min(dt_scheduling) as ts_first_visit
  FROM public.dim_booking db
  WHERE db.type = 'Visita'
  GROUP BY id_agent
@@ -25,7 +25,15 @@ SELECT
 	WHERE "timestamp" <= CAST('{0}' AS TIMESTAMP)
 )
 SELECT
-	s.*,
+	s.sk_agent,
+	s.sk_slot_date,
+	to_char(s.ts_slot_hour,'YYYYMMDDHH24') as sk_slot_date_hour,
+	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
+	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
+	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
+	s.ts_slot_hour,
+	s.allocated_slots,
+	s.allocated_slots_0,
 	CASE d.week_day
 		WHEN 0 THEN 0	                           -- Sunday
 		WHEN 6 THEN                                -- Saturday
@@ -51,11 +59,8 @@ SELECT
 		    END
 	END = 1 AS is_allocation_available,
 	COALESCE(a.area, '-1') AS area,
-	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
-	dt_first_visit,
-	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
-	getdate() as dt_timestamp
+	ts_first_visit,
+	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
