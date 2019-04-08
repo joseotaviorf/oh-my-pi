@@ -27,7 +27,7 @@ SELECT
 SELECT
 	s.sk_agent,
 	s.sk_slot_date,
-	to_char(s.ts_slot_hour,'YYYYMMDDHH24') as sk_slot_date_hour,
+	to_char(s.ts_slot_hour,'YYYYMMDDHH24')::bigint as sk_slot_date_hour,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
 	COALESCE(acr.workcontract_id, -1) as sk_contract_type,

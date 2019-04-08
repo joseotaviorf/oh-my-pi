@@ -2,7 +2,7 @@ drop table if exists agent.fact_agent_hourly_allocations ;
 create table agent.fact_agent_hourly_allocations (
   sk_agent integer,
   sk_slot_date integer,
-  sk_slot_date_hour integer,
+  sk_slot_date_hour bigint,
   sk_agent_region varchar(20),
   sk_slot_date_agent bigint,
   sk_contract_type integer,
