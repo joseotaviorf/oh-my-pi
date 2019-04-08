@@ -65,7 +65,7 @@ def __save_data_to_s3_raw(invoice_obj, data_frame, raw_table_name):
     object_ = df_json_service.to_json_bytes()
     invoice_obj.save_into_s3_raw(
         object_=object_,
-        file_path_prefix='raw/seu_barriga/invoice/{}'.format(invoice_obj._type),
+        file_path_prefix='raw/seu_barriga/invoice/{}'.format(invoice_obj.type_),
         raw_table_name=raw_table_name,
     )
     object_.flush()
@@ -77,7 +77,7 @@ def __get_dataframe_from_invoice_result(_invoice, result):
         raise Exception
 
     # fines
-    if _invoice._type == 'fine':
+    if _invoice.type_ == 'fine':
         return pd.read_json(result)
 
     # reports
