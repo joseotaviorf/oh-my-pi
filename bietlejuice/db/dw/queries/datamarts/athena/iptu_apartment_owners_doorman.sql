@@ -37,8 +37,10 @@ WITH doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE work_city = 'São Paulo'
-    AND a.lat IS NOT NULL
+  WHERE
+    -- work_city = 'São Paulo'
+    -- AND
+    a.lat IS NOT NULL AND a.lat != ''
 ),
 phones AS (
 SELECT cpf, phone_number
@@ -72,12 +74,18 @@ apts AS (
     ea.numero_imovel,
     -- ea.nome_lougradouro_imovel,
     -- ea.address_number,
-    ea.complemento_imovel
+    ea.complemento_imovel,
     -- ea.tipo_uso_imovel,
     -- ea.area_construida,
     -- ea.numero_condominio,
+    geo.lat,
+    geo.lng,
+    geo.geocoded_address AS google_formatted_address
   FROM datalake_raw.external_sp_apts AS ea
+  LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
+    ON ea.bldg_address_id = geo.bldg_address_id
   WHERE ea.numero_imovel IS NOT NULL AND TRY_CAST(ea.numero_imovel AS INTEGER) IS NOT NULL
+    AND geo.lat IS NOT NULL AND geo.lat != ''
     -- AND CAST(ea.qtd_ocorrencias AS INTEGER) > 1  -- owners with more than 1 apt
   -- drop duplicate property_person_id?
 ),
@@ -96,13 +104,16 @@ doorman_join_apts_owners AS (
     MIN(ts_joined_program_timestamp) AS earliest_doorman_joined_date
   FROM apts AS a
   INNER JOIN doorman AS d
-    ON CAST(a.numero_imovel AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
-  INNER JOIN datalake_raw.sp_quadras_polygons_buffer_50m AS p
-    ON ST_INTERSECTS(
-      ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)),
-      ST_POLYGON(p.geometry)
+    ON ST_WITHIN(
+      ST_POINT(CAST(a.lng AS double), CAST(a.lat AS DOUBLE)),
+      ST_BUFFER(
+        -- 1 degree 110752 meters at latitude -23
+        -- 100 meters 0.00090291823 degrees
+        ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
+      )
     )
-    AND p.setor_quad = a.setor_quadra
+    AND
+    CAST(a.numero_imovel AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
   GROUP BY a.property_person_id
 )
 -- ,
