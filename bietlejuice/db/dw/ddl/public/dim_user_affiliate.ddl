@@ -1,5 +1,4 @@
 drop table if exists dim_user_affiliate;
-
 create table public.dim_user_affiliate (
     sk_user_affiliate bigint primary key,
     id_user_affiliate bigint,
@@ -9,12 +8,12 @@ create table public.dim_user_affiliate (
     is_active boolean,
     ts_updated timestamp,
     ts_created timestamp,
-    creci_number varchar(100),
+    creci_number varchar(255),
     origin varchar(24),
     type varchar(62),
-    is_inspector BOOLEAN,
-    is_realstate_agent BOOLEAN,
-    is_photographer BOOLEAN,
+    is_inspector boolean,
+    is_realstate_agent boolean,
+    is_photographer boolean,
     tracking_source varchar(255),
     tracking_medium varchar(255),
     tracking_campaign varchar(255),
