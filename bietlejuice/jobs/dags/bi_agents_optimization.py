@@ -7,6 +7,7 @@ from airflow.contrib.operators.emr_create_job_flow_operator import EmrCreateJobF
 from airflow.contrib.operators.emr_terminate_job_flow_operator import EmrTerminateJobFlowOperator
 from airflow.contrib.sensors.emr_step_sensor import EmrStepSensor
 from airflow.models import DAG
+from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -14,7 +15,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.sensors import QuintoAndarEmrJobFlowSensor
 
 # global vars
-MAIN_DAG_ID = 'bi-agents-optimization'
+MAIN_DAG_ID = 'bi-agents-optimization-v1'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 
@@ -22,6 +23,19 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-optimization')
                             .replace('__S3_BUCKET__', s3_bucket))
+
+
+# functions
+def add_new_table_partition(ds, **kwargs):
+    athena_client = AthenaClient(s3_bucket)
+    athena_client.upsert_single_partition(
+        bucket_folder_path='{}/hekima/optimization_result/historical'.format(s3_bucket),
+        database='datalake_raw',
+        table='agents_optimization',
+        partition_name='dt_predicted',
+        partition_value=ds
+    )
+
 
 # dags
 main_dag = DAG(
@@ -144,6 +158,13 @@ agents_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='agents_optimization_step',
     step='agents_optimization',
     sub_dag_func=send_step_sub_dag
+)
+
+add_new_table_partition_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='add_new_partition',
+    python_callable=add_new_table_partition,
+    provide_context=True
 )
 
 terminate_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
