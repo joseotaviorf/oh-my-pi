@@ -54,7 +54,7 @@ bldgs_stats AS (
     ON stats.bldg_address_id = info.bldg_address_id
   LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
     ON info.bldg_address_id = geo.bldg_address_id
-  WHERE geo.lat IS NOT NULL
+  WHERE geo.lat IS NOT NULL AND geo.lat != ''
 ),
 doorman AS (
   SELECT
