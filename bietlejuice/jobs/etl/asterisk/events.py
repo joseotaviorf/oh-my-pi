@@ -9,7 +9,7 @@ logger = QuintoAndarLogger('AsteriskEvents')
 class AsteriskEvents(Asterisk):
     CLASS_ENUM = AsteriskTableEnum.EVENTS
 
-    events = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
+    EVENTS = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
               'crm_destination_set', 'agent_aswered', 'key_typed', 'audio_message_started']
 
     @logger
@@ -21,10 +21,10 @@ class AsteriskEvents(Asterisk):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned_event(self, class_, r_cols, c_cols, event):
-        key = "clean/asterisk/{CLASS_VALUE}/dt={PARTITION_DATE}/" \
-              "event={EVENT}/{PARTITION_DATE}.parq".format(CLASS_VALUE=class_.value,
-                                                           PARTITION_DATE=self.partition_date,
-                                                           EVENT=event)
+        key = "clean/asterisk/{class_value}/dt={partition_date}/" \
+              "event={event}/{partition_date}.parq".format(class_value=class_.value,
+                                                           partition_date=self.partition_date,
+                                                           event=event)
         self._move_to_clean(
             class_=class_,
             key=key,
@@ -37,6 +37,7 @@ class AsteriskEvents(Asterisk):
     @logger
     def move_to_clean(self):
         r_cols = OrderedDict([
+            ('id', str),
             ('id_call', str),
             ('id_phase', str),
             ('phase', str),
@@ -46,7 +47,7 @@ class AsteriskEvents(Asterisk):
             ('ts_load', str)
         ])
 
-        for event in AsteriskEvents.events:
+        for event in AsteriskEvents.EVENTS:
             self._move_to_clean_partitioned_event(
                 class_=AsteriskEvents.CLASS_ENUM,
                 r_cols=r_cols,
