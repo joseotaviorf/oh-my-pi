@@ -101,50 +101,31 @@ main_dag = DAG(
 )
 
 # operators
-# TODO: make it DRY
-'''
-Gets all files from DW_QUERIES_DIR/datamarts/ and creates a table using the filename
-'''
-for filename in os.listdir('{}/{}'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
-    filename_split = filename.split('.')
+operators = [
+    {'queries_dir': DW_QUERIES_DIR, 'python_callable': create_datamart_from_dw},
+    {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena}
+]
 
-    if len(filename_split) < 1:
-        logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
-        continue
+for operator in operators:
+    '''
+    Gets all files from queries_dir/datamarts/ and creates a table using the filename
+    '''
+    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
+        filename_split = filename.split('.')
 
-    if filename_split[1] != 'sql':
-        logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
-        continue
+        if len(filename_split) < 1:
+            logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
+            continue
 
-    table_name = filename_split[0]
-    PythonOperator(
-        task_id=table_name,
-        provide_context=True,
-        python_callable=create_datamart_from_dw,
-        dag=main_dag,
-        op_kwargs={'table_name': table_name}
-    )
+        if filename_split[1] != 'sql':
+            logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
+            continue
 
-
-'''
-Gets all files from DATALAKE_QUERIES_DIR/datamarts/ and creates a table using the filename
-'''
-for filename in os.listdir('{}/{}'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA)):
-    filename_split = filename.split('.')
-
-    if len(filename_split) < 1:
-        logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
-        continue
-
-    if filename_split[1] != 'sql':
-        logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
-        continue
-
-    table_name = filename_split[0]
-    PythonOperator(
-        task_id=table_name,
-        provide_context=True,
-        python_callable=create_datamart_from_athena,
-        dag=main_dag,
-        op_kwargs={'table_name': table_name}
-    )
+        table_name = filename_split[0]
+        PythonOperator(
+            task_id=table_name,
+            provide_context=True,
+            python_callable=operator['python_callable'],
+            dag=main_dag,
+            op_kwargs={'table_name': table_name}
+        )
