@@ -1,6 +1,6 @@
 with asterisk_data as (
 	select dt, content from datalake_raw.asterisk_logs_full
-	where date(from_iso8601_timestamp(dt)) = date('{partition_date}')
+	where dt = '{partition_date}'
 ),
 ids_calls as (
 	select
@@ -10,7 +10,7 @@ ids_calls as (
 	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)')=true
 	group by 2
 ),
-call_started as (
+first_event_started as (
 	select
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 2) as id_call,
 	    regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 2) as id_phase,
@@ -23,11 +23,23 @@ call_started as (
 	    end as params,
 		min(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 1)) as ts_created,
 		now() as ts_load    
-	from asterisk_data
-	right join ids_calls id_c
-	on (id_call=id_c.id_call and ts_created=id_c.ts_created)
-	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)')=true		
+	from asterisk_data	
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)')=true
 	group by 1,2,3,4,5,7
+),
+call_started as (
+	select
+		e.id_call,
+		e.id_phase,
+		e.phase,
+		e.name,
+		e.params,
+		e.ts_created,
+		e.ts_load
+	from first_event_started e
+	right join ids_calls id_c
+	on (e.id_call=id_c.id_call and e.ts_created=id_c.ts_created)
+	group by 1,2,3,4,5,6,7
 ),
 call_ended as (
 	select

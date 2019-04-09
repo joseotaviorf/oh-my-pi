@@ -8,7 +8,8 @@ logger = QuintoAndarLogger('AsteriskEvents')
 
 class AsteriskEvents(Asterisk):
     CLASS_ENUM = AsteriskTableEnum.EVENTS
-    events = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set',
+
+    events = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
               'crm_destination_set', 'agent_aswered', 'key_typed', 'audio_message_started']
 
     @logger
