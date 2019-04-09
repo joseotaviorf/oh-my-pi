@@ -3,7 +3,7 @@ from datetime import datetime
 
 from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksUngroupedManual, CRMTasksFactory, CRMTasksOffboarding, \
     CRMTasksClosing, CRMTasksRepair, CRMTasksInspection, CRMTasksLead, CRMTasksOnboardingTenant, CRMTasksPayment, \
-    CRMTasksPhotoJob, CRMTasksVisit, CRMTasksCredit
+    CRMTasksPhotoJob, CRMTasksVisit, CRMTasksCredit, CRMTasksCollection
 from bietlejuice.jobs.etl.crm.tasks.linhadireta_chat import CRMTasksChatLinhaDireta
 
 S3_BUCKET = 's3_bucket'
@@ -32,6 +32,14 @@ def ungrouped_manual():
 @pytest.fixture(scope='session')
 def offboarding():
     return CRMTasksOffboarding(
+        s3_bucket=S3_BUCKET,
+        execution_date=EXECUTION_DATE
+    )
+
+
+@pytest.fixture(scope='session')
+def collection():
+    return CRMTasksCollection(
         s3_bucket=S3_BUCKET,
         execution_date=EXECUTION_DATE
     )
