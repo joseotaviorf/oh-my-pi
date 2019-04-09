@@ -1,5 +1,5 @@
-drop table if exists datalake_raw.agents_optimization;
-create external table if not exists datalake_raw.agents_optimization (
+drop table if exists datalake_raw.agents_allocation_optimization;
+create external table if not exists datalake_raw.agents_allocation_optimization (
   region_code string,
   prediction_hour string,
   dt string,

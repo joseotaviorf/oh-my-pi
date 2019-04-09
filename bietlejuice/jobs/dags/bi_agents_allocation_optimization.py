@@ -31,7 +31,7 @@ def add_new_table_partition(ds, **kwargs):
     athena_client.upsert_single_partition(
         bucket_folder_path='{}/hekima/optimization_result/historical'.format(s3_bucket),
         database='datalake_raw',
-        table='agents_optimization',
+        table='agents_allocation_optimization',
         partition_name='dt_predicted',
         partition_value=ds
     )
@@ -153,10 +153,10 @@ visits_learning_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=send_step_sub_dag
 )
 
-agents_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+agents_allocation_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='agents_optimization_step',
-    step='agents_optimization',
+    sub_dag_name='agents_allocation_optimization_step',
+    step='agents_allocation_optimization',
     sub_dag_func=send_step_sub_dag
 )
 
@@ -178,7 +178,8 @@ airflow_helpers.chain(
     create_job_flow_sub_dag_task,
     data_preparation_sub_dag_task,
     visits_learning_sub_dag_task,
-    agents_optimization_sub_dag_task
+    agents_allocation_optimization_sub_dag_task
 )
 
-agents_optimization_sub_dag_task.set_downstream([add_new_table_partition_task, terminate_job_flow_sub_dag_task])
+agents_allocation_optimization_sub_dag_task.set_downstream([add_new_table_partition_task,
+                                                            terminate_job_flow_sub_dag_task])
