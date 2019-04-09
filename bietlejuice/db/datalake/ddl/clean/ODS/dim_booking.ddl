@@ -2,7 +2,7 @@ drop table if exists datalake_clean.ods_dim_booking;
 create external table if not exists datalake_clean.ods_dim_booking (
   sk_booking string,
   id_booking string,
-  valid_bookings_not_rescheduled string,
+  is_rescheduled string,
   dt_scheduling string,
   type string,
   confirmed string,

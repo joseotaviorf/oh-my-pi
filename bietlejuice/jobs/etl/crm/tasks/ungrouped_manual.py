@@ -11,6 +11,11 @@ class CRMTasksUngroupedManual(CRMTasks):
         'dim': 'dim_ungrouped_manual_task'
     }
 
+    QUERY_FILENAMES = {
+        'staging': 'append_fact_ungrouped_manual_info.sql',
+        'prod': 'append_fact_ungrouped_manual_table.sql'
+    }
+
     @logger(exclude='mongo_client_uri')
     def __init__(self, s3_bucket, mongo_client_uri, execution_date):
         super(CRMTasksUngroupedManual, self).__init__(
@@ -21,7 +26,10 @@ class CRMTasksUngroupedManual(CRMTasks):
 
     @logger
     def move_fact_to_staging(self):
-        self._move_fact_to_staging(table_name=CRMTasksUngroupedManual.TABLE_NAMES['fact'])
+        self._move_fact_to_staging(
+            table_name=CRMTasksUngroupedManual.TABLE_NAMES['fact'],
+            append_query_filename=CRMTasksUngroupedManual.QUERY_FILENAMES['staging']
+        )
 
     @logger
     def move_dim_to_staging(self):
@@ -29,7 +37,10 @@ class CRMTasksUngroupedManual(CRMTasks):
 
     @logger
     def append_fact_to_dw(self):
-        self._append_fact_to_dw(table_name=CRMTasksUngroupedManual.TABLE_NAMES['fact'])
+        self._append_fact_to_dw(
+            table_name=CRMTasksUngroupedManual.TABLE_NAMES['fact'],
+            query_filename=CRMTasksUngroupedManual.QUERY_FILENAMES['prod']
+        )
 
     @logger
     def append_dim_to_dw(self):
