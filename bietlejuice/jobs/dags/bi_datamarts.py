@@ -10,6 +10,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
@@ -28,7 +29,7 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 # functions
 @logger
 def create_datamart_from_dw(table_name, **kwargs):
-    query = BaseETL.get_query_from_file_name('{}/datamarts/dw/{}.sql'.format(DW_QUERIES_DIR, table_name))
+    query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
     logger.info('m=create_datamart_from_dw, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
@@ -49,7 +50,7 @@ def create_datamart_from_dw(table_name, **kwargs):
 
 def create_datamart_from_athena(table_name, **kwargs):
     athena = AthenaClient(s3_bucket)
-    query = BaseETL.get_query_from_file_name('{}/datamarts/athena/{}.sql'.format(DW_QUERIES_DIR, table_name))
+    query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
@@ -102,9 +103,9 @@ main_dag = DAG(
 # operators
 # TODO: make it DRY
 '''
-Gets all files from DW_QUERIES_DIR/datamarts/dw and creates a table using the filename
+Gets all files from DW_QUERIES_DIR/datamarts/ and creates a table using the filename
 '''
-for filename in os.listdir('{}/{}/dw'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
+for filename in os.listdir('{}/{}'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
     filename_split = filename.split('.')
 
     if len(filename_split) < 1:
@@ -126,9 +127,9 @@ for filename in os.listdir('{}/{}/dw'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
 
 
 '''
-Gets all files from DW_QUERIES_DIR/datamarts/athena and creates a table using the filename
+Gets all files from DATALAKE_QUERIES_DIR/datamarts/ and creates a table using the filename
 '''
-for filename in os.listdir('{}/{}/athena'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
+for filename in os.listdir('{}/{}'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA)):
     filename_split = filename.split('.')
 
     if len(filename_split) < 1:
