@@ -15,7 +15,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.sensors import QuintoAndarEmrJobFlowSensor
 
 # global vars
-MAIN_DAG_ID = 'bi-agents-optimization'
+MAIN_DAG_ID = 'bi-agents-allocation-optimization'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 
