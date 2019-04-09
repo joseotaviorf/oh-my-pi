@@ -364,7 +364,7 @@ class BaseETL(object):
             command='create table {} ({})'.format(table_name, df_columns_text),
             db_enum=enum_db,
             encoding=encoding,
-            commit=True
+            commit=commit
         )
 
     @classmethod

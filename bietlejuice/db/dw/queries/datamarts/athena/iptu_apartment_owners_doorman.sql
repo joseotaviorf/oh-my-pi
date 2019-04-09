@@ -38,8 +38,6 @@ WITH doorman AS (
     ) AS leads
       ON u.sk_user = leads.sk_user
   WHERE
-    -- work_city = 'São Paulo'
-    -- AND
     a.lat IS NOT NULL AND a.lat != ''
 ),
 phones AS (
@@ -56,7 +54,6 @@ WHERE row IN (1, 2)
 apts AS (
   SELECT
     ea.numero_contribuinte,
-    -- ea.bldg_id,
     ea.bldg_address_id,
     ea.numero_contribuinte || '/' || ea.cpf_cnpj AS property_person_id,
     ea.setor_quadra,
@@ -72,12 +69,7 @@ apts AS (
     ea.tipo_contribuinte_2,
     ea.formatted_address,
     ea.numero_imovel,
-    -- ea.nome_lougradouro_imovel,
-    -- ea.address_number,
     ea.complemento_imovel,
-    -- ea.tipo_uso_imovel,
-    -- ea.area_construida,
-    -- ea.numero_condominio,
     geo.lat,
     geo.lng,
     geo.geocoded_address AS google_formatted_address
@@ -86,14 +78,9 @@ apts AS (
     ON ea.bldg_address_id = geo.bldg_address_id
   WHERE ea.numero_imovel IS NOT NULL AND TRY_CAST(ea.numero_imovel AS INTEGER) IS NOT NULL
     AND geo.lat IS NOT NULL AND geo.lat != ''
-    -- AND CAST(ea.qtd_ocorrencias AS INTEGER) > 1  -- owners with more than 1 apt
-  -- drop duplicate property_person_id?
 ),
 doorman_join_apts_owners AS (
   SELECT
-    -- d.*,
-    -- p.setor_quad,
-    -- a.*
     a.property_person_id,
     COUNT(*) AS doorman_ct,
     array_agg(telefone_principal) AS doorman_phone,
@@ -116,15 +103,6 @@ doorman_join_apts_owners AS (
     CAST(a.numero_imovel AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
   GROUP BY a.property_person_id
 )
--- ,
--- apts_owners_counts AS (
---   SELECT
---     listing_id,
---     COUNT(*) AS possible_owners_count
---   FROM apts_owners
---   GROUP BY listing_id
---   HAVING COUNT(*) < 150
--- )
 SELECT
   d.doorman_ct,
   d.doorman_phone,

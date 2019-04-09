@@ -48,7 +48,7 @@ def create_datamart_from_dw(table_name, **kwargs):
 
 
 def create_datamart_from_athena(table_name, **kwargs):
-    athena = AthenaClient('5a-datalake')
+    athena = AthenaClient(s3_bucket)
     query = BaseETL.get_query_from_file_name('{}/datamarts/athena/{}.sql'.format(DW_QUERIES_DIR, table_name))
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
@@ -63,8 +63,6 @@ def create_datamart_from_athena(table_name, **kwargs):
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     df = athena.execute_query_and_return_dataframe(
         sql=query,
-        paginate=False,
-        page_size=0,
         query_params={'dt': execution_date}
     )
 
@@ -83,7 +81,7 @@ def create_datamart_from_athena(table_name, **kwargs):
         table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
         encoding='utf-8',
         append=False,
-        bucket_name='5a-datalake'
+        bucket_name=s3_bucket
     )
 
 
@@ -102,6 +100,7 @@ main_dag = DAG(
 )
 
 # operators
+# TODO: make it DRY
 '''
 Gets all files from DW_QUERIES_DIR/datamarts/dw and creates a table using the filename
 '''
