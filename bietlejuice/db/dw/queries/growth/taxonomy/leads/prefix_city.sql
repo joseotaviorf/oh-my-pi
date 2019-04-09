@@ -16,7 +16,7 @@ with all_dates_prev as (
 	l.utm_campaign,
 	l.utm_content,
 	l.utm_term,
-    rank() over (partition by
+    dense_rank() over (partition by
                         coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -33,7 +33,7 @@ with all_dates_prev as (
                         l.utm_content,
                         l.utm_term
                         order by f.sk_house_listing_flow asc)
-    	+ rank() over (partition by
+    	+ dense_rank() over (partition by
     	                coalesce(dr.city_name, ''),
     	                date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -51,7 +51,7 @@ with all_dates_prev as (
                         l.utm_term
                         order by f.sk_house_listing_flow desc)
 			- 1 as daily_count,
-    rank() over (partition by
+    dense_rank() over (partition by
                         coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('week', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -66,7 +66,7 @@ with all_dates_prev as (
                         l.utm_content,
                         l.utm_term
                         order by f.sk_house_listing_flow asc)
-    	+ rank() over (partition by
+    	+ dense_rank() over (partition by
     	                coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('week', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -82,7 +82,7 @@ with all_dates_prev as (
                         l.utm_term
                         order by f.sk_house_listing_flow desc)
 			- 1 as weekly_count,
-    rank() over (partition by
+    dense_rank() over (partition by
                         coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -97,7 +97,7 @@ with all_dates_prev as (
                         l.utm_content,
                         l.utm_term
                         order by f.sk_house_listing_flow asc)
-    	+ rank() over (partition by
+    	+ dense_rank() over (partition by
     	                coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         date_part('month', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
@@ -113,7 +113,7 @@ with all_dates_prev as (
                         l.utm_term
                         order by f.sk_house_listing_flow desc)
 			- 1 as monthly_count,
-    rank() over (partition by
+    dense_rank() over (partition by
                         coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
                         f.mkt_category,
@@ -127,7 +127,7 @@ with all_dates_prev as (
                         l.utm_content,
                         l.utm_term
                         order by f.sk_house_listing_flow asc)
-    	+ rank() over (partition by
+    	+ dense_rank() over (partition by
     	                coalesce(dr.city_name, ''),
                         date_part('year', to_date(f.sk_lead_date::varchar, 'YYYYMMDD')),
     	                f.mkt_category,

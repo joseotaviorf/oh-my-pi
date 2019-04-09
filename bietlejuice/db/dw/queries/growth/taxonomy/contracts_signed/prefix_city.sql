@@ -139,7 +139,7 @@ with all_dates as (
 		on f.sk_booking = db.sk_booking
 	join dim_contract dc
 		on f.sk_contract = dc.sk_contract
-		and sk_contract_signed_date > 0
+		and f.sk_contract_signed_date > 0
 	left join dim_rent_flow_taxonomy drft
 	    on f.sk_rent_flow_taxonomy = drft.sk_rent_flow_taxonomy
     left join dim_region dr

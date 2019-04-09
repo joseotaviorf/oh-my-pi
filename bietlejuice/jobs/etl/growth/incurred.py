@@ -1,6 +1,6 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.etl import DW_QUERIES_DIR
+from bietlejuice.jobs.etl import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Growth')
@@ -9,6 +9,7 @@ logger = QuintoAndarLogger('Growth')
 class Growth(object):
     SCHEMA = 'growth'
     QUERIES_DIR = '{}/growth'.format(DW_QUERIES_DIR)
+    DL_QUERIES_DIR = '{}/growth'.format(DATALAKE_QUERIES_DIR)
     FACT_TABLE_NAME = 'fact_growth'
 
     @staticmethod
@@ -16,8 +17,8 @@ class Growth(object):
     def get_measure_all_query(is_taxonomy=False):
         if not is_taxonomy:
             return BaseETL.get_query_from_file_name('{}/measure_all.sql'.format(Growth.QUERIES_DIR))
-        else:
-            return BaseETL.get_query_from_file_name('{}/taxonomy/measure_all.sql'.format(Growth.QUERIES_DIR))
+
+        return BaseETL.get_query_from_file_name('{}/taxonomy/measure_all.sql'.format(Growth.QUERIES_DIR))
 
     @staticmethod
     @logger
@@ -45,9 +46,10 @@ class Growth(object):
 
     @staticmethod
     @logger
-    def create_table(funnel, measure, _filter, period, is_taxonomy):
+    def create_table(funnel, measure, _filter, period, is_taxonomy, is_from_dw=True):
         prefix_file = BaseETL.get_query_from_file_name(
-            '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR, funnel, measure, _filter))
+            '{}/{}/{}/prefix_{}.sql'.format(Growth.QUERIES_DIR if is_from_dw else Growth.DL_QUERIES_DIR, funnel,
+                                            measure, _filter))
         suffix_file = BaseETL.get_query_from_file_name('{}/suffix_{}.sql'.format(
             (Growth.QUERIES_DIR if not is_taxonomy else '{}/{}'.format(Growth.QUERIES_DIR, funnel)), period))
 

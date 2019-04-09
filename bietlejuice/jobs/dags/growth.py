@@ -124,7 +124,23 @@ def materialize_growth_measure_table_query(**kwargs):
     else:
         Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
 
-    Growth.create_table(funnel, measure, _filter, period, is_taxonomy=is_taxonomy)
+    Growth.create_table(funnel, measure, _filter, period, is_taxonomy=is_taxonomy, is_from_dw=True)
+
+
+@logger
+def materialize_growth_measure_table_from_datalake(**kwargs):
+    funnel = kwargs['funnel']
+    measure = kwargs['measure']
+    _filter = kwargs['filter']
+    period = kwargs['period']
+    is_taxonomy = (funnel == 'taxonomy')
+
+    if is_taxonomy:
+        Growth.drop_table(table_name='{}_{}_{}_{}'.format(funnel, measure, _filter, period), schema=Growth.SCHEMA)
+    else:
+        Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
+
+    Growth.create_table(funnel, measure, _filter, period, is_taxonomy=is_taxonomy, is_from_dw=False)
 
 
 def materialize_growth_measure_prediction_table_query(**kwargs):
@@ -695,12 +711,12 @@ taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                  'taxonomy')
 
 taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                                    materialize_growth_measure_table_query,
+                                                                    materialize_growth_measure_table_from_datalake,
                                                                     'demand_active_user_sessions',
                                                                     'taxonomy')
 
 taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                            materialize_growth_measure_table_query,
+                                                            materialize_growth_measure_table_from_datalake,
                                                             'demand_active_users',
                                                             'taxonomy')
 

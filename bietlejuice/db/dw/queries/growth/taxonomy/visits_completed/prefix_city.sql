@@ -137,7 +137,7 @@ with all_dates as (
 	from fact_listing_rent_flows f
 	join dim_booking db
 		on f.sk_booking = db.sk_booking
-			and db.visit_follow_up in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+			and f.flg_visit_completed
 			and db.dt_created >= '2018-01-01' and db.dt_created < current_date
 			and f.sk_booking != -1
 	join fact_house_listings fhl
