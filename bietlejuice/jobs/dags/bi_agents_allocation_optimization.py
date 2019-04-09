@@ -21,7 +21,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 
 # env vars
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-optimization')
+bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-allocation-optimization')
                             .replace('__S3_BUCKET__', s3_bucket))
 
 
