@@ -10,7 +10,7 @@ class AsteriskEvents(Asterisk):
     CLASS_ENUM = AsteriskTableEnum.EVENTS
 
     EVENTS = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
-              'crm_destination_set', 'agent_aswered', 'key_typed', 'audio_message_started']
+              'crm_destination_set', 'agent_aswered', 'key_typed', 'audio_message_started', 'queue_join_time_set']
 
     @logger
     def __init__(self, s3_bucket, execution_date):
