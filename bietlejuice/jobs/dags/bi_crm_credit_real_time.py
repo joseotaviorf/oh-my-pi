@@ -94,12 +94,16 @@ def send_data_to_s3(ebdb_filename, ustasks_filename, sort_direction):
                          right_on='origemId')
     merged_df.drop('origemId', axis=1, inplace=True)
     merged_df.rename(columns={'assigneeName': 'analyst'}, inplace=True)
+    
+    # removing automatic assignment from proposal tasks
     merged_df.drop(merged_df[merged_df.analyst == 'Closing3 Time 3'].index, inplace=True)
 
     logger.info(
         'm=send_data_to_s3, sql_filename={}, ustasks_filename={}, sort_direction={}, msg=replacing nan values'.format(
             ebdb_filename, ustasks_filename, sort_direction))
     merged_df = merged_df.where((pd.notnull(merged_df)), '-')
+    
+    # removing already closed tasks/tasks with no Analyst
     merged_df.drop(merged_df[merged_df.analyst == '-'].index, inplace=True)
 
     key = 'clean/credit/proposals_in_analysis/{}.parq'.format(sort_direction)
