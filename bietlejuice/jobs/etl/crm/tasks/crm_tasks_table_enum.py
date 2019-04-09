@@ -14,3 +14,4 @@ class CRMTasksTableEnum(Enum):
     UNGROUPED_MANUAL = 'ungrouped_manual'
     OFFBOARDING = 'offboarding'
     LINHADIRETA_CHAT = 'linhadireta_chat'
+    COLLECTION = 'collection'

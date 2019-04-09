@@ -1,12 +1,12 @@
 with tickets_filter as (
 	select distinct t.* from datalake_clean.zendesk_tickets t
-	where (t.tags not like '%hsm%' or t.subject != 'SCRUBBED')
+	where (t.channel<>'api' or (t.channel='api' and t.tags not like '%hsm%')) and (t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
 parse_fields as (
     select zt.id,
         f1.field,
-        regexp_extract(f1.field, '{\\?"id\\?":(\d+)', 1) as field_id,
+        regexp_extract(f1.field, '{\\?"id\\?":"?(\d+)"?', 1) as field_id,
         nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}]+)', 1), 'null') as value
     from tickets_filter zt
     cross join unnest(regexp_extract_all(zt.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
@@ -17,6 +17,7 @@ fields_map as (
     from parse_fields f
     left join datalake_clean.zendesk_ticket_fields cf
        on cf.id = f.field_id
+    where f.value is not null
     group by f.id
 ),
 tickets as (

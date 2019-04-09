@@ -9,17 +9,24 @@ class TestCRMTasksUngroupedManual(object):
         'dim': 'dim_ungrouped_manual_task'
     }
 
+    QUERY_FILENAMES = {
+        'staging': 'append_fact_ungrouped_manual_info.sql',
+        'prod': 'append_fact_ungrouped_manual_table.sql'
+    }
+
     @mock.patch.object(CRMTasksUngroupedManual, '_move_fact_to_staging')
     def test_move_fact_to_staging(self, mock__move_fact_to_staging, ungrouped_manual):
         # arrange
         table_name = TestCRMTasksUngroupedManual.TABLE_NAMES['fact']
+        append_query_name = TestCRMTasksUngroupedManual.QUERY_FILENAMES['staging']
 
         # act
         ungrouped_manual.move_fact_to_staging()
 
         # assert
         assert mock__move_fact_to_staging.call_count == 1
-        assert mock__move_fact_to_staging.call_args[1] == {'table_name': table_name}
+        assert mock__move_fact_to_staging.call_args[1]['table_name'] == table_name
+        assert mock__move_fact_to_staging.call_args[1]['append_query_filename'] == append_query_name
 
     @mock.patch.object(CRMTasksUngroupedManual, '_move_dim_to_staging')
     def test_move_dim_to_staging(self, mock__move_dim_to_staging, ungrouped_manual):
@@ -37,13 +44,15 @@ class TestCRMTasksUngroupedManual(object):
     def test_append_fact_to_dw(self, mock__append_fact_to_dw, ungrouped_manual):
         # arrange
         table_name = TestCRMTasksUngroupedManual.TABLE_NAMES['fact']
+        query_filename = TestCRMTasksUngroupedManual.QUERY_FILENAMES['prod']
 
         # act
         ungrouped_manual.append_fact_to_dw()
 
         # assert
         assert mock__append_fact_to_dw.call_count == 1
-        assert mock__append_fact_to_dw.call_args[1] == {'table_name': table_name}
+        assert mock__append_fact_to_dw.call_args[1]['table_name'] == table_name
+        assert mock__append_fact_to_dw.call_args[1]['query_filename'] == query_filename
 
     @mock.patch.object(CRMTasksUngroupedManual, '_append_dim_to_dw')
     def test_append_dim_to_dw(self, mock__append_dim_to_dw, ungrouped_manual):
