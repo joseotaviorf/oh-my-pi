@@ -181,4 +181,15 @@ audio_message_started as (
   	group by 1,2,3,4,5,6,7
 )
 
-select * from "{event}" where id_call is not null and id_phase is not null;
+select
+	concat(id_phase,date_format(cast(ts_created as timestamp),'%Y%m%d%H%i%s')) as id,
+	id_call,
+	id_phase,
+	phase,
+	name,
+	params,
+	ts_created,
+	ts_load
+from "{event}" 
+where id_call is not null 
+and id_phase is not null;

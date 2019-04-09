@@ -1,5 +1,6 @@
 drop table if exists datalake_clean.asterisk_events;
 create external table if not exists datalake_clean.asterisk_events (
+  id string,
   id_call string,
   id_phase string,
   phase string,
