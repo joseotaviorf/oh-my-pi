@@ -1,34 +1,34 @@
 {
   "$match": {
-      "$and": [
+    "$and": [
+      {
+        "type": {
+          "$in": [
+            "EnviarCardiff",
+            "AnalisarDocumentacaoProprietario"
+          ]
+        }
+      },
+      {
+        "origem": "Proposta"
+      },
+      {
+        "$or": [
           {
-              "type": {
-                  "$in": [
-                      "EnviarCardiff",
-                      "AnalisarDocumentacaoProprietario"
-                  ]
-              }
+            "resolvida": "false"
           },
           {
-              "origem": "Proposta"
-          },
-          {
-              "$or": [
-                  {
-                      "resolvida": "false"
-                  },
-                  {
-                      "realizadaEm": {
-                          "$exists": "false"
-                      }
-                  }
-              ]
-          },
-          {
-              "origemId": {
-                  "$in": __PROPOSAL_IDS__
-              }
+            "realizadaEm": {
+              "$exists": "false"
+            }
           }
-      ]
+        ]
+      },
+      {
+        "origemId": {
+          "$in": __PROPOSAL_IDS__
+        }
+      }
+    ]
   }
 }
