@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -122,10 +121,10 @@ for operator in operators:
             continue
 
         table_name = filename_split[0]
-        PythonOperator(
+        BaseDAG.build_python_operator(
+            dag=main_dag,
             task_id=table_name,
             provide_context=True,
             python_callable=operator['python_callable'],
-            dag=main_dag,
             op_kwargs={'table_name': table_name}
         )
