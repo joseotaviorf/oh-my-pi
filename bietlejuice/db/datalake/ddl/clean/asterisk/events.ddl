@@ -1,5 +1,6 @@
 drop table if exists datalake_clean.asterisk_events;
 create external table if not exists datalake_clean.asterisk_events (
+  id string,
   id_call string,
   id_phase string,
   phase string,
@@ -9,7 +10,8 @@ create external table if not exists datalake_clean.asterisk_events (
   ts_load string
 )
 partitioned by (
-  dt string
+  dt string,
+  event string
 )
 stored as parquet
 location 's3://5a-datalake/clean/asterisk/events/';

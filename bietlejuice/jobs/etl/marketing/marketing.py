@@ -29,7 +29,9 @@ class Marketing(object):
         'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
         'dim_rtb_campaign': 'sk_rtb_campaign',
         'dim_classified': 'sk_classified',
-        'fact_daily_classifieds_costs': 'sk_classified'
+        'fact_daily_classifieds_costs': 'sk_classified',
+        'dim_trovit_campaign': 'sk_trovit_campaign',
+        'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -122,7 +124,7 @@ class Marketing(object):
             commit=True,
         )
 
-    @logger(exclude="staging_query")
+    @logger(exclude=['staging_query', 'column_types'])
     def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(

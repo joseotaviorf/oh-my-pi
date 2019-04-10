@@ -18,7 +18,7 @@ select
     external_id,
     type,
     replace(cast(json_extract(via, '$.channel') as varchar), '"') as channel,
-    json_extract(via, '$.source') as source,
+    replace(replace(replace(json_format(json_extract(via, '$.source')), '"{\', '{'), '}"', '}'), '\', '') as source,
     updated_at,
     problem_id,
     due_at,
@@ -27,13 +27,19 @@ select
     generated_timestamp,
     raw_subject,
     forum_topic_id,
-    array_join(regexp_extract_all(replace(custom_fields, '\'), '\{\\?"id\\?":"?\w+"?, ?\\?"value\\?":"?.*?"?\}'), ',') as custom_fields,
+    '[' || replace(
+    	replace(
+    		replace(array_join(regexp_extract_all(
+    			replace(custom_fields, '\'), '\{\\?"id\\?":"?\w+"?, ?\\?"value\\?":"?.*?"?\}'
+    		), ','), '"{\', '{'
+    	), '}"', '}'
+    ), '\', '') || ']' as custom_fields,
     allow_channelback,
     satisfaction_rating,
     submitter_id,
     priority,
-    array_join(regexp_extract_all(collaborator_ids, 'i":"([^"]+)', 1), ',') as collaborator_ids ,
-    array_join(regexp_extract_all(tags, '(?!"i"|","|":")"([^"]+)"', 1), ',') as tags,
+    replace(collaborator_ids, '"', '') as collaborator_ids,
+    cast(regexp_extract_all(tags, '(?!"i"|","|":")"([^"]+)"', 1) as JSON) as tags,
     brand_id,
     metric_set,
     group_id,

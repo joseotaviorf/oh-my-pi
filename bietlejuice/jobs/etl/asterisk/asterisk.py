@@ -130,7 +130,7 @@ class Asterisk(object):
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned(self, class_, r_cols, c_cols):
         key = 'clean/asterisk/{}/dt={}/data.parq'.format(class_.value, self.partition_date)
-        self.__move_to_clean(
+        self._move_to_clean(
             class_=class_,
             key=key,
             r_cols=r_cols,
@@ -141,7 +141,7 @@ class Asterisk(object):
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_full(self, class_, r_cols, c_cols):
         key = 'clean/asterisk/{}/data.parq'.format(class_.value)
-        self.__move_to_clean(
+        self._move_to_clean(
             class_=class_,
             key=key,
             r_cols=r_cols,
@@ -149,7 +149,7 @@ class Asterisk(object):
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def __move_to_clean(self, class_, key, r_cols, c_cols, **params):
+    def _move_to_clean(self, class_, key, r_cols, c_cols, **params):
         query = BaseETL.get_query_from_file_name(
             '{}/asterisk/create_{}_table.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )

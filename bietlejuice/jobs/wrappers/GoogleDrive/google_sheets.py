@@ -14,26 +14,26 @@ class GoogleSheets(object):
         self.google_api_scope = google_api_scope
 
     @logger(exclude=['google_sheets_files'])
-    def move_sheets_data_to_datalake(self, google_sheets_files, list_filenames):
+    def move_sheets_data_to_datalake(self, google_sheets_files):
+        if not google_sheets_files['files']:
+            raise ValueError(
+                'm=move_sheets_data_to_datalake, msg=no files set in json google sheets schema.')
 
-        for row in list_filenames:
-            gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
-            s3 = S3ToODS(s3_bucket=self.s3_bucket)
-            found = 0
+        gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
+        s3 = S3ToODS(s3_bucket=self.s3_bucket)
 
-            for item in google_sheets_files['files']:
-                if item['fileName'] == row:
-                    found += 1
-                    df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'],
-                                                                  sheet_id=item['sheetId'])
-                    snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
-                    df_gsheets.rename(columns=snake_case_columns, inplace=True)
-                    s3.move_df_to_datalake(df=df_gsheets, tablename=item['s3_path'])
-
-            if found == 0:
+        for item in google_sheets_files['files']:
+            df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'],
+                                                          sheet_id=item['sheetId'])
+            if df_gsheets is None:
                 raise ValueError(
-                    'm=move_sheets_data_to_datalake, filename={}, msg=no filename found in json google sheets schema.'.format(
-                        row))
+                    "m=move_sheets_data_to_datalake, sheet_id={}, sheet_name={}, "
+                    "msg=no data found in google sheets.".format(
+                        item['sheetId'], item['sheetName']))
+
+            snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
+            df_gsheets.rename(columns=snake_case_columns, inplace=True)
+            s3.move_df_to_datalake(df=df_gsheets, tablename=item['s3_path'])
 
     @staticmethod
     @logger(exclude='old_columns')
