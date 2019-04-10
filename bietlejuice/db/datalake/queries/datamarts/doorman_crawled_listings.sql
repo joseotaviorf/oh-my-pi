@@ -1,0 +1,100 @@
+WITH listings AS (
+  SELECT *
+    FROM
+    (SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY DATE(crawled_on) ASC) AS row
+    FROM datalake_clean.crawlers
+    WHERE ws='imovelweb'
+      AND advertiser_name != 'quintoandar'
+    ) as tmp
+  WHERE row = 1
+    AND DATE(updated_on) >= current_date - interval '7' day
+  -- get only the first time a listing was crawled
+),
+doorman AS (
+  SELECT
+    d.*,
+    regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') as extracted_work_house_number,
+    trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city as formatted_address,
+    a.google_formatted_address,
+    a.lat,
+    a.lng,
+    u.telefone_principal,
+    u.nome,
+    u.dadosafiliado_ativo,
+    CASE WHEN d.ts_joined_program != '' AND d.ts_joined_program IS NOT NULL THEN
+      CAST(d.ts_joined_program as timestamp)
+    ELSE NULL END AS ts_joined_program_timestamp,
+    leads.lead_activity
+  FROM datalake_clean.ods_dim_user_doorman d
+  LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = a.id_user_doorman
+  JOIN datalake_clean.ods_dim_user u ON CAST(d.sk_user_affiliate AS VARCHAR) = u.dados_afiliado_id
+  LEFT JOIN (
+      SELECT dim_user_affiliate.sk_user AS sk_user,
+             max(DATE(dim_date_lead.date)) AS last_date_lead,
+             min(DATE(dim_date_lead.date)) AS first_date_lead,
+             CASE
+               WHEN max(DATE(dim_date_lead.date)) IS NULL THEN 'no referral'
+               WHEN max(DATE(dim_date_lead.date)) >= current_date - interval '30' day THEN 'referral last 30 days'
+               WHEN max(DATE(dim_date_lead.date)) >= current_date - interval '90' day AND max(DATE(dim_date_lead.date)) < current_date - interval '30' day THEN 'referral last 90 days'
+               WHEN max(DATE(dim_date_lead.date)) >= current_date - interval '180' day AND max(DATE(dim_date_lead.date)) < current_date - interval '90' day THEN 'referral last 180 days'
+               ELSE 'referral more than 180 days'
+             END as lead_activity
+      FROM datalake_clean.ods_fact_house_listing_flows AS fact_house_listing_flows_affiliates
+      FULL OUTER JOIN
+        (SELECT *
+         FROM datalake_clean.ods_dim_user
+         WHERE dados_afiliado_id IS NOT NULL) AS dim_user_affiliate ON fact_house_listing_flows_affiliates.sk_user_lead_affiliate = dim_user_affiliate.sk_user
+      LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows_affiliates.sk_lead_date
+      WHERE dim_date_lead.date != '' AND dim_date_lead.date IS NOT NULL
+      GROUP BY dim_user_affiliate.sk_user
+    ) AS leads
+      ON u.sk_user = leads.sk_user
+  WHERE a.lat IS NOT NULL
+),
+listings_join_doorman AS
+(
+  SELECT
+    d.id_user_doorman,
+    array_agg(l.id) AS listing_id,
+    array_agg(l.crawled_on) AS listing_crawled_on,
+    array_agg(l.updated_on) AS listing_listing_date,
+    array_agg(l.type) AS listing_type,
+    array_agg(l.advertiser_name) AS listing_advertiser_name
+  FROM doorman AS d
+  JOIN listings AS l
+  ON
+    ST_WITHIN(
+      ST_POINT(CAST(l.lng AS double), CAST(l.lat AS DOUBLE)),
+      ST_BUFFER(
+        -- 1 degree 110752 meters at latitude -23
+        -- 100 meters 0.00090291823 degrees
+        ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
+      )
+    )
+    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+  GROUP BY d.id_user_doorman
+)
+SELECT
+  d.telefone_principal AS doorman_phone,
+  TRIM(d.nome) AS doorman_name,
+  d.lead_activity AS doorman_active,
+  d.ts_joined_program AS doorman_joined_date,
+  CASE
+    WHEN
+      (d.lead_activity = 'referral last 30 days') OR
+      (d.lead_activity = 'referral last 90 days') OR
+      (d.lead_activity = 'referral last 180 days')
+    THEN true
+    ELSE false
+  END AS is_active_doorman,
+  CASE
+    WHEN (d.lead_activity = 'referral last 30 days') THEN 'referral last 30 days'
+    WHEN (d.lead_activity = 'referral last 90 days') THEN 'referral last 90 days'
+    WHEN (d.lead_activity = 'referral last 180 days') THEN 'referral last 180 days'
+    WHEN (d.lead_activity = 'referral more than 180 days') THEN 'referral more than 180 days'
+    WHEN (d.lead_activity = 'no referral') THEN 'no referral'
+  END AS doorman_activity,
+  l.*
+FROM doorman d
+INNER JOIN listings_join_doorman l ON l.id_user_doorman = d.id_user_doorman
+ORDER BY CAST(d.id_user_doorman AS INTEGER)
