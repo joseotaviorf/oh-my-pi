@@ -85,5 +85,5 @@ or t1.expiresAt in (
     )
 group by t1.id
 order by last_interaction {sort_direction}
-limit 10
+limit 100
 ;
