@@ -317,4 +317,5 @@ create_dim_agent_region_dw.set_downstream(
 create_agent_contract_dw >> create_dim_agent_contract_type_dw_task >> create_fact_agent_daily_allocations
 create_fact_agent_daily_allocations >> xcom_fact_agent_daily_allocations
 create_dim_agent_review >> load_dim_agent_review_dw
-agent_status_history_task.set_downstream([create_fact_agent_daily_allocations, create_fact_photographer])
+agent_status_history_task.set_downstream(
+    [create_fact_agent_daily_allocations, create_fact_photographer, create_fact_agent_hourly_allocations])
