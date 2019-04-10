@@ -21,6 +21,11 @@
             "realizadaEm": {
               "$exists": "false"
             }
+          },
+          {
+            "realizadaEm": {
+              "$eq": null
+            }
           }
         ]
       },
