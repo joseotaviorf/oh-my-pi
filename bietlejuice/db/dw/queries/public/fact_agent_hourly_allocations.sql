@@ -29,7 +29,7 @@ SELECT
 	s.sk_slot_date,
 	to_char(s.ts_slot_hour,'YYYYMMDDHH24')::bigint as sk_slot_date_hour,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
+	CAST(CAST(s.sk_slot_date AS VARCHAR) + CAST(s.sk_agent AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
 	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
 	s.ts_slot_hour,
 	s.allocated_slots,
@@ -37,7 +37,7 @@ SELECT
 	CASE d.week_day
 		WHEN 0 THEN 0	                           -- Sunday
 		WHEN 6 THEN                                -- Saturday
-            CASE date_part('h', s.slot_hour_ts)
+            CASE date_part('h', s.ts_slot_hour)
                 WHEN  9 THEN coalesce(cast(achd.is_saturday_available_at_09 as integer),0)
                 WHEN 10 THEN coalesce(cast(achd.is_saturday_available_at_10 as integer),0)
                 WHEN 11 THEN coalesce(cast(achd.is_saturday_available_at_11 as integer),0)
@@ -45,7 +45,7 @@ SELECT
                 WHEN 13 THEN coalesce(cast(achd.is_saturday_available_at_13 as integer),0)
             END
 		ELSE                                       -- Weekdays
-		    CASE date_part('h', s.slot_hour_ts)
+		    CASE date_part('h', s.ts_slot_hour)
 		        WHEN  8 THEN coalesce(cast(achd.is_weekday_available_at_08 as integer),0)
 		        WHEN  9 THEN coalesce(cast(achd.is_weekday_available_at_09 as integer),0)
 		        WHEN 10 THEN coalesce(cast(achd.is_weekday_available_at_10 as integer),0)
@@ -63,14 +63,14 @@ SELECT
 	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
-	ON d.sk_date = s.sk_date
+	ON d.sk_date = s.sk_slot_date
 LEFT JOIN public.dim_agent_region a
-	ON a.sk_regions_date = s.sk_date
-		AND a.sk_agent = s.sk_agent_id
+	ON a.sk_regions_date = s.sk_slot_date
+		AND a.sk_agent = s.sk_agent
 LEFT JOIN first_visits fv
-	ON fv.id_agent = s.sk_agent_id
+	ON fv.id_agent = s.sk_agent
 LEFT JOIN agent_contract_rank acr
-    ON acr.agent_id = s.sk_agent_id AND acr."rank" = 1
+    ON acr.agent_id = s.sk_agent AND acr."rank" = 1
 LEFT JOIN datalake_raw.agent_contract_hours achd
     ON cast(achd.id as integer) = acr.workcontract_id
-ORDER BY s.sk_date;
+ORDER BY s.sk_slot_date;

@@ -1,7 +1,7 @@
 WITH schedule AS
 (SELECT
-	t.agent_id AS sk_agent_id,
-	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_date,
+	t.agent_id AS sk_agent,
+	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_slot_date,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS allocated_slots,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS allocated_slots_0
  FROM agent.agents_slots t
@@ -32,20 +32,20 @@ SELECT
 	END AS max_slots_allocation_available,
 	COALESCE(a.area, '-1') AS area,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	CAST(CAST(s.sk_date AS VARCHAR) + CAST(s.sk_agent_id AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
+	CAST(CAST(s.sk_slot_date AS VARCHAR) + CAST(s.sk_agent AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
 	dt_first_visit,
 	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
-	getdate() as dt_timestamp
+	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
-	ON d.sk_date = s.sk_date
+	ON d.sk_date = s.sk_slot_date
 LEFT JOIN public.dim_agent_region a
-	ON a.sk_regions_date = s.sk_date
-		AND a.sk_agent = s.sk_agent_id
+	ON a.sk_regions_date = s.sk_slot_date
+		AND a.sk_agent = s.sk_agent
 LEFT JOIN first_visits fv
-	ON fv.id_agent = s.sk_agent_id
+	ON fv.id_agent = s.sk_agent
 LEFT JOIN agent_contract_rank acr
-    ON acr.agent_id = s.sk_agent_id AND acr."rank" = 1
+    ON acr.agent_id = s.sk_agent AND acr."rank" = 1
 LEFT JOIN agent.dim_agent_contract_type dact
     ON dact.sk_agent_contract_type = acr.workcontract_id
-ORDER BY s.sk_date;
+ORDER BY s.sk_slot_date;
