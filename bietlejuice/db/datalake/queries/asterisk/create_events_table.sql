@@ -33,13 +33,16 @@ call_started as (
 		e.id_phase,
 		e.phase,
 		e.name,
-		e.params,
+		-- according to order: (1) ura (incoming_call), (2) queue (incoming_call_directly) and  (3) attendance (made_call) 
+		-- it's necessary when ts_created is the same
+		min(e.params) as params, 
 		e.ts_created,
 		e.ts_load
 	from first_event_started e
-	right join ids_calls id_c
-	on (e.id_call=id_c.id_call and e.ts_created=id_c.ts_created)
-	group by 1,2,3,4,5,6,7
+	inner join ids_calls id_c
+		on id_c.id_call=e.id_call and e.ts_created=id_c.ts_created
+	where e.params is not null
+	group by 1,2,3,4,6,7
 ),
 call_ended as (
 	select
@@ -61,15 +64,32 @@ call_ended as (
 ),
 ura_started as (
 	select
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(__CRM_SOURCE=\d+)"', 2) as id_call,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(__CRM_SOURCE=\d+)"', 3) as id_phase,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(NOW=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(NOW=\d+)"', 3) as id_phase,
 		'ura' as phase,
 		'ura_started' as name,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(__CRM_SOURCE=\d+)"', 4) as params,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(__CRM_SOURCE=\d+)"', 1) as ts_created,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(NOW=\d+)"', 4) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(NOW=\d+)"', 1) as ts_created,
 		now() as ts_load
 	from asterisk_data
-	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(__CRM_SOURCE=\d+)"')=true
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("SIP/\d+-(\w+)", "(NOW=\d+)"')=true
+	group by 1,2,3,4,5,6,7
+),
+crm_source_set as (
+	select
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 6) as id_phase,
+		case
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 3)='SIP' then 'ura'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 3)='Local' then 'queue'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 3)='PJSIP' then 'attendance'
+		end as phase,
+		'crm_source_set' as name,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 8) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"', 1) as ts_created,
+		now() as ts_load
+	from asterisk_data
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(__CRM_SOURCE=\d+)"')=true
 	group by 1,2,3,4,5,6,7
 ),
 queue_started as (
@@ -135,7 +155,7 @@ attendance_started as (
 	from events_attendance
 	group by 1,2,3,4,5,6,7
 ),
-agent_aswered as (
+agent_answered as (
 	select
 		id_call,
 		id_attendance as id_phase,
@@ -198,14 +218,18 @@ queue_join_time_set as (
     group by 1,2,3,4,5,6,7
 )
 select
-	concat(id_phase,date_format(cast(ts_created as timestamp),'%Y%m%d%H%i%s')) as id,
-	id_call,
-	id_phase,
-	phase,
-	name,
-	params,
-	ts_created,
-	ts_load
-from "{event}" 
-where id_call is not null 
-and id_phase is not null;
+	e.id_call,
+	concat(id.id_call,date_format(cast(id.ts_created as timestamp),'%Y%m%d%H%i%s')) as sk_call,
+	e.id_phase,
+	e.phase,
+	e.name,
+	e.params,
+	e.ts_created,
+	e.ts_load
+from "{event}" e
+inner join ids_calls id 
+on e.id_call=id.id_call
+   and date(cast(e.ts_created as timestamp))=date(cast(id.ts_created as timestamp))
+   and e.ts_created >= id.ts_created
+where e.id_call is not null 
+	  and e.id_phase is not null;
