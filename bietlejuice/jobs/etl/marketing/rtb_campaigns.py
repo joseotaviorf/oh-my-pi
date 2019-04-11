@@ -1,15 +1,15 @@
 import json
-import petl
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-from qa_python_utils.default_logger import QuintoAndarLogger
-from rtbhouse_sdk.reports_api import ReportsApiSession
 
+import petl
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
+from qa_python_utils.default_logger import QuintoAndarLogger
+from rtbhouse_sdk.reports_api import ReportsApiSession
 
 logger = QuintoAndarLogger('RtbCampaigns')
 
@@ -28,8 +28,10 @@ class RtbCampaigns(Marketing):
     def __make_request(self, client_id, client_secret):
         api = ReportsApiSession(client_id, client_secret)
         advertisers = api.get_advertisers()
-        stats = api.get_campaign_stats_total(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                             self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        stats_old = api.get_campaign_stats_total(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
+                                                 self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
+                                         self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
         # stats are the total number of clicks, costs etc
         # advertisers are the information about our campaign (currency, start date etc)
         return stats, advertisers
@@ -39,15 +41,16 @@ class RtbCampaigns(Marketing):
         array_stats, array_ads = self.__make_request(client_id, client_secret)
 
         dic_ads = array_ads[0]
-        dic_stats = array_stats[0]
+        dic_stats = array_stats
         columns_to_remove = ('ecc', 'roas', 'conversionsValue')
 
-        for k in columns_to_remove:
-            dic_stats.pop(k, None)
+        for i in range(len(dic_stats)):
+            for k in columns_to_remove:
+                del dic_stats[i][k]
 
-        columns_to_merge = ('status', 'name', 'url', 'hash', 'currency')
-        for j in columns_to_merge:
-            dic_stats[j] = dic_ads[j]
+            columns_to_merge = ('status', 'name', 'url', 'hash', 'currency')
+            for j in columns_to_merge:
+                dic_stats[i][j] = dic_ads[j]
 
         gz_body = BytesIO()
         with GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -198,3 +201,9 @@ class RtbCampaigns(Marketing):
     # the select is not a separate query, it's just a select distinct * hard-coded
     def load_to_prod(self, table_name):
         self._load_to_prod(table_name)
+
+# from bietlejuice.jobs.dags.util import environment as env
+# from datetime import datetime
+# auth = json.loads(env.get_airflow_env_var('rtb_login'))
+# rtb = RtbCampaigns(s3_bucket='5a-datalake', execution_date=datetime.now(), auth=auth)
+# rtb.move_rtb_campaigns_to_raw()
