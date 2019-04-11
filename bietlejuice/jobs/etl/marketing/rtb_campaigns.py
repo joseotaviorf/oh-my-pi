@@ -36,10 +36,9 @@ class RtbCampaigns(Marketing):
 
     def _save_to_s3(self, client_id, client_secret):
         logger.info('m=_save_to_s3, client_id={}'.format(client_id))
-        array_stats, array_ads = self.__make_request(client_id, client_secret)
+        dic_stats, array_ads = self.__make_request(client_id, client_secret)
 
         dic_ads = array_ads[0]
-        dic_stats = array_stats
         columns_to_remove = ('ecc', 'roas', 'conversionsValue')
 
         for i in range(len(dic_stats)):
