@@ -112,7 +112,7 @@ class Agent(object):
     @logger
     def create_table_dw(self, table_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean', schema='public'):
         logger.info('m=create_table_dw, table_name = {}, msg=start query to create table'.format(table_name))
-        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt, schema=schema)
+        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt)
 
         logger.info('m=create_table_dw, msg=to DW')
         self.move_data_to_destination(data=table, table_name=table_name, enumdb=enumdb, bucket=bucket, append=append,
@@ -153,18 +153,18 @@ class Agent(object):
         )
 
     @logger
-    def insert_dummy(self, table_name, key_column, value='-1', previous_check=False):
+    def insert_dummy(self, table_name, key_column, value='-1', previous_check=False, schema='public'):
         if previous_check:
-            if not self.check_dummy_exists(enumdb=EnumDB.BI_DW, schema='public', table_name=table_name,
+            if not self.check_dummy_exists(enumdb=EnumDB.BI_DW, schema=schema, table_name=table_name,
                                            key_column=key_column):
                 BaseETL.execute_command(
-                    'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                    'insert into {}.{}({}) values ({});'.format(schema, table_name, key_column, value),
                     db_enum=EnumDB.BI_DW,
                     commit=True
                 )
         else:
             BaseETL.execute_command(
-                'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                'insert into {}.{}({}) values ({});'.format(schema, table_name, key_column, value),
                 db_enum=EnumDB.BI_DW,
                 commit=True
             )

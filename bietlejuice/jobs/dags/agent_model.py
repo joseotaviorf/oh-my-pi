@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -85,8 +84,8 @@ def create_dim_agent_contract_type():
                                 append=False,
                                 schema='agent',
                                 decode=False)
-    ar.insert_dummy(table_name='agent.dim_agent_contract_type',
-                    key_column='sk_agent_contract_type')
+    ar.insert_dummy(table_name='dim_agent_contract_type',
+                    key_column='sk_agent_contract_type', schema='agent')
 
 
 def create_fact_agent_allocations(table_name, execution_date, **kwargs):
@@ -97,10 +96,11 @@ def create_fact_agent_allocations(table_name, execution_date, **kwargs):
                                  date_column='sk_slot_date',
                                  dt=execution_date,
                                  format='YYYYMMDD')
-    ar.create_table_dw(table_name=table_name, append=True, dt=execution_date)
+    ar.create_table_dw(table_name=table_name, append=True, dt=execution_date, schema='agent')
     ar.insert_dummy(table_name=table_name,
                     key_column='sk_slot_date_agent',
-                    previous_check=True)
+                    previous_check=True,
+                    schema='agent')
 
 
 def create_fact_photographer(**kwargs):
