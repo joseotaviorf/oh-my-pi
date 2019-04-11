@@ -2,7 +2,7 @@ SELECT
     case when name='BR_QuintoAndar' then 1 else 0 end as sk_rtb_campaign,
     cast(date_format(cast(cost_attribution_date as date), '%Y%m%d') as integer) as sk_date,
     case when upper(device_type)='PC' then 'Desktop'
-         when upper(device_type)='UNKNOWN' then 'Outro'
+         when upper(device_type)='UNKNOWN' then 'Other'
          when device_type is not null and device_type <> '' then 'Mobile'
      end as device,
     currency,
