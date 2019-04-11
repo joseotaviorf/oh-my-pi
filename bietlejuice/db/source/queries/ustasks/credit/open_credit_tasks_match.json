@@ -1,0 +1,39 @@
+{
+  "$match": {
+    "$and": [
+      {
+        "type": {
+          "$in": [
+            "EnviarCardiff",
+            "AnalisarDocumentacaoProprietario"
+          ]
+        }
+      },
+      {
+        "origem": "Proposta"
+      },
+      {
+        "$or": [
+          {
+            "resolvida": "false"
+          },
+          {
+            "realizadaEm": {
+              "$exists": "false"
+            }
+          },
+          {
+            "realizadaEm": {
+              "$eq": null
+            }
+          }
+        ]
+      },
+      {
+        "origemId": {
+          "$in": __PROPOSAL_IDS__
+        }
+      }
+    ]
+  }
+}
