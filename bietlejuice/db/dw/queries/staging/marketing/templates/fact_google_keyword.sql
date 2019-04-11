@@ -58,6 +58,8 @@ cte_keywords as (
         COALESCE(tablet_devices_keywords.total_clicks, 0) as tablet_clicks,
         COALESCE(computer_devices_keywords.total_clicks, 0) as computer_clicks,
         (COALESCE(mobile_devices_keywords.total_clicks, 0) + COALESCE(tablet_devices_keywords.total_clicks, 0) + COALESCE(computer_devices_keywords.total_clicks, 0)) as total_clicks,
+        (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0)) as mobile_cost,
+        COALESCE(computer_devices_keywords.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0) + COALESCE(computer_devices_keywords.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) as impressions,
         google_table.acc
@@ -96,6 +98,8 @@ final_cte_keywords as (
         cte_keywords.tablet_clicks,
         cte_keywords.computer_clicks,
         cte_keywords.total_clicks,
+        cte_keywords.mobile_cost,
+        cte_keywords.desktop_cost,
         cte_keywords.total_cost,
         cte_keywords.impressions,
         getdate() as ts_load
