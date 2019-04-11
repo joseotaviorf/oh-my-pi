@@ -19,7 +19,7 @@ logger = QuintoAndarLogger('bi_crm_credit_real_time')
 # global vars
 MAIN_DAG_ID = 'bi-crm-credit-real-time'
 MAIN_START_DATE = datetime(2019, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('10 * * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('*/3 * * * *')
 
 # env vars
 env.set_airflow_var_to_local_env('EBDB')
@@ -95,10 +95,16 @@ def send_data_to_s3(ebdb_filename, ustasks_filename, sort_direction):
     merged_df.drop('origemId', axis=1, inplace=True)
     merged_df.rename(columns={'assigneeName': 'analyst'}, inplace=True)
 
+    # removing automatic assignment from proposal tasks
+    merged_df.drop(merged_df[merged_df.analyst == 'Closing3 Time 3'].index, inplace=True)
+
     logger.info(
         'm=send_data_to_s3, sql_filename={}, ustasks_filename={}, sort_direction={}, msg=replacing nan values'.format(
             ebdb_filename, ustasks_filename, sort_direction))
     merged_df = merged_df.where((pd.notnull(merged_df)), '-')
+
+    # removing already closed tasks/tasks with no Analyst
+    merged_df.drop(merged_df[merged_df.analyst == '-'].index, inplace=True)
 
     key = 'clean/credit/proposals_in_analysis/{}.parq'.format(sort_direction)
     cols = OrderedDict([

@@ -1,4 +1,5 @@
 from bietlejuice.jobs.etl.crm.tasks.closing import CRMTasksClosing
+from bietlejuice.jobs.etl.crm.tasks.collection import CRMTasksCollection
 from bietlejuice.jobs.etl.crm.tasks.credit import CRMTasksCredit
 from bietlejuice.jobs.etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnum
 from bietlejuice.jobs.etl.crm.tasks.inspection import CRMTasksInspection
@@ -44,5 +45,6 @@ class CRMTasksFactory(object):
             CRMTasksTableEnum.REPAIR: CRMTasksRepair,
             CRMTasksTableEnum.UNGROUPED_MANUAL: CRMTasksUngroupedManual,
             CRMTasksTableEnum.OFFBOARDING: CRMTasksOffboarding,
-            CRMTasksTableEnum.LINHADIRETA_CHAT: CRMTasksChatLinhaDireta
+            CRMTasksTableEnum.LINHADIRETA_CHAT: CRMTasksChatLinhaDireta,
+            CRMTasksTableEnum.COLLECTION: CRMTasksCollection
         }.get(class_)
