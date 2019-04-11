@@ -28,8 +28,6 @@ class RtbCampaigns(Marketing):
     def __make_request(self, client_id, client_secret):
         api = ReportsApiSession(client_id, client_secret)
         advertisers = api.get_advertisers()
-        stats_old = api.get_campaign_stats_total(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                                 self.execution_date.strftime('%Y-%m-%d'), ['day'])
         stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
                                          self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
         # stats are the total number of clicks, costs etc
