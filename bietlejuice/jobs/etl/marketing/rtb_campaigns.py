@@ -54,8 +54,9 @@ class RtbCampaigns(Marketing):
 
         gz_body = BytesIO()
         with GzipFile(fileobj=gz_body, mode='w') as fp:
-            fp.write((json.dumps(dic_stats, ensure_ascii=False)).encode('utf-8'))
-            fp.write('\n')
+            for row in dic_stats:
+                fp.write((json.dumps(row, ensure_ascii=False)).encode('utf-8'))
+                fp.write('\n')
 
         file_suffix = 'raw/marketing/rtb_campaigns/acc=default/dt={}/data.gz'.format(
             self.execution_date.strftime('%Y-%m-%d'))
@@ -77,6 +78,7 @@ class RtbCampaigns(Marketing):
             ('name', str),
             ('currency', str),
             ('url', str),
+            ('devicetype', str),
             ('cost_attribution_date', str),
             ('impscount', str),
             ('clickscount', str),
@@ -93,6 +95,7 @@ class RtbCampaigns(Marketing):
             ('name', str),
             ('currency', str),
             ('url', str),
+            ('device_type', str),
             ('cost_attribution_date', str),
             ('impressions_count', str),
             ('clicks_count', str),
@@ -201,9 +204,3 @@ class RtbCampaigns(Marketing):
     # the select is not a separate query, it's just a select distinct * hard-coded
     def load_to_prod(self, table_name):
         self._load_to_prod(table_name)
-
-# from bietlejuice.jobs.dags.util import environment as env
-# from datetime import datetime
-# auth = json.loads(env.get_airflow_env_var('rtb_login'))
-# rtb = RtbCampaigns(s3_bucket='5a-datalake', execution_date=datetime.now(), auth=auth)
-# rtb.move_rtb_campaigns_to_raw()

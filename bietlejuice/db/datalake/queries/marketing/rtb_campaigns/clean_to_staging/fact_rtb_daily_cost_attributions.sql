@@ -1,6 +1,7 @@
 SELECT
     case when name='BR_QuintoAndar' then 1 else 0 end as sk_rtb_campaign,
     cast(date_format(cast(cost_attribution_date as date), '%Y%m%d') as integer) as sk_date,
+    device_type as device,
     currency,
     cast(cast(clicks_count as double)as integer) as clicks,
     cast(impressions_count as double) as impressions,
