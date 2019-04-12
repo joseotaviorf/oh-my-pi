@@ -355,11 +355,29 @@ class BaseETL(object):
 
     @classmethod
     def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
-        df_columns = df.columns.values.tolist()
+        df_columns = []
+        # list with all column names and max length
+        for column in df:
+            max_length = df[column].astype(str).str.len().max()
+            df_columns.append({'name': column, 'max_length': max_length})
         if len(df_columns) == 0:
             raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has no '
                              'columns'.format(table_name))
-        df_columns_text = ' varchar, '.join(df_columns) + ' varchar'
+        # create sql statement for columns considering their max length
+        df_columns_text = []
+        for column in df_columns:
+            max_length = column['max_length']
+            if max_length > 65536:
+                raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has a column '
+                                 'with very long text string'.format(table_name))
+            elif max_length > 256:
+                max_length = max_length + (max_length % 8)  # round to multiples of eight
+                length_text = '({})'.format(max_length)
+            else:
+                length_text = ''
+            column_text = ' {} varchar{}'.format(column['name'], length_text)
+            df_columns_text.append(column_text)
+        df_columns_text = ', '.join(df_columns_text)
         BaseETL.execute_command(
             command='create table {} ({})'.format(table_name, df_columns_text),
             db_enum=enum_db,
