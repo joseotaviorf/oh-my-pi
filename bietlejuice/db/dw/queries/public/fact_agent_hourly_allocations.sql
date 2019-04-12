@@ -6,7 +6,7 @@ WITH schedule AS
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.available_slot_24h AS INTEGER) else 0 end) AS allocated_slots,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t.specific_slot AS INTEGER) else 0 end) AS allocated_slots_0
  FROM agent.agents_slots t
- WHERE DATE(t.slot_dt) = DATE('{0}') and t.agent_type = 'Visita'
+ WHERE DATE(t.slot_dt) BETWEEN DATE('{0}') AND (DATE('{0}') + INTERVAL '7 days') and t.agent_type = 'Visita'
 GROUP BY 1, 2, 3
 ),
 first_visits AS
@@ -65,7 +65,7 @@ FROM schedule s
 JOIN public.dim_date d
 	ON d.sk_date = s.sk_slot_date
 LEFT JOIN public.dim_agent_region a
-	ON a.sk_regions_date = s.sk_slot_date
+	ON a.sk_regions_date = COALESCE(to_char('{0}'::DATE,'YYYYMMDD')::INTEGER, -1)
 		AND a.sk_agent = s.sk_agent
 LEFT JOIN first_visits fv
 	ON fv.id_agent = s.sk_agent

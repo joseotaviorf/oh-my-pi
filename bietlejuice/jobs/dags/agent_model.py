@@ -90,12 +90,11 @@ def create_dim_agent_contract_type():
 
 def create_fact_agent_allocations(table_name, execution_date, **kwargs):
     ar = Agent(bucket_datalake)
-    ar.clean_daily_data_in_table(enum=EnumDB.BI_DW,
-                                 schema='agent',
-                                 dim_name=table_name,
-                                 date_column='sk_slot_date',
-                                 dt=execution_date,
-                                 format='YYYYMMDD')
+    ar.clean_greater_than_daily_data_in_table(enum=EnumDB.BI_DW,
+                                              schema='agent',
+                                              dim_name=table_name,
+                                              date_column='sk_agent_region',
+                                              dt=execution_date)
     ar.create_table_dw(table_name=table_name, append=True, dt=execution_date, schema='agent')
     ar.insert_dummy(table_name=table_name,
                     key_column='sk_slot_date_agent',

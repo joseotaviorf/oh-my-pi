@@ -137,6 +137,23 @@ class Agent(object):
         )
 
     @logger
+    def clean_greater_than_daily_data_in_table(self, enum, schema, dim_name, date_column, dt):
+        logger.info('m=clean_greater_than_daily_data_in_table, dim_name={}, msg=start query to clean.'.format(dim_name))
+
+        query = '''DELETE FROM {}.{}
+                 WHERE concat(cast({} as varchar), cast(sk_agent as varchar)) =
+                 concat(to_char('{}'::DATE,'YYYYMMDD'), cast(sk_agent as varchar))'''.format(schema, dim_name,
+                                                                                             date_column,
+                                                                                             str(dt), format)
+
+        BaseETL.execute_command(
+            db_enum=enum,
+            encoding='UTF8',
+            command=query,
+            commit=True
+        )
+
+    @logger
     def reprocess_old_records(self, exec_dt):
         infinity_date = '2099-12-31 00:00:00'
 
