@@ -4,6 +4,7 @@ SELECT
   name,
   currency,
   url,
+  devicetype,
   cast(day as date) as cost_attribution_date,
   impscount,
   clickscount,
