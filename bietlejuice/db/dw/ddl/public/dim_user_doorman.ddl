@@ -16,6 +16,7 @@ create table public.dim_user_doorman(
     recruiter varchar(255),
     subscription_source varchar(255),
     occupation_id bigint,
+    occupation_name varchar(255),
     ts_updated timestamp,
     ts_created timestamp,
     ts_joined_program timestamp,

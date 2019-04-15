@@ -16,6 +16,7 @@ CREATE TABLE staging.dim_user_doorman (
     recruiter VARCHAR(255),
     subscription_source VARCHAR(255),
     occupation_id BIGINT,
+    occupation_name VARCHAR(255),
     ts_updated TIMESTAMP,
     ts_created TIMESTAMP,
     ts_joined_program TIMESTAMP,

@@ -17,6 +17,7 @@ CREATE VIEW public.vw_dim_user_doorman as
         recruiter AS recruiter,
         subscriptionSource AS subscription_source,
         doorman_occupation_id AS occupation_id,
+        occupation_name AS occupation_name,
         atualizadoEm as ts_updated,
         criadoEm as ts_created,
         joinedProgramAt as ts_joined_program,
