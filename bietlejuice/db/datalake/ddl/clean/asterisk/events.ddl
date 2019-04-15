@@ -10,8 +10,8 @@ create external table if not exists datalake_clean.asterisk_events (
   ts_load string
 )
 partitioned by (
-  dt string,
-  event string
+  event string,
+  dt string
 )
 stored as parquet
 location 's3://5a-datalake/clean/asterisk/events/';
