@@ -5,10 +5,18 @@ CREATE VIEW public.vw_dim_user_doorman as
         id as sk_user_doorman,
         id as id_user_doorman,
         workAddress	as work_address,
+        workStreet AS work_street,
         workHouseNumber as work_house_number,
         workNeighbourhood as work_neighbourhood,
         workCity as work_city,
+        workState AS work_state,
+        lat AS work_lat,
+        lng AS work_lng,
+        placeId AS work_place_id,
         code as code,
+        recruiter AS recruiter,
+        subscriptionSource AS subscription_source,
+        doorman_occupation_id AS occupation_id,
         atualizadoEm as ts_updated,
         criadoEm as ts_created,
         joinedProgramAt as ts_joined_program,
@@ -18,5 +26,3 @@ CREATE VIEW public.vw_dim_user_doorman as
     from
         user_doorman
 ;
-
-  
