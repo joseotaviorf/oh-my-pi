@@ -6,7 +6,7 @@ import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
 from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
+from util.athena import AthenaClient
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
@@ -115,7 +115,7 @@ class Asterisk(object):
         gz_body.flush()
 
     @logger
-    def _upsert_partition(self, bucket_type, class_):
+    def _upsert_single_partition(self, bucket_type, class_):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
@@ -125,6 +125,19 @@ class Asterisk(object):
             table='asterisk_{}'.format(class_.value),
             partition_name='dt',
             partition_value=self.partition_date
+        )
+
+    @logger
+    def _upsert_partition(self, bucket_type, class_, partition_name_list, partition_value_list):
+        if bucket_type not in ('raw', 'clean'):
+            raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+
+        self.athena_client.upsert_partition(
+            bucket_folder_path='{}/{}/asterisk/{}'.format(self.s3_bucket, bucket_type, class_.value),
+            database='datalake_{}'.format(bucket_type),
+            table='asterisk_{}'.format(class_.value),
+            partition_name_list=partition_name_list,
+            partition_value_list=partition_value_list
         )
 
     @logger(exclude=['r_cols', 'c_cols'])

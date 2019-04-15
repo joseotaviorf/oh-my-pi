@@ -35,10 +35,9 @@ def upsert_partition(class_, bucket_type, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    asterisk._upsert_partition(
+    asterisk._upsert_single_partition(
         class_=class_,
         bucket_type=bucket_type
-
     )
 
 
@@ -145,21 +144,6 @@ def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
     )
 
     return upsert_partition_task
-
-
-def upsert_single_table_partitioned(table_name, local_dag, bucket_type, **kwargs):
-    upsert_single_table_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_{}_partition'.format(table_name),
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'bucket_type': bucket_type
-        }
-    )
-
-    return upsert_single_table_partition_task
 
 
 # operators
