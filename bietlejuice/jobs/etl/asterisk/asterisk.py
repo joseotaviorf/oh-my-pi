@@ -6,7 +6,7 @@ import boto3
 import pandas as pd
 from botocore.exceptions import ClientError
 from qa_python_utils import QuintoAndarLogger
-from util.athena import AthenaClient
+from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
