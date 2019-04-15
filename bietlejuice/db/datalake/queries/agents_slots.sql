@@ -330,7 +330,7 @@ left join
 	planner_active pa
 	on pa.agent_id = vu.agent_id
 	and pa.dt_active = date(vu.slot_dt)
-where date(vu.slot_dt) between date('{dt}') and date('{dt}') + interval '14' day
+where date(vu.slot_dt) between date('{dt}') and date('{dt}') + interval '21' day
    and ah.status = '1'
 order by vu.slot_dt
 ;
