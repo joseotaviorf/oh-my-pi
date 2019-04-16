@@ -39,7 +39,7 @@ class AsteriskEvents(Asterisk):
     def mount_partitions(self, class_, bucket_type):
 
         for event in AsteriskEvents.EVENTS:
-            super(AsteriskEvents, self)._upsert_partitions(
+            self._upsert_partitions(
                 class_=class_,
                 bucket_type=bucket_type,
                 partitions_list_dicts=[
