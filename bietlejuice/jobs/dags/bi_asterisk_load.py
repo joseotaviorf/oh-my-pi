@@ -28,18 +28,24 @@ def data_existence_check(class_, bucket_type, **kwargs):
     return asterisk.data_existence_check(bucket_type)
 
 
-def upsert_partition(class_, bucket_type, **kwargs):
+def upsert_partition(class_, bucket_type, storage_format, **kwargs):
     asterisk = AsteriskFactory.factory(
         entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
 
-    asterisk._upsert_partition(
-        class_=class_,
-        bucket_type=bucket_type
+    if (storage_format == 'one_partition'):
+        asterisk._upsert_single_partition(
+            class_=class_,
+            bucket_type=bucket_type
+        )
 
-    )
+    elif (storage_format == 'multiple_partitions'):
+        asterisk._upsert_partitions(
+            class_=class_,
+            bucket_type=bucket_type
+        )
 
 
 def exec_factory_method(class_, method, **kwargs):
@@ -98,8 +104,8 @@ def raw_sub_dag(sub_dag_name, storage_format, **kwargs):
     )
     extract_and_load_data_task >> data_existence_check_task
 
-    if (storage_format == 'partitioned'):
-        upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
+    if (storage_format == 'one_partition' or storage_format == 'multiple_partitions'):
+        upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', storage_format, **kwargs)
         data_existence_check_task >> upsert_raw_partition_task
 
     return local_dag
@@ -125,14 +131,14 @@ def clean_sub_dag(sub_dag_name, storage_format, **kwargs):
         }
     )
 
-    if (storage_format == 'partitioned'):
-        upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
+    if (storage_format == 'one_partition' or storage_format == 'multiple_partitions'):
+        upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', storage_format, **kwargs)
         move_to_clean_task >> upsert_clean_partition_task
 
     return local_dag
 
 
-def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
+def upsert_partitioned(sub_dag_name, local_dag, bucket_type, storage_format, **kwargs):
     upsert_partition_task = BaseDAG.build_python_operator(
         task_id='upsert_{}_partition'.format(sub_dag_name),
         python_callable=upsert_partition,
@@ -140,33 +146,19 @@ def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
         provide_context=True,
         op_kwargs={
             'class_': kwargs['class_'],
-            'bucket_type': bucket_type
+            'bucket_type': bucket_type,
+            'storage_format': storage_format
         }
     )
 
     return upsert_partition_task
 
 
-def upsert_single_table_partitioned(table_name, local_dag, bucket_type, **kwargs):
-    upsert_single_table_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_{}_partition'.format(table_name),
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'bucket_type': bucket_type
-        }
-    )
-
-    return upsert_single_table_partition_task
-
-
 # operators
 cdr_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cdr_raw',
-    storage_format='partitioned',
+    storage_format='one_partition',
     sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.CDR
 )
@@ -174,7 +166,7 @@ cdr_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
 cdr_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='cdr_clean',
-    storage_format='partitioned',
+    storage_format='one_partition',
     sub_dag_func=clean_sub_dag,
     class_=AsteriskTableEnum.CDR
 )
@@ -183,13 +175,14 @@ logs_full_raw_partition_task = upsert_partitioned(
     sub_dag_name='logs_full_raw',
     local_dag=main_dag,
     bucket_type='raw',
+    storage_format='one_partition',
     class_=AsteriskTableEnum.LOGS_FULL
 )
 
 calls_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='calls_details_clean',
-    storage_format='partitioned',
+    storage_format='one_partition',
     sub_dag_func=clean_sub_dag,
     class_=AsteriskTableEnum.CALLS_DETAILS
 )
@@ -197,7 +190,7 @@ calls_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
 events_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='events_clean',
-    storage_format='partitioned',
+    storage_format='multiple_partitions',
     sub_dag_func=clean_sub_dag,
     class_=AsteriskTableEnum.EVENTS
 )

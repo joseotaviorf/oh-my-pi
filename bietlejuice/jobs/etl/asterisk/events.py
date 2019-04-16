@@ -9,8 +9,9 @@ logger = QuintoAndarLogger('AsteriskEvents')
 class AsteriskEvents(Asterisk):
     CLASS_ENUM = AsteriskTableEnum.EVENTS
 
-    EVENTS = ['call_started', 'call_ended', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
-              'crm_destination_set', 'agent_aswered', 'key_typed', 'audio_message_started', 'queue_join_time_set']
+    EVENTS = ['call_started', 'hung_up', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
+              'crm_destination_set', 'agent_answered', 'key_typed', 'audio_message_started', 'queue_join_time_set',
+              'crm_source_set']
 
     @logger
     def __init__(self, s3_bucket, execution_date):
@@ -21,10 +22,10 @@ class AsteriskEvents(Asterisk):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned_event(self, class_, r_cols, c_cols, event):
-        key = "clean/asterisk/{class_value}/dt={partition_date}/" \
-              "event={event}/{partition_date}.parq".format(class_value=class_.value,
-                                                           partition_date=self.partition_date,
-                                                           event=event)
+        key = "clean/asterisk/{class_value}/event={event}/" \
+              "dt={partition_date}/{event}_{partition_date}.parq".format(class_value=class_.value,
+                                                                         partition_date=self.partition_date,
+                                                                         event=event)
         self._move_to_clean(
             class_=class_,
             key=key,
@@ -34,11 +35,21 @@ class AsteriskEvents(Asterisk):
             event=event
         )
 
+    def _upsert_partitions(self, class_, bucket_type):
+
+        for event in AsteriskEvents.EVENTS:
+            super(AsteriskEvents, self)._upsert_partitions(
+                class_=class_,
+                bucket_type=bucket_type,
+                partition_name_list=['event', 'dt'],
+                partition_value_list=[event, self.partition_date]
+            )
+
     @logger
     def move_to_clean(self):
         r_cols = OrderedDict([
-            ('id', str),
             ('id_call', str),
+            ('sk_call', str),
             ('id_phase', str),
             ('phase', str),
             ('name', str),
