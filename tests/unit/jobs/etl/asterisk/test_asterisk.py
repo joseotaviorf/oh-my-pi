@@ -197,7 +197,7 @@ class TestAsterisk(object):
         partition_name = 'dt'
 
         # act
-        asterisk._upsert_partition(bucket_type, class_)
+        asterisk._upsert_single_partition(class_, bucket_type)
 
         # assert
         mock_upsert_single_partition.assert_called_once_with(
