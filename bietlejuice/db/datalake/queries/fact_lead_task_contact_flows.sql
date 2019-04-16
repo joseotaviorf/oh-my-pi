@@ -1,13 +1,14 @@
 with tasks_updated as (
-SELECT ct.*
-from datalake_clean.crm_tasks ct
-JOIN (
+    with t_max as (
     SELECT id, max(dt) as max_dt FROM datalake_clean.crm_tasks
     WHERE type in ({task_types})
     GROUP BY 1
-    ) m
-    on m.id = ct.id AND dt = max_dt
-WHERE type in ({task_types})
+    )
+    SELECT ct.*
+    from datalake_clean.crm_tasks ct
+    JOIN t_max m
+        on m.id = ct.id AND dt = max_dt
+    WHERE type in ({task_types})
 ),
 min_max_id_hosanna as (
 SELECT m.codigo, min(id) as min_id, max(id) as max_id
