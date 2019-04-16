@@ -82,11 +82,7 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 
 @logger(exclude='kwargs')
-def create_table_in_dw_from_datalake(**kwargs):
-    # getting parameters
-    query_params = kwargs.get('query_params')
-    table_name = kwargs.get('table_name')
-
+def create_table_in_dw_from_datalake(query_params, table_name, **kwargs):
     # setting variables
     file_path = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name)
     athena_client = AthenaClient(bucket)

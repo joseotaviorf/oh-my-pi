@@ -1,12 +1,12 @@
-with max_dt as (
-SELECT id, max(dt) as max_dt FROM datalake_clean.crm_tasks
-WHERE type in ({task_types})
-GROUP BY 1
-),
-tasks_updated as (
+with tasks_updated as (
 SELECT ct.*
 from datalake_clean.crm_tasks ct
-JOIN max_dt m on m.id = ct.id AND dt = max_dt
+JOIN (
+    SELECT id, max(dt) as max_dt FROM datalake_clean.crm_tasks
+    WHERE type in ({task_types})
+    GROUP BY 1
+    ) m
+    on m.id = ct.id AND dt = max_dt
 WHERE type in ({task_types})
 ),
 min_max_id_hosanna as (
@@ -34,7 +34,6 @@ WHERE taskreferenceeventorigin in ('WEB_HOOK_BEFORE_NOTIFICATION','WEB_HOOK_AFTE
 GROUP BY 1
 )
 SELECT
-    distinct
     cast(l.id as integer) as "sk_lead",
     t.id as "sk_task",
     cast(try(date_format(date_parse(r.created_date, '%Y-%m-%d %H:%i:%s.%f'), '%Y%m%d')) as integer) as "sk_imported_to_task_references_date",
