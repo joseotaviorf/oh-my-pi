@@ -140,11 +140,12 @@ class Agent(object):
     def clean_greater_than_daily_data_in_table(self, enum, schema, dim_name, date_column, dt):
         logger.info('m=clean_greater_than_daily_data_in_table, dim_name={}, msg=start query to clean.'.format(dim_name))
 
-        query = '''DELETE FROM {}.{}
-                 WHERE concat(cast({} as varchar), cast(sk_agent as varchar)) =
-                 concat(to_char('{}'::DATE,'YYYYMMDD'), cast(sk_agent as varchar))'''.format(schema, dim_name,
-                                                                                             date_column,
-                                                                                             str(dt), format)
+        query = '''DELETE
+                    FROM {0}.{1}
+                    WHERE cast({2} as integer) BETWEEN
+                    cast(to_char('{3}'::DATE,'YYYYMMDD') as integer) and
+                    cast(to_char('{3}'::DATE + interval '7 days','YYYYMMDD') as integer)'''.format(schema, dim_name,
+                                                                                                   date_column, str(dt))
 
         BaseETL.execute_command(
             db_enum=enum,
