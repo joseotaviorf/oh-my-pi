@@ -185,7 +185,7 @@ class TestAsterisk(object):
         assert mock_obj_to_s3.call_args[1]['file_path'] == file_suffix
 
     @mock.patch.object(AthenaClient, 'upsert_single_partition')
-    def test__upsert_partition(self, mock_upsert_partition, asterisk):
+    def test__upsert_single_partition(self, mock_upsert_single_partition, asterisk):
         # arrange
         bucket_type = mock.ANY
         class_ = AsteriskTableEnum.CDR
@@ -200,7 +200,7 @@ class TestAsterisk(object):
         asterisk._upsert_partition(bucket_type, class_)
 
         # assert
-        mock_upsert_partition.assert_called_once_with(
+        mock_upsert_single_partition.assert_called_once_with(
             bucket_folder_path=folder_path,
             database=database,
             table=table,
@@ -208,14 +208,14 @@ class TestAsterisk(object):
             partition_value=partition_date
         )
 
-    def test__upsert_partition_invalid_bucket_type(self, asterisk):
+    def test__upsert_single_partition_invalid_bucket_type(self, asterisk):
         # arrange
         bucket_type = 'dummy'
         class_ = AsteriskTableEnum.CDR
 
         # act & assert
         with pytest.raises(ValueError):
-            asterisk._upsert_partition(bucket_type, class_)
+            asterisk._upsert_single_partition(bucket_type, class_)
 
     @mock.patch.object(AthenaClient, 'create_parquet_from_query')
     @mock.patch.object(BaseETL, 'get_query_from_file_name')
