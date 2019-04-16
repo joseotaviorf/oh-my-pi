@@ -13,7 +13,7 @@ CREATE TABLE staging.dim_user_doorman (
     work_lng DECIMAL,
     id_work_place VARCHAR(255),
     code VARCHAR(255),
-    recruiter VARCHAR(255),
+    recruiter_name VARCHAR(255),
     subscription_source VARCHAR(255),
     occupation_id BIGINT,
     occupation_name VARCHAR(255),
