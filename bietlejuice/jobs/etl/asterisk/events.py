@@ -41,8 +41,10 @@ class AsteriskEvents(Asterisk):
             super(AsteriskEvents, self)._upsert_partitions(
                 class_=class_,
                 bucket_type=bucket_type,
-                partition_name_list=['event', 'dt'],
-                partition_value_list=[event, self.partition_date]
+                partitions_list_dict=[
+                    {'partition_name': 'event', 'partition_value': event},
+                    {'partition_name': 'dt', 'partition_value': self.partition_date}
+                ]
             )
 
     @logger

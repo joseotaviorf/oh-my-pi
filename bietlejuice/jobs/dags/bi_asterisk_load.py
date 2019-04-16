@@ -35,7 +35,7 @@ def upsert_partition(class_, bucket_type, method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(asterisk, method)(bucket_type, class_)
+    getattr(asterisk, method)(class_, bucket_type)
 
 
 def exec_factory_method(class_, method, **kwargs):
