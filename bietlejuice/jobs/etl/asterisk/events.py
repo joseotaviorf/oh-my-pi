@@ -44,7 +44,7 @@ class AsteriskEvents(Asterisk):
 
         if (bucket_type == 'clean'):
             for event in AsteriskEvents.EVENTS:
-                super(AsteriskEvents, self)._upsert_partition(
+                super(AsteriskEvents, self)._upsert_partitions(
                     class_=class_,
                     bucket_type=bucket_type,
                     partition_name_list=['event', 'dt'],

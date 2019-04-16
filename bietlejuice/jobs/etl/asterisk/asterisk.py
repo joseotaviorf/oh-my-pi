@@ -128,7 +128,7 @@ class Asterisk(object):
         )
 
     @logger
-    def _upsert_partition(self, bucket_type, class_, partition_name_list, partition_value_list):
+    def _upsert_partitions(self, bucket_type, class_, partition_name_list, partition_value_list):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
