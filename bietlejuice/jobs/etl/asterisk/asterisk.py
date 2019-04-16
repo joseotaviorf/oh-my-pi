@@ -132,7 +132,7 @@ class Asterisk(object):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
-        self.athena_client.upsert_partition(
+        self.athena_client.upsert_partitions(
             bucket_folder_path='{}/{}/asterisk/{}'.format(self.s3_bucket, bucket_type, class_.value),
             database='datalake_{}'.format(bucket_type),
             table='asterisk_{}'.format(class_.value),
