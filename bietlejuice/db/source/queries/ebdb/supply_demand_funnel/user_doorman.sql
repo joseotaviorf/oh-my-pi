@@ -1,10 +1,19 @@
 SELECT
 	dad.id,
 	dad.workAddress,
+	dad.workStreet,
 	dad.workHouseNumber,
 	dad.workNeighbourhood,
 	dad.workCity,
+	dad.workState,
+	dad.lat,
+	dad.lng,
+	dad.placeId,
 	dad.code,
+	dad.recruiter,
+	dad.subscriptionSource,
+	dad.doorman_occupation_id,
+	dao.name as occupation_name,
 	dad.atualizadoEm,
 	dad.criadoEm,
 	dad.joinedProgramAt,
@@ -20,3 +29,6 @@ LEFT JOIN
 LEFT JOIN
     Usuario u
     ON u.dadosAfiliado_id = da.id
+LEFT JOIN
+  DoormanAffiliateOccupation dao
+	ON dad.doorman_occupation_id = dao.id
