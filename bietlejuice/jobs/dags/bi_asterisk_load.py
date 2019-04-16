@@ -28,24 +28,14 @@ def data_existence_check(class_, bucket_type, **kwargs):
     return asterisk.data_existence_check(bucket_type)
 
 
-def upsert_partition(class_, bucket_type, storage_format, **kwargs):
+def upsert_partition(class_, bucket_type, method, **kwargs):
     asterisk = AsteriskFactory.factory(
         entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
 
-    if (storage_format == 'one_partition'):
-        asterisk._upsert_single_partition(
-            class_=class_,
-            bucket_type=bucket_type
-        )
-
-    elif (storage_format == 'multiple_partitions'):
-        asterisk._upsert_partitions(
-            class_=class_,
-            bucket_type=bucket_type
-        )
+    getattr(asterisk, method)(bucket_type, class_)
 
 
 def exec_factory_method(class_, method, **kwargs):
@@ -147,7 +137,7 @@ def upsert_partitioned(sub_dag_name, local_dag, bucket_type, storage_format, **k
         op_kwargs={
             'class_': kwargs['class_'],
             'bucket_type': bucket_type,
-            'storage_format': storage_format
+            'method': '_upsert_single_partition' if storage_format == 'one_partition' else '_upsert_partitions'
         }
     )
 
