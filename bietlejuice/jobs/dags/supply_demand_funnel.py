@@ -90,7 +90,7 @@ def create_table_in_dw_from_datalake(query_params, table_name, **kwargs):
     # executing methods
     df = athena_client.execute_file_query_and_return_dataframe(filename=file_path, query_params=query_params)
 
-    if df.empty:
+    if len(df.index) == 0:
         raise ValueError(
             'm=create_table_in_dw_from_datalake, filename={}, msg=Query returned empty df'.format(file_path))
 
