@@ -3,6 +3,7 @@ from bietlejuice.jobs.etl.asterisk.asterisk_table_enum import AsteriskTableEnum
 from bietlejuice.jobs.etl.asterisk.cdr import AsteriskCDR
 from bietlejuice.jobs.etl.asterisk.calls_details import AsteriskCallsDetails
 from bietlejuice.jobs.etl.asterisk.events import AsteriskEvents
+from bietlejuice.jobs.etl.asterisk.logs_full import AsteriskLogsFull
 from bietlejuice.jobs.etl.asterisk.cxpanel_queues import AsteriskCXPanelQueues
 from bietlejuice.jobs.etl.asterisk.cxpanel_users import AsteriskCXPanelUsers
 from bietlejuice.jobs.etl.asterisk.devices import AsteriskDevices
