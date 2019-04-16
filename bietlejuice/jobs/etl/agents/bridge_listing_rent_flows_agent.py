@@ -54,26 +54,26 @@ class Bridge(object):
         )
 
     @logger
-    def guarantee_integrity(self, db_enum, schema, f_name, f_column, dim_name, dim_column, type):
+    def guarantee_integrity(self, db_enum, f_schema, f_name, f_column, d_schema, dim_name, dim_column, type):
         if type == 'update':
             query = """
                     UPDATE {0}.{1}
                     SET {2} = -1
                     WHERE  NOT EXISTS (
                        SELECT 1
-                       FROM   {0}.{3} d
+                       FROM   {5}.{3} d
                        WHERE  {1}.{2} = d.{4}
                        );
-                    """.format(schema, f_name, f_column, dim_name, dim_column)
+                    """.format(f_schema, f_name, f_column, dim_name, dim_column, d_schema)
         else:
             query = """
                     DELETE FROM {0}.{1}
                     WHERE  NOT EXISTS (
                        SELECT 1
-                       FROM   {0}.{3} d
+                       FROM   {5}.{3} d
                        WHERE  {1}.{2} = d.{4}
                        );
-                    """.format(schema, f_name, f_column, dim_name, dim_column)
+                    """.format(f_schema, f_name, f_column, dim_name, dim_column, d_schema)
 
         BaseETL.execute_command(
             query,

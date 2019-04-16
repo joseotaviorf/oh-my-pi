@@ -14,7 +14,7 @@ SELECT
 	a.sk_agent AS sk_agent,
 	a.sk_slot_date_agent AS sk_slot_date_agent
 FROM
-public.fact_agent a
+agent.fact_agent_daily_allocations a
 )
 SELECT
 	COALESCE(lrf.sk_demand, -1) AS sk_demand,
