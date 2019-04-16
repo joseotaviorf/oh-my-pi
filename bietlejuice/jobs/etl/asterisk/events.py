@@ -35,7 +35,8 @@ class AsteriskEvents(Asterisk):
             event=event
         )
 
-    def _upsert_partitions(self, class_, bucket_type):
+    @logger
+    def mount_partitions(self, class_, bucket_type):
 
         for event in AsteriskEvents.EVENTS:
             super(AsteriskEvents, self)._upsert_partitions(

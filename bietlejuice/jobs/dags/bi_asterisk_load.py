@@ -35,7 +35,7 @@ def upsert_partition(class_, bucket_type, method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(asterisk, method)(class_, bucket_type, None)
+    getattr(asterisk, method)(class_, bucket_type)
 
 
 def exec_factory_method(class_, method, **kwargs):
@@ -137,7 +137,7 @@ def upsert_partitioned(sub_dag_name, local_dag, bucket_type, storage_format, **k
         op_kwargs={
             'class_': kwargs['class_'],
             'bucket_type': bucket_type,
-            'method': '_upsert_single_partition' if storage_format == 'one_partition' else '_upsert_partitions'
+            'method': '_upsert_single_partition' if storage_format == 'one_partition' else 'mount_partitions'
         }
     )
 

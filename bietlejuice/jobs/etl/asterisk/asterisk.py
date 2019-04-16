@@ -42,6 +42,10 @@ class Asterisk(object):
     def move_to_clean(self):
         raise NotImplementedError('m=move_to_clean, msg=method not implemented')
 
+    @abstractmethod
+    def mount_partitions(self, class_, bucket_type):
+        raise NotImplementedError('m=mount_partitions, msg=method not implemented')
+
     # instance methods
     @logger
     def _data_existence_check_partitioned(self, bucket_type, class_):
