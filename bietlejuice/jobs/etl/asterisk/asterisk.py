@@ -128,7 +128,7 @@ class Asterisk(object):
         )
 
     @logger
-    def _upsert_partitions(self, class_, bucket_type, partitions_list_dict):
+    def _upsert_partitions(self, class_, bucket_type, partitions_list_dicts):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
@@ -136,7 +136,7 @@ class Asterisk(object):
             bucket_folder_path='{}/{}/asterisk/{}'.format(self.s3_bucket, bucket_type, class_.value),
             database='datalake_{}'.format(bucket_type),
             table='asterisk_{}'.format(class_.value),
-            partitions_list_dict=partitions_list_dict
+            partitions_list_dicts=partitions_list_dicts
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
