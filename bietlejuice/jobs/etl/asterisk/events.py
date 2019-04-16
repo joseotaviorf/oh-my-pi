@@ -35,21 +35,15 @@ class AsteriskEvents(Asterisk):
             event=event
         )
 
-    def _upsert_single_partition(self, class_, bucket_type, partition_name=None, partition_value=None):
-        if (bucket_type == 'raw'):
-            super(AsteriskEvents, self)._upsert_single_partition(
-                class_=class_,
-                bucket_type=bucket_type
-            )
+    def _upsert_partitions(self, class_, bucket_type):
 
-        if (bucket_type == 'clean'):
-            for event in AsteriskEvents.EVENTS:
-                super(AsteriskEvents, self)._upsert_partitions(
-                    class_=class_,
-                    bucket_type=bucket_type,
-                    partition_name_list=['event', 'dt'],
-                    partition_value_list=[event, self.partition_date]
-                )
+        for event in AsteriskEvents.EVENTS:
+            super(AsteriskEvents, self)._upsert_partitions(
+                class_=class_,
+                bucket_type=bucket_type,
+                partition_name_list=['event', 'dt'],
+                partition_value_list=[event, self.partition_date]
+            )
 
     @logger
     def move_to_clean(self):
