@@ -7,6 +7,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_rtb_campaigns (
     currency string,
     url string,
     day string,
+    devicetype string,
     impscount string,
     clickscount string,
     ctr string,

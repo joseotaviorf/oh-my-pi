@@ -1,15 +1,15 @@
 import json
-import petl
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-from qa_python_utils.default_logger import QuintoAndarLogger
-from rtbhouse_sdk.reports_api import ReportsApiSession
 
+import petl
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
+from qa_python_utils.default_logger import QuintoAndarLogger
+from rtbhouse_sdk.reports_api import ReportsApiSession
 
 logger = QuintoAndarLogger('RtbCampaigns')
 
@@ -28,31 +28,32 @@ class RtbCampaigns(Marketing):
     def __make_request(self, client_id, client_secret):
         api = ReportsApiSession(client_id, client_secret)
         advertisers = api.get_advertisers()
-        stats = api.get_campaign_stats_total(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                             self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
+                                         self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
         # stats are the total number of clicks, costs etc
         # advertisers are the information about our campaign (currency, start date etc)
         return stats, advertisers
 
     def _save_to_s3(self, client_id, client_secret):
         logger.info('m=_save_to_s3, client_id={}'.format(client_id))
-        array_stats, array_ads = self.__make_request(client_id, client_secret)
+        dic_stats, array_ads = self.__make_request(client_id, client_secret)
 
         dic_ads = array_ads[0]
-        dic_stats = array_stats[0]
         columns_to_remove = ('ecc', 'roas', 'conversionsValue')
 
-        for k in columns_to_remove:
-            dic_stats.pop(k, None)
+        for i in range(len(dic_stats)):
+            for k in columns_to_remove:
+                del dic_stats[i][k]
 
-        columns_to_merge = ('status', 'name', 'url', 'hash', 'currency')
-        for j in columns_to_merge:
-            dic_stats[j] = dic_ads[j]
+            columns_to_merge = ('status', 'name', 'url', 'hash', 'currency')
+            for j in columns_to_merge:
+                dic_stats[i][j] = dic_ads[j]
 
         gz_body = BytesIO()
         with GzipFile(fileobj=gz_body, mode='w') as fp:
-            fp.write((json.dumps(dic_stats, ensure_ascii=False)).encode('utf-8'))
-            fp.write('\n')
+            for row in dic_stats:
+                fp.write((json.dumps(row, ensure_ascii=False)).encode('utf-8'))
+                fp.write('\n')
 
         file_suffix = 'raw/marketing/rtb_campaigns/acc=default/dt={}/data.gz'.format(
             self.execution_date.strftime('%Y-%m-%d'))
@@ -74,6 +75,7 @@ class RtbCampaigns(Marketing):
             ('name', str),
             ('currency', str),
             ('url', str),
+            ('devicetype', str),
             ('cost_attribution_date', str),
             ('impscount', str),
             ('clickscount', str),
@@ -90,6 +92,7 @@ class RtbCampaigns(Marketing):
             ('name', str),
             ('currency', str),
             ('url', str),
+            ('device_type', str),
             ('cost_attribution_date', str),
             ('impressions_count', str),
             ('clicks_count', str),
