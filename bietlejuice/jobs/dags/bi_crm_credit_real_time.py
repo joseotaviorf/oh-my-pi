@@ -19,7 +19,7 @@ logger = QuintoAndarLogger('bi_crm_credit_real_time')
 # global vars
 MAIN_DAG_ID = 'bi-crm-credit-real-time'
 MAIN_START_DATE = datetime(2019, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('3 * * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('*/3 * * * *')
 
 # env vars
 env.set_airflow_var_to_local_env('EBDB')

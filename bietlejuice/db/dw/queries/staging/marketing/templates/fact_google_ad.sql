@@ -58,6 +58,8 @@ cte_ads as (
         COALESCE(tablet_devices_ads.total_clicks, 0) as tablet_clicks,
         COALESCE(computer_devices_ads.total_clicks, 0) as computer_clicks,
         (COALESCE(mobile_devices_ads.total_clicks, 0) + COALESCE(tablet_devices_ads.total_clicks, 0) + COALESCE(computer_devices_ads.total_clicks, 0)) as total_clicks,
+        (COALESCE(mobile_devices_ads.total_cost, 0) + COALESCE(tablet_devices_ads.total_cost, 0)) as mobile_cost,
+        COALESCE(computer_devices_ads.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_ads.total_cost, 0) + COALESCE(tablet_devices_ads.total_cost, 0) + COALESCE(computer_devices_ads.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices_ads.impressions, 0) + COALESCE(tablet_devices_ads.impressions, 0) + COALESCE(computer_devices_ads.impressions, 0)) as impressions,
         google_table.acc
@@ -96,6 +98,8 @@ final_cte_ads as (
         cte_ads.tablet_clicks,
         cte_ads.computer_clicks,
         cte_ads.total_clicks,
+        cte_ads.mobile_cost,
+        cte_ads.desktop_cost,
         cte_ads.total_cost,
         cte_ads.impressions,
         getdate() as ts_load

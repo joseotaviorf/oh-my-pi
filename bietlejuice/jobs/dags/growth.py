@@ -1,18 +1,19 @@
+from datetime import datetime
+
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
-from datetime import datetime
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.etl.amplitude.engaged_users import EngagedUsers
+from bietlejuice.jobs.etl.amplitude.growth_amplitude import GrowthAmplitude
 from bietlejuice.jobs.etl.amplitude.listings_unique_page_views import ListingsWithPageViews
 from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
 from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.etl.growth.incurred import Growth
 from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
+from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -116,9 +117,30 @@ def materialize_growth_measure_table_query(**kwargs):
     measure = kwargs['measure']
     _filter = kwargs['filter']
     period = kwargs['period']
+    is_taxonomy = (funnel == 'taxonomy')
 
-    Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
-    Growth.create_table(funnel, measure, _filter, period)
+    if is_taxonomy:
+        Growth.drop_table(table_name='{}_{}_{}_{}'.format(funnel, measure, _filter, period), schema=Growth.SCHEMA)
+    else:
+        Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
+
+    Growth.create_table(funnel, measure, _filter, period, is_taxonomy=is_taxonomy, is_from_dw=True)
+
+
+@logger
+def materialize_growth_measure_table_from_datalake(**kwargs):
+    funnel = kwargs['funnel']
+    measure = kwargs['measure']
+    _filter = kwargs['filter']
+    period = kwargs['period']
+    is_taxonomy = (funnel == 'taxonomy')
+
+    if is_taxonomy:
+        Growth.drop_table(table_name='{}_{}_{}_{}'.format(funnel, measure, _filter, period), schema=Growth.SCHEMA)
+    else:
+        Growth.drop_table(table_name='{}_{}_{}'.format(measure, _filter, period), schema=Growth.SCHEMA)
+
+    Growth.create_table(funnel, measure, _filter, period, is_taxonomy=is_taxonomy, is_from_dw=False)
 
 
 def materialize_growth_measure_prediction_table_query(**kwargs):
@@ -183,10 +205,10 @@ def append_predictions_fact_growth():
 
 
 @logger
-def consolidate_with_filters(measure):
+def consolidate_with_filters(measure, is_taxonomy=False):
     Growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
 
-    consolidation_query = Growth.get_measure_all_query()
+    consolidation_query = Growth.get_measure_all_query(is_taxonomy)
     Growth.execute_command(consolidation_query.format(measure))
 
 
@@ -211,7 +233,7 @@ def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=No
     return SubDagOperator(
         subdag=sub_dag_func(MAIN_DAG_NAME, sub_dag_name, funnel, main_dag.start_date, main_dag.schedule_interval,
                             materialize_func, placeholders, truncate_func),
-        task_id=sub_dag_name,
+        task_id=sub_dag_name if funnel != 'taxonomy' else '{}_{}'.format(funnel, sub_dag_name),
         dag=main_dag,
         executor=LocalExecutor()
     )
@@ -319,6 +341,8 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
 
 def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
                               placeholders, truncate_func):
+    full_sub_dag_name = '{}_{}'.format(funnel, sub_dag_name)
+
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
@@ -340,9 +364,36 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     consolidation_task = build_python_operator(task_id='consolidate',
                                                python_callable=consolidate_with_filters,
                                                dag=local_dag,
-                                               op_kwargs={'measure': sub_dag_name}
+                                               op_kwargs={
+                                                   'measure': sub_dag_name
+                                               }
                                                )
     consolidation_task.set_upstream(region_tasks)
+
+    return local_dag
+
+
+def sub_dag_func_taxonomy(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
+                          placeholders, truncate_func):
+    full_sub_dag_name = '{}_{}'.format(funnel, sub_dag_name)
+
+    local_dag = DAG(
+        '{}.{}'.format(main_dag_name, full_sub_dag_name),
+        schedule_interval=schedule_interval,
+        start_date=start_date
+    )
+
+    # city
+    city_tasks = get_filter_tasks('city', funnel, local_dag, sub_dag_name, materialize_func, placeholders)
+
+    consolidation_task = build_python_operator(task_id='consolidate',
+                                               python_callable=consolidate_with_filters,
+                                               dag=local_dag,
+                                               op_kwargs={
+                                                   'measure': full_sub_dag_name,
+                                                   'is_taxonomy': True}
+                                               )
+    consolidation_task.set_upstream(city_tasks)
 
     return local_dag
 
@@ -625,6 +676,74 @@ prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with
 # fact append
 fact_append_task = build_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
 
+# measures with taxonomy detail
+taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                              materialize_growth_measure_table_query, 'leads',
+                                              'taxonomy')
+taxonomy_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                      materialize_growth_measure_table_query,
+                                                      'visits_booked',
+                                                      'taxonomy')
+
+taxonomy_visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                         materialize_growth_measure_table_query,
+                                                         'visits_completed',
+                                                         'taxonomy')
+
+taxonomy_offers_submitted_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                         materialize_growth_measure_table_query,
+                                                         'offers_submitted',
+                                                         'taxonomy')
+
+taxonomy_offers_approved_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                        materialize_growth_measure_table_query,
+                                                        'offers_approved',
+                                                        'taxonomy')
+
+taxonomy_contracts_signed_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                         materialize_growth_measure_table_query,
+                                                         'contracts_signed',
+                                                         'taxonomy')
+
+taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                 materialize_growth_measure_table_query,
+                                                 'listings',
+                                                 'taxonomy')
+
+taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                                    materialize_growth_measure_table_from_datalake,
+                                                                    'demand_active_user_sessions',
+                                                                    'taxonomy')
+
+taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                            materialize_growth_measure_table_from_datalake,
+                                                            'demand_active_users',
+                                                            'taxonomy')
+
+taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                                    materialize_growth_measure_table_query,
+                                                                    'supply_active_user_sessions',
+                                                                    'taxonomy')
+
+taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                            materialize_growth_measure_table_query,
+                                                            'supply_active_users',
+                                                            'taxonomy')
+
+create_conversion_points_supply_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_supply',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_supply', 'sub_level': 'taxonomy'}
+)
+
+create_conversion_points_demand_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_demand',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_demand', 'sub_level': 'taxonomy'}
+)
+
 # flow
 amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
@@ -633,6 +752,17 @@ amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
 amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views_sub_dag
 
+# measures with taxonomy flow
+(taxonomy_supply_active_users_sub_dag >> taxonomy_supply_active_user_sessions_sub_dag >>
+ taxonomy_demand_active_users_sub_dag >> taxonomy_demand_active_user_sessions_sub_dag >> taxonomy_leads_sub_dag >>
+ taxonomy_listings_sub_dag >> taxonomy_visits_booked_sub_dag >> taxonomy_visits_completed_sub_dag >>
+ taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag >>
+ create_conversion_points_supply_task >> create_conversion_points_demand_task)
+
+# link from taxonomy to default measures
+(taxonomy_contracts_signed_sub_dag >> leads_sub_dag)
+
+# measures flow
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
  opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag >>
  engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
