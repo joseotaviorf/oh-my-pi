@@ -2,13 +2,12 @@ import time
 from collections import OrderedDict
 from copy import deepcopy
 
-from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing import Marketing
+from qa_python_utils.aws.batch import BatchClient
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('TrovitCampaigns')
 
@@ -51,7 +50,9 @@ class TrovitCampaigns(Marketing):
             ('id', str),
             ('name', str),
             ('clicks', str),
-            ('cost', str),
+            ('desktop_cost', str),
+            ('mobile_cost', str),
+            ('total_cost', str),
             ('curr_date', str)
         ])
 
