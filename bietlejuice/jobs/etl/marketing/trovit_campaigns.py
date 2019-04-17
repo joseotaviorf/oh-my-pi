@@ -2,12 +2,13 @@ import time
 from collections import OrderedDict
 from copy import deepcopy
 
+from qa_python_utils.aws.batch import BatchClient
+from qa_python_utils.default_logger import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing import Marketing
-from qa_python_utils.aws.batch import BatchClient
-from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('TrovitCampaigns')
 
@@ -30,8 +31,11 @@ class TrovitCampaigns(Marketing):
             job_name=job_name,
             job_queue=job_queue,
             job_definition='scrap-marketing-data:1',
-            command=['scrapy', 'crawl', 'trovit', '-a', 'start_date={}'.format(start_date), '-a',
-                     'end_date={}'.format(start_date)]
+            command=['scrapy', 'crawl', 'trovit',
+                     '-a', 'start_date={}'.format(start_date),
+                     '-a', 'end_date={}'.format(start_date),
+                     '-o', 's3://5a-datalake/raw/marketing/trovit_campaigns/acc={}/dt={}/data.gz'.format(self.account,
+                                                                                                         start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
