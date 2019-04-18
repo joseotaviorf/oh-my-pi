@@ -34,7 +34,7 @@ class TrovitCampaigns(Marketing):
             command=['scrapy', 'crawl', 'trovit',
                      '-a', 'start_date={}'.format(start_date),
                      '-a', 'end_date={}'.format(start_date),
-                     '-o', 's3://5a-datalake/raw/marketing/trovit_campaigns/acc={}/dt={}/data.gz'.format(self.account,
+                     '-o', 's3://5a-datalake/raw/marketing/trovit_campaigns/acc={}/dt={}/data.gz'.format('default',
                                                                                                          start_date)]
         )
 
