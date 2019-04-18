@@ -42,6 +42,10 @@ class Asterisk(object):
     def move_to_clean(self):
         raise NotImplementedError('m=move_to_clean, msg=method not implemented')
 
+    @abstractmethod
+    def mount_partitions(self, class_, bucket_type):
+        raise NotImplementedError('m=mount_partitions, msg=method not implemented')
+
     # instance methods
     @logger
     def _data_existence_check_partitioned(self, bucket_type, class_):
@@ -115,9 +119,9 @@ class Asterisk(object):
         gz_body.flush()
 
     @logger
-    def _upsert_partition(self, bucket_type, class_):
+    def _upsert_single_partition(self, class_, bucket_type):
         if bucket_type not in ('raw', 'clean'):
-            raise ValueError('m=_upsert_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+            raise ValueError('m=_upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.upsert_single_partition(
             bucket_folder_path='{}/{}/asterisk/{}'.format(self.s3_bucket, bucket_type, class_.value),
@@ -127,10 +131,22 @@ class Asterisk(object):
             partition_value=self.partition_date
         )
 
+    @logger
+    def _upsert_partitions(self, class_, bucket_type, partitions_list_dicts):
+        if bucket_type not in ('raw', 'clean'):
+            raise ValueError('m=_upsert_partitions, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
+
+        self.athena_client.upsert_partitions(
+            bucket_folder_path='{}/{}/asterisk/{}'.format(self.s3_bucket, bucket_type, class_.value),
+            database='datalake_{}'.format(bucket_type),
+            table='asterisk_{}'.format(class_.value),
+            partitions_list_dicts=partitions_list_dicts
+        )
+
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned(self, class_, r_cols, c_cols):
         key = 'clean/asterisk/{}/dt={}/data.parq'.format(class_.value, self.partition_date)
-        self.__move_to_clean(
+        self._move_to_clean(
             class_=class_,
             key=key,
             r_cols=r_cols,
@@ -141,7 +157,7 @@ class Asterisk(object):
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_full(self, class_, r_cols, c_cols):
         key = 'clean/asterisk/{}/data.parq'.format(class_.value)
-        self.__move_to_clean(
+        self._move_to_clean(
             class_=class_,
             key=key,
             r_cols=r_cols,
@@ -149,7 +165,7 @@ class Asterisk(object):
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def __move_to_clean(self, class_, key, r_cols, c_cols, **params):
+    def _move_to_clean(self, class_, key, r_cols, c_cols, **params):
         query = BaseETL.get_query_from_file_name(
             '{}/asterisk/create_{}_table.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
