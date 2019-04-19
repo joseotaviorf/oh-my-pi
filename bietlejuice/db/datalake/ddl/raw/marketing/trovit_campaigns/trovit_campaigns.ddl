@@ -4,7 +4,9 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_trovit_campaigns(
   `id`          string,
   `name`        string,
   `clicks`      string,
-  `cost`        string,
+  `desktop_cost`  string,
+  `mobile_cost`  string,
+  `total_cost`  string,
   `curr_date`   string)
 PARTITIONED BY(
   acc string,
