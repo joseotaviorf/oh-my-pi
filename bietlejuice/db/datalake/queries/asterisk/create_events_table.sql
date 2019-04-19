@@ -219,12 +219,16 @@ queue_join_time_set as (
 )
 select
 	e.id_call,
-	concat(id.id_call,date_format(cast(id.ts_created as timestamp),'%Y%m%d%H%i%s')) as sk_call,
+	concat(id.id_call, date_format(
+		   cast(concat(e.ts_created,' ','America/Sao_Paulo') as timestamp) at time zone 'UTC',
+		   '%Y%m%d%H%i%s')) as sk_call,
 	e.id_phase,
 	e.phase,
 	e.name,
 	e.params,
-	(cast(concat(e.ts_created,' ','America/Sao_Paulo') as timestamp) at time zone 'UTC') as ts_created,
+	cast(
+		cast(concat(e.ts_created,' ','America/Sao_Paulo') as timestamp) at time zone 'UTC' 
+		as varchar) as ts_created,
 	e.ts_load
 from "{event}" e
 inner join ids_calls id 
