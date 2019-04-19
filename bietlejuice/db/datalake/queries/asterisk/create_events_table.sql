@@ -224,7 +224,7 @@ select
 	e.phase,
 	e.name,
 	e.params,
-	e.ts_created,
+	(cast(concat(e.ts_created,' ','America/Sao_Paulo') as timestamp) at time zone 'UTC') as ts_created,
 	e.ts_load
 from "{event}" e
 inner join ids_calls id 
