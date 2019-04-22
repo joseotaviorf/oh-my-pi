@@ -56,7 +56,7 @@ def enrich_and_move_to_clean():
     ws = 'vivareal'
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
-        return None
+        raise RuntimeError('m=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
     last_crawling_date = crawler_entity.get_last_crawling_date(ws)
     query = query.format(started_on=last_crawling_date, ws=ws)
@@ -137,7 +137,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
-    max_active_runs=1
+    max_active_runs=1,
+    catchup=False
 )
 
 crawl_vr = BaseDAG.build_python_operator(
