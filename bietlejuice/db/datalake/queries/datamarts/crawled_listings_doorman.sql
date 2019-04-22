@@ -1,13 +1,55 @@
 WITH listings AS (
-  SELECT *
-    FROM
-    (SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY DATE(crawled_on) ASC) AS row
-    FROM datalake_clean.crawlers
-    WHERE ws='imovelweb'
-      AND advertiser_name != 'quintoandar'
+  SELECT
+    *
+  FROM
+    (
+      SELECT
+        ws || '-' || id AS id,
+        website,
+        url,
+        crawled_on,
+        updated_on,
+        business,
+        type,
+        advertiser_name,
+        advertiser_type,
+        advertiser_id,
+        phones,
+        price,
+        rent,
+        condominium,
+        iptu,
+        total_area,
+        useful_area,
+        bedrooms,
+        suites,
+        toilets,
+        garages,
+        photos,
+        unit_features,
+        common_features,
+        complementary_info,
+        year_building,
+        cep,
+        lat,
+        lng,
+        street,
+        nb_street,
+        neighborhood,
+        city,
+        state,
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+      FROM datalake_clean.crawlers
+      WHERE ws IN ('imovelweb', 'vivareal')
+        AND advertiser_name != 'quintoandar'
     ) as tmp
-  WHERE row = 1
-  -- get only the first time a listing was crawled
+  WHERE
+    row = 1
+    -- get only the first time a listing was posted
+    AND DATE(updated_on) >= current_date - interval '7' day
+    AND lat IS NOT NULL AND lat != ''
+    AND lng IS NOT NULL AND lng != ''
+    AND nb_street IS NOT NULL AND nb_street != ''
 ),
 doorman AS (
   SELECT
@@ -48,7 +90,10 @@ doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE a.lat IS NOT NULL
+  WHERE
+    a.lat IS NOT NULL AND a.lat != ''
+    AND a.lng IS NOT NULL AND a.lng != ''
+    AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') IS NOT NULL AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') != ''
 ),
 listings_join_doorman AS
 (

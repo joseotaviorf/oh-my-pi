@@ -1,14 +1,30 @@
 WITH listings AS (
-  SELECT *
-    FROM
-    (SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY DATE(crawled_on) ASC) AS row
-    FROM datalake_clean.crawlers
-    WHERE ws='imovelweb'
-      AND advertiser_name != 'quintoandar'
+  SELECT
+    *
+  FROM
+    (
+      SELECT
+        ws || '-' || id AS id,
+        crawled_on,
+        updated_on,
+        type,
+        advertiser_name,
+        lng,
+        lat,
+        nb_street,
+        url,
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+      FROM datalake_clean.crawlers
+      WHERE ws IN ('imovelweb', 'vivareal')
+        AND advertiser_name != 'quintoandar'
     ) as tmp
-  WHERE row = 1
+  WHERE
+    row = 1
+    -- get only the first time a listing was posted
     AND DATE(updated_on) >= current_date - interval '7' day
-  -- get only the first time a listing was crawled
+    AND lat IS NOT NULL AND lat != ''
+    AND lng IS NOT NULL AND lng != ''
+    AND nb_street IS NOT NULL AND nb_street != ''
 ),
 doorman AS (
   SELECT
@@ -49,7 +65,10 @@ doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE a.lat IS NOT NULL
+  WHERE
+    a.lat IS NOT NULL AND a.lat != ''
+    AND a.lng IS NOT NULL AND a.lng != ''
+    AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') IS NOT NULL AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') != ''
 ),
 listings_join_doorman AS
 (
@@ -59,7 +78,8 @@ listings_join_doorman AS
     array_agg(l.crawled_on) AS listing_crawled_on,
     array_agg(l.updated_on) AS listing_listing_date,
     array_agg(l.type) AS listing_type,
-    array_agg(l.advertiser_name) AS listing_advertiser_name
+    array_agg(l.advertiser_name) AS listing_advertiser_name,
+    array_agg(l.url) AS listing_url
   FROM doorman AS d
   JOIN listings AS l
   ON
