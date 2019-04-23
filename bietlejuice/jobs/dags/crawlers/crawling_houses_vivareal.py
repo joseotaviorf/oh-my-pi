@@ -38,6 +38,7 @@ def submit_vr(**kwargs):
         job_name='crawl-vivareal',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
+        memory=6144,
         command=['./crawlers/vivareal_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
@@ -56,7 +57,8 @@ def enrich_and_move_to_clean():
     ws = 'vivareal'
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
-        raise RuntimeError('m=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
+        raise RuntimeError(
+            'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
     last_crawling_date = crawler_entity.get_last_crawling_date(ws)
     query = query.format(started_on=last_crawling_date, ws=ws)
