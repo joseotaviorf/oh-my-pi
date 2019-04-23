@@ -209,6 +209,6 @@ airflow_helpers.chain(
     agents_allocation_optimization_sub_dag_task
 )
 
-visits_learning_sub_dag_task >> add_new_agents_table_partition_task
+visits_learning_sub_dag_task >> add_new_visits_table_partition_task
 agents_allocation_optimization_sub_dag_task.set_downstream([add_new_agents_table_partition_task,
                                                             terminate_job_flow_sub_dag_task])
