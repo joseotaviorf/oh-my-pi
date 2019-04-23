@@ -22,9 +22,9 @@ WITH listings AS (
     row = 1
     -- get only the first time a listing was posted
     AND DATE(updated_on) >= current_date - interval '7' day
-    AND lat IS NOT NULL AND lat != ''
-    AND lng IS NOT NULL AND lng != ''
-    AND nb_street IS NOT NULL AND nb_street != ''
+    AND COALESCE(lat, '') != ''
+    AND COALESCE(lng, '') != ''
+    AND COALESCE(nb_street, '') != ''
 ),
 doorman AS (
   SELECT
@@ -66,9 +66,11 @@ doorman AS (
     ) AS leads
       ON u.sk_user = leads.sk_user
   WHERE
-    a.lat IS NOT NULL AND a.lat != ''
-    AND a.lng IS NOT NULL AND a.lng != ''
-    AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') IS NOT NULL AND regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') != ''
+    AND COALESCE(a.lat, '') != ''
+    AND COALESCE(a.lng, '') != ''
+    AND COALESCE(
+      regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+    , '') != ''
 ),
 listings_join_doorman AS
 (
