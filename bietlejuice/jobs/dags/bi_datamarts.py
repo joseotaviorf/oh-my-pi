@@ -101,8 +101,8 @@ main_dag = DAG(
 
 # operators
 operators = [
-    {'queries_dir': DW_QUERIES_DIR, 'python_callable': create_datamart_from_dw},
-    {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena}
+    {'queries_dir': DW_QUERIES_DIR, 'python_callable': create_datamart_from_dw, 'db': 'dw'},
+    {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena, 'db': 'athena'}
 ]
 
 for operator in operators:
@@ -123,7 +123,7 @@ for operator in operators:
         table_name = filename_split[0]
         BaseDAG.build_python_operator(
             dag=main_dag,
-            task_id=table_name,
+            task_id='{}_{}'.format(operator['db'], table_name),
             provide_context=True,
             python_callable=operator['python_callable'],
             op_kwargs={'table_name': table_name}
