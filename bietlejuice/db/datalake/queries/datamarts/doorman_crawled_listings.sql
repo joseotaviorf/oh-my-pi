@@ -66,7 +66,7 @@ doorman AS (
     ) AS leads
       ON u.sk_user = leads.sk_user
   WHERE
-    AND COALESCE(a.lat, '') != ''
+    COALESCE(a.lat, '') != ''
     AND COALESCE(a.lng, '') != ''
     AND COALESCE(
       regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
