@@ -148,7 +148,7 @@ def terminate_job_flow_sub_dag(sub_dag_name, **kwargs):
 # operators
 create_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='create_job_flow',
+    sub_dag_name=CREATE_JOB_FLOW_TASK_ID,
     sub_dag_func=create_job_flow_sub_dag
 )
 
