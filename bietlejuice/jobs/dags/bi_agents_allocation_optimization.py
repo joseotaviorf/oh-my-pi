@@ -19,19 +19,6 @@ MAIN_DAG_ID = 'bi-agents-allocation-optimization'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 
-CREATE_JOB_FLOW_TASK_ID = 'create_job_flow'
-MACROS = {
-    'xcom_job_flow_push': '{{ ' + "task_instance.xcom_pull('{job_flow_task_id}', key='return_value')".format(
-        job_flow_task_id=CREATE_JOB_FLOW_TASK_ID) + ' }}',
-    'xcom_job_flow_pull': '{{ ' + "task_instance.xcom_pull(dag_id='{dag_id}.{job_flow_subdag_id}', "
-                                  "task_ids='{job_flow_task_id}', key='return_value')".format(
-        dag_id=MAIN_DAG_ID,
-        job_flow_subdag_id=CREATE_JOB_FLOW_TASK_ID,
-        job_flow_task_id=CREATE_JOB_FLOW_TASK_ID
-    ) + ' }}',
-    'xcom_step_pull': "task_instance.xcom_pull('{step}_step', key='return_value')[0]"
-}
-
 # env vars
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-allocation-optimization')
@@ -75,14 +62,14 @@ def create_job_flow_sub_dag(sub_dag_name, **kwargs):
     )._build_local_dag()
 
     create_job_flow_task = EmrCreateJobFlowOperator(
-        task_id=CREATE_JOB_FLOW_TASK_ID,
+        task_id='create_job_flow',
         job_flow_overrides=bi_hekima_json['job_flow_overrides'],
         dag=local_dag
     )
 
     create_job_flow_sensor = QuintoAndarEmrJobFlowSensor(
-        task_id='check_{}'.format(CREATE_JOB_FLOW_TASK_ID),
-        job_flow_id=MACROS['xcom_job_flow_push'],
+        task_id='check_create_job_flow',
+        job_flow_id="{{ task_instance.xcom_pull('create_job_flow', key='return_value') }}",
         dag=local_dag
     )
 
@@ -102,15 +89,15 @@ def send_step_sub_dag(sub_dag_name, step, **kwargs):
 
     step_task = EmrAddStepsOperator(
         task_id='{}_step'.format(step),
-        job_flow_id=MACROS['xcom_job_flow_pull'],
+        job_flow_id="{{ task_instance.xcom_pull('create_job_flow', key='return_value') }}",
         steps=bi_hekima_json['{}_params'.format(step)],
         dag=local_dag
     )
 
     step_sensor = EmrStepSensor(
         task_id='check_{}_step'.format(step),
-        job_flow_id=MACROS['xcom_job_flow_pull'],
-        step_id='{{ ' + MACROS['xcom_step_pull'].format(step=step) + ' }}',
+        job_flow_id="{{ task_instance.xcom_pull('create_job_flow', key='return_value') }}",
+        step_id="{{ task_instance.xcom_pull('{}_step', key='return_value')[0] }}".format(step),
         dag=local_dag
     )
 
@@ -130,13 +117,13 @@ def terminate_job_flow_sub_dag(sub_dag_name, **kwargs):
 
     terminate_job_flow_task = EmrTerminateJobFlowOperator(
         task_id='terminate_job_flow',
-        job_flow_id=MACROS['xcom_job_flow_pull'],
+        job_flow_id="{{ task_instance.xcom_pull('create_job_flow', key='return_value') }}",
         dag=local_dag
     )
 
     check_terminate_job_flow_sensor = QuintoAndarEmrJobFlowSensor(
         task_id='check_terminate_job_flow',
-        job_flow_id=MACROS['xcom_job_flow_pull'],
+        job_flow_id="{{ task_instance.xcom_pull('create_job_flow', key='return_value') }}",
         dag=local_dag
     )
 
@@ -148,7 +135,7 @@ def terminate_job_flow_sub_dag(sub_dag_name, **kwargs):
 # operators
 create_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name=CREATE_JOB_FLOW_TASK_ID,
+    sub_dag_name='create_job_flow',
     sub_dag_func=create_job_flow_sub_dag
 )
 
@@ -166,6 +153,17 @@ visits_learning_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=send_step_sub_dag
 )
 
+add_new_visits_table_partition_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='add_new_visits_table_partition',
+    python_callable=add_new_table_partition,
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'region_code_visits_prediction'
+    }
+)
+
 agents_allocation_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='agents_allocation_optimization_step',
@@ -173,11 +171,15 @@ agents_allocation_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=send_step_sub_dag
 )
 
-add_new_table_partition_task = BaseDAG.build_python_operator(
+add_new_agents_table_partition_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='add_new_partition',
+    task_id='add_new_agents_table_partition',
     python_callable=add_new_table_partition,
-    provide_context=True
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'agents_allocation_optimization'
+    }
 )
 
 terminate_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
@@ -194,5 +196,6 @@ airflow_helpers.chain(
     agents_allocation_optimization_sub_dag_task
 )
 
-agents_allocation_optimization_sub_dag_task.set_downstream([add_new_table_partition_task,
+visits_learning_sub_dag_task >> add_new_agents_table_partition_task
+agents_allocation_optimization_sub_dag_task.set_downstream([add_new_agents_table_partition_task,
                                                             terminate_job_flow_sub_dag_task])
