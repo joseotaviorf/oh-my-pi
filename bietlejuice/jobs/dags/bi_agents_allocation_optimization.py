@@ -39,12 +39,12 @@ bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-allocation-optimi
 
 
 # functions
-def add_new_table_partition(ds, **kwargs):
+def add_new_table_partition(ds, schema, table_name, **kwargs):
     athena_client = AthenaClient(s3_bucket)
     athena_client.upsert_single_partition(
         bucket_folder_path='{}/hekima/optimization_result/historical'.format(s3_bucket),
-        database='datalake_raw',
-        table='agents_allocation_optimization',
+        database=schema,
+        table=table_name,
         partition_name='dt_predicted',
         partition_value=ds
     )
