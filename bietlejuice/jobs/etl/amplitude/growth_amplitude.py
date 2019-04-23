@@ -68,10 +68,9 @@ class GrowthAmplitude(object):
 
     @staticmethod
     @logger
-    def create_table_as_file_query(table_name, sub_level=None):
+    def create_table_as_file_query(table_name, level=None, sub_level=None):
         query = BaseETL.get_query_from_file_name(
-            '{0}/{1}{2}/{2}.sql'.format(GrowthAmplitude.DW_QUERIES_DIR_GROWTH, sub_level + '/' if sub_level else '',
-                                        table_name))
+            '{0}/{1}/{2}/{3}.sql'.format(GrowthAmplitude.DW_QUERIES_DIR_GROWTH, level, sub_level, table_name))
 
         GrowthAmplitude._drop_table(table_name)
 

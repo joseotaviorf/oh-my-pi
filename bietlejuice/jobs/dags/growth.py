@@ -730,18 +730,36 @@ taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonom
                                                             'supply_active_users',
                                                             'taxonomy')
 
-create_conversion_points_supply_task = BaseDAG.build_python_operator(
+create_conversion_points_supply_daily_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='create_conversion_points_supply',
+    task_id='create_conversion_points_supply_daily',
     python_callable=GrowthAmplitude.create_table_as_file_query,
-    op_kwargs={'table_name': 'conversion_points_supply', 'sub_level': 'taxonomy'}
+    op_kwargs={'table_name': 'conversion_points_supply_daily', 'level': 'taxonomy',
+               'sub_level': 'conversion_points_supply'}
 )
 
-create_conversion_points_demand_task = BaseDAG.build_python_operator(
+create_conversion_points_demand_daily_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='create_conversion_points_demand',
+    task_id='create_conversion_points_demand_daily',
     python_callable=GrowthAmplitude.create_table_as_file_query,
-    op_kwargs={'table_name': 'conversion_points_demand', 'sub_level': 'taxonomy'}
+    op_kwargs={'table_name': 'conversion_points_demand_daily', 'level': 'taxonomy',
+               'sub_level': 'conversion_points_demand'}
+)
+
+create_conversion_points_supply_weekly_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_supply_weekly',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_supply_weekly', 'level': 'taxonomy',
+               'sub_level': 'conversion_points_supply'}
+)
+
+create_conversion_points_demand_weekly_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='create_conversion_points_demand_weekly',
+    python_callable=GrowthAmplitude.create_table_as_file_query,
+    op_kwargs={'table_name': 'conversion_points_demand_weekly', 'level': 'taxonomy',
+               'sub_level': 'conversion_points_demand'}
 )
 
 # flow
@@ -757,7 +775,8 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
  taxonomy_demand_active_users_sub_dag >> taxonomy_demand_active_user_sessions_sub_dag >> taxonomy_leads_sub_dag >>
  taxonomy_listings_sub_dag >> taxonomy_visits_booked_sub_dag >> taxonomy_visits_completed_sub_dag >>
  taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag >>
- create_conversion_points_supply_task >> create_conversion_points_demand_task)
+ create_conversion_points_supply_daily_task >> create_conversion_points_demand_daily_task >>
+ create_conversion_points_supply_weekly_task >> create_conversion_points_demand_weekly_task)
 
 # link from taxonomy to default measures
 (taxonomy_contracts_signed_sub_dag >> leads_sub_dag)
