@@ -3,6 +3,8 @@ from datetime import datetime
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
@@ -13,7 +15,6 @@ from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews
 from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.etl.growth.incurred import Growth
 from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
-from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -220,14 +221,6 @@ def consolidate_no_filters(measure):
     Growth.execute_command(consolidation_query.format(measure))
 
 
-@logger
-def consolidate_employees_no_filters(measure):
-    Growth.drop_table(table_name=measure, schema=Growth.SCHEMA)
-
-    consolidation_query = Growth.get_employee_all_query()
-    Growth.execute_command(consolidation_query.format(measure))
-
-
 def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=None, placeholders=None,
                          truncate_func=None):
     return SubDagOperator(
@@ -249,15 +242,12 @@ def build_python_operator(task_id, python_callable, dag, op_kwargs=None):
 
 
 def get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders=None):
-    all_day_task = None
-
-    if sub_dag_name != 'employees':
-        all_day_task = build_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
-                                             python_callable=materialize_func,
-                                             dag=local_dag,
-                                             op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                        'period': 'day', 'placeholders': placeholders}
-                                             )
+    all_day_task = build_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
+                                         python_callable=materialize_func,
+                                         dag=local_dag,
+                                         op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                    'period': 'day', 'placeholders': placeholders}
+                                         )
 
     all_week_task = build_python_operator(task_id='extract_{}_all_week'.format(sub_dag_name),
                                           python_callable=materialize_func,
@@ -327,22 +317,19 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
     no_filter_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders)
 
     consolidation_task = build_python_operator(task_id='consolidate',
-                                               python_callable=consolidate_no_filters if sub_dag_name != 'employees' else
-                                               consolidate_employees_no_filters,
+                                               python_callable=consolidate_no_filters,
                                                dag=local_dag,
                                                op_kwargs={'measure': sub_dag_name}
                                                )
 
     no_filter_list = [no_filter_tasks[i] for i in range(0, 4)]
-    consolidation_task.set_upstream(no_filter_list[1:] if sub_dag_name == 'employees' else no_filter_list)
+    consolidation_task.set_upstream(no_filter_list)
 
     return local_dag
 
 
 def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, schedule_interval, materialize_func,
                               placeholders, truncate_func):
-    full_sub_dag_name = '{}_{}'.format(funnel, sub_dag_name)
-
     local_dag = DAG(
         '{}.{}'.format(main_dag_name, sub_dag_name),
         schedule_interval=schedule_interval,
@@ -585,13 +572,6 @@ amplitude_owner_landing_views_bv_previous_task = get_sub_dag_operator(sub_dag_fu
 owner_landing_views_bv_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
                                                       'owner_landing_views_bv', 'top_funnel')
 
-employees_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query, 'employees',
-                                         'top_funnel')
-ticket_resolution_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query,
-                                                 'ticket_resolution', 'top_funnel')
-tickets_sub_dag = get_sub_dag_operator(sub_dag_func_no_filters, materialize_growth_measure_table_query, 'tickets',
-                                       'top_funnel')
-
 # demand measures
 approved_by_insurer_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
                                                    'approved_by_insurer', 'demand')
@@ -764,15 +744,21 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
 
 # measures flow
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
- opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag >>
- engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
- owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> employees_sub_dag >>
- ticket_resolution_sub_dag >> tickets_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >>
- offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >>
- offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> ended_rentals_sub_dag >>
- visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> ongoing_listings_sub_dag >>
- ongoing_stranded_listings_sub_dag >> fact_task >> prediction_visits_booked_sub_dag >>
- prediction_visits_completed_sub_dag >> prediction_offers_submitted_sub_dag >> prediction_offers_approved_sub_dag >>
- prediction_documentation_sent_sub_dag >> prediction_approved_by_insurer_sub_dag >> prediction_tenants_sub_dag >>
- fact_append_task
- )
+ opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag)
+
+(engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
+ owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> approved_by_insurer_sub_dag >>
+ documentation_sent_sub_dag)
+
+(offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >>
+ offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> ended_rentals_sub_dag)
+
+(visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> ongoing_listings_sub_dag >>
+ ongoing_stranded_listings_sub_dag)
+
+fact_task.set_upstream([ongoing_contracts_sub_dag, documentation_sent_sub_dag,
+                        ended_rentals_sub_dag, ongoing_stranded_listings_sub_dag])
+fact_task.set_downstream([
+    prediction_visits_booked_sub_dag, prediction_visits_completed_sub_dag, prediction_offers_submitted_sub_dag,
+    prediction_offers_approved_sub_dag, prediction_documentation_sent_sub_dag, prediction_approved_by_insurer_sub_dag,
+    prediction_tenants_sub_dag, fact_append_task])
