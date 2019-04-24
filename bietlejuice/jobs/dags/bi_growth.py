@@ -232,75 +232,71 @@ def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=No
     )
 
 
-def build_python_operator(task_id, python_callable, dag, op_kwargs=None):
-    return BaseDAG.build_python_operator(
-        dag=dag,
-        task_id=task_id,
-        python_callable=python_callable,
-        op_kwargs=op_kwargs
-    )
-
-
 def get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders=None):
-    all_day_task = build_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
-                                         python_callable=materialize_func,
-                                         dag=local_dag,
-                                         op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                    'period': 'day', 'placeholders': placeholders}
-                                         )
+    all_day_task = BaseDAG.build_python_operator(task_id='extract_{}_all_day'.format(sub_dag_name),
+                                                 python_callable=materialize_func,
+                                                 dag=local_dag,
+                                                 op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                            'period': 'day', 'placeholders': placeholders}
+                                                 )
 
-    all_week_task = build_python_operator(task_id='extract_{}_all_week'.format(sub_dag_name),
-                                          python_callable=materialize_func,
-                                          dag=local_dag,
-                                          op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                     'period': 'week', 'placeholders': placeholders}
-                                          )
+    all_week_task = BaseDAG.build_python_operator(task_id='extract_{}_all_week'.format(sub_dag_name),
+                                                  python_callable=materialize_func,
+                                                  dag=local_dag,
+                                                  op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                             'period': 'week', 'placeholders': placeholders}
+                                                  )
 
-    all_month_task = build_python_operator(task_id='extract_{}_all_month'.format(sub_dag_name),
-                                           python_callable=materialize_func,
-                                           dag=local_dag,
-                                           op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                      'period': 'month', 'placeholders': placeholders}
-                                           )
+    all_month_task = BaseDAG.build_python_operator(task_id='extract_{}_all_month'.format(sub_dag_name),
+                                                   python_callable=materialize_func,
+                                                   dag=local_dag,
+                                                   op_kwargs={'funnel': funnel, 'measure': sub_dag_name,
+                                                              'filter': 'all',
+                                                              'period': 'month', 'placeholders': placeholders}
+                                                   )
 
-    all_year_task = build_python_operator(task_id='extract_{}_all_year'.format(sub_dag_name),
-                                          python_callable=materialize_func,
-                                          dag=local_dag,
-                                          op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
-                                                     'period': 'year', 'placeholders': placeholders}
-                                          )
+    all_year_task = BaseDAG.build_python_operator(task_id='extract_{}_all_year'.format(sub_dag_name),
+                                                  python_callable=materialize_func,
+                                                  dag=local_dag,
+                                                  op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': 'all',
+                                                             'period': 'year', 'placeholders': placeholders}
+                                                  )
 
     return all_day_task, all_week_task, all_month_task, all_year_task
 
 
 def get_filter_tasks(_filter, funnel, local_dag, sub_dag_name, materialize_func, placeholders):
-    filter_day_task = build_python_operator(task_id='extract_{}_{}_day'.format(sub_dag_name, _filter),
-                                            python_callable=materialize_func,
-                                            dag=local_dag,
-                                            op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
-                                                       'period': 'day', 'placeholders': placeholders}
-                                            )
+    filter_day_task = BaseDAG.build_python_operator(task_id='extract_{}_{}_day'.format(sub_dag_name, _filter),
+                                                    python_callable=materialize_func,
+                                                    dag=local_dag,
+                                                    op_kwargs={'funnel': funnel, 'measure': sub_dag_name,
+                                                               'filter': _filter,
+                                                               'period': 'day', 'placeholders': placeholders}
+                                                    )
 
-    filter_week_task = build_python_operator(task_id='extract_{}_{}_week'.format(sub_dag_name, _filter),
-                                             python_callable=materialize_func,
-                                             dag=local_dag,
-                                             op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
-                                                        'period': 'week', 'placeholders': placeholders}
-                                             )
+    filter_week_task = BaseDAG.build_python_operator(task_id='extract_{}_{}_week'.format(sub_dag_name, _filter),
+                                                     python_callable=materialize_func,
+                                                     dag=local_dag,
+                                                     op_kwargs={'funnel': funnel, 'measure': sub_dag_name,
+                                                                'filter': _filter,
+                                                                'period': 'week', 'placeholders': placeholders}
+                                                     )
 
-    filter_month_task = build_python_operator(task_id='extract_{}_{}_month'.format(sub_dag_name, _filter),
-                                              python_callable=materialize_func,
-                                              dag=local_dag,
-                                              op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
-                                                         'period': 'month', 'placeholders': placeholders}
-                                              )
+    filter_month_task = BaseDAG.build_python_operator(task_id='extract_{}_{}_month'.format(sub_dag_name, _filter),
+                                                      python_callable=materialize_func,
+                                                      dag=local_dag,
+                                                      op_kwargs={'funnel': funnel, 'measure': sub_dag_name,
+                                                                 'filter': _filter,
+                                                                 'period': 'month', 'placeholders': placeholders}
+                                                      )
 
-    filter_year_task = build_python_operator(task_id='extract_{}_{}_year'.format(sub_dag_name, _filter),
-                                             python_callable=materialize_func,
-                                             dag=local_dag,
-                                             op_kwargs={'funnel': funnel, 'measure': sub_dag_name, 'filter': _filter,
-                                                        'period': 'year', 'placeholders': placeholders}
-                                             )
+    filter_year_task = BaseDAG.build_python_operator(task_id='extract_{}_{}_year'.format(sub_dag_name, _filter),
+                                                     python_callable=materialize_func,
+                                                     dag=local_dag,
+                                                     op_kwargs={'funnel': funnel, 'measure': sub_dag_name,
+                                                                'filter': _filter,
+                                                                'period': 'year', 'placeholders': placeholders}
+                                                     )
 
     return filter_day_task, filter_week_task, filter_month_task, filter_year_task
 
@@ -316,11 +312,11 @@ def sub_dag_func_no_filters(main_dag_name, sub_dag_name, funnel, start_date, sch
     # all
     no_filter_tasks = get_no_filter_tasks(funnel, local_dag, sub_dag_name, materialize_func, placeholders)
 
-    consolidation_task = build_python_operator(task_id='consolidate',
-                                               python_callable=consolidate_no_filters,
-                                               dag=local_dag,
-                                               op_kwargs={'measure': sub_dag_name}
-                                               )
+    consolidation_task = BaseDAG.build_python_operator(task_id='consolidate',
+                                                       python_callable=consolidate_no_filters,
+                                                       dag=local_dag,
+                                                       op_kwargs={'measure': sub_dag_name}
+                                                       )
 
     no_filter_list = [no_filter_tasks[i] for i in range(0, 4)]
     consolidation_task.set_upstream(no_filter_list)
@@ -348,13 +344,13 @@ def sub_dag_func_with_filters(main_dag_name, sub_dag_name, funnel, start_date, s
     for i in range(0, 4):
         no_filter_tasks[i] >> city_tasks[i] >> region_tasks[i]
 
-    consolidation_task = build_python_operator(task_id='consolidate',
-                                               python_callable=consolidate_with_filters,
-                                               dag=local_dag,
-                                               op_kwargs={
-                                                   'measure': sub_dag_name
-                                               }
-                                               )
+    consolidation_task = BaseDAG.build_python_operator(task_id='consolidate',
+                                                       python_callable=consolidate_with_filters,
+                                                       dag=local_dag,
+                                                       op_kwargs={
+                                                           'measure': sub_dag_name
+                                                       }
+                                                       )
     consolidation_task.set_upstream(region_tasks)
 
     return local_dag
@@ -373,13 +369,13 @@ def sub_dag_func_taxonomy(main_dag_name, sub_dag_name, funnel, start_date, sched
     # city
     city_tasks = get_filter_tasks('city', funnel, local_dag, sub_dag_name, materialize_func, placeholders)
 
-    consolidation_task = build_python_operator(task_id='consolidate',
-                                               python_callable=consolidate_with_filters,
-                                               dag=local_dag,
-                                               op_kwargs={
-                                                   'measure': full_sub_dag_name,
-                                                   'is_taxonomy': True}
-                                               )
+    consolidation_task = BaseDAG.build_python_operator(task_id='consolidate',
+                                                       python_callable=consolidate_with_filters,
+                                                       dag=local_dag,
+                                                       op_kwargs={
+                                                           'measure': full_sub_dag_name,
+                                                           'is_taxonomy': True}
+                                                       )
     consolidation_task.set_upstream(city_tasks)
 
     return local_dag
@@ -393,27 +389,27 @@ def sub_dag_func_amplitude(main_dag_name, sub_dag_name, funnel, start_date, sche
         start_date=start_date
     )
 
-    truncate_task = build_python_operator(
+    truncate_task = BaseDAG.build_python_operator(
         'truncate_table',
         truncate_func,
         local_dag
     )
 
-    all_task = build_python_operator(
+    all_task = BaseDAG.build_python_operator(
         'extract_all_data',
         materialize_func,
         local_dag,
         op_kwargs={'filter': 'all'}
     )
 
-    city_task = build_python_operator(
+    city_task = BaseDAG.build_python_operator(
         'extract_city_data',
         materialize_func,
         local_dag,
         op_kwargs={'filter': 'city'}
     )
 
-    region_task = build_python_operator(
+    region_task = BaseDAG.build_python_operator(
         'extract_region_data',
         materialize_func,
         local_dag,
@@ -434,9 +430,10 @@ def sub_dag_func_active_users(main_dag_name, sub_dag_name, funnel, start_date, s
         start_date=start_date
     )
 
-    active_users_truncate_task = build_python_operator('truncate_table', truncate_active_users_table, local_dag)
+    active_users_truncate_task = BaseDAG.build_python_operator('truncate_table', truncate_active_users_table, local_dag)
 
-    active_users_all_task = build_python_operator('extract_all_data', materialize_active_users_table_query, local_dag)
+    active_users_all_task = BaseDAG.build_python_operator('extract_all_data', materialize_active_users_table_query,
+                                                          local_dag)
 
     # must be sequential because of the appending operation
     active_users_truncate_task >> active_users_all_task
@@ -452,12 +449,13 @@ def sub_dag_func_owner_landing_views_users(main_dag_name, sub_dag_name, funnel, 
         start_date=start_date
     )
 
-    owner_landing_views_truncate_task = build_python_operator('truncate_table', truncate_owner_landing_views_table,
-                                                              local_dag)
+    owner_landing_views_truncate_task = BaseDAG.build_python_operator('truncate_table',
+                                                                      truncate_owner_landing_views_table,
+                                                                      local_dag)
 
-    owner_landing_views_all_task = build_python_operator('extract_all_data',
-                                                         materialize_owner_landing_views_table_query,
-                                                         local_dag)
+    owner_landing_views_all_task = BaseDAG.build_python_operator('extract_all_data',
+                                                                 materialize_owner_landing_views_table_query,
+                                                                 local_dag)
 
     # must be sequential because of the appending operation
     owner_landing_views_truncate_task >> owner_landing_views_all_task
@@ -473,13 +471,13 @@ def sub_dag_func_owner_landing_views_bv_users(main_dag_name, sub_dag_name, funne
         start_date=start_date
     )
 
-    owner_landing_views_bv_truncate_task = build_python_operator('truncate_table',
-                                                                 truncate_owner_landing_views_bv_table,
-                                                                 local_dag)
+    owner_landing_views_bv_truncate_task = BaseDAG.build_python_operator('truncate_table',
+                                                                         truncate_owner_landing_views_bv_table,
+                                                                         local_dag)
 
-    owner_landing_views_bv_all_task = build_python_operator('extract_all_data',
-                                                            materialize_owner_landing_views_bv_table_query,
-                                                            local_dag)
+    owner_landing_views_bv_all_task = BaseDAG.build_python_operator('extract_all_data',
+                                                                    materialize_owner_landing_views_bv_table_query,
+                                                                    local_dag)
 
     # must be sequential because of the appending operation
     owner_landing_views_bv_truncate_task >> owner_landing_views_bv_all_task
@@ -599,7 +597,7 @@ visits_completed_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, mater
                                                 'visits_completed', 'demand')
 
 # fact
-fact_task = build_python_operator('load_fact_growth', load_fact_growth, main_dag)
+fact_task = BaseDAG.build_python_operator('load_fact_growth', load_fact_growth, main_dag)
 
 # predictions
 
@@ -654,7 +652,8 @@ prediction_tenants_sub_dag = get_sub_dag_operator(sub_dag_func=sub_dag_func_with
                                                   )
 
 # fact append
-fact_append_task = build_python_operator('append_predictions_fact_growth', append_predictions_fact_growth, main_dag)
+fact_append_task = BaseDAG.build_python_operator('append_predictions_fact_growth', append_predictions_fact_growth,
+                                                 main_dag)
 
 # measures with taxonomy detail
 taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
