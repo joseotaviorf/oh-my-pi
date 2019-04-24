@@ -4,6 +4,7 @@ from airflow.models import DAG
 from datetime import datetime, timedelta
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 
 from bietlejuice.jobs.wrappers.carto.carto_api import CartoApi
@@ -66,7 +67,8 @@ def geocode_doorman(**kwargs):
 
 
 def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date, final_sql):
-    file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
+    # FIXME: hardcoded folder path
+    file_name = '{}/carto/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
     logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
     query = read_query(file_name)
 
@@ -80,8 +82,11 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     if len(df) > 0:
         # upload CSV to CARTO
+        create_table_statement = BaseETL.generate_create_table_statement(df, carto_table_name)
+        print(CartoApi.run_sql(create_table_statement))
         print(CartoApi.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
         print(CartoApi.upload_csv(csv_file_path, carto_table_name))
+        print(CartoApi.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name)))
         print(CartoApi.run_sql(final_sql))
         # write result to S3
         df_export = df
@@ -91,34 +96,16 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date
         athena.create_parquet_from_df(key=key, df=df_export)
 
 
-def load_building_doorman_data_iptu_sp(**kwargs):
-    carto_table_name = 'iptu_bldgs_doormen_data'
-    load_data_and_upload_to_carto(
-        sql_filename='building_join_doorman',
-        carto_table_name=carto_table_name,
-        execution_date=kwargs['execution_date'].strftime('%Y-%m-%d'),
-        final_sql='UPDATE {} SET the_geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326) WHERE the_geom IS NULL'.format(carto_table_name)
-    )
-
-
-def load_building_doorman_data_cnpj(**kwargs):
-    carto_table_name = 'cnpj_bldgs_doormen_data'
-    load_data_and_upload_to_carto(
-        sql_filename='cnpj_condo_join_doorman',
-        carto_table_name=carto_table_name,
-        execution_date=kwargs['execution_date'].strftime('%Y-%m-%d'),
-        final_sql='UPDATE {} SET the_geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326) WHERE the_geom IS NULL'.format(carto_table_name)
-    )
-
-
-def load_region_polygons(**kwargs):
-    carto_table_name = 'qa_subregions'
-    load_data_and_upload_to_carto(
-        sql_filename='extract_region_polygons',
-        carto_table_name=carto_table_name,
-        execution_date=kwargs['execution_date'].strftime('%Y-%m-%d'),
-        final_sql='UPDATE {} SET the_geom = ST_GeomFromText(geometry, 4326)'.format(carto_table_name)
-    )
+tasks = [
+    {'carto_table_name': 'iptu_bldgs_doormen_data',
+     'final_sql': 'UPDATE iptu_bldgs_doormen_data SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
+    {'carto_table_name': 'cnpj_bldgs_doormen_data',
+     'final_sql': 'UPDATE cnpj_bldgs_doormen_data SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
+    {'carto_table_name': 'qa_subregions',
+     'final_sql': 'UPDATE qa_subregions SET the_geom = ST_GeomFromText(geometry, 4326)'},
+    {'carto_table_name': 'qa_listings',
+     'final_sql': 'UPDATE qa_listings SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL'}
+]
 
 
 dag = DAG(
@@ -136,7 +123,7 @@ dag = DAG(
     max_active_runs=1
 )
 
-# operators
+# TEMP:
 geocode_doorman_dag = BaseDAG.build_python_operator(
     dag=dag,
     task_id='geocode_doorman',
@@ -144,26 +131,28 @@ geocode_doorman_dag = BaseDAG.build_python_operator(
     provide_context=True
 )
 
-building_doorman_data_iptu_sp = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_building_doorman_data_iptu_sp',
-    python_callable=load_building_doorman_data_iptu_sp,
-    provide_context=True
-)
+# TEMP:
+operators = []
 
-building_doorman_data_cnpj = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_building_doorman_data_cnpj',
-    python_callable=load_building_doorman_data_cnpj,
-    provide_context=True
-)
+for task in tasks:
+    def callable(**kwargs):
+        load_data_and_upload_to_carto(
+            sql_filename=task['carto_table_name'],
+            carto_table_name=task['carto_table_name'],
+            execution_date=kwargs['execution_date'].strftime('%Y-%m-%d'),
+            final_sql=task['final_sql']
+        )
 
-regions_data = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_region_polygons',
-    python_callable=load_region_polygons,
-    provide_context=True
-)
+    operator = BaseDAG.build_python_operator(
+        dag=dag,
+        task_id=task['carto_table_name'],
+        python_callable=callable,
+        provide_context=True
+    )
 
-# flow
-geocode_doorman_dag >> building_doorman_data_iptu_sp >> building_doorman_data_cnpj >> regions_data
+    # TEMP:
+    operators.append(operator)
+
+# TEMP:
+for op in operators:
+    geocode_doorman_dag.set_downstream(op)
