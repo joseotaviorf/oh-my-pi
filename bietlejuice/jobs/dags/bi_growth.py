@@ -738,9 +738,6 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
  taxonomy_offers_submitted_sub_dag >> taxonomy_offers_approved_sub_dag >> taxonomy_contracts_signed_sub_dag >>
  create_conversion_points_supply_task >> create_conversion_points_demand_task)
 
-# link from taxonomy to default measures
-(taxonomy_contracts_signed_sub_dag >> leads_sub_dag)
-
 # measures flow
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
  opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag)
