@@ -8,9 +8,11 @@ WITH doorman_address AS (
   JOIN datalake_clean.ods_dim_user AS u ON CAST(d.sk_user_affiliate AS varchar) = u.dados_afiliado_id
   LEFT JOIN datalake_raw.doorman_geocoded_addresses AS a ON d.id_user_doorman = a.id_user_doorman
   WHERE
-    work_address IS NOT NULL AND work_address != ''
-    AND work_city IS NOT NULL AND work_city != ''
-    AND dadosafiliado_ativo = '1'
+    dadosafiliado_ativo = '1'
+    AND COALESCE(work_address, '') != ''
+    AND COALESCE(work_city, '') != ''
+    AND COALESCE(work_lat, '') = ''
+    AND COALESCE(work_lng, '') = ''
 )
 SELECT *
 FROM doorman_address
