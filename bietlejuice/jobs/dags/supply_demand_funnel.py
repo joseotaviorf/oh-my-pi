@@ -5,7 +5,8 @@ import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
+from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
@@ -13,6 +14,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('SupplyDemandFunnel')
 
@@ -77,6 +79,22 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
     logger.info('m=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=REQUIREMENT MET'.format(exec_date,
                                                                                                        dag_id,
                                                                                                        task_id))
+
+
+@logger(exclude='kwargs')
+def create_table_in_dw_from_datalake(query_params, table_name, **kwargs):
+    # setting variables
+    file_path = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name)
+    athena_client = AthenaClient(bucket)
+
+    # executing methods
+    df = athena_client.execute_file_query_and_return_dataframe(filename=file_path, query_params=query_params)
+
+    if len(df.index) == 0:
+        raise ValueError(
+            'm=create_table_in_dw_from_datalake, filename={}, msg=Query returned empty df'.format(file_path))
+
+    BaseETL.dataframe_to_db(df=df, table_name=table_name, enum_db=EnumDB.BI_DW, encoding='utf-8', append=False)
 
 
 def lead_sub_dag(sub_dag_name):
@@ -380,6 +398,14 @@ dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
     task_id='DW_Rent_Flow_Taxonomy',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'rent_flow_taxonomy', 'bucket': bucket, 'insert_dummy': True, 'post_command_file': True}
+)
+
+fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='Fact_Lead_Task_Contact_Flows',
+    python_callable=create_table_in_dw_from_datalake,
+    op_kwargs={'query_params': {'task_types': "'ConverterLead', 'ConverterLeadPrioritario'"},
+               'table_name': 'fact_lead_task_contact_flows'}
 )
 
 # flow

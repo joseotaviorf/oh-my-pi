@@ -14,7 +14,7 @@ facebookads==2.11.1
 numpy==1.13.0
 fastparquet==0.2.1
 futures==3.0.5
-git+git://github.com/quintoandar/python-utils.git@v0.3.4
+git+git://github.com/quintoandar/python-utils.git@v0.3.6
 google-api-python-client>=1.6.2
 googlemaps==2.5.1
 gspread==3.1.0

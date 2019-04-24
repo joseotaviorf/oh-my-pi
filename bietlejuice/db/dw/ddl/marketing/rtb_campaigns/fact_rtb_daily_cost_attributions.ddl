@@ -2,6 +2,7 @@ DROP TABLE if EXISTS marketing.fact_rtb_daily_cost_attributions;
 CREATE TABLE if NOT EXISTS marketing.fact_rtb_daily_cost_attributions (
     sk_rtb_campaign INTEGER,
     sk_date INTEGER,
+    device VARCHAR(50),
     currency VARCHAR(100),
     clicks INTEGER,
     impressions DOUBLE PRECISION,

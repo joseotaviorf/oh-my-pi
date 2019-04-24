@@ -474,6 +474,13 @@ tasks_linhadireta_chat_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=CRMTasksTableEnum.LINHADIRETA_CHAT
 )
 
+tasks_collection_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='tasks_collection',
+    sub_dag_func=class_sub_dag,
+    class_=CRMTasksTableEnum.COLLECTION
+)
+
 # flow
 airflow_helpers.chain(
     extract_and_load_tasks_task,
@@ -502,7 +509,8 @@ tasks_tasks = [
     tasks_repair_sub_dag_task,
     tasks_ungrouped_manual_sub_dag_task,
     tasks_offboarding_sub_dag_task,
-    tasks_linhadireta_chat_sub_dag_task
+    tasks_linhadireta_chat_sub_dag_task,
+    tasks_collection_sub_dag_task
 ]
 
 workgroups_sub_dag_task.set_downstream(tasks_tasks)

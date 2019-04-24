@@ -1,15 +1,4 @@
-WITH listings AS (
-  SELECT *
-    FROM
-    (SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY DATE(crawled_on) ASC) AS row
-    FROM datalake_clean.crawlers
-    WHERE ws='imovelweb'
-      AND advertiser_name != 'quintoandar'
-    ) as tmp
-  WHERE row = 1
-  -- get only the first time a listing was crawled
-),
-doorman AS (
+WITH doorman AS (
   SELECT
     d.*,
     regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') as extracted_work_house_number,
@@ -48,13 +37,51 @@ doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE work_city = 'São Paulo'
-    AND a.lat IS NOT NULL
+  WHERE
+    a.lat IS NOT NULL AND a.lat != ''
 ),
-listings_join_doorman AS
-(
+phones AS (
+SELECT cpf, phone_number
+FROM
+  (SELECT
+  	cpf,
+    telefone as phone_number,
+    ROW_NUMBER() OVER(PARTITION BY cpf ORDER BY ordem) AS row
+  FROM datalake_raw.external_sp_houses_phones
+  WHERE tipo = 'L') AS tmp
+WHERE row IN (1, 2)
+),
+apts AS (
   SELECT
-    l.id,
+    ea.numero_contribuinte,
+    ea.bldg_address_id,
+    ea.numero_contribuinte || '/' || ea.cpf_cnpj AS property_person_id,
+    ea.setor_quadra,
+    ea.ano_construcao_corrigido,
+    ea.cpf_cnpj,
+    ea.nome_direct,
+    ea.sexo,
+    ea.idade,
+    ea.obito,
+    ea.qtd_ocorrencias,
+    ea.contribuinte_1_ou_2,
+    ea.tipo_contribuinte_1,
+    ea.tipo_contribuinte_2,
+    ea.formatted_address,
+    ea.numero_imovel,
+    ea.complemento_imovel,
+    geo.lat,
+    geo.lng,
+    geo.geocoded_address AS google_formatted_address
+  FROM datalake_raw.external_sp_apts AS ea
+  LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
+    ON ea.bldg_address_id = geo.bldg_address_id
+  WHERE ea.numero_imovel IS NOT NULL AND TRY_CAST(ea.numero_imovel AS INTEGER) IS NOT NULL
+    AND geo.lat IS NOT NULL AND geo.lat != ''
+),
+doorman_join_apts_owners AS (
+  SELECT
+    a.property_person_id,
     COUNT(*) AS doorman_ct,
     array_agg(telefone_principal) AS doorman_phone,
     array_agg(TRIM(nome)) AS doorman_name,
@@ -62,23 +89,21 @@ listings_join_doorman AS
     array_agg(ts_joined_program) AS doorman_joined_date,
     MAX(ts_joined_program_timestamp) AS latest_doorman_joined_date,
     MIN(ts_joined_program_timestamp) AS earliest_doorman_joined_date
-  FROM doorman AS d
-  JOIN listings AS l
-  ON
-    ST_WITHIN(
-      ST_POINT(CAST(l.lng AS double), CAST(l.lat AS DOUBLE)),
+  FROM apts AS a
+  INNER JOIN doorman AS d
+    ON ST_WITHIN(
+      ST_POINT(CAST(a.lng AS double), CAST(a.lat AS DOUBLE)),
       ST_BUFFER(
         -- 1 degree 110752 meters at latitude -23
         -- 100 meters 0.00090291823 degrees
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
-    -- guarantee only 1 bldg match per doorman (nearest?)
-  GROUP BY l.id
+    AND
+    CAST(a.numero_imovel AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+  GROUP BY a.property_person_id
 )
 SELECT
-  l.id AS listing_id,
   d.doorman_ct,
   d.doorman_phone,
   d.doorman_name,
@@ -101,40 +126,7 @@ SELECT
     WHEN contains(d.doorman_active, 'referral more than 180 days') THEN 'referral more than 180 days'
     WHEN contains(d.doorman_active, 'no referral') THEN 'no referral'
   END AS most_active_doorman,
-  l.website,
-  l.url,
-  l.crawled_on,
-  l.updated_on AS listing_date,
-  l.business,
-  l.type,
-  l.advertiser_name,
-  l.advertiser_type,
-  l.advertiser_id,
-  l.phones,
-  l.price,
-  l.rent,
-  l.condominium,
-  l.iptu,
-  l.total_area,
-  l.useful_area,
-  l.bedrooms,
-  l.suites,
-  l.toilets,
-  l.garages,
-  l.photos,
-  l.description,
-  l.unit_features,
-  l.common_features,
-  l.complementary_info,
-  l.year_building,
-  l.cep,
-  l.lat,
-  l.lng,
-  l.street,
-  l.nb_street,
-  l.neighborhood,
-  l.city,
-  l.state
-FROM listings l
-LEFT JOIN listings_join_doorman d ON l.id = d.id
-ORDER BY DATE(crawled_on), DATE(listing_date)
+  a.*
+FROM apts a
+INNER JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
+ORDER BY a.bldg_address_id, a.complemento_imovel

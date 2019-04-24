@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
 
@@ -29,18 +28,14 @@ def data_existence_check(class_, bucket_type, **kwargs):
     return asterisk.data_existence_check(bucket_type)
 
 
-def upsert_partition(class_, bucket_type, **kwargs):
+def upsert_partition(class_, bucket_type, method, **kwargs):
     asterisk = AsteriskFactory.factory(
         entity=class_,
         s3_bucket=s3_bucket,
         execution_date=kwargs['execution_date']
     )
 
-    asterisk._upsert_partition(
-        class_=class_,
-        bucket_type=bucket_type
-
-    )
+    getattr(asterisk, method)(class_, bucket_type)
 
 
 def exec_factory_method(class_, method, **kwargs):
@@ -67,7 +62,7 @@ main_dag = DAG(
 )
 
 
-def partitioned_class_sub_dag(sub_dag_name, **kwargs):
+def raw_sub_dag(sub_dag_name, storage_format, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -97,52 +92,16 @@ def partitioned_class_sub_dag(sub_dag_name, **kwargs):
             'bucket_type': 'raw'
         }
     )
+    extract_and_load_data_task >> data_existence_check_task
 
-    upsert_raw_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_raw_partition',
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'bucket_type': 'raw'
-        }
-    )
-
-    move_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_to_clean',
-        python_callable=exec_factory_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'method': 'move_to_clean'
-        }
-    )
-
-    upsert_clean_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_clean_partition',
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'bucket_type': 'clean'
-        }
-    )
-
-    airflow_helpers.chain(
-        extract_and_load_data_task,
-        data_existence_check_task,
-        upsert_raw_partition_task,
-        move_to_clean_task,
-        upsert_clean_partition_task
-    )
+    if (storage_format == 'one_partition' or storage_format == 'multiple_partitions'):
+        upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', storage_format, **kwargs)
+        data_existence_check_task >> upsert_raw_partition_task
 
     return local_dag
 
 
-def full_class_sub_dag(sub_dag_name, **kwargs):
+def clean_sub_dag(sub_dag_name, storage_format, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -151,28 +110,6 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_data_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_data',
-        python_callable=exec_factory_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'method': 'extract_and_load_data'
-        }
-    )
-
-    data_existence_check_task = ShortCircuitOperator(
-        task_id='raw_data_existence_check',
-        python_callable=data_existence_check,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'bucket_type': 'raw'
-        }
-    )
-
     move_to_clean_task = BaseDAG.build_python_operator(
         task_id='move_to_clean',
         python_callable=exec_factory_method,
@@ -184,79 +121,208 @@ def full_class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    airflow_helpers.chain(
-        extract_and_load_data_task,
-        data_existence_check_task,
-        move_to_clean_task
-    )
+    if (storage_format == 'one_partition' or storage_format == 'multiple_partitions'):
+        upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', storage_format, **kwargs)
+        move_to_clean_task >> upsert_clean_partition_task
 
     return local_dag
+
+
+def upsert_partitioned(sub_dag_name, local_dag, bucket_type, storage_format, **kwargs):
+    upsert_partition_task = BaseDAG.build_python_operator(
+        task_id='upsert_{}_partition'.format(sub_dag_name),
+        python_callable=upsert_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': bucket_type,
+            'method': '_upsert_single_partition' if storage_format == 'one_partition' else 'mount_partitions'
+        }
+    )
+
+    return upsert_partition_task
 
 
 # operators
-cdr_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+cdr_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='cdr',
-    sub_dag_func=partitioned_class_sub_dag,
+    sub_dag_name='cdr_raw',
+    storage_format='one_partition',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.CDR
 )
 
-cxpanel_queues_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+cdr_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='cxpanel_queues',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='cdr_clean',
+    storage_format='one_partition',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.CDR
+)
+
+logs_full_raw_partition_task = upsert_partitioned(
+    sub_dag_name='logs_full_raw',
+    local_dag=main_dag,
+    bucket_type='raw',
+    storage_format='one_partition',
+    class_=AsteriskTableEnum.LOGS_FULL
+)
+
+calls_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='calls_details_clean',
+    storage_format='one_partition',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.CALLS_DETAILS
+)
+
+events_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='events_clean',
+    storage_format='multiple_partitions',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.EVENTS
+)
+
+cxpanel_queues_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='cxpanel_queues_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.CXPANEL_QUEUES
 )
 
-cxpanel_users_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+cxpanel_queues_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='cxpanel_users',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='cxpanel_queues_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.CXPANEL_QUEUES
+)
+
+cxpanel_users_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='cxpanel_users_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.CXPANEL_USERS
 )
 
-devices_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+cxpanel_users_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='devices',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='cxpanel_users_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.CXPANEL_USERS
+)
+
+devices_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='devices_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.DEVICES
 )
 
-ivr_details_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+devices_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='ivr_details',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='devices_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.DEVICES
+)
+
+ivr_details_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='ivr_details_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.IVR_DETAILS
 )
 
-ivr_entries_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+ivr_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='ivr_entries',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='ivr_details_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.IVR_DETAILS
+)
+
+ivr_entries_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='ivr_entries_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.IVR_ENTRIES
 )
 
-queues_config_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+ivr_entries_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='queues_config',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='ivr_entries_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.IVR_ENTRIES
+)
+
+queues_config_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='queues_config_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.QUEUES_CONFIG
 )
 
-queues_details_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+queues_config_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='queues_details',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='queues_config_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.QUEUES_CONFIG
+)
+
+queues_details_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='queues_details_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
     class_=AsteriskTableEnum.QUEUES_DETAILS
 )
 
-users_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+queues_details_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='users',
-    sub_dag_func=full_class_sub_dag,
+    sub_dag_name='queues_details_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
+    class_=AsteriskTableEnum.QUEUES_DETAILS
+)
+
+users_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='users_raw',
+    storage_format='full',
+    sub_dag_func=raw_sub_dag,
+    class_=AsteriskTableEnum.USERS
+)
+
+users_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='users_clean',
+    storage_format='full',
+    sub_dag_func=clean_sub_dag,
     class_=AsteriskTableEnum.USERS
 )
 
 # flow
+logs_full_raw_partition_task.set_downstream([calls_details_clean_sub_dag_task, events_clean_sub_dag_task])
+cdr_raw_sub_dag_task >> cdr_clean_sub_dag_task
+cxpanel_queues_raw_sub_dag_task >> cxpanel_queues_clean_sub_dag_task
+cxpanel_users_raw_sub_dag_task >> cxpanel_users_clean_sub_dag_task
+devices_raw_sub_dag_task >> devices_clean_sub_dag_task
+ivr_details_raw_sub_dag_task >> ivr_details_clean_sub_dag_task
+ivr_entries_raw_sub_dag_task >> ivr_entries_clean_sub_dag_task
+queues_config_raw_sub_dag_task >> queues_config_clean_sub_dag_task
+queues_details_raw_sub_dag_task >> queues_details_clean_sub_dag_task
+users_raw_sub_dag_task >> users_clean_sub_dag_task
 
 # TODO: add unit tests
