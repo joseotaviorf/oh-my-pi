@@ -39,12 +39,12 @@ bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-allocation-optimi
 
 
 # functions
-def add_new_table_partition(ds, **kwargs):
+def add_new_table_partition(ds, schema, table_name, **kwargs):
     athena_client = AthenaClient(s3_bucket)
     athena_client.upsert_single_partition(
         bucket_folder_path='{}/hekima/optimization_result/historical'.format(s3_bucket),
-        database='datalake_raw',
-        table='agents_allocation_optimization',
+        database=schema,
+        table=table_name,
         partition_name='dt_predicted',
         partition_value=ds
     )
@@ -166,6 +166,17 @@ visits_learning_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=send_step_sub_dag
 )
 
+add_new_visits_table_partition_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='add_new_visits_table_partition',
+    python_callable=add_new_table_partition,
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'region_code_visits_prediction'
+    }
+)
+
 agents_allocation_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='agents_allocation_optimization_step',
@@ -173,11 +184,15 @@ agents_allocation_optimization_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=send_step_sub_dag
 )
 
-add_new_table_partition_task = BaseDAG.build_python_operator(
+add_new_agents_table_partition_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='add_new_partition',
+    task_id='add_new_agents_table_partition',
     python_callable=add_new_table_partition,
-    provide_context=True
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'agents_allocation_optimization'
+    }
 )
 
 terminate_job_flow_sub_dag_task = BaseSubDag.get_sub_dag_operator(
@@ -194,5 +209,6 @@ airflow_helpers.chain(
     agents_allocation_optimization_sub_dag_task
 )
 
-agents_allocation_optimization_sub_dag_task.set_downstream([add_new_table_partition_task,
+visits_learning_sub_dag_task >> add_new_visits_table_partition_task
+agents_allocation_optimization_sub_dag_task.set_downstream([add_new_agents_table_partition_task,
                                                             terminate_job_flow_sub_dag_task])
