@@ -333,21 +333,6 @@ ods_house_rent_flow = BaseDAG.build_python_operator(
     op_kwargs={'table_name': 'house_rent_flow'}
 )
 
-ods_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='ODS_supply',
-    provide_context=True,
-    python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'fact_supply'}
-)
-
-fact_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='DW_Fact_Supply',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-)
-
 fact_house_listings = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_House_Listings',
@@ -543,11 +528,9 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
-ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
-airflow_helpers.chain(ods_supply, fact_supply)
 fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
 house_dag.set_downstream([fact_photo_job, fact_house_status])
 photo_job_dag >> fact_photo_job
