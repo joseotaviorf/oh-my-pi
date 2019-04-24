@@ -141,7 +141,7 @@ group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 demand as (
 select
-    vb1.sk_date,
+    to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
 	vb1.city_group,
 	vb1.city,
 	vb1.mkt_category,
@@ -154,11 +154,11 @@ select
 	vb1.utm_campaign,
 	vb1.utm_content,
 	vb1.utm_term,
-    coalesce(vb1.total_daily_visits_booked, 0) as total_daily_visits_booked,
-    coalesce(vc1.total_daily_visits_confirmed,0) as total_daily_visits_confirmed,
-    coalesce(os1.total_daily_offers_submitted,0) as total_daily_offers_submitted,
-    coalesce(oa1.total_daily_offers_approved,0) as total_daily_offers_approved,
-    coalesce(cs1.total_daily_contracts_signed,0) as total_daily_contracts_signed
+    sum(coalesce(vb1.total_daily_visits_booked, 0)) as total_weekly_visits_booked,
+    sum(coalesce(vc1.total_daily_visits_confirmed,0)) as total_weekly_visits_confirmed,
+    sum(coalesce(os1.total_daily_offers_submitted,0)) as total_weekly_offers_submitted,
+    sum(coalesce(oa1.total_daily_offers_approved,0)) as total_weekly_offers_approved,
+    sum(coalesce(cs1.total_daily_contracts_signed,0)) as total_weekly_contracts_signed
 from booking vb1
 left join visit_confirmed vc1 on
     vb1.sk_date = vc1.sk_date
@@ -216,111 +216,99 @@ left join contract_signed cs1 on
 	and (coalesce(vb1.utm_campaign,'') = coalesce(cs1.utm_campaign,''))
 	and (coalesce(vb1.utm_content,'') = coalesce(cs1.utm_content,''))
 	and (coalesce(vb1.utm_term,'') = coalesce(cs1.utm_term,''))
+join public.dim_date dd
+   on vb1.sk_date = dd.sk_date
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+), users as (
+select
+ to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
+ tx1.city_group,
+ tx1.city,
+ tx1.mkt_category,
+ tx1.mkt_flow,
+ tx1.mkt_completion,
+ tx1.mkt_channel,
+ tx1.mkt_medium,
+ tx1.mkt_source,
+ tx1.mkt_platform,
+ tx1.utm_campaign,
+ tx1.utm_content,
+ tx1.utm_term,
+ max(coalesce(tx1.total_weekly_demand_sessions, 0)) as total_weekly_sessions,
+ max(coalesce(ls1.total_weekly_demand_dau, 0)) as total_weekly_active_users
+from
+ demand_session tx1
+left join demand_dau ls1
+ on ls1.sk_date = tx1.sk_date
+ and (ls1.city_group = tx1.city_group)
+ and (ls1.city = tx1.city)
+ and (ls1.mkt_category = tx1.mkt_category)
+ and (ls1.mkt_flow = tx1.mkt_flow)
+ and (ls1.mkt_completion = tx1.mkt_completion)
+ and (ls1.mkt_channel = tx1.mkt_channel)
+ and (ls1.mkt_medium = tx1.mkt_medium)
+ and (ls1.mkt_source = tx1.mkt_source)
+ and (coalesce(ls1.mkt_platform,'') = coalesce(tx1.mkt_platform,''))
+ and (coalesce(ls1.utm_campaign,'') = coalesce(tx1.utm_campaign,''))
+ and (coalesce(ls1.utm_term,'') = coalesce(tx1.utm_term,''))
+ and (coalesce(ls1.utm_content,'') = coalesce(tx1.utm_content,''))
+join public.dim_date dd
+   on tx1.sk_date = dd.sk_date
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 )
 select 
-	to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
-	demand.city_group,
-	demand.city,
-	demand.mkt_category,
-	demand.mkt_flow,
-	demand.mkt_completion,
-	demand.mkt_channel,
-	demand.mkt_medium,
-	demand.mkt_source,
-	demand.mkt_platform,
-	demand.utm_campaign,
-	demand.utm_content,
-	demand.utm_term,
-    sum(coalesce(demand.total_daily_visits_booked, 0)) as total_weekly_visits_booked,
-    sum(coalesce(demand.total_daily_visits_confirmed, 0)) as total_weekly_visits_confirmed,
-    sum(coalesce(demand.total_daily_offers_submitted, 0)) as total_weekly_offers_submitted,
-    sum(coalesce(demand.total_daily_offers_approved, 0)) as total_weekly_offers_approved,
-    sum(coalesce(demand.total_daily_contracts_signed, 0)) as total_weekly_contracts_signed,
-    sum(coalesce(sed.total_weekly_demand_sessions,0)) as total_weekly_sessions,
-    sum(coalesce(dau1.total_weekly_demand_dau,0)) as total_weekly_active_users
+	demand.*,
+    coalesce(us.total_weekly_sessions,0) as total_weekly_sessions,
+    coalesce(us.total_weekly_active_users,0) as total_weekly_active_users
 from demand demand
-left join demand_session sed on
-	demand.sk_date = sed.sk_date
-	and (coalesce(demand.city_group,'') = coalesce(sed.city_group,''))
-	and (coalesce(demand.city,'') = coalesce(sed.city,'')) 
-	and (coalesce(demand.mkt_category,'') = coalesce(sed.mkt_category,'')) 
-	and (coalesce(demand.mkt_flow,'') = coalesce(sed.mkt_flow,''))
-	and (coalesce(demand.mkt_completion,'') = coalesce(sed.mkt_completion,''))
-	and (coalesce(demand.mkt_channel,'') = coalesce(sed.mkt_channel,''))
-	and (coalesce(demand.mkt_medium,'') = coalesce(sed.mkt_medium,''))
-	and (coalesce(demand.mkt_source,'') = coalesce(sed.mkt_source,''))
-	and (coalesce(demand.mkt_platform,'') = coalesce(sed.mkt_platform,''))
-	and (coalesce(demand.utm_campaign,'') = coalesce(sed.utm_campaign,''))
-	and (coalesce(demand.utm_content,'') = coalesce(sed.utm_content,''))
-	and (coalesce(demand.utm_term,'') = coalesce(sed.utm_term,''))
-left join demand_dau dau1 on
-	demand.sk_date = dau1.sk_date
-	and (coalesce(demand.city_group,'') = coalesce(dau1.city_group,''))
-	and (coalesce(demand.city,'') = coalesce(dau1.city,'')) 
-	and (coalesce(demand.mkt_category,'') = coalesce(dau1.mkt_category,'')) 
-	and (coalesce(demand.mkt_flow,'') = coalesce(dau1.mkt_flow,''))
-	and (coalesce(demand.mkt_completion,'') = coalesce(dau1.mkt_completion,''))
-	and (coalesce(demand.mkt_channel,'') = coalesce(dau1.mkt_channel,''))
-	and (coalesce(demand.mkt_medium,'') = coalesce(dau1.mkt_medium,''))
-	and (coalesce(demand.mkt_source,'') = coalesce(dau1.mkt_source,''))
-	and (coalesce(demand.mkt_platform,'') = coalesce(dau1.mkt_platform,''))
-	and (coalesce(demand.utm_campaign,'') = coalesce(dau1.utm_campaign,''))
-	and (coalesce(demand.utm_content,'') = coalesce(dau1.utm_content,''))
-	and (coalesce(demand.utm_term,'') = coalesce(dau1.utm_term,''))
-join public.dim_date dd
-    on demand.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+left join users us
+ on us.sk_week_start_date = demand.sk_week_start_date
+ and (us.city_group = demand.city_group)
+ and (us.city = demand.city)
+ and (us.mkt_category = demand.mkt_category)
+ and (us.mkt_flow = demand.mkt_flow)
+ and (us.mkt_completion = demand.mkt_completion)
+ and (us.mkt_channel = demand.mkt_channel)
+ and (us.mkt_medium = demand.mkt_medium)
+ and (us.mkt_source = demand.mkt_source)
+ and (coalesce(us.mkt_platform,'') = coalesce(demand.mkt_platform,''))
+ and (coalesce(us.utm_campaign,'') = coalesce(demand.utm_campaign,''))
+ and (coalesce(us.utm_term,'') = coalesce(demand.utm_term,''))
+ and (coalesce(us.utm_content,'') = coalesce(demand.utm_content,''))
 union
 select
-    to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
-	sed.city_group,
-	sed.city,
-	sed.mkt_category,
-	sed.mkt_flow,
-	sed.mkt_completion,
-	sed.mkt_channel,
-	sed.mkt_medium,
-	sed.mkt_source,
-	sed.mkt_platform,
-	sed.utm_campaign,
-	sed.utm_content,
-	sed.utm_term,
-    sum(coalesce(dem.total_daily_visits_booked, 0)) as total_weekly_visits_booked,
-    sum(coalesce(dem.total_daily_visits_confirmed, 0)) as total_weekly_visits_confirmed,
-    sum(coalesce(dem.total_daily_offers_submitted, 0)) as total_weekly_offers_submitted,
-    sum(coalesce(dem.total_daily_offers_approved, 0)) as total_weekly_offers_approved,
-    sum(coalesce(dem.total_daily_contracts_signed, 0)) as total_weekly_contracts_signed,
-    sum(coalesce(sed.total_weekly_demand_sessions,0)) as total_weekly_sessions,
-    sum(coalesce(dau1.total_weekly_demand_dau,0)) as total_weekly_active_users
-from demand_session sed
+    us.sk_week_start_date,
+	us.city_group,
+	us.city,
+	us.mkt_category,
+	us.mkt_flow,
+	us.mkt_completion,
+	us.mkt_channel,
+	us.mkt_medium,
+	us.mkt_source,
+	us.mkt_platform,
+	us.utm_campaign,
+	us.utm_content,
+	us.utm_term,
+    coalesce(dem.total_weekly_visits_booked, 0) as total_weekly_visits_booked,
+    coalesce(dem.total_weekly_visits_confirmed, 0) as total_weekly_visits_confirmed,
+    coalesce(dem.total_weekly_offers_submitted, 0) as total_weekly_offers_submitted,
+    coalesce(dem.total_weekly_offers_approved, 0) as total_weekly_offers_approved,
+    coalesce(dem.total_weekly_contracts_signed, 0) as total_weekly_contracts_signed,
+    coalesce(us.total_weekly_sessions,0) as total_weekly_sessions,
+    coalesce(us.total_weekly_active_users,0) as total_weekly_active_users
+from users us
 left join demand dem on
-	sed.sk_date = dem.sk_date
-	and (coalesce(sed.city_group,'') = coalesce(dem.city_group,''))
-	and (coalesce(sed.city,'') = coalesce(dem.city,'')) 
-	and (coalesce(sed.mkt_category,'') = coalesce(dem.mkt_category,'')) 
-	and (coalesce(sed.mkt_flow,'') = coalesce(dem.mkt_flow,''))
-	and (coalesce(sed.mkt_completion,'') = coalesce(dem.mkt_completion,''))
-	and (coalesce(sed.mkt_channel,'') = coalesce(dem.mkt_channel,''))
-	and (coalesce(sed.mkt_medium,'') = coalesce(dem.mkt_medium,''))
-	and (coalesce(sed.mkt_source,'') = coalesce(dem.mkt_source,''))
-	and (coalesce(sed.mkt_platform,'') = coalesce(dem.mkt_platform,''))
-	and (coalesce(sed.utm_campaign,'') = coalesce(dem.utm_campaign,''))
-	and (coalesce(sed.utm_content,'') = coalesce(dem.utm_content,''))
-	and (coalesce(sed.utm_term,'') = coalesce(dem.utm_term,''))
-left join demand_dau dau1 on
-	sed.sk_date = dau1.sk_date
-	and (coalesce(sed.city_group,'') = coalesce(dau1.city_group,''))
-	and (coalesce(sed.city,'') = coalesce(dau1.city,'')) 
-	and (coalesce(sed.mkt_category,'') = coalesce(dau1.mkt_category,'')) 
-	and (coalesce(sed.mkt_flow,'') = coalesce(dau1.mkt_flow,''))
-	and (coalesce(sed.mkt_completion,'') = coalesce(dau1.mkt_completion,''))
-	and (coalesce(sed.mkt_channel,'') = coalesce(dau1.mkt_channel,''))
-	and (coalesce(sed.mkt_medium,'') = coalesce(dau1.mkt_medium,''))
-	and (coalesce(sed.mkt_source,'') = coalesce(dau1.mkt_source,''))
-	and (coalesce(sed.mkt_platform,'') = coalesce(dau1.mkt_platform,''))
-	and (coalesce(sed.utm_campaign,'') = coalesce(dau1.utm_campaign,''))
-	and (coalesce(sed.utm_content,'') = coalesce(dau1.utm_content,''))
-	and (coalesce(sed.utm_term,'') = coalesce(dau1.utm_term,''))
-join public.dim_date dd
-    on sed.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+	us.sk_week_start_date = dem.sk_week_start_date
+	and (coalesce(us.city_group,'') = coalesce(dem.city_group,''))
+	and (coalesce(us.city,'') = coalesce(dem.city,''))
+	and (coalesce(us.mkt_category,'') = coalesce(dem.mkt_category,''))
+	and (coalesce(us.mkt_flow,'') = coalesce(dem.mkt_flow,''))
+	and (coalesce(us.mkt_completion,'') = coalesce(dem.mkt_completion,''))
+	and (coalesce(us.mkt_channel,'') = coalesce(dem.mkt_channel,''))
+	and (coalesce(us.mkt_medium,'') = coalesce(dem.mkt_medium,''))
+	and (coalesce(us.mkt_source,'') = coalesce(dem.mkt_source,''))
+	and (coalesce(us.mkt_platform,'') = coalesce(dem.mkt_platform,''))
+	and (coalesce(us.utm_campaign,'') = coalesce(dem.utm_campaign,''))
+	and (coalesce(us.utm_content,'') = coalesce(dem.utm_content,''))
+	and (coalesce(us.utm_term,'') = coalesce(dem.utm_term,''))

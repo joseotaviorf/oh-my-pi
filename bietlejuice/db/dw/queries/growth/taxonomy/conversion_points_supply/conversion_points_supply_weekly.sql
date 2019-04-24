@@ -79,8 +79,21 @@ from
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ), supply as (
 select
- tx1.*,
- coalesce(ls1.total_daily_listings, 0) as total_daily_listings
+ to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
+ tx1.city_group,
+ tx1.city,
+ tx1.mkt_category,
+ tx1.mkt_flow,
+ tx1.mkt_completion,
+ tx1.mkt_channel,
+ tx1.mkt_medium,
+ tx1.mkt_source,
+ tx1.mkt_platform,
+ tx1.utm_campaign,
+ tx1.utm_content,
+ tx1.utm_term,
+ sum(coalesce(tx1.total_daily_leads,0)) as total_weekly_leads,
+ sum(coalesce(ls1.total_daily_listings, 0)) as total_weekly_listings
 from
  leads tx1
 left join listings ls1
@@ -97,11 +110,27 @@ left join listings ls1
  and (coalesce(ls1.utm_campaign,'') = coalesce(tx1.utm_campaign,''))
  and (coalesce(ls1.utm_term,'') = coalesce(tx1.utm_term,''))
  and (coalesce(ls1.utm_content,'') = coalesce(tx1.utm_content,''))
+join public.dim_date dd
+   on tx1.sk_date = dd.sk_date
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
  ),
 users as (
 select
- tx1.*,
- coalesce(ls1.total_weekly_active_users, 0) as total_weekly_active_users
+ to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
+ tx1.city_group,
+ tx1.city,
+ tx1.mkt_category,
+ tx1.mkt_flow,
+ tx1.mkt_completion,
+ tx1.mkt_channel,
+ tx1.mkt_medium,
+ tx1.mkt_source,
+ tx1.mkt_platform,
+ tx1.utm_campaign,
+ tx1.utm_content,
+ tx1.utm_term,
+ max(coalesce(tx1.total_weekly_sessions, 0)) as total_weekly_sessions,
+ max(coalesce(ls1.total_weekly_active_users, 0)) as total_weekly_active_users
 from
  sessions tx1
 left join active_users ls1
@@ -118,29 +147,18 @@ left join active_users ls1
  and (coalesce(ls1.utm_campaign,'') = coalesce(tx1.utm_campaign,''))
  and (coalesce(ls1.utm_term,'') = coalesce(tx1.utm_term,''))
  and (coalesce(ls1.utm_content,'') = coalesce(tx1.utm_content,''))
+join public.dim_date dd
+   on tx1.sk_date = dd.sk_date
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 )
 select
-	 to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
-	 supply.city_group,
-	 supply.city,
-	 supply.mkt_category,
-	 supply.mkt_flow,
-	 supply.mkt_completion,
-	 supply.mkt_channel,
-	 supply.mkt_medium,
-	 supply.mkt_source,
-	 supply.mkt_platform,
-	 supply.utm_campaign,
-	 supply.utm_content,
-	 supply.utm_term,
-	 sum(coalesce(supply.total_daily_leads, 0)) as total_weekly_leads,
-	 sum(coalesce(supply.total_daily_listings, 0)) as total_weekly_listings,
-	 sum(coalesce(us.total_weekly_sessions, 0)) as total_weekly_sessions,
-	 sum(coalesce(us.total_weekly_active_users, 0)) as total_weekly_active_users
+	 supply.*,
+	 coalesce(us.total_weekly_sessions, 0) as total_weekly_sessions,
+	 coalesce(us.total_weekly_active_users, 0) as total_weekly_active_users
 from
 	supply supply
 left join users us
- on us.sk_date = supply.sk_date
+ on us.sk_week_start_date = supply.sk_week_start_date
  and (us.city_group = supply.city_group)
  and (us.city = supply.city)
  and (us.mkt_category = supply.mkt_category)
@@ -153,12 +171,9 @@ left join users us
  and (coalesce(us.utm_campaign,'') = coalesce(supply.utm_campaign,''))
  and (coalesce(us.utm_term,'') = coalesce(supply.utm_term,''))
  and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
-join public.dim_date dd
-    on supply.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 UNION
 select
-	 to_char(dd.week_start, 'yyyyMMdd')::integer as sk_week_start_date,
+	 us.sk_week_start_date,
 	 us.city_group,
 	 us.city,
 	 us.mkt_category,
@@ -171,14 +186,14 @@ select
 	 us.utm_campaign,
 	 us.utm_content,
 	 us.utm_term,
-	 sum(coalesce(supply.total_daily_leads, 0)) as total_weekly_leads,
-	 sum(coalesce(supply.total_daily_listings, 0)) as total_weekly_listings,
-	 sum(coalesce(us.total_weekly_sessions, 0)) as total_weekly_sessions,
-	 sum(coalesce(us.total_weekly_active_users, 0)) as total_weekly_active_users
+	 coalesce(supply.total_weekly_leads, 0) as total_weekly_leads,
+	 coalesce(supply.total_weekly_listings, 0) as total_weekly_listings,
+	 coalesce(us.total_weekly_sessions, 0) as total_weekly_sessions,
+	 coalesce(us.total_weekly_active_users, 0) as total_weekly_active_users
 from
 	users us
 left join supply supply
- on us.sk_date = supply.sk_date
+ on us.sk_week_start_date = supply.sk_week_start_date
  and (us.city_group = supply.city_group)
  and (us.city = supply.city)
  and (us.mkt_category = supply.mkt_category)
@@ -191,6 +206,3 @@ left join supply supply
  and (coalesce(us.utm_campaign,'') = coalesce(supply.utm_campaign,''))
  and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
  and (coalesce(us.utm_term,'') = coalesce(supply.utm_term,''))
-join public.dim_date dd
-    on us.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
