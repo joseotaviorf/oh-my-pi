@@ -230,6 +230,19 @@ queue_hung_up as (
 	from asterisk_data
 	where regexp_like(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+Hangup\("Local/(\d+)@from-queue-(\w+);\d"')=true
 	group by 1,2,3,4,5,6,7
+),
+queue_spawned_extension as (
+	select
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.', 4) as id_phase,
+		'queue' as phase,
+		'queue_spawned_extension' as name,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.', 3) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.', 1) as ts_created,
+		now() as ts_load
+	from asterisk_data
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.')=true
+	group by 1,2,3,4,5,6,7
 )
 select
 	e.id_call,
