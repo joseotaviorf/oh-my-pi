@@ -122,16 +122,38 @@ class Redshift(object):
         :param timeout_seconds: integer; Max seconds to wait for cluster become available
         """
         waiter_coefficient = 60 * 5
-        for i in range(1, timeout_seconds / waiter_coefficient):
+        for i in range(0, (timeout_seconds / waiter_coefficient) - 1):
             status = self.get_cluster_status(cluster_id=cluster_id)
             if status == self.AVAILABLE_STATUS:
                 logger.info('cluster_id={0}, approximate_waiting_time={1} seconds,'
-                            'msg=Cluster available'.format(cluster_id, str((i - 1) * waiter_coefficient)))
+                            'msg=Cluster available'.format(cluster_id, str(i * waiter_coefficient)))
                 return
 
             # Waits before trying again
             logger.info('cluster_id={0}, retrial={1}, sum_waiting_time={2}, '
-                        'msg=Starting waiting mode'.format(cluster_id, str(i), str(i * waiter_coefficient)))
+                        'msg=Starting waiting mode'.format(cluster_id, str(i + 1), str(i * waiter_coefficient)))
             time.sleep(waiter_coefficient)
 
         raise RuntimeError('cluster_id={0}, msg=Timeout waiting for cluster to become available'.format(cluster_id))
+
+    def wait_for_cluster_shutdown(self, cluster_id, timeout_seconds=3600):
+        """Get status from an Amazon Redshift cluster
+
+        :param cluster_id: string; Cluster name to be shutdown
+        :param timeout_seconds: integer; Max seconds to wait for cluster become available
+        """
+        waiter_coefficient = 60 * 5
+        for i in range(0, (timeout_seconds / waiter_coefficient) - 1):
+            try:
+                status = self.get_cluster_status(cluster_id=cluster_id)
+            except RuntimeError:
+                logger.info('cluster_id={0}, approximate_waiting_time={1} seconds,'
+                            'msg=Cluster not found'.format(cluster_id, str(i * waiter_coefficient)))
+                return
+
+            # Waits before trying again
+            logger.info('cluster_id={0}, retrial={1}, sum_waiting_time={2}, status={3} '
+                        'msg=Starting waiting mode'.format(cluster_id, str(i + 1), str(i * waiter_coefficient), status))
+            time.sleep(waiter_coefficient)
+
+        raise RuntimeError('cluster_id={0}, msg=Timeout waiting for cluster to shutdown'.format(cluster_id))
