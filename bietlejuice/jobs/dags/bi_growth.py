@@ -228,7 +228,11 @@ def get_sub_dag_operator(sub_dag_func, materialize_func, sub_dag_name, funnel=No
                             materialize_func, placeholders, truncate_func),
         task_id=sub_dag_name if funnel != 'taxonomy' else '{}_{}'.format(funnel, sub_dag_name),
         dag=main_dag,
-        executor=LocalExecutor()
+        executor=LocalExecutor(),
+        execution_timeout=BaseDAG.EXECUTION_TIMEOUT,
+        retries=BaseDAG.OPERATOR_RETRIES['retries'],
+        retry_delay=BaseDAG.OPERATOR_RETRIES['retry_delay'],
+        max_retry_delay=BaseDAG.OPERATOR_RETRIES['max_retry_delay']
     )
 
 
@@ -754,7 +758,9 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
 
 fact_task.set_upstream([ongoing_contracts_sub_dag, documentation_sent_sub_dag,
                         ended_rentals_sub_dag, ongoing_stranded_listings_sub_dag])
-fact_task.set_downstream([
-    prediction_visits_booked_sub_dag, prediction_visits_completed_sub_dag, prediction_offers_submitted_sub_dag,
-    prediction_offers_approved_sub_dag, prediction_documentation_sent_sub_dag, prediction_approved_by_insurer_sub_dag,
-    prediction_tenants_sub_dag, fact_append_task])
+
+fact_task >> fact_append_task
+fact_append_task.set_upstream([prediction_visits_booked_sub_dag, prediction_visits_completed_sub_dag,
+                               prediction_offers_submitted_sub_dag, prediction_offers_approved_sub_dag,
+                               prediction_documentation_sent_sub_dag, prediction_approved_by_insurer_sub_dag,
+                               prediction_tenants_sub_dag])
