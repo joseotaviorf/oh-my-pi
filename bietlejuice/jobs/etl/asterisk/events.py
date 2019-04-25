@@ -11,7 +11,7 @@ class AsteriskEvents(Asterisk):
 
     EVENTS = ['call_started', 'hung_up', 'ura_started', 'queue_started', 'queue_num_set', 'attendance_started',
               'crm_destination_set', 'agent_answered', 'key_typed', 'audio_message_started', 'queue_join_time_set',
-              'crm_source_set', 'queue_hung_up', 'queue_spawned_extension']
+              'crm_source_set', 'queue_hung_up', 'queue_spawned_extension', 'crm_linkedid_set']
 
     @logger
     def __init__(self, s3_bucket, execution_date):

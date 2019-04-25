@@ -242,6 +242,19 @@ queue_spawned_extension as (
 		now() as ts_load
 	from asterisk_data
 	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Spawn extension (.+) exited non-zero on .Local/\d+@from-queue-(\w+);\d.')=true
+  group by 1,2,3,4,5,6,7
+),
+crm_linkedid_set as (
+	select
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+ Set\("SIP/\d+-(\w+)", "(__CRM_LINKEDID=\d+.\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+ Set\("SIP/\d+-(\w+)", "(__CRM_LINKEDID=\d+.\d+)"', 3) as id_phase,
+		'ura' as phase,
+		'crm_linkedid_set' as name, 
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+ Set\("SIP/\d+-(\w+)", "(__CRM_LINKEDID=\d+.\d+)"', 4) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+ Set\("SIP/\d+-(\w+)", "(__CRM_LINKEDID=\d+.\d+)"', 1) as ts_created,
+		now() as ts_load
+	from asterisk_data
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\] pbx.c: Executing .+ Set\("SIP/\d+-(\w+)", "(__CRM_LINKEDID=\d+.\d+)"')=true
 	group by 1,2,3,4,5,6,7
 )
 select
