@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -13,10 +17,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
-logger = QuintoAndarLogger('SupplyDemandFunnel')
+logger = QuintoAndarLogger('bi-supply-demand-etl')
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -524,7 +526,15 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
                'dag_id': 'bi-amplitude-load-events'},
     retry_delay=timedelta(minutes=10),
-    max_retry_delay=timedelta(minutes=10)
+    max_retry_delay=timedelta(minutes=10),
+    retries=10
+)
+
+# trigger bi-growth dag after all tasks have been successfully completed
+trigger_bi_growth_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_growth_dag',
+    trigger_dag_id='bi-growth'
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
@@ -542,3 +552,5 @@ airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
+
+trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
