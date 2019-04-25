@@ -33,7 +33,7 @@ main_dag = DAG(
         'depends_on_past': False
     },
     start_date=datetime(2018, 2, 15, 0, 0, 0),
-    schedule_interval=env.convert_to_utc_schedule('0 6 * * *'),
+    schedule_interval=None,  # will get triggered by bi-supply-demand-etl
     max_active_runs=1,
     catchup=False,
     orientation='TB'
