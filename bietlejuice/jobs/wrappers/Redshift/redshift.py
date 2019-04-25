@@ -140,7 +140,7 @@ class Redshift(object):
         """Get status from an Amazon Redshift cluster
 
         :param cluster_id: string; Cluster name to be shutdown
-        :param timeout_seconds: integer; Max seconds to wait for cluster become available
+        :param timeout_seconds: integer; Max seconds to wait for cluster to shutdown
         """
         waiter_coefficient = 60 * 5
         for i in range(0, (timeout_seconds / waiter_coefficient) - 1):
