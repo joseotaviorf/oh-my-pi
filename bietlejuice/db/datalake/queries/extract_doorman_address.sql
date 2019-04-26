@@ -11,8 +11,7 @@ WITH doorman_address AS (
     dadosafiliado_ativo = '1'
     AND COALESCE(work_address, '') != ''
     AND COALESCE(work_city, '') != ''
-    AND COALESCE(work_lat, '') = ''
-    AND COALESCE(work_lng, '') = ''
+    AND COALESCE(work_place_id, '') = ''
 )
 SELECT *
 FROM doorman_address
