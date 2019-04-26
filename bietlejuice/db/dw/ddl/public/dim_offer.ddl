@@ -7,13 +7,13 @@ create table dim_offer (
   renting_original_value integer,
   condo_original_value integer,
   dt_analysis timestamp,
-  editing varchar(50),
-  status varchar(50),
+  editing varchar,
+  status varchar
   id_user integer,
   id_property integer,
   dt_created timestamp,
   dt_updated timestamp,
-  dt_timestamp timestamp without time zone,
+  dt_timestamp timestamp,
   offer_submitted boolean,
   ultimo_update_edicao integer,
   dt_first_sent timestamp,
@@ -33,7 +33,5 @@ create table dim_offer (
   replace_or_modify_conditions integer,
   price_conditions integer,
   other_conditions integer,
-  type varchar(255),
-  constraint dim_offer_pkey primary key(sk_offer)
-)
-;
+  type varchar(255)
+);
