@@ -115,6 +115,7 @@ def submit_olx(**kwargs):
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
+        memory=6144,
         command=['./crawlers/olx_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
     )
     logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
