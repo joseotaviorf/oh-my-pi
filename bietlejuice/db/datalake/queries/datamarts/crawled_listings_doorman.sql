@@ -46,7 +46,7 @@ WITH listings AS (
   WHERE
     row = 1
     -- get only the first time a listing was posted
-    AND DATE(updated_on) >= current_date - interval '7' day
+    AND DATE(updated_on) >= current_date - interval '30' day
 ),
 doorman AS (
   SELECT
