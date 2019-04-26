@@ -8,7 +8,6 @@ logger = QuintoAndarLogger('Redshift')
 
 
 class Redshift(object):
-    AVAILABLE_STATUS = 'available'
     CLUSTER_SUBNET_GROUP_NAME = 'quintoandar-aux'
     IAM_ROLES = ['arn:aws:iam::632540934959:role/SpectrumAccess']
 
