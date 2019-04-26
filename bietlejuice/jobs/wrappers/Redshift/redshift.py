@@ -1,4 +1,4 @@
-import time
+import datetime
 
 import boto3
 from botocore.exceptions import ClientError
@@ -10,10 +10,12 @@ logger = QuintoAndarLogger('Redshift')
 class Redshift(object):
     AVAILABLE_STATUS = 'available'
     CLUSTER_SUBNET_GROUP_NAME = 'quintoandar-aux'
+    IAM_ROLES = ['arn:aws:iam::632540934959:role/SpectrumAccess']
 
     def __init__(self):
         self.redshift_client = boto3.client('redshift')
 
+    @logger
     def create_cluster_from_snapshot(self, source_cluster_id, target_cluster_id):
         """Create an Amazon Redshift cluster from previous snapshot
 
@@ -21,7 +23,6 @@ class Redshift(object):
 
         :param source_cluster_id: string; Name of the cluster which contains the source snapshots
         :param target_cluster_id: string; Name to assign the cluster to be created
-        :return dictionary containing cluster information
         """
         if self.check_if_cluster_exists(cluster_id=target_cluster_id):
             raise ValueError('cluster_id={},msg=Cluster already exists'.format(target_cluster_id))
@@ -37,7 +38,8 @@ class Redshift(object):
                         ClusterIdentifier=target_cluster_id,
                         SnapshotIdentifier=snapshot_id,
                         SnapshotClusterIdentifier=source_cluster_id,
-                        ClusterSubnetGroupName=self.CLUSTER_SUBNET_GROUP_NAME)
+                        ClusterSubnetGroupName=self.CLUSTER_SUBNET_GROUP_NAME,
+                        IamRoles=self.IAM_ROLES)
             except Exception as e:
                 raise RuntimeError(
                     'cluster_id={0}, snapshot={1}, error={2}, msg=Not able to start cluster'.format(target_cluster_id,
@@ -46,6 +48,7 @@ class Redshift(object):
 
             logger.info('cluster_id={0}, msg=Cluster starting.'.format(target_cluster_id))
 
+    @logger
     def check_if_cluster_exists(self, cluster_id):
         """Check whether an Amazon Redshift cluster exists
 
@@ -54,10 +57,13 @@ class Redshift(object):
         """
         try:
             response = self.redshift_client.describe_clusters(ClusterIdentifier=cluster_id)
+            logger.info('cluster_id={0}, msg=Cluster exists'.format(cluster_id))
             return True
         except ClientError:
+            logger.info('cluster_id={0}, msg=Cluster does not exists'.format(cluster_id))
             return False
 
+    @logger
     def get_latest_snapshot(self, cluster_id):
         """Get the latest snapshot from Amazon Redshift cluster
 
@@ -82,26 +88,28 @@ class Redshift(object):
         snapshot_list.sort(reverse=True)
         return snapshot_list[0]
 
+    @logger
     def shutdown_cluster(self, cluster_id):
-        """Shutdown an Amazon Redshift cluster
+        """Send command to shutdown an Amazon Redshift cluster
 
         :param cluster_id: string; Cluster name to be shutdown
-        :return boolean; Whether cluster was shutdown
         """
         if self.check_if_cluster_exists(cluster_id=cluster_id):
             try:
                 response = \
                     self.redshift_client.delete_cluster(ClusterIdentifier=cluster_id,
-                                                        FinalClusterSnapshotIdentifier='{}-before-shuting-down'.format(
-                                                            cluster_id))
-                return True
+                                                        FinalClusterSnapshotIdentifier='{}-{}'.format(
+                                                            cluster_id,
+                                                            str(datetime.datetime.today().strftime('%Y%m%d-%H-%M'))))
+
+                logger.info('cluster_id={0}, msg=Command to shutdown sent'.format(cluster_id))
             except ClientError as e:
                 raise RuntimeError('cluster_id={0}, error={1}, msg=Unable to shutdown cluster'.format(cluster_id,
                                                                                                       e.message))
         else:
-            logger.error('cluster_id={0}, msg=Cluster does not exist'.format(cluster_id))
-            return False
+            raise ValueError('cluster_id={0}, msg=Cluster does not exist'.format(cluster_id))
 
+    @logger
     def get_cluster_status(self, cluster_id):
         """Get status from an Amazon Redshift cluster
 
@@ -115,45 +123,49 @@ class Redshift(object):
             raise RuntimeError('cluster_id={0}, error={1}, msg=Unable to gather info from cluster'.format(cluster_id,
                                                                                                           e.message))
 
-    def wait_for_cluster_availability(self, cluster_id, timeout_seconds=3600):
-        """Get status from an Amazon Redshift cluster
+    @logger
+    def wait_for_cluster_availability(self, cluster_id):
+        """Wait for Amazon Redshift cluster to become available
 
-        :param cluster_id: string; Cluster name to be shutdown
-        :param timeout_seconds: integer; Max seconds to wait for cluster become available
+        :param cluster_id: string; Cluster name to monitor
         """
-        waiter_coefficient = 60 * 5
-        for i in range(0, (timeout_seconds / waiter_coefficient) - 1):
-            status = self.get_cluster_status(cluster_id=cluster_id)
-            if status == self.AVAILABLE_STATUS:
-                logger.info('cluster_id={0}, approximate_waiting_time={1} seconds,'
-                            'msg=Cluster available'.format(cluster_id, str(i * waiter_coefficient)))
-                return
+        waiter = self.redshift_client.get_waiter('cluster_available')
+        try:
+            waiter.wait(ClusterIdentifier=cluster_id)
+        except Exception as e:
+            raise RuntimeError(
+                'cluster_id={0}, error={1}, msg=Timeout waiting for cluster to became available'.format(cluster_id,
+                                                                                                        e.message))
 
-            # Waits before trying again
-            logger.info('cluster_id={0}, retrial={1}, sum_waiting_time={2}, '
-                        'msg=Starting waiting mode'.format(cluster_id, str(i + 1), str(i * waiter_coefficient)))
-            time.sleep(waiter_coefficient)
+    @logger
+    def wait_for_cluster_shutdown(self, cluster_id):
+        """Wait for Amazon Redshift cluster to shutdown
 
-        raise RuntimeError('cluster_id={0}, msg=Timeout waiting for cluster to become available'.format(cluster_id))
-
-    def wait_for_cluster_shutdown(self, cluster_id, timeout_seconds=3600):
-        """Get status from an Amazon Redshift cluster
-
-        :param cluster_id: string; Cluster name to be shutdown
-        :param timeout_seconds: integer; Max seconds to wait for cluster to shutdown
+        :param cluster_id: string; Cluster name to monitor
         """
-        waiter_coefficient = 60 * 5
-        for i in range(0, (timeout_seconds / waiter_coefficient) - 1):
+        waiter = self.redshift_client.get_waiter('cluster_deleted')
+        try:
+            waiter.wait(ClusterIdentifier=cluster_id)
+        except Exception as e:
+            raise RuntimeError(
+                'cluster_id={0}, error={1}, msg=Timeout waiting for cluster to shutdown'.format(cluster_id, e.message))
+
+    @logger
+    def scale_down_cluster(self, cluster_id):
+        """Send command to scale down an Amazon Redshift cluster
+
+        :param cluster_id: string; Cluster name to be resized
+        """
+        if self.check_if_cluster_exists(cluster_id=cluster_id):
             try:
-                status = self.get_cluster_status(cluster_id=cluster_id)
-            except RuntimeError:
-                logger.info('cluster_id={0}, approximate_waiting_time={1} seconds,'
-                            'msg=Cluster not found'.format(cluster_id, str(i * waiter_coefficient)))
-                return
+                response = \
+                    self.redshift_client.modify_cluster(ClusterIdentifier=cluster_id,
+                                                        ClusterType='single-node',
+                                                        NodeType='dc2.large')
 
-            # Waits before trying again
-            logger.info('cluster_id={0}, retrial={1}, sum_waiting_time={2}, status={3} '
-                        'msg=Starting waiting mode'.format(cluster_id, str(i + 1), str(i * waiter_coefficient), status))
-            time.sleep(waiter_coefficient)
-
-        raise RuntimeError('cluster_id={0}, msg=Timeout waiting for cluster to shutdown'.format(cluster_id))
+                logger.info('cluster_id={0}, msg=Command to scale down sent'.format(cluster_id))
+            except ClientError as e:
+                raise RuntimeError('cluster_id={0}, error={1}, msg=Unable to scale down cluster'.format(cluster_id,
+                                                                                                        e.message))
+        else:
+            raise ValueError('cluster_id={0}, msg=Cluster does not exist'.format(cluster_id))
