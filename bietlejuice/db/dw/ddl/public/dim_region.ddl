@@ -2,7 +2,7 @@ drop table if exists dim_region;
 create table if not exists dim_region (
   sk_region integer,
   id integer,
-  level varchar
+  level varchar,
   name varchar,
   macro_id integer,
   macro_name varchar,
