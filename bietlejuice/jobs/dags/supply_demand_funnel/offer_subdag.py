@@ -40,7 +40,7 @@ class OfferSubDag(DimSubDag):
         )
 
         offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
-        pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task >> pre_proposta_condicao_proposta_task
+        pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task
         staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_condicao_proposta_task])
         staging_dim_offer_task.set_downstream(tests_tasks)
         dim_offer_task.set_upstream(tests_tasks)
@@ -126,18 +126,6 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        pre_proposta_condicao_proposta_task = BaseDAG.build_python_operator(
-            task_id='ODS_pre_proposal_condition',
-            dag=dag,
-            python_callable=utils.extract_table_dim_from_ebdb_to_ods,
-            op_kwargs={
-                'dim_name': 'pre_proposal_condition',
-                'table_name': 'PreProposta_CondicaoProposta',
-                'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
-            }
-        )
-
         staging_dim_offer_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_offer',
@@ -160,4 +148,4 @@ class OfferSubDag(DimSubDag):
         )
 
         return (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
-                condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task, dim_offer_task)
+                condicao_proposta_task, staging_dim_offer_task, dim_offer_task)
