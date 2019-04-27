@@ -31,7 +31,7 @@ class OfferSubDag(DimSubDag):
         offer_dag = self._build_local_dag()
 
         (offer_to_s3_task, topic_to_s3_task, offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
-         condicao_proposta_task, pre_proposta_condicao_proposta_task, staging_dim_offer_task,
+         condicao_proposta_task, staging_dim_offer_task,
          dim_offer_task) = self.__build_data_tasks(offer_dag)
 
         tests_tasks = self.build_tests_tasks(
@@ -41,7 +41,7 @@ class OfferSubDag(DimSubDag):
 
         offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task])
         pre_proposal_task >> pre_proposta_aud_task >> condicao_proposta_task
-        staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_condicao_proposta_task])
+        offer_to_ods_task >> staging_dim_offer_task
         staging_dim_offer_task.set_downstream(tests_tasks)
         dim_offer_task.set_upstream(tests_tasks)
 
