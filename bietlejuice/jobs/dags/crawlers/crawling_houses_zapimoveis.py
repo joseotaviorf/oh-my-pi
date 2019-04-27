@@ -147,6 +147,7 @@ crawl_zap = BaseDAG.build_python_operator(
     dag=dag,
     task_id='crawl-zapimoveis',
     python_callable=submit_zap,
+    provide_context=True,
     op_kwargs=json.loads(crawler_params)
 )
 
