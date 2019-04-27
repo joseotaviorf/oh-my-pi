@@ -8,7 +8,7 @@ create table dim_offer (
   condo_original_value integer,
   dt_analysis timestamp,
   editing varchar,
-  status varchar
+  status varchar,
   id_user integer,
   id_property integer,
   dt_created timestamp,
