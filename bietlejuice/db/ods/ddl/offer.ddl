@@ -1,5 +1,5 @@
 drop table if exists offer;
-create table offer (
+create table if not exists offer (
   id bigint not null,
   atualizado_em timestamp,
   analysis_date timestamp,
@@ -18,10 +18,10 @@ create table offer (
   rent_flow_id bigint,
   rejection_reason varchar(255),
   iteration integer,
-  expiration_date datetime,
+  expiration_date timestamp,
   type varchar(255),
-  first_sent_at datetime,
-  last_sent_at datetime,
+  first_sent_at timestamp,
+  last_sent_at timestamp,
   topic_type varchar(255)
 )
 ;

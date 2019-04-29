@@ -1,4 +1,5 @@
 from bietlejuice.jobs.etl.crm.tasks.closing import CRMTasksClosing
+from bietlejuice.jobs.etl.crm.tasks.collection import CRMTasksCollection
 from bietlejuice.jobs.etl.crm.tasks.credit import CRMTasksCredit
 from bietlejuice.jobs.etl.crm.tasks.crm_tasks_table_enum import CRMTasksTableEnum
 from bietlejuice.jobs.etl.crm.tasks.factory import CRMTasksFactory

@@ -1,14 +1,14 @@
-SELECT
-	da.id,
-	da.inicioAtuacao,
-	da.tipoAfiliado,
-	da.cidadeAtuacao,
-	coalesce(da.ativo,0) as ativo,
-	da.atualizadoEm,
-	da.criadoEm,
-	da.numeroCreci,
-	da.origin,
-	da.affiliateType,
-    da.usuario_id
-FROM
-	DadosAfiliado da
+select
+	id,
+	inicioAtuacao,
+	tipoAfiliado,
+	cidadeAtuacao,
+	coalesce(ativo,0) as ativo,
+	atualizadoEm,
+	criadoEm,
+	left(numeroCreci, 50) as numeroCreci,
+	origin,
+	affiliateType,
+    usuario_id
+from DadosAfiliado
+;

@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS marketing.fact_google_daily_cost_attributions (
 	tablet_clicks INTEGER,
 	computer_clicks INTEGER,
 	total_clicks INTEGER,
+	mobile_cost DOUBLE PRECISION,
+	desktop_cost DOUBLE PRECISION,
 	total_cost DOUBLE PRECISION,
 	impressions INTEGER,
-	ts_load TIMESTAMP,
+	ts_load TIMESTAMP
 );

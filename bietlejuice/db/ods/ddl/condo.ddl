@@ -1,17 +1,16 @@
 drop table if exists public.condo;
-CREATE TABLE public.condo (
-  id BIGINT PRIMARY KEY,
-  updated_in DATE,
-  created_in DATE,
-  neighborhood VARCHAR(200),
-  zipcode VARCHAR(20),
-  city VARCHAR(200),
-  address VARCHAR(200),
-  lat NUMERIC(10,7),
-  lng NUMERIC(10,7),
-  name VARCHAR(255),
-  number VARCHAR(200),
-  condo_manager_id BIGINT,
-  rules TEXT
-)
-;
+create table if not exists condo (
+  id bigint primary key,
+  updated_in date,
+  created_in date,
+  neighborhood varchar(200),
+  zipcode varchar(200),
+  city varchar(200),
+  address varchar(200),
+  lat numeric(10,7),
+  lng numeric(10,7),
+  name varchar(255),
+  number varchar(200),
+  condo_manager_id bigint,
+  rules text
+);

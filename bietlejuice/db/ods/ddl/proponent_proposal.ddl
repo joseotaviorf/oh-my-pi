@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS public.proponent_proposal;
-CREATE TABLE public.proponent_proposal (
+drop table if exists proponent_proposal;
+create table if not exists proponent_proposal (
    id bigint,
    contribuiNoImovelAtual integer,
    cpf varchar(18),
@@ -58,5 +58,4 @@ CREATE TABLE public.proponent_proposal (
    telefoneResidencial varchar(255),
    origemRenda varchar(255),
    rendimentoAdicional integer
-)
-WITH (oids = false);
+);

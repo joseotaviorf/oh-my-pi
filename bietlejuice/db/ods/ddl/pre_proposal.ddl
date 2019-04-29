@@ -1,37 +1,31 @@
-DROP TABLE IF EXISTS public.pre_proposal;
-CREATE TABLE public.pre_proposal (
-  id INTEGER NOT NULL,
-  "aceitoAluguel" INTEGER,
-  "aceitoComprovarRenda" INTEGER,
-  "aceitoEncargos" INTEGER,
-  aluguel INTEGER,
-  "aluguelOriginal" INTEGER,
-  "condominioOriginal" INTEGER,
-  -- "iptuOriginal" integer,
-  dt_analysis public.datetime,
-  edicao VARCHAR(50) NOT NULL,
-  status VARCHAR(50) NOT NULL,
-  "proprietarioAceitouCondicoes5A" INTEGER,
-  usuario_id BIGINT,
-  imovel_id BIGINT,
-  "criadoEm" public.datetime,
-  "atualizadoEm" public.datetime,
-  "ultimoUpdateEdicao" INTEGER,
-  "dataPrimerioEnvio" public.datetime,
-  code varchar(10),
+drop table if exists pre_proposal;
+create table if not exists pre_proposal (
+  id integer not null,
+  "aceitoAluguel" integer,
+  "aceitoComprovarRenda" integer,
+  "aceitoEncargos" integer,
+  aluguel integer,
+  "aluguelOriginal" integer,
+  "condominioOriginal" integer,
+  dt_analysis timestamp,
+  edicao varchar(255),
+  status varchar(255),
+  "proprietarioAceitouCondicoes5A" integer,
+  usuario_id bigint,
+  imovel_id bigint,
+  "criadoEm" timestamp,
+  "atualizadoEm" timestamp,
+  "ultimoUpdateEdicao" integer,
+  "dataPrimerioEnvio" timestamp,
+  code varchar(255),
   rejection_reason varchar(255),
-  animais_condition INTEGER,
-  quando_vai_mudar_condition INTEGER,
-  quem_vai_morar_condition INTEGER,
-  special_conditions_count INTEGER,
-  remove_conditions INTEGER,
-  include_conditions INTEGER,
-  maintenance_or_repair_conditions INTEGER,
-  replace_or_modify_conditions INTEGER,
-  other_conditions INTEGER
-)
-WITH (oids = false);
-
--- select * from pre_proposal
-
-
+  animais_condition integer,
+  quando_vai_mudar_condition integer,
+  quem_vai_morar_condition integer,
+  special_conditions_count integer,
+  remove_conditions integer,
+  include_conditions integer,
+  maintenance_or_repair_conditions integer,
+  replace_or_modify_conditions integer,
+  other_conditions integer
+);

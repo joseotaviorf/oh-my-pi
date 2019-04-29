@@ -623,33 +623,6 @@ union all
 select
 	sk_date,
 	sk_week_start_date,
-	'employees' as measure,
-	team,
-	_year,
-	_month,
-	_week,
-	_day,
-	null as region,
-	null as city,
-	0 as daily_count,
-	prev_weekly_count,
-	weekly_count,
-	monthly_count,
-	0 as yearly_count,
-	0 as wow,
-	mtd,
-	ytd,
-	0 as mom,
-	0 as yoy,
-	0 as flg_predicted,
-	getdate() as dt_timestamp
-from growth.employees
-
-union all
-
-select
-	sk_date,
-	sk_week_start_date,
 	'engaged_users' as measure,
 	null as team,
 	_year,
@@ -807,57 +780,4 @@ select
 	getdate() as dt_timestamp
 from growth.schedule_page_views
 
-union all
-
-select
-	sk_date,
-	sk_week_start_date,
-	'ticket_resolution' as measure,
-	null as team,
-	_year,
-	_month,
-	_week,
-	_day,
-	region,
-	city,
-	daily_count,
-	prev_weekly_count,
-	weekly_count,
-	monthly_count,
-	yearly_count,
-	wow,
-	mtd,
-	ytd,
-	mom,
-	yoy,
-	0 as flg_predicted,
-	getdate() as dt_timestamp
-from growth.ticket_resolution
-
-union all
-
-select
-	sk_date,
-	sk_week_start_date,
-	'tickets' as measure,
-	null as team,
-	_year,
-	_month,
-	_week,
-	_day,
-	region,
-	city,
-	daily_count,
-	prev_weekly_count,
-	weekly_count,
-	monthly_count,
-	yearly_count,
-	wow,
-	mtd,
-	ytd,
-	mom,
-	yoy,
-	0 as flg_predicted,
-	getdate() as dt_timestamp
-from growth.tickets
 ;

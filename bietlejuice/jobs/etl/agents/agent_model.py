@@ -2,12 +2,13 @@ import re
 from datetime import datetime
 
 import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR, DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR, DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 
 logger = QuintoAndarLogger('Agent')
 
@@ -112,7 +113,7 @@ class Agent(object):
     @logger
     def create_table_dw(self, table_name, append, dt=None, enumdb=EnumDB.BI_DW, bucket='clean', schema='public'):
         logger.info('m=create_table_dw, table_name = {}, msg=start query to create table'.format(table_name))
-        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt, schema=schema)
+        table = self.get_agent_data(table_name=table_name, db_enum=enumdb, dt=dt)
 
         logger.info('m=create_table_dw, msg=to DW')
         self.move_data_to_destination(data=table, table_name=table_name, enumdb=enumdb, bucket=bucket, append=append,
@@ -128,6 +129,25 @@ class Agent(object):
         query = "DELETE FROM {}.{} WHERE cast({} as varchar) = to_char('{}'::DATE,'{}')".format(schema, dim_name,
                                                                                                 date_column,
                                                                                                 str(dt), format)
+
+        BaseETL.execute_command(
+            db_enum=enum,
+            encoding='UTF8',
+            command=query,
+            commit=True
+        )
+
+    @logger
+    def clean_greater_than_daily_data_in_table(self, enum, schema, dim_name, date_column, dt):
+        logger.info('m=clean_greater_than_daily_data_in_table, dim_name={}, msg=start query to clean.'.format(dim_name))
+
+        query = '''DELETE
+                    FROM {0}.{1}
+                    WHERE cast({2} as integer) BETWEEN
+                    cast(to_char('{3}'::DATE,'YYYYMMDD') as integer) and
+                    cast(to_char('{3}'::DATE + interval '21 days','YYYYMMDD') as integer)'''.format(schema, dim_name,
+                                                                                                    date_column,
+                                                                                                    str(dt))
 
         BaseETL.execute_command(
             db_enum=enum,
@@ -153,18 +173,18 @@ class Agent(object):
         )
 
     @logger
-    def insert_dummy(self, table_name, key_column, value='-1', previous_check=False):
+    def insert_dummy(self, table_name, key_column, value='-1', previous_check=False, schema='public'):
         if previous_check:
-            if not self.check_dummy_exists(enumdb=EnumDB.BI_DW, schema='public', table_name=table_name,
+            if not self.check_dummy_exists(enumdb=EnumDB.BI_DW, schema=schema, table_name=table_name,
                                            key_column=key_column):
                 BaseETL.execute_command(
-                    'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                    'insert into {}.{}({}) values ({});'.format(schema, table_name, key_column, value),
                     db_enum=EnumDB.BI_DW,
                     commit=True
                 )
         else:
             BaseETL.execute_command(
-                'insert into {}({}) values ({});'.format(table_name, key_column, value),
+                'insert into {}.{}({}) values ({});'.format(schema, table_name, key_column, value),
                 db_enum=EnumDB.BI_DW,
                 commit=True
             )
