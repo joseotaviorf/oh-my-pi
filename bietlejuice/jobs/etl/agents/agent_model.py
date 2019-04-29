@@ -2,12 +2,13 @@ import re
 from datetime import datetime
 
 import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR, DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, ODS_QUERIES_DIR, DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 
 logger = QuintoAndarLogger('Agent')
 
@@ -144,8 +145,9 @@ class Agent(object):
                     FROM {0}.{1}
                     WHERE cast({2} as integer) BETWEEN
                     cast(to_char('{3}'::DATE,'YYYYMMDD') as integer) and
-                    cast(to_char('{3}'::DATE + interval '7 days','YYYYMMDD') as integer)'''.format(schema, dim_name,
-                                                                                                   date_column, str(dt))
+                    cast(to_char('{3}'::DATE + interval '21 days','YYYYMMDD') as integer)'''.format(schema, dim_name,
+                                                                                                    date_column,
+                                                                                                    str(dt))
 
         BaseETL.execute_command(
             db_enum=enum,
