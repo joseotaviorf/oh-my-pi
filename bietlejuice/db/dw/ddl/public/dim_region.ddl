@@ -1,25 +1,23 @@
-drop table public.dim_region;
-
-CREATE TABLE public.dim_region (
-  sk_region INTEGER,
-  id INTEGER,
-  level VARCHAR(30),
-  name VARCHAR(100),
-  macro_id INTEGER,
-  macro_name VARCHAR(100),
-  city_id INTEGER,
-  city_name VARCHAR(100),
-  city_group VARCHAR(100),
-  region_code VARCHAR(10),
-  region_code_deprecated VARCHAR(10),
-  short_region_name VARCHAR(255),
-  long_region_name VARCHAR(510),
-  greater_region VARCHAR(255),
-  dt_created TIMESTAMP WITHOUT TIME ZONE,
-  dt_updated TIMESTAMP WITHOUT TIME ZONE,
-  dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  dt_first_property_created TIMESTAMP,
-  dt_first_booking TIMESTAMP,
-  days_from_first_booking INTEGER,
-  CONSTRAINT dim_region_pkey PRIMARY KEY(sk_region)
-) ;
+drop table if exists dim_region;
+create table if not exists dim_region (
+  sk_region integer,
+  id integer,
+  level varchar,
+  name varchar,
+  macro_id integer,
+  macro_name varchar,
+  city_id integer,
+  city_name varchar,
+  city_group varchar,
+  region_code varchar,
+  region_code_deprecated varchar,
+  short_region_name varchar,
+  long_region_name varchar(510),
+  greater_region varchar,
+  dt_created timestamp without time zone,
+  dt_updated timestamp without time zone,
+  dt_timestamp timestamp without time zone,
+  dt_first_property_created timestamp,
+  dt_first_booking timestamp,
+  days_from_first_booking integer
+);
