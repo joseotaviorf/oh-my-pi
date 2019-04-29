@@ -173,7 +173,7 @@ add_new_visits_table_partition_task = BaseDAG.build_python_operator(
     provide_context=True,
     op_kwargs={
         'schema': 'datalake_raw',
-        'table_name': 'region_code_visits_prediction'
+        'table_name': 'adjusted_visits_prediction'
     }
 )
 
