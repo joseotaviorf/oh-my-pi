@@ -1,15 +1,21 @@
 WITH doorman AS (
   SELECT
     d.*,
-    regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') as extracted_work_house_number,
-    trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city as formatted_address,
-    a.google_formatted_address,
-    a.lat,
-    a.lng,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+    END AS extracted_work_house_number,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_address
+      ELSE trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city
+    END AS formatted_address,
+    COALESCE(a.google_formatted_address, d.work_address) AS google_formatted_address,
+    COALESCE(a.lat, d.work_lat) AS lat,
+    COALESCE(a.lng, d.work_lng) AS lng,
     u.telefone_principal,
     u.nome,
     u.dadosafiliado_ativo,
-    CASE WHEN d.ts_joined_program != '' AND d.ts_joined_program IS NOT NULL THEN
+    CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
       CAST(d.ts_joined_program as timestamp)
     ELSE NULL END AS ts_joined_program_timestamp,
     leads.lead_activity
@@ -38,7 +44,14 @@ WITH doorman AS (
     ) AS leads
       ON u.sk_user = leads.sk_user
   WHERE
-    a.lat IS NOT NULL AND a.lat != ''
+    (
+      COALESCE(a.lat, '') != ''
+      AND COALESCE(a.lng, '') != ''
+      AND COALESCE(
+        regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+        , '') != ''
+    )
+    OR COALESCE(d.work_place_id, '') != ''
 ),
 phones AS (
 SELECT cpf, phone_number
@@ -51,10 +64,8 @@ FROM
   WHERE tipo = 'L') AS tmp
 WHERE row IN (1, 2)
 ),
-apts AS (
+apts_iptu_sp AS (
   SELECT
-    ea.numero_contribuinte,
-    ea.bldg_address_id,
     ea.numero_contribuinte || '/' || ea.cpf_cnpj AS property_person_id,
     ea.setor_quadra,
     ea.ano_construcao_corrigido,
@@ -72,12 +83,48 @@ apts AS (
     ea.complemento_imovel,
     geo.lat,
     geo.lng,
-    geo.geocoded_address AS google_formatted_address
+    geo.geocoded_address AS google_formatted_address,
+    'SP' as uf,
+    'São Paulo' as municipio
   FROM datalake_raw.external_sp_apts AS ea
   LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
     ON ea.bldg_address_id = geo.bldg_address_id
   WHERE ea.numero_imovel IS NOT NULL AND TRY_CAST(ea.numero_imovel AS INTEGER) IS NOT NULL
     AND geo.lat IS NOT NULL AND geo.lat != ''
+),
+apts_direct AS (
+  SELECT
+    i.direct_id || '/' || i.proprietario_cpf AS property_person_id,
+    NULL as setor_quadra,
+    NULL as ano_construcao_corrigido,
+    i.proprietario_cpf AS cpf_cnpj,
+    i.proprietario_nome AS nome_direct,
+    NULL as sexo,
+    NULL as idade,
+    NULL as obito,
+    NULL as qtd_ocorrencias,
+    NULL as contribuinte_1_ou_2,
+    NULL as tipo_contribuinte_1,
+    NULL as tipo_contribuinte_2,
+    a.formatted_address,
+    i.endereco_numero as numero_imovel,
+    i.endereco_complemento as complemento_imovel,
+    a.lat,
+    a.lng,
+    a.google_formatted_address,
+    i.uf,
+    i.municipio
+  FROM datalake_raw.external_iptu_owners i
+  JOIN datalake_raw.external_iptu_owners_addresses a ON i.direct_id = a.direct_id
+  WHERE
+    i.endereco_numero IS NOT NULL AND TRY_CAST(i.endereco_numero AS INTEGER) IS NOT NULL
+    AND COALESCE(a.lat, '') IS NOT NULL AND COALESCE(a.lat, '') != ''
+    AND COALESCE(i.proprietario_cpf, '') != ''
+),
+apts AS (
+  SELECT * FROM apts_iptu_sp
+  UNION ALL
+  SELECT * FROM apts_direct
 ),
 doorman_join_apts_owners AS (
   SELECT
@@ -129,4 +176,4 @@ SELECT
   a.*
 FROM apts a
 INNER JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
-ORDER BY a.bldg_address_id, a.complemento_imovel
+ORDER BY a.google_formatted_address, a.complemento_imovel

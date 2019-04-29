@@ -534,21 +534,37 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
 trigger_bi_growth_dag_task = TriggerDagRunOperator(
     dag=main_dag,
     task_id='trigger_bi_growth_dag',
-    trigger_dag_id='bi-growth'
+    trigger_dag_id='bi-growth',
+    execution_date='{{ execution_date }}'
+)
+
+# trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
+trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_agents_allocation_optimization_dag',
+    trigger_dag_id='bi-agents-allocation-optimization'
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
+
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
+
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
+                                        trigger_bi_agents_allocation_optimization_dag_task])
+
 house_dag.set_downstream([fact_photo_job, fact_house_status])
+
 photo_job_dag >> fact_photo_job
+
 fact_house_listings.set_upstream(
     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
+
 # new 'supply' flow
-ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
-airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
+dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
+                                          ods_house_listing_flows])
+
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
