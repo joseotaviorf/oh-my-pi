@@ -47,7 +47,7 @@ all_dates as (
     	+ dense_rank() over (partition by f.year order by f.sk_house desc)
 			- 1 as yearly_count
 	from fact_house_status_filter f
-	where f."date" < current_date and f.is_last_version = true and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
   order by 1, 2, 3, 4
 ),
 all_dates_last_week as (
