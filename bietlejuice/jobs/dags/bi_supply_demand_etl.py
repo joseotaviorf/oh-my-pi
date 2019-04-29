@@ -542,8 +542,7 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
 trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     dag=main_dag,
     task_id='trigger_bi_agents_allocation_optimization_dag',
-    trigger_dag_id='bi-agents-allocation-optimization',
-    execution_date='{{ execution_date }}'
+    trigger_dag_id='bi-agents-allocation-optimization'
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
