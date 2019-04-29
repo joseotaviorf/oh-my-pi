@@ -8,20 +8,18 @@ logger = QuintoAndarLogger('Redshift')
 
 
 class Redshift(object):
-    CLUSTER_SUBNET_GROUP_NAME = 'quintoandar-aux'
-    IAM_ROLES = ['arn:aws:iam::632540934959:role/SpectrumAccess']
-
     def __init__(self):
         self.redshift_client = boto3.client('redshift')
 
     @logger
-    def create_cluster_from_snapshot(self, source_cluster_id, target_cluster_id):
+    def create_cluster_from_snapshot(self, source_cluster_id, target_cluster_id, config_json):
         """Create an Amazon Redshift cluster from previous snapshot
 
         The function returns without waiting for the cluster to be fully created.
 
         :param source_cluster_id: string; Name of the cluster which contains the source snapshots
         :param target_cluster_id: string; Name to assign the cluster to be created
+        :param config_json: string; Json with parameters to be used in the creation of cluster
         """
         if self.check_if_cluster_exists(cluster_id=target_cluster_id):
             raise ValueError('cluster_id={},msg=Cluster already exists'.format(target_cluster_id))
@@ -37,8 +35,12 @@ class Redshift(object):
                         ClusterIdentifier=target_cluster_id,
                         SnapshotIdentifier=snapshot_id,
                         SnapshotClusterIdentifier=source_cluster_id,
-                        ClusterSubnetGroupName=self.CLUSTER_SUBNET_GROUP_NAME,
-                        IamRoles=self.IAM_ROLES)
+                        ClusterSubnetGroupName=config_json['CLUSTER_SUBNET_GROUP_NAME'],
+                        ClusterParameterGroupName=config_json['CLUSTER_PARAMETER_GROUP_NAME'],
+                        VpcSecurityGroupIds=config_json['VPC_SECURITY_GROUP_ID'],
+                        IamRoles=config_json['IAM_ROLES'],
+                        AvailabilityZone=config_json['AVAILABILITY_ZONE'],
+                        PubliclyAccessible=True)
             except Exception as e:
                 raise RuntimeError(
                     'cluster_id={0}, snapshot={1}, error={2}, msg=Not able to start cluster'.format(target_cluster_id,

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
@@ -9,6 +10,7 @@ from qa_python_utils import QuintoAndarLogger
 
 DW_PROD_ID = env.get_airflow_env_var('DW_PROD_ID')
 DW_FORNO_ID = env.get_airflow_env_var('DW_FORNO_ID')
+DW_FORNO_CONFIGS = json.loads(env.get_airflow_env_var('DW_FORNO_CONFIGS'))
 
 # global vars
 logger = QuintoAndarLogger('dw_forno')
@@ -29,9 +31,10 @@ def check_cluster_shutdown(target_cluster):
     rs_client.wait_for_cluster_shutdown(cluster_id=target_cluster)
 
 
-def create_cluster(source_cluster, target_cluster):
+def create_cluster(source_cluster, target_cluster, config_json):
     rs_client = Redshift()
-    rs_client.create_cluster_from_snapshot(source_cluster_id=source_cluster, target_cluster_id=target_cluster)
+    rs_client.create_cluster_from_snapshot(source_cluster_id=source_cluster, target_cluster_id=target_cluster,
+                                           config_json=config_json)
 
 
 def check_cluster_availability(target_cluster):
@@ -76,7 +79,8 @@ create_cluster_task = BaseDAG.build_python_operator(
     task_id='create_cluster',
     python_callable=create_cluster,
     op_kwargs={'source_cluster': 'quintoandar-bi',
-               'target_cluster': 'quintoandar-bi-forno-test'}
+               'target_cluster': 'quintoandar-bi-forno-test',
+               'config_json': DW_FORNO_CONFIGS}
 )
 
 check_cluster_availability_task = BaseDAG.build_python_operator(
