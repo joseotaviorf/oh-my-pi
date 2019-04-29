@@ -35,11 +35,11 @@ class Redshift(object):
                         ClusterIdentifier=target_cluster_id,
                         SnapshotIdentifier=snapshot_id,
                         SnapshotClusterIdentifier=source_cluster_id,
-                        ClusterSubnetGroupName=config_json['CLUSTER_SUBNET_GROUP_NAME'],
-                        ClusterParameterGroupName=config_json['CLUSTER_PARAMETER_GROUP_NAME'],
-                        VpcSecurityGroupIds=config_json['VPC_SECURITY_GROUP_ID'],
-                        IamRoles=config_json['IAM_ROLES'],
-                        AvailabilityZone=config_json['AVAILABILITY_ZONE'],
+                        ClusterSubnetGroupName=config_json.get('CLUSTER_SUBNET_GROUP_NAME'),
+                        ClusterParameterGroupName=config_json.get('CLUSTER_PARAMETER_GROUP_NAME'),
+                        VpcSecurityGroupIds=config_json.get('VPC_SECURITY_GROUP_ID'),
+                        IamRoles=config_json.get('IAM_ROLES'),
+                        AvailabilityZone=config_json.get('AVAILABILITY_ZONE'),
                         PubliclyAccessible=True)
             except Exception as e:
                 raise RuntimeError(
