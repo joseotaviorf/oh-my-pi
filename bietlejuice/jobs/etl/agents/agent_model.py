@@ -145,7 +145,7 @@ class Agent(object):
                     WHERE cast({2} as integer) BETWEEN
                     cast(to_char('{3}'::DATE,'YYYYMMDD') as integer) and
                     cast(to_char('{3}'::DATE + interval '21 days','YYYYMMDD') as integer)'''.format(schema, dim_name,
-                                                                                                   date_column, str(dt))
+                                                                                                    date_column, str(dt))
 
         BaseETL.execute_command(
             db_enum=enum,
