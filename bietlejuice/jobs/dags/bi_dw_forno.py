@@ -64,22 +64,22 @@ shutdown_cluster_cluster_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='shutdown_cluster',
     python_callable=shutdown_cluster,
-    op_kwargs={'target_cluster': 'quintoandar-bi-forno-test'}
+    op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
 check_cluster_shutdown_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_shutdown',
     python_callable=check_cluster_shutdown,
-    op_kwargs={'target_cluster': 'quintoandar-bi-forno-test'}
+    op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
 create_cluster_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_cluster',
     python_callable=create_cluster,
-    op_kwargs={'source_cluster': 'quintoandar-bi',
-               'target_cluster': 'quintoandar-bi-forno-test',
+    op_kwargs={'source_cluster': DW_PROD_ID,
+               'target_cluster': DW_FORNO_ID,
                'config_json': DW_FORNO_CONFIGS}
 )
 
@@ -87,21 +87,21 @@ check_cluster_availability_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_availability',
     python_callable=check_cluster_availability,
-    op_kwargs={'target_cluster': 'quintoandar-bi-forno-test'}
+    op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
 scale_down_cluster_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='scale_down_cluster',
     python_callable=scale_down_cluster,
-    op_kwargs={'target_cluster': 'quintoandar-bi-forno-test'}
+    op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
 check_cluster_scaled_down_availability_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_scaled_down_availability',
     python_callable=check_cluster_availability,
-    op_kwargs={'target_cluster': 'quintoandar-bi-forno-test'}
+    op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
 # Tasks Flow

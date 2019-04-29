@@ -71,9 +71,6 @@ class Redshift(object):
         :param cluster_id: string; Cluster identifier
         :return string; Latest Snapshot Identifier
         """
-        # TODO
-        # Get only last day snapshot
-
         snapshot_list = []
 
         try:
