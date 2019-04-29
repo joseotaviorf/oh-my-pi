@@ -563,8 +563,8 @@ fact_house_listings.set_upstream(
     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
 
 # new 'supply' flow
-ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
-airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
+dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
+                                          ods_house_listing_flows])
 
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
