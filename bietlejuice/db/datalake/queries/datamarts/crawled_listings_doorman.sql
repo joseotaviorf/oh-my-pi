@@ -40,7 +40,7 @@ WITH listings AS (
         state,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal')
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
     ) as tmp
   WHERE

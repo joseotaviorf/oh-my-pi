@@ -15,7 +15,7 @@ WITH listings AS (
         url,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal')
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
     ) as tmp
   WHERE
@@ -85,6 +85,7 @@ listings_join_doorman AS
 (
   SELECT
     d.id_user_doorman,
+    count(l.id) AS listing_count,
     array_agg(l.id) AS listing_id,
     array_agg(l.crawled_on) AS listing_crawled_on,
     array_agg(l.updated_on) AS listing_listing_date,
