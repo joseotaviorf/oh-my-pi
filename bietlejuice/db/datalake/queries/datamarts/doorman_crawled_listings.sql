@@ -88,10 +88,7 @@ listings_join_doorman AS
     count(l.id) AS listing_count,
     array_agg(l.id) AS listing_id,
     array_agg(l.crawled_on) AS listing_crawled_on,
-    array_agg(l.updated_on) AS listing_listing_date,
-    array_agg(l.type) AS listing_type,
-    array_agg(l.advertiser_name) AS listing_advertiser_name,
-    array_agg(l.url) AS listing_url
+    array_agg(l.updated_on) AS listing_listing_date
   FROM doorman AS d
   JOIN listings AS l
   ON
