@@ -3,8 +3,7 @@ fact_house_status_filter as (
 -- new step so we can filter last version and also last status (in case there are two status in the same day)
 select
     fhs.*,
-    rank() over(partition by dd.week_start, fhs.sk_house order by coalesce(fhs.sk_max_status_date, to_char(current_date -1, 'YYYYMMDD')::bigint) desc) as rk,
-    dh.is_last_version,
+    rank() over(partition by dd.date, fhs.sk_house order by fhs.sk_min_status_date asc) as rk,
     dd.date,
     dd.year,
     dd.month,
@@ -61,7 +60,7 @@ all_dates_last_month as (
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_house) as monthly_count
 	from fact_house_status_filter f
-	where f."date" < current_date and f.is_last_version = true and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
 		and f.year = date_part('year', add_months(current_date, -1))
   	and f.month = date_part('month', add_months(current_date, -1))
   	and f.day < date_part('day', current_date)
@@ -75,7 +74,7 @@ all_dates_last_year as (
 	  'QuintoAndar'::varchar as city,
   	count(distinct f.sk_house) as yearly_count
 	from fact_house_status_filter f
-	where f."date" < current_date and f.is_last_version = true and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
 	  and f.year = date_part('year', add_months(current_date, -12))
   		and ((f.month = date_part('month', add_months(current_date, -12))
   		      and f.day < date_part('day', add_months(current_date, -12)))
