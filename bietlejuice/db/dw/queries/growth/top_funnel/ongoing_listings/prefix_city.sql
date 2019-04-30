@@ -3,7 +3,6 @@ fact_house_status_filter as (
 -- new step so we can filter last version and also last status (in case there are two status in the same day)
 select
     fhs.*,
-    rank() over(partition by dd.date, fhs.sk_house order by fhs.sk_min_status_date asc) as rk,
     dd.date,
     dd.year,
     dd.month,
@@ -11,7 +10,7 @@ select
     dd.day
 from fact_house_status fhs
 join dim_date dd
-		on dd.sk_date between fhs.sk_min_status_date and coalesce(fhs.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+		on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 left join dim_house_listing dh
   on fhs.sk_house = dh.sk_house_listing
 ),
@@ -56,7 +55,7 @@ all_dates as (
 	from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.status_history = 'publicado'
   order by 6, 1, 2, 3, 4
 ),
 all_dates_last_week as (
@@ -72,7 +71,7 @@ all_dates_last_month as (
 	from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.status_history = 'publicado'
 		and f.year = date_part('year', add_months(current_date, -1))
     and f.month = date_part('month', add_months(current_date, -1))
   	and f.day < date_part('day', current_date)
@@ -88,7 +87,7 @@ all_dates_last_year as (
   from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where f."date" < current_date and f.rk = 1 and f.status_history = 'publicado'
+	where f."date" < current_date and f.status_history = 'publicado'
     and f.year = date_part('year', add_months(current_date, -12))
   		and ((f.month = date_part('month', add_months(current_date, -12))
   		      and f.day < date_part('day', add_months(current_date, -12)))
