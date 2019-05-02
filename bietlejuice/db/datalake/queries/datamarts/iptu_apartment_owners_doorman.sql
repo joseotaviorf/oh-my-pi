@@ -94,17 +94,17 @@ apts_iptu_sp AS (
 ),
 apts_direct AS (
   SELECT
-    i.direct_id || '/' || i.proprietario_cpf AS property_person_id,
+    i.direct_id || '/' || i.proprietario_cpf_cnpj AS property_person_id,
     NULL as setor_quadra,
     NULL as ano_construcao_corrigido,
-    i.proprietario_cpf AS cpf_cnpj,
+    i.proprietario_cpf_cnpj AS cpf_cnpj,
     i.proprietario_nome AS nome_direct,
     NULL as sexo,
     NULL as idade,
     NULL as obito,
     NULL as qtd_ocorrencias,
     NULL as contribuinte_1_ou_2,
-    NULL as tipo_contribuinte_1,
+    proprietario_tipo as tipo_contribuinte_1,
     NULL as tipo_contribuinte_2,
     a.formatted_address,
     i.endereco_numero as numero_imovel,
@@ -119,7 +119,7 @@ apts_direct AS (
   WHERE
     i.endereco_numero IS NOT NULL AND TRY_CAST(i.endereco_numero AS INTEGER) IS NOT NULL
     AND COALESCE(a.lat, '') IS NOT NULL AND COALESCE(a.lat, '') != ''
-    AND COALESCE(i.proprietario_cpf, '') != ''
+    AND COALESCE(i.proprietario_cpf_cnpj, '') != ''
 ),
 apts AS (
   SELECT * FROM apts_iptu_sp
