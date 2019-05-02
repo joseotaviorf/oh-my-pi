@@ -107,15 +107,19 @@ queue_started as (
 ),
 queue_num_set as (
 	select
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 2) as id_call,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 3) as id_phase,
-		'queue' as phase,  
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 6) as id_phase,
+		case
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='SIP' then 'ura'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='Local' then 'queue'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='PJSIP' then 'attendance'
+		end as phase,
 		'queue_number_set' as name,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 4) as params,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 1) as ts_created,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 8) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 1) as ts_created,
 		now() as ts_load
 	from asterisk_data
-	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"')=true	
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"')=true
 	group by 1,2,3,4,5,6,7
 ),
 crm_destination_set as ( -- only to calls made by agents
