@@ -17,3 +17,4 @@ from bietlejuice.jobs.dags.supply_demand_funnel.proposal_subdag import ProposalS
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.inspection_subdag import InspectionSubDag
