@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -13,10 +17,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
-logger = QuintoAndarLogger('SupplyDemandFunnel')
+logger = QuintoAndarLogger('bi-supply-demand-etl')
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'GODFATHER')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -333,21 +335,6 @@ ods_house_rent_flow = BaseDAG.build_python_operator(
     op_kwargs={'table_name': 'house_rent_flow'}
 )
 
-ods_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='ODS_supply',
-    provide_context=True,
-    python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'fact_supply'}
-)
-
-fact_supply = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='DW_Fact_Supply',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'supply', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-)
-
 fact_house_listings = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_House_Listings',
@@ -539,23 +526,47 @@ xcom_booking_amplitude_task = BaseDAG.build_python_operator(
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
                'dag_id': 'bi-amplitude-load-events'},
     retry_delay=timedelta(minutes=10),
-    max_retry_delay=timedelta(minutes=10)
+    max_retry_delay=timedelta(minutes=10),
+    retries=10
+)
+
+# trigger bi-growth dag after all tasks have been successfully completed
+trigger_bi_growth_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_growth_dag',
+    trigger_dag_id='bi-growth',
+    execution_date='{{ execution_date }}'
+)
+
+# trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
+trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_agents_allocation_optimization_dag',
+    trigger_dag_id='bi-agents-allocation-optimization'
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
-ods_supply.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
+
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
-airflow_helpers.chain(ods_supply, fact_supply)
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows])
+
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
+                                        trigger_bi_agents_allocation_optimization_dag_task])
+
 house_dag.set_downstream([fact_photo_job, fact_house_status])
+
 photo_job_dag >> fact_photo_job
+
 fact_house_listings.set_upstream(
     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
+
 # new 'supply' flow
-ods_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag])
-airflow_helpers.chain(ods_house_listing_flows, dw_fact_house_listing_flows)
+dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
+                                          ods_house_listing_flows])
+
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
+
+trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])

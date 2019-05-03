@@ -24,15 +24,6 @@ class TestGrowth(object):
         assert mock_get_query_from_file_name.call_count == 1
         assert 'measure_no_filters.sql' in mock_get_query_from_file_name.call_args[0][0]
 
-    @mock.patch.object(BaseETL, 'get_query_from_file_name', return_value=mock.ANY)
-    def test_get_employee_all_query(self, mock_get_employee_all_query, growth):
-        # act
-        result = growth.get_employee_all_query()
-
-        # assert
-        assert mock_get_employee_all_query.call_count == 1
-        assert 'team_all.sql' in mock_get_employee_all_query.call_args[0][0]
-
     @mock.patch.object(Growth, 'drop_table')
     @mock.patch.object(Growth, '_execute_file_query')
     def test_load_fact(self, mock__execute_file_query, mock_drop_table, growth):
