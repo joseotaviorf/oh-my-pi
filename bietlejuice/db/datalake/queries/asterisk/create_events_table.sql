@@ -5,10 +5,11 @@ with asterisk_data as (
 ids_calls as (
 	select
 		min(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 1)) as ts_created,
+		date(cast(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 1) as timestamp)) as dt_created,
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 2) as id_call
 	from asterisk_data
 	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)')=true
-	group by 2
+	group by 2,3
 ),
 first_event_started as (
 	select
