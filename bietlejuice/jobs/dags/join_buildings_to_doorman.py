@@ -66,7 +66,7 @@ def geocode_doorman(**kwargs):
             print('---> no addresses to geocode.')
 
 
-def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date, final_sql):
+def load_data_and_upload_to_carto(sql_filename, carto_table_name, final_sql, **kwargs):
     # FIXME: hardcoded folder path
     file_name = '{}/carto/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
     logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
@@ -76,7 +76,7 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, execution_date
         sql=query,
         paginate=False,
         page_size=0,
-        query_params={'dt': execution_date})
+        query_params={'dt': kwargs['execution_date'].strftime('%Y-%m-%d')})
 
     csv_file_path = '/var/tmp/{}.csv'.format(sql_filename)
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
@@ -134,19 +134,14 @@ geocode_doorman_dag = BaseDAG.build_python_operator(
 # TEMP:
 operators = []
 
-for task in tasks:
-    def callable(**kwargs):
-        load_data_and_upload_to_carto(
-            sql_filename=task['carto_table_name'],
-            carto_table_name=task['carto_table_name'],
-            execution_date=kwargs['execution_date'].strftime('%Y-%m-%d'),
-            final_sql=task['final_sql']
-        )
 
+for task in tasks:
     operator = BaseDAG.build_python_operator(
         dag=dag,
         task_id=task['carto_table_name'],
-        python_callable=callable,
+        python_callable=load_data_and_upload_to_carto,
+        op_kwargs={'sql_filename': task['carto_table_name'], 'carto_table_name': task['carto_table_name'],
+                   'final_sql': task['final_sql']},
         provide_context=True
     )
 
