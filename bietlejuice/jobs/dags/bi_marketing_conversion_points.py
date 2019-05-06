@@ -272,6 +272,22 @@ load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
                'file_name': 'fact_marketing_daily_costs'}
 )
 
+load_fact_daily_supply_conversion_points_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='load_fact_daily_supply_conversion_points',
+    python_callable=move_file_query_data_to_dw,
+    op_kwargs={'schema': 'marketing',
+               'file_name': 'fact_daily_supply_conversion_points'}
+)
+
+load_fact_daily_demand_conversion_points_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='load_fact_daily_demand_conversion_points',
+    python_callable=move_file_query_data_to_dw,
+    op_kwargs={'schema': 'marketing',
+               'file_name': 'fact_daily_demand_conversion_points'}
+)
+
 # flow
 airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_active_user_sessions_sub_dag,
                       taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag,
@@ -281,4 +297,5 @@ airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_acti
                       create_conversion_points_supply_daily_task, create_conversion_points_demand_daily_task,
                       create_conversion_points_supply_weekly_task, create_conversion_points_demand_weekly_task,
                       create_conversion_points_supply_monthly_task, create_conversion_points_demand_monthly_task,
-                      load_fact_marketing_daily_costs_task)
+                      load_fact_marketing_daily_costs_task, load_fact_daily_supply_conversion_points_task,
+                      load_fact_daily_demand_conversion_points_task)
