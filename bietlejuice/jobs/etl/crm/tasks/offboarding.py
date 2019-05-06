@@ -6,6 +6,10 @@ logger = QuintoAndarLogger('CRMTasksOffboarding')
 
 
 class CRMTasksOffboarding(CRMTasks):
+    QUEUES = [
+        'EncerrarContrato'
+    ]
+
     MANUAL_TASK_WORKGROUP_IDS = [
         'DEP_OFFBOARDING_2',
         'DEP_OFFBOARDING_ID',
@@ -34,6 +38,7 @@ class CRMTasksOffboarding(CRMTasks):
     def move_fact_to_staging(self):
         self._move_fact_to_staging(
             table_name=CRMTasksOffboarding.TABLE_NAMES['fact'],
+            queues=CRMTasksOffboarding.QUEUES,
             manual_task_workgroups=CRMTasksOffboarding.MANUAL_TASK_WORKGROUP_IDS,
             append_query_filename=CRMTasksOffboarding.QUERY_FILENAMES['staging']
         )
@@ -42,6 +47,7 @@ class CRMTasksOffboarding(CRMTasks):
     def move_dim_to_staging(self):
         self._move_dim_to_staging(
             table_name=CRMTasksOffboarding.TABLE_NAMES['dim'],
+            queues=CRMTasksOffboarding.QUEUES,
             manual_task_workgroups=CRMTasksOffboarding.MANUAL_TASK_WORKGROUP_IDS
         )
 

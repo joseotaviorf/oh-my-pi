@@ -1,26 +1,71 @@
 WITH listings AS (
-  SELECT *
-    FROM
-    (SELECT *, ROW_NUMBER() OVER(PARTITION BY id ORDER BY DATE(crawled_on) ASC) AS row
-    FROM datalake_clean.crawlers
-    WHERE ws='imovelweb'
-      AND advertiser_name != 'quintoandar'
+  SELECT
+    *
+  FROM
+    (
+      SELECT
+        ws || '-' || id AS id,
+        website,
+        url,
+        crawled_on,
+        updated_on,
+        business,
+        type,
+        advertiser_name,
+        advertiser_type,
+        advertiser_id,
+        phones,
+        price,
+        rent,
+        condominium,
+        iptu,
+        total_area,
+        useful_area,
+        bedrooms,
+        suites,
+        toilets,
+        garages,
+        photos,
+        unit_features,
+        common_features,
+        complementary_info,
+        year_building,
+        cep,
+        lat,
+        lng,
+        street,
+        nb_street,
+        neighborhood,
+        city,
+        state,
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+      FROM datalake_clean.crawlers
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
+        AND advertiser_name != 'quintoandar'
     ) as tmp
-  WHERE row = 1
-  -- get only the first time a listing was crawled
+  WHERE
+    row = 1
+    -- get only the first time a listing was posted
+    AND DATE(updated_on) >= current_date - interval '30' day
 ),
 doorman AS (
   SELECT
     d.*,
-    regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') as extracted_work_house_number,
-    trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city as formatted_address,
-    a.google_formatted_address,
-    a.lat,
-    a.lng,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+    END AS extracted_work_house_number,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_address
+      ELSE trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city
+    END AS formatted_address,
+    COALESCE(a.google_formatted_address, d.work_address) AS google_formatted_address,
+    COALESCE(a.lat, d.work_lat) AS lat,
+    COALESCE(a.lng, d.work_lng) AS lng,
     u.telefone_principal,
     u.nome,
     u.dadosafiliado_ativo,
-    CASE WHEN d.ts_joined_program != '' AND d.ts_joined_program IS NOT NULL THEN
+    CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
       CAST(d.ts_joined_program as timestamp)
     ELSE NULL END AS ts_joined_program_timestamp,
     leads.lead_activity
@@ -48,8 +93,15 @@ doorman AS (
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads
       ON u.sk_user = leads.sk_user
-  WHERE work_city = 'São Paulo'
-    AND a.lat IS NOT NULL
+  WHERE
+    (
+      COALESCE(a.lat, '') != ''
+      AND COALESCE(a.lng, '') != ''
+      AND COALESCE(
+        regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+        , '') != ''
+    )
+    OR COALESCE(d.work_place_id, '') != ''
 ),
 listings_join_doorman AS
 (
@@ -122,7 +174,6 @@ SELECT
   l.toilets,
   l.garages,
   l.photos,
-  l.description,
   l.unit_features,
   l.common_features,
   l.complementary_info,

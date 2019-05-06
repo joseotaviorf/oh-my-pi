@@ -31,8 +31,11 @@ class TrovitCampaigns(Marketing):
             job_name=job_name,
             job_queue=job_queue,
             job_definition='scrap-marketing-data:1',
-            command=['scrapy', 'crawl', 'trovit', '-a', 'start_date={}'.format(start_date), '-a',
-                     'end_date={}'.format(start_date)]
+            command=['scrapy', 'crawl', 'trovit',
+                     '-a', 'start_date={}'.format(start_date),
+                     '-a', 'end_date={}'.format(start_date),
+                     '-o', 's3://5a-datalake/raw/marketing/trovit_campaigns/acc={}/dt={}/data.gz'.format('default',
+                                                                                                         start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
@@ -51,7 +54,9 @@ class TrovitCampaigns(Marketing):
             ('id', str),
             ('name', str),
             ('clicks', str),
-            ('cost', str),
+            ('desktop_cost', str),
+            ('mobile_cost', str),
+            ('total_cost', str),
             ('curr_date', str)
         ])
 

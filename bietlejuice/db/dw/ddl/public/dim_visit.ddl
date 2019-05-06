@@ -1,16 +1,15 @@
-DROP TABLE IF EXISTS public.dim_visit;
-CREATE TABLE public.dim_visit (
-  sk_visit INTEGER,
-  id_visit INTEGER,
-  cd_visit VARCHAR(12),
-  day_visit DATE,
-  slot INTEGER,
-  slot_count INTEGER,
-  type INTEGER,
-  status VARCHAR(50),
-  booking_type VARCHAR(100),
-  dt_created TIMESTAMP,
-  dt_updated TIMESTAMP,
-  dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
-  CONSTRAINT dim_visit_pkey PRIMARY KEY(sk_visit)
-) ;
+drop table if exists dim_visit;
+create table if not exists dim_visit (
+  sk_visit integer,
+  id_visit integer,
+  cd_visit varchar(200),
+  day_visit date,
+  slot integer,
+  slot_count integer,
+  type integer,
+  status varchar(50),
+  booking_type varchar(255),
+  dt_created timestamp,
+  dt_updated timestamp,
+  dt_timestamp timestamp without time zone
+);

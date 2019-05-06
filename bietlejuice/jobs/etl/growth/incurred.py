@@ -1,7 +1,8 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Growth')
 
@@ -24,11 +25,6 @@ class Growth(object):
     @logger
     def get_measure_no_filters_query():
         return BaseETL.get_query_from_file_name('{}/measure_no_filters.sql'.format(Growth.QUERIES_DIR))
-
-    @staticmethod
-    @logger
-    def get_employee_all_query():
-        return BaseETL.get_query_from_file_name('{}/top_funnel/employees/team_all.sql'.format(Growth.QUERIES_DIR))
 
     @logger
     def load_fact(self):
