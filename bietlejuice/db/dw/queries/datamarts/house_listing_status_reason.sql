@@ -11,15 +11,12 @@ select
 	    else 'unknown'
 		end status_reason,
     rev.motivo as status_reason_2,
-    date(timestamp 'epoch' + (cast(rev.timestamp as bigint)/1000)* interval '1 second') as date_change_suspension_reason--,
-    --row_number() over (partition by im.id, im.status, status_reason order by date_change_suspension_reason) as rn
+    date(timestamp 'epoch' + (cast(rev.timestamp as bigint)/1000)* interval '1 second') as date_change_suspension_reason
 from datalake_raw.ebdb_imovel_aud im
 join datalake_raw.ebdb_usuariorevisionentity rev on im.rev=rev.id
 where
 	(suspensionreason_mod = 1 and im.status = 'suspenso')
 	or (unpublishedreason_mod = 1 and im.status = 'despublicado')
-	--im.suspensionreason is not null then im.suspensionreason
-	 --   when im.unpublishedreason is not null then im.unpublishedreason
 ),
 aux_query as
 (select
