@@ -65,7 +65,7 @@ class RedshiftClient(object):
             logger.info('m=check_if_cluster_exists, cluster_id={0}, msg=Cluster exists'.format(cluster_id))
             return True
         except ClientError as e:
-            logger.info(
+            logger.error(
                 'm=check_if_cluster_exists, cluster_id={0}, error={1}, msg=Cluster does not exists'.format(cluster_id,
                                                                                                            e.message))
             return False
