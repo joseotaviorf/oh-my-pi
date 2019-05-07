@@ -150,6 +150,20 @@ class RedshiftClient(object):
                 'msg=Timeout waiting for cluster to became available'.format(cluster_id, e.message))
 
     @logger
+    def wait_for_cluster_restore(self, cluster_id):
+        """Wait for Amazon Redshift cluster to restore itself
+
+        :param cluster_id: string; Cluster name to monitor
+        """
+        waiter = self.redshift_client.get_waiter('cluster_restored')
+        try:
+            waiter.wait(ClusterIdentifier=cluster_id)
+        except Exception as e:
+            raise RuntimeError(
+                'm=wait_for_cluster_availability, cluster_id={0}, error={1}, '
+                'msg=Timeout waiting for cluster to be restored'.format(cluster_id, e.message))
+
+    @logger
     def wait_for_cluster_shutdown(self, cluster_id):
         """Wait for Amazon Redshift cluster to shutdown
 
