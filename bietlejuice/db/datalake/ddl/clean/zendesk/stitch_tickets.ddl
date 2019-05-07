@@ -26,7 +26,6 @@ create external table if not exists datalake_clean.stitch_zendesk_tickets (
     description string,
     recipient string,
     is_public string,
-    ts_last_received string,
     ts_created string,
     ts_created_local string,
     ts_updated string,
