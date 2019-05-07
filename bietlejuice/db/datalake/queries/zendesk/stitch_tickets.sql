@@ -17,7 +17,7 @@ select
     satisfaction_rating,
     url as ticket_url,
     priority,
-    satisfaction_rating as score, -- to do: extract value from json
+    regexp_extract(via, '\{"score":"(\w+)".+', 1) as score,
     raw_subject,
     subject,
     regexp_extract(via, '\{"channel":"(\w+)".+', 1) as channel,
@@ -29,7 +29,8 @@ select
     collaborator_ids,
     brand_id,
     submitter_id,
-    custom_fields as forum_topic_id, -- to do: extract value from json
+    custom_fields,
+    status,
     has_incidents,
     type,
     allow_channelback,
