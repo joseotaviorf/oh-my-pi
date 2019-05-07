@@ -15,7 +15,7 @@ from qa_python_utils import QuintoAndarLogger
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-MAIN_DAG_NAME = 'bi-marketing-conversion-points'
+MAIN_DAG_NAME = 'bi-marketing-funnels-conversions'
 MAIN_START_DATE = datetime(2019, 1, 5)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 7 * * *')
 
@@ -272,20 +272,20 @@ load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
                'file_name': 'fact_marketing_daily_costs'}
 )
 
-load_fact_daily_supply_conversion_points_task = BaseDAG.build_python_operator(
+load_fact_daily_supply_funnel_conversions_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='load_fact_daily_supply_conversion_points',
+    task_id='load_fact_daily_supply_funnel_conversions',
     python_callable=move_file_query_data_to_dw,
     op_kwargs={'schema': 'marketing',
-               'file_name': 'fact_daily_supply_conversion_points'}
+               'file_name': 'fact_daily_supply_funnel_conversions'}
 )
 
-load_fact_daily_demand_conversion_points_task = BaseDAG.build_python_operator(
+load_fact_daily_demand_funnel_conversions_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='load_fact_daily_demand_conversion_points',
+    task_id='load_fact_daily_demand_funnel_conversions',
     python_callable=move_file_query_data_to_dw,
     op_kwargs={'schema': 'marketing',
-               'file_name': 'fact_daily_demand_conversion_points'}
+               'file_name': 'fact_daily_demand_funnel_conversions'}
 )
 
 # flow
@@ -297,5 +297,5 @@ airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_acti
                       create_conversion_points_supply_daily_task, create_conversion_points_demand_daily_task,
                       create_conversion_points_supply_weekly_task, create_conversion_points_demand_weekly_task,
                       create_conversion_points_supply_monthly_task, create_conversion_points_demand_monthly_task,
-                      load_fact_marketing_daily_costs_task, load_fact_daily_supply_conversion_points_task,
-                      load_fact_daily_demand_conversion_points_task)
+                      load_fact_marketing_daily_costs_task, load_fact_daily_supply_funnel_conversions_task,
+                      load_fact_daily_demand_funnel_conversions_task)

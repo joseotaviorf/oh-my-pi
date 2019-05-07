@@ -218,7 +218,7 @@ UNION
 )
 select 
 sk_date,
-side,
+side as funnel_side,
 account_name,
 campaign_name,
 city_group_final as city_group,

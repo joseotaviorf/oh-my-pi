@@ -1,9 +1,6 @@
-DROP TABLE if EXISTS marketing.fact_marketing_daily_costs;
-CREATE TABLE if NOT EXISTS marketing.fact_marketing_daily_costs (
+DROP TABLE if EXISTS marketing.fact_daily_supply_funnel_conversions;
+CREATE TABLE if NOT EXISTS marketing.fact_daily_supply_funnel_conversions (
     sk_date integer,
-    funnel_side varchar(16),
-    account_name varchar(512),
-    campaign_name varchar(512),
     city_group varchar,
     mkt_category varchar,
     mkt_flow varchar,
@@ -16,6 +13,10 @@ CREATE TABLE if NOT EXISTS marketing.fact_marketing_daily_costs (
     utm_term varchar(512),
     utm_content varchar(512),
     cost numeric(16,4),
+    total_daily_sessions integer,
+    total_daily_active_users integer,
+    total_daily_leads integer,
+    total_daily_listings integer,
     ts_load timestamp
 )
 ;

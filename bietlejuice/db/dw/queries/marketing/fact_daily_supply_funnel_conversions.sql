@@ -14,7 +14,7 @@ with fact as  (
 		utm_content,
 		sum(coalesce(cost,0)) as cost
 	from marketing.fact_marketing_daily_costs
-	where side = 'supply'
+	where funnel_side = 'supply'
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 s_cube as (
