@@ -21,7 +21,7 @@ class InspectionSubDag(DimSubDag):
         )
 
     @logger
-    def build_user_with_tests(self):
+    def build_inspection_with_tests(self):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, self.ods_stg_table_name)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
 
