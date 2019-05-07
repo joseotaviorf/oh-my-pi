@@ -42,5 +42,8 @@ create table if not exists inspection (
   id_booking bigint,
   schedule_observations text,
   report_revised varchar(50),
-  is_schedule_double_checked integer
+  is_schedule_double_checked integer,
+  has_inspector_comment integer,
+  has_tenant_comment integer,
+  has_owner_comment integer
 );

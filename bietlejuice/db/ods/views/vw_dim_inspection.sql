@@ -9,6 +9,9 @@ select
   ts_expired,
   is_tenant_approved::boolean,
   is_owner_approved::boolean,
+  coalesce(has_inspector_comment::boolean, false) as has_inspector_comment,
+  coalesce(has_tenant_comment::boolean, false) as has_tenant_comment,
+  coalesce(has_owner_comment::boolean, false) as has_owner_comment,
   now()::timestamp as ts_load
 from inspection
 ;

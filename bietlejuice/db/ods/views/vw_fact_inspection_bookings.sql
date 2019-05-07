@@ -41,9 +41,6 @@ select
   coalesce(to_char(insp.ts_tenant_approved, 'YYYYMMDD')::integer, -1) as sk_tenant_approved_date,
   coalesce(to_char(insp.ts_owner_approved, 'YYYYMMDD')::integer, -1) as sk_owner_approved_date,
   coalesce(retries, 0) as booking_retries,
-  coalesce(pc.has_inspector_comment, false) as has_inspector_comment,
-  coalesce(pc.has_tenant_comment, false) as has_tenant_comment,
-  coalesce(pc.has_owner_comment, false) as has_owner_comment,
   now()::timestamp as ts_load
 from inspection insp
 left join booking b

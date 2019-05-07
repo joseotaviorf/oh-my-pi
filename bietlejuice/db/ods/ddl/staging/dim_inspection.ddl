@@ -8,5 +8,8 @@ create table if not exists staging.dim_inspection (
   ts_expired timestamp,
   is_tenant_approved boolean,
   is_owner_approved boolean,
+  has_inspector_comment boolean,
+  has_tenant_comment boolean,
+  has_owner_comment boolean,
   ts_load timestamp
 );
