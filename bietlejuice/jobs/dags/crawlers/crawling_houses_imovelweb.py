@@ -1,9 +1,10 @@
 import json
-import pandas as pd
 import re
-from airflow.models import DAG
 from collections import OrderedDict
 from datetime import datetime, timedelta
+
+import pandas as pd
+from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.batch import BatchClient
 
@@ -38,6 +39,7 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
+        memory=6144,
         command=['./crawlers/imovelweb_crawler.py', '--max_crawl', str(max_crawl), '--start_dt', str(start_dt),
                  '--states'] + states
     )

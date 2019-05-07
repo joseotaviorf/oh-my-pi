@@ -2,13 +2,14 @@ import os
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
@@ -26,10 +27,10 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 
 # functions
 @logger
-def create_datamart(table_name, **kwargs):
-    query = BaseETL.get_query_from_file_name('{}/datamarts/{}.sql'.format(DW_QUERIES_DIR, table_name))
+def create_datamart_from_dw(table_name, **kwargs):
+    query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
-    logger.info('m=create_datamart, table_name={}, msg=Dropping table'.format(table_name))
+    logger.info('m=create_datamart_from_dw, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
         command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
         db_enum=EnumDB.BI_DW,
@@ -37,12 +38,50 @@ def create_datamart(table_name, **kwargs):
         commit=True
     )
 
-    logger.info('m=create_datamart, table_name={}, msg=Creating table'.format(table_name))
+    logger.info('m=create_datamart_from_dw, table_name={}, msg=Creating table'.format(table_name))
     BaseETL.execute_command(
         command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', '')),
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
+    )
+
+
+def create_datamart_from_athena(table_name, **kwargs):
+    athena = AthenaClient(s3_bucket)
+    query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
+
+    logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
+    BaseETL.execute_command(
+        command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
+        db_enum=EnumDB.BI_DW,
+        encoding='utf-8',
+        commit=True
+    )
+
+    logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+    df = athena.execute_query_and_return_dataframe(
+        sql=query,
+        query_params={'dt': execution_date}
+    )
+
+    logger.info('m=create_datamart_from_athena, table_name={}, msg=Creating table in datamart'.format(table_name))
+    BaseETL.create_table_from_dataframe(
+        enum_db=EnumDB.BI_DW,
+        df=df,
+        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
+        encoding='utf-8',
+    )
+
+    logger.info('m=create_datamart_from_athena, table_name={}, msg=Writing data to datamart'.format(table_name))
+    BaseETL.dataframe_to_db(
+        enum_db=EnumDB.BI_DW,
+        df=df,
+        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
+        encoding='utf-8',
+        append=False,
+        bucket_name=s3_bucket
     )
 
 
@@ -61,25 +100,31 @@ main_dag = DAG(
 )
 
 # operators
-'''
-Gets all files from DW_QUERIES_DIR/datamarts and creates a table using the filename
-'''
-for filename in os.listdir('{}/{}'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA)):
-    filename_split = filename.split('.')
+operators = [
+    {'queries_dir': DW_QUERIES_DIR, 'python_callable': create_datamart_from_dw, 'db': 'dw'},
+    {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena, 'db': 'athena'}
+]
 
-    if len(filename_split) < 1:
-        logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
-        continue
+for operator in operators:
+    '''
+    Gets all files from queries_dir/datamarts/ and creates a table using the filename
+    '''
+    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
+        filename_split = filename.split('.')
 
-    if filename_split[1] != 'sql':
-        logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
-        continue
+        if len(filename_split) < 1:
+            logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
+            continue
 
-    table_name = filename_split[0]
-    PythonOperator(
-        task_id=table_name,
-        provide_context=True,
-        python_callable=create_datamart,
-        dag=main_dag,
-        op_kwargs={'table_name': table_name}
-    )
+        if filename_split[1] != 'sql':
+            logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
+            continue
+
+        table_name = filename_split[0]
+        BaseDAG.build_python_operator(
+            dag=main_dag,
+            task_id='{}_{}'.format(operator['db'], table_name),
+            provide_context=True,
+            python_callable=operator['python_callable'],
+            op_kwargs={'table_name': table_name}
+        )

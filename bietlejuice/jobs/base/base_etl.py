@@ -1,20 +1,20 @@
-import sys
-
-import boto3
 import codecs
 import datetime
 import gzip
 import io
 import json
 import os
-import petl
 import re
+import sys
 import zipfile
 from StringIO import StringIO
 from decimal import Decimal
 from functools import partial
 from io import BytesIO
 from logging import info as log
+
+import boto3
+import petl
 from petl.io.db import create_table
 from unidecode import unidecode
 
@@ -354,6 +354,38 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
+    def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
+        df_columns = []
+        # list with all column names and max length
+        for column in df:
+            max_length = df[column].astype(str).str.len().max()
+            df_columns.append({'name': column, 'max_length': max_length})
+        if len(df_columns) == 0:
+            raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has no '
+                             'columns'.format(table_name))
+        # create sql statement for columns considering their max length
+        df_columns_text = []
+        for column in df_columns:
+            max_length = column['max_length']
+            if max_length > 65536:
+                raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has a column '
+                                 'with very long text string'.format(table_name))
+            elif max_length > 256:
+                max_length = max_length + (max_length % 8)  # round to multiples of eight
+                length_text = '({})'.format(max_length)
+            else:
+                length_text = ''
+            column_text = ' {} varchar{}'.format(column['name'], length_text)
+            df_columns_text.append(column_text)
+        df_columns_text = ', '.join(df_columns_text)
+        BaseETL.execute_command(
+            command='create table {} ({})'.format(table_name, df_columns_text),
+            db_enum=enum_db,
+            encoding=encoding,
+            commit=commit
+        )
+
+    @classmethod
     def dataframe_to_db(cls, df, table_name, enum_db, encoding='LATIN1', append=True, commit=True, bucket_name=None,
                         int_columns=None):
         df_table = petl.fromdataframe(df=df)
@@ -408,8 +440,11 @@ class BaseETL(object):
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
         try:
             if not append:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, msg=truncating table'.format(table_name)
                 con.cursor().execute('truncate table {};'.format(table_name))
             if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from s3 to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                         NULL AS 'NULL'
@@ -422,12 +457,16 @@ class BaseETL(object):
                     delimiter)
                 con.cursor().execute(sql)
             else:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from stdin to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
                 con.cursor().copy_expert(sql, f_cursor)
 
             if commit:
+                print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
         finally:
+            print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
             con.close()
 
     @classmethod

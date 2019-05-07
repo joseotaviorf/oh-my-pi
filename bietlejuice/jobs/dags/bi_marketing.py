@@ -3,15 +3,14 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import \
     MarketingSubDagFactory
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
