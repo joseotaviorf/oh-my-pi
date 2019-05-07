@@ -7,6 +7,13 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.redshift import RedshiftClient
 
+#  AWS env vars
+env.set_airflow_var_to_local_env(
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION'
+)
+
 DW_PROD_ID = env.get_airflow_env_var('DW_PROD_ID')
 DW_FORNO_ID = env.get_airflow_env_var('DW_FORNO_ID')
 DW_FORNO_CONFIGS = json.loads(env.get_airflow_env_var('DW_FORNO_CONFIGS'))
