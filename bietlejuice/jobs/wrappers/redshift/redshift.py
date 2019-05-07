@@ -160,7 +160,7 @@ class RedshiftClient(object):
             waiter.wait(ClusterIdentifier=cluster_id)
         except Exception as e:
             raise RuntimeError(
-                'm=wait_for_cluster_availability, cluster_id={0}, error={1}, '
+                'm=wait_for_cluster_restore, cluster_id={0}, error={1}, '
                 'msg=Timeout waiting for cluster to be restored'.format(cluster_id, e.message))
 
     @logger
