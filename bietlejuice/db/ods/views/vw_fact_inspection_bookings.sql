@@ -10,25 +10,6 @@ with inspection_booking_retries as (
       and b.tipo = 'Vistoria'
       and b."reagendadoDe_id" is not null
   group by 1
-),
-parties_comments as (
-  select
-    insp.id,
-    count(ii_inspector.id) > 0 as has_inspector_comment,
-    count(ii_tenant.id) > 0 as has_tenant_comment,
-    count(ii_owner.id) > 0 as has_owner_comment
-  from inspection insp
-  left join inspection_item ii_inspector
-    on insp.id = ii_inspector.id_inspection
-      and ii_inspector.comment is not null
-  left join inspection_item ii_tenant
-    on insp.id = ii_tenant.id_inspection
-      and ii_tenant.tenant_comment is not null
-  left join inspection_item ii_owner
-    on insp.id = ii_owner.id_inspection
-      and ii_owner.owner_comment is not null
-  group by 1
-  having count(ii_inspector.id) + count(ii_tenant.id) + count(ii_owner.id) > 0
 )
 select
   insp.id as sk_inspection,
@@ -50,6 +31,4 @@ left join house_listing hl
   	and insp.ts_created::date between hl.min_version_time::date and coalesce(hl.max_version_time::date - 1, current_date)
 left join inspection_booking_retries ibr
 	on ibr.id = insp.id
-left join parties_comments pc
-	on pc.id = insp.id
 ;
