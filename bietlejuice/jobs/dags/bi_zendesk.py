@@ -68,6 +68,18 @@ def prod_sub_dag(sub_dag_name):
     return sub_dag.build_tasks('prod')
 
 
+def unit_tests_sub_dag(sub_dag_name):
+    sub_dag = ZendeskSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_tasks('test')
+
+
 clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
@@ -86,4 +98,12 @@ prod_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='zendesk-production-sub-dag'
 )
 
-airflow_helpers.chain(clean_dag, staging_dag, prod_dag)
+# unit tests
+unit_tests_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='unit_tests_sub_dag'
+)
+
+
+airflow_helpers.chain(clean_dag, staging_dag, prod_dag, unit_tests_sub_dag)
