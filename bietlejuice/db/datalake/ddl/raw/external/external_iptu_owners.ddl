@@ -16,8 +16,9 @@ create external table datalake_raw.external_iptu_owners (
   valor_venal string,
   proprietario_nome string,
   proprietario_nome_norm string,
-  proprietario_cpf_cnpj string,
   proprietario_tipo string,
+  proprietario_match_tipo string,
+  proprietario_cpf_cnpj string,
   proprietario_obito string,
   direct_id string,
   data_consulta string
