@@ -1,7 +1,7 @@
 drop table if exists rental_flow;
 create table if not exists rental_flow (
   id bigint,
-  atualizadoEm timestamp default null,
+  atualizadoEm timestamp,
   criadoEm timestamp,
   cliente_id bigint,
   gerente_id bigint,

@@ -1,20 +1,20 @@
-import sys
-
-import boto3
 import codecs
 import datetime
 import gzip
 import io
 import json
 import os
-import petl
 import re
+import sys
 import zipfile
 from StringIO import StringIO
 from decimal import Decimal
 from functools import partial
 from io import BytesIO
 from logging import info as log
+
+import boto3
+import petl
 from petl.io.db import create_table
 from unidecode import unidecode
 
@@ -440,8 +440,11 @@ class BaseETL(object):
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
         try:
             if not append:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, msg=truncating table'.format(table_name)
                 con.cursor().execute('truncate table {};'.format(table_name))
             if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from s3 to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                         NULL AS 'NULL'
@@ -454,12 +457,16 @@ class BaseETL(object):
                     delimiter)
                 con.cursor().execute(sql)
             else:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from stdin to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
                 con.cursor().copy_expert(sql, f_cursor)
 
             if commit:
+                print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
         finally:
+            print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
             con.close()
 
     @classmethod
