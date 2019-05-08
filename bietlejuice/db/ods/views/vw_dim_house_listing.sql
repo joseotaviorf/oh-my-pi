@@ -1,6 +1,6 @@
 drop view if exists vw_dim_house_listing;
 create or replace view vw_dim_house_listing as
-with leads as (
+with b2b_info as (
   select
     h.id as id_house,
     -- although these rules are replicated from vw_dim_lead, it would much work to centralize with ODS right now
@@ -95,12 +95,12 @@ select
   h.key_location,
   coalesce(h.visit_restriction = 'Restriction', false) as has_visit_restriction,
   h.predicted_price as house_predicted_price,
-  ls.is_b2b,
-  ls.b2b_type,
-  ls.b2b_prime_type,
+  bi.is_b2b,
+  bi.b2b_type,
+  bi.b2b_prime_type,
   now() as ts_load
 from house h
 left join house_listing pl
   on pl.id = h.id
-left join leads ls
-  on ls.id_house = h.id
+left join b2b_info bi
+  on bi.id_house = h.id
