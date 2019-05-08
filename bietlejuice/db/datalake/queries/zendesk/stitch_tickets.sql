@@ -12,7 +12,6 @@ with stitch_data as (
     from stitch.tickets
     where regexp_extract(via, '\{"channel":"(\w+)".+', 1) is not null
 		  and raw_subject != 'SCRUBBED'
-		  and subject not like '%WhatsApp - Comunicado%'
 		  and dt = '{execution_date}'
 )
 select 
