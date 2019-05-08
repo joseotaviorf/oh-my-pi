@@ -17,7 +17,6 @@ create external table if not exists datalake_clean.stitch_zendesk_tickets (
     collaborator_ids string,
     brand_id string,
     submitter_id string,
-    forum_topic_id string,
     status string,
     custom_fields string,
     has_incidents string,
