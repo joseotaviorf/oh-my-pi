@@ -55,6 +55,7 @@ create table if not exists dim_lead (
   dados_corretor_email varchar(250),
   dados_gerente_contas_nome varchar(250),
   dados_gerente_contas_email varchar(250),
+  affiliate_type varchar,
   dados_afiliado_inicio_atuacao timestamp without time zone,
   dados_afiliado_cidade_atuacao varchar(100),
   region_id integer,
