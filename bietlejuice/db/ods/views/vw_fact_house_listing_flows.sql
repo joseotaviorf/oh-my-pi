@@ -86,6 +86,7 @@ potential_listings as (
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
+		coalesce(pa_b2b.partner_id, -1) as sk_partner,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
 		coalesce(to_char(bt.dt_created::date, 'YYYYMMDD')::integer, -1) as sk_task_created_date,
@@ -195,6 +196,10 @@ potential_listings as (
         on r.nivel = 'Cidade' and
         regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g') =
 		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
+	left join usuario u_b2b
+	  on u_b2b.telefone_principal = l.telefone_anunciante
+    left join partner_agent pa_b2b
+	  on pa_b2b.user_id = u_b2b.id
 ),
 taxonomy as (
     select
@@ -232,6 +237,7 @@ select
 	pl.sk_user_task_assignee,
 	pl.sk_region,
 	pl.sk_city,
+	pl.sk_partner,
 	pl.sk_lead_date,
 	pl.sk_prospect_date,
 	pl.sk_task_created_date,

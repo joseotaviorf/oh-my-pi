@@ -13,6 +13,7 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	sk_user_task_assignee string,
 	sk_region string,
 	sk_city string,
+	sk_partner string,
 	sk_lead_date string,
 	sk_prospect_date string,
 	sk_task_created_date string,
