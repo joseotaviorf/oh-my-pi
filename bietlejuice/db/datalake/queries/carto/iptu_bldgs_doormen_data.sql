@@ -73,13 +73,11 @@ doorman AS (
     u.telefone_principal,
     u.nome,
     u.dadosafiliado_ativo,
-    CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
-      CAST(d.ts_joined_program as timestamp)
-    ELSE NULL END AS ts_joined_program_timestamp,
+    TRY(CAST(d.ts_joined_program as timestamp)) AS ts_joined_program_timestamp,
     leads.lead_activity
   FROM datalake_clean.ods_dim_user_doorman d
   LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = a.id_user_doorman
-  JOIN datalake_clean.ods_dim_user u ON CAST(d.sk_user_affiliate AS VARCHAR) = u.dados_afiliado_id
+  JOIN datalake_clean.ods_dim_user u ON d.sk_user_affiliate = u.dados_afiliado_id
   LEFT JOIN (
       SELECT dim_user_affiliate.sk_user AS sk_user,
              max(DATE(dim_date_lead.date)) AS last_date_lead,
@@ -120,7 +118,7 @@ SELECT
   bldgs_doormen.doorman_joined_date,
   bldgs_doormen.latest_doorman_joined_date,
   bldgs_doormen.earliest_doorman_joined_date,
-  CASE WHEN bldgs_doormen.doorman_ct > 0 THEN true ELSE false END AS has_doorman,
+  bldgs_doormen.doorman_ct > 0 AS has_doorman,
   CASE
     WHEN
       contains(bldgs_doormen.doorman_active, 'referral last 30 days') OR
@@ -159,8 +157,6 @@ LEFT JOIN
       )
     )
     AND CAST(b.bldg_street_num AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
-    -- leading zero issue here?
-    -- also: guarantee only 1 bldg match per doorman (nearest?)
   GROUP BY b.bldg_address_id) AS bldgs_doormen
 ON bldgs_stats.bldg_address_id = bldgs_doormen.bldg_address_id
 ;

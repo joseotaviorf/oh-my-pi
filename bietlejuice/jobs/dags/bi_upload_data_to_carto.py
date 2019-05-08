@@ -11,22 +11,20 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 
+import json
+
 env.set_airflow_var_to_local_env('BI_DW')
 athena = AthenaClient('5a-datalake')
 logger = QuintoAndarLogger('bi-doorman-data')
-
-
-def read_query(file_name):
-    with open(file_name) as f:
-        return f.read()
+carto_path = 'carto'
+CARTO_CREDENTIALS = json.loads(env.get_airflow_env_var('CARTO_CREDENTIALS'))
+carto_api = CartoApi(CARTO_CREDENTIALS)
 
 
 def load_data_and_upload_to_carto(sql_filename, carto_table_name, final_sql, **kwargs):
-    # FIXME: hardcoded folder path
-    file_name = '{}/carto/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
-    # logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
+    file_name = '{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, carto_path, sql_filename)
     logger.info('m=load_data_and_upload_to_carto, file={}, msg=reading file from s3'.format(file_name))
-    query = read_query(file_name)
+    query = BaseETL.get_query_from_file_name(file_name)
 
     df = athena.execute_query_and_return_dataframe(
         sql=query,
@@ -39,11 +37,11 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, final_sql, **k
     if len(df) > 0:
         # upload CSV to CARTO
         create_table_statement = BaseETL.generate_create_table_statement(df, carto_table_name)
-        CartoApi.run_sql(create_table_statement)
-        CartoApi.run_sql('TRUNCATE TABLE {}'.format(carto_table_name))
-        CartoApi.upload_csv(csv_file_path, carto_table_name)
-        CartoApi.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name))
-        CartoApi.run_sql(final_sql)
+        carto_api.run_sql(create_table_statement)
+        carto_api.run_sql('TRUNCATE TABLE {}'.format(carto_table_name))
+        carto_api.upload_csv(csv_file_path, carto_table_name)
+        carto_api.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name))
+        carto_api.run_sql(final_sql)
         # write result to S3
         df_export = df
         cols = df_export.columns.values.tolist()
