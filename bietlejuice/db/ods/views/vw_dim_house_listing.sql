@@ -35,10 +35,8 @@ with leads as (
     on rl.id = l.id
   left join lead lo
     on lo.id = rl.id_origin_lead
-  left join usuario u_b2b
-	on u_b2b.email = l.proprietario_email
   left join partner_agent pa_b2b
-	on pa_b2b.user_id = u_b2b.id
+	on pa_b2b.user_id = h.usuario_id
   left join photo_job pj
     on pj.imovel_id = h.id
 )
