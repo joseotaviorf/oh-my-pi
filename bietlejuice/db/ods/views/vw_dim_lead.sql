@@ -113,7 +113,7 @@ left join lateral
 )  an
   on true
 left join usuario u_b2b
-	on u_b2b.email = l.proprietario_email
+	on u_b2b.telefone_principal = l.telefone_anunciante
 left join partner_agent pa_b2b
 	on pa_b2b.user_id = u_b2b.id
 ;
