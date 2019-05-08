@@ -7,7 +7,7 @@ import json
 from bietlejuice.jobs.dags.util import environment as env
 
 CARTO_CREDENTIALS = json.loads(env.get_airflow_env_var('CARTO_CREDENTIALS'))
-CartoApi_KEY = CARTO_CREDENTIALS['api_key']
+CARTO_API_KEY = CARTO_CREDENTIALS['api_key']
 BASE_URL = CARTO_CREDENTIALS['base_url']
 BASE_URL_SQL = BASE_URL + 'sql'
 BASE_URL_COPY = BASE_URL + 'sql/copyfrom'
@@ -20,7 +20,7 @@ class CartoApi(object):
     @staticmethod
     def run_sql(sql, data_format='JSON'):
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}&format={}'.format(BASE_URL_SQL, url_params_encoded, CartoApi_KEY, data_format)
+        url = '{}?q={}&api_key={}&format={}'.format(BASE_URL_SQL, url_params_encoded, CARTO_API_KEY, data_format)
         r = requests.get(url)
         return r.content
 
@@ -33,7 +33,7 @@ class CartoApi(object):
             f_out.writelines(f_in)
         sql = 'COPY {} ({}) FROM stdin WITH (FORMAT csv, HEADER true)'.format(table_name, cols)
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}'.format(BASE_URL_COPY, url_params_encoded, CartoApi_KEY)
+        url = '{}?q={}&api_key={}'.format(BASE_URL_COPY, url_params_encoded, CARTO_API_KEY)
         headers = {
             'Content-Encoding': 'gzip',
             'Content-Type': 'application/octet-stream'

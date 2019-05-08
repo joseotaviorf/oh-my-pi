@@ -9,8 +9,10 @@ from slugify import slugify
 import hashlib
 
 from bietlejuice.jobs.dags.util import environment as env
+from qa_python_utils import QuintoAndarLogger
 
 GOOGLE_MAPS_API_KEY = env.get_airflow_env_var('GOOGLE_MAPS_API_KEY_DATA')
+logger = QuintoAndarLogger('bi-doorman-data')
 
 
 class GeocodingApi(object):
@@ -70,7 +72,7 @@ class GeocodingApi(object):
                     with open(folder_path + pkey + '.json', 'w') as fp:
                         json.dump(geocoded.raw, fp)
                 except Exception as e:
-                    print(e)
+                    logger.error("m=geocode_addresses, msg=couldn't create geocode address, e={}.".format(e))
         print('--->done.')
 
     @staticmethod

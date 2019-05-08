@@ -4,10 +4,8 @@ from airflow.models import DAG
 from datetime import datetime, timedelta
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 
-from bietlejuice.jobs.wrappers.carto.carto_api import CartoApi
 from bietlejuice.jobs.wrappers.geocoding.geocoding_api import GeocodingApi
 
 from qa_python_utils import QuintoAndarLogger
@@ -27,7 +25,7 @@ def read_query(file_name):
 def load_doorman(**kwargs):
     sql_filename = 'extract_doorman_address'
     file_name = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
-    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
+    logger.info('m=load_doorman, file={}, msg=reading file from s3'.format(file_name))
     query = read_query(file_name)
     execution_date = datetime.utcnow().strftime('%Y-%m-%d')
     df = athena.execute_query_and_return_dataframe(
@@ -66,51 +64,12 @@ def geocode_doorman(**kwargs):
             print('---> no addresses to geocode.')
 
 
-def load_data_and_upload_to_carto(sql_filename, carto_table_name, final_sql, **kwargs):
-    # FIXME: hardcoded folder path
-    file_name = '{}/carto/{}.sql'.format(DATALAKE_QUERIES_DIR, sql_filename)
-    logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), file_name))
-    query = read_query(file_name)
-
-    df = athena.execute_query_and_return_dataframe(
-        sql=query,
-        paginate=False,
-        page_size=0,
-        query_params={'dt': kwargs['execution_date'].strftime('%Y-%m-%d')})
-
-    csv_file_path = '/var/tmp/{}.csv'.format(sql_filename)
-    df.to_csv(csv_file_path, index=False, encoding='utf-8')
-    if len(df) > 0:
-        # upload CSV to CARTO
-        create_table_statement = BaseETL.generate_create_table_statement(df, carto_table_name)
-        print(CartoApi.run_sql(create_table_statement))
-        print(CartoApi.run_sql('TRUNCATE TABLE {}'.format(carto_table_name)))
-        print(CartoApi.upload_csv(csv_file_path, carto_table_name))
-        print(CartoApi.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name)))
-        print(CartoApi.run_sql(final_sql))
-        # write result to S3
-        df_export = df
-        cols = df_export.columns.values.tolist()
-        df_export[cols] = df_export[cols].astype(str)
-        key = 'clean/external/{}/{}.parq'.format(carto_table_name, carto_table_name)
-        athena.create_parquet_from_df(key=key, df=df_export)
-
-
-tasks = [
-    {'carto_table_name': 'iptu_bldgs_doormen_data',
-     'final_sql': 'UPDATE iptu_bldgs_doormen_data SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
-    {'carto_table_name': 'cnpj_bldgs_doormen_data',
-     'final_sql': 'UPDATE cnpj_bldgs_doormen_data SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
-    {'carto_table_name': 'qa_subregions',
-     'final_sql': 'UPDATE qa_subregions SET the_geom = ST_GeomFromText(geometry, 4326)'},
-    {'carto_table_name': 'qa_listings',
-     'final_sql': 'UPDATE qa_listings SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL'}
-]
+MAIN_DAG_NAME = 'bi-geocode-doorman'
 
 
 dag = DAG(
-    dag_id='join-buildings-to-doorman',
-    description='Geocode doorman, join buildings to doorman and upload data to CARTO',
+    dag_id=MAIN_DAG_NAME,
+    description='Geocode doorman',
     default_args={
         'owner': 'Data Team',
         'wait_for_downstream': False,
@@ -119,35 +78,14 @@ dag = DAG(
         'retry_delay': timedelta(minutes=30),
     },
     start_date=datetime(2019, 2, 16, 0, 0, 0),
-    schedule_interval='30 9 * * *',
-    max_active_runs=1
+    schedule_interval='30 8 * * *',
+    max_active_runs=1,
+    catchup=False
 )
 
-# TEMP:
 geocode_doorman_dag = BaseDAG.build_python_operator(
     dag=dag,
     task_id='geocode_doorman',
     python_callable=geocode_doorman,
     provide_context=True
 )
-
-# TEMP:
-operators = []
-
-
-for task in tasks:
-    operator = BaseDAG.build_python_operator(
-        dag=dag,
-        task_id=task['carto_table_name'],
-        python_callable=load_data_and_upload_to_carto,
-        op_kwargs={'sql_filename': task['carto_table_name'], 'carto_table_name': task['carto_table_name'],
-                   'final_sql': task['final_sql']},
-        provide_context=True
-    )
-
-    # TEMP:
-    operators.append(operator)
-
-# TEMP:
-for op in operators:
-    geocode_doorman_dag.set_downstream(op)

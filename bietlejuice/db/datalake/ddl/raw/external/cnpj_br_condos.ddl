@@ -1,4 +1,4 @@
-drop table datalake_raw.cnpj_br_condos
+drop table if exists datalake_raw.cnpj_br_condos
 
 create external table datalake_raw.cnpj_br_condos (
   tipo_registro string,
