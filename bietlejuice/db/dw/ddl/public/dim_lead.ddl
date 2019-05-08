@@ -55,7 +55,6 @@ create table if not exists dim_lead (
   dados_corretor_email varchar(250),
   dados_gerente_contas_nome varchar(250),
   dados_gerente_contas_email varchar(250),
-  dados_afiliado_tipo_afiliado varchar(255),
   dados_afiliado_inicio_atuacao timestamp without time zone,
   dados_afiliado_cidade_atuacao varchar(100),
   region_id integer,
@@ -76,5 +75,7 @@ create table if not exists dim_lead (
   flg_latlng_served boolean,
   flg_location_served boolean,
   score_factor bigint,
+  is_b2b boolean,
+  b2b_type varchar,
   load_timestamp timestamp without time zone
 ) ;
