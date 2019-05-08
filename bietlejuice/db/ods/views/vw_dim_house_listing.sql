@@ -8,7 +8,7 @@ with leads as (
     coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
     case
       when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-       then 'referral'
+       then 'online'
       when pa_b2b.id is not null
        then 'prime'
     end as b2b_type,
@@ -19,9 +19,9 @@ with leads as (
         then
           case
             when pj.id is null
-              then 'under_negotiation'
+              then 'advanced_negotiation'
             when h.external_id is null
-              then 'new'
+              then 'standard'
             when h.external_id is not null
               then 'batch'
           end
