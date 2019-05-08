@@ -42,30 +42,9 @@ select
 	v.scheduleObservations as schedule_observations,
 	v.reportRevised as report_revised,
 	v.scheduleDoubleChecked+0 as is_schedule_double_checked,
-	comentario_vistoria.has_inspector_comment,
-	comentario_vistoria.has_tenant_comment,
-	comentario_vistoria.has_owner_comment
+	coalesce((select 1 from ItemVistoria ii_inspector where ii_inspector.vistoria_id = v.id and ii_inspector.comentario is not null limit 1), 0) as has_inspector_comment,
+  coalesce((select 1 from ItemVistoria ii_tenant where ii_tenant.vistoria_id = v.id and ii_tenant.comentarioInquilino is not null limit 1), 0) as has_tenant_comment,
+  coalesce((select 1 from ItemVistoria ii_owner where ii_owner.vistoria_id = v.id and ii_owner.comentarioProprietario is not null limit 1), 0) as has_owner_comment
 from Vistoria v
-left join (
--- in order to avoid having to bring more than 3kk rows to memory, this subquery is being joined in the source
-  select
-    insp.id,
-    count(ii_inspector.id) > 0 as has_inspector_comment,
-    count(ii_tenant.id) > 0 as has_tenant_comment,
-    count(ii_owner.id) > 0 as has_owner_comment
-    from Vistoria insp
-    left join ItemVistoria ii_inspector
-      on insp.id = ii_inspector.vistoria_id
-        and ii_inspector.comentario is not null
-    left join ItemVistoria ii_tenant
-      on insp.id = ii_tenant.vistoria_id
-        and ii_tenant.comentarioInquilino is not null
-    left join ItemVistoria ii_owner
-      on insp.id = ii_owner.vistoria_id
-        and ii_owner.comentarioProprietario is not null
-    group by 1
-    having count(ii_inspector.id) + count(ii_tenant.id) + count(ii_owner.id) > 0
-) comentario_vistoria
-	on v.id = comentario_vistoria.id
 where date(coalesce(v.criadoEm, '1900-01-01 00:00:00')) <= date('{}')
 ;
