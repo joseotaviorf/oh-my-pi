@@ -14,7 +14,7 @@ with b2b_info as (
     end as b2b_type,
     case
     -- because a lead can have both 'affiliate_type' = 'B2BPartner' and 'partner_agent.id' not null and we need to
-    -- prioritize the first type (referral), the following check must be done
+    -- prioritize the first type (online), the following check must be done
       when pa_b2b.id is not null and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
         then
           case
