@@ -82,7 +82,7 @@ CREATE VIEW public.vw_dim_lead as
   coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
   case
     when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-     then 'referral'
+     then 'online'
     when pa_b2b.id is not null
      then 'prime'
   end as b2b_type,
