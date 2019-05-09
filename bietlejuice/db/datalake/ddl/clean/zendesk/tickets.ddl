@@ -37,3 +37,5 @@ PARTITIONED BY (
 STORED AS PARQUET
 LOCATION
   's3://5a-datalake/clean/zendesk/tickets_xplenty/';
+
+MSCK REPAIR TABLE datalake_clean.zendesk_tickets_xplenty;
