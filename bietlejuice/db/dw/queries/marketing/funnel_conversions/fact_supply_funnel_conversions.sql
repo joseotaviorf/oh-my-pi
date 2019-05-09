@@ -13,14 +13,14 @@ with fact as  (
 		utm_term,
 		utm_content,
 		sum(coalesce(cost,0)) as cost
-	from marketing.fact_marketing_{1}_costs mkt
+	from marketing.fact_marketing_daily_costs mkt
 	join public.dim_date dd on dd.sk_date =  mkt.sk_date
 	where funnel_side = 'supply'
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 s_cube as (
 	select
-		coalesce(sk_date, -1) as sk_date,
+		coalesce(sk_{1}date, -1) as sk_date,
 		city_group,
 		mkt_category,
 		mkt_flow,
@@ -38,11 +38,11 @@ s_cube as (
 			else utm_term end as utm_term,
 		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium <> 'Display' then NULL
 			else utm_content end as utm_content,
-		sum(coalesce(total_{1}_sessions, 0)) as total_{1}_sessions,
-		sum(coalesce(total_{1}_active_users, 0)) as total_{1}_active_users,
-		sum(coalesce(total_{1}_leads, 0)) as total_{1}_leads,
-		sum(coalesce(total_{1}_listings, 0)) as total_{1}_listings
-	from growth.conversion_points_supply_{1}
+		sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
+		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
+		sum(coalesce(total_{2}_leads, 0)) as total_{2}_leads,
+		sum(coalesce(total_{2}_listings, 0)) as total_{2}_listings
+	from growth.conversion_points_supply_{2}
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 )
 select
@@ -59,10 +59,10 @@ select
 	coalesce(fact.utm_term, s_cube.utm_term) as  utm_term,
 	coalesce(fact.utm_content, s_cube.utm_content) as  utm_content,
 	coalesce(fact.cost, 0) as cost,
-	coalesce(s_cube.total_{1}_sessions, 0) as total_{1}_sessions,
-	coalesce(s_cube.total_{1}_active_users, 0) as total_{1}_active_users,
-	coalesce(s_cube.total_{1}_leads, 0) as total_{1}_leads,
-	coalesce(s_cube.total_{1}_listings, 0) as total_{1}_listings,
+	coalesce(s_cube.total_{2}_sessions, 0) as total_{2}_sessions,
+	coalesce(s_cube.total_{2}_active_users, 0) as total_{2}_active_users,
+	coalesce(s_cube.total_{2}_leads, 0) as total_{2}_leads,
+	coalesce(s_cube.total_{2}_listings, 0) as total_{2}_listings,
 	getdate() as ts_load
 from fact
 full outer join s_cube

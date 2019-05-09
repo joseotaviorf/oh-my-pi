@@ -20,7 +20,7 @@ with fact as  (
 ),
 d_cube as (
 	select
-		coalesce(sk_week_start_date, -1) as sk_date,
+		coalesce(sk_{1}date, -1) as sk_date,
 		city_group,
 		mkt_category,
 		mkt_flow,
@@ -38,14 +38,14 @@ d_cube as (
 			else utm_term end as utm_term,
 		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium <> 'Display' then NULL
 			else utm_content end as utm_content,
-        sum(coalesce(total_{1}_sessions, 0)) as total_{1}_sessions,
-		sum(coalesce(total_{1}_active_users, 0)) as total_{1}_active_users,
-		sum(coalesce(total_{1}_visits_booked, 0)) as total_{1}_visits_booked,
-		sum(coalesce(total_{1}_visits_confirmed, 0)) as total_{1}_visits_confirmed,
-		sum(coalesce(total_{1}_offers_submitted, 0)) as total_{1}_offers_submitted,
-		sum(coalesce(total_{1}_offers_approved, 0)) as total_{1}_offers_approved,
-		sum(coalesce(total_{1}_contracts_signed, 0)) as total_{1}_contracts_signed
-	from growth.conversion_points_demand_{1}
+        sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
+		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
+		sum(coalesce(total_{2}_visits_booked, 0)) as total_{2}_visits_booked,
+		sum(coalesce(total_{2}_visits_confirmed, 0)) as total_{2}_visits_confirmed,
+		sum(coalesce(total_{2}_offers_submitted, 0)) as total_{2}_offers_submitted,
+		sum(coalesce(total_{2}_offers_approved, 0)) as total_{2}_offers_approved,
+		sum(coalesce(total_{2}_contracts_signed, 0)) as total_{2}_contracts_signed
+	from growth.conversion_points_demand_{2}
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 )
 select
@@ -62,13 +62,13 @@ select
 	coalesce(fact.utm_term, d_cube.utm_term) as  utm_term,
 	coalesce(fact.utm_content, d_cube.utm_content) as  utm_content,
 	coalesce(fact.cost, 0) as cost,
-	coalesce(d_cube.total_{1}_sessions, 0) as total_{1}_sessions,
-	coalesce(d_cube.total_{1}_active_users, 0) as total_{1}_active_users,
-	coalesce(d_cube.total_{1}_visits_booked, 0) as total_{1}_visits_booked,
-	coalesce(d_cube.total_{1}_visits_confirmed, 0) as total_{1}_visits_confirmed,
-	coalesce(d_cube.total_{1}_offers_submitted, 0) as total_{1}_offers_submitted,
-	coalesce(d_cube.total_{1}_offers_approved, 0) as total_{1}_offers_approved,
-	coalesce(d_cube.total_{1}_contracts_signed, 0) as total_{1}_contracts_signed,
+	coalesce(d_cube.total_{2}_sessions, 0) as total_{2}_sessions,
+	coalesce(d_cube.total_{2}_active_users, 0) as total_{2}_active_users,
+	coalesce(d_cube.total_{2}_visits_booked, 0) as total_{2}_visits_booked,
+	coalesce(d_cube.total_{2}_visits_confirmed, 0) as total_{2}_visits_confirmed,
+	coalesce(d_cube.total_{2}_offers_submitted, 0) as total_{2}_offers_submitted,
+	coalesce(d_cube.total_{2}_offers_approved, 0) as total_{2}_offers_approved,
+	coalesce(d_cube.total_{2}_contracts_signed, 0) as total_{2}_contracts_signed,
 	getdate() as ts_load
 from fact
 full outer join d_cube

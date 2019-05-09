@@ -21,16 +21,20 @@ class FunnelConversionSubDag(BaseSubDag):
         self.funnel_side = funnel_side
 
     @logger
-    def load_funnel_conversions(self, period):
+    def __load_funnel_conversions(self, period):
         dim_date_column = {'daily': 'date',
                            'weekly': 'week_start',
                            'monthly': 'month_start'}
+
+        conversion_column = {'daily': '',
+                             'weekly': 'week_start_',
+                             'monthly': 'month_start_'}
 
         query = BaseETL.get_query_from_file_name(
             file_name='{}/marketing/funnel_conversions/fact_{}_funnel_conversions.sql'.format(DW_QUERIES_DIR,
                                                                                               self.funnel_side))
 
-        query = query.format(dim_date_column.get(period), period)
+        query = query.format(dim_date_column.get(period), conversion_column.get(period), period)
 
         table = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
@@ -58,25 +62,22 @@ class FunnelConversionSubDag(BaseSubDag):
         daily_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='load_fact_daily_{}_funnel_conversions'.format(self.funnel_side),
-            python_callable=self.load_funnel_conversions,
-            op_kwargs={'funnel_side': self.funnel_side,
-                       'period': 'daily'}
+            python_callable=self.__load_funnel_conversions,
+            op_kwargs={'period': 'daily'}
         )
 
         weekly_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='load_fact_weekly_{}_funnel_conversions'.format(self.funnel_side),
-            python_callable=self.load_funnel_conversions,
-            op_kwargs={'funnel_side': self.funnel_side,
-                       'period': 'weekly'}
+            python_callable=self.__load_funnel_conversions,
+            op_kwargs={'period': 'weekly'}
         )
 
         monthly_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='load_fact_monthly_{}_funnel_conversions'.format(self.funnel_side),
-            python_callable=self.load_funnel_conversions,
-            op_kwargs={'funnel_side': self.funnel_side,
-                       'period': 'monthly'}
+            python_callable=self.__load_funnel_conversions,
+            op_kwargs={'period': 'monthly'}
         )
 
         return daily_task, weekly_task, monthly_task
