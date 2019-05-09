@@ -64,8 +64,10 @@ class RedshiftClient(object):
             response = self.redshift_client.describe_clusters(ClusterIdentifier=cluster_id)
             logger.info('m=check_if_cluster_exists, cluster_id={0}, msg=Cluster exists'.format(cluster_id))
             return True
-        except ClientError:
-            logger.info('m=check_if_cluster_exists, cluster_id={0}, msg=Cluster does not exists'.format(cluster_id))
+        except ClientError as e:
+            logger.error(
+                'm=check_if_cluster_exists, cluster_id={0}, error={1}, msg=Cluster does not exists'.format(cluster_id,
+                                                                                                           e.message))
             return False
 
     @logger
@@ -146,6 +148,20 @@ class RedshiftClient(object):
             raise RuntimeError(
                 'm=wait_for_cluster_availability, cluster_id={0}, error={1}, '
                 'msg=Timeout waiting for cluster to became available'.format(cluster_id, e.message))
+
+    @logger
+    def wait_for_cluster_restore(self, cluster_id):
+        """Wait for Amazon Redshift cluster to restore itself
+
+        :param cluster_id: string; Cluster name to monitor
+        """
+        waiter = self.redshift_client.get_waiter('cluster_restored')
+        try:
+            waiter.wait(ClusterIdentifier=cluster_id)
+        except Exception as e:
+            raise RuntimeError(
+                'm=wait_for_cluster_restore, cluster_id={0}, error={1}, '
+                'msg=Timeout waiting for cluster to be restored'.format(cluster_id, e.message))
 
     @logger
     def wait_for_cluster_shutdown(self, cluster_id):

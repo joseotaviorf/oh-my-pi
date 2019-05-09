@@ -7,6 +7,13 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.redshift import RedshiftClient
 
+#  AWS env vars
+env.set_airflow_var_to_local_env(
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'AWS_DEFAULT_REGION'
+)
+
 DW_PROD_ID = env.get_airflow_env_var('DW_PROD_ID')
 DW_FORNO_ID = env.get_airflow_env_var('DW_FORNO_ID')
 DW_FORNO_CONFIGS = json.loads(env.get_airflow_env_var('DW_FORNO_CONFIGS'))
@@ -38,6 +45,11 @@ def create_cluster(source_cluster, target_cluster, config_json):
 def check_cluster_availability(target_cluster):
     rs_client = RedshiftClient()
     rs_client.wait_for_cluster_availability(cluster_id=target_cluster)
+
+
+def check_cluster_availability_after_restore(target_cluster):
+    rs_client = RedshiftClient()
+    rs_client.wait_for_cluster_restore(cluster_id=target_cluster)
 
 
 def scale_down_cluster(target_cluster):
@@ -81,10 +93,10 @@ create_cluster_task = BaseDAG.build_python_operator(
                'config_json': DW_FORNO_CONFIGS}
 )
 
-check_cluster_availability_task = BaseDAG.build_python_operator(
+check_cluster_availability_after_restore_task = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='check_cluster_availability',
-    python_callable=check_cluster_availability,
+    task_id='check_cluster_availability_after_restore',
+    python_callable=check_cluster_availability_after_restore,
     op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
@@ -104,5 +116,5 @@ check_cluster_scaled_down_availability_task = BaseDAG.build_python_operator(
 
 # Tasks Flow
 airflow_helpers.chain(shutdown_cluster_cluster_task, check_cluster_shutdown_task, create_cluster_task,
-                      check_cluster_availability_task, scale_down_cluster_task,
+                      check_cluster_availability_after_restore_task, scale_down_cluster_task,
                       check_cluster_scaled_down_availability_task)
