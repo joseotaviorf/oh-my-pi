@@ -1,5 +1,5 @@
-drop table if exists crm.fact_lead_tasks;
-create table if not exists crm.fact_lead_tasks (
+drop table if exists crm.fact_lead_task_actions;
+create table if not exists crm.fact_lead_task_actions (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
