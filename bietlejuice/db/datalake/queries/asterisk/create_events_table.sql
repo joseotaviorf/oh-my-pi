@@ -5,10 +5,11 @@ with asterisk_data as (
 ids_calls as (
 	select
 		min(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 1)) as ts_created,
+		date(cast(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 1) as timestamp)) as dt_created,
 		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)', 2) as id_call
 	from asterisk_data
 	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(\w+)')=true
-	group by 2
+	group by 2,3
 ),
 first_event_started as (
 	select
@@ -107,15 +108,19 @@ queue_started as (
 ),
 queue_num_set as (
 	select
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 2) as id_call,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 3) as id_phase,
-		'queue' as phase,  
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 2) as id_call,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 6) as id_phase,
+		case
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='SIP' then 'ura'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='Local' then 'queue'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 3)='PJSIP' then 'attendance'
+		end as phase,
 		'queue_number_set' as name,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 4) as params,
-		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"', 1) as ts_created,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 8) as params,
+		regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"', 1) as ts_created,
 		now() as ts_load
 	from asterisk_data
-	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("Local/\d+@from-queue-(\w+);\d", "(QUEUENUM=\d+)"')=true	
+	where regexp_like(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+Set\("(PJSIP|SIP|Local)/(\d+)(@from-queue)?-(\w+)(;\d)?", "(QUEUENUM=\d+)"')=true
 	group by 1,2,3,4,5,6,7
 ),
 crm_destination_set as ( -- only to calls made by agents
@@ -186,18 +191,21 @@ key_typed as (
 ),
 audio_message_started as (
   	select
-    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 2) as id_call,
-    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 4) as id_phase,
+    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 2) as id_call,
+    	coalesce(regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 4),
+                 regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 5))
+        as id_phase,
 		case 
-			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 3)='SIP' then 'ura'
-			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 3)='PJSIP' then 'attendance' 
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 3)='SIP' then 'ura'
+			when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 3)='PJSIP' then 'attendance'
+            when regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 3)='Local' then 'queue' 
 		end as phase,
 		'audio_message_started' as name, 
-    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 6) as params,
-    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*', 1) as ts_created,
+    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 7) as params,
+    	regexp_extract(content,'\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)', 1) as ts_created,
 		now() as ts_load
   	from asterisk_data
-	where regexp_like(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP)/\d+-(\w+)> Playing .?(.custom/)?(.+)\.(ulaw.?|gsm).*')=true
+	where regexp_like(content, '\[(.+)\] VERBOSE\[[0-9]+\]\[C-(\w+)\].+<(SIP|PJSIP|Local)\/(?:\d+(?:@from-queue)?-(\w+)(?:;\d)?|\w+-PJSIP-(\w+))> Playing .?(.custom\/)?(.+)\.(ulaw.?|gsm)')=true
   	group by 1,2,3,4,5,6,7
 ),
 queue_join_time_set as (
