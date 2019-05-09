@@ -15,11 +15,10 @@ from logging import info as log
 
 import boto3
 import petl
-from petl.io.db import create_table
-from unidecode import unidecode
-
 from db_factory import DBFactory
 from enum_db import EnumDB
+from petl.io.db import create_table
+from unidecode import unidecode
 
 
 class BaseETL(object):
@@ -646,4 +645,20 @@ class BaseETL(object):
         s3.Bucket(bucket).put_object(
             Body=csv_buffer.getvalue(),
             Key=filename
+        )
+
+    @classmethod
+    def move_file_query_data_to_db(cls, schema, file_name, append, db_enum_source, db_enum_destination):
+        query = BaseETL.get_query_from_file_name(file_name=file_name)
+
+        table = BaseETL.from_db_query(
+            db_enum=db_enum_source,
+            query=query)
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name='{}.{}'.format(schema, file_name),
+            db_enum=db_enum_destination,
+            encoding='UTF-8',
+            append=append
         )
