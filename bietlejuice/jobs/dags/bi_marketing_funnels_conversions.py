@@ -7,7 +7,7 @@ from airflow.operators.subdag_operator import SubDagOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags.marketing_funnels_conversions.funnel_conversion_subdag import FunnelConversionSubDag
+from bietlejuice.jobs.dags.marketing_funnels_conversions import FunnelConversionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.amplitude.growth_amplitude import GrowthAmplitude
