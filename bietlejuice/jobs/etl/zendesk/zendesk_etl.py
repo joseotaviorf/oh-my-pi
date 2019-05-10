@@ -113,7 +113,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key="clean/zendesk/tickets/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
+            key="clean/zendesk/tickets_xplenty/dt_extraction={dt}/{dt}.parquet".format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
