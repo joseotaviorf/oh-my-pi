@@ -72,6 +72,25 @@ fact_with_reproc as (
         left join lead lr
             on lr.id = rl.id_origin_lead
 ),
+leads_b2b as (
+  select
+    l.id as id_lead,
+    pa_b2b_online.partner_id as online_partner_id,
+    pa_b2b_prime.partner_id as prime_partner_id
+  from lead l
+  left join usuario u_b2b_prime
+	  on u_b2b_prime.telefone_principal = l.telefone_anunciante
+  left join partner_agent pa_b2b_prime
+	  on pa_b2b_prime.user_id = u_b2b_prime.id
+	left join user_affiliate ua
+    on l.usuario_que_indicou_id = ua.id
+      and ua.affiliateType = 'B2BPartner'
+  left join usuario u_b2b_online
+    on u_b2b_online.dados_afiliado_id = ua.id
+  left join partner_agent pa_b2b_online
+    on pa_b2b_online.user_id = u_b2b_online.id
+  where coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id) is not null
+),
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
@@ -86,7 +105,7 @@ potential_listings as (
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
-		coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
+		coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, -1) as sk_partner,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
 		coalesce(to_char(bt.dt_created::date, 'YYYYMMDD')::integer, -1) as sk_task_created_date,
@@ -196,17 +215,8 @@ potential_listings as (
         on r.nivel = 'Cidade' and
         regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g') =
 		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
-	left join usuario u_b2b_prime
-	  on u_b2b_prime.telefone_principal = l.telefone_anunciante
-    left join partner_agent pa_b2b_prime
-	  on pa_b2b_prime.user_id = u_b2b_prime.id
-	left join user_affiliate ua
-      on l.usuario_que_indicou_id = ua.id
-        and ua.affiliateType = 'B2BPartner'
-    left join usuario u_b2b_online
-      on u_b2b_online.dados_afiliado_id = ua.id
-    left join partner_agent pa_b2b_online
-      on pa_b2b_online.user_id = u_b2b_online.id
+	left join leads_b2b l_b2b
+      on l_b2b.id_lead = l.id
 ),
 taxonomy as (
     select
