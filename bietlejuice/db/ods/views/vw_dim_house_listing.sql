@@ -1,9 +1,9 @@
 drop view if exists vw_dim_house_listing;
 create or replace view vw_dim_house_listing as
 with b2b_info as (
-  select
+  select distinct
     h.id as id_house,
-    -- although these rules are replicated from vw_dim_lead, it would much work to centralize with ODS right now
+    -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
     coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
     case

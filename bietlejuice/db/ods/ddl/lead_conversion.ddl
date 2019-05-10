@@ -1,6 +1,7 @@
 drop table if exists lead_conversion;
 create table if not exists lead_conversion (
   id bigint,
+  ts_converted timestamp,
   id_house bigint,
   id_lead bigint,
   id_seller bigint,
