@@ -9,6 +9,6 @@ create table if not exists fact_inspection_bookings (
   sk_expired_date bigint,
   sk_tenant_approved_date bigint,
   sk_owner_approved_date bigint,
-  booking_retry_rank_by_inpection_type smallint,
+  booking_retry_rank_by_inspection_type smallint,
   ts_load timestamp
 );

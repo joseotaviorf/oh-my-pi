@@ -20,7 +20,7 @@ select
   coalesce(to_char(insp.ts_expired, 'YYYYMMDD')::integer, -1) as sk_expired_date,
   coalesce(to_char(insp.ts_tenant_approved, 'YYYYMMDD')::integer, -1) as sk_tenant_approved_date,
   coalesce(to_char(insp.ts_owner_approved, 'YYYYMMDD')::integer, -1) as sk_owner_approved_date,
-  coalesce(ibr.rn, 1) as booking_retry_rank_by_inpection_type,
+  coalesce(ibr.rn, 1) as booking_retry_rank_by_inspection_type,
   now()::timestamp as ts_load
 from inspection insp
 left join booking b
