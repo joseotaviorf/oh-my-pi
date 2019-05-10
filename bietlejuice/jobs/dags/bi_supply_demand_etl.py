@@ -14,7 +14,7 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, DATALAKE_Q
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag, LeadConversionSubDag
+    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag, InspectionSubDag, LeadConversionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
@@ -153,6 +153,18 @@ def user_sub_dag(sub_dag_name):
     )
 
     return sub_dag.build_user_with_tests()
+
+
+def inspection_sub_dag(sub_dag_name):
+    sub_dag = InspectionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+
+    return sub_dag.build_inspection_with_tests()
 
 
 def house_sub_dag(sub_dag_name):
@@ -374,6 +386,13 @@ fact_house_status = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'house_status', 'is_fact': True, 'bucket': bucket}
 )
 
+fact_inspection_bookings_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_inspection_bookings',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
+)
+
 # new 'supply' flow
 ods_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -435,6 +454,12 @@ user_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=user_sub_dag,
     sub_dag_name='User'
+)
+
+inspection_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=inspection_sub_dag,
+    sub_dag_name='Inspection'
 )
 
 house_dag = BaseSubDag.get_sub_dag_operator(
@@ -587,5 +612,7 @@ dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, u
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
+
+inspection_dag >> fact_inspection_bookings_task
 
 trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
