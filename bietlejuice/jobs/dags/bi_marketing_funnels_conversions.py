@@ -290,12 +290,36 @@ load_fact_daily_demand_funnel_conversions_task = BaseDAG.build_python_operator(
 
 # flow
 airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_active_user_sessions_sub_dag,
-                      taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag,
-                      taxonomy_leads_sub_dag, taxonomy_listings_sub_dag, taxonomy_visits_booked_sub_dag,
-                      taxonomy_visits_completed_sub_dag, taxonomy_offers_submitted_sub_dag,
-                      taxonomy_offers_approved_sub_dag, taxonomy_contracts_signed_sub_dag,
-                      create_conversion_points_supply_daily_task, create_conversion_points_demand_daily_task,
-                      create_conversion_points_supply_weekly_task, create_conversion_points_demand_weekly_task,
-                      create_conversion_points_supply_monthly_task, create_conversion_points_demand_monthly_task,
-                      load_fact_marketing_daily_costs_task, load_fact_daily_supply_funnel_conversions_task,
+                      taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag)
+taxonomy_demand_active_user_sessions_sub_dag.set_downstream([taxonomy_leads_sub_dag,
+                                                             taxonomy_listings_sub_dag,
+                                                             taxonomy_visits_booked_sub_dag,
+                                                             taxonomy_visits_completed_sub_dag,
+                                                             taxonomy_offers_submitted_sub_dag,
+                                                             taxonomy_offers_approved_sub_dag,
+                                                             taxonomy_contracts_signed_sub_dag])
+create_conversion_points_supply_daily_task.set_upstream([taxonomy_leads_sub_dag,
+                                                         taxonomy_listings_sub_dag,
+                                                         taxonomy_visits_booked_sub_dag,
+                                                         taxonomy_visits_completed_sub_dag,
+                                                         taxonomy_offers_submitted_sub_dag,
+                                                         taxonomy_offers_approved_sub_dag,
+                                                         taxonomy_contracts_signed_sub_dag])
+create_conversion_points_demand_daily_task.set_upstream([taxonomy_leads_sub_dag,
+                                                         taxonomy_listings_sub_dag,
+                                                         taxonomy_visits_booked_sub_dag,
+                                                         taxonomy_visits_completed_sub_dag,
+                                                         taxonomy_offers_submitted_sub_dag,
+                                                         taxonomy_offers_approved_sub_dag,
+                                                         taxonomy_contracts_signed_sub_dag])
+airflow_helpers.chain(create_conversion_points_supply_daily_task,
+                      create_conversion_points_supply_weekly_task,
+                      create_conversion_points_supply_monthly_task)
+airflow_helpers.chain(create_conversion_points_demand_daily_task,
+                      create_conversion_points_demand_weekly_task,
+                      create_conversion_points_demand_monthly_task)
+load_fact_marketing_daily_costs_task.set_upstream([create_conversion_points_supply_monthly_task,
+                                                   create_conversion_points_demand_monthly_task])
+airflow_helpers.chain(load_fact_marketing_daily_costs_task,
+                      load_fact_daily_supply_funnel_conversions_task,
                       load_fact_daily_demand_funnel_conversions_task)

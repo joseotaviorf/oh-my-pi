@@ -175,5 +175,5 @@ SELECT
   END AS most_active_doorman,
   a.*
 FROM apts a
-INNER JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
+LEFT JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
 ORDER BY a.google_formatted_address, a.complemento_imovel
