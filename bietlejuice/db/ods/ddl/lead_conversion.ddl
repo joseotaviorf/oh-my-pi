@@ -1,14 +1,13 @@
-DROP TABLE IF EXISTS public.lead_conversion;
-CREATE TABLE lead_conversion (
-  id integer NOT NULL,
-  imovel_id integer NOT NULL,
-  "leadConvertido_id" integer DEFAULT NULL,
-  vendedor_id integer DEFAULT NULL,
-  "gerenteContas_id" integer DEFAULT NULL,
-  validado integer DEFAULT NULL,
-  status varchar(255) DEFAULT NULL,
-  tipo varchar(31) NOT NULL,
-  "dataConversao" datetime NOT NULL,
-  "atualizadoEm" datetime DEFAULT NULL,
-  "criadoEm" datetime DEFAULT NULL
-) WITH (oids = false);
+drop table if exists lead_conversion;
+create table if not exists lead_conversion (
+  id bigint,
+  id_house bigint,
+  id_lead bigint,
+  id_seller bigint,
+  id_account_manager bigint,
+  ts_updated timestamp,
+  ts_created timestamp,
+  is_valid integer,
+  status varchar(255),
+  "type" varchar(31)
+);
