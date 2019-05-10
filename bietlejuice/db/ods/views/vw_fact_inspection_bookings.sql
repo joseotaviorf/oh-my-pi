@@ -3,13 +3,12 @@ create or replace view vw_fact_inspection_bookings as
 with inspection_booking_retries as (
   select
     insp.id,
-    count(1) as retries
-  from inspection insp
+    row_number() over (partition by c.id, insp."type" order by b.id asc) as rn
+  from contract c
+  join inspection insp
+    on c.id = insp.id_contract
   join booking b
-    on insp.id_booking = b.id
-      and b.tipo = 'Vistoria'
-      and b."reagendadoDe_id" is not null
-  group by 1
+	on insp.id_booking = b.id
 )
 select
   insp.id as sk_inspection,
@@ -21,7 +20,7 @@ select
   coalesce(to_char(insp.ts_expired, 'YYYYMMDD')::integer, -1) as sk_expired_date,
   coalesce(to_char(insp.ts_tenant_approved, 'YYYYMMDD')::integer, -1) as sk_tenant_approved_date,
   coalesce(to_char(insp.ts_owner_approved, 'YYYYMMDD')::integer, -1) as sk_owner_approved_date,
-  coalesce(retries, 0) as booking_retries,
+  coalesce(ibr.rn, 1) as booking_retry_by_inspection_type,
   now()::timestamp as ts_load
 from inspection insp
 left join booking b
