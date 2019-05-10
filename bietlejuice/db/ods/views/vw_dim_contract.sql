@@ -1,7 +1,7 @@
 drop view if exists vw_dim_contract;
 create view vw_dim_contract as
 with b2b_info as (
-  select
+  select distinct
     c.id as id_contract,
     -- although these rules are replicated from vw_dim_lead, it would much work to centralize with ODS right now
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
