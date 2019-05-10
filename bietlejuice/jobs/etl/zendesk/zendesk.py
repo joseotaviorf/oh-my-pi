@@ -39,8 +39,8 @@ class Zendesk(object):
                                                          bucket_type if bucket_type == 'clean' else 'stitch',
                                                          class_.value),
             database='datalake_{}'.format(bucket_type) if bucket_type == 'clean' else 'stitch',
-            table='zendesk_{}'.format(class_.value),
-            partition_name='dt_load',
+            table='zendesk_{}'.format(class_.value) if bucket_type == 'clean' else class_.value,
+            partition_name='dt',
             partition_value=self.partition_date
         )
 
