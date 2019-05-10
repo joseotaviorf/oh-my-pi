@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.stitch_zendesk_tickets;
-create external table if not exists datalake_clean.stitch_zendesk_tickets (
+drop table if exists datalake_clean.zendesk_tickets;
+create external table if not exists datalake_clean.zendesk_tickets (
     ticket_id string,
     satisfaction_rating string,
     ticket_url string,
@@ -31,7 +31,7 @@ create external table if not exists datalake_clean.stitch_zendesk_tickets (
     ts_load string
 )
 partitioned by (
-    dt_load
+    dt string
 )
 stored as parquet
-location 's3://5a-datalake/clean/stitch_zendesk/';
+location 's3://5a-datalake/clean/zendesk/';

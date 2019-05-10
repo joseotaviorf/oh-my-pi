@@ -6,11 +6,11 @@ with stitch_data as (
 	   		from_iso8601_timestamp(created_at) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
 			from_iso8601_timestamp(created_at) at time zone 'GMT-3',
 			from_iso8601_timestamp(created_at) at time zone 'Brazil/East') as ts_created_local,
-		regexp_extract(satisfaction_rating, '\{"score":"(\w+)".+', 1) as score,
-		regexp_extract(via, '\{"channel":"(\w+)".+', 1) as channel,
+		regexp_extract(satisfaction_rating, '\."score":"(\w+)".+', 1) as score,
+		regexp_extract(via, '\."channel":"(\w+)".+', 1) as channel,
     	row_number() over (partition by id, dt order by updated_at desc) as last_updated
     from stitch.tickets
-    where regexp_extract(via, '\{"channel":"(\w+)".+', 1) is not null
+    where regexp_extract(via, '\."channel":"(\w+)".+', 1) is not null
 		  and raw_subject != 'SCRUBBED'
 		  and dt = '{execution_date}'
 )
@@ -23,6 +23,7 @@ select
     raw_subject,
     subject,
     channel,
+    via,
     tags,
     group_id,
     ticket_form_id, 
@@ -31,8 +32,8 @@ select
     collaborator_ids,
     brand_id,
     submitter_id,
-    custom_fields,
     status,
+    custom_fields,
     has_incidents,
     type,
     allow_channelback,
@@ -42,6 +43,6 @@ select
     cast(from_iso8601_timestamp(created_at) as varchar) as ts_created,
     cast(ts_created_local as varchar) as ts_created_local,
     cast(from_iso8601_timestamp(updated_at) as varchar) as ts_updated,
-    now() as ts_load
-from stitch_data t
+    cast(now() as varchar) as ts_load
+from stitch_data
 where last_updated = 1;
