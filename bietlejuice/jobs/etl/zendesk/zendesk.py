@@ -15,7 +15,7 @@ class Zendesk(object):
     @logger
     def __init__(self, s3_bucket, execution_date):
         self.s3_bucket = s3_bucket
-        self.partition_date = execution_date.strftime('%Y-%m-%d')
+        self.execution_date = execution_date.strftime('%Y-%m-%d')
 
         self.athena_client = AthenaClient(self.s3_bucket)
         self.s3_resource = boto3.resource('s3')
@@ -41,7 +41,7 @@ class Zendesk(object):
             database='datalake_{}'.format(bucket_type) if bucket_type == 'clean' else 'stitch',
             table='zendesk_{}'.format(class_.value) if bucket_type == 'clean' else class_.value,
             partition_name='dt',
-            partition_value=self.partition_date
+            partition_value=self.execution_date
         )
 
     @logger
@@ -61,18 +61,18 @@ class Zendesk(object):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned(self, class_, r_cols, c_cols):
-        key = 'clean/zendesk/{1}/dt={2}/{2}.parq'.format(class_.value, self.partition_date)
+        key = 'clean/zendesk/{0}/dt={1}/{1}.parq'.format(class_.value, self.execution_date)
         self._move_to_clean(
             class_=class_,
             key=key,
             r_cols=r_cols,
             c_cols=c_cols,
-            partition_date=self.partition_date
+            execution_date=self.execution_date
         )
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_full(self, class_, r_cols, c_cols):
-        key = 'clean/zendesk/{1}/data.parq'.format(class_.value)
+        key = 'clean/zendesk/{}/data.parq'.format(class_.value)
         self._move_to_clean(
             class_=class_,
             key=key,
@@ -83,7 +83,8 @@ class Zendesk(object):
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, class_, key, r_cols, c_cols, **params):
         query = BaseETL.get_query_from_file_name(
-            '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
+            # temporary
+            '{}/zendesk/stitch_{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
 
         self.athena_client.create_parquet_from_query(

@@ -1,11 +1,13 @@
+from collections import OrderedDict
 from qa_python_utils import QuintoAndarLogger
 from bietlejuice.jobs.etl.zendesk.zendesk import Zendesk
+from bietlejuice.jobs.etl.zendesk.table_enum import ZendeskTableEnum
 
 logger = QuintoAndarLogger('ZendeskTickets')
 
 
 class ZendeskTickets(Zendesk):
-    TABLE = 'tickets'
+    CLASS_ENUM = ZendeskTableEnum.TICKETS
 
     @logger
     def __init__(self, s3_bucket, execution_date):
@@ -16,4 +18,44 @@ class ZendeskTickets(Zendesk):
 
     @logger
     def upsert_single_partition(self, bucket_type, class_):
-        self._upsert_single_partition(bucket_type=bucket_type, class_=self.TABLE)
+        self._upsert_single_partition(bucket_type=bucket_type, class_=ZendeskTickets.CLASS_ENUM)
+
+    @logger
+    def move_to_clean(self):
+        r_cols = OrderedDict([
+            ('ticket_id', str),
+            ('satisfaction_rating', str),
+            ('ticket_url', str),
+            ('priority', str),
+            ('score', str),
+            ('raw_subject', str),
+            ('subject', str),
+            ('channel', str),
+            ('via', str),
+            ('tags', str),
+            ('group_id', str),
+            ('ticket_form_id', str),
+            ('requester_id', str),
+            ('assignee_id', str),
+            ('collaborator_ids', str),
+            ('brand_id', str),
+            ('submitter_id', str),
+            ('status', str),
+            ('custom_fields', str),
+            ('has_incidents', str),
+            ('type', str),
+            ('allow_channelback', str),
+            ('description', str),
+            ('recipient', str),
+            ('is_public', str),
+            ('ts_created', str),
+            ('ts_created_local', str),
+            ('ts_updated', str),
+            ('ts_load', str)
+        ])
+
+        self._move_to_clean_partitioned(
+            class_=ZendeskTickets.CLASS_ENUM,
+            r_cols=r_cols,
+            c_cols=r_cols
+        )

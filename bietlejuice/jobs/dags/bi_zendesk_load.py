@@ -29,6 +29,16 @@ main_dag = DAG(
 )
 
 
+def exec_factory_method(class_, method, **kwargs):
+    zendesk = ZendeskFactory.factory(
+        entity=class_,
+        s3_bucket=s3_bucket,
+        execution_date=kwargs['execution_date']
+    )
+
+    getattr(zendesk, method)()
+
+
 def upsert_partition(class_, bucket_type, method, **kwargs):
     zendesk = ZendeskFactory.factory(
         entity=class_,
@@ -68,6 +78,21 @@ def sub_dag(sub_dag_name, **kwargs):
     # extract and load data by StitchData
 
     upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
+
+    move_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_to_clean',
+        python_callable=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'method': 'move_to_clean'
+        }
+    )
+
+    upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
+    upsert_raw_partition_task >> move_to_clean_task
+    move_to_clean_task >> upsert_clean_partition_task
 
     return local_dag
 
