@@ -17,11 +17,11 @@ class ZendeskTickets(Zendesk):
         )
 
     @logger
-    def upsert_single_partition(self, bucket_type, class_):
+    def upsert_single_partition(self, class_, bucket_type):
         self._upsert_single_partition(bucket_type=bucket_type, class_=ZendeskTickets.CLASS_ENUM)
 
     @logger
-    def move_to_clean(self):
+    def move_to_clean(self, class_, bucket_type):
         r_cols = OrderedDict([
             ('id_ticket', str),
             ('satisfaction_rating', str),

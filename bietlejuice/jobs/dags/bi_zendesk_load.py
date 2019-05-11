@@ -8,7 +8,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
 
 MAIN_DAG_ID = 'bi-zendesk-load'
-MAIN_START_DATE = datetime(2019, 5, 9, 0, 0, 0)
+MAIN_START_DATE = datetime(2019, 5, 7, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -29,17 +29,7 @@ main_dag = DAG(
 )
 
 
-def exec_factory_method(class_, method, **kwargs):
-    zendesk = ZendeskFactory.factory(
-        entity=class_,
-        s3_bucket=s3_bucket,
-        execution_date=kwargs['execution_date']
-    )
-
-    getattr(zendesk, method)()
-
-
-def upsert_partition(class_, bucket_type, method, **kwargs):
+def exec_factory_method(class_, bucket_type, method, **kwargs):
     zendesk = ZendeskFactory.factory(
         entity=class_,
         s3_bucket=s3_bucket,
@@ -52,13 +42,13 @@ def upsert_partition(class_, bucket_type, method, **kwargs):
 def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
     upsert_partition_task = BaseDAG.build_python_operator(
         task_id='upsert_{}_{}_partition'.format(bucket_type, sub_dag_name),
-        python_callable=upsert_partition,
+        python_callable=exec_factory_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
             'class_': kwargs['class_'],
             'bucket_type': bucket_type,
-            'method': '_upsert_single_partition'
+            'method': 'upsert_single_partition'
         }
     )
 
@@ -86,6 +76,7 @@ def sub_dag(sub_dag_name, **kwargs):
         provide_context=True,
         op_kwargs={
             'class_': kwargs['class_'],
+            'bucket_type': 'clean',
             'method': 'move_to_clean'
         }
     )

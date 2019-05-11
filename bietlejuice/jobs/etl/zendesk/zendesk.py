@@ -24,10 +24,6 @@ class Zendesk(object):
     def move_to_clean(self):
         raise NotImplementedError('m=move_to_clean, msg=method not implemented')
 
-    @abstractmethod
-    def mount_partitions(self, class_, bucket_type):
-        raise NotImplementedError('m=mount_partitions, msg=method not implemented')
-
     @logger
     def _upsert_single_partition(self, class_, bucket_type):
         if bucket_type not in ('raw', 'clean'):
@@ -44,23 +40,11 @@ class Zendesk(object):
             partition_value=self.execution_date
         )
 
-    @logger
-    def _upsert_partitions(self, class_, bucket_type, partitions_list_dicts):
-        if bucket_type not in ('raw', 'clean'):
-            raise ValueError('m=_upsert_partitions, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
-
-        self.athena_client.upsert_partitions(
-            # temporary
-            bucket_folder_path='{}/{}/zendesk/{}'.format(self.s3_bucket if bucket_type == 'clean' else '5a-datalake-leo-test',
-                                                         bucket_type if bucket_type == 'clean' else 'stitch',
-                                                         class_.value),
-            database='datalake_{}'.format(bucket_type),
-            table='zendesk_{}'.format(class_.value),
-            partitions_list_dicts=partitions_list_dicts
-        )
-
-    @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean_partitioned(self, class_, r_cols, c_cols):
+
+        logger.info('m=_move_to_clean_partitioned, class_={}, \nr_cols={}, \nc_cols={}'
+                    .format(class_, str(r_cols), str(c_cols)))
+
         key = 'clean/zendesk/{0}/dt={1}/{1}.parq'.format(class_.value, self.execution_date)
         self._move_to_clean(
             class_=class_,
@@ -70,18 +54,11 @@ class Zendesk(object):
             execution_date=self.execution_date
         )
 
-    @logger(exclude=['r_cols', 'c_cols'])
-    def _move_to_clean_full(self, class_, r_cols, c_cols):
-        key = 'clean/zendesk/{}/data.parq'.format(class_.value)
-        self._move_to_clean(
-            class_=class_,
-            key=key,
-            r_cols=r_cols,
-            c_cols=c_cols
-        )
-
-    @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, class_, key, r_cols, c_cols, **params):
+
+        logger.info('m=_move_to_clean, class_={}, key={}, \nr_cols={}, \nc_cols={}, \n**params={}'
+                    .format(class_, key, str(r_cols), str(c_cols), params))
+
         query = BaseETL.get_query_from_file_name(
             # temporary
             '{}/zendesk/stitch_{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
