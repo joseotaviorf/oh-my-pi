@@ -1,6 +1,6 @@
 with distinct_data as (
     select distinct t.*
-    from datalake_clean.zendesk_users t
+    from datalake_clean.zendesk_users_xplenty t
     __WHERE_CLAUSE__
 )
 select

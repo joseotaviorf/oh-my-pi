@@ -379,7 +379,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_users_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'users'
+        table_name = 'users_xplenty'
 
         zendesk.users(table_name)
 
