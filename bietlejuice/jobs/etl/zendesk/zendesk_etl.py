@@ -40,7 +40,7 @@ class ZendeskETL(object):
 
     @logger
     def tickets(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/tickets.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/tickets_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -121,7 +121,7 @@ class ZendeskETL(object):
 
     @logger
     def ticket_fields(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_fields.sql'.format(DATALAKE_QUERIES_DIR))
+        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_fields_xplenty.sql'.format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
             ('id', str),
@@ -253,7 +253,7 @@ class ZendeskETL(object):
 
     @logger
     def users(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/users.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/users_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -348,7 +348,7 @@ class ZendeskETL(object):
 
     @logger
     def groups(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/groups.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/groups_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -379,7 +379,7 @@ class ZendeskETL(object):
 
     @logger
     def articles(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/articles.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/articles_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -446,7 +446,7 @@ class ZendeskETL(object):
 
     @logger
     def group_memberships(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/group_memberships.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/group_memberships_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([

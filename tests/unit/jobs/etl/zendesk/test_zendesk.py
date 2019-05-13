@@ -344,7 +344,7 @@ class TestZendeskETL(object):
         zendesk.tickets(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/tickets.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/tickets_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
@@ -357,7 +357,7 @@ class TestZendeskETL(object):
         zendesk.ticket_fields(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/ticket_fields.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/ticket_fields_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
@@ -384,7 +384,7 @@ class TestZendeskETL(object):
         zendesk.users(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/users.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/users_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
@@ -397,7 +397,7 @@ class TestZendeskETL(object):
         zendesk.groups(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/groups.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/groups_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
@@ -410,7 +410,7 @@ class TestZendeskETL(object):
         zendesk.articles(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/articles.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/articles_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
@@ -423,7 +423,7 @@ class TestZendeskETL(object):
         zendesk.group_memberships(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/group_memberships.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/group_memberships_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
