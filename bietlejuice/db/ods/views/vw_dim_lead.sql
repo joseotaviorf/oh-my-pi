@@ -79,7 +79,7 @@ CREATE VIEW public.vw_dim_lead as
   l.flg_latlng_served,
   l.flg_location_served,
   lsf.score_factor,
-  coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
+  coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or pa_b2b.id is not null, false) as is_b2b,
   case
     when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
      then 'online'
