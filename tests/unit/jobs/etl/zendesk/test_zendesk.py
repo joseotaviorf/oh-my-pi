@@ -339,7 +339,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_tickets_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'tickets'
+        table_name = 'tickets_xplenty'
 
         zendesk.tickets(table_name)
 
@@ -392,7 +392,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_groups_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'groups'
+        table_name = 'groups_xplenty'
 
         zendesk.groups(table_name)
 
@@ -418,7 +418,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_group_memberships_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'group_memberships'
+        table_name = 'group_memberships_xplenty'
 
         zendesk.group_memberships(table_name)
 
