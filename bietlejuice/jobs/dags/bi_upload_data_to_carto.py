@@ -56,7 +56,9 @@ tasks = [
     {'carto_table_name': 'cnpj_bldgs_doormen_data',
      'final_sql': 'UPDATE cnpj_bldgs_doormen_data SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
     {'carto_table_name': 'qa_subregions',
-     'final_sql': 'UPDATE qa_subregions SET the_geom = ST_GeomFromText(geometry, 4326)'}
+     'final_sql': 'UPDATE qa_subregions SET the_geom = ST_GeomFromText(geometry, 4326)'},
+    {'carto_table_name': 'qa_listings',
+     'final_sql': 'UPDATE qa_listings SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL'}
 ]
 
 MAIN_DAG_NAME = 'bi-upload-data-to-carto'
