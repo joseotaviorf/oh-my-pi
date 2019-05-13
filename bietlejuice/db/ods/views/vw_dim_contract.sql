@@ -1,38 +1,85 @@
 drop view if exists vw_dim_contract;
 create view vw_dim_contract as
+with b2b_info as (
+  select distinct
+    c.id as id_contract,
+    -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
+    -- TODO: after moving everything to our data lake, we can centralize rules like these ones
+    coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
+    case
+      when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+       then 'online'
+      when pa_b2b.id is not null
+       then 'prime'
+    end as b2b_type,
+    case
+    -- because a lead can have both 'affiliate_type' = 'B2BPartner' and 'partner_agent.id' not null and we need to
+    -- prioritize the first type (online), the following check must be done
+      when pa_b2b.id is not null and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
+        then
+          case
+            when pj.id is null
+              then 'advanced_negotiation'
+            when h.external_id is null
+              then 'standard'
+            when h.external_id is not null
+              then 'batch'
+          end
+    end as b2b_prime_type
+  from contract c
+  join house h
+    on c.id_house = h.id
+  left join lead_conversion lc
+    on lc.id_house = h.id
+  left join lead l
+    on l.id = lc.id_lead
+  left join reprocessed_lead rl
+    on rl.id = l.id
+  left join lead lo
+    on lo.id = rl.id_origin_lead
+  left join partner_agent pa_b2b
+	on pa_b2b.user_id = h.usuario_id
+  left join photo_job pj
+    on pj.imovel_id = h.id
+)
 select
-  id as sk_contract,
-  id as id_contract,
-  rent,
-  day_month_due,
-  guarantee,
-  type,
-  status,
-  dt_start,
-  ts_signature,
-  ts_draft_approved,
-  dt_entrance,
-  dt_intended_end,
-  dt_annulment,
-  condo_payer,
-  condo_responsible,
-  iptu_payer,
-  iptu_responsible,
-  rental_insurance_installments,
-  rental_insurance_value,
-  home_insurance_installments,
-  home_insurance_value,
-  first_rental_commission,
-  condo,
-  iptu,
-  signature_type,
-  closing_status,
-  ts_created,
-  ts_updated,
-  ts_canceled,
-  cancellation_reason,
+  c.id as sk_contract,
+  c.id as id_contract,
+  c.rent,
+  c.day_month_due,
+  c.guarantee,
+  c.type,
+  c.status,
+  c.dt_start,
+  c.ts_signature,
+  c.ts_draft_approved,
+  c.dt_entrance,
+  c.dt_intended_end,
+  c.dt_annulment,
+  c.condo_payer,
+  c.condo_responsible,
+  c.iptu_payer,
+  c.iptu_responsible,
+  c.rental_insurance_installments,
+  c.rental_insurance_value,
+  c.home_insurance_installments,
+  c.home_insurance_value,
+  c.first_rental_commission,
+  c.condo,
+  c.iptu,
+  c.signature_type,
+  c.closing_status,
+  c.ts_created,
+  c.ts_updated,
+  c.ts_canceled,
+  c.cancellation_reason,
+  bi.is_b2b,
+  bi.b2b_type,
+  bi.b2b_prime_type,
   now()::timestamp as ts_load
-from contract
+from contract c
+left join b2b_info bi
+  on c.id = bi.id_contract
 ;
 
 

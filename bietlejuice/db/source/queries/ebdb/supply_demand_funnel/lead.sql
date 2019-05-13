@@ -54,7 +54,7 @@ select distinct
   udc.email as dados_corretor_email,
   udgc.nome as dados_gerente_contas_nome,
   udgc.email as dados_gerente_contas_email,
-  da.tipoAfiliado as dados_afiliado_tipo_afiliado,
+  da.affiliateType as affiliate_type,
   da.inicioAtuacao as dados_afiliado_inicio_atuacao,
   da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
   l.region_id,

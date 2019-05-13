@@ -1,8 +1,9 @@
-drop table if exists dim_partner;
-create table dim_partner (
+drop table if exists staging.dim_partner;
+create table staging.dim_partner (
     sk_partner bigint,
     id_partner bigint,
     name varchar,
+    trade_name varchar,
     phone varchar,
     email varchar,
     cnpj varchar,

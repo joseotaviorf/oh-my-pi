@@ -55,7 +55,7 @@ CREATE TABLE staging.dim_lead (
   dados_corretor_email VARCHAR(200),
   dados_gerente_contas_nome VARCHAR(200),
   dados_gerente_contas_email VARCHAR(200),
-  dados_afiliado_tipo_afiliado VARCHAR(255),
+  affiliate_type VARCHAR(255),
   dados_afiliado_inicio_atuacao TIMESTAMP WITHOUT TIME ZONE,
   dados_afiliado_cidade_atuacao VARCHAR(100),
   region_id INTEGER,
@@ -76,5 +76,7 @@ CREATE TABLE staging.dim_lead (
   flg_latlng_served boolean,
   flg_location_served boolean,
   score_factor bigint,
+  is_b2b boolean,
+  b2b_type varchar,
   load_timestamp TIMESTAMP WITHOUT TIME ZONE
 ) ;

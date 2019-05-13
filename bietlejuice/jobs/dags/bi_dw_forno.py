@@ -47,6 +47,11 @@ def check_cluster_availability(target_cluster):
     rs_client.wait_for_cluster_availability(cluster_id=target_cluster)
 
 
+def check_cluster_availability_after_restore(target_cluster):
+    rs_client = RedshiftClient()
+    rs_client.wait_for_cluster_restore(cluster_id=target_cluster)
+
+
 def scale_down_cluster(target_cluster):
     rs_client = RedshiftClient()
     rs_client.scale_down_cluster(cluster_id=target_cluster)
@@ -88,10 +93,10 @@ create_cluster_task = BaseDAG.build_python_operator(
                'config_json': DW_FORNO_CONFIGS}
 )
 
-check_cluster_availability_task = BaseDAG.build_python_operator(
+check_cluster_availability_after_restore_task = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='check_cluster_availability',
-    python_callable=check_cluster_availability,
+    task_id='check_cluster_availability_after_restore',
+    python_callable=check_cluster_availability_after_restore,
     op_kwargs={'target_cluster': DW_FORNO_ID}
 )
 
@@ -111,5 +116,5 @@ check_cluster_scaled_down_availability_task = BaseDAG.build_python_operator(
 
 # Tasks Flow
 airflow_helpers.chain(shutdown_cluster_cluster_task, check_cluster_shutdown_task, create_cluster_task,
-                      check_cluster_availability_task, scale_down_cluster_task,
+                      check_cluster_availability_after_restore_task, scale_down_cluster_task,
                       check_cluster_scaled_down_availability_task)
