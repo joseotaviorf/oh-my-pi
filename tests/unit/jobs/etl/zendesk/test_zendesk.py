@@ -405,7 +405,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_articles_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'articles'
+        table_name = 'articles_xplenty'
 
         zendesk.articles(table_name)
 
