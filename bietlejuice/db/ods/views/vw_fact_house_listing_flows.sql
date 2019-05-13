@@ -82,13 +82,8 @@ leads_b2b as (
 	  on u_b2b_prime.telefone_principal = l.telefone_anunciante
   left join partner_agent pa_b2b_prime
 	  on pa_b2b_prime.user_id = u_b2b_prime.id
-	left join user_affiliate ua
-    on l.usuario_que_indicou_id = ua.id
-      and ua.affiliateType = 'B2BPartner'
-  left join usuario u_b2b_online
-    on u_b2b_online.dados_afiliado_id = ua.id
   left join partner_agent pa_b2b_online
-    on pa_b2b_online.user_id = u_b2b_online.id
+    on pa_b2b_online.user_id = l.usuario_que_indicou_id
   where coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id) is not null
 ),
 potential_listings as (
@@ -216,7 +211,7 @@ potential_listings as (
         regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g') =
 		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
 	left join leads_b2b l_b2b
-      on l_b2b.id_lead = l.id
+      on l_b2b.id_lead = f.lead_id
 ),
 taxonomy as (
     select
