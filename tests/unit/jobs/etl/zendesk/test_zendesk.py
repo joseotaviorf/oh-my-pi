@@ -339,7 +339,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_tickets_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'tickets_xplenty'
+        table_name = 'tickets'
 
         zendesk.tickets(table_name)
 
@@ -352,7 +352,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_ticket_fields_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'ticket_fields_xplenty'
+        table_name = 'ticket_fields'
 
         zendesk.ticket_fields(table_name)
 
@@ -379,7 +379,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_users_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'users_xplenty'
+        table_name = 'users'
 
         zendesk.users(table_name)
 
@@ -392,7 +392,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_groups_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'groups_xplenty'
+        table_name = 'groups'
 
         zendesk.groups(table_name)
 
@@ -405,7 +405,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_articles_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'articles_xplenty'
+        table_name = 'articles'
 
         zendesk.articles(table_name)
 
@@ -418,7 +418,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_group_memberships_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'group_memberships_xplenty'
+        table_name = 'group_memberships'
 
         zendesk.group_memberships(table_name)
 
