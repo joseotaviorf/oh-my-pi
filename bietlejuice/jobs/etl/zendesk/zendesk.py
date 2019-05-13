@@ -30,7 +30,7 @@ class Zendesk(object):
             raise ValueError('m=_upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.upsert_single_partition(
-            # temporary
+            # temp
             bucket_folder_path='{}/{}/zendesk/{}'.format(self.s3_bucket if bucket_type == 'clean' else '5a-datalake-leo-test',
                                                          bucket_type if bucket_type == 'clean' else 'stitch',
                                                          class_.value),
@@ -60,7 +60,7 @@ class Zendesk(object):
                     .format(class_, key, str(r_cols), str(c_cols), params))
 
         query = BaseETL.get_query_from_file_name(
-            # temporary
+            # temp
             '{}/zendesk/stitch_{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
 
