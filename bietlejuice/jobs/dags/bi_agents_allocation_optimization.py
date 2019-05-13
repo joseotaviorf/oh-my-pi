@@ -8,6 +8,7 @@ from airflow.contrib.operators.emr_terminate_job_flow_operator import EmrTermina
 from airflow.contrib.sensors.emr_step_sensor import EmrStepSensor
 from airflow.models import DAG
 from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -15,6 +16,8 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.sensors import QuintoAndarEmrJobFlowSensor
 
 # global vars
+logger = QuintoAndarLogger('bi-agents-allocation-optimization')
+
 MAIN_DAG_ID = 'bi-agents-allocation-optimization'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = None
@@ -39,13 +42,17 @@ bi_hekima_json = json.loads(env.get_airflow_env_var('bi-agents-allocation-optimi
 
 
 # functions
-def add_new_table_partition(ds, schema, table_name, **kwargs):
+def add_new_table_partition(ds, schema, table_name, bucket_folder_path, partition_name, **kwargs):
+    logger.info(
+        'm=add_new_table_partition, ds={}, schema={}, table_name={}, bucket_folder_path={}, partition_name={}'.format(
+            ds, schema, table_name, bucket_folder_path, partition_name))
+
     athena_client = AthenaClient(s3_bucket)
     athena_client.upsert_single_partition(
-        bucket_folder_path='{}/hekima/optimization_result/historical'.format(s3_bucket),
+        bucket_folder_path='{}/hekima/{}/historical'.format(s3_bucket, bucket_folder_path),
         database=schema,
         table=table_name,
-        partition_name='dt_predicted',
+        partition_name=partition_name,
         partition_value=ds
     )
 
@@ -173,7 +180,35 @@ add_new_visits_table_partition_task = BaseDAG.build_python_operator(
     provide_context=True,
     op_kwargs={
         'schema': 'datalake_raw',
-        'table_name': 'adjusted_visits_prediction'
+        'table_name': 'visits_prediction',
+        'bucket_folder_path': 'results/prediction/rf',
+        'partition_name': 'dt_predicted'
+    }
+)
+
+add_new_visits_adjustment_table_partition_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='add_new_visits_adjustment_table_partition',
+    python_callable=add_new_table_partition,
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'adjusted_visits_prediction',
+        'bucket_folder_path': 'results/prediction/rf/visits_adjustment',
+        'partition_name': 'dt_predicted'
+    }
+)
+
+add_new_visits_conversion_table_partition_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='add_new_visits_conversion_table_partition',
+    python_callable=add_new_table_partition,
+    provide_context=True,
+    op_kwargs={
+        'schema': 'datalake_raw',
+        'table_name': 'visits_conversion',
+        'bucket_folder_path': 'results/prediction/rf/visits_conversion',
+        'partition_name': 'dt_calculated'
     }
 )
 
@@ -191,7 +226,9 @@ add_new_agents_table_partition_task = BaseDAG.build_python_operator(
     provide_context=True,
     op_kwargs={
         'schema': 'datalake_raw',
-        'table_name': 'agents_allocation_optimization'
+        'table_name': 'agents_allocation_optimization',
+        'bucket_folder_path': 'optimization_result',
+        'partition_name': 'dt_predicted'
     }
 )
 
@@ -209,6 +246,8 @@ airflow_helpers.chain(
     agents_allocation_optimization_sub_dag_task
 )
 
-visits_learning_sub_dag_task >> add_new_visits_table_partition_task
+visits_learning_sub_dag_task.set_downstream([add_new_visits_table_partition_task,
+                                             add_new_visits_adjustment_table_partition_task,
+                                             add_new_visits_conversion_table_partition_task])
 agents_allocation_optimization_sub_dag_task.set_downstream([add_new_agents_table_partition_task,
                                                             terminate_job_flow_sub_dag_task])
