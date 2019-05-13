@@ -100,7 +100,7 @@ listings_join_doorman AS
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+    AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
   GROUP BY d.id_user_doorman
 )
 SELECT
