@@ -36,7 +36,7 @@ class TestZendeskETL(object):
 
         # assert
         assert mock_add_partition.call_count == 1
-        assert mock_add_partition.call_args[1]['table_name'] == 'zendesk_{}'.format(table_name)
+        assert mock_add_partition.call_args[1]['table_name'] == 'zendesk_{}_xplenty'.format(table_name)
         assert mock_add_partition.call_args[1]['partition'] == "dt_extraction='2018-01-01'"
         assert mock_create_parquet_from_query.call_count == 1
         assert mock_create_parquet_from_query.call_args[1]['query'] == query
