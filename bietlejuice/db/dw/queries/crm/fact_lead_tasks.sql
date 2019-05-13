@@ -15,7 +15,7 @@
 	count(1) over (PARTITION by sk_task) as total_actions,
     action_type,
     sk_assignee
- FROM crm.fact_lead_tasks flta -- to be crm.fact_lead_task_actions
+ FROM crm.fact_lead_task_actions flta
 ),
 task_dates as (
 select 
@@ -52,7 +52,6 @@ select
 	coalesce(td.sk_first_resolved_date, -1) as sk_first_resolved_date,
 	coalesce(tm.sk_assignee, -1) as sk_user_first_asignee,
 	coalesce(tm2.sk_assignee, -1) as sk_rank_user_first_resolver
-into crm.fact_lead_tasks_test
 from task_dates td
 join first_assignee fa
 	on td.sk_task = fa.sk_task

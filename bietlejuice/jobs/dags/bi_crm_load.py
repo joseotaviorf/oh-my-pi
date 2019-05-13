@@ -492,7 +492,7 @@ fact_lead_tasks_task = BaseDAG.build_python_operator(
                'append': False,
                'db_enum_source': EnumDB.BI_DW,
                'db_enum_destination': EnumDB.BI_DW,
-               'table_name': 'fact_lead_tasks_test'
+               'table_name': 'fact_lead_tasks'
                }
 )
 
