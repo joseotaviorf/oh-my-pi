@@ -371,7 +371,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/groups_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -501,14 +501,14 @@ class ZendeskETL(object):
 
         self.athena_client.add_partition(
             database=ZendeskETL.SCHEMAS['clean'],
-            table_name="zendesk_{}".format(table_name),
+            table_name="zendesk_{}_xplenty".format(table_name),
             partition="dt_extraction='{}'".format(self.execution_date)
         )
 
     @logger
     def _is_clean_table_empty(self, table_name):
         result = self.athena_client.execute_query_and_return_dataframe(
-            "select 1 from {}.zendesk_{} limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
+            "select 1 from {}.zendesk_{}_xplenty limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
 
         empty = len(result) == 0
 
