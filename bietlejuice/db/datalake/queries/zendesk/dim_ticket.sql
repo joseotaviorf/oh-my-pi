@@ -35,7 +35,7 @@ fields_map as (
     select f.id,
         map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
-    left join datalake_clean.zendesk_ticket_fields cf
+    left join datalake_clean.zendesk_ticket_fields_xplenty cf
        on cf.id = f.field_id
     where f.value is not null
     group by f.id

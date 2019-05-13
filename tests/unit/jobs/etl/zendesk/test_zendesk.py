@@ -352,7 +352,7 @@ class TestZendeskETL(object):
     @mock.patch.object(ZendeskETL, '_move_to_clean')
     def test_ticket_fields_with_right_query_path(self, mock__move_to_clean, mock_get_query_from_file_name, zendesk):
         # arrange
-        table_name = 'ticket_fields'
+        table_name = 'ticket_fields_xplenty'
 
         zendesk.ticket_fields(table_name)
 
