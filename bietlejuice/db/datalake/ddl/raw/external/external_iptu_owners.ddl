@@ -1,4 +1,4 @@
-drop table datalake_raw.external_iptu_owners
+drop table if exists datalake_raw.external_iptu_owners;
 
 create external table datalake_raw.external_iptu_owners (
   uf string,
@@ -20,6 +20,7 @@ create external table datalake_raw.external_iptu_owners (
   proprietario_match_tipo string,
   proprietario_cpf_cnpj string,
   proprietario_obito string,
+  proprietario_idade string,
   direct_id string,
   data_consulta string
 )
