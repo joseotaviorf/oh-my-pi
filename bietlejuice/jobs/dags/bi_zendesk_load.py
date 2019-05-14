@@ -6,6 +6,7 @@ from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
 
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
+import airflow.utils.helpers as airflow_helpers
 
 MAIN_DAG_ID = 'bi-zendesk-load'
 MAIN_START_DATE = datetime(2019, 5, 7, 0, 0, 0)
@@ -82,8 +83,12 @@ def sub_dag(sub_dag_name, **kwargs):
     )
 
     upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
-    upsert_raw_partition_task >> move_to_clean_task
-    move_to_clean_task >> upsert_clean_partition_task
+
+    airflow_helpers.chain(
+        upsert_raw_partition_task,
+        move_to_clean_task,
+        upsert_clean_partition_task
+    )
 
     return local_dag
 
@@ -93,4 +98,11 @@ tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='tickets',
     sub_dag_func=sub_dag,
     class_=ZendeskTableEnum.TICKETS
+)
+
+ticket_fields_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='ticket_fields',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.TICKET_FIELDS
 )

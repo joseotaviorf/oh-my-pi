@@ -60,7 +60,6 @@ class Zendesk(object):
                     .format(class_, key, str(r_cols), str(c_cols), params))
 
         query = BaseETL.get_query_from_file_name(
-            # temp
             '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
 
