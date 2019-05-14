@@ -4,6 +4,7 @@ SELECT
   id as sk_partner,
   id as id_partner,
   name,
+  trade_name,
   phone,
   email,
   cnpj,

@@ -1,5 +1,45 @@
 drop view if exists vw_dim_house_listing;
 create or replace view vw_dim_house_listing as
+with b2b_info as (
+  select distinct
+    h.id as id_house,
+    -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
+    -- TODO: after moving everything to our data lake, we can centralize rules like these ones
+    coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner', pa_b2b.id is not null) as is_b2b,
+    case
+      when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+       then 'online'
+      when pa_b2b.id is not null
+       then 'prime'
+    end as b2b_type,
+    case
+    -- because a lead can have both 'affiliate_type' = 'B2BPartner' and 'partner_agent.id' not null and we need to
+    -- prioritize the first type (online), the following check must be done
+      when pa_b2b.id is not null and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
+        then
+          case
+            when pj.id is null
+              then 'advanced_negotiation'
+            when h.external_id is null
+              then 'standard'
+            when h.external_id is not null
+              then 'batch'
+          end
+    end as b2b_prime_type
+  from house h
+  left join lead_conversion lc
+    on lc.id_house = h.id
+  left join lead l
+    on l.id = lc.id_lead
+  left join reprocessed_lead rl
+    on rl.id = l.id
+  left join lead lo
+    on lo.id = rl.id_origin_lead
+  left join partner_agent pa_b2b
+	on pa_b2b.user_id = h.usuario_id
+  left join photo_job pj
+    on pj.imovel_id = h.id
+)
 select
   ((h.id || '00') || coalesce(pl.version, 1))::bigint as sk_house_listing,
   h.id as id_house,
@@ -55,7 +95,12 @@ select
   h.key_location,
   coalesce(h.visit_restriction = 'Restriction', false) as has_visit_restriction,
   h.predicted_price as house_predicted_price,
+  bi.is_b2b,
+  bi.b2b_type,
+  bi.b2b_prime_type,
   now() as ts_load
 from house h
 left join house_listing pl
   on pl.id = h.id
+left join b2b_info bi
+  on bi.id_house = h.id

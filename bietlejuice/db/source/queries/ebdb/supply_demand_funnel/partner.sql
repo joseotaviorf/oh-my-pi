@@ -7,6 +7,7 @@ SELECT
    p.creci,
    p.partnershipStartsAt AS ts_joined_partnership,
    p.atualizadoEm AS ts_updated,
-   p.criadoEm AS ts_created
+   p.criadoEm AS ts_created,
+   p.tradeName as trade_name
 FROM
    Partner AS p;

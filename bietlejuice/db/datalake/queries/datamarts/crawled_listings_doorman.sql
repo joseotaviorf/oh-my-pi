@@ -125,7 +125,7 @@ listings_join_doorman AS
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+    AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
     -- guarantee only 1 bldg match per doorman (nearest?)
   GROUP BY l.id
 )
