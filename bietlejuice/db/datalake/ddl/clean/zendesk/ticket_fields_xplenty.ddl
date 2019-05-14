@@ -1,6 +1,6 @@
-drop table datalake_clean.zendesk_ticket_fields;
+drop table datalake_clean.zendesk_ticket_fields_xplenty;
 
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_fields`(
+CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_fields_xplenty`(
     `id` string,
     `title` string,
     `raw_title` string,
@@ -26,7 +26,7 @@ PARTITIONED BY (
   `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/zendesk/ticket_fields/'
+  's3://5a-datalake/clean/zendesk/ticket_fields_xplenty/'
   ;
 
-msck repair table datalake_clean.zendesk_ticket_fields;
+msck repair table datalake_clean.zendesk_ticket_fields_xplenty;

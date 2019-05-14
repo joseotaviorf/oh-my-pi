@@ -40,7 +40,7 @@ class ZendeskETL(object):
 
     @logger
     def tickets(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/tickets.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/tickets_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -121,7 +121,7 @@ class ZendeskETL(object):
 
     @logger
     def ticket_fields(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_fields.sql'.format(DATALAKE_QUERIES_DIR))
+        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_fields_xplenty.sql'.format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
             ('id', str),
@@ -173,7 +173,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/ticket_fields/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/ticket_fields_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -253,7 +253,7 @@ class ZendeskETL(object):
 
     @logger
     def users(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/users.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/users_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -340,7 +340,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/users/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/users_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -348,7 +348,7 @@ class ZendeskETL(object):
 
     @logger
     def groups(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/groups.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/groups_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -371,7 +371,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/groups/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/groups_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -379,7 +379,7 @@ class ZendeskETL(object):
 
     @logger
     def articles(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/articles.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/articles_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -438,7 +438,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/articles/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/articles_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -446,7 +446,7 @@ class ZendeskETL(object):
 
     @logger
     def group_memberships(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/group_memberships.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/group_memberships_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -471,7 +471,7 @@ class ZendeskETL(object):
 
         self._move_to_clean(
             table_name=table_name,
-            key='clean/zendesk/group_memberships/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
+            key='clean/zendesk/group_memberships_xplenty/dt_extraction={dt}/{dt}.parquet'.format(dt=self.execution_date),
             query=query,
             r_cols=r_cols,
             c_cols=c_cols
@@ -501,14 +501,14 @@ class ZendeskETL(object):
 
         self.athena_client.add_partition(
             database=ZendeskETL.SCHEMAS['clean'],
-            table_name="zendesk_{}".format(table_name),
+            table_name="zendesk_{}_xplenty".format(table_name),
             partition="dt_extraction='{}'".format(self.execution_date)
         )
 
     @logger
     def _is_clean_table_empty(self, table_name):
         result = self.athena_client.execute_query_and_return_dataframe(
-            "select 1 from {}.zendesk_{} limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
+            "select 1 from {}.zendesk_{}_xplenty limit 1".format(ZendeskETL.SCHEMAS['clean'], table_name))
 
         empty = len(result) == 0
 

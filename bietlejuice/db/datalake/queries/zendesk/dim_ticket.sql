@@ -7,7 +7,7 @@ max_ticket_groups as (
 	select
 		id,
 		max(dt_extraction) as dt_extraction
-	from datalake_clean.zendesk_groups
+	from datalake_clean.zendesk_groups_xplenty
 	group by 1
 ),
 last_ticket_groups as (
@@ -20,7 +20,7 @@ last_ticket_groups as (
 		updated_at,
 		mg.dt_extraction
 	from max_ticket_groups mg
-	join datalake_clean.zendesk_groups g
+	join datalake_clean.zendesk_groups_xplenty g
 	 on g.id = mg.id and g.dt_extraction = mg.dt_extraction
 ),
 parse_fields as (
@@ -35,7 +35,7 @@ fields_map as (
     select f.id,
         map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
-    left join datalake_clean.zendesk_ticket_fields cf
+    left join datalake_clean.zendesk_ticket_fields_xplenty cf
        on cf.id = f.field_id
     where f.value is not null
     group by f.id
