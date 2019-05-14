@@ -18,7 +18,7 @@ with b2b_info as (
       when pa_b2b.id is not null and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
         then
           case
-            when pj.id is null
+            when pj.id is null and h.first_publication is not null
               then 'advanced_negotiation'
             when h.external_id is null
               then 'standard'
