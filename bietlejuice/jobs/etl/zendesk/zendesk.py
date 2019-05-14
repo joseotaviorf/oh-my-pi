@@ -61,7 +61,7 @@ class Zendesk(object):
 
         query = BaseETL.get_query_from_file_name(
             # temp
-            '{}/zendesk/stitch_{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
+            '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
 
         self.athena_client.create_parquet_from_query(
