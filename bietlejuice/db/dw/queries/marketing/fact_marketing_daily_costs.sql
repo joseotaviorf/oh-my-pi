@@ -18,7 +18,7 @@ with campaigns_full as (
 	from marketing.fact_facebook_daily_cost_attributions ff 
 	join marketing.dim_facebook_ad df 
 		on ff.sk_ad = df.sk_ad
-	where ff.sk_date >= 20190101
+	where ff.sk_date >= 20180101
 UNION
 	select  
 		fg.sk_date,
@@ -43,7 +43,7 @@ UNION
 		on dga.sk_ad = fg.sk_ad
 	left join marketing.dim_google_campaign dgc 
 		on dgc.sk_campaign = fg.sk_campaign
-	where fg.sk_date >= 20190101
+	where fg.sk_date >= 20180101
 UNION
     select 
         ftc.sk_date,
@@ -64,7 +64,7 @@ UNION
     from marketing.fact_trovit_daily_cost_attributions ftc
     left join marketing.dim_trovit_campaign dtc 
     	on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
-    where ftc.sk_date >= 20190101
+    where ftc.sk_date >= 20180101
 UNION
 	select 
         fct.sk_date,
@@ -85,7 +85,7 @@ UNION
 	from marketing.fact_criteo_daily_cost_attributions fct
 	left join marketing.dim_criteo_campaign dct 
 		on fct.sk_criteo_campaign = dct.sk_criteo_campaign
-	where fct.sk_date >= 20190101
+	where fct.sk_date >= 20180101
 UNION
     select
         frt.sk_date,
@@ -108,7 +108,7 @@ UNION
       	-- records in dim table are repeated
       	(select distinct * from marketing.dim_rtb_campaign) drt 
       	on frt.sk_rtb_campaign = drt.sk_rtb_campaign
-      where frt.sk_date >= 20190101
+      where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
      select 
@@ -129,7 +129,7 @@ UNION
         fcl.cost as total_cost
       from marketing.fact_daily_classifieds_costs fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
-      where fcl.sk_cost_date >= 20190101
+      where fcl.sk_cost_date >= 20180101
 )
 ,demand_tax as (
 	select 

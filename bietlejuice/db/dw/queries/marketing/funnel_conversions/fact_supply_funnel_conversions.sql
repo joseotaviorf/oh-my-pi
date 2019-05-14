@@ -20,7 +20,7 @@ with fact as  (
 ),
 s_cube as (
 	select
-		coalesce(sk_{1}date, -1) as sk_date,
+		coalesce({1}, -1) as sk_date,
 		city_group,
 		mkt_category,
 		mkt_flow,

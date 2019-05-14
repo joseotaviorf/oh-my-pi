@@ -26,9 +26,9 @@ class FunnelConversionSubDag(BaseSubDag):
                            'weekly': 'week_start',
                            'monthly': 'month_start'}
 
-        conversion_column = {'daily': '',
-                             'weekly': 'week_start_',
-                             'monthly': 'month_start_'}
+        conversion_column = {'daily': 'sk_date',
+                             'weekly': 'sk_week_start_date',
+                             'monthly': 'sk_month_start_date'}
 
         query = BaseETL.get_query_from_file_name(
             file_name='{}/marketing/funnel_conversions/fact_{}_funnel_conversions.sql'.format(DW_QUERIES_DIR,
