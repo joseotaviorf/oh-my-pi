@@ -34,4 +34,4 @@ partitioned by (
     dt string
 )
 stored as parquet
-location 's3://5a-datalake/clean/zendesk/';
+location 's3://5a-datalake/clean/zendesk/tickets/';
