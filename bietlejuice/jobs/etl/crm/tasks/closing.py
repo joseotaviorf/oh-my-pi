@@ -10,8 +10,8 @@ class CRMTasksClosing(CRMTasks):
         'FrontEnd',
         'CriarMinuta',
         'AprovarMinuta',
-        'FollowUpAssinaturas', 
-        'EnviarContratoViaEmail', 
+        'FollowUpAssinaturas',
+        'EnviarContratoViaEmail',
         'AnalisarDocumentacaoProprietario'
     ]
 

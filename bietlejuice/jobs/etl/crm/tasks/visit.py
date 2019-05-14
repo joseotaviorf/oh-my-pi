@@ -9,7 +9,7 @@ class CRMTasksVisit(CRMTasks):
     QUEUES = [
         'ConfirmarAgendamento',
         'ConfirmarCondicoesEntrada',
-        'ConfirmarDisponibilidadeDoImovel', 
+        'ConfirmarDisponibilidadeDoImovel',
         'SolicitarLockbox',
         'VisitaCanceladaOutroDDD'
     ]
