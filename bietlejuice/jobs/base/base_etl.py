@@ -15,11 +15,10 @@ from logging import info as log
 
 import boto3
 import petl
-from petl.io.db import create_table
-from unidecode import unidecode
-
 from db_factory import DBFactory
 from enum_db import EnumDB
+from petl.io.db import create_table
+from unidecode import unidecode
 
 
 class BaseETL(object):
@@ -316,7 +315,7 @@ class BaseETL(object):
         cls.execute_command(
             command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name),
             db_enum=db_enum,
-            timeout=300,
+            timeout=100,
             commit=True
         )
 
