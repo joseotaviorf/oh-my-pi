@@ -203,17 +203,17 @@ class BaseETL(object):
         cursor = conn.cursor()
 
         if show_logs:
-            print ('Start Execute Command at: {}'.format(cls.now()))
+            print ('Starting Execute Command at: {}'.format(cls.now()))
 
         cursor.execute(command)
 
         if commit:
             if show_logs:
-                print ('Start Commit Command at: {}'.format(cls.now()))
+                print ('Starting Commit Command at: {}'.format(cls.now()))
             conn.commit()
 
         if show_logs:
-            print ('End Execute Command at: {}'.format(cls.now()))
+            print ('Ended Execute Command at: {}'.format(cls.now()))
 
         if return_value:
             return_value = None if cursor.rowcount <= 0 else cursor.fetchone()
