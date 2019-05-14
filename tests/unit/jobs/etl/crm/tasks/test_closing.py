@@ -8,7 +8,9 @@ class TestCRMTasksClosing(object):
         'FrontEnd',
         'CriarMinuta',
         'AprovarMinuta',
-        'FollowUpAssinaturas'
+        'FollowUpAssinaturas',
+        'EnviarContratoViaEmail',
+        'AnalisarDocumentacaoProprietario'
     ]
 
     TABLE_NAMES = {
