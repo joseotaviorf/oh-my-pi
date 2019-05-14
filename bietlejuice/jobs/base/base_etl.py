@@ -198,11 +198,18 @@ class BaseETL(object):
             conn = cls.get_connection(db_enum, encoding, timeout)
 
         if show_logs:
-            print ('Start Execute Command at: {}'.format(cls.now()))
+            print ('Starting Connection at: {}'.format(cls.now()))
+
         cursor = conn.cursor()
+
+        if show_logs:
+            print ('Start Execute Command at: {}'.format(cls.now()))
+
         cursor.execute(command)
 
         if commit:
+            if show_logs:
+                print ('Start Commit Command at: {}'.format(cls.now()))
             conn.commit()
 
         if show_logs:
