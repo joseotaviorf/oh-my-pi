@@ -50,5 +50,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/zendesk/users/'
 ;
-
 msck repair table datalake_raw.zendesk_users;
