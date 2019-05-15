@@ -6,7 +6,11 @@ logger = QuintoAndarLogger('CRMTasksRepair')
 
 
 class CRMTasksRepair(CRMTasks):
-    MANUAL_TASK_WORKGROUP_IDS = ['DEP_MEDIACAO_POS_CONTRATO_ID', 'PROTECTION_CUSTOMERS', 'PROTECTION_PARTNERS']
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_MEDIACAO_POS_CONTRATO_ID',
+        'PROTECTION_CUSTOMERS',
+        'PROTECTION_PARTNERS'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_repair_tasks',
