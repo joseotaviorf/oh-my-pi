@@ -15,11 +15,10 @@ from logging import info as log
 
 import boto3
 import petl
-from petl.io.db import create_table
-from unidecode import unidecode
-
 from db_factory import DBFactory
 from enum_db import EnumDB
+from petl.io.db import create_table
+from unidecode import unidecode
 
 
 class BaseETL(object):
@@ -199,15 +198,22 @@ class BaseETL(object):
             conn = cls.get_connection(db_enum, encoding, timeout)
 
         if show_logs:
-            print ('Start Execute Command at: {}'.format(cls.now()))
+            print ('Starting Connection at: {}'.format(cls.now()))
+
         cursor = conn.cursor()
+
+        if show_logs:
+            print ('Starting Execute Command at: {}'.format(cls.now()))
+
         cursor.execute(command)
 
         if commit:
+            if show_logs:
+                print ('Starting Commit Command at: {}'.format(cls.now()))
             conn.commit()
 
         if show_logs:
-            print ('End Execute Command at: {}'.format(cls.now()))
+            print ('Ended Execute Command at: {}'.format(cls.now()))
 
         if return_value:
             return_value = None if cursor.rowcount <= 0 else cursor.fetchone()
@@ -316,7 +322,7 @@ class BaseETL(object):
         cls.execute_command(
             command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name),
             db_enum=db_enum,
-            timeout=30,
+            timeout=100,
             commit=True
         )
 

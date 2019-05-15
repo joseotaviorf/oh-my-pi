@@ -1,6 +1,6 @@
-drop table datalake_clean.zendesk_users;
+drop table datalake_clean.zendesk_users_xplenty;
 
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_users`(
+CREATE EXTERNAL TABLE datalake_clean.`zendesk_users_xplenty`(
     id string,
     url string,
     name string,
@@ -43,7 +43,7 @@ PARTITIONED BY (
   `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/zendesk/users/'
+  's3://5a-datalake/clean/zendesk/users_xplenty/'
 ;
 
-msck repair table datalake_clean.zendesk_users;
+msck repair table datalake_clean.zendesk_users_xplenty;

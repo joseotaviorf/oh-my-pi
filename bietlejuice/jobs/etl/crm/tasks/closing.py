@@ -10,7 +10,9 @@ class CRMTasksClosing(CRMTasks):
         'FrontEnd',
         'CriarMinuta',
         'AprovarMinuta',
-        'FollowUpAssinaturas'
+        'FollowUpAssinaturas',
+        'EnviarContratoViaEmail',
+        'AnalisarDocumentacaoProprietario'
     ]
 
     TABLE_NAMES = {

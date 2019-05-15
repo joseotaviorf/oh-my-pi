@@ -1,25 +1,26 @@
 with fact as  (
 	select
-		coalesce(sk_date, -1) as sk_date,
-		city_group,
-		mkt_category,
-		mkt_flow,
-		mkt_completion,
-		mkt_channel,
-		mkt_medium,
-		mkt_source,
-		mkt_platform,
-		replace(replace(utm_campaign, '_', '.'), '-', '.') as utm_campaign,
-		utm_term,
-		utm_content,
-		sum(coalesce(cost,0)) as cost
-	from marketing.fact_marketing_daily_costs
+		coalesce(to_char(date(dd.{0}),'YYYYMMDD')::integer, -1) as sk_date,
+		mkt.city_group,
+		mkt.mkt_category,
+		mkt.mkt_flow,
+		mkt.mkt_completion,
+		mkt.mkt_channel,
+		mkt.mkt_medium,
+		mkt.mkt_source,
+		mkt.mkt_platform,
+		replace(replace(mkt.utm_campaign, '_', '.'), '-', '.') as utm_campaign,
+		mkt.utm_term,
+		mkt.utm_content,
+		sum(coalesce(mkt.cost,0)) as cost
+	from marketing.fact_marketing_daily_costs mkt
+	join public.dim_date dd on dd.sk_date =  mkt.sk_date
     where funnel_side = 'demand'
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 d_cube as (
 	select
-		coalesce(sk_date, -1) as sk_date,
+		coalesce({1}, -1) as sk_date,
 		city_group,
 		mkt_category,
 		mkt_flow,
@@ -37,14 +38,14 @@ d_cube as (
 			else utm_term end as utm_term,
 		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium <> 'Display' then NULL
 			else utm_content end as utm_content,
-		sum(coalesce(total_daily_sessions, 0)) as total_daily_sessions,
-		sum(coalesce(total_daily_active_users, 0)) as total_daily_active_users,
-		sum(coalesce(total_daily_visits_booked, 0)) as total_daily_visits_booked,
-		sum(coalesce(total_daily_visits_confirmed, 0)) as total_daily_visits_confirmed,
-		sum(coalesce(total_daily_offers_submitted, 0)) as total_daily_offers_submitted,
-		sum(coalesce(total_daily_offers_approved, 0)) as total_daily_offers_approved,
-		sum(coalesce(total_daily_contracts_signed, 0)) as total_daily_contracts_signed
-	from growth.conversion_points_demand_daily
+        sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
+		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
+		sum(coalesce(total_{2}_visits_booked, 0)) as total_{2}_visits_booked,
+		sum(coalesce(total_{2}_visits_confirmed, 0)) as total_{2}_visits_confirmed,
+		sum(coalesce(total_{2}_offers_submitted, 0)) as total_{2}_offers_submitted,
+		sum(coalesce(total_{2}_offers_approved, 0)) as total_{2}_offers_approved,
+		sum(coalesce(total_{2}_contracts_signed, 0)) as total_{2}_contracts_signed
+	from growth.conversion_points_demand_{2}
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 )
 select
@@ -61,13 +62,13 @@ select
 	coalesce(fact.utm_term, d_cube.utm_term) as  utm_term,
 	coalesce(fact.utm_content, d_cube.utm_content) as  utm_content,
 	coalesce(fact.cost, 0) as cost,
-	coalesce(d_cube.total_daily_sessions, 0) as total_daily_sessions,
-	coalesce(d_cube.total_daily_active_users, 0) as total_daily_active_users,
-	coalesce(d_cube.total_daily_visits_booked, 0) as total_daily_visits_booked,
-	coalesce(d_cube.total_daily_visits_confirmed, 0) as total_daily_visits_confirmed,
-	coalesce(d_cube.total_daily_offers_submitted, 0) as total_daily_offers_submitted,
-	coalesce(d_cube.total_daily_offers_approved, 0) as total_daily_offers_approved,
-	coalesce(d_cube.total_daily_contracts_signed, 0) as total_daily_contracts_signed,
+	coalesce(d_cube.total_{2}_sessions, 0) as total_{2}_sessions,
+	coalesce(d_cube.total_{2}_active_users, 0) as total_{2}_active_users,
+	coalesce(d_cube.total_{2}_visits_booked, 0) as total_{2}_visits_booked,
+	coalesce(d_cube.total_{2}_visits_confirmed, 0) as total_{2}_visits_confirmed,
+	coalesce(d_cube.total_{2}_offers_submitted, 0) as total_{2}_offers_submitted,
+	coalesce(d_cube.total_{2}_offers_approved, 0) as total_{2}_offers_approved,
+	coalesce(d_cube.total_{2}_contracts_signed, 0) as total_{2}_contracts_signed,
 	getdate() as ts_load
 from fact
 full outer join d_cube
