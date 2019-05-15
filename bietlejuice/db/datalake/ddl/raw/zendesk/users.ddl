@@ -39,3 +39,8 @@ create external table if not exists stitch.users (
     user_fields string,
     verified string
 )
+partitioned by (
+    dt string
+)
+stored as parquet
+location 's3://5a-datalake-tes/stitch/zendesk/tickets/';
