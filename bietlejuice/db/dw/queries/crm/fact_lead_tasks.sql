@@ -50,8 +50,8 @@ select
 	coalesce(td.sk_created_date, -1) as sk_created_date,
 	coalesce(td.sk_first_realized_date, -1) as sk_first_realized_date,
 	coalesce(td.sk_first_resolved_date, -1) as sk_first_resolved_date,
-	coalesce(tm.sk_assignee, -1) as sk_user_first_asignee,
-	coalesce(tm2.sk_assignee, -1) as sk_rank_user_first_resolver
+	coalesce(tm.sk_assignee, -1) as sk_user_first_assignee,
+	coalesce(tm2.sk_assignee, -1) as sk_user_first_resolver
 from task_dates td
 join first_assignee fa
 	on td.sk_task = fa.sk_task
