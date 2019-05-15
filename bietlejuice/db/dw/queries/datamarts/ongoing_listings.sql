@@ -1,6 +1,7 @@
 select
     week_start,
-    week_since_publication,
+    weeks_since_publication,
+    status_history,
 	sk_house
 from(
 select
@@ -9,7 +10,7 @@ select
     dr.city_name as city,
     dd.date,
     date(dh.ts_publication) as ts_publication,
-    date_diff('week', dh.ts_publication, dd.week_start) as week_since_publication,
+    date_diff('week', dh.ts_publication, dd.week_start) as weeks_since_publication,
     dd.weekday_name,
     dd.week_start,
     dh.is_last_version
@@ -22,6 +23,6 @@ left join dim_house_listing dh
   on fhs.sk_house = dh.sk_house_listing
 where dd.weekday_name = 'Sunday'
 )
-where rk = 1
-  and status_history = 'publicado'
-  and week_start = '2018-01-01'
+where
+	rk = 1
+	and status_history in ('suspenso','publicado')
