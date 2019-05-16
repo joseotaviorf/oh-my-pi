@@ -13,8 +13,8 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 MAIN_DAG_NAME = 'bi-marketing-costs-2018'
-MAIN_START_DATE = datetime(2018, 1, 1, 2, 0, 0)
-MAIN_END_DATE = datetime(2019, 1, 1, 2, 0, 0)
+MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
+MAIN_END_DATE = datetime(2019, 1, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 6 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
