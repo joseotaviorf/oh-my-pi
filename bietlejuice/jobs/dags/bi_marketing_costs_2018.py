@@ -63,6 +63,7 @@ def raw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        end_date=MAIN_END_DATE,
         auth=auth[class_]
     )
 
@@ -77,6 +78,7 @@ def clean_sub_dag(sub_dag_name, class_, accounts):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        end_date=MAIN_END_DATE,
         accounts=accounts,
         auth=auth[class_]
     )
@@ -92,6 +94,7 @@ def load_to_pre_staging_sub_dag(sub_dag_name, class_, accounts):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        end_date=MAIN_END_DATE,
         accounts=accounts
     )
 
@@ -106,6 +109,7 @@ def load_to_staging_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        end_date=MAIN_END_DATE,
         auth=auth[class_]
     )
 
@@ -120,6 +124,7 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
+        end_date=MAIN_END_DATE,
         auth=auth[class_]
     )
 
