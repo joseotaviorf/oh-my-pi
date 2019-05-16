@@ -20,9 +20,8 @@ create external table if not exists stitch.users (
     organization_id string,
     permanently_deleted string,
     phone string,
-    photo string,
-    report_csv,
-    restricted_agent,
+    report_csv string,
+    restricted_agent string,
     role string,
     role_type string,
     shared string,
@@ -42,5 +41,11 @@ create external table if not exists stitch.users (
 partitioned by (
     dt string
 )
-stored as parquet
-location 's3://5a-datalake-tes/stitch/zendesk/tickets/';
+row format serde
+  'org.openx.data.jsonserde.JsonSerDe'
+stored as inputformat
+  'org.apache.hadoop.mapred.TextInputFormat'
+outputformat
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+location
+  's3://5a-datalake-leo-test/stitch/zendesk/users/';
