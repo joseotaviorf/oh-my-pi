@@ -251,7 +251,8 @@ main_dag = BaseDAG.build_dag(
     dag_id=MAIN_DAG_NAME,
     description='ETL for extracting CRM tasks',
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    catchup=False
 )
 
 lead_tasks = BaseDAG.build_python_operator(
@@ -267,7 +268,7 @@ photo_tasks = BaseDAG.build_python_operator(
     task_id='load_photo_tasks',
     python_callable=load_tasks,
     op_kwargs={'table_name': 'photo_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket,
-               'id_column': 'job_photo_id', 'task_types': ['FupFoto', 'AgendarJobDeFotografo']}
+               'id_column': 'photo_job_id', 'task_types': ['FupFoto', 'AgendarJobDeFotografo']}
 )
 
 manual_tasks = BaseDAG.build_python_operator(

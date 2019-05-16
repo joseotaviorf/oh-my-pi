@@ -4,7 +4,7 @@ CREATE TABLE crm.photo_tasks (
 	task_status varchar(255),
 	rep_id integer,
 	first_rep_id integer,
-	job_photo_id integer,
+	photo_job_id integer,
 	number_of_reschedules integer,
 	dt_created timestamp,
 	dt_closed timestamp
