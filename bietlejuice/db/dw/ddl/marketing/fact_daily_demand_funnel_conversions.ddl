@@ -9,7 +9,7 @@ CREATE TABLE if NOT EXISTS marketing.fact_daily_demand_funnel_conversions (
     mkt_medium varchar,
     mkt_source varchar,
     mkt_platform varchar,
-    utm_campaign varchar(512),
+    utm_campaign varchar(2048),
     utm_term varchar(512),
     utm_content varchar(512),
     cost numeric(16,4),
