@@ -2,7 +2,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
-	sk_house
+   	sk_house as sk_house_listing
 from(
 select
     fhs.*,
