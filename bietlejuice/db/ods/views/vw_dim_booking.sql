@@ -1,7 +1,5 @@
-drop view if exists public.vw_dim_booking;
-
-create or replace view public.vw_dim_booking
-as
+drop view if exists vw_dim_booking;
+create or replace view vw_dim_booking as
 with bms as (
     select
         row_number() over(partition by bms.visita_id order by bms.event_time) as rn,
@@ -9,23 +7,41 @@ with bms as (
     from public.booking_media_sources bms
 ),
 taxonomy_demand as (
+	 with taxonomy_min_ids as (
+		select
+		  min(id) as id
+		from files.taxonomy_demand
+		group by
+			lower(app_type),
+			lower(utm_source),
+			lower(utm_medium),
+			lower(first_update_source),
+			lower(category),
+			lower(flow),
+			lower(completion),
+			lower(channel),
+			lower(medium),
+			lower(source),
+			lower(platform)
+	)
 	 select
 	    cast(td.id as bigint) as id,
-		td.app_type,
-		td.utm_source,
-		td.utm_medium,
-		td.branded,
-		td.first_update_source,
-		td.flg_via_reschedule::boolean,
-		td.Category as mkt_category,
-		td.Flow as mkt_flow,
-		td.Completion as mkt_completion,
-		td.Channel as mkt_channel,
-		td.Medium as mkt_medium,
-		td.Source as mkt_source,
-		td.Platform as mkt_platform
-    from
-        files.taxonomy_demand td
+			td.app_type,
+			td.utm_source,
+			td.utm_medium,
+			td.branded,
+			td.first_update_source,
+			td.flg_via_reschedule::boolean,
+			td.Category as mkt_category,
+			td.Flow as mkt_flow,
+			td.Completion as mkt_completion,
+			td.Channel as mkt_channel,
+			td.Medium as mkt_medium,
+			td.Source as mkt_source,
+			td.Platform as mkt_platform
+    from files.taxonomy_demand td
+    join taxonomy_min_ids td_min
+    	on td.id = td_min.id
 ),
 reschedules as (
     select "reagendadoDe_id" as id_reschedule
@@ -33,8 +49,7 @@ reschedules as (
     where "reagendadoDe_id" is not null
     group by 1 -- guaranteeing there are no future duplication on Product
 ),	
-bookings as
-(
+bookings as (
 	select 
 	    s.id as sk_booking,
 	    s.id as id_booking,
@@ -195,3 +210,4 @@ on
 	and lower(coalesce(td.branded,'')) = lower(coalesce(b.branded,''))
 	and lower(coalesce(td.first_update_source,'')) = lower(coalesce(b.first_update_source,''))
 	and coalesce(td.flg_via_reschedule,false) = coalesce(b.flg_via_reschedule,false)
+;
