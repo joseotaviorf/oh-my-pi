@@ -5,3 +5,4 @@ class ZendeskTableEnum(Enum):
     TICKETS = 'tickets'
     TICKET_FIELDS = 'ticket_fields'
     GROUPS = 'groups'
+    USERS = 'users'

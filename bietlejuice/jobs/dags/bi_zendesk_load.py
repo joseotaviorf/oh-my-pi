@@ -113,3 +113,10 @@ groups_sub_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=sub_dag,
     class_=ZendeskTableEnum.GROUPS
 )
+
+users_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='users',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.USERS
+)
