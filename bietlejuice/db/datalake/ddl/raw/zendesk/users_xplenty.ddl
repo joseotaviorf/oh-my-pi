@@ -1,6 +1,6 @@
 drop table datalake_raw.zendesk_users;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_users`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_users_xplenty`(
     id string,
     url string,
     name string,
@@ -50,5 +50,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/zendesk/users/'
 ;
-
 msck repair table datalake_raw.zendesk_users;
