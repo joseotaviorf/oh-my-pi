@@ -1,6 +1,6 @@
 drop table datalake_raw.zendesk_users;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_users`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_users_xplenty`(
     id string,
     url string,
     name string,
