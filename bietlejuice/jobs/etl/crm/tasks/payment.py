@@ -9,7 +9,8 @@ class CRMTasksPayment(CRMTasks):
     QUEUES = [
         'BuscarPrimeiroBoleto',
         'PedidoDeReembolso',
-        'ConfirmarBoletoCondominio'
+        'ConfirmarBoletoCondominio',
+        'PedidoDeReembolsoInquilino'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
