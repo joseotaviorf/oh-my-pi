@@ -1,24 +1,23 @@
-import airflow.utils.helpers as airflow_helpers
 from airflow import DAG
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.dags.zendesk import ZendeskSubDag
 
-MAIN_DAG_NAME = 'bi-zendesk-etl'
-MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
+from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
+import airflow.utils.helpers as airflow_helpers
+
+MAIN_DAG_ID = 'bi-zendesk'
+MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
-ZENDESK_CLEAN_TABLES = env.get_airflow_env_var('bi-zendesk-tables').split(",")
-
 # dags
 main_dag = DAG(
-    dag_id=MAIN_DAG_NAME,
+    dag_id=MAIN_DAG_ID,
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
@@ -31,59 +30,107 @@ main_dag = DAG(
 )
 
 
-def clean_sub_dag(sub_dag_name):
-    sub_dag = ZendeskSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-        tables=ZENDESK_CLEAN_TABLES
+def exec_factory_method(class_, bucket_type, method, **kwargs):
+    zendesk = ZendeskFactory.factory(
+        entity=class_,
+        s3_bucket=s3_bucket,
+        execution_date=kwargs['execution_date']
     )
 
-    return sub_dag.build_tasks('clean')
+    getattr(zendesk, method)(class_, bucket_type)
 
 
-def staging_sub_dag(sub_dag_name):
-    sub_dag = ZendeskSubDag(
+def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
+    upsert_partition_task = BaseDAG.build_python_operator(
+        task_id='upsert_{}_{}_partition'.format(bucket_type, sub_dag_name),
+        python_callable=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': bucket_type,
+            'method': 'upsert_single_partition'
+        }
+    )
+
+    return upsert_partition_task
+
+
+def sub_dag(sub_dag_name, **kwargs):
+
+    local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
+        dag_name=MAIN_DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    # extract and load data by StitchData
+
+    upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
+
+    move_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_to_clean',
+        python_callable=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': 'clean',
+            'method': 'move_to_clean'
+        }
     )
 
-    return sub_dag.build_tasks('staging')
+    upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
 
-
-def prod_sub_dag(sub_dag_name):
-    sub_dag = ZendeskSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
+    airflow_helpers.chain(
+        upsert_raw_partition_task,
+        move_to_clean_task,
+        upsert_clean_partition_task
     )
 
-    return sub_dag.build_tasks('prod')
+    return local_dag
 
 
-clean_dag = BaseSubDag.get_sub_dag_operator(
+tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='zendesk-clean-sub-dag'
+    sub_dag_name='tickets',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.TICKETS
 )
 
-staging_dag = BaseSubDag.get_sub_dag_operator(
+ticket_fields_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=staging_sub_dag,
-    sub_dag_name='zendesk-staging-sub-dag'
+    sub_dag_name='ticket_fields',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.TICKET_FIELDS
 )
 
-prod_dag = BaseSubDag.get_sub_dag_operator(
+groups_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_func=prod_sub_dag,
-    sub_dag_name='zendesk-production-sub-dag'
+    sub_dag_name='groups',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.GROUPS
 )
 
-airflow_helpers.chain(clean_dag, staging_dag, prod_dag)
+users_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='users',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.USERS
+)
+
+group_memberships_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='group_memberships',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.GROUP_MEMBERSHIPS
+)
+
+ticket_metrics_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='ticket_metrics',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.TICKET_METRICS
+)
