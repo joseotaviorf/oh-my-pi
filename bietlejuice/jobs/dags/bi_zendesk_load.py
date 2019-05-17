@@ -9,7 +9,7 @@ from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
 import airflow.utils.helpers as airflow_helpers
 
 MAIN_DAG_ID = 'bi-zendesk-load'
-MAIN_START_DATE = datetime(2019, 5, 7, 0, 0, 0)
+MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
