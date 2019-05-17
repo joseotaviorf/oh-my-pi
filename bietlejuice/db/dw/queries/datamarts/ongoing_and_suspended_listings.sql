@@ -2,7 +2,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
-	sk_house as sk_house_listing
+   	sk_house as sk_house_listing
 from(
 select
     fhs.*,
@@ -23,3 +23,4 @@ where dd.weekday_name = 'Sunday'
 where
 	rk = 1
 	and status_history in ('suspenso','publicado')
+;
