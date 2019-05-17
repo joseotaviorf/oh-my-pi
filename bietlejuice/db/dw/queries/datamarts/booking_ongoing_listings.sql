@@ -16,7 +16,6 @@ select
 	from(
 SELECT 
     fhs.*,
-    -- rank() over(partition by dd.week_start, fhs.sk_house order by coalesce(fhs.sk_min_status_date, to_char(current_date -1, 'YYYYMMDD')::bigint) desc) as rk,
     dr.city_group,
     dr.city_name as city,
     dr.macro_name as macro_region,
