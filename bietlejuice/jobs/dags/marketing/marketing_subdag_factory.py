@@ -20,7 +20,7 @@ logger = QuintoAndarLogger("MarketingSubDagFactory")
 class MarketingSubDagFactory(object):
     @staticmethod
     def factory(class_, bucket, sub_dag_name, dag_name, schedule_interval,
-                start_date, accounts=None,
+                start_date, end_date=None, accounts=None,
                 auth=None):
         logger.info(
             "m=factory, msg=creating class instance, class={}".format(class_))
@@ -36,6 +36,7 @@ class MarketingSubDagFactory(object):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
+            end_date=end_date,
             accounts=accounts,
             auth=auth
         )
