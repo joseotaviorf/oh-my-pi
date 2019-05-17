@@ -36,7 +36,7 @@ class Zendesk(object):
                                                          class_.value),
             database='datalake_{}'.format(bucket_type) if bucket_type == 'clean' else 'stitch',
             table='zendesk_{}'.format(class_.value) if bucket_type == 'clean' else class_.value,
-            partition_name='dt',
+            partition_name='dt_extracted' if bucket_type == 'clean' else 'dt',
             partition_value=self.execution_date
         )
 
@@ -45,7 +45,7 @@ class Zendesk(object):
         logger.info('m=_move_to_clean_partitioned, class_={}, \nr_cols={}, \nc_cols={}'
                     .format(class_, str(r_cols), str(c_cols)))
 
-        key = 'clean/zendesk/{0}/dt={1}/{1}.parq'.format(class_.value, self.execution_date)
+        key = 'clean/zendesk/{0}/dt_extracted={1}/{1}.parq'.format(class_.value, self.execution_date)
         self._move_to_clean(
             class_=class_,
             key=key,
