@@ -38,7 +38,6 @@ left join dim_house_listing dh
 where dd.weekday_name = 'Sunday'
 )
 where week_start >= '2018-01-01'
-  and week_start >= '2018-01-01'
 group by 1, 2, 3, 4, 5, 6, 7, 8
 having count(distinct case when status_history = 'publicado' then sk_house end) > 0
 order by 2 desc, 1 asc, 3 desc, 4
