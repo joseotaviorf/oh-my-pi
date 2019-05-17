@@ -263,19 +263,20 @@ lead_tasks = BaseDAG.build_python_operator(
                'id_column': 'lead_id', 'task_types': ["ConverterLead", "ConverterLeadPrioritario"]}
 )
 
-photo_tasks = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='load_photo_tasks',
-    python_callable=load_tasks,
-    op_kwargs={'table_name': 'photo_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket,
-               'id_column': 'photo_job_id', 'task_types': ['FupFoto', 'AgendarJobDeFotografo']}
-)
 
 manual_tasks = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='load_manual_tasks',
     python_callable=load_manual_tasks,
     op_kwargs={'table_name': 'manual_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
+)
+
+photo_tasks = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='load_photo_tasks',
+    python_callable=load_tasks,
+    op_kwargs={'table_name': 'photo_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket,
+               'id_column': 'photo_job_id', 'task_types': ['FupFoto', 'AgendarJobDeFotografo']}
 )
 
 lead_tasks >> photo_tasks >> manual_tasks
