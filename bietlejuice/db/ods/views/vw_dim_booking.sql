@@ -7,6 +7,12 @@ with bms as (
     from public.booking_media_sources bms
 ),
 taxonomy_demand as (
+-- removing duplicates rows due to case difference in the taxonomy
+/* ex:
+	id    |    app_type    |    utm_medium
+	123   |    android     |       CPC
+	456   |    android     |       cpc -- to be removed
+*/
 	 with taxonomy_min_ids as (
 		select
 		  min(id) as id
