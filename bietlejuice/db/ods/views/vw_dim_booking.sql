@@ -21,6 +21,8 @@ taxonomy_demand as (
 			lower(app_type),
 			lower(utm_source),
 			lower(utm_medium),
+			lower(branded),
+			flg_via_reschedule,
 			lower(first_update_source),
 			lower(category),
 			lower(flow),
