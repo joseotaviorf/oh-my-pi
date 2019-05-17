@@ -10,7 +10,7 @@ create external table if not exists datalake_clean.zendesk_groups (
     ts_load string
 )
 partitioned by (
-    dt_extracted {for example} string
+    dt_extracted string
 )
 stored as parquet
 location 's3://5a-datalake/clean/zendesk/groups/';
