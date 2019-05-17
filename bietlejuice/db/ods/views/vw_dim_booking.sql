@@ -22,15 +22,8 @@ taxonomy_demand as (
 			lower(utm_source),
 			lower(utm_medium),
 			lower(branded),
-			flg_via_reschedule,
 			lower(first_update_source),
-			lower(category),
-			lower(flow),
-			lower(completion),
-			lower(channel),
-			lower(medium),
-			lower(source),
-			lower(platform)
+		        flg_via_reschedule
 	)
 	 select
 	    cast(td.id as bigint) as id,
