@@ -68,8 +68,7 @@ LEFT JOIN dim_date ddb
     ON fr.sk_booking_created_date = ddb.sk_date 
 LEFT JOIN dim_date dd 
     ON (DATE(dd.date )) = (DATE(dh.ts_publication ))
-WHERE 1=1
-  and ddb.week_start >= '2018-01-01'
+WHERE ddb.week_start >= '2018-01-01'
 GROUP BY 1,2,3,4,5,6,7,8
 ORDER BY 5 DESC
 )
