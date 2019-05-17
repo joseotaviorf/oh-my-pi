@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.ticket_metrics;
-create external table if not exists datalake_clean.ticket_metrics (
+drop table if exists datalake_clean.zendesk_ticket_metrics;
+create external table if not exists datalake_clean.zendesk_ticket_metrics (
     id_ticket_metrics string,
     url_ticket_metrics string,
     ts_minutes_first_calendar_resolution string,
