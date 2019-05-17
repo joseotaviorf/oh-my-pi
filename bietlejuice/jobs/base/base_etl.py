@@ -322,7 +322,7 @@ class BaseETL(object):
         cls.execute_command(
             command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name),
             db_enum=db_enum,
-            timeout=100,
+            timeout=500,
             commit=True
         )
 
