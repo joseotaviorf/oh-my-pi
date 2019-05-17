@@ -51,3 +51,4 @@ select
     cast(from_iso8601_timestamp(updated_at) as varchar) as ts_updated,
     cast(now() as varchar) as ts_load
 from stitch_data
+where last_updated = 1;
