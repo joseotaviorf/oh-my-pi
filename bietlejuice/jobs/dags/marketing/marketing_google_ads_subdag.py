@@ -1,16 +1,16 @@
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.marketing import MarketingSubDag
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('MarketingGoogleAdsSubDag')
 
 
 class MarketingGoogleAdsSubDag(MarketingSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, integration=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date=None,
+                 integration=None,
                  accounts=None, auth=None):
         super(MarketingGoogleAdsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
-                                                       start_date, integration, accounts)
+                                                       start_date, end_date, integration, accounts)
         self.dim_tables = ["dim_google_keyword", "dim_google_ad", "dim_google_campaign"]
         self.fact_tables = ["fact_google_daily_cost_attributions"]
         self.datalake_tables = ["marketing_google_keywords", "marketing_google_ads", "marketing_google_campaigns"]
