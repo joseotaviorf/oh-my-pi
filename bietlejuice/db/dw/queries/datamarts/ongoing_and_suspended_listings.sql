@@ -2,7 +2,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
-	sk_house
+	sk_house as sk_house_listing
 from(
 select
     fhs.*,
@@ -15,7 +15,7 @@ select
     dh.is_last_version
 from fact_house_status fhs
 join dim_date dd
-  on dd.sk_date between fhs.sk_min_status_date and coalesce(fhs.sk_max_status_date, to_char(current_date -1, 'YYYYMMDD')::bigint)
+  on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
 left join dim_house_listing dh
   on fhs.sk_house = dh.sk_house_listing
 where dd.weekday_name = 'Sunday'
