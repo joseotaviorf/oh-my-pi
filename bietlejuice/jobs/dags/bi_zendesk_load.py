@@ -127,3 +127,10 @@ group_memberships_sub_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=sub_dag,
     class_=ZendeskTableEnum.GROUP_MEMBERSHIPS
 )
+
+ticket_metrics_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='ticket_metrics',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.TICKET_METRICS
+)

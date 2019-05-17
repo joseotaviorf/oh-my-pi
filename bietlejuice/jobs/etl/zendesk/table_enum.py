@@ -7,3 +7,4 @@ class ZendeskTableEnum(Enum):
     GROUPS = 'groups'
     USERS = 'users'
     GROUP_MEMBERSHIPS = 'group_memberships'
+    TICKET_METRICS = 'ticket_metrics'
