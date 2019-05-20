@@ -2,17 +2,13 @@
  SELECT
     sk_task,
     sk_lead,
-	case when action_type = 'CREATE' then 
- 		min(sk_action_date) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING) 
- 		end	as sk_created_date,
-	case when action_type = 'REALIZE' then 
- 		min(sk_action_date) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING) 
- 		end as sk_first_realized_date,
-	case when action_type = 'RESOLVE' then 
- 		min(sk_action_date) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING) 
- 		end as sk_first_resolved_date,
+	min(case when action_type = 'CREATE' then sk_action_date else null end) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING)
+ 		as sk_created_date,
+ 	min(case when action_type = 'REALIZE' then sk_action_date else null end) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING)
+ 		as sk_first_realized_date,
+	min(case when action_type = 'RESOLVE' then sk_action_date else null end) over (partition by sk_task order by ts_action ROWS UNBOUNDED PRECEDING)
+ 		as sk_first_resolved_date,
 	row_number() over(PARTITION BY sk_task ORDER BY ts_action) as rn,
-	count(1) over (PARTITION by sk_task) as total_actions,
     action_type,
     sk_assignee
  FROM crm.fact_lead_task_actions flta
@@ -40,7 +36,7 @@ select
 	sk_task,
 	min(rn) as min_rn		
 from task_metrics tm
-where action_type = 'REALIZE'
+where action_type = 'REALIZE' and sk_assignee <> -1
 group by 1
 )
 select
@@ -51,7 +47,7 @@ select
 	coalesce(td.sk_first_realized_date, -1) as sk_first_realized_date,
 	coalesce(td.sk_first_resolved_date, -1) as sk_first_resolved_date,
 	coalesce(tm.sk_assignee, -1) as sk_user_first_assignee,
-	coalesce(tm2.sk_assignee, -1) as sk_user_first_resolver
+	coalesce(tm_fr.sk_assignee, -1) as sk_user_first_resolver
 from task_dates td
 join first_assignee fa
 	on td.sk_task = fa.sk_task
@@ -60,6 +56,6 @@ join task_metrics tm
 	and tm.rn = fa.min_rn
 left join first_resolver fr
 	on td.sk_task = fr.sk_task
-left join task_metrics tm2 
-	on tm2.sk_task = fr.sk_task
-	and tm2.rn = fr.min_rn
+left join task_metrics tm_fr
+	on tm_fr.sk_task = fr.sk_task
+	and tm_fr.rn = fr.min_rn
