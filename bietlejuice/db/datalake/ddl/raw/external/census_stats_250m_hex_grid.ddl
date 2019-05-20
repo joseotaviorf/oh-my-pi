@@ -17,7 +17,7 @@ row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ','
 )
-location 's3://5a-datalake/raw/external/census/census_stats_250m_hex_grid/'
+location 's3://5a-datalake/raw/external/census/2010/census_stats_250m_hex_grid/'
 tblproperties (
   'skip.header.line.count' = '1'
 )
