@@ -20,15 +20,18 @@ base_lead_tasks as (
 		crm.lead_tasks
 ),
 base_photo_tasks as (
-	select
+    select
         distinct
-        cast(i.id as integer) as imovel_id
+        cast(coalesce(i.id,i_direct.id) as integer) as imovel_id
     from
-        public.imovel i
-    join public.photo_job pj
+    	crm.photo_tasks pt
+    left join public.photo_job pj
+    	on pt.origin_id = pj.id
+    left join public.imovel i
         on i.id = pj.imovel_id
-    join crm.photo_tasks pt
-        on pt.photo_job_id = pj.id
+    left join public.imovel i_direct
+    	on i_direct.id = pt.origin_id
+    where coalesce(i.id, i_direct.id) is not null
 ),
 base_leads as (
     select
