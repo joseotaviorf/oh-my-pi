@@ -137,13 +137,15 @@ class RedshiftClient(object):
 
     @logger
     def wait_for_cluster_status(self, cluster_id, status_enum):
-        """Wait for Amazon Redshift cluster to become available
+        """Wait for Amazon Redshift cluster to reach given status
 
         :param cluster_id: string; Cluster name to monitor
         :param status_enum: string; Status to be monitored, values accessible via RedshiftStatusEnum class
         """
         if status_enum is None:
-            raise ValueError()
+            raise ValueError(
+                'm=wait_for_cluster_status, cluster_id={0}, status{1}'
+                'msg=No status found'.format(cluster_id, status_enum))
 
         waiter = self.redshift_client.get_waiter(status_enum)
         try:
