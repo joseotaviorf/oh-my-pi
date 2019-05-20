@@ -4,7 +4,11 @@ from bietlejuice.jobs.etl.crm.tasks import CRMTasksRepair
 
 
 class TestCRMTasksRepair(object):
-    MANUAL_TASK_WORKGROUP_IDS = ['DEP_MEDIACAO_POS_CONTRATO_ID']
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_MEDIACAO_POS_CONTRATO_ID',
+        'PROTECTION_CUSTOMERS',
+        'PROTECTION_PARTNERS'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_repair_tasks',

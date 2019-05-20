@@ -6,7 +6,10 @@ from bietlejuice.jobs.etl.crm.tasks import CRMTasksVisit
 class TestCRMTasksVisit(object):
     QUEUES = [
         'ConfirmarAgendamento',
-        'ConfirmarCondicoesEntrada'
+        'ConfirmarCondicoesEntrada',
+        'ConfirmarDisponibilidadeDoImovel',
+        'SolicitarLockbox',
+        'VisitaCanceladaOutroDDD'
     ]
 
     TABLE_NAMES = {

@@ -8,7 +8,10 @@ logger = QuintoAndarLogger('CRMTasksVisit')
 class CRMTasksVisit(CRMTasks):
     QUEUES = [
         'ConfirmarAgendamento',
-        'ConfirmarCondicoesEntrada'
+        'ConfirmarCondicoesEntrada',
+        'ConfirmarDisponibilidadeDoImovel',
+        'SolicitarLockbox',
+        'VisitaCanceladaOutroDDD'
     ]
 
     TABLE_NAMES = {

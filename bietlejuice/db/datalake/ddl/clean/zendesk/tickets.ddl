@@ -1,41 +1,37 @@
-DROP TABLE datalake_clean.zendesk_tickets_xplenty
-
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_tickets_xplenty`(
-    `subject` string,
-    `created_at` string,
-    `description` string,
-    `external_id` string,
-    `type` string,
-    `channel` string,
-    `source` string,
-    `updated_at` string,
-    `problem_id` string,
-    `due_at` string,
-    `id` string,
-    `assignee_id` string,
-    `generated_timestamp` string,
-    `raw_subject` string,
-    `forum_topic_id` string,
-    `custom_fields` string,
-    `allow_channelback` string,
-    `satisfaction_rating` string,
-    `submitter_id` string,
-    `priority` string,
-    `collaborator_ids` string,
-    `tags` string,
-    `brand_id` string,
-    `metric_set` string,
-    `group_id` string,
-    `organization_id` string,
-    `recipient` string,
-    `is_public` string,
-    `has_incidents` string,
-    `status` string,
-    `requester_id` string)
-PARTITIONED BY (
-  `dt_extraction` string)
-STORED AS PARQUET
-LOCATION
-  's3://5a-datalake/clean/zendesk/tickets_xplenty/';
-
-MSCK REPAIR TABLE datalake_clean.zendesk_tickets_xplenty;
+drop table if exists datalake_clean.zendesk_tickets;
+create external table if not exists datalake_clean.zendesk_tickets (
+    id_ticket string,
+    satisfaction_rating string,
+    url_ticket string,
+    priority string, 
+    score string,
+    raw_subject string,
+    subject string,  
+    channel string,
+    via string,
+    tags string,
+    id_group string,
+    id_ticket_form string,
+    id_requester string,
+    id_assignee string,
+    ids_collaborator string,
+    id_brand string,
+    id_submitter string,
+    status string,
+    custom_fields string,
+    has_incidents string,
+    type string,
+    allow_channelback string,
+    description string,
+    recipient string,
+    is_public string,
+    ts_created string,
+    ts_created_local string,
+    ts_updated string,
+    ts_load string
+)
+partitioned by (
+    dt_extracted string
+)
+stored as parquet
+location 's3://5a-datalake/clean/zendesk/tickets/';
