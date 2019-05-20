@@ -140,20 +140,21 @@ class RedshiftClient(object):
         """Wait for Amazon Redshift cluster to reach given status
 
         :param cluster_id: string; Cluster name to monitor
-        :param status_enum: string; Status to be monitored, values accessible via RedshiftStatusEnum class
+        :param status_enum: string; Enum Status to be monitored, accessible via RedshiftStatusEnum class
         """
-        if status_enum is None:
+        if status_enum.value is None:
             raise ValueError(
                 'm=wait_for_cluster_status, cluster_id={0}, status{1}'
-                'msg=No status found'.format(cluster_id, status_enum))
+                'msg=No status found'.format(cluster_id, str(status_enum)))
 
-        waiter = self.redshift_client.get_waiter(status_enum)
+        waiter = self.redshift_client.get_waiter(status_enum.value)
         try:
             waiter.wait(ClusterIdentifier=cluster_id)
         except Exception as e:
             raise RuntimeError(
                 'm=wait_for_cluster_status, cluster_id={0}, error={1}, status{2}'
-                'msg=Timeout waiting for cluster to be in expected status'.format(cluster_id, e.message, status_enum))
+                'msg=Timeout waiting for cluster to be in expected status'.format(cluster_id, e.message,
+                                                                                  str(status_enum)))
 
     @logger
     def scale_down_cluster(self, cluster_id):
