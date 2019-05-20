@@ -136,46 +136,22 @@ class RedshiftClient(object):
                     e.message))
 
     @logger
-    def wait_for_cluster_availability(self, cluster_id):
+    def wait_for_cluster_status(self, cluster_id, status_enum):
         """Wait for Amazon Redshift cluster to become available
 
         :param cluster_id: string; Cluster name to monitor
+        :param status_enum: string; Status to be monitored, values accessible via RedshiftStatusEnum class
         """
-        waiter = self.redshift_client.get_waiter('cluster_available')
+        if status_enum is None:
+            raise ValueError()
+
+        waiter = self.redshift_client.get_waiter(status_enum)
         try:
             waiter.wait(ClusterIdentifier=cluster_id)
         except Exception as e:
             raise RuntimeError(
-                'm=wait_for_cluster_availability, cluster_id={0}, error={1}, '
-                'msg=Timeout waiting for cluster to became available'.format(cluster_id, e.message))
-
-    @logger
-    def wait_for_cluster_restore(self, cluster_id):
-        """Wait for Amazon Redshift cluster to restore itself
-
-        :param cluster_id: string; Cluster name to monitor
-        """
-        waiter = self.redshift_client.get_waiter('cluster_restored')
-        try:
-            waiter.wait(ClusterIdentifier=cluster_id)
-        except Exception as e:
-            raise RuntimeError(
-                'm=wait_for_cluster_restore, cluster_id={0}, error={1}, '
-                'msg=Timeout waiting for cluster to be restored'.format(cluster_id, e.message))
-
-    @logger
-    def wait_for_cluster_shutdown(self, cluster_id):
-        """Wait for Amazon Redshift cluster to shutdown
-
-        :param cluster_id: string; Cluster name to monitor
-        """
-        waiter = self.redshift_client.get_waiter('cluster_deleted')
-        try:
-            waiter.wait(ClusterIdentifier=cluster_id)
-        except Exception as e:
-            raise RuntimeError(
-                'm=wait_for_cluster_shutdown, cluster_id={0}, error={1}, '
-                'msg=Timeout waiting for cluster to shutdown'.format(cluster_id, e.message))
+                'm=wait_for_cluster_status, cluster_id={0}, error={1}, status{2}'
+                'msg=Timeout waiting for cluster to be in expected status'.format(cluster_id, e.message, status_enum))
 
     @logger
     def scale_down_cluster(self, cluster_id):
