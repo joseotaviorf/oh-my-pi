@@ -1,19 +1,19 @@
 , contracts as (
   select
     t.*,
-    cast(coalesce(dc.sk_contract, eo.contrato_id, dcf.sk_contract, '-1') as bigint) as sk_contract
+    cast(coalesce(ec.id, eo.contrato_id, ec_refund.id, '-1') as bigint) as sk_contract
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
-  left join datalake_clean.ods_dim_contract dc
+  left join datalake_raw.ebdb_contrato ec
     on trim(ct.origin) = 'Contrato'
-      and cast(ct.id_origin as bigint) = try(cast(dc.sk_contract as bigint))
+      and ct.id_origin = ec.id
   left join datalake_raw.ebdb_onboarding eo
     on trim(ct.origin) = 'Onboarding'
-      and cast(ct.id_origin as bigint) = try(cast(eo.id as bigint))
-  left join datalake_clean.ods_dim_contract dcf
-    on trim(ct.origin) = 'Refund'
-      and regexp_extract(ct.metadata, 'contract_id":(\d+)', 1) = dcf.sk_contract
+      and ct.id_origin = eo.id
+  left join datalake_raw.ebdb_contrato ec_refund
+    on trim(ct.origin) in ('Refund', 'TenantRefund')
+      and regexp_extract(ct.metadata, 'contract_id":(\d+)', 1) = ec_refund.id
 ),
 contract_house_listing as (
   select
