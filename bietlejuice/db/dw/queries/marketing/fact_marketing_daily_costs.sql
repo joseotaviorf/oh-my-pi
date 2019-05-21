@@ -1,31 +1,12 @@
 with campaigns_full as (
-	select  
-		ff.sk_date,
-		'facebook'  as origin,
-		'fact_facebook_daily_cost_attributions' as fact_cost,
-		df.campaign_name,
-		lower(SPLIT_PART(df.campaign_name, '.', 4)) as campaign_city,
-		df.account_name,
-		lower(df.campaign_name) as campaign_name_l,
-		lower(df.account_name) as account_name_l,
-		df.campaign_name as utm_campaign,
-		df.adset_name as utm_term,
-		df.ad_name as utm_content,
-		ff.desktop_spend as desktop_cost,
-		ff.mobile_spend as mobile_cost,
-		ff.other_spend as other_cost,
-		null as total_cost
-	from marketing.fact_facebook_daily_cost_attributions ff 
-	join marketing.dim_facebook_ad df 
-		on ff.sk_ad = df.sk_ad
-	where ff.sk_date >= 20180101
-UNION
+    with google as (
 	select  
 		fg.sk_date,
 		'google' as origin,
 		'fact_google_daily_cost_attributions' as fact_cost,			
 		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
 		lower(SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)) as campaign_city,
+		lower(SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)) as campaign_city_alternative,
 		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
 		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
 		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
@@ -44,6 +25,45 @@ UNION
 	left join marketing.dim_google_campaign dgc 
 		on dgc.sk_campaign = fg.sk_campaign
 	where fg.sk_date >= 20180101
+	)
+	select
+	    sk_date,
+		origin,
+		fact_cost,
+		campaign_name,
+		case when campaign_city ~ '^[0-9]+$' then campaign_city_alternative else campaign_city end as campaign_city,
+		account_name,
+		campaign_name_l,
+		account_name_l,
+		utm_campaign,
+		utm_term,
+		utm_content,
+		desktop_cost,
+		mobile_cost,
+		other_cost,
+		total_cost
+	from google
+UNION
+    select
+		ff.sk_date,
+		'facebook'  as origin,
+		'fact_facebook_daily_cost_attributions' as fact_cost,
+		df.campaign_name,
+		lower(SPLIT_PART(df.campaign_name, '.', 4)) as campaign_city,
+		df.account_name,
+		lower(df.campaign_name) as campaign_name_l,
+		lower(df.account_name) as account_name_l,
+		df.campaign_name as utm_campaign,
+		df.adset_name as utm_term,
+		df.ad_name as utm_content,
+		ff.desktop_spend as desktop_cost,
+		ff.mobile_spend as mobile_cost,
+		ff.other_spend as other_cost,
+		null as total_cost
+	from marketing.fact_facebook_daily_cost_attributions ff
+	join marketing.dim_facebook_ad df
+		on ff.sk_ad = df.sk_ad
+	where ff.sk_date >= 20180101
 UNION
     select 
         ftc.sk_date,
