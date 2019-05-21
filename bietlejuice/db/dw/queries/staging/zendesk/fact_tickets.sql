@@ -48,5 +48,3 @@ left join datalake_clean.zendesk_tickets t
 on tm.id_ticket=t.id_ticket
 where (t.channel<>'api' 
       or (t.channel='api' and t.tags not like '%hsm%'));
-      
-     select group_stations from datalake_clean.zendesk_ticket_metrics limit 50;
