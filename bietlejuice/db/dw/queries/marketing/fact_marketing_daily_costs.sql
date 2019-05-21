@@ -150,6 +150,9 @@ UNION
 			when cf.campaign_name_l like '%barueri%' then 'RMSP'
 			when cf.campaign_name_l like '%osasco%' then 'RMSP'
 			when cf.campaign_name_l like '%jundia%' then 'RMSP'
+			when cf.campaign_name_l like '%santo_andr%' then 'RMSP'
+			when cf.campaign_name_l like '%s_o_bernardo%' then 'RMSP'
+			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
 	 	    when cf.campaign_name_l like '%rio de janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
@@ -164,7 +167,7 @@ UNION
 		-- city via campaign_name name convention
 		case when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city = 'campinas' then 'Campinas'
-			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro') then 'Rio de Janeiro'
+			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
 			 when campaign_city = 'goiania' then 'Goiânia'
 			 when campaign_city in ('poa', 'porto_alegre') then 'Porto Alegre'
