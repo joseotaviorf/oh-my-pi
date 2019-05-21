@@ -1,0 +1,52 @@
+select
+    t.id_ticket as sk_ticket,
+    coalesce('to do', '-1') as sk_house_listing,
+    coalesce('to do', '-1') as sk_contract,
+    coalesce('to do', '-1') as sk_client,
+    coalesce('to do', '-1') as sk_owner,
+    coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
+    coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
+    coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
+    coalesce(cast(date_format(cast(tm.ts_created as timestamp), '%Y%m%d') as integer), -1) as sk_created_date,
+    coalesce(cast(date_format(cast(tm.ts_created_local as timestamp), '%Y%m%d') as integer), -1) as sk_created_date_local,
+    coalesce(cast(date_format(cast(tm.ts_solved as timestamp), '%Y%m%d') as integer), -1) as sk_solved_date,
+    coalesce('to do', '-1') as sk_solved_date_local,
+    coalesce('to do', '-1') as sk_closed_date,
+    coalesce('to do', '-1') as sk_closed_date_local,
+    coalesce(cast(date_format(cast(tm.ts_initially_assigned as timestamp), '%Y%m%d') as integer), -1) as sk_initially_assigned,
+    coalesce('to do', '-1') as sk_initially_assigned_local,
+    coalesce(cast(date_format(cast(tm.ts_assigned as timestamp), '%Y%m%d') as integer), -1) as sk_last_assigned,
+    coalesce('to do', '-1') as sk_last_assigned_local,
+    coalesce(cast(date_format(cast(t.dt_extracted as date), '%Y%m%d') as integer), -1) as sk_extraction_date,
+    tm.group_stations as total_group_stations,
+    tm.assignee_stations as total_assignee_stations,
+    'to do' as minutes_first_reply_time_business,
+    'to do' as minutes_first_reply_time_calendar,
+    tm.minutes_first_business_resolution as minutes_first_resolution_time_business,
+    tm.minutes_first_calendar_resolution as minutes_first_resolution_time_calendar,
+    tm.minutes_business_requester_wait as minutes_requester_wait_time_business,
+   	tm.minutes_calendar_requester_wait as minutes_requester_wait_time_calendar,
+    tm.minutes_business_agent_wait as minutes_agent_wait_time_business,
+    tm.minutes_calendar_agent_wait as minutes_agent_wait_time_calendar,
+    tm.minutes_business_on_hold as minutes_on_hold_time_business,
+    tm.minutes_calendar_on_hold as minutes_on_hold_time_calendar,
+    tm.minutes_full_business_resolution as minutes_full_resolution_time_business,
+    tm.minutes_full_calendar_resolution as minutes_full_resolution_time_calendar,
+    tm.reopens as reopens,
+    tm.replies as replies,
+    tm.ts_assigned as ts_last_assigned,
+    'to do' as ts_last_assigned_local,
+    tm.ts_solved as ts_solved,
+    'to do' as ts_solved_local,
+    t.ts_updated as ts_updated,
+    'to do' as ts_updated_local,
+    'to do' as ts_closed,
+    'to do' as ts_closed_local,
+    t.ts_load
+from datalake_clean.zendesk_ticket_metrics tm
+left join datalake_clean.zendesk_tickets t
+on tm.id_ticket=t.id_ticket
+where (t.channel<>'api' 
+      or (t.channel='api' and t.tags not like '%hsm%'));
+      
+     select group_stations from datalake_clean.zendesk_ticket_metrics limit 50;
