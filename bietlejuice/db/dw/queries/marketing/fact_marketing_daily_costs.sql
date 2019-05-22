@@ -1,49 +1,4 @@
 with campaigns_full as (
-    with google as (
-	select  
-		fg.sk_date,
-		'google' as origin,
-		'fact_google_daily_cost_attributions' as fact_cost,			
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
-		lower(SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)) as campaign_city,
-		lower(SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)) as campaign_city_alternative,
-		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
-		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
-		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as utm_campaign,
-		dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
-		cast(dga.ad_id as varchar) as utm_content,
-		fg.desktop_cost as desktop_cost,
-		fg.mobile_cost as mobile_cost,
-		null as other_cost,
-		null as total_cost
-	from marketing.fact_google_daily_cost_attributions fg
-	left join marketing.dim_google_keyword dgk 
-		on dgk.sk_keyword = fg.sk_keyword
-	left join marketing.dim_google_ad dga 
-		on dga.sk_ad = fg.sk_ad
-	left join marketing.dim_google_campaign dgc 
-		on dgc.sk_campaign = fg.sk_campaign
-	where fg.sk_date >= 20180101
-	)
-	select
-	    sk_date,
-		origin,
-		fact_cost,
-		campaign_name,
-		case when campaign_city ~ '^[0-9]+$' then campaign_city_alternative else campaign_city end as campaign_city,
-		account_name,
-		campaign_name_l,
-		account_name_l,
-		utm_campaign,
-		utm_term,
-		utm_content,
-		desktop_cost,
-		mobile_cost,
-		other_cost,
-		total_cost
-	from google
-UNION
     select
 		ff.sk_date,
 		'facebook'  as origin,
@@ -64,6 +19,35 @@ UNION
 	join marketing.dim_facebook_ad df
 		on ff.sk_ad = df.sk_ad
 	where ff.sk_date >= 20180101
+UNION
+    select
+		fg.sk_date,
+		'google' as origin,
+		'fact_google_daily_cost_attributions' as fact_cost,
+		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
+		lower(case when SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2) ~ '^[0-9]+$' then
+		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)
+		    else
+		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)
+		    end) as campaign_city,
+		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
+		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
+		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
+		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as utm_campaign,
+		dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
+		cast(dga.ad_id as varchar) as utm_content,
+		fg.desktop_cost as desktop_cost,
+		fg.mobile_cost as mobile_cost,
+		null as other_cost,
+		null as total_cost
+	from marketing.fact_google_daily_cost_attributions fg
+	left join marketing.dim_google_keyword dgk
+		on dgk.sk_keyword = fg.sk_keyword
+	left join marketing.dim_google_ad dga
+		on dga.sk_ad = fg.sk_ad
+	left join marketing.dim_google_campaign dgc
+		on dgc.sk_campaign = fg.sk_campaign
+	where fg.sk_date >= 20180101
 UNION
     select 
         ftc.sk_date,
