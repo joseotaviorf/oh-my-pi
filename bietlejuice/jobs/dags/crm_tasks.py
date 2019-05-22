@@ -1,13 +1,13 @@
 import locale
-import pandas as pd
 from datetime import datetime, timedelta
-from pymongo import MongoClient
-from qa_python_utils import QuintoAndarLogger
 
+import pandas as pd
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
+from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -53,17 +53,17 @@ def cap_dt(dt):
     return None
 
 
-def extract_lead_tasks(_uri, dt=None):
+def extract_tasks(_uri, id_column, task_types, dt=None):
     client = MongoClient(_uri)
     db = client.tasks
-    conversion_columns = ['task_id', 'task_status', 'rep_id', 'first_rep_id', 'lead_id', 'number_of_reschedules',
+    conversion_columns = ['task_id', 'task_status', 'rep_id', 'first_rep_id', id_column, 'number_of_reschedules',
                           'dt_created', 'dt_closed']
     _filter = {
-        "type": {"$in": ["ConverterLead", "ConverterLeadPrioritario"]}
+        "type": {"$in": task_types}
     }
     if dt is not None:
         _filter = {
-            "type": {"$in": ["ConverterLead", "ConverterLeadPrioritario"]},
+            "type": {"$in": task_types},
             "dataInicio": {"$gte": dt}
         }
 
@@ -79,16 +79,16 @@ def extract_lead_tasks(_uri, dt=None):
 
     tasks = list()
     count = 0
-    logger.info('m=extract_conversion_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
-    logger.info('m=extract_conversion_tasks, msg=listing tasks')
+    logger.info('m=extract_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
+    logger.info('m=extract_tasks, msg=listing tasks')
     for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
-            logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
+            logger.info('m=extract_tasks, total_loaded={}'.format(count))
         task_status = 'Open'
         task_id = row['_id']
         rep_id = row['assigneeId']
-        lead_id = row['origemId']
+        origem_id = row['origemId']
         number_of_reschedules = 0
         dt_created = row['dataInicio']
         dt_closed = None
@@ -116,7 +116,7 @@ def extract_lead_tasks(_uri, dt=None):
             "task_id": task_id,
             "task_status": task_status,
             "rep_id": int(rep_id),
-            "lead_id": lead_id,
+            id_column: origem_id,
             "number_of_reschedules": number_of_reschedules,
             "first_rep_id": int(first_rep_id),
             "dt_created": dt_created,
@@ -217,9 +217,9 @@ def extract_manual_tasks(_uri, dt=None):
     return df.loc[:, conversion_columns]
 
 
-def load_lead_tasks(_uri, table_name, _bucket, schema_name='crm'):
-    df = extract_lead_tasks(_uri=_uri)
-    logger.info('m=load_lead_tasks, msg=start saving to db')
+def load_tasks(_uri, table_name, _bucket, id_column, task_types, schema_name='crm'):
+    df = extract_tasks(_uri=_uri, id_column=id_column, task_types=task_types)
+    logger.info('m=load_tasks, table_name={}, msg=start saving to db'.format(table_name))
     BaseETL.dataframe_to_db(
         df=df,
         enum_db=EnumDB.BI_ODS,
@@ -228,7 +228,7 @@ def load_lead_tasks(_uri, table_name, _bucket, schema_name='crm'):
         append=False,
         bucket_name='{}/raw/crm/{}'.format(_bucket, table_name)
     )
-    logger.info('m=load_lead_tasks, msg=saved to db')
+    logger.info('m=load_tasks, table_name={}, msg=saved to db'.format(table_name))
 
 
 def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
@@ -251,14 +251,16 @@ main_dag = BaseDAG.build_dag(
     dag_id=MAIN_DAG_NAME,
     description='ETL for extracting CRM tasks',
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    catchup=False
 )
 
 lead_tasks = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='load_lead_tasks',
-    python_callable=load_lead_tasks,
-    op_kwargs={'table_name': 'lead_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
+    python_callable=load_tasks,
+    op_kwargs={'table_name': 'lead_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket,
+               'id_column': 'lead_id', 'task_types': ["ConverterLead", "ConverterLeadPrioritario"]}
 )
 
 manual_tasks = BaseDAG.build_python_operator(
@@ -268,4 +270,12 @@ manual_tasks = BaseDAG.build_python_operator(
     op_kwargs={'table_name': 'manual_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket}
 )
 
-lead_tasks >> manual_tasks
+photo_tasks = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='load_photo_tasks',
+    python_callable=load_tasks,
+    op_kwargs={'table_name': 'photo_tasks', '_uri': uri, 'schema_name': 'crm', '_bucket': bucket,
+               'id_column': 'origin_id', 'task_types': ['FupFoto', 'AgendarJobDeFotografo']}
+)
+
+lead_tasks >> photo_tasks >> manual_tasks
