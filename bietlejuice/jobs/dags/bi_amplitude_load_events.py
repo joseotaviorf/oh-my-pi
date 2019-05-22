@@ -98,7 +98,8 @@ xcom_amplitude_load_events_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='XCom_amplitude_load_events',
     python_callable=xcom_amplitude_load_events,
-    provide_context=True
+    provide_context=True,
+    execution_timeout=timedelta(hours=5)
 )
 
 load_active_user_sessions_raw_task = BaseDAG.build_python_operator(
