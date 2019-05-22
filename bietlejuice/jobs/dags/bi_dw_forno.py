@@ -5,7 +5,7 @@ import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.wrappers.redshift import RedshiftClient
+from bietlejuice.jobs.wrappers.redshift import RedshiftClient, RedshiftStatusEnum
 
 #  AWS env vars
 env.set_airflow_var_to_local_env(
@@ -31,25 +31,15 @@ def shutdown_cluster(target_cluster):
         rs_client.shutdown_cluster(cluster_id=target_cluster)
 
 
-def check_cluster_shutdown(target_cluster):
-    rs_client = RedshiftClient()
-    rs_client.wait_for_cluster_shutdown(cluster_id=target_cluster)
-
-
 def create_cluster(source_cluster, target_cluster, config_json):
     rs_client = RedshiftClient()
     rs_client.create_cluster_from_snapshot(source_cluster_id=source_cluster, target_cluster_id=target_cluster,
                                            config_json=config_json)
 
 
-def check_cluster_availability(target_cluster):
+def check_cluster_status(target_cluster, status_enum):
     rs_client = RedshiftClient()
-    rs_client.wait_for_cluster_availability(cluster_id=target_cluster)
-
-
-def check_cluster_availability_after_restore(target_cluster):
-    rs_client = RedshiftClient()
-    rs_client.wait_for_cluster_restore(cluster_id=target_cluster)
+    rs_client.wait_for_cluster_status(cluster_id=target_cluster, status_enum=status_enum)
 
 
 def scale_down_cluster(target_cluster):
@@ -80,8 +70,8 @@ shutdown_cluster_cluster_task = BaseDAG.build_python_operator(
 check_cluster_shutdown_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_shutdown',
-    python_callable=check_cluster_shutdown,
-    op_kwargs={'target_cluster': DW_FORNO_ID}
+    python_callable=check_cluster_status,
+    op_kwargs={'target_cluster': DW_FORNO_ID, 'status_enum': RedshiftStatusEnum.SHUTDOWN}
 )
 
 create_cluster_task = BaseDAG.build_python_operator(
@@ -96,8 +86,8 @@ create_cluster_task = BaseDAG.build_python_operator(
 check_cluster_availability_after_restore_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_availability_after_restore',
-    python_callable=check_cluster_availability_after_restore,
-    op_kwargs={'target_cluster': DW_FORNO_ID}
+    python_callable=check_cluster_status,
+    op_kwargs={'target_cluster': DW_FORNO_ID, 'status_enum': RedshiftStatusEnum.RESTORED}
 )
 
 scale_down_cluster_task = BaseDAG.build_python_operator(
@@ -110,8 +100,8 @@ scale_down_cluster_task = BaseDAG.build_python_operator(
 check_cluster_scaled_down_availability_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='check_cluster_scaled_down_availability',
-    python_callable=check_cluster_availability,
-    op_kwargs={'target_cluster': DW_FORNO_ID}
+    python_callable=check_cluster_status,
+    op_kwargs={'target_cluster': DW_FORNO_ID, 'status_enum': RedshiftStatusEnum.AVAILABLE}
 )
 
 # Tasks Flow

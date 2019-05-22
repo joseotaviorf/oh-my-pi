@@ -44,13 +44,9 @@ left join lead_conversion lc
   on lc.id_house = h.id
 left join lead l
   on l.id = lc.id_lead
-left join user_affiliate ua
-  on l.usuario_que_indicou_id = ua.id
-    and ua.affiliateType = 'B2BPartner'
-left join usuario u_b2b_online
-   on u_b2b_online.dados_afiliado_id = ua.id
+    and l.affiliate_type = 'B2BPartner'
 left join partner_agent pa_b2b_online
-  on pa_b2b_online.user_id = u_b2b_online.id
+  on pa_b2b_online.user_id = l.usuario_que_indicou_id
 left join vw_stranded_house_listings st
   on ((hl.id || '00') || coalesce(hl.version, 1))::bigint = st.sk_house
 ;

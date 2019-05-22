@@ -31,7 +31,7 @@ create external table if not exists datalake_clean.zendesk_tickets (
     ts_load string
 )
 partitioned by (
-    dt string
+    dt_extracted string
 )
 stored as parquet
-location 's3://5a-datalake/clean/zendesk/';
+location 's3://5a-datalake/clean/zendesk/tickets/';
