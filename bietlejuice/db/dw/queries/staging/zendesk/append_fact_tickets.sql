@@ -50,17 +50,10 @@ tickets as (
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
-        coalesce(cast(date_format(cast(tm.ts_created as timestamp), '%Y%m%d') as integer), -1) as sk_created_date,
-        coalesce(cast(date_format(cast(tm.ts_created_local as timestamp), '%Y%m%d') as integer), -1) as sk_created_date_local,
-        coalesce(cast(date_format(cast(tm.ts_solved as timestamp), '%Y%m%d') as integer), -1) as sk_solved_date,
-        coalesce('to do', '-1') as sk_closed_date,
-        coalesce(cast(date_format(cast(tm.ts_initially_assigned as timestamp), '%Y%m%d') as integer), -1) as sk_initially_assigned,
-        coalesce(cast(date_format(cast(tm.ts_assigned as timestamp), '%Y%m%d') as integer), -1) as sk_last_assigned,
-        coalesce(cast(date_format(cast(t.dt_extracted as date), '%Y%m%d') as integer), -1) as sk_extraction_date,
         tm.group_stations as total_group_stations,
         tm.assignee_stations as total_assignee_stations,
-        'to do' as minutes_first_reply_time_business,
-        'to do' as minutes_first_reply_time_calendar,
+        0 as minutes_first_reply_time_business,
+        0 as minutes_first_reply_time_calendar,
         tm.minutes_first_business_resolution as minutes_first_resolution_time_business,
         tm.minutes_first_calendar_resolution as minutes_first_resolution_time_calendar,
         tm.minutes_business_requester_wait as minutes_requester_wait_time_business,
@@ -73,18 +66,44 @@ tickets as (
         tm.minutes_full_calendar_resolution as minutes_full_resolution_time_calendar,
         tm.reopens as reopens,
         tm.replies as replies,
-        tm.ts_assigned as ts_last_assigned,
-        tm.ts_solved as ts_solved,
-        t.ts_updated as ts_updated,
-        'to do' as ts_closed,
-        t.ts_load
+        date(t.dt_extracted) as extracted_date,
+        from_iso8601_timestamp(tm.ts_initially_assigned) as ts_initially_assigned,
+        if((from_iso8601_timestamp(tm.ts_initially_assigned) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	    from_iso8601_timestamp(tm.ts_initially_assigned) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+		    from_iso8601_timestamp(tm.ts_initially_assigned) at time zone 'GMT-3',
+		    from_iso8601_timestamp(tm.ts_initially_assigned) at time zone 'Brazil/East') as ts_initially_assigned_local,
+        from_iso8601_timestamp(tm.ts_assigned) as ts_last_assigned,
+        if((from_iso8601_timestamp(tm.ts_assigned) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	    from_iso8601_timestamp(tm.ts_assigned) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+		    from_iso8601_timestamp(tm.ts_assigned) at time zone 'GMT-3',
+		    from_iso8601_timestamp(tm.ts_assigned) at time zone 'Brazil/East') as ts_last_assigned_local,
+        from_iso8601_timestamp(tm.ts_solved) as ts_solved,
+        if((from_iso8601_timestamp(tm.ts_solved) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	    from_iso8601_timestamp(tm.ts_solved) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+		    from_iso8601_timestamp(tm.ts_solved) at time zone 'GMT-3',
+		    from_iso8601_timestamp(tm.ts_solved) at time zone 'Brazil/East') as ts_solved_local,
+        from_iso8601_timestamp(t.ts_created) as ts_created,
+        from_iso8601_timestamp(t.ts_created_local) as ts_created_local,
+        from_iso8601_timestamp(t.ts_updated) as ts_updated,
+        if((from_iso8601_timestamp(t.ts_updated) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	    from_iso8601_timestamp(t.ts_updated) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+		    from_iso8601_timestamp(t.ts_updated) at time zone 'GMT-3',
+		    from_iso8601_timestamp(t.ts_updated) at time zone 'Brazil/East') as ts_updated_local,
+        if(t.status='closed',cast(t.ts_updated as timestamp), null) as ts_closed,
+         if(t.status='closed',    
+            if((from_iso8601_timestamp(t.ts_updated) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	        from_iso8601_timestamp(t.ts_updated) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+		        from_iso8601_timestamp(t.ts_updated) at time zone 'GMT-3',
+		        from_iso8601_timestamp(t.ts_updated) at time zone 'Brazil/East'),
+            null) as ts_closed_local,
+        cast(t.ts_load as timestamp) as ts_load
     from tickets_filter t
     left join datalake_clean.zendesk_ticket_metrics tm
         on t.id_ticket=tm.id_ticket
     left join custom_fields c 
         on c.id_ticket=t.id_ticket
     left join datalake_clean.ods_dim_house_listing dhl
-        on c.cols['Código do Imóvel'] = dhl.short_id_house
+        on c.cols['Código do Imóvel'] = dhl.short_id_house or c.cols['Código do Imóvel'] = dhl.id_house
         and cast(t.ts_created as timestamp)
         between cast(regexp_extract(dhl.ts_listing_version_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
         and (case
@@ -103,11 +122,19 @@ select
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
-    t.sk_created_date,
-    t.sk_created_date_local,
-    t.sk_solved_date,
-    'to do' as sk_solved_date_local,
-    t.sk_extraction_date,
+    coalesce(cast(date_format(t.ts_created, '%Y%m%d') as integer), -1) as sk_created_date,
+    coalesce(cast(date_format(t.ts_created_local, '%Y%m%d') as integer), -1) as sk_created_date_local,
+    coalesce(cast(date_format(t.ts_solved, '%Y%m%d') as integer), -1) as sk_solved_date,
+    coalesce(cast(date_format(t.ts_solved_local, '%Y%m%d') as integer), -1) as sk_solved_date_local,
+    coalesce(cast(date_format(t.ts_closed, '%Y%m%d') as integer), -1) as sk_closed_date,
+    coalesce(cast(date_format(t.ts_closed_local, '%Y%m%d') as integer), -1) as sk_closed_date_local,
+    coalesce(cast(date_format(t.ts_initially_assigned, '%Y%m%d') as integer), -1) as sk_initially_assigned,
+    coalesce(cast(date_format(t.ts_initially_assigned_local, '%Y%m%d') as integer), -1) as sk_initially_assigned_local,
+    coalesce(cast(date_format(t.ts_last_assigned, '%Y%m%d') as integer), -1) as sk_last_assigned,
+    coalesce(cast(date_format(t.ts_last_assigned_local, '%Y%m%d') as integer), -1) as sk_last_assigned_local,
+    coalesce(cast(date_format(t.extracted_date, '%Y%m%d') as integer), -1) as sk_extraction_date,
+    t.total_group_stations,
+    t.total_assignee_stations,
     t.minutes_first_reply_time_calendar,
 	t.minutes_first_reply_time_business,
 	t.minutes_first_resolution_time_calendar,
@@ -122,12 +149,16 @@ select
 	t.minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
-    t.ts_updated,
-    'to do' as ts_updated_local,
+    t.ts_initially_assigned,
+    t.ts_initially_assigned_local,
+    t.ts_last_assigned,
+    t.ts_last_assigned_local,
     t.ts_solved,
-    'to do' as ts_solved_local,
+    t.ts_solved_local,
+    t.ts_updated,
+    t.ts_updated_local,
     t.ts_closed,
-    'to do' as ts_closed_local,
+    t.ts_closed_local,
     now() as ts_load
 from tickets t
 left join contract c
