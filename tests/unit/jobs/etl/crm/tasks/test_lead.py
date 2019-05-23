@@ -10,7 +10,7 @@ class TestCRMTasksLead(object):
     ]
 
     TABLE_NAMES = {
-        'fact': 'fact_lead_tasks',
+        'fact': 'fact_lead_task_actions',
         'dim': 'dim_lead_task'
     }
 
