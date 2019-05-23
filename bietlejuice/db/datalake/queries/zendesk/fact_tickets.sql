@@ -1,7 +1,7 @@
 with tickets_filter as (
 	select distinct * from datalake_clean.zendesk_tickets t
 	where (channel<>'api' or (channel='api' and tags not like '%hsm%'))
-          and dt_extracted = '{partition_date}'
+          and dt_extracted = '{extraction_date}'
 ),
 custom_fields as (
     with parse_fields as (
@@ -136,21 +136,20 @@ select
     coalesce(cast(date_format(t.ts_initially_assigned_local, '%Y%m%d') as integer), -1) as sk_initially_assigned_local,
     coalesce(cast(date_format(t.ts_last_assigned, '%Y%m%d') as integer), -1) as sk_last_assigned,
     coalesce(cast(date_format(t.ts_last_assigned_local, '%Y%m%d') as integer), -1) as sk_last_assigned_local,
-    coalesce(cast(date_format(t.extracted_date, '%Y%m%d') as integer), -1) as sk_extraction_date,
     t.total_group_stations,
     t.total_assignee_stations,
-    t.minutes_reply_calendar,
-	t.minutes_reply_business,
-	t.minutes_first_resolution_calendar,
-	t.minutes_first_resolution_business,
-	t.minutes_requester_wait_calendar,
-	t.minutes_requester_wait_business,
-	t.minutes_agent_wait_calendar,
-	t.minutes_agent_wait_business,
-	t.minutes_on_hold_calendar,
-	t.minutes_on_hold_business,
-	t.minutes_full_resolution_calendar,
-	t.minutes_full_resolution_business,
+    t.minutes_reply_calendar as minutes_first_reply_time_calendar,
+	t.minutes_reply_business as minutes_first_reply_time_business,
+	t.minutes_first_resolution_calendar as minutes_first_resolution_time_calendar,
+	t.minutes_first_resolution_business as minutes_first_resolution_time_business,
+	t.minutes_requester_wait_calendar as minutes_requester_wait_time_calendar,
+	t.minutes_requester_wait_business as minutes_requester_wait_time_business,
+	t.minutes_agent_wait_calendar as minutes_agent_wait_time_calendar,
+	t.minutes_agent_wait_business as minutes_agent_wait_time_business,
+	t.minutes_on_hold_calendar as minutes_on_hold_time_calendar,
+	t.minutes_on_hold_business as minutes_on_hold_time_business,
+	t.minutes_full_resolution_calendar as minutes_full_resolution_time_calendar,
+	t.minutes_full_resolution_business as minutes_full_resolution_time_business,
     t.reopens,
     t.replies,
     t.ts_initially_assigned,
