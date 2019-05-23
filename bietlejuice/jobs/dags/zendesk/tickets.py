@@ -27,7 +27,6 @@ class ZendeskTickets(Zendesk):
             ('satisfaction_rating', str),
             ('url_ticket', str),
             ('priority', str),
-            ('score', str),
             ('raw_subject', str),
             ('subject', str),
             ('channel', str),
