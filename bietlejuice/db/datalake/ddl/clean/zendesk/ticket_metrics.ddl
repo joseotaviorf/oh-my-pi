@@ -22,7 +22,6 @@ create external table if not exists datalake_clean.zendesk_ticket_metrics (
     minutes_agent_wait_business string, 
     minutes_on_hold_calendar string, 
     minutes_on_hold_business string,
-    group_stations string,
     ts_initially_assigned string,
     ts_assignee_updated string,
     ts_assigned string,
