@@ -42,6 +42,9 @@ house as (
     and sk_house_listing != '-1'
   group by 1,2
 ),
+last_ticket_entries as (
+    select id_ticket, max(ts_updated) as ts_updated from tickets_filter group by 1
+),
 tickets as (
     select
         t.id_ticket as sk_ticket,
@@ -52,21 +55,20 @@ tickets as (
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         tm.group_stations as total_group_stations,
         tm.assignee_stations as total_assignee_stations,
-        0 as minutes_first_reply_time_business,
-        0 as minutes_first_reply_time_calendar,
-        tm.minutes_first_business_resolution as minutes_first_resolution_time_business,
-        tm.minutes_first_calendar_resolution as minutes_first_resolution_time_calendar,
-        tm.minutes_business_requester_wait as minutes_requester_wait_time_business,
-        tm.minutes_calendar_requester_wait as minutes_requester_wait_time_calendar,
-        tm.minutes_business_agent_wait as minutes_agent_wait_time_business,
-        tm.minutes_calendar_agent_wait as minutes_agent_wait_time_calendar,
-        tm.minutes_business_on_hold as minutes_on_hold_time_business,
-        tm.minutes_calendar_on_hold as minutes_on_hold_time_calendar,
-        tm.minutes_full_business_resolution as minutes_full_resolution_time_business,
-        tm.minutes_full_calendar_resolution as minutes_full_resolution_time_calendar,
+        tm.minutes_reply_calendar,
+        tm.minutes_reply_business,
+        tm.minutes_first_resolution_business,
+        tm.minutes_first_resolution_calendar,
+        tm.minutes_requester_wait_business,
+        tm.minutes_requester_wait_calendar,
+        tm.minutes_agent_wait_business,
+        tm.minutes_agent_wait_calendar,
+        tm.minutes_on_hold_business,
+        tm.minutes_on_hold_calendar,
+        tm.minutes_full_resolution_business,
+        tm.minutes_full_resolution_calendar,
         tm.reopens as reopens,
         tm.replies as replies,
-        date(t.dt_extracted) as extracted_date,
         from_iso8601_timestamp(tm.ts_initially_assigned) as ts_initially_assigned,
         if((from_iso8601_timestamp(tm.ts_initially_assigned) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
 	    from_iso8601_timestamp(tm.ts_initially_assigned) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
@@ -97,7 +99,9 @@ tickets as (
 		        from_iso8601_timestamp(t.ts_updated) at time zone 'Brazil/East'),
             null) as ts_closed_local,
         cast(t.ts_load as timestamp) as ts_load
-    from tickets_filter t
+    from last_ticket_entries lt 
+    inner join tickets_filter t
+    on lt.id_ticket=t.id_ticket and lt.ts_updated=t.ts_updated
     left join datalake_clean.zendesk_ticket_metrics tm
         on t.id_ticket=tm.id_ticket
     left join custom_fields c 
@@ -135,18 +139,18 @@ select
     coalesce(cast(date_format(t.extracted_date, '%Y%m%d') as integer), -1) as sk_extraction_date,
     t.total_group_stations,
     t.total_assignee_stations,
-    t.minutes_first_reply_time_calendar,
-	t.minutes_first_reply_time_business,
-	t.minutes_first_resolution_time_calendar,
-	t.minutes_first_resolution_time_business,
-	t.minutes_requester_wait_time_calendar,
-	t.minutes_requester_wait_time_business,
-	t.minutes_agent_wait_time_calendar,
-	t.minutes_agent_wait_time_business,
-	t.minutes_on_hold_time_calendar,
-	t.minutes_on_hold_time_business,
-	t.minutes_full_resolution_time_calendar,
-	t.minutes_full_resolution_time_business,
+    t.minutes_reply_calendar,
+	t.minutes_reply_business,
+	t.minutes_first_resolution_calendar,
+	t.minutes_first_resolution_business,
+	t.minutes_requester_wait_calendar,
+	t.minutes_requester_wait_business,
+	t.minutes_agent_wait_calendar,
+	t.minutes_agent_wait_business,
+	t.minutes_on_hold_calendar,
+	t.minutes_on_hold_business,
+	t.minutes_full_resolution_calendar,
+	t.minutes_full_resolution_business,
     t.reopens,
     t.replies,
     t.ts_initially_assigned,
