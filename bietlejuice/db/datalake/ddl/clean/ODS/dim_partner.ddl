@@ -3,6 +3,7 @@ create external table if not exists datalake_clean.ods_dim_partner (
     sk_partner string,
     id_partner string,
     name string,
+    trade_name string,
     phone string,
     email string,
     cnpj string,

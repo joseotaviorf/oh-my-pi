@@ -17,6 +17,7 @@ select
   task_action_type,
   task_user_action_resolve_hours,
   sk_contract,
+  sk_inspection,
   sk_house_listing,
   getdate() as ts_load
 from staging.{table_name}

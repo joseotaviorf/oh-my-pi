@@ -7,7 +7,8 @@ class TestCRMTasksPayment(object):
     QUEUES = [
         'BuscarPrimeiroBoleto',
         'PedidoDeReembolso',
-        'ConfirmarBoletoCondominio'
+        'ConfirmarBoletoCondominio',
+        'PedidoDeReembolsoInquilino'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [

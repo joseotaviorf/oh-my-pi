@@ -1,5 +1,5 @@
 with campaigns_full as (
-	select  
+    select
 		ff.sk_date,
 		'facebook'  as origin,
 		'fact_facebook_daily_cost_attributions' as fact_cost,
@@ -15,17 +15,21 @@ with campaigns_full as (
 		ff.mobile_spend as mobile_cost,
 		ff.other_spend as other_cost,
 		null as total_cost
-	from marketing.fact_facebook_daily_cost_attributions ff 
-	join marketing.dim_facebook_ad df 
+	from marketing.fact_facebook_daily_cost_attributions ff
+	join marketing.dim_facebook_ad df
 		on ff.sk_ad = df.sk_ad
-	where ff.sk_date >= 20190101
+	where ff.sk_date >= 20180101
 UNION
-	select  
+    select
 		fg.sk_date,
 		'google' as origin,
-		'fact_google_daily_cost_attributions' as fact_cost,			
+		'fact_google_daily_cost_attributions' as fact_cost,
 		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
-		lower(SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)) as campaign_city,
+		lower(case when SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2) ~ '^[0-9]+$' then
+		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)
+		    else
+		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)
+		    end) as campaign_city,
 		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
 		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
 		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
@@ -37,13 +41,13 @@ UNION
 		null as other_cost,
 		null as total_cost
 	from marketing.fact_google_daily_cost_attributions fg
-	left join marketing.dim_google_keyword dgk 
+	left join marketing.dim_google_keyword dgk
 		on dgk.sk_keyword = fg.sk_keyword
-	left join marketing.dim_google_ad dga 
+	left join marketing.dim_google_ad dga
 		on dga.sk_ad = fg.sk_ad
-	left join marketing.dim_google_campaign dgc 
+	left join marketing.dim_google_campaign dgc
 		on dgc.sk_campaign = fg.sk_campaign
-	where fg.sk_date >= 20190101
+	where fg.sk_date >= 20180101
 UNION
     select 
         ftc.sk_date,
@@ -64,7 +68,7 @@ UNION
     from marketing.fact_trovit_daily_cost_attributions ftc
     left join marketing.dim_trovit_campaign dtc 
     	on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
-    where ftc.sk_date >= 20190101
+    where ftc.sk_date >= 20180101
 UNION
 	select 
         fct.sk_date,
@@ -85,7 +89,7 @@ UNION
 	from marketing.fact_criteo_daily_cost_attributions fct
 	left join marketing.dim_criteo_campaign dct 
 		on fct.sk_criteo_campaign = dct.sk_criteo_campaign
-	where fct.sk_date >= 20190101
+	where fct.sk_date >= 20180101
 UNION
     select
         frt.sk_date,
@@ -108,7 +112,7 @@ UNION
       	-- records in dim table are repeated
       	(select distinct * from marketing.dim_rtb_campaign) drt 
       	on frt.sk_rtb_campaign = drt.sk_rtb_campaign
-      where frt.sk_date >= 20190101
+      where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
      select 
@@ -129,7 +133,7 @@ UNION
         fcl.cost as total_cost
       from marketing.fact_daily_classifieds_costs fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
-      where fcl.sk_cost_date >= 20190101
+      where fcl.sk_cost_date >= 20180101
 )
 ,demand_tax as (
 	select 
@@ -150,6 +154,9 @@ UNION
 			when cf.campaign_name_l like '%barueri%' then 'RMSP'
 			when cf.campaign_name_l like '%osasco%' then 'RMSP'
 			when cf.campaign_name_l like '%jundia%' then 'RMSP'
+			when cf.campaign_name_l like '%santo_andr%' then 'RMSP'
+			when cf.campaign_name_l like '%s_o_bernardo%' then 'RMSP'
+			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
 	 	    when cf.campaign_name_l like '%rio de janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
@@ -164,7 +171,7 @@ UNION
 		-- city via campaign_name name convention
 		case when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city = 'campinas' then 'Campinas'
-			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro') then 'Rio de Janeiro'
+			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
 			 when campaign_city = 'goiania' then 'Goiânia'
 			 when campaign_city in ('poa', 'porto_alegre') then 'Porto Alegre'

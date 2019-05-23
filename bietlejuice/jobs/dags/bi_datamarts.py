@@ -80,8 +80,7 @@ def create_datamart_from_athena(table_name, **kwargs):
         df=df,
         table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
         encoding='utf-8',
-        append=False,
-        bucket_name=s3_bucket
+        append=False
     )
 
 

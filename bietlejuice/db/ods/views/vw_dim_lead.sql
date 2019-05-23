@@ -1,8 +1,6 @@
-DROP VIEW if exists public.vw_dim_lead;
-
-CREATE VIEW public.vw_dim_lead as
- select
-  distinct
+drop view if exists vw_dim_lead;
+create or replace view vw_dim_lead as
+ select distinct
   l.id as sk_lead,
   l.id,
   l.anuncio_criado_em,
@@ -58,7 +56,7 @@ CREATE VIEW public.vw_dim_lead as
   l.dados_corretor_email,
   l.dados_gerente_contas_nome,
   l.dados_gerente_contas_email,
-  coalesce(lo.dados_afiliado_tipo_afiliado, l.dados_afiliado_tipo_afiliado) as dados_afiliado_tipo_afiliado,
+  coalesce(lo.affiliate_type, l.affiliate_type) as affiliate_type,
   coalesce(lo.dados_afiliado_inicio_atuacao, l.dados_afiliado_inicio_atuacao) as dados_afiliado_inicio_atuacao,
   coalesce(lo.dados_afiliado_cidade_atuacao, l.dados_afiliado_cidade_atuacao) as dados_afiliado_cidade_atuacao,
   l.region_id,
@@ -79,6 +77,13 @@ CREATE VIEW public.vw_dim_lead as
   l.flg_latlng_served,
   l.flg_location_served,
   lsf.score_factor,
+  coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or b2b_prime.id_lead is not null, false) as is_b2b,
+  case
+    when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
+     then 'online'
+    when b2b_prime.id_lead is not null
+     then 'prime'
+  end as b2b_type,
   now() as load_timestamp
 FROM
   public.lead l
@@ -104,6 +109,14 @@ left join lateral
   	l.usuario_que_indicou_id::integer = an.user_id
   limit 1
 )  an
-  on true;
-
-  
+  on true
+left join (
+	select l.id as id_lead
+	from lead l
+	join usuario u_b2b
+		on u_b2b.telefone_principal = l.telefone_anunciante
+	join partner_agent pa_b2b
+		on pa_b2b.user_id = u_b2b.id
+) b2b_prime
+  on b2b_prime.id_lead = l.id
+;

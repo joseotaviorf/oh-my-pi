@@ -1,0 +1,32 @@
+drop table datalake_clean.zendesk_ticket_fields_xplenty;
+
+CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_fields_xplenty`(
+    `id` string,
+    `title` string,
+    `raw_title` string,
+    `is_collapsed_for_agents` string,
+    `is_visible_in_portal` string,
+    `description` string,
+    `is_active` string,
+    `raw_title_in_portal` string,
+    `created_at` string,
+    `type` string,
+    `raw_description` string,
+    `is_required` string,
+    `is_editable_in_portal` string,
+    `is_required_in_portal` string,
+    `updated_at` string,
+    `system_field_options` string,
+    `is_removable` string,
+    `validation_regexp` string,
+    `position` string,
+    `tag` string,
+    `title_in_portal` string)
+PARTITIONED BY (
+  `dt_extraction` string)
+STORED AS PARQUET
+LOCATION
+  's3://5a-datalake/clean/zendesk/ticket_fields_xplenty/'
+  ;
+
+msck repair table datalake_clean.zendesk_ticket_fields_xplenty;

@@ -1,5 +1,5 @@
 with tickets_filter as (
-	select distinct t.* from datalake_clean.zendesk_tickets t
+	select distinct t.* from datalake_clean.zendesk_tickets_xplenty t
 	where (t.channel<>'api' or (t.channel='api' and t.tags not like '%hsm%')) and (t.subject != 'SCRUBBED')
 	__WHERE_CLAUSE__
 ),
@@ -15,7 +15,7 @@ fields_map as (
     select f.id,
         map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
-    left join datalake_clean.zendesk_ticket_fields cf
+    left join datalake_clean.zendesk_ticket_fields_xplenty cf
        on cf.id = f.field_id
     where f.value is not null
     group by f.id

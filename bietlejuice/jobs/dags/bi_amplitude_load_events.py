@@ -91,7 +91,8 @@ load_events_to_clean_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='load_events_to_clean',
     provide_context=True,
-    python_callable=load_amplitude_clean
+    python_callable=load_amplitude_clean,
+    execution_timeout=timedelta(hours=5)
 )
 
 xcom_amplitude_load_events_task = BaseDAG.build_python_operator(

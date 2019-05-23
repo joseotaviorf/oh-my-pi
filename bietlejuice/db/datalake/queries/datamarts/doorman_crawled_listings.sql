@@ -30,7 +30,7 @@ doorman AS (
   SELECT
     d.*,
     CASE
-      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
       ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
     END AS extracted_work_house_number,
     CASE
@@ -100,7 +100,7 @@ listings_join_doorman AS
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+    AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
   GROUP BY d.id_user_doorman
 )
 SELECT
