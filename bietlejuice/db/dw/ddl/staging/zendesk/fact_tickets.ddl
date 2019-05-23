@@ -18,7 +18,6 @@ create table if not exists staging.zendesk_fact_tickets (
     sk_initially_assigned_local integer,
     sk_last_assigned integer,
     sk_last_assigned_local integer,
-    sk_extraction_date integer,
     total_group_stations integer,
     total_assignee_stations integer,
     minutes_first_reply_time_calendar integer,
