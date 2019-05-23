@@ -40,11 +40,11 @@ fields_map as (
     group by p.id_ticket
 )
 select
-    t.id_ticket,
+    t.id_ticket as sk_ticket,
     t.subject,
     t.description,
     t.channel,
-    g.name as groups,
+    g.name as "group",
     t.priority,
     t.recipient,
     t.tags,
