@@ -1,11 +1,7 @@
 import json
 from collections import OrderedDict
-from datetime import timedelta
 from gzip import GzipFile
 from io import BytesIO
-
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
@@ -13,6 +9,8 @@ from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.crm.tasks.tasks import UnidecodeHandler
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 logger = QuintoAndarLogger('ClassifiedsCosts')
 
@@ -31,8 +29,8 @@ class ClassifiedsCosts(Marketing):
     def __init__(self, s3_bucket, execution_date, account=None, auth=None):
         self.auth = auth
         self.google_api_scope = 'https://www.googleapis.com/auth/spreadsheets.readonly'
-        # add the day that was subtracted before in the marketing_subdag
-        execution_date = execution_date + timedelta(1)
+        # simulate first day of the month
+        execution_date = execution_date.replace(day=1)
         self.sheet_name = execution_date.strftime('%Y-%m-%d')
         super(ClassifiedsCosts, self).__init__(s3_bucket, execution_date, 'classifieds_costs', account)
 
