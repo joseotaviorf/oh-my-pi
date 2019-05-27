@@ -1,10 +1,9 @@
 import petl
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Marketing')
 
@@ -45,7 +44,7 @@ class Marketing(object):
         self.database = 'datalake_raw'
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
+    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None, validate_data=False):
         key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/' \
               'dt_created={date_partition}/{file_name}.parquet' \
             .format(
@@ -67,6 +66,9 @@ class Marketing(object):
             table_name=table_name,
             partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
+
+        if validate_data:
+            self._validate_data_with_previous_execution(table_name=table_name)
 
         self.athena_client.create_parquet_from_query(
             key=key,
@@ -243,3 +245,33 @@ class Marketing(object):
                 table_name=table,
                 partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=acc)
             )
+
+    @logger
+    def _validate_data_with_previous_execution(self, table_name):
+        file_query = (
+            '{query_base_dir}/{query_path}/test.sql'.format(
+                query_base_dir=DATALAKE_QUERIES_DIR,
+                query_path=self.raw_query_path))
+
+        df = self.athena_client.execute_file_query_and_return_dataframe(filename=file_query,
+                                                                        query_params={'table_name': table_name,
+                                                                                      'date': self.partition_date,
+                                                                                      'account': self.account})
+
+        try:
+            # Due to a issue in comparing numpy.bool_ type we compare it using pandas
+            df = df.eq(True)
+            result = df.iloc[0][0]
+        except Exception as e:
+            raise ValueError(
+                'm=_validate_data_with_previous_execution, file_query_path={0}, date={1}, account={2}, error={3}, '
+                'msg=Validation query did not return any expected result'.format(file_query, self.partition_date,
+                                                                                 self.account, str(e.message)))
+        if not result:
+            raise ValueError(
+                'm=_validate_data_with_previous_execution, file_query_path={0}, date={1}, account={2}, '
+                'msg=Validation not successful'.format(file_query, self.partition_date,
+                                                       self.account))
+
+        logger.info('m=_validate_data_with_previous_execution, date={0}, account={1}, '
+                    'msg=Validation successful'.format(self.partition_date, self.account))
