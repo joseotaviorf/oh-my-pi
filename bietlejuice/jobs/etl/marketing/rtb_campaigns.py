@@ -33,6 +33,8 @@ class RtbCampaigns(Marketing):
         # dpa values are not included in above request
         dpa_stats = api.get_dpa_campaign_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
                                                self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        for item in dpa_stats:
+            item[u'deviceType'] = 'MOBILE'
 
         # stats are the total number of clicks, costs etc
         # advertisers are the information about our campaign (currency, start date etc)
