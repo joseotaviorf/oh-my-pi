@@ -56,7 +56,7 @@ create external table if not exists datalake_clean.ods_dim_lead (
   dados_corretor_email string,
   dados_gerente_contas_nome string,
   dados_gerente_contas_email string,
-  dados_afiliado_tipo_afiliado string,
+  affiliate_type string,
   dados_afiliado_inicio_atuacao string,
   dados_afiliado_cidade_atuacao string,
   region_id string,
@@ -77,6 +77,8 @@ create external table if not exists datalake_clean.ods_dim_lead (
   flg_latlng_served string,
   flg_location_served string,
   score_factor string,
+  is_b2b string,
+  b2b_type string,
   load_timestamp string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

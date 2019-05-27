@@ -30,6 +30,9 @@ create table dim_contract (
   ts_updated timestamp,
   ts_canceled timestamp,
   cancellation_reason varchar,
+  is_b2b boolean,
+  b2b_type varchar,
+  b2b_prime_type varchar,
   ts_load timestamp
 )
 ;

@@ -15,7 +15,7 @@ WITH listings AS (
         url,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal')
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
     ) as tmp
   WHERE
@@ -29,15 +29,21 @@ WITH listings AS (
 doorman AS (
   SELECT
     d.*,
-    regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') as extracted_work_house_number,
-    trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city as formatted_address,
-    a.google_formatted_address,
-    a.lat,
-    a.lng,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
+      ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+    END AS extracted_work_house_number,
+    CASE
+      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_address
+      ELSE trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city
+    END AS formatted_address,
+    COALESCE(a.google_formatted_address, d.work_address) AS google_formatted_address,
+    COALESCE(a.lat, d.work_lat) AS lat,
+    COALESCE(a.lng, d.work_lng) AS lng,
     u.telefone_principal,
     u.nome,
     u.dadosafiliado_ativo,
-    CASE WHEN d.ts_joined_program != '' AND d.ts_joined_program IS NOT NULL THEN
+    CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
       CAST(d.ts_joined_program as timestamp)
     ELSE NULL END AS ts_joined_program_timestamp,
     leads.lead_activity
@@ -66,22 +72,23 @@ doorman AS (
     ) AS leads
       ON u.sk_user = leads.sk_user
   WHERE
-    COALESCE(a.lat, '') != ''
-    AND COALESCE(a.lng, '') != ''
-    AND COALESCE(
-      regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
-    , '') != ''
+    (
+      COALESCE(a.lat, '') != ''
+      AND COALESCE(a.lng, '') != ''
+      AND COALESCE(
+        regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
+        , '') != ''
+    )
+    OR COALESCE(d.work_place_id, '') != ''
 ),
 listings_join_doorman AS
 (
   SELECT
     d.id_user_doorman,
+    count(l.id) AS listing_count,
     array_agg(l.id) AS listing_id,
     array_agg(l.crawled_on) AS listing_crawled_on,
-    array_agg(l.updated_on) AS listing_listing_date,
-    array_agg(l.type) AS listing_type,
-    array_agg(l.advertiser_name) AS listing_advertiser_name,
-    array_agg(l.url) AS listing_url
+    array_agg(l.updated_on) AS listing_listing_date
   FROM doorman AS d
   JOIN listings AS l
   ON
@@ -93,7 +100,7 @@ listings_join_doorman AS
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+    AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
   GROUP BY d.id_user_doorman
 )
 SELECT

@@ -15,19 +15,19 @@ with house_listing_contracts as (
 )
 select
   ((h.id || '00') || coalesce(hl.version, 1))::bigint as sk_house_listing,
-  coalesce(nullif(h.usuario_id, pa.user_id), -1) as sk_owner,
+  coalesce(nullif(nullif(h.usuario_id, pa_b2b_online.user_id), pa_b2b_prime.user_id), -1) as sk_owner,
   coalesce(h.regiao_id, -1) as sk_region,
   coalesce(h.usuario_que_cadastrou_id, -1) as sk_user_registration,
   coalesce(hlc.id_contract, -1) as sk_contract,
   coalesce(cd.id, -1) as sk_condo,
-  coalesce(pa.user_id, -1) as sk_user_partner_agent,
-  coalesce(pa.partner_id, -1) as sk_partner,
+  coalesce(pa_b2b_online.user_id, pa_b2b_prime.user_id, -1) as sk_user_partner_agent,
+  coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
   coalesce(to_char(st.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
-  (date_part('epoch', hlc.ts_contract_signed - hl.min_version_time) / 86400)::integer as days_first_listing_to_contract_signed,
-  (date_part('epoch', hl.de_publication_date - hl.min_version_time) / 86400)::integer as days_listing_to_depublication,
-  (date_part('epoch', hl.max_version_time - hlc.dt_contract_annulment) / 86400)::integer as days_ended_rental_to_relisting,
-  (date_part('epoch', hlc.ts_next_contract_signed - hl.max_version_time) / 86400)::integer as days_relisting_to_re_rental,
-  (date_part('epoch', hlc.ts_next_contract_signed - hlc.dt_contract_annulment) / 86400)::integer as days_ended_rental_to_re_rented,
+  date_part('day', hlc.ts_contract_signed - hl.min_version_time)::integer as days_listing_to_contract_signed,
+  date_part('day', hl.de_publication_date - hl.min_version_time)::integer as days_listing_to_depublication,
+  date_part('day', hl.max_version_time - hlc.dt_contract_annulment)::integer as days_ended_rental_to_relisting,
+  date_part('day', hlc.ts_next_contract_signed - hl.max_version_time)::integer as days_relisting_to_re_rental,
+  date_part('day', hlc.ts_next_contract_signed - hlc.dt_contract_annulment)::integer as days_ended_rental_to_re_rented,
   coalesce(hl.nr_renting::bigint, 0) as nr_renting,
   now()::timestamp as ts_load
 from house h
@@ -38,8 +38,15 @@ left join house_listing_contracts hlc
     and hl.version = hlc.house_version
 left join condo cd
   on h.condo_id = cd.id
-left join partner_agent pa
-  on h.usuario_id = pa.user_id
+left join partner_agent pa_b2b_prime
+  on h.usuario_id = pa_b2b_prime.user_id
+left join lead_conversion lc
+  on lc.id_house = h.id
+left join lead l
+  on l.id = lc.id_lead
+    and l.affiliate_type = 'B2BPartner'
+left join partner_agent pa_b2b_online
+  on pa_b2b_online.user_id = l.usuario_que_indicou_id
 left join vw_stranded_house_listings st
   on ((hl.id || '00') || coalesce(hl.version, 1))::bigint = st.sk_house
 ;

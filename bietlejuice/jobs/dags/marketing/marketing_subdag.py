@@ -1,17 +1,17 @@
 from datetime import timedelta
-from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, auth=None,
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date=None, auth=None,
                  accounts=None):
-        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date)
+        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date)
         self.class_ = class_
         self.accounts = accounts
         self.dim_tables = []

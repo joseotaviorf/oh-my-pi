@@ -1,48 +1,61 @@
-with all_dates as (
+with
+fact_house_status_filter as (
+-- new step so we can filter last version and also last status (in case there are two status in the same day)
+select
+    fhs.*,
+    dd.date,
+    dd.year,
+    dd.month,
+    dd.calendar_week,
+    dd.day
+from fact_house_status fhs
+join dim_date dd
+		on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+left join dim_house_listing dh
+  on fhs.sk_house = dh.sk_house_listing
+),
+all_dates as (
 	select distinct
-    dd.year as _year,
-    dd.month as _month,
-    dd.calendar_week as _week,
-    dd.day as _day,
+    f.year as _year,
+    f.month as _month,
+    f.calendar_week as _week,
+    f.day as _day,
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year,
-    																dd.month,
-    																dd.calendar_week,
-    																dd.day order by f.sk_house asc)
+                                    f.year,
+    																f.month,
+    																f.calendar_week,
+    																f.day order by f.sk_house asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  dd.year,
-    																		dd.month,
-    																		dd.calendar_week,
-    																		dd.day order by f.sk_house desc)
+    	                                  f.year,
+    																		f.month,
+    																		f.calendar_week,
+    																		f.day order by f.sk_house desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year,
-    																dd.calendar_week order by f.sk_house asc)
+                                    f.year,
+    																f.calendar_week order by f.sk_house asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  dd.year,
-    																		dd.calendar_week order by f.sk_house desc)
+    	                                  f.year,
+    																		f.calendar_week order by f.sk_house desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year,
-    																dd.month order by f.sk_house asc)
+                                    f.year,
+    																f.month order by f.sk_house asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  dd.year,
-    																		dd.month order by f.sk_house desc)
+    	                                  f.year,
+    																		f.month order by f.sk_house desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year order by f.sk_house asc)
+                                    f.year order by f.sk_house asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  dd.year order by f.sk_house desc)
+    	                                  f.year order by f.sk_house desc)
 			- 1 as yearly_count
-	from fact_house_status f
-	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and f.status_history = 'publicado'
+	from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where dd."date" < current_date
+	where f."date" < current_date and f.status_history = 'publicado'
   order by 6, 1, 2, 3, 4
 ),
 all_dates_last_week as (
@@ -50,41 +63,35 @@ all_dates_last_week as (
 ),
 all_dates_last_month as (
 	select
-    dd.year as _year,
-    dd.month as _month,
+    f.year as _year,
+    f.month as _month,
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_house) as monthly_count
-	from fact_house_status f
-	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and f.status_history = 'publicado'
+	from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where dd."date" < current_date
-		and dd.year = date_part('year', add_months(current_date, -1))
-    and dd.month = date_part('month', add_months(current_date, -1))
-  	and dd.day < date_part('day', current_date)
+	where f."date" < current_date and f.status_history = 'publicado'
+		and f.year = date_part('year', add_months(current_date, -1))
+    and f.month = date_part('month', add_months(current_date, -1))
+  	and f.day < date_part('day', current_date)
  	group by 4, 1, 2
   order by 4, 1, 2
 ),
 all_dates_last_year as (
 	select
-		dd.year as _year,
+		f.year as _year,
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_house) as yearly_count
-  from fact_house_status f
-	join dim_date dd
-		on dd.sk_date between f.sk_min_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and f.status_history = 'publicado'
+  from fact_house_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
-	where dd."date" < current_date
-    and dd.year = date_part('year', add_months(current_date, -12))
-  		and ((dd.month = date_part('month', add_months(current_date, -12))
-  		      and dd.day < date_part('day', add_months(current_date, -12)))
-  		  or dd.month < date_part('month', add_months(current_date, -12))
+	where f."date" < current_date and f.status_history = 'publicado'
+    and f.year = date_part('year', add_months(current_date, -12))
+  		and ((f.month = date_part('month', add_months(current_date, -12))
+  		      and f.day < date_part('day', add_months(current_date, -12)))
+  		  or f.month < date_part('month', add_months(current_date, -12))
   		  )
 	group by 3, 1
 	order by 3, 1

@@ -1,25 +1,24 @@
-import sys
-
-import boto3
 import codecs
 import datetime
 import gzip
 import io
 import json
 import os
-import petl
 import re
+import sys
 import zipfile
 from StringIO import StringIO
 from decimal import Decimal
 from functools import partial
 from io import BytesIO
 from logging import info as log
-from petl.io.db import create_table
-from unidecode import unidecode
 
+import boto3
+import petl
 from db_factory import DBFactory
 from enum_db import EnumDB
+from petl.io.db import create_table
+from unidecode import unidecode
 
 
 class BaseETL(object):
@@ -199,15 +198,22 @@ class BaseETL(object):
             conn = cls.get_connection(db_enum, encoding, timeout)
 
         if show_logs:
-            print ('Start Execute Command at: {}'.format(cls.now()))
+            print ('Starting Connection at: {}'.format(cls.now()))
+
         cursor = conn.cursor()
+
+        if show_logs:
+            print ('Starting Execute Command at: {}'.format(cls.now()))
+
         cursor.execute(command)
 
         if commit:
+            if show_logs:
+                print ('Starting Commit Command at: {}'.format(cls.now()))
             conn.commit()
 
         if show_logs:
-            print ('End Execute Command at: {}'.format(cls.now()))
+            print ('Ended Execute Command at: {}'.format(cls.now()))
 
         if return_value:
             return_value = None if cursor.rowcount <= 0 else cursor.fetchone()
@@ -316,7 +322,7 @@ class BaseETL(object):
         cls.execute_command(
             command='TRUNCATE TABLE "{}"."{}";'.format(schema, table_name),
             db_enum=db_enum,
-            timeout=30,
+            timeout=500,
             commit=True
         )
 
@@ -440,8 +446,11 @@ class BaseETL(object):
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
         try:
             if not append:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, msg=truncating table'.format(table_name)
                 con.cursor().execute('truncate table {};'.format(table_name))
             if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from s3 to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM '{}'
                         CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}'
                         NULL AS 'NULL'
@@ -454,12 +463,16 @@ class BaseETL(object):
                     delimiter)
                 con.cursor().execute(sql)
             else:
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from stdin to Redshift'.format(
+                    table_name, file)
                 sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
                 con.cursor().copy_expert(sql, f_cursor)
 
             if commit:
+                print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
         finally:
+            print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
             con.close()
 
     @classmethod
@@ -639,4 +652,24 @@ class BaseETL(object):
         s3.Bucket(bucket).put_object(
             Body=csv_buffer.getvalue(),
             Key=filename
+        )
+
+    @classmethod
+    def move_file_query_data_to_db(cls, schema, file_name, table_name, append, db_enum_source, db_enum_destination,
+                                   query_params_dict=None):
+        query = BaseETL.get_query_from_file_name(file_name=file_name)
+
+        if query_params_dict:
+            query = query.format(**query_params_dict)
+
+        table = BaseETL.from_db_query(
+            db_enum=db_enum_source,
+            query=query)
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name='{}.{}'.format(schema, table_name),
+            db_enum=db_enum_destination,
+            encoding='UTF-8',
+            append=append
         )

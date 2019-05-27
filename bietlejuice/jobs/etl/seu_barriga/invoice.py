@@ -65,7 +65,7 @@ class SeuBarrigaInvoice(object):
 
     @logger
     def wait_for_results(self, status_url):
-        max_wait_count = 2
+        max_wait_count = 360
         wait_count = 0
         while not self.is_job_finished(status_url=status_url) and wait_count < max_wait_count:
             time.sleep(self.api_dict['job-waiting-time'])

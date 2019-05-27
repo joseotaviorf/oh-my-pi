@@ -1,49 +1,47 @@
-drop table datalake_clean.zendesk_users;
-
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_users`(
-    id string,
-    url string,
-    name string,
-    email string,
-    created_at string,
-    updated_at string,
-    time_zone string,
-    iana_time_zone string,
-    phone string,
-    shared_phone_number string,
-    photo string,
-    locale_id string,
-    locale string,
-    organization_id string,
-    role string,
-    verified string,
-    external_id string,
-    tags string,
+drop table if exists datalake_clean.zendesk_users;
+create external table if not exists datalake_clean.zendesk_users (
+    id_user string,
+    is_active string,
     alias string,
-    active string,
-    shared string,
-    shared_agent string,
-    last_login_at string,
-    two_factor_auth_enabled string,
-    signature string,
     details string,
+    email string,
+    phone string,
+    name string,
     notes string,
-    role_type string,
-    custom_role_id string,
-    moderator string,
-    ticket_restriction string,
-    only_private_comments string,
-    restricted_agent string,
-    suspended string,
+    url_user string,
     chat_only string,
-    default_group_id string,
-    report_csv string,
-    user_fields string)
-PARTITIONED BY (
-  `dt_extraction` string)
-STORED AS PARQUET
-LOCATION
-  's3://5a-datalake/clean/zendesk/users/'
-;
-
-msck repair table datalake_clean.zendesk_users;
+    id_custom_role string,
+    id_default_group string,
+    id_external string,
+    locale string,
+    id_locale string,
+    is_moderator string,
+    is_only_private_comments string,
+    id_organization string,
+    is_permanently_deleted string,
+    is_report_csv string,
+    is_restricted_agent string,
+    role string,
+    role_type string,
+    is_shared string,
+    is_shared_agent string,
+    is_shared_phone_number string, 
+    signature string,
+    is_suspended string,
+    tags string,
+    ticket_restriction string,
+    time_zone string,
+    is_two_factor_auth_enabled string,
+    user_fields string,
+    is_verified string,
+    ts_last_login string,
+    ts_created string,
+    ts_created_local string,
+    ts_updated string,
+    ts_load string
+)
+partitioned by (
+    dt_extracted string
+)
+stored as parquet
+location 's3://5a-datalake/clean/zendesk/users/';

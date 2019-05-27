@@ -1,17 +1,17 @@
-DROP TABLE datalake_clean.zendesk_group_memberships;
-
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_group_memberships`(
-  `url` string,
-  `id` string,
-  `user_id` string,
-  `group_id` string,
-  `default` string,
-  `created_at` string,
-  `updated_at` string)
-PARTITIONED BY (
-  `dt_extraction` string)
-STORED AS PARQUET
-LOCATION
-  's3://5a-datalake/clean/zendesk/group_memberships/'
-
-MSCK REPAIR TABLE datalake_clean.zendesk_group_memberships;
+drop table if exists datalake_clean.zendesk_group_memberships;
+create external table if not exists datalake_clean.zendesk_group_memberships (    
+    id_group_memberships string,
+    url_group_memberships string,
+    is_default string,
+    id_group string,
+    id_user string,
+    ts_created string,
+    ts_created_local string,
+    ts_updated string,
+    ts_load string
+)
+partitioned by (
+    dt_extracted string
+)
+stored as parquet
+    location 's3://5a-datalake/clean/zendesk/group_memberships/';

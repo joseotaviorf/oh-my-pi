@@ -1,52 +1,46 @@
-with distinct_data as (
-	with row_n as (
-	    select
-	        t.*,
-	        row_number() over (partition by id, dt order by updated_at desc) as rn
-	    from datalake_raw.zendesk_tickets t
-	    __WHERE_CLAUSE__
-	)
-	select
-		*
-	from row_n
-	where rn = 1
+with stitch_data as (
+    select
+		*,
+        -- bug caused by start delay of daylight saving time
+		if((from_iso8601_timestamp(created_at) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
+	   		from_iso8601_timestamp(created_at) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
+			from_iso8601_timestamp(created_at) at time zone 'GMT-3',
+			from_iso8601_timestamp(created_at) at time zone 'Brazil/East') as ts_created_local,
+		cast(json_extract(via, '$.channel') as varchar) as channel,
+    	row_number() over (partition by id, dt order by updated_at desc) as last_updated
+    from stitch.tickets
+    where cast(json_extract(via, '$.channel') as varchar) is not null
+		  and raw_subject != 'SCRUBBED'
+		  and dt = '{execution_date}'
 )
-select
-    subject,
-    created_at,
-    description,
-    external_id,
-    type,
-    replace(cast(json_extract(via, '$.channel') as varchar), '"') as channel,
-    replace(replace(replace(json_format(json_extract(via, '$.source')), '"{\', '{'), '}"', '}'), '\', '') as source,
-    updated_at,
-    problem_id,
-    due_at,
-    id,
-    assignee_id,
-    generated_timestamp,
-    raw_subject,
-    forum_topic_id,
-    '[' || replace(
-    	replace(
-    		replace(array_join(regexp_extract_all(
-    			replace(custom_fields, '\'), '\{\\?"id\\?":"?\w+"?, ?\\?"value\\?":"?.*?"?\}'
-    		), ','), '"{\', '{'
-    	), '}"', '}'
-    ), '\', '') || ']' as custom_fields,
-    allow_channelback,
+select 
+    id as id_ticket, 
     satisfaction_rating,
-    submitter_id,
+    url as url_ticket,
     priority,
-    replace(collaborator_ids, '"', '') as collaborator_ids,
-    cast(regexp_extract_all(tags, '(?!"i"|","|":")"([^"]+)"', 1) as JSON) as tags,
-    brand_id,
-    metric_set,
-    group_id,
-    organization_id,
+    raw_subject,
+    subject,
+    channel,
+    via,
+    tags,
+    group_id as id_group,
+    ticket_form_id as id_ticket_form, 
+    requester_id as id_requester,
+    assignee_id as id_assignee,
+    collaborator_ids as ids_collaborator,
+    brand_id as id_brand,
+    submitter_id as id_submitter,
+    status,
+    custom_fields,
+    has_incidents,
+    type,
+    allow_channelback,
+    description,
     recipient,
     is_public,
-    has_incidents,
-    status,
-    requester_id
-from distinct_data
+    cast(from_iso8601_timestamp(created_at) as varchar) as ts_created,
+    cast(ts_created_local as varchar) as ts_created_local,
+    cast(from_iso8601_timestamp(updated_at) as varchar) as ts_updated,
+    cast(now() as varchar) as ts_load
+from stitch_data
+where last_updated = 1;
