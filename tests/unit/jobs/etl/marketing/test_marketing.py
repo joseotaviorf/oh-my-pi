@@ -1,10 +1,11 @@
+from collections import OrderedDict
+
 import mock
 import pandas as pd
-from collections import OrderedDict
-from qa_python_utils.aws.athena import AthenaClient
-
+import pytest
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl.marketing import Marketing
+from qa_python_utils.aws.athena import AthenaClient
 
 
 class TestMarketing(object):
@@ -274,3 +275,31 @@ class TestMarketing(object):
 
         # assert
         assert mock_add_partition.call_count == 2
+
+    @pytest.mark.parametrize('df_return', [pd.DataFrame(data=[False], columns=['']), False, mock.ANY])
+    @mock.patch.object(AthenaClient, 'execute_file_query_and_return_dataframe')
+    def test__validate_data_with_previous_execution_exception(self, mock_execute_file_query_and_return_dataframe,
+                                                              df_return, marketing):
+        # arrange
+        table_name = mock.ANY
+        mock_execute_file_query_and_return_dataframe.return_value = df_return
+
+        # act & assert
+        with pytest.raises(ValueError):
+            marketing._validate_data_with_previous_execution(table_name)
+
+    @mock.patch.object(AthenaClient, 'execute_file_query_and_return_dataframe',
+                       return_value=pd.DataFrame(data=[True], columns=['']))
+    def test__validate_data_with_previous_execution_correct_validation(self,
+                                                                       mock_execute_file_query_and_return_dataframe,
+                                                                       marketing):
+        # arrange
+        table_name = 'lorem ipsum'
+
+        # act
+        marketing._validate_data_with_previous_execution(table_name)
+
+        # assert
+        assert mock_execute_file_query_and_return_dataframe.call_count == 1
+        assert mock_execute_file_query_and_return_dataframe.call_args[1].get('query_params').get(
+            'table_name') == table_name
