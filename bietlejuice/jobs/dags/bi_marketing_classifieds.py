@@ -3,17 +3,16 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from qa_python_utils.aws.athena import AthenaClient
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import MarketingSubDagFactory
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
+from qa_python_utils.aws.athena import AthenaClient
 
 MAIN_DAG_NAME = 'bi-marketing-classifieds-costs'
 MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 1 * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * *')
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
@@ -41,7 +40,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    catchup=True,
+    catchup=False,
     max_active_runs=1
 )
 
