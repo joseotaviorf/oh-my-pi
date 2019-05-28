@@ -1,5 +1,6 @@
 with tickets_filter as (
 	select distinct * from datalake_clean.zendesk_tickets t
+    -- we don't track whatsapp notifications
 	where (channel<>'api' or (channel='api' and tags not like '%hsm%'))
           and dt_extracted = '{extraction_date}'
 ),
@@ -70,7 +71,7 @@ tickets as (
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         cast(tm.group_stations as integer) as total_group_stations,
         cast(tm.assignee_stations as integer) as total_assignee_stations,
-        -- (temp) to do: treatment in datalake
+        -- (temp) to do: handling in datalake
         cast(nullif(tm.minutes_reply_calendar, 'null') as integer) as minutes_reply_calendar,
         cast(nullif(tm.minutes_reply_business, 'null') as integer) as minutes_reply_business,
         cast(nullif(tm.minutes_first_resolution_business, 'null') as integer) as minutes_first_resolution_business,
