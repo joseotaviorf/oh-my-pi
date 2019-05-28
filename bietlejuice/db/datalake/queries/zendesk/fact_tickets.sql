@@ -9,7 +9,7 @@ custom_fields as (
 	        f1.field,
 	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
 	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}}]+)', 1), 'null') as value
-	    from tickets_filter tf  
+	    from tickets_filter tf
 	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
@@ -35,6 +35,7 @@ house as (
     select
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
         cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
+        -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_end,
         coalesce(dhl.id_house, dhl.short_id_house) as id_house    
@@ -42,6 +43,7 @@ house as (
     left join datalake_clean.ods_fact_listing_rent_flows fl
     on dhl.sk_house_listing = fl.sk_house_listing 
     where
+        -- Athena has shown that it has problems doing left joins with 'or'
     	dhl.id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
     	or dhl.short_id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
     group by 1,2,3,4,5
@@ -68,6 +70,7 @@ tickets as (
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         cast(tm.group_stations as integer) as total_group_stations,
         cast(tm.assignee_stations as integer) as total_assignee_stations,
+        -- (temp) to do: treatment in datalake
         cast(nullif(tm.minutes_reply_calendar, 'null') as integer) as minutes_reply_calendar,
         cast(nullif(tm.minutes_reply_business, 'null') as integer) as minutes_reply_business,
         cast(nullif(tm.minutes_first_resolution_business, 'null') as integer) as minutes_first_resolution_business,
@@ -83,6 +86,7 @@ tickets as (
         cast(tm.reopens as integer) as reopens,
         cast(tm.replies as integer) as replies,
         cast(tm.ts_initially_assigned as timestamp) as ts_initially_assigned,
+        -- bug caused by start delay of daylight saving time
         if(cast(tm.ts_initially_assigned as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
 	    cast(tm.ts_initially_assigned as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
 		    cast(tm.ts_initially_assigned as timestamp) at time zone 'GMT-3',
