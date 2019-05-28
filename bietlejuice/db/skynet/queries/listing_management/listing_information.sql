@@ -29,4 +29,5 @@ lv.de_publication_date,
 cs.contract_signed,
 lv.status
 from listing_versions lv
-left join contract_signed cs on cs.sk_house_listing = lv.sk_house_listing;
+left join contract_signed cs on cs.sk_house_listing = lv.sk_house_listing
+where lv.sk_house_listing <> -1;
