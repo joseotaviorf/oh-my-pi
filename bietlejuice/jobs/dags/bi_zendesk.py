@@ -37,7 +37,12 @@ def exec_factory_method(class_, bucket_type, method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(zendesk, method)(class_, bucket_type)
+    op_kwargs = {
+        'class_': class_,
+        'bucket_type': bucket_type
+    }
+
+    getattr(zendesk, method)(**op_kwargs)
 
 
 def upsert_partitioned(sub_dag_name, local_dag, bucket_type, **kwargs):
@@ -93,6 +98,44 @@ def sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
+def sub_dag_dw(sub_dag_name, **kwargs):
+
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    move_to_staging_task = BaseDAG.build_python_operator(
+        task_id='move_to_staging',
+        python_callable=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': None,
+            'method': 'move_to_staging'
+        }
+    )
+
+    move_to_prod_task = BaseDAG.build_python_operator(
+        task_id='move_to_prod',
+        python_callable=exec_factory_method,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'class_': kwargs['class_'],
+            'bucket_type': None,
+            'method': 'move_to_prod'
+        }
+    )
+
+    move_to_staging_task >> move_to_prod_task
+    return local_dag
+
+
 tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='tickets',
@@ -134,3 +177,12 @@ ticket_metrics_sub_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=sub_dag,
     class_=ZendeskTableEnum.TICKET_METRICS
 )
+
+fact_tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='fact_tickets',
+    sub_dag_func=sub_dag_dw,
+    class_=ZendeskTableEnum.FACT_TICKETS
+)
+
+fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag])

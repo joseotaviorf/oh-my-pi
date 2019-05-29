@@ -7,10 +7,12 @@ from bietlejuice.jobs.dags.zendesk.groups import ZendeskGroups
 from bietlejuice.jobs.dags.zendesk.users import ZendeskUsers
 from bietlejuice.jobs.dags.zendesk.group_memberships import ZendeskGroupMemberships
 from bietlejuice.jobs.dags.zendesk.ticket_metrics import ZendeskTicketMetrics
+from bietlejuice.jobs.dags.zendesk.fact_tickets import ZendeskFactTickets
 logger = QuintoAndarLogger('ZendeskFactory')
 
 
 class ZendeskFactory(object):
+
     @staticmethod
     def factory(entity, s3_bucket, execution_date):
         if entity is None:
@@ -31,4 +33,5 @@ class ZendeskFactory(object):
             ZendeskTableEnum.USERS: ZendeskUsers,
             ZendeskTableEnum.GROUP_MEMBERSHIPS: ZendeskGroupMemberships,
             ZendeskTableEnum.TICKET_METRICS: ZendeskTicketMetrics,
+            ZendeskTableEnum.FACT_TICKETS: ZendeskFactTickets,
         }.get(entity)
