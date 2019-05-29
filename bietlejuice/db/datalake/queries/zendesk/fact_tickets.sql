@@ -4,6 +4,9 @@ with tickets_filter as (
 	where (channel<>'api' or (channel='api' and tags not like '%hsm%'))
           and dt_extracted = '{extraction_date}'
 ),
+last_updated_ticket as (
+    select id_ticket, max(ts_updated) from tickets_filter group by 1
+),
 custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
@@ -11,6 +14,8 @@ custom_fields as (
 	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
 	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}}]+)', 1), 'null') as value
 	    from tickets_filter tf
+        inner join last_updated_ticket l
+            on tf.id_ticket=l.id_ticket
 	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
@@ -117,7 +122,9 @@ tickets as (
 		        cast(t.ts_updated as timestamp) at time zone 'Brazil/East'),
             null) as ts_closed_local,
         t.ts_load as ts_load
-    from tickets_filter  t
+    from last_updated_ticket lt 
+    inner join tickets_filter t
+        on t.id_ticket = lt.id_ticket
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
 )
