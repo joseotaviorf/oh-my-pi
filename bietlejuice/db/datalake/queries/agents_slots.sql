@@ -28,7 +28,6 @@ with weekly_schedule_prev as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
-	where cast(hsa.atualizadoem as timestamp) > date'2019-01-01'
 )
 , weekly_schedule as (
 	select
