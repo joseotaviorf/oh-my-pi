@@ -301,5 +301,4 @@ class TestMarketing(object):
 
         # assert
         assert mock_execute_file_query_and_return_dataframe.call_count == 1
-        assert mock_execute_file_query_and_return_dataframe.call_args[1].get('query_params').get(
-            'table_name') == table_name
+        assert mock_execute_file_query_and_return_dataframe.call_args[1]['query_params']['table_name'] == table_name

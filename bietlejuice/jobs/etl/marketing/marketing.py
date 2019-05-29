@@ -249,7 +249,7 @@ class Marketing(object):
     @logger
     def _validate_data_with_previous_execution(self, table_name):
         file_query = (
-            '{query_base_dir}/{query_path}/test.sql'.format(
+            '{query_base_dir}/{query_path}/row_count_test.sql'.format(
                 query_base_dir=DATALAKE_QUERIES_DIR,
                 query_path=self.raw_query_path))
 
