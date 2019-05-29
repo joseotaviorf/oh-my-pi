@@ -1,142 +1,103 @@
-import datetime
+import sys
+import os
 from multiprocessing.dummy import Pool as ThreadPool
+sys.path.append(os.path.dirname(os.path.expanduser('~/bi-etl-ejuice/bietlejuice/jobs/composer/etl/load_data_into_datalake_etl.py')))
+sys.path.append(os.path.dirname(os.path.expanduser('~/bi-etl-ejuice/bietlejuice/jobs/composer/consumers/my_sql_consumer.py')))
 
-import spark as spark
-from django import db
+from load_data_into_datalake_etl import LoadDataIntoDatalakeETL
+from my_sql_consumer import MySQLConsumer
 from python_logger import QuintoAndarLogger
+logger = QuintoAndarLogger()
 
-op = 'full'  # full, daily, pre_daily
+op = 'full'  # full or daily
+size_threshold = 1000  # size in mb to decide if a table is big
+num_partitions = 16  # how much parallel connections to use when reading a table in jdbc
 black_list = ['REVCHANGES']
+
 write_format = 'json'
 path = 's3://5a-datalake/temp/ebdb/'
 
-logger = QuintoAndarLogger()
-
-
-@logger
-def copy_full_table(table, consumer):
-    db = consumer.connection['db']
-    logger.info('m=copy_full_table, msg=Start pulling table {}.{}.'.format(db, table))
-    df = consumer.get_data_from_table(table)
-    try:
-        df.write.mode("overwrite").format(write_format).option('path', path + table.lower()).saveAsTable(
-            db + '.' + table)
-    except Exception as e:
-        raise RuntimeError('m=copy_full_table, msg=Cannot copy table to datalake {}.{}, e={}'.format(db, table, e))
-
-    logger.info('m=copy_full_table, msg=Finished pulling table {}.{}.'.format(db, table))
-
-
-@logger
-def copy_incremental_table(table, consumer):
-    db = consumer.connection['db']
-    logger.info('m=copy_incremental_table, msg=Start pulling table {}.{}.'.format(db, table))
-    df = consumer.get_data_from_table(table)
-    df.write.mode("append").format(write_format).option('path', path + table.lower()).saveAsTable(
-        db + '.' + table)
-    logger.info('m=copy_full_table, msg=Finished pulling table {}.{}.'.format(db, table))
-
-
-@logger
-def copy_small_tables(tables, threads_nb, consumer):
-    db = consumer.connection['db']
-    logger.info('m=copy_small_tables, msg=Started pulling small tables {}.{}.'.format(db, tables))
-    tables = [(table, consumer) for table in tables]
-    pool = ThreadPool(threads_nb)
-    pool.map(lambda table: copy_full_table(table[0], table[1]), tables)
-    pool.close()
-    pool.join()
-    logger.info('m=copy_small_tables, msg=Finished pulling small tables {}.{}.'.format(db, tables))
-
-
-@logger
-def copy_big_table(table, num_partitions, consumer):
-    db = consumer.connection['db']
-    partition_column = consumer._get_partition_column_from_table(table)
-    if partition_column:
-        logger.info(
-            'm=copy_big_table, msg=Started pulling table {}.{} with partition column {}.'.format(db, table,
-                                                                                                 partition_column))
-        df = consumer.get_data_from_table_in_parallel(table, partition_column, num_partitions)
-    else:
-        logger.info(
-            'm=copy_big_table, msg=Could not get partition column in {}.{}, Started pulling it with a single query.'.format(
-                db, table))
-        df = consumer.get_data_from_table(table)
-    try:
-        df.write.mode("overwrite").format(write_format).option('path', path + table.lower()).saveAsTable(
-            db + '.' + table)
-    except Exception as e:
-        raise RuntimeError('m=copy_big_table, msg=Cannot copy table to datalake {}.{}, e={}'.format(db, table, e))
-
-    logger.info('m=copy_big_table, msg=Finished pulling table {}.{}.'.format(db, table))
-
-
-@logger
-def copy_big_tables(tables, num_partitions, consumer):
-    db = consumer.connection['db']
-    logger.info(
-        'm=copy_big_tables, msg=Started pulling tables {}.{}'.format(db, tables))
-    for table in tables:
-        copy_big_table(table, num_partitions, consumer)
-
-
-@logger
-def aud_map_function(table_consumer_tuple):
-    table, consumer = table_consumer_tuple
-    query = """
+aud_daily_query = """
   SELECT
     {table}.*
-
+    DATE(NOW() - INTERVAL 1 DAY) as dt
   FROM
     {table}
     JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id
   WHERE
     DATE(FROM_UNIXTIME(UsuarioRevisionEntity.`timestamp`/1000)) = DATE(NOW() - INTERVAL 1 DAY)
-  """
-    print(str(datetime.datetime.now()) + " Start pulling query - " + table)
-    df = consumer.get_data_from_query(query.format(table=table))
-    df.write.mode("append").format(write_format).option('path', path + table.lower()).saveAsTable(
-        consumer.connection['db'] + '.' + table)
-    print(str(datetime.datetime.now()) + " Finished pulling " + consumer.connection['db'] + '.' + table)
+"""
 
-
-@logger
-def aud_pre_daily_map_function(table_consumer_tuple):
-    table, consumer = table_consumer_tuple
-    query = """
+aud_full_query = """
   SELECT
     {table}.*
+    DATE(FROM_UNIXTIME(UsuarioRevisionEntity.`timestamp`/1000)) as dt
   FROM
     {table}
     JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id
-  WHERE
-    DATE(FROM_UNIXTIME(UsuarioRevisionEntity.`timestamp`/1000)) < DATE(NOW())
-  """
-    print(str(datetime.datetime.now()) + " Start pulling query - " + table)
-    df = consumer.get_data_from_query(query.format(table=table))
-    try:
-        df.write.mode("overwrite").format(write_format).option('path', path + table.lower()).saveAsTable(
-            consumer.connection['db'] + '.' + table)
-    except:
-        print(datetime.datetime.now() + ' ' + table + ' Overwrite error -> clean table and recreate')
-        spark.sql('drop table {}.{}'.format(db, table))
-        dbutils.fs.rm(path + table.lower(), True)
-        df.write.mode("overwrite").format(write_format).option('path', path + table.lower()).saveAsTable(
-            consumer.connection['db'] + '.' + table)
-    print(str(datetime.datetime.now()) + " Finished pulling " + consumer.connection['db'] + '.' + table)
+"""
 
 
-def aud_strategy(tables, threads, consumer, pre_daily=False):
-    print(str(datetime.datetime.now()) + " AUD tables strategy started")
-    table_consumer_tuples = [(table, consumer) for table in tables]
-    pool = ThreadPool(threads)
-    if pre_daily:
-        results = pool.map(aud_pre_daily_map_function, table_consumer_tuples)
+def is_aud(table):
+    return '_aud' in table.lower()
+
+
+@logger
+def small_table_map_function(args):
+    table, loader, consumer = args
+    logger.info('m=copy_full_table, msg=Start pulling table {}.'.format(table))
+    if is_aud(table):
+        loader.load_full_table_into_datalake(aud_full_query.format(table), consumer, partition_by='dt', concurrency=1)
     else:
-        results = pool.map(aud_map_function, table_consumer_tuples)
+        loader.load_full_table_into_datalake(table, consumer)
+    logger.info('m=copy_full_table, msg=Finished pulling table {}.'.format(table))
+
+
+@logger
+def copy_small_tables(tables, threads, loader, consumer):
+    logger.info('m=copy_small_tables, msg=Started pulling small tables')
+    tables = [(table, loader, consumer) for table in tables]
+    pool = ThreadPool(threads)
+    pool.map(small_table_map_function, tables)
     pool.close()
     pool.join()
+    logger.info('m=copy_small_tables, msg=Finished pulling small tables')
+
+
+@logger
+def copy_big_tables(tables, num_partitions, loader, consumer):
+    logger.info(
+        'm=copy_big_tables, msg=Started pulling big tables')
+    for table in tables:
+        if is_aud(table):
+            loader.load_full_table_into_datalake(aud_full_query.format(table), consumer, partition_by='dt', concurrency=1)
+        else:
+            loader.load_full_table_into_datalake(table, consumer, concurrency=num_partitions)
+    logger.info(
+        'm=copy_big_tables, msg=Finished pulling big tables')
+
+
+@logger
+def aud_map_function(args):
+    table, loader, consumer = args
+    logger.info(
+        'm=aud_map_function, msg=Started pulling daily updates of - {}'.format(table))
+    loader.load_incremental_partitioned_table_into_datalake(table, aud_daily_query.format(table=table), consumer, partition_by='dt')
+    logger.info(
+        'm=aud_map_function, msg=Finished pulling daily updates of - {}'.format(table))
+
+
+@logger
+def copy_aud_daily(tables, threads, loader, consumer):
+    logger.info(
+        'm=copy_aud_daily, msg=Started pulling daily incremental aud tables')
+    tables = [(table, loader, consumer) for table in tables]
+    pool = ThreadPool(threads)
+    results = pool.map(aud_map_function, tables)
+    pool.close()
+    pool.join()
+    logger.info(
+        'm=copy_aud_daily, msg=Finished pulling daily incremental aud tables')
 
 
 def main():
@@ -146,42 +107,37 @@ def main():
     username = "bi"
     password = "paraguay-attorney-dignity"
 
-    num_partitions = 16
-    consumer = MysqlConsumer(host,
+    consumer = MySQLConsumer(host,
                              port,
                              database,
                              username,
                              password)
 
-    tables_sizes = dict(consumer.get_table_names_and_sizes_from_source().collect())
-    tables_sizes = {k: v for k, v in tables_sizes.items() if k not in black_list}
+    loader = LoadDataIntoDatalakeETL()
 
-    spark.sql('CREATE DATABASE IF NOT EXISTS {}'.format(consumer.connection['db']))
+    tables_sizes = dict(loader.get_table_names_and_sizes_from_source(consumer).collect())
+    tables_sizes = {k: v for k, v in tables_sizes.items() if k not in black_list}  # filter out blacklist
 
     if op == 'full':
-        big_tables = [table[0] for table in tables_sizes.items() if table[1] != None and table[1] > 200]
-        small_tables = [table[0] for table in tables_sizes.items() if table[1] != None and table[1] <= 200]
+        big_tables = [table[0] for table in tables_sizes.items() if
+                      table[1] is not None and table[1] > size_threshold]
+        small_tables = [table[0] for table in tables_sizes.items() if
+                        table[1] is not None and table[1] <= size_threshold]
 
-        for table in big_tables:
-            copy_big_table
-        copy_big_tables(big_tables, num_partitions, consumer)
-        copy_small_tables(small_tables, num_partitions, consumer)
+        copy_big_tables(big_tables, num_partitions, loader, consumer)
+        copy_small_tables(small_tables, num_partitions, loader, consumer)
 
     if op == 'daily':
-        aud_tables = [table[0] for table in tables_sizes.items() if table[1] != None and table[0][-3:] == 'AUD']
-        non_aud_tables = [table[0] for table in tables_sizes.items() if table[1] != None and table[0][-3:] != 'AUD']
-        big_tables = [table[0] for table in tables_sizes.items() if
-                      table[1] != None and table[0] not in aud_tables and table[1] > 200]
-        small_tables = [table[0] for table in tables_sizes.items() if
-                        table[1] != None and table[0] not in aud_tables and table[1] <= 200]
+        aud_tables = [table[0] for table in tables_sizes.items() if
+                      table[1] is not None and table[0][-3:] == 'AUD']
+        non_aud_big_tables = [table[0] for table in tables_sizes.items() if
+                              table[1] is not None and table[0] not in aud_tables and table[1] > size_threshold]
+        non_aud_small_tables = [table[0] for table in tables_sizes.items() if
+                                table[1] is not None and table[0] not in aud_tables and table[1] <= size_threshold]
 
-        copy_big_tables(big_tables, num_partitions, consumer)
-        copy_small_tables(small_tables, num_partitions, consumer)
-        aud_strategy(aud_tables, num_partitions, consumer)
-
-    if op == 'pre_daily':
-        aud_tables = [table[0] for table in tables_sizes.items() if table[1] != None and table[0][-3:] == 'AUD']
-        aud_strategy(aud_tables, num_partitions, consumer, pre_daily=True)
+        copy_big_tables(non_aud_big_tables, num_partitions, loader, consumer)
+        copy_small_tables(non_aud_small_tables, num_partitions, loader, consumer)
+        copy_aud_daily(aud_tables, num_partitions, loader, consumer)
 
 
 if __name__ == '__main__':
