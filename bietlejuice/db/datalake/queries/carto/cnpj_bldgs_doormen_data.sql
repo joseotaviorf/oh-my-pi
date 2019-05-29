@@ -60,7 +60,7 @@ doorman AS (
   SELECT
     d.*,
     CASE
-      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
       ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
     END AS extracted_work_house_number,
     CASE
