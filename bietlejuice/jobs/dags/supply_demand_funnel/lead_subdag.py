@@ -33,10 +33,9 @@ class LeadSubDag(DimSubDag):
 
         tests_tasks = self.build_tests_tasks(lead_dag)
 
-        airflow_helpers.chain(ods_lead_origin_task, ods_lead_first_event_tracking_task)
         ods_lead_task.set_upstream(
-            [ods_lead_score_factor_task, ods_lead_first_event_tracking_task, ods_reprocessed_lead_task])
-        airflow_helpers.chain(ods_lead_task, staging_dim_lead_task)
+            [ods_lead_score_factor_task, ods_reprocessed_lead_task, ods_lead_origin_task])
+        airflow_helpers.chain(ods_lead_task, ods_lead_first_event_tracking_task, staging_dim_lead_task)
         staging_dim_lead_task.set_downstream(tests_tasks)
         dw_dim_lead_task.set_upstream(tests_tasks)
 

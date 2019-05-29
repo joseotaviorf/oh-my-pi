@@ -133,7 +133,8 @@ UNION
         fcl.cost as total_cost
       from marketing.fact_daily_classifieds_costs fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
-      where fcl.sk_cost_date >= 20180101
+      -- filter with 'between' because there is future cost
+      where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 )
 ,demand_tax as (
 	select 

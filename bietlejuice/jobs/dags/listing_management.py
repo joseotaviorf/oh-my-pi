@@ -147,7 +147,7 @@ def train_model(**kwargs):
         image_name=kwargs.get('image'),
         role=SAGEMAKER_ROLE,
         train_instance_count=1,
-        train_instance_type='ml.m5.xlarge',
+        train_instance_type='ml.m5.4xlarge',
         output_path='s3://{}/{}'.format(SKYNET_BUCKET, TRAINING_PATH),
         hyperparameters=params)
 
