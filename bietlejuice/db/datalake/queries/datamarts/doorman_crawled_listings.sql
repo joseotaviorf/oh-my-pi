@@ -21,7 +21,7 @@ WITH listings AS (
   WHERE
     row = 1
     -- get only the first time a listing was posted
-    AND DATE(updated_on) >= current_date - interval '7' day
+    AND DATE(updated_on) >= current_date - interval '15' day
     AND COALESCE(lat, '') != ''
     AND COALESCE(lng, '') != ''
     AND COALESCE(nb_street, '') != ''
