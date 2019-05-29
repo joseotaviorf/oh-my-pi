@@ -89,12 +89,19 @@ class Zendesk(object):
 
         delete_query = BaseETL.get_query_from_file_name(
             '{}/staging/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
-        )
-        self.__delete_old_entries(delete_query.format(table_name=class_.value,
-                                                      sk_field=sk_field))
+        ).format(table_name=class_.value, sk_field=sk_field)
+
+        self.__delete_old_entries(delete_query, commit=True)
 
     @logger
     def _move_to_prod(self, class_, sk_field):
+
+        delete_query = BaseETL.get_query_from_file_name(
+            '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        ).format(table_name=class_.value, sk_field=sk_field)
+
+        self.__delete_old_entries(delete_query, commit=False)
+
         query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
         logger.info('m=move_to_prod, query={}, msg=Getting data from DW'.format(query))
 
@@ -113,18 +120,12 @@ class Zendesk(object):
             commit=True
         )
 
-        delete_query = BaseETL.get_query_from_file_name(
-            '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
-        )
-        self.__delete_old_entries(delete_query.format(table_name=class_.value,
-                                                      sk_field=sk_field))
-
     @logger
-    def __delete_old_entries(self, delete_query):
+    def __delete_old_entries(self, delete_query, commit):
 
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
             command=delete_query,
-            commit=True,
+            commit=commit,
             encoding='utf-8'
         )

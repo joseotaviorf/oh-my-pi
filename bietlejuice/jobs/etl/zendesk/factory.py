@@ -8,6 +8,8 @@ from bietlejuice.jobs.dags.zendesk.users import ZendeskUsers
 from bietlejuice.jobs.dags.zendesk.group_memberships import ZendeskGroupMemberships
 from bietlejuice.jobs.dags.zendesk.ticket_metrics import ZendeskTicketMetrics
 from bietlejuice.jobs.dags.zendesk.fact_tickets import ZendeskFactTickets
+from bietlejuice.jobs.dags.zendesk.dim_ticket import ZendeskDimTicket
+
 logger = QuintoAndarLogger('ZendeskFactory')
 
 
@@ -34,4 +36,5 @@ class ZendeskFactory(object):
             ZendeskTableEnum.GROUP_MEMBERSHIPS: ZendeskGroupMemberships,
             ZendeskTableEnum.TICKET_METRICS: ZendeskTicketMetrics,
             ZendeskTableEnum.FACT_TICKETS: ZendeskFactTickets,
+            ZendeskTableEnum.DIM_TICKET: ZendeskDimTicket,
         }.get(entity)

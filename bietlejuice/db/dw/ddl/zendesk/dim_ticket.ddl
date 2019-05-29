@@ -9,7 +9,7 @@ create table if not exists zendesk.dim_ticket (
     recipient varchar,
     tags varchar(MAX),
     status varchar(20),
-    is_public_comments boolean,
+    has_public_comments boolean,
     custom_fields varchar(MAX),
     score varchar(20),
     reason varchar,
@@ -18,5 +18,6 @@ create table if not exists zendesk.dim_ticket (
     client_type varchar(30),
     ts_created timestamp,
     ts_created_local timestamp,
+    ts_updated timestamp,
     ts_load timestamp
 );

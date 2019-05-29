@@ -12,7 +12,7 @@ MAIN_DAG_ID = 'bi-zendesk'
 MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW_FORNO')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 # dags
@@ -185,4 +185,12 @@ fact_tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.FACT_TICKETS
 )
 
-fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag])
+dim_ticket_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='dim_ticket',
+    sub_dag_func=sub_dag_dw,
+    class_=ZendeskTableEnum.DIM_TICKET
+)
+
+fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
+dim_ticket_sub_dag.set_upstream([tickets_sub_dag, groups_sub_dag, ticket_fields_sub_dag])
