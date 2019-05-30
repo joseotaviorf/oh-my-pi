@@ -72,35 +72,43 @@ class Zendesk(object):
 
     @logger
     def _move_to_staging(self, class_, sk_field):
+
+        conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
+                                      encoding='UTF-8')
+
         query = BaseETL.get_query_from_file_name(
             '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         )
         df = self.athena_client.execute_query_and_return_dataframe(query.format(extraction_date=self.execution_date))
         table_data = petl.fromdataframe(df)
 
-        BaseETL.bulk_insert(
-            table=table_data,
-            table_name='staging.zendesk_{}'.format(class_.value),
+        BaseETL.to_db(
+            data_table=table_data,
+            schema='staging',
             db_enum=EnumDB.BI_DW,
+            table_name='zendesk_{}'.format(class_.value),
             encoding='utf-8',
             append=False,
-            commit=True
+            conn=conn
         )
 
         delete_query = BaseETL.get_query_from_file_name(
             '{}/staging/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
         ).format(table_name=class_.value, sk_field=sk_field)
 
-        self.__delete_old_entries(delete_query, commit=True)
+        self.__delete_old_entries(delete_query, True, conn)
 
     @logger
     def _move_to_prod(self, class_, sk_field):
+
+        conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
+                                      encoding='UTF-8')
 
         delete_query = BaseETL.get_query_from_file_name(
             '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
         ).format(table_name=class_.value, sk_field=sk_field)
 
-        self.__delete_old_entries(delete_query, commit=False)
+        self.__delete_old_entries(delete_query, False, conn)
 
         query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
         logger.info('m=move_to_prod, query={}, msg=Getting data from DW'.format(query))
@@ -109,23 +117,25 @@ class Zendesk(object):
             db_enum=EnumDB.BI_DW,
             query=query,
             encoding='utf-8',
+            conn=conn
         )
 
-        BaseETL.bulk_insert(
-            table=table_data,
-            table_name='zendesk.{}'.format(class_.value),
-            db_enum=EnumDB.BI_DW,
-            encoding='utf-8',
-            append=True,
-            commit=True
-        )
+        BaseETL.to_db(data_table=table_data,
+                      schema='zendesk',
+                      table_name=class_.value,
+                      db_enum=EnumDB.BI_DW,
+                      encoding='utf-8',
+                      append=True,
+                      commit=True,
+                      conn=conn)
 
     @logger
-    def __delete_old_entries(self, delete_query, commit):
+    def __delete_old_entries(self, delete_query, commit, conn=False):
 
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
             command=delete_query,
             commit=commit,
+            conn=conn,
             encoding='utf-8'
         )
