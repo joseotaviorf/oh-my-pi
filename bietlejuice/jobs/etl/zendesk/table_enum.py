@@ -10,3 +10,4 @@ class ZendeskTableEnum(Enum):
     TICKET_METRICS = 'ticket_metrics'
     FACT_TICKETS = 'fact_tickets'
     DIM_TICKET = 'dim_ticket'
+    DIM_ZENDESK_USER = 'dim_zendesk_user'
