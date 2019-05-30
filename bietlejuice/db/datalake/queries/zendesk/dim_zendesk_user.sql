@@ -9,13 +9,13 @@ with distinct_users as (
 )
 select
     cast(u.id_user as bigint) as sk_zendesk_user,
-    coalesce(cast(u.is_active as boolean), false) as is_active,
+    cast(u.is_active as boolean) as is_active,
     u.url_user,
     u.name,
     u.alias,
     u.email,
     u.phone,
-    coalesce(cast(u.is_shared_phone_number as boolean), false) as is_shared_phone_number,
+    cast(u.is_shared_phone_number as boolean) as is_shared_phone_number,
     u.time_zone,
     u.locale,
     u.tags,
