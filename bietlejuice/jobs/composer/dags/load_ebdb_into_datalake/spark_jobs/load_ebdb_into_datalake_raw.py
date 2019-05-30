@@ -6,6 +6,7 @@ from python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.my_sql_consumer import MySQLConsumer
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.load_ebdb_into_datalake_etl import LoadEBDBIntoDatalakeETL
+from bietlejuice.jobs.composer.base.enum_db import EnumDB
 
 sys.path.append(
     os.path.dirname(os.path.expanduser('~/bi-etl-ejuice/bietlejuice/jobs/composer/etl/load_data_into_datalake_etl.py')))
@@ -31,12 +32,12 @@ aud_daily_query = """
 """
 
 aud_full_query = """
-  (SELECT
+  SELECT
     {table}.*
     DATE(FROM_UNIXTIME(UsuarioRevisionEntity.`timestamp`/1000)) as dt
   FROM
     {table}
-    JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id) as {table}
+    JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id
 """
 
 
@@ -73,7 +74,7 @@ def copy_big_tables(tables, num_partitions, loader, consumer):
         'm=copy_big_tables, msg=Started pulling big tables')
     for table in tables:
         if is_aud(table):
-            loader.load_full_table_into_datalake(table, consumer, aud_full_query.format(table=table), partition_by='dt',
+            loader.load_full_table_into_datalake(table, consumer, query=aud_full_query.format(table=table), partition_by='dt',
                                                  concurrency=1)
         else:
             loader.load_full_table_into_datalake(table, consumer, concurrency=num_partitions)
@@ -86,7 +87,7 @@ def aud_map_function(args):
     table, loader, consumer = args
     logger.info(
         'm=aud_map_function, msg=Started pulling daily updates of - {}'.format(table))
-    loader.load_incremental_partitioned_table_into_datalake(table, aud_daily_query.format(table=table), consumer,
+    loader.load_incremental_partitioned_table_into_datalake(table, consumer, query=aud_daily_query.format(table=table),
                                                             partition_by='dt')
     logger.info(
         'm=aud_map_function, msg=Finished pulling daily updates of - {}'.format(table))
@@ -106,17 +107,7 @@ def copy_aud_daily(tables, threads, loader, consumer):
 
 
 def main():
-    host = 'quintoandardbprod-read1.ciuoqxapzjot.us-east-1.rds.amazonaws.com'
-    port = '3306'
-    database = 'ebdb'
-    username = "bi"
-    password = "paraguay-attorney-dignity"
-
-    consumer = MySQLConsumer(host,
-                             port,
-                             database,
-                             username,
-                             password)
+    consumer = MySQLConsumer(EnumDB.QuintoAndar_ebdb)
 
     loader = LoadEBDBIntoDatalakeETL()
 
