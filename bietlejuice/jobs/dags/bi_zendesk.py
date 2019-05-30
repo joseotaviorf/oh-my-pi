@@ -192,13 +192,6 @@ dim_ticket_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.DIM_TICKET
 )
 
-dim_ticket_sub_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='dim_ticket',
-    sub_dag_func=sub_dag_dw,
-    class_=ZendeskTableEnum.DIM_TICKET
-)
-
 dim_zendesk_user_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='dim_zendesk_user',
@@ -206,6 +199,6 @@ dim_zendesk_user_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.DIM_ZENDESK_USER
 )
 
-fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
 dim_ticket_sub_dag.set_upstream([tickets_sub_dag, groups_sub_dag, ticket_fields_sub_dag])
-dim_zendesk_user_sub_dag.set_upstream(users_sub_dag)
+fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
+dim_zendesk_user_sub_dag.set_upstream([users_sub_dag])
