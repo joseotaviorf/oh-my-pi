@@ -56,9 +56,9 @@ select
     cast(json_extract(t.satisfaction_rating,'$.comment') as varchar) as comment,
     c.cols['Tipo de Solicitação'] as request_type,
     c.cols['Tipo de Cliente'] as client_type,
-    cast(t.ts_created as timestamp) as ts_created,
-    cast(t.ts_created_local as timestamp) as ts_created_local,
-    cast(t.ts_created as timestamp) as ts_updated,    
+    cast(t.ts_created as timestamp with time zone) as ts_created,
+    cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
+    cast(t.ts_created as timestamp with time zone) as ts_updated,    
     now() as ts_load
 from last_updated_ticket te
 inner join tickets_filter t

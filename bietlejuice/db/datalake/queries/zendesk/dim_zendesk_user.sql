@@ -9,21 +9,21 @@ with distinct_users as (
 )
 select
     cast(u.id_user as bigint) as sk_zendesk_user,
-    coalesce(cast(u.is_active as boolean), false) as is_active,
+    cast(u.is_active as boolean) as is_active,
     u.url_user,
     u.name,
     u.alias,
     u.email,
     u.phone,
-    coalesce(cast(u.is_shared_phone_number as boolean), false) as is_shared_phone_number,
+    cast(u.is_shared_phone_number as boolean) as is_shared_phone_number,
     u.time_zone,
     u.locale,
     u.tags,
     u.role,
-    cast(u.ts_last_login as timestamp) as ts_last_login,
-    cast(u.ts_created as timestamp) as ts_created,
-    cast(u.ts_created_local as timestamp) as ts_created_local,
-    cast(u.ts_updated as timestamp) as ts_updated,
+    cast(u.ts_last_login as timestamp with time zone) as ts_last_login,
+    cast(u.ts_created as timestamp with time zone) as ts_created,
+    cast(u.ts_created_local as timestamp with time zone) as ts_created_local,
+    cast(u.ts_updated as timestamp with time zone) as ts_updated,
     now() as ts_load
 from distinct_users du
 inner join datalake_clean.zendesk_users u
