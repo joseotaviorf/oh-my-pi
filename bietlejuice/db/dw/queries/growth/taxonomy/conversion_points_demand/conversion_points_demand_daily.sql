@@ -270,8 +270,8 @@ select
     coalesce(dem.total_daily_offers_submitted, 0) as total_daily_offers_submitted,
     coalesce(dem.total_daily_offers_approved, 0) as total_daily_offers_approved,
     coalesce(dem.total_daily_contracts_signed, 0) as total_daily_contracts_signed,
-    sed.total_daily_demand_sessions as total_daily_sessions,
-    dau1.total_daily_demand_dau as total_daily_active_users
+    coalesce(sed.total_daily_demand_sessions, 0) as total_daily_sessions,
+    coalesce(dau1.total_daily_demand_dau, 0) as total_daily_active_users
 from demand_session sed
 left join demand dem on
 	sed.sk_date = dem.sk_date
