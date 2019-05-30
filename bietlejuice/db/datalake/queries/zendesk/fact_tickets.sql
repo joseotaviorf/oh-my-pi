@@ -41,7 +41,7 @@ house as (
     select
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
         cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
-        -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp
+        -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_end,
         coalesce(dhl.id_house, dhl.short_id_house) as id_house    
@@ -91,35 +91,35 @@ tickets as (
         cast(nullif(tm.minutes_full_resolution_calendar, 'null') as integer) as minutes_full_resolution_calendar,
         cast(tm.reopens as integer) as reopens,
         cast(tm.replies as integer) as replies,
-        cast(tm.ts_initially_assigned as timestamp) as ts_initially_assigned,
+        cast(tm.ts_initially_assigned as timestamp with time zone) as ts_initially_assigned,
         -- bug caused by start delay of daylight saving time
-        if(cast(tm.ts_initially_assigned as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
-	    cast(tm.ts_initially_assigned as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
-		    cast(tm.ts_initially_assigned as timestamp) at time zone 'GMT-3',
-		    cast(tm.ts_initially_assigned as timestamp) at time zone 'Brazil/East') as ts_initially_assigned_local,
-        cast(tm.ts_assigned as timestamp) as ts_last_assigned,
-        if(cast(tm.ts_assigned as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
-	    cast(tm.ts_assigned as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
-		    cast(tm.ts_assigned as timestamp) at time zone 'GMT-3',
-		    cast(tm.ts_assigned as timestamp) at time zone 'Brazil/East') as ts_last_assigned_local,
-        cast(tm.ts_solved as timestamp) as ts_solved,
-        if(cast(tm.ts_solved as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
-	    cast(tm.ts_solved as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
-		    cast(tm.ts_solved as timestamp) at time zone 'GMT-3',
-		    cast(tm.ts_solved as timestamp) at time zone 'Brazil/East') as ts_solved_local,
-        cast(t.ts_created as timestamp) as ts_created,
-        cast(t.ts_created_local as timestamp) as ts_created_local,
-        cast(t.ts_updated as timestamp) as ts_updated,
-        if(cast(t.ts_updated as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
-	    cast(t.ts_updated as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
-		    cast(t.ts_updated as timestamp) at time zone 'GMT-3',
-		    cast(t.ts_updated as timestamp) at time zone 'Brazil/East') as ts_updated_local,
-        if(t.status='closed',cast(t.ts_updated as timestamp), null) as ts_closed,
+        if(cast(tm.ts_initially_assigned as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	    cast(tm.ts_initially_assigned as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		    cast(tm.ts_initially_assigned as timestamp with time zone) at time zone 'GMT-3',
+		    cast(tm.ts_initially_assigned as timestamp with time zone) at time zone 'Brazil/East') as ts_initially_assigned_local,
+        cast(tm.ts_assigned as timestamp with time zone) as ts_last_assigned,
+        if(cast(tm.ts_assigned as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	    cast(tm.ts_assigned as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		    cast(tm.ts_assigned as timestamp with time zone) at time zone 'GMT-3',
+		    cast(tm.ts_assigned as timestamp with time zone) at time zone 'Brazil/East') as ts_last_assigned_local,
+        cast(tm.ts_solved as timestamp with time zone) as ts_solved,
+        if(cast(tm.ts_solved as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	    cast(tm.ts_solved as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		    cast(tm.ts_solved as timestamp with time zone) at time zone 'GMT-3',
+		    cast(tm.ts_solved as timestamp with time zone) at time zone 'Brazil/East') as ts_solved_local,
+        cast(t.ts_created as timestamp with time zone) as ts_created,
+        cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
+        cast(t.ts_updated as timestamp with time zone) as ts_updated,
+        if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	    cast(t.ts_updated as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		    cast(t.ts_updated as timestamp with time zone) at time zone 'GMT-3',
+		    cast(t.ts_updated as timestamp with time zone) at time zone 'Brazil/East') as ts_updated_local,
+        if(t.status='closed',cast(t.ts_updated as timestamp with time zone), null) as ts_closed,
          if(t.status='closed',    
-            if(cast(t.ts_updated as timestamp) >= cast('2018-10-23 02:00:00 UTC' as timestamp) and 
-	        cast(t.ts_updated as timestamp) <= cast('2018-11-04 03:00:00 UTC' as timestamp),
-		        cast(t.ts_updated as timestamp) at time zone 'GMT-3',
-		        cast(t.ts_updated as timestamp) at time zone 'Brazil/East'),
+            if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	        cast(t.ts_updated as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		        cast(t.ts_updated as timestamp with time zone) at time zone 'GMT-3',
+		        cast(t.ts_updated as timestamp with time zone) at time zone 'Brazil/East'),
             null) as ts_closed_local,
         t.ts_load as ts_load
     from last_updated_ticket lt 
@@ -180,7 +180,7 @@ left join custom_fields c
     on c.id_ticket=t.id_ticket
 left join house dhl
 	on c.cols['Código do Imóvel'] = dhl.id_house
-    and date_format(cast(t.ts_created as timestamp), '%Y-%m-%d')
+    and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
     between dhl.ts_listing_version_start
     and coalesce(dhl.ts_listing_version_end, date_format(now() - interval '1' day, '%Y-%m-%d'))         
 left join contract dc

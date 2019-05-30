@@ -20,10 +20,10 @@ select
     u.locale,
     u.tags,
     u.role,
-    cast(u.ts_last_login as timestamp) as ts_last_login,
-    cast(u.ts_created as timestamp) as ts_created,
-    cast(u.ts_created_local as timestamp) as ts_created_local,
-    cast(u.ts_updated as timestamp) as ts_updated,
+    cast(u.ts_last_login as timestamp with time zone) as ts_last_login,
+    cast(u.ts_created as timestamp with time zone) as ts_created,
+    cast(u.ts_created_local as timestamp with time zone) as ts_created_local,
+    cast(u.ts_updated as timestamp with time zone) as ts_updated,
     now() as ts_load
 from distinct_users du
 inner join datalake_clean.zendesk_users u
