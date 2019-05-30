@@ -1,5 +1,5 @@
-drop table if exists crm.fact_inspection_tasks;
-create table if not exists crm.fact_inspection_tasks (
+drop table if exists crm.fact_lead_task_actions;
+create table if not exists crm.fact_lead_task_actions (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,
@@ -17,9 +17,7 @@ create table if not exists crm.fact_inspection_tasks (
   ts_task_action_end timestamp,
   task_action_type varchar,
   task_user_action_resolve_hours numeric(14,2),
-  sk_contract bigint,
-  sk_inspection bigint,
-  sk_house_listing bigint,
+  sk_lead bigint,
   ts_load timestamp
 )
 ;

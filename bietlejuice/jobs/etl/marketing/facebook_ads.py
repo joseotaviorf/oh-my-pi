@@ -71,7 +71,8 @@ class FacebookAds(Marketing):
             table_name='marketing_facebook_ads',
             sql_file_name='ads_insights.sql',
             r_cols=r_cols,
-            c_cols=c_cols
+            c_cols=c_cols,
+            validate_data=True
         )
 
     @logger

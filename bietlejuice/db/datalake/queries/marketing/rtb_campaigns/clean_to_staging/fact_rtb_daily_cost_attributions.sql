@@ -4,6 +4,7 @@ SELECT
     case when upper(device_type)='PC' then 'Desktop'
          when upper(device_type)='UNKNOWN' then 'Other'
          when device_type is not null and device_type <> '' then 'Mobile'
+         else 'Other'
      end as device,
     currency,
     cast(cast(clicks_count as double)as integer) as clicks,

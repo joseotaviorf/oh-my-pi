@@ -653,3 +653,23 @@ class BaseETL(object):
             Body=csv_buffer.getvalue(),
             Key=filename
         )
+
+    @classmethod
+    def move_file_query_data_to_db(cls, schema, file_name, table_name, append, db_enum_source, db_enum_destination,
+                                   query_params_dict=None):
+        query = BaseETL.get_query_from_file_name(file_name=file_name)
+
+        if query_params_dict:
+            query = query.format(**query_params_dict)
+
+        table = BaseETL.from_db_query(
+            db_enum=db_enum_source,
+            query=query)
+
+        BaseETL.bulk_insert(
+            table=table,
+            table_name='{}.{}'.format(schema, table_name),
+            db_enum=db_enum_destination,
+            encoding='UTF-8',
+            append=append
+        )

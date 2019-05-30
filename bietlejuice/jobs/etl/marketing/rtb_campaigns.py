@@ -30,9 +30,15 @@ class RtbCampaigns(Marketing):
         advertisers = api.get_advertisers()
         stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
                                          self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
+        # dpa values are not included in above request
+        dpa_stats = api.get_dpa_campaign_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
+                                               self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        for item in dpa_stats:
+            item[u'deviceType'] = 'MOBILE'
+
         # stats are the total number of clicks, costs etc
         # advertisers are the information about our campaign (currency, start date etc)
-        return stats, advertisers
+        return (stats + dpa_stats), advertisers
 
     def _save_to_s3(self, client_id, client_secret):
         logger.info('m=_save_to_s3, client_id={}'.format(client_id))

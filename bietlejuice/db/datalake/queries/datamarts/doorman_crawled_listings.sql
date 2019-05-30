@@ -21,7 +21,7 @@ WITH listings AS (
   WHERE
     row = 1
     -- get only the first time a listing was posted
-    AND DATE(updated_on) >= current_date - interval '7' day
+    AND DATE(updated_on) >= current_date - interval '15' day
     AND COALESCE(lat, '') != ''
     AND COALESCE(lng, '') != ''
     AND COALESCE(nb_street, '') != ''
@@ -30,7 +30,7 @@ doorman AS (
   SELECT
     d.*,
     CASE
-      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
       ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
     END AS extracted_work_house_number,
     CASE

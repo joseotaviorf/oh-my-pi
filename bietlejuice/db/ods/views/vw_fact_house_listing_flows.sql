@@ -12,12 +12,26 @@ with legacy_doorman as (
 	and
 		"Cod Imóvel" is not null
 ),
-base_tasks as (
+base_lead_tasks as (
 	select
 		*,
 		row_number() over (partition by lead_id order by dt_created desc) as rn
 	from
 		crm.lead_tasks
+),
+base_photo_tasks as (
+    select
+        distinct
+        cast(coalesce(i.id,i_direct.id) as integer) as imovel_id
+    from
+    	crm.photo_tasks pt
+    left join public.photo_job pj
+    	on pt.origin_id = pj.id
+    left join public.imovel i
+        on i.id = pj.imovel_id
+    left join public.imovel i_direct
+    	on i_direct.id = pt.origin_id
+    where coalesce(i.id, i_direct.id) is not null
 ),
 base_leads as (
     select
@@ -157,7 +171,7 @@ potential_listings as (
 		f.days_lead_to_processing,
 		h.exclusivity as is_exclusive,
 		case when bt.rep_id is not null then 'Lead'
-		     when f.rep_id is not null then 'Photojob'
+		     when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
 		end as first_isales_intervention,
 		bl.lead_type,
 		bl.lead_origin,
@@ -174,7 +188,7 @@ potential_listings as (
 		end as is_doorman,
 		(acquisition_channel_rep = 'Inside Sales') as is_isales_direct_register,
 		(acquisition_channel_rep = 'Admin') as is_cx_direct_register,
-		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
+		(coalesce(f.rep_id, bt.rep_id, bpt.imovel_id) is not null) as has_isales_intervention,
 		(us_cad.id is not null) as is_call_center
 	from
 		fact_with_reproc f
@@ -185,9 +199,12 @@ potential_listings as (
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
 	left join
-		base_tasks bt
+		base_lead_tasks bt
 		on bt.lead_id = f.lead_id
 		and bt.rn = 1
+	left join
+	    base_photo_tasks bpt
+	    on f.imovel_id = bpt.imovel_id
 	left join
 		rep_leads bl
 		on bl.lead_id = f.lead_id
