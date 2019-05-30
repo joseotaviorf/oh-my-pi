@@ -42,12 +42,12 @@ def is_aud(table):
 @logger
 def small_table_map_function(args):
     table, loader, consumer = args
-    logger.info('m=small_table_map_function, msg=Start pulling table {}.'.format(table))
+    logger.info('m=small_table_map_function, msg=Start pulling table {}'.format(table))
     if is_aud(table):
-        loader.load_full_table_into_datalake(aud_full_query.format(table=table), consumer, partition_by='dt', concurrency=1)
+        loader.load_full_table_into_datalake(table, consumer, aud_full_query.format(table=table), partition_by='dt', concurrency=1)
     else:
         loader.load_full_table_into_datalake(table, consumer)
-    logger.info('m=small_table_map_function, msg=Finished pulling table {}.'.format(table))
+    logger.info('m=small_table_map_function, msg=Finished pulling table {}'.format(table))
 
 
 @logger
@@ -67,7 +67,7 @@ def copy_big_tables(tables, num_partitions, loader, consumer):
         'm=copy_big_tables, msg=Started pulling big tables')
     for table in tables:
         if is_aud(table):
-            loader.load_full_table_into_datalake(aud_full_query.format(table=table), consumer, partition_by='dt', concurrency=1)
+            loader.load_full_table_into_datalake(table, consumer, aud_full_query.format(table=table), partition_by='dt', concurrency=1)
         else:
             loader.load_full_table_into_datalake(table, consumer, concurrency=num_partitions)
     logger.info(
