@@ -14,9 +14,6 @@ size_threshold = 1000  # size in mb to decide if a table is big
 num_partitions = 16  # how much parallel connections to use when reading a table in jdbc
 black_list = ['REVCHANGES']
 
-write_format = 'json'
-path = 's3://5a-datalake/temp/ebdb/'
-
 aud_daily_query = """
   SELECT
     {table}.*
@@ -29,12 +26,12 @@ aud_daily_query = """
 """
 
 aud_full_query = """
-  SELECT
+  (SELECT
     {table}.*
     DATE(FROM_UNIXTIME(UsuarioRevisionEntity.`timestamp`/1000)) as dt
   FROM
     {table}
-    JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id
+    JOIN UsuarioRevisionEntity on {table}.REV = UsuarioRevisionEntity.id) as {table}
 """
 
 
@@ -45,12 +42,12 @@ def is_aud(table):
 @logger
 def small_table_map_function(args):
     table, loader, consumer = args
-    logger.info('m=copy_full_table, msg=Start pulling table {}.'.format(table))
+    logger.info('m=small_table_map_function, msg=Start pulling table {}.'.format(table))
     if is_aud(table):
-        loader.load_full_table_into_datalake(aud_full_query.format(table), consumer, partition_by='dt', concurrency=1)
+        loader.load_full_table_into_datalake(aud_full_query.format(table=table), consumer, partition_by='dt', concurrency=1)
     else:
         loader.load_full_table_into_datalake(table, consumer)
-    logger.info('m=copy_full_table, msg=Finished pulling table {}.'.format(table))
+    logger.info('m=small_table_map_function, msg=Finished pulling table {}.'.format(table))
 
 
 @logger
@@ -70,7 +67,7 @@ def copy_big_tables(tables, num_partitions, loader, consumer):
         'm=copy_big_tables, msg=Started pulling big tables')
     for table in tables:
         if is_aud(table):
-            loader.load_full_table_into_datalake(aud_full_query.format(table), consumer, partition_by='dt', concurrency=1)
+            loader.load_full_table_into_datalake(aud_full_query.format(table=table), consumer, partition_by='dt', concurrency=1)
         else:
             loader.load_full_table_into_datalake(table, consumer, concurrency=num_partitions)
     logger.info(
