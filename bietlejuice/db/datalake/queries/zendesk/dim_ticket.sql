@@ -49,7 +49,7 @@ select
     t.recipient,
     t.tags,
     t.status,
-    cast(t.is_public as boolean) as has_public_comments,
+    coalesce(cast(t.is_public as boolean), false) as has_public_comments,
 	json_format(cast(c.cols as JSON)) as custom_fields,
     cast(json_extract(t.satisfaction_rating,'$.score') as varchar) as score,
     cast(json_extract(t.satisfaction_rating,'$.reason') as varchar) as reason,

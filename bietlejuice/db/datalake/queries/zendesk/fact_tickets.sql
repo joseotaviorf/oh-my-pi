@@ -149,6 +149,7 @@ select
     coalesce(cast(date_format(t.ts_last_assigned_local, '%Y%m%d') as integer), -1) as sk_last_assigned_local,
     t.total_group_stations,
     t.total_assignee_stations,
+    -- temp (I will rename this columns in datalake clean)
     t.minutes_reply_calendar as minutes_first_reply_time_calendar,
 	t.minutes_reply_business as minutes_first_reply_time_business,
 	t.minutes_first_resolution_calendar as minutes_first_resolution_time_calendar,
