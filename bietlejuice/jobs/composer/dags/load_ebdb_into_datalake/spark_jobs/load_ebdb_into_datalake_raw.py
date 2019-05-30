@@ -1,4 +1,3 @@
-import os
 import sys
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -8,14 +7,8 @@ from bietlejuice.jobs.composer.consumers.my_sql_consumer import MySQLConsumer
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.load_ebdb_into_datalake_etl import LoadEBDBIntoDatalakeETL
 from bietlejuice.jobs.composer.base.enum_db import EnumDB
 
-sys.path.append(
-    os.path.dirname(os.path.expanduser('~/bi-etl-ejuice/bietlejuice/jobs/composer/etl/load_data_into_datalake_etl.py')))
-sys.path.append(
-    os.path.dirname(os.path.expanduser('~/bi-etl-ejuice/bietlejuice/jobs/composer/consumers/my_sql_consumer.py')))
-
 logger = QuintoAndarLogger()
 
-op = 'full'  # full or daily
 size_threshold = 1000  # size in mb to decide if a table is big
 num_partitions = 16  # how much parallel connections to use when reading a table in jdbc
 black_list = ['REVCHANGES']
@@ -74,8 +67,8 @@ def copy_big_tables(tables, num_partitions, loader, consumer):
         'm=copy_big_tables, msg=Started pulling big tables')
     for table in tables:
         if is_aud(table):
-            loader.load_full_table_into_datalake(table, consumer, query=aud_full_query.format(table=table), partition_by='dt',
-                                                 concurrency=1)
+            loader.load_full_table_into_datalake(table, consumer, query=aud_full_query.format(table=table),
+                                                 partition_by='dt', concurrency=1)
         else:
             loader.load_full_table_into_datalake(table, consumer, concurrency=num_partitions)
     logger.info(
@@ -111,10 +104,11 @@ def main():
 
     loader = LoadEBDBIntoDatalakeETL()
 
-    tables_sizes = dict(loader.get_table_names_and_sizes_from_source(consumer).collect())
+    tables_sizes = dict(loader.get_table_names_and_sizes_from_consumer(consumer).collect())
     tables_sizes = {k: v for k, v in tables_sizes.items() if k not in black_list}  # filter out blacklist
 
-    if op == 'full':
+    op = sys.argv[1].lower()
+    if op == 'first_time':
         big_tables = [table[0] for table in tables_sizes.items() if
                       table[1] is not None and table[1] > size_threshold]
         small_tables = [table[0] for table in tables_sizes.items() if
