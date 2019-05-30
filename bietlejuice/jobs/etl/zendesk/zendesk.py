@@ -74,21 +74,22 @@ class Zendesk(object):
     def _move_to_staging(self, class_, sk_field):
 
         conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
-                                      encoding='UTF-8')
+                                      encoding='utf-8')
 
         query = BaseETL.get_query_from_file_name(
             '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
-        )
-        df = self.athena_client.execute_query_and_return_dataframe(query.format(extraction_date=self.execution_date))
+        ).format(extraction_date=self.execution_date)
+
+        df = self.athena_client.execute_query_and_return_dataframe(query)
         table_data = petl.fromdataframe(df)
 
-        BaseETL.to_db(
-            data_table=table_data,
-            schema='staging',
+        BaseETL.bulk_insert(
+            table=table_data,
             db_enum=EnumDB.BI_DW,
-            table_name='zendesk_{}'.format(class_.value),
+            table_name='staging.zendesk_{}'.format(class_.value),
             encoding='utf-8',
             append=False,
+            commit=False,
             conn=conn
         )
 
@@ -102,7 +103,7 @@ class Zendesk(object):
     def _move_to_prod(self, class_, sk_field):
 
         conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
-                                      encoding='UTF-8')
+                                      encoding='utf-8')
 
         delete_query = BaseETL.get_query_from_file_name(
             '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
@@ -120,14 +121,15 @@ class Zendesk(object):
             conn=conn
         )
 
-        BaseETL.to_db(data_table=table_data,
-                      schema='zendesk',
-                      table_name=class_.value,
-                      db_enum=EnumDB.BI_DW,
-                      encoding='utf-8',
-                      append=True,
-                      commit=True,
-                      conn=conn)
+        BaseETL.bulk_insert(
+            table=table_data,
+            db_enum=EnumDB.BI_DW,
+            table_name='zendesk.{}'.format(class_.value),
+            encoding='utf-8',
+            append=True,
+            commit=True,
+            conn=conn
+        )
 
     @staticmethod
     @logger
