@@ -14,7 +14,7 @@ class Consumer(abc.ABC):
         try:
             env = json.loads(os.environ.get(db_enum))
         except TypeError as e:
-            raise RuntimeError('m=Consumer, msg={} is not a valid connection in Airflow, e={}'.format(db_enum, e))
+            raise RuntimeError('m=get_connection, msg={} is not a valid connection in Airflow, e={}'.format(db_enum, e))
 
         return env
 
@@ -27,9 +27,13 @@ class Consumer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_data_from_table_in_parallel(self, table, num_partitions):
+    def get_data_from_table_in_parallel(self, table, concurrency):
         pass
 
     @abc.abstractmethod
     def get_data_from_query(self, query):
+        pass
+
+    @abc.abstractmethod
+    def get_table_schema(self, table):
         pass
