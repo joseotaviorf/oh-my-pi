@@ -129,8 +129,9 @@ class Zendesk(object):
                       commit=True,
                       conn=conn)
 
+    @staticmethod
     @logger
-    def __delete_old_entries(self, delete_query, commit, conn=False):
+    def __delete_old_entries(delete_query, commit, conn=False):
 
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
