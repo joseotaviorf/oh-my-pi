@@ -3,9 +3,9 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 from python_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.enum_db import EnumDB
-from bietlejuice.jobs.composer.consumers.my_sql_consumer import MySQLConsumer
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import EBDBIntoDatalakeLoader
+from bietlejuice.jobs.composer.base import EnumDB
+from bietlejuice.jobs.composer.consumers import MySQLConsumer
+from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader
 
 logger = QuintoAndarLogger('load_ebdb_into_datalake')
 
@@ -46,7 +46,7 @@ def full_small_table_map_function(args):
         loader.load_full_table_into_datalake_raw(table,
                                                  consumer,
                                                  AUD_FULL_QUERY.format(table=table),
-                                                 partition_by='dt',
+                                                 partition_by=['dt'],
                                                  read_concurrency=1)
     else:
         loader.load_full_table_into_datalake(table, consumer)
@@ -67,35 +67,36 @@ def load_full_small_tables(tables, threads, loader, consumer):
 @logger
 def load_full_big_tables(tables, num_partitions, loader, consumer):
     logger.info(
-        'm=load_full_big_tables, msg=Starting pulling big tables...')
+        'm=load_full_big_tables, msg=Starting loading big tables...')
     for table in tables:
         if is_aud(table):
             loader.load_full_table_into_datalake_raw(table,
                                                      consumer,
                                                      query=AUD_FULL_QUERY.format(table=table),
-                                                     partition_by='dt',
+                                                     partition_by=['dt'],
                                                      read_concurrency=1)
         else:
             loader.load_full_table_into_datalake_raw(table,
                                                      consumer,
                                                      read_concurrency=num_partitions)
     logger.info(
-        'm=load_full_big_tables, msg=Finished pulling big tables.')
+        'm=load_full_big_tables, msg=Finished loading big tables.')
 
 
 @logger
 def aud_map_function(args):
     table, loader, consumer, execution_date = args
     logger.info(
-        'm=aud_map_function, msg=Started pulling daily updates of - {}'.format(table))
+        'm=aud_map_function, table={}, msg=Started loading daily updates from table'.format(table))
     loader.load_incremental_partitioned_table_into_datalake_raw(table,
                                                                 consumer,
                                                                 query=AUD_DAILY_QUERY.format(
                                                                     table=table,
                                                                     execution_date=execution_date),
-                                                                partition_by='dt')
+                                                                partition_by=[('dt', execution_date)]
+                                                                )
     logger.info(
-        'm=aud_map_function, msg=Finished pulling daily updates of - {}'.format(table))
+        'm=aud_map_function, table={}, msg=Finished loading daily updates from table'.format(table))
 
 
 @logger
@@ -114,7 +115,7 @@ def load_aud_daily(tables, threads, loader, consumer, execution_date):
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         raise RuntimeError(
-            'm=__main__, msg=This script expects to receive to params: operation_mode and execution_date')
+            'm=__main__, msg=This script expects to receive two params: operation_mode and execution_date')
     operation_mode = sys.argv[1].lower()
     execution_date = sys.argv[2]
 

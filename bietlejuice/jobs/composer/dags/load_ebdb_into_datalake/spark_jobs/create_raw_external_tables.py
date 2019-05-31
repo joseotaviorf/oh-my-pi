@@ -1,7 +1,7 @@
 from python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import EBDBIntoDatalakeLoader, \
+from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader, \
     execute_athena_query, get_athena_client
 
 logger = QuintoAndarLogger('create_raw_external_tables')

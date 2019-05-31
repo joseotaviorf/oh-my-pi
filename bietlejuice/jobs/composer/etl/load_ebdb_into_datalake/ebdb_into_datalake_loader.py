@@ -159,5 +159,5 @@ def execute_athena_query(client, query, database):
                     'm=execute_athena_query, msg=Athena client failed when executing the query., query={}'.format(
                         query))
             elif state == 'SUCCEEDED':
-                return
+                return execution_id
         time.sleep(3)
