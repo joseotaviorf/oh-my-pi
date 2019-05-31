@@ -1,21 +1,136 @@
-SELECT 
-	date_week,
-	metric_name,
-	metric_value
-FROM 
-
---- Indicador Visits
-   (
-	SELECT 
-		date_table.week_start as date_week,
-		'Visits' as metric_name,
-		count(1) as metric_value
-	FROM public.fact_listing_rent_flows as demand
-	left join public.dim_date as date_table
-	on demand.sk_visit_date=date_table.sk_date
-	
-	WHERE
-	demand.sk_visit_date IS NOT NULL and date_table.week_start is not null and date_table.week_start >= '2017-01-01'
-	GROUP by 1
-	order by 1 desc) AS visits
-
+WITH
+k AS (
+  SELECT
+    'week' AS period,
+    -12 AS period_difference
+),
+contracts_signed AS (
+	SELECT
+		DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_region,
+		COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_contract_signed_date  >= 0) THEN fact_listing_rent_flows.sk_contract  ELSE NULL END) AS contracts_signed,
+    COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_contract_signed_date  >= 0) AND (fact_listing_rent_flows.days_offer_submitted_to_contract_signed <= 7) THEN fact_listing_rent_flows.sk_contract  ELSE NULL END) AS contracts_signed_7_days,
+		(contracts_signed / NULLIF(LAG(contracts_signed, 1) OVER (ORDER BY date_period)::REAL, 0)) - 1 AS contracts_signed_wow,
+		(contracts_signed_7_days / NULLIF(LAG(contracts_signed_7_days, 1) OVER (ORDER BY date_period)::REAL, 0)) - 1 AS contracts_signed_7_days_wow
+	FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
+	LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_contract_signed_date = dim_date.sk_date
+	WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+),
+visits_booked AS (
+  SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_region,
+  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_booked
+	FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
+	LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+),
+ongoing_listings AS (
+  SELECT
+    DATE_TRUNC('week', olsl.week_start) AS date_period,
+    fhl.sk_region,
+    COUNT(DISTINCT CASE WHEN olsl.status_history = 'publicado' THEN olsl.sk_house_listing END) AS ongoing_listings
+  FROM datamarts.ongoing_listed_suspended_listings olsl
+  LEFT JOIN public.fact_house_listings fhl ON olsl.sk_house_listing = fhl.sk_house_listing
+  WHERE olsl.week_start >= DATEADD('week', -12, CURRENT_DATE)
+  GROUP BY 1, 2
+),
+visits_completed AS (
+  SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_region,
+    COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) AND (fact_listing_rent_flows.flg_visit_completed  > 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_completed
+  FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
+  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+  GROUP BY 1, 2
+),
+offers_submitted AS (
+  SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_region,
+    COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_offer_submitted_date  >= 0) THEN fact_listing_rent_flows.sk_offer  ELSE NULL END) AS offers_submitted
+  FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
+  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_offer_submitted_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+  GROUP BY 1, 2
+),
+-- average_visits_booked_per_ongoing_listings AS (
+-- 	SELECT
+--     vb.date_period,
+--     vb.sk_region,
+-- 	  vb.visits_booked / NULLIF(ol.ongoing_listings::REAL, 0) AS average_visits_booked_per_ongoing_listings,
+-- 	 (average_visits_booked_per_ongoing_listings / NULLIF(LAG(average_visits_booked_per_ongoing_listings, 1) OVER (ORDER BY vb.date_period)::REAL, 0)) - 1 AS average_visits_booked_per_ongoing_listings_wow
+-- 	FROM visits_booked vb
+-- 	JOIN ongoing_listings ol USING(date_period, sk_region)
+-- ),
+-- average_offers_submitted_per_visits_completed AS (
+--   SELECT
+--     vc.date_period,
+--     vc.sk_region,
+-- 	  vc.visits_completed / NULLIF(os.offers_submitted::REAL, 0) AS average_offers_submitted_per_visits_completed,
+-- 	 (average_offers_submitted_per_visits_completed / NULLIF(LAG(average_offers_submitted_per_visits_completed, 1) OVER (ORDER BY vc.date_period)::REAL, 0)) - 1 AS average_offers_submitted_per_visits_completed_wow
+-- 	FROM visits_completed vc
+-- 	JOIN offers_submitted os USING(date_period, sk_region)
+-- ),
+-- average_contracts_signed_7_days_per_offers_submitted AS (
+--   SELECT
+--     os.date_period,
+--     os.sk_region,
+--     cs.contracts_signed_7_days / NULLIF(os.offers_submitted::REAL, 0) AS average_offers_submitted_per_contracts_signed_7_days,
+--    (average_offers_submitted_per_contracts_signed_7_days / NULLIF(LAG(average_offers_submitted_per_contracts_signed_7_days, 1) OVER (ORDER BY os.date_period)::REAL, 0)) - 1 AS average_offers_submitted_per_contracts_signed_7_days_wow
+--   FROM offers_submitted os
+--   JOIN contracts_signed cs USING(date_period, sk_region)
+-- ),
+prospects AS (
+	SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_house_listing_flows.sk_region,
+		COUNT(CASE WHEN (fact_house_listing_flows.sk_prospect_date  >= 0) THEN 1 ELSE NULL END) AS prospects,
+    (prospects / NULLIF(LAG(prospects, 1) OVER (ORDER BY date_period)::REAL, 0)) - 1 AS prospects_wow
+	FROM public.fact_house_listing_flows AS fact_house_listing_flows
+	LEFT JOIN public.dim_date ON fact_house_listing_flows.sk_prospect_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+),
+first_listings AS (
+	SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_house_listing_flows.sk_region,
+		COUNT(CASE WHEN (fact_house_listing_flows.sk_first_listing_date  >= 0) THEN 1 ELSE NULL END) AS first_listings,
+    (first_listings / NULLIF(LAG(first_listings, 1) OVER (ORDER BY date_period)::REAL, 0)) - 1 AS first_listings_wow
+	FROM public.fact_house_listing_flows AS fact_house_listing_flows
+	LEFT JOIN public.dim_date ON fact_house_listing_flows.sk_first_listing_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+)
+SELECT metrics.*,
+			 region.name,
+			 region.city_name,
+			 region.city_group,
+			 region.region_code,
+			 CASE
+			     WHEN region.city_group IN ('Belo Horizonte', 'Brasília', 'Goiânia', 'Campinas') THEN 'Center'
+			     WHEN region.city_group IN ('RMSP') THEN 'RMSP'
+					 WHEN region.city_group IN ('Rio de Janeiro', 'Curitiba', 'Florianópolis', 'Porto Alegre') THEN 'RJ / South'
+					 ELSE 'No regional'
+			 END AS regional
+FROM
+(
+  SELECT *
+  FROM contracts_signed
+  JOIN visits_booked USING(date_period, sk_region)
+  JOIN ongoing_listings USING(date_period, sk_region)
+  -- JOIN average_visits_booked_per_ongoing_listings USING(date_period, sk_region)
+  JOIN visits_completed USING(date_period, sk_region)
+  JOIN offers_submitted USING(date_period, sk_region)
+  -- JOIN average_offers_submitted_per_visits_completed USING(date_period, sk_region)
+  -- JOIN average_contracts_signed_7_days_per_offers_submitted USING(date_period, sk_region)
+  JOIN prospects USING(date_period, sk_region)
+  JOIN first_listings USING(date_period, sk_region)
+) metrics
+LEFT JOIN public.dim_region region USING(sk_region)
+WHERE sk_region != -1
+-- ORDER BY metrics.date_period
