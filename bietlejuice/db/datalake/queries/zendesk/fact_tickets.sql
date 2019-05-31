@@ -42,8 +42,8 @@ house as (
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
         cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
-        regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_start,
-        regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as ts_listing_version_end,
+        regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
+        regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         coalesce(dhl.id_house, dhl.short_id_house) as id_house    
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_listing_rent_flows fl
@@ -185,7 +185,7 @@ left join custom_fields c
 left join house dhl
 	on c.cols['Código do Imóvel'] = dhl.id_house
     and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
-    between dhl.ts_listing_version_start
-    and coalesce(dhl.ts_listing_version_end, date_format(now() - interval '1' day, '%Y-%m-%d'))         
+    between dhl.dt_listing_version_start
+    and coalesce(dhl.dt_listing_version_end, date_format(now() - interval '1' day, '%Y-%m-%d'))         
 left join contract dc
     on c.cols['Código do Contrato'] = cast(dc.sk_contract as varchar);
