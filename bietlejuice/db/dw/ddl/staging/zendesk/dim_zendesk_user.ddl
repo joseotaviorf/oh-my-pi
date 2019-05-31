@@ -1,23 +1,20 @@
 drop table if exists staging.zendesk_dim_zendesk_user;
-
 create table if not exists staging.zendesk_dim_zendesk_user (
     sk_zendesk_user bigint,
-    url varchar,
+    is_active boolean,
+    url_user varchar,
     name varchar,
+    alias varchar,
     email varchar,
     phone varchar,
+    is_shared_phone_number boolean,
     time_zone varchar,
-    shared_phone_number varchar,
     locale varchar,
-    organization_id varchar,
-    verified varchar,
-    external_id varchar,
     tags varchar,
     role varchar,
-    active varchar,
-    group_id varchar,
-    last_login_at varchar,
-    created_at varchar,
-    updated_at varchar
-)
-;
+    ts_last_login timestamp,
+    ts_created timestamp,
+    ts_created_local timestamp, 
+    ts_updated timestamp,
+    ts_load timestamp
+);

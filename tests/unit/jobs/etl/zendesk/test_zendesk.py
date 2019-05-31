@@ -142,7 +142,7 @@ class TestZendeskETL(object):
                                                                       mock__upsert_data, mock_get_query_from_file_name,
                                                                       zendesk):
         # arrange
-        table_name = 'dim_zendesk_user'
+        table_name = 'dim_zendesk_user_xplenty'
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
         delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
 
@@ -207,7 +207,7 @@ class TestZendeskETL(object):
         assert mock_bulk_insert.call_count == 1
         assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_table'
 
-    @pytest.mark.parametrize('table', ['dim_ticket', 'fact_ticket_metrics', 'dim_zendesk_user'])
+    @pytest.mark.parametrize('table', ['dim_ticket_xplenty', 'fact_ticket_metrics', 'dim_zendesk_user_xplenty'])
     @mock.patch.object(BaseETL, 'get_query_from_file_name')
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=DataFrame())
@@ -220,13 +220,13 @@ class TestZendeskETL(object):
         table_name = table
         table_where_clause_dict = {
             'fact_ticket_metrics': 'and t.dt_extraction=\'{}\'',
-            'dim_ticket': 'and t.dt_extraction=\'{}\'',
-            'dim_zendesk_user': 'where t.dt_extraction=\'{}\''
+            'dim_ticket_xplenty': 'and t.dt_extraction=\'{}\'',
+            'dim_zendesk_user_xplenty': 'where t.dt_extraction=\'{}\''
         }
         table_mock_queries = {
             'fact_ticket_metrics': "select * from fact_ticket_metrics where channel != 'api' __WHERE_CLAUSE__",
-            'dim_ticket': "select * from dim_ticket where channel != 'api' __WHERE_CLAUSE__",
-            'dim_zendesk_user': "select * from dim_zendesk_user __WHERE_CLAUSE__"
+            'dim_ticket_xplenty': "select * from dim_ticket_xplenty where channel != 'api' __WHERE_CLAUSE__",
+            'dim_zendesk_user_xplenty': "select * from dim_zendesk_user_xplenty __WHERE_CLAUSE__"
         }
         mock_get_query_from_file_name.return_value = table_mock_queries[table_name]
         expect_table_name = 'staging.zendesk_{}'.format(table_name)
@@ -248,7 +248,7 @@ class TestZendeskETL(object):
         assert mock_bulk_insert.call_count == 1
         assert mock_bulk_insert.call_args[1]['table_name'] == expect_table_name
 
-    @pytest.mark.parametrize('table', ['dim_ticket', 'fact_ticket_metrics', 'dim_zendesk_user'])
+    @pytest.mark.parametrize('table', ['dim_ticket_xplenty', 'fact_ticket_metrics', 'dim_zendesk_user_xplenty'])
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(BaseETL, 'get_query_from_file_name',
                        return_value='select 1 from staging.zendesk_{} __WHERE_CLAUSE__')
