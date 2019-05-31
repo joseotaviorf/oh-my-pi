@@ -112,7 +112,7 @@ class Zendesk(object):
         self.__delete_old_entries(delete_query, False, conn)
 
         query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
-        logger.info('m=move_to_prod, query={}, msg=Getting data from DW'.format(query))
+        logger.info('m=_move_to_prod, query={}, msg=Getting data from DW'.format(query))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
