@@ -37,3 +37,15 @@ class Consumer(abc.ABC):
     @abc.abstractmethod
     def get_table_schema(self, table):
         pass
+
+    @logger
+    def is_db_empty(self):
+        result = None
+        try:
+            result = self.get_table_names_and_sizes()
+        except Exception as e:
+            logger.error('m=is_db_empty, msg=Database of this consumer does not exist., e={}'.format(e))
+        if result and result.count():
+            return False
+
+        return True
