@@ -413,7 +413,7 @@ class BaseETL(object):
 
     @classmethod
     def bulk_insert(cls, table, table_name, db_enum,
-                    encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None):
+                    encoding='LATIN1', append=True, commit=True, delimiter=',', bucket_name=None, conn=None):
         # create a s3_tmp_file before insert on DB
         tmpdir = '/tmp'
         filename = table_name
@@ -423,23 +423,23 @@ class BaseETL(object):
         cls.to_s3(filename, table, bucket_name, encoding, tmpdir)
         csv_temp_file = '{}/{}'.format(tmpdir, filename)
 
-        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit)
+        cls.bulk_insert_from_local_file(csv_temp_file, table_name, db_enum, encoding, append, commit, conn)
 
     @classmethod
     def bulk_insert_from_local_file(cls, csv_filepath, table_name, db_enum,
-                                    encoding='LATIN1', append=True, commit=True):
+                                    encoding='LATIN1', append=True, commit=True, conn=None):
         with codecs.open(filename=csv_filepath, encoding=encoding) as f:
             bucket_folder_path, filename = cls.file_to_s3(filename=csv_filepath, dir_path='')
             cls.bulk_insert_from_s3_to_dw(bucket_folder_path, filename, db_enum,
-                                          table_name, append, commit, encoding, f)
+                                          table_name, append, commit, encoding, f, conn)
 
     @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
-                                  append=True, commit=True, encoding='LATIN1', f_cursor=None):
+                                  append=True, commit=True, encoding='LATIN1', f_cursor=None, conn=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         forno = os.environ.get('forno')
-        con = cls.get_connection(enum_db_dest, encoding)
+        con = cls.get_connection(enum_db_dest, encoding) if not conn else conn
         file = 's3://{}/{}'.format(bucket_name, filename)
         delimiter = ','
 
@@ -472,8 +472,9 @@ class BaseETL(object):
                 print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
         finally:
-            print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
-            con.close()
+            if not conn:
+                print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
+                con.close()
 
     @classmethod
     def to_s3(cls, filename, data_table, bucket_folder_path=None, encoding='utf8', tmp_dir='/tmp', write_header=True):
