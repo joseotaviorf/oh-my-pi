@@ -156,8 +156,8 @@ select
 	 us.utm_term,
 	 coalesce(supply.total_daily_leads, 0) as total_daily_leads,
 	 coalesce(supply.total_daily_listings, 0) as total_daily_listings,
-	 us.total_daily_sessions,
-	 us.total_daily_active_users
+	 coalesce(us.total_daily_sessions, 0) as total_daily_sessions,
+	 coalesce(us.total_daily_active_users, 0) as total_daily_active_users
 from
 	users us
 left join supply supply
