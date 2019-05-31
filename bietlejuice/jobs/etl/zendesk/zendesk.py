@@ -79,6 +79,7 @@ class Zendesk(object):
         query = BaseETL.get_query_from_file_name(
             '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
         ).format(extraction_date=self.execution_date)
+        logger.info('m=_move_to_prod, query={}, msg=Getting data from staging(DW)'.format(query))
 
         df = self.athena_client.execute_query_and_return_dataframe(query)
         table_data = petl.fromdataframe(df)
@@ -96,6 +97,7 @@ class Zendesk(object):
         delete_query = BaseETL.get_query_from_file_name(
             '{}/staging/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
         ).format(table_name=class_.value, sk_field=sk_field)
+        logger.info('m=_move_to_prod, delete_query={}, msg=Deleting old entries into staging(DW)'.format(delete_query))
 
         self.__delete_old_entries(delete_query, True, conn)
 
@@ -108,11 +110,12 @@ class Zendesk(object):
         delete_query = BaseETL.get_query_from_file_name(
             '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
         ).format(table_name=class_.value, sk_field=sk_field)
+        logger.info('m=_move_to_prod, delete_query={}, msg=Deleting old entries into prod(DW)'.format(delete_query))
 
         self.__delete_old_entries(delete_query, False, conn)
 
         query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
-        logger.info('m=_move_to_prod, query={}, msg=Getting data from DW'.format(query))
+        logger.info('m=_move_to_prod, query={}, msg=Getting data from prod(DW)'.format(query))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
