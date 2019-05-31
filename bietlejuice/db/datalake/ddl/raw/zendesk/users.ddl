@@ -48,4 +48,4 @@ stored as inputformat
 outputformat
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 location
-  's3://5a-datalake-leo-test/stitch/zendesk/users/';
+  's3://5a-datalake-leo-test/stitch/zendesk_users/users/';
