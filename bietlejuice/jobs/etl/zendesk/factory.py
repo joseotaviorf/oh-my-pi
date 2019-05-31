@@ -1,15 +1,7 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.etl.zendesk.table_enum import ZendeskTableEnum
-from bietlejuice.jobs.dags.zendesk.tickets import ZendeskTickets
-from bietlejuice.jobs.dags.zendesk.ticket_fields import ZendeskTicketFields
-from bietlejuice.jobs.dags.zendesk.groups import ZendeskGroups
-from bietlejuice.jobs.dags.zendesk.users import ZendeskUsers
-from bietlejuice.jobs.dags.zendesk.group_memberships import ZendeskGroupMemberships
-from bietlejuice.jobs.dags.zendesk.ticket_metrics import ZendeskTicketMetrics
-from bietlejuice.jobs.dags.zendesk.fact_tickets import ZendeskFactTickets
-from bietlejuice.jobs.dags.zendesk.dim_ticket import ZendeskDimTicket
-from bietlejuice.jobs.dags.zendesk.dim_zendesk_user import ZendeskDimUser
+from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskTickets, ZendeskTicketFields, ZendeskGroups, ZendeskUsers, ZendeskGroupMemberships,\
+    ZendeskTicketMetrics, ZendeskFactTickets, ZendeskDimTicket, ZendeskDimUser
 
 logger = QuintoAndarLogger('ZendeskFactory')
 

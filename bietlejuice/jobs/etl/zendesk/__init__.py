@@ -2,3 +2,12 @@ from bietlejuice.jobs.etl.zendesk.zendesk_etl import ZendeskETL
 from bietlejuice.jobs.etl.zendesk.zendesk import Zendesk
 from bietlejuice.jobs.etl.zendesk.table_enum import ZendeskTableEnum
 from bietlejuice.jobs.etl.zendesk.factory import ZendeskFactory
+from bietlejuice.jobs.etl.zendesk.tickets import ZendeskTickets
+from bietlejuice.jobs.etl.zendesk.ticket_fields import ZendeskTicketFields
+from bietlejuice.jobs.etl.zendesk.groups import ZendeskGroups
+from bietlejuice.jobs.etl.zendesk.users import ZendeskUsers
+from bietlejuice.jobs.etl.zendesk.group_memberships import ZendeskGroupMemberships
+from bietlejuice.jobs.etl.zendesk.ticket_metrics import ZendeskTicketMetrics
+from bietlejuice.jobs.etl.zendesk.fact_tickets import ZendeskFactTickets
+from bietlejuice.jobs.etl.zendesk.dim_ticket import ZendeskFactTickets
+from bietlejuice.jobs.etl.zendesk.dim_user import ZendeskDimUser
