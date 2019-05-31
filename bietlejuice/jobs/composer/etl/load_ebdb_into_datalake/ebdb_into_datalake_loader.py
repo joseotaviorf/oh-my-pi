@@ -83,7 +83,7 @@ class EBDBIntoDatalakeLoader:
             'table data {}.{} into datalake ({}).'.format(db, table, final_path))
 
     @logger
-    def get_table_names_and_sizes_from_consumer(self, consumer):
+    def get_table_names_and_sizes(self, consumer):
         return consumer.get_table_names_and_sizes()
 
     @logger

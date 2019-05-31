@@ -20,6 +20,6 @@ if __name__ == '__main__':
         table_name = table.tableName
         datalake_loader.create_athena_external_table(databricks_consumer,
                                                      table_name,
-                                                     ['dt'] if 'aud' in table_name.lower() else None)
+                                                     ['dt'] if '_aud' in table_name.lower() else None)
 
     logger.info('m=__main__, msg=All raw external tables were created successfully.')

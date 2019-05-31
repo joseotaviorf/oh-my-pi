@@ -35,11 +35,11 @@ dag = DAG(
 load_ebdb_into_datalake_raw_task = DatabricksSubmitRunOperator(
     task_id='load_ebdb_into_datalake_raw_task',
     dag=dag,
-    provide_context=True,
     json={
         'new_cluster': new_cluster,
         'spark_python_task': {
             'python_file': 'dbfs:/FileStore/airflow/bla.py',
+            'parameters': ['first_time', '{{ ds }}']
         }
     }
 )
