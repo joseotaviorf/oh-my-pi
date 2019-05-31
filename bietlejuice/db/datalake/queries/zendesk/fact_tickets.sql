@@ -5,7 +5,7 @@ with tickets_filter as (
           and dt_extracted = '{extraction_date}'
 ),
 last_updated_ticket as (
-    select id_ticket, max(ts_updated) from tickets_filter group by 1
+    select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
 custom_fields as (
     with parse_fields as (
@@ -58,37 +58,28 @@ ticket_metrics as (
     with row_n as (
         select
             t.id_ticket,
-            max(ts_updated) as ts_updated 
+            max(dt_extracted) as ts_extracted,
+            max(ts_updated) as ts_updated
         from datalake_clean.zendesk_ticket_metrics t
         group by 1
     )
     select
-        t.*
-    from row_n 
-    inner join datalake_clean.zendesk_ticket_metrics t
-    on row_n.id_ticket = t.id_ticket and t.ts_updated=row_n.ts_updated
-),
-tickets as (
-    select
-        t.id_ticket,
-        coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
-        coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
-        coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
+        tm.id_ticket,
         cast(tm.group_stations as integer) as total_group_stations,
         cast(tm.assignee_stations as integer) as total_assignee_stations,
         -- (temp) to do: handling in datalake
-        cast(coalesce(nullif(tm.minutes_reply_business, 'null'), '0') as integer) as minutes_reply_calendar, 
-        cast(coalesce(nullif(tm.minutes_reply_business, 'null'), '0') as integer) as minutes_reply_business,
-        cast(coalesce(nullif(tm.minutes_first_resolution_business, 'null'), '0') as integer) as minutes_first_resolution_business,
-        cast(coalesce(nullif(tm.minutes_first_resolution_calendar, 'null'), '0') as integer) as minutes_first_resolution_calendar,
-        cast(coalesce(nullif(tm.minutes_requester_wait_business, 'null'), '0') as integer) as minutes_requester_wait_business,
-        cast(coalesce(nullif(tm.minutes_requester_wait_calendar, 'null'), '0') as integer) as minutes_requester_wait_calendar,
-        cast(coalesce(nullif(tm.minutes_agent_wait_business, 'null'), '0') as integer) as minutes_agent_wait_business,
-        cast(coalesce(nullif(tm.minutes_agent_wait_calendar, 'null'), '0') as integer) as minutes_agent_wait_calendar,
-        cast(coalesce(nullif(tm.minutes_on_hold_business, 'null'), '0') as integer) as minutes_on_hold_business,
-        cast(coalesce(nullif(tm.minutes_on_hold_calendar, 'null'), '0') as integer) as minutes_on_hold_calendar,
-        cast(coalesce(nullif(tm.minutes_full_resolution_business, 'null'), '0') as integer) as minutes_full_resolution_business,
-        cast(coalesce(nullif(tm.minutes_full_resolution_calendar, 'null'), '0') as integer) as minutes_full_resolution_calendar,
+        cast(nullif(tm.minutes_reply_calendar, 'null') as integer) as minutes_reply_calendar,
+        cast(nullif(tm.minutes_reply_business, 'null') as integer) as minutes_reply_business,
+        cast(nullif(tm.minutes_first_resolution_business, 'null') as integer) as minutes_first_resolution_business,
+        cast(nullif(tm.minutes_first_resolution_calendar, 'null') as integer) as minutes_first_resolution_calendar,
+        cast(nullif(tm.minutes_requester_wait_business, 'null') as integer) as minutes_requester_wait_business,
+        cast(nullif(tm.minutes_requester_wait_calendar, 'null') as integer) as minutes_requester_wait_calendar,
+        cast(nullif(tm.minutes_agent_wait_business, 'null') as integer) as minutes_agent_wait_business,
+        cast(nullif(tm.minutes_agent_wait_calendar, 'null') as integer) as minutes_agent_wait_calendar,
+        cast(nullif(tm.minutes_on_hold_business, 'null') as integer) as minutes_on_hold_business,
+        cast(nullif(tm.minutes_on_hold_calendar, 'null') as integer) as minutes_on_hold_calendar,
+        cast(nullif(tm.minutes_full_resolution_business, 'null') as integer) as minutes_full_resolution_business,
+        cast(nullif(tm.minutes_full_resolution_calendar, 'null') as integer) as minutes_full_resolution_calendar,
         cast(tm.reopens as integer) as reopens,
         cast(tm.replies as integer) as replies,
         cast(tm.ts_initially_assigned as timestamp with time zone) as ts_initially_assigned,
@@ -106,7 +97,20 @@ tickets as (
         if(cast(tm.ts_solved as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
 	    cast(tm.ts_solved as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
 		    cast(tm.ts_solved as timestamp with time zone) at time zone 'GMT-3',
-		    cast(tm.ts_solved as timestamp with time zone) at time zone 'Brazil/East') as ts_solved_local,
+		    cast(tm.ts_solved as timestamp with time zone) at time zone 'Brazil/East') as ts_solved_local
+    from row_n 
+    inner join datalake_clean.zendesk_ticket_metrics tm
+    on row_n.id_ticket = tm.id_ticket 
+    and tm.dt_extracted=row_n.ts_extracted
+    and tm.ts_updated=row_n.ts_updated
+),
+tickets as (
+    select
+        cast(t.id_ticket as bigint) as sk_ticket,
+        tm.*,
+        coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
+        coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
+        coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         cast(t.ts_created as timestamp with time zone) as ts_created,
         cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
         cast(t.ts_updated as timestamp with time zone) as ts_updated,
@@ -124,7 +128,7 @@ tickets as (
         t.ts_load as ts_load
     from last_updated_ticket lt 
     inner join tickets_filter t
-        on t.id_ticket = lt.id_ticket
+        on t.id_ticket = lt.id_ticket and t.ts_updated=lt.ts_last_updated
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
 )
