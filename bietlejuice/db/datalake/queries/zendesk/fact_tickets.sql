@@ -58,6 +58,8 @@ ticket_metrics as (
     with row_n as (
         select
             t.id_ticket,
+            -- it was necessary 2 columns, because there are other update fields,
+            -- so, when ts_updated is duplicate, we get data with the last extraction  
             max(dt_extracted) as ts_extracted,
             max(ts_updated) as ts_updated
         from datalake_clean.zendesk_ticket_metrics t
