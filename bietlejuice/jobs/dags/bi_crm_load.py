@@ -19,7 +19,7 @@ mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
 MAIN_DAG_ID = 'bi-crm-load'
 MAIN_START_DATE = datetime(2018, 1, 1)
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_SCHEDULE_INTERVAL = None  # will get triggered by bi-supply-demand-etl
 
 
 # functions
