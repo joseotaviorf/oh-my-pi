@@ -4,7 +4,7 @@ create table if not exists zendesk.dim_ticket (
     subject varchar(MAX),
     description varchar(MAX),
     channel varchar(15),
-    "group" varchar,
+    group_name varchar,
     priority varchar(10),
     recipient varchar,
     tags varchar(MAX),
