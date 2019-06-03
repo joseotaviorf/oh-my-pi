@@ -65,7 +65,7 @@ with agent_contracts as (
       select
         rf.sk_user_agent as agent_id,
         dcontract.month_start as compensation_month,
-        hours_opened,
+        sum(hours_opened) as hours_opened,
         round(sum(dc.rent*hch.commission),2) as sum_rent_contracts_signed
       from agent_hours_opened ho
         join fact_listing_rent_flows rf
@@ -77,10 +77,10 @@ with agent_contracts as (
         join datalake_raw.agents_hourly_compensation_history hch
           on hch.region_code = ho.region_code
           and dcontract.date BETWEEN hch."init" and hch."end"
-      group by 1, 2, 3
+      group by 1, 2
     ),
     compensation_by_hour as (
-      select
+      select distinct
         agent_id,
         compensation_month,
         'Hour' as compensation_type,
