@@ -67,8 +67,8 @@ ticket_metrics as (
     )
     select
         tm.id_ticket,
-        cast(tm.group_stations as integer) as total_group_stations,
-        cast(tm.assignee_stations as integer) as total_assignee_stations,
+        cast(tm.group_stations as smallint) as total_group_stations,
+        cast(tm.assignee_stations as smallint) as total_assignee_stations,
         -- (temp) to do: handling in datalake
         cast(nullif(tm.minutes_reply_calendar, 'null') as integer) as minutes_reply_calendar,
         cast(nullif(tm.minutes_reply_business, 'null') as integer) as minutes_reply_business,
@@ -82,8 +82,8 @@ ticket_metrics as (
         cast(nullif(tm.minutes_on_hold_calendar, 'null') as integer) as minutes_on_hold_calendar,
         cast(nullif(tm.minutes_full_resolution_business, 'null') as integer) as minutes_full_resolution_business,
         cast(nullif(tm.minutes_full_resolution_calendar, 'null') as integer) as minutes_full_resolution_calendar,
-        cast(tm.reopens as integer) as reopens,
-        cast(tm.replies as integer) as replies,
+        cast(tm.reopens as smallint) as reopens,
+        cast(tm.replies as smallint) as replies,
         cast(tm.ts_initially_assigned as timestamp with time zone) as ts_initially_assigned,
         -- bug caused by start delay of daylight saving time
         if(cast(tm.ts_initially_assigned as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
@@ -188,6 +188,6 @@ left join house dhl
 	on c.cols['Código do Imóvel'] = dhl.id_house
     and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
     between dhl.dt_listing_version_start
-    and coalesce(dhl.dt_listing_version_end, date_format(now() - interval '1' day, '%Y-%m-%d'))         
+    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')       
 left join contract dc
     on c.cols['Código do Contrato'] = cast(dc.sk_contract as varchar);
