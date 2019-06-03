@@ -119,7 +119,7 @@ class TestZendeskETL(object):
         table_name = 'fact_ticket_metrics'
         upsert_query = "SELECT * FROM staging.zendesk_{} \nwhere sk_extraction_date = {};".format(table_name,
                                                                                                   '20180101')
-        delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        delete_query_path = '{}/zendesk/delete_old_entries_xplenty.sql'.format(DW_QUERIES_DIR)
 
         # act
         zendesk.build_prod_table(table_name)
@@ -144,7 +144,7 @@ class TestZendeskETL(object):
         # arrange
         table_name = 'dim_zendesk_user_xplenty'
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
-        delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        delete_query_path = '{}/zendesk/delete_old_entries_xplenty.sql'.format(DW_QUERIES_DIR)
 
         # act
         zendesk.build_prod_table(table_name)
@@ -169,7 +169,7 @@ class TestZendeskETL(object):
         # arrange
         table_name = 'fact_table'
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
-        delete_query_path = '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        delete_query_path = '{}/zendesk/delete_old_entries_xplenty.sql'.format(DW_QUERIES_DIR)
 
         # act
         zendesk.build_prod_table(table_name)

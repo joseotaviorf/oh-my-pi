@@ -553,7 +553,7 @@ class ZendeskETL(object):
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
 
         delete_query = BaseETL.get_query_from_file_name(
-            '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
+            '{query_base_dir}/zendesk/delete_old_entries_xplenty.sql'.format(
                 query_base_dir=DW_QUERIES_DIR))
 
         empty = self._is_prod_table_empty(table_name)
