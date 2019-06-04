@@ -2,15 +2,16 @@ from datetime import datetime
 
 from airflow.contrib.operators.databricks_operator import DatabricksSubmitRunOperator
 from airflow.models import DAG
-from airflow.operators.python_operator import BranchPythonOperator
 
 import bietlejuice.jobs.composer.etl.load_ebdb_into_datalake as load_ebdb_into_datalake_etl
 from bietlejuice.jobs.base import BaseDAG
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader
 
 DAG_ID = 'load-ebdb-into-datalake'
-load_ebdb_into_datalake_raw_file_path = 'dbfs:/FileStore/load_ebdb_into_datalake/load_ebdb_into_datalake.py'
+load_ebdb_into_datalake_raw_file_path = 'dbfs:/FileStore/airflow/load_ebdb_into_datalake/load_ebdb_into_datalake.py'
 create_raw_external_tables_file_path = 'dbfs:/FileStore/airflow/load_ebdb_into_datalake/create_raw_external_tables.py'
+
+cluster_id_test = '0511-125545-good204'
 
 new_cluster = {
     'spark_version': '5.3.x-scala2.11',
@@ -48,30 +49,14 @@ dag = DAG(
     catchup=False
 )
 
-_first_time_or_daily_loading = BranchPythonOperator(
-    task_id='first_time_or_daily_loading',
-    python_callable=get_task_to_load_ebdb_data_into_datalake)
-
 _ebdb_to_datalake_raw_first_time = DatabricksSubmitRunOperator(
     task_id='ebdb_to_datalake_raw_first_time',
     dag=dag,
     json={
-        'new_cluster': new_cluster,
+        # 'new_cluster': new_cluster,
+        'existing_cluster_id': cluster_id_test,
         'spark_python_task': {
-            'python_file': load_ebdb_into_datalake_raw_file_path,
-            'parameters': ['first_time', '{{ ds }}']
-        }
-    }
-)
-
-_ebdb_to_datalake_raw_daily = DatabricksSubmitRunOperator(
-    task_id='ebdb_to_datalake_raw_daily',
-    dag=dag,
-    json={
-        'new_cluster': new_cluster,
-        'spark_python_task': {
-            'python_file': load_ebdb_into_datalake_raw_file_path,
-            'parameters': ['daily', '{{ ds }}']
+            'python_file': load_ebdb_into_datalake_raw_file_path
         }
     }
 )
@@ -80,12 +65,12 @@ _create_athena_raw_external_tables = DatabricksSubmitRunOperator(
     task_id='create_athena_raw_external_tables',
     dag=dag,
     json={
-        'new_cluster': new_cluster,
+        # 'new_cluster': new_cluster,
+        'existing_cluster_id': cluster_id_test,
         'spark_python_task': {
             'python_file': create_raw_external_tables_file_path
         }
     }
 )
 
-_first_time_or_daily_loading.set_downstream([_ebdb_to_datalake_raw_daily, _ebdb_to_datalake_raw_first_time])
-_create_athena_raw_external_tables.set_upstream([_ebdb_to_datalake_raw_daily, _ebdb_to_datalake_raw_first_time])
+_ebdb_to_datalake_raw_first_time >> _create_athena_raw_external_tables

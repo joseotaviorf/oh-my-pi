@@ -7,14 +7,15 @@ logger = QuintoAndarLogger('MySQLConsumer')
 
 
 class MySQLConsumer(Consumer):
+    FETCH_SIZE = 50000
 
+    @logger
     def __init__(self, db_enum):
         connection = self.get_connection(db_enum)
-        if self.connection['dbtype'] != 'mysql':
+        if connection['dbtype'] != 'mysql':
             raise RuntimeError(
-                'm=__init__, msg={} connection is not a mysql connection ({})'.format(db_enum,
-                                                                                      self.connection[
-                                                                                          'dbtype']))
+                'm=__init__, con_type={}, msg={} connection is not a mysql'
+                'connection'.format(self.connection['dbtype'], db_enum))
 
         connection['url'] = "jdbc:mysql://{}:{}/{}".format(connection['host'],
                                                            connection['port'],
@@ -28,10 +29,12 @@ class MySQLConsumer(Consumer):
 
         return spark.read.format('jdbc') \
             .option("driver", self.connection['driver']) \
+            .option("fetchsize", self.FETCH_SIZE) \
             .option("url", self.connection['url']) \
             .option("user", self.connection['user']) \
             .option("password", self.connection['pwd'])
 
+    @logger
     def get_table_names_and_sizes(self):
         query = """
     SELECT
@@ -48,6 +51,7 @@ class MySQLConsumer(Consumer):
 
         return result
 
+    @logger
     def get_data_from_table(self, table):
         remote_table = self._get_default_read_format_and_options() \
             .option("dbtable", table) \
@@ -55,6 +59,7 @@ class MySQLConsumer(Consumer):
 
         return remote_table
 
+    @logger
     def _get_partition_column_from_table(self, table):
         query = """
     SELECT
@@ -79,15 +84,12 @@ class MySQLConsumer(Consumer):
         s.`CARDINALITY`
     ORDER by s.`CARDINALITY` desc
     """
-        df = self.get_data_from_query(query.format(db=self.connection['db'], table=table)) \
+        df = self.get_data_from_query(
+            query.format(db=self.connection['db'], table=table)) \
             .select('COLUMN_NAME')
 
-        if not len(df.head(1)):
-            column = ''
-        else:
-            column = df.collect()[0][0]
-
-        return column
+        if df.count():
+            return df.collect()[0][0]
 
     @logger
     def get_data_from_table_in_parallel(self, table, concurrency):
@@ -107,24 +109,38 @@ class MySQLConsumer(Consumer):
             remote_table = remote_table \
                 .option("partitionColumn", partition_column) \
                 .option("lowerBound", lower_bound) \
-                .option("upperBound", upper_bound)
+                .option("upperBound", upper_bound) \
+                .option("numPartitions", concurrency)
         else:
             logger.warning(
-                'm=get_data_from_table_in_parallel, msg=Partition column to parallelize the table extraction'
-                'was not found, getting the data serially.')
+                'm=get_data_from_table_in_parallel, table={}, msg=Partition column '
+                'to parallelize the table read was not found. Getting the table '
+                'serially.'.format(table))
 
         remote_table = remote_table \
             .option("dbtable", table) \
-            .option("numPartitions", concurrency) \
             .load()
 
         return remote_table
 
+    @logger
     def get_data_from_query(self, query):
         remote_table = self._get_default_read_format_and_options() \
             .option("query", query) \
             .load()
         return remote_table
 
+    @logger
     def get_table_schema(self, table):
-        raise NotImplementedError()
+        query = """
+        select
+            COLUMN_NAME, COLUMN_TYPE
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_NAME = '{table}'
+        """
+
+        result = self.get_data_from_query(query.format(table=table))
+
+        return result

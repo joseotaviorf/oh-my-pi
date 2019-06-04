@@ -8,7 +8,7 @@ logger = QuintoAndarLogger('create_raw_external_tables')
 
 if __name__ == '__main__':
     athena_db = EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA
-    execute_athena_query(get_athena_client(), 'CREATE DATABASE IF NOT EXISTS {}'.format(athena_db))
+    execute_athena_query(get_athena_client(), 'CREATE DATABASE IF NOT EXISTS `{}`'.format(athena_db), 'default')
     databricks_consumer = DatabricksConsumer('ebdb')
     response = databricks_consumer.get_table_names_and_sizes()
     tables = response.select('tableName').collect()
@@ -18,8 +18,7 @@ if __name__ == '__main__':
     logger.info('m=__main__, msg=Creating raw external tables...')
     for table in tables:
         table_name = table.tableName
-        datalake_loader.create_athena_external_table(databricks_consumer,
-                                                     table_name,
-                                                     ['dt'] if '_aud' in table_name.lower() else None)
+        datalake_loader.create_athena_external_table(consumer=databricks_consumer,
+                                                     table=table_name)
 
     logger.info('m=__main__, msg=All raw external tables were created successfully.')
