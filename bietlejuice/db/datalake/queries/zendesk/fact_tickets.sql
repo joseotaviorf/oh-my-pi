@@ -53,7 +53,7 @@ house as (
     left join datalake_clean.ods_fact_listing_rent_flows fl
     on dhl.sk_house_listing = fl.sk_house_listing 
     where
-        fl.sk_owner= '-1'
+        fl.sk_owner = '-1'
         -- Athena has shown that it has problems doing left joins with 'or'
     	and dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
     	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
@@ -142,8 +142,8 @@ tickets as (
 select
     cast(t.id_ticket as bigint) as sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
-    coalesce(dhl.sk_contract, -1)  as sk_contract,
-    coalesce(dhl.sk_client, -1)  as sk_client,
+    coalesce(dc.sk_contract, -1)  as sk_contract,
+    coalesce(dc.sk_client, -1)  as sk_client,
     coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
