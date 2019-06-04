@@ -1,6 +1,6 @@
-DROP TABLE datalake_raw.zendesk_group_memberships;
+DROP TABLE datalake_raw.zendesk_group_memberships_xplenty;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_group_memberships`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_group_memberships_xplenty`(
   `url` string,
   `id` string,
   `user_id` string,
@@ -19,4 +19,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/zendesk/group_memberships/'
 
-MSCK REPAIR TABLE datalake_raw.zendesk_group_memberships;
+MSCK REPAIR TABLE datalake_raw.zendesk_group_memberships_xplenty;

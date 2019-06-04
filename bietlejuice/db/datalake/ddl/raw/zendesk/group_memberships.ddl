@@ -1,5 +1,5 @@
-drop table if exists stitch.group_memberships;
-create external table if not exists stitch.group_memberships (
+drop table if exists datalake_raw.zendesk_group_memberships;
+create external table if not exists datalake_raw.zendesk_group_memberships (
     user_id string,
     url string,
     group_id string,
