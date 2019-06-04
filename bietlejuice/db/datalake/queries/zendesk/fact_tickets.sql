@@ -56,8 +56,8 @@ house as (
     on cast(dhl.sk_house_listing as bigint) = c.sk_house_listing 
     where
         -- Athena has shown that it has problems doing left joins with 'or'
-    	dhl.id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
-    	or dhl.short_id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
+    	dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
+    	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
     group by 1,2,3,4,5,6,7
 ),
 ticket_metrics as (
