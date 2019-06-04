@@ -143,9 +143,9 @@ tickets as (
 select
     cast(t.id_ticket as bigint) as sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
-    coalesce(dc.sk_contract, -1)  as sk_contract,
-    coalesce(dc.sk_client, -1)  as sk_client,
-    coalesce(dc.sk_owner, -1)  as sk_owner,
+    coalesce(dc.sk_contract, dhl.sk_contract, -1)  as sk_contract,
+    coalesce(dc.sk_client, dhl.sk_client, -1)  as sk_client,
+    coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
