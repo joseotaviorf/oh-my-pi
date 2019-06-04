@@ -53,7 +53,7 @@ house as (
     left join datalake_clean.ods_fact_listing_rent_flows fl
     on dhl.sk_house_listing = fl.sk_house_listing 
     where
-        fl.sk_owner = '-1'
+        fl.sk_owner != '-1'
         -- Athena has shown that it has problems doing left joins with 'or'
     	and dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
     	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
