@@ -28,6 +28,7 @@ class MySQLConsumer(Consumer):
         spark = SparkSession.builder.getOrCreate()
 
         return spark.read.format('jdbc') \
+            .option("fetchsize", 500000) \
             .option("driver", self.connection['driver']) \
             .option("fetchsize", self.FETCH_SIZE) \
             .option("url", self.connection['url']) \
