@@ -35,24 +35,30 @@ contract as (
     from datalake_clean.ods_dim_contract dc 
     left join datalake_clean.ods_fact_listing_rent_flows fl
     on dc.sk_contract = fl.sk_contract 
+    where fl.sk_owner != '-1'
+          and fl.sk_client != '-1'
+          and fl.sk_house_listing != '-1'
+          and fl.sk_contract != '-1'
     group by 1,2,3,4
 ),
 house as (
     select
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
-        cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
+        cast(coalesce(c.sk_owner, -1) as bigint) as sk_owner,
+        cast(coalesce(c.sk_client, -1) as bigint) as sk_client,
+        cast(coalesce(c.sk_contract, -1) as bigint) as sk_contract,
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         coalesce(dhl.id_house, dhl.short_id_house) as id_house    
     from datalake_clean.ods_dim_house_listing dhl 
-    left join datalake_clean.ods_fact_listing_rent_flows fl
-    on dhl.sk_house_listing = fl.sk_house_listing 
+    left join contract c
+    on cast(dhl.sk_house_listing as bigint) = c.sk_house_listing 
     where
         -- Athena has shown that it has problems doing left joins with 'or'
-    	dhl.id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
-    	or dhl.short_id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
-    group by 1,2,3,4,5
+    	dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
+    	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
+    group by 1,2,3,4,5,6,7
 ),
 ticket_metrics as (
     with row_n as (
@@ -137,9 +143,9 @@ tickets as (
 select
     cast(t.id_ticket as bigint) as sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
-    coalesce(dc.sk_contract, -1)  as sk_contract,
-    coalesce(dc.sk_client, -1)  as sk_client,
-    coalesce(dc.sk_owner, -1)  as sk_owner,
+    coalesce(dc.sk_contract, dhl.sk_contract, -1)  as sk_contract,
+    coalesce(dc.sk_client, dhl.sk_client, -1)  as sk_client,
+    coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
