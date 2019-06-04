@@ -1,5 +1,5 @@
-drop table if exists stitch.ticket_fields;
-create external table if not exists stitch.ticket_fields (
+drop table if exists datalake_raw.zendesk_ticket_fields;
+create external table if not exists datalake_raw.zendesk_ticket_fields (
     id string,
     active string,
     agent_description string,

@@ -1,6 +1,6 @@
-drop table datalake_raw.zendesk_ticket_fields;
+drop table datalake_raw.zendesk_ticket_fields_xplenty;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_fields`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_fields_xplenty`(
   `id` string,
   `title` string,
   `raw_title` string,
@@ -30,4 +30,5 @@ STORED AS INPUTFORMAT
    'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
   's3://5a-datalake/raw/zendesk/tickets_fields/'
-;
+
+MSCK REPAIR TABLE datalake_raw.zendesk_ticket_fields_xplenty;
