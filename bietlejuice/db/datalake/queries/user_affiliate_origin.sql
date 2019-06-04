@@ -1,9 +1,9 @@
 with amplitude_affiliate_tracking as(
 select
 	user_id,
-	u_initial_utm_source,
-	u_initial_utm_medium,
-	u_initial_utm_campaign,
+	u_utm_source,
+	u_utm_medium,
+	u_utm_campaign,
 	u_platform,
 	device_type,
 	country,
@@ -12,15 +12,15 @@ select
 	client_event_time,
 	rank() over (partition by user_id order by event_time, client_event_time) as event_order
 from datalake_clean.amplitude_events
-where et in ('login_confirmation_viewed', 'home_page_viewed')
+where et in ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
 and app='205027'
 and user_id <> ''
 )
 select
 	user_id,
-	u_initial_utm_source,
-	u_initial_utm_medium,
-	u_initial_utm_campaign,
+	u_utm_source,
+	u_utm_medium,
+	u_utm_campaign,
 	u_platform,
 	device_type,
 	country,
