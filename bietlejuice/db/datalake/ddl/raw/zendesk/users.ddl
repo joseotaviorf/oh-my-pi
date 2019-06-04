@@ -1,5 +1,5 @@
-drop table if exists stitch.users;
-create external table if not exists stitch.users (
+drop table if exists datalake_raw.zendesk_users;
+create external table if not exists datalake_raw.zendesk_users (
     id string,
     active string,
     alias string,
