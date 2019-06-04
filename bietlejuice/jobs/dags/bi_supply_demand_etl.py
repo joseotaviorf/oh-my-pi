@@ -580,6 +580,14 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
     execution_date='{{ execution_date }}'
 )
 
+# trigger bi-crm-load dag after all tasks have been successfully completed
+trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_crm_load_dag',
+    trigger_dag_id='bi-crm-load',
+    execution_date='{{ execution_date }}'
+)
+
 # trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
 trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     dag=main_dag,
@@ -616,3 +624,4 @@ bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
 inspection_dag >> fact_inspection_bookings_task
 
 trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+trigger_bi_crm_load_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
