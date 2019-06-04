@@ -192,8 +192,25 @@ def create_demand_funnel_conversions_sub_dag(sub_dag_name):
 
 # measures with taxonomy detail
 taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                              materialize_growth_measure_table_query, 'leads',
+                                              materialize_growth_measure_table_query,
+                                              'leads',
                                               'taxonomy')
+
+taxonomy_prospects_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                  materialize_growth_measure_table_query,
+                                                  'prospects',
+                                                  'taxonomy')
+
+taxonomy_qualifieds_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                   materialize_growth_measure_table_query,
+                                                   'qualifieds',
+                                                   'taxonomy')
+
+taxonomy_opportunities_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                      materialize_growth_measure_table_query,
+                                                      'opportunities',
+                                                      'taxonomy')
+
 taxonomy_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                       materialize_growth_measure_table_query,
                                                       'visits_booked',
@@ -316,6 +333,9 @@ demand_funnel_conversions_subdag = BaseSubDag.get_sub_dag_operator(
 airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_active_user_sessions_sub_dag,
                       taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag)
 taxonomy_demand_active_user_sessions_sub_dag.set_downstream([taxonomy_leads_sub_dag,
+                                                             taxonomy_prospects_sub_dag,
+                                                             taxonomy_qualifieds_sub_dag,
+                                                             taxonomy_opportunities_sub_dag,
                                                              taxonomy_listings_sub_dag,
                                                              taxonomy_visits_booked_sub_dag,
                                                              taxonomy_visits_completed_sub_dag,
@@ -323,6 +343,9 @@ taxonomy_demand_active_user_sessions_sub_dag.set_downstream([taxonomy_leads_sub_
                                                              taxonomy_offers_approved_sub_dag,
                                                              taxonomy_contracts_signed_sub_dag])
 create_conversion_points_supply_daily_task.set_upstream([taxonomy_leads_sub_dag,
+                                                         taxonomy_prospects_sub_dag,
+                                                         taxonomy_qualifieds_sub_dag,
+                                                         taxonomy_opportunities_sub_dag,
                                                          taxonomy_listings_sub_dag,
                                                          taxonomy_visits_booked_sub_dag,
                                                          taxonomy_visits_completed_sub_dag,
@@ -330,6 +353,9 @@ create_conversion_points_supply_daily_task.set_upstream([taxonomy_leads_sub_dag,
                                                          taxonomy_offers_approved_sub_dag,
                                                          taxonomy_contracts_signed_sub_dag])
 create_conversion_points_demand_daily_task.set_upstream([taxonomy_leads_sub_dag,
+                                                         taxonomy_prospects_sub_dag,
+                                                         taxonomy_qualifieds_sub_dag,
+                                                         taxonomy_opportunities_sub_dag,
                                                          taxonomy_listings_sub_dag,
                                                          taxonomy_visits_booked_sub_dag,
                                                          taxonomy_visits_completed_sub_dag,
