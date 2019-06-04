@@ -30,11 +30,11 @@ create external table if exists datalake_raw.zendesk_ticket_metrics (
 partitioned by (
     dt string
 )
-ROW FORMAT SERDE                                                                                                                                                                                                                                               
-  'org.openx.data.jsonserde.JsonSerDe'                                                                                                                                                                                                                         
-STORED AS INPUTFORMAT                                                                                                                                                                                                                                          
-  'org.apache.hadoop.mapred.TextInputFormat'                                                                                                                                                                                                                   
-OUTPUTFORMAT                                                                                                                                                                                                                                                   
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'                                                                                                                                                                                                 
-LOCATION
+row format serde                                                                                                                                                                                                                                               
+    'org.openx.data.jsonserde.JsonSerDe'                                                                                                                                                                                                                         
+stored as inputformat                                                                                                                                                                                                                                          
+    'org.apache.hadoop.mapred.TextInputFormat'                                                                                                                                                                                                                   
+outputformat                                                                                                                                                                                                                                                   
+    'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'                                                                                                                                                                                                 
+location
     's3://5a-datalake-leo-test/stitch/zendesk/ticket_metrics';                   
