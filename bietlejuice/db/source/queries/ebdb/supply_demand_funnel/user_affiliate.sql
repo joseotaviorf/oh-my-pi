@@ -8,8 +8,5 @@ select
 	da.criadoEm,
 	left(da.numeroCreci, 50) as numeroCreci,
 	da.origin,
-	da.affiliateType,
-	u.id as user_id
+	da.affiliateType
 from DadosAfiliado da
-join Usuario u
-	on da.id = u.dadosAfiliado_id
