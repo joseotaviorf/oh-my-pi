@@ -44,16 +44,16 @@ contract as (
 house as (
     select
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
-        cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
+        cast(coalesce(fhl.sk_owner, '-1') as bigint) as sk_owner,
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         coalesce(dhl.id_house, dhl.short_id_house) as id_house    
     from datalake_clean.ods_dim_house_listing dhl 
-    left join datalake_clean.ods_fact_listing_rent_flows fl
-    on dhl.sk_house_listing = fl.sk_house_listing 
+    left join datalake_clean.ods_fact_house_listings fhl
+    on dhl.sk_house_listing = fhl.sk_house_listing 
     where
-        fl.sk_owner != '-1'
+        fhl.sk_owner != '-1'
         -- Athena has shown that it has problems doing left joins with 'or'
     	and dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
     	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
