@@ -1,6 +1,10 @@
 drop table if exists datalake_raw.zendesk_ticket_fields;
 create external table if not exists datalake_raw.zendesk_ticket_fields (
     id string,
+    `_sdc_sequence` string,
+    `_sdc_received_at` string,
+    `_sdc_batched_at` string,
+    `_sdc_table_version` string,
     active string,
     agent_description string,
     collapsed_for_agents string,

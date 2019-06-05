@@ -2,6 +2,10 @@ drop table if exists datalake_raw.zendesk_users;
 create external table if not exists datalake_raw.zendesk_users (
     id string,
     active string,
+    `_sdc_sequence` string,
+    `_sdc_received_at` string,
+    `_sdc_batched_at` string,
+    `_sdc_table_version` string,
     alias string,
     chat_only string,
     created_at string,

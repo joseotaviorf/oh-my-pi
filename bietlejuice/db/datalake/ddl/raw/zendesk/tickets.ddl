@@ -6,6 +6,7 @@ create external table if not exists datalake_raw.zendesk_tickets (
     `_sdc_received_at` string,
     `_sdc_batched_at` string,
     `_sdc_table_version` string,
+    external_id string,
     satisfaction_rating string,
     url string,
     priority string,
