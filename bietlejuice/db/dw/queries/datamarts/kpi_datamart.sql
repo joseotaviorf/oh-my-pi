@@ -32,6 +32,16 @@ ongoing_listings AS (
   WHERE olsl.week_start >= DATEADD('week', -12, CURRENT_DATE)
   GROUP BY 1, 2
 ),
+listings_with_visit_booked AS (
+	SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    flrf.sk_region,
+  	COUNT(DISTINCT CASE WHEN (flrf.sk_booking  >= 0) THEN flrf.sk_house_listing  ELSE NULL END) AS listings_with_visit_booked
+	FROM public.fact_listing_rent_flows AS flrf
+	LEFT JOIN public.dim_date ON flrf.sk_booking_created_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+),
 visits_completed AS (
   SELECT
     DATE_TRUNC('week', dim_date.date) AS date_period,
@@ -89,6 +99,7 @@ FROM
   FROM contracts_signed
   JOIN visits_booked USING(date_period, sk_region)
   JOIN ongoing_listings USING(date_period, sk_region)
+  JOIN listings_with_visit_booked USING(date_period, sk_region)
   JOIN visits_completed USING(date_period, sk_region)
   JOIN offers_submitted USING(date_period, sk_region)
   JOIN prospects USING(date_period, sk_region)
