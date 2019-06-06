@@ -15,8 +15,8 @@ class ZendeskETL(object):
 
     TABLE_WHERE_CLAUSE = {
         'fact_ticket_metrics': 'and t.dt_extraction=\'{}\'',
-        'dim_ticket': 'and t.dt_extraction=\'{}\'',
-        'dim_zendesk_user': 'where t.dt_extraction=\'{}\''
+        'dim_ticket_xplenty': 'and t.dt_extraction=\'{}\'',
+        'dim_zendesk_user_xplenty': 'where t.dt_extraction=\'{}\''
     }
 
     SCHEMAS = {
@@ -26,8 +26,8 @@ class ZendeskETL(object):
 
     SK_FIELDS = {
         'fact_ticket_metrics': 'sk_ticket',
-        'dim_ticket': 'sk_ticket',
-        'dim_zendesk_user': 'sk_zendesk_user'
+        'dim_ticket_xplenty': 'sk_ticket',
+        'dim_zendesk_user_xplenty': 'sk_zendesk_user'
     }
 
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
@@ -553,7 +553,7 @@ class ZendeskETL(object):
         upsert_query = "SELECT * FROM staging.zendesk_{}".format(table_name)
 
         delete_query = BaseETL.get_query_from_file_name(
-            '{query_base_dir}/zendesk/delete_old_entries.sql'.format(
+            '{query_base_dir}/zendesk/delete_old_entries_xplenty.sql'.format(
                 query_base_dir=DW_QUERIES_DIR))
 
         empty = self._is_prod_table_empty(table_name)
