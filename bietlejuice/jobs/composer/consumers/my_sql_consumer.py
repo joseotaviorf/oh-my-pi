@@ -9,13 +9,11 @@ logger = QuintoAndarLogger('MySQLConsumer')
 class MySQLConsumer(Consumer):
     FETCH_SIZE = 50000
 
-    @logger
-    def __init__(self, db_enum):
-        connection = self.get_connection(db_enum)
-        if connection['dbtype'] != 'mysql':
+    def __init__(self, connection):
+        if connection['dbtype'].lower() != 'mysql':
             raise RuntimeError(
-                'm=__init__, con_type={}, msg={} connection is not a mysql'
-                'connection'.format(self.connection['dbtype'], db_enum))
+                'm=__init__, con_type={}, msg=Connection is not a mysql'
+                'connection'.format(connection.get('dbtype')))
 
         connection['url'] = "jdbc:mysql://{}:{}/{}".format(connection['host'],
                                                            connection['port'],

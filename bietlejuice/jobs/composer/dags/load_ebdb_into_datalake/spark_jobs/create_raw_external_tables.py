@@ -1,15 +1,21 @@
+import logging
+
 from python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader, \
     execute_athena_query, get_athena_client
 
+logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger('create_raw_external_tables')
 
 if __name__ == '__main__':
     athena_db = EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA
     execute_athena_query(get_athena_client(), 'CREATE DATABASE IF NOT EXISTS `{}`'.format(athena_db), 'default')
-    databricks_consumer = DatabricksConsumer('ebdb')
+    connection = {
+        'db': 'ebdb'
+    }
+    databricks_consumer = DatabricksConsumer(connection)
     response = databricks_consumer.get_table_names_and_sizes()
     tables = response.select('tableName').collect()
 

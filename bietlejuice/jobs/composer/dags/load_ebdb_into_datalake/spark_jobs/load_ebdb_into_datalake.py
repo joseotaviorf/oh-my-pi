@@ -1,3 +1,5 @@
+import json
+import logging
 from multiprocessing.dummy import Pool as ThreadPool
 
 from python_logger import QuintoAndarLogger
@@ -6,6 +8,7 @@ from bietlejuice.jobs.composer.base import EnumDB
 from bietlejuice.jobs.composer.consumers import MySQLConsumer
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader
 
+logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger('load_ebdb_into_datalake')
 
 SIZE_THRESHOLD = 1024  # size in mb to decide if a table is big
@@ -46,7 +49,9 @@ def load_full_big_tables(tables, num_partitions, loader, consumer):
 
 
 if __name__ == '__main__':
-    mysql_consumer = MySQLConsumer(EnumDB.QuintoAndar_ebdb)
+    connection_json = dbutils.secrets.get(scope='quintoandar', key=EnumDB.QuintoAndar_ebdb)
+    conn_details = json.loads(connection_json)
+    mysql_consumer = MySQLConsumer(conn_details)
 
     loader = EBDBIntoDatalakeLoader()
 

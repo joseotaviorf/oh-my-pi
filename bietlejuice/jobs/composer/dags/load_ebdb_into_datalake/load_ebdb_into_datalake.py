@@ -1,39 +1,93 @@
+import json
 from datetime import datetime
 
 from airflow.contrib.operators.databricks_operator import DatabricksSubmitRunOperator
+from airflow.hooks.base_hook import BaseHook
 from airflow.models import DAG
+from databricks import DatabricksClusterClient, DatabricksLibraryClient
 
-import bietlejuice.jobs.composer.etl.load_ebdb_into_datalake as load_ebdb_into_datalake_etl
-from bietlejuice.jobs.base import BaseDAG
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader
+from bietlejuice.jobs.composer.base import BaseDAG
 
 DAG_ID = 'load-ebdb-into-datalake'
-load_ebdb_into_datalake_raw_file_path = 'dbfs:/FileStore/airflow/load_ebdb_into_datalake/load_ebdb_into_datalake.py'
-create_raw_external_tables_file_path = 'dbfs:/FileStore/airflow/load_ebdb_into_datalake/create_raw_external_tables.py'
 
-cluster_id_test = '0511-125545-good204'
+LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/spark_jobs/\
+load-ebdb-into-datalake/load_ebdb_into_datalake.py'
+CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/spark_jobs/\
+load-ebdb-into-datalake/create_raw_external_tables.py'
 
-new_cluster = {
-    'spark_version': '5.3.x-scala2.11',
-    'node_type_id': 'i3.xlarge',
-    'aws_attributes': {
-        'availability': 'SPOT',
-        'spot_bid_price_percent': 100,
-        'zone_id': 'us-east-1'
+LOGS_OUTPUT_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/\
+logs/load-ebdb-into-datalake'
+
+CLUSTER_DESCRIPTION = {
+    'autoscale': {
+        'min_workers': 3,
+        'max_workers': 4
     },
-    'num_workers': 2
+    'cluster_name': DAG_ID,
+    'spark_version': '5.2.x-scala2.11',
+    'spark_conf': {
+        'spark.speculation': 'true'
+    },
+    'aws_attributes': {
+        'first_on_demand': 1,
+        'availability': 'SPOT_WITH_FALLBACK',
+        'zone_id': 'us-east-1e',
+        'instance_profile_arn': 'arn:aws:iam::632540934959:instance-profile/Databricks',
+        'spot_bid_price_percent': 100,
+        'ebs_volume_count': 0
+    },
+    'node_type_id': 'i3.xlarge',
+    'driver_node_type_id': 'i3.xlarge',
+    'ssh_public_keys': [],
+    'custom_tags': {},
+    'spark_env_vars': {
+        'PYSPARK_PYTHON': '/databricks/python3/bin/python3'
+    },
+    'autotermination_minutes': 60,
+    'enable_elastic_disk': True,
+    'cluster_source': 'API',
+    'init_scripts': [],
+    'cluster_log_conf': {
+        's3': {
+            'destination': LOGS_OUTPUT_PATH
+        }
+    }
 }
 
+LIBRARIES_DESCRIPTION = [
+    {
+        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/bi_etl_ejuice-0.1.0-py3-none-any.whl'
+    },
+    {
+        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/python_logger-0.1.0-py3-none-any.whl'
+    },
+    {
+        'jar': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/mysql-connector-java-5.1.47.jar'
+    }
+]
 
-def get_task_to_load_ebdb_data_into_datalake():
-    athena_client = load_ebdb_into_datalake_etl.get_athena_client()
-    execution_id = load_ebdb_into_datalake_etl.execute_athena_query(athena_client, 'show databases', 'default')
-    results = athena_client.get_query_results(QueryExecutionId=execution_id, MaxResults=1000)
-    if EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA in [row['Data'][0]['VarCharValue'] for row in
-                                                    results['ResultSet']['Rows']]:
-        return 'ebdb_to_datalake_raw_daily'
-    else:
-        return 'ebdb_to_datalake_raw_first_time'
+
+def create_cluster():
+    dbricks_connection = BaseHook.get_connection('databricks_default')
+    dbricks_host = dbricks_connection.host
+    dbricks_token = json.loads(dbricks_connection.extra)['token']
+
+    cluster_client = DatabricksClusterClient(dbricks_host, dbricks_token)
+    cluster_id = cluster_client.create_cluster(CLUSTER_DESCRIPTION)
+
+    libraries_client = DatabricksLibraryClient(dbricks_host, dbricks_token)
+    libraries_client.install_libraries(cluster_id, LIBRARIES_DESCRIPTION)
+
+    return cluster_id
+
+
+def terminate_cluster(**kwargs):
+    dbricks_connection = BaseHook.get_connection('databricks_default')
+    dbricks_host = dbricks_connection.host
+    dbricks_token = json.loads(dbricks_connection.extra)['token']
+    cluster_client = DatabricksClusterClient(dbricks_host, dbricks_token)
+    cluster_id = kwargs['ti'].xcom_pull(task_ids='create_cluster')
+    cluster_client.permanent_delete_cluster(cluster_id)
 
 
 dag = DAG(
@@ -49,14 +103,19 @@ dag = DAG(
     catchup=False
 )
 
-_ebdb_to_datalake_raw_first_time = DatabricksSubmitRunOperator(
-    task_id='ebdb_to_datalake_raw_first_time',
+_create_cluster = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='create_cluster',
+    python_callable=create_cluster
+)
+
+_ebdb_to_datalake_raw = DatabricksSubmitRunOperator(
+    task_id='ebdb_to_datalake_raw',
     dag=dag,
     json={
-        # 'new_cluster': new_cluster,
-        'existing_cluster_id': cluster_id_test,
+        'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create_cluster")}}',
         'spark_python_task': {
-            'python_file': load_ebdb_into_datalake_raw_file_path
+            'python_file': LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH
         }
     }
 )
@@ -65,12 +124,18 @@ _create_athena_raw_external_tables = DatabricksSubmitRunOperator(
     task_id='create_athena_raw_external_tables',
     dag=dag,
     json={
-        # 'new_cluster': new_cluster,
-        'existing_cluster_id': cluster_id_test,
+        'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create_cluster")}}',
         'spark_python_task': {
-            'python_file': create_raw_external_tables_file_path
+            'python_file': CREATE_RAW_EXTERNAL_TABLES_FILE_PATH
         }
     }
 )
 
-_ebdb_to_datalake_raw_first_time >> _create_athena_raw_external_tables
+_terminate_cluster = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='terminate_cluster',
+    provide_context=True,
+    python_callable=terminate_cluster
+)
+
+_create_cluster >> _ebdb_to_datalake_raw >> _create_athena_raw_external_tables >> _terminate_cluster

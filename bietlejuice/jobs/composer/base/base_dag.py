@@ -5,7 +5,7 @@ from airflow.operators.python_operator import PythonOperator
 
 
 class BaseDAG:
-    DEFAULT_OWNER = 'Data Team'
+    DEFAULT_OWNER = 'Data Engineering Team'
     OPERATOR_RETRIES = {
         'retries': 3,
         'retry_delay': timedelta(minutes=3),

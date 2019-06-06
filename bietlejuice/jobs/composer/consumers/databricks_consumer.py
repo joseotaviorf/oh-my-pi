@@ -9,11 +9,8 @@ logger = QuintoAndarLogger('DatabricksConsumer')
 
 class DatabricksConsumer(Consumer):
 
-    @logger
-    def __init__(self, db):
-        self.connection = {
-            'db': db
-        }
+    def __init__(self, connection):
+        self.connection = connection
 
     @logger
     def get_table_names_and_sizes(self):
