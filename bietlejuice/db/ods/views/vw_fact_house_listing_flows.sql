@@ -114,7 +114,7 @@ potential_listings as (
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
-		coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, -1) as sk_partner,
+		coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
 		coalesce(to_char(bt.dt_created::date, 'YYYYMMDD')::integer, -1) as sk_task_created_date,
@@ -229,6 +229,8 @@ potential_listings as (
 		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
 	left join leads_b2b l_b2b
       on l_b2b.id_lead = f.lead_id
+    left join partner_agent pa_b2b_prime
+      on h.usuario_id = pa_b2b_prime.user_id
 ),
 taxonomy as (
     select
