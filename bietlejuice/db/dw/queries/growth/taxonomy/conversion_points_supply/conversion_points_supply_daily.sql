@@ -18,7 +18,7 @@ from
  growth.taxonomy_leads tx1
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
-with prospects as (
+prospects as (
  select
  p.sk_date,
  p.city_group,
@@ -38,7 +38,7 @@ from
  growth.taxonomy_prospects p
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
-with qualifieds as (
+qualifieds as (
  select
  q.sk_date,
  q.city_group,
@@ -58,7 +58,7 @@ from
  growth.taxonomy_qualifieds q
 group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
-with opportunities as (
+opportunities as (
  select
  op.sk_date,
  op.city_group,
@@ -232,18 +232,18 @@ from
 	supply supply
 left join users us
  on us.sk_date = supply.sk_date
- and (us.city_group = supply.city_group)
- and (us.city = supply.city)
- and (us.mkt_category = supply.mkt_category)
- and (us.mkt_flow = supply.mkt_flow)
- and (us.mkt_completion = supply.mkt_completion)
- and (us.mkt_channel = supply.mkt_channel)
- and (us.mkt_medium = supply.mkt_medium)
- and (us.mkt_source = supply.mkt_source)
+ and (coalesce(us.city_group,'') = coalesce(supply.city_group,''))
+ and (coalesce(us.city,'') = coalesce(supply.city,''))
+ and (coalesce(us.mkt_category,'') = coalesce(supply.mkt_category,''))
+ and (coalesce(us.mkt_flow,'') = coalesce(supply.mkt_flow,''))
+ and (coalesce(us.mkt_completion,'') = coalesce(supply.mkt_completion,''))
+ and (coalesce(us.mkt_channel,'') = coalesce(supply.mkt_channel,''))
+ and (coalesce(us.mkt_medium,'') = coalesce(supply.mkt_medium,''))
+ and (coalesce(us.mkt_source,'') = coalesce(supply.mkt_source,''))
  and (coalesce(us.mkt_platform,'') = coalesce(supply.mkt_platform,''))
  and (coalesce(us.utm_campaign,'') = coalesce(supply.utm_campaign,''))
- and (coalesce(us.utm_term,'') = coalesce(supply.utm_term,''))
  and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
+ and (coalesce(us.utm_term,'') = coalesce(supply.utm_term,''))
 UNION
 select
 	 us.sk_date,
@@ -260,6 +260,9 @@ select
 	 us.utm_content,
 	 us.utm_term,
 	 coalesce(supply.total_daily_leads, 0) as total_daily_leads,
+	 coalesce(supply.total_daily_prospects, 0) as total_daily_prospects,
+     coalesce(supply.total_daily_qualifieds, 0) as total_daily_qualifieds,
+     coalesce(supply.total_daily_opportunities, 0) as total_daily_opportunities,
 	 coalesce(supply.total_daily_listings, 0) as total_daily_listings,
 	 coalesce(us.total_daily_sessions, 0) as total_daily_sessions,
 	 coalesce(us.total_daily_active_users, 0) as total_daily_active_users
@@ -267,14 +270,14 @@ from
 	users us
 left join supply supply
  on us.sk_date = supply.sk_date
- and (us.city_group = supply.city_group)
- and (us.city = supply.city)
- and (us.mkt_category = supply.mkt_category)
- and (us.mkt_flow = supply.mkt_flow)
- and (us.mkt_completion = supply.mkt_completion)
- and (us.mkt_channel = supply.mkt_channel)
- and (us.mkt_medium = supply.mkt_medium)
- and (us.mkt_source = supply.mkt_source)
+ and (coalesce(us.city_group,'') = coalesce(supply.city_group,''))
+ and (coalesce(us.city,'') = coalesce(supply.city,''))
+ and (coalesce(us.mkt_category,'') = coalesce(supply.mkt_category,''))
+ and (coalesce(us.mkt_flow,'') = coalesce(supply.mkt_flow,''))
+ and (coalesce(us.mkt_completion,'') = coalesce(supply.mkt_completion,''))
+ and (coalesce(us.mkt_channel,'') = coalesce(supply.mkt_channel,''))
+ and (coalesce(us.mkt_medium,'') = coalesce(supply.mkt_medium,''))
+ and (coalesce(us.mkt_source,'') = coalesce(supply.mkt_source,''))
  and (coalesce(us.mkt_platform,'') = coalesce(supply.mkt_platform,''))
  and (coalesce(us.utm_campaign,'') = coalesce(supply.utm_campaign,''))
  and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
