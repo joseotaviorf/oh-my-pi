@@ -14,7 +14,8 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, DATALAKE_Q
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag, InspectionSubDag, LeadConversionSubDag
+    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag, InspectionSubDag, LeadConversionSubDag, \
+    SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 
@@ -351,6 +352,16 @@ def polygon_region_sub_dag(sub_dag_name):
     return sub_dag.build_polygon_region_with_tests()
 
 
+def special_condition_sub_dag(sub_dag_name):
+    sub_dag = SpecialConditionSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_special_condition()
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id='ODS_house_rent_flow',
     dag=main_dag,
@@ -552,6 +563,12 @@ polygon_region_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='PolygonRegion'
 )
 
+special_condition_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=special_condition_sub_dag,
+    sub_dag_name='SpecialCondition'
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='XCom_fact_listing_rent_flows',
@@ -597,7 +614,7 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
 
-lead_conversion_dag >> house_dag
+[lead_conversion_dag, special_condition_dag] >> house_dag
 
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
