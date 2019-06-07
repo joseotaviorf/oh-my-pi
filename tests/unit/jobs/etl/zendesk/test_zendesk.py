@@ -76,12 +76,12 @@ class TestZendesk(object):
     @mock.patch.object(BaseETL, 'bulk_insert')
     @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=pd.DataFrame(['', '']))
     @mock.patch.object(BaseETL, 'get_query_from_file_name')
-    @mock.patch.object(BaseETL, 'get_connection', return_value=mock.sentinel.some_object)
+    @mock.patch.object(BaseETL, 'get_connection')
     def test_move_to_staging(self, mock_get_connection, mock_get_query_from_file_name, mock_execute_query_and_return_dataframe,
                              mock_bulk_insert, mock__Zendesk__delete_old_entries, zendesk):
 
         # arrange
-        class_ = ZendeskTableEnum.TICKET_METRICS
+        class_ = ZendeskTableEnum.FACT_TICKETS
         sk_field = 'sk_ticket'
 
         # act
@@ -95,15 +95,37 @@ class TestZendesk(object):
         assert mock__Zendesk__delete_old_entries.call_count == 1
 
         # asserts (returns and params)
-        assert mock_get_connection.return_value == mock.sentinel.some_object
         assert mock_bulk_insert.call_args[1]['table'] is not None
         assert mock_bulk_insert.call_args[1]['commit'] is False
         assert mock_bulk_insert.call_args[1]['append'] is False
         assert mock_bulk_insert.call_args[1]['conn'] == mock_get_connection.return_value
         assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_{}'.format(class_.value)
 
-    # @mock.patch.object(Zendesk, '_move_to_prod')
-    # def test_move_to_prod(zendesk, class_, sk_field):
+    @mock.patch.object(Zendesk, '_Zendesk__delete_old_entries')
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    @mock.patch.object(BaseETL, 'from_db_query')
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    @mock.patch.object(BaseETL, 'get_connection')
+    def test_move_to_prod(self, mock_get_connection, mock_get_query_from_file_name, mock_from_db_query,
+                          mock_bulk_insert, mock__Zendesk__delete_old_entries, zendesk):
+        # arrange
+        class_ = ZendeskTableEnum.DIM_ZENDESK_USER
+        sk_field = 'sk_zendesk_user'
+        query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
 
-    # @mock.patch.object(Zendesk, '__delete_old_entries')
-    # def test__delete_old_entries(delete_query, commit, conn=False):
+        # act
+        zendesk._move_to_prod(class_, sk_field)
+
+        # asserts
+        assert mock_get_connection.call_count == 1
+        assert mock_get_query_from_file_name.call_count == 1
+        assert mock_from_db_query.call_count == 1
+        assert mock__Zendesk__delete_old_entries.call_count == 1
+
+        # asserts (returns and params)
+        assert mock_bulk_insert.call_args[1]['table'] is not None
+        assert mock_bulk_insert.call_args[1]['commit'] is True
+        assert mock_bulk_insert.call_args[1]['append'] is True
+        assert mock_bulk_insert.call_args[1]['conn'] == mock_get_connection.return_value
+        assert mock_bulk_insert.call_args[1]['table_name'] == 'zendesk.{}'.format(class_.value)
+        assert mock_from_db_query.call_args[1]['query'] == query
