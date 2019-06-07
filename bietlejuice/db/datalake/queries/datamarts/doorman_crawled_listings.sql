@@ -123,7 +123,7 @@ SELECT
     WHEN (d.lead_activity = 'referral last 90 days') THEN 'referral last 90 days'
     WHEN (d.lead_activity = 'referral last 180 days') THEN 'referral last 180 days'
     WHEN (d.lead_activity = 'referral more than 180 days') THEN 'referral more than 180 days'
-    ELSE 'no referral'
+    WHEN (d.lead_activity = 'no referral') THEN 'no referral'
   END AS doorman_activity,
   d.doorman_total_leads,
   l.*
