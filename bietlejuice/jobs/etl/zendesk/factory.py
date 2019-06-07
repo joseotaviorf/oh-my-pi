@@ -1,16 +1,13 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.etl.zendesk.table_enum import ZendeskTableEnum
-from bietlejuice.jobs.dags.zendesk.tickets import ZendeskTickets
-from bietlejuice.jobs.dags.zendesk.ticket_fields import ZendeskTicketFields
-from bietlejuice.jobs.dags.zendesk.groups import ZendeskGroups
-from bietlejuice.jobs.dags.zendesk.users import ZendeskUsers
-from bietlejuice.jobs.dags.zendesk.group_memberships import ZendeskGroupMemberships
-from bietlejuice.jobs.dags.zendesk.ticket_metrics import ZendeskTicketMetrics
+from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskTickets, ZendeskTicketFields, ZendeskGroups, ZendeskUsers, ZendeskGroupMemberships,\
+    ZendeskTicketMetrics, ZendeskFactTickets, ZendeskDimTicket, ZendeskDimUser
+
 logger = QuintoAndarLogger('ZendeskFactory')
 
 
 class ZendeskFactory(object):
+
     @staticmethod
     def factory(entity, s3_bucket, execution_date):
         if entity is None:
@@ -31,4 +28,7 @@ class ZendeskFactory(object):
             ZendeskTableEnum.USERS: ZendeskUsers,
             ZendeskTableEnum.GROUP_MEMBERSHIPS: ZendeskGroupMemberships,
             ZendeskTableEnum.TICKET_METRICS: ZendeskTicketMetrics,
+            ZendeskTableEnum.FACT_TICKETS: ZendeskFactTickets,
+            ZendeskTableEnum.DIM_TICKET: ZendeskDimTicket,
+            ZendeskTableEnum.DIM_ZENDESK_USER: ZendeskDimUser,
         }.get(entity)
