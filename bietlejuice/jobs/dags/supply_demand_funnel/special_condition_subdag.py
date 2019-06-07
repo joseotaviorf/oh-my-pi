@@ -25,15 +25,15 @@ class SpecialConditionSubDag(DimSubDag):
     @logger
     def build_special_condition(self):
         special_condition_dag = self._build_local_dag()
-        special_condition_task, house_special_condition_task = self.__build_data_tasks(special_condition_dag)
+        special_condition_task, special_condition_aud_task, house_special_condition_task = self.__build_data_tasks(
+            special_condition_dag)
 
         return special_condition_dag
 
     @logger
-    def __get_query(self, table_name, execution_date):
+    def __get_query(self, table_name, **kwargs):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, table_name)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
-        query = query.format(str(execution_date))
 
         utils.extract_query_dim_from_ebdb_to_ods(
             dim_name=table_name,
@@ -42,32 +42,34 @@ class SpecialConditionSubDag(DimSubDag):
         )
 
     @logger
-    def get_special_condition_query(self, execution_date, **kwargs):
-        self.__get_query(
-            table_name='special_condition',
-            execution_date=execution_date
-        )
-
-    @logger
-    def get_house_special_condition_query(self, execution_date, **kwargs):
-        self.__get_query(
-            table_name='house_special_condition',
-            execution_date=execution_date
-        )
-
-    @logger
     def __build_data_tasks(self, dag):
         special_condition_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_special_condition',
             provide_context=True,
-            python_callable=self.get_special_condition_query
+            python_callable=self.__get_query,
+            op_kwargs={
+                'table_name': 'special_condition'
+            }
+        )
+
+        special_condition_aud_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_special_condition_aud',
+            provide_context=True,
+            python_callable=self.__get_query,
+            op_kwargs={
+                'table_name': 'special_condition_aud'
+            }
         )
 
         house_special_condition_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_house_special_condition',
             provide_context=True,
-            python_callable=self.get_house_special_condition_query
+            python_callable=self.__get_query,
+            op_kwargs={
+                'table_name': 'house_special_condition'
+            }
         )
-        return special_condition_task, house_special_condition_task
+        return special_condition_task, special_condition_aud_task, house_special_condition_task
