@@ -1,4 +1,6 @@
 import mock
+import pandas as pd
+
 from qa_python_utils.aws.athena import AthenaClient
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
@@ -14,6 +16,7 @@ class TestZendesk(object):
 
         # arrange
         class_ = ZendeskTableEnum.TICKET_FIELDS
+        # This moment, there are only partitioned tables.
         key = 'clean/zendesk/{0}/dt_extracted={1}/{1}.parq'.format(class_.value, zendesk.execution_date)
         r_cols = OrderedDict([
             ('col1', str),
@@ -28,7 +31,7 @@ class TestZendesk(object):
         # asserts
         assert mock_get_query_from_file_name.call_count == 1
         assert mock_create_parquet_from_query.call_count == 1
-        assert query == mock_get_query_from_file_name.call_args[0][0]
+        assert mock_get_query_from_file_name.call_args[0][0] == query
 
     @mock.patch.object(Zendesk, '_move_to_clean')
     def test_move_to_clean_partitioned(self, mock_move_to_clean, zendesk):
@@ -50,11 +53,50 @@ class TestZendesk(object):
         assert mock_move_to_clean.call_args[1]['class_'] in ZendeskTableEnum
         assert mock_move_to_clean.call_args[1]['key'] == key
 
-    # @mock.patch.object(Zendesk, '_upsert_single_partition')
-    # def test_upsert_single_partition(zendesk, class_, bucket_type):
+    @mock.patch.object(AthenaClient, 'upsert_single_partition')
+    def test_upsert_single_partition(self, mock_upsert_single_partition, zendesk):
 
-    # @mock.patch.object(Zendesk, '_move_to_staging')
-    # def test_move_to_staging(zendesk, class_, sk_field):
+        # arrange
+        class_ = ZendeskTableEnum.TICKET_FIELDS
+        bucket_type = 'clean'
+        database = 'datalake_{}'.format(bucket_type)
+        table = 'zendesk_{}'.format(class_.value)
+
+        # act
+        zendesk._upsert_single_partition(class_, bucket_type)
+
+        # asserts
+        assert mock_upsert_single_partition.call_count == 1
+        assert mock_upsert_single_partition.call_args[1]['partition_name'] is not None
+        assert mock_upsert_single_partition.call_args[1]['partition_value'] is not None
+        assert mock_upsert_single_partition.call_args[1]['table'] == table
+        assert mock_upsert_single_partition.call_args[1]['database'] == database
+
+    @mock.patch.object(Zendesk, '_Zendesk__delete_old_entries')
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    @mock.patch.object(AthenaClient, 'execute_query_and_return_dataframe', return_value=pd.DataFrame(['', '']))
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    @mock.patch.object(BaseETL, 'get_connection', return_value=mock.sentinel.some_object)
+    def test_move_to_staging(self, mock_get_connection, mock_get_query_from_file_name, mock_execute_query_and_return_dataframe,
+                             mock_bulk_insert, mock__Zendesk__delete_old_entries, zendesk):
+
+        # arrange
+        class_ = ZendeskTableEnum.TICKETS
+        sk_field = 'sk_ticket'
+
+        # act
+        zendesk._move_to_staging(class_, sk_field)
+
+        # asserts (# calls)
+        assert mock_get_connection.call_count == 1
+        assert mock_get_query_from_file_name.call_count == 2
+        assert mock_bulk_insert.call_count == 1
+        assert mock_execute_query_and_return_dataframe.call_count == 1
+        assert mock__Zendesk__delete_old_entries.call_count == 1
+
+        assert mock_get_connection.return_value == mock.sentinel.some_object
+        # query to insert data into staging and to delete old entries
+    #     # assert sk_field[:3] == 'sk_'
 
     # @mock.patch.object(Zendesk, '_move_to_prod')
     # def test_move_to_prod(zendesk, class_, sk_field):
