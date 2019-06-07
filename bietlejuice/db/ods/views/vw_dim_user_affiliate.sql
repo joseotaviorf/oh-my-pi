@@ -35,10 +35,10 @@ CREATE VIEW public.vw_dim_user_affiliate as
 	uao.city as tracking_city,
 	now() as ts_load
  from user_affiliate ua
+ join
+ 	  usuario u on u.dados_afiliado_id = ua.id
  left join
- 	  user_affiliate_origin uao on ua.user_id = uao.user_id
- left join
- 	  usuario u on u.dados_afiliado_id = ua.id and lower(u.tipo_admin) <> 'sudo'
+ 	  user_affiliate_origin uao on u.id = uao.user_id
  left join
 	  vistorias v on v.agente_id = ua.id
   

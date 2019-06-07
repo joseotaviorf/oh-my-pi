@@ -44,7 +44,7 @@ select
     t.subject,
     t.description,
     t.channel,
-    g.name as "group",
+    g.name as group_name,
     t.priority,
     t.recipient,
     t.tags,
