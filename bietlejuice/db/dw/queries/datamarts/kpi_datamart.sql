@@ -52,16 +52,6 @@ offers_submitted AS (
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
   GROUP BY 1, 2
 ),
-listings_with_offer_submitted AS (
-  SELECT
-    DATE_TRUNC('week', dim_date.date) AS date_period,
-    fact_listing_rent_flows.sk_region,
-    COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_offer_submitted_date  >= 0) THEN fact_listing_rent_flows.sk_house_listing  ELSE NULL END) AS listings_with_offer_submitted
-  FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_offer_submitted_date = dim_date.sk_date
-  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
-  GROUP BY 1, 2
-),
 prospects AS (
 	SELECT
     DATE_TRUNC('week', dim_date.date) AS date_period,
@@ -98,11 +88,9 @@ FROM
   SELECT *
   FROM contracts_signed
   JOIN visits_booked USING(date_period, sk_region)
-	JOIN listings_with_visit_booked USING(date_period, sk_region)
   JOIN ongoing_listings USING(date_period, sk_region)
   JOIN visits_completed USING(date_period, sk_region)
   JOIN offers_submitted USING(date_period, sk_region)
-	JOIN listings_with_offer_submitted USING(date_period, sk_region)
   JOIN prospects USING(date_period, sk_region)
   JOIN first_listings USING(date_period, sk_region)
 ) metrics
