@@ -81,7 +81,7 @@ class TestZendesk(object):
                              mock_bulk_insert, mock__Zendesk__delete_old_entries, zendesk):
 
         # arrange
-        class_ = ZendeskTableEnum.TICKETS
+        class_ = ZendeskTableEnum.TICKET_METRICS
         sk_field = 'sk_ticket'
 
         # act
@@ -94,9 +94,13 @@ class TestZendesk(object):
         assert mock_execute_query_and_return_dataframe.call_count == 1
         assert mock__Zendesk__delete_old_entries.call_count == 1
 
+        # asserts (returns and params)
         assert mock_get_connection.return_value == mock.sentinel.some_object
-        # query to insert data into staging and to delete old entries
-    #     # assert sk_field[:3] == 'sk_'
+        assert mock_bulk_insert.call_args[1]['table'] is not None
+        assert mock_bulk_insert.call_args[1]['commit'] is False
+        assert mock_bulk_insert.call_args[1]['append'] is False
+        assert mock_bulk_insert.call_args[1]['conn'] == mock_get_connection.return_value
+        assert mock_bulk_insert.call_args[1]['table_name'] == 'staging.zendesk_{}'.format(class_.value)
 
     # @mock.patch.object(Zendesk, '_move_to_prod')
     # def test_move_to_prod(zendesk, class_, sk_field):
