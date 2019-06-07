@@ -151,7 +151,7 @@ SELECT
     WHEN contains(d.doorman_active, 'referral last 90 days') THEN 'referral last 90 days'
     WHEN contains(d.doorman_active, 'referral last 180 days') THEN 'referral last 180 days'
     WHEN contains(d.doorman_active, 'referral more than 180 days') THEN 'referral more than 180 days'
-    WHEN contains(d.doorman_active, 'no referral') THEN 'no referral'
+    ELSE 'no referral'
   END AS most_active_doorman,
   l.website,
   l.url,
