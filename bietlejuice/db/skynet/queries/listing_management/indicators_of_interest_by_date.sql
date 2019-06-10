@@ -33,19 +33,13 @@ with listing_versions as (
 	lv.house_bathrooms as numero_banheiros,
 	lv.house_suites	as numero_suites,
 	lv.house_garages as numero_vagas,
-	if(lv.is_house_furnished = '1', 1, 0) as mobiliado,
-    prp.email as prop_email,
-    prp.telefoneprincipal as prop_phone1
-    -- prp.nome as name,
-    -- prp.sexo as gender,
+	if(lv.is_house_furnished = '1', 1, 0) as mobiliado
     -- i.predictedPrice as pricepred_estimate
 	from datalake_clean.ods_dim_house_listing as lv
 	join datalake_clean.ods_fact_house_listings as fhl
 	on fhl.sk_house_listing = lv.sk_house_listing
-    join datalake_raw.ebdb_usuario prp on prp.id = fhl.sk_owner
     join datalake_clean.ods_dim_region dr on dr.sk_region = fhl.sk_region 
 	-- left join price_predictions pp on pp.imovel_id = lv.id
-	where cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) >= date('2017-09-01')  
 ),
 first_listing_viz as (
 	select 
@@ -317,7 +311,7 @@ lv_date_series as (
 	lv.house_id,
 	date(date_add('day', seq.n, lv.publication_date)) as date
 	from listing_versions lv 
-	cross join unnest(sequence(0,date_diff('day', date('2017-09-01'), now()))) seq (n)
+	cross join unnest(sequence(0,date_diff('day', lv.publication_date, now()))) seq (n)
 	where date_add('day', seq.n, lv.publication_date) <= coalesce(lv.max_version_time, now())
 ),
 imovel_status_rev as (
