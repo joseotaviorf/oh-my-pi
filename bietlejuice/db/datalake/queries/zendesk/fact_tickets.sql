@@ -111,7 +111,8 @@ ticket_metrics as (
 tickets as (
     select
         cast(t.id_ticket as bigint) as sk_ticket,
-        -- id_contract and id_house may be filled with string
+        -- id_contract and id_house may be filled with string (filled wrong)
+        -- id_house may be filled with id_house or short_id_house
         if(length(c.cols['Código do Imóvel']) < 9, 892700000 + try_cast(c.cols['Código do Imóvel'] as bigint), try_cast(c.cols['Código do Imóvel'] as bigint)) as id_house,
         try_cast(c.cols['Código do Contrato'] as bigint) as id_contract,
         tm.*,
