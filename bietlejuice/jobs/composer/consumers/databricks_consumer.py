@@ -22,18 +22,6 @@ class DatabricksConsumer(Consumer):
         return result
 
     @logger
-    def get_data_from_table(self, table):
-        raise NotImplementedError()
-
-    @logger
-    def get_data_from_table_in_parallel(self, table, concurrency):
-        raise NotImplementedError()
-
-    @logger
-    def get_data_from_query(self, query):
-        raise NotImplementedError()
-
-    @logger
     def get_table_schema(self, table):
         spark = SparkSession.builder.getOrCreate()
         result = spark.sql('describe {}.{}'.format(self.connection['db'], table)) \

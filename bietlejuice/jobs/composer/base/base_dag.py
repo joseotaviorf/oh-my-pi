@@ -15,8 +15,14 @@ class BaseDAG:
     EXECUTION_TIMEOUT = timedelta(hours=3)
 
     @staticmethod
-    def build_dag(dag_id, start_date, schedule_interval, description='', wait_for_downstream=False,
-                  depends_on_past=False, catchup=False, orientation='LR'):
+    def build_dag(dag_id,
+                  start_date,
+                  schedule_interval,
+                  description='',
+                  wait_for_downstream=False,
+                  depends_on_past=False,
+                  catchup=False,
+                  orientation='LR'):
         return DAG(
             dag_id=dag_id,
             description=description,

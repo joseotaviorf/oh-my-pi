@@ -1,4 +1,1 @@
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import EBDBIntoDatalakeLoader
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import execute_athena_query
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import get_athena_client
-from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake.ebdb_into_datalake_loader import start_athena_query

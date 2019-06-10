@@ -1,39 +1,36 @@
-import abc
-
 from python_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Consumer')
 
 
-class Consumer(abc.ABC):
+class Consumer:
 
-    @abc.abstractmethod
+    @logger
     def get_table_names_and_sizes(self):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
+    @logger
     def get_data_from_table(self, table):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
+    @logger
     def get_data_from_table_in_parallel(self, table, concurrency):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
+    @logger
     def get_data_from_query(self, query):
-        pass
+        raise NotImplementedError()
 
-    @abc.abstractmethod
+    @logger
     def get_table_schema(self, table):
-        pass
+        raise NotImplementedError()
 
     @logger
     def is_db_empty(self):
-        result = None
         try:
             result = self.get_table_names_and_sizes()
         except Exception as e:
-            logger.error('m=is_db_empty, msg=Database of this consumer does not exist., e={}'.format(e))
+            raise RuntimeError('m=is_db_empty, msg=Database of this consumer does not exist., e={}'.format(e))
         if result and result.count():
             return False
 

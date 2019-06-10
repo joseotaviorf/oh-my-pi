@@ -1,22 +1,26 @@
 import json
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.contrib.operators.databricks_operator import DatabricksSubmitRunOperator
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import DAG
 from databricks import DatabricksClusterClient, DatabricksLibraryClient
+from python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import BaseDAG
 
-DAG_ID = 'load-ebdb-into-datalake'
+logger = QuintoAndarLogger('load_ebdb_into_datalake')
 
-LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/spark_jobs/\
+DAG_ID = 'load-ebdb-into-datalake'
+S3_PREFIX = 's3://5a-databricks/github-repos/bi-etl-ejuice'
+
+LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX + '/spark_jobs/\
 load-ebdb-into-datalake/load_ebdb_into_datalake.py'
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/spark_jobs/\
+CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/\
 load-ebdb-into-datalake/create_raw_external_tables.py'
 
-LOGS_OUTPUT_PATH = 's3://5a-databricks/github-repos/bi-etl-ejuice/\
-logs/load-ebdb-into-datalake'
+LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/load-ebdb-into-datalake'
 
 CLUSTER_DESCRIPTION = {
     'autoscale': {
@@ -24,7 +28,7 @@ CLUSTER_DESCRIPTION = {
         'max_workers': 4
     },
     'cluster_name': DAG_ID,
-    'spark_version': '5.2.x-scala2.11',
+    'spark_version': '5.4.x-scala2.11',
     'spark_conf': {
         'spark.speculation': 'true'
     },
@@ -49,7 +53,8 @@ CLUSTER_DESCRIPTION = {
     'init_scripts': [],
     'cluster_log_conf': {
         's3': {
-            'destination': LOGS_OUTPUT_PATH
+            'destination': LOGS_OUTPUT_PATH,
+            'region': 'us-east-1'
         }
     }
 }
@@ -67,6 +72,7 @@ LIBRARIES_DESCRIPTION = [
 ]
 
 
+@logger
 def create_cluster():
     dbricks_connection = BaseHook.get_connection('databricks_default')
     dbricks_host = dbricks_connection.host
@@ -81,6 +87,7 @@ def create_cluster():
     return cluster_id
 
 
+@logger
 def terminate_cluster(**kwargs):
     dbricks_connection = BaseHook.get_connection('databricks_default')
     dbricks_host = dbricks_connection.host
@@ -103,13 +110,13 @@ dag = DAG(
     catchup=False
 )
 
-_create_cluster = BaseDAG.build_python_operator(
+create_cluster_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='create_cluster',
     python_callable=create_cluster
 )
 
-_ebdb_to_datalake_raw = DatabricksSubmitRunOperator(
+ebdb_to_datalake_raw_task = DatabricksSubmitRunOperator(
     task_id='ebdb_to_datalake_raw',
     dag=dag,
     json={
@@ -120,8 +127,8 @@ _ebdb_to_datalake_raw = DatabricksSubmitRunOperator(
     }
 )
 
-_create_athena_raw_external_tables = DatabricksSubmitRunOperator(
-    task_id='create_athena_raw_external_tables',
+create_raw_external_tables_task = DatabricksSubmitRunOperator(
+    task_id='create_raw_external_tables',
     dag=dag,
     json={
         'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create_cluster")}}',
@@ -131,11 +138,14 @@ _create_athena_raw_external_tables = DatabricksSubmitRunOperator(
     }
 )
 
-_terminate_cluster = BaseDAG.build_python_operator(
+terminate_cluster_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='terminate_cluster',
     provide_context=True,
     python_callable=terminate_cluster
 )
 
-_create_cluster >> _ebdb_to_datalake_raw >> _create_athena_raw_external_tables >> _terminate_cluster
+airflow_helpers.chain(create_cluster_task,
+                      ebdb_to_datalake_raw_task,
+                      create_raw_external_tables_task,
+                      terminate_cluster_task)
