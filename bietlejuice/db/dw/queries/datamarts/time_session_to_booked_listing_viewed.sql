@@ -97,8 +97,9 @@ house_conversion_sessions as (
 	min(ts_first_search_session) as ts_first_search_session
 	from user_session_mapping usm
 	where id_house is not null
+	and ts_first_lpv_session is not null
+	and ts_visit_schedule_confirmed is not null
 	group by 1, 2
-    having min(ts_visit_schedule_confirmed) is not null
 )
 -- returns amplitude event conversion timestamps with all dimensions of the related house id
 select distinct
