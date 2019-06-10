@@ -12,5 +12,7 @@ CREATE TABLE public.fact_lead_task_contact_flows (
     ts_first_call TIMESTAMP,
     sk_first_connection_date INTEGER,
     ts_first_connection TIMESTAMP,
+    is_mailing_active BOOLEAN,
+    is_mailing_paused BOOLEAN,
     ts_load TIMESTAMP default getdate()
 );

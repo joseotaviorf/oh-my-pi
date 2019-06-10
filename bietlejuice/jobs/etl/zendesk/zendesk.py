@@ -1,11 +1,12 @@
 from abc import abstractmethod
-
+import petl
 import boto3
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from bietlejuice.jobs.base.enum_db import EnumDB
 
 logger = QuintoAndarLogger('Zendesk')
 
@@ -15,8 +16,7 @@ class Zendesk(object):
     @logger
     def __init__(self, s3_bucket, execution_date):
         self.s3_bucket = s3_bucket
-        self.execution_date = execution_date.strftime('%Y-%m-%d')
-
+        self.execution_date = execution_date.strftime("%Y-%m-%d")
         self.athena_client = AthenaClient(self.s3_bucket)
         self.s3_resource = boto3.resource('s3')
 
@@ -68,4 +68,80 @@ class Zendesk(object):
             query=query.format(**params),
             raw_columns=r_cols,
             clean_columns=c_cols
+        )
+
+    @logger
+    def _move_to_staging(self, class_, sk_field):
+
+        conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
+                                      encoding='utf-8')
+
+        query = BaseETL.get_query_from_file_name(
+            '{}/zendesk/{}.sql'.format(DATALAKE_QUERIES_DIR, class_.value)
+        ).format(extraction_date=self.execution_date)
+        logger.info('m=_move_to_prod, query={}, msg=Getting data from staging(DW)'.format(query))
+
+        df = self.athena_client.execute_query_and_return_dataframe(query)
+        table_data = petl.fromdataframe(df)
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            db_enum=EnumDB.BI_DW,
+            table_name='staging.zendesk_{}'.format(class_.value),
+            encoding='utf-8',
+            append=False,
+            commit=False,
+            conn=conn
+        )
+
+        delete_query = BaseETL.get_query_from_file_name(
+            '{}/staging/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        ).format(table_name=class_.value, sk_field=sk_field)
+        logger.info('m=_move_to_prod, delete_query={}, msg=Deleting old entries into staging(DW)'.format(delete_query))
+
+        self.__delete_old_entries(delete_query, True, conn)
+
+    @logger
+    def _move_to_prod(self, class_, sk_field):
+
+        conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW,
+                                      encoding='utf-8')
+
+        delete_query = BaseETL.get_query_from_file_name(
+            '{}/zendesk/delete_old_entries.sql'.format(DW_QUERIES_DIR)
+        ).format(table_name=class_.value, sk_field=sk_field)
+        logger.info('m=_move_to_prod, delete_query={}, msg=Deleting old entries into prod(DW)'.format(delete_query))
+
+        self.__delete_old_entries(delete_query, False, conn)
+
+        query = 'select distinct * from staging.zendesk_{};'.format(class_.value)
+        logger.info('m=_move_to_prod, query={}, msg=Getting data from prod(DW)'.format(query))
+
+        table_data = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query=query,
+            encoding='utf-8',
+            conn=conn
+        )
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            db_enum=EnumDB.BI_DW,
+            table_name='zendesk.{}'.format(class_.value),
+            encoding='utf-8',
+            append=True,
+            commit=True,
+            conn=conn
+        )
+
+    @staticmethod
+    @logger
+    def __delete_old_entries(delete_query, commit, conn=False):
+
+        BaseETL.execute_command(
+            db_enum=EnumDB.BI_DW,
+            command=delete_query,
+            commit=commit,
+            conn=conn,
+            encoding='utf-8'
         )
