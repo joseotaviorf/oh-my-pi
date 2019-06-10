@@ -6,6 +6,7 @@ with leads as (
  tx1.mkt_category,
  tx1.mkt_flow,
  tx1.mkt_completion,
+ tx1.mkt_origin,
  tx1.mkt_channel,
  tx1.mkt_medium,
  tx1.mkt_source,
@@ -26,6 +27,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -46,6 +48,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -66,6 +69,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -85,6 +89,7 @@ select
  tx1.mkt_category,
  tx1.mkt_flow,
  tx1.mkt_completion,
+ tx1.mkt_origin,
  tx1.mkt_channel,
  tx1.mkt_medium,
  tx1.mkt_source,
@@ -103,6 +108,7 @@ left join listings ls1
  and (ls1.mkt_category = tx1.mkt_category)
  and (ls1.mkt_flow = tx1.mkt_flow)
  and (ls1.mkt_completion = tx1.mkt_completion)
+ and (ls1.mkt_origin = tx1.mkt_origin)
  and (ls1.mkt_channel = tx1.mkt_channel)
  and (ls1.mkt_medium = tx1.mkt_medium)
  and (ls1.mkt_source = tx1.mkt_source)
@@ -122,6 +128,7 @@ select
  tx1.mkt_category,
  tx1.mkt_flow,
  tx1.mkt_completion,
+ tx1.mkt_origin,
  tx1.mkt_channel,
  tx1.mkt_medium,
  tx1.mkt_source,
@@ -141,6 +148,7 @@ left join active_users ls1
  and (ls1.mkt_flow = tx1.mkt_flow)
  and (ls1.mkt_completion = tx1.mkt_completion)
  and (ls1.mkt_channel = tx1.mkt_channel)
+ and (ls1.mkt_origin = tx1.mkt_origin)
  and (ls1.mkt_medium = tx1.mkt_medium)
  and (ls1.mkt_source = tx1.mkt_source)
  and (coalesce(ls1.mkt_platform,'') = coalesce(tx1.mkt_platform,''))
@@ -164,6 +172,7 @@ left join users us
  and (us.mkt_category = supply.mkt_category)
  and (us.mkt_flow = supply.mkt_flow)
  and (us.mkt_completion = supply.mkt_completion)
+ and (us.mkt_origin = supply.mkt_origin)
  and (us.mkt_channel = supply.mkt_channel)
  and (us.mkt_medium = supply.mkt_medium)
  and (us.mkt_source = supply.mkt_source)
@@ -179,6 +188,7 @@ select
 	 us.mkt_category,
 	 us.mkt_flow,
 	 us.mkt_completion,
+	 us.mkt_origin,
 	 us.mkt_channel,
 	 us.mkt_medium,
 	 us.mkt_source,
@@ -199,6 +209,7 @@ left join supply supply
  and (us.mkt_category = supply.mkt_category)
  and (us.mkt_flow = supply.mkt_flow)
  and (us.mkt_completion = supply.mkt_completion)
+ and (us.mkt_origin = supply.mkt_origin)
  and (us.mkt_channel = supply.mkt_channel)
  and (us.mkt_medium = supply.mkt_medium)
  and (us.mkt_source = supply.mkt_source)
