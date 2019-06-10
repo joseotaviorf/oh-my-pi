@@ -2,8 +2,6 @@ import json
 import logging
 from multiprocessing.dummy import Pool as ThreadPool
 
-from pyspark.dbutils import DBUtils
-from pyspark.shell import spark
 from python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseEnum
@@ -51,7 +49,6 @@ def load_full_big_tables(tables, num_partitions, consumer):
 
 
 if __name__ == '__main__':
-    dbutils = DBUtils(spark.sparkContext)
     connection_json = dbutils.secrets.get(scope='quintoandar-forno', key=DatabaseEnum.EBDB)
     connection = json.loads(connection_json)
     mysql_consumer = MySQLConsumer(connection)
