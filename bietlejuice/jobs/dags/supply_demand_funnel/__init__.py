@@ -7,6 +7,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.condo_subdag import CondoSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.contract_subdag import ContractSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.doorman_subdag import DoormanSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.house_subdag import HouseSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.inspection_subdag import InspectionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_conversion_subdag import LeadConversionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.lead_subdag import LeadSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.offer_subdag import OfferSubDag
@@ -16,6 +17,6 @@ from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJob
 from bietlejuice.jobs.dags.supply_demand_funnel.polygon_region_subdag import PolygonRegionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.proposal_subdag import ProposalSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.special_condition_subdag import SpecialConditionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
-from bietlejuice.jobs.dags.supply_demand_funnel.inspection_subdag import InspectionSubDag
