@@ -8,6 +8,7 @@ select
 	aaus.mkt_category,
 	aaus.mkt_flow,
 	aaus.mkt_completion,
+	aaus.mkt_origin,
 	aaus.mkt_channel,
 	aaus.mkt_medium,
 	aaus.mkt_source,
