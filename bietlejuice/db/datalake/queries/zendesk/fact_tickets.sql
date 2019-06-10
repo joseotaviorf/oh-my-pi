@@ -48,16 +48,14 @@ house as (
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
-        coalesce(dhl.id_house, dhl.short_id_house) as id_house    
+        dhl.id_house,
+        dhl.short_id_house 
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
     where
         fhl.sk_owner != '-1'
-        -- Athena has shown that it has problems doing left joins with 'or'
-    	and dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
-    	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
-    group by 1,2,3,4,5
+    group by 1,2,3,4,5,6
 ),
 ticket_metrics as (
     with row_n as (
@@ -141,7 +139,7 @@ tickets as (
 )
 select
     cast(t.id_ticket as bigint) as sk_ticket,
-    coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
+    coalesce(dc.sk_house_listing, dhl.sk_house_listing, dhl_short.sk_house_listing, -1) as sk_house_listing,
     coalesce(dc.sk_contract, -1)  as sk_contract,
     coalesce(dc.sk_client, -1)  as sk_client,
     coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
@@ -193,6 +191,11 @@ left join house dhl
 	on c.cols['Código do Imóvel'] = dhl.id_house
     and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
     between dhl.dt_listing_version_start
-    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')       
+    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')
+left join house dhl_short
+	on c.cols['Código do Imóvel'] = dhl_short.short_id_house
+    and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
+    between dhl_short.dt_listing_version_start
+    and date_format(coalesce(cast(dhl_short.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')       
 left join contract dc
     on c.cols['Código do Contrato'] = cast(dc.sk_contract as varchar);
