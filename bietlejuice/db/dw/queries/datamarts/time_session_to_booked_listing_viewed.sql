@@ -99,31 +99,28 @@ house_conversion_sessions as (
 	where id_house is not null
 	group by 1, 2
     having min(ts_visit_schedule_confirmed) is not null
-),
-results_raw as (
-	-- returns amplitude event conversion timestamps with all dimensions of the related house id
-	select distinct
-		hsd.city_group,
-		hsd.city,
-		hsd.macro_region,
-		hsd.neighborhood,
-		hsd.week_start,
-		hsd.week_start_publication,
-		hsd.house_bedrooms,
-		hsd.is_b2b,
-		hsd.house_rent,
-		hsd.house_total_value,
-		hsd.house_total_area,
-		hcs.amplitude_id,
-		hcs.id_house,
-		hcs.sk_booking_dt,
-		hcs.ts_session_start,
-		hcs.ts_first_lpv_session,
-		hcs.ts_visit_schedule_confirmed,
-		hcs.ts_first_search_session,
-		date_diff('second', ts_session_start, ts_first_lpv_session) as seconds_sessionstart_to_first_lpv,
-		coalesce(hcs.ts_first_search_session < hcs.ts_first_lpv_session, false) as searched_in_session_before_lpv
-	from house_conversion_sessions hcs
-	join house_status_and_dimensions hsd on hsd.id_house = hcs.id_house and hsd.sk_date = hcs.sk_booking_dt
 )
-select * from results_raw;
+-- returns amplitude event conversion timestamps with all dimensions of the related house id
+select distinct
+    hsd.city_group,
+    hsd.city,
+    hsd.macro_region,
+    hsd.neighborhood,
+    hsd.week_start,
+    hsd.week_start_publication,
+    hsd.house_bedrooms,
+    hsd.is_b2b,
+    hsd.house_rent,
+    hsd.house_total_value,
+    hsd.house_total_area,
+    hcs.amplitude_id,
+    hcs.id_house,
+    hcs.sk_booking_dt,
+    hcs.ts_session_start,
+    hcs.ts_first_lpv_session,
+    hcs.ts_visit_schedule_confirmed,
+    hcs.ts_first_search_session,
+    date_diff('second', ts_session_start, ts_first_lpv_session) as seconds_sessionstart_to_first_lpv,
+    coalesce(hcs.ts_first_search_session < hcs.ts_first_lpv_session, false) as searched_in_session_before_lpv
+from house_conversion_sessions hcs
+join house_status_and_dimensions hsd on hsd.id_house = hcs.id_house and hsd.sk_date = hcs.sk_booking_dt;
