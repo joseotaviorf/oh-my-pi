@@ -18,8 +18,8 @@ class SpecialConditionSubDag(DimSubDag):
             dag_name=dag_name,
             schedule_interval=schedule_interval,
             start_date=start_date,
-            table_name='Imovel',
-            ods_stg_table_name='house_listing'
+            table_name='SpecialCondition',
+            ods_stg_table_name='special_condition'
         )
 
     @logger
