@@ -248,6 +248,7 @@ taxonomy as (
         ts.mkt_category,
         ts.mkt_flow,
         ts.mkt_completion,
+        ts.mkt_origin,
         ts.mkt_channel,
         ts.mkt_platform,
         ts.mkt_medium,
@@ -319,6 +320,7 @@ select
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_category end as mkt_category,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_flow end as mkt_flow,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_completion end as mkt_completion,
+	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_origin end as mkt_origin,
 	case when t.mkt_flow is null then 'Not Mapped' else t.mkt_channel end as mkt_channel,
 	case when t.mkt_flow is null then 'Not Mapped'
 	     when t.mkt_platform is null and pl.tracking_platform = 'web_mobile' then 'Web Mobile'
