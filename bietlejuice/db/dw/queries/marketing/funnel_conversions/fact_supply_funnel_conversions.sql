@@ -15,7 +15,7 @@ with fact as  (
 		sum(coalesce(cost,0)) as cost
 	from marketing.fact_marketing_daily_costs mkt
 	join public.dim_date dd on dd.sk_date =  mkt.sk_date
-	where funnel_side = 'supply' and coalesce(to_char(date(dd.{0}),'YYYYMMDD')::integer, -1) >= 20190601 -- remove where
+	where funnel_side = 'supply'
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 s_cube as (
@@ -46,7 +46,6 @@ s_cube as (
 		sum(coalesce(total_{2}_opportunities, 0)) as total_{2}_opportunities,
 		sum(coalesce(total_{2}_listings, 0)) as total_{2}_listings
 	from growth.conversion_points_supply_{2}
-	where coalesce({1}, -1) >= 20190601 -- remove where
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
 )
 select
