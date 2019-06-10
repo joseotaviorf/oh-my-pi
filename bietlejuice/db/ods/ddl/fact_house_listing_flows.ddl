@@ -38,4 +38,7 @@ create table public.fact_house_listing_flows (
 	days_opportunity_to_listing decimal(10,1),
 	days_lead_to_listing decimal(10,1),
 	days_lead_to_processing decimal(10,1)
-)
+);
+
+create index fact_house_listing_flows_lead_id_idx on fact_house_listing_flows (lead_id);
+create index fact_house_listing_flows_imovel_id_idx on fact_house_listing_flows (imovel_id);
