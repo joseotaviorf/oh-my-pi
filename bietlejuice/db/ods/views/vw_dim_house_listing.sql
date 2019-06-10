@@ -55,7 +55,7 @@ special_conditions as (
     select
       id,
       special_condition_type,
-      ts_opted_in as in_,
+      date(ts_opted_in) as in_,
       max(date(ts_opted_out)) as out_
     from special_condition_aud
     where special_condition_status in ('OptedIn', 'OptedOut')
