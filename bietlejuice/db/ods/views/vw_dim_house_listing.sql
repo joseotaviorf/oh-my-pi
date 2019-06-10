@@ -253,7 +253,8 @@ select
   bi.is_b2b,
   bi.b2b_type,
   bi.b2b_prime_type,
-  lsc_originals.dt_last_opted_in is not null as is_originals,
+  lsc_originals.dt_last_opted_in is not null 
+    and lsc_originals.dt_last_opted_out is null as is_originals_active,
   lsc_originals.special_condition_type as originals_type,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
   lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
