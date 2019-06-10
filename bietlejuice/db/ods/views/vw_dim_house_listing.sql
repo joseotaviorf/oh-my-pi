@@ -159,41 +159,26 @@ listing_special_conditions as (
   group by 1, 2
 ),
 listing_special_conditions_originals as (
-  with multiple_originals as (
-  -- in case a house listing has two Originals types: ready and reno on the same version
-    select
-      sk_house_listing,
-      count(1)
-    from listing_special_conditions
-    where special_condition_type like 'Originals%'
-    group by 1
-    having count(1) > 1
-  ),
-  max_dates as (
-  -- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-    select
-      lsc.sk_house_listing,
-      max(lsc.dt_last_opted_in) as max_dt_last_opted_in,
-      -- adding a coalesce with 2100-01-01, instead of first filtering nulls, in favor of performance
-      max(coalesce(lsc.dt_last_opted_out, '2100-01-01'::date)) as max_dt_last_opted_out
-    from listing_special_conditions lsc
-    join multiple_originals mo
-      on lsc.sk_house_listing = mo.sk_house_listing
-        and lsc.special_condition_type like 'Originals%'
-    group by 1
+	with multiple_originals as (
+	-- in case a house listing has two Originals types: ready and reno on the same version
+  	select
+  		sk_house_listing,
+  		special_condition_type,
+  		dt_last_opted_in,
+  		dt_last_opted_out,
+  		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
+  		row_number() over (partition by sk_house_listing order by dt_last_opted_in desc, coalesce(dt_last_opted_out, '2100-01-01'::date) desc) as rn
+  	from listing_special_conditions
+		where special_condition_type like 'Originals%'
   )
-  -- select the latest Originals type a house listing has enter
+  -- select the latest Originals type a house listing has entered
   select
-    lsc.sk_house_listing,
-    lsc.special_condition_type,
-    coalesce(md.max_dt_last_opted_in, lsc.dt_last_opted_in) as dt_last_opted_in,
-    nullif(coalesce(md.max_dt_last_opted_out, lsc.dt_last_opted_out), '2100-01-01'::date) as dt_last_opted_out
-  from listing_special_conditions lsc
-  join max_dates md
-    on lsc.sk_house_listing = md.sk_house_listing
-      and lsc.dt_last_opted_in = md.max_dt_last_opted_in
-      and coalesce(lsc.dt_last_opted_out, '2100-01-01'::date) = md.max_dt_last_opted_out
-  where lsc.special_condition_type like 'Originals%'
+  	sk_house_listing,
+  	special_condition_type,
+  	dt_last_opted_in,
+  	dt_last_opted_out
+  from multiple_originals
+  where rn = 1
 )
 select
   hl.sk_house_listing,
