@@ -1,4 +1,4 @@
-DROP TABLE datalake_clean.monthly_active_user_sessions;
+DROP TABLE datalake_clean.amplitude_monthly_active_user_sessions;
 
 CREATE EXTERNAL TABLE datalake_clean.amplitude_monthly_active_user_sessions (
     date string,
