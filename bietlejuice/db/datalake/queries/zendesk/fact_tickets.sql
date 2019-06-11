@@ -12,7 +12,7 @@ custom_fields as (
 		select tf.id_ticket,
 	        f1.field,
 	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}}]+)', 1), 'null') as value
+	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
@@ -35,23 +35,25 @@ contract as (
     from datalake_clean.ods_dim_contract dc 
     left join datalake_clean.ods_fact_listing_rent_flows fl
     on dc.sk_contract = fl.sk_contract 
+    where fl.sk_owner != '-1'
+          and fl.sk_client != '-1'
+          and fl.sk_house_listing != '-1'
+          and fl.sk_contract != '-1'
     group by 1,2,3,4
 ),
 house as (
     select
         cast(coalesce(dhl.sk_house_listing, '-1') as bigint) as sk_house_listing, 
-        cast(coalesce(fl.sk_owner, '-1') as bigint) as sk_owner,
+        cast(coalesce(fhl.sk_owner, '-1') as bigint) as sk_owner,
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
-        coalesce(dhl.id_house, dhl.short_id_house) as id_house    
+        cast(dhl.id_house as bigint) as id_house
     from datalake_clean.ods_dim_house_listing dhl 
-    left join datalake_clean.ods_fact_listing_rent_flows fl
-    on dhl.sk_house_listing = fl.sk_house_listing 
+    left join datalake_clean.ods_fact_house_listings fhl
+    on dhl.sk_house_listing = fhl.sk_house_listing 
     where
-        -- Athena has shown that it has problems doing left joins with 'or'
-    	dhl.id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
-    	or dhl.short_id_house in (select distinct c.cols['Código do Imóvel'] from custom_fields c)
+        fhl.sk_owner != '-1'
     group by 1,2,3,4,5
 ),
 ticket_metrics as (
@@ -109,6 +111,10 @@ ticket_metrics as (
 tickets as (
     select
         cast(t.id_ticket as bigint) as sk_ticket,
+        -- id_contract and id_house may be filled with string (filled wrong)
+        -- id_house may be filled with id_house or short_id_house
+        if(length(c.cols['Código do Imóvel']) < 9, 892700000 + try_cast(c.cols['Código do Imóvel'] as bigint), try_cast(c.cols['Código do Imóvel'] as bigint)) as id_house,
+        try_cast(c.cols['Código do Contrato'] as bigint) as id_contract,
         tm.*,
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
@@ -133,13 +139,15 @@ tickets as (
         on t.id_ticket = lt.id_ticket and t.ts_updated=lt.ts_last_updated
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
+    left join custom_fields c 
+    on c.id_ticket=t.id_ticket
 )
 select
     cast(t.id_ticket as bigint) as sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
     coalesce(dc.sk_contract, -1)  as sk_contract,
     coalesce(dc.sk_client, -1)  as sk_client,
-    coalesce(dc.sk_owner, -1)  as sk_owner,
+    coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
@@ -182,12 +190,10 @@ select
     t.ts_closed_local,
     now() as ts_load
 from tickets t
-left join custom_fields c 
-    on c.id_ticket=t.id_ticket
 left join house dhl
-	on c.cols['Código do Imóvel'] = dhl.id_house
+	on t.id_house = dhl.id_house
     and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
     between dhl.dt_listing_version_start
-    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')       
+    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')      
 left join contract dc
-    on c.cols['Código do Contrato'] = cast(dc.sk_contract as varchar);
+    on id_contract = dc.sk_contract;
