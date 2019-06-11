@@ -25,7 +25,7 @@ custom_fields as (
 		select tf.id_ticket,
 	        f1.field,
 	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}}]+)', 1), 'null') as value
+	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
