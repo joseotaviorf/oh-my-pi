@@ -1,21 +1,24 @@
-DROP TABLE datalake_raw.zendesk_groups;
-
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_groups`(
-  `url` string,
-  `id` string,
-  `name` string,
-  `deleted` string,
-  `created_at` string,
-  `updated_at` string)
-PARTITIONED BY (
-  `dt` string)
-ROW FORMAT SERDE
+drop table if exists datalake_raw.zendesk_groups;
+create table if not exists datalake_raw.zendesk_groups (
+    id string,
+    updated_at string,
+    `_sdc_sequence` string,
+    `_sdc_received_at` string,
+    `_sdc_batched_at` string,
+    `_sdc_table_version` string,
+    url string,
+    name string,
+    deleted string,
+    created_at string
+)
+partitioned by (
+    dt string
+)
+row format serde
   'org.openx.data.jsonserde.JsonSerDe'
-STORED AS INPUTFORMAT
+stored as inputformat
   'org.apache.hadoop.mapred.TextInputFormat'
-OUTPUTFORMAT
+outputformat
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION
-  's3://5a-datalake/raw/zendesk/groups/'
-
-MSCK REPAIR TABLE datalake_raw.zendesk_groups;
+location
+  's3://5a-datalake-leo-test/stitch/zendesk/groups';
