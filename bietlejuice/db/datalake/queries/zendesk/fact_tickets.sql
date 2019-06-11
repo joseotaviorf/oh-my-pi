@@ -49,7 +49,7 @@ house as (
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         cast(dhl.id_house as bigint) as id_house,
-        try_cast(dhl.version as smallint) as version
+        try_cast(coalesce(dhl.version,'1') as smallint) as version
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
@@ -194,8 +194,9 @@ select
 from tickets t
 left join house dhl
 	on t.id_house = dhl.id_house
-    and str_created_date between least(coalesce(dhl.dt_listing_version_start, str_created_date), str_created_date)
-        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')
-    and coalesce(dhl.version, 1) = 1     
+    and str_created_date between 
+        (case when dhl.version = 1 then least(coalesce(dhl.dt_listing_version_start, t.str_created_date), t.str_created_date)
+        else dhl.dt_listing_version_start end)
+        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')     
 left join contract dc
     on id_contract = dc.sk_contract;
