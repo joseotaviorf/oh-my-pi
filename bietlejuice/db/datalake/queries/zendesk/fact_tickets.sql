@@ -48,13 +48,14 @@ house as (
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
-        cast(dhl.id_house as bigint) as id_house
+        cast(dhl.id_house as bigint) as id_house,
+        try_cast(coalesce(dhl.version,'1') as smallint) as version
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
     where
         fhl.sk_owner != '-1'
-    group by 1,2,3,4,5
+    group by 1,2,3,4,5,6
 ),
 ticket_metrics as (
     with row_n as (
@@ -120,6 +121,7 @@ tickets as (
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         cast(t.ts_created as timestamp with time zone) as ts_created,
+        date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d') as str_created_date,
         cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
         cast(t.ts_updated as timestamp with time zone) as ts_updated,
         if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
@@ -192,8 +194,9 @@ select
 from tickets t
 left join house dhl
 	on t.id_house = dhl.id_house
-    and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
-    between dhl.dt_listing_version_start
-    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')      
+    and str_created_date between 
+        (case when dhl.version = 1 then least(coalesce(dhl.dt_listing_version_start, t.str_created_date), t.str_created_date)
+        else dhl.dt_listing_version_start end)
+        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')     
 left join contract dc
     on id_contract = dc.sk_contract;
