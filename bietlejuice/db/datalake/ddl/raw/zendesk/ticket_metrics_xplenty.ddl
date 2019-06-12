@@ -1,0 +1,38 @@
+DROP TABLE if exists datalake_raw.zendesk_ticket_metrics_xplenty;
+CREATE EXTERNAL TABLE if not exists datalake_raw.zendesk_ticket_metrics_xplenty(                                                                                                                                                                                                   
+  id string,                                                                                                                                                                                                                     
+  ticket_id string,                                                                                                                                                                                                              
+  created_at string,                                                                                                                                                                                                             
+  updated_at string,                                                                                                                                                                                                             
+  group_stations string,                                                                                                                                                                                                         
+  assignee_stations string,                                                                                                                                                                                                      
+  reopens string,                                                                                                                                                                                                                
+  replies string,                                                                                                                                                                                                                
+  assignee_updated_at string,                                                                                                                                                                                                    
+  requester_updated_at string,                                                                                                                                                                                                   
+  status_updated_at string,                                                                                                                                                                                                      
+  initially_assigned_at string,                                                                                                                                                                                                  
+  assigned_at string,                                                                                                                                                                                                            
+  solved_at string,                                                                                                                                                                                                              
+  latest_comment_added_at string,                                                                                                                                                                                                
+  reply_time_in_minutes string,                                                                                                                                                                                                  
+  first_resolution_time_in_minutes string,                                                                                                                                                                                       
+  regexp_for_validation string,                                                                                                                                                                                                  
+  full_resolution_time_in_minutes string,                                                                                                                                                                                        
+  agent_wait_time_in_minutes string,                                                                                                                                                                                             
+  requester_wait_time_in_minutes string,                                                                                                                                                                                         
+  on_hold_time_in_minutes string
+)                                                                                                                                                                                                
+PARTITIONED BY (                                                                                                                                                                                                                                               
+  dt string
+)                                                                                                                                                                                                                                                 
+ROW FORMAT SERDE                                                                                                                                                                                                                                               
+  'org.openx.data.jsonserde.JsonSerDe'                                                                                                                                                                                                                         
+STORED AS INPUTFORMAT                                                                                                                                                                                                                                          
+  'org.apache.hadoop.mapred.TextInputFormat'                                                                                                                                                                                                                   
+OUTPUTFORMAT                                                                                                                                                                                                                                                   
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'                                                                                                                                                                                                 
+LOCATION                                                                                                                                                                                                                                                       
+  's3://5a-datalake/raw/zendesk/ticket_metrics/'
+
+MSCK REPAIR TABLE datalake_raw.zendesk_ticket_metrics_xplenty;

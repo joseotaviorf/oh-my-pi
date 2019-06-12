@@ -358,8 +358,8 @@ airflow_helpers.chain(create_conversion_points_supply_daily_task,
 airflow_helpers.chain(create_conversion_points_demand_daily_task,
                       create_conversion_points_demand_weekly_task,
                       create_conversion_points_demand_monthly_task)
-load_fact_marketing_daily_costs_task.set_upstream([create_conversion_points_supply_monthly_task,
-                                                   create_conversion_points_demand_monthly_task])
+supply_funnel_conversions_subdag.set_upstream([create_conversion_points_supply_monthly_task,
+                                               create_conversion_points_demand_monthly_task])
 airflow_helpers.chain(load_fact_marketing_daily_costs_task,
                       supply_funnel_conversions_subdag,
                       demand_funnel_conversions_subdag)

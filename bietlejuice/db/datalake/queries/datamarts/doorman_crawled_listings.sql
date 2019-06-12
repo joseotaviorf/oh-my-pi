@@ -46,12 +46,14 @@ doorman AS (
     CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
       CAST(d.ts_joined_program as timestamp)
     ELSE NULL END AS ts_joined_program_timestamp,
-    leads.lead_activity
+    leads.lead_activity,
+    leads.doorman_total_leads
   FROM datalake_clean.ods_dim_user_doorman d
   LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = a.id_user_doorman
   JOIN datalake_clean.ods_dim_user u ON CAST(d.sk_user_affiliate AS VARCHAR) = u.dados_afiliado_id
   LEFT JOIN (
       SELECT dim_user_affiliate.sk_user AS sk_user,
+             COUNT(*) AS doorman_total_leads,
              max(DATE(dim_date_lead.date)) AS last_date_lead,
              min(DATE(dim_date_lead.date)) AS first_date_lead,
              CASE
@@ -121,9 +123,9 @@ SELECT
     WHEN (d.lead_activity = 'referral last 90 days') THEN 'referral last 90 days'
     WHEN (d.lead_activity = 'referral last 180 days') THEN 'referral last 180 days'
     WHEN (d.lead_activity = 'referral more than 180 days') THEN 'referral more than 180 days'
-    WHEN (d.lead_activity = 'no referral') THEN 'no referral'
+    ELSE 'no referral'
   END AS doorman_activity,
+  d.doorman_total_leads,
   l.*
 FROM doorman d
-INNER JOIN listings_join_doorman l ON l.id_user_doorman = d.id_user_doorman
-ORDER BY CAST(d.id_user_doorman AS INTEGER)
+LEFT JOIN listings_join_doorman l ON l.id_user_doorman = d.id_user_doorman

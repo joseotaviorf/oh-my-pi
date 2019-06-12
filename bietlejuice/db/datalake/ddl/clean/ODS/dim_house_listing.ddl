@@ -57,6 +57,10 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   is_b2b string,
   b2b_type string,
   b2b_prime_type string,
+  is_originals_active string,
+  last_originals_type string,
+  dt_last_originals_opted_in string,
+  dt_last_originals_opted_out string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
@@ -67,5 +71,4 @@ with serdeproperties (
 location 's3://5a-datalake/clean/ods/house_listing'
 tblproperties (
   'skip.header.line.count' = '1'
-)
-;
+);
