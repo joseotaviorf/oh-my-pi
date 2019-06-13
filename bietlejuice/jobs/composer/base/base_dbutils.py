@@ -9,7 +9,7 @@ class BaseDBUtils:
     def get_dbutils(self):
         spark = SparkContext.getOrCreate()
         setting = spark.getConf().get("spark.master")
-        if "local" in setting:
+        if 'local' in setting:
             from pyspark.dbutils import DBUtils
             logger.info('m=get_db_utils, msg=returning local dbutils reference')
             return DBUtils(spark.sparkContext)
