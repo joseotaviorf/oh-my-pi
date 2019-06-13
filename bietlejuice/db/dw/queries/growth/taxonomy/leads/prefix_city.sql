@@ -170,7 +170,7 @@ all_dates as (
         mkt_category,
         mkt_flow,
         mkt_completion,
-        f.mkt_origin,
+        mkt_origin,
         mkt_channel,
         mkt_medium,
         mkt_source,
@@ -184,5 +184,5 @@ all_dates as (
         max(yearly_count) as yearly_count
     from
         all_dates_prev
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
