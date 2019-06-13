@@ -32,6 +32,20 @@ ongoing_listings AS (
   WHERE olsl.week_start >= DATEADD('week', -12, CURRENT_DATE)
   GROUP BY 1, 2
 ),
+ongoing_rentals AS (
+	SELECT
+	  dim_date.date_week AS date_period,
+		sk_region,
+		COUNT(*) AS ongoing_rentals
+	FROM public.dim_contract AS dc
+	JOIN public.fact_listing_rent_flows USING(sk_contract)
+	JOIN (SELECT DATE_TRUNC('week', "date") AS date_week FROM public.dim_date GROUP BY 1) AS dim_date
+	  ON dim_date.date_week >= DATE_TRUNC('week', dc.dt_start)
+			 AND dim_date.date_week <= DATE_TRUNC('week', CURRENT_DATE)
+			 AND dim_date.date_week >= DATE_TRUNC('week', DATEADD('week', -12, CURRENT_DATE))
+	WHERE dc.status = 'Ativo'
+	GROUP BY 1, 2
+),
 visits_completed AS (
   SELECT
     DATE_TRUNC('week', dim_date.date) AS date_period,
@@ -89,6 +103,7 @@ FROM
   FROM contracts_signed
   JOIN visits_booked USING(date_period, sk_region)
   JOIN ongoing_listings USING(date_period, sk_region)
+  JOIN ongoing_rentals USING(date_period, sk_region)
   JOIN visits_completed USING(date_period, sk_region)
   JOIN offers_submitted USING(date_period, sk_region)
   JOIN prospects USING(date_period, sk_region)
