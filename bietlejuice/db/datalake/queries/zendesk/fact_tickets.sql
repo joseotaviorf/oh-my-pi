@@ -49,7 +49,7 @@ house as (
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         cast(dhl.id_house as bigint) as id_house,
-        coalesce(try_cast(dhl.version,'1') as smallint) as version
+        coalesce(try_cast(dhl.version as smallint),'1') as version
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
