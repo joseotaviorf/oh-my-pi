@@ -21,7 +21,7 @@ left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), weekly as (
 select
 	date,
@@ -45,7 +45,7 @@ left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), monthly as (
 select
 	date,
@@ -69,7 +69,7 @@ left join datalake_clean.ods_dim_region dr
     on daus.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 dim_date as (
 SELECT
