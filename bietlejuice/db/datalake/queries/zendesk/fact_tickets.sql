@@ -14,12 +14,12 @@ custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
 	        f1.field,
-	        regexp_extract(f1.field, '{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}]+)', 1), 'null') as value
+	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
+	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
-	    cross join unnest(regexp_extract_all(tf.custom_fields, '{[^}]+[^,]+[^{]+}')) as f1(field)
+	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
         map_agg(tf.raw_title, f.value) as cols
