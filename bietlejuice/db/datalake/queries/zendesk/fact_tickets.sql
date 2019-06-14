@@ -7,6 +7,9 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
+last_updated_ticket_fields as (
+	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
+),
 custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
@@ -19,10 +22,12 @@ custom_fields as (
 	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
-        map_agg(cf.raw_title, f.value) as cols
+        map_agg(tf.raw_title, f.value) as cols
     from parse_fields f
-    inner join datalake_clean.zendesk_ticket_fields cf
-       on cf.id_ticket_fields = f.id_field
+    inner join last_updated_ticket_fields l
+       on l.id_ticket_fields = f.id_field
+    inner join datalake_clean.zendesk_ticket_fields tf
+       on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated 
     where f.value is not null
     group by 1
 ),
@@ -49,7 +54,7 @@ house as (
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
         cast(dhl.id_house as bigint) as id_house,
-        try_cast(coalesce(dhl.version,'1') as smallint) as version
+        coalesce(try_cast(dhl.version as smallint), 1) as version
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
@@ -60,7 +65,7 @@ house as (
 ticket_metrics as (
     with row_n as (
         select
-            t.id_ticket,
+            t.id_ticket, 
             -- it was necessary 2 columns, because there are other update fields,
             -- so, when ts_updated is duplicate, we get data with the last extraction  
             max(dt_extracted) as ts_extracted,
@@ -145,7 +150,7 @@ tickets as (
     on c.id_ticket=t.id_ticket
 )
 select
-    cast(t.id_ticket as bigint) as sk_ticket,
+    sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
     coalesce(dc.sk_contract, -1)  as sk_contract,
     coalesce(dc.sk_client, -1)  as sk_client,
