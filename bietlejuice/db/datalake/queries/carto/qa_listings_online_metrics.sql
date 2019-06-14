@@ -17,8 +17,6 @@ general_info AS (
       dhl.id_house
   FROM datalake_clean.ods_dim_house_listing dhl
   WHERE dhl.ts_publication <> ''
-  AND dhl.status NOT IN ('despublicado', 'excluido', 'alugado')
-  AND dhl.is_last_version = 'True'
 )
 SELECT
   gi.sk_house_listing,
@@ -28,4 +26,4 @@ SELECT
 FROM listing_page_viewed lpv
 JOIN general_info gi
   ON lpv.house_id = gi.id_house
-WHERE event_timestamp >= DATE_ADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', event_timestamp) = DATE_TRUNC('week', CURRENT_DATE)
+WHERE event_timestamp >= DATE_ADD('week', -2, CURRENT_DATE) OR DATE_TRUNC('week', event_timestamp) = DATE_TRUNC('week', CURRENT_DATE)
