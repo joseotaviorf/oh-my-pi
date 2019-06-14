@@ -41,6 +41,9 @@ s_cube as (
 		sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
 		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
 		sum(coalesce(total_{2}_leads, 0)) as total_{2}_leads,
+		sum(coalesce(total_{2}_prospects, 0)) as total_{2}_prospects,
+		sum(coalesce(total_{2}_qualifieds, 0)) as total_{2}_qualifieds,
+		sum(coalesce(total_{2}_opportunities, 0)) as total_{2}_opportunities,
 		sum(coalesce(total_{2}_listings, 0)) as total_{2}_listings
 	from growth.conversion_points_supply_{2}
 	group by 1,2,3,4,5,6,7,8,9,10,11,12
@@ -62,6 +65,9 @@ select
 	coalesce(s_cube.total_{2}_sessions, 0) as total_{2}_sessions,
 	coalesce(s_cube.total_{2}_active_users, 0) as total_{2}_active_users,
 	coalesce(s_cube.total_{2}_leads, 0) as total_{2}_leads,
+	coalesce(s_cube.total_{2}_prospects, 0) as total_{2}_prospects,
+	coalesce(s_cube.total_{2}_qualifieds, 0) as total_{2}_qualifieds,
+	coalesce(s_cube.total_{2}_opportunities, 0) as total_{2}_opportunities,
 	coalesce(s_cube.total_{2}_listings, 0) as total_{2}_listings,
 	getdate() as ts_load
 from fact
