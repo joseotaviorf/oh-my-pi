@@ -35,8 +35,7 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, db, final_sql,
         df = athena.execute_query_and_return_dataframe(
             sql=query,
             paginate=False,
-            page_size=0,
-            query_params={'dt': kwargs['execution_date'].strftime('%Y-%m-%d')})
+            page_size=0)
     elif db == 'dw':
         table = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
