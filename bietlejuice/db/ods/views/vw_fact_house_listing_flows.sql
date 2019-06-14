@@ -12,12 +12,26 @@ with legacy_doorman as (
 	and
 		"Cod Imóvel" is not null
 ),
-base_tasks as (
+base_lead_tasks as (
 	select
 		*,
 		row_number() over (partition by lead_id order by dt_created desc) as rn
 	from
 		crm.lead_tasks
+),
+base_photo_tasks as (
+    select
+        distinct
+        cast(coalesce(i.id,i_direct.id) as integer) as imovel_id
+    from
+    	crm.photo_tasks pt
+    left join public.photo_job pj
+    	on pt.origin_id = pj.id
+    left join public.imovel i
+        on i.id = pj.imovel_id
+    left join public.imovel i_direct
+    	on i_direct.id = pt.origin_id
+    where coalesce(i.id, i_direct.id) is not null
 ),
 base_leads as (
     select
@@ -72,6 +86,20 @@ fact_with_reproc as (
         left join lead lr
             on lr.id = rl.id_origin_lead
 ),
+leads_b2b as (
+  select
+    l.id as id_lead,
+    pa_b2b_online.partner_id as online_partner_id,
+    pa_b2b_prime.partner_id as prime_partner_id
+  from lead l
+  left join usuario u_b2b_prime
+	  on u_b2b_prime.telefone_principal = l.telefone_anunciante
+  left join partner_agent pa_b2b_prime
+	  on pa_b2b_prime.user_id = u_b2b_prime.id
+  left join partner_agent pa_b2b_online
+    on pa_b2b_online.user_id = l.usuario_que_indicou_id
+  where coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id) is not null
+),
 potential_listings as (
 	select
 		f.id as sk_house_listing_flow,
@@ -86,6 +114,7 @@ potential_listings as (
 		coalesce(bt.rep_id, -1) as sk_user_task_assignee,
 		coalesce(f.region_id, -1) as sk_region,
 		coalesce(dr.city_id, r.id, -1) as sk_city,
+		coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
 		coalesce(to_char(f.dt_lead::date,'YYYYMMDD')::integer, -1) as sk_lead_date,
 		coalesce(to_char(f.dt_prospect::date,'YYYYMMDD')::integer, -1) as sk_prospect_date,
 		coalesce(to_char(bt.dt_created::date, 'YYYYMMDD')::integer, -1) as sk_task_created_date,
@@ -142,7 +171,7 @@ potential_listings as (
 		f.days_lead_to_processing,
 		h.exclusivity as is_exclusive,
 		case when bt.rep_id is not null then 'Lead'
-		     when f.rep_id is not null then 'Photojob'
+		     when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
 		end as first_isales_intervention,
 		bl.lead_type,
 		bl.lead_origin,
@@ -159,7 +188,7 @@ potential_listings as (
 		end as is_doorman,
 		(acquisition_channel_rep = 'Inside Sales') as is_isales_direct_register,
 		(acquisition_channel_rep = 'Admin') as is_cx_direct_register,
-		(coalesce(f.rep_id, bt.rep_id) is not null) as has_isales_intervention,
+		(coalesce(f.rep_id, bt.rep_id, bpt.imovel_id) is not null) as has_isales_intervention,
 		(us_cad.id is not null) as is_call_center
 	from
 		fact_with_reproc f
@@ -170,9 +199,12 @@ potential_listings as (
 		legacy_doorman d
 		on f.imovel_id = d.imovel_id
 	left join
-		base_tasks bt
+		base_lead_tasks bt
 		on bt.lead_id = f.lead_id
 		and bt.rn = 1
+	left join
+	    base_photo_tasks bpt
+	    on f.imovel_id = bpt.imovel_id
 	left join
 		rep_leads bl
 		on bl.lead_id = f.lead_id
@@ -195,6 +227,10 @@ potential_listings as (
         on r.nivel = 'Cidade' and
         regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '','g') =
 		regexp_replace(remove_accentuation(lower(r.nome)), '[^a-z]+', '','g')
+	left join leads_b2b l_b2b
+      on l_b2b.id_lead = f.lead_id
+    left join partner_agent pa_b2b_prime
+      on h.usuario_id = pa_b2b_prime.user_id
 ),
 taxonomy as (
     select
@@ -232,6 +268,7 @@ select
 	pl.sk_user_task_assignee,
 	pl.sk_region,
 	pl.sk_city,
+	pl.sk_partner,
 	pl.sk_lead_date,
 	pl.sk_prospect_date,
 	pl.sk_task_created_date,

@@ -28,14 +28,16 @@ with weekly_schedule_prev as (
 				horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
 			]
 		) as t(key, value)
-), weekly_schedule as (
+)
+, weekly_schedule as (
 	select
 		*,
 		lead(dt_update) over (partition by agent_id, dow, slot_number order by dt_update) as dt_next_update,
 		lag(available_slot) over (partition by agent_id, dow, slot_number order by dt_update) as previous_status
 	from
 		weekly_schedule_prev
-), specific_schedule as (
+)
+, specific_schedule as (
 	select distinct
 		agente_id as agent_id,
 		max(cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key)  as dt_update,
@@ -63,7 +65,8 @@ with weekly_schedule_prev as (
 				disponivel19as20,disponivel19as20,disponivel19as20,disponivel19as20
 			]
 		) as t(key, value)
-), ss_visits as (
+)
+, ss_visits as (
 	select distinct
 		a.agente_id as agent_id,
 		date_add('minute',15 * cast(a.slotdia as integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') as date) as timestamp))) as slot_dt
@@ -79,6 +82,7 @@ with weekly_schedule_prev as (
 	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
 	  and a.tipo = 'Visita'
 	  and vo.nome in ('Inquilinos', 'SelfServiceWeb')
+	  and cast(nullif(trim(a."data"),'') as date) >= date'2019-01-01'
 ), full_visits as (
 	select distinct
 		a.agente_id as agent_id,
@@ -91,6 +95,7 @@ with weekly_schedule_prev as (
 		and aa.revtype='0'
 	where a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
 	  and a.tipo = 'Visita'
+	  and cast(nullif(trim(a."data"),'') as date) >= date'2019-01-01'
 ), base_time as (
 	select
     cast(date_column AS timestamp) as dt,
@@ -98,13 +103,13 @@ with weekly_schedule_prev as (
 		date_diff('minute', date_trunc('day', cast(date_column AS timestamp)) + interval '8' hour, cast(date_column AS timestamp))/15 as slot_number
 	from
 		(
-			values(sequence(from_iso8601_date('2015-01-01'),current_date + interval '2' month, interval '15' minute))
+			values(sequence(from_iso8601_date('2019-01-01'),current_date + interval '2' month, interval '15' minute))
 		) AS t1(date_array)
 	cross join
 	    unnest(date_array) as t2(date_column)
 	where
 		hour(cast(date_column AS timestamp)) between 7 and 21
-		and cast(date_column AS timestamp) >= cast('2015-01-01' AS timestamp)
+		and cast(date_column AS timestamp) >= cast('2019-01-01' AS timestamp)
 ), schedule_versions as (
 	select
 		agent_id,
@@ -178,7 +183,8 @@ with weekly_schedule_prev as (
 		on bs.agent_id = ss.agent_id
 		and bs.slot_dt = ss.slot_dt
 	order by bs.slot_dt
-), time_window_updates as (
+)
+, time_window_updates as (
 	select
 		sc.agent_id,
 		sc.agent_type,

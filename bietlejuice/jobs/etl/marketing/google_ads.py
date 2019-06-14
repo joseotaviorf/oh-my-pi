@@ -67,7 +67,8 @@ class GoogleAds(Marketing):
         self._move_to_clean(
             table_name='marketing_google_campaigns',
             sql_file_name='campaign.sql',
-            r_cols=r_cols
+            r_cols=r_cols,
+            validate_data=True
         )
 
     @logger
@@ -114,7 +115,8 @@ class GoogleAds(Marketing):
             table_name='marketing_google_keywords',
             sql_file_name='keyword.sql',
             r_cols=r_cols,
-            c_cols=c_cols
+            c_cols=c_cols,
+            validate_data=True
         )
 
     @logger
@@ -169,7 +171,8 @@ class GoogleAds(Marketing):
             table_name='marketing_google_ads',
             sql_file_name='ad.sql',
             r_cols=r_cols,
-            c_cols=c_cols
+            c_cols=c_cols,
+            validate_data=True
         )
 
     @logger(exclude='account')

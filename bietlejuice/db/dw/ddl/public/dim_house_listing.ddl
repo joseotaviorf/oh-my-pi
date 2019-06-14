@@ -54,6 +54,13 @@ create table dim_house_listing (
   key_location varchar,
   has_visit_restriction boolean,
   house_predicted_price numeric(14,2),
+  is_b2b boolean,
+  b2b_type varchar,
+  b2b_prime_type varchar,
+  is_originals_active boolean,
+  last_originals_type varchar,
+  dt_last_originals_opted_in date,
+  dt_last_originals_opted_out date,
   ts_load timestamp
 )
 ;

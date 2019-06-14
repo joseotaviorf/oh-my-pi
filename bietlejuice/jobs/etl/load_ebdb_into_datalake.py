@@ -4,9 +4,10 @@ from io import BytesIO
 import boto3
 import pandas as pd
 import petl
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
+
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 
 logger = QuintoAndarLogger('EBDBDatalake')
 
@@ -167,7 +168,7 @@ class EBDBDatalake(object):
 
         command = 'create external table {}.{}_{} (\n'.format(athena_db, EBDBDatalake.SCHEMA_NAME, table_name)
         for column, original_type in columns:
-            command += '\t{} string,\n'.format(column)
+            command += '\t`{}` string,\n'.format(column)
         command = command[:-2]  # remove last comma
         command += ddl_suffix.format(self.bucket_datalake, EBDBDatalake.SCHEMA_NAME, table_name)
 

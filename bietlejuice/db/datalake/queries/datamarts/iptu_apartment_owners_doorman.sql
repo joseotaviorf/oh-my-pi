@@ -2,7 +2,7 @@ WITH doorman AS (
   SELECT
     d.*,
     CASE
-      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
       ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
     END AS extracted_work_house_number,
     CASE
@@ -171,9 +171,9 @@ SELECT
     WHEN contains(d.doorman_active, 'referral last 90 days') THEN 'referral last 90 days'
     WHEN contains(d.doorman_active, 'referral last 180 days') THEN 'referral last 180 days'
     WHEN contains(d.doorman_active, 'referral more than 180 days') THEN 'referral more than 180 days'
-    WHEN contains(d.doorman_active, 'no referral') THEN 'no referral'
+    ELSE 'no referral'
   END AS most_active_doorman,
   a.*
 FROM apts a
-INNER JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
+LEFT JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
 ORDER BY a.google_formatted_address, a.complemento_imovel

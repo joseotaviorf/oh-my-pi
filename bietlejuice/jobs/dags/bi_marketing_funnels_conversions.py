@@ -6,6 +6,8 @@ from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.dags.marketing_funnels_conversions import FunnelConversionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.etl.amplitude.growth_amplitude import GrowthAmplitude
@@ -162,10 +164,53 @@ def move_file_query_data_to_dw(schema, file_name):
     )
 
 
+def create_supply_funnel_conversions_sub_dag(sub_dag_name):
+    sub_dag = FunnelConversionSubDag(
+        bucket=bucket,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        funnel_side='supply'
+    )
+
+    return sub_dag.build_subdag()
+
+
+def create_demand_funnel_conversions_sub_dag(sub_dag_name):
+    sub_dag = FunnelConversionSubDag(
+        bucket=bucket,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        funnel_side='demand'
+    )
+
+    return sub_dag.build_subdag()
+
+
 # measures with taxonomy detail
 taxonomy_leads_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                              materialize_growth_measure_table_query, 'leads',
+                                              materialize_growth_measure_table_query,
+                                              'leads',
                                               'taxonomy')
+
+taxonomy_prospects_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                  materialize_growth_measure_table_query,
+                                                  'prospects',
+                                                  'taxonomy')
+
+taxonomy_qualifieds_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                   materialize_growth_measure_table_query,
+                                                   'qualifieds',
+                                                   'taxonomy')
+
+taxonomy_opportunities_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+                                                      materialize_growth_measure_table_query,
+                                                      'opportunities',
+                                                      'taxonomy')
+
 taxonomy_visits_booked_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                       materialize_growth_measure_table_query,
                                                       'visits_booked',
@@ -272,30 +317,49 @@ load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
                'file_name': 'fact_marketing_daily_costs'}
 )
 
-load_fact_daily_supply_funnel_conversions_task = BaseDAG.build_python_operator(
+supply_funnel_conversions_subdag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    task_id='load_fact_daily_supply_funnel_conversions',
-    python_callable=move_file_query_data_to_dw,
-    op_kwargs={'schema': 'marketing',
-               'file_name': 'fact_daily_supply_funnel_conversions'}
+    sub_dag_func=create_supply_funnel_conversions_sub_dag,
+    sub_dag_name='supply_funnel_conversions'
 )
 
-load_fact_daily_demand_funnel_conversions_task = BaseDAG.build_python_operator(
+demand_funnel_conversions_subdag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    task_id='load_fact_daily_demand_funnel_conversions',
-    python_callable=move_file_query_data_to_dw,
-    op_kwargs={'schema': 'marketing',
-               'file_name': 'fact_daily_demand_funnel_conversions'}
+    sub_dag_func=create_demand_funnel_conversions_sub_dag,
+    sub_dag_name='demand_funnel_conversions'
 )
 
 # flow
 airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_active_user_sessions_sub_dag,
-                      taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag,
-                      taxonomy_leads_sub_dag, taxonomy_listings_sub_dag, taxonomy_visits_booked_sub_dag,
-                      taxonomy_visits_completed_sub_dag, taxonomy_offers_submitted_sub_dag,
-                      taxonomy_offers_approved_sub_dag, taxonomy_contracts_signed_sub_dag,
-                      create_conversion_points_supply_daily_task, create_conversion_points_demand_daily_task,
-                      create_conversion_points_supply_weekly_task, create_conversion_points_demand_weekly_task,
-                      create_conversion_points_supply_monthly_task, create_conversion_points_demand_monthly_task,
-                      load_fact_marketing_daily_costs_task, load_fact_daily_supply_funnel_conversions_task,
-                      load_fact_daily_demand_funnel_conversions_task)
+                      taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag)
+taxonomy_demand_active_user_sessions_sub_dag.set_downstream([taxonomy_leads_sub_dag,
+                                                             taxonomy_prospects_sub_dag,
+                                                             taxonomy_qualifieds_sub_dag,
+                                                             taxonomy_opportunities_sub_dag,
+                                                             taxonomy_listings_sub_dag,
+                                                             taxonomy_visits_booked_sub_dag,
+                                                             taxonomy_visits_completed_sub_dag,
+                                                             taxonomy_offers_submitted_sub_dag,
+                                                             taxonomy_offers_approved_sub_dag,
+                                                             taxonomy_contracts_signed_sub_dag])
+create_conversion_points_supply_daily_task.set_upstream([taxonomy_leads_sub_dag,
+                                                         taxonomy_prospects_sub_dag,
+                                                         taxonomy_qualifieds_sub_dag,
+                                                         taxonomy_opportunities_sub_dag,
+                                                         taxonomy_listings_sub_dag])
+create_conversion_points_demand_daily_task.set_upstream([taxonomy_visits_booked_sub_dag,
+                                                         taxonomy_visits_completed_sub_dag,
+                                                         taxonomy_offers_submitted_sub_dag,
+                                                         taxonomy_offers_approved_sub_dag,
+                                                         taxonomy_contracts_signed_sub_dag])
+airflow_helpers.chain(create_conversion_points_supply_daily_task,
+                      create_conversion_points_supply_weekly_task,
+                      create_conversion_points_supply_monthly_task)
+airflow_helpers.chain(create_conversion_points_demand_daily_task,
+                      create_conversion_points_demand_weekly_task,
+                      create_conversion_points_demand_monthly_task)
+supply_funnel_conversions_subdag.set_upstream([create_conversion_points_supply_monthly_task,
+                                               create_conversion_points_demand_monthly_task])
+airflow_helpers.chain(load_fact_marketing_daily_costs_task,
+                      supply_funnel_conversions_subdag,
+                      demand_funnel_conversions_subdag)

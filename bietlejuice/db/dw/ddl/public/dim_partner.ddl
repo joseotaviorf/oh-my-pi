@@ -3,6 +3,7 @@ create table dim_partner (
     sk_partner bigint,
     id_partner bigint,
     name varchar(255)  DEFAULT NULL,
+    trade_name varchar(255)  DEFAULT NULL,
     phone varchar(255) DEFAULT NULL,
     email varchar(255) DEFAULT NULL,
     cnpj varchar(255)  DEFAULT NULL,

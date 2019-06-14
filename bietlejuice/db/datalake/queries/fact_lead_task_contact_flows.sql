@@ -47,6 +47,8 @@ SELECT
     try(date_parse(events.ts_first_call, '%Y-%m-%d %H:%i:%s.%f')) as ts_first_call,
     cast(try(date_format(date_parse(events.ts_first_connection, '%Y-%m-%d %H:%i:%s.%f'), '%Y%m%d')) as integer) as sk_first_connection_date,
     try(date_parse(events.ts_first_connection, '%Y-%m-%d %H:%i:%s.%f')) as ts_first_connection,
+    coalesce((mlc.active = 'Y'), false) as is_mailing_active,
+    coalesce((mlc.estado = 'P'), false) as is_mailing_paused,
     now() as ts_load
 FROM datalake_raw.ebdb_lead l
 JOIN tasks_updated t on t.id_origin = l.id
@@ -54,3 +56,4 @@ LEFT JOIN datalake_clean.autodialer_task_references r on r.task_id = t.id
 LEFT JOIN mailing_list_updated_max m1 on m1.codigo = r.task_id
 LEFT JOIN mailing_list_updated_min m2 on m2.codigo = r.task_id
 LEFT JOIN first_call events on events.task_id = t.id
+LEFT JOIN datalake_raw.autodialer_mailing_list_conf mlc on mlc.id = m1.easy_disc_mailing_conf_id

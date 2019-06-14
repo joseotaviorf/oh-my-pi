@@ -12,7 +12,7 @@ create table if not exists crm.dim_lead_task (
   type varchar,
   description varchar(2000),
   titles varchar(2000),
-  workgroups varchar,
+  workgroups varchar(1024),
   ts_load timestamp
 )
 ;

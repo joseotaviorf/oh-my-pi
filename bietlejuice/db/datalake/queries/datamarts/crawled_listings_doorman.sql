@@ -52,7 +52,7 @@ doorman AS (
   SELECT
     d.*,
     CASE
-      WHEN COALESCE(d.work_place_id, '') != '' THEN d.work_house_number
+      WHEN COALESCE(d.work_place_id, '') != '' AND COALESCE(d.work_house_number, '') != '' THEN d.work_house_number
       ELSE regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')
     END AS extracted_work_house_number,
     CASE
@@ -125,7 +125,7 @@ listings_join_doorman AS
         ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
       )
     )
-    AND CAST(l.nb_street AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
+    AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
     -- guarantee only 1 bldg match per doorman (nearest?)
   GROUP BY l.id
 )
@@ -151,7 +151,7 @@ SELECT
     WHEN contains(d.doorman_active, 'referral last 90 days') THEN 'referral last 90 days'
     WHEN contains(d.doorman_active, 'referral last 180 days') THEN 'referral last 180 days'
     WHEN contains(d.doorman_active, 'referral more than 180 days') THEN 'referral more than 180 days'
-    WHEN contains(d.doorman_active, 'no referral') THEN 'no referral'
+    ELSE 'no referral'
   END AS most_active_doorman,
   l.website,
   l.url,

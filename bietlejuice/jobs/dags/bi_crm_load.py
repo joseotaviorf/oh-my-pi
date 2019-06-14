@@ -1,10 +1,12 @@
+from datetime import datetime
+
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
-from datetime import datetime
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.base.new_base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.crm.task_titles import CRMTaskTitles
 from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTableEnum
@@ -17,7 +19,7 @@ mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
 MAIN_DAG_ID = 'bi-crm-load'
 MAIN_START_DATE = datetime(2018, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
+MAIN_SCHEDULE_INTERVAL = None  # will get triggered by bi-supply-demand-etl
 
 
 # functions
@@ -481,6 +483,19 @@ tasks_collection_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     class_=CRMTasksTableEnum.COLLECTION
 )
 
+fact_lead_tasks_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='fact_lead_tasks',
+    python_callable=BaseETL.move_file_query_data_to_db,
+    op_kwargs={'schema': 'crm',
+               'file_name': '{}/crm/fact_lead_tasks.sql'.format(DW_QUERIES_DIR),
+               'append': False,
+               'db_enum_source': EnumDB.BI_DW,
+               'db_enum_destination': EnumDB.BI_DW,
+               'table_name': 'fact_lead_tasks'
+               }
+)
+
 # flow
 airflow_helpers.chain(
     extract_and_load_tasks_task,
@@ -515,5 +530,6 @@ tasks_tasks = [
 
 workgroups_sub_dag_task.set_downstream(tasks_tasks)
 task_titles_sub_dag_task.set_downstream(tasks_tasks)
+airflow_helpers.chain(tasks_lead_sub_dag_task, fact_lead_tasks_task)
 
 # TODO: add unit tests

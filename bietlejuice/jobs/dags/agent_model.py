@@ -106,12 +106,11 @@ def create_fact_photographer(**kwargs):
     exec_date = kwargs['execution_date']
     table_name = 'fact_photographer'
     ar = Agent(bucket_datalake)
-    ar.clean_daily_data_in_table(enum=EnumDB.BI_DW,
-                                 schema='public',
-                                 dim_name=table_name,
-                                 date_column='sk_slot_date',
-                                 dt=exec_date,
-                                 format='YYYYMMDD')
+    ar.clean_greater_than_daily_data_in_table(enum=EnumDB.BI_DW,
+                                              schema='public',
+                                              dim_name=table_name,
+                                              date_column='sk_slot_date',
+                                              dt=exec_date)
     ar.create_table_dw(table_name=table_name, append=True, dt=exec_date)
 
 

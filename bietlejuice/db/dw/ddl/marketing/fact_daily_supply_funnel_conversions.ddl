@@ -9,13 +9,16 @@ CREATE TABLE if NOT EXISTS marketing.fact_daily_supply_funnel_conversions (
     mkt_medium varchar,
     mkt_source varchar,
     mkt_platform varchar,
-    utm_campaign varchar(512),
+    utm_campaign varchar(2048),
     utm_term varchar(512),
     utm_content varchar(512),
     cost numeric(16,4),
     total_daily_sessions integer,
     total_daily_active_users integer,
     total_daily_leads integer,
+    total_daily_prospects integer,
+    total_daily_qualifieds integer,
+    total_daily_opportunities integer,
     total_daily_listings integer,
     ts_load timestamp
 )
