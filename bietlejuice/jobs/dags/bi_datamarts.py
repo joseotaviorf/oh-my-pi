@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import yaml
 
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
@@ -109,21 +110,31 @@ for operator in operators:
     Gets all files from queries_dir/datamarts/ and creates a table using the filename
     '''
     for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
-        filename_split = filename.split('.')
+        if filename.endswith('.sql'):
+            filename_split = filename.split('.')
+            table_name = filename_split[0]
+            task = BaseDAG.build_python_operator(
+                dag=main_dag,
+                task_id='{}_{}'.format(operator['db'], table_name),
+                provide_context=True,
+                python_callable=operator['python_callable'],
+                op_kwargs={'table_name': table_name}
+            )
 
-        if len(filename_split) < 1:
-            logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
-            continue
-
-        if filename_split[1] != 'sql':
-            logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
-            continue
-
-        table_name = filename_split[0]
-        BaseDAG.build_python_operator(
-            dag=main_dag,
-            task_id='{}_{}'.format(operator['db'], table_name),
-            provide_context=True,
-            python_callable=operator['python_callable'],
-            op_kwargs={'table_name': table_name}
-        )
+for operator in operators:
+    '''
+    Gets all config files from queries_dir/datamarts/ and sets task configs
+    '''
+    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
+        if filename.endswith(('.yml', 'yaml')):
+            filename_split = filename.split('.')
+            table_name = filename_split[0]
+            task_id = '{}_{}'.format(operator['db'], table_name)
+            current_task = main_dag.task_dict[task_id]
+            file_path = '{}/{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA, filename)
+            with open(file_path, 'r') as stream:
+                config = yaml.safe_load(stream)
+                if 'upstream' in config:
+                    upstream = config['upstream']
+                    for upstream_task_id in upstream:
+                        current_task.set_upstream(main_dag.task_dict[upstream_task_id])
