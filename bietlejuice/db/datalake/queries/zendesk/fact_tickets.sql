@@ -7,6 +7,9 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
+last_updated_ticket_fields as (
+	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
+),
 custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
@@ -19,10 +22,12 @@ custom_fields as (
 	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
-        map_agg(cf.raw_title, f.value) as cols
+        map_agg(tf.raw_title, f.value) as cols
     from parse_fields f
-    inner join datalake_clean.zendesk_ticket_fields cf
-       on cf.id_ticket_fields = f.id_field
+    inner join last_updated_ticket_fields l
+       on l.id_ticket_fields = f.id_field
+    inner join datalake_clean.zendesk_ticket_fields tf
+       on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated 
     where f.value is not null
     group by 1
 ),
@@ -145,7 +150,7 @@ tickets as (
     on c.id_ticket=t.id_ticket
 )
 select
-    cast(t.id_ticket as bigint) as sk_ticket,
+    sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
     coalesce(dc.sk_contract, -1)  as sk_contract,
     coalesce(dc.sk_client, -1)  as sk_client,
