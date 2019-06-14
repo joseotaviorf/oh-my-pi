@@ -375,7 +375,7 @@ class BaseETL(object):
                 length_text = '({})'.format(max_length)
             else:
                 length_text = ''
-            column_text = ' {} varchar{}'.format(column['name'], length_text)
+            column_text = ' "{}" varchar{}'.format(column['name'], length_text)
             df_columns_text.append(column_text)
         df_columns_text = ', '.join(df_columns_text)
         statement = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(table_name, df_columns_text)
