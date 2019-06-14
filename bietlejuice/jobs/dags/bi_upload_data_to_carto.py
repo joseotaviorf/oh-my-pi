@@ -84,7 +84,7 @@ tasks = [
      'final_sql': None},
     {'carto_table_name': 'qa_listings_metrics',
      'db': 'dw',
-     'final_sql': 'UPDATE qa_listings_metrics SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL'}
+     'final_sql': None}
 ]
 
 MAIN_DAG_NAME = 'bi-upload-data-to-carto'
