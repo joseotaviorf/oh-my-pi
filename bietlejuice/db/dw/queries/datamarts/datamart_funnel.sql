@@ -4,9 +4,7 @@ select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	case when dl.is_b2b is true or dhl.is_b2b is true
-	then true
-	else false end as is_b2b,
+	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
@@ -44,9 +42,7 @@ select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	case when (dl.is_b2b = true OR dhl.is_b2b = true)
-	then true
-	else false end as is_b2b,
+	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
@@ -84,9 +80,7 @@ select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	case when (dl.is_b2b = true OR dhl.is_b2b = true)
-	then true
-	else false end as is_b2b,
+	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
@@ -124,9 +118,7 @@ select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	case when (dl.is_b2b = true OR dhl.is_b2b = true)
-	then true
-	else false end as is_b2b,
+	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
