@@ -121,6 +121,7 @@ for operator in operators:
                 op_kwargs={'table_name': table_name}
             )
 
+# FIXME: I could actually get all files, append to a list, then run the sql files first and the yml after
 for operator in operators:
     '''
     Gets all config files from queries_dir/datamarts/ and sets task configs
