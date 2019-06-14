@@ -1,94 +1,24 @@
-WITH listing_metrics AS (
+WITH
+visits_booked AS (
   SELECT
-  	dim_house_listing.sk_house_listing AS "sk_house_listing",
-  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking >= 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS "visits_booked",
-  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking >= 0) AND (fact_listing_rent_flows.flg_visit_completed  > 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS "visits_completed",
-  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_offer_submitted_date >= 0) THEN fact_listing_rent_flows.sk_offer  ELSE NULL END) AS "offers_submitted",
-  	COUNT(DISTINCT CASE WHEN fact_listing_rent_flows.days_offer_submitted_to_internal_analysis IS NOT NULL THEN fact_listing_rent_flows.sk_offer END) AS "offers_processed",
-  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_offer_approved_date >= 0) THEN fact_listing_rent_flows.sk_offer  ELSE NULL END) AS "offers_accepted",
-  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_contract_signed_date >= 0) THEN fact_listing_rent_flows.sk_contract  ELSE NULL END) AS "contracts_signed"
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_house_listing,
+  	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_booked
+	FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
+	LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+	GROUP BY 1, 2
+),
+visits_completed AS (
+  SELECT
+    DATE_TRUNC('week', dim_date.date) AS date_period,
+    fact_listing_rent_flows.sk_house_listing,
+    COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) AND (fact_listing_rent_flows.flg_visit_completed  > 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_completed
   FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-  FULL OUTER JOIN public.dim_house_listing AS dim_house_listing ON fact_listing_rent_flows.sk_house_listing = dim_house_listing.sk_house_listing
-  LEFT JOIN public.dim_date AS dim_date_house_listing ON (DATE(dim_date_house_listing.date)) = (DATE(dim_house_listing.ts_publication))
-  WHERE
-  	dim_date_house_listing.date >= DATE('2018-10-01')
-  GROUP BY 1
+  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+  WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
+  GROUP BY 1, 2
 )
-SELECT
-  dhl.sk_house_listing,
-  dhl.id_house,
-  dhl.short_id_house,
-  dhl.version,
-  dhl.status,
-  dhl.ts_listing_version_start,
-  dhl.ts_listing_version_end,
-  dhl.ts_house_registration_first_verification,
-  dhl.ts_house_last_confirmation_availability,
-  dhl.ts_house_first_publication,
-  dhl.ts_house_last_publication,
-  dhl.ts_publication,
-  dhl.ts_de_publication,
-  dhl.rent,
-  dhl.house_rent,
-  dhl.house_neighborhood,
-  dhl.house_zipcode,
-  dhl.house_city,
-  dhl.house_complement,
-  dhl.house_condo,
-  dhl.house_elevator,
-  dhl.house_address,
-  dhl.house_iptu,
-  dhl.house_lat,
-  dhl.house_lng,
-  dhl.is_house_furnished,
-  dhl.house_number,
-  dhl.house_bathrooms,
-  dhl.house_bedrooms,
-  dhl.house_suites,
-  dhl.house_garages,
-  dhl.house_status,
-  dhl.house_type,
-  dhl.house_entrance,
-  dhl.house_garage_type,
-  dhl.is_house_registration_verified,
-  dhl.house_total_value,
-  dhl.house_total_area,
-  dhl.house_construction_area,
-  dhl.house_condo_type,
-  dhl.house_iptu_type,
-  dhl.ts_house_create,
-  dhl.ts_house_update,
-  dhl.registration_abandoned_reason,
-  dhl.house_unpublished_reason,
-  dhl.listing_category_start,
-  dhl.listing_category_end,
-  dhl.is_last_version,
-  dhl.is_exclusive,
-  dhl.who_is_living,
-  dhl.key_type,
-  dhl.key_location,
-  dhl.has_visit_restriction,
-  dhl.house_predicted_price,
-  dhl.is_b2b,
-  dhl.b2b_type,
-  dhl.b2b_prime_type,
-  dhl.ts_load,
-  fhl.sk_region,
-  fhl.sk_owner,
-  fhl.sk_contract,
-  fhl.sk_stranded_date,
-  fhl.days_listing_to_contract_signed,
-  fhl.days_listing_to_depublication,
-  fhl.days_ended_rental_to_relisting,
-  fhl.days_relisting_to_re_rental,
-  fhl.days_ended_rental_to_re_rented,
-  fhl.nr_renting,
-  lm.visits_booked,
-  lm.visits_completed,
-  lm.offers_submitted,
-  lm.offers_processed,
-  lm.offers_accepted,
-  lm.contracts_signed
-FROM dim_house_listing dhl
-JOIN fact_house_listings fhl USING(sk_house_listing)
-JOIN listing_metrics lm USING(sk_house_listing)
+SELECT *
+FROM visits_booked
+JOIN visits_completed USING(date_period, sk_house_listing)
