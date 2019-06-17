@@ -1,1 +1,3 @@
+# Config for kpi_datamart
+---
 upstream: ['dw_ongoing_listed_suspended_listings']
