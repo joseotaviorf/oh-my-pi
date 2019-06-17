@@ -91,7 +91,6 @@ select
  ls1.mkt_flow,
  ls1.mkt_completion,
  ls1.mkt_origin,
- ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
