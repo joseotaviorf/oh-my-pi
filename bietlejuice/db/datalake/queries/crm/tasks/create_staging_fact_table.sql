@@ -47,7 +47,14 @@ prev_tasks as (
        )), -1) as sk_task_user_end_date,
     ct.ts_task_user_end,
     ct.task_user_type,
-    ct.task_user_resolve_hours,
+    coalesce(
+      cast(ct.task_user_resolve_hours as decimal),
+      round(date_diff('second',
+                      cast(lag(ct.ts_action) over (partition by ct.id order by ct.ts_action) as timestamp),
+                      cast(ts_action as timestamp)
+            ) / 3600.0, 1
+      )
+    ) as task_user_resolve_hours,
     cast(ct.dt as date) as dt_partition
   from datalake_clean.crm_tasks_resolution ct
   join max_date md

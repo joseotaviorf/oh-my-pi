@@ -39,7 +39,7 @@ house_status_and_dimensions as (
 		hsd.status,
 		dr.city_group,
 	    dr.city_name as city,
-	    dr.macro_name as macro_region,
+	    dr.region_code,
 	    dr.name as neighborhood,
 	    date(date_trunc('week', dhl.ts_publication)) as week_start_publication,
 	    case when dhl.house_bedrooms in (0,1) then 1
@@ -57,7 +57,7 @@ ongoing_listings_wk_snapshot as (
 	select
 		hsd.city_group,
 	    hsd.city,
-	    hsd.macro_region,
+	    hsd.region_code,
 	    hsd.neighborhood,
 	    hsd.week_start,
 	    hsd.week_start_publication,
@@ -74,7 +74,7 @@ bookings as (
 	select
 		hsd.city_group,
 		hsd.city,
-		hsd.macro_region,
+		hsd.region_code,
 		hsd.neighborhood,
 	    hsd.week_start,
 	    hsd.week_start_publication,
@@ -106,7 +106,7 @@ listing_page_views as (
 	select
 		hsd.city_group,
 		hsd.city,
-		hsd.macro_region,
+		hsd.region_code,
 		hsd.neighborhood,
 	    hsd.week_start,
 	    hsd.week_start_publication,
@@ -122,7 +122,7 @@ results as (
 	select
    		coalesce(ol.city_group, coalesce(vb.city_group, lpv.city_group)) as "city_group",
 		coalesce(ol.city, coalesce(vb.city, lpv.city)) as "city",
-		coalesce(ol.macro_region, coalesce(vb.macro_region, lpv.macro_region)) as "macro_region",
+		coalesce(ol.region_code, coalesce(vb.region_code, lpv.region_code)) as "region_code",
 		coalesce(ol.neighborhood, coalesce(vb.neighborhood, lpv.neighborhood)) as "neighborhood",
 	    coalesce(ol.week_start, coalesce(vb.week_start, lpv.week_start)) as "week_start",
 		coalesce(ol.week_start_publication, coalesce(vb.week_start_publication, lpv.week_start_publication)) as "week_start_publication",
@@ -135,7 +135,7 @@ results as (
 	full join bookings vb on
 	    vb.city_group = ol.city_group and
 	    vb.city = ol.city and
-		vb.macro_region = ol.macro_region and
+		vb.region_code = ol.region_code and
 		vb.neighborhood = ol.neighborhood and
 	    vb.week_start = ol.week_start and
 		vb.week_start_publication = ol.week_start_publication and
@@ -144,7 +144,7 @@ results as (
 	full join listing_page_views lpv on
 	    lpv.city_group = ol.city_group and
 	    lpv.city = ol.city and
-		lpv.macro_region = ol.macro_region and
+		lpv.region_code = ol.region_code and
 		lpv.neighborhood = ol.neighborhood and
 	    lpv.week_start = ol.week_start and
 		lpv.week_start_publication = ol.week_start_publication and

@@ -7,22 +7,27 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
+last_updated_ticket_fields as (
+	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
+),
 custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
 	        f1.field,
 	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?([^\\?"|}}]+)', 1), 'null') as value
+	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
 	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 	)
 	select f.id_ticket,
-        map_agg(cf.raw_title, f.value) as cols
+        map_agg(tf.raw_title, f.value) as cols
     from parse_fields f
-    inner join datalake_clean.zendesk_ticket_fields cf
-       on cf.id_ticket_fields = f.id_field
+    inner join last_updated_ticket_fields l
+       on l.id_ticket_fields = f.id_field
+    inner join datalake_clean.zendesk_ticket_fields tf
+       on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated 
     where f.value is not null
     group by 1
 ),
@@ -48,21 +53,19 @@ house as (
         -- Athena can't convert the format 'yyyy-mm-dd hh:mm:ss.xxxx' to timestamp with time zone
         regexp_extract(dhl.ts_listing_version_start, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_start,
         regexp_extract(dhl.ts_listing_version_end, '\d{{4}}-\d{{2}}-\d{{2}}') as dt_listing_version_end,
-        coalesce(dhl.id_house, dhl.short_id_house) as id_house    
+        cast(dhl.id_house as bigint) as id_house,
+        coalesce(try_cast(dhl.version as smallint), 1) as version
     from datalake_clean.ods_dim_house_listing dhl 
     left join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing 
     where
         fhl.sk_owner != '-1'
-        -- Athena has shown that it has problems doing left joins with 'or'
-    	and dhl.id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
-    	or dhl.short_id_house in (select distinct cf.cols['Código do Imóvel'] from custom_fields cf)
-    group by 1,2,3,4,5
+    group by 1,2,3,4,5,6
 ),
 ticket_metrics as (
     with row_n as (
         select
-            t.id_ticket,
+            t.id_ticket, 
             -- it was necessary 2 columns, because there are other update fields,
             -- so, when ts_updated is duplicate, we get data with the last extraction  
             max(dt_extracted) as ts_extracted,
@@ -114,11 +117,16 @@ ticket_metrics as (
 tickets as (
     select
         cast(t.id_ticket as bigint) as sk_ticket,
+        -- id_contract and id_house may be filled with string (filled wrong)
+        -- id_house may be filled with id_house or short_id_house
+        if(length(c.cols['Código do Imóvel']) < 9, 892700000 + try_cast(c.cols['Código do Imóvel'] as bigint), try_cast(c.cols['Código do Imóvel'] as bigint)) as id_house,
+        try_cast(c.cols['Código do Contrato'] as bigint) as id_contract,
         tm.*,
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
         cast(t.ts_created as timestamp with time zone) as ts_created,
+        date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d') as str_created_date,
         cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
         cast(t.ts_updated as timestamp with time zone) as ts_updated,
         if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
@@ -138,9 +146,11 @@ tickets as (
         on t.id_ticket = lt.id_ticket and t.ts_updated=lt.ts_last_updated
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
+    left join custom_fields c 
+    on c.id_ticket=t.id_ticket
 )
 select
-    cast(t.id_ticket as bigint) as sk_ticket,
+    sk_ticket,
     coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
     coalesce(dc.sk_contract, -1)  as sk_contract,
     coalesce(dc.sk_client, -1)  as sk_client,
@@ -187,12 +197,11 @@ select
     t.ts_closed_local,
     now() as ts_load
 from tickets t
-left join custom_fields c 
-    on c.id_ticket=t.id_ticket
 left join house dhl
-	on c.cols['Código do Imóvel'] = dhl.id_house
-    and date_format(cast(t.ts_created as timestamp with time zone), '%Y-%m-%d')
-    between dhl.dt_listing_version_start
-    and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')       
+	on t.id_house = dhl.id_house
+    and str_created_date between 
+        (case when dhl.version = 1 then least(coalesce(dhl.dt_listing_version_start, t.str_created_date), t.str_created_date)
+        else dhl.dt_listing_version_start end)
+        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')     
 left join contract dc
-    on c.cols['Código do Contrato'] = cast(dc.sk_contract as varchar);
+    on id_contract = dc.sk_contract;
