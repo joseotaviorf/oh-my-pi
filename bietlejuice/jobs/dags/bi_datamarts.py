@@ -85,6 +85,32 @@ def create_datamart_from_athena(table_name, **kwargs):
     )
 
 
+def create_task(dag, queries_dir, python_callable, db, table_name, file_name):
+    task = BaseDAG.build_python_operator(
+        dag=dag,
+        task_id='{}_{}'.format(db, table_name),
+        provide_context=True,
+        python_callable=python_callable,
+        op_kwargs={'table_name': table_name}
+    )
+
+
+def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
+    task_id = '{}_{}'.format(db, table_name)
+    current_task = main_dag.task_dict[task_id]
+    file_path = '{}/{}/{}'.format(queries_dir, DATAMARTS_SCHEMA, file_name)
+    with open(file_path, 'r') as stream:
+        config = yaml.safe_load(stream)
+        if 'upstream' in config:
+            upstream = config['upstream']
+            for upstream_task_id in upstream:
+                current_task.set_upstream(main_dag.task_dict[upstream_task_id])
+        if 'downstream' in config:
+            downstream = config['downstream']
+            for downstream_task_id in downstream:
+                current_task.set_downstream(main_dag.task_dict[downstream_task_id])
+
+
 # dags
 main_dag = DAG(
     dag_id=MAIN_DAG_ID,
@@ -105,37 +131,40 @@ operators = [
     {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena, 'db': 'athena'}
 ]
 
-for operator in operators:
-    '''
-    Gets all files from queries_dir/datamarts/ and creates a table using the filename
-    '''
-    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
-        if filename.endswith('.sql'):
-            filename_split = filename.split('.')
-            table_name = filename_split[0]
-            task = BaseDAG.build_python_operator(
-                dag=main_dag,
-                task_id='{}_{}'.format(operator['db'], table_name),
-                provide_context=True,
-                python_callable=operator['python_callable'],
-                op_kwargs={'table_name': table_name}
-            )
+queries = []
+task_configs = []
 
-# FIXME: I could actually get all files, append to a list, then run the sql files first and the yml after
 for operator in operators:
     '''
-    Gets all config files from queries_dir/datamarts/ and sets task configs
+    Gets all queries and config files from queries_dir/datamarts/
     '''
-    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
-        if filename.endswith(('.yml', 'yaml')):
-            filename_split = filename.split('.')
-            table_name = filename_split[0]
-            task_id = '{}_{}'.format(operator['db'], table_name)
-            current_task = main_dag.task_dict[task_id]
-            file_path = '{}/{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA, filename)
-            with open(file_path, 'r') as stream:
-                config = yaml.safe_load(stream)
-                if 'upstream' in config:
-                    upstream = config['upstream']
-                    for upstream_task_id in upstream:
-                        current_task.set_upstream(main_dag.task_dict[upstream_task_id])
+    for file_name in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
+        file_name_split = file_name.split('.')
+        table_name = file_name_split[0]
+        file_dict = {'queries_dir': operator['queries_dir'], 'python_callable': operator['python_callable'], 'db': operator['db'], 'table_name': table_name, 'file_name': file_name}
+        if file_name.endswith('.sql'):
+            queries.append(file_dict)
+        elif file_name.endswith(('.yml', 'yaml')):
+            task_configs.append(file_dict)
+
+# create tasks
+for query in queries:
+    create_task(
+        dag=main_dag,
+        queries_dir=query['queries_dir'],
+        python_callable=query['python_callable'],
+        db=query['db'],
+        table_name=query['table_name'],
+        file_name=query['file_name']
+    )
+
+# configure tasks
+for task_config in task_configs:
+    config_task(
+        dag=main_dag,
+        queries_dir=task_config['queries_dir'],
+        python_callable=task_config['python_callable'],
+        db=task_config['db'],
+        table_name=task_config['table_name'],
+        file_name=task_config['file_name']
+    )
