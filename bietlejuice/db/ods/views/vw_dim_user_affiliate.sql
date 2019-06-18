@@ -1,7 +1,7 @@
 DROP VIEW if exists public.vw_dim_user_affiliate;
 
 CREATE VIEW public.vw_dim_user_affiliate as
-with vistorias as (
+ with vistorias as (
  select
  		distinct b.agente_id
  	 from
@@ -26,7 +26,7 @@ with vistorias as (
 	v.agente_id is not null as is_inspector,
 	nullif(u.dadosagente_numero_creci, '') is not null as is_realstate_agent,
 	u.dados_fotografo_id is not null as is_photographer,
-	u.telefone_principal as telefoneprincipal,
+	substring(u.telefone_principal,4,2) as ddd_telefone,
 	uao.utm_source as tracking_source,
 	uao.utm_medium as tracking_medium,
 	uao.utm_campaign as tracking_campaign,
@@ -64,6 +64,20 @@ select
 	afl.creci_number,
 	afl.origin,
 	afl.type,
+	coalesce(
+	case
+		when city_campaign like '%riodejaneiro%' or city_campaign like '%rj%' then 'Rio de Janeiro'
+		when city_campaign like '%belohorizonte%' then 'Belo Horizonte'
+		when city_campaign like '%florian_polis%' then 'Florianópolis'
+		when city_campaign like '%bras_lia%' then 'Brasília'
+		when city_campaign like '%goi_nia%' then 'Goiânia'
+		when city_campaign like '%portoalegre%' or city_campaign like 'rs%' then 'Porto Alegre'
+		when city_campaign like '%curitiba%' then 'Curitiba'
+		when city_campaign like '%campinas%' then 'Campinas'
+		when city_campaign like '%s_opaulo%' then 'RMSP'
+		when city_campaign like '%sp%' then 'RMSP' end,
+	    rgs_via_city.city_group, rgs_via_ddd.city_group,null) as marketing_city_group,
+	    rgs_via_ddd.regional,
 	afl.is_inspector,
 	afl.is_realstate_agent,
 	afl.is_photographer,
@@ -76,26 +90,10 @@ select
 	afl.tracking_country,
 	afl.tracking_state,
 	afl.tracking_city,
-	coalesce(
-	case
-		when city_campaign like '%riodejaneiro%' or city_campaign like '%rj%' then 'Rio de Janeiro'
-		when city_campaign like '%belohorizonte%' then 'Belo Horizonte'
-		when city_campaign like '%florian_polis%' then 'Florianópolis'
-		when city_campaign like '%bras_lia%' then 'Brasília'
-		when city_campaign like '%goi_nia%' then 'Goiânia'
-		when city_campaign like '%portoalegre%' or city_campaign like 'rs%' then 'Porto Alegre'
-		when city_campaign like '%curitiba%' then 'Curitiba'
-		when city_campaign like '%campinas%' then 'Campinas'
-		when city_campaign like '%s_opaulo%' then 'RMSP'
-		when city_campaign like '%rmsp%' then 'RMSP'
-		when city_campaign like '%sp%' then 'RMSP' end,
-	    rgs.city_group, rgns.city_group, 'sem_city_group') as city_campaign_tracking_ddd,
-	rgns.regional,
-	afl.telefoneprincipal,
 	now() as ts_load
 from afiliadosfull afl
 left join
-	regions rgs on afl.tracking_city = rgs.city_name
+	regions rgs_via_city on afl.tracking_city = rgs_via_city.city_name
 left join
-	regions rgns on substring(afl.telefoneprincipal,4,2) = rgns.ddd
+	regions rgs_via_ddd on afl.ddd_telefone = rgs_via_ddd.ddd
   

@@ -12,6 +12,8 @@ CREATE TABLE staging.dim_user_affiliate (
     creci_number VARCHAR(255),
     origin VARCHAR(255),
     type VARCHAR(255),
+    marketing_city_group VARCHAR(255),
+    regional VARCHAR(255),
     is_inspector BOOLEAN,
     is_realstate_agent BOOLEAN,
     is_photographer BOOLEAN,
@@ -23,9 +25,6 @@ CREATE TABLE staging.dim_user_affiliate (
     tracking_country VARCHAR(255),
     tracking_state VARCHAR(255),
     tracking_city VARCHAR(255),
-    city_campaign_tracking_ddd VARCHAR(255),
-    regional VARCHAR(255),
-    telefoneprincipal VARCHAR(255)
     ts_load TIMESTAMP
 )
 WITH (oids = false);
