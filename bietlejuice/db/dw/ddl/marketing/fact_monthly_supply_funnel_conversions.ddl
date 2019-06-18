@@ -16,6 +16,9 @@ CREATE TABLE if NOT EXISTS marketing.fact_monthly_supply_funnel_conversions (
     total_monthly_sessions integer,
     total_monthly_active_users integer,
     total_monthly_leads integer,
+    total_monthly_prospects integer,
+    total_monthly_qualifieds integer,
+    total_monthly_opportunities integer,
     total_monthly_listings integer,
     ts_load timestamp
 )
