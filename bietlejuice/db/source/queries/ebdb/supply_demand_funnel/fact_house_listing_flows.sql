@@ -72,7 +72,7 @@ from
 		base.conversao_id,
 		jf2.id as photo_job_id,
 		base.imovel_id,
-		coalesce(base.rep_id, photo_ure.usuario_id) as rep_id,
+		coalesce(base.rep_id, photo_rep_ure.usuario_id) as rep_id,
 		base.affiliate_id,
 		base.owner_id,
 		base.region_id,
@@ -420,14 +420,25 @@ from
 		on l.id = base.lead_id
 	left join
 	(
-		select min(REV) as REV, ja.id from
-		JobFotografo_AUD ja
-		inner join UsuarioRevisionEntity ure on ure.id = ja.REV
-		inner join Usuario u on u.id = ure.usuario_id
-		where (u.dadosVendedor_id is not null)
-		group by ja.id
-	) photo_rep
-		on photo_rep.id = jf.id
-	left join	UsuarioRevisionEntity photo_ure	on photo_ure.id = photo_rep.REV
+		SELECT
+            i.id,
+            MIN(jaud.REV) as min_REV
+        FROM Imovel i
+        JOIN JobFotografo_AUD jaud
+            ON i.id = jaud.imovel_id
+            AND jaud.status_MOD = 1
+            AND jaud.status = 'Agendado'
+        JOIN UsuarioRevisionEntity ure
+            ON ure.id = jaud.REV
+            AND (i.firstPublication IS NULL  OR
+                DATE(from_unixtime(ure.timestamp/1000)) <= DATE(i.firstPublication))
+        JOIN Usuario u
+            ON u.id = ure.usuario_id
+            AND dadosVendedor_id IS NOT NULL
+        GROUP BY 1
+	) photo_rep_via_imovel
+		on photo_rep_via_imovel.id = i.id
+	left join	UsuarioRevisionEntity photo_rep_ure
+	    on photo_rep_ure.id = photo_rep_via_imovel.min_REV
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;
