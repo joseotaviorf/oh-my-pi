@@ -126,6 +126,7 @@ potential_listings as (
 		coalesce(to_char(f.dt_first_listing::date,'YYYYMMDD')::integer, -1) as sk_first_listing_date,
 		coalesce(to_char(f.dt_discarded::date,'YYYYMMDD')::integer, -1) as sk_discard_date,
 		coalesce(user_id_lead_first_discarder, -1) as sk_user_lead_first_discarder,
+		coalesce(user_id_lead_last_discarder, -1) as sk_user_lead_last_discarder,
 		case
 			when d.imovel_id is not null and acquisition_channel_rep not like ('Reprocessed%')
 			then 'Lead Flow'
@@ -280,6 +281,7 @@ select
 	pl.sk_first_listing_date,
 	pl.sk_discard_date,
 	pl.sk_user_lead_first_discarder,
+	pl.sk_user_lead_last_discarder,
 	pl.funnel_step,
 	pl.funnel_drop_reason,
 	pl.hours_lead_to_prospect,

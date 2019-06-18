@@ -16,6 +16,7 @@ select
 	dt_first_listing,
 	dt_discarded,
 	user_id_lead_first_discarder,
+	user_id_lead_last_discarder,
 	flow,
 	acquisition_method,
 	acquisition_channel,
@@ -93,6 +94,7 @@ from
 		i.firstPublication as dt_first_listing,
 		dt_discarded,
 		user_id_lead_first_discarder,
+		user_id_lead_last_discarder,
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
@@ -126,6 +128,7 @@ from
 			end as dt_qualified,
 			null as dt_discarded,
 			null as user_id_lead_first_discarder,
+			null as user_id_lead_last_discarder,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service Flow'
@@ -202,6 +205,7 @@ from
       end as dt_qualified,
       from_unixtime(dure.timestamp/1000) as dt_discarded,
       ure_disc.usuario_id as user_id_lead_first_discarder,
+      ure_disc_max.usuario_id as user_id_lead_last_discarder,
       case
         when l.origem = 'OwnerPWA' then 'Self-Service Flow'
         else 'Lead Flow'
@@ -341,6 +345,22 @@ from
     left join
     	UsuarioRevisionEntity ure_disc
     	on ure_disc.id = d_ure.min_id
+    left join (
+		SELECT
+	    	laud.id,
+	    	max(ure.id) as max_id
+	    FROM Lead_AUD laud
+	    join UsuarioRevisionEntity ure
+	    	on laud.REV = ure.id
+   		 where laud.status = 'Descartado'
+                    and laud.automaticallyDiscarded = 0
+                    and (status_MOD = 1 or recurringStatusCount_MOD = 1)
+    	group by laud.id
+    ) d_ure_max
+        on d_ure_max.id = l.id
+    left join
+    	UsuarioRevisionEntity ure_disc_max
+    	on ure_disc_max.id = d_ure_max.min_id
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
@@ -382,6 +402,7 @@ from
 			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
 			null as dt_discarded,
 			null as user_id_lead_first_discarder,
+			null as user_id_lead_last_discarder,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			'Inside Sales' as acquisition_channel,
