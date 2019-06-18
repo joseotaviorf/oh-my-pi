@@ -141,7 +141,13 @@ for operator in operators:
     for file_name in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
         file_name_split = file_name.split('.')
         table_name = file_name_split[0]
-        file_dict = {'queries_dir': operator['queries_dir'], 'python_callable': operator['python_callable'], 'db': operator['db'], 'table_name': table_name, 'file_name': file_name}
+        file_dict = {
+            'queries_dir': operator['queries_dir'],
+            'python_callable': operator['python_callable'], 
+            'db': operator['db'], 
+            'table_name': table_name, 
+            'file_name': file_name
+        }
         if file_name.endswith('.sql'):
             queries.append(file_dict)
         elif file_name.endswith(('.yml', 'yaml')):
