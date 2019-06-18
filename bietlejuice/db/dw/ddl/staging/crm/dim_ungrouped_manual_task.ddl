@@ -10,6 +10,7 @@ create table if not exists staging.dim_ungrouped_manual_task (
   version numeric(14,2),
   origin varchar,
   type varchar,
+  is_task_auto_completed boolean,
   description varchar(10000),
   titles varchar,
   workgroups varchar,

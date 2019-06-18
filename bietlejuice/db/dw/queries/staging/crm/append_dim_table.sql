@@ -9,6 +9,7 @@ select
   version,
   origin,
   type,
+  is_task_auto_completed,
   description,
   titles,
   workgroups,
