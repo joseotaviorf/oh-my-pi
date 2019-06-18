@@ -10,6 +10,7 @@ create table if not exists crm.dim_credit_task (
   version numeric(14,2),
   origin varchar,
   type varchar,
+  is_task_auto_completed boolean,
   description varchar(2000),
   titles varchar,
   workgroups varchar,
