@@ -22,5 +22,8 @@ create table public.dim_user_affiliate (
     tracking_country varchar(255),
     tracking_state varchar(255),
     tracking_city varchar(255),
+    city_campaign_tracking_ddd varchar(255),
+    regional varchar(255),
+    telefoneprincipal varchar(255)
     ts_load timestamp without time zone
 );
