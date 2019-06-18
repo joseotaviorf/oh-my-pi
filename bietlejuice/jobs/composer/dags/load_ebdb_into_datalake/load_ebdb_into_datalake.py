@@ -61,13 +61,13 @@ CLUSTER_DESCRIPTION = {
 
 LIBRARIES_DESCRIPTION = [
     {
-        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/bi_etl_ejuice-0.1.0-py3-none-any.whl'
+        'whl': S3_PREFIX + '/libraries/bi_etl_ejuice-0.1.0-py3-none-any.whl'
     },
     {
-        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/quintoandar_python_logger-0.1.3-py3-none-any.whl'
+        'whl': S3_PREFIX + '/libraries/quintoandar_python_logger-0.1.3-py3-none-any.whl'
     },
     {
-        'jar': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/mysql-connector-java-5.1.47.jar'
+        'jar': S3_PREFIX + '/libraries/mysql-connector-java-5.1.47.jar'
     }
 ]
 
