@@ -354,7 +354,7 @@ from
 	    	on laud.REV = ure.id
    		 where laud.status = 'Descartado'
                     and laud.automaticallyDiscarded = 0
-                    and (status_MOD = 1 or recurringStatusCount_MOD = 1)
+                    and (status_MOD + recurringStatusCount_MOD >= 1)
     	group by laud.id
     ) d_ure_max
         on d_ure_max.id = l.id
