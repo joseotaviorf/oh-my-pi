@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from pyspark.sql import SparkSession
-from python_logger import QuintoAndarLogger
+from quintoandar.python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 

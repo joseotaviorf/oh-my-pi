@@ -2,7 +2,7 @@ import json
 import logging
 from multiprocessing.dummy import Pool as ThreadPool
 
-from python_logger import QuintoAndarLogger
+from quintoandar.python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
 from bietlejuice.jobs.composer.consumers import MySQLConsumer

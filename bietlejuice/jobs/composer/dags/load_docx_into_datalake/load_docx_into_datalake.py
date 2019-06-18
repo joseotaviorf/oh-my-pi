@@ -1,12 +1,13 @@
 import json
 from datetime import datetime
+import time
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.contrib.operators.databricks_operator import DatabricksSubmitRunOperator
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import DAG
 from databricks import DatabricksClusterClient, DatabricksLibraryClient
-from python_logger import QuintoAndarLogger
+from quintoandar.python_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import BaseDAG
 
@@ -25,7 +26,7 @@ LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/load-docx-into-datalake'
 CLUSTER_DESCRIPTION = {
     'autoscale': {
         'min_workers': 2,
-        'max_workers': 2
+        'max_workers': 3
     },
     'cluster_name': DAG_ID,
     'spark_version': '5.4.x-scala2.11',
@@ -64,7 +65,7 @@ LIBRARIES_DESCRIPTION = [
         'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/bi_etl_ejuice-0.1.0-py3-none-any.whl'
     },
     {
-        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/python_logger-0.1.0-py3-none-any.whl'
+        'whl': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/quintoandar_python_logger-0.1.3-py3-none-any.whl'
     },
     {
         'jar': 's3://5a-databricks/github-repos/bi-etl-ejuice/libraries/mysql-connector-java-5.1.47.jar'
@@ -80,6 +81,8 @@ def create_cluster():
 
     cluster_client = DatabricksClusterClient(dbricks_host, dbricks_token)
     cluster_id = cluster_client.create_cluster(CLUSTER_DESCRIPTION)
+
+    time.sleep(300)
 
     libraries_client = DatabricksLibraryClient(dbricks_host, dbricks_token)
     libraries_client.install_libraries(cluster_id, LIBRARIES_DESCRIPTION)
