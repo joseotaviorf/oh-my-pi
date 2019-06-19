@@ -16,6 +16,9 @@ CREATE TABLE if NOT EXISTS marketing.fact_weekly_supply_funnel_conversions (
     total_weekly_sessions integer,
     total_weekly_active_users integer,
     total_weekly_leads integer,
+    total_weekly_prospects integer,
+    total_weekly_qualifieds integer,
+    total_weekly_opportunities integer,
     total_weekly_listings integer,
     ts_load timestamp
 )

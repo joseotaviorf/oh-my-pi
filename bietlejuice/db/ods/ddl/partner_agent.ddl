@@ -7,3 +7,5 @@ create table if not exists partner_agent (
     ts_updated timestamp,
     ts_created timestamp
 );
+
+CREATE INDEX user_id_idx ON public."partner_agent" (user_id);

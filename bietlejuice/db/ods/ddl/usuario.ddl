@@ -89,3 +89,6 @@ create table usuario (
   atualizado_em timestamp,
   contacorrente_id bigint
 );
+
+CREATE INDEX telefone_principal_idx ON public."usuario" (telefone_principal);
+CREATE unique INDEX id_idx ON public."usuario" (id);

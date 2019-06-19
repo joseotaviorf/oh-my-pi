@@ -8,7 +8,7 @@ contracts_signed AS (
 		COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_contract_signed_date  >= 0) THEN fact_listing_rent_flows.sk_contract  ELSE NULL END) AS contracts_signed,
     COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_contract_signed_date  >= 0) AND (fact_listing_rent_flows.days_offer_submitted_to_contract_signed <= 7) THEN fact_listing_rent_flows.sk_contract  ELSE NULL END) AS contracts_signed_7_days
 	FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-	LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_contract_signed_date = dim_date.sk_date
+	JOIN public.dim_date ON fact_listing_rent_flows.sk_contract_signed_date = dim_date.sk_date
 	WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
 	GROUP BY 1, 2
 ),
@@ -18,7 +18,7 @@ visits_booked AS (
     fact_listing_rent_flows.sk_region,
   	COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_booked
 	FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-	LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+	JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
 	GROUP BY 1, 2
 ),
@@ -52,7 +52,7 @@ visits_completed AS (
     fact_listing_rent_flows.sk_region,
     COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_booking  >= 0) AND (fact_listing_rent_flows.flg_visit_completed  > 0) THEN fact_listing_rent_flows.sk_booking  ELSE NULL END) AS visits_completed
   FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+  JOIN public.dim_date ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
   GROUP BY 1, 2
 ),
@@ -62,7 +62,7 @@ offers_submitted AS (
     fact_listing_rent_flows.sk_region,
     COUNT(DISTINCT CASE WHEN (fact_listing_rent_flows.sk_offer_submitted_date  >= 0) THEN fact_listing_rent_flows.sk_offer  ELSE NULL END) AS offers_submitted
   FROM public.fact_listing_rent_flows AS fact_listing_rent_flows
-  LEFT JOIN public.dim_date ON fact_listing_rent_flows.sk_offer_submitted_date = dim_date.sk_date
+  JOIN public.dim_date ON fact_listing_rent_flows.sk_offer_submitted_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
   GROUP BY 1, 2
 ),
@@ -72,7 +72,7 @@ prospects AS (
     fact_house_listing_flows.sk_region,
 		COUNT(CASE WHEN (fact_house_listing_flows.sk_prospect_date  >= 0) THEN 1 ELSE NULL END) AS prospects
 	FROM public.fact_house_listing_flows AS fact_house_listing_flows
-	LEFT JOIN public.dim_date ON fact_house_listing_flows.sk_prospect_date = dim_date.sk_date
+	JOIN public.dim_date ON fact_house_listing_flows.sk_prospect_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
 	GROUP BY 1, 2
 ),
@@ -82,7 +82,7 @@ first_listings AS (
     fact_house_listing_flows.sk_region,
 		COUNT(CASE WHEN (fact_house_listing_flows.sk_first_listing_date  >= 0) THEN 1 ELSE NULL END) AS first_listings
 	FROM public.fact_house_listing_flows AS fact_house_listing_flows
-	LEFT JOIN public.dim_date ON fact_house_listing_flows.sk_first_listing_date = dim_date.sk_date
+	JOIN public.dim_date ON fact_house_listing_flows.sk_first_listing_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
 	GROUP BY 1, 2
 )
@@ -101,13 +101,12 @@ FROM
 (
   SELECT *
   FROM contracts_signed
-  JOIN visits_booked USING(date_period, sk_region)
-  JOIN ongoing_listings USING(date_period, sk_region)
-  JOIN ongoing_rentals USING(date_period, sk_region)
-  JOIN visits_completed USING(date_period, sk_region)
-  JOIN offers_submitted USING(date_period, sk_region)
-  JOIN prospects USING(date_period, sk_region)
-  JOIN first_listings USING(date_period, sk_region)
+  FULL OUTER JOIN visits_booked USING(date_period, sk_region)
+  FULL OUTER JOIN ongoing_listings USING(date_period, sk_region)
+  FULL OUTER JOIN visits_completed USING(date_period, sk_region)
+  FULL OUTER JOIN offers_submitted USING(date_period, sk_region)
+  FULL OUTER JOIN prospects USING(date_period, sk_region)
+  FULL OUTER JOIN first_listings USING(date_period, sk_region)
 ) metrics
 LEFT JOIN public.dim_region region USING(sk_region)
 WHERE sk_region != -1
