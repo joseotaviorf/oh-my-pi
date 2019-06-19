@@ -76,7 +76,7 @@ select
 		when city_campaign like '%campinas%' then 'Campinas'
 		when city_campaign like '%s_opaulo%' then 'RMSP'
 		when city_campaign like '%sp%' then 'RMSP' end,
-	    rgs_via_city.city_group, rgs_via_ddd.city_group,null) as marketing_city_group,
+	    rgs_via_city.city_group, rgs_via_ddd.city_group) as marketing_city_group,
 	    rgs_via_ddd.regional,
 	afl.is_inspector,
 	afl.is_realstate_agent,
