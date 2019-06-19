@@ -26,11 +26,11 @@ PARTITIONED BY (
   `dt` string)
 ROW FORMAT SERDE
    'org.openx.data.jsonserde.JsonSerDe'
-STORED AS INPUTFORMAT
-   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+stored as inputformat
+  'org.apache.hadoop.mapred.TextInputFormat'
 OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://5a-datalake/raw/zendesk/tickets_fields/'
+  's3://5a-datalake/raw/zendesk/ticket_fields/'
 
 MSCK REPAIR TABLE datalake_raw.zendesk_ticket_fields_xplenty;
