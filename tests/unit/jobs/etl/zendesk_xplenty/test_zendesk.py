@@ -371,7 +371,7 @@ class TestZendeskETL(object):
         zendesk.ticket_metric_events(table_name)
 
         assert mock_get_query_from_file_name.call_count == 1
-        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/ticket_metric_events.sql'.format(
+        assert mock_get_query_from_file_name.call_args[0][0] == '{}/zendesk/ticket_metric_events_xplenty.sql'.format(
             DATALAKE_QUERIES_DIR)
         assert mock__move_to_clean.call_count == 1
 
