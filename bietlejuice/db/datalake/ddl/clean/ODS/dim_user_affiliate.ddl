@@ -11,6 +11,8 @@ create external table if not exists datalake_clean.ods_dim_user_affiliate (
     creci_number string,
     origin string,
     type string,
+    marketing_city_group string,
+    regional string,
     is_inspector string,
     is_realstate_agent string,
     is_photographer string,
