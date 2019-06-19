@@ -121,12 +121,7 @@ SELECT metrics.*,
 			 region.city_name,
 			 region.city_group,
 			 region.region_code,
-			 CASE
-			     WHEN region.city_group IN ('Belo Horizonte', 'Brasília', 'Goiânia', 'Campinas') THEN 'Center'
-			     WHEN region.city_group IN ('RMSP') THEN 'RMSP'
-					 WHEN region.city_group IN ('Rio de Janeiro', 'Curitiba', 'Florianópolis', 'Porto Alegre') THEN 'RJ / South'
-					 ELSE 'No regional'
-			 END AS regional
+			 region.regional
 FROM
 (
   SELECT *
