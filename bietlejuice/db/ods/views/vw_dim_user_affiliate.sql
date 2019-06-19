@@ -46,6 +46,7 @@ from user_affiliate ua
 ),
 region_ddd as (
 select distinct
+	city_group,
 	cast(city_ddd as varchar) as ddd,
 	regional
 from public.vw_dim_region
@@ -81,7 +82,7 @@ select
 		when city_campaign like '%campinas%' then 'Campinas'
 		when city_campaign like '%s_opaulo%' then 'RMSP'
 		when city_campaign like '%sp%' then 'RMSP' end,
-	    region_city.city_group) as marketing_city_group,
+	    region_city.city_group, region_ddd.city_group) as marketing_city_group,
 	coalesce(region_city.regional, region_ddd.regional) as regional,
 	afl.is_inspector,
 	afl.is_realstate_agent,
