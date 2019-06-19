@@ -97,18 +97,18 @@ def create_task(dag, queries_dir, python_callable, db, table_name, file_name):
 
 def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
     task_id = '{}_{}'.format(db, table_name)
-    current_task = main_dag.task_dict[task_id]
+    current_task = dag.task_dict[task_id]
     file_path = '{}/{}/{}'.format(queries_dir, DATAMARTS_SCHEMA, file_name)
     with open(file_path, 'r') as stream:
         config = yaml.safe_load(stream)
-        if 'upstream' in config:
-            upstream = config['upstream']
-            for upstream_task_id in upstream:
-                current_task.set_upstream(main_dag.task_dict[upstream_task_id])
-        if 'downstream' in config:
-            downstream = config['downstream']
-            for downstream_task_id in downstream:
-                current_task.set_downstream(main_dag.task_dict[downstream_task_id])
+        streams = config['streams']
+        for stream in streams:
+            direction = stream['direction']
+            task_ids = stream['task_ids']
+            set_stream_method = getattr(current_task, 'set_{}'.format(direction))
+            for id in task_ids:
+                logger.info('m=config_task, msg=setting {} {} of {}'.format(task_id, direction, id))
+                set_stream_method(dag.task_dict[id])
 
 
 # dags
@@ -143,9 +143,9 @@ for operator in operators:
         table_name = file_name_split[0]
         file_dict = {
             'queries_dir': operator['queries_dir'],
-            'python_callable': operator['python_callable'], 
-            'db': operator['db'], 
-            'table_name': table_name, 
+            'python_callable': operator['python_callable'],
+            'db': operator['db'],
+            'table_name': table_name,
             'file_name': file_name
         }
         if file_name.endswith('.sql'):
