@@ -133,6 +133,7 @@ FROM
   FROM contracts_signed
   FULL OUTER JOIN visits_booked USING(date_period, sk_region)
   FULL OUTER JOIN ongoing_listings USING(date_period, sk_region)
+  FULL OUTER JOIN ongoing_rentals USING(date_period, sk_region)
   FULL OUTER JOIN visits_completed USING(date_period, sk_region)
   FULL OUTER JOIN offers_submitted USING(date_period, sk_region)
   FULL OUTER JOIN prospects USING(date_period, sk_region)
