@@ -8,7 +8,6 @@ select
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
-	fhlf.mkt_completion,
 	null as mkt_medium_demand,
 	count(fhlf.sk_prospect_date) as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
 	null::integer as qualifieds,
@@ -35,7 +34,7 @@ left join dim_region dr
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 qualified as (
 select
@@ -46,7 +45,6 @@ select
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
-	fhlf.mkt_completion,
 	null as mkt_medium_demand,
 	null::integer as prospects,
 	count(fhlf.sk_qualified_date) as qualifieds, -- this count is done on the qualified date because not all listings come from a lead, and maybe one lead brings multiple house listings
@@ -73,7 +71,7 @@ left join dim_region dr
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 opportunity as (
 select
@@ -84,7 +82,6 @@ select
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
-	fhlf.mkt_completion,
 	null as mkt_medium_demand,
 	null::integer as prospects,
 	null::integer as qualifieds,
@@ -111,7 +108,7 @@ left join dim_region dr
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 listing as (
 select
@@ -122,7 +119,6 @@ select
 	dl.origem as lead_origin,
 	fhlf.mkt_channel,
 	fhlf.mkt_medium as mkt_medium_lead,
-	fhlf.mkt_completion,
 	null as mkt_medium_demand,
 	null::integer as prospects,
 	null::integer as qualifieds,
@@ -149,7 +145,7 @@ left join dim_region dr
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 visits_booked as (
 select
@@ -160,7 +156,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -187,7 +182,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 visits_completed as (
 select
@@ -198,7 +193,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -225,7 +219,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 offer_submitted as (
 select
@@ -236,7 +230,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -263,7 +256,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date"between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 offer_approved as(
 select
@@ -274,7 +267,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -301,7 +293,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 doc_sent as(
 select
@@ -312,7 +304,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -339,7 +330,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 doc_completed as(
 select
@@ -350,7 +341,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -377,7 +367,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 credit_processed as(
 select
@@ -388,7 +378,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -415,7 +404,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 credit_approved as(
 select
@@ -426,7 +415,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -453,7 +441,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 contract_created as (
 select
@@ -464,7 +452,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -491,7 +478,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 contract_signed as (
 select
@@ -502,7 +489,6 @@ select
   null as lead_origin,
   null as mkt_channel,
   null as mkt_medium_lead,
-  null as mkt_completion,
   db.mkt_medium as mkt_medium_demand,
   null::integer as prospects,
   null::integer as qualifieds,
@@ -529,7 +515,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 union_all as (
 	select * from prospect
@@ -568,7 +554,6 @@ select
     ua.lead_origin,
     ua.mkt_channel,
     ua.mkt_medium_lead,
-    ua.mkt_completion,
     ua.mkt_medium_demand,
     ua.prospects,
     ua.qualifieds,
@@ -600,7 +585,6 @@ select
 	          when mkt_medium_lead in ('SEM branded', 'Social', 'Notifications', 'Direct') then 'Organic'
 	          when mkt_medium_lead in ('Crawling', 'Not Mapped', 'Lost Tracking', 'Content', 'Portal', 'Recovered Leads') then 'Other'
 	     else mkt_medium_lead end end as mkt_medium_lead,
-    mkt_completion,
     case when mkt_medium_demand = 'Agents' then 'Agents'
          when mkt_medium_demand = 'Online Classifieds' then 'Online Classifieds'
          when mkt_medium_demand in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
@@ -621,8 +605,8 @@ select
     sum(contract_created) as contract_created,
     sum(contract_signed) as contract_signed
 from union_all
-group by "date", city_group, is_b2b, 4, mkt_completion, 6
-order by "date", city_group, is_b2b, 4, mkt_completion, 6
+group by "date", city_group, is_b2b, 4, 5
+order by "date", city_group, is_b2b, 4, 5
 )
 select * from agg_all
 ;
