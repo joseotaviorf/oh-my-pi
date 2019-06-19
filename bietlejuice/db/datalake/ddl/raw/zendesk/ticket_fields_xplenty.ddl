@@ -28,6 +28,8 @@ ROW FORMAT SERDE
    'org.openx.data.jsonserde.JsonSerDe'
 STORED AS INPUTFORMAT
    'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
   's3://5a-datalake/raw/zendesk/tickets_fields/'
 
