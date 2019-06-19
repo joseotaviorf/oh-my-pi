@@ -48,7 +48,7 @@ regions as (
 select distinct
 	city_name,
 	city_group,
-	ddd,
+	cast(city_ddd as varchar) as ddd,
 	regional
 from public.vw_dim_region
 )
@@ -96,4 +96,3 @@ left join
 	regions rgs_via_city on afl.tracking_city = rgs_via_city.city_name
 left join
 	regions rgs_via_ddd on afl.ddd_telefone = rgs_via_ddd.ddd
-  
