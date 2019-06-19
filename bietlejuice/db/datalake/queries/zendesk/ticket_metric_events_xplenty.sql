@@ -1,0 +1,2 @@
+select t.* from datalake_raw.zendesk_ticket_metric_events_xplenty t
+__WHERE_CLAUSE__
