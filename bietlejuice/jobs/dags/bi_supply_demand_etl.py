@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,6 +15,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
