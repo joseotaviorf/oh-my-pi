@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import yaml
 
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
@@ -84,6 +85,32 @@ def create_datamart_from_athena(table_name, **kwargs):
     )
 
 
+def create_task(dag, queries_dir, python_callable, db, table_name, file_name):
+    task = BaseDAG.build_python_operator(
+        dag=dag,
+        task_id='{}_{}'.format(db, table_name),
+        provide_context=True,
+        python_callable=python_callable,
+        op_kwargs={'table_name': table_name}
+    )
+
+
+def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
+    task_id = '{}_{}'.format(db, table_name)
+    current_task = dag.task_dict[task_id]
+    file_path = '{}/{}/{}'.format(queries_dir, DATAMARTS_SCHEMA, file_name)
+    with open(file_path, 'r') as stream:
+        config = yaml.safe_load(stream)
+        streams = config['streams']
+        for stream in streams:
+            direction = stream['direction']
+            task_ids = stream['task_ids']
+            set_stream_method = getattr(current_task, 'set_{}'.format(direction))
+            for id in task_ids:
+                logger.info('m=config_task, msg=setting {} {} of {}'.format(task_id, direction, id))
+                set_stream_method(dag.task_dict[id])
+
+
 # dags
 main_dag = DAG(
     dag_id=MAIN_DAG_ID,
@@ -104,26 +131,46 @@ operators = [
     {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena, 'db': 'athena'}
 ]
 
+queries = []
+task_configs = []
+
 for operator in operators:
     '''
-    Gets all files from queries_dir/datamarts/ and creates a table using the filename
+    Gets all queries and config files from queries_dir/datamarts/
     '''
-    for filename in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
-        filename_split = filename.split('.')
+    for file_name in os.listdir('{}/{}'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
+        file_name_split = file_name.split('.')
+        table_name = file_name_split[0]
+        file_dict = {
+            'queries_dir': operator['queries_dir'],
+            'python_callable': operator['python_callable'],
+            'db': operator['db'],
+            'table_name': table_name,
+            'file_name': file_name
+        }
+        if file_name.endswith('.sql'):
+            queries.append(file_dict)
+        elif file_name.endswith(('.yml', 'yaml')):
+            task_configs.append(file_dict)
 
-        if len(filename_split) < 1:
-            logger.warn('m=dag_run, filename={}, msg=no file extension'.format(filename))
-            continue
+# create tasks
+for query in queries:
+    create_task(
+        dag=main_dag,
+        queries_dir=query['queries_dir'],
+        python_callable=query['python_callable'],
+        db=query['db'],
+        table_name=query['table_name'],
+        file_name=query['file_name']
+    )
 
-        if filename_split[1] != 'sql':
-            logger.warn('m=dag_run, filename={}, msg=file extension different from sql'.format(filename))
-            continue
-
-        table_name = filename_split[0]
-        BaseDAG.build_python_operator(
-            dag=main_dag,
-            task_id='{}_{}'.format(operator['db'], table_name),
-            provide_context=True,
-            python_callable=operator['python_callable'],
-            op_kwargs={'table_name': table_name}
-        )
+# configure tasks
+for task_config in task_configs:
+    config_task(
+        dag=main_dag,
+        queries_dir=task_config['queries_dir'],
+        python_callable=task_config['python_callable'],
+        db=task_config['db'],
+        table_name=task_config['table_name'],
+        file_name=task_config['file_name']
+    )

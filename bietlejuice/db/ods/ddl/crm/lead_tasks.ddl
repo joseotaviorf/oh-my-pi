@@ -9,3 +9,6 @@ CREATE TABLE crm.lead_tasks (
 	dt_created timestamp,
 	dt_closed timestamp
 );
+
+create index lead_tasks_lead_id_idx on crm.lead_tasks (lead_id);
+create index lead_tasks_dt_created_idx on crm.lead_tasks (dt_created);
