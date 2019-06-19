@@ -578,18 +578,21 @@ agg_all as (
 select
 	"date",
 	city_group,
-	is_b2b,
+	case when is_b2b is true then 'B2B'
+	     else
     case when lead_origin = 'PriceSuggestion' then 'Calculadora'
 	     else
 	     case when mkt_medium_lead in ('SEM non-branded', 'Display', 'Retargeting', 'Online Networks', 'Online Classifieds') then 'Online Paid'
 	          when mkt_medium_lead in ('SEM branded', 'Social', 'Notifications', 'Direct') then 'Organic'
 	          when mkt_medium_lead in ('Crawling', 'Not Mapped', 'Lost Tracking', 'Content', 'Portal', 'Recovered Leads') then 'Other'
-	     else mkt_medium_lead end end as mkt_medium_lead,
+	     else mkt_medium_lead end end end as mkt_medium_lead,
+	case when is_b2b is true then 'B2B'
+	     else
     case when mkt_medium_demand = 'Agents' then 'Agents'
          when mkt_medium_demand = 'Online Classifieds' then 'Online Classifieds'
          when mkt_medium_demand in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
          when mkt_medium_demand in ('Display','Retargeting','SEM non-branded') then 'Online Paid'
-         else 'Other' end as mkt_medium_demand,
+         else 'Other' end end as mkt_medium_demand,
 	sum(prospects) as prospects,
     sum(qualifieds) as qualifieds,
     sum(opportunities) as opportunities,
@@ -605,8 +608,8 @@ select
     sum(contract_created) as contract_created,
     sum(contract_signed) as contract_signed
 from union_all
-group by "date", city_group, is_b2b, 4, 5
-order by "date", city_group, is_b2b, 4, 5
+group by "date", city_group, 3, 4
+order by "date", city_group, 3, 4
 )
 select * from agg_all
 ;
