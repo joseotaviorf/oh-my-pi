@@ -44,11 +44,16 @@ from user_affiliate ua
  left join
 	  vistorias v on v.agente_id = ua.id
 ),
-regions as (
+region_ddd as (
+select distinct
+	cast(city_ddd as varchar) as ddd,
+	regional
+from public.vw_dim_region
+),
+region_city as (
 select distinct
 	city_name,
 	city_group,
-	cast(city_ddd as varchar) as ddd,
 	regional
 from public.vw_dim_region
 )
@@ -76,15 +81,14 @@ select
 		when city_campaign like '%campinas%' then 'Campinas'
 		when city_campaign like '%s_opaulo%' then 'RMSP'
 		when city_campaign like '%sp%' then 'RMSP' end,
-	    rgs_via_city.city_group, rgs_via_ddd.city_group) as marketing_city_group,
-	    rgs_via_ddd.regional,
+	    region_city.city_group) as marketing_city_group,
+	coalesce(region_city.regional, region_ddd.regional) as regional,
 	afl.is_inspector,
 	afl.is_realstate_agent,
 	afl.is_photographer,
 	afl.tracking_source,
 	afl.tracking_medium,
 	afl.tracking_campaign,
-	afl.city_campaign,
 	afl.tracking_platform,
 	afl.tracking_device_type,
 	afl.tracking_country,
@@ -93,6 +97,6 @@ select
 	now() as ts_load
 from afiliadosfull afl
 left join
-	regions rgs_via_city on afl.tracking_city = rgs_via_city.city_name
+	region_city on afl.tracking_city = region_city.city_name
 left join
-	regions rgs_via_ddd on afl.ddd_telefone = rgs_via_ddd.ddd
+	region_ddd on afl.ddd_telefone = region_ddd.ddd
