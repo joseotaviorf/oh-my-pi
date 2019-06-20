@@ -28,14 +28,15 @@ pipeline:
 
   upload-to-gs:
     image: plugins/gcs
-    settings:
-      source: "bietlejuice/*"
-      target: us-east4-airflow-forno-d10a26d5-bucket/dags/drone-test/
-      ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
-      acl: allUsers:READER
-      cache_control: public,max-age=3600
-      token:
-        from_secret: google_cloud_composer_credentials
+    source: "bietlejuice/*"
+    target: us-east4-airflow-forno-d10a26d5-bucket/dags/drone-test/
+    ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
+    acl: allUsers:READER
+    cache_control: public,max-age=3600
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    debug: true
     when:
       event: push
 #
