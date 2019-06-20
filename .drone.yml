@@ -26,22 +26,33 @@ pipeline:
 #    when:
 #      event: push
 
-  publish-jobs-staging:
-    group: publish-staging
-    image: quintoandar/drone-gcs-sync
-    pull: true
-    bucket: us-east4-airflow-forno-d10a26d5-bucket
-    source: bietlejuice
+  upload-to-gs:
+    image: wyattjoh/drone-gcs
+    acl: public
+    bucket: "us-east4-airflow-forno-d10a26d5-bucket"
+    source: bietlejuice/*
+    strip_prefix: bietlejuice/
     target: dags/drone-test/
     exclude:
-      - "**/*.py"
-    delete: true
-    dry_run: false
-    secrets:
-     - source: google_cloud_composer_credentials
-       target: google_application_credentials
-    when:
-     event: push
+      - **/*.py
+
+
+#  publish-jobs-staging:
+#    group: publish-staging
+#    image: quintoandar/drone-gcs-sync
+#    pull: true
+#    bucket: us-east4-airflow-forno-d10a26d5-bucket
+#    source: bietlejuice
+#    target: dags/drone-test/
+#    exclude:
+#      - "**/*.py"
+#    delete: true
+#    dry_run: false
+#    secrets:
+#     - source: google_cloud_composer_credentials
+#       target: google_application_credentials
+#    when:
+#     event: push
 
 #  upload-to-gs:
 #    image: plugins/gcs
