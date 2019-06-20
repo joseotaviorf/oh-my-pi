@@ -34,7 +34,7 @@ pipeline:
     strip_prefix: bietlejuice/
     target: dags/drone-test/
     exclude:
-      - **/*.py
+      - "**/*.py"
 
 
 #  publish-jobs-staging:
