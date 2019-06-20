@@ -26,15 +26,15 @@ pipeline:
 #    when:
 #      event: push
 
-  upload-to-gs:
-    image: wyattjoh/drone-gcs
-    acl: public
-    bucket: "us-east4-airflow-forno-d10a26d5-bucket"
-    source: bietlejuice/*
-    strip_prefix: bietlejuice/
-    target: dags/drone-test/
-    exclude:
-      - "**/*.py"
+#  upload-to-gs:
+#    image: wyattjoh/drone-gcs
+#    acl: public
+#    bucket: "us-east4-airflow-forno-d10a26d5-bucket"
+#    source: bietlejuice/*
+#    strip_prefix: bietlejuice/
+#    target: dags/drone-test/
+#    exclude:
+#      - "**/*.py"
 
 
 #  publish-jobs-staging:
@@ -54,19 +54,18 @@ pipeline:
 #    when:
 #     event: push
 
-#  upload-to-gs:
-#    image: plugins/gcs
-#    source: "bietlejuice/*"
-#    target: us-east4-airflow-forno-d10a26d5-bucket/dags/drone-test/
-#    ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
-#    acl: allUsers:READER
-#    cache_control: public,max-age=3600
-#    secrets:
-#      - source: google_cloud_composer_credentials
-#        target: google_application_credentials
-#    debug: true
-#    when:
-#      event: push
+  upload-to-gs:
+    image: plugins/gcs
+    source: "bietlejuice/*"
+    target: us-east4-airflow-forno-d10a26d5-bucket/dags/drone-test/
+    ignore: "**/jobs/old_etl/**"
+    acl: allUsers:READER
+    cache_control: public,max-age=3600
+    secrets:
+      - token: google_application_credentials_contents
+    when:
+      event: push
+
 #
 #  publish-coverage:
 #    image: plugins/s3
