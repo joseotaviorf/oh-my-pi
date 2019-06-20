@@ -31,7 +31,7 @@ pipeline:
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-forno-d10a26d5-bucket
-    source: bietlejuice/*
+    source: bietlejuice
     target: dags/drone-test/
     ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
     delete: true
