@@ -613,7 +613,7 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
-airflow_helpers.chain(region_dag, affiliate_dag)
+affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
 fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag,

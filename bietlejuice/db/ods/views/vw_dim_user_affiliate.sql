@@ -59,21 +59,21 @@ select distinct
 from public.vw_dim_region
 ), affiliate_mkt_city_group as (
 select
-*,
-coalesce(
-	case
-		when af_mkt.city_campaign like '%riodejaneiro%' or city_campaign like '%rj%' then 'Rio de Janeiro'
-		when af_mkt.city_campaign like '%belohorizonte%' then 'Belo Horizonte'
-		when af_mkt.city_campaign like '%florian_polis%' then 'Florianópolis'
-		when af_mkt.city_campaign like '%bras_lia%' then 'Brasília'
-		when af_mkt.city_campaign like '%goi_nia%' then 'Goiânia'
-		when af_mkt.city_campaign like '%portoalegre%' or city_campaign like 'rs%' then 'Porto Alegre'
-		when af_mkt.city_campaign like '%curitiba%' then 'Curitiba'
-		when af_mkt.city_campaign like '%campinas%' then 'Campinas'
-		when af_mkt.city_campaign like '%s_opaulo%' then 'RMSP'
-		when af_mkt.city_campaign like '%sp%' then 'RMSP' end,
-	    region_city.city_group, region_ddd.city_group) as marketing_city_group,
-	    coalesce(region_city.regional, region_ddd.regional) as regional_ddd_city
+    *,
+    coalesce(
+        case
+            when af_mkt.city_campaign like '%riodejaneiro%' or city_campaign like '%rj%' then 'Rio de Janeiro'
+            when af_mkt.city_campaign like '%belohorizonte%' then 'Belo Horizonte'
+            when af_mkt.city_campaign like '%florian_polis%' then 'Florianópolis'
+            when af_mkt.city_campaign like '%bras_lia%' then 'Brasília'
+            when af_mkt.city_campaign like '%goi_nia%' then 'Goiânia'
+            when af_mkt.city_campaign like '%portoalegre%' or city_campaign like 'rs%' then 'Porto Alegre'
+            when af_mkt.city_campaign like '%curitiba%' then 'Curitiba'
+            when af_mkt.city_campaign like '%campinas%' then 'Campinas'
+            when af_mkt.city_campaign like '%s_opaulo%' then 'RMSP'
+            when af_mkt.city_campaign like '%sp%' then 'RMSP' end,
+            region_city.city_group, region_ddd.city_group) as marketing_city_group,
+    coalesce(region_city.regional, region_ddd.regional) as regional_ddd_city
 from afiliadosfull af_mkt
 left join
 	region_city on af_mkt.tracking_city = region_city.city_name
@@ -107,4 +107,6 @@ select
 	aff_cityreg.tracking_city,
 	now() as ts_load
 from affiliate_mkt_city_group aff_cityreg
-left join region_ddd as region_city_group on aff_cityreg.marketing_city_group = region_city_group.city_group
+left join
+    region_ddd as region_city_group
+    on aff_cityreg.marketing_city_group = region_city_group.city_group
