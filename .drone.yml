@@ -33,7 +33,8 @@ pipeline:
     bucket: us-east4-airflow-forno-d10a26d5-bucket
     source: bietlejuice
     target: dags/drone-test/
-    ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
+    ignore:
+      - "**/jobs/old_etl/**"
     delete: true
     dry_run: false
     secrets:
