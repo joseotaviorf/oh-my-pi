@@ -26,161 +26,174 @@ pipeline:
     when:
       event: push
 
-  publish-coverage:
-    image: plugins/s3
-    pull: true
-    acl: public-read
-    bucket: 5a-coverage
-    source: badge-lines.svg
-    target: /bi-etl-ejuice
-    content_type: image/svg+xml
-    cache_control: no-cache
+  upload-to-gs:
+    image: plugins/gcs
+    settings:
+      source: "bietlejuice/*"
+      target: us-east4-airflow-forno-d10a26d5-bucket/dags/drone-test/
+      ignore: ["**/__pycache__/**", "**/jobs/old_etl/**", "**/jobs/dags/**"]
+      acl: allUsers:READER
+      cache_control: public,max-age=3600
+      token:
+        from_secret: google_cloud_composer_credentials
     when:
       event: push
-      branch: [ master ]
-
-  install-forno:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: .
-    target: ~/bi
-    include: [ 'requirements.txt', 'variables.json' ]
-    exclude: [ '*' ]
-    args: '-vI'
-    script:
-      - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  install-production:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: .
-    target: ~/bi
-    include: [ 'requirements.txt', 'variables.json' ]
-    exclude: [ '*' ]
-    args: '-vI'
-    script:
-      - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master ]
-
-  load-dags-forno:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: "bietlejuice/*"
-    target: /var/www/airflow/dags/bietlejuice
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-dags-production:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: "bietlejuice/*"
-    target: /var/www/airflow/dags/bietlejuice
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master ]
-
-  load-plugins-forno:
-    group: deploy
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: plugins/*
-    target: /var/www/airflow/plugins
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-plugins-prod:
-    group: deploy
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: plugins/*
-    target: /var/www/airflow/plugins
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master ]
-
-  sonar-preview:
-    image: quintoandar/sonar-scanner
-    pull: true
-    commands:
-      - |-
-        sonar-scanner \
-          -Dsonar.projectName=Bietlejuice \
-          -Dsonar.projectKey=${DRONE_REPO_NAME} \
-          -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=./bietlejuice \
-          -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.analysis.mode=preview \
-          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
-          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
-          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
-          -Dsonar.host.url=https://sonar.quintoandar.com.br \
-          -Dsonar.login=user \
-          -Dsonar.password=$${SONAR_PASSWORD}
-    secrets: [ sonar_password, github_access_token ]
-    when:
-      event: pull_request
-      branch: [ master ]
-
-  sonar-report:
-    image: quintoandar/sonar-scanner
-    pull: true
-    commands:
-      - |-
-        sonar-scanner \
-          -Dsonar.projectName=Bietlejuice \
-          -Dsonar.projectKey=${DRONE_REPO_NAME} \
-          -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=./bietlejuice \
-          -Dsonar.python.coverage.reportPath=coverage.xml \
-          -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.tests=./tests \
-          -Dsonar.host.url=https://sonar.quintoandar.com.br \
-          -Dsonar.projectKey=${DRONE_REPO_NAME} \
-          -Dsonar.login=user \
-          -Dsonar.password=$${SONAR_PASSWORD}
-    secrets: [ sonar_password, github_access_token ]
-    when:
-      event: push
-      branch: [ master ]
-
-  notify:
-    image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
-    channel: data-ops
-    when:
-      branch: [ forno, master ]
-      status: [ success, failure ]
+#
+#  publish-coverage:
+#    image: plugins/s3
+#    pull: true
+#    acl: public-read
+#    bucket: 5a-coverage
+#    source: badge-lines.svg
+#    target: /bi-etl-ejuice
+#    content_type: image/svg+xml
+#    cache_control: no-cache
+#    when:
+#      event: push
+#      branch: [ master ]
+#
+#  install-forno:
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+#    user: airflow
+#    source: .
+#    target: ~/bi
+#    include: [ 'requirements.txt', 'variables.json' ]
+#    exclude: [ '*' ]
+#    args: '-vI'
+#    script:
+#      - cd /var/www/airflow/
+#      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+#      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+#      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ forno ]
+#
+#  install-production:
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.quintoandar.com.br ]
+#    user: airflow
+#    source: .
+#    target: ~/bi
+#    include: [ 'requirements.txt', 'variables.json' ]
+#    exclude: [ '*' ]
+#    args: '-vI'
+#    script:
+#      - cd /var/www/airflow/
+#      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+#      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+#      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+#      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ master ]
+#
+#  load-dags-forno:
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+#    user: airflow
+#    source: "bietlejuice/*"
+#    target: /var/www/airflow/dags/bietlejuice
+#    args: '--force -vI'
+#    delete: true
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ forno ]
+#
+#  load-dags-production:
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.quintoandar.com.br ]
+#    user: airflow
+#    source: "bietlejuice/*"
+#    target: /var/www/airflow/dags/bietlejuice
+#    args: '--force -vI'
+#    delete: true
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ master ]
+#
+#  load-plugins-forno:
+#    group: deploy
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+#    user: airflow
+#    source: plugins/*
+#    target: /var/www/airflow/plugins
+#    args: '--force -vI'
+#    delete: true
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ forno ]
+#
+#  load-plugins-prod:
+#    group: deploy
+#    image: drillster/drone-rsync
+#    hosts: [ ssh.airflow.quintoandar.com.br ]
+#    user: airflow
+#    source: plugins/*
+#    target: /var/www/airflow/plugins
+#    args: '--force -vI'
+#    delete: true
+#    secrets: [ rsync_key ]
+#    when:
+#      event: push
+#      branch: [ master ]
+#
+#  sonar-preview:
+#    image: quintoandar/sonar-scanner
+#    pull: true
+#    commands:
+#      - |-
+#        sonar-scanner \
+#          -Dsonar.projectName=Bietlejuice \
+#          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+#          -Dsonar.projectBaseDir=. \
+#          -Dsonar.sources=./bietlejuice \
+#          -Dsonar.sourceEncoding=UTF-8 \
+#          -Dsonar.analysis.mode=preview \
+#          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
+#          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
+#          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
+#          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+#          -Dsonar.login=user \
+#          -Dsonar.password=$${SONAR_PASSWORD}
+#    secrets: [ sonar_password, github_access_token ]
+#    when:
+#      event: pull_request
+#      branch: [ master ]
+#
+#  sonar-report:
+#    image: quintoandar/sonar-scanner
+#    pull: true
+#    commands:
+#      - |-
+#        sonar-scanner \
+#          -Dsonar.projectName=Bietlejuice \
+#          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+#          -Dsonar.projectBaseDir=. \
+#          -Dsonar.sources=./bietlejuice \
+#          -Dsonar.python.coverage.reportPath=coverage.xml \
+#          -Dsonar.sourceEncoding=UTF-8 \
+#          -Dsonar.tests=./tests \
+#          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+#          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+#          -Dsonar.login=user \
+#          -Dsonar.password=$${SONAR_PASSWORD}
+#    secrets: [ sonar_password, github_access_token ]
+#    when:
+#      event: push
+#      branch: [ master ]
+#
+#  notify:
+#    image: plugins/slack
+#    webhook: https://hooks.slack.com/services/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
+#    channel: data-ops
+#    when:
+#      branch: [ forno, master ]
+#      status: [ success, failure ]
