@@ -1,6 +1,7 @@
+import petl as etl
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 from qa_python_utils.default_logger import QuintoAndarLogger
-
-from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 
 logger = QuintoAndarLogger('Kenshoo')
 
@@ -10,18 +11,34 @@ class Kenshoo(object):
     CSV_PATH_PREFIX = '/tmp/kenshoo'
 
     @logger
-    def __init__(self, athena_client, execution_date):
-        self.athena_client = athena_client
+    def __init__(self, execution_date):
         self.execution_date = execution_date
 
     @logger
-    def execute_query_from_file(self, query_filename):
-        if query_filename is None or '.sql' not in query_filename:
-            raise RuntimeError('m=execute_query_from_file, msg=query_filename is invalid')
-
+    def _athena_execute_query_from_file(self, query_filename, athena_client):
         full_path = '{}/{}/{}'.format(DATALAKE_QUERIES_DIR, Kenshoo.PREFIX_QUERIES_PATH, query_filename)
-        df = self.athena_client.execute_file_query_and_return_dataframe(filename=full_path)
 
+        return athena_client.execute_file_query_and_return_dataframe(filename=full_path)
+
+    @logger
+    def _redshift_execute_query_from_file(self, query_filename, query_params=None):
+        filename = '{}/{}/{}'.format(DW_QUERIES_DIR, Kenshoo.PREFIX_QUERIES_PATH, query_filename)
+        with open(filename) as f:
+            query = f.read()
+
+        if query_params:
+            query = query.format(**query_params)
+
+        petl_table = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query=query,
+            encoding='UTF8'
+        )
+
+        return etl.todataframe(petl_table)
+
+    @logger(exclude='df')
+    def _save_single_file(self, df):
         # saving as csv for later SFTP send
         csv_path = '{}-{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, self.execution_date)
         df.to_csv(
@@ -30,5 +47,44 @@ class Kenshoo(object):
             encoding='utf-8'
         )
 
-        logger.info('m=execute_query_from_file, query_filename={}, msg=csv saved to {}'.format(query_filename,
-                                                                                               csv_path))
+        logger.info('m=_save_single_file_in_datalake, msg=csv saved to {}'.format(csv_path))
+
+    @logger(exclude='df')
+    def _save_multiple_files(self, df, query_filename, split_by_column=None):
+        # splitting
+        df_index = df[split_by_column].unique()
+
+        for row in df_index:
+            # saving as csv for later SFTP send
+            csv_path = '{}/{}/{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, query_filename.replace('.sql', ''),
+                                             row.encode('ascii', 'ignore'))
+
+            df[df[split_by_column] == row].to_csv(
+                path_or_buf=csv_path,
+                index=False,
+                encoding='utf-8'
+            )
+
+            logger.info('m=_save_multiple_file_in_datalake, index={}, msg=csv saved to {}'.format(
+                row.encode('ascii', 'ignore'), csv_path))
+
+    @logger(exclude='athena_client')
+    def save_file_from_athena_query_execution(self, query_filename, athena_client):
+        if query_filename is None or '.sql' not in query_filename:
+            raise RuntimeError('m=save_file_from_athena_query_execution, msg=query_filename is invalid')
+
+        df = self._athena_execute_query_from_file(query_filename=query_filename, athena_client=athena_client)
+
+        self._save_single_file(df=df)
+
+    @logger
+    def save_file_from_redshift_query_execution(self, query_filename, query_params=None, split_by_column=None):
+        if query_filename is None or '.sql' not in query_filename:
+            raise RuntimeError('m=save_file_from_redshift_query_execution, msg=query_filename is invalid')
+
+        df = self._redshift_execute_query_from_file(query_filename=query_filename, query_params=query_params)
+
+        if split_by_column:
+            self._save_multiple_files(df=df, query_filename=query_filename, split_by_column=split_by_column)
+        else:
+            self._save_single_file(df=df)
