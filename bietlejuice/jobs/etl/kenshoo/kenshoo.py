@@ -56,7 +56,7 @@ class Kenshoo(object):
 
         for row in df_index:
             # saving as csv for later SFTP send
-            csv_path = '{}/{}/{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, query_filename.replace('.sql', ''),
+            csv_path = '{}-{}-{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, query_filename.replace('.sql', ''),
                                              row.encode('ascii', 'ignore'))
 
             df[df[split_by_column] == row].to_csv(
@@ -72,6 +72,9 @@ class Kenshoo(object):
     def save_file_from_athena_query_execution(self, query_filename, athena_client):
         if query_filename is None or '.sql' not in query_filename:
             raise RuntimeError('m=save_file_from_athena_query_execution, msg=query_filename is invalid')
+
+        if athena_client is None:
+            raise RuntimeError('m=save_file_from_athena_query_execution, msg=athena_client param is mandatory')
 
         df = self._athena_execute_query_from_file(query_filename=query_filename, athena_client=athena_client)
 
