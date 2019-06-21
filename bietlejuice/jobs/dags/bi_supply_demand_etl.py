@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,6 +15,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
@@ -614,10 +613,10 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
 )
 
 airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
-
+airflow_helpers.chain(region_dag, affiliate_dag)
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
-fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
 

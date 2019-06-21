@@ -1,0 +1,5 @@
+# Config for kpi_datamart
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_ongoing_listed_suspended_listings']

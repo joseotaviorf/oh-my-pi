@@ -11,6 +11,8 @@ create table public.dim_user_affiliate (
     creci_number varchar(255),
     origin varchar(255),
     type varchar(255),
+    marketing_city_group varchar(255),
+    regional varchar(255),
     is_inspector boolean,
     is_realstate_agent boolean,
     is_photographer boolean,
