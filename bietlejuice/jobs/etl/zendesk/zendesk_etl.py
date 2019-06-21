@@ -181,7 +181,7 @@ class ZendeskETL(object):
 
     @logger
     def ticket_metric_events(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_metric_events.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_metric_events_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -214,7 +214,7 @@ class ZendeskETL(object):
 
     @logger
     def ticket_events(self, table_name):
-        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_events.sql'
+        query = BaseETL.get_query_from_file_name('{}/zendesk/ticket_events_xplenty.sql'
                                                  .format(DATALAKE_QUERIES_DIR))
 
         r_cols = OrderedDict([
@@ -486,7 +486,7 @@ class ZendeskETL(object):
 
             self.athena_client.add_partition(
                 database=ZendeskETL.SCHEMAS['raw'],
-                table_name="zendesk_{}".format(table_name),
+                table_name="zendesk_{}_xplenty".format(table_name),
                 partition="dt='{}'".format(self.execution_date)
             )
         else:
