@@ -9,5 +9,5 @@ select
     t.ticket_id,
     t.timestamp,
     t.via
-from datalake_raw.zendesk_ticket_events t
+from datalake_raw.zendesk_ticket_events_xplenty t
 __WHERE_CLAUSE__
