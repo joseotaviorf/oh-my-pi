@@ -32,7 +32,7 @@ pipeline:
     pull: true
     bucket: us-east4-airflow-forno-d10a26d5-bucket
     source: bietlejuice/jobs/composer/
-    target: dags/bietlejuice/jobs/composer_test/
+    target: dags/bietlejuice/jobs/composer/
     delete: true
     dry_run: false
     secrets:
@@ -40,6 +40,7 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
+      branch: [ DPL-48 ]
 
 #
 #  publish-coverage:
