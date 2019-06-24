@@ -8,7 +8,7 @@ with stitch_data as (
 			from_iso8601_timestamp(created_at) at time zone 'Brazil/East') as ts_created_local,
 		cast(json_extract(via, '$.channel') as varchar) as channel,
     	row_number() over (partition by id, dt order by updated_at desc) as last_updated
-    from stitch.tickets
+    from datalake_raw.zendesk_tickets
     where cast(json_extract(via, '$.channel') as varchar) is not null
 		  and raw_subject != 'SCRUBBED'
 		  and dt = '{execution_date}'

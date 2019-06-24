@@ -10,3 +10,5 @@ create table lead_first_event_tracking (
     tracking_region varchar(255),
     tracking_city varchar(255)
 );
+
+create index lead_first_event_tracking_id_lead_idx on lead_first_event_tracking (id_lead);

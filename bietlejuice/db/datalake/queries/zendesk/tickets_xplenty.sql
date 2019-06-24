@@ -3,7 +3,7 @@ with distinct_data as (
 	    select
 	        t.*,
 	        row_number() over (partition by id, dt order by updated_at desc) as rn
-	    from datalake_raw.zendesk_tickets t
+	    from datalake_raw.zendesk_tickets_xplenty t
 	    __WHERE_CLAUSE__
 	)
 	select
