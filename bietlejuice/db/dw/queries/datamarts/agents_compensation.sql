@@ -42,7 +42,7 @@ old_compensation as (
 		bv.sk_user_agent as sk_agent,
 		bv.compensation_month,
 		'Old Commission' as compensation_type,
-		(bv.visits_performed*10.0 + bc.contracts_signed*0.2) as agent_monthly_compensation
+		(coalesce(bv.visits_performed,0)*10.0 + coalesce(bc.contracts_signed,0)*0.2) as agent_monthly_compensation
 	from old_compensation_by_visit bv
 		left join old_compensation_by_contract bc
 			on bv.sk_user_agent = bc.sk_user_agent
