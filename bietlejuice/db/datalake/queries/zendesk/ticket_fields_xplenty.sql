@@ -20,5 +20,5 @@ select
     t.position,
     t.tag,
     t.title_in_portal
-from datalake_raw.zendesk_ticket_fields t
+from datalake_raw.zendesk_ticket_fields_xplenty t
 __WHERE_CLAUSE__

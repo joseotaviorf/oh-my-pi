@@ -26,7 +26,7 @@ FROM schedule s
 JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
 LEFT JOIN public.dim_agent_region a
-	ON a.sk_regions_date = s.sk_date
+	ON a.sk_regions_date = (to_char('{0}'::DATE,'YYYYMMDD')::INTEGER)
 		AND a.sk_agent = s.sk_agent_id
 LEFT JOIN public.dim_user u
     ON s.sk_agent_id = u.dados_agente_id

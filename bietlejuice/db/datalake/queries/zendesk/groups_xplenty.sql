@@ -5,5 +5,5 @@ select
     t.deleted,
     t.created_at,
     t.updated_at
-from datalake_raw.zendesk_groups t
+from datalake_raw.zendesk_groups_xplenty t
 __WHERE_CLAUSE__
