@@ -199,4 +199,4 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
-      branch: [ DPL-48 ]
+      branch: [ forno ]
