@@ -115,7 +115,7 @@ class TestKenshoo(object):
     def test__save_single_file(self, kenshoo):
         # arrange
         path = '/tmp'
-        kenshoo.execution_date = datetime.datetime(2000, 01, 01)
+        kenshoo.execution_date = datetime.datetime(2000, 1, 1)
         full_path = '{}-{}.csv'.format('kenshoo', kenshoo.execution_date)
         df = pd.DataFrame(data=[1], columns=['id'])
 

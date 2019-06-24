@@ -61,7 +61,8 @@ def execute_redshift_query(query_filename, has_query_params, split_by_column, ds
 
 
 def create_tasks_in_subdag(sub_dag_name):
-    local_path = '/tmp/kenshoo/visits_accomplished'
+    local_path = '/tmp'
+    validation_prefix_list = ['kenshoo-visits_accomplished']
 
     local_dag = BaseSubDag(
         bucket=S3_BUCKET,
@@ -73,19 +74,21 @@ def create_tasks_in_subdag(sub_dag_name):
 
     list_files = [f for f in listdir(local_path) if isfile(join(local_path, f))]
     for item in list_files:
-        dag_prefix = local_path.split('/')[-1]
-        dag_suffix = (item.replace('.csv', '').replace(' ', '')),
-        dag_suffix = dag_suffix[0]
-        file_name = item
+        for validation_item in validation_prefix_list:
+            if validation_item in item:
+                dag_prefix = validation_item.split('-')[-1]
+                dag_suffix = (item.replace('.csv', '').replace(' ', '')),
+                dag_suffix = dag_suffix[0]
+                file_name = item
 
-        SFTPOperator(
-            task_id='{}_{}_task'.format(dag_prefix, dag_suffix),
-            ssh_hook=ssh_hook,
-            local_filepath='{}-{}-{}'.format(Kenshoo.CSV_PATH_PREFIX, dag_prefix, file_name),
-            remote_filepath='{}/{}'.format(dag_prefix, file_name),
-            operation=SFTPOperation.PUT,
-            dag=local_dag
-        )
+                SFTPOperator(
+                    task_id='{}_{}'.format(dag_prefix, dag_suffix),
+                    ssh_hook=ssh_hook,
+                    local_filepath='{}-{}-{}'.format(Kenshoo.CSV_PATH_PREFIX, dag_prefix, file_name),
+                    remote_filepath='{}/{}'.format(dag_prefix, file_name),
+                    operation=SFTPOperation.PUT,
+                    dag=local_dag
+                )
 
     return local_dag
 
@@ -116,7 +119,7 @@ send_adjust_search_offline_conversions_data_task = SFTPOperator(
 )
 
 execute_visit_accomplished_query_task = BaseDAG.build_python_operator(
-    task_id='execute_visit_accomplished_query_task',
+    task_id='execute_visit_accomplished_query',
     python_callable=execute_redshift_query,
     provide_context=True,
     op_kwargs={'query_filename': 'visits_accomplished.sql',
@@ -128,7 +131,7 @@ execute_visit_accomplished_query_task = BaseDAG.build_python_operator(
 
 send_visits_accomplished_query_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='send_visits_accomplished_query_task',
+    sub_dag_name='send_visits_accomplished_query',
     sub_dag_func=create_tasks_in_subdag
 )
 

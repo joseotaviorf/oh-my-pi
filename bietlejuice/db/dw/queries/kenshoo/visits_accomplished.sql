@@ -13,7 +13,6 @@ with users_with_visits_last7d as (
 	join fact_house_listings fhl on fhl.sk_house_listing = dhl.sk_house_listing
 	join dim_region dr on dr.sk_region = fhl.sk_region
 	where bk.type = 'Visita'
-	and bk.status = 'Realizado'
 	and bk.visit_follow_up in ('VaiNegociar', 'VisitouSozinho', 'Talvez')
 	and bk.dt_scheduling between dateadd(day, -7, date('{dt}')) and date('{dt}')
 )

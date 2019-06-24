@@ -47,7 +47,7 @@ class Kenshoo(object):
             encoding='utf-8'
         )
 
-        logger.info('m=_save_single_file_in_datalake, msg=csv saved to {}'.format(csv_path))
+        logger.info('m=_save_single_file, msg=csv saved to {}'.format(csv_path))
 
     @logger(exclude='df')
     def _save_multiple_files(self, df, query_filename, split_by_column=None):
@@ -65,7 +65,7 @@ class Kenshoo(object):
                 encoding='utf-8'
             )
 
-            logger.info('m=_save_multiple_file_in_datalake, index={}, msg=csv saved to {}'.format(
+            logger.info('m=_save_multiple_files, index={}, msg=csv saved to {}'.format(
                 row.encode('ascii', 'ignore'), csv_path))
 
     @logger(exclude='athena_client')
