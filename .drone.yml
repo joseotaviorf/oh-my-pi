@@ -37,7 +37,7 @@ pipeline:
     dry_run: false
     secrets:
       - source: google_cloud_composer_credentials
-      - target: google_application_credentials
+        target: google_application_credentials
     when:
       event: push
 
