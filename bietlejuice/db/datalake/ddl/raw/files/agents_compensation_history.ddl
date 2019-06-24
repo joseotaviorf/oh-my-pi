@@ -12,6 +12,7 @@ create external table datalake_raw.agents_compensation_history (
     `end` date,
     `region_code` string
 )
+COMMENT 'from google sheets [Agents Compensation] file  and [Historico de Comissoes] sheet in link  https://docs.google.com/spreadsheets/d/1e3588dE7amznUtmUCTZ6GZDZQkKPvrMq1XsLMoiT-6g/ '
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ';',
