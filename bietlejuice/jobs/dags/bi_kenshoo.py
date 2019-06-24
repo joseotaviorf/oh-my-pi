@@ -84,8 +84,8 @@ def create_tasks_in_subdag(sub_dag_name):
                 SFTPOperator(
                     task_id='{}_{}'.format(dag_prefix, dag_suffix),
                     ssh_hook=ssh_hook,
-                    local_filepath='{}-{}-{}'.format(Kenshoo.CSV_PATH_PREFIX, dag_prefix, file_name),
-                    remote_filepath='{}/{}'.format(dag_prefix, file_name),
+                    local_filepath='{}/{}'.format(local_path, file_name),
+                    remote_filepath='{}/{}.csv'.format(dag_prefix, file_name),
                     operation=SFTPOperation.PUT,
                     dag=local_dag
                 )
