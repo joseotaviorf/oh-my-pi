@@ -9,6 +9,5 @@ create table if not exists user_affiliate (
     criadoEm timestamp,
     numeroCreci varchar(255),
     origin varchar(255),
-    affiliateType varchar(255),
-    user_id bigint
+    affiliateType varchar(255)
 );
