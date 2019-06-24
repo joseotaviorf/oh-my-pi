@@ -7,7 +7,7 @@ with stitch_data as (
 			from_iso8601_timestamp(created_at) at time zone 'GMT-3',
 			from_iso8601_timestamp(created_at) at time zone 'Brazil/East') as ts_created_local,
     	row_number() over (partition by id, dt order by updated_at desc) as last_updated
-    from stitch.group_memberships
+    from datalake_raw.zendesk_group_memberships
     where dt = '{execution_date}'
 )
 select

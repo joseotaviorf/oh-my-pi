@@ -1,6 +1,6 @@
-DROP TABLE datalake_raw.zendesk_articles;
+DROP TABLE datalake_raw.zendesk_articles_xplenty;
 
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_articles`(
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_articles_xplenty`(
   `id` string,
   `url` string,
   `html_url` string,
@@ -36,4 +36,4 @@ OUTPUTFORMAT
 LOCATION
   's3://5a-datalake/raw/zendesk/articles/';
 
-MSCK REPAIR TABLE datalake_raw.zendesk_articles;
+MSCK REPAIR TABLE datalake_raw.zendesk_articles_xplenty;
