@@ -14,6 +14,8 @@ with users_with_visits_last7d as (
 	join dim_region dr on dr.sk_region = fhl.sk_region
 	where bk.type = 'Visita'
 	and bk.visit_follow_up in ('VaiNegociar', 'VisitouSozinho', 'Talvez')
+	-- 'NaoGostou' also consists a fup condition to be filtered
+	-- However we only want situations that would result in possible proposals
 	and bk.dt_scheduling between dateadd(day, -7, date('{dt}')) and date('{dt}')
 )
 select distinct
