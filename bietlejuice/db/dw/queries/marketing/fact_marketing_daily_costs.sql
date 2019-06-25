@@ -185,6 +185,10 @@ UNION
 	    tx.mkt_category,
 	    tx.mkt_flow,
 	    tx.mkt_completion,
+	    -- due to higher granularity it was not possible to add this column in taxonomy table
+	    case when tx.side = 'supply' and cf.campaign_name_l like '%calculadora%' then 'PriceSuggestion'
+	         when tx.side = 'supply' then 'OwnerPWA'
+	    end as mkt_origin,
 	    tx.mkt_channel,
 	    tx.mkt_medium,
 	    tx.mkt_source,
@@ -233,6 +237,7 @@ city_group_final as city_group,
 mkt_category,
 mkt_flow,
 mkt_completion,
+mkt_origin,
 mkt_channel,
 mkt_medium,
 mkt_source,
