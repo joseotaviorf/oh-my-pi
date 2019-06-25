@@ -10,6 +10,7 @@ SELECT
   r."cidadeId" as city_id,
   coalesce(ar.city, r."cidadeNome") as city_name,
   ar.city_group,
+  ar.ddd as city_ddd,
   ar.region_code as region_code,
   ar.region_code_deprecated as region_code_deprecated,
 	ar.state as short_region_name,
@@ -27,6 +28,7 @@ SELECT
 			'Barueri') then 'Grande São Paulo'
 		else NULL
 	end as greater_region,
+  ar.regional as regional,
   r."criadaEm" as dt_created,
   r."atualizadoEm" as dt_updated,
   r.dt_timestamp::date as dt_timestamp,

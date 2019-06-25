@@ -1,6 +1,6 @@
-drop table datalake_clean.`zendesk_ticket_events`;
+drop table datalake_clean.`zendesk_ticket_events_xplenty`;
 
-CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_events`(
+CREATE EXTERNAL TABLE datalake_clean.`zendesk_ticket_events_xplenty`(
   `metadata` string,
   `system` string,
   `event_type` string,
@@ -15,7 +15,7 @@ PARTITIONED BY (
   `dt_extraction` string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/zendesk/ticket_events'
+  's3://5a-datalake/clean/zendesk/ticket_events_xplenty'
   ;
 
-msck repair table datalake_clean.`zendesk_ticket_events`;
+msck repair table datalake_clean.`zendesk_ticket_events_xplenty`;
