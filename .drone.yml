@@ -177,14 +177,6 @@ pipeline:
       event: push
       branch: [ master ]
 
-  notify:
-    image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
-    channel: data-ops
-    when:
-      branch: [ forno, master ]
-      status: [ success, failure ]
-
   publish-composer-jobs-forno:
     group: publish-composer-jobs
     image: quintoandar/drone-gcs-sync
@@ -200,3 +192,27 @@ pipeline:
     when:
       event: push
       branch: [ forno ]
+
+  publish-composer-jobs-prod:
+    group: publish-composer-jobs
+    image: quintoandar/drone-gcs-sync
+    pull: true
+    bucket: us-east4-airflow-prod-3f72afaa-bucket
+    source: bietlejuice/jobs/composer/
+    target: dags/bietlejuice/jobs/composer/
+    delete: true
+    dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [ master ]
+
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: data-ops
+    when:
+      branch: [ forno, master ]
+      status: [ success, failure ]
