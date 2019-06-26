@@ -34,6 +34,8 @@ create table staging.dim_offer (
   price_conditions integer,
   other_conditions integer,
   type varchar(255),
-  constraint dim_offer_pkey primary key(sk_offer)
+  constraint dim_offer_pkey primary key(sk_offer),
+  last_rent_value_offered_by_tenant decimal(18,4),
+  last_rent_value_offered_by_owner decimal(18,4)
 )
 ;
