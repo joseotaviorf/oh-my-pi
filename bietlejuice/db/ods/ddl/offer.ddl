@@ -22,7 +22,9 @@ create table if not exists offer (
   type varchar(255),
   first_sent_at timestamp,
   last_sent_at timestamp,
-  topic_type varchar(255)
+  topic_type varchar(255),
+  last_rent_value_offered_by_tenant bigint,
+  last_rent_value_offered_by_owner bigint
 )
 ;
 

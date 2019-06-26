@@ -1,5 +1,4 @@
 drop table if exists datalake_clean.ods_dim_offer;
-
 create external table if not exists datalake_clean.ods_dim_offer (
   sk_offer string,
   id_offer string,
