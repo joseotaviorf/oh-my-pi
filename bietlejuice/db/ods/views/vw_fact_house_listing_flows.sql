@@ -5,7 +5,7 @@ with legacy_doorman as (
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
   from files.porteiros_legado
-  where (porteiros_legado."Status" = (['Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'])) 
+  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
 base_lead_tasks as (
