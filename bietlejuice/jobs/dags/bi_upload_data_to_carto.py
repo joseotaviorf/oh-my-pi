@@ -80,6 +80,9 @@ tasks = [
      'final_sql': None},
     {'carto_table_name': 'qa_listings_metrics',
      'db': 'dw',
+     'final_sql': None},
+    {'carto_table_name': 'qa_region_codes_liquidity',
+     'db': 'dw',
      'final_sql': None}
 ]
 
