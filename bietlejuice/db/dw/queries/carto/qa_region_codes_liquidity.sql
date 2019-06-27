@@ -185,10 +185,10 @@ SELECT
   ROUND(percent_rented_6_weeks, 2) AS percent_rented_6_weeks,
   ROUND((percent_rented_6_weeks - percent_rented_6_weeks_error), 2)::VARCHAR || '-' || ROUND((percent_rented_6_weeks + percent_rented_6_weeks_error), 2)::VARCHAR AS percent_rented_6_weeks_interval,
   CASE
-    WHEN percent_rented_8_weeks_error <= 0.05 THEN 'Low'
-    WHEN percent_rented_8_weeks_error <= 0.10 THEN 'Medium'
-    WHEN percent_rented_8_weeks_error >= 0.10 THEN 'High'
-  END AS percent_rented_8_weeks_error_level,
+    WHEN percent_rented_6_weeks_error <= 0.05 THEN 'Low'
+    WHEN percent_rented_6_weeks_error <= 0.10 THEN 'Medium'
+    WHEN percent_rented_6_weeks_error >= 0.10 THEN 'High'
+  END AS percent_rented_6_weeks_error_level,
 
   ROUND(average_days_house_listing_to_contract_signed) AS average_days_house_listing_to_contract_signed,
   ROUND((average_days_house_listing_to_contract_signed - average_days_house_listing_to_contract_signed_error), 0)::VARCHAR || '-' || ROUND((average_days_house_listing_to_contract_signed + average_days_house_listing_to_contract_signed_error), 0)::VARCHAR AS average_days_house_listing_to_contract_signed_interval,
