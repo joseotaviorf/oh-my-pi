@@ -146,6 +146,7 @@ UNION
 		mccc.city_group as cost_city_group,
 		-- city via campaign_name full name written
 		case
+	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
 			when cf.campaign_name_l like '%s_o_paulo%' or cf.campaign_name_l like '%sp detailed%' then 'RMSP'
 			when cf.campaign_name_l like 'sp %' then 'RMSP'
 			when cf.campaign_name_l like '%all cities%' then 'RMSP'
@@ -160,7 +161,6 @@ UNION
 			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
 	 	    when cf.campaign_name_l like '%rio de janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
-	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
 	     	when cf.campaign_name_l like '%bh%' or cf.campaign_name_l like '%belo%h%' then 'Belo Horizonte'
 	 	    when cf.campaign_name_l like '%minas_gerais%' then 'Belo Horizonte'
 	     	when cf.campaign_name_l like '%goi_nia%' or cf.campaign_name_l like '%goi_s%' then 'Goiânia'
@@ -170,8 +170,8 @@ UNION
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
-		case when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
-			 when campaign_city = 'campinas' then 'Campinas'
+		case when campaign_city = 'campinas' then 'Campinas'
+		     when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
 			 when campaign_city = 'goiania' then 'Goiânia'
