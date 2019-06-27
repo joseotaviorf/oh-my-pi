@@ -4,7 +4,7 @@ import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.composer.base.base_dag import BaseDAG
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
 
