@@ -1,4 +1,67 @@
-with campaigns_full as (
+with manual_google_costs as (
+    with t_prep as (
+        select
+          replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
+          campaign_name,
+          to_char(cast(cost_date as date), 'yyyyMMdd')::integer as sk_date,
+          cast(replace(desktop_cost, ',', '') as numeric(10,2)) as desktop_cost,
+          cast(replace(mobile_cost, ',', '') as numeric(10,2)) as mobile_cost,
+          cast(replace(tablet_cost, ',', '') as numeric(10,2)) as tablet_cost
+        from datalake_raw.marketing_manual_costs_google
+    )
+    select
+        case when prep_account_name = 'quintoandar_display_and_video' then 'quintoandar_dra'
+			else prep_account_name end as account_name,
+		*
+	    from t_prep
+),
+google_consolidated_cost as (
+    with t_google as (
+        select
+            fg.sk_date,
+            coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
+            coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
+            dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
+            cast(dga.ad_id as varchar) as utm_content,
+            fg.desktop_cost,
+            fg.mobile_cost
+        from marketing.fact_google_daily_cost_attributions fg
+        left join marketing.dim_google_keyword dgk
+            on dgk.sk_keyword = fg.sk_keyword
+        left join marketing.dim_google_ad dga
+            on dga.sk_ad = fg.sk_ad
+        left join marketing.dim_google_campaign dgc
+            on dgc.sk_campaign = fg.sk_campaign
+        )
+    select
+		coalesce(m.sk_date, g.sk_date) as sk_date,
+		case when m.sk_date is not null then m.campaign_name
+		    else g.campaign_name end
+		    as campaign_name,
+		case when m.sk_date is not null then m.account_name
+		    else g.account_name end
+		    as account_name,
+		case when m.sk_date is not null then m.campaign_name
+		    else g.campaign_name end
+		    as utm_campaign,
+		case when m.sk_date is null then g.utm_term end
+		    as utm_term,
+		case when m.sk_date is null then g.utm_content end
+		    as utm_content,
+		case when m.sk_date is not null then m.desktop_cost
+		    else g.desktop_cost end
+		    as desktop_cost,
+		case when m.sk_date is not null then m.mobile_cost
+		    else g.mobile_cost end
+		    as mobile_cost
+	from t_google g
+	full outer join manual_google_costs m
+	    on m.sk_date = g.sk_date
+	    and m.account_name = g.account_name
+	    and m.campaign_name = g.campaign_name
+	where coalesce(m.sk_date, g.sk_date) >= 20180101
+),
+campaigns_full as (
     select
 		ff.sk_date,
 		'facebook'  as origin,
@@ -21,33 +84,26 @@ with campaigns_full as (
 	where ff.sk_date >= 20180101
 UNION
     select
-		fg.sk_date,
+		sk_date,
 		'google' as origin,
 		'fact_google_daily_cost_attributions' as fact_cost,
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
-		lower(case when SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2) ~ '^[0-9]+$' then
-		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)
+		campaign_name,
+		lower(case when SPLIT_PART(campaign_name, '.', 2) ~ '^[0-9]+$' then
+		    SPLIT_PART(campaign_name, '.', 3)
 		    else
-		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)
+		    SPLIT_PART(campaign_name, '.', 2)
 		    end) as campaign_city,
-		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
-		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
-		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as utm_campaign,
-		dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
-		cast(dga.ad_id as varchar) as utm_content,
-		fg.desktop_cost as desktop_cost,
-		fg.mobile_cost as mobile_cost,
+		account_name,
+		lower(campaign_name) as campaign_name_l,
+		lower(account_name) as account_name_l,
+		cast(utm_campaign as varchar) as utm_campaign,
+		cast(utm_term as varchar) as utm_term,
+		cast(utm_content as varchar) as utm_content,
+		desktop_cost,
+		mobile_cost,
 		null as other_cost,
 		null as total_cost
-	from marketing.fact_google_daily_cost_attributions fg
-	left join marketing.dim_google_keyword dgk
-		on dgk.sk_keyword = fg.sk_keyword
-	left join marketing.dim_google_ad dga
-		on dga.sk_ad = fg.sk_ad
-	left join marketing.dim_google_campaign dgc
-		on dgc.sk_campaign = fg.sk_campaign
-	where fg.sk_date >= 20180101
+	from google_consolidated_cost
 UNION
     select 
         ftc.sk_date,
