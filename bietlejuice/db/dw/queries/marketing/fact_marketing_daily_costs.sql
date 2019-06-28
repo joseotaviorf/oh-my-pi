@@ -41,7 +41,7 @@ google_consolidated_cost as (
 		case when m.sk_date is not null then m.account_name
 		    else g.account_name end
 		    as account_name,
-		case when m.sk_date is null then m.campaign_name
+		case when m.sk_date is not null then m.campaign_name
 		    else g.campaign_name end
 		    as utm_campaign,
 		case when m.sk_date is null then g.utm_term end
