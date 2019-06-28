@@ -23,5 +23,5 @@ select
     t.permission_group_id,
     t.label_names,
     t.body
-from datalake_raw.zendesk_articles t
+from datalake_raw.zendesk_articles_xplenty t
 __WHERE_CLAUSE__

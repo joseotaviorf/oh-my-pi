@@ -81,6 +81,7 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
     count = 0
     logger.info('m=extract_tasks, total_task={}'.format(db.tasks.find(_filter).count()))
     logger.info('m=extract_tasks, msg=listing tasks')
+
     for row in db.tasks.find(_filter, projection).batch_size(200):
         count += 1
         if count % 1000 == 0:
@@ -94,12 +95,18 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
         dt_closed = None
         first_rep_id = None
 
+        # status construction
         if 'silenciadaAte' in row:
             task_status = 'Rescheduled'
         if 'realizadaEm' in row:
             task_status = 'Closed'
             dt_closed = row['realizadaEm']
+
         for action in row['actions']:
+            # resolved tasks do not have a specific time column, time must be found through actions
+            if action['type'] == 'RESOLVE':
+                task_status = 'Closed'
+                dt_closed = action['date']
             if action['type'] == 'SNOOZE':
                 number_of_reschedules += 1
             if action['type'] == 'UPDATE':

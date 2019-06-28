@@ -1,4 +1,4 @@
-DROP TABLE datalake_clean.monthly_active_user_sessions;
+DROP TABLE datalake_clean.amplitude_monthly_active_user_sessions;
 
 CREATE EXTERNAL TABLE datalake_clean.amplitude_monthly_active_user_sessions (
     date string,
@@ -10,6 +10,7 @@ CREATE EXTERNAL TABLE datalake_clean.amplitude_monthly_active_user_sessions (
 	mkt_category string,
 	mkt_flow string,
 	mkt_completion string,
+	mkt_origin string,
 	mkt_channel string,
 	mkt_medium string,
 	mkt_source string,

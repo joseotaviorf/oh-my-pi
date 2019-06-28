@@ -1,10 +1,12 @@
-drop table if not exists datalake_raw.zendesk_ticket_metrics;
-create external table if exists datalake_raw.zendesk_ticket_metrics (
+drop table if exists datalake_raw.zendesk_ticket_metrics;
+create external table if not exists datalake_raw.zendesk_ticket_metrics (
     id string,
-    `_sdc_sequence` string,
-    `_sdc_received_at` string,
-    `_sdc_batched_at` string,
-    `_sdc_table_version` string,
+    /* These columns are applicable to all tables and integration types. 
+       Unless noted, every column in this list will be present in every integration table created by Stitch. */
+    `_sdc_sequence` string,      -- order in which data points were considered for loading.
+    `_sdc_received_at` string,   -- indicating when Stitch received the record for loading.
+    `_sdc_batched_at` string,    -- indicating when Stitch loaded the batch the record was a part of into the data warehouse
+    `_sdc_table_version` string, -- Indicates the version of the table.
     first_resolution_time_in_minutes string,
     requester_updated_at string,
     solved_at string,
@@ -37,4 +39,4 @@ stored as inputformat
 outputformat                                                                                                                                                                                                                                                   
     'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'                                                                                                                                                                                                 
 location
-    's3://5a-datalake-leo-test/stitch/zendesk/ticket_metrics';                   
+    's3://5a-datalake/raw/zendesk_tickets/ticket_metrics';                   

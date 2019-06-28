@@ -37,5 +37,5 @@ select
     t.default_group_id,
     t.report_csv,
     t.user_fields
-from datalake_raw.zendesk_users t
+from datalake_raw.zendesk_users_xplenty t
 __WHERE_CLAUSE__
