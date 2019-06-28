@@ -3,6 +3,7 @@ create table if not exists staging.zendesk_dim_ticket (
     sk_ticket bigint,
     subject varchar(MAX),
     description varchar(MAX),
+    ticket_via varchar(15),
     channel varchar(15),
     group_name varchar,
     priority varchar(10),

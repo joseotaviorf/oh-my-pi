@@ -3,6 +3,7 @@ create table if not exists zendesk.dim_ticket (
     sk_ticket bigint,
     subject varchar(MAX),
     description varchar(MAX),
+    ticket_via varchar(15),
     channel varchar(15),
     group_name varchar,
     priority varchar(10),
@@ -19,5 +20,6 @@ create table if not exists zendesk.dim_ticket (
     ts_created timestamp,
     ts_created_local timestamp,
     ts_updated timestamp,
+    ts_updated_local timestamp,
     ts_load timestamp
 );

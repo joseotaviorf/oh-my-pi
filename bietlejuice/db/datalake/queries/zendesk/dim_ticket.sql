@@ -1,7 +1,7 @@
 with tickets_filter as (
 	select distinct t.* 
     from datalake_clean.zendesk_tickets t
-	where (t.channel<>'api' or (t.channel='api' and t.tags not like '%hsm%'))
+	where (t.ticket_via<>'api' or (t.ticket_via='api' and t.tags not like '%hsm%'))
 	and t.dt_extracted='{extraction_date}'
 ),
 last_updated_ticket as (
@@ -43,7 +43,13 @@ select
     cast(t.id_ticket as bigint) as sk_ticket,
     t.subject,
     t.description,
-    t.channel,
+    t.ticket_via,
+    case 
+        when t.ticket_via in ('api', 'web') and (tags like '%call_contato_ativo%' or tags like '%call_contato_receptivo%') then 'call'
+        when t.ticket_via in ('api') and tags like '%form%' then 'form_faq'
+        when t.ticket_via in ('web', 'email', 'chat') then t.ticket_via
+        else 'other'
+    end as channel,
     g.name as group_name,
     t.priority,
     t.recipient,
