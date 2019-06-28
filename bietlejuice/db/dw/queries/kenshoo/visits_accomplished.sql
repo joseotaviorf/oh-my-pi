@@ -11,7 +11,7 @@ with users_with_visits_last7d as (
 	join dim_user u on u.id = bk.id_visitor
 	join dim_house_listing dhl on dhl.id_house = bk.id_property
 	join fact_house_listings fhl on fhl.sk_house_listing = dhl.sk_house_listing
-	join dim_region dr on dr.sk_region = fhl.sk_region
+	join dim_region dr on dr.sk_region = fhl.sk_region and fhl.sk_region <> -1
 	where bk.type = 'Visita'
 	and bk.visit_follow_up in ('VaiNegociar', 'VisitouSozinho', 'Talvez')
 	-- 'NaoGostou' also consists a fup condition to be filtered
