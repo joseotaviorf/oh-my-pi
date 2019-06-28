@@ -64,7 +64,12 @@ select
     c.cols['Tipo de Cliente'] as client_type,
     cast(t.ts_created as timestamp with time zone) as ts_created,
     cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
-    cast(t.ts_created as timestamp with time zone) as ts_updated,    
+    cast(t.ts_updated as timestamp with time zone) as ts_updated,
+    -- bug caused by start delay of daylight saving time 
+    if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+	cast(t.ts_updated as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
+		cast(t.ts_updated as timestamp with time zone) at time zone 'GMT-3',
+		cast(t.ts_updated as timestamp with time zone) at time zone 'Brazil/East') as ts_updated_local,
     now() as ts_load
 from last_updated_ticket te
 inner join tickets_filter t

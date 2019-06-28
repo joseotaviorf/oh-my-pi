@@ -20,5 +20,6 @@ create table if not exists staging.zendesk_dim_ticket (
     ts_created timestamp,
     ts_created_local timestamp,
     ts_updated timestamp,
+    ts_updated_local timestamp,
     ts_load timestamp
 );
