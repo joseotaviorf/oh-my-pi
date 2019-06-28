@@ -6,7 +6,7 @@ with stitch_data as (
 	   		from_iso8601_timestamp(created_at) <= cast('2018-11-04 03:00:00 UTC' as timestamp)),
 			from_iso8601_timestamp(created_at) at time zone 'GMT-3',
 			from_iso8601_timestamp(created_at) at time zone 'Brazil/East') as ts_created_local,
-		cast(json_extract(via, '$.channel') as varchar) as channel,
+		cast(json_extract(via, '$.channel') as varchar) as ticket_via,
     	row_number() over (partition by id, dt order by updated_at desc) as last_updated
     from datalake_raw.zendesk_tickets
     where cast(json_extract(via, '$.channel') as varchar) is not null
@@ -20,7 +20,7 @@ select
     priority,
     raw_subject,
     subject,
-    channel,
+    ticket_via,
     via,
     tags,
     group_id as id_group,
