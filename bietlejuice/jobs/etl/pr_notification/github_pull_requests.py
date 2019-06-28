@@ -55,7 +55,7 @@ class GithubPullRequests(GithubService):
                 'm=extract_pull_requests, repository={}, msg=no data for repository'.format(self.repo_name))
 
         for prs in repo['pullRequests']['edges']:
-            _title = prs['node']['title'].encode('ascii', 'ignore').decode('ascii') # removing non-ascii chars
+            _title = prs['node']['title'].encode('ascii', 'ignore').decode('ascii')  # removing non-ascii chars
             _author = prs['node']['author']['login']
             _url = prs['node']['url']
 
