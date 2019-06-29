@@ -13,8 +13,8 @@ from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
 MAIN_DAG_NAME = 'bi-marketing-costs-2019'
-MAIN_START_DATE = datetime(2018, 12, 31, 0, 0, 0)
-MAIN_END_DATE = datetime(2019, 4, 15, 0, 0, 0)
+MAIN_START_DATE = datetime(2018, 4, 14, 0, 0, 0)
+MAIN_END_DATE = datetime(2019, 5, 27, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 3 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -153,40 +153,7 @@ rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.RTB,
 )
 
-trovit_raw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=raw_sub_dag,
-    sub_dag_name='trovit-load-to-raw',
-    class_=MarketingEnum.TROVIT
-)
-
-trovit_clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='trovit-raw-to-clean',
-    class_=MarketingEnum.TROVIT,
-    accounts='default'
-)
-
-trovit_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='trovit-load-to-staging',
-    class_=MarketingEnum.TROVIT
-)
-
-trovit_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='trovit-load-to-dw',
-    class_=MarketingEnum.TROVIT
-)
-
 airflow_helpers.chain(rtb_raw_dag,
                       rtb_clean_dag,
                       rtb_load_to_staging_dag,
                       rtb_load_to_dw_dag)
-airflow_helpers.chain(trovit_raw_dag,
-                      trovit_clean_dag,
-                      trovit_load_to_staging_dag,
-                      trovit_load_to_dw_dag)

@@ -9,6 +9,7 @@ with all_dates as (
     db.mkt_category,
 	db.mkt_flow,
 	db.mkt_completion,
+	'Not Mapped' as mkt_origin,
 	db.mkt_channel,
 	db.mkt_medium,
 	db.mkt_source,

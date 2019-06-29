@@ -15,6 +15,7 @@ CREATE EXTERNAL TABLE datalake_raw.amplitude_active_user_sessions (
   utm_campaign string,
   utm_content string,
   utm_term string,
+  event_type string,
   app string)
 partitioned by (
   dt string)
