@@ -61,6 +61,7 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	mkt_category string,
 	mkt_flow string,
 	mkt_completion string,
+	mkt_origin string,
 	mkt_channel string,
 	mkt_platform string,
 	mkt_medium string,

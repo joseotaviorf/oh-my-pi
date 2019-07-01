@@ -176,15 +176,14 @@ agent_contracts as (
 				on trim(ah.region_code) = trim(ch.region_code)			
 				and ah.month_hours_opened between ch.init and ch.end
 	)
-	select
-      *
-    from compensation_by_commission
-    union all
-    select
-      *
-    from compensation_by_hour
-    union all
-    select
-    	*
-    from old_compensation
-)
+select
+  *
+from compensation_by_commission
+union all
+select
+  *
+from compensation_by_hour
+union all
+select
+    *
+from old_compensation
