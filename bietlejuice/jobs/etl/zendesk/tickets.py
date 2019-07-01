@@ -31,7 +31,7 @@ class ZendeskTickets(Zendesk):
             ('priority', str),
             ('raw_subject', str),
             ('subject', str),
-            ('channel', str),
+            ('ticket_via', str),
             ('via', str),
             ('tags', str),
             ('id_group', str),
