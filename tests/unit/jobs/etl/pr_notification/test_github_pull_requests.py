@@ -80,7 +80,7 @@ class TestGithubPullRequests(object):
                     'pullRequests': {
                         'edges': [{
                             'node': {
-                                'title': mock.ANY,
+                                'title': 'title',
                                 'author': {
                                     'login': mock.ANY
                                 },
