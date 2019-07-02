@@ -1,11 +1,7 @@
 from datetime import datetime, timedelta
 
-import airflow.utils.helpers as airflow_helpers
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -18,6 +14,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
@@ -411,7 +409,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
-    execution_timeout=timedelta(hours=4),
+    execution_timeout=timedelta(hours=5),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 
@@ -578,9 +576,9 @@ xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
 )
 
 # check the dependency of amplitude_load_events
-xcom_booking_amplitude_task = BaseDAG.build_python_operator(
+xcom_amplitude_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='xcom_booking_amplitude',
+    task_id='xcom_amplitude',
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
@@ -613,11 +611,11 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     trigger_dag_id='bi-agents-allocation-optimization'
 )
 
-airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
-
+xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
+affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
-fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag, region_dag,
+fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag,
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
 

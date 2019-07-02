@@ -10,7 +10,7 @@ class TestActiveUserSessionsETL(object):
         # arrange
         df = pd.DataFrame(data=[1], columns=['id'])
         period = mock.ANY
-        expected_cols_length = 16
+        expected_cols_length = 17
         expected_table_name = DemandEnum.ACTIVE_USER_SESSIONS.value
 
         # act

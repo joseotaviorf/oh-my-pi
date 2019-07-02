@@ -7,6 +7,7 @@ select
 	aaus.mkt_category,
 	aaus.mkt_flow,
 	aaus.mkt_completion,
+	aaus.mkt_origin,
 	aaus.mkt_channel,
 	aaus.mkt_medium,
 	aaus.mkt_source,
@@ -20,4 +21,4 @@ join
 	datalake_clean.ods_dim_date dd
 	on dd."date" = aaus.dt_event
 group by
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16

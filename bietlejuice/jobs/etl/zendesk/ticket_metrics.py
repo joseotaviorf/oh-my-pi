@@ -18,7 +18,9 @@ class ZendeskTicketMetrics(Zendesk):
 
     @logger
     def upsert_single_partition(self, class_, bucket_type):
-        self._upsert_single_partition(bucket_type=bucket_type, class_=ZendeskTicketMetrics.CLASS_ENUM)
+        self._upsert_single_partition(bucket_type=bucket_type,
+                                      class_=ZendeskTicketMetrics.CLASS_ENUM,
+                                      integration_name='zendesk_tickets')
 
     @logger
     def move_to_clean(self, class_, bucket_type):

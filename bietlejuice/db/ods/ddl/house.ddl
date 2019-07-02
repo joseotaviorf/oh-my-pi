@@ -128,3 +128,5 @@ create table public.house (
   predicted_price numeric(14,2),
   registration_abandoned_reason varchar(255)
 );
+
+create unique index house_id_idx on house (id);

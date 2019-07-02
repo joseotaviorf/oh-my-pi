@@ -8,6 +8,7 @@ CREATE TABLE if NOT EXISTS marketing.fact_marketing_daily_costs (
     mkt_category varchar,
     mkt_flow varchar,
     mkt_completion varchar,
+    mkt_origin varchar,
     mkt_channel varchar,
     mkt_medium varchar,
     mkt_source varchar,
