@@ -2,7 +2,7 @@ import json
 import logging
 from multiprocessing.dummy import Pool as ThreadPool
 
-from quintoandar.python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
 from bietlejuice.jobs.composer.consumers import MySQLConsumer
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
-    connection_json = dbutils.secrets.get(scope='quintoandar-forno', key=DatabaseEnum.DOCX)
+    connection_json = dbutils.secrets.get(scope='quintoandar-forno', key=DatabaseEnum.EBDB)
     connection = json.loads(connection_json)
     mysql_consumer = MySQLConsumer(connection)
 

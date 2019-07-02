@@ -1,7 +1,7 @@
 import time
 
 import boto3
-from quintoandar.python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('AthenaClient')
 

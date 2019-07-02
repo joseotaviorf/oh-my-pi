@@ -1,6 +1,6 @@
 import logging
 
-from quintoandar.python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.etl.load_ebdb_into_datalake import EBDBIntoDatalakeLoader

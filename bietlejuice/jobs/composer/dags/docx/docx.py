@@ -10,17 +10,15 @@ from airflow.operators.quintoandar_databricks import (QuintoAndarDatabricksCreat
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base import BaseDAG
 
-logger = QuintoAndarLogger('load_ebdb_into_datalake')
+logger = QuintoAndarLogger('docx')
 
-DAG_ID = 'load-ebdb-into-datalake'
+DAG_ID = 'docx'
 S3_PREFIX = Variable.get('bietlejuice_s3_prefix')
 
-LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX + '/spark_jobs/\
-load-ebdb-into-datalake/load_ebdb_into_datalake.py'
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/\
-load-ebdb-into-datalake/create_raw_external_tables.py'
+LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX + '/spark_jobs/docx/load_docx_into_datalake.py'
+CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/docx/create_raw_external_tables.py'
 
-LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/load-ebdb-into-datalake'
+LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/docx'
 
 CLUSTER_DESCRIPTION = Variable.get('databricks_default_cluster', deserialize_json=True)
 CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID
@@ -51,13 +49,13 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION
 )
 
-ebdb_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id='ebdb_to_datalake_raw',
+docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id='docx_to_datalake_raw',
     dag=dag,
     json={
         'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create_cluster", key="cluster_id")}}',
         'spark_python_task': {
-            'python_file': LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH
+            'python_file': LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH
         }
     }
 )
@@ -80,6 +78,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 airflow_helpers.chain(create_cluster_task,
-                      ebdb_to_datalake_raw_task,
+                      docx_to_datalake_raw_task,
                       create_raw_external_tables_task,
                       terminate_cluster_task)

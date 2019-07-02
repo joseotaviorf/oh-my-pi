@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from quintoandar.python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseTypeEnum
 from bietlejuice.jobs.composer.consumers.consumer import Consumer
