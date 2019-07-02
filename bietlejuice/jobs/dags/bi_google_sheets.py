@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB
@@ -59,4 +60,5 @@ load_google_sheet_files_to_ods_task = BaseDAG.build_python_operator(
     python_callable=load_google_sheet_files_to_ods
 )
 
-load_google_sheet_files_to_datalake_task >> load_google_sheet_files_to_ods_task
+airflow_helpers.chain(load_google_sheet_files_to_datalake_task,
+                      load_google_sheet_files_to_ods_task)

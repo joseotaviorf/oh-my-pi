@@ -2,8 +2,10 @@ import re
 
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 logger = QuintoAndarLogger('GoogleSheets')
@@ -37,6 +39,8 @@ class GoogleSheets(object):
 
             if enumdb_destination == EnumDB.QuintoAndar_datalake:
                 self._move_df_to_datalake(df=df_gsheets, table_name=item['s3_path'])
+                self._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
+                                          table_name=item['s3_path'])
             if enumdb_destination == EnumDB.BI_ODS:
                 self._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='files')
 
@@ -89,3 +93,30 @@ class GoogleSheets(object):
         except Exception as e:
             raise RuntimeError('m=_move_df_to_ods, table_name={0}, schema={1}, error={2}, '
                                'msg=Problem in send df to ods'.format(table_name, schema, str(e.message)))
+
+    @logger(exclude='df')
+    def _create_athena_table(self, df, schema_name, schema_folder, table_name):
+        columns_definition = self._get_df_columns_definition(df)
+        athena_client = AthenaClient(self.s3_bucket)
+
+        logger.info('schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
+        athena_client.execute_query_and_wait_for_results(
+            sql='drop table if exists {0}.{1};'.format(schema_name, table_name))
+
+        logger.info('schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
+        athena_client.execute_file_query_and_wait_for_results(
+            filename='{0}/gsheets/base_create_table.sql'.format(DATALAKE_QUERIES_DIR),
+            query_params={
+                'schema_name': schema_name,
+                'schema_folder': schema_folder,
+                'table_name': table_name,
+                'columns': columns_definition
+            }
+        )
+
+        logger.info('schema={0}, table_name={1}, msg=table created'.format(schema_name, table_name))
+
+    @logger(exclude='df')
+    def _get_df_columns_definition(self, df):
+        column_list = df.columns.values.tolist()
+        return ' string,'.join(map(str, column_list)) + ' string'
