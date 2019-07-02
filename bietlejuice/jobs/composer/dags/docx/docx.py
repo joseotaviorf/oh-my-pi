@@ -73,8 +73,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag,
-    task_id='terminate_cluster',
-    provide_context=True
+    task_id='terminate_cluster'
 )
 
 airflow_helpers.chain(create_cluster_task,

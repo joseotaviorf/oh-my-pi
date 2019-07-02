@@ -25,6 +25,7 @@ LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/load-ebdb-into-datalake'
 CLUSTER_DESCRIPTION = Variable.get('databricks_default_cluster', deserialize_json=True)
 CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID + '_' + '{{ run_id }}'
 CLUSTER_DESCRIPTION['cluster_log_conf']['s3']['destination'] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION['num_workers'] = 4
 
 DEFAULT_LIBRARIES = Variable.get('bietlejuice_default_libraries', deserialize_json=True)
 CUSTOM_LIBRARIES = [{'jar': S3_PREFIX + '/libraries/mysql-connector-java-5.1.47.jar'}]
@@ -75,8 +76,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag,
-    task_id='terminate_cluster',
-    provide_context=True
+    task_id='terminate_cluster'
 )
 
 airflow_helpers.chain(create_cluster_task,
