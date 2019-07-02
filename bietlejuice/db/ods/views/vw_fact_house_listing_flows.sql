@@ -5,7 +5,7 @@ with legacy_doorman as (
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
   from files.porteiros_legado
-  where (porteiros_legado."Status" = (['Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'])) 
+  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
 base_lead_tasks as (
@@ -341,6 +341,7 @@ taxonomy as (
     mkt_category,
     mkt_flow,
     mkt_completion,
+    mkt_origin,
     mkt_channel,
     mkt_platform,
     mkt_medium,
@@ -420,6 +421,10 @@ select
     when t.mkt_flow is null then 'Not Mapped'
     else t.mkt_completion
   end as mkt_completion,
+  case
+    when t.mkt_flow is null then 'Not Mapped'
+    else t.mkt_origin
+  end as mkt_origin,
   case
     when t.mkt_flow is null then 'Not Mapped'
     else t.mkt_channel

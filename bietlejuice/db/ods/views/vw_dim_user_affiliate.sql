@@ -93,7 +93,7 @@ select
 	aff_cityreg.origin,
 	aff_cityreg.type,
 	aff_cityreg.marketing_city_group,
-	coalesce(aff_cityreg.regional_ddd_city,region_city_group.regional) as regional,
+	coalesce(region_city_group.regional,aff_cityreg.regional_ddd_city) as regional,
 	aff_cityreg.is_inspector,
 	aff_cityreg.is_realstate_agent,
 	aff_cityreg.is_photographer,

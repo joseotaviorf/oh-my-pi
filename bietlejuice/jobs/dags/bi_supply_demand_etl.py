@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -577,9 +576,9 @@ xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
 )
 
 # check the dependency of amplitude_load_events
-xcom_booking_amplitude_task = BaseDAG.build_python_operator(
+xcom_amplitude_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='xcom_booking_amplitude',
+    task_id='xcom_amplitude',
     provide_context=True,
     python_callable=xcom_dependencies,
     op_kwargs={'task_id': 'XCom_amplitude_load_events',
@@ -612,7 +611,7 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     trigger_dag_id='bi-agents-allocation-optimization'
 )
 
-airflow_helpers.chain(xcom_booking_amplitude_task, booking_dag)
+xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
