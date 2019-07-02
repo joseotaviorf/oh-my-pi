@@ -21,7 +21,7 @@ CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/docx/create_raw_
 LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/docx'
 
 CLUSTER_DESCRIPTION = Variable.get('databricks_default_cluster', deserialize_json=True)
-CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID
+CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID + '_' + '{{ run_id }}'
 CLUSTER_DESCRIPTION['cluster_log_conf']['s3']['destination'] = LOGS_OUTPUT_PATH
 
 DEFAULT_LIBRARIES = Variable.get('bietlejuice_default_libraries', deserialize_json=True)

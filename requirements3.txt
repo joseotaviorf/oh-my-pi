@@ -10,7 +10,6 @@ Click==7.0
 colorama==0.4.1
 configparser==3.5.3
 croniter==0.3.30
-databricks==1.0.0
 defusedxml==0.6.0
 dill==0.2.9
 docutils==0.14

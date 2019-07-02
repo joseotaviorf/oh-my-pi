@@ -23,7 +23,7 @@ load-ebdb-into-datalake/create_raw_external_tables.py'
 LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/load-ebdb-into-datalake'
 
 CLUSTER_DESCRIPTION = Variable.get('databricks_default_cluster', deserialize_json=True)
-CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID
+CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID + '_' + '{{ run_id }}'
 CLUSTER_DESCRIPTION['cluster_log_conf']['s3']['destination'] = LOGS_OUTPUT_PATH
 
 DEFAULT_LIBRARIES = Variable.get('bietlejuice_default_libraries', deserialize_json=True)
