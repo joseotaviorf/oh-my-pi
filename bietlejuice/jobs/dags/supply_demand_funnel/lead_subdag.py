@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -98,6 +98,7 @@ class LeadSubDag(DimSubDag):
             task_id='ODS_lead',
             provide_context=True,
             python_callable=self.__move_query_results_from_ebdb_to_ods,
+            execution_timeout=timedelta(hours=4),
             op_kwargs={
                 'dim_name': 'lead'
             }
