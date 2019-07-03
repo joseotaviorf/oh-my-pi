@@ -158,7 +158,7 @@ left join
             on p_aud.REVTYPE = 2
             and max_ure.id = p_aud.max_rev
 	) poligons
-    on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2018-08-01')
+    on  DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) >= DATE('2019-01-01')
         and coalesce(l.criadoEm, '1900-01-01 00:00:00') between poligons.dt_start and poligons.dt_end
 	    and ST_Contains(poligons.poligono, Point(l.lng, l.lat)) = 1
 where DATE(coalesce(l.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

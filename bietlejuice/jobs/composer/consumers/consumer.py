@@ -1,4 +1,4 @@
-from python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Consumer')
 

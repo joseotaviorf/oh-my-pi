@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit, col
-from python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.consumer import Consumer
 
