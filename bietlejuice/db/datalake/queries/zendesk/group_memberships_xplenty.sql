@@ -6,5 +6,5 @@ select
     t.default,
     t.created_at,
     t.updated_at
-from datalake_raw.zendesk_group_memberships t
+from datalake_raw.zendesk_group_memberships_xplenty t
 __WHERE_CLAUSE__

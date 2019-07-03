@@ -18,6 +18,7 @@ class ActiveUsersETL(DemandETL):
         ('mkt_category', str),
         ('mkt_flow', str),
         ('mkt_completion', str),
+        ('mkt_origin', str),
         ('mkt_channel', str),
         ('mkt_medium', str),
         ('mkt_source', str),

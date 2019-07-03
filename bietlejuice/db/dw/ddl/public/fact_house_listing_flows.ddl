@@ -62,6 +62,7 @@ create table public.fact_house_listing_flows (
 	mkt_category varchar(255),
 	mkt_flow varchar(255),
 	mkt_completion varchar(255),
+	mkt_origin varchar(255),
 	mkt_channel varchar(255),
 	mkt_platform varchar(255),
 	mkt_medium varchar(255),

@@ -5,6 +5,7 @@ CREATE TABLE if NOT EXISTS marketing.fact_weekly_supply_funnel_conversions (
     mkt_category varchar,
     mkt_flow varchar,
     mkt_completion varchar,
+    mkt_origin varchar,
     mkt_channel varchar,
     mkt_medium varchar,
     mkt_source varchar,

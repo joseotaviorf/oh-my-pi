@@ -15,6 +15,7 @@ create external table datalake_raw.taxonomy_supply (
   mkt_category string,
   mkt_flow string,
   mkt_completion string,
+  mkt_origin string,
   mkt_channel string,
   mkt_medium string,
   mkt_source string,

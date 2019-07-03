@@ -1,6 +1,5 @@
-drop table datalake_raw.zendesk_ticket_metric_events;
-
-CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_metric_events`(
+drop table datalake_raw.zendesk_ticket_metric_events_xplenty;
+CREATE EXTERNAL TABLE datalake_raw.`zendesk_ticket_metric_events_xplenty`(
   `id` string,
   `ticket_id` string,
   `metric` string,
@@ -21,4 +20,4 @@ LOCATION
   's3://5a-datalake/raw/zendesk/ticket_metric_events/'
 ;
 
-msck repair table datalake_raw.zendesk_ticket_metric_events;
+msck repair table datalake_raw.zendesk_ticket_metric_events_xplenty;

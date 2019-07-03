@@ -13,6 +13,7 @@ with sessions_raw as (
 	    region,
 	    u_platform,
 	    app,
+	    event_type,
 	    min(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as session_start_ts,
 	    date(cast(regexp_extract(trim(server_upload_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as server_upload_time
     from datalake_clean.amplitude_events
@@ -20,7 +21,7 @@ with sessions_raw as (
     and date(cast(regexp_extract(trim(server_upload_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
     and session_id != '-1'
     and (app = '170698' or app ='183047')
-    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,15
+    group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16
 ),
 rn as (
 	select
@@ -43,6 +44,7 @@ select
     u_utm_campaign as utm_campaign,
     u_utm_content as utm_content,
     u_utm_term as utm_term,
+    event_type,
     app as app
 from rn
     where rn = 1
