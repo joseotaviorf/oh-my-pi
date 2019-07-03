@@ -2,8 +2,8 @@ import re
 
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.base.data_frame_service import DataFrameJsonService
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
@@ -42,7 +42,7 @@ class GoogleSheets(object):
                 self._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
                                           table_name=item['s3_path'])
             if enumdb_destination == EnumDB.BI_ODS:
-                self._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='files')
+                self._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets_files')
 
     @staticmethod
     @logger(exclude='old_columns')
@@ -62,9 +62,16 @@ class GoogleSheets(object):
 
     @logger(exclude='df')
     def _move_df_to_datalake(self, df, table_name):
-        s3 = S3ToODS(s3_bucket=self.s3_bucket)
-        logger.info('m=_move_df_to_datalake, table_name={0}, msg=Sending df to datalake'.format(table_name))
-        s3.move_df_to_datalake(df=df, tablename=table_name)
+        df_json_service = DataFrameJsonService(df=df)
+        object_ = df_json_service.to_json_bytes()
+
+        BaseETL.obj_to_s3(
+            obj_io=object_,
+            bucket=self.s3_bucket,
+            file_path='{0}/gsheets_files/{1}/{1}.gz'.format('raw', table_name)
+        )
+
+        object_.flush()
 
     @logger(exclude='df')
     def _move_df_to_ods(self, df, table_name, schema):
@@ -74,7 +81,8 @@ class GoogleSheets(object):
             schema=schema
         )
         if not exists:
-            logger.info('m=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
+            logger.info(
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
             BaseETL.create_table(
                 conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
                 table=petl.fromdataframe(df),
@@ -82,7 +90,8 @@ class GoogleSheets(object):
                 schema=schema
             )
 
-        logger.info('m=_move_df_to_ods, table_name={0},schema={1}, msg=Sending df to ods'.format(table_name, schema))
+        logger.info(
+            'm=_move_df_to_ods, table_name={0},schema={1}, msg=Sending df to ods'.format(table_name, schema))
         try:
             BaseETL.dataframe_to_ods(
                 df=df,
@@ -101,7 +110,7 @@ class GoogleSheets(object):
 
         logger.info('schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
         athena_client.execute_query_and_wait_for_results(
-            sql='drop table if exists {0}.{1};'.format(schema_name, table_name))
+            sql='drop table if exists {0}.{1}_{2};'.format(schema_name, 'gsheet', table_name))
 
         logger.info('schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
         athena_client.execute_file_query_and_wait_for_results(
@@ -114,7 +123,7 @@ class GoogleSheets(object):
             }
         )
 
-        logger.info('schema={0}, table_name={1}, msg=table created'.format(schema_name, table_name))
+        logger.info('schema={0}, table_name=gsheet_{1}, msg=table created'.format(schema_name, table_name))
 
     @logger(exclude='df')
     def _get_df_columns_definition(self, df):

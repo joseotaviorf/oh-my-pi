@@ -1,13 +1,9 @@
-create external table {schema_name}.{table_name} (
+create external table {schema_name}.gsheet_{table_name} (
   {columns}
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+row format serde 'org.openx.data.jsonserde.JsonSerDe'
 with serdeproperties (
-  'separatorChar' = ';',
-  'quoteChar' = '\"'
+  'ignore.malformed.json'='true'
 )
-location 's3://5a-datalake/{schema_folder}/files/{table_name}/'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
+location 's3://5a-datalake/{schema_folder}/gsheets_files/{table_name}/'
 ;
