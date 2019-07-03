@@ -360,7 +360,7 @@ from
         on d_ure_max.id = l.id
     left join
     	UsuarioRevisionEntity ure_disc_max
-    	on ure_disc_max.id = d_ure_max.min_id
+    	on ure_disc_max.id = d_ure_max.max_id
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
