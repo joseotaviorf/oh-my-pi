@@ -29,7 +29,7 @@ def full_small_table_map_function(args):
         table=table,
         consumer=consumer,
         raw_path=RAW_PATH
-        )
+    )
     logger.info('m=full_small_table_map_function, table={}, msg=Finished loading table.'.format(table))
 
 
