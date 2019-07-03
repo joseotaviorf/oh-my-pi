@@ -41,7 +41,7 @@ select distinct
   eo.originalhomeinsurance,
   eo.originaliptu,
   eo.originalrent,
-  eo.rent as last_rent,
+  eo.rent as last_offered_rent,
   eo.status,
   eo.turn,
   eo.client_id,
