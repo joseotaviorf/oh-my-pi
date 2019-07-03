@@ -71,8 +71,7 @@ if __name__ == '__main__':
     mysql_consumer = MySQLConsumer(connection)
 
     tables_sizes = dict(DataSourceIntoDataLakeLoader.get_table_names_and_sizes(
-        mysql_consumer).collect()
-                        )
+        mysql_consumer).collect())
     tables_sizes = {k: v for k, v in tables_sizes.items() if k not in BLACK_LIST}  # filter out blacklist
 
     big_tables = [table[0] for table in tables_sizes.items() if
