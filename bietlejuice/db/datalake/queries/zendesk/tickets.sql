@@ -40,7 +40,7 @@ select
     is_public,
     cast(from_iso8601_timestamp(created_at) as varchar) as ts_created,
     cast(ts_created_local as varchar) as ts_created_local,
-    cast(from_iso8601_timestamp(updated_at) as varchar) as ts_updated,
+    cast(from_iso8601_timestamp(greatest(created_at,updated_at)) as varchar) as ts_updated,
     cast(now() as varchar) as ts_load
 from stitch_data
 where last_updated = 1;
