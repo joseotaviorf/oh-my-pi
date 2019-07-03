@@ -22,7 +22,7 @@ ebdb-into-datalake/load_ebdb_into_datalake.py'
 CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/\
 ebdb-into-datalake/create_raw_external_tables.py'
 
-LOGS_OUTPUT_PATH = S3_PREFIX + '../../logs/ebdb-into-datalake'
+LOGS_OUTPUT_PATH = S3_PREFIX + 's3://5a-databricks/logs/jobs/ebdb-into-datalake'
 
 CLUSTER_DESCRIPTION = Variable.get('databricks_default_cluster', deserialize_json=True)
 CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID + '_{{ run_id }}'
