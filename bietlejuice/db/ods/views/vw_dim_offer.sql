@@ -70,7 +70,7 @@ new_offer as (
       (id * 100) + 2 as sk_offer,
       id as id_offer,
       godfather_id as id_godfather,
-      last_offered_rent,
+      last_rent as last_offered_rent,
       original_rent,
       original_condo,
       analysis_date as dt_analysis,
