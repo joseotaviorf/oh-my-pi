@@ -13,7 +13,7 @@ setup(
     version='0.1.0',
     description='bi-etl-ejuice module',
     author='Data Engineering Team',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=install_requires,
     dependency_links=[
         'https://quintoandar.github.io/python-package-server/'
