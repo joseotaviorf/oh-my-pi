@@ -210,7 +210,7 @@ pipeline:
       branch: [ master ]
 
   version:
-    image: python:3.5.2
+    image: python:3.6.7
     commands:
       - make package-name
       - make version
@@ -219,7 +219,7 @@ pipeline:
 #      branch: master
 
   package:
-    image: python:3.5.2
+    image: python:3.6.7
     commands:
       - make package
     when:
