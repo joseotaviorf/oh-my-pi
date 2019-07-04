@@ -16,8 +16,8 @@ logger = QuintoAndarLogger('docx')
 DAG_ID = 'docx'
 S3_PREFIX = Variable.get('bietlejuice_s3_prefix')
 
-LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX + '/spark_jobs/docx/load_docx_into_datalake.py'
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/docx/create_raw_external_tables.py'
+LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX + '/spark_jobs/forno/docx/load_docx_into_datalake.py'
+CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = S3_PREFIX + '/spark_jobs/forno/docx/create_raw_external_tables.py'
 
 LOGS_OUTPUT_PATH = S3_PREFIX + 's3://5a-databricks/logs/jobs/docx'
 
