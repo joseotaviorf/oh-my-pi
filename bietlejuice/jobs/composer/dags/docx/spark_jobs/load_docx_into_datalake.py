@@ -10,9 +10,8 @@ from bietlejuice.jobs.composer.etl import DataSourceIntoDataLakeLoader
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_docx_into_datalake")
 
-BLACK_LIST = ["flyway_schema_history"]
-
 DATABRICKS_SCOPE = "quintoandar-forno"
+BLACK_LIST = ["flyway_schema_history"]
 
 
 if __name__ == "__main__":
@@ -28,6 +27,7 @@ if __name__ == "__main__":
     ).collect()
 
     for table in tables:
-        DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-            table_name=table.table_name, consumer=mysql_consumer
-        )
+        if table.table_name not in BLACK_LIST:
+            DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
+                table_name=table.table_name, consumer=mysql_consumer
+            )
