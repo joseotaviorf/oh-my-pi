@@ -26,7 +26,7 @@ class MySQLConsumer(Consumer):
     def get_table_names_and_sizes(self):
         query = """
     SELECT
-      table_name AS `table`,
+      table_name,
       round(((data_length + index_length) / 1024 / 1024), 2) AS `size`
     FROM
       information_schema.TABLES
@@ -41,25 +41,25 @@ class MySQLConsumer(Consumer):
         return result
 
     @logger
-    def get_data_from_table(self, table):
+    def get_data_from_table(self, table_name):
         remote_table = self._get_default_read_format_and_options() \
-            .option("dbtable", table) \
+            .option("dbtable", table_name) \
             .load()
 
         return remote_table
 
     @logger
-    def get_data_from_table_in_parallel(self, table, concurrency):
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
         remote_table = self._get_default_read_format_and_options()
 
-        partition_column = self._get_partition_column_from_table(table)
+        partition_column = self._get_partition_column_from_table(table_name)
 
         if partition_column:
-            query = "select max({}) from {}".format(partition_column, table)
+            query = "select max({}) from {}".format(partition_column, table_name)
             result = self.get_data_from_query(query)
             upper_bound = result.collect()[0][0]
 
-            query = "select min({}) from {}".format(partition_column, table)
+            query = "select min({}) from {}".format(partition_column, table_name)
             result = self.get_data_from_query(query)
             lower_bound = result.collect()[0][0]
 
@@ -70,7 +70,7 @@ class MySQLConsumer(Consumer):
                 .option("numPartitions", concurrency)
 
         remote_table = remote_table \
-            .option("dbtable", table) \
+            .option("dbtable", table_name) \
             .load()
 
         return remote_table
@@ -83,10 +83,11 @@ class MySQLConsumer(Consumer):
         return remote_table
 
     @logger
-    def get_table_schema(self, table):
+    def get_table_schema(self, table_name):
         query = """
         select
-            COLUMN_NAME, COLUMN_TYPE
+            COLUMN_NAME as col_name,
+            COLUMN_TYPE as col_type
         FROM
             INFORMATION_SCHEMA.COLUMNS
         WHERE
@@ -94,7 +95,7 @@ class MySQLConsumer(Consumer):
         """
 
         result = self.get_data_from_query(
-            query.format(table=table)
+            query.format(table=table_name)
         )
 
         return result

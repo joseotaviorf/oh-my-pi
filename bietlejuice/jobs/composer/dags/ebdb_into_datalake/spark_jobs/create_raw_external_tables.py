@@ -26,7 +26,7 @@ if __name__ == '__main__':
         table_name = 'ebdb_{}'.format(table.tableName)
         DataSourceIntoDataLakeLoader.create_athena_external_table(
             consumer=databricks_consumer,
-            table=table_name,
+            table_name=table_name,
             raw_path=RAW_PATH,
             athena_raw_schema=ATHENA_DB
         )

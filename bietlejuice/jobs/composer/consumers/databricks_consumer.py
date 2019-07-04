@@ -16,16 +16,16 @@ class DatabricksConsumer(Consumer):
     def get_table_names_and_sizes(self):
         spark = SparkSession.builder.getOrCreate()
         result = spark.sql('show tables in ' + self.connection['db']) \
-            .select("tableName") \
+            .select(col("tableName").alias("table_name")) \
             .withColumn('size', lit(0))
 
         return result
 
     @logger
-    def get_table_schema(self, table):
+    def get_table_schema(self, table_name):
         spark = SparkSession.builder.getOrCreate()
-        result = spark.sql('describe {}.{}'.format(self.connection['db'], table)) \
-            .select('col_name', 'data_type') \
+        result = spark.sql('describe {}.{}'.format(self.connection['db'], table_name)) \
+            .select('col_name', col('data_type').alias('col_type')) \
             .filter(col('col_name').rlike(r'^\w')) \
             .distinct()
 

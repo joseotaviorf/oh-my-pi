@@ -26,7 +26,7 @@ def full_small_table_map_function(args):
     logger.info('m=full_small_table_map_function, table={}, msg=Starting loading'
                 'table.'.format(table))
     DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-        table=table,
+        table_name=table,
         consumer=consumer,
         raw_path=RAW_PATH
     )
@@ -50,7 +50,7 @@ def load_full_big_tables(tables, num_partitions, consumer):
         'm=load_full_big_tables, msg=Starting loading big tables...')
     for table in tables:
         DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-            table=table,
+            table_name=table,
             consumer=consumer,
             raw_path=RAW_PATH,
             concurrency=num_partitions

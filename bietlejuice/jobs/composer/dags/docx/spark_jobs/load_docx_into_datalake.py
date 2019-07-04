@@ -15,8 +15,6 @@ SIZE_THRESHOLD = 1024  # size in mb to decide if a table is big
 NUM_PARTITIONS = 8  # max parallel connections to use when reading a table in jdbc
 BLACK_LIST = ['flyway_schema_history']
 
-ATHENA_DB = 'datalake_raw_spark'
-RAW_PATH = 's3://5a-datalake/raw_spark/docx'
 DATABRICKS_SCOPE = 'quintoandar-prod'
 
 
@@ -26,9 +24,8 @@ def full_small_table_map_function(args):
     logger.info('m=full_small_table_map_function, table={}, msg=Starting loading'
                 'table.'.format(table))
     DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-        table=table,
+        table_name=table,
         consumer=consumer,
-        raw_path=RAW_PATH
     )
     logger.info('m=full_small_table_map_function, table={}, msg=Finished loading table.'.format(table))
 
@@ -50,9 +47,8 @@ def load_full_big_tables(tables, num_partitions, consumer):
         'm=load_full_big_tables, msg=Starting loading big tables...')
     for table in tables:
         DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-            table=table,
+            table_name=table,
             consumer=consumer,
-            raw_path=RAW_PATH,
             concurrency=num_partitions
         )
     logger.info(
