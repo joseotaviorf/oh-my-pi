@@ -10,11 +10,11 @@ class Consumer:
         raise NotImplementedError()
 
     @logger
-    def get_data_from_table(self, table):
+    def get_data_from_table(self, table_name):
         raise NotImplementedError()
 
     @logger
-    def get_data_from_table_in_parallel(self, table, concurrency):
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
         raise NotImplementedError()
 
     @logger
@@ -22,7 +22,7 @@ class Consumer:
         raise NotImplementedError()
 
     @logger
-    def get_table_schema(self, table):
+    def get_table_schema(self, table_name):
         raise NotImplementedError()
 
     @logger
