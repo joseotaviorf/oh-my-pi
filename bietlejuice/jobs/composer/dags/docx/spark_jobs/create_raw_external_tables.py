@@ -27,6 +27,7 @@ if __name__ == '__main__':
         DataSourceIntoDataLakeLoader.create_athena_external_table(
             consumer=databricks_consumer,
             table_name=table.table_name,
+            db_source='docx'
         )
 
     logger.info('m=__main__, msg=All raw external tables were created successfully.')
