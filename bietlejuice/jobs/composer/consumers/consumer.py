@@ -1,10 +1,9 @@
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger('Consumer')
+logger = QuintoAndarLogger("Consumer")
 
 
 class Consumer:
-
     @logger
     def get_table_names_and_sizes(self):
         raise NotImplementedError()
@@ -30,7 +29,11 @@ class Consumer:
         try:
             result = self.get_table_names_and_sizes()
         except Exception as e:
-            raise RuntimeError('m=is_db_empty, msg=Database of this consumer does not exist., e={}'.format(e))
+            raise RuntimeError(
+                "m=is_db_empty, msg=Database of this consumer does not exist., e={}".format(
+                    e
+                )
+            )
         if result and result.count():
             return False
 
