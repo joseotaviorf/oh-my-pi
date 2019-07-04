@@ -33,4 +33,5 @@ select
   risk_level_best_subset,
   process_date
 from "ProposalVersion"
+where date(created_at) <= date('{execution_date}')
 ;
