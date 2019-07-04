@@ -174,7 +174,7 @@ class DataSourceIntoDataLakeLoader:
             path='{}/{}/{}'.format(
                 DataSourceIntoDataLakeLoader.DATALAKE_RAW_PATH,
                 db_source,
-                table_name[len(db_source):]
+                table_name[len(db_source) + 1:]
             )
         )
         AthenaClient.execute_athena_query(create_query, DataSourceIntoDataLakeLoader.DATALAKE_RAW_DB)
