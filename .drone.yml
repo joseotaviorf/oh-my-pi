@@ -216,7 +216,7 @@ pipeline:
       - make version
     when:
       event: [push, tag]
-#      branch: master
+  #      branch: master
 
   package:
     image: python:3.6.7
@@ -224,7 +224,7 @@ pipeline:
       - make package
     when:
       event: [push, tag]
-#      branch: master
+  #      branch: master
 
   prepare-to-export-latest-release:
     image: alpine:3.10
@@ -246,8 +246,17 @@ pipeline:
     cache_control: no-cache
     when:
       event: push
-#      event: tag
-#      branch: master
+  #      event: tag
+  #      branch: master
+
+  upload-spark-jobs-s3-forno:
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py forno
+    when:
+      event: push
+      branch: forno
 
   notify:
     image: plugins/slack
