@@ -11,7 +11,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import BaseDAG
 
-DAG_ID = "ebdb-to-datalake"
+DAG_ID = "ebdb_to_datalake"
 ENV = "forno"
 
 logger = QuintoAndarLogger(DAG_ID)
