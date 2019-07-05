@@ -59,7 +59,6 @@ special_conditions as (
       max(date(ts_opted_out)) as out_
     from special_condition_aud
     where special_condition_status in ('OptedIn', 'OptedOut')
-      and special_condition_status_mod = 1
       and special_condition_type in ('Exclusivity', 'OriginalsReady', 'OriginalsReno')
     group by 1, 2, 3
   )
@@ -147,8 +146,8 @@ listing_special_conditions as (
   select
     hl.sk_house_listing,
     sc.special_condition_type,
-    max(sc.in_) as dt_last_opted_in,
-    max(sc.out_) as dt_last_opted_out
+    max(sc.in_) as dt_opted_in,
+    max(sc.out_) as dt_opted_out
   from house_listings hl
   join special_conditions sc
     on hl.id_house = sc.id_house
@@ -158,27 +157,49 @@ listing_special_conditions as (
       and greatest(coalesce(sc.out_, (now() - interval '1 day')::date), coalesce(hl.ts_listing_version_end::date, (now() - interval '1 day')::date)) >= hl.ts_listing_version_start::date
   group by 1, 2
 ),
-listing_special_conditions_originals as (
-	with multiple_originals as (
-	-- in case a house listing has two Originals types: ready and reno on the same version
-  	select
+listing_special_conditions_dates as (
+	with multiple_special_conditions as (
+	-- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
+  	  select
   		sk_house_listing,
   		special_condition_type,
-  		dt_last_opted_in,
-  		dt_last_opted_out,
+  		dt_opted_in,
+  		dt_opted_out,
   		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-  		row_number() over (partition by sk_house_listing order by dt_last_opted_in desc, coalesce(dt_last_opted_out, '2100-01-01'::date) desc) as rn
-  	from listing_special_conditions
-		where special_condition_type like 'Originals%'
-  )
-  -- select the latest Originals type a house listing has entered
-  select
-  	sk_house_listing,
-  	special_condition_type,
-  	dt_last_opted_in,
-  	dt_last_opted_out
-  from multiple_originals
-  where rn = 1
+  		row_number() over (partition by sk_house_listing, special_condition_type order by dt_opted_in desc, coalesce(dt_opted_out, '2100-01-01'::date) desc) as rn_last,
+  		row_number() over (partition by sk_house_listing, special_condition_type order by dt_opted_in asc, coalesce(dt_opted_out, '2100-01-01'::date) asc) as rn_first
+  	  from listing_special_conditions
+    ),
+    last_opt as (
+    -- select the latest Special Condition type a house listing has entered
+      select
+        sk_house_listing,
+        special_condition_type,
+        dt_opted_in,
+        dt_opted_out
+      from multiple_special_conditions
+      where rn_last = 1
+    ),
+    first_opt as (
+    -- select the latest Special Condition type a house listing has entered
+      select
+        sk_house_listing,
+        special_condition_type,
+        dt_opted_in,
+        dt_opted_out
+      from multiple_special_conditions
+      where rn_first = 1
+    )
+     select
+        fo.sk_house_listing,
+        fo.special_condition_type,
+        fo.dt_opted_in as dt_first_opted_in,
+        fo.dt_opted_out as dt_first_opted_out,
+        lo.dt_opted_in as dt_last_opted_in,
+        lo.dt_opted_out as dt_last_opted_out
+     from last_opt lo
+     join first_opt fo
+       on lo.sk_house_listing = fo.sk_house_listing and lo.special_condition_type = fo.special_condition_type
 )
 select
   hl.sk_house_listing,
@@ -229,7 +250,7 @@ select
   hl.listing_category_start,
   hl.listing_category_end,
   hl.is_last_version,
-  hl.is_exclusive,
+  lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
   hl.who_is_living,
   hl.key_type,
   hl.key_location,
@@ -247,6 +268,8 @@ select
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
-left join listing_special_conditions_originals lsc_originals
-  on hl.sk_house_listing = lsc_originals.sk_house_listing
+left join listing_special_conditions lsc_originals
+  on hl.sk_house_listing = lsc_originals.sk_house_listing and lsc_originals.special_condition_type like 'Originals%'
+left join listing_special_conditions lsc_exclusivity
+  on hl.sk_house_listing = lsc_exclusivity.sk_house_listing and lsc_exclusivity.special_condition_type = 'Exclusivity'
 ;
