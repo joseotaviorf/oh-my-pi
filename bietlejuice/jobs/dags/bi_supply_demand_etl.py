@@ -585,7 +585,7 @@ xcom_amplitude_task = BaseDAG.build_python_operator(
                'dag_id': 'bi-amplitude-load-events'},
     retry_delay=timedelta(minutes=10),
     max_retry_delay=timedelta(minutes=10),
-    retries=10
+    retries=15
 )
 
 # trigger bi-growth dag after all tasks have been successfully completed
