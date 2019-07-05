@@ -83,7 +83,10 @@ tasks = [
      'final_sql': None},
     {'carto_table_name': 'qa_region_codes_liquidity',
      'db': 'dw',
-     'final_sql': None}
+     'final_sql': None},
+    {'carto_table_name': 'qa_out_of_area_leads',
+     'db': 'dw',
+     'final_sql': 'UPDATE qa_out_of_area_leads SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'}
 ]
 
 MAIN_DAG_NAME = 'bi-upload-data-to-carto'
