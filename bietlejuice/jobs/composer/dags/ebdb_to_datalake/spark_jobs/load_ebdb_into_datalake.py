@@ -44,7 +44,7 @@ if __name__ == "__main__":
         mysql_consumer
     ).collect()
 
-    with Pool(20) as p:
+    with Pool(NB_THREADS) as p:
         p.map(
             load_table_into_datalake,
             [

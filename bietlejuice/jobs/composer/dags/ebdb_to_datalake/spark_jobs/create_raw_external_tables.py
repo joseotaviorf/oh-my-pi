@@ -11,7 +11,7 @@ from bietlejuice.jobs.composer.wrappers import AthenaClient
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_raw_external_tables")
 
-NB_THREADS = 20
+NB_THREADS = 16
 
 
 @logger
@@ -34,14 +34,14 @@ if __name__ == "__main__":
         ),
         "default",
     )
-    connection = {"db": "datalake_raw_spark"}
+    connection = {"db": DataSourceIntoDataLakeLoader.DATALAKE_RAW_DB}
     databricks_consumer = DatabricksConsumer(connection)
     df = databricks_consumer.get_table_names_and_sizes()
     tables = (
         df.select("table_name").filter(col("table_name").rlike(r"^ebdb_")).collect()
     )
     logger.info("m=__main__, msg=Creating raw external tables...")
-    with Pool(16) as p:
+    with Pool(NB_THREADS) as p:
         p.map(
             create_raw_external_table,
             [(table.table_name, databricks_consumer) for table in tables],
