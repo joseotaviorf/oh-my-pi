@@ -5,14 +5,14 @@ clone:
 
 pipeline:
 
-  progressive-lint:
-    image: python:2.7.12
-    commands:
-      - pip install -q flake8==3.5.0
-      - export FILES_CHANGED=$(git diff --name-only master | grep '.py$' || true)
-      - flake8 --max-line-length=120 $FILES_CHANGED
-    when:
-      event: push
+#  progressive-lint:
+#    image: python:2.7.12
+#    commands:
+#      - pip install -q flake8==3.5.0
+#      - export FILES_CHANGED=$(git diff --name-only master | grep '.py$' || true)
+#      - flake8 --max-line-length=120 $FILES_CHANGED
+#    when:
+#      event: push
 
 #  unit-test:
 #    image: python:2.7.12
