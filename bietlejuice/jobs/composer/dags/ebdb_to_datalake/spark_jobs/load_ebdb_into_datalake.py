@@ -15,7 +15,7 @@ logger = QuintoAndarLogger("load_ebdb_into_datalake")
 DATABRICKS_SCOPE = "quintoandar-forno"
 BLACK_LIST = ["REVCHANGES"]
 PARTITION_SIZE = 512
-NB_THREADS = 16
+NB_THREADS = 20
 
 
 @logger
