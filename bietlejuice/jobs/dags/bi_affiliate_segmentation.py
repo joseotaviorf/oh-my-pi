@@ -6,16 +6,16 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 
 env.set_airflow_var_to_local_env('BI_DW')
-# bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-affiliate-segmentation'
-MAIN_START_DATE = datetime(2019, 7, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 7 1 * *')
+MAIN_START_DATE = datetime(2019, 6, 1)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 1 * *')
 
 
 def create_dw_table_via_sql(file_name, table_name, **kwargs):
     # extraction
     query = BaseETL.get_query_from_file_name(file_name='{0}/public/{1}'.format(DW_QUERIES_DIR, file_name))
+    query = query.format(kwargs['execution_date'])
     affiliate_data = BaseETL.from_db_query(db_enum=EnumDB.BI_DW, query=query)
 
     # load

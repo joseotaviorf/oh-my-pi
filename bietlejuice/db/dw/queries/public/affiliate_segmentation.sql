@@ -104,5 +104,5 @@ sk_user,
 segmentation,
 flg_last_segmentation
 FROM checkall
--- WHERE sk_user_affiliate = 21407
+WHERE sk_date <= cast(to_char(ADD_MONTHS('{0}'::DATE, 1) ,'YYYYMMDD') as integer)
 ;
