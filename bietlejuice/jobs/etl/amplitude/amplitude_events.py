@@ -156,6 +156,9 @@ class AmplitudeEventsETL(BaseETL):
             df_final = df_final.append(df_raw_json)
             i += 1
 
+        # grouping by same name columns
+        df_final = df_final.groupby(df_final.columns, axis=1).first()
+
         self.create_parquets(athena_client=athena_client, execution_date=execution_date, df=df_final)
 
     @logger
