@@ -4,29 +4,30 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base import DatabaseTypeEnum
 from bietlejuice.jobs.composer.consumers.consumer import Consumer
 
-logger = QuintoAndarLogger('MySQLConsumer')
+logger = QuintoAndarLogger("MySQLConsumer")
 
 
 class MySQLConsumer(Consumer):
     FETCH_SIZE = 50000
 
     def __init__(self, connection):
-        if connection['dbtype'].lower() != DatabaseTypeEnum.MYSQL:
+        if connection["dbtype"].lower() != DatabaseTypeEnum.MYSQL:
             raise RuntimeError(
-                'm=__init__, con_type={}, msg=Connection is not a mysql'
-                'connection'.format(connection.get('dbtype')))
+                "m=__init__, con_type={}, msg=Connection is not a mysql"
+                "connection".format(connection.get("dbtype"))
+            )
 
-        connection['url'] = "jdbc:mysql://{}:{}/{}".format(connection['host'],
-                                                           connection['port'],
-                                                           connection['db'])
-        connection['driver'] = 'com.mysql.jdbc.Driver'
+        connection["url"] = "jdbc:mysql://{}:{}/{}".format(
+            connection["host"], connection["port"], connection["db"]
+        )
+        connection["driver"] = "com.mysql.jdbc.Driver"
         self.connection = connection
 
     @logger
     def get_table_names_and_sizes(self):
         query = """
     SELECT
-      table_name AS `table`,
+      table_name,
       round(((data_length + index_length) / 1024 / 1024), 2) AS `size`
     FROM
       information_schema.TABLES
@@ -35,67 +36,66 @@ class MySQLConsumer(Consumer):
     ORDER BY
       (data_length + index_length) DESC
     """
-        result = self.get_data_from_query(
-            query.format(db=self.connection['db']))
+        result = self.get_data_from_query(query.format(db=self.connection["db"]))
 
         return result
 
     @logger
-    def get_data_from_table(self, table):
-        remote_table = self._get_default_read_format_and_options() \
-            .option("dbtable", table) \
+    def get_data_from_table(self, table_name):
+        remote_table = (
+            self._get_default_read_format_and_options()
+            .option("dbtable", table_name)
             .load()
+        )
 
         return remote_table
 
     @logger
-    def get_data_from_table_in_parallel(self, table, concurrency):
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
         remote_table = self._get_default_read_format_and_options()
 
-        partition_column = self._get_partition_column_from_table(table)
+        partition_column = self._get_partition_column_from_table(table_name)
 
         if partition_column:
-            query = "select max({}) from {}".format(partition_column, table)
+            query = "select max({}) from {}".format(partition_column, table_name)
             result = self.get_data_from_query(query)
             upper_bound = result.collect()[0][0]
 
-            query = "select min({}) from {}".format(partition_column, table)
+            query = "select min({}) from {}".format(partition_column, table_name)
             result = self.get_data_from_query(query)
             lower_bound = result.collect()[0][0]
 
-            remote_table = remote_table \
-                .option("partitionColumn", partition_column) \
-                .option("lowerBound", lower_bound) \
-                .option("upperBound", upper_bound) \
+            remote_table = (
+                remote_table.option("partitionColumn", partition_column)
+                .option("lowerBound", lower_bound)
+                .option("upperBound", upper_bound)
                 .option("numPartitions", concurrency)
+            )
 
-        remote_table = remote_table \
-            .option("dbtable", table) \
-            .load()
+        remote_table = remote_table.option("dbtable", table_name).load()
 
         return remote_table
 
     @logger
     def get_data_from_query(self, query):
-        remote_table = self._get_default_read_format_and_options() \
-            .option("query", query) \
-            .load()
+        remote_table = (
+            self._get_default_read_format_and_options().option("query", query).load()
+        )
         return remote_table
 
     @logger
-    def get_table_schema(self, table):
+    def get_table_schema(self, table_name):
         query = """
         select
-            COLUMN_NAME, COLUMN_TYPE
+            COLUMN_NAME as col_name,
+            COLUMN_TYPE as col_type
         FROM
             INFORMATION_SCHEMA.COLUMNS
         WHERE
             TABLE_NAME = '{table}'
         """
 
-        result = self.get_data_from_query(
-            query.format(table=table)
-        )
+        result = self.get_data_from_query(query.format(table=table_name))
 
         return result
 
@@ -103,12 +103,14 @@ class MySQLConsumer(Consumer):
     def _get_default_read_format_and_options(self):
         spark = SparkSession.builder.getOrCreate()
 
-        return spark.read.format('jdbc') \
-            .option("driver", self.connection['driver']) \
-            .option("fetchsize", self.FETCH_SIZE) \
-            .option("url", self.connection['url']) \
-            .option("user", self.connection['user']) \
-            .option("password", self.connection['pwd'])
+        return (
+            spark.read.format("jdbc")
+            .option("driver", self.connection["driver"])
+            .option("fetchsize", self.FETCH_SIZE)
+            .option("url", self.connection["url"])
+            .option("user", self.connection["user"])
+            .option("password", self.connection["pwd"])
+        )
 
     @logger
     def _get_partition_column_from_table(self, table):
@@ -136,12 +138,13 @@ class MySQLConsumer(Consumer):
         ORDER by s.`CARDINALITY` desc
         """
         df = self.get_data_from_query(
-            query.format(db=self.connection['db'], table=table)
-        ).select('COLUMN_NAME')
+            query.format(db=self.connection["db"], table=table)
+        ).select("COLUMN_NAME")
 
         if df.count():
             return df.collect()[0][0]
 
         logger.warning(
-            'm=_get_partition_column_from_table, table={}, msg=Partition column '
-            'to parallelize the table read was not found.'.format(table))
+            "m=_get_partition_column_from_table, table={}, msg=Partition column "
+            "to parallelize the table read was not found.".format(table)
+        )
