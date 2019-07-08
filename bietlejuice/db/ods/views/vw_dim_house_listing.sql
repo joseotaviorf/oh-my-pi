@@ -264,6 +264,7 @@ select
   lsc_originals.special_condition_type as last_originals_type,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
   lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
+  lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
