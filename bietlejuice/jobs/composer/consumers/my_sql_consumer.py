@@ -113,7 +113,7 @@ class MySQLConsumer(Consumer):
         )
 
     @logger
-    def _get_partition_column_from_table(self, table):
+    def _get_partition_column_from_table(self, table_name):
         query = """
         SELECT
             k.TABLE_NAME,
@@ -138,7 +138,7 @@ class MySQLConsumer(Consumer):
         ORDER by s.`CARDINALITY` desc
         """
         df = self.get_data_from_query(
-            query.format(db=self.connection["db"], table=table)
+            query.format(db=self.connection["db"], table=table_name)
         ).select("COLUMN_NAME")
 
         if df.count():
@@ -146,5 +146,5 @@ class MySQLConsumer(Consumer):
 
         logger.warning(
             "m=_get_partition_column_from_table, table={}, msg=Partition column "
-            "to parallelize the table read was not found.".format(table)
+            "to parallelize the table read was not found.".format(table_name)
         )
