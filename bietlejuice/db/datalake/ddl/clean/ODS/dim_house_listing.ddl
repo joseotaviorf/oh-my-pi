@@ -61,6 +61,7 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   last_originals_type string,
   dt_last_originals_opted_in string,
   dt_last_originals_opted_out string,
+  dt_last_exclusivity_opted_out string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
