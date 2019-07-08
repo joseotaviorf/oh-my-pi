@@ -17,7 +17,7 @@ from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 MAIN_DAG_NAME = 'crawling-houses-zapimoveis'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 3 * * *'
+MAIN_SCHEDULE_INTERVAL = '0 0 * * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -26,9 +26,9 @@ crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
-def submit_zap(**kwargs):
+def submit_zap(execution_date, **kwargs):
     states = kwargs.get('states')
-    listing_date = kwargs.get('execution_date').strftime('%Y-%m-%d')
+    listing_date = execution_date.strftime('%Y-%m-%d')
 
     assert isinstance(states, list)
 
@@ -136,7 +136,7 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=env.convert_to_utc_schedule(MAIN_SCHEDULE_INTERVAL),
     max_active_runs=1,
     catchup=False
 )
