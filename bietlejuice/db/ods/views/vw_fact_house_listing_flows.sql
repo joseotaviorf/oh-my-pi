@@ -5,7 +5,7 @@ with legacy_doorman as (
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
   from files.porteiros_legado
-  where (porteiros_legado."Status" = (['Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'])) 
+  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
 base_lead_tasks as (
@@ -96,6 +96,7 @@ fact_with_reproc as (
       fhlf.dt_first_listing,
       fhlf.dt_discarded,
       fhlf.user_id_lead_first_discarder,
+      fhlf.user_id_lead_last_discarder,
       fhlf.flow,
       fhlf.acquisition_method,
       fhlf.acquisition_channel,
@@ -147,6 +148,7 @@ fact_with_reproc as (
     acquisition_channels.dt_first_listing,
     acquisition_channels.dt_discarded,
     acquisition_channels.user_id_lead_first_discarder,
+    acquisition_channels.user_id_lead_last_discarder,
     acquisition_channels.flow,
     acquisition_channels.acquisition_method,
     acquisition_channels.acquisition_channel,
@@ -253,6 +255,7 @@ potential_listings as (
     coalesce(to_char(f.dt_first_listing::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_listing_date,
     coalesce(to_char(f.dt_discarded::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_discard_date,
     coalesce(f.user_id_lead_first_discarder, '-1'::integer) as sk_user_lead_first_discarder,
+    coalesce(f.user_id_lead_last_discarder, '-1'::integer) as sk_user_lead_last_discarder,
     a.flow,
     a.acquisition_method,
     a.acquisition_channel,
@@ -341,6 +344,7 @@ taxonomy as (
     mkt_category,
     mkt_flow,
     mkt_completion,
+    mkt_origin,
     mkt_channel,
     mkt_platform,
     mkt_medium,
@@ -372,6 +376,7 @@ select
   pl.sk_first_listing_date,
   pl.sk_discard_date,
   pl.sk_user_lead_first_discarder,
+  pl.sk_user_lead_last_discarder,
   pl.funnel_step,
   pl.funnel_drop_reason,
   pl.hours_lead_to_prospect,
@@ -420,6 +425,10 @@ select
     when t.mkt_flow is null then 'Not Mapped'
     else t.mkt_completion
   end as mkt_completion,
+  case
+    when t.mkt_flow is null then 'Not Mapped'
+    else t.mkt_origin
+  end as mkt_origin,
   case
     when t.mkt_flow is null then 'Not Mapped'
     else t.mkt_channel

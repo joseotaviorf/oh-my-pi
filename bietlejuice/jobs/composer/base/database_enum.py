@@ -1,4 +1,5 @@
 class DatabaseEnum:
+    DOCX = 'ENV_DOCX'
     EBDB = 'ENV_EBDB'
     GODFATHER = 'ENV_GODFATHER'
     DARKRUM = 'ENV_DARKRUM'
