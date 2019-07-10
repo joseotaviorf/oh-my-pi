@@ -8,7 +8,7 @@ from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEventsETL
 from bietlejuice.jobs.composer.base import BaseDBUtils
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger('load_docx_into_datalake')
+logger = QuintoAndarLogger('load_events_into_datalake_raw')
 
 base_dbutils = BaseDBUtils()
 if base_dbutils.get_dbutils() is not None:
