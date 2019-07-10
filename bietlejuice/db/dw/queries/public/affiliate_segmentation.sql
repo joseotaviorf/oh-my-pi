@@ -24,10 +24,10 @@ CASE WHEN
 	end as flg_last_segmentation,
 	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_lead_date > 0 AND dt_lead.date < dt.month_start THEN fhl.sk_house_listing_flow END) AS FLOAT) AS "leads",
 	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_prospect_date > 0 AND dt_prospect.date < dt.month_start then fhl.sk_house_listing_flow END) AS FLOAT) AS "prospects",
-	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_prospect_date > 0 AND dt_prospect.date BETWEEN date(add_months(dt.month_end,-4)) AND add_months(dt.month_end,-1) THEN fhl.sk_house_listing_flow END) AS FLOAT) AS "prospectslast90days",
+	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_prospect_date > 0 AND dt_prospect.date BETWEEN date(add_months(dt.month_start,-3)) AND add_months(dt.month_end,-1) THEN fhl.sk_house_listing_flow END) AS FLOAT) AS "prospectslast90days",
 	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_prospect_date > 0 AND dt_prospect.date BETWEEN date(add_months(dt.month_start,-3)) AND date(add_months(dt.month_end,-1)) THEN dt_prospect.month END) AS FLOAT) AS "activelast90inmonths",
 	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_first_listing_date > 0 AND dt_listing.date < dt.month_start then fhl.sk_house_listing_flow END) AS FLOAT) as "listings",
-	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_first_listing_date > 0 AND dt_listing.date BETWEEN date(add_months(dt.month_end,-4)) AND add_months(dt.month_end,-1) then fhl.sk_house_listing_flow END) AS FLOAT) AS "listingslast90days"
+	CAST(COUNT(DISTINCT CASE WHEN fhl.sk_first_listing_date > 0 AND dt_listing.date BETWEEN date(add_months(dt.month_start,-3)) AND add_months(dt.month_end,-1) then fhl.sk_house_listing_flow END) AS FLOAT) AS "listingslast90days"
 FROM dim_user_affiliate duaf
 CROSS JOIN monthsbegin dt
 LEFT JOIN dim_user u ON u.dados_afiliado_id = duaf.sk_user_affiliate
@@ -79,7 +79,7 @@ CASE
 	END AS eixo_vertical
 FROM conditional_inactives_new
 ),
-checkall AS (
+full_segmentation AS (
 SELECT
 *,
 CASE
@@ -103,6 +103,6 @@ sk_user_affiliate,
 sk_user,
 segmentation,
 flg_last_segmentation
-FROM checkall
+FROM full_segmentation
 WHERE sk_date <= cast(to_char(ADD_MONTHS('{0}'::DATE, 1) ,'YYYYMMDD') as integer)
 ;
