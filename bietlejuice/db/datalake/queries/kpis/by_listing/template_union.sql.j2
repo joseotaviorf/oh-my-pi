@@ -1,0 +1,34 @@
+WITH
+dates AS (
+  SELECT DATE(d.date) AS date_day
+  FROM datalake_clean.ods_dim_date d
+  WHERE
+    d.sk_date != '-1'
+    AND DATE(d.date) >= DATE_ADD('{{ date_interval }}', {{ date_difference }}, CURRENT_DATE)
+    AND DATE_TRUNC('{{ date_interval }}', DATE(d.date)) <= DATE_TRUNC('{{ date_interval }}', CURRENT_DATE)
+),
+{% for metric in metrics %}
+{{ metric.name }} AS (
+  SELECT
+    DATE_TRUNC('{{ date_interval }}', DATE(d.date)) AS date_period,
+    {{ metric.table_name }}.{{ group_by_column }},
+    {{ metric.sql}} AS metric,
+    '{{ metric.name }}' AS metric_name
+    FROM (SELECT * FROM datalake_clean.ods_{{ metric.table_name }} WHERE {{ metric.event_date }} != '-1') AS {{ metric.table_name }}
+  JOIN datalake_clean.ods_dim_date AS d ON {{ metric.table_name }}.{{ metric.event_date }} = d.sk_date
+  WHERE DATE(d.date) >= DATE_ADD('{{ date_interval }}', {{ date_difference }}, CURRENT_DATE) OR DATE_TRUNC('{{ date_interval }}', DATE(d.date)) = DATE_TRUNC('{{ date_interval }}', CURRENT_DATE)
+  GROUP BY 1, 2
+),
+{% endfor %}
+metrics AS (
+  {% for metric in metrics %}SELECT * FROM {{ metric.name }}
+  {% if not loop.last %}UNION ALL{% endif %}
+  {% endfor %}
+)
+SELECT
+  m.date_period,
+  m.{{ group_by_column }},
+  {% for metric in metrics %}SUM(CASE WHEN metric_name = '{{ metric.name }}' THEN metric ELSE 0 END) AS {{ metric.name }}{% if not loop.last %},{% endif %}
+  {% endfor %}
+FROM metrics AS m
+GROUP BY m.date_period, m.{{ group_by_column }}
