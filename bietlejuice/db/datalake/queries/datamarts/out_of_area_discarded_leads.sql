@@ -1,7 +1,7 @@
 WITH
 radius AS (
   -- here we define our tolerance radius of out of area leads, in km
-  SELECT 1 AS "radius_km"
+  SELECT 1.0 AS "radius_km"
 ),
 discarded_leads AS (
   SELECT
@@ -32,7 +32,7 @@ discarded_leads AS (
   LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows.sk_lead_date
   WHERE (dim_lead.reason = 'ForaArea') AND (dim_lead.status = 'Descartado')
     AND TRY(DATE(dim_date_lead.date))  >= CURRENT_DATE - INTERVAL '30' day
-    -- FIXME: filter not prospect
+    AND fact_house_listing_flows.sk_prospect_date = '-1'
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
 ),
 subregions AS (
