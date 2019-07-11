@@ -62,7 +62,6 @@ discarded_leads_subregions AS (
         ST_POINT(TRY(CAST(dl.lng AS REAL)), TRY(CAST(dl.lat AS REAL))),
         r.geometry
       ) <= ((SELECT radius_km FROM radius) / (111.321 * COS(RADIANS(ST_MIN_Y(r.geometry)))))
-
     )
 ),
 distance_order AS (
@@ -77,7 +76,7 @@ SELECT
     WHEN lead_distance_meters_from_current_region = 0 THEN '0'
     WHEN lead_distance_meters_from_current_region > 0 AND lead_distance_meters_from_current_region <= 250 THEN '1-250'
     WHEN lead_distance_meters_from_current_region > 250 AND lead_distance_meters_from_current_region <= 500 THEN '251-500'
-    WHEN lead_distance_meters_from_current_region > 501 AND lead_distance_meters_from_current_region <= 1000 THEN '501-1000'
+    WHEN lead_distance_meters_from_current_region > 500 AND lead_distance_meters_from_current_region <= 1000 THEN '501-1000'
   END AS distance_category_meters,
   CASE
     WHEN lead_distance_meters_from_current_region = 0 THEN 'Lead inside existing region'
