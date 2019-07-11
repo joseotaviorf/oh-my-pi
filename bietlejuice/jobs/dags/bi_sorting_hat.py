@@ -22,10 +22,11 @@ logger = QuintoAndarLogger(MAIN_DAG_NAME)
 def extract_table(**kwargs):
     table_name = kwargs['table_name']
 
+    table = SortingHat.extract_table_from_db(query_file_path=kwargs['query_file_path_suffix'],
+                                             query_param={'execution_date': kwargs[
+                                                 'execution_date']} if 'execution_date' in kwargs else None)
+
     sorting_hat = SortingHat()
-    table = sorting_hat.extract_table_from_db(query_file_path=kwargs['query_file_path_suffix'],
-                                              query_param={'execution_date': kwargs[
-                                                  'execution_date']} if 'execution_date' in kwargs else None)
     sorting_hat.load_table_to_s3(table_name=table_name,
                                  data_table=table,
                                  s3_bucket=env.get_airflow_env_var('bi-datalake-s3-bucket')

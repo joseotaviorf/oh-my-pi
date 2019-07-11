@@ -9,8 +9,9 @@ logger = QuintoAndarLogger('SortingHat')
 class SortingHat(object):
     ODS_SCHEMA = 'sortinghat'
 
+    @staticmethod
     @logger
-    def extract_table_from_db(self, query_file_path, query_param=None):
+    def extract_table_from_db(query_file_path, query_param=None):
         query = BaseETL.get_query_from_file_name('{}/sorting_hat/{}'.format(SOURCE_QUERIES_DIR, query_file_path))
 
         if query_param:
