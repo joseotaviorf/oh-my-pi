@@ -5,7 +5,7 @@ WITH monthsbegin as (
         month_start,
         month_end
     FROM dim_date d
-    WHERE d.date BETWEEN add_months('{0}'::DATE, -17) AND ('{0}'::DATE)
+    WHERE d.date BETWEEN add_months('{0}'::DATE, -17) AND add_months('{0}'::DATE, 1)
 )
 ,base_aff as (
     SELECT
@@ -60,7 +60,7 @@ WITH monthsbegin as (
         RANK() OVER(PARTITION BY duaf.sk_user_affiliate ORDER BY dt.month_start DESC) = 1 as is_last_segmentation
     FROM dim_user_affiliate duaf
     CROSS JOIN monthsbegin dt
-    LEFT JOIN dim_user u
+    JOIN dim_user u
         ON u.dados_afiliado_id = duaf.sk_user_affiliate
     LEFT JOIN fact_house_listing_flows fhl
         ON fhl.sk_user_lead_affiliate = u.sk_user
@@ -70,7 +70,7 @@ WITH monthsbegin as (
         ON dt_prospect.sk_date = fhl.sk_prospect_date
     LEFT JOIN dim_date dt_listing
         ON dt_listing.sk_date = fhl.sk_first_listing_date
-    WHERE duaf.type = 'Standard'
+    WHERE duaf.type = 'Standard' -- This is the only affiliate type that we analyze segmentation
     GROUP BY 1,2,3,4,5,6,7,8,9
 ), ratios AS (
     SELECT
@@ -125,6 +125,7 @@ axis_hor_ver AS (
 full_segmentation AS (
     SELECT
         *,
+        -- Next step: Create a dynamic and more self service process to manage current and new segmentation names
         CASE
             WHEN new_inactive <> 'active' THEN new_inactive
             WHEN eixo_horizontal = 1 AND eixo_vertical = 1 THEN 'teste'
