@@ -1,6 +1,6 @@
-drop table public.fact_affiliate_segmentation;
+drop table public.fact_affiliate_segmentations;
 
-create table if not exists public.fact_affiliate_segmentation (
+create table if not exists public.fact_affiliate_segmentations (
     sk_date integer,
     sk_user_affiliate integer,
     sk_user integer,

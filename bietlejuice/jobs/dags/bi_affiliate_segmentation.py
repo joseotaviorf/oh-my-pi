@@ -36,5 +36,5 @@ create_affiliate_segmentation_task = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=create_dw_table_via_sql,
     op_kwargs={'file_name': 'affiliate_segmentation.sql',
-               'table_name': 'fact_affiliate_segmentation'}
+               'table_name': 'fact_affiliate_segmentations'}
 )
