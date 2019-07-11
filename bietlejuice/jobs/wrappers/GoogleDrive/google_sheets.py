@@ -5,7 +5,6 @@ from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.data_frame_service import DataFrameJsonService
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
 logger = QuintoAndarLogger('GoogleSheets')
@@ -18,7 +17,7 @@ class GoogleSheets(object):
         self.google_api_scope = google_api_scope
 
     @logger(exclude=['google_sheets_files'])
-    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination):
+    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None):
         if not google_sheets_files:
             raise ValueError(
                 'm=move_sheets_data_to_destination, msg=no files set.')
@@ -38,11 +37,15 @@ class GoogleSheets(object):
             df_gsheets.rename(columns=snake_case_columns, inplace=True)
 
             if enumdb_destination == EnumDB.QuintoAndar_datalake:
+                if not athena_client:
+                    raise ValueError('m=move_sheets_data_to_destination, msg=AthenaClient object must be given.')
+
                 self._move_df_to_datalake(df=df_gsheets, table_name=item['s3_path'])
-                self._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
-                                          table_name=item['s3_path'])
+                GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
+                                                  table_name=item['s3_path'], athena_client=athena_client)
+
             if enumdb_destination == EnumDB.BI_ODS:
-                self._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets_files')
+                GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets')
 
     @staticmethod
     @logger(exclude='old_columns')
@@ -68,31 +71,36 @@ class GoogleSheets(object):
         BaseETL.obj_to_s3(
             obj_io=object_,
             bucket=self.s3_bucket,
-            file_path='{0}/gsheets_files/{1}/{1}.gz'.format('raw', table_name)
+            file_path='{0}/gsheets/{1}/{1}.gz'.format('raw', table_name)
         )
 
         object_.flush()
 
+    @staticmethod
     @logger(exclude='df')
-    def _move_df_to_ods(self, df, table_name, schema):
+    def _move_df_to_ods(df, table_name, schema):
         exists = BaseETL.table_exists(
             db_enum=EnumDB.BI_ODS,
             table_name=table_name,
             schema=schema
         )
-        if not exists:
+        if exists:
             logger.info(
-                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
-            BaseETL.create_table(
-                conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
-                table=petl.fromdataframe(df),
-                tablename=table_name,
-                schema=schema
-            )
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Dropping table'.format(table_name, schema))
+            BaseETL.drop_table(db_enum=EnumDB.BI_ODS, table_name=table_name, schema=schema)
 
         logger.info(
-            'm=_move_df_to_ods, table_name={0},schema={1}, msg=Sending df to ods'.format(table_name, schema))
+            'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
+        BaseETL.create_table(
+            conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
+            table=petl.fromdataframe(df),
+            tablename=table_name,
+            schema=schema
+        )
+
         try:
+            logger.info(
+                'm=_move_df_to_ods, table_name={0},schema={1}, msg=Sending df to ods'.format(table_name, schema))
             BaseETL.dataframe_to_ods(
                 df=df,
                 table_name='{}."{}"'.format(schema, table_name),
@@ -103,16 +111,18 @@ class GoogleSheets(object):
             raise RuntimeError('m=_move_df_to_ods, table_name={0}, schema={1}, error={2}, '
                                'msg=Problem in send df to ods'.format(table_name, schema, str(e.message)))
 
+    @staticmethod
     @logger(exclude='df')
-    def _create_athena_table(self, df, schema_name, schema_folder, table_name):
-        columns_definition = self._get_df_columns_definition(df)
-        athena_client = AthenaClient(self.s3_bucket)
+    def _create_athena_table(df, schema_name, schema_folder, table_name, athena_client):
+        columns_definition = GoogleSheets._get_df_columns_definition(df)
 
-        logger.info('schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
+        logger.info(
+            'm=_create_athena_table, schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
         athena_client.execute_query_and_wait_for_results(
             sql='drop table if exists {0}.{1}_{2};'.format(schema_name, 'gsheet', table_name))
 
-        logger.info('schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
+        logger.info(
+            'm=_create_athena_table, schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
         athena_client.execute_file_query_and_wait_for_results(
             filename='{0}/gsheets/base_create_table.sql'.format(DATALAKE_QUERIES_DIR),
             query_params={
@@ -123,9 +133,12 @@ class GoogleSheets(object):
             }
         )
 
-        logger.info('schema={0}, table_name=gsheet_{1}, msg=table created'.format(schema_name, table_name))
+        logger.info('m=_create_athena_table, schema={0}, table_name=gsheet_{1}, msg=table created'.format(schema_name,
+                                                                                                          table_name))
 
+    @staticmethod
     @logger(exclude='df')
-    def _get_df_columns_definition(self, df):
+    def _get_df_columns_definition(df):
         column_list = df.columns.values.tolist()
+        logger.info('m=_get_df_columns_definition, column_list={0}'.format(', '.join(map(str, column_list))))
         return ' string,'.join(map(str, column_list)) + ' string'
