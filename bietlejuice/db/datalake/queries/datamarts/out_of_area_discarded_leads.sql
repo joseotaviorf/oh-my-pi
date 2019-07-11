@@ -40,7 +40,6 @@ subregions AS (
 	FROM datalake_clean.ods_dim_region r
 	JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
 	WHERE level = 'SubRegiao'
-    -- AND r.city_group IN ('Rio de Janeiro', 'Curitiba', 'Florianópolis', 'Porto Alegre')
 ),
 discarded_leads_subregions AS (
 	SELECT
