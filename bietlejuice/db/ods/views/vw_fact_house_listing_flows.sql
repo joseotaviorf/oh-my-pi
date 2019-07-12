@@ -125,7 +125,11 @@ fact_with_reproc as (
         else fhlf.acquisition_channel
       end as acquisition_channel_rep,
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
-      coalesce(coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner' or pa_b2b.id is not null, false) as is_b2b
+      coalesce(
+            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            or pa_b2b.id is not null
+            or b2b_prime.id_lead is not null
+            , false) as is_b2b
     from fact_house_listing_flows fhlf
     left join lead l 
       on l.id = fhlf.lead_id
@@ -135,6 +139,15 @@ fact_with_reproc as (
       on h.id = fhlf.imovel_id
     left join partner_agent pa_b2b
       on pa_b2b.user_id = h.usuario_id
+    left join (
+		select distinct le.id as id_lead
+		from lead le
+		join usuario u_b2b
+			on u_b2b.telefone_principal = le.telefone_anunciante
+		join partner_agent pa_b2b
+			on pa_b2b.user_id = u_b2b.id
+	) b2b_prime
+	  on b2b_prime.id_lead = l.id
   )
   select 
     acquisition_channels.id,
