@@ -1,4 +1,5 @@
-WITH qa_listings AS (
+WITH
+qa_listings AS (
   SELECT
     *,
     regexp_extract(trim(house_number), '\d+$') AS extracted_house_number
@@ -32,11 +33,6 @@ crawled_listings AS (
         suites,
         toilets,
         garages,
-        photos,
-        unit_features,
-        common_features,
-        complementary_info,
-        year_building,
         cep,
         lat,
         lng,
@@ -45,14 +41,15 @@ crawled_listings AS (
         neighborhood,
         city,
         state,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) DESC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
+        AND started_on >= CURRENT_DATE - INTERVAL '7' DAY  -- only query listings posted in the last 7 days
     ) as tmp
   WHERE
-    row = 1  -- get only the first time a listing was posted
-    AND DATE(updated_on) >= current_date - interval '7' day
+    row = 1  -- get the most recent time it was crawled
+    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '7' DAY  -- and only listings posted in the last 7 days
 ),
 qa_listings_unique_locations AS (
   SELECT
