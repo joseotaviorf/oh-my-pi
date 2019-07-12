@@ -6,9 +6,36 @@ qa_listings AS (
   FROM datalake_clean.ods_dim_house_listing
   WHERE status = 'publicado' AND is_last_version = 'True'
 ),
+-- here we have to scan (almost) all the data first to find the first time a listing was really crawled
+-- we limit the columns and then join to listings below to reduce the amount of data scanned
+-- we also get the partition from the last 120 days
+-- if a listing has been there for longer than 120 days we'll ignore its previous history
+first_listings AS (
+  SELECT
+    id,
+    crawled_on AS first_time_crawled_on,
+    updated_on AS first_time_updated_on
+  FROM
+    (
+      SELECT
+        ws || '-' || id AS id,
+        crawled_on,
+        updated_on,
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+      FROM datalake_clean.crawlers
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
+        AND advertiser_name != 'quintoandar'
+        AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
+    ) as tmp
+  WHERE
+    row = 1  -- get the first time it was crawled
+    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
+),
 crawled_listings AS (
   SELECT
-    *
+    first_listings.first_time_crawled_on,
+    first_listings.first_time_updated_on,
+    listings.*
   FROM
     (
       SELECT
@@ -41,15 +68,16 @@ crawled_listings AS (
         neighborhood,
         city,
         state,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) DESC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
         AND started_on >= CURRENT_DATE - INTERVAL '7' DAY  -- only query listings from crawler jobs started in the last 7 days
-    ) as tmp
+      ) as listings
+    JOIN first_listings ON listings.id = first_listings.id
   WHERE
-    row = 1  -- get the most recent time it was crawled
-    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '7' DAY  -- and only listings posted in the last 7 days
+    listings.row = 1  -- get the first time it was crawled within last 30 days
+    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '7' DAY  -- and only listings posted or updated in the last 7 days
 ),
 qa_listings_unique_locations AS (
   SELECT
