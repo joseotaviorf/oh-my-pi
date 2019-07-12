@@ -45,7 +45,7 @@ crawled_listings AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
-        AND started_on >= CURRENT_DATE - INTERVAL '7' DAY  -- only query listings posted in the last 7 days
+        AND started_on >= CURRENT_DATE - INTERVAL '7' DAY  -- only query listings from crawler jobs started in the last 7 days
     ) as tmp
   WHERE
     row = 1  -- get the most recent time it was crawled

@@ -38,7 +38,7 @@ listings AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
-        AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings posted in the last 30 days
+        AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
     ) as tmp
   WHERE
     row = 1  -- get the most recent time it was crawled
