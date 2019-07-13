@@ -34,7 +34,8 @@ select
   fup.motivoProprietario as owner_missing_reason,
   (case when e.successful=1 then 1 when e.successful=0 then 0 else null end) as successful_entrance,
   e.problem as troublesome_entrance,
-  a.checkInStatus
+  a.checkInStatus as checkin_status,
+  m.reasonEnum as reason_enum
 from
   Agendamento a
 -- MUDANCA STATUS
