@@ -5,12 +5,12 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
-logger = QuintoAndarLogger('EBDBIntoDatalakeLoader')
+logger = QuintoAndarLogger('DocxIntoDatalakeLoader')
 
 
-class EBDBIntoDatalakeLoader:
-    RAW_PATH = 's3://5a-datalake/temp/ebdb'
-    ATHENA_RAW_SCHEMA = 'datalake_test'
+class DocxIntoDatalakeLoader:
+    RAW_PATH = 's3://5a-datalake/temp/docx'
+    ATHENA_RAW_SCHEMA = 'docx'
     RAW_FORMAT = 'json'
     DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
     CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
@@ -28,7 +28,7 @@ class EBDBIntoDatalakeLoader:
     @logger
     def load_full_table_into_datalake_raw(table, consumer, query=None, partition_by=None, concurrency=1):
         db = consumer.connection['db']
-        final_path = '{}/{}'.format(EBDBIntoDatalakeLoader.RAW_PATH, table.lower())
+        final_path = '{}/{}'.format(DocxIntoDatalakeLoader.RAW_PATH, table.lower())
 
         logger.info('m=load_full_table_into_datalake_raw, table={}.{}, msg=Getting  data...'.format(db, table))
         if query:
@@ -47,7 +47,7 @@ class EBDBIntoDatalakeLoader:
         SparkSession.builder.getOrCreate().sql('CREATE DATABASE IF NOT EXISTS {}'.format(db))
         write_df = df.write.mode("overwrite") \
             .option("compression", "gzip") \
-            .format(EBDBIntoDatalakeLoader.RAW_FORMAT) \
+            .format(DocxIntoDatalakeLoader.RAW_FORMAT) \
             .option('path', final_path)
         if partition_by:
             for col in partition_by:
@@ -69,7 +69,7 @@ class EBDBIntoDatalakeLoader:
                 'msg=partition_by param is required to not overwrite the'
                 'entire table but a single partition')
         db = consumer.connection['db']
-        final_path = EBDBIntoDatalakeLoader.RAW_PATH + table.lower()
+        final_path = DocxIntoDatalakeLoader.RAW_PATH + table.lower()
         for key, val in partition_by:
             final_path += '/{}={}'.format(key, val)
 
@@ -81,7 +81,7 @@ class EBDBIntoDatalakeLoader:
             'm=load_incremental_partitioned_table_into_datalake_raw, msg=Writing data into datalake...')
         df.write.mode("overwrite") \
             .option("compression", "gzip") \
-            .format(EBDBIntoDatalakeLoader.RAW_FORMAT) \
+            .format(DocxIntoDatalakeLoader.RAW_FORMAT) \
             .save(final_path)
 
         # refresh table in spark metastore
@@ -105,14 +105,14 @@ class EBDBIntoDatalakeLoader:
     @staticmethod
     @logger
     def create_athena_external_table(consumer, table, partition_by=None):
-        file_format = EBDBIntoDatalakeLoader.CREATE_QUERY_RAW_FORMAT
+        file_format = DocxIntoDatalakeLoader.CREATE_QUERY_RAW_FORMAT
 
-        drop_query = EBDBIntoDatalakeLoader.DROP_QUERY_TEMPLATE.format(
-            database=EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
+        drop_query = DocxIntoDatalakeLoader.DROP_QUERY_TEMPLATE.format(
+            database=DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
             table=table)
-        AthenaClient.execute_athena_query(drop_query, EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
+        AthenaClient.execute_athena_query(drop_query, DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
         logger.info('m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully'.format(
-            EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
+            DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
             table))
 
         table_schema = consumer.get_table_schema(table).collect()
@@ -126,22 +126,22 @@ class EBDBIntoDatalakeLoader:
         if partition_by:
             partitions_section = 'PARTITIONED BY (\n  {}\n)'.format(
                 ',\n  '.join(['`' + col + '` ' + table_schema[col] for col in partition_by]))
-        create_query = EBDBIntoDatalakeLoader.CREATE_QUERY_TEMPLATE.format(
-            database=EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
+        create_query = DocxIntoDatalakeLoader.CREATE_QUERY_TEMPLATE.format(
+            database=DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
             table=table,
             columns=columns_section,
             partitioned_by=partitions_section,
             format=file_format,
             path='{}/{}'.format(
-                EBDBIntoDatalakeLoader.RAW_PATH, table)
+                DocxIntoDatalakeLoader.RAW_PATH, table)
         )
-        AthenaClient.execute_athena_query(create_query, EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
+        AthenaClient.execute_athena_query(create_query, DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
         if partition_by:
             AthenaClient.execute_athena_query(
-                'MSCK REPAIR TABLE `{}`.`{}`;'.format(EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
+                'MSCK REPAIR TABLE `{}`.`{}`;'.format(DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA,
                                                       table),
-                EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
+                DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA)
 
         logger.info(
             'm=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena'.format(
-                EBDBIntoDatalakeLoader.ATHENA_RAW_SCHEMA, table))
+                DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA, table))

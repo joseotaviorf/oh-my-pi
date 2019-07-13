@@ -1,0 +1,1 @@
+from bietlejuice.jobs.composer.etl.load_docx_into_datalake.docx_into_datalake_loader import DocxIntoDatalakeLoader

@@ -1,4 +1,5 @@
-WITH listings AS (
+WITH
+listings AS (
   SELECT
     *
   FROM
@@ -25,11 +26,6 @@ WITH listings AS (
         suites,
         toilets,
         garages,
-        photos,
-        unit_features,
-        common_features,
-        complementary_info,
-        year_building,
         cep,
         lat,
         lng,
@@ -38,15 +34,15 @@ WITH listings AS (
         neighborhood,
         city,
         state,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) DESC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
+        AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
     ) as tmp
   WHERE
-    row = 1
-    -- get only the first time a listing was posted
-    AND DATE(updated_on) >= current_date - interval '30' day
+    row = 1  -- get the most recent time it was crawled
+    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted in the last 30 days
 ),
 doorman AS (
   SELECT
@@ -103,6 +99,9 @@ doorman AS (
     )
     OR COALESCE(d.work_place_id, '') != ''
 ),
+radius AS (
+  SELECT 0.1 AS radius_km
+),
 listings_join_doorman AS
 (
   SELECT
@@ -120,9 +119,8 @@ listings_join_doorman AS
     ST_WITHIN(
       ST_POINT(CAST(l.lng AS double), CAST(l.lat AS DOUBLE)),
       ST_BUFFER(
-        -- 1 degree 110752 meters at latitude -23
-        -- 100 meters 0.00090291823 degrees
-        ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)), 0.00090291823
+        ST_POINT(CAST(d.lng AS double), CAST(d.lat AS DOUBLE)),
+        ((SELECT radius_km FROM radius) / (111.321 * COS(RADIANS(TRY(CAST(d.lat AS REAL))))))  -- distance calculation from decimal degrees to km
       )
     )
     AND CAST(l.nb_street AS BIGINT) = CAST(d.extracted_work_house_number AS BIGINT)
@@ -173,11 +171,6 @@ SELECT
   l.suites,
   l.toilets,
   l.garages,
-  l.photos,
-  l.unit_features,
-  l.common_features,
-  l.complementary_info,
-  l.year_building,
   l.cep,
   l.lat,
   l.lng,
@@ -188,4 +181,3 @@ SELECT
   l.state
 FROM listings l
 LEFT JOIN listings_join_doorman d ON l.id = d.id
-ORDER BY DATE(crawled_on), DATE(listing_date)
