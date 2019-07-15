@@ -272,10 +272,10 @@ select
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
-left join listing_special_conditions lsc_originals
+left join listing_special_conditions_dates lsc_originals
   on hl.sk_house_listing = lsc_originals.sk_house_listing
     and lsc_originals.special_condition_type like 'Originals%'
-left join listing_special_conditions lsc_exclusivity
+left join listing_special_conditions_dates lsc_exclusivity
   on hl.sk_house_listing = lsc_exclusivity.sk_house_listing
     and lsc_exclusivity.special_condition_type = 'Exclusivity'
 ;
