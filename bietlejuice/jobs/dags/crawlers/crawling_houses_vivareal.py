@@ -114,7 +114,7 @@ def enrich_and_move_to_clean(**kwargs):
         ])
 
         crawler_entity.athena_client.create_parquet_from_df(
-            key='clean/crawlers/ws={}/started_on={}/data.parq'.format(ws, execution_date),
+            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
             df=leads,
             raw_columns=r_cols,
             clean_columns=r_cols)
