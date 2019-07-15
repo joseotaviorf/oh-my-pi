@@ -62,7 +62,6 @@ create table dim_house_listing (
   last_originals_type varchar,
   dt_last_originals_opted_in date,
   dt_last_originals_opted_out date,
-  dt_last_exclusivity_opted_out date,
   ts_load timestamp
 )
 ;
