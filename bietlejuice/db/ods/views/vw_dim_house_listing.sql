@@ -168,8 +168,8 @@ listing_special_conditions_dates as (
   		dt_opted_in,
   		dt_opted_out,
   		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-  		row_number() over (partition by sk_house_listing, special_condition_type order by dt_opted_in desc, coalesce(dt_opted_out, '2100-01-01'::date) desc) as rn_last,
-  		row_number() over (partition by sk_house_listing, special_condition_type order by dt_opted_in asc, coalesce(dt_opted_out, '2100-01-01'::date) asc) as rn_first
+  		row_number() over (partition by sk_house_listing, case when special_condition_type like 'Originals%' then 'Originals' else special_condition_type end order by dt_opted_in desc, coalesce(dt_opted_out, '2100-01-01'::date) desc) as rn_last,
+  		row_number() over (partition by sk_house_listing, case when special_condition_type like 'Originals%' then 'Originals' else special_condition_type end order by dt_opted_in asc, coalesce(dt_opted_out, '2100-01-01'::date) asc) as rn_first
   	  from listing_special_conditions
     ),
     last_opt as (
@@ -194,7 +194,7 @@ listing_special_conditions_dates as (
     )
      select
         fo.sk_house_listing,
-        fo.special_condition_type,
+        lo.special_condition_type, -- important to select special_condition_type from last_op since we want to show LAST special condition type
         fo.dt_opted_in as dt_first_opted_in,
         fo.dt_opted_out as dt_first_opted_out,
         lo.dt_opted_in as dt_last_opted_in,
@@ -202,7 +202,7 @@ listing_special_conditions_dates as (
      from last_opt lo
      join first_opt fo
        on lo.sk_house_listing = fo.sk_house_listing
-         and lo.special_condition_type = fo.special_condition_type
+       and (case when lo.special_condition_type like 'Originals%' then 'Originals' else lo.special_condition_type end) = (case when fo.special_condition_type like 'Originals%' then 'Originals' else fo.special_condition_type end)
 )
 select
   hl.sk_house_listing,
@@ -254,6 +254,7 @@ select
   hl.listing_category_end,
   hl.is_last_version,
   lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
+  lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   hl.who_is_living,
   hl.key_type,
   hl.key_location,
@@ -267,7 +268,6 @@ select
   lsc_originals.special_condition_type as last_originals_type,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
   lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
-  lsc_exclusivity.dt_last_opted_out as dt_last_exclusivity_opted_out,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
