@@ -32,6 +32,20 @@ ongoing_listings AS (
   WHERE olsl.week_start >= DATEADD('week', -12, CURRENT_DATE)
   GROUP BY 1, 2
 ),
+ongoing_rentals AS (
+	SELECT
+	  dim_date.date_week AS date_period,
+		sk_region,
+		COUNT(*) AS ongoing_rentals
+	FROM public.dim_contract AS dc
+	JOIN public.fact_listing_rent_flows USING(sk_contract)
+	JOIN (SELECT DATE_TRUNC('week', "date") AS date_week FROM public.dim_date GROUP BY 1) AS dim_date
+	  ON dim_date.date_week >= DATE_TRUNC('week', dc.dt_start)
+			 AND dim_date.date_week <= DATE_TRUNC('week', CURRENT_DATE)
+			 AND dim_date.date_week >= DATE_TRUNC('week', DATEADD('week', -12, CURRENT_DATE))
+	WHERE dc.status = 'Ativo'
+	GROUP BY 1, 2
+),
 visits_completed AS (
   SELECT
     DATE_TRUNC('week', dim_date.date) AS date_period,
@@ -71,28 +85,55 @@ first_listings AS (
 	JOIN public.dim_date ON fact_house_listing_flows.sk_first_listing_date = dim_date.sk_date
   WHERE dim_date.date >= DATEADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', dim_date.date) = DATE_TRUNC('week', CURRENT_DATE)
 	GROUP BY 1, 2
+),
+online_metrics AS (
+  SELECT
+  	DATE_TRUNC('week', CAST(SUBSTRING(event_time, 1, 10) AS DATE)) AS event_date,
+  	TRIM(evt.e_house_id) AS house_id,
+    COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END) AS listing_page_views,
+    COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END) AS schedule_page_views
+  FROM datalake_clean.amplitude_events evt
+  	WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed')
+  	AND TRIM(app) = '170698'
+  	AND ym >= '2019-05'
+  GROUP BY 1, 2
+),
+houses AS (
+  SELECT DISTINCT
+      SUBSTRING(lf.sk_house_listing, 1, 9) AS house_id,
+      lf.sk_region
+  FROM public.fact_house_listing_flows lf
+  WHERE lf.sk_house_listing > 0
+),
+online_metrics_by_region AS (
+  SELECT
+		DATE_TRUNC('week', om.event_date) AS date_period,
+    h.sk_region,
+    SUM(listing_page_views) AS listing_page_views,
+    SUM(schedule_page_views) AS schedule_page_views
+  FROM online_metrics om
+  JOIN houses h ON om.house_id = h.house_id
+  WHERE event_date >= DATE_ADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', event_date) = DATE_TRUNC('week', CURRENT_DATE)
+  GROUP BY 1, 2
 )
 SELECT metrics.*,
 			 region.name,
 			 region.city_name,
 			 region.city_group,
 			 region.region_code,
-			 CASE
-			     WHEN region.city_group IN ('Belo Horizonte', 'Brasília', 'Goiânia', 'Campinas') THEN 'Center'
-			     WHEN region.city_group IN ('RMSP') THEN 'RMSP'
-					 WHEN region.city_group IN ('Rio de Janeiro', 'Curitiba', 'Florianópolis', 'Porto Alegre') THEN 'RJ / South'
-					 ELSE 'No regional'
-			 END AS regional
+			 region.regional
 FROM
 (
   SELECT *
   FROM contracts_signed
   FULL OUTER JOIN visits_booked USING(date_period, sk_region)
   FULL OUTER JOIN ongoing_listings USING(date_period, sk_region)
+  FULL OUTER JOIN ongoing_rentals USING(date_period, sk_region)
   FULL OUTER JOIN visits_completed USING(date_period, sk_region)
   FULL OUTER JOIN offers_submitted USING(date_period, sk_region)
   FULL OUTER JOIN prospects USING(date_period, sk_region)
   FULL OUTER JOIN first_listings USING(date_period, sk_region)
+  FULL OUTER JOIN online_metrics_by_region USING(date_period, sk_region)
 ) metrics
 LEFT JOIN public.dim_region region USING(sk_region)
 WHERE sk_region != -1

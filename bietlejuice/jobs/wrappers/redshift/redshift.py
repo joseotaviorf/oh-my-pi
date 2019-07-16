@@ -166,8 +166,9 @@ class RedshiftClient(object):
             try:
                 response = \
                     self.redshift_client.modify_cluster(ClusterIdentifier=cluster_id,
-                                                        ClusterType='single-node',
-                                                        NodeType='dc2.large')
+                                                        ClusterType='multi-node',
+                                                        NodeType='dc2.large',
+                                                        NumberOfNodes=3)
 
                 logger.info('m=scale_down_cluster, cluster_id={0}, msg=Command to scale down sent'.format(cluster_id))
             except ClientError as e:

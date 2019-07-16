@@ -1,8 +1,7 @@
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import SOURCE_QUERIES_DIR
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('SortingHat')
 
@@ -10,12 +9,18 @@ logger = QuintoAndarLogger('SortingHat')
 class SortingHat(object):
     ODS_SCHEMA = 'sortinghat'
 
+    @staticmethod
     @logger
-    def extract_table_from_db(self, query_file_path):
+    def extract_table_from_db(query_file_path, query_param=None):
+        query = BaseETL.get_query_from_file_name('{}/sorting_hat/{}'.format(SOURCE_QUERIES_DIR, query_file_path))
+
+        if query_param:
+            query = query.format(**query_param)
+
         return BaseETL.from_db_query(
             db_enum=EnumDB.QuintoAndar_sortinghat,
             encoding='UTF8',
-            query=BaseETL.get_query_from_file_name('{}/sorting_hat/{}'.format(SOURCE_QUERIES_DIR, query_file_path))
+            query=query
         )
 
     @logger(exclude='data_table')
