@@ -7,12 +7,12 @@ from bietlejuice.jobs.etl import DW_QUERIES_DIR
 
 env.set_airflow_var_to_local_env('BI_DW')
 
-MAIN_DAG_ID = 'bi-affiliate-segmentation'
+MAIN_DAG_ID = 'bi-affiliate-category-segmentation'
 MAIN_START_DATE = datetime(2019, 6, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 1 * *')
 
 
-def create_dw_table_via_sql(file_name, table_name, **kwargs):
+def bulk_insert_data_into_table(file_name, table_name, **kwargs):
     # extraction
     query = BaseETL.get_query_from_file_name(file_name='{0}/public/{1}'.format(DW_QUERIES_DIR, file_name))
     query = query.format(kwargs['execution_date'])
@@ -30,11 +30,11 @@ main_dag = BaseDAG.build_dag(
     catchup=False
 )
 
-create_affiliate_segmentation_task = BaseDAG.build_python_operator(
+create_affiliate_category_segmentation_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='create_affiliate_segmentation',
+    task_id='create_affiliate_category_segmentation',
     provide_context=True,
-    python_callable=create_dw_table_via_sql,
-    op_kwargs={'file_name': 'affiliate_segmentation.sql',
-               'table_name': 'fact_affiliate_segmentations'}
+    python_callable=bulk_insert_data_into_table,
+    op_kwargs={'file_name': 'affiliate_monthly_category_segmentation.sql',
+               'table_name': 'fact_affiliate_monthly_category_segmentations'}
 )

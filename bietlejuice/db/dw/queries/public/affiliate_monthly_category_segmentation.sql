@@ -1,11 +1,12 @@
-WITH monthsbegin as (
+WITH date_month_range as (
     SELECT
         DISTINCT
-        cast(trim(regexp_replace(month_start,'-','')) as integer) as sk_date,
+        sk_date,
         month_start,
         month_end
     FROM dim_date d
-    WHERE d.date BETWEEN add_months('{0}'::DATE, -17) AND add_months('{0}'::DATE, 1)
+    WHERE  d.month_start = d.date
+        AND d.date BETWEEN add_months('{0}'::DATE, -17) AND add_months('{0}'::DATE, 1)
 )
 ,base_aff as (
     SELECT
@@ -36,14 +37,14 @@ WITH monthsbegin as (
                 AND add_months(dt.month_end,-1) THEN fhl.sk_house_listing_flow END
             )
             AS FLOAT)
-        AS "prospectslast90days",
+        AS "prospects_last_90_days",
         CAST(
             COUNT(
                 DISTINCT CASE WHEN fhl.sk_prospect_date > 0 AND dt_prospect.date BETWEEN date(add_months(dt.month_start,-3))
                 AND date(add_months(dt.month_end,-1)) THEN dt_prospect.month END
             )
             AS FLOAT)
-        AS "activelast90inmonths",
+        AS "active_last_90_days_in_months",
         CAST(
             COUNT(
                 DISTINCT CASE WHEN fhl.sk_first_listing_date > 0 AND dt_listing.date < dt.month_start then fhl.sk_house_listing_flow END
@@ -56,10 +57,10 @@ WITH monthsbegin as (
                 AND add_months(dt.month_end,-1) then fhl.sk_house_listing_flow END
             )
             AS FLOAT)
-        AS "listingslast90days",
+        AS "listings_last_90_days",
         RANK() OVER(PARTITION BY duaf.sk_user_affiliate ORDER BY dt.month_start DESC) = 1 as is_last_segmentation
     FROM dim_user_affiliate duaf
-    CROSS JOIN monthsbegin dt
+    CROSS JOIN date_month_range dt
     JOIN dim_user u
         ON u.dados_afiliado_id = duaf.sk_user_affiliate
     LEFT JOIN fact_house_listing_flows fhl
@@ -75,10 +76,10 @@ WITH monthsbegin as (
 ), ratios AS (
     SELECT
         *,
-        baf.listings/coalesce(nullif(baf.leads,0),1) AS conversion_leads_listings,
-        baf.listings/coalesce(nullif(baf.prospects,0),1) AS conversion_prospects_listings,
-        baf.prospectslast90days/coalesce(nullif(baf.activelast90inmonths,0),1) AS prospects_last90_months_active,
-        baf.listingslast90days/coalesce(nullif(baf.prospectslast90days,0),1) AS prospects_listings_last90
+        baf.listings/coalesce(nullif(baf.leads,0),1) AS conversion_lead_to_listing,
+        baf.listings/coalesce(nullif(baf.prospects,0),1) AS conversion_prospect_to_listing,
+        baf.prospects_last_90_days/coalesce(nullif(baf.active_last_90_days_in_months,0),1) AS prospects_last_90_months_active,
+        baf.listings_last_90_days/coalesce(nullif(baf.prospects_last_90_days,0),1) AS prospects_listings_last_90
     FROM base_aff baf
 ),
 conditional_inactives_new AS (
@@ -87,36 +88,36 @@ conditional_inactives_new AS (
         CASE
             WHEN rt.lifetime_days_cohort > 0 AND rt.lifetime_days_cohort < 10 THEN 'new user'
             WHEN rt.lifetime_days_cohort < 0 THEN 'different cohort'
-            WHEN rt.prospectslast90days = 0 THEN
+            WHEN rt.prospects_last_90_days = 0 THEN
                 CASE WHEN rt.leads = 0 THEN 'curioso'
                      WHEN rt.listings = 0 THEN 'desconfiado'
-                     WHEN rt.conversion_prospects_listings > 0.10 THEN 'ex-show'
-                     WHEN rt.conversion_prospects_listings > 0.01 THEN 'ex-ok'
-                     WHEN rt.conversion_prospects_listings < 0.01
-                       AND rt.conversion_prospects_listings > 0 THEN 'ex-perdido'
+                     WHEN rt.conversion_prospect_to_listing > 0.10 THEN 'ex-show'
+                     WHEN rt.conversion_prospect_to_listing > 0.01 THEN 'ex-ok'
+                     WHEN rt.conversion_prospect_to_listing < 0.01
+                       AND rt.conversion_prospect_to_listing > 0 THEN 'ex-perdido'
                      ELSE 'active' END
             ELSE 'active'
         END AS new_inactive
     FROM ratios rt
 ),
-axis_hor_ver AS (
+horizontal_vertical_axis AS (
     SELECT
         *,
         CASE
             WHEN new_inactive = 'active' THEN
-                CASE WHEN prospects_last90_months_active >= 100 THEN 3
-                     WHEN prospects_last90_months_active < 100
-                        AND prospects_last90_months_active >= 2.5 THEN 2
-                     WHEN prospects_last90_months_active < 2.5 THEN 1
+                CASE WHEN prospects_last_90_months_active >= 100 THEN 3
+                     WHEN prospects_last_90_months_active < 100
+                        AND prospects_last_90_months_active >= 2.5 THEN 2
+                     WHEN prospects_last_90_months_active < 2.5 THEN 1
                      ELSE 0 END
             ELSE 0
             END AS eixo_horizontal,
         CASE
             WHEN new_inactive = 'active' THEN
-                CASE WHEN prospects_listings_last90 >= 0.10 THEN 3
-                     WHEN prospects_listings_last90 < 0.10
-                        AND prospects_listings_last90 >= 0.01 THEN 2
-                     WHEN prospects_listings_last90 < 0.01 THEN 1
+                CASE WHEN prospects_listings_last_90 >= 0.10 THEN 3
+                     WHEN prospects_listings_last_90 < 0.10
+                        AND prospects_listings_last_90 >= 0.01 THEN 2
+                     WHEN prospects_listings_last_90 < 0.01 THEN 1
                      ELSE 0 END
             ELSE 0
             END AS eixo_vertical
@@ -139,7 +140,7 @@ full_segmentation AS (
             WHEN eixo_horizontal = 3 AND eixo_vertical = 3 THEN 'estrela'
             ELSE 'sem-segmentacao'
         END AS segmentation
-    FROM axis_hor_ver
+    FROM horizontal_vertical_axis
 )
 SELECT
     sk_date,
