@@ -25,6 +25,7 @@ class AmplitudeEvents():
         self.s3_raw_path = s3_raw_path
         self.keys = keys
 
+    @staticmethod
     def get_number_of_partitions(self, len_data):
         return max(len_data // AmplitudeEvents.RECORDS_BY_PARTITION, 1)
 
@@ -37,6 +38,7 @@ class AmplitudeEvents():
             .withColumn('day', dayofmonth(col('server_upload_time')))
         return df
 
+    @staticmethod
     def get_data_from_zip_file(self, zip_file):
         data = []
         for name in zip_file.namelist():
