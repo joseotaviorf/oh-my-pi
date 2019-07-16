@@ -72,7 +72,8 @@ fact_with_reproc as (
       rl.id,
       l.origem,
       l.tipo,
-      l.usuario_que_indicou_id
+      l.usuario_que_indicou_id,
+      l.affiliate_type
     from reprocessed_lead rl
     join lead l 
       on l.id = rl.id_origin_lead
@@ -123,12 +124,30 @@ fact_with_reproc as (
         when l.origem = 'Reprocessado' then 'Reprocessed Others'
         else fhlf.acquisition_channel
       end as acquisition_channel_rep,
-      rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id
+      rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
+      coalesce(
+            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            or pa_b2b.id is not null
+            or b2b_prime.id_lead is not null
+            , false) as is_b2b
     from fact_house_listing_flows fhlf
     left join lead l 
       on l.id = fhlf.lead_id
     left join reproc_leads rl 
       on rl.id = fhlf.lead_id
+    left join house h
+      on h.id = fhlf.imovel_id
+    left join partner_agent pa_b2b
+      on pa_b2b.user_id = h.usuario_id
+    left join (
+		select distinct le.id as id_lead
+		from lead le
+		join usuario u_b2b
+			on u_b2b.telefone_principal = le.telefone_anunciante
+		join partner_agent pa_b2b
+			on pa_b2b.user_id = u_b2b.id
+	) b2b_prime
+	  on b2b_prime.id_lead = l.id
   )
   select 
     acquisition_channels.id,
@@ -171,7 +190,8 @@ fact_with_reproc as (
     acquisition_channels.days_lead_to_processing,
     acquisition_channels.acquisition_channel_rep,
     acquisition_channels.origin_lead_usuario_que_indicou_id,
-    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed
+    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
+    acquisition_channels.is_b2b
   from acquisition_channels
 ), 
 acquisitions as (
@@ -296,7 +316,7 @@ potential_listings as (
     coalesce(lfet.tracking_medium, bl.utm_medium) as utm_medium,
     lfet.tracking_platform,
     bl.branded_lead as is_branded,
-    bl.b2b_lead as is_b2b,
+    (bl.b2b_lead or f.is_b2b) as is_b2b, -- Using business rules for both constraints of old b2b and new one
     bl.reprocessed_flg,
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
