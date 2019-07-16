@@ -38,14 +38,15 @@ main_dag = DAG(
 
 
 # functions
-def execute_athena_query(query_filename, ds, **kwargs):
+def execute_athena_query(query_filename, ds, file_name, **kwargs):
     kenshoo = Kenshoo(
         execution_date=ds
     )
 
     # using dependency injection instead of coupling classes
     athena_client = AthenaClient(S3_BUCKET)
-    kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client)
+    kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client,
+                                                  file_name=file_name)
 
 
 def execute_redshift_query(query_filename, has_query_params, split_by_column, ds, **kwargs):
@@ -105,14 +106,15 @@ execute_adjust_search_offline_conversions_query_task = BaseDAG.build_python_oper
     task_id='execute_adjust_search_offline_conversions_query',
     python_callable=execute_athena_query,
     provide_context=True,
-    op_kwargs={'query_filename': 'adjust_search_offline_conversions.sql'},
+    op_kwargs={'query_filename': 'adjust_search_offline_conversions.sql',
+               'file_name': 'adjust_search_offline_conversions'},
     dag=main_dag
 )
 
 send_adjust_search_offline_conversions_data_task = SFTPOperator(
     task_id='send_adjust_search_offline_conversions_data',
     ssh_hook=ssh_hook,
-    local_filepath='{}-{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, '{{ ds }}'),
+    local_filepath='{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, 'adjust_search_offline_conversions', '{{ ds }}'),
     remote_filepath='query_result_{{ ds }}.csv',
     operation=SFTPOperation.PUT,
     dag=main_dag
@@ -135,6 +137,26 @@ send_visits_accomplished_query_task = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=create_tasks_in_subdag
 )
 
+# operators
+execute_visit_schedule_confirmed_with_gclid_query_task = BaseDAG.build_python_operator(
+    task_id='execute_visit_schedule_confirmed_with_gclid_query',
+    python_callable=execute_athena_query,
+    provide_context=True,
+    op_kwargs={'query_filename': 'visit_schedule_confirmed_with_gclid.sql',
+               'file_name': 'visit_schedule_confirmed_with_gclid'},
+    dag=main_dag
+)
+
+send_visit_schedule_confirmed_with_gclid_query_task = SFTPOperator(
+    task_id='send_visit_schedule_confirmed_with_gclid_query',
+    ssh_hook=ssh_hook,
+    local_filepath='{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, 'visit_schedule_confirmed_with_gclid', '{{ ds }}'),
+    remote_filepath='visit_schedule_confirmed_with_gclid/query_result_{{ ds }}.csv',
+    operation=SFTPOperation.PUT,
+    dag=main_dag
+)
+
 # flow
 execute_adjust_search_offline_conversions_query_task >> send_adjust_search_offline_conversions_data_task
 send_visits_accomplished_query_task.set_upstream(execute_visit_accomplished_query_task)
+execute_visit_schedule_confirmed_with_gclid_query_task >> send_visit_schedule_confirmed_with_gclid_query_task
