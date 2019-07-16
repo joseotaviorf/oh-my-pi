@@ -63,12 +63,12 @@ main_dag = DAG(
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
-        'depends_on_past': False
+        'depends_on_past': False,
+        'retries': 3
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
-    retries=3,
     catchup=False
 )
 
