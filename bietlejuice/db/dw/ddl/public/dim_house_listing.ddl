@@ -50,6 +50,7 @@ create table dim_house_listing (
   is_last_version boolean,
   is_exclusive boolean,
   dt_last_exclusive_opted_out date,
+  dt_last_exclusive_opted_in date,
   who_is_living varchar,
   key_type varchar,
   key_location varchar,

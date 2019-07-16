@@ -255,6 +255,7 @@ select
   hl.is_last_version,
   lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
   lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
+  lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
   hl.who_is_living,
   hl.key_type,
   hl.key_location,
