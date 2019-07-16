@@ -1,1 +1,1 @@
-from bietlejuice.jobs.composer.etl.amplitude.amplitude_events import AmplitudeEventsETL
+from bietlejuice.jobs.composer.etl.amplitude.amplitude_events import AmplitudeEvents

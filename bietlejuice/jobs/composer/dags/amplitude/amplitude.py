@@ -12,18 +12,19 @@ from bietlejuice.jobs.composer.base import BaseDAG
 
 logger = QuintoAndarLogger('amplitude')
 
+ENV = Variable.get('environment')
+
 DAG_ID = 'amplitude'
 S3_PREFIX = Variable.get('databricks_bietlejuice_s3_prefix')
-LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = S3_PREFIX \
-    + '/spark_jobs/forno/amplitude/load_events_into_datalake_raw.py'
+LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = '{}/spark_jobs/{}/amplitude/load_events_into_datalake_raw.py'\
+    .format(S3_PREFIX, ENV)
 LOGS_OUTPUT_PATH = S3_PREFIX + '/logs/' + DAG_ID
 
 CLUSTER_DESCRIPTION = Variable.get('databricks_memory_optimized_cluster', deserialize_json=True)
-CLUSTER_DESCRIPTION['cluster_name'] = DAG_ID + '_' + '{{ run_id }}'
 CLUSTER_DESCRIPTION['cluster_log_conf']['s3']['destination'] = LOGS_OUTPUT_PATH
 
 LIBRARIES_DESCRIPTION = Variable.get('bietlejuice_default_libraries', deserialize_json=True)
-logger = QuintoAndarLogger('AmplitudeEvents')
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -40,26 +41,26 @@ dag = DAG(
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
-    task_id='create_cluster',
+    task_id='create-cluster',
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION
 )
 
 events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id='events_to_datalake_raw',
+    task_id='events-to-datalake-raw',
     dag=dag,
     json={
-        'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create_cluster", key="cluster_id")}}',
+        'existing_cluster_id': '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
         'spark_python_task': {
             'python_file': LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH,
-            'parameters': ['{{ ds }}']
+            'parameters': ['{{ ds }}', ENV]
         }
     }
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag,
-    task_id='terminate_cluster'
+    task_id='terminate-cluster'
 )
 
 airflow_helpers.chain(create_cluster_task,
