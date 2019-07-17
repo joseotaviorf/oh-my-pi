@@ -92,7 +92,7 @@ agent_contracts as (
                   when contract_rnk = 4 then rent*"4_contract"
                   when contract_rnk = 5 then rent*"5_contract"
                   when contract_rnk = 6 then rent*"6_contract"
-                  else rent*"7_or_more__contract"
+                  else rent*"7_or_more_contract"
               end
               ) as agent_monthly_compensation
       from agent_contracts a
