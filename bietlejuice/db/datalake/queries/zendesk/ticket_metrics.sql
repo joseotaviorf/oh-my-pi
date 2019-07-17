@@ -7,8 +7,8 @@ with stitch_data as (
 			from_iso8601_timestamp(tm.created_at) at time zone 'GMT-3',
 			from_iso8601_timestamp(tm.created_at) at time zone 'Brazil/East') as ts_created_local,
     	row_number() over (partition by tm.id, tm.dt order by tm.updated_at desc) as last_updated
-    from stitch.ticket_metrics tm
-    left join stitch.tickets t
+    from datalake_raw.zendesk_ticket_metrics tm
+    left join datalake_raw.zendesk_tickets t
     on t.id = tm.ticket_id
     where tm.dt = '{execution_date}'
           and regexp_extract(t.via, '."channel":"(\w+)".+', 1) is not null

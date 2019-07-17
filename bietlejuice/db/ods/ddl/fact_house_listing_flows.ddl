@@ -18,6 +18,7 @@ create table public.fact_house_listing_flows (
 	dt_first_listing timestamp without time zone,
 	dt_discarded timestamp without time zone,
 	user_id_lead_first_discarder integer,
+	user_id_lead_last_discarder integer,
 	flow character varying(255) DEFAULT NULL::character varying,
 	acquisition_method character varying(255) DEFAULT NULL::character varying,
 	acquisition_channel character varying(255) DEFAULT NULL::character varying,
@@ -38,4 +39,7 @@ create table public.fact_house_listing_flows (
 	days_opportunity_to_listing decimal(10,1),
 	days_lead_to_listing decimal(10,1),
 	days_lead_to_processing decimal(10,1)
-)
+);
+
+create index fact_house_listing_flows_lead_id_idx on fact_house_listing_flows (lead_id);
+create index fact_house_listing_flows_imovel_id_idx on fact_house_listing_flows (imovel_id);

@@ -1,49 +1,52 @@
 from pyspark.sql import SparkSession
-from python_logger import QuintoAndarLogger
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseTypeEnum
 from bietlejuice.jobs.composer.consumers.consumer import Consumer
 
-logger = QuintoAndarLogger('MySQLConsumer')
+logger = QuintoAndarLogger('PostgreSQLConsumer')
 
 
-class MySQLConsumer(Consumer):
+class PostgreSQLConsumer(Consumer):
     FETCH_SIZE = 50000
 
     def __init__(self, connection):
-        if connection['dbtype'].lower() != DatabaseTypeEnum.MYSQL:
+        if connection['dbtype'].lower() != DatabaseTypeEnum.POSTGRESQL:
             raise RuntimeError(
-                'm=__init__, con_type={}, msg=Connection is not a mysql'
+                'm=__init__, con_type={}, msg=Connection is not a postgresql'
                 'connection'.format(connection.get('dbtype')))
 
-        connection['url'] = "jdbc:mysql://{}:{}/{}".format(connection['host'],
-                                                           connection['port'],
-                                                           connection['db'])
-        connection['driver'] = 'com.mysql.jdbc.Driver'
+        connection['url'] = "jdbc:postgresql://{}:{}/{}".format(connection['host'],
+                                                                connection['port'],
+                                                                connection['db'])
+        connection['driver'] = 'org.postgresql.Driver'
+        if 'schema' not in connection:
+            connection['schema'] = 'public'
+
         self.connection = connection
 
     @logger
     def get_table_names_and_sizes(self):
         query = """
-    SELECT
-      table_name AS `table`,
-      round(((data_length + index_length) / 1024 / 1024), 2) AS `size`
-    FROM
-      information_schema.TABLES
-    where
-      table_schema = '{db}'
-    ORDER BY
-      (data_length + index_length) DESC
-    """
+            SELECT
+                table_name as table,
+                pg_relation_size(quote_ident(table_name)) / 1024 / 1024 AS size
+            FROM
+                information_schema.tables
+            WHERE
+                table_schema = '{schema}'
+            ORDER BY
+                size DESC
+        """
         result = self.get_data_from_query(
-            query.format(db=self.connection['db']))
+            query.format(schema=self.connection['schema']))
 
         return result
 
     @logger
     def get_data_from_table(self, table):
         remote_table = self._get_default_read_format_and_options() \
-            .option("dbtable", table) \
+            .option("dbtable", self.connection['schema'] + '.' + table) \
             .load()
 
         return remote_table
@@ -70,7 +73,7 @@ class MySQLConsumer(Consumer):
                 .option("numPartitions", concurrency)
 
         remote_table = remote_table \
-            .option("dbtable", table) \
+            .option("dbtable", self.connection['schema'] + '.' + table) \
             .load()
 
         return remote_table
@@ -85,16 +88,16 @@ class MySQLConsumer(Consumer):
     @logger
     def get_table_schema(self, table):
         query = """
-        select
-            COLUMN_NAME, COLUMN_TYPE
-        FROM
-            INFORMATION_SCHEMA.COLUMNS
-        WHERE
-            TABLE_NAME = '{table}'
+            SELECT
+                column_name, data_type as column_type
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = '{table}'
         """
 
         result = self.get_data_from_query(
-            query.format(table=table)
+            query.format(table=self.connection['schema'] + '.' + table)
         )
 
         return result
@@ -113,30 +116,29 @@ class MySQLConsumer(Consumer):
     @logger
     def _get_partition_column_from_table(self, table):
         query = """
-        SELECT
-            k.TABLE_NAME,
-            k.COLUMN_NAME,
-            k.CONSTRAINT_NAME,
-            s.`CARDINALITY`
-        FROM
-            information_schema.table_constraints t
-            JOIN information_schema.key_column_usage k
-            on t.constraint_name = k.constraint_name and t.table_schema = k.table_schema and t.table_name = k.table_name
-            left JOIN information_schema.STATISTICS s
-            on s.TABLE_NAME = t.TABLE_NAME and s.COLUMN_NAME = k.COLUMN_NAME
-        WHERE
-            s.INDEX_NAME = 'PRIMARY'
-            AND t.constraint_type='PRIMARY KEY'
-            AND t.table_schema='{db}'
-            AND t.table_name = '{table}'
-        GROUP by
-            k.TABLE_NAME,
-            k.CONSTRAINT_NAME,
-            s.`CARDINALITY`
-        ORDER by s.`CARDINALITY` desc
+            SELECT
+                pg_attribute.attname as COLUMN_NAME,
+                format_type(pg_attribute.atttypid, pg_attribute.atttypmod),
+                reltuples as cardinality
+            FROM
+                pg_index,
+                pg_class,
+                pg_attribute,
+                pg_namespace
+            WHERE
+                pg_class.oid = '{table}'::regclass AND
+                indrelid = pg_class.oid AND
+                nspname = '{schema}' AND
+                pg_class.relnamespace = pg_namespace.oid AND
+                pg_attribute.attrelid = pg_class.oid AND
+                pg_attribute.attnum = any(pg_index.indkey) AND
+                indisprimary
+            ORDER BY
+                cardinality DESC
         """
+
         df = self.get_data_from_query(
-            query.format(db=self.connection['db'], table=table)
+            query.format(db=self.connection['db'], table=table, schema=self.connection['schema'])
         ).select('COLUMN_NAME')
 
         if df.count():

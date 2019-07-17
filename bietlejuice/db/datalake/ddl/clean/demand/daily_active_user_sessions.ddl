@@ -10,6 +10,7 @@ CREATE EXTERNAL TABLE datalake_clean.amplitude_daily_active_user_sessions (
 	mkt_category string,
 	mkt_flow string,
 	mkt_completion string,
+	mkt_origin string,
 	mkt_channel string,
 	mkt_medium string,
 	mkt_source string,

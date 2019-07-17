@@ -27,10 +27,8 @@ data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
 def submit_vr(**kwargs):
-    max_crawl = kwargs.get('max_crawl', 1000000)
     states = kwargs.get('states')
-
-    assert isinstance(max_crawl, int)
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     assert isinstance(states, list)
 
     logger.info('Starting job...')
@@ -39,7 +37,7 @@ def submit_vr(**kwargs):
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         memory=6144,
-        command=['./crawlers/vivareal_crawler.py', '--max_crawl', str(max_crawl), '--states'] + states
+        command=['./crawlers/vivareal_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
                                                                           r.get('jobName')]), r.get('status')))
@@ -47,21 +45,21 @@ def submit_vr(**kwargs):
     # get task instance
     ti = kwargs.get('ti')
 
-    exec_date = str(datetime.date(kwargs.get('execution_date')))
     xcom.xcom_push(ti,
-                   key='crawler_houses_vr_{}'.format(exec_date),
+                   key='crawler_houses_vr_{}'.format(execution_date),
                    k_value=r.get('jobId'))
 
 
-def enrich_and_move_to_clean():
+def enrich_and_move_to_clean(**kwargs):
     ws = 'vivareal'
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
         raise RuntimeError(
             'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
-    last_crawling_date = crawler_entity.get_last_crawling_date(ws)
-    query = query.format(started_on=last_crawling_date, ws=ws)
+    query = query.format(started_on=execution_date, ws=ws)
     leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
 
     if leads.empty:
@@ -116,14 +114,14 @@ def enrich_and_move_to_clean():
         ])
 
         crawler_entity.athena_client.create_parquet_from_df(
-            key='clean/crawlers/ws={}/started_on={}/data.parq'.format(ws, last_crawling_date),
+            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
             df=leads,
             raw_columns=r_cols,
             clean_columns=r_cols)
 
         q = "alter table datalake_clean.crawlers add if not exists partition (ws='{}', started_on='{}')".format(
             ws,
-            last_crawling_date)
+            execution_date)
         try:
             crawler_entity.athena_client.execute_query_and_wait_for_results(q)
         except Exception as e:
@@ -163,6 +161,7 @@ move_to_clean = BaseDAG.build_python_operator(
     dag=dag,
     task_id='move-to-clean',
     python_callable=enrich_and_move_to_clean,
+    provide_context=True
 )
 
 crawl_vr >> vr_success_test >> move_to_clean

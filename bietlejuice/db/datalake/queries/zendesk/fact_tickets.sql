@@ -1,7 +1,7 @@
 with tickets_filter as (
 	select distinct * from datalake_clean.zendesk_tickets t
     -- we don't track whatsapp notifications
-	where (channel<>'api' or (channel='api' and tags not like '%hsm%'))
+	where (t.ticket_via<>'api' or (t.ticket_via='api' and t.tags not like '%hsm%'))
           and dt_extracted = '{extraction_date}'
 ),
 last_updated_ticket as (

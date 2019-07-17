@@ -123,6 +123,7 @@ all_dates as (
     mkt_category,
 	mkt_flow,
 	mkt_completion,
+	'Not Mapped' as mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,

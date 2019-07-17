@@ -25,17 +25,18 @@ class Zendesk(object):
         raise NotImplementedError('m=move_to_clean, msg=method not implemented')
 
     @logger
-    def _upsert_single_partition(self, class_, bucket_type):
+    def _upsert_single_partition(self, class_, bucket_type, integration_name=None):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
         self.athena_client.upsert_single_partition(
-            # temp
-            bucket_folder_path='{}/{}/zendesk/{}'.format(self.s3_bucket if bucket_type == 'clean' else '5a-datalake-leo-test',
-                                                         bucket_type if bucket_type == 'clean' else 'stitch',
-                                                         class_.value),
-            database='datalake_{}'.format(bucket_type) if bucket_type == 'clean' else 'stitch',
-            table='zendesk_{}'.format(class_.value) if bucket_type == 'clean' else class_.value,
+            bucket_folder_path='{}/{}/{}/{}'.format(self.s3_bucket,
+                                                    bucket_type,
+                                                    # a different folder for each integration made in Stitch
+                                                    integration_name if bucket_type == 'raw' else 'zendesk',
+                                                    class_.value),
+            database='datalake_{}'.format(bucket_type),
+            table='zendesk_{}'.format(class_.value),
             partition_name='dt_extracted' if bucket_type == 'clean' else 'dt',
             partition_value=self.execution_date
         )
