@@ -216,7 +216,7 @@ pipeline:
       - make version
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [ master, forno ]
 
   package:
     image: python:3.6.7
@@ -224,7 +224,7 @@ pipeline:
       - make package
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [ master, forno ]
 
   prepare-to-export-latest-release:
     image: alpine:3.10
@@ -233,6 +233,14 @@ pipeline:
     when:
       event: [ push, tag ]
       branch: master
+
+  prepare-to-export-forno-release:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
+    when:
+      event: push
+      branch: forno
 
   export-latest-release-to-s3:
     image: plugins/s3
@@ -245,7 +253,7 @@ pipeline:
     cache_control: no-cache
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [ master, forno ]
 
   upload-spark-jobs-s3-forno:
     image: python:3.6.7

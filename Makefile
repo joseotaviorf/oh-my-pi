@@ -7,15 +7,15 @@ environment:
 
 .PHONY: version
 version:
-	@grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .version
+	@grep __version__ setup3.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .version
 
 .PHONY: package-name
 package-name:
-	@grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .package_name
+	@grep __package_name__ setup3.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .package_name
 
 .PHONY: repository-url
 repository-url:
-	@grep __repository_url__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .repository_url
+	@grep __repository_url__ setup3.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .repository_url
 
 .PHONY: package
 package:
