@@ -2,12 +2,12 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit, col
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers.consumer import Consumer
+from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 
 logger = QuintoAndarLogger("DatabricksConsumer")
 
 
-class DatabricksConsumer(Consumer):
+class DatabricksConsumer(DatabaseConsumer):
     def __init__(self, connection):
         self.connection = connection
 
@@ -33,3 +33,15 @@ class DatabricksConsumer(Consumer):
         )
 
         return result
+
+    @logger
+    def get_data_from_table(self, table_name):
+        raise NotImplementedError()
+
+    @logger
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
+        raise NotImplementedError()
+
+    @logger
+    def get_data_from_query(self, query):
+        raise NotImplementedError()

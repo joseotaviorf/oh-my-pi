@@ -1,28 +1,30 @@
+from abc import ABC, abstractmethod
+
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("Consumer")
+logger = QuintoAndarLogger("DatabaseConsumer")
 
 
-class Consumer:
-    @logger
+class DatabaseConsumer(ABC):
+    @abstractmethod
     def get_table_names_and_sizes(self):
-        raise NotImplementedError()
+        pass
 
-    @logger
+    @abstractmethod
     def get_data_from_table(self, table_name):
-        raise NotImplementedError()
+        pass
 
-    @logger
+    @abstractmethod
     def get_data_from_table_in_parallel(self, table_name, concurrency):
-        raise NotImplementedError()
+        pass
 
-    @logger
+    @abstractmethod
     def get_data_from_query(self, query):
-        raise NotImplementedError()
+        pass
 
-    @logger
+    @abstractmethod
     def get_table_schema(self, table_name):
-        raise NotImplementedError()
+        pass
 
     @logger
     def is_db_empty(self):

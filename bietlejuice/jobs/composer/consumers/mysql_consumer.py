@@ -2,12 +2,12 @@ from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseTypeEnum
-from bietlejuice.jobs.composer.consumers.consumer import Consumer
+from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 
 logger = QuintoAndarLogger("MySQLConsumer")
 
 
-class MySQLConsumer(Consumer):
+class MySQLConsumer(DatabaseConsumer):
     FETCH_SIZE = 50000
 
     def __init__(self, connection):
