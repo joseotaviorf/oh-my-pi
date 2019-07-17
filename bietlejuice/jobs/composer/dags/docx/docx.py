@@ -7,17 +7,13 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import BaseDAG
 
 DAG_ID = "docx"
-ENV = "forno"
+ENV = Variable.get("environment")
 
-logger = QuintoAndarLogger(DAG_ID)
-
-
-S3_PREFIX = Variable.get("bietlejuice_s3_prefix")
+S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
 LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + "/spark_jobs/{}/{}/load_docx_into_datalake.py".format(ENV, DAG_ID)
@@ -29,7 +25,6 @@ CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
 LOGS_OUTPUT_PATH = "s3://5a-databricks/logs/jobs/{}".format(DAG_ID)
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_name"] = DAG_ID + "_{{ run_id }}"
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)

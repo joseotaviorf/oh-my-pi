@@ -5,14 +5,13 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
 from bietlejuice.jobs.composer.consumers import MySQLConsumer
-from bietlejuice.jobs.composer.etl import DataSourceIntoDataLakeLoader
+from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_docx_into_datalake")
 
-DATABRICKS_SCOPE = "quintoandar-forno"
+DATABRICKS_SCOPE = "quintoandar-prod"
 BLACK_LIST = ["flyway_schema_history"]
-
 
 if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
@@ -22,12 +21,9 @@ if __name__ == "__main__":
     connection = json.loads(connection_json)
     mysql_consumer = MySQLConsumer(connection)
 
-    tables = DataSourceIntoDataLakeLoader.get_table_names_and_sizes(
-        mysql_consumer
-    ).collect()
+    tables = mysql_consumer.get_table_names_and_sizes().collect()
+    loader = DatabaseIntoDataLakeRawLoader()
 
     for table in tables:
         if table.table_name not in BLACK_LIST:
-            DataSourceIntoDataLakeLoader.load_full_table_into_datalake_raw(
-                table_name=table.table_name, consumer=mysql_consumer
-            )
+            loader.load_full_table(consumer=mysql_consumer, table_name=table.table_name)
