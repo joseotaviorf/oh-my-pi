@@ -70,5 +70,4 @@ select
   cast(json_extract(task_entry, '$.resolvida') as varchar) as resolved,
   dt
 from json_entries
-where dt = '01-07-2019'
-;
+where dt = '__PARTITION_DATE__'
