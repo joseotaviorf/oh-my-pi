@@ -14,7 +14,7 @@ with amplitude_schedules as (
 select
     "Date",
      "GCLID",
-     'booking_sdk_ios' as "Conversion Type",
+     '' as "Conversion Type",
       1 as "Qty."
 from amplitude_schedules
 where date("Date") >= current_date - interval '7' day
