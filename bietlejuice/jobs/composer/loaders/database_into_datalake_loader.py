@@ -72,7 +72,6 @@ class DatabaseIntoDataLakeLoader:
             )
         )
 
-    @staticmethod
     @logger
     def load_incremental_partitioned_table(
         self, consumer, table_name, query, partition_by
@@ -116,7 +115,6 @@ class DatabaseIntoDataLakeLoader:
             )
         )
 
-    @staticmethod
     @logger
     def create_athena_external_table(
         self, consumer, table_name, db_source, partition_by=None
