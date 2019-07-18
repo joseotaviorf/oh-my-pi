@@ -17,8 +17,12 @@ select
                 json_extract(task_entry, '$.metadata.comentario'))
       as varchar) as "comment",
   cast(json_extract(task_entry, '$.origemId') as varchar) as id_origin,
-  cast(cast(json_extract(task_entry, '$.assigneeId') as double) as varchar) as id_assignee,
+  cast(json_extract(task_entry, '$.assigneeId') as varchar) as id_assignee,
+  cast(json_extract(task_entry, '$.origemId') as varchar) as id_origin,
   json_format(json_extract(task_entry, '$.score')) as score,
+  cast(coalesce(json_extract(task_entry, '$.origem'),
+                json_extract(task_entry, '$.metadata.origem')) 
+      as varchar) as origin,
   cast(coalesce(json_extract(task_entry, '$.dataVisita'),
                 json_extract(task_entry, '$.metadata.dataVisita')) 
       as varchar) as ts_visit,
