@@ -1,4 +1,4 @@
-drop view if exists vw_dim_house_listing;
+drop view if exists vw_dim_house_listing cascade;
 create or replace view vw_dim_house_listing as
 with b2b_info as (
   select distinct
@@ -264,7 +264,7 @@ select
   bi.is_b2b,
   bi.b2b_type,
   bi.b2b_prime_type,
-  lsc_originals.dt_last_opted_in is not null 
+  lsc_originals.dt_last_opted_in is not null
     and lsc_originals.dt_last_opted_out is null as is_originals_active,
   lsc_originals.special_condition_type as last_originals_type,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
@@ -273,10 +273,10 @@ select
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
-left join listing_special_conditions lsc_originals
+left join listing_special_conditions_dates lsc_originals
   on hl.sk_house_listing = lsc_originals.sk_house_listing
     and lsc_originals.special_condition_type like 'Originals%'
-left join listing_special_conditions lsc_exclusivity
+left join listing_special_conditions_dates lsc_exclusivity
   on hl.sk_house_listing = lsc_exclusivity.sk_house_listing
     and lsc_exclusivity.special_condition_type = 'Exclusivity'
 ;
