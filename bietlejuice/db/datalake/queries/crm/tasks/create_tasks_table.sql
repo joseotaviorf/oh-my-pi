@@ -16,7 +16,7 @@ select
   cast(coalesce(json_extract(task_entry, '$.comentario'),
                 json_extract(task_entry, '$.metadata.comentario'))
       as varchar) as "comment",
-  cast(json_extract(json_parse(task_entry), '$.origemId') as varchar) as id_origin,
+  cast(json_extract(task_entry, '$.origemId') as varchar) as id_origin,
   cast(cast(json_extract(task_entry, '$.assigneeId') as double) as varchar) as id_assignee,
   json_format(json_extract(task_entry, '$.score')) as score,
   cast(coalesce(json_extract(task_entry, '$.dataVisita'),
@@ -34,26 +34,41 @@ select
   cast(coalesce(json_extract(task_entry, '$.metadata.imovelId'),
                 json_extract(task_entry, '$.imovelId'))
       as varchar) as id_house,
-  cast(coalesce(json_extract(task_entry, '$.metadata.assunto') as varchar) as subject,
-  json_format(coalesce(json_extract(task_entry, '$.tags'),
-                       json_extract(task_entry, '%.metadata.tags'))) as tags,
+  cast(json_extract(task_entry, '$.metadata.assunto') as varchar) as subject,
+  json_format(json_extract(task_entry, '$.tags')) as tags,
   cast(json_extract(task_entry, '$.openedById') as varchar) as id_opened_by,
   cast(coalesce(json_extract(task_entry, '$.inquilinoId'),
                 json_extract(task_entry, '$.metadata.inquilinoId'))  
       as varchar) as id_tenant,
-  cast(json_extract(task_entry, '$.dataCriacao') as varchar) as ts_created,
-  cast(cast(json_extract(task_entry, '$.negociacaoId') as double) as bigint) as id_negotiation,
+  cast(coalesce(json_extract(task_entry, '$.dataCriacao'),
+                json_extract(task_entry, '$.metadata.dataCriacao'))
+      as varchar) as ts_created,
+  cast(coalesce(json_extract(task_entry, '$.negociacaoId'),
+                json_extract(task_entry, '$.metadata.negociacaoId'))
+      as varchar) as id_negotiation,
   cast(json_extract(task_entry, '$.origemData') as varchar) as ts_origin,
-  cast(cast(json_extract(task_entry, '$.gerenteId') as double) as bigint) as id_manager,
-  cast(json_extract(task_entry, '$.dataFup') as varchar) as ts_fup,
+  cast(coalesce(json_extract(task_entry, '$.gerenteId'), 
+                json_extract(task_entry, '$.metadata.gerenteId'))
+      as varchar) as id_manager,
+  cast(coalesce(json_extract(task_entry, '$.dataFup'),
+                json_extract(task_entry, '$.metadata.dataFup')) 
+      as varchar) as ts_fup,
   cast(json_extract(task_entry, '$.followUpVisita') as varchar) as visit_fup,
   json_format(json_extract(task_entry, '$.metadata')) as metadata,
-  cast(cast(json_extract(task_entry, '$.__v') as double) as integer) as v,
-  cast(cast(json_extract(task_entry, '$.proprietarioId') as double) as bigint) as id_owner,
-  cast(cast(json_extract(task_entry, '$.destinatarioId') as double) as bigint) as id_receiver,
+  cast(json_extract(task_entry, '$.__v') as varchar) as v,
+  cast(coalesce(json_extract(task_entry, '$.proprietarioId'),
+                json_extract(task_entry, '$.metadata.proprietarioId'), 
+                json_extract(task_entry, '$.metadata.house.proprietarioId'),
+                json_extract(task_entry, '$.metadata.imovel.proprietarioId'),
+                json_extract(task_entry, '$.metadata.contrato.imovel.proprietarioId'))
+      as varchar) as id_owner,
+  cast(coalesce(json_extract(task_entry, '$.metadata.destinatarioId'),
+                json_extract(task_entry, '$.destinatarioId'),
+                json_extract(task_entry, '$.metadata.destinatario.id')) 
+      as varchar) as id_receiver,
   cast(json_extract(task_entry, '$._id') as varchar) as id,
-  cast(json_extract(task_entry, '$.resolvida') as boolean) as resolved,
+  cast(json_extract(task_entry, '$.resolvida') as varchar) as resolved,
   dt
 from json_entries
-where dt = '__PARTITION_DATE__'
+where dt = '01-07-2019'
 ;
