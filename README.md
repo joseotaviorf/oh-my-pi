@@ -103,7 +103,7 @@ To run the jobs call scheduler
 $ airflow scheduler
 ```
 
-#### Improving Airflow performance
+#### Improving local Airflow performance
 
 For best performance, we advise you to install postgres to be your Airflow database.
 
