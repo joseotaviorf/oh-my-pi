@@ -17,6 +17,7 @@ Airflow implementation and DAGs.
 - [Useful commands](#useful-commands)
 - [Airflow](#airflow)
   - [Running local Airflow](#running-local-airflow)
+  - [Improving Airflow Performance](#improving-airflow-performance)
 - [Architecture](#architecture)
 - [Operators](#operators)
 - [Monitoring](#monitoring)
@@ -102,7 +103,7 @@ To run the jobs call scheduler
 $ airflow scheduler
 ```
 
-#### Improving Airflow performance (OPTIONAL)
+#### Improving Airflow performance
 
 For best performance, we advise you to install postgres to be your Airflow database.
 
@@ -111,6 +112,7 @@ For best performance, we advise you to install postgres to be your Airflow datab
 ```
 sql_alchemy_conn = postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_SCHEMA}
 ```
+
 3. Now, you can execute tasks in parallel, but first also change this param to:
 ```
 executor = LocalExecutor
