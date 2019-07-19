@@ -35,7 +35,8 @@ select
       as varchar) as phase,
   cast(json_extract(task_entry, '$.silenciadaAte') as varchar) as ts_silenced_until,
   cast(coalesce(json_extract(task_entry, '$.metadata.imovelId'),
-                json_extract(task_entry, '$.imovelId'))
+                json_extract(task_entry, '$.imovelId'),
+                json_extract(task_entry, '$.metadata.imovel.id'))
       as varchar) as id_house,
   cast(json_extract(task_entry, '$.metadata.assunto') as varchar) as subject,
   json_format(json_extract(task_entry, '$.tags')) as tags,
