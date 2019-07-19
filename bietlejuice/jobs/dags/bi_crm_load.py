@@ -13,13 +13,13 @@ from bietlejuice.jobs.etl.crm.tasks import CRMTasks, CRMTasksFactory, CRMTasksTa
 from bietlejuice.jobs.etl.crm.workgroups import CRMWorkgroups
 
 # env vars
-env.set_airflow_var_to_local_env('BI_DW_FORNO')
-s3_bucket = env.get_airflow_env_var('bi-datalake-forno-s3-bucket')
+env.set_airflow_var_to_local_env('BI_DW')
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 
 MAIN_DAG_ID = 'bi-crm-load'
 MAIN_START_DATE = datetime(2018, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')  # will get triggered by bi-supply-demand-etl
+MAIN_SCHEDULE_INTERVAL = None  # will get triggered by bi-supply-demand-etl
 
 
 # functions
@@ -122,7 +122,7 @@ main_dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     orientation='TB',
-    catchup=False
+    catchup=True
 )
 
 
