@@ -107,11 +107,16 @@ $ airflow scheduler
 For best performance, we advise you to install postgres to be your Airflow database.
 
 1. After installing postgres, create a user, password and database for your Airflow.
-2. Open the `airflow.cfg` file and change the value of the `sql_alchemy_conn` parameter to:
+2. Open the `airflow.cfg` file and change the value of the `sql_alchemy_conn` param to:
 ```
 sql_alchemy_conn = postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_SCHEMA}
 ```
-3. Run the command: 
+3. Now, you can execute tasks in parallel, but first also change this param to:
+```
+executor = LocalExecutor
+```
+
+4. Run the command: 
 ```
 airflow initdb
 ```
