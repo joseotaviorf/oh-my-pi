@@ -102,6 +102,20 @@ To run the jobs call scheduler
 $ airflow scheduler
 ```
 
+#### Improving Airflow performance (OPTIONAL)
+
+For best performance, we advise you to install postgres to be your Airflow database.
+
+1. After installing postgres, create a user, password and database for your Airflow.
+2. Open the `airflow.cfg` file and change the value of the `sql_alchemy_conn` parameter to:
+```
+sql_alchemy_conn = postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_SCHEMA}
+```
+3. Run the command: 
+```
+airflow initdb
+```
+
 ### Architecture
 
 We're trying out an Airflow installation using a LocalExecutor running at a automatically deployed EC2 instance. This architecture is heavily inspired by the [Airflow at WePay presentation](https://www.slideshare.net/criccomini/airflow-at-wepay). Although "simple" (no Celery, no multiple executor instances, etc.), that seems to be good enough to handle way more load than we'll need anytime soon.
