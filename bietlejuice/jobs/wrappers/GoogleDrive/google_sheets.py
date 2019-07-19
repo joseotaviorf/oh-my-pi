@@ -1,4 +1,6 @@
 import re
+from datetime import datetime
+from io import BytesIO
 
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
@@ -17,7 +19,8 @@ class GoogleSheets(object):
         self.google_api_scope = google_api_scope
 
     @logger(exclude=['google_sheets_files'])
-    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None):
+    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None,
+                                        csv=False, date_versioning=False):
         if not google_sheets_files:
             raise ValueError(
                 'm=move_sheets_data_to_destination, msg=no files set.')
@@ -37,12 +40,16 @@ class GoogleSheets(object):
             df_gsheets.rename(columns=snake_case_columns, inplace=True)
 
             if enumdb_destination == EnumDB.QuintoAndar_datalake:
-                if not athena_client:
-                    raise ValueError('m=move_sheets_data_to_destination, msg=AthenaClient object must be given.')
+                self._move_df_to_datalake(df=df_gsheets,
+                                          table_name=item['s3_path'] if 'full_s3_path' not in item else item[
+                                              'fileName'],
+                                          csv=csv,
+                                          file_path=item['full_s3_path'] if 'full_s3_path' in item else None,
+                                          date_versioning=date_versioning)
 
-                self._move_df_to_datalake(df=df_gsheets, table_name=item['s3_path'])
-                GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
-                                                  table_name=item['s3_path'], athena_client=athena_client)
+                if athena_client:
+                    GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
+                                                      table_name=item['s3_path'], athena_client=athena_client)
 
             if enumdb_destination == EnumDB.BI_ODS:
                 GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets')
@@ -64,17 +71,38 @@ class GoogleSheets(object):
         return new_columns
 
     @logger(exclude='df')
-    def _move_df_to_datalake(self, df, table_name):
-        df_json_service = DataFrameJsonService(df=df)
-        object_ = df_json_service.to_json_bytes()
+    def _move_df_to_datalake(self, df, table_name, file_path=None, csv=False, date_versioning=False):
+        if csv:
+            object_ = self._get_csv_io_object(df=df)
+        else:
+            object_ = self._get_json_io_object(df=df)
+
+        full_file_path = '{0}/gsheets/{1}/{1}.gz'.format('raw', table_name) if not file_path else file_path
+        full_file_path = full_file_path.format(
+            date=datetime.now().strftime("%d-%m-%Y")) if date_versioning else full_file_path
 
         BaseETL.obj_to_s3(
             obj_io=object_,
             bucket=self.s3_bucket,
-            file_path='{0}/gsheets/{1}/{1}.gz'.format('raw', table_name)
+            file_path=full_file_path
         )
 
+        # clear obj allocation
+        # only flushing does not clear the buffer
+        object_.seek(0)
         object_.flush()
+
+    @logger(exclude='df')
+    def _get_json_io_object(self, df):
+        df_json_service = DataFrameJsonService(df=df)
+        object_ = df_json_service.to_json_bytes()
+        return object_
+
+    @logger(exclude='df')
+    def _get_csv_io_object(self, df):
+        object_ = BytesIO()
+        df.to_csv(object_, index=False, sep=',', encoding='utf-8', header=True)
+        return object_
 
     @staticmethod
     @logger(exclude='df')
