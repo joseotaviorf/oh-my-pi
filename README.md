@@ -17,7 +17,7 @@ Airflow implementation and DAGs.
 - [Useful commands](#useful-commands)
 - [Airflow](#airflow)
   - [Running local Airflow](#running-local-airflow)
-  - [Improving Airflow Performance](#improving-local-airflow-performance)
+  - [Improving local Airflow Performance](#improving-local-airflow-performance)
 - [Architecture](#architecture)
 - [Operators](#operators)
 - [Monitoring](#monitoring)
