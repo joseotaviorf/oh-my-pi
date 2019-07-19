@@ -73,9 +73,9 @@ class GoogleSheets(object):
     @logger(exclude='df')
     def _move_df_to_datalake(self, df, table_name, file_path=None, csv=False, date_versioning=False):
         if csv:
-            object_ = self._get_csv_io_object(df=df)
+            object_ = GoogleSheets._get_csv_io_object(df=df)
         else:
-            object_ = self._get_json_io_object(df=df)
+            object_ = GoogleSheets._get_json_io_object(df=df)
 
         full_file_path = '{0}/gsheets/{1}/{1}.gz'.format('raw', table_name) if not file_path else file_path
         full_file_path = full_file_path.format(
