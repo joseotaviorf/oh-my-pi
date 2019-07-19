@@ -92,14 +92,16 @@ class GoogleSheets(object):
         object_.seek(0)
         object_.flush()
 
+    @staticmethod
     @logger(exclude='df')
-    def _get_json_io_object(self, df):
+    def _get_json_io_object(df):
         df_json_service = DataFrameJsonService(df=df)
         object_ = df_json_service.to_json_bytes()
         return object_
 
+    @staticmethod
     @logger(exclude='df')
-    def _get_csv_io_object(self, df):
+    def _get_csv_io_object(df):
         object_ = BytesIO()
         df.to_csv(object_, index=False, sep=',', encoding='utf-8', header=True)
         return object_
