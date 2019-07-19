@@ -37,7 +37,7 @@ def submit_zap(**kwargs):
         job_name='crawl-zapimoveis',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=6144,
+        memory=10240,
         command=['./crawlers/zapimoveis_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),

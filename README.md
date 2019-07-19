@@ -6,30 +6,52 @@
 
 Airflow implementation and DAGs.
 
-### Post-clone
-#### Configuration Settings
+## Table of contents
 
-Install `requirements.txt` in a virtualenv:
+- [Getting Started](#getting-started)
+  - [Create a virtualenv](#create-a-virtualenv)
+  - [Install requirements](#install-requirements)
+  - [Set up Airflow](#set-up-airflow)
+  - [Git hooks](#git-hooks)
+  - [Export PYTHONPATH](#export-pythonpath)
+- [Useful commands](#useful-commands)
+- [Airflow](#airflow)
+  - [Running local Airflow](#running-local-airflow)
+- [Architecture](#architecture)
+- [Operators](#operators)
+- [Monitoring](#monitoring)
+
+### Getting Started
+
+#### Create a virtualenv:
+
 - To create a virtual environment (inside bi-etl-ejuice directory):
 ```
-virtualenv [ENVIRONMENT_NAME]
+$ virtualenv [ENVIRONMENT_NAME]
 ```
 
 - To activate a virtual environment:
 ```
-source [ENVIRONMENT_NAME]/bin/activate
+$ source [ENVIRONMENT_NAME]/bin/activate
 ```
+
+- To deactivate the virtual environment:
+```
+$ deactivate
+```
+
+#### Install requirements:
+
+```
+$ pip install -r requirements.txt -r requirements_test.txt
+```
+
+##### Set up Airflow:
 
 Export `AIRFLOW_GPL_UNIDECODE` variable
 
 ```
-export AIRFLOW_GPL_UNIDECODE=yes
-```
-
-- Install requirements.txt
-
-```
-pip install -r requirements.txt
+$ export AIRFLOW_GPL_UNIDECODE=yes
 ```
 
 Configure path folder/file which Airflow will run the Dags
@@ -38,19 +60,26 @@ Configure path folder/file which Airflow will run the Dags
 - Open file airflow.cfg with an editor
 - Edit line with variable `dags_folder`, assigning your right path
 
+#### Git hooks
+
+```
+$ pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
+```
+
 #### Export `PYTHONPATH`
 
 You might have to export your `PYTHONPATH` to point to your `bi-etl-ejuice` folder, example: 
 
 ```
-export PYTHONPATH=:/home/YOUR_USERNAME/PycharmProjects/bi-etl-ejuice
+$ export PYTHONPATH=:/home/YOUR_USERNAME/PycharmProjects/bi-etl-ejuice
 ```
 
-#### Git hooks
+### Useful commands
 
-```
-pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
-```
+You should be all set with the correct environment. Now you can use any of the following commands:
+
+* `pytest --cov=bietlejuice/ tests --cov-report html:coverage`: will run all tests and generate project coverage at `/bi-etl-ejuice/coverage`.
+* `flake8 --max-line-length=120 bietlejuice/`: will run flake8 for dir `bietlejuice/`.
 
 ### Airflow
 
@@ -60,17 +89,17 @@ Deployment configuration is available within the [terraform](terraform) folder. 
 
 Initialize the metadata database
 ```
-airflow initdb
+$ airflow initdb
 ```
 
 Start a Airflow webserver instance. Will open Airflow UI on [http://localhost:8080](http://localhost:8080) by default
 ```
-airflow webserver
+$ airflow webserver
 ```
 
 To run the jobs call scheduler
 ```
-airflow scheduler
+$ airflow scheduler
 ```
 
 ### Architecture
