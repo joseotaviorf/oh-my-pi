@@ -18,6 +18,7 @@ first_listings AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
+        AND COALESCE(rent, '') != ''
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as tmp
   WHERE
@@ -66,6 +67,7 @@ listings AS (
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
         AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
+        AND COALESCE(rent, '') != ''
     ) as listings
   JOIN first_listings ON listings.id = first_listings.id
   WHERE
