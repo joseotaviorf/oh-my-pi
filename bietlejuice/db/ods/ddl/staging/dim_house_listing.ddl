@@ -49,6 +49,7 @@ create table staging.dim_house_listing (
   listing_category_end varchar,
   is_last_version boolean,
   is_exclusive boolean,
+  dt_last_exclusive_opted_in date,
   dt_last_exclusive_opted_out date,
   who_is_living varchar,
   key_type varchar,
