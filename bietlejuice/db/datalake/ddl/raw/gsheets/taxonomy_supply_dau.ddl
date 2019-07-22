@@ -1,6 +1,6 @@
-drop table if exists datalake_raw.gsheet_dau_taxonomy_supply;
+drop table if exists datalake_raw.gsheets_dau_taxonomy_supply;
 
-CREATE EXTERNAL TABLE datalake_raw.gsheet_dau_taxonomy_supply(
+CREATE EXTERNAL TABLE datalake_raw.gsheets_dau_taxonomy_supply(
   category string,
   channel string,
   completion string,
@@ -18,7 +18,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"')
 location
-  's3://5a-datalake/raw/gsheet/dau_taxonomy_supply/'
+  's3://5a-datalake/raw/gsheets/dau_taxonomy_supply/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

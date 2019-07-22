@@ -71,6 +71,6 @@ LEFT JOIN first_visits fv
 	ON fv.id_agent = s.sk_agent
 LEFT JOIN agent_contract_rank acr
     ON acr.agent_id = s.sk_agent AND acr."rank" = 1
-LEFT JOIN datalake_raw.gsheet_agent_contract_hours_detailed achd
+LEFT JOIN datalake_raw.gsheets_agent_contract_hours_detailed achd
     ON cast(achd.id as integer) = acr.workcontract_id
 ORDER BY s.sk_slot_date;

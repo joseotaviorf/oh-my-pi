@@ -12,7 +12,7 @@ with old_compensation_by_visit as (
 			on dr.sk_region = rf.sk_region
 		join dim_date dd
 			on dd.sk_date = rf.sk_visit_date
-		left join datalake_raw.gsheet_agents_hourly_compensation ch
+		left join datalake_raw.gsheets_agents_hourly_compensation ch
 			on dr.region_code = ch.region_code
 	where ch.region_code is null
 	group by 1, 2
@@ -31,7 +31,7 @@ old_compensation_by_contract as (
 		join dim_contract dc
 			on dc.sk_contract = rf.sk_contract
 			and rf.sk_contract_signed_date > 0
-		left join datalake_raw.gsheet_agents_hourly_compensation ch
+		left join datalake_raw.gsheets_agents_hourly_compensation ch
 			on dr.region_code = ch.region_code
 	where ch.region_code is null
 	group by 1, 2
@@ -96,7 +96,7 @@ agent_contracts as (
               end
               ) as agent_monthly_compensation
       from agent_contracts a
-          join datalake_raw.gsheet_agents_compensation ch
+          join datalake_raw.gsheets_agents_compensation ch
               on a.doc_signed_date between date(ch."dt_init") and date(ch."dt_end")
               and a.region_code = ch.region_code
       group by 1, 2, 3
@@ -172,7 +172,7 @@ agent_contracts as (
 			left join agent_contracts_signed cs
 				on ah.agent_id = cs.agent_id
 				and ah.month_hours_opened = cs.contract_signed_month
-			join datalake_raw.gsheet_agents_hourly_compensation ch
+			join datalake_raw.gsheets_agents_hourly_compensation ch
 				on trim(ah.region_code) = trim(ch.region_code)			
 				and ah.month_hours_opened between ch.dt_init and ch.dt_end
 	)
