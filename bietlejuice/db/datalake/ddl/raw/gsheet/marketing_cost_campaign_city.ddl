@@ -1,6 +1,6 @@
-drop table if exists datalake_raw.gsheet_mkt_cost_campaign_city;
+drop table if exists datalake_raw.gsheet_marketing_cost_campaign_city;
 
-create external table datalake_raw.gsheet_mkt_cost_campaign_city (
+create external table datalake_raw.gsheet_marketing_cost_campaign_city (
     account_name string,
     campaign_name string,
     city_group string,
@@ -11,7 +11,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/raw/gheet/mkt_cost_campaign_city/'
+location 's3://5a-datalake/raw/gheet/marketing_cost_campaign_city/'
 tblproperties (
   'skip.header.line.count' = '1'
 )
