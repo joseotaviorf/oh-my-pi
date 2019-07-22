@@ -3,11 +3,11 @@ with manual_google_costs as (
         select
           replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
           campaign_name,
-          to_char(cast(cost_date as date), 'yyyyMMdd')::integer as sk_date,
+          to_char(cast(g.date as date), 'yyyyMMdd')::integer as sk_date,
           cast(replace(desktop_cost, ',', '') as numeric(10,2)) as desktop_cost,
           cast(replace(mobile_cost, ',', '') as numeric(10,2)) as mobile_cost,
           cast(replace(tablet_cost, ',', '') as numeric(10,2)) as tablet_cost
-        from datalake_raw.marketing_manual_costs_google
+        from datalake_raw.gsheets_marketing_manual_costs_google g
     )
     select
         case when prep_account_name = 'quintoandar_display_and_video' then 'quintoandar_dra'
@@ -277,9 +277,9 @@ UNION
 		         or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
 		   end as side
 	from campaigns_full cf
-		left join datalake_raw.mkt_cost_campaign_city as mccc
+		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l
-		left join datalake_raw.taxonomy_mkt_cost as tx 
+		left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
 			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '') 
 				and cf.fact_cost = tx.fact_cost
 				and cf.origin = tx.origin
