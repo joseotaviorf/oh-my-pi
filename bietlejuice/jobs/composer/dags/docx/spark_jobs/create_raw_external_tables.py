@@ -12,7 +12,7 @@ logger = QuintoAndarLogger("create_raw_external_tables")
 
 if __name__ == "__main__":
     loader = DatabaseIntoDataLakeRawLoader()
-    datalake_db = loader.get_datalake_db()
+    datalake_db = loader.datalake_db
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(datalake_db), "default"
     )
