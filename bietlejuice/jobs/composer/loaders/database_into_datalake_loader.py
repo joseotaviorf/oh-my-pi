@@ -30,7 +30,7 @@ class DatabaseIntoDataLakeLoader:
     ):
         db_source = consumer.connection["db"]
         final_path = "{}/{}/{}".format(
-            self.get_datalake_path(), db_source, table_name.lower()
+            self.datalake_path, db_source, table_name.lower()
         )
 
         logger.info(
@@ -52,23 +52,23 @@ class DatabaseIntoDataLakeLoader:
         )
         # create the db in spark metastore in case it doesn't exist it
         SparkSession.builder.getOrCreate().sql(
-            "CREATE DATABASE IF NOT EXISTS {}".format(self.get_datalake_db())
+            "CREATE DATABASE IF NOT EXISTS {}".format(self.datalake_db)
         )
         write_df = (
             df.write.mode("overwrite")
-            .option("compression", self.get_codec())
-            .format(self.get_file_format())
+            .option("compression", self.codec)
+            .format(self.file_format)
             .option("path", final_path)
         )
         if partition_by:
             for col in partition_by:
                 write_df = write_df.partitionBy(col)
         new_table_name = "{}_{}".format(db_source, table_name)
-        write_df.saveAsTable("{}.{}".format(self.get_datalake_db(), new_table_name))
+        write_df.saveAsTable("{}.{}".format(self.datalake_db, new_table_name))
         logger.info(
             "load_full_table, table={}.{},"
             "msg=Copied table into datalake ({}).".format(
-                self.get_datalake_db(), new_table_name, final_path
+                self.datalake_db, new_table_name, final_path
             )
         )
 
@@ -84,7 +84,7 @@ class DatabaseIntoDataLakeLoader:
             )
         data_source = consumer.connection["db"]
         final_path = "{}/{}/{}".format(
-            self.get_datalake_path(), data_source, table_name.lower()
+            self.datalake_path, data_source, table_name.lower()
         )
         for key, val in partition_by:
             final_path += "/{}={}".format(key, val)
@@ -97,21 +97,19 @@ class DatabaseIntoDataLakeLoader:
         logger.info(
             "load_incremental_partitioned_table, msg=Writing data into datalake..."
         )
-        df.write.mode("overwrite").option("compression", self.get_codec()).format(
-            self.get_format()
+        df.write.mode("overwrite").option("compression", self.codec).format(
+            self.file_format
         ).save(final_path)
 
         # refresh table in spark metastore
         spark = SparkSession.builder.getOrCreate()
         new_table_name = "{}_{}".format(data_source, table_name)
-        spark.sql(
-            "MSCK REPAIR TABLE {}.{}".format(self.get_datalake_db(), new_table_name)
-        )
-        spark.sql("REFRESH TABLE {}.{}".format(self.get_datalake_db(), new_table_name))
+        spark.sql("MSCK REPAIR TABLE {}.{}".format(self.datalake_db, new_table_name))
+        spark.sql("REFRESH TABLE {}.{}".format(self.datalake_db, new_table_name))
         logger.info(
             "load_incremental_partitioned_table, table={}.{},"
             "msg=Loaded successfully incremental data into datalake ({}).".format(
-                self.get_datalake_db(), new_table_name, final_path
+                self.datalake_db, new_table_name, final_path
             )
         )
 
@@ -127,12 +125,12 @@ class DatabaseIntoDataLakeLoader:
             )
 
         drop_query = self.DROP_QUERY_TEMPLATE.format(
-            database=self.get_datalake_db(), table=table_name
+            database=self.datalake_db, table=table_name
         )
-        AthenaClient.execute_athena_query(drop_query, self.get_datalake_db())
+        AthenaClient.execute_athena_query(drop_query, self.datalake_db)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped "
-            "table in Athena successfully".format(self.get_datalake_db(), table_name)
+            "table in Athena successfully".format(self.datalake_db, table_name)
         )
 
         table_schema = consumer.get_table_schema(table_name).collect()
@@ -161,65 +159,68 @@ class DatabaseIntoDataLakeLoader:
                 )
             )
         create_query = self.CREATE_QUERY_TEMPLATE.format(
-            database=self.get_datalake_db(),
+            database=self.datalake_db,
             table=table_name,
             columns=columns_section,
             partitioned_by=partitions_section,
-            format=self.get_create_query_format(),
+            format=self.create_query_format,
             path="{}/{}/{}".format(
-                self.get_datalake_path(), db_source, table_name[len(db_source) + 1 :]
+                self.datalake_path, db_source, table_name[len(db_source) + 1 :]
             ),
         )
-        AthenaClient.execute_athena_query(create_query, self.get_datalake_db())
+        AthenaClient.execute_athena_query(create_query, self.datalake_db)
         if partition_by:
             AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(
-                    self.get_datalake_db(), table_name
-                ),
-                self.get_datalake_db(),
+                "MSCK REPAIR TABLE `{}`.`{}`;".format(self.datalake_db, table_name),
+                self.datalake_db,
             )
 
         logger.info(
             "m=_create_athena_external_table, table={}.{}, msg=The table was created "
-            "successfully in Athena".format(self.get_datalake_db(), table_name)
+            "successfully in Athena".format(self.datalake_db, table_name)
         )
 
-    def get_datalake_db(self):
+    @property
+    def datalake_db(self):
         if "datalake_db" not in self.config:
-            raise ValueError(
-                "param=datalake_db, msg=Parameter is required in database loader "
+            raise AttributeError(
+                "param=datalake_db, msg=Attribute is required in database loader "
                 "configuration."
             )
         return self.config["datalake_db"]
 
-    def get_datalake_path(self):
+    @property
+    def datalake_path(self):
         if "datalake_path" not in self.config:
-            raise ValueError(
-                "param=datalake_path, msg=Parameter is required in database loader "
+            raise AttributeError(
+                "param=datalake_path, msg=Attribute is required in database loader "
                 "configuration."
             )
         return self.config["datalake_path"]
 
-    def get_codec(self):
+    @property
+    def codec(self):
         if "codec" not in self.config:
-            raise ValueError(
-                "param=codec, msg=Parameter is required in database loader "
+            raise AttributeError(
+                "param=codec, msg=Attribute is required in database loader "
                 "configuration."
             )
         return self.config["codec"]
 
-    def get_file_format(self):
+    @property
+    def file_format(self):
         if "format" not in self.config:
-            raise ValueError(
-                "param=format, msg=Parameter is required in database loader "
+            raise AttributeError(
+                "param=format, msg=Attribute is required in database loader "
                 "configuration."
             )
         return self.config["format"]
 
-    def get_create_query_format(self):
+    @property
+    def create_query_format(self):
         if "create_query_format" not in self.config:
-            raise ValueError(
-                "param=create_query_format, msg=Parameter is required in database loader "
+            raise AttributeError(
+                "param=create_query_format, msg=Attribute is required in database loader "
                 "configuration."
             )
         return self.config["create_query_format"]
