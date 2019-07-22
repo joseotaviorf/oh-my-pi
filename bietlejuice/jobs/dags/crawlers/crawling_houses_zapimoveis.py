@@ -26,9 +26,9 @@ crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
-def submit_zap(execution_date, **kwargs):
+def submit_zap(**kwargs):
     states = kwargs.get('states')
-    listing_date = execution_date.strftime('%Y-%m-%d')
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     assert isinstance(states, list)
 
@@ -37,8 +37,8 @@ def submit_zap(execution_date, **kwargs):
         job_name='crawl-zapimoveis',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=6144,
-        command=['./crawlers/zapimoveis_crawler.py', '--listing_date', listing_date, '--states'] + states
+        memory=10240,
+        command=['./crawlers/zapimoveis_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
                                                                           r.get('jobName')]), r.get('status')))
@@ -47,19 +47,20 @@ def submit_zap(execution_date, **kwargs):
     ti = kwargs.get('ti')
 
     xcom.xcom_push(ti,
-                   key='crawler_houses_zap_{}'.format(listing_date),
+                   key='crawler_houses_zap_{}'.format(execution_date),
                    k_value=r.get('jobId'))
 
 
 def enrich_and_move_to_clean(**kwargs):
     ws = 'zapimoveis'
+    execution_date = kwargs.get('execution_date').strftime('%Y-%m-%d')
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
         raise RuntimeError(
             'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
-    listing_date = kwargs.get('execution_date').strftime('%Y-%m-%d')
-    query = query.format(started_on=listing_date, ws=ws)
+
+    query = query.format(started_on=execution_date, ws=ws)
     leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
 
     if leads.empty:
@@ -114,14 +115,14 @@ def enrich_and_move_to_clean(**kwargs):
         ])
 
         crawler_entity.athena_client.create_parquet_from_df(
-            key='clean/crawlers/ws={}/started_on={}/data.parq'.format(ws, listing_date),
+            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
             df=leads,
             raw_columns=r_cols,
             clean_columns=r_cols)
 
         q = "alter table datalake_clean.crawlers add if not exists partition (ws='{}', started_on='{}')".format(
             ws,
-            listing_date)
+            execution_date)
         try:
             crawler_entity.athena_client.execute_query_and_wait_for_results(q)
         except Exception as e:
