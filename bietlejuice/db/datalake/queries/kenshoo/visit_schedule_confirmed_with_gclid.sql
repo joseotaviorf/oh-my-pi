@@ -4,6 +4,7 @@ with amplitude_schedules as (
         platform,
         cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as "Date",
         case when u_gclid != '' then '_k_' || u_gclid || '_k_' end as "GCLID"
+        -- Appending _k_ so kenshoo client can decode as google client id
 	from datalake_clean.amplitude_events evt
 	where trim(ym) >= '2019-02'
         and trim(et) = 'visit_schedule_confirmed'
