@@ -9,7 +9,7 @@ class DatabaseEnum:
     DW_STAG = "ENV_DW_STAG"
     ODS = "ENV_ODS"
     DW_PROD = "ENV_DW_PROD"
-
+    INSIDER = "ENV_INSIDER"
 
 class DatabaseTypeEnum:
     POSTGRESQL = "postgres"
