@@ -1,6 +1,6 @@
-drop table if exists datalake_raw.taxonomy_mkt_cost;
+drop table if exists datalake_raw.gsheets_taxonomy_mkt_cost;
 
-create external table datalake_raw.taxonomy_mkt_cost (
+create external table datalake_raw.gsheets_taxonomy_mkt_cost (
     account_name string,
     fact_cost string,
     fator_custo string,
@@ -22,7 +22,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/raw/files/taxonomy_mkt_cost/'
+location 's3://5a-datalake/raw/gsheets/taxonomy_mkt_cost/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

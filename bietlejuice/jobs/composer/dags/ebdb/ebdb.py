@@ -10,13 +10,13 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base import BaseDAG
 
-DAG_ID = "docx"
+DAG_ID = "ebdb"
 ENV = Variable.get("environment")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/{}/load_docx_into_datalake.py".format(ENV, DAG_ID)
+LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH = (
+    S3_PREFIX + "/spark_jobs/{}/{}/load_ebdb_into_datalake.py".format(ENV, DAG_ID)
 )
 CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
     S3_PREFIX + "/spark_jobs/{}/{}/create_raw_external_tables.py".format(ENV, DAG_ID)
@@ -26,6 +26,7 @@ LOGS_OUTPUT_PATH = "s3://5a-databricks/logs/jobs/{}".format(DAG_ID)
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["num_workers"] = 6
 
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
@@ -53,12 +54,12 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="docx-to-datalake-raw",
+ebdb_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="ebdb-to-datalake-raw",
     dag=dag,
     json={
         "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
-        "spark_python_task": {"python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH},
+        "spark_python_task": {"python_file": LOAD_EBDB_INTO_DATALAKE_RAW_FILE_PATH},
     },
 )
 
@@ -77,7 +78,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 airflow_helpers.chain(
     create_cluster_task,
-    docx_to_datalake_raw_task,
+    ebdb_to_datalake_raw_task,
     create_raw_external_tables_task,
     terminate_cluster_task,
 )

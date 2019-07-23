@@ -209,6 +209,70 @@ pipeline:
       event: push
       branch: [ master ]
 
+  version:
+    image: python:3.6.7
+    commands:
+      - make package-name
+      - make version
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  package:
+    image: python:3.6.7
+    commands:
+      - make package
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  prepare-to-export-latest-release:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+    when:
+      event: [ push, tag ]
+      branch: master
+
+  prepare-to-export-forno-release:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
+    when:
+      event: push
+      branch: forno
+
+  export-latest-release-to-s3:
+    image: plugins/s3
+    pull: true
+    bucket: 5a-artifacts
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: private
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  upload-spark-jobs-s3-forno:
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py forno
+    when:
+      event: push
+      branch: forno
+
+  upload-spark-jobs-s3-prod:
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py prod
+    when:
+      event: push
+      branch: master
+
   notify:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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

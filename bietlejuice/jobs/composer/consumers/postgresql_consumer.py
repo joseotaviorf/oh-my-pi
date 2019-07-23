@@ -2,26 +2,27 @@ from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base import DatabaseTypeEnum
-from bietlejuice.jobs.composer.consumers.consumer import Consumer
+from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 
-logger = QuintoAndarLogger('PostgreSQLConsumer')
+logger = QuintoAndarLogger("PostgreSQLConsumer")
 
 
-class PostgreSQLConsumer(Consumer):
+class PostgreSQLConsumer(DatabaseConsumer):
     FETCH_SIZE = 50000
 
     def __init__(self, connection):
-        if connection['dbtype'].lower() != DatabaseTypeEnum.POSTGRESQL:
+        if connection["dbtype"].lower() != DatabaseTypeEnum.POSTGRESQL:
             raise RuntimeError(
-                'm=__init__, con_type={}, msg=Connection is not a postgresql'
-                'connection'.format(connection.get('dbtype')))
+                "m=__init__, con_type={}, msg=Connection is not a postgresql"
+                "connection".format(connection.get("dbtype"))
+            )
 
-        connection['url'] = "jdbc:postgresql://{}:{}/{}".format(connection['host'],
-                                                                connection['port'],
-                                                                connection['db'])
-        connection['driver'] = 'org.postgresql.Driver'
-        if 'schema' not in connection:
-            connection['schema'] = 'public'
+        connection["url"] = "jdbc:postgresql://{}:{}/{}".format(
+            connection["host"], connection["port"], connection["db"]
+        )
+        connection["driver"] = "org.postgresql.Driver"
+        if "schema" not in connection:
+            connection["schema"] = "public"
 
         self.connection = connection
 
@@ -39,15 +40,18 @@ class PostgreSQLConsumer(Consumer):
                 size DESC
         """
         result = self.get_data_from_query(
-            query.format(schema=self.connection['schema']))
+            query.format(schema=self.connection["schema"])
+        )
 
         return result
 
     @logger
     def get_data_from_table(self, table):
-        remote_table = self._get_default_read_format_and_options() \
-            .option("dbtable", self.connection['schema'] + '.' + table) \
+        remote_table = (
+            self._get_default_read_format_and_options()
+            .option("dbtable", self.connection["schema"] + "." + table)
             .load()
+        )
 
         return remote_table
 
@@ -66,23 +70,24 @@ class PostgreSQLConsumer(Consumer):
             result = self.get_data_from_query(query)
             lower_bound = result.collect()[0][0]
 
-            remote_table = remote_table \
-                .option("partitionColumn", partition_column) \
-                .option("lowerBound", lower_bound) \
-                .option("upperBound", upper_bound) \
+            remote_table = (
+                remote_table.option("partitionColumn", partition_column)
+                .option("lowerBound", lower_bound)
+                .option("upperBound", upper_bound)
                 .option("numPartitions", concurrency)
+            )
 
-        remote_table = remote_table \
-            .option("dbtable", self.connection['schema'] + '.' + table) \
-            .load()
+        remote_table = remote_table.option(
+            "dbtable", self.connection["schema"] + "." + table
+        ).load()
 
         return remote_table
 
     @logger
     def get_data_from_query(self, query):
-        remote_table = self._get_default_read_format_and_options() \
-            .option("query", query) \
-            .load()
+        remote_table = (
+            self._get_default_read_format_and_options().option("query", query).load()
+        )
         return remote_table
 
     @logger
@@ -97,7 +102,7 @@ class PostgreSQLConsumer(Consumer):
         """
 
         result = self.get_data_from_query(
-            query.format(table=self.connection['schema'] + '.' + table)
+            query.format(table=self.connection["schema"] + "." + table)
         )
 
         return result
@@ -106,12 +111,14 @@ class PostgreSQLConsumer(Consumer):
     def _get_default_read_format_and_options(self):
         spark = SparkSession.builder.getOrCreate()
 
-        return spark.read.format('jdbc') \
-            .option("driver", self.connection['driver']) \
-            .option("fetchsize", self.FETCH_SIZE) \
-            .option("url", self.connection['url']) \
-            .option("user", self.connection['user']) \
-            .option("password", self.connection['pwd'])
+        return (
+            spark.read.format("jdbc")
+            .option("driver", self.connection["driver"])
+            .option("fetchsize", self.FETCH_SIZE)
+            .option("url", self.connection["url"])
+            .option("user", self.connection["user"])
+            .option("password", self.connection["pwd"])
+        )
 
     @logger
     def _get_partition_column_from_table(self, table):
@@ -138,12 +145,15 @@ class PostgreSQLConsumer(Consumer):
         """
 
         df = self.get_data_from_query(
-            query.format(db=self.connection['db'], table=table, schema=self.connection['schema'])
-        ).select('COLUMN_NAME')
+            query.format(
+                db=self.connection["db"], table=table, schema=self.connection["schema"]
+            )
+        ).select("COLUMN_NAME")
 
         if df.count():
             return df.collect()[0][0]
 
         logger.warning(
-            'm=_get_partition_column_from_table, table={}, msg=Partition column '
-            'to parallelize the table read was not found.'.format(table))
+            "m=_get_partition_column_from_table, table={}, msg=Partition column "
+            "to parallelize the table read was not found.".format(table)
+        )
