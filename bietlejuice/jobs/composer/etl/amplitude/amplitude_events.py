@@ -26,7 +26,7 @@ class AmplitudeEvents():
         self.keys = keys
 
     @staticmethod
-    def get_number_of_partitions(self, len_data):
+    def get_number_of_partitions(len_data):
         return max(len_data // AmplitudeEvents.RECORDS_BY_PARTITION, 1)
 
     def create_events_dataframe(self, data, len_data):
@@ -39,7 +39,7 @@ class AmplitudeEvents():
         return df
 
     @staticmethod
-    def get_data_from_zip_file(self, zip_file):
+    def get_data_from_zip_file(zip_file):
         data = []
         for name in zip_file.namelist():
             with gzip.open(io.BytesIO(zip_file.read(name)), "rb") as gzip_file:
