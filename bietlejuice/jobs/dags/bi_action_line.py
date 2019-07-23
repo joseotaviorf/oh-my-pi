@@ -41,10 +41,10 @@ def verify_execution_time(execution_date, **kwargs):
         return 'load_discarded_leads'
     elif int(execution_date.hour) == 21:
         return 'load_reorganize_leads'
-    else:
-        raise ValueError(
-            'm=verify_execution_time, execution_date={}, msg=Execution Date not matching expected ones'.format(
-                execution_date))
+
+    raise ValueError(
+        'm=verify_execution_time, execution_date={}, msg=Execution Date not matching expected ones'.format(
+            execution_date))
 
 
 dag = DAG(
