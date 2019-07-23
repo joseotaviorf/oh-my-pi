@@ -1,4 +1,4 @@
-create external table {schema_name}.gsheet_{table_name} (
+create external table {schema_name}.gsheets_{table_name} (
   {columns}
 )
 row format serde 'org.openx.data.jsonserde.JsonSerDe'

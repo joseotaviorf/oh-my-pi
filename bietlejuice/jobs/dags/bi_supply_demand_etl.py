@@ -611,7 +611,7 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     trigger_dag_id='bi-agents-allocation-optimization'
 )
 
-# xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
+xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 

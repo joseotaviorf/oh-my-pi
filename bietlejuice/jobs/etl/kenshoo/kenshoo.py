@@ -38,9 +38,9 @@ class Kenshoo(object):
         return etl.todataframe(petl_table)
 
     @logger(exclude='df')
-    def _save_single_file(self, df):
+    def _save_single_file(self, df, file_name=''):
         # saving as csv for later SFTP send
-        csv_path = '{}-{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, self.execution_date)
+        csv_path = '{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, file_name, self.execution_date)
         df.to_csv(
             path_or_buf=csv_path,
             index=False,
@@ -69,7 +69,7 @@ class Kenshoo(object):
                 row.encode('ascii', 'ignore'), csv_path))
 
     @logger(exclude='athena_client')
-    def save_file_from_athena_query_execution(self, query_filename, athena_client):
+    def save_file_from_athena_query_execution(self, query_filename, athena_client, file_name):
         if query_filename is None or '.sql' not in query_filename:
             raise RuntimeError('m=save_file_from_athena_query_execution, msg=query_filename is invalid')
 
@@ -78,7 +78,7 @@ class Kenshoo(object):
 
         df = self._athena_execute_query_from_file(query_filename=query_filename, athena_client=athena_client)
 
-        self._save_single_file(df=df)
+        self._save_single_file(df=df, file_name=file_name)
 
     @logger
     def save_file_from_redshift_query_execution(self, query_filename, query_params=None, split_by_column=None):
