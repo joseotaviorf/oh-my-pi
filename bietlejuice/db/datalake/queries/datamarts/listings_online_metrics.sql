@@ -4,16 +4,28 @@ dates AS (
   FROM datalake_clean.ods_dim_date d
   WHERE d.sk_date != '-1'
     AND DATE(d.date) >= DATE_ADD('week', -2, CURRENT_DATE)
-    AND DATE_TRUNC('week', DATE(d.date)) < DATE_TRUNC('week', CURRENT_DATE)
+    AND DATE_TRUNC('week', DATE(d.date)) <= DATE_TRUNC('week', CURRENT_DATE)
 ),
 days_published AS (
-  SELECT
-    sk_house AS sk_house_listing,
-    SUBSTRING(sk_house, 1, 9) AS sk_house,
-    DATE_PARSE(sk_min_status_date, '%Y%m%d') AS min_status_date,
-    COALESCE(TRY(DATE_PARSE(sk_max_status_date, '%Y%m%d')), CURRENT_DATE) AS max_status_date
-  FROM datalake_clean.ods_fact_house_status
-  WHERE status_history = 'publicado'
+  WITH
+  published AS (
+    SELECT
+      sk_house AS sk_house_listing,
+      SUBSTRING(sk_house, 1, 9) AS sk_house,
+      DATE_PARSE(sk_min_status_date, '%Y%m%d') AS min_status_date,
+      COALESCE(TRY(DATE_PARSE(sk_max_status_date, '%Y%m%d')), CURRENT_DATE) AS max_status_date
+    FROM datalake_clean.ods_fact_house_status
+    WHERE status_history = 'publicado'
+  ),
+  rows AS (
+    SELECT
+      *,
+      ROW_NUMBER() OVER(PARTITION BY sk_house, max_status_date ORDER BY max_status_date ASC) AS row
+    FROM published
+  )
+  -- HACK: fact_house_status has an issue where it can have two rows with a published status and null max_status_date
+  -- while we don't fix that, here we will take only the first row
+  SELECT * FROM rows WHERE row = 1
 ),
 days_published_in_period AS (
   SELECT
