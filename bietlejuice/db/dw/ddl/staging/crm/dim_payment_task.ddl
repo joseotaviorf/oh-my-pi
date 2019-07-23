@@ -12,6 +12,7 @@ create table if not exists staging.dim_payment_task (
   type varchar,
   is_task_auto_completed boolean,
   description varchar(4000),
+  subject varchar(100),
   titles varchar,
   workgroups varchar,
   dt_partition date

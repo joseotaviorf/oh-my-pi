@@ -12,6 +12,7 @@ create table if not exists crm.dim_linhadireta_chat_task (
   type varchar,
   is_task_auto_completed boolean,
   description varchar(2000),
+  subject varchar(100),
   titles varchar,
   workgroups varchar,
   ts_load timestamp

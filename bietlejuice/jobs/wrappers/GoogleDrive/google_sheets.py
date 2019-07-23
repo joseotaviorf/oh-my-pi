@@ -149,7 +149,7 @@ class GoogleSheets(object):
         logger.info(
             'm=_create_athena_table, schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
         athena_client.execute_query_and_wait_for_results(
-            sql='drop table if exists {0}.{1}_{2};'.format(schema_name, 'gsheet', table_name))
+            sql='drop table if exists {0}.{1}_{2};'.format(schema_name, 'gsheets', table_name))
 
         logger.info(
             'm=_create_athena_table, schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
@@ -163,8 +163,8 @@ class GoogleSheets(object):
             }
         )
 
-        logger.info('m=_create_athena_table, schema={0}, table_name=gsheet_{1}, msg=table created'.format(schema_name,
-                                                                                                          table_name))
+        logger.info('m=_create_athena_table, schema={0}, table_name=gsheets_{1}, msg=table created'.format(schema_name,
+                                                                                                           table_name))
 
     @staticmethod
     @logger(exclude='df')
