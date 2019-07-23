@@ -11,6 +11,7 @@ class DatabaseEnum:
     DW_PROD = "ENV_DW_PROD"
     INSIDER = "ENV_INSIDER"
 
+
 class DatabaseTypeEnum:
     POSTGRESQL = "postgres"
     MYSQL = "mysql"
