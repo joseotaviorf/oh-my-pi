@@ -10,7 +10,7 @@ import airflow.utils.helpers as airflow_helpers
 
 MAIN_DAG_ID = 'bi-zendesk'
 MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 1 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')

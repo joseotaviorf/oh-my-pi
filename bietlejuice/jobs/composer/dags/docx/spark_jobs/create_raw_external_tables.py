@@ -1,28 +1,32 @@
 import logging
 
+from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.etl.load_docx_into_datalake import DocxIntoDatalakeLoader
+from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger('create_raw_external_tables')
+logger = QuintoAndarLogger("create_raw_external_tables")
 
-if __name__ == '__main__':
-    athena_db = DocxIntoDatalakeLoader.ATHENA_RAW_SCHEMA
-    AthenaClient.execute_athena_query('CREATE DATABASE IF NOT EXISTS `{}`'.format(athena_db), 'default')
-    connection = {
-        'db': 'docx'
-    }
+if __name__ == "__main__":
+    loader = DatabaseIntoDataLakeRawLoader()
+    datalake_db = loader.datalake_db
+    AthenaClient.execute_athena_query(
+        "CREATE DATABASE IF NOT EXISTS `{}`".format(datalake_db), "default"
+    )
+    connection = {"db": datalake_db}
     databricks_consumer = DatabricksConsumer(connection)
-    response = databricks_consumer.get_table_names_and_sizes()
-    tables = response.select('tableName').collect()
+    df = databricks_consumer.get_table_names_and_sizes()
+    tables = (
+        df.select("table_name").filter(col("table_name").rlike(r"^docx_")).collect()
+    )
 
-    logger.info('m=__main__, msg=Creating raw external tables...')
+    logger.info("m=__main__, msg=Creating raw external tables...")
     for table in tables:
-        table_name = table.tableName
-        DocxIntoDatalakeLoader.create_athena_external_table(consumer=databricks_consumer,
-                                                            table=table_name)
+        loader.create_athena_external_table(
+            consumer=databricks_consumer, table_name=table.table_name, db_source="docx"
+        )
 
-    logger.info('m=__main__, msg=All raw external tables were created successfully.')
+    logger.info("m=__main__, msg=All raw external tables were created successfully.")
