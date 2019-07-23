@@ -3,7 +3,7 @@ dates AS (
   SELECT DATE(d.date) AS date_day
   FROM datalake_clean.ods_dim_date d
   WHERE d.sk_date != '-1'
-    AND DATE(d.date) >= DATE_ADD('week', -12, CURRENT_DATE)
+    AND DATE(d.date) >= DATE_ADD('week', -24, CURRENT_DATE)
     AND DATE_TRUNC('week', DATE(d.date)) <= DATE_TRUNC('week', CURRENT_DATE)
 ),
 days_published AS (
@@ -67,7 +67,7 @@ online_metrics AS (
   FROM metrics m
   JOIN days_published dp
     ON m.house_id = dp.sk_house AND m.event_timestamp BETWEEN dp.min_status_date AND dp.max_status_date
-  WHERE (m.event_timestamp >= DATE_ADD('week', -12, CURRENT_DATE) OR DATE_TRUNC('week', m.event_timestamp) = DATE_TRUNC('week', CURRENT_DATE))
+  WHERE (m.event_timestamp >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_timestamp) = DATE_TRUNC('week', CURRENT_DATE))
 )
 SELECT
   om.*,
