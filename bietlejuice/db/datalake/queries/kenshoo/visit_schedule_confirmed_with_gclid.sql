@@ -1,7 +1,6 @@
 with amplitude_schedules as (
 	select
-        et as event_type,
-        platform,
+	    distinct
         cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as "Date",
         case when u_gclid != '' then '_k_' || u_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
@@ -10,7 +9,17 @@ with amplitude_schedules as (
         and trim(et) = 'visit_schedule_confirmed'
         and u_utm_source = 'google'
         and u_utm_medium = 'cpc'
-        group by 1,2,3,4
+    union
+    select
+        distinct
+        cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as "Date",
+        case when user_gclid is not null then '_k_' || user_gclid || '_k_' end as "GCLID"
+        -- Appending _k_ so kenshoo client can decode as google client id
+    from
+        datalake_clean_spark.amplitude_visit_schedule_confirmed_events
+    where year >= 2019
+        and user_utm_source = 'google'
+        and user_utm_medium = 'cpc'
 )
 select
     "Date",
