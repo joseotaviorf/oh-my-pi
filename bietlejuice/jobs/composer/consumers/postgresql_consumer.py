@@ -30,7 +30,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
     def get_table_names_and_sizes(self):
         query = """
             SELECT
-                table_name as table,
+                table_name,
                 pg_relation_size(quote_ident(table_name)) / 1024 / 1024 AS size
             FROM
                 information_schema.tables
@@ -94,7 +94,8 @@ class PostgreSQLConsumer(DatabaseConsumer):
     def get_table_schema(self, table):
         query = """
             SELECT
-                column_name, data_type as column_type
+                column_name as col_name,
+                data_type as col_type
             FROM
                 information_schema.columns
             WHERE
