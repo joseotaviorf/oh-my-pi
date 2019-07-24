@@ -14,7 +14,7 @@ base_dbutils = BaseDBUtils()
 if base_dbutils.get_dbutils() is not None:
     dbutils = base_dbutils.get_dbutils()
 
-parser = ArgumentParser(description='Load amplitude events into datalake raw')
+parser = ArgumentParser(description='load_events_into_datalake_raw')
 parser.add_argument('execution_date')
 parser.add_argument('env')
 
@@ -39,5 +39,5 @@ if __name__ == '__main__':
     db_raw = 'datalake_raw_spark'
     s3_raw_path = get_s3_raw_path(env)
 
-    amplitude_events = AmplitudeEvents(db_raw, s3_raw_path, keys)
+    amplitude_events = AmplitudeEvents(db_raw=db_raw, s3_raw_path=s3_raw_path, keys=keys)
     amplitude_events.load_events_into_datalake_raw(start_date=start_date, end_date=end_date)

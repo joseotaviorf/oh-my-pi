@@ -1,13 +1,12 @@
 import io
 import zipfile
 import gzip
-
-from pyspark.sql.functions import col, year, month, dayofmonth
+from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
-from bietlejuice.jobs.composer.base import BaseSparkContext
-from bietlejuice.jobs.composer.base import DataFrameService
+from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
+from bietlejuice.jobs.composer.base_spark import BaseSparkContext
+from bietlejuice.jobs.composer.base_spark import DataFrameService
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 
@@ -18,24 +17,44 @@ spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 class AmplitudeEvents():
     AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
     RAW_FORMAT = 'json'
-    RECORDS_BY_PARTITION = 55000
+    RAW_RECORDS_BY_PARTITION = 55000
+    CLEAN_FORMAT = 'parquet'
+    CLEAN_RECORDS_BY_PARTITION = 250000
 
-    def __init__(self, db_raw, s3_raw_path, keys):
+    DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
+    CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
+                            `{database}`.`{table}`
+                            (
+                              {columns}
+                            )
+                            {partitioned_by}
+                            {format}
+                            LOCATION '{path}'
+                            tblproperties ("parquet.compress"="SNAPPY");"""
+    CREATE_QUERY_CLEAN_FORMAT = "STORED AS PARQUET"
+
+    def __init__(self, db_raw=None, s3_raw_path=None, db_clean=None, s3_clean_path=None, keys=None):
         self.db_raw = db_raw
         self.s3_raw_path = s3_raw_path
         self.keys = keys
 
+        self.db_clean = db_clean
+        self.s3_clean_path = s3_clean_path
+
     @staticmethod
-    def get_number_of_partitions(len_data):
-        return max(len_data // AmplitudeEvents.RECORDS_BY_PARTITION, 1)
+    def get_number_of_partitions(len_data, stage):
+        if stage == 'raw':
+            return max(len_data // AmplitudeEvents.RAW_RECORDS_BY_PARTITION, 1)
+        elif stage == 'clean':
+            return max(len_data // AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION, 1)
 
     def create_events_dataframe(self, data, len_data):
-        n = self.get_number_of_partitions(len_data)
+        n = self.get_number_of_partitions(len_data, 'raw')
         logger.info('m=create_events_dataframe, the dataframe will be written in {} partitions'.format(n))
         df = spark.read.json(sc.parallelize(data, n))
-        df = df.withColumn('year', year(col('server_upload_time'))) \
-            .withColumn('month', month(col('server_upload_time'))) \
-            .withColumn('day', dayofmonth(col('server_upload_time')))
+        df = DataFrameService.df_columns_name_format(df)
+        df = DataFrameService.df_struct_type_to_json(df)
+        df = DataFrameService.df_create_year_month_day_columns(df, 'server_upload_time')
         return df
 
     @staticmethod
@@ -75,4 +94,108 @@ class AmplitudeEvents():
                                                        AmplitudeEvents.RAW_FORMAT,
                                                        ['year', 'month', 'day', 'app'],
                                                        self.db_raw, table_name,
-                                                       self.s3_raw_path + table_name)
+                                                       self.s3_raw_path + table_name,
+                                                       True)
+
+    @logger
+    def update_clean_amplitude_events(self, date):
+        year, month, day = date.year, date.month, date.day
+        logger.info('m=create_clean_amplitude_events, Param Date String: year={} month={} day={}'
+                    .format(year, month, day))
+        query = """
+                select
+                  server_received_time, app, device_carrier, schema, city, user_id, uuid,
+                  event_time, platform, os_version, amplitude_id, processed_time, user_creation_time,
+                  version_name, ip_address, paying, dma, user_properties, client_upload_time,
+                  insert_id, event_type, library, amplitude_attribution_ids, device_type,
+                  device_manufacturer, start_version, location_lng, server_upload_time, event_id,
+                  location_lat, os_name, amplitude_event_type, device_brand, event_properties,
+                  data, device_id, language, device_model, country, region, is_attribution_event,
+                  adid, session_id, device_family, sample_rate, idfa, client_event_time, year,
+                  month, day
+                from
+                  {}.{}
+                where
+                  year={} and month={} and day={}
+                """
+        table_name = "amplitude_events"
+        df = spark.sql(query.format(self.db_raw, table_name, year, month, day))
+
+        len_df = df.count()
+        partitions = self.get_number_of_partitions(len_df, 'clean')
+        df = df.coalesce(partitions)
+
+        DataFrameService.incremental_write(df,
+                                           AmplitudeEvents.CLEAN_FORMAT,
+                                           ['year', 'month', 'day', 'event_type'],
+                                           self.db_clean, table_name,
+                                           self.s3_clean_path + table_name)
+
+    @logger
+    def update_filtered_events_table(self, date, event_type):
+        table_name = 'amplitude_events'
+        year, month, day = date.year, date.month, date.day
+        filtered_event_df = spark.sql("select * from {}.{} where year={} and month={} and day={} and event_type = '{}'"
+                                      .format(self.db_clean, table_name, year, month, day, event_type))
+
+        filtered_event_exploded_df = DataFrameService.explode_json_column(filtered_event_df,
+                                                                          'user_properties',
+                                                                          'user_', True)
+        filtered_event_exploded_df = DataFrameService.explode_json_column(filtered_event_exploded_df,
+                                                                          'event_properties',
+                                                                          'event_', True)
+
+        len_df = filtered_event_exploded_df.count()
+        partitions = self.get_number_of_partitions(len_df, 'clean')
+        filtered_event_exploded_df = filtered_event_exploded_df.coalesce(partitions)
+
+        table_name = 'amplitude_{}_events'.format(event_type)
+        DataFrameService.incremental_write(filtered_event_exploded_df,
+                                           AmplitudeEvents.CLEAN_FORMAT,
+                                           ['year', 'month', 'day'],
+                                           self.db_clean, table_name,
+                                           self.s3_clean_path + table_name,
+                                           True)
+
+    @logger
+    def create_athena_external_table(self, consumer, table, partition_by=None):
+        file_format = AmplitudeEvents.CREATE_QUERY_CLEAN_FORMAT
+
+        drop_query = AmplitudeEvents.DROP_QUERY_TEMPLATE.format(
+            database=self.db_clean,
+            table=table)
+        AthenaClient.execute_athena_query(drop_query, self.db_clean)
+        logger.info('m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully'.format(
+            self.db_clean,
+            table))
+
+        table_schema = consumer.get_table_schema(table).collect()
+        table_schema = OrderedDict(
+            [(row['col_name'], row['col_type'].lower().replace('timestamp', 'string')) for row in table_schema])
+
+        columns_section = ',\n  '.join(
+            ['`' + col + '` ' + col_type.upper() for col, col_type in table_schema.items() if
+             not partition_by or col not in partition_by])
+        partitions_section = ''
+        if partition_by:
+            partitions_section = 'PARTITIONED BY (\n  {}\n)'.format(
+                ',\n  '.join(['`' + col + '` ' + table_schema[col] for col in partition_by]))
+        create_query = AmplitudeEvents.CREATE_QUERY_TEMPLATE.format(
+            database=self.db_clean,
+            table=table,
+            columns=columns_section,
+            partitioned_by=partitions_section,
+            format=file_format,
+            path='{}{}'.format(
+                self.s3_clean_path,
+                table
+            )
+        )
+        AthenaClient.execute_athena_query(create_query, self.db_clean)
+        if partition_by:
+            AthenaClient.execute_athena_query(
+                'MSCK REPAIR TABLE `{}`.`{}`;'.format(self.db_clean, table), self.db_clean)
+
+        logger.info(
+            'm=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena'.format(
+                self.db_clean, table))
