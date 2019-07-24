@@ -575,18 +575,19 @@ xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     provide_context=True
 )
 
+# TODO Recreate amplitude xcom after the data flow is fully fixed
 # check the dependency of amplitude_load_events
-xcom_amplitude_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='xcom_amplitude',
-    provide_context=True,
-    python_callable=xcom_dependencies,
-    op_kwargs={'task_id': 'XCom_amplitude_load_events',
-               'dag_id': 'bi-amplitude-load-events'},
-    retry_delay=timedelta(minutes=10),
-    max_retry_delay=timedelta(minutes=10),
-    retries=15
-)
+# xcom_amplitude_task = BaseDAG.build_python_operator(
+#     dag=main_dag,
+#     task_id='xcom_amplitude',
+#     provide_context=True,
+#     python_callable=xcom_dependencies,
+#     op_kwargs={'task_id': 'XCom_amplitude_load_events',
+#                'dag_id': 'bi-amplitude-load-events'},
+#     retry_delay=timedelta(minutes=10),
+#     max_retry_delay=timedelta(minutes=10),
+#     retries=15
+# )
 
 # trigger bi-growth dag after all tasks have been successfully completed
 trigger_bi_growth_dag_task = TriggerDagRunOperator(
@@ -611,7 +612,8 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     trigger_dag_id='bi-agents-allocation-optimization'
 )
 
-xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
+# TODO Recreate tasks flow after the data flow is fully fixed
+# xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
