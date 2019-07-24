@@ -151,7 +151,7 @@ send_visit_schedule_confirmed_with_gclid_query_task = SFTPOperator(
     task_id='send_visit_schedule_confirmed_with_gclid_query',
     ssh_hook=ssh_hook,
     local_filepath='{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, 'visit_schedule_confirmed_with_gclid', '{{ ds }}'),
-    remote_filepath='visit_schedule_confirmed_with_gclid/query_result_{{ ds }}.csv',
+    remote_filepath='visit_schedule_confirmed_with_gclid/visit_schedule_confirmed_{{ ds }}.csv',
     operation=SFTPOperation.PUT,
     dag=main_dag
 )
