@@ -16,7 +16,7 @@ with cross_platform as (
 		u_adjust_network as adjust_network,
 		case
 			when u_platform in ('web_desktop','web_mobile')
-				then coalesce(u_utm_source,'organic')
+				then coalesce(nullif(u_utm_source, ''), 'organic')
 			else u_adjust_network
 		end as media_source
 	from
@@ -24,6 +24,31 @@ with cross_platform as (
 	where
 		et = 'visit_schedule_confirmed'
 	and trim(app) = '170698'
+	-- union with amplitude events via SPARK process
+	union
+	select
+	    cast(app as varchar) as app,
+	    event_time,
+	    cast(json_extract(user_properties, '$.platform') as varchar) as platform,
+	    coalesce(
+				nullif(regexp_replace(cast(json_extract(event_properties, '$.Visita_id') as varchar), '\[|\]', ''),''),
+				nullif(cast(json_extract(event_properties, '$.visit_code') as varchar),''),
+				coalesce(cast(json_extract(event_properties, '$.visita_code') as varchar), '')
+		) as visit_code,
+	    coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as utm_source,
+	    coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as utm_medium,
+	    coalesce(cast(json_extract(user_properties, '$.utm_campaign') as varchar), '') as utm_campaign,
+	    coalesce(cast(json_extract(user_properties, '$.utm_content') as varchar), '') as utm_content,
+	    coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
+	 	case
+	 		when cast(json_extract(user_properties, '$.platform') as varchar) in ('web_desktop','web_mobile')
+	 			then coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), 'organic')
+	 		else coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '')
+	 	end as media_source
+	  from datalake_clean_spark.amplitude_events
+	  where event_type = 'visit_schedule_confirmed'
+	  and app=170698
 ),
 ios as (
 	select
