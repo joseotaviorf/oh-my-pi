@@ -58,20 +58,36 @@ house_status_and_dimensions as (
 ),
 user_session_events as (
 	-- returns top amplitude events that we use as proxy for session start, listing view and booking confirmation
-	select
-	amplitude_id,
-	to_char(to_date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})'), 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
-	regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
-	regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-	session_id,
-	et,
-	case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-		 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-		 else null end as id_house
-	from datalake_clean.amplitude_events evt
-	where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-	and ym >= '2019-01'
-	and app = '170698'
+       select
+        amplitude_id,
+        to_char(to_date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})'), 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
+        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
+        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+        session_id,
+        et,
+        case when regexp_substr(e_house_id, '^\\d{9}$') != ''
+             then regexp_substr(e_house_id, '^\\d{9}$')::bigint
+             else null end as id_house
+       from datalake_clean.amplitude_events evt
+       where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+        and ym >= '2019-01'
+        and app = '170698'
+	union
+      -- enriching with amplitude data via SPARK
+       SELECT
+        amplitude_id::varchar,
+        to_char(to_date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})'), 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
+        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date AS event_dt,
+        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+        session_id::varchar,
+        event_type,
+        case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
+             then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
+             else null end as id_house
+       FROM datalake_clean_spark.amplitude_events
+       WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+        AND app = 170698
+        AND year >= 2019
 ),
 user_session_mapping as (
 	-- returns min event timestamps for different partitions like user, session and house id
