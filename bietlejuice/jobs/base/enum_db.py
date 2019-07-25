@@ -5,6 +5,7 @@ class EnumDB():
     QuintoAndar_sortinghat = 'ENV_SORTINGHAT'
     QuintoAndar_asterisk = 'ENV_ASTERISK'
     QuintoAndar_killqueue = 'ENV_KILLQUEUE'
+    QuintoAndar_datalake = 'ENV_DATALAKE'
     BI_Staging = 'ENV_BI_STG'
     BI_ODS = 'ENV_BI_ODS'
     BI_DW = 'ENV_BI_DW'

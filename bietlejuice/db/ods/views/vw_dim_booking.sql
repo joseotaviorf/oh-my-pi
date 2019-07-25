@@ -82,6 +82,12 @@ bookings as (
 	    		when s.last_update_source in ('Inquilinos', 'SelfServiceWeb') then 'Tenant'
 	    		when s.last_update_source in ('Proprietarios', 'ProprietariosEmail') then 'Owner'
 	    	end,
+	    	case
+                when s.reason_enum = 'CANCELED_BY_OWNER_FROM_APP' then 'Owner'
+                when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED' then 'Consequence management'
+                when s.reason_enum = 'CANCELED_HOUSE_RESERVED' then 'House Reserved'
+                when s.reason_enum = 'AGENT_TRANSFER' then 'Agent'
+            end,
 	    	s.reason_category    	
 	   	) as reason_category,
 	   	coalesce(

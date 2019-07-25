@@ -11,6 +11,7 @@ select
   type,
   is_task_auto_completed,
   description,
+  subject,
   titles,
   workgroups,
   getdate() as ts_load

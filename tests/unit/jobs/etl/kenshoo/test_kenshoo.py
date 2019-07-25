@@ -13,11 +13,13 @@ from qa_python_utils.aws.athena import AthenaClient
 
 class TestKenshoo(object):
 
-    @pytest.mark.parametrize('query_filename, athena_client', [[None, ''], ['', ''], ['query', ''], ['sql.sql', None]])
-    def test_save_file_from_athena_query_execution_with_wrong_param(self, kenshoo, query_filename, athena_client):
+    @pytest.mark.parametrize('query_filename, athena_client, file_name',
+                             [[None, '', ''], ['', '', ''], ['query', '', ''], ['sql.sql', None, '']])
+    def test_save_file_from_athena_query_execution_with_wrong_param(self, kenshoo, query_filename, athena_client,
+                                                                    file_name):
         # act & assert
         with pytest.raises(RuntimeError):
-            kenshoo.save_file_from_athena_query_execution(query_filename, athena_client)
+            kenshoo.save_file_from_athena_query_execution(query_filename, athena_client, file_name)
 
     @pytest.mark.parametrize('query_filename', [None, '', 'query'])
     def test_save_file_from_redshift_query_execution_with_wrong_param(self, kenshoo, query_filename):
@@ -32,12 +34,15 @@ class TestKenshoo(object):
         # arrange
         query_filename = 'query.sql'
         athena_client = 'mock_athena_client'
+        file_name = mock.ANY
 
         # act
-        kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client)
+        kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client,
+                                                      file_name=file_name)
 
         # assert
-        mock__save_single_file.assert_called_once_with(df=mock__athena_execute_query_from_file.return_value)
+        mock__save_single_file.assert_called_once_with(df=mock__athena_execute_query_from_file.return_value,
+                                                       file_name=file_name)
         mock__athena_execute_query_from_file.assert_called_once_with(query_filename=query_filename,
                                                                      athena_client=athena_client)
 
@@ -116,11 +121,12 @@ class TestKenshoo(object):
         # arrange
         path = '/tmp'
         kenshoo.execution_date = datetime.datetime(2000, 1, 1)
-        full_path = '{}-{}.csv'.format('kenshoo', kenshoo.execution_date)
+        file_name = 'test'
+        full_path = '{}-{}{}.csv'.format('kenshoo', file_name, kenshoo.execution_date)
         df = pd.DataFrame(data=[1], columns=['id'])
 
         # act
-        kenshoo._save_single_file(df=df)
+        kenshoo._save_single_file(df=df, file_name=file_name)
 
         # assert
         files = [f for f in listdir(path) if isfile(join(path, f))]

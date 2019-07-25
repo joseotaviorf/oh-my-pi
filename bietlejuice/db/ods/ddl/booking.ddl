@@ -32,5 +32,6 @@ create table if not exists booking (
   owner_missing_reason varchar(255),
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
-  checkin_status varchar(255)
+  checkin_status varchar(255),
+  reason_enum varchar(255)
 );

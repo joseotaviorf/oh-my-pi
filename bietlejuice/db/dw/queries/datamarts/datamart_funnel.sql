@@ -592,7 +592,7 @@ select
          when mkt_medium_demand = 'Online Classifieds' then 'OnlineClassifieds'
          when mkt_medium_demand in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
          when mkt_medium_demand in ('Display','Retargeting','SEM non-branded') then 'Online Paid'
-         else 'Other' end end as mkt_medium_demand,
+         else mkt_medium_demand end end as mkt_medium_demand,
 	sum(prospects) as prospects,
     sum(qualifieds) as qualifieds,
     sum(opportunities) as opportunities,
