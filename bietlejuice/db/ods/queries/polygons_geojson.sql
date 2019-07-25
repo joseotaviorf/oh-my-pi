@@ -8,17 +8,17 @@ with subregions as (
 	where r.level = 'SubRegiao'
 ),
 features as (
-	with geometries as (
+	with geo_properties as (
 		select
 			'Feature' as type,
-			ST_AsGeoJSON(poligono)::json As geometry,
-			row_to_json(sr)
+			ST_AsGeoJSON(poligono)::json as geometry,
+			row_to_json(sr) as properties
 		from subregions sr
 	)
 	select
 		'FeatureCollection' as type,
-		array_to_json(array_agg(g)) as features
-	from geometries g
+		array_to_json(array_agg(gp)) as features
+	from geo_properties gp
 )
 select
 	row_to_json(f)
