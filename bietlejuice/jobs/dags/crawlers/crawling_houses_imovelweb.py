@@ -1,7 +1,7 @@
 import json
 import re
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pandas as pd
 from airflow.models import DAG
@@ -17,7 +17,7 @@ from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
 MAIN_DAG_NAME = 'crawling-houses-imovelweb'
 MAIN_START_DATE = datetime(2018, 3, 20)
-MAIN_SCHEDULE_INTERVAL = '0 0 * * *'
+MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -27,11 +27,8 @@ data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
 def submit_iw(**kwargs):
-    max_crawl = kwargs.get('max_crawl', 100000)
     states = kwargs.get('states')
-    start_dt = datetime.today().date() - timedelta(days=1)
-
-    assert isinstance(max_crawl, int)
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     assert isinstance(states, list)
 
     logger.info('Starting job...')
@@ -39,8 +36,8 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=6144,
-        command=['./crawlers/imovelweb_crawler.py', '--max_crawl', str(max_crawl), '--start_dt', str(start_dt),
+        memory=8192,
+        command=['./crawlers/imovelweb_crawler.py', '--listing_date', execution_date,
                  '--states'] + states
     )
     logger.info('m=submit_iw, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
@@ -48,23 +45,21 @@ def submit_iw(**kwargs):
 
     # get task instance
     ti = kwargs.get('ti')
-
-    exec_date = str(datetime.date(kwargs.get('execution_date')))
     xcom.xcom_push(ti,
-                   key='crawler_houses_iw_{}'.format(exec_date),
+                   key='crawler_houses_iw_{}'.format(execution_date),
                    k_value=r.get('jobId'))
 
 
-def enrich_and_move_to_clean():
-    print(datetime.today())
+def enrich_and_move_to_clean(**kwargs):
     ws = 'imovelweb'
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
-        return None
-    crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
-    last_crawling_date = crawler_entity.get_last_crawling_date(ws)
-    query = query.format(started_on=last_crawling_date,
-                         ws=ws)
+        raise RuntimeError(
+            'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
+    crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, False)
+    query = query.format(started_on=execution_date, ws=ws)
     leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
 
     if leads.empty:
@@ -76,7 +71,6 @@ def enrich_and_move_to_clean():
         leads['nb_street'] = leads['street'].apply(
             lambda st: re.search(regex, str(st)).group(2) if re.search(regex, str(st)) else
             None)
-
         leads = leads.where((pd.notnull(leads)), None)
 
         r_cols = OrderedDict([
@@ -120,11 +114,11 @@ def enrich_and_move_to_clean():
         ])
 
         crawler_entity.athena_client.create_parquet_from_df(
-            key='clean/crawlers/ws={}/started_on={}/data.parq'.format(ws, last_crawling_date),
+            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
             df=leads, raw_columns=r_cols, clean_columns=r_cols)
 
         q = "alter table datalake_clean.crawlers add if not exists partition (ws='imovelweb', started_on='{}')".format(
-            last_crawling_date)
+            execution_date)
         try:
             crawler_entity.athena_client.execute_query_and_wait_for_results(q)
         except Exception as e:
@@ -164,6 +158,7 @@ move_to_clean = BaseDAG.build_python_operator(
     dag=dag,
     task_id='move-to-clean',
     python_callable=enrich_and_move_to_clean,
+    provide_context=True
 )
 
 crawl_iw >> iw_success_test >> move_to_clean
