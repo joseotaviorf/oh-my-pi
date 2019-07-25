@@ -88,18 +88,38 @@ bookings as (
 ),
 lpv_events as (
 	-- aggregates listing_page_view event counts per event date and house_id
-	select
-		case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-			 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-			 else null end as id_house,
-		to_char(to_date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})'), 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
-		regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
-		count(distinct uuid) as cnt_listing_page_view
-	from datalake_clean.amplitude_events evt
-	where et = 'listing_page_viewed'
-	and ym >= '2018-01'
-	and app = '170698'
-	group by 1, 2, 3
+	with amplitude as (
+        select
+            case when regexp_substr(e_house_id, '^\\d{9}$') != ''
+                 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
+                 else null end as id_house,
+            to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
+            regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
+            uuid
+        from datalake_clean.amplitude_events evt
+        where et = 'listing_page_viewed'
+            and ym >= '2018-01'
+            and app = '170698'
+    union
+    -- enriching with amplitude data via SPARK
+        SELECT
+            case when nullif(regexp_substr(event_house_id::varchar, '^\\d{9}$'), '') is not null
+                 then regexp_substr(event_house_id::varchar, '^\\d{9}$')::bigint
+                 else null end as id_house,
+            to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
+            regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
+            uuid
+        FROM datalake_clean_spark.amplitude_listing_page_viewed_events
+        WHERE app = 170698
+            AND year >= 2019
+    )
+    select
+        id_house,
+        sk_event_dt,
+        event_dt,
+        count(distinct uuid) as cnt_listing_page_view
+    from amplitude
+    group by 1,2,3
 ),
 listing_page_views as (
 	-- returns number of listing_page_view events per house and date, independently of house status on event date
