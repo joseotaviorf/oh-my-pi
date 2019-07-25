@@ -6,9 +6,8 @@ class DatabaseEnum:
     SORTINGHAT = "ENV_SORTINGHAT"
     ASTERISK = "ENV_ASTERISK"
     KILLQUEUE = "ENV_KILLQUEUE"
-    DW_STAG = "ENV_DW_STAG"
     ODS = "ENV_ODS"
-    DW_PROD = "ENV_DW_PROD"
+    DW = "ENV_DW"
     INSIDER = "ENV_INSIDER"
 
 
