@@ -177,21 +177,23 @@ class RegionSubDag(DimSubDag):
     def save_polygons_geojson_to_local(self, subregion_polygons_filename_prefix):
         table_view = self.__get_polygons_geojson_data()
         if not table_view:
-            logger.error('m=__save_polygons_geojson, msg=table_view is empty or None')
+            logger.error('m=save_polygons_geojson_to_local, msg=table_view is empty or None')
 
         with open('/tmp/{}.geojson'.format(subregion_polygons_filename_prefix),
                   'w') as fp:
             logger.info(
-                'm=__save_polygons_geojson, msg=saving table_view as json to /tmp')
+                'm=save_polygons_geojson_to_local, msg=saving table_view as json to /tmp')
             json.dump(table_view[1][0], fp)
 
     @logger
     def upload_polygons_topojson_to_s3(self, subregion_polygons_filename_prefix):
         logger.info('m=upload_polygons_topojson_to_s3, msg=saving history file')
+
         filename = '{}.topojson'.format(subregion_polygons_filename_prefix)
         dir_path = '/tmp'
         bucket_folder_path_prefix = '5a-looker/subregion_polygons'
         today = datetime.now().date()
+
         BaseETL.file_to_s3(
             filename=filename,
             dir_path=dir_path,
