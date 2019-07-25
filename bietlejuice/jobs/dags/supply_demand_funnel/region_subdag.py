@@ -1,10 +1,14 @@
+import json
 from datetime import datetime
+
+import airflow.utils.helpers as airflow_helpers
+from airflow.operators.bash_operator import BashOperator
 from qa_python_utils import QuintoAndarLogger
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, ODS_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 logger = QuintoAndarLogger('RegionSubDag')
@@ -27,10 +31,22 @@ class RegionSubDag(DimSubDag):
     def build_region_with_tests(self):
         region_dag = self._build_local_dag()
 
-        agent_region, region, dim_region, load_region = self.__build_data_tasks(region_dag)
+        (agent_region,
+         region,
+         polygon_region,
+         save_polygons_geojson_to_local,
+         convert_polygons_geojson_to_topojson,
+         upload_polygons_topojson_to_s3,
+         dim_region,
+         load_region) = self.__build_data_tasks(
+            region_dag)
 
         tests_tasks = self.build_tests_tasks(region_dag)
 
+        save_polygons_geojson_to_local.set_upstream([region, polygon_region])
+        airflow_helpers.chain(save_polygons_geojson_to_local,
+                              convert_polygons_geojson_to_topojson,
+                              upload_polygons_topojson_to_s3)
         dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
         load_region.set_upstream(tests_tasks)
@@ -61,6 +77,38 @@ class RegionSubDag(DimSubDag):
             }
         )
 
+        polygon_region = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_polygon_region',
+            python_callable=self.get_polygon_region_query
+        )
+
+        subregion_polygons_filename_prefix = '5a_subregion_polygons'
+        save_polygons_geojson_to_local = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='save_polygons_geojson_to_local',
+            python_callable=self.save_polygons_geojson_to_local,
+            op_kwargs={
+                'subregion_polygons_filename_prefix': subregion_polygons_filename_prefix
+            }
+        )
+
+        convert_polygons_geojson_to_topojson = BashOperator(
+            dag=dag,
+            task_id='convert_polygons_geojson_to_topojson',
+            bash_command='geo2topo -o /tmp/{0}.topojson /tmp/{0}.geojson'.format(
+                subregion_polygons_filename_prefix),
+        )
+
+        upload_polygons_topojson_to_s3 = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='upload_polygons_topojson_to_s3',
+            python_callable=self.upload_polygons_topojson_to_s3,
+            op_kwargs={
+                'subregion_polygons_filename_prefix': subregion_polygons_filename_prefix
+            }
+        )
+
         dim_region = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_region',
@@ -82,11 +130,82 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        return agent_region, region, dim_region, load_region
+        return (agent_region,
+                region,
+                polygon_region,
+                save_polygons_geojson_to_local,
+                convert_polygons_geojson_to_topojson,
+                upload_polygons_topojson_to_s3,
+                dim_region,
+                load_region
+                )
 
     @logger
     def __extract_query_dim_from_ebdb_to_ods(self, dim_name, bucket):
         command = BaseETL.get_query_from_file_name(
-            file_name='{0}/ebdb/supply_demand_funnel/{1}.sql'.format(SOURCE_QUERIES_DIR, dim_name))
+            file_name='{0}/ebdb/supply_demand_funnel/{1}.sql'.format(SOURCE_QUERIES_DIR,
+                                                                     dim_name))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=bucket, command=command)
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=bucket,
+                                                 command=command)
+
+    @logger
+    def get_polygon_region_query(self):
+        dim = 'polygon_region'
+
+        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR,
+                                                                 dim)
+
+        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim,
+                                                 bucket=DimSubDag.S3_BUCKET,
+                                                 command=query,
+                                                 table_name=None)
+
+    @logger
+    def __get_polygons_geojson_data(self):
+        command = BaseETL.get_query_from_file_name(
+            file_name='{0}/polygons_geojson.sql'.format(ODS_QUERIES_DIR))
+
+        logger.info('m=__get_polygons_geojson_data, msg=querying geojson from db')
+        return BaseETL.from_db_query(
+            db_enum=EnumDB.BI_ODS,
+            query=command
+        )
+
+    @logger
+    def save_polygons_geojson_to_local(self, subregion_polygons_filename_prefix):
+        table_view = self.__get_polygons_geojson_data()
+        if not table_view:
+            logger.error('m=__save_polygons_geojson, msg=table_view is empty or None')
+
+        with open('/tmp/{}.geojson'.format(subregion_polygons_filename_prefix),
+                  'w') as fp:
+            logger.info(
+                'm=__save_polygons_geojson, msg=saving table_view as json to /tmp')
+            json.dump(table_view[1][0], fp)
+
+    @logger
+    def upload_polygons_topojson_to_s3(self, subregion_polygons_filename_prefix):
+        logger.info('m=upload_polygons_topojson_to_s3, msg=saving history file')
+        filename = '{}.topojson'.format(subregion_polygons_filename_prefix)
+        dir_path = '/tmp'
+        bucket_folder_path_prefix = '5a-looker/subregion_polygons'
+        today = datetime.now().date()
+        BaseETL.file_to_s3(
+            filename=filename,
+            dir_path=dir_path,
+            bucket_folder_path='{}/year={}/month={}/day={}'.format(
+                bucket_folder_path_prefix,
+                today.strftime('%Y'),
+                today.strftime('%m'),
+                today.strftime('%d')
+            )
+        )
+
+        logger.info('m=upload_polygons_topojson_to_s3, msg=saving latest file')
+        BaseETL.file_to_s3(
+            filename=filename,
+            dir_path=dir_path,
+            bucket_folder_path=bucket_folder_path_prefix
+        )
