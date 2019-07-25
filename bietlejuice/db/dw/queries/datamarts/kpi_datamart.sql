@@ -87,16 +87,35 @@ first_listings AS (
 	GROUP BY 1, 2
 ),
 online_metrics AS (
+  with amplitude as (
   SELECT
   	DATE_TRUNC('week', CAST(SUBSTRING(event_time, 1, 10) AS DATE)) AS event_date,
   	TRIM(evt.e_house_id) AS house_id,
-    COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END) AS listing_page_views,
-    COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END) AS schedule_page_views
+    CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
+    CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views
   FROM datalake_clean.amplitude_events evt
   	WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed')
   	AND TRIM(app) = '170698'
   	AND ym >= '2019-05'
-  GROUP BY 1, 2
+  union
+  -- enriching with amplitude data via SPARK
+   SELECT
+  	DATE_TRUNC('week', CAST(SUBSTRING(event_time, 1, 10) AS DATE)) AS event_date,
+  	cast(json_extract_path_text(event_properties, 'house_id') as varchar) AS house_id,
+    CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
+    CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views
+   FROM datalake_clean_spark.amplitude_events
+  	WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed')
+  	AND app = 170698
+  	AND year >= 2019
+  )
+  select
+   event_date,
+   house_id,
+   count(distinct listing_page_views) as listing_page_views,
+   count(distinct schedule_page_views) as schedule_page_views
+  from amplitude
+  group by 1, 2
 ),
 houses AS (
   SELECT DISTINCT
