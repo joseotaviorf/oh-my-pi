@@ -8,7 +8,6 @@ from bietlejuice.jobs.base.base_etl import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
 from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('ActionLineDag')
 s3_bucket = env.get_airflow_env_var('wololo-s3-prod-bucket')
@@ -21,7 +20,6 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 11,18 * * *')
 
 
 def load_google_sheet_files_to_datalake(file_name):
-    athena_client = AthenaClient(s3_bucket)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
     files = []
@@ -31,7 +29,6 @@ def load_google_sheet_files_to_datalake(file_name):
 
     gs.move_sheets_data_to_destination(google_sheets_files=files,
                                        enumdb_destination=EnumDB.QuintoAndar_datalake,
-                                       athena_client=athena_client,
                                        date_versioning=True,
                                        csv=True)
 
