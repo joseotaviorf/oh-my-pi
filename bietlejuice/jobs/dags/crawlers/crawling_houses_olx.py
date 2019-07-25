@@ -1,4 +1,5 @@
 import json
+import re
 from collections import OrderedDict
 from datetime import datetime
 
@@ -66,6 +67,10 @@ def enrich_and_move_to_clean(**kwargs):
     else:
         logger.info("m=enrich_and_move_to_clean, msg=got {} leads from datalake raw".format(len(leads)))
         leads = crawler_entity.cleaning(leads)
+        regex = "^(.*)-(\d+)\D*$"
+        leads['nb_street'] = leads['street'].apply(
+            lambda st: re.search(regex, str(st)).group(2) if re.search(regex, str(st)) else
+            None)
         leads = leads.where((pd.notnull(leads)), None)
 
         r_cols = OrderedDict([
