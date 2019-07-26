@@ -117,7 +117,7 @@ class CrawlerEntity(object):
         if 'listing_type' in entity:
             entity.listing_type = entity.listing_type.replace(self.map_types)
         if 'description' in entity:
-            entity.description = entity.description.apply(lambda desc: re.sub('<.*?>', '', desc.lower() or ''))
+            entity.description = entity.description.apply(lambda desc: re.sub('<.*?>', '', desc.lower()) if desc else None)
 
         num_columns = ['lat', 'lng']
         for c in num_columns:
