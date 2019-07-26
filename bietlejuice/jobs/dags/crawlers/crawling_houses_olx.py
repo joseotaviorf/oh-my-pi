@@ -101,7 +101,6 @@ def enrich_and_move_to_clean(**kwargs):
             ('lat', str),
             ('lng', str),
             ('street', str),
-            ('nb_street', str),
             ('neighborhood', str),
             ('city', str),
             ('state', str),
