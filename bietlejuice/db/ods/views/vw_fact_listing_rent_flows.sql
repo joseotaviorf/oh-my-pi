@@ -2,7 +2,7 @@ drop view if exists vw_fact_listing_rent_flows;
 create or replace view vw_fact_listing_rent_flows as
 with _reservation as (
    select
-       r1.id as id,
+       max(r1.id) as id,
        r1.created_at as created_at,
        r1.house_id as id_house,
        r1.tenant_id as id_tenant,
@@ -13,6 +13,7 @@ with _reservation as (
     from reservation
     group by house_id, tenant_id) as r2
     on r1.house_id = r2.house_id and r1.tenant_id = r2.tenant_id and r1.created_at = r2.max_created_at
+    group by 2, 3, 4, 5
 ),
 _fact as (
 	select
