@@ -71,6 +71,8 @@ def enrich_and_move_to_clean(**kwargs):
             lambda st: re.search(regex, str(st)).group(1) if re.search(regex, str(st)) else
             None)
         leads = crawler_entity.cleaning(leads)
+        leads['business'] = leads['business'].replace('rental', 'aluguel')
+        leads['business'] = leads['business'].replace('sale', 'venda')
         leads = leads.where((pd.notnull(leads)), None)
 
         r_cols = OrderedDict([
