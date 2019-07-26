@@ -83,6 +83,7 @@ pipeline:
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
     source: "bietlejuice/*"
+    exclude: "jobs/composer/*"
     target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
     delete: true
@@ -96,6 +97,7 @@ pipeline:
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
     source: "bietlejuice/*"
+    exclude: "jobs/composer/*"
     target: /var/www/airflow/dags/bietlejuice
     args: '--force -vI'
     delete: true
