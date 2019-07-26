@@ -1,0 +1,5 @@
+# Config for liquidity_by_region
+---
+streams:
+  - direction: 'downstream'
+    task_ids: ['dw_liquidity_by_region_code', 'dw_liquidity_by_sk_region']
