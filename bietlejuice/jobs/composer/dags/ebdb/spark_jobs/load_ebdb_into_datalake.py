@@ -5,7 +5,8 @@ from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
+from bietlejuice.jobs.composer.base import DatabaseEnum
+from bietlejuice.jobs.composer.base_spark import BaseDBUtils
 from bietlejuice.jobs.composer.consumers import MySQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 

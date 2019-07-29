@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.base import BaseDBUtils
+from bietlejuice.jobs.composer.base_spark import BaseDBUtils
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger('load_events_into_datalake_raw')
