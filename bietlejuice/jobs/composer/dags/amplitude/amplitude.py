@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (QuintoAndarDatabricksCreat
                                                       QuintoAndarDatabricksSubmitRunOperator)
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.base import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 logger = QuintoAndarLogger('amplitude')
 

@@ -3,7 +3,7 @@ from collections import OrderedDict
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
-from bietlejuice.jobs.composer.base_spark import BaseSparkContext
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("DatabaseIntoDataLakeLoader")
 

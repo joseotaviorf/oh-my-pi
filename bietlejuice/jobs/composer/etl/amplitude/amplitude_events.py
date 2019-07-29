@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
-from bietlejuice.jobs.composer.base_spark import BaseSparkContext, DataFrameService
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 
