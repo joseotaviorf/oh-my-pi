@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, DATALAKE_Q
 from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
     HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
     VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
-    PartnerSubDag, PartnerAgentSubDag, PolygonRegionSubDag, InspectionSubDag, LeadConversionSubDag, \
+    PartnerSubDag, PartnerAgentSubDag, InspectionSubDag, LeadConversionSubDag, \
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
@@ -339,17 +339,6 @@ def doorman_sub_dag(sub_dag_name):
     return sub_dag.build_doorman_with_tests()
 
 
-def polygon_region_sub_dag(sub_dag_name):
-    sub_dag = PolygonRegionSubDag(
-        bucket=bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_NAME,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
-    )
-    return sub_dag.build_polygon_region_with_tests()
-
-
 def special_condition_sub_dag(sub_dag_name):
     sub_dag = SpecialConditionSubDag(
         bucket=bucket,
@@ -556,12 +545,6 @@ doorman_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='Doorman'
 )
 
-polygon_region_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=polygon_region_sub_dag,
-    sub_dag_name='PolygonRegion'
-)
-
 special_condition_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=special_condition_sub_dag,
@@ -575,18 +558,19 @@ xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     provide_context=True
 )
 
+# TODO Recreate amplitude xcom after the data flow is fully fixed
 # check the dependency of amplitude_load_events
-xcom_amplitude_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='xcom_amplitude',
-    provide_context=True,
-    python_callable=xcom_dependencies,
-    op_kwargs={'task_id': 'XCom_amplitude_load_events',
-               'dag_id': 'bi-amplitude-load-events'},
-    retry_delay=timedelta(minutes=10),
-    max_retry_delay=timedelta(minutes=10),
-    retries=15
-)
+# xcom_amplitude_task = BaseDAG.build_python_operator(
+#     dag=main_dag,
+#     task_id='xcom_amplitude',
+#     provide_context=True,
+#     python_callable=xcom_dependencies,
+#     op_kwargs={'task_id': 'XCom_amplitude_load_events',
+#                'dag_id': 'bi-amplitude-load-events'},
+#     retry_delay=timedelta(minutes=10),
+#     max_retry_delay=timedelta(minutes=10),
+#     retries=15
+# )
 
 # trigger bi-growth dag after all tasks have been successfully completed
 trigger_bi_growth_dag_task = TriggerDagRunOperator(
@@ -611,7 +595,8 @@ trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
     trigger_dag_id='bi-agents-allocation-optimization'
 )
 
-xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
+# TODO Recreate tasks flow after the data flow is fully fixed
+# xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 

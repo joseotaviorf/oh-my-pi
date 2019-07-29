@@ -1,5 +1,4 @@
 import json
-import re
 from collections import OrderedDict
 from datetime import datetime
 
@@ -10,12 +9,12 @@ from qa_python_utils.aws.batch import BatchClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.dags.util import environment as env, xcom
+from bietlejuice.jobs.dags.util import environment as env, xcom as xcom
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.crawlers.crawler_entity import CrawlerEntity
 from bietlejuice.jobs.sensors.aws_batch_sensor import QuintoAndarAWSBatchSensor
 
-MAIN_DAG_NAME = 'crawling-houses-imovelweb'
+MAIN_DAG_NAME = 'crawling-houses-olx'
 MAIN_START_DATE = datetime(2018, 3, 20)
 MAIN_SCHEDULE_INTERVAL = '0 1 * * *'
 
@@ -26,32 +25,32 @@ crawler_params = env.get_airflow_env_var('CRAWLING_HOUSES_PARAMS')
 data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 
-def submit_iw(**kwargs):
+def submit_olx(**kwargs):
     states = kwargs.get('states')
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     assert isinstance(states, list)
 
-    logger.info('Starting job...')
+    logger.info('m=submit_olx, msg=Starting job...')
     r = BatchClient().start_batch_job(
-        job_name='crawl-imovelweb',
+        job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         memory=8192,
-        command=['./crawlers/imovelweb_crawler.py', '--listing_date', execution_date,
-                 '--states'] + states
+        command=['./crawlers/olx_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
-    logger.info('m=submit_iw, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
-                                                                          r.get('jobName')]), r.get('status')))
+    logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
+                                                                           r.get('jobName')]), r.get('status')))
 
     # get task instance
     ti = kwargs.get('ti')
+
     xcom.xcom_push(ti,
-                   key='crawler_houses_iw_{}'.format(execution_date),
+                   key='crawler_houses_olx_{}'.format(execution_date),
                    k_value=r.get('jobId'))
 
 
 def enrich_and_move_to_clean(**kwargs):
-    ws = 'imovelweb'
+    ws = 'olx'
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
@@ -67,10 +66,6 @@ def enrich_and_move_to_clean(**kwargs):
     else:
         logger.info("m=enrich_and_move_to_clean, msg=got {} leads from datalake raw".format(len(leads)))
         leads = crawler_entity.cleaning(leads)
-        regex = "^(.*)-(\d+)\D*$"
-        leads['nb_street'] = leads['street'].apply(
-            lambda st: re.search(regex, str(st)).group(2) if re.search(regex, str(st)) else
-            None)
         leads = leads.where((pd.notnull(leads)), None)
 
         r_cols = OrderedDict([
@@ -106,7 +101,6 @@ def enrich_and_move_to_clean(**kwargs):
             ('lat', str),
             ('lng', str),
             ('street', str),
-            ('nb_street', str),
             ('neighborhood', str),
             ('city', str),
             ('state', str),
@@ -115,9 +109,12 @@ def enrich_and_move_to_clean(**kwargs):
 
         crawler_entity.athena_client.create_parquet_from_df(
             key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
-            df=leads, raw_columns=r_cols, clean_columns=r_cols)
+            df=leads,
+            raw_columns=r_cols,
+            clean_columns=r_cols)
 
-        q = "alter table datalake_clean.crawlers add if not exists partition (ws='imovelweb', started_on='{}')".format(
+        q = "alter table datalake_clean.crawlers add if not exists partition (ws='{}', started_on='{}')".format(
+            ws,
             execution_date)
         try:
             crawler_entity.athena_client.execute_query_and_wait_for_results(q)
@@ -138,20 +135,21 @@ dag = DAG(
     catchup=False
 )
 
-crawl_iw = BaseDAG.build_python_operator(
+# operators
+crawl_olx = BaseDAG.build_python_operator(
     dag=dag,
-    task_id='crawl-iw',
-    python_callable=submit_iw,
+    task_id='crawl-olx',
+    python_callable=submit_olx,
     provide_context=True,
     op_kwargs=json.loads(crawler_params)
 )
 
-iw_success_test = QuintoAndarAWSBatchSensor(
-    task_id='iw-success-test',
-    poke_interval=5 * 60,
+olx_success_test = QuintoAndarAWSBatchSensor(
+    task_id='olx-success-test',
+    poke_interval=20 * 60,
     timeout=22 * 3600,
     provide_context=True,
-    xcom_task_id='crawl-iw'
+    xcom_task_id='crawl-olx'
 )
 
 move_to_clean = BaseDAG.build_python_operator(
@@ -161,4 +159,4 @@ move_to_clean = BaseDAG.build_python_operator(
     provide_context=True
 )
 
-crawl_iw >> iw_success_test >> move_to_clean
+crawl_olx >> olx_success_test >> move_to_clean
