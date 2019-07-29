@@ -9,6 +9,7 @@ logger = QuintoAndarLogger("DatabaseIntoDataLakeLoader")
 
 spark = BaseSparkContext.spark
 
+
 class DatabaseIntoDataLakeLoader:
     DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
     CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
