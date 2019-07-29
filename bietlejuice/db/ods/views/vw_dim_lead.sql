@@ -111,7 +111,8 @@ left join lateral
 )  an
   on true
 left join (
-	select l.id as id_lead
+	select distinct
+	    l.id as id_lead
 	from lead l
 	join usuario u_b2b
 		on u_b2b.telefone_principal = l.telefone_anunciante
