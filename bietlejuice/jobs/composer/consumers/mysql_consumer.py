@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base import DatabaseTypeEnum
+from bietlejuice.jobs.composer.base.db import DatabaseTypeEnum
 from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 
 logger = QuintoAndarLogger("MySQLConsumer")
