@@ -222,7 +222,7 @@ acquisitions as (
     on f.imovel_id = d.imovel_id
 ), 
 leads_b2b as (
-  select 
+  select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id,
     pa_b2b_prime.partner_id as prime_partner_id
