@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
+from bietlejuice.jobs.composer.base.db import DatabaseEnum
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
