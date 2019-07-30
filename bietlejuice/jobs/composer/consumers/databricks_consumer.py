@@ -9,6 +9,7 @@ logger = QuintoAndarLogger("DatabricksConsumer")
 
 spark = BaseSparkContext.spark
 
+
 class DatabricksConsumer(DatabaseConsumer):
     def __init__(self, connection):
         self.connection = connection
