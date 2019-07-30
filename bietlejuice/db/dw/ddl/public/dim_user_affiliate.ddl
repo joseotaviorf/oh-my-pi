@@ -19,6 +19,8 @@ create table public.dim_user_affiliate (
     tracking_source varchar(255),
     tracking_medium varchar(255),
     tracking_campaign varchar(255),
+    tracking_content varchar(255),
+    tracking_term varchar(255),
     tracking_platform varchar(255),
     tracking_device_type varchar(255),
     tracking_country varchar(255),

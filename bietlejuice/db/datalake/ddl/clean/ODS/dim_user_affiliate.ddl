@@ -19,6 +19,8 @@ create external table if not exists datalake_clean.ods_dim_user_affiliate (
     tracking_source string,
     tracking_medium string,
     tracking_campaign string,
+    tracking_content string,
+    tracking_term string,
     tracking_platform string,
     tracking_device_type string,
     tracking_country string,
