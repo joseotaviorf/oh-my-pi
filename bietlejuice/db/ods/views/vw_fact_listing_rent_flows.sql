@@ -1,19 +1,24 @@
 drop view if exists vw_fact_listing_rent_flows;
 create or replace view vw_fact_listing_rent_flows as
 with _reservation as (
-   select
-       max(r1.id) as id,
-       r1.created_at as created_at,
-       r1.house_id as id_house,
-       r1.tenant_id as id_tenant,
-       r2.reservation_attempts as reservation_attempts
-    from reservation r1
-    inner join
-    (select house_id, tenant_id, max(created_at) as max_created_at, count(*) as reservation_attempts
-    from reservation
-    group by house_id, tenant_id) as r2
-    on r1.house_id = r2.house_id and r1.tenant_id = r2.tenant_id and r1.created_at = r2.max_created_at
-    group by 2, 3, 4, 5
+  with max_ids as (
+	select
+		house_id,
+		tenant_id,
+		max(id) as id,
+		count(1) as reservation_attempts
+	from reservation
+	group by 1, 2
+  )
+  select
+    r1.id,
+    r1.created_at as created_at,
+    r1.house_id as id_house,
+    r1.tenant_id as id_tenant,
+    mi.reservation_attempts as reservation_attempts
+  from reservation r1
+  join max_ids mi
+	on r1.id = mi.id
 ),
 _fact as (
 	select
