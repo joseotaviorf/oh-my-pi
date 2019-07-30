@@ -4,6 +4,8 @@ create table if not exists user_affiliate_origin (
 	utm_source varchar(255),
 	utm_medium varchar(255),
 	utm_campaign varchar(255),
+	utm_content varchar(255),
+	utm_term varchar(255),
 	platform varchar(255),
 	device_type varchar(255),
 	country varchar(255),

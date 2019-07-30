@@ -222,7 +222,7 @@ acquisitions as (
     on f.imovel_id = d.imovel_id
 ), 
 leads_b2b as (
-  select 
+  select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id,
     pa_b2b_prime.partner_id as prime_partner_id
@@ -315,7 +315,8 @@ potential_listings as (
     coalesce(lfet.tracking_source, bl.utm_source) as utm_source,
     coalesce(lfet.tracking_medium, bl.utm_medium) as utm_medium,
     lfet.tracking_platform,
-    bl.branded_lead as is_branded,
+    coalesce(lower(btrim(lfet.tracking_campaign)) ~* '(institucional)|(branded)',
+             bl.branded_lead) as is_branded,
     (bl.b2b_lead or f.is_b2b) as is_b2b, -- Using business rules for both constraints of old b2b and new one
     bl.reprocessed_flg,
     a.is_doorman,

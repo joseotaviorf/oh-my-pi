@@ -20,6 +20,8 @@ CREATE TABLE staging.dim_user_affiliate (
     tracking_source VARCHAR(255),
     tracking_medium VARCHAR(255),
     tracking_campaign VARCHAR(255),
+    tracking_content VARCHAR(255),
+    tracking_term VARCHAR(255),
     tracking_platform VARCHAR(255),
     tracking_device_type VARCHAR(255),
     tracking_country VARCHAR(255),
