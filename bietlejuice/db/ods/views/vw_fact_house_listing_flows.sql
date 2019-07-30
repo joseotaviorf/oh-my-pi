@@ -25,7 +25,7 @@ base_lead_tasks_first as (
         rn_lead.dt_created,
         rn_lead.dt_closed
     from rn_lead
-    where rn_first.rn = 1
+    where rn_first = 1
 ),
 -- last conversion task created for a lead
 base_lead_tasks_last as (
@@ -35,7 +35,7 @@ base_lead_tasks_last as (
       rn_lead.dt_created,
       rn_lead.dt_closed
   from rn_lead
-  where rn_last.rn = 1
+  where rn_last = 1
 ),
 base_photo_tasks as (
   select distinct 
