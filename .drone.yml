@@ -1,28 +1,33 @@
 clone:
   git-clone:
     image: plugins/git
-    depth: 20
 
 pipeline:
-
-  progressive-lint:
+  check-style-python2:
+    group: tests
     image: python:2.7.12
     commands:
-      - pip install -q flake8==3.5.0
-      - export FILES_CHANGED=$(git diff --name-only master | grep '.py$' || true)
-      - flake8 --max-line-length=120 $FILES_CHANGED
+      - make requirements-lint-python2
+      - make check-style-python2
     when:
       event: push
 
-  unit-test:
+  check-style-python3:
+    group: tests
+    image: python:3.6.7
+    commands:
+      - make requirements-lint-python3
+      - make check-style-python3
+    when:
+      event: push
+
+  unit-tests-python2:
+    group: tests
     image: python:2.7.12
     commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
-      - export AWS_DEFAULT_REGION=us-east-1
-      - pip install -r requirements.txt
-      - pip install -r requirements_test.txt
-      - pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=25 --cov-config .coveragerc tests
-      - coverage-badge -o badge-lines.svg
+      - make requirements-python2
+      - make unit-tests-python2
+      - make cov-badge
     when:
       event: push
 
@@ -39,26 +44,44 @@ pipeline:
       event: push
       branch: [ master ]
 
-  install-forno:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: .
-    target: ~/bi
-    include: [ 'requirements.txt', 'variables.json' ]
-    exclude: [ '*' ]
-    args: '-vI'
-    script:
-      - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-    secrets: [ rsync_key ]
+  make-package-python3:
+    image: python:3.6.7
+    commands:
+      - make package-python3
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  prepare-release-python3-forno:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
     when:
       event: push
-      branch: [ forno ]
+      branch: forno
 
-  install-production:
+  prepare-release-python3-prod:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+    when:
+      event: [ push, tag ]
+      branch: master
+
+  export-releases-to-s3:
+    image: plugins/s3
+    pull: true
+    bucket: 5a-artifacts
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: private
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  install-dependencies-ec2-prod:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -78,21 +101,8 @@ pipeline:
       event: push
       branch: [ master ]
 
-  load-dags-forno:
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: "bietlejuice/*"
-    exclude: "jobs/composer/*"
-    target: /var/www/airflow/dags/bietlejuice
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-dags-production:
+  load-jobs-ec2-prod:
+    group: updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -106,22 +116,8 @@ pipeline:
       event: push
       branch: [ master ]
 
-  load-plugins-forno:
-    group: deploy
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: plugins/*
-    target: /var/www/airflow/plugins
-    args: '--force -vI'
-    delete: true
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ forno ]
-
-  load-plugins-prod:
-    group: deploy
+  load-plugins-ec2-prod:
+    group: updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -133,6 +129,58 @@ pipeline:
     when:
       event: push
       branch: [ master ]
+
+  load-dags-composer-forno:
+    group: updated_jobs
+    image: quintoandar/drone-gcs-sync
+    pull: true
+    bucket: us-east4-airflow-forno-d10a26d5-bucket
+    source: bietlejuice/jobs/composer/
+    target: dags/bietlejuice/jobs/composer/
+    delete: true
+    dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [ forno ]
+
+  load-dags-composer-prod:
+    group: updated_jobs
+    image: quintoandar/drone-gcs-sync
+    pull: true
+    bucket: us-east4-airflow-prod-3f72afaa-bucket
+    source: bietlejuice/jobs/composer/
+    target: dags/bietlejuice/jobs/composer/
+    delete: true
+    dry_run: false
+    secrets:
+      - source: google_cloud_composer_credentials
+        target: google_application_credentials
+    when:
+      event: push
+      branch: [ master ]
+
+  load-spark-jobs-s3-forno:
+    group: updated_jobs
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py forno
+    when:
+      event: push
+      branch: forno
+
+  load-spark-jobs-s3-prod:
+    group: updated_jobs
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py prod
+    when:
+      event: push
+      branch: master
 
   sonar-preview:
     image: quintoandar/sonar-scanner
@@ -178,102 +226,6 @@ pipeline:
     when:
       event: push
       branch: [ master ]
-
-  publish-composer-jobs-forno:
-    group: publish-composer-jobs
-    image: quintoandar/drone-gcs-sync
-    pull: true
-    bucket: us-east4-airflow-forno-d10a26d5-bucket
-    source: bietlejuice/jobs/composer/
-    target: dags/bietlejuice/jobs/composer/
-    delete: true
-    dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
-    when:
-      event: push
-      branch: [ forno ]
-
-  publish-composer-jobs-prod:
-    group: publish-composer-jobs
-    image: quintoandar/drone-gcs-sync
-    pull: true
-    bucket: us-east4-airflow-prod-3f72afaa-bucket
-    source: bietlejuice/jobs/composer/
-    target: dags/bietlejuice/jobs/composer/
-    delete: true
-    dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
-    when:
-      event: push
-      branch: [ master ]
-
-  version:
-    image: python:3.6.7
-    commands:
-      - make package-name
-      - make version
-    when:
-      event: [ push, tag ]
-      branch: [ master, forno ]
-
-  package:
-    image: python:3.6.7
-    commands:
-      - make package
-    when:
-      event: [ push, tag ]
-      branch: [ master, forno ]
-
-  prepare-to-export-latest-release:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
-    when:
-      event: [ push, tag ]
-      branch: master
-
-  prepare-to-export-forno-release:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
-    when:
-      event: push
-      branch: forno
-
-  export-latest-release-to-s3:
-    image: plugins/s3
-    pull: true
-    bucket: 5a-artifacts
-    source: dist/*.whl
-    target: bi-etl-ejuice/
-    strip_prefix: dist/
-    acl: private
-    cache_control: no-cache
-    when:
-      event: [ push, tag ]
-      branch: [ master, forno ]
-
-  upload-spark-jobs-s3-forno:
-    image: python:3.6.7
-    commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py forno
-    when:
-      event: push
-      branch: forno
-
-  upload-spark-jobs-s3-prod:
-    image: python:3.6.7
-    commands:
-      - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py prod
-    when:
-      event: push
-      branch: master
 
   notify:
     image: plugins/slack
