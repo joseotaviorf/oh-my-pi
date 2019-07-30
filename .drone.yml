@@ -25,7 +25,8 @@ pipeline:
     group: tests
     image: python:2.7.12
     commands:
-      -
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
       - make requirements-python2
       - make unit-tests-python2
       - make cov-badge

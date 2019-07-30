@@ -8,7 +8,6 @@ environment-python2:
 
 .PHONY: requirements-python2
 requirements-python2:
-	@export AIRFLOW_GPL_UNIDECODE=yes
 	@pip install -U -r requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2
@@ -35,8 +34,6 @@ unit-tests-python2:
 	@echo "Automated Tests"
 	@echo "=========="
 	@echo ""
-	@export AIRFLOW_GPL_UNIDECODE=yes
-	@export AWS_DEFAULT_REGION=us-east-1
 	@python -m pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=25 --cov-config .coveragerc tests
 
 ############# PYTHON3 commands #######################
