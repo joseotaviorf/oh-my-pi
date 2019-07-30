@@ -8,6 +8,7 @@ environment-python2:
 
 .PHONY: requirements-python2
 requirements-python2:
+	@export AIRFLOW_GPL_UNIDECODE=yes
 	@pip install -U -r requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2

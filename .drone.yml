@@ -25,6 +25,7 @@ pipeline:
     group: tests
     image: python:2.7.12
     commands:
+      -
       - make requirements-python2
       - make unit-tests-python2
       - make cov-badge
