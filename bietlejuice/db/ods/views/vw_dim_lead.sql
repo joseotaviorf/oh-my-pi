@@ -73,9 +73,6 @@ create or replace view vw_dim_lead as
   lfet.tracking_city,
   coalesce(l.utm_source, an.network) as network, -- add the network of the campaign (currenlty only present for leads from the landing page), or network of the afiliado (if the lead was recommended by an affiliate)
   coalesce(lo.usuario_que_indicou_id, l.usuario_que_indicou_id) as usuario_que_indicou_id,
-  l.flg_city_served,
-  l.flg_latlng_served,
-  l.flg_location_served,
   lsf.score_factor,
   coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or b2b_prime.id_lead is not null, false) as is_b2b,
   case
