@@ -111,7 +111,7 @@ class CrawlerEntity(object):
                 lambda feats: ','.join(self.__sanitize_text(feat) for feat in feats.split(',')).replace('_', '-')
                 if feats else None)
         if 'cep' in entity:
-            entity.cep = entity.cep.apply(lambda cep: cep.zfill(8) if cep else None)
+            entity.cep = entity.cep.apply(lambda cep: str(cep).zfill(8) if cep else None)
         if 'type' in entity:
             entity.type = entity.type.replace(self.map_types)
         if 'listing_type' in entity:
