@@ -77,7 +77,7 @@ class MySQLConsumer(DatabaseConsumer):
         return remote_table
 
     @logger
-    def get_data_from_query(self, query):
+    def get_data_from_query(self, query, table_name=None):
         remote_table = (
             self._get_default_read_format_and_options().option("query", query).load()
         )

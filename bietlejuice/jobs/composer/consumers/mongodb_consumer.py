@@ -43,13 +43,12 @@ class MongoDBConsumer(DatabaseConsumer):
         raise NotImplementedError()
 
     @logger
-    def get_data_from_query(self, query):
+    def get_data_from_query(self, query, table_name):
         db = self.connection['db']
-        table, pipeline = query
         df = spark.read.format("mongo")\
             .option("uri", self.connection['uri'])\
             .option('database', db)\
-            .option("collection", table)\
-            .option('pipeline', pipeline)\
+            .option("collection", table_name)\
+            .option('pipeline', query)\
             .load()
         return df
