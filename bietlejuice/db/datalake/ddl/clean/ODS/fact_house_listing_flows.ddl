@@ -18,7 +18,7 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	sk_lead_date string,
 	sk_prospect_date string,
 	sk_first_task_created_date string,
-	sk_first_task_created_date string,
+      sk_first_task_closed_date string,
 	sk_last_task_created_date string,
 	sk_last_task_closed_date string,
 	sk_first_inside_sales_contact_date string,
