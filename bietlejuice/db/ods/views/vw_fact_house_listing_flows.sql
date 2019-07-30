@@ -8,41 +8,34 @@ with legacy_doorman as (
   where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
+rn_lead as (
+    select lead_tasks.rep_id,
+        lead_tasks.lead_id,
+        lead_tasks.dt_created,
+        lead_tasks.dt_closed,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created asc) as rn_first,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn_last
+    from crm.lead_tasks
+),
 -- first conversion task created for a lead
 base_lead_tasks_first as (
-  with rn_lead as (
-    select lead_tasks.rep_id,
-      lead_tasks.lead_id,
-      lead_tasks.dt_created,
-      lead_tasks.dt_closed,
-       row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created asc) as rn
-    from crm.lead_tasks
-  )
-  select 
-    rn_lead.rep_id,
-    rn_lead.lead_id,
-    rn_lead.dt_created,
-    rn_lead.dt_closed
-  from rn_lead
-  where rn_lead.rn = 1
+    select
+        rn_lead.rep_id,
+        rn_lead.lead_id,
+        rn_lead.dt_created,
+        rn_lead.dt_closed
+    from rn_lead
+    where rn_first.rn = 1
 ),
 -- last conversion task created for a lead
 base_lead_tasks_last as (
-  with rn_lead as (
-    select lead_tasks.rep_id,
-      lead_tasks.lead_id,
-      lead_tasks.dt_created,
-      lead_tasks.dt_closed,
-       row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn
-    from crm.lead_tasks
-  )
   select
-    rn_lead.rep_id,
-    rn_lead.lead_id,
-    rn_lead.dt_created,
-    rn_lead.dt_closed
+      rn_lead.rep_id,
+      rn_lead.lead_id,
+      rn_lead.dt_created,
+      rn_lead.dt_closed
   from rn_lead
-  where rn_lead.rn = 1
+  where rn_last.rn = 1
 ),
 base_photo_tasks as (
   select distinct 
@@ -328,7 +321,7 @@ potential_listings as (
     f.days_lead_to_processing,
     h.exclusivity as is_exclusive,
     case
-      when btl.rep_id is not null then 'Lead'
+      when btf.rep_id is not null then 'Lead'
       when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
@@ -343,7 +336,7 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, btl.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
+    coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
     us_cad.id is not null as is_call_center
   from fact_with_reproc f
   left join lead_first_event_tracking lfet 
