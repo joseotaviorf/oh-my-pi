@@ -1,4 +1,4 @@
-import pymongo
+from pymongo import MongoClient
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -17,7 +17,7 @@ class MongoDBConsumer(DatabaseConsumer):
     @logger
     def get_table_names_and_sizes(self):
         db = self.connection['db']
-        client = pymongo.MongoClient(self.connection['uri'])
+        client = MongoClient(self.connection['uri'])
         collections = [
             {'table_name': collection, 'size': client['tasks'].command('collstats', collection)['size'] / 1024 / 1024}
             for collection in client[db].list_collection_names()]
