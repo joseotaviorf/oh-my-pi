@@ -8,10 +8,10 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(ct.id_origin as bigint) = try(cast(dc.sk_contract as bigint))
+      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
   left join datalake_raw.ebdb_fluxolocacao eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and cast(ct.id_origin as bigint) = try(cast(eo.id as bigint))
+        and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(eo.id as bigint))
 ),
 contract_house_listing as (
   select
