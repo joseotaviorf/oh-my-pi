@@ -51,29 +51,29 @@ listings_metrics AS (
     dp.days_published
   FROM public.dim_house_listing hl
   LEFT JOIN rent_flows_contracts rf ON hl.sk_house_listing = rf.sk_house_listing
-  LEFT JOIN regions r ON hl.sk_house_listing = r.sk_house_listing
+  INNER JOIN regions r ON hl.sk_house_listing = r.sk_house_listing
   LEFT JOIN public.dim_region dr ON r.sk_region = dr.sk_region
   LEFT JOIN days_published dp ON hl.sk_house_listing = dp.sk_house_listing
-  WHERE r.sk_region IS NOT NULL AND r.sk_region != -1
+  WHERE r.sk_region != -1
 ),
 liquidity_metrics AS (
   SELECT
     m.city_group,
     m.region_code,
     m.house_bedrooms_category,
-    SUM(CASE WHEN m.days_house_listing_to_contract_signed BETWEEN 0 AND 42 THEN 1 ELSE 0 END) AS rented_6_weeks,
-    SUM(CASE WHEN m.days_house_listing_to_contract_signed NOT BETWEEN 0 AND 42 AND m.days_published >= 42 THEN 1 ELSE 0 END) AS not_rented_6_weeks,
-    rented_6_weeks + not_rented_6_weeks AS sample_size,
-    -- percent_rented_6_weeks
-    rented_6_weeks / NULLIF(sample_size, 0)::REAL AS percent_rented_6_weeks,
-    SQRT((1.96^2 * percent_rented_6_weeks * (1 - percent_rented_6_weeks)) / sample_size) AS percent_rented_6_weeks_error,
-    percent_rented_6_weeks_error / NULLIF(percent_rented_6_weeks, 0) AS percent_rented_6_weeks_error_percent,
+    SUM(CASE WHEN m.days_house_listing_to_contract_signed BETWEEN 0 AND 42 THEN 1 ELSE 0 END) AS rented_in_6_weeks,
+    SUM(CASE WHEN m.days_house_listing_to_contract_signed NOT BETWEEN 0 AND 42 AND m.days_published >= 42 THEN 1 ELSE 0 END) AS not_rented_in_6_weeks,
+    rented_in_6_weeks + not_rented_in_6_weeks AS sample_size,
+    -- percent_rented_in_6_weeks
+    rented_in_6_weeks / NULLIF(sample_size, 0)::REAL AS percent_rented_in_6_weeks,
+    SQRT((1.96^2 * percent_rented_in_6_weeks * (1 - percent_rented_in_6_weeks)) / sample_size) AS percent_rented_in_6_weeks_error,
+    percent_rented_in_6_weeks_error / NULLIF(percent_rented_in_6_weeks, 0) AS percent_rented_in_6_weeks_error_percent,
     CASE
-      WHEN percent_rented_6_weeks_error <= 0.05 THEN 'low'
-      WHEN percent_rented_6_weeks_error <= 0.10 THEN 'medium'
-      WHEN percent_rented_6_weeks_error <= 0.20 THEN 'high'
-      WHEN percent_rented_6_weeks_error > 0.20 THEN 'very high'
-    END AS percent_rented_6_weeks_error_level,
+      WHEN percent_rented_in_6_weeks_error <= 0.05 THEN 'low'
+      WHEN percent_rented_in_6_weeks_error <= 0.10 THEN 'medium'
+      WHEN percent_rented_in_6_weeks_error <= 0.20 THEN 'high'
+      WHEN percent_rented_in_6_weeks_error > 0.20 THEN 'very high'
+    END AS percent_rented_in_6_weeks_error_level,
     -- average_days_house_listing_to_contract_signed
     AVG(days_house_listing_to_contract_signed) AS average_days_house_listing_to_contract_signed,
     SQRT((1.96^2 * var_samp(days_house_listing_to_contract_signed)) / sample_size) AS average_days_house_listing_to_contract_signed_error,
@@ -83,9 +83,9 @@ liquidity_metrics AS (
   GROUP BY 1, 2, 3
   HAVING
     sample_size > 0
-    AND percent_rented_6_weeks < 1
-    AND percent_rented_6_weeks > 0
-    AND percent_rented_6_weeks_error_level != 'very high'
+    AND percent_rented_in_6_weeks < 1
+    AND percent_rented_in_6_weeks > 0
+    AND percent_rented_in_6_weeks_error_level != 'very high'
 ),
 all_regions AS (
   SELECT
@@ -111,11 +111,11 @@ SELECT
   r.min_bedrooms,
   r.max_bedrooms,
   l.sample_size AS rentals_sample_size,
-  -- percent_rented_6_weeks
-  ROUND(percent_rented_6_weeks, 2) AS percent_rented_6_weeks,
-  TO_CHAR((percent_rented_6_weeks - percent_rented_6_weeks_error), '0.00') || '-' || TO_CHAR((percent_rented_6_weeks + percent_rented_6_weeks_error), '0.00') AS percent_rented_6_weeks_interval,
-  ROUND(percent_rented_6_weeks_error, 2) AS percent_rented_6_weeks_error,
-  percent_rented_6_weeks_error_level,
+  -- percent_rented_in_6_weeks
+  ROUND(percent_rented_in_6_weeks, 2) AS percent_rented_in_6_weeks,
+  TO_CHAR((percent_rented_in_6_weeks - percent_rented_in_6_weeks_error), '0.00') || '-' || TO_CHAR((percent_rented_in_6_weeks + percent_rented_in_6_weeks_error), '0.00') AS percent_rented_in_6_weeks_interval,
+  ROUND(percent_rented_in_6_weeks_error, 2) AS percent_rented_in_6_weeks_error,
+  percent_rented_in_6_weeks_error_level,
   -- average_days_house_listing_to_contract_signed
   ROUND(average_days_house_listing_to_contract_signed) AS average_days_house_listing_to_contract_signed,
   ROUND((average_days_house_listing_to_contract_signed - average_days_house_listing_to_contract_signed_error), 0)::VARCHAR || '-' || ROUND((average_days_house_listing_to_contract_signed + average_days_house_listing_to_contract_signed_error), 0)::VARCHAR AS average_days_house_listing_to_contract_signed_interval,
