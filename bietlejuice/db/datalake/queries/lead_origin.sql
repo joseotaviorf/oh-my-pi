@@ -12,6 +12,7 @@ with t_all as (
             u_initial_utm_content,
             u_initial_utm_term,
             u_platform,
+            u_referring_domain,
             region,
             city,
             uuid
@@ -41,6 +42,7 @@ with t_all as (
             coalesce(cast(json_extract(user_properties, '$.initial_utm_content') as varchar), '') as u_initial_utm_content,
             coalesce(cast(json_extract(user_properties, '$.initial_utm_term') as varchar), '') as u_initial_utm_term,
             coalesce(cast(json_extract(user_properties, '$.platform') as varchar), '') as platform,
+            coalesce(cast(json_extract(user_properties, '$.referring_domain') as varchar), '') as u_referring_domain,
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
@@ -67,6 +69,7 @@ with t_all as (
             u_initial_utm_content,
             u_initial_utm_term,
             u_platform,
+            u_referring_domain,
             region,
             city,
             uuid
@@ -92,6 +95,7 @@ with t_all as (
             coalesce(cast(json_extract(user_properties, '$.initial_utm_content') as varchar), '') as u_initial_utm_content,
             coalesce(cast(json_extract(user_properties, '$.initial_utm_term') as varchar), '') as u_initial_utm_term,
             coalesce(cast(json_extract(user_properties, '$.platform') as varchar), '') as platform,
+            coalesce(cast(json_extract(user_properties, '$.referring_domain') as varchar), '') as u_referring_domain,
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
@@ -112,6 +116,7 @@ with t_all as (
             u_initial_utm_content,
             u_initial_utm_term,
             u_platform,
+            u_referring_domain,
             region,
             city,
             uuid
@@ -135,6 +140,7 @@ with t_all as (
             coalesce(cast(json_extract(user_properties, '$.initial_utm_content') as varchar), '') as u_initial_utm_content,
             coalesce(cast(json_extract(user_properties, '$.initial_utm_term') as varchar), '') as u_initial_utm_term,
             coalesce(cast(json_extract(user_properties, '$.platform') as varchar), '') as platform,
+            coalesce(cast(json_extract(user_properties, '$.referring_domain') as varchar), '') as u_referring_domain,
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
@@ -155,6 +161,7 @@ with t_all as (
             u_initial_utm_content,
             u_initial_utm_term,
             u_platform,
+            u_referring_domain,
             region,
             city,
             uuid
@@ -179,6 +186,7 @@ with t_all as (
             coalesce(cast(json_extract(user_properties, '$.initial_utm_content') as varchar), '') as u_initial_utm_content,
             coalesce(cast(json_extract(user_properties, '$.initial_utm_term') as varchar), '') as u_initial_utm_term,
             coalesce(cast(json_extract(user_properties, '$.platform') as varchar), '') as platform,
+            coalesce(cast(json_extract(user_properties, '$.referring_domain') as varchar), '') as u_referring_domain,
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
@@ -220,6 +228,7 @@ select
     u_initial_utm_content,
     u_initial_utm_term,
     u_platform,
+    u_referring_domain,
     region,
     city,
     uuid
