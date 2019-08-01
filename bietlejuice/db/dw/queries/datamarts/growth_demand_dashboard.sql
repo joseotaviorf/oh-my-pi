@@ -26,7 +26,7 @@ city_groups as (
 	select distinct dr.regional, dr.city_group 
 	from funnel_counts fc
 	join dim_region dr on dr.city_group = fc.city_group
-	where fc.	city_group is not null
+	where fc.city_group is not null
 ),
 mkt_channels_mediums as (
 	select distinct mkt_channel, mkt_medium 
