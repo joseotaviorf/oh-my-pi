@@ -54,6 +54,7 @@ class DataFrameService():
         return formatted_name.lower()
 
     @staticmethod
+    @logger(exclude='df')
     def df_columns_name_format(df):
         if not df:
             raise AttributeError('m=df_columns_name_format, msg=input df is None')

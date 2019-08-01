@@ -58,7 +58,7 @@ class AmplitudeEvents():
         return df
 
     @staticmethod
-    def get_data_from_zip_file(zip_file):
+    def get_data_from_zip_file(zip_file):  # Todo: move method to external client
         data = []
         for name in zip_file.namelist():
             with gzip.open(io.BytesIO(zip_file.read(name)), "rb") as gzip_file:
