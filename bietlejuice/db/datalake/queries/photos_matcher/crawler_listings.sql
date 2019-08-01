@@ -120,6 +120,11 @@ quintoandar_join_crawled AS
 )
 SELECT
   ROW_NUMBER () OVER (ORDER BY sk_house_listing) AS row_id,
-  *
+  sk_house_listing,
+  short_id_house,
+  listing_photos,
+  crawled_listing_id,
+  crawled_photos
 FROM quintoandar_join_crawled
 WHERE COALESCE(crawled_photos, '') != ''
+;

@@ -11,7 +11,7 @@ row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
   'separatorChar' = ','
 )
-location 's3://5a-datalake/raw/crawler_photos_matcher/crawler_matches/'
+location 's3://5a-datalake/raw/photos_matcher/crawler_matches/'
 tblproperties (
   'skip.header.line.count' = '1'
 )
