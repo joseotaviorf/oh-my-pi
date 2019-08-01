@@ -19,15 +19,15 @@ class DatabricksConsumer(DatabaseConsumer):
         if not table_name_match:
             result = (
                 spark.sql("show tables in " + self.connection["db"])
-                    .select(col("tableName").alias("table_name"))
-                    .withColumn("size", lit(0))
+                .select(col("tableName").alias("table_name"))
+                .withColumn("size", lit(0))
             )
         else:
             result = (
                 spark.sql("show tables in " + self.connection["db"])
-                    .where('tableName like "{}"'.format(table_name_match))
-                    .select(col("tableName").alias("table_name"))
-                    .withColumn("size", lit(0))
+                .where('tableName like "{}"'.format(table_name_match))
+                .select(col("tableName").alias("table_name"))
+                .withColumn("size", lit(0))
             )
         return result
 

@@ -1,7 +1,6 @@
 import logging
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
