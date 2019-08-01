@@ -27,6 +27,6 @@ PARTITIONED BY (
   dt_created string)
 STORED AS PARQUET
 LOCATION
-  's3://5a-datalake/clean/marketing/twitter_ads/twitter_campaigns/'
+  's3://5a-datalake/clean/marketing/twitter_ads/marketing_twitter_campaigns/'
 
 MSCK REPAIR TABLE datalake_clean.marketing_twitter_campaigns;

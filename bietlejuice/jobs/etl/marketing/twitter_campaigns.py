@@ -115,7 +115,7 @@ class TwitterCampaigns(Marketing):
         ])
 
         self._move_to_clean(
-            table_name=self.CAMPAIGNS_TABLE_NAME,
+            table_name='marketing_' + self.CAMPAIGNS_TABLE_NAME,
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=clean_cols
@@ -156,7 +156,7 @@ class TwitterCampaigns(Marketing):
         ])
 
         self._move_to_clean(
-            table_name=self.AD_GROUPS_TABLE_NAME,
+            table_name='marketing_' + self.AD_GROUPS_TABLE_NAME,
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=raw_cols
@@ -178,7 +178,7 @@ class TwitterCampaigns(Marketing):
         ])
 
         self._move_to_clean(
-            table_name=self.ADS_TABLE_NAME,
+            table_name='marketing_' + self.ADS_TABLE_NAME,
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=raw_cols
@@ -211,7 +211,7 @@ class TwitterCampaigns(Marketing):
         ])
 
         self._move_to_clean(
-            table_name=self.ADS_STATS_TABLE_NAME,
+            table_name='marketing_' + self.ADS_STATS_TABLE_NAME,
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=clean_cols

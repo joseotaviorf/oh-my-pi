@@ -126,7 +126,7 @@ class TestTwitterCampaigns(object):
 
         mock__move_to_clean.assert_called_once()
         mock__move_to_clean.assert_called_once_with(
-            table_name='twitter_campaigns',
+            table_name='marketing_twitter_campaigns',
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=clean_cols)
@@ -172,7 +172,7 @@ class TestTwitterCampaigns(object):
 
         mock__move_to_clean.assert_called_once()
         mock__move_to_clean.assert_called_once_with(
-            table_name='twitter_ad_groups',
+            table_name='marketing_twitter_ad_groups',
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=raw_cols)
@@ -199,7 +199,7 @@ class TestTwitterCampaigns(object):
 
         mock__move_to_clean.assert_called_once()
         mock__move_to_clean.assert_called_once_with(
-            table_name='twitter_ads',
+            table_name='marketing_twitter_ads',
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=raw_cols)
@@ -237,7 +237,7 @@ class TestTwitterCampaigns(object):
 
         mock__move_to_clean.assert_called_once()
         mock__move_to_clean.assert_called_once_with(
-            table_name='twitter_ads_stats',
+            table_name='marketing_twitter_ads_stats',
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=clean_cols)
