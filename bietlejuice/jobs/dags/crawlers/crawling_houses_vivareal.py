@@ -58,7 +58,7 @@ def enrich_and_move_to_clean(**kwargs):
     if not query:
         raise RuntimeError(
             'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
-    crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, None)
+    crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, False)
     query = query.format(started_on=execution_date, ws=ws)
     leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
 
@@ -71,6 +71,8 @@ def enrich_and_move_to_clean(**kwargs):
             lambda st: re.search(regex, str(st)).group(1) if re.search(regex, str(st)) else
             None)
         leads = crawler_entity.cleaning(leads)
+        leads['business'] = leads['business'].replace('rental', 'aluguel')
+        leads['business'] = leads['business'].replace('sale', 'venda')
         leads = leads.where((pd.notnull(leads)), None)
 
         r_cols = OrderedDict([

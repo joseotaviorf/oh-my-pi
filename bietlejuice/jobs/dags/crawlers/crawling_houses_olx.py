@@ -101,7 +101,6 @@ def enrich_and_move_to_clean(**kwargs):
             ('lat', str),
             ('lng', str),
             ('street', str),
-            ('nb_street', str),
             ('neighborhood', str),
             ('city', str),
             ('state', str),
@@ -159,6 +158,5 @@ move_to_clean = BaseDAG.build_python_operator(
     python_callable=enrich_and_move_to_clean,
     provide_context=True
 )
-
 
 crawl_olx >> olx_success_test >> move_to_clean

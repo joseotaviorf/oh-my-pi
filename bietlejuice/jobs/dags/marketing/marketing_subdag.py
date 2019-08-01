@@ -9,23 +9,27 @@ logger = QuintoAndarLogger('MarketingSubDag')
 
 
 class MarketingSubDag(BaseSubDag):
-    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date=None, auth=None,
-                 accounts=None):
-        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date)
+    def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval,
+                 start_date, end_date=None, auth=None,
+                 accounts=None, extra_configs=None):
+        super(MarketingSubDag, self).__init__(bucket, sub_dag_name, dag_name,
+                                              schedule_interval, start_date, end_date)
         self.class_ = class_
         self.accounts = accounts
         self.dim_tables = []
         self.fact_tables = []
         self.datalake_tables = []
         self.auth = auth
+        self.extra_configs = extra_configs
 
-    def transfer_files_to_raw(self, bucket, **kwargs):
+    def transfer_files_to_raw(self, bucket, extra_configs, **kwargs):
         logger('m=transfer_files_to_raw, bucket={}'.format(bucket))
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__get_execution_date(kwargs['execution_date']),
-            auth=self.auth
+            execution_date=self.__get_execution_date(kwargs.get('execution_date')),
+            auth=self.auth,
+            extra_configs=extra_configs
         )
         getattr(marketing_class, 'move_{}_to_raw'.format(self.class_.value))()
 
@@ -47,7 +51,8 @@ class MarketingSubDag(BaseSubDag):
             s3_bucket=bucket,
             execution_date=self.__get_execution_date(kwargs['execution_date'])
         )
-        marketing_class.load_to_pre_staging(clean_table=clean_table, prod_table=prod_table,
+        marketing_class.load_to_pre_staging(clean_table=clean_table,
+                                            prod_table=prod_table,
                                             account=self.accounts[clean_table])
 
     @logger
@@ -84,7 +89,8 @@ class MarketingSubDag(BaseSubDag):
             python_callable=self.transfer_files_to_raw,
             provide_context=True,
             op_kwargs={
-                'bucket': self.bucket
+                'bucket': self.bucket,
+                'extra_configs': self.extra_configs
             }
         )
 
