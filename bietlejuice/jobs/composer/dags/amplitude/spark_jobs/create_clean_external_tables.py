@@ -36,8 +36,8 @@ if __name__ == '__main__':
 
     connection = {'db': db_clean}
     databricks_consumer = DatabricksConsumer(connection)
-    df = databricks_consumer.get_table_names_and_sizes()
-    tables = df.select("table_name").filter(col("table_name").rlike(r"^amplitude_")).collect()
+    df = databricks_consumer.get_table_names_and_sizes(table_name_match='amplitude_%')
+    tables = df.select("table_name").collect()
     table_extra_partitions = {'amplitude_events': ['event_type']}
 
     logger.info('m=__main__, msg=Creating clean external tables...')

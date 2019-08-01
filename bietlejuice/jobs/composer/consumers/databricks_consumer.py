@@ -15,13 +15,20 @@ class DatabricksConsumer(DatabaseConsumer):
         self.connection = connection
 
     @logger
-    def get_table_names_and_sizes(self):
-        result = (
-            spark.sql("show tables in " + self.connection["db"])
-            .select(col("tableName").alias("table_name"))
-            .withColumn("size", lit(0))
-        )
-
+    def get_table_names_and_sizes(self, table_name_match=None):
+        if not table_name_match:
+            result = (
+                spark.sql("show tables in " + self.connection["db"])
+                    .select(col("tableName").alias("table_name"))
+                    .withColumn("size", lit(0))
+            )
+        else:
+            result = (
+                spark.sql("show tables in " + self.connection["db"])
+                    .where('tableName like "{}"'.format(table_name_match))
+                    .select(col("tableName").alias("table_name"))
+                    .withColumn("size", lit(0))
+            )
         return result
 
     @logger

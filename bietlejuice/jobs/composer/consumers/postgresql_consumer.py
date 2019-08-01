@@ -27,7 +27,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
         self.connection = connection
 
     @logger
-    def get_table_names_and_sizes(self):
+    def get_table_names_and_sizes(self, table_name_match=None):
         query = """
             SELECT
                 table_name,
