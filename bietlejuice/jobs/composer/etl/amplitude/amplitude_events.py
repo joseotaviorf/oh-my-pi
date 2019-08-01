@@ -1,6 +1,7 @@
 import io
 import zipfile
 import gzip
+import os
 from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
@@ -103,22 +104,11 @@ class AmplitudeEvents():
         year, month, day = date.year, date.month, date.day
         logger.info('m=create_clean_amplitude_events, year={}, month={}, day={}'
                     .format(year, month, day))
-        query = """
-                select
-                  server_received_time, app, device_carrier, schema, city, user_id, uuid,
-                  event_time, platform, os_version, amplitude_id, processed_time, user_creation_time,
-                  version_name, ip_address, paying, dma, user_properties, client_upload_time,
-                  insert_id, event_type, library, amplitude_attribution_ids, device_type,
-                  device_manufacturer, start_version, location_lng, server_upload_time, event_id,
-                  location_lat, os_name, amplitude_event_type, device_brand, event_properties,
-                  data, device_id, language, device_model, country, region, is_attribution_event,
-                  adid, session_id, device_family, sample_rate, idfa, client_event_time, year,
-                  month, day
-                from
-                  {}.{}
-                where
-                  year={} and month={} and day={}
-                """
+
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               "../../../../db/composer/amplitude/clean_amplitude_events.sql")) as f:
+            query = f.read()
+
         table_name = "amplitude_events"
         df = spark.sql(query.format(self.db_raw, table_name, year, month, day))
 
