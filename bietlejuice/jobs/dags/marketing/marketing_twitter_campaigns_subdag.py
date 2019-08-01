@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.marketing import MarketingSubDag
+from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
 
 logger = QuintoAndarLogger('MarketingTwitterCampaignsSubDag')
 
@@ -18,16 +21,28 @@ class MarketingTwitterCampaignsSubDag(MarketingSubDag):
                                                               auth,
                                                               accounts, extra_configs)
 
+        self.tables = [TwitterCampaigns.CAMPAIGNS_TABLE_NAME,
+                       TwitterCampaigns.AD_GROUPS_TABLE_NAME,
+                       TwitterCampaigns.ADS_TABLE_NAME,
+                       TwitterCampaigns.ADS_STATS_TABLE_NAME]
+
     @logger
     def build_clean_tasks(self, dag):
-        BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='{}_task'.format(self.class_.value),
-            python_callable=self.transfer_files_to_clean,
-            provide_context=True,
-            op_kwargs={
-                'bucket': self.bucket,
-                'datalake_table': self.datalake_tables[0],
-                'account': 'default'
-            }
-        )
+        twitter_campaigns = TwitterCampaigns(self.bucket, datetime.now(), self.auth)
+        accounts = twitter_campaigns.get_accounts()
+        logger.info(
+            'm=build_clean_tasks, msg={} accounts found'.format(accounts.fetched))
+
+        for account in accounts:
+            for table in self.tables:
+                BaseDAG.build_python_operator(
+                    dag=dag,
+                    task_id='{}_task'.format(table),
+                    python_callable=self.transfer_files_to_clean,
+                    provide_context=True,
+                    op_kwargs={
+                        'bucket': self.bucket,
+                        'datalake_table': table,
+                        'account': account.id
+                    }
+                )

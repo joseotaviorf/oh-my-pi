@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from qa_python_utils.default_logger import QuintoAndarLogger
 
@@ -37,6 +38,20 @@ def raw_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('raw')
 
 
+def clean_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=BI_TWITTER_CAMPAIGNS_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=AUTH
+    )
+
+    return sub_dag.build_tasks('clean')
+
+
 main_dag = DAG(
     dag_id=BI_TWITTER_CAMPAIGNS_DAG_NAME,
     default_args={
@@ -56,3 +71,13 @@ twitter_raw_sub_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='twitter-load-to-raw',
     class_=MarketingEnum.TWITTER
 )
+
+twitter_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='twitter-load-to-clean',
+    class_=MarketingEnum.TWITTER
+)
+
+airflow_helpers.chain(twitter_raw_sub_dag,
+                      twitter_ads_clean_dag)

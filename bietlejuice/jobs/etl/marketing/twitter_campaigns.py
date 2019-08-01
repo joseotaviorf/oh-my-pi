@@ -1,5 +1,6 @@
 import json
 import time
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from gzip import GzipFile
 from io import BytesIO
@@ -18,11 +19,16 @@ logger = QuintoAndarLogger('TwitterCampaigns')
 
 
 class TwitterCampaigns(Marketing):
-    S3_DATA_LAKE_TWITTER_PATH = 'raw/marketing/twitter_ads'
     S3_CAMPAIGNS_FOLDER = 'campaigns'
     S3_LINE_ITEMS_FOLDER = 'ad_groups'
-    S3_PROMOTED_TWEETS_FOLDER = 'promoted_tweets'
-    S3_PROMOTED_TWEETS_STATS_FOLDER = 'promoted_tweets_stats'
+    S3_PROMOTED_TWEETS_FOLDER = 'ads'
+    S3_PROMOTED_TWEETS_STATS_FOLDER = 'ads_stats'
+    S3_TWITTER_FOLDER = 'twitter_ads'
+    S3_DATA_LAKE_RAW_TWITTER_PATH = 'raw/marketing/{}'.format(S3_TWITTER_FOLDER)
+    CAMPAIGNS_TABLE_NAME = "twitter_campaigns"
+    AD_GROUPS_TABLE_NAME = 'twitter_ad_groups'
+    ADS_TABLE_NAME = "twitter_ads"
+    ADS_STATS_TABLE_NAME = "twitter_ads_stats"
 
     def __init__(self, s3_bucket, execution_date, auth, account=None):
         """
@@ -31,35 +37,188 @@ class TwitterCampaigns(Marketing):
         https://developer.twitter.com/en/apps/16579094
         """
         super(TwitterCampaigns, self).__init__(s3_bucket, execution_date,
-                                               'twitter_campaigns', account)
+                                               self.S3_TWITTER_FOLDER, account)
 
         self._twitter_client = TwitterClient(auth['consumer_key'],
                                              auth['consumer_secret'],
                                              auth['access_token'],
                                              auth['access_token_secret'])
         self._JOB_WAIT_SECONDS = 15
-        self._JOB_STATUS_MAX_TRIES = 5
+        self._JOB_STATUS_MAX_TRIES = 10
 
     @logger
-    def move_twitter_campaigns_to_raw(self):
+    def move_twitter_ads_to_raw(self):
         """
         Fetch all accounts on Twitter Ads platform and save all its Campaigns, AdGroups,
         Promoted Tweets details and Promoted Tweets stats on data lake raw
         """
 
-        accounts = self._twitter_client.accounts()
-        if accounts.count:
-            for acc in accounts:
-                campaigns_ids = self._fetch_and_save_campaigns(acc)
-                ad_groups_ids = self._fetch_and_save_ad_groups(acc, campaigns_ids)
-                prom_twts_ids = self._fetch_and_save_promoted_tweets(acc, ad_groups_ids)
-                self._fetch_and_save_promoted_tweets_stats(acc, prom_twts_ids)
-        else:
-            logger.info('m=move_twitter_campaigns_to_raw, msg=No accounts found. '
-                        'Finishing the processing.')
+        for acc in self.get_accounts():
+            campaigns_ids = self._fetch_and_save_campaigns(acc)
+            ad_groups_ids = self._fetch_and_save_ad_groups(acc, campaigns_ids)
+            prom_twts_ids = self._fetch_and_save_promoted_tweets(acc, ad_groups_ids)
+            self._fetch_and_save_promoted_tweets_stats(acc, prom_twts_ids)
+
+    @logger
+    def move_twitter_campaigns_to_clean(self):
+        """
+        Here it's mapped raw and clean columns and the sql file which will be used to
+        execute the query on Athena raw table.
+        The raw_cols maps raw_table_query_file result columns and the clean_cols maps the
+        columns on parquet. The raw_cols and clean_cols should have corresponding
+        columns at the same index
+        """
+        raw_table_query_file = 'campaigns.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('name', str),
+            ('id_account', str),
+            ('account_name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('duration_in_days', str),
+            ('total_budget_amount_local_micro', str),
+            ('daily_budget_amount_local_micro', str),
+            ('standard_delivery', str),
+            ('currency', str),
+            ('servable', str),
+            ('funding_instrument_id', str),
+            ('reasons_not_servable', str),
+            ('frequency_cap', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+        clean_cols = OrderedDict([
+            ('id', str),
+            ('name', str),
+            ('id_account', str),
+            ('account_name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('duration_in_days', str),
+            ('total_budget', str),
+            ('daily_budget', str),
+            ('standard_delivery', str),
+            ('currency', str),
+            ('servable', str),
+            ('funding_instrument_id', str),
+            ('reasons_not_servable', str),
+            ('frequency_cap', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+
+        self._move_to_clean(
+            table_name=self.CAMPAIGNS_TABLE_NAME,
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=clean_cols
+        )
+
+    @logger
+    def move_twitter_ad_groups_to_clean(self):
+        raw_table_query_file = 'ad_groups.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('id_campaign', str),
+            ('id_account', str),
+            ('name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('total_budget_amount_local_micro', str),
+            ('bid_amount_local_micro', str),
+            ('automatically_select_bid', str),
+            ('bid_type', str),
+            ('bid_unit', str),
+            ('advertiser_domain', str),
+            ('advertiser_user_id', str),
+            ('categories', str),
+            ('charge_by', str),
+            ('include_sentiment', str),
+            ('lookalike_expansion', str),
+            ('objective', str),
+            ('optimization', str),
+            ('placements', str),
+            ('primary_web_event_tag', str),
+            ('product_type', str),
+            ('tracking_tags', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+
+        self._move_to_clean(
+            table_name=self.AD_GROUPS_TABLE_NAME,
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=raw_cols
+        )
+
+    @logger
+    def move_twitter_ads_to_clean(self):
+        raw_table_query_file = 'ads.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('id_line_item', str),
+            ('id_account', str),
+            ('tweet_id', str),
+            ('approval_status', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('deleted', str),
+            ('entity_status', str)
+        ])
+
+        self._move_to_clean(
+            table_name=self.ADS_TABLE_NAME,
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=raw_cols
+        )
+
+    @logger
+    def move_twitter_ads_stats_to_clean(self):
+        raw_table_query_file = 'ads_stats.sql'
+        raw_cols = OrderedDict([
+            ('id_ad', str),
+            ('segment_name', str),
+            ('segment_value', str),
+            ('all_impressions', str),
+            ('all_engagements', str),
+            ('all_billed_charge_local_micro', str),
+            ('all_billed_engagements', str),
+            ('all_clicks', str),
+            ('all_url_clicks', str),
+        ])
+        clean_cols = OrderedDict([
+            ('id_ad', str),
+            ('platform_name', str),
+            ('platform_id', str),
+            ('impressions', str),
+            ('engagements', str),
+            ('cost', str),
+            ('billed_engagements', str),
+            ('clicks', str),
+            ('url_clicks', str),
+        ])
+
+        self._move_to_clean(
+            table_name=self.ADS_STATS_TABLE_NAME,
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=clean_cols
+        )
 
     @logger(exclude='raw_data')
-    def _save_to_s3(self, account_id, entity_name, raw_data):
+    def _save_to_s3(self, id_account, entity_name, raw_data):
         """
             This method saves the json on the datalake raw as a compacted gzip file
             Every row is broken in lines, so that Athena will compute
@@ -73,9 +232,9 @@ class TwitterCampaigns(Marketing):
                 fp.write('\n')
 
         s3_file_path = '{}/{}/acc={}/dt={}/data.gz'.format(
-            self.S3_DATA_LAKE_TWITTER_PATH,
+            self.S3_DATA_LAKE_RAW_TWITTER_PATH,
             entity_name,
-            account_id,
+            id_account,
             self.execution_date.strftime('%Y-%m-%d'))
 
         logger.info(
@@ -93,6 +252,19 @@ class TwitterCampaigns(Marketing):
         gz_body.flush()
 
         logger.info('m=_save_to_s3, msg=Saved with success!')
+
+    @logger
+    def get_accounts(self):
+        """
+        Fetches QuintoAndar accounts at ads.twitter.com
+        :return: twitter_ads.cursor.Cursor with found accounts
+        """
+        accounts = self._twitter_client.accounts()
+        if accounts.fetched == 0:
+            logger.info('m=get_accounts, msg=No ads accounts found')
+            return []
+
+        return accounts
 
     @logger
     def _get_utc_start_and_end_datetime(self):
@@ -168,7 +340,8 @@ class TwitterCampaigns(Marketing):
                 for campaign in campaigns_cursor:
                     campaign_details = {
                         'id': campaign.id,
-                        'account_id': account.id,
+                        'id_account': account.id,
+                        'account_name': account.name,
                         'name': campaign.name,
                         'created_at': campaign.created_at,
                         'updated_at': campaign.updated_at,
@@ -218,8 +391,8 @@ class TwitterCampaigns(Marketing):
                 for line_item in line_items_cursor:
                     line_item_details = {
                         'id': line_item.id,
-                        'campaign_id': line_item.campaign_id,
-                        'account_id': account.id,
+                        'id_campaign': line_item.campaign_id,
+                        'id_account': account.id,
                         'name': line_item.name,
                         'start_time': line_item.start_time,
                         'end_time': line_item.end_time,
@@ -277,8 +450,8 @@ class TwitterCampaigns(Marketing):
                 for prom_tweet in prom_tweets_cursor:
                     prom_tweet_details = {
                         'id': prom_tweet.id,
-                        'line_item_id': prom_tweet.line_item_id,
-                        'account_id': account.id,
+                        'id_line_item': prom_tweet.line_item_id,
+                        'id_account': account.id,
                         'tweet_id': prom_tweet.tweet_id,
                         'approval_status': prom_tweet.approval_status,
                         'created_at': prom_tweet.created_at,
@@ -486,7 +659,7 @@ class TwitterCampaigns(Marketing):
         if platform_id not in all_promoted_tweets_stats[prom_twt_id]:
             all_promoted_tweets_stats[prom_twt_id].update({
                 platform_id: {
-                    'id': prom_twt_id
+                    'id_ad': prom_twt_id
                 }
             })
 
@@ -498,7 +671,7 @@ class TwitterCampaigns(Marketing):
                                   placement_prefix):
         plat_twt = {}
         plat_twt.update({
-            'id': prom_twt_id,
+            'id_ad': prom_twt_id,
             'segment_value': platform_id,
             'segment_name': plat_stats['segment']['segment_name']
         })

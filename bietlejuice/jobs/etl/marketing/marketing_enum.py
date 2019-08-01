@@ -8,4 +8,4 @@ class MarketingEnum(Enum):
     RTB = 'rtb_campaigns'
     CLASSIFIEDS_COSTS = 'classifieds_costs'
     TROVIT = 'trovit_campaigns'
-    TWITTER = 'twitter_campaigns'
+    TWITTER = 'twitter_ads'

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 
 import mock
@@ -14,61 +15,53 @@ from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
 
 class TestTwitterCampaigns(object):
 
+    @mock.patch.object(TwitterCampaigns, 'get_accounts')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_campaigns')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_ad_groups')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_promoted_tweets')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_promoted_tweets_stats')
-    def test_move_twitter_campaigns_to_raw_with_no_account(
+    def test_move_twitter_ads_to_raw_with_no_account(
             self, mock__fetch_and_save_promoted_tweets_stats,
             mock__fetch_and_save_promoted_tweets, mock__fetch_and_save_ad_groups,
-            mock__fetch_and_save_campaigns, twitter_campaigns):
+            mock__fetch_and_save_campaigns, mock__get_accounts, twitter_campaigns):
         # arrange
-        mock_accounts = MagicMock()
-        mock_accounts.count = 0
-        twitter_campaigns._twitter_client.accounts = MagicMock(
-            return_value=mock_accounts)
+        mock__get_accounts.return_value = []
 
         # act
-        twitter_campaigns.move_twitter_campaigns_to_raw()
+        twitter_campaigns.move_twitter_ads_to_raw()
 
         # assert
-        twitter_campaigns._twitter_client.accounts.assert_called_once()
         mock__fetch_and_save_campaigns.assert_not_called()
         mock__fetch_and_save_ad_groups.assert_not_called()
         mock__fetch_and_save_promoted_tweets.assert_not_called()
         mock__fetch_and_save_promoted_tweets_stats.assert_not_called()
 
+    @mock.patch.object(TwitterCampaigns, 'get_accounts')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_campaigns')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_ad_groups')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_promoted_tweets')
     @mock.patch.object(TwitterCampaigns, '_fetch_and_save_promoted_tweets_stats')
-    def test_move_twitter_campaigns_to_raw(
+    def test_move_twitter_ads_to_raw(
             self, mock__fetch_and_save_promoted_tweets_stats,
             mock__fetch_and_save_promoted_tweets, mock__fetch_and_save_ad_groups,
-            mock__fetch_and_save_campaigns, twitter_campaigns):
+            mock__fetch_and_save_campaigns, mock__get_accounts, twitter_campaigns):
         # arrange
-        acc1 = MagicMock()
-        acc2 = MagicMock()
         campaigns_ids = ['c1', 'c2']
         ad_groups_ids = ['ag1', 'ag2']
         prom_twts_ids = ['tw1', 'tw2']
 
-        mock_accounts = MagicMock()
-        mock_accounts.count = 2
-        mock_accounts.__iter__.return_value = [acc1, acc2]
-
-        twitter_campaigns._twitter_client.accounts = MagicMock(
-            return_value=mock_accounts)
+        acc1 = MagicMock()
+        acc2 = MagicMock()
+        mock__get_accounts.return_value = [acc1, acc2]
 
         mock__fetch_and_save_campaigns.return_value = campaigns_ids
         mock__fetch_and_save_ad_groups.return_value = ad_groups_ids
         mock__fetch_and_save_promoted_tweets.return_value = prom_twts_ids
 
         # act
-        twitter_campaigns.move_twitter_campaigns_to_raw()
+        twitter_campaigns.move_twitter_ads_to_raw()
 
         # assert
-        twitter_campaigns._twitter_client.accounts.assert_called_once()
         mock__fetch_and_save_campaigns.assert_has_calls(
             [mock.call(acc1), mock.call(acc2)])
         mock__fetch_and_save_ad_groups.assert_has_calls(
@@ -77,6 +70,177 @@ class TestTwitterCampaigns(object):
             [mock.call(acc1, ad_groups_ids), mock.call(acc2, ad_groups_ids)])
         mock__fetch_and_save_promoted_tweets_stats.assert_has_calls(
             [mock.call(acc1, prom_twts_ids), mock.call(acc2, prom_twts_ids)])
+
+    @mock.patch.object(TwitterCampaigns, '_move_to_clean')
+    def test_move_twitter_campaigns_to_clean(self, mock__move_to_clean,
+                                             twitter_campaigns):
+        # act
+        twitter_campaigns.move_twitter_campaigns_to_clean()
+
+        # assert
+        raw_table_query_file = 'campaigns.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('name', str),
+            ('id_account', str),
+            ('account_name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('duration_in_days', str),
+            ('total_budget_amount_local_micro', str),
+            ('daily_budget_amount_local_micro', str),
+            ('standard_delivery', str),
+            ('currency', str),
+            ('servable', str),
+            ('funding_instrument_id', str),
+            ('reasons_not_servable', str),
+            ('frequency_cap', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+        clean_cols = OrderedDict([
+            ('id', str),
+            ('name', str),
+            ('id_account', str),
+            ('account_name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('duration_in_days', str),
+            ('total_budget', str),
+            ('daily_budget', str),
+            ('standard_delivery', str),
+            ('currency', str),
+            ('servable', str),
+            ('funding_instrument_id', str),
+            ('reasons_not_servable', str),
+            ('frequency_cap', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+
+        mock__move_to_clean.assert_called_once()
+        mock__move_to_clean.assert_called_once_with(
+            table_name='twitter_campaigns',
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=clean_cols)
+
+    @mock.patch.object(TwitterCampaigns, '_move_to_clean')
+    def test_move_twitter_ad_groups_to_clean(self, mock__move_to_clean,
+                                             twitter_campaigns):
+        # act
+        twitter_campaigns.move_twitter_ad_groups_to_clean()
+
+        # assert
+        raw_table_query_file = 'ad_groups.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('id_campaign', str),
+            ('id_account', str),
+            ('name', str),
+            ('start_time', str),
+            ('end_time', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('entity_status', str),
+            ('total_budget_amount_local_micro', str),
+            ('bid_amount_local_micro', str),
+            ('automatically_select_bid', str),
+            ('bid_type', str),
+            ('bid_unit', str),
+            ('advertiser_domain', str),
+            ('advertiser_user_id', str),
+            ('categories', str),
+            ('charge_by', str),
+            ('include_sentiment', str),
+            ('lookalike_expansion', str),
+            ('objective', str),
+            ('optimization', str),
+            ('placements', str),
+            ('primary_web_event_tag', str),
+            ('product_type', str),
+            ('tracking_tags', str),
+            ('to_delete', str),
+            ('deleted', str)
+        ])
+
+        mock__move_to_clean.assert_called_once()
+        mock__move_to_clean.assert_called_once_with(
+            table_name='twitter_ad_groups',
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=raw_cols)
+
+    @mock.patch.object(TwitterCampaigns, '_move_to_clean')
+    def test_move_twitter_ads_to_clean(self, mock__move_to_clean,
+                                       twitter_campaigns):
+        # act
+        twitter_campaigns.move_twitter_ads_to_clean()
+
+        # assert
+        raw_table_query_file = 'ads.sql'
+        raw_cols = OrderedDict([
+            ('id', str),
+            ('id_line_item', str),
+            ('id_account', str),
+            ('tweet_id', str),
+            ('approval_status', str),
+            ('created_at', str),
+            ('updated_at', str),
+            ('deleted', str),
+            ('entity_status', str)
+        ])
+
+        mock__move_to_clean.assert_called_once()
+        mock__move_to_clean.assert_called_once_with(
+            table_name='twitter_ads',
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=raw_cols)
+
+    @mock.patch.object(TwitterCampaigns, '_move_to_clean')
+    def test_move_twitter_ads_stats_to_clean(self, mock__move_to_clean,
+                                             twitter_campaigns):
+        # act
+        twitter_campaigns.move_twitter_ads_stats_to_clean()
+
+        # assert
+        raw_table_query_file = 'ads_stats.sql'
+        raw_cols = OrderedDict([
+            ('id_ad', str),
+            ('segment_name', str),
+            ('segment_value', str),
+            ('all_impressions', str),
+            ('all_engagements', str),
+            ('all_billed_charge_local_micro', str),
+            ('all_billed_engagements', str),
+            ('all_clicks', str),
+            ('all_url_clicks', str),
+        ])
+        clean_cols = OrderedDict([
+            ('id_ad', str),
+            ('platform_name', str),
+            ('platform_id', str),
+            ('impressions', str),
+            ('engagements', str),
+            ('cost', str),
+            ('billed_engagements', str),
+            ('clicks', str),
+            ('url_clicks', str),
+        ])
+
+        mock__move_to_clean.assert_called_once()
+        mock__move_to_clean.assert_called_once_with(
+            table_name='twitter_ads_stats',
+            sql_file_name=raw_table_query_file,
+            r_cols=raw_cols,
+            c_cols=clean_cols)
 
     @mock.patch.object(BaseETL, 'obj_to_s3')
     @mock.patch('bietlejuice.jobs.etl.marketing.twitter_campaigns.BytesIO')
@@ -102,6 +266,39 @@ class TestTwitterCampaigns(object):
         mock__obj_to_s3.assert_called_with(obj_io=mocked_bytes_io,
                                            bucket=twitter_campaigns.s3_bucket,
                                            file_path=expected_s3_file_path)
+
+    def test_get_accounts_with_no_accounts(self, twitter_campaigns):
+        # arrange
+        mock_accounts = MagicMock()
+        mock_accounts.fetched = 0
+        twitter_campaigns._twitter_client.accounts = MagicMock(
+            return_value=mock_accounts)
+
+        # act
+        acc_ids = twitter_campaigns.get_accounts()
+
+        # assert
+        assert acc_ids == []
+
+    def test_get_accounts(self, twitter_campaigns):
+        # arrange
+        mock_accounts = MagicMock()
+        mock_accounts.count = 2
+        acc1 = MagicMock()
+        acc1.id = 3
+        acc2 = MagicMock()
+        acc2.id = 5
+        acc3 = MagicMock()
+        acc3.id = 8
+        mock_accounts._collection = [acc1, acc2, acc3]
+        twitter_campaigns._twitter_client.accounts = MagicMock(
+            return_value=mock_accounts)
+
+        # act
+        acc_ids = twitter_campaigns.get_accounts()
+
+        # assert
+        assert acc_ids._collection == [acc1, acc2, acc3]
 
     @pytest.mark.parametrize("execution_date,start_date,end_date",
                              [(datetime(2019, 9, 22),
@@ -237,8 +434,10 @@ class TestTwitterCampaigns(object):
         campaigns_cursor.__iter__.return_value = [mock_campaign]
 
         account_id = 'abcd12f'
+        account_name = '5a_merchans'
         account = MagicMock()
         account.id = account_id
+        account.name = account_name
         account.campaigns.return_value = campaigns_cursor
 
         # act
@@ -247,7 +446,8 @@ class TestTwitterCampaigns(object):
         # assert
         expected_campaign = {
             'id': 'aaa',
-            'account_id': account_id,
+            'id_account': account_id,
+            'account_name': account_name,
             'name': '2',
             'created_at': '3',
             'updated_at': '4',
@@ -333,8 +533,8 @@ class TestTwitterCampaigns(object):
         # assert
         expected_line_item = {
             'id': '1',
-            'account_id': account_id,
-            'campaign_id': 'aaa',
+            'id_account': account_id,
+            'id_campaign': 'aaa',
             'name': '2',
             'start_time': '3',
             'end_time': '4',
@@ -410,8 +610,8 @@ class TestTwitterCampaigns(object):
         # assert
         expected_prom_tweet = {
             'id': '1',
-            'account_id': account_id,
-            'line_item_id': 'aaa',
+            'id_account': account_id,
+            'id_line_item': 'aaa',
             'tweet_id': '3',
             'approval_status': '4',
             'created_at': '5',
@@ -713,7 +913,7 @@ class TestTwitterCampaigns(object):
 
         # assert
         expected_dict1 = {
-            'id': '3344aa',
+            'id_ad': '3344aa',
             'all_on_twitter_carousel_swipes': 1,
             'all_on_twitter_likes': 2,
             'all_on_twitter_poll_card_vote': 3,
@@ -735,7 +935,7 @@ class TestTwitterCampaigns(object):
             'segment_value': '18'
         }
         expected_dict2 = {
-            'id': '668aa',
+            'id_ad': '668aa',
             'publisher_network_segment_carousel_swipes': 1,
             'publisher_network_segment_likes': 2,
             'publisher_network_segment_poll_card_vote': 3,
