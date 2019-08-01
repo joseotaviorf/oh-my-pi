@@ -32,7 +32,6 @@ mkt_channels_mediums as (
 	select distinct mkt_channel, mkt_medium 
 	from funnel_counts
 	where mkt_channel is not null
-	/*and mkt_channel != 'Not Mapped'*/
 ),
 growth_dimensions as (
 	select * 
