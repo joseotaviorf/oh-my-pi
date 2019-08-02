@@ -12,9 +12,9 @@ from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
-MAIN_DAG_NAME = 'bi-marketing-costs-2019'
-MAIN_START_DATE = datetime(2018, 4, 14, 0, 0, 0)
-MAIN_END_DATE = datetime(2019, 5, 27, 0, 0, 0)
+MAIN_DAG_NAME = 'bi-marketing-costs-trovit-2018'
+MAIN_START_DATE = datetime(2018, 1, 1, 0, 0, 0)
+MAIN_END_DATE = datetime(2019, 7, 21, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 3 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
@@ -24,7 +24,6 @@ accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
 
 # API auth
 auth = {
-    MarketingEnum.RTB: json.loads(env.get_airflow_env_var('rtb_login')),
     MarketingEnum.TROVIT: None
 }
 
@@ -124,36 +123,36 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('dw')
 
 
-rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
+trovit_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
-    sub_dag_name='rtb-load-to-raw',
-    class_=MarketingEnum.RTB
+    sub_dag_name='trovit-load-to-raw',
+    class_=MarketingEnum.TROVIT
 )
 
-rtb_clean_dag = BaseSubDag.get_sub_dag_operator(
+trovit_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
-    sub_dag_name='rtb-raw-to-clean',
-    class_=MarketingEnum.RTB,
+    sub_dag_name='trovit-raw-to-clean',
+    class_=MarketingEnum.TROVIT,
     accounts='default'
 )
 
-rtb_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+trovit_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='rtb-load-to-staging',
-    class_=MarketingEnum.RTB,
+    sub_dag_name='trovit-load-to-staging',
+    class_=MarketingEnum.TROVIT
 )
 
-rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+trovit_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='rtb-load-to-dw',
-    class_=MarketingEnum.RTB,
+    sub_dag_name='trovit-load-to-dw',
+    class_=MarketingEnum.TROVIT
 )
 
-airflow_helpers.chain(rtb_raw_dag,
-                      rtb_clean_dag,
-                      rtb_load_to_staging_dag,
-                      rtb_load_to_dw_dag)
+airflow_helpers.chain(trovit_raw_dag,
+                      trovit_clean_dag,
+                      trovit_load_to_staging_dag,
+                      trovit_load_to_dw_dag)
