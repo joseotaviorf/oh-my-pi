@@ -2,6 +2,14 @@ WITH
 radius AS (
   SELECT 1.0 AS "radius_km"
 ),
+images AS (
+  SELECT
+    i.imovel_id,
+    i.nome
+  FROM datalake_raw.ebdb_imagem i
+  WHERE TRY(CAST(i.ordem AS INTEGER)) <= 40  -- no more than 40 images per listing
+  ORDER BY i.ordem ASC
+),
 quintoandar_listings AS (
   SELECT
          l.sk_house_listing,
@@ -10,9 +18,9 @@ quintoandar_listings AS (
          l.house_lng,
          l.house_bedrooms,
          regexp_extract(trim(house_number), '\d+$') AS extracted_house_number,
-         array_agg(i.nome ORDER BY i.ordem ASC) AS photos
+         array_agg(i.nome) AS photos
   FROM datalake_clean.ods_dim_house_listing l
-  LEFT JOIN datalake_raw.ebdb_imagem i ON l.id_house = i.imovel_id
+  LEFT JOIN images i ON l.id_house = i.imovel_id
   WHERE status IN ('publicado') AND is_last_version = 'True'
     AND COALESCE(house_lat, '') != '' AND COALESCE(house_lng, '') != ''
     AND COALESCE(
@@ -37,7 +45,6 @@ first_listings AS (
         updated_on,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
-      -- WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
         AND COALESCE(rent, '') != ''
@@ -92,6 +99,8 @@ crawled_listings AS (
         AND advertiser_name != 'quintoandar'
         AND COALESCE(rent, '') != ''
         AND started_on >= CURRENT_DATE - INTERVAL '1' DAY  -- only query listings from crawler jobs started in the last 2 days
+        AND COALESCE(photos, '') != ''
+        AND cardinality(split(photos, ',')) > 4  -- crawled listing must have at least 4 photos
     ) as listings
   JOIN first_listings ON listings.id = first_listings.id
   WHERE
@@ -115,8 +124,8 @@ quintoandar_join_crawled AS
         ST_POINT(TRY(CAST(c.lng AS REAL)), TRY(CAST(c.lat AS REAL)))
       ) <= ((SELECT radius_km FROM radius) / (111.321 * COS(RADIANS(TRY(CAST(c.lat AS REAL))))))
     )
-    AND CAST(q.extracted_house_number AS BIGINT) = CAST(c.nb_street AS BIGINT)
-    AND CAST(q.house_bedrooms AS BIGINT) = CAST(c.bedrooms AS BIGINT)
+    AND TRY(CAST(q.extracted_house_number AS BIGINT)) = TRY(CAST(c.nb_street AS BIGINT))
+    AND TRY(CAST(q.house_bedrooms AS BIGINT)) = TRY(CAST(c.bedrooms AS BIGINT))
 )
 SELECT
   ROW_NUMBER () OVER (ORDER BY sk_house_listing) AS row_id,
@@ -126,5 +135,4 @@ SELECT
   crawled_listing_id,
   crawled_photos
 FROM quintoandar_join_crawled
-WHERE COALESCE(crawled_photos, '') != ''
 ;
