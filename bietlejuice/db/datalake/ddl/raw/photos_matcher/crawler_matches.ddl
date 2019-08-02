@@ -2,7 +2,7 @@ drop table if exists datalake_raw.crawler_matches;
 
 create external table datalake_raw.crawler_matches (
   id string,
-  crawler_id string,
+  crawled_listing_id string,
   sk_house_listing string,
   match string,
   created_on string
@@ -12,7 +12,4 @@ with serdeproperties (
   'separatorChar' = ','
 )
 location 's3://5a-datalake/raw/photos_matcher/crawler_matches/'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
 ;

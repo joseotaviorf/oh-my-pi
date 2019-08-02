@@ -10,7 +10,7 @@ from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
-env.set_airflow_var_to_local_env('QuintoAndar_photos_matcher')
+env.set_airflow_var_to_local_env('PHOTOS_MATCHER')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-photos-matcher'
@@ -24,18 +24,18 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 @logger
 def extract_data_from_matcher(table_name, **kwargs):
     # connect to external db, extract data, save csv to S3
-    current_date_string = kwargs['current_date_string']
-    query = 'SELECT id, crawler_id, sk_house_listing, match, created_on FROM crawler_matches WHERE created_on::date = {}::date;'.format(current_date_string)
+    query = "SELECT id, crawled_listing_id, sk_house_listing, match, created_on FROM crawler_matches WHERE created_on::DATE = CURRENT_DATE;"
 
     logger.info('m=extract_data_from_matcher, table_name={}, msg=Extracting data from photos matcher'.format(table_name))
     data_table = BaseETL.from_db_query(
         db_enum=EnumDB.QuintoAndar_photos_matcher,
+        query=query,
         encoding='utf-8'
     )
     BaseETL.to_s3(
-        filename='{}_{}.csv'.format(current_date_string, table_name),
+        filename='{}_{}.csv'.format(kwargs['current_date_string'], table_name),
         data_table=data_table,
-        bucket_folder_path='{}/raw/photos_matcher/{}/'.format(s3_bucket, table_name),
+        bucket_folder_path='{}/raw/photos_matcher/{}'.format(s3_bucket, table_name),
         write_header=False
     )
 
