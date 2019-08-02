@@ -1,6 +1,8 @@
 alembic==0.9.10
 apache-airflow==1.10.3
+arrow==0.14.4
 Babel==2.7.0
+binaryornot==0.4.4
 boto3==1.9.183
 botocore==1.12.183
 certifi==2019.3.9
@@ -8,6 +10,7 @@ chardet==3.0.4
 Click==7.0
 colorama==0.4.1
 configparser==3.5.3
+cookiecutter==1.6.0
 croniter==0.3.30
 defusedxml==0.6.0
 dill==0.2.9
@@ -31,6 +34,7 @@ idna==2.8
 iso8601==0.1.12
 itsdangerous==1.1.0
 Jinja2==2.10
+jinja2-time==0.2.0
 jmespath==0.9.4
 json-merge-patch==0.2
 lockfile==0.12.2
@@ -43,6 +47,7 @@ numpy==1.16.4
 ordereddict==1.1
 pandas==0.24.2
 pendulum==1.4.4
+poyo==0.5.0
 psutil==5.6.3
 psycopg2==2.7.7
 py4j==0.10.7
@@ -72,5 +77,6 @@ tzlocal==1.5.1
 unicodecsv==0.14.1
 urllib3==1.25.2
 Werkzeug==0.14.1
+whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
