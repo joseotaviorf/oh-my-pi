@@ -44,6 +44,7 @@ select
 	replace_not_latin_chars(u_initial_utm_content) as tracking_content,
 	replace_not_latin_chars(u_initial_utm_term) as tracking_term,
 	replace_not_latin_chars(u_platform) as tracking_platform,
+	replace_not_latin_chars(u_referring_domain) as tracking_referring_domain,
 	replace_not_latin_chars(region) as tracking_region,
 	replace_not_latin_chars(city) as tracking_city
 from t_rn
