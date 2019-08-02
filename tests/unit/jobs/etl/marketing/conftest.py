@@ -6,6 +6,7 @@ from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
 from bietlejuice.jobs.etl.marketing import Marketing
 from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
+from bietlejuice.jobs.etl.marketing import TwitterCampaigns
 
 S3_BUCKET = 's3_bucket'
 EXECUTION_DATE = datetime(2018, 1, 1)
@@ -61,4 +62,16 @@ def criteo_campaigns():
         s3_bucket=S3_BUCKET,
         execution_date=EXECUTION_DATE,
         auth=AUTH,
+    )
+
+
+@pytest.fixture
+def twitter_campaigns():
+    return TwitterCampaigns(
+        s3_bucket=S3_BUCKET,
+        execution_date=EXECUTION_DATE,
+        auth={"consumer_key": "consumer_key",
+              "consumer_secret": "consumer_secret",
+              "access_token": "access_token",
+              "access_token_secret": "access_token_secret"},
     )

@@ -26,7 +26,7 @@ class HouseSubDag(DimSubDag):
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        (house_task, affiliate, rent_flow, listing_views, house_listing, staging_dim_house_listing_task,
+        (house_task, affiliate, rent_flow, house_listing, staging_dim_house_listing_task,
          dim_house_listing) = self.__build_data_tasks(house_dag)
 
         tests_tasks = self.build_tests_tasks(house_dag)
@@ -82,17 +82,6 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        listing_views = BaseDAG.build_python_operator(
-            task_id='ODS_listing_views',
-            dag=dag,
-            python_callable=utils.load_athena_file_query_to_ods,
-            op_kwargs={
-                'table_name': 'listing_views',
-                'file_name': 'listing_views.sql',
-                'bucket': DimSubDag.S3_BUCKET
-            }
-        )
-
         property_listing = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_house_listing',
@@ -122,5 +111,5 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, listing_views, property_listing, staging_dim_house_listing_task,
+        return (property_task, affiliate, rent_flow, property_listing, staging_dim_house_listing_task,
                 dim_house_listing)

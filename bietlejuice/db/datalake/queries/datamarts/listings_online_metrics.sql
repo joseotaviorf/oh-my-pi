@@ -41,33 +41,55 @@ days_published_in_period AS (
       ON d.date_day >= dp.min_status_date AND d.date_day < dp.max_status_date)
   GROUP BY 1, 2
 ),
-online_metrics AS (
+pre_online_metrics AS (
   WITH
   metrics AS (
-    SELECT
-      DATE_TRUNC('week', CAST(SUBSTRING(TRIM(evt.event_time), 1, 10) AS DATE)) AS event_date,
-      TRIM(evt.e_house_id) AS house_id,
-      COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END) AS listing_page_views,
-      COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END) AS schedule_page_views,
-      COUNT(DISTINCT CASE WHEN TRIM(evt.et) = 'tips_page_viewed' THEN evt.uuid END) AS tips_page_views
-    FROM datalake_clean.amplitude_events evt
-    WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-      AND TRIM(platform) IN ('Web', 'iOS')
-      AND TRIM(u_platform) IN ('web_mobile', 'web_desktop', 'ios')
-      AND ym >= '2019-01'
-    GROUP BY 1, 2
+        SELECT
+          DATE_TRUNC('week', CAST(regexp_extract(TRIM(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) AS TIMESTAMP)) AS event_timestamp,
+          TRIM(evt.e_house_id) AS house_id,
+          CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
+          CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views,
+          CASE WHEN TRIM(evt.et) = 'tips_page_viewed' THEN evt.uuid END AS tips_page_views
+        FROM datalake_clean.amplitude_events evt
+        WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
+          AND TRIM(platform) IN ('Web', 'iOS')
+          AND TRIM(u_platform) IN ('web_mobile', 'web_desktop', 'ios')
+          AND ym >= '2019-01'
+    union
+        SELECT
+          DATE_TRUNC('week', CAST(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) AS TIMESTAMP)) AS event_timestamp,
+          coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '') as house_id,
+          CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
+          CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
+          CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views
+        FROM datalake_clean_spark.amplitude_events
+        WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
+          AND year >= 2019
+          AND platform IN ('Web', 'iOS')
+          and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )
+    select
+        event_timestamp,
+        house_id,
+        count(distinct listing_page_views) as listing_page_views,
+        count(distinct schedule_page_views) as schedule_page_views,
+        count(distinct tips_page_views) as tips_page_views
+    from
+        metrics
+    group by 1, 2
+),
+online_metrics as (
   SELECT
-    date_trunc('week', m.event_date) AS date_period,
+    date_trunc('week', m.event_timestamp) AS date_period,
     'week' AS period,
     dp.sk_house_listing,
     m.listing_page_views,
     m.schedule_page_views,
     m.tips_page_views
-  FROM metrics m
+  FROM pre_online_metrics m
   JOIN days_published dp
-    ON m.house_id = dp.sk_house AND m.event_date BETWEEN dp.min_status_date AND dp.max_status_date
-  WHERE (m.event_date >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_date) = DATE_TRUNC('week', CURRENT_DATE))
+    ON m.house_id = dp.sk_house AND m.event_timestamp BETWEEN dp.min_status_date AND dp.max_status_date
+  WHERE (m.event_timestamp >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_timestamp) = DATE_TRUNC('week', CURRENT_DATE))
 )
 SELECT
   om.*,
