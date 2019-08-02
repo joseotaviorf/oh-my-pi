@@ -3,4 +3,4 @@ ignore = E203, E501, E741, F811, F841, C901, W503
 max-line-length = 120
 exclude=
     __init__.py,
-    dag_template/{{ cookiecutter.dag_slug }}/{{ cookiecutter.dag_slug }}.py
+    dag_template/*
