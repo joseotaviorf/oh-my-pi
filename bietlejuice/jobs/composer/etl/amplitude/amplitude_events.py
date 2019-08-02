@@ -84,20 +84,20 @@ class AmplitudeEvents():
             f = a.get_files_from_extract_api(start, end)
             if not f:
                 logger.warning("m=load_events_into_datalake_raw, msg=None response from get_files_from_extract_api")
+            else:
+                with zipfile.ZipFile(f, 'r') as zip_file:
+                    data = self.get_data_from_zip_file(zip_file)
+                    len_data = len(data)
+                    logger.info('m=load_events_into_datalake_raw, got {} events'.format(len_data))
 
-            with zipfile.ZipFile(f, 'r') as zip_file:
-                data = self.get_data_from_zip_file(zip_file)
-                len_data = len(data)
-                logger.info('m=load_events_into_datalake_raw, got {} events'.format(len_data))
-
-                df = self.create_events_dataframe(data, len_data)
-                table_name = 'amplitude_events'
-                DataFrameService.incremental_write(df,
-                                                   AmplitudeEvents.RAW_FORMAT,
-                                                   ['year', 'month', 'day', 'app'],
-                                                   self.db_raw, table_name,
-                                                   self.s3_raw_path + table_name,
-                                                   True)
+                    df = self.create_events_dataframe(data, len_data)
+                    table_name = 'amplitude_events'
+                    DataFrameService.incremental_write(df,
+                                                       AmplitudeEvents.RAW_FORMAT,
+                                                       ['year', 'month', 'day', 'app'],
+                                                       self.db_raw, table_name,
+                                                       self.s3_raw_path + table_name,
+                                                       True)
 
     @logger
     def update_clean_amplitude_events(self, date):
