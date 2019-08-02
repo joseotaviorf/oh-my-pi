@@ -14,7 +14,7 @@ DAG_ID = "{{ cookiecutter.dag_slug }}"
 ENV = Variable.get("environment")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-{% set tasks = cookiecutter.tasks_names.replace(' ', '_').replace('-', '_').split(',') %}
+{% set tasks = cookiecutter.task_names.replace(' ', '_').replace('-', '_').split(',') %}
 {%- for task in tasks %}
 {{ task.upper() }}_FILE_PATH = (
     S3_PREFIX + "/spark_jobs/{}/{}/{{ task }}.py".format(ENV, DAG_ID)
