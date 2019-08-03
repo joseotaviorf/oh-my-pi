@@ -479,13 +479,14 @@ ongoing_stranded_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filte
                                                          'ongoing_stranded_listings', 'top_funnel')
 
 # Amplitude engaged users
-amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
-                                                             materialize_engaged_users_table_query,
-                                                             'amplitude_engaged_users_previous',
-                                                             'top_funnel', None,
-                                                             truncate_engaged_users_table)
-engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
-                                             'engaged_users', 'top_funnel', None, truncate_engaged_users_table)
+# FIXME: re-activate this step after migrating the DAG to Spark
+# amplitude_engaged_users_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
+#                                                              materialize_engaged_users_table_query,
+#                                                              'amplitude_engaged_users_previous',
+#                                                              'top_funnel', None,
+#                                                              truncate_engaged_users_table)
+# engaged_users_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters, materialize_growth_measure_table_query,
+#                                              'engaged_users', 'top_funnel', None, truncate_engaged_users_table)
 
 # Amplitude engaged users
 amplitude_listings_unique_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
@@ -617,7 +618,8 @@ fact_append_task = BaseDAG.build_python_operator('append_predictions_fact_growth
                                                  main_dag)
 
 # flow
-amplitude_engaged_users_previous_task >> engaged_users_sub_dag
+# FIXME: re-activate this step after migrating the DAG to Spark
+# amplitude_engaged_users_previous_task >> engaged_users_sub_dag
 amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
