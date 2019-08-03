@@ -630,7 +630,7 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
  opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag)
 
-(engaged_users_sub_dag >> schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
+(schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
  owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> approved_by_insurer_sub_dag >>
  documentation_sent_sub_dag)
 
