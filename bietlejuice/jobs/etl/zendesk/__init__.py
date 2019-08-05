@@ -1,4 +1,3 @@
-from bietlejuice.jobs.etl.zendesk.zendesk_etl import ZendeskETL
 from bietlejuice.jobs.etl.zendesk.ticket_fields import ZendeskTicketFields
 from bietlejuice.jobs.etl.zendesk.tickets import ZendeskTickets
 from bietlejuice.jobs.etl.zendesk.groups import ZendeskGroups
