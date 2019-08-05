@@ -9,6 +9,8 @@ with amplitude_schedules as (
         and trim(et) = 'visit_schedule_confirmed'
         and u_utm_source = 'google'
         and u_utm_medium = 'cpc'
+        and date(cast(regexp_extract(trim(evt.event_time),
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
     union
     select
         distinct
@@ -20,6 +22,8 @@ with amplitude_schedules as (
     where year >= 2019
         and user_utm_source = 'google'
         and user_utm_medium = 'cpc'
+        and date(cast(regexp_extract(event_time,
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
 )
 select
     "Date",
@@ -27,5 +31,4 @@ select
      'visit_schedule_confirmed_amp' as "Conversion Type",
       1 as "Qty."
 from amplitude_schedules
-where date("Date") >= date('{dt}')
-    and "GCLID" is not null
+where "GCLID" is not null
