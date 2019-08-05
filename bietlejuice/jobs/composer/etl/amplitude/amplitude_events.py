@@ -17,7 +17,7 @@ spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 class AmplitudeEvents:
     AMPLITUDE_API_DATE_FORMAT = "%Y%m%dT%H"
     RAW_FORMAT = "json"
-    RAW_RECORDS_BY_PARTITION = 55000
+    RAW_RECORDS_BY_PARTITION = 45000
     CLEAN_FORMAT = "parquet"
     CLEAN_RECORDS_BY_PARTITION = 250000
 
