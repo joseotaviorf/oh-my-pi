@@ -10,7 +10,7 @@ images AS (
   WHERE TRY(CAST(i.ordem AS INTEGER)) <= 40  -- no more than 40 images per listing
     AND NOT regexp_like(LOWER(i.legenda), 'churrasqueira|comum|condominio|condomínio|externa|externo|festa|festas|futebol|garagem|gourmet|jardim|piscina|playground|quadra|quintal|salão|sauna|skate|social|spa|subsolo')
     -- remove photos from external areas which will not help identify the apartment interior
-  ORDER BY i.ordem ASC
+  ORDER BY i.imovel_id, i.ordem ASC
 ),
 matches AS (
   SELECT
@@ -120,6 +120,6 @@ SELECT
   listing_photos,
   crawled_listing_id,
   crawled_photos,
-  CURRENT_DATE AS created_on
+  CURRENT_DATE AS dt_created
 FROM quintoandar_join_crawled
 ;

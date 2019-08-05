@@ -8,6 +8,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 
 # env vars
 env.set_airflow_var_to_local_env('PHOTOS_MATCHER')
@@ -24,7 +25,8 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 @logger
 def extract_data_from_matcher(table_name, **kwargs):
     # connect to external db, extract data, save csv to S3
-    query = "SELECT id, crawled_listing_id, sk_house_listing, match, created_on FROM crawler_matches WHERE created_on::DATE = CURRENT_DATE;"
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+    query = "SELECT id, crawled_listing_id, sk_house_listing, match, dt_created FROM crawler_matches WHERE dt_created::DATE = CURRENT_DATE;"
 
     logger.info('m=extract_data_from_matcher, table_name={}, msg=Extracting data from photos matcher'.format(table_name))
     data_table = BaseETL.from_db_query(
@@ -33,20 +35,20 @@ def extract_data_from_matcher(table_name, **kwargs):
         encoding='utf-8'
     )
     BaseETL.to_s3(
-        filename='{}_{}.csv'.format(kwargs['current_date_string'], table_name),
+        filename='{}_{}.csv'.format(execution_date, table_name),
         data_table=data_table,
         bucket_folder_path='{}/raw/photos_matcher/{}'.format(s3_bucket, table_name),
-        write_header=False
+        write_header=True
     )
 
 
 def upload_data_to_matcher(table_name, **kwargs):
     # extract data from athena, save to external db
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     athena = AthenaClient(s3_bucket)
-    query = BaseETL.get_query_from_file_name('./bietlejuice/db/datalake/queries/photos_matcher/{}.sql'.format(table_name))
+    query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name))
 
     logger.info('m=upload_data_to_matcher, table_name={}, msg=Reading data from datalake'.format(table_name))
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     df = athena.execute_query_and_return_dataframe(
         sql=query,
         query_params={'dt': execution_date}
@@ -54,7 +56,7 @@ def upload_data_to_matcher(table_name, **kwargs):
 
     logger.info('m=upload_data_to_matcher, table_name={}, msg=Truncating table in photos matcher db'.format(table_name))
     BaseETL.execute_command(
-        command='TRUNCATE TABLE public.{}'.format(table_name),
+        command='DELETE FROM public.{} WHERE dt_created::DATE = CURRENT_DATE;'.format(table_name),
         db_enum=EnumDB.QuintoAndar_photos_matcher,
         encoding='utf-8',
         commit=True
@@ -66,7 +68,7 @@ def upload_data_to_matcher(table_name, **kwargs):
         df=df,
         table_name='public.{}'.format(table_name),
         encoding='utf-8',
-        append=False
+        append=True
     )
 
 
@@ -89,7 +91,7 @@ extract_data_from_matcher_task = BaseDAG.build_python_operator(
     task_id='extract_data_from_matcher',
     provide_context=True,
     python_callable=extract_data_from_matcher,
-    op_kwargs={'table_name': 'crawler_matches', 'current_date_string': datetime.now().strftime('%Y%m%d')}
+    op_kwargs={'table_name': 'crawler_matches'}
 )
 
 upload_data_to_matcher_task = BaseDAG.build_python_operator(

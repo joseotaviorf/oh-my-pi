@@ -12,4 +12,7 @@ with serdeproperties (
   'separatorChar' = ','
 )
 location 's3://5a-datalake/raw/photos_matcher/crawler_matches/'
+tblproperties (
+  'skip.header.line.count' = '1'
+)
 ;
