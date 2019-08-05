@@ -45,7 +45,7 @@ pre_online_metrics AS (
   WITH
   metrics AS (
         SELECT
-          DATE_TRUNC('week', CAST(regexp_extract(TRIM(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) AS TIMESTAMP)) AS event_timestamp,
+          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(evt.event_time), 1, 10) AS DATE)) AS event_date,
           TRIM(evt.e_house_id) AS house_id,
           CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
           CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views,
@@ -57,7 +57,7 @@ pre_online_metrics AS (
           AND ym >= '2019-01'
     union
         SELECT
-          DATE_TRUNC('week', CAST(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) AS TIMESTAMP)) AS event_timestamp,
+          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
           coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '') as house_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
           CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
@@ -69,7 +69,7 @@ pre_online_metrics AS (
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )
     select
-        event_timestamp,
+        event_date,
         house_id,
         count(distinct listing_page_views) as listing_page_views,
         count(distinct schedule_page_views) as schedule_page_views,
@@ -80,7 +80,7 @@ pre_online_metrics AS (
 ),
 online_metrics as (
   SELECT
-    date_trunc('week', m.event_timestamp) AS date_period,
+    date_trunc('week', m.event_date) AS date_period,
     'week' AS period,
     dp.sk_house_listing,
     m.listing_page_views,
@@ -88,8 +88,8 @@ online_metrics as (
     m.tips_page_views
   FROM pre_online_metrics m
   JOIN days_published dp
-    ON m.house_id = dp.sk_house AND m.event_timestamp BETWEEN dp.min_status_date AND dp.max_status_date
-  WHERE (m.event_timestamp >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_timestamp) = DATE_TRUNC('week', CURRENT_DATE))
+    ON m.house_id = dp.sk_house AND m.event_date BETWEEN dp.min_status_date AND dp.max_status_date
+  WHERE (m.event_date >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_date) = DATE_TRUNC('week', CURRENT_DATE))
 )
 SELECT
   om.*,
