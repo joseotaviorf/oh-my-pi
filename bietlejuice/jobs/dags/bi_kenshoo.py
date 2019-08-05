@@ -90,7 +90,8 @@ def create_tasks_in_subdag(sub_dag_name):
                     local_filepath='{}/{}'.format(local_path, file_name),
                     remote_filepath='{}/{}.csv'.format(dag_prefix, file_name),
                     operation=SFTPOperation.PUT,
-                    dag=local_dag
+                    dag=local_dag,
+                    retries=3
                 )
 
     return local_dag
@@ -120,7 +121,8 @@ send_adjust_search_offline_conversions_data_task = SFTPOperator(
     local_filepath='{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, 'adjust_search_offline_conversions', '{{ ds }}'),
     remote_filepath='query_result_{{ ds }}.csv',
     operation=SFTPOperation.PUT,
-    dag=main_dag
+    dag=main_dag,
+    retries=3
 )
 
 execute_visit_accomplished_query_task = BaseDAG.build_python_operator(
@@ -157,7 +159,8 @@ send_visit_schedule_confirmed_with_gclid_query_task = SFTPOperator(
     local_filepath='{}-{}{}.csv'.format(Kenshoo.CSV_PATH_PREFIX, 'visit_schedule_confirmed_with_gclid', '{{ ds }}'),
     remote_filepath='visit_schedule_confirmed_with_gclid/visit_schedule_confirmed_{{ ds }}.csv',
     operation=SFTPOperation.PUT,
-    dag=main_dag
+    dag=main_dag,
+    retries=3
 )
 
 # flow
