@@ -1,6 +1,5 @@
 with amplitude_schedules as (
 	select
-	    distinct
         cast(regexp_extract(trim(evt.event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp) as "Date",
         case when u_gclid != '' then '_k_' || u_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
@@ -13,7 +12,6 @@ with amplitude_schedules as (
             '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
     union
     select
-        distinct
         cast(regexp_extract(event_time, '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp) as "Date",
         case when user_gclid is not null then '_k_' || user_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
