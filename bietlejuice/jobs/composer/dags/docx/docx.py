@@ -56,17 +56,13 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="docx-to-datalake-raw",
     dag=dag,
-    json={
-        "spark_python_task": {"python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH},
-    },
+    json={"spark_python_task": {"python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH}},
 )
 
 create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-raw-external-tables",
     dag=dag,
-    json={
-        "spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH},
-    },
+    json={"spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH}},
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
