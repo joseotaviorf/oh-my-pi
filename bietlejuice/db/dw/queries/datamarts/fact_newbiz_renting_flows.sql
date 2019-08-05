@@ -339,3 +339,4 @@ LEFT JOIN dim_date dd17
 WHERE nb.init_date <= dd1.date
 ORDER BY nb.sk_house_listing,
  		 lrf.sk_rent_flow;
+          
