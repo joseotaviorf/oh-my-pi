@@ -1,7 +1,7 @@
 with amplitude_schedules as (
 	select
 	    distinct
-        cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as "Date",
+        cast(regexp_extract(trim(evt.event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp) as "Date",
         case when u_gclid != '' then '_k_' || u_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
 	from datalake_clean.amplitude_events evt
@@ -12,7 +12,7 @@ with amplitude_schedules as (
     union
     select
         distinct
-        cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as "Date",
+        cast(regexp_extract(event_time, '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp) as "Date",
         case when user_gclid is not null then '_k_' || user_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
     from
@@ -27,5 +27,5 @@ select
      'visit_schedule_confirmed_amp' as "Conversion Type",
       1 as "Qty."
 from amplitude_schedules
-where date("Date") >= current_date - interval '7' day
+where date("Date") >= date('{dt}')
     and "GCLID" is not null
