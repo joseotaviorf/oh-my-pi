@@ -6,7 +6,7 @@ Cookie Cutter to ease the creation of new Airflow DAGs (or migration of old ones
 
 Run:
 ```
-cookiecutter dag_template/ -o bietlejuice/jobs/composer/dags/
+cookiecutter databricks_dag_template/ -o bietlejuice/jobs/composer/dags/
 ```
 
 Enter the dag details:
