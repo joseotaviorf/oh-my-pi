@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-with open('requirements.txt') as f:
-    install_requires = [line for line in f.read().splitlines() if len(line) > 0]
-
 __package_name__ = "bi-etl-ejuice"
 __version__ = "0.1.0"
 __repository_url__ = "https://github.com/quintoandar/bi-etl-ejuice"
+
+with open('requirements.txt') as f:
+    install_requires = [line for line in f.read().splitlines() if len(line) > 0]
 
 setup(
     name=__package_name__,

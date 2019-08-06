@@ -10,17 +10,16 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
-DAG_ID = "docx"
+DAG_ID = "{{ cookiecutter.dag_slug }}"
 ENV = Variable.get("environment")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-
-LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/{}/load_docx_into_datalake.py".format(ENV, DAG_ID)
+{% set tasks = cookiecutter.task_names.replace(' ', '_').replace('-', '_').split(',') %}
+{%- for task in tasks %}
+{{ task.upper() }}_FILE_PATH = (
+    S3_PREFIX + "/spark_jobs/{}/{}/{{ task }}.py".format(ENV, DAG_ID)
 )
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/{}/create_raw_external_tables.py".format(ENV, DAG_ID)
-)
+{%- endfor %}
 
 LOGS_OUTPUT_PATH = "s3://5a-databricks/logs/jobs/{}".format(DAG_ID)
 
@@ -28,9 +27,7 @@ CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_jso
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
-CUSTOM_LIBRARIES = [
-    {"jar": "s3://5a-artifacts/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
-]
+CUSTOM_LIBRARIES = []
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 dag = DAG(
@@ -40,10 +37,10 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 5, 31, 0, 0, 0),
-    schedule_interval="0 4 * * *",
-    max_active_runs=1,
-    catchup=False,
+    start_date=datetime.strptime("{{ cookiecutter.dag_start_date }}", '%Y-%m-%d'),
+    schedule_interval="{{ cookiecutter.dag_schedule_interval }}",
+    max_active_runs={{ cookiecutter.dag_max_active_runs }},
+    catchup={{ cookiecutter.dag_catchup }},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -52,26 +49,23 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION,
 )
-
-docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="docx-to-datalake-raw",
+{%- for task in tasks %}
+{{ task }}_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="{{ task.replace('_', '-') }}",
     dag=dag,
-    json={"spark_python_task": {"python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH}},
+    json={
+        "spark_python_task": {"python_file": {{ task.upper() }}_FILE_PATH},
+    },
 )
-
-create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-raw-external-tables",
-    dag=dag,
-    json={"spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH}},
-)
-
+{%- endfor %}
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
 airflow_helpers.chain(
     create_cluster_task,
-    docx_to_datalake_raw_task,
-    create_raw_external_tables_task,
+    {%- for task in tasks %}
+    {{ task }}_task,
+    {%- endfor %}
     terminate_cluster_task,
 )
