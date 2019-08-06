@@ -370,21 +370,23 @@ taxonomy as (
   select 
     lead_type,
     lead_origin,
-    lead_utm_source,
-    lead_utm_medium,
+    lead_tracking_medium,
+    lead_tracking_source,
+    affiliate_type,
+    lead_referring_domain,
+    subscription_source,
     is_branded::integer::boolean as is_branded,
     is_b2b::integer::boolean as is_b2b,
-    is_doorman::integer::boolean as is_doorman,
     is_isales_direct_register::integer::boolean as is_isales_direct_register,
     is_cx_direct_register::integer::boolean as is_cx_direct_register,
     has_isales_intervention::integer::boolean as has_isales_intervention,
     is_call_center::integer::boolean as is_call_center,
-    mkt_category,
-    mkt_flow,
-    mkt_completion,
+--    mkt_category,
+--    mkt_flow,
+--    mkt_completion,
     mkt_origin,
     mkt_channel,
-    mkt_platform,
+--    mkt_platform,
     mkt_medium,
     mkt_source
   from files.taxonomy_supply
@@ -454,38 +456,29 @@ select
     when pl.is_branded then 'Branded'
     else 'Other'
   end as mkt_branded,
+  'to be defined' as mkt_category,
+  'to be defined' as mkt_flow,
+  'to be defined' as mkt_completion,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_category
-  end as mkt_category,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_flow
-  end as mkt_flow,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_completion
-  end as mkt_completion,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_origin
   end as mkt_origin,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_channel
   end as mkt_channel,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_mobile' then 'Web Mobile'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_desktop' then 'Web Desktop'
-    else t.mkt_platform
+    when t.mkt_origin is null then 'Not Mapped'
+    when pl.tracking_platform = 'web_mobile' then 'Web Mobile'
+    when pl.tracking_platform = 'web_desktop' then 'Web Desktop'
+    else 'Not Mapped'
   end as mkt_platform,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_medium
   end as mkt_medium,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_source
   end as mkt_source,
   now() as ts_load
@@ -493,11 +486,13 @@ from potential_listings pl
 left join taxonomy t 
   on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '') 
     and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '') 
-    and coalesce(pl.utm_source, '') = coalesce(t.lead_utm_source, '') 
-    and coalesce(pl.utm_medium, '') = coalesce(t.lead_utm_medium, '') 
+    and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
+    and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
+--    affiliate_type varchar(255),
+--    lead_referring_domain varchar(512),
+--    subscription_source varchar(512),
     and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false) 
-    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false) 
-    and coalesce(pl.is_doorman, false) = coalesce(t.is_doorman, false) 
+    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false)
     and coalesce(pl.is_isales_direct_register, false) = coalesce(t.is_isales_direct_register, false) 
     and coalesce(pl.is_cx_direct_register, false) = coalesce(t.is_cx_direct_register, false) 
     and coalesce(pl.has_isales_intervention, false) = coalesce(t.has_isales_intervention, false) 
