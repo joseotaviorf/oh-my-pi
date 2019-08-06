@@ -7,7 +7,7 @@ logger = QuintoAndarLogger("DatabaseConsumer")
 
 class DatabaseConsumer(ABC):
     @abstractmethod
-    def get_table_names_and_sizes(self, table_name_match=None):
+    def get_table_names_and_sizes(self):
         pass
 
     @abstractmethod
