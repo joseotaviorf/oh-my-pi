@@ -16,11 +16,17 @@ class MongoDBConsumer(DatabaseConsumer):
 
     @logger
     def get_table_names_and_sizes(self):
-        db = self.connection['db']
-        client = MongoClient(self.connection['uri'])
+        db = self.connection["db"]
+        client = MongoClient(self.connection["uri"])
         collections = [
-            {'table_name': collection, 'size': client['tasks'].command('collstats', collection)['size'] / 1024 / 1024}
-            for collection in client[db].list_collection_names()]
+            {
+                "table_name": collection,
+                "size": client["tasks"].command("collstats", collection)["size"]
+                / 1024
+                / 1024,
+            }
+            for collection in client[db].list_collection_names()
+        ]
         df = spark.read.json(sc.parallelize(collections, 1))
         return df
 
@@ -30,12 +36,14 @@ class MongoDBConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_table(self, table_name):
-        db = self.connection['db']
-        df = spark.read.format("mongo")\
-            .option("uri", self.connection['uri'])\
-            .option('database', db)\
-            .option("collection", table_name)\
+        db = self.connection["db"]
+        df = (
+            spark.read.format("mongo")
+            .option("uri", self.connection["uri"])
+            .option("database", db)
+            .option("collection", table_name)
             .load()
+        )
         return df
 
     @logger
@@ -44,11 +52,13 @@ class MongoDBConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_query(self, query, table_name):
-        db = self.connection['db']
-        df = spark.read.format("mongo")\
-            .option("uri", self.connection['uri'])\
-            .option('database', db)\
-            .option("collection", table_name)\
-            .option('pipeline', query)\
+        db = self.connection["db"]
+        df = (
+            spark.read.format("mongo")
+            .option("uri", self.connection["uri"])
+            .option("database", db)
+            .option("collection", table_name)
+            .option("pipeline", query)
             .load()
+        )
         return df
