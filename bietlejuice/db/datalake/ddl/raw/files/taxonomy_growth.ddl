@@ -1,6 +1,6 @@
-drop table if exists datalake_raw.taxonomy_supply;
+drop table if exists datalake_raw.taxonomy_growth;
 
-create external table datalake_raw.taxonomy_supply (
+create external table datalake_raw.taxonomy_growth (
     lead_type string,
     lead_origin string,
     lead_tracking_medium string,
@@ -24,7 +24,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/raw/files/taxonomy_supply/'
+location 's3://5a-datalake/raw/files/taxonomy_growth/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

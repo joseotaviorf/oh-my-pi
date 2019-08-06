@@ -1,5 +1,5 @@
-drop table if exists files.taxonomy_supply;
-create table files.taxonomy_supply (
+drop table if exists files.taxonomy_growth;
+create table files.taxonomy_growth (
     lead_type varchar(255),
     lead_origin varchar(255),
     lead_tracking_medium varchar(255),

@@ -338,7 +338,12 @@ potential_listings as (
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
     coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
-    us_cad.id is not null as is_call_center
+    us_cad.id is not null as is_call_center,
+    lfet.tracking_referring_domain as lead_referring_domain,
+    us_d.subscriptionSource as subscription_source,
+    case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
+		 when u.dados_agente_id is not null then 'Agent'
+		 else ua.affiliateType end as affiliate_type
   from fact_with_reproc f
   left join lead_first_event_tracking lfet 
     on lfet.id_lead = f.lead_id
@@ -365,6 +370,12 @@ potential_listings as (
     on l_b2b.id_lead = f.lead_id
   left join partner_agent pa_b2b_prime 
     on h.usuario_id = pa_b2b_prime.user_id
+  left join usuario u
+	on coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) = u.id
+  left join user_doorman us_d
+    on us_d.id_dados_afiliado = u.dados_afiliado_id
+  left join user_affiliate ua
+    on ua.id = u.dados_afiliado_id
 ), 
 taxonomy as (
   select 
@@ -381,15 +392,11 @@ taxonomy as (
     is_cx_direct_register::integer::boolean as is_cx_direct_register,
     has_isales_intervention::integer::boolean as has_isales_intervention,
     is_call_center::integer::boolean as is_call_center,
---    mkt_category,
---    mkt_flow,
---    mkt_completion,
     mkt_origin,
     mkt_channel,
---    mkt_platform,
     mkt_medium,
     mkt_source
-  from files.taxonomy_supply
+  from files.taxonomy_growth
 )
 select 
   pl.sk_house_listing_flow,
@@ -452,6 +459,9 @@ select
   pl.has_isales_intervention,
   pl.is_call_center,
   pl.reprocessed_flg as is_lead_reprocessed,
+  pl.affiliate_type,
+  pl.lead_referring_domain,
+  pl.subscription_source,
   case
     when pl.is_branded then 'Branded'
     else 'Other'
@@ -488,9 +498,9 @@ left join taxonomy t
     and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '') 
     and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
     and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
---    affiliate_type varchar(255),
---    lead_referring_domain varchar(512),
---    subscription_source varchar(512),
+    and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')
+    and coalesce(pl.lead_referring_domain, '') = coalesce(t.lead_referring_domain, '')
+    and coalesce(pl.subscription_source, '') = coalesce(t.subscription_source, '')
     and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false) 
     and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false)
     and coalesce(pl.is_isales_direct_register, false) = coalesce(t.is_isales_direct_register, false) 
