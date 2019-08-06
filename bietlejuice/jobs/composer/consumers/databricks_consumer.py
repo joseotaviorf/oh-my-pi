@@ -1,10 +1,11 @@
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit, col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("DatabricksConsumer")
+spark = BaseSparkContext.spark
 
 
 class DatabricksConsumer(DatabaseConsumer):
@@ -13,7 +14,6 @@ class DatabricksConsumer(DatabaseConsumer):
 
     @logger
     def get_table_names_and_sizes(self):
-        spark = SparkSession.builder.getOrCreate()
         result = (
             spark.sql("show tables in " + self.connection["db"])
             .select(col("tableName").alias("table_name"))
@@ -24,7 +24,6 @@ class DatabricksConsumer(DatabaseConsumer):
 
     @logger
     def get_table_schema(self, table_name):
-        spark = SparkSession.builder.getOrCreate()
         result = (
             spark.sql("describe {}.{}".format(self.connection["db"], table_name))
             .select("col_name", col("data_type").alias("col_type"))
