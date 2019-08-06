@@ -19,6 +19,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   status string,
   slot_dia string,
   reason string,
+  cancelation_reason_category string,
   reason_category string,
   responsible string,
   app_type string,

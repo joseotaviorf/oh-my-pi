@@ -19,6 +19,7 @@ CREATE TABLE staging.dim_booking (
   status varchar(255),
   slot_dia INTEGER,
   reason VARCHAR(255),
+  cancelation_reason_category VARCHAR(255),
   reason_category VARCHAR(255),
   responsible VARCHAR(255),
   app_type VARCHAR(255),
