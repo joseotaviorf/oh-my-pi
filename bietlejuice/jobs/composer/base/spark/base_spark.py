@@ -3,7 +3,7 @@ from pyspark import SparkContext
 
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("BaseDBUtils")
+logger = QuintoAndarLogger("base_spark")
 
 
 class BaseDBUtils:
