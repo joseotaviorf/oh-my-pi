@@ -48,7 +48,8 @@ def execute_athena_query(query_filename, ds, file_name, use_query_params, **kwar
     kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client,
                                                   file_name=file_name,
                                                   query_params=dict(
-                                                      {'dt': datetime.date(ds)}) if use_query_params else None)
+                                                      {'dt': datetime.date(
+                                                          kwargs['execution_date'])}) if use_query_params else None)
 
 
 def execute_redshift_query(query_filename, has_query_params, split_by_column, ds, **kwargs):
