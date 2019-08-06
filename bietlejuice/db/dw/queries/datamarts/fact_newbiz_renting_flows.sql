@@ -175,48 +175,48 @@ WITH newbiz_listings AS (
 			DATE(dhl.ts_publication)				AS init_date	
 		FROM dim_house_listing dhl
 		WHERE dhl.last_originals_type = 'OriginalsReady'
-		) base
+
+        UNION
+        
+        -- gets irent info
+        SELECT
+            MAX(dhl.sk_house_listing)										AS sk_house_listing,
+            dhl.id_house,
+            DATE(dhl.ts_publication)										AS publication_date,
+            DATE(dhl.ts_de_publication)										AS de_publication_date,
+            dhl.status,
+            dhl.is_last_version,
+            dhl.house_status,
+            dhl.rent,
+            dhl.house_condo,
+            dhl.house_iptu,
+            dhl.house_predicted_price,
+            dhl.house_bedrooms,
+            dhl.house_total_area,
+            dhl.is_exclusive,
+            False 															AS is_orent,
+            True															AS is_irent,
+            DATE(NULL) 														AS optedin_orent_date,
+            MIN(DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000)))	AS optedin_irent_date,
+            dhl.last_originals_type,
+            dhl.dt_last_originals_opted_in,
+            dhl.dt_last_originals_opted_out,
+            dhl.is_originals_active,
+            DATE(NULL) 														AS date_job_photos_uploaded,
+            DATE(NULL)														AS date_photos_uploaded,
+            DATE(dhl.ts_publication) 										AS init_date
+        FROM dim_house_listing dhl
+        JOIN datalake_raw.ebdb_imovel_aud ima
+            ON dhl.id_house = ima.id
+        AND ima.usuario_id = '908761'
+        AND ima.usuario_mod = '1'
+        JOIN datalake_raw.ebdb_usuariorevisionentity rev
+            ON ima.rev = rev.id
+        WHERE
+            dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
+        GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25
+        ) base
 	WHERE init_date IS NOT NULL
-	
-	UNION
-	
-	-- gets irent info
-	SELECT
-		MAX(dhl.sk_house_listing)										AS sk_house_listing,
-		dhl.id_house,
-		DATE(dhl.ts_publication)										AS publication_date,
-		DATE(dhl.ts_de_publication)										AS de_publication_date,
-		dhl.status,
-		dhl.is_last_version,
-		dhl.house_status,
-		dhl.rent,
-		dhl.house_condo,
-		dhl.house_iptu,
-		dhl.house_predicted_price,
-		dhl.house_bedrooms,
-		dhl.house_total_area,
-		dhl.is_exclusive,
-		False 															AS is_orent,
-		True															AS is_irent,
-		DATE(NULL) 														AS optedin_orent_date,
-		MIN(DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000)))	AS optedin_irent_date,
-		dhl.last_originals_type,
-		dhl.dt_last_originals_opted_in,
-		dhl.dt_last_originals_opted_out,
-		dhl.is_originals_active,
-		DATE(NULL) 														AS date_job_photos_uploaded,
-		DATE(NULL)														AS date_photos_uploaded,
-		DATE(dhl.ts_publication) 										AS init_date
-	FROM dim_house_listing dhl
-	JOIN datalake_raw.ebdb_imovel_aud ima
-		ON dhl.id_house = ima.id
-	   AND ima.usuario_id = '908761'
-	   AND ima.usuario_mod = '1'
-	JOIN datalake_raw.ebdb_usuariorevisionentity rev
-		ON ima.rev = rev.id
-	WHERE
-		dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
-	GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25
 	) 
 
 SELECT
@@ -339,4 +339,3 @@ LEFT JOIN dim_date dd17
 WHERE nb.init_date <= dd1.date
 ORDER BY nb.sk_house_listing,
  		 lrf.sk_rent_flow;
-          
