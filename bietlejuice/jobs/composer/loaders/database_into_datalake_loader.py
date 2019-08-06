@@ -53,9 +53,7 @@ class DatabaseIntoDataLakeLoader:
             "msg=Writing data into datalake...".format(db_source, table_name)
         )
         # create the db in spark metastore in case it doesn't exist it
-        spark.sql(
-            "CREATE DATABASE IF NOT EXISTS {}".format(self.datalake_db)
-        )
+        spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(self.datalake_db))
         write_df = (
             df.write.mode("overwrite")
             .option("compression", self.codec)

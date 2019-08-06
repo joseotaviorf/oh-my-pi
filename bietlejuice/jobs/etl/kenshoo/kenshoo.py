@@ -15,10 +15,10 @@ class Kenshoo(object):
         self.execution_date = execution_date
 
     @logger
-    def _athena_execute_query_from_file(self, query_filename, athena_client):
+    def _athena_execute_query_from_file(self, query_filename, athena_client, query_params):
         full_path = '{}/{}/{}'.format(DATALAKE_QUERIES_DIR, Kenshoo.PREFIX_QUERIES_PATH, query_filename)
 
-        return athena_client.execute_file_query_and_return_dataframe(filename=full_path)
+        return athena_client.execute_file_query_and_return_dataframe(filename=full_path, query_params=query_params)
 
     @logger
     def _redshift_execute_query_from_file(self, query_filename, query_params=None):
@@ -69,14 +69,15 @@ class Kenshoo(object):
                 row.encode('ascii', 'ignore'), csv_path))
 
     @logger(exclude='athena_client')
-    def save_file_from_athena_query_execution(self, query_filename, athena_client, file_name):
+    def save_file_from_athena_query_execution(self, query_filename, athena_client, file_name, query_params=None):
         if query_filename is None or '.sql' not in query_filename:
             raise RuntimeError('m=save_file_from_athena_query_execution, msg=query_filename is invalid')
 
         if athena_client is None:
             raise RuntimeError('m=save_file_from_athena_query_execution, msg=athena_client param is mandatory')
 
-        df = self._athena_execute_query_from_file(query_filename=query_filename, athena_client=athena_client)
+        df = self._athena_execute_query_from_file(query_filename=query_filename, athena_client=athena_client,
+                                                  query_params=query_params)
 
         self._save_single_file(df=df, file_name=file_name)
 

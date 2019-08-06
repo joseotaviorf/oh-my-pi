@@ -4,7 +4,8 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base import DatabaseEnum, BaseDBUtils
+from bietlejuice.jobs.composer.base.db import DatabaseEnum
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
@@ -15,13 +16,13 @@ base_dbutils = BaseDBUtils()
 if base_dbutils.get_dbutils() is not None:
     dbutils = base_dbutils.get_dbutils()
 
-parser = ArgumentParser(description='load_insider_into_datalake')
-parser.add_argument('env')
+parser = ArgumentParser(description="load_insider_into_datalake")
+parser.add_argument("env")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
-    secrets_scope = 'quintoandar-{}'.format(env)
+    secrets_scope = "quintoandar-{}".format(env)
 
     connection_json = dbutils.secrets.get(scope=secrets_scope, key=DatabaseEnum.INSIDER)
     connection = json.loads(connection_json)

@@ -6,6 +6,7 @@ from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsum
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("DatabricksConsumer")
+spark = BaseSparkContext.spark
 
 spark = BaseSparkContext.spark
 
