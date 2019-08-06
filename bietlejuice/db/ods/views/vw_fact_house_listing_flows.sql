@@ -378,7 +378,8 @@ potential_listings as (
     on ua.id = u.dados_afiliado_id
 ), 
 taxonomy as (
-  select 
+  select
+    distinct
     lead_type,
     lead_origin,
     lead_tracking_medium,
