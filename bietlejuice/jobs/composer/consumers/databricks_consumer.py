@@ -1,10 +1,13 @@
 from pyspark.sql.functions import lit, col
+
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("DatabricksConsumer")
+spark = BaseSparkContext.spark
+
 spark = BaseSparkContext.spark
 
 
