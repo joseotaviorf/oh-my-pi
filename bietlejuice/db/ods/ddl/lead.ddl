@@ -66,9 +66,6 @@ create table if not exists lead (
   utm_source varchar(255),
   usuario_que_indicou_id bigint,
   codigo_imobiliaria varchar(255),
-  flg_city_served boolean,
-  flg_latlng_served boolean,
-  flg_location_served boolean,
   flg_b2b boolean
 );
 

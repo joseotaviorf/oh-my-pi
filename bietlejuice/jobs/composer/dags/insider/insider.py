@@ -27,7 +27,9 @@ LOGS_OUTPUT_PATH = "s3://5a-databricks/logs/jobs/{}".format(DAG_ID)
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
-LIBRARIES_DESCRIPTION = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
+LIBRARIES_DESCRIPTION = Variable.get(
+    "bietlejuice_default_libraries", deserialize_json=True
+)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -53,21 +55,17 @@ insider_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="insider-to-datalake-raw",
     dag=dag,
     json={
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
         "spark_python_task": {
             "python_file": LOAD_INSIDER_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters" : [ENV]},
-
+            "parameters": [ENV],
+        }
     },
 )
 
 create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-raw-external-tables",
     dag=dag,
-    json={
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
-        "spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH},
-    },
+    json={"spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH}},
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

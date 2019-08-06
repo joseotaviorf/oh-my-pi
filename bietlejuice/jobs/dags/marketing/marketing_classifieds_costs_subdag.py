@@ -8,7 +8,7 @@ logger = QuintoAndarLogger('MarketingClassifiedsCostsSubDag')
 class MarketingClassifiedsCostsSubDag(MarketingSubDag):
     def __init__(self, class_, bucket, sub_dag_name, dag_name, schedule_interval, start_date, end_date=None,
                  integration=None,
-                 accounts=None, auth=None):
+                 accounts=None, auth=None, extra_configs=None):
         super(MarketingClassifiedsCostsSubDag, self).__init__(class_, bucket, sub_dag_name, dag_name, schedule_interval,
                                                               start_date, end_date, integration, auth)
         self.auth = auth
