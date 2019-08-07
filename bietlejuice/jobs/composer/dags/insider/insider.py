@@ -16,13 +16,15 @@ ENV = Variable.get("environment")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
 LOAD_INSIDER_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/{}/load_insider_into_datalake.py".format(ENV, DAG_ID)
+    S3_PREFIX + "/spark_jobs/{}/load_insider_into_datalake.py".format(DAG_ID)
 )
 CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/{}/create_raw_external_tables.py".format(ENV, DAG_ID)
+    S3_PREFIX + "/spark_jobs/{}/create_raw_external_tables.py".format(DAG_ID)
 )
 
-LOGS_OUTPUT_PATH = "s3://5a-databricks/logs/jobs/{}".format(DAG_ID)
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
+)
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -65,7 +67,12 @@ insider_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
 create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-raw-external-tables",
     dag=dag,
-    json={"spark_python_task": {"python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH}},
+    json={
+        "spark_python_task": {
+            "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
+            "parameters": [ENV],
+        }
+    },
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
