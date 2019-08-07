@@ -1,1 +1,2 @@
 from bietlejuice.jobs.composer.wrappers.athena_client import AthenaClient
+from bietlejuice.jobs.composer.wrappers.amplitude_export_api import AmplitudeExportApi
