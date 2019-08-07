@@ -99,7 +99,7 @@ quintoandar_join_crawled AS
     q.sk_house_listing,
     q.short_id_house,
     q.photos AS listing_photos,
-    c.id AS crawled_listing_id,
+    c.id AS id_crawled_listing,
     c.photos AS crawled_photos
   FROM crawled_listings AS c
   JOIN quintoandar_listings AS q
@@ -118,7 +118,7 @@ SELECT
   sk_house_listing,
   short_id_house,
   listing_photos,
-  crawled_listing_id,
+  id_crawled_listing,
   crawled_photos,
   CURRENT_DATE AS dt_created
 FROM quintoandar_join_crawled

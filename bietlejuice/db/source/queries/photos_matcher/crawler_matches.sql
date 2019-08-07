@@ -1,6 +1,6 @@
 SELECT
   "id",
-  "crawled_listing_id",
+  "id_crawled_listing",
   "sk_house_listing",
   "match",
   "dt_created"
