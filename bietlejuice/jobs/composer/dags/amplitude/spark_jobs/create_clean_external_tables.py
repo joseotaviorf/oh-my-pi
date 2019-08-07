@@ -35,6 +35,7 @@ def create_raw_external_table(args):
         consumer=databricks_consumer, table=table_name, partition_by=partition_by
     )
 
+
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
