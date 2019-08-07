@@ -398,78 +398,14 @@ taxonomy as (
     mkt_medium,
     mkt_source
   from files.taxonomy_growth
-)
+),
+applied_taxonomy as (
 select 
-  pl.sk_house_listing_flow,
-  pl.sk_condo,
-  pl.sk_lead,
-  pl.sk_lead_conversion,
-  pl.sk_first_photo_job,
-  pl.sk_house_listing,
-  pl.sk_user_house_registrant,
-  pl.sk_user_sales_rep,
-  pl.sk_user_lead_affiliate,
-  pl.sk_user_first_task_assignee,
-  pl.sk_user_last_task_assignee,
-  pl.sk_region,
-  pl.sk_city,
-  pl.sk_partner,
-  pl.sk_lead_date,
-  pl.sk_prospect_date,
-  pl.sk_first_task_created_date,
-  pl.sk_first_task_closed_date,
-  pl.sk_last_task_created_date,
-  pl.sk_last_task_closed_date,
-  pl.sk_first_inside_sales_contact_date,
-  pl.sk_conversion_date,
-  pl.sk_qualified_date,
-  pl.sk_opportunity_date,
-  pl.sk_first_listing_date,
-  pl.sk_discard_date,
-  pl.sk_user_lead_first_discarder,
-  pl.sk_user_lead_last_discarder,
-  pl.funnel_step,
-  pl.funnel_drop_reason,
-  pl.hours_lead_to_prospect,
-  pl.hours_prospect_to_qualified,
-  pl.hours_lead_to_first_inside_sales_contact,
-  pl.hours_prospect_to_first_inside_sales_contact,
-  pl.hours_qualified_to_opportunity,
-  pl.hours_opportunity_to_listing,
-  pl.hours_lead_to_listing,
-  pl.days_lead_to_prospect,
-  pl.days_prospect_to_qualified,
-  pl.days_lead_to_first_inside_sales_contact,
-  pl.days_prospect_to_first_inside_sales_contact,
-  pl.days_qualified_to_opportunity,
-  pl.days_opportunity_to_listing,
-  pl.days_lead_to_listing,
-  pl.days_lead_to_processing,
-  pl.is_exclusive,
-  pl.first_isales_intervention,
-  pl.lead_type,
-  pl.lead_origin,
-  pl.utm_source as lead_tracking_source,
-  pl.utm_medium as lead_tracking_medium,
-  pl.tracking_platform as lead_tracking_platform,
-  pl.is_branded,
-  pl.is_b2b,
-  pl.is_doorman,
-  pl.is_isales_direct_register,
-  pl.is_cx_direct_register,
-  pl.has_isales_intervention,
-  pl.is_call_center,
-  pl.reprocessed_flg as is_lead_reprocessed,
-  pl.affiliate_type,
-  pl.lead_referring_domain,
-  pl.subscription_source,
+  pl.*,
   case
     when pl.is_branded then 'Branded'
     else 'Other'
   end as mkt_branded,
-  'to be defined' as mkt_category,
-  'to be defined' as mkt_flow,
-  'to be defined' as mkt_completion,
   case
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_origin
@@ -508,4 +444,96 @@ left join taxonomy t
     and coalesce(pl.is_cx_direct_register, false) = coalesce(t.is_cx_direct_register, false) 
     and coalesce(pl.has_isales_intervention, false) = coalesce(t.has_isales_intervention, false) 
     and coalesce(pl.is_call_center, false) = coalesce(t.is_call_center, false)
-;
+),
+applied_taxonomy_flow as (
+    select
+        *,
+        case when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
+             when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
+                  and mkt_source = 'Direct Referral' then 'Self-Service'
+             when mkt_origin = 'Other' then 'Other'
+             else 'Non-Self Service' end as mkt_flow
+    from  applied_taxonomy
+)
+select
+  atax.sk_house_listing_flow,
+  atax.sk_condo,
+  atax.sk_lead,
+  atax.sk_lead_conversion,
+  atax.sk_first_photo_job,
+  atax.sk_house_listing,
+  atax.sk_user_house_registrant,
+  atax.sk_user_sales_rep,
+  atax.sk_user_lead_affiliate,
+  atax.sk_user_first_task_assignee,
+  atax.sk_user_last_task_assignee,
+  atax.sk_region,
+  atax.sk_city,
+  atax.sk_partner,
+  atax.sk_lead_date,
+  atax.sk_prospect_date,
+  atax.sk_first_task_created_date,
+  atax.sk_first_task_closed_date,
+  atax.sk_last_task_created_date,
+  atax.sk_last_task_closed_date,
+  atax.sk_first_inside_sales_contact_date,
+  atax.sk_conversion_date,
+  atax.sk_qualified_date,
+  atax.sk_opportunity_date,
+  atax.sk_first_listing_date,
+  atax.sk_discard_date,
+  atax.sk_user_lead_first_discarder,
+  atax.sk_user_lead_last_discarder,
+  atax.funnel_step,
+  atax.funnel_drop_reason,
+  atax.hours_lead_to_prospect,
+  atax.hours_prospect_to_qualified,
+  atax.hours_lead_to_first_inside_sales_contact,
+  atax.hours_prospect_to_first_inside_sales_contact,
+  atax.hours_qualified_to_opportunity,
+  atax.hours_opportunity_to_listing,
+  atax.hours_lead_to_listing,
+  atax.days_lead_to_prospect,
+  atax.days_prospect_to_qualified,
+  atax.days_lead_to_first_inside_sales_contact,
+  atax.days_prospect_to_first_inside_sales_contact,
+  atax.days_qualified_to_opportunity,
+  atax.days_opportunity_to_listing,
+  atax.days_lead_to_listing,
+  atax.days_lead_to_processing,
+  atax.is_exclusive,
+  atax.first_isales_intervention,
+  atax.lead_type,
+  atax.lead_origin,
+  atax.utm_source as lead_tracking_source,
+  atax.utm_medium as lead_tracking_medium,
+  atax.tracking_platform as lead_tracking_platform,
+  atax.is_branded,
+  atax.is_b2b,
+  atax.is_doorman,
+  atax.is_isales_direct_register,
+  atax.is_cx_direct_register,
+  atax.has_isales_intervention,
+  atax.is_call_center,
+  atax.reprocessed_flg as is_lead_reprocessed,
+  atax.affiliate_type,
+  atax.lead_referring_domain,
+  atax.subscription_source,
+  atax.mkt_branded,
+  case when atax.mkt_flow = 'Self-Service' then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('App', 'Crawling', 'Form', 'Planilha') then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') then 'Inbound'
+       else 'Other' end as mkt_category,
+  atax.mkt_flow,
+  case when atax.mkt_flow = 'Non-Self Service' then 'Non-Self Service'
+       when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
+       when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
+       when atax.mkt_flow = 'Other' then 'Other'
+       else 'Not Mapped' end as mkt_completion,
+  atax.mkt_origin,
+  atax.mkt_channel,
+  atax.mkt_platform,
+  atax.mkt_medium,
+  atax.mkt_source,
+  atax.ts_load
+from applied_taxonomy_flow atax
