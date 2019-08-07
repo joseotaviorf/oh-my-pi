@@ -23,9 +23,8 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 
 # functions
 @logger
-def extract_data_from_matcher(table_name, **kwargs):
+def extract_data_from_matcher(table_name, ds, **kwargs):
     # connect to external db, extract data, save csv to S3
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(SOURCE_QUERIES_DIR, table_name))
 
     logger.info('m=extract_data_from_matcher, table_name={}, msg=Extracting data from photos matcher'.format(table_name))
@@ -35,23 +34,22 @@ def extract_data_from_matcher(table_name, **kwargs):
         encoding='utf-8'
     )
     BaseETL.to_s3(
-        filename='{}_{}.csv'.format(execution_date, table_name),
+        filename='{}_{}.csv'.format(ds, table_name),
         data_table=data_table,
         bucket_folder_path='{}/raw/photos_matcher/{}'.format(s3_bucket, table_name),
         write_header=True
     )
 
 
-def upload_data_to_matcher(table_name, **kwargs):
+def upload_data_to_matcher(table_name, ds, **kwargs):
     # extract data from athena, save to external db
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     athena = AthenaClient(s3_bucket)
     query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name))
 
     logger.info('m=upload_data_to_matcher, table_name={}, msg=Reading data from datalake'.format(table_name))
     df = athena.execute_query_and_return_dataframe(
         sql=query,
-        query_params={'dt': execution_date}
+        query_params={'dt': ds}
     )
 
     logger.info('m=upload_data_to_matcher, table_name={}, msg=Truncating table in photos matcher db'.format(table_name))
