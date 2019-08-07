@@ -4,12 +4,16 @@ from bietlejuice.jobs.composer.loaders.database_into_datalake_loader import (
 
 
 class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
-    def __init__(self):
+    def __init__(self, environment, source):
+        if environment not in ("forno", "prod"):
+            raise RuntimeError(
+                "msg=environment %s invalid. It must be `forno` or `prod`" % environment
+            )
         config = {
             "format": "json",
             "codec": "gzip",
-            "datalake_db": "datalake_raw_spark",
-            "datalake_path": "s3://5a-datalake/raw_spark",
+            "datalake_db": "datalake_{}_raw".format(source),
+            "datalake_path": "s3://5a-datalake-{}/raw/{}".format(environment, source),
             "create_query_format": "ROW FORMAT serde 'org.apache.hive.hcatalog.data.JsonSerDe'",
         }
-        super().__init__(config)
+        super().__init__(config, environment)
