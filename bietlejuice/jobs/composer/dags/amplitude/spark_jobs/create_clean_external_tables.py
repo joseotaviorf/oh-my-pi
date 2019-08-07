@@ -1,49 +1,47 @@
 import logging
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.wrappers import AthenaClient
+
+JOB_NAME = "create_clean_external_tables"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("create_clean_external_tables")
-
-parser = ArgumentParser(description="create_clean_external_tables")
-parser.add_argument("env")
+logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_s3_clean_path(env):
-    if env == "forno":
-        return "s3://5a-datalake-forno/clean_spark/amplitude/"
-    elif env == "prod":
-        return "s3://5a-datalake/clean_spark/amplitude/"
-    raise ValueError("The environment do not exists: {}".format(env))
+def get_s3_clean_path(environment):
+    if not Environment.is_valid_environment(environment):
+        raise RuntimeError(
+            "msg=environment %s invalid. Environments allowed are: " % ', '.join(
+                Environment.get_valid_environments())
+        )
+    return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
     args = parser.parse_args()
-    env = args.env
+    environment = args.env
 
-    db_clean = "datalake_clean_spark"
-    s3_clean_path = get_s3_clean_path(env)
-    amplitude_events = AmplitudeEvents(db_clean=db_clean, s3_clean_path=s3_clean_path)
+    db_clean = "datalake_amplitude_clean"
+    s3_clean_path = get_s3_clean_path(environment)
+    amplitude_events = AmplitudeEvents(environment=environment, db_clean=db_clean, s3_clean_path=s3_clean_path)
 
-    athena_db = amplitude_events.db_clean
+    athena_db = "{}_{}".format(db_clean,
+                               environment) if environment != Environment.PROD else db_clean
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
 
     connection = {"db": db_clean}
     databricks_consumer = DatabricksConsumer(connection)
-    df = databricks_consumer.get_table_names_and_sizes()
-    tables = (
-        df.select("table_name")
-        .filter(col("table_name").rlike(r"^amplitude_"))
-        .collect()
-    )
+    tables = databricks_consumer.get_table_names_and_sizes().collect()
     table_extra_partitions = {"amplitude_events": ["event_type"]}
 
     logger.info("m=__main__, msg=Creating clean external tables...")

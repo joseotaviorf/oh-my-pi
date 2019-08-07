@@ -1,39 +1,43 @@
-from datetime import datetime
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 
+JOB_NAME = "events_raw_to_clean"
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("events_raw_to_clean")
-
-parser = ArgumentParser(description="events_raw_to_clean")
-parser.add_argument("execution_date")
-parser.add_argument("env")
+logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_s3_clean_path(env):
-    if env == "forno":
-        return "s3://5a-datalake-forno/clean_spark/amplitude/"
-    elif env == "prod":
-        return "s3://5a-datalake/clean_spark/amplitude/"
-    raise ValueError("The environment do not exists: {}".format(env))
+def get_s3_clean_path(environment):
+    if not Environment.is_valid_environment(environment):
+        raise RuntimeError(
+            "msg=environment %s invalid. Environments allowed are: " % ', '.join(
+                Environment.get_valid_environments())
+        )
+    return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("execution_date")
+    parser.add_argument("env")
     args = parser.parse_args()
     execution_date = args.execution_date
-    env = args.env
+    environment = args.env
 
     date = datetime.strptime(execution_date, "%Y-%m-%d")
-    db_raw = "datalake_raw_spark"
-    db_clean = "datalake_clean_spark"
-    s3_clean_path = get_s3_clean_path(env)
+    db_raw = "datalake_amplitude_raw"
+    db_clean = "datalake_amplitude_clean"
+    s3_clean_path = get_s3_clean_path(environment)
 
-    amplitude_events = AmplitudeEvents(
-        db_raw=db_raw, db_clean=db_clean, s3_clean_path=s3_clean_path
-    )
+    amplitude_events = AmplitudeEvents(environment=environment,
+                                       db_raw=db_raw, db_clean=db_clean, s3_clean_path=s3_clean_path
+                                       )
 
     amplitude_events.update_clean_amplitude_events(date=date)
 
