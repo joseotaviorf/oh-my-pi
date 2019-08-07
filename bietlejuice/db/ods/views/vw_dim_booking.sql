@@ -76,6 +76,7 @@ bookings as (
 	    s.status,
 	    s."slotDia" as slot_dia,
 	    s.reason::varchar(200) as reason,
+	    s.reason_enum as cancellation_reason,
 	    case
 	        when s.status = 'Cancelado' then
 	            case
@@ -120,7 +121,7 @@ bookings as (
                     when s.reason_enum = 'CANCELED_AGENT_VISIT_TOO_FAR' then 'Agent'
                     else 'Unknown'
                 end
-	    end as cancelation_reason_category,
+	    end as cancellation_reason_category,
 	    coalesce(
 	    	nullif(d."new reason",'CHECK ORIGEM'), 
 	    	case  
@@ -209,16 +210,17 @@ select
 	b.status,
 	b.slot_dia,
 	b.reason,
-	b.cancelation_reason_category,
+	b.cancellation_reason,
+	b.cancellation_reason_category,
 	coalesce
 	(
 		nullif(b.reason_category, 'Other'),
 		'Unknown'
 	) as reason_category,
 	case
-		when b.cancelation_reason_category in ('Agent','House Suspended','House Reserved','House Unlisted','Consequence Management') then 'QuintoAndar'
-		when b.cancelation_reason_category in ('Reschedule_Tenant','Reschedule_Agent') then 'Reschedule'
-		else b.cancelation_reason_category
+		when b.cancellation_reason_category in ('Agent','House Suspended','House Reserved','House Unlisted','Consequence Management') then 'QuintoAndar'
+		when b.cancellation_reason_category in ('Reschedule_Tenant','Reschedule_Agent') then 'Reschedule'
+		else b.cancellation_reason_category
 	end as responsible,
 	b.app_type,
   	b.media_source,
