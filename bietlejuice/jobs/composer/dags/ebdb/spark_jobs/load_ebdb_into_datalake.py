@@ -22,7 +22,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 @logger
 def load_table_into_datalake(args):
-    table_name, table_size, loader, consumer = args
+    loader, consumer, table_name, table_size = args
     num_partitions = int(math.ceil(float(table_size) / PARTITION_SIZE))
     loader.load_full_table(
         consumer=consumer, table_name=table_name, concurrency=num_partitions
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         p.map(
             load_table_into_datalake,
             [
-                (t.table_name, t.size, loader, mysql_consumer)
+                (loader, mysql_consumer, t.table_name, t.size)
                 for t in tables
                 if t.table_name not in BLACK_LIST and t.table_name and t.size
             ],

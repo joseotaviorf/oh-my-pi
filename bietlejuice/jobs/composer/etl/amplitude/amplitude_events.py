@@ -1,14 +1,13 @@
-import io
-import zipfile
 import gzip
+import io
 import os
+import zipfile
 from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.airflow.environment import Environment
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
+from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
 
 logger = QuintoAndarLogger("AmplitudeEvents")
 
@@ -23,8 +22,8 @@ class AmplitudeEvents:
     CLEAN_FORMAT = "parquet"
     CLEAN_RECORDS_BY_PARTITION = 250000
 
-    DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
-    CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
+    DROP_TABLE_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
+    CREATE_TABLE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
                             `{database}`.`{table}`
                             (
                               {columns}
@@ -37,19 +36,12 @@ class AmplitudeEvents:
 
     def __init__(
         self,
-        environment,
         db_raw=None,
         s3_raw_path=None,
         db_clean=None,
         s3_clean_path=None,
         keys=None,
     ):
-        if not Environment.is_valid_environment(environment):
-            raise RuntimeError(
-                "msg=environment %s invalid. Environments allowed are: " % ', '.join(
-                    Environment.get_valid_environments())
-            )
-        self.environment = environment
         self.db_raw = db_raw
         self.s3_raw_path = s3_raw_path
         self.keys = keys
@@ -203,19 +195,17 @@ class AmplitudeEvents:
         )
 
     @logger
-    def create_athena_external_table(self, consumer, table, partition_by=None):
-        # in glue metastore we need to distinguish schemas between environments
-        datalake_db = "{}_{}".format(self.db_clean,
-                                     self.environment) if self.environment != Environment.PROD else self.db_clean
+    def create_athena_external_table(
+        self, consumer, table, athena_db, partition_by=None
+    ):
         file_format = AmplitudeEvents.CREATE_QUERY_CLEAN_FORMAT
-
-        drop_query = AmplitudeEvents.DROP_QUERY_TEMPLATE.format(
-            database=datalake_db, table=table
+        drop_query = AmplitudeEvents.DROP_TABLE_QUERY_TEMPLATE.format(
+            database=athena_db, table=table
         )
-        AthenaClient.execute_athena_query(drop_query, datalake_db)
+        AthenaClient.execute_athena_query(drop_query, athena_db)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                datalake_db, table
+                athena_db, table
             )
         )
 
@@ -244,23 +234,22 @@ class AmplitudeEvents:
                     ["`" + col + "` " + table_schema[col] for col in partition_by]
                 )
             )
-        create_query = AmplitudeEvents.CREATE_QUERY_TEMPLATE.format(
-            database=datalake_db,
+        create_query = AmplitudeEvents.CREATE_TABLE_QUERY_TEMPLATE.format(
+            database=athena_db,
             table=table,
             columns=columns_section,
             partitioned_by=partitions_section,
             format=file_format,
             path="{}{}".format(self.s3_clean_path, table),
         )
-        AthenaClient.execute_athena_query(create_query, datalake_db)
+        AthenaClient.execute_athena_query(create_query, athena_db)
         if partition_by:
             AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(datalake_db, table),
-                datalake_db,
+                "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table), athena_db
             )
 
         logger.info(
             "m=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
-                datalake_db, table
+                athena_db, table
             )
         )

@@ -1,6 +1,6 @@
 class Environment:
-    FORNO = 'forno'
-    PROD = 'prod'
+    FORNO = "forno"
+    PROD = "prod"
 
     @classmethod
     def is_valid_environment(cls, environment):

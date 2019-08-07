@@ -1,3 +1,4 @@
+from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.loaders.database_into_datalake_loader import (
     DatabaseIntoDataLakeLoader,
 )
@@ -5,6 +6,11 @@ from bietlejuice.jobs.composer.loaders.database_into_datalake_loader import (
 
 class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
     def __init__(self, environment, source):
+        if not Environment.is_valid_environment(environment):
+            raise RuntimeError(
+                "msg=environment %s invalid. Environments allowed are: "
+                % ", ".join(Environment.get_valid_environments())
+            )
         config = {
             "format": "json",
             "codec": "gzip",
@@ -12,4 +18,4 @@ class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
             "datalake_path": "s3://5a-datalake-{}/raw/{}".format(environment, source),
             "create_query_format": "ROW FORMAT serde 'org.apache.hive.hcatalog.data.JsonSerDe'",
         }
-        super().__init__(config, environment)
+        super().__init__(config)

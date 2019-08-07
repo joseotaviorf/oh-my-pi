@@ -17,8 +17,8 @@ logger = QuintoAndarLogger(JOB_NAME)
 def get_s3_clean_path(environment):
     if not Environment.is_valid_environment(environment):
         raise RuntimeError(
-            "msg=environment %s invalid. Environments allowed are: " % ', '.join(
-                Environment.get_valid_environments())
+            "msg=environment %s invalid. Environments allowed are: "
+            % ", ".join(Environment.get_valid_environments())
         )
     return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
 
@@ -31,10 +31,9 @@ if __name__ == "__main__":
 
     db_clean = "datalake_amplitude_clean"
     s3_clean_path = get_s3_clean_path(environment)
-    amplitude_events = AmplitudeEvents(environment=environment, db_clean=db_clean, s3_clean_path=s3_clean_path)
+    amplitude_events = AmplitudeEvents(db_clean=db_clean, s3_clean_path=s3_clean_path)
 
-    athena_db = "{}_{}".format(db_clean,
-                               environment) if environment != Environment.PROD else db_clean
+    athena_db = "{}_{}".format(db_clean, environment)
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
@@ -51,6 +50,9 @@ if __name__ == "__main__":
         if table_name in table_extra_partitions:
             partition_by = partition_by + table_extra_partitions[table_name]
         amplitude_events.create_athena_external_table(
-            consumer=databricks_consumer, table=table_name, partition_by=partition_by
+            consumer=databricks_consumer,
+            table=table_name,
+            athena_db=athena_db,
+            partition_by=partition_by,
         )
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

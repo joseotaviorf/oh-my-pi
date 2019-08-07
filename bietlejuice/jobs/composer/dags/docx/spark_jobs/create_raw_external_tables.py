@@ -21,8 +21,7 @@ if __name__ == "__main__":
     source = "docx"
 
     loader = DatabaseIntoDataLakeRawLoader(environment, source)
-    athena_db = "{}_{}".format(loader.datalake_db,
-                               environment) if environment != Environment.PROD else loader.datalake_db
+    athena_db = "{}_{}".format(loader.datalake_db, environment)
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
@@ -33,7 +32,9 @@ if __name__ == "__main__":
     logger.info("m=__main__, msg=Creating raw external tables...")
     for table in tables:
         loader.create_athena_external_table(
-            consumer=databricks_consumer, table_name=table.table_name
+            consumer=databricks_consumer,
+            table_name=table.table_name,
+            athena_db=athena_db,
         )
 
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

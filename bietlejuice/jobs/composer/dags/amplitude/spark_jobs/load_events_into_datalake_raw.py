@@ -18,8 +18,8 @@ logger = QuintoAndarLogger(JOB_NAME)
 def get_s3_raw_path(environment):
     if not Environment.is_valid_environment(environment):
         raise RuntimeError(
-            "msg=environment %s invalid. Environments allowed are: " % ', '.join(
-                Environment.get_valid_environments())
+            "msg=environment %s invalid. Environments allowed are: "
+            % ", ".join(Environment.get_valid_environments())
         )
     return "s3://5a-datalake-{}/raw/amplitude/".format(environment)
 
@@ -42,9 +42,9 @@ if __name__ == "__main__":
     db_raw = "datalake_amplitude_raw"
     s3_raw_path = get_s3_raw_path(environment)
 
-    amplitude_events = AmplitudeEvents(environment=environment,
-                                       db_raw=db_raw, s3_raw_path=s3_raw_path, keys=keys
-                                       )
+    amplitude_events = AmplitudeEvents(
+        db_raw=db_raw, s3_raw_path=s3_raw_path, keys=keys
+    )
     amplitude_events.load_events_into_datalake_raw(
         start_date=start_date, end_date=end_date
     )

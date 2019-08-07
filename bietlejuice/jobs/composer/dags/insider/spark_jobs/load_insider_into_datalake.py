@@ -25,9 +25,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    connection_json = dbutils.secrets.get(
-        scope="quintoandar", key=DatabaseEnum.INSIDER
-    )
+    connection_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.INSIDER)
     connection = json.loads(connection_json)
     postgres_consumer = PostgreSQLConsumer(connection)
 

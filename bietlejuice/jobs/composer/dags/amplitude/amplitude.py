@@ -66,7 +66,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH,
             "parameters": ["{{ ds }}", ENV],
-        },
+        }
     },
 )
 
@@ -77,7 +77,7 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
             "parameters": ["{{ ds }}", ENV],
-        },
+        }
     },
 )
 
@@ -88,7 +88,7 @@ create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH,
             "parameters": [ENV],
-        },
+        }
     },
 )
 
