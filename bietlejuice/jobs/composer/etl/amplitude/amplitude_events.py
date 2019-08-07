@@ -5,6 +5,8 @@ import os
 from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
 
@@ -35,12 +37,19 @@ class AmplitudeEvents:
 
     def __init__(
         self,
+        environment,
         db_raw=None,
         s3_raw_path=None,
         db_clean=None,
         s3_clean_path=None,
         keys=None,
     ):
+        if not Environment.is_valid_environment(environment):
+            raise RuntimeError(
+                "msg=environment %s invalid. Environments allowed are: " % ', '.join(
+                    Environment.get_valid_environments())
+            )
+        self.environment = environment
         self.db_raw = db_raw
         self.s3_raw_path = s3_raw_path
         self.keys = keys
@@ -195,15 +204,18 @@ class AmplitudeEvents:
 
     @logger
     def create_athena_external_table(self, consumer, table, partition_by=None):
+        # in glue metastore we need to distinguish schemas between environments
+        datalake_db = "{}_{}".format(self.db_clean,
+                                     self.environment) if self.environment != Environment.PROD else self.db_clean
         file_format = AmplitudeEvents.CREATE_QUERY_CLEAN_FORMAT
 
         drop_query = AmplitudeEvents.DROP_QUERY_TEMPLATE.format(
-            database=self.db_clean, table=table
+            database=datalake_db, table=table
         )
-        AthenaClient.execute_athena_query(drop_query, self.db_clean)
+        AthenaClient.execute_athena_query(drop_query, datalake_db)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                self.db_clean, table
+                datalake_db, table
             )
         )
 
@@ -233,22 +245,22 @@ class AmplitudeEvents:
                 )
             )
         create_query = AmplitudeEvents.CREATE_QUERY_TEMPLATE.format(
-            database=self.db_clean,
+            database=datalake_db,
             table=table,
             columns=columns_section,
             partitioned_by=partitions_section,
             format=file_format,
             path="{}{}".format(self.s3_clean_path, table),
         )
-        AthenaClient.execute_athena_query(create_query, self.db_clean)
+        AthenaClient.execute_athena_query(create_query, datalake_db)
         if partition_by:
             AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(self.db_clean, table),
-                self.db_clean,
+                "MSCK REPAIR TABLE `{}`.`{}`;".format(datalake_db, table),
+                datalake_db,
             )
 
         logger.info(
             "m=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
-                self.db_clean, table
+                datalake_db, table
             )
         )

@@ -1,6 +1,6 @@
 import io
-import requests
 
+import requests
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("AmplitudeExportApi")
