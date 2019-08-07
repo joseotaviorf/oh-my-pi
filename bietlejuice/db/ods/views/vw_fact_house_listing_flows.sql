@@ -8,23 +8,35 @@ with legacy_doorman as (
   where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
-base_lead_tasks as (
-  with rn_lead as (
+rn_lead as (
     select lead_tasks.rep_id,
-      lead_tasks.lead_id,
-      lead_tasks.dt_created,
-      lead_tasks.dt_closed,
-       row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn
+        lead_tasks.lead_id,
+        lead_tasks.dt_created,
+        lead_tasks.dt_closed,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created asc) as rn_first,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn_last
     from crm.lead_tasks
-  )
-  select 
-    rn_lead.rep_id,
-    rn_lead.lead_id,
-    rn_lead.dt_created,
-    rn_lead.dt_closed
+),
+-- first conversion task created for a lead
+base_lead_tasks_first as (
+    select
+        rn_lead.rep_id,
+        rn_lead.lead_id,
+        rn_lead.dt_created,
+        rn_lead.dt_closed
+    from rn_lead
+    where rn_first = 1
+),
+-- last conversion task created for a lead
+base_lead_tasks_last as (
+  select
+      rn_lead.rep_id,
+      rn_lead.lead_id,
+      rn_lead.dt_created,
+      rn_lead.dt_closed
   from rn_lead
-  where rn_lead.rn = 1
-), 
+  where rn_last = 1
+),
 base_photo_tasks as (
   select distinct 
     coalesce(i.id, i_direct.id)::integer as imovel_id
@@ -258,16 +270,19 @@ potential_listings as (
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
     coalesce(f.imovel_id || '001', '-1') as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
-    coalesce(f.rep_id, bt.rep_id, '-1'::integer) as sk_user_sales_rep,
+    coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
-    coalesce(bt.rep_id, '-1'::integer) as sk_user_task_assignee,
+    coalesce(btf.rep_id, '-1'::integer) as sk_user_first_task_assignee,
+    coalesce(btl.rep_id, '-1'::integer) as sk_user_last_task_assignee,
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
     coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
-    coalesce(to_char(bt.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_task_created_date,
-    coalesce(to_char(bt.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_task_closed_date,
+    coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
+    coalesce(to_char(btf.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_closed_date,
+    coalesce(to_char(btl.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_created_date,
+    coalesce(to_char(btl.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_closed_date,
     coalesce(to_char(f.dt_first_inside_sales_contact::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_inside_sales_contact_date,
     coalesce(to_char(f.dt_conversion::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_conversion_date,
     coalesce(to_char(f.dt_qualified::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_qualified_date,
@@ -306,7 +321,7 @@ potential_listings as (
     f.days_lead_to_processing,
     h.exclusivity as is_exclusive,
     case
-      when bt.rep_id is not null then 'Lead'
+      when btf.rep_id is not null then 'Lead'
       when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
@@ -322,15 +337,17 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, bt.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
+    coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
     us_cad.id is not null as is_call_center
   from fact_with_reproc f
   left join lead_first_event_tracking lfet 
     on lfet.id_lead = f.lead_id
   left join acquisitions a 
     on a.id = f.id
-  left join base_lead_tasks bt 
-    on bt.lead_id = f.lead_id
+  left join base_lead_tasks_first btf
+    on btf.lead_id = f.lead_id
+  left join base_lead_tasks_last btl
+    on btl.lead_id = f.lead_id
   left join base_photo_tasks bpt 
     on f.imovel_id = bpt.imovel_id
   left join rep_leads bl 
@@ -382,14 +399,17 @@ select
   pl.sk_user_house_registrant,
   pl.sk_user_sales_rep,
   pl.sk_user_lead_affiliate,
-  pl.sk_user_task_assignee,
+  pl.sk_user_first_task_assignee,
+  pl.sk_user_last_task_assignee,
   pl.sk_region,
   pl.sk_city,
   pl.sk_partner,
   pl.sk_lead_date,
   pl.sk_prospect_date,
-  pl.sk_task_created_date,
-  pl.sk_task_closed_date,
+  pl.sk_first_task_created_date,
+  pl.sk_first_task_closed_date,
+  pl.sk_last_task_created_date,
+  pl.sk_last_task_closed_date,
   pl.sk_first_inside_sales_contact_date,
   pl.sk_conversion_date,
   pl.sk_qualified_date,

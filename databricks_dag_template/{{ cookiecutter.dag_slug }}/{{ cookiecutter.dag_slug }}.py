@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "{{ cookiecutter.dag_slug }}"
 ENV = Variable.get("environment")
@@ -54,9 +54,6 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="{{ task.replace('_', '-') }}",
     dag=dag,
     json={
-    {%- raw %}
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
-    {%- endraw %}
         "spark_python_task": {"python_file": {{ task.upper() }}_FILE_PATH},
     },
 )
