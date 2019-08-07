@@ -13,6 +13,10 @@ class TestCRMTasksClosing(object):
         'AnalisarDocumentacaoProprietario'
     ]
 
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_CLOSING_ID'
+    ]
+
     TABLE_NAMES = {
         'fact': 'fact_closing_tasks',
         'dim': 'dim_closing_task'
@@ -28,6 +32,7 @@ class TestCRMTasksClosing(object):
         # arrange
         table_name = TestCRMTasksClosing.TABLE_NAMES['fact']
         queues = TestCRMTasksClosing.QUEUES
+        manual_task_workgroups = TestCRMTasksClosing.MANUAL_TASK_WORKGROUP_IDS
         append_query_filename = TestCRMTasksClosing.QUERY_FILENAMES['staging']
 
         # act
@@ -38,6 +43,7 @@ class TestCRMTasksClosing(object):
         assert mock__move_fact_to_staging.call_args[1] == {
             'table_name': table_name,
             'queues': queues,
+            'manual_task_workgroups': manual_task_workgroups,
             'append_query_filename': append_query_filename
         }
 
@@ -46,6 +52,7 @@ class TestCRMTasksClosing(object):
         # arrange
         table_name = TestCRMTasksClosing.TABLE_NAMES['dim']
         queues = TestCRMTasksClosing.QUEUES
+        manual_task_workgroups = TestCRMTasksClosing.MANUAL_TASK_WORKGROUP_IDS
 
         # act
         closing.move_dim_to_staging()
@@ -54,7 +61,8 @@ class TestCRMTasksClosing(object):
         assert mock__move_dim_to_staging.call_count == 1
         assert mock__move_dim_to_staging.call_args[1] == {
             'table_name': table_name,
-            'queues': queues
+            'queues': queues,
+            'manual_task_workgroups': manual_task_workgroups
         }
 
     @mock.patch.object(CRMTasksClosing, '_append_fact_to_dw')

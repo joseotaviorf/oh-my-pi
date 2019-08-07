@@ -1,0 +1,26 @@
+from pyspark.sql import session, context
+from pyspark import SparkContext
+
+from quintoandar_logger import QuintoAndarLogger
+
+logger = QuintoAndarLogger("base_spark")
+
+
+class BaseDBUtils:
+    @logger(exclude_return=True)
+    def get_dbutils(self):
+        spark = SparkContext.getOrCreate()
+        setting = spark.getConf().get("spark.master")
+        if "local" in setting:
+            from pyspark.dbutils import DBUtils
+
+            logger.info("m=get_db_utils, msg=returning local dbutils reference")
+            return DBUtils(spark.sparkContext)
+
+        logger.info("m=get_db_utils, msg=dbutils already available")
+
+
+class BaseSparkContext:
+    sc = SparkContext.getOrCreate()
+    spark = session.SparkSession(sc)
+    sqlContext = context.HiveContext(sc)
