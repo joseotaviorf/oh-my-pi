@@ -49,15 +49,15 @@ reschedules as (
     from booking
     where "reagendadoDe_id" is not null
     group by 1 -- guaranteeing there are no future duplication on Product
-),	
+),
 bookings as (
-	select 
+	select
 	    s.id as sk_booking,
 	    s.id as id_booking,
 	    r.id_reschedule is not null as is_rescheduled,
-	    s.data 
-				+ (("slotDia" * 15 / 60)+8) * interval '1 hour' 
-				+ ("slotDia" * 15 % 60) * interval '1 minute' 				
+	    s.data
+				+ (("slotDia" * 15 / 60)+8) * interval '1 hour'
+				+ ("slotDia" * 15 % 60) * interval '1 minute'
 			as dt_booking,
 	    s.tipo as type,
 	    s."fupVisita" is not null
@@ -123,8 +123,8 @@ bookings as (
                 end
 	    end as cancellation_reason_category,
 	    coalesce(
-	    	nullif(d."new reason",'CHECK ORIGEM'), 
-	    	case  
+	    	nullif(d."new reason",'CHECK ORIGEM'),
+	    	case
 	    		when s.last_update_source in ('Inquilinos', 'SelfServiceWeb') then 'Tenant'
 	    		when s.last_update_source in ('Proprietarios', 'ProprietariosEmail') then 'Owner'
 	    	end,
@@ -134,16 +134,16 @@ bookings as (
                 when s.reason_enum = 'CANCELED_HOUSE_RESERVED' then 'House Reserved'
                 when s.reason_enum = 'AGENT_TRANSFER' then 'Agent'
             end,
-	    	s.reason_category    	
+	    	s.reason_category
 	   	) as reason_category,
 	   	coalesce(
 	   		nullif(responsible, ''),
-	    	nullif(d."new reason",'CHECK ORIGEM'), 
-	    	case  
+	    	nullif(d."new reason",'CHECK ORIGEM'),
+	    	case
 	    		when s.last_update_source in ('Inquilinos', 'SelfServiceWeb') then 'Tenant'
 	    		when s.last_update_source in ('Proprietarios', 'ProprietariosEmail') then 'Owner'
 	    	end,
-	    	s.reason_category    	
+	    	s.reason_category
 	   	) as responsible,
         s.last_update_source,
         s.first_update_source,
