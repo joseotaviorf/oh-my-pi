@@ -86,7 +86,10 @@ tasks = [
      'final_sql': None},
     {'carto_table_name': 'qa_out_of_area_leads',
      'db': 'dw',
-     'final_sql': 'UPDATE qa_out_of_area_leads SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'}
+     'final_sql': 'UPDATE qa_out_of_area_leads SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL'},
+    {'carto_table_name': 'qa_bookings',
+     'db': 'dw',
+     'final_sql': 'UPDATE qa_bookings SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL'},
 ]
 
 MAIN_DAG_NAME = 'bi-upload-data-to-carto'
