@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
@@ -24,6 +25,11 @@ class DatabaseIntoDataLakeLoader:
 
     @logger
     def __init__(self, config, environment):
+        if not Environment.is_valid_environment(environment):
+            raise RuntimeError(
+                "msg=environment %s invalid. Environments allowed are: " % ', '.join(
+                    Environment.get_valid_environments())
+            )
         self.config = config
         self.environment = environment
 
@@ -110,7 +116,7 @@ class DatabaseIntoDataLakeLoader:
     def create_athena_external_table(self, consumer, table_name, partition_by=None):
         # in glue metastore we need to distinguish schemas between environments
         datalake_db = "{}_{}".format(self.datalake_db,
-                                     self.environment) if self.environment != 'prod' else self.datalake_db
+                                     self.environment) if self.environment != Environment.PROD else self.datalake_db
         drop_query = self.DROP_QUERY_TEMPLATE.format(
             database=datalake_db, table=table_name
         )

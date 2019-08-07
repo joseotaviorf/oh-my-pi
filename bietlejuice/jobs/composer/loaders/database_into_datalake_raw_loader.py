@@ -5,10 +5,6 @@ from bietlejuice.jobs.composer.loaders.database_into_datalake_loader import (
 
 class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
     def __init__(self, environment, source):
-        if environment not in ("forno", "prod"):
-            raise RuntimeError(
-                "msg=environment %s invalid. It must be `forno` or `prod`" % environment
-            )
         config = {
             "format": "json",
             "codec": "gzip",
