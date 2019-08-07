@@ -451,7 +451,7 @@ applied_taxonomy_flow as (
         case when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
              when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
                   and mkt_source = 'Direct Referral' then 'Self-Service'
-             when mkt_origin = 'Other' then 'Other'
+             when mkt_origin in ('Other', 'Not Mapped') then mkt_origin
              else 'Non-Self Service' end as mkt_flow
     from  applied_taxonomy
 )
@@ -523,12 +523,13 @@ select
   case when atax.mkt_flow = 'Self-Service' then 'Outbound'
        when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('App', 'Crawling', 'Form', 'Planilha') then 'Outbound'
        when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') then 'Inbound'
+       when atax.mkt_flow = 'Not Mapped' then 'Not Mapped'
        else 'Other' end as mkt_category,
   atax.mkt_flow,
   case when atax.mkt_flow = 'Non-Self Service' then 'Non-Self Service'
        when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
        when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
-       when atax.mkt_flow = 'Other' then 'Other'
+       when atax.mkt_flow in ('Not Mapped', 'Other') then atax.mkt_flow
        else 'Not Mapped' end as mkt_completion,
   atax.mkt_origin,
   atax.mkt_channel,
