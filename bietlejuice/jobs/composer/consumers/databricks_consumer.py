@@ -45,5 +45,5 @@ class DatabricksConsumer(DatabaseConsumer):
         raise NotImplementedError()
 
     @logger
-    def get_data_from_query(self, query):
+    def get_data_from_query(self, query, table_name=None):
         raise NotImplementedError()
