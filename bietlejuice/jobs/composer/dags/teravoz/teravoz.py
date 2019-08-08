@@ -71,11 +71,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [
-                    sub_dag_name,
-                    "datalake_raw_spark",
-                    "{{ ds }}"
-                ],
+                "parameters": [sub_dag_name, "datalake_raw_spark", "{{ ds }}"],
             },
         },
     )
@@ -114,9 +110,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 # )
 
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, 
-    sub_dag_name="calls", 
-    sub_dag_func=raw_sub_dag
+    dag=dag, sub_dag_name="calls", sub_dag_func=raw_sub_dag
 )
 
 # reports_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
