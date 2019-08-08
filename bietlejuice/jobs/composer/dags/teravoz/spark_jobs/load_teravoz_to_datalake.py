@@ -1,34 +1,68 @@
 import json
-import math
+from argparse import ArgumentParser
+from datetime import datetime
+
 from datetime import datetime
 from multiprocessing.dummy import Pool
 
-# from bietlejuice.jobs.composer.base import BaseDBUtils
 
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.jobs.composer.loaders.teravoz import CallsTeravozLoader, TeravozFactory
 
 DATABRICKS_SCOPE = "quintoandar-prod"
-NB_THREADS = len(ENDPOINTS.keys())
+# NB_THREADS = 4
 
-if __name__ == "__main__":
-
-    # start Spark Session
-    base_dbutils = BaseDBUtils()
-
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
-    # get Teravoz credentials stored in Databricks secrets
-    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="ENV_TERAVOZ")
-    credentials = json.loads(json_credentials)
-
-    teravoz_client = TeravozLoader(
-        api_user=credentials["teravoz_user"], api_pwd=credentials["teravoz_password"]
+def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):    
+    
+    teravoz = TeravozFactory.factory(
+        entity=endpoint,
+        api_user=api_user,
+        api_pwd=api_pwd,
+        execution_date=execution_date
     )
 
-    # endpoints_file = open('api_requests.py', 'r')
-    # endpoints = endpoints_file.format(execution_date=datetime.datetime(2019, 7, 1))
-    with Pool(NB_THREADS) as p:
-        p.map(
-            teravoz_client.load_data_into_datalake,
-            [(edp, param) for edp, param in ENDPOINTS.items()],
+    getattr(teravoz, method)
+    return teravoz
+
+
+if __name__ == "__main__":
+    
+    parser = ArgumentParser(description="load_teravoz_to_datalake_raw")
+    
+    # args passed by Airflow task
+    parser.add_argument("endpoint", type=str, help="which endpoint to call")
+    parser.add_argument("datalake_layer", type=str, help="which endpoint to call")
+    parser.add_argument("execution_date", type=str, help="which endpoint to call")
+    
+    args = parser.parse_args()
+
+    datalake_layer = args.datalake_layer
+    execution_date = args.execution_date
+    endpoint = args.endpoint
+    
+    if datalake_layer == 'raw':
+        
+        # start Spark Session
+        base_dbutils = BaseDBUtils()
+
+        if base_dbutils.get_dbutils() is not None:
+            dbutils = base_dbutils.get_dbutils()
+
+        # get Teravoz credentials stored in Databricks secrets
+        json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="ENV_TERAVOZ")
+        
+        credentials = json.loads(json_credentials)
+        
+        teravoz = exec_factory_method(
+            endpoint=endpoint,
+            method="__init__",
+            api_user=credentials["teravoz_user"],
+            api_pwd=credentials["teravoz_password"],  
+            execution_date=execution_date
+        )
+
+        df = teravoz.request_api_and_get_dataframe()
+        teravoz.load_data_into_datalake(
+          df=df, 
+          datalake_layer=datalake_layer
         )
