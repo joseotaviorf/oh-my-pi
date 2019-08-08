@@ -1,5 +1,6 @@
 import logging
 from argparse import ArgumentParser
+from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -13,6 +14,8 @@ JOB_NAME = "create_clean_external_tables"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+NB_THREADS = 11
+
 
 def get_s3_clean_path(environment):
     if not Environment.is_valid_environment(environment):
@@ -21,6 +24,16 @@ def get_s3_clean_path(environment):
             % ", ".join(Environment.get_valid_environments())
         )
     return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
+
+
+def create_raw_external_table(args):
+    table_name, table_extra_partitions, amplitude_events, databricks_consumer = args
+    partition_by = ["year", "month", "day"]
+    if table_name in table_extra_partitions:
+        partition_by = partition_by + table_extra_partitions[table_name]
+    amplitude_events.create_athena_external_table(
+        consumer=databricks_consumer, table=table_name, partition_by=partition_by
+    )
 
 
 if __name__ == "__main__":
@@ -44,15 +57,18 @@ if __name__ == "__main__":
     table_extra_partitions = {"amplitude_events": ["event_type"]}
 
     logger.info("m=__main__, msg=Creating clean external tables...")
-    for table in tables:
-        table_name = table.table_name
-        partition_by = ["year", "month", "day"]
-        if table_name in table_extra_partitions:
-            partition_by = partition_by + table_extra_partitions[table_name]
-        amplitude_events.create_athena_external_table(
-            consumer=databricks_consumer,
-            table=table_name,
-            athena_db=athena_db,
-            partition_by=partition_by,
+
+    with Pool(NB_THREADS) as p:
+        p.map(
+            create_raw_external_table,
+            [
+                (
+                    table.table_name,
+                    table_extra_partitions,
+                    amplitude_events,
+                    databricks_consumer,
+                )
+                for table in tables
+            ],
         )
     logger.info("m=__main__, msg=All raw external tables were created successfully.")
