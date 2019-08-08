@@ -4,7 +4,6 @@ from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 from bietlejuice.jobs.composer.wrappers import AthenaClient
