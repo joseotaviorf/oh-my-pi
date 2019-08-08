@@ -128,13 +128,9 @@ class TeravozLoader:
             s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint, partitions)
 
             # dataframe to json
-            df_write = (
-                df.write.mode("overwrite")
-                .option("compression", "gzip")
-                .format("json")
-                .option("path", s3_path)
-                .save()
-            )
+            df.write.mode("overwrite").option("compression", "gzip").format(
+                "json"
+            ).option("path", s3_path).save()
 
             if partitions:
                 list_partitions = []
@@ -145,4 +141,4 @@ class TeravozLoader:
 
                 self._create_partition_table(endpoint, s3_path, list_partitions)
 
-            spark.sql("REFRESH TABLE {}.{}".format(self.SOURCE, endpoint))
+            self.spark.sql("REFRESH TABLE {}.{}".format(self.SOURCE, endpoint))
