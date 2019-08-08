@@ -29,7 +29,7 @@ quintoandar_join_crawled AS
     q.quintoandar_rent - c.rent AS rent_difference,
     q.quintoandar_rent,
     c.rent AS crawled_rent,
-    DATE(q.quintoandar_ts_publication) AS quintoandar_publication,
+    DATE(q.quintoandar_ts_publication) AS quintoandar_publication_date,
     c.first_time_updated_on AS crawler_first_time_updated_on,
     m.positive_matches,
     m.identical_matches,
