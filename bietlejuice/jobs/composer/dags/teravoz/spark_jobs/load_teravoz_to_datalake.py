@@ -1,13 +1,8 @@
 import json
 from argparse import ArgumentParser
-from datetime import datetime
 
-from datetime import datetime
-from multiprocessing.dummy import Pool
-
-
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
-from bietlejuice.jobs.composer.loaders.teravoz import CallsTeravozLoader, TeravozFactory
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.loaders.teravoz import TeravozFactory
 
 DATABRICKS_SCOPE = "quintoandar-prod"
 # NB_THREADS = 4
