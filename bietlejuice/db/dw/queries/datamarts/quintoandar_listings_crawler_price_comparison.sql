@@ -18,7 +18,7 @@ quintoandar_listings AS (
          'https://www.quintoandar.com.br/imovel/' || l.id_house AS quintoandar_url,
          l.rent AS quintoandar_rent
   FROM public.dim_house_listing l
-  WHERE status IN ('publicado') AND is_last_version = 'True'
+  WHERE status IN ('publicado') AND is_last_version
     AND l.ts_publication >= DATEADD('day', -14, CURRENT_DATE) -- our listings pulished in the last 7 days
 ),
 quintoandar_join_crawled AS
