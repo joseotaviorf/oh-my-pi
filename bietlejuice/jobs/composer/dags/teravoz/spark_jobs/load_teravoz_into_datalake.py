@@ -1,11 +1,20 @@
 import json
+import logging
 from argparse import ArgumentParser
 
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
 
+from quintoandar_logger import QuintoAndarLogger
+
 DATABRICKS_SCOPE = "quintoandar-prod"
 # NB_THREADS = 4
+
+
+JOB_NAME = "load_teravoz_into_datalake"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
 
 
 def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):
