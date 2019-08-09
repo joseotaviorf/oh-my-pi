@@ -52,6 +52,34 @@ def clean_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('clean')
 
 
+def load_to_staging_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=BI_TWITTER_CAMPAIGNS_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=AUTH
+    )
+
+    return sub_dag.build_tasks('staging')
+
+
+def load_to_dw_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=BI_TWITTER_CAMPAIGNS_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=AUTH
+    )
+
+    return sub_dag.build_tasks('dw')
+
+
 main_dag = DAG(
     dag_id=BI_TWITTER_CAMPAIGNS_DAG_NAME,
     default_args={
@@ -72,12 +100,28 @@ twitter_raw_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.TWITTER
 )
 
-twitter_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
+twitter_ads_clean_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
     sub_dag_name='twitter-load-to-clean',
     class_=MarketingEnum.TWITTER
 )
 
+twitter_ads_load_to_staging_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='twitter-load-to-staging',
+    class_=MarketingEnum.TWITTER,
+)
+
+twitter_ads_load_to_prod_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='twitter-load-to-dw',
+    class_=MarketingEnum.TWITTER,
+)
+
 airflow_helpers.chain(twitter_raw_sub_dag,
-                      twitter_ads_clean_dag)
+                      twitter_ads_clean_sub_dag,
+                      twitter_ads_load_to_staging_sub_dag,
+                      twitter_ads_load_to_prod_sub_dag)
