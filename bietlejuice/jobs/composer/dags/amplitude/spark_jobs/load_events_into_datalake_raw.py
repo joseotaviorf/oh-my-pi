@@ -47,7 +47,7 @@ if __name__ == "__main__":
     amplitude_events = AmplitudeEvents(
         db_raw=db_raw, s3_raw_path=s3_raw_path, keys=keys
     )
-    spark.sql('CREATE DATABASE IF NOT EXISTS {}'.format(db_raw))
+    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_raw))
     amplitude_events.load_events_into_datalake_raw(
         start_date=start_date, end_date=end_date
     )

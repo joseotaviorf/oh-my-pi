@@ -42,7 +42,7 @@ if __name__ == "__main__":
         db_raw=db_raw, db_clean=db_clean, s3_clean_path=s3_clean_path
     )
 
-    spark.sql('CREATE DATABASE IF NOT EXISTS {}'.format(db_clean))
+    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_clean))
     amplitude_events.update_clean_amplitude_events(date=date)
 
     event_types = [
