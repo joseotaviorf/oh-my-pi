@@ -215,7 +215,7 @@ UNION
 			when cf.campaign_name_l like '%santo_andr%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_bernardo%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
-	 	    when cf.campaign_name_l like '%rio de janeiro%' then 'Rio de Janeiro'
+	 	    when cf.campaign_name_l like '%rio_de_janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
 	     	when cf.campaign_name_l like '%bh%' or cf.campaign_name_l like '%belo%h%' then 'Belo Horizonte'
 	 	    when cf.campaign_name_l like '%minas_gerais%' then 'Belo Horizonte'

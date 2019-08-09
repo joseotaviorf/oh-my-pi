@@ -112,7 +112,7 @@ execute_adjust_search_offline_conversions_query_task = BaseDAG.build_python_oper
     provide_context=True,
     op_kwargs={'query_filename': 'adjust_search_offline_conversions.sql',
                'file_name': 'adjust_search_offline_conversions',
-               'use_query_params': False},
+               'use_query_params': True},
     dag=main_dag
 )
 
