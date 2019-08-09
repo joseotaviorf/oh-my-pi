@@ -2,7 +2,7 @@ import json
 from argparse import ArgumentParser
 
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozFactory
+from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
 
 DATABRICKS_SCOPE = "quintoandar-prod"
 # NB_THREADS = 4
