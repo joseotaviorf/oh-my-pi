@@ -72,7 +72,9 @@ def raw_sub_dag(sub_dag_name, **kwargs):
         task_id="request-api-load-to-raw",
         dag=local_dag,
         json={
-            "existing_cluster_id": '{{task_instance.xcom_pull(dag_id="teravoz", task_ids="create-cluster", key="cluster_id")}}',
+            "existing_cluster_id": '{{task_instance.xcom_pull(dag_id="'
+            + DAG_ID
+            + '", task_ids="create_cluster", key="cluster_id")}}',
             "spark_python_task": {
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
