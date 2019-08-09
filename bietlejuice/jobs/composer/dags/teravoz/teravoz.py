@@ -66,14 +66,13 @@ def raw_sub_dag(sub_dag_name, **kwargs):
         dag=local_dag,
         kwargs={"api_request": sub_dag_name, "execution_date": ""},
         json={
-            "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
             "spark_python_task": {
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
                 "parameters": [sub_dag_name, "datalake_raw_spark", "{{ ds }}"],
             },
-        },
+        }
     )
 
     create_raw_partition_task = DummyOperator(
