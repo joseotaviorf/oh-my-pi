@@ -2,77 +2,73 @@ import logging
 from argparse import ArgumentParser
 from multiprocessing.dummy import Pool
 
+from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.airflow.environment import Environment
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.wrappers import AthenaClient
-
-JOB_NAME = "create_clean_external_tables"
+from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger(JOB_NAME)
+logger = QuintoAndarLogger("create_clean_external_tables")
+
+parser = ArgumentParser(description="create_clean_external_tables")
+parser.add_argument("env")
 
 NB_THREADS = 11
 
 
-def get_s3_clean_path(environment):
-    if not Environment.is_valid_environment(environment):
-        raise RuntimeError(
-            "msg=environment %s invalid. Environments allowed are: "
-            % ", ".join(Environment.get_valid_environments())
-        )
-    return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
+def get_s3_clean_path(env):
+    if env == "forno":
+        return "s3://5a-datalake-forno/clean_spark/amplitude/"
+    elif env == "prod":
+        return "s3://5a-datalake/clean_spark/amplitude/"
+    raise ValueError("The environment do not exists: {}".format(env))
 
 
-def create_clean_external_table(args):
-    table_name, table_extra_partitions, amplitude_events, databricks_consumer, athena_db = (
-        args
-    )
+def create_raw_external_table(args):
+    table_name, table_extra_partitions, amplitude_events, databricks_consumer = args
     partition_by = ["year", "month", "day"]
     if table_name in table_extra_partitions:
         partition_by = partition_by + table_extra_partitions[table_name]
     amplitude_events.create_athena_external_table(
-        consumer=databricks_consumer,
-        table=table_name,
-        athena_db=athena_db,
-        partition_by=partition_by,
+        consumer=databricks_consumer, table=table_name, partition_by=partition_by
     )
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
     args = parser.parse_args()
-    environment = args.env
+    env = args.env
 
-    db_clean = "datalake_amplitude_clean"
-    s3_clean_path = get_s3_clean_path(environment)
+    db_clean = "datalake_clean_spark"
+    s3_clean_path = get_s3_clean_path(env)
     amplitude_events = AmplitudeEvents(db_clean=db_clean, s3_clean_path=s3_clean_path)
 
-    athena_db = "{}_{}".format(db_clean, environment)
+    athena_db = amplitude_events.db_clean
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
 
     connection = {"db": db_clean}
     databricks_consumer = DatabricksConsumer(connection)
-    tables = databricks_consumer.get_table_names_and_sizes().collect()
-    table_extra_partitions = {"events": ["event_type"]}
+    df = databricks_consumer.get_table_names_and_sizes()
+    tables = (
+        df.select("table_name")
+        .filter(col("table_name").rlike(r"^amplitude_"))
+        .collect()
+    )
+    table_extra_partitions = {"amplitude_events": ["event_type"]}
 
     logger.info("m=__main__, msg=Creating clean external tables...")
-
     with Pool(NB_THREADS) as p:
         p.map(
-            create_clean_external_table,
+            create_raw_external_table,
             [
                 (
                     table.table_name,
                     table_extra_partitions,
                     amplitude_events,
                     databricks_consumer,
-                    athena_db,
                 )
                 for table in tables
             ],
