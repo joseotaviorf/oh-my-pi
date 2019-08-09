@@ -24,10 +24,13 @@ ENV = Variable.get("environment")
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 S3_BUCKET = "5a-datalake-forno"
-LOGS_OUTPUT_PATH = S3_PREFIX + "/logs/teravoz"
+
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
+)
 
 # spark_jobs path
-SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/{}".format(ENV, DAG_ID)
+SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}".format(DAG_ID)
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -35,7 +38,11 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 # databricks libraries
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
-CUSTOM_LIBRARIES = [{"jar": S3_PREFIX + "/libraries/mysql-connector-java-5.1.47.jar"}]
+CUSTOM_LIBRARIES = [
+    {
+        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.4-py3-none-any.whl"
+    }
+]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 dag = DAG(
