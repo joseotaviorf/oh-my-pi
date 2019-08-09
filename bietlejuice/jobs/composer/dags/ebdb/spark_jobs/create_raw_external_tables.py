@@ -22,7 +22,7 @@ def create_raw_external_table(args):
         consumer=databricks_consumer, table_name=table_name, athena_db=athena_db
     )
     logger.info(
-        "m=create_raw_external_table, table={}, msg=Finished creating table.".format(
+        "m=create_clean_external_table, table={}, msg=Finished creating table.".format(
             table_name
         )
     )

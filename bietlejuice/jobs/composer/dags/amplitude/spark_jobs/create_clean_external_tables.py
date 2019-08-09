@@ -26,13 +26,18 @@ def get_s3_clean_path(environment):
     return "s3://5a-datalake-{}/clean/amplitude/".format(environment)
 
 
-def create_raw_external_table(args):
-    table_name, table_extra_partitions, amplitude_events, databricks_consumer = args
+def create_clean_external_table(args):
+    table_name, table_extra_partitions, amplitude_events, databricks_consumer, athena_db = (
+        args
+    )
     partition_by = ["year", "month", "day"]
     if table_name in table_extra_partitions:
         partition_by = partition_by + table_extra_partitions[table_name]
     amplitude_events.create_athena_external_table(
-        consumer=databricks_consumer, table=table_name, partition_by=partition_by
+        consumer=databricks_consumer,
+        table=table_name,
+        athena_db=athena_db,
+        partition_by=partition_by,
     )
 
 
@@ -60,13 +65,14 @@ if __name__ == "__main__":
 
     with Pool(NB_THREADS) as p:
         p.map(
-            create_raw_external_table,
+            create_clean_external_table,
             [
                 (
                     table.table_name,
                     table_extra_partitions,
                     amplitude_events,
                     databricks_consumer,
+                    athena_db,
                 )
                 for table in tables
             ],
