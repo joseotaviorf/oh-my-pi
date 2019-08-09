@@ -18,6 +18,7 @@ setup(
     url=__repository_url__,
     author='Data Engineering Team',
     packages=find_packages(exclude=["tests", "tests.*"]),
+    include_package_data=True,
     install_requires=install_requires,
     description='ETL jobs',
     dependency_links=[

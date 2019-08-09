@@ -196,10 +196,10 @@ from
         else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
       end as dt_prospect,
       isc.dt dt_first_inside_sales_contact,
-      coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
+      coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
       case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         when cl.leadConvertido_id is not null
-          then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
+          then coalesce(cl.criadoEm, cl.dataConversao, from_unixtime(ure.timestamp/1000))
         when l.lead_reason in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada')
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
@@ -397,9 +397,9 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_first_inside_sales_contact,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_first_inside_sales_contact,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_qualified,
 			null as dt_discarded,
 			null as user_id_lead_first_discarder,
 			null as user_id_lead_last_discarder,
