@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
+import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -31,6 +32,8 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
+local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -38,8 +41,8 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 5, 31, 0, 0, 0),
-    schedule_interval="0 4 * * *",
+    start_date=datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz),
+    schedule_interval="0 1 * * *",
     max_active_runs=1,
     catchup=False,
 )
