@@ -34,7 +34,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 )
 
 dag = DAG(
-    dag_id=DAG_ID,
+    dag_id="bietlejuice.{}".format(DAG_ID),
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
