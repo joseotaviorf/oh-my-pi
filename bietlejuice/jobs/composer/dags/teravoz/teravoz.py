@@ -71,8 +71,8 @@ def raw_sub_dag(sub_dag_name, **kwargs):
                     SPARK_JOBS_PATH
                 ),
                 "parameters": [sub_dag_name, "datalake_raw_spark", "{{ ds }}"],
-            },
-        }
+            }
+        },
     )
 
     create_raw_partition_task = DummyOperator(
