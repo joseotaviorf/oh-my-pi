@@ -59,7 +59,7 @@ if __name__ == "__main__":
     connection = {"db": db_clean}
     databricks_consumer = DatabricksConsumer(connection)
     tables = databricks_consumer.get_table_names_and_sizes().collect()
-    table_extra_partitions = {"amplitude_events": ["event_type"]}
+    table_extra_partitions = {"events": ["event_type"]}
 
     logger.info("m=__main__, msg=Creating clean external tables...")
 

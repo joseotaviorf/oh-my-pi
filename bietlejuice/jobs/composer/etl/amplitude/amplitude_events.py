@@ -118,7 +118,7 @@ class AmplitudeEvents:
                     )
 
                     df = self.create_events_dataframe(data, len_data)
-                    table_name = "amplitude_events"
+                    table_name = "events"
                     DataFrameService.incremental_write(
                         df,
                         AmplitudeEvents.RAW_FORMAT,
@@ -146,7 +146,7 @@ class AmplitudeEvents:
         ) as f:
             query = f.read()
 
-        table_name = "amplitude_events"
+        table_name = "events"
         df = spark.sql(query.format(self.db_raw, table_name, year, month, day))
 
         len_df = df.count()
@@ -164,7 +164,7 @@ class AmplitudeEvents:
 
     @logger
     def update_filtered_events_table(self, date, event_type):
-        table_name = "amplitude_events"
+        table_name = "events"
         year, month, day = date.year, date.month, date.day
         filtered_event_df = spark.sql(
             "select * from {}.{} where year={} and month={} and day={} and event_type = '{}'".format(
@@ -183,7 +183,7 @@ class AmplitudeEvents:
         partitions = self.get_number_of_partitions(len_df, "clean")
         filtered_event_exploded_df = filtered_event_exploded_df.coalesce(partitions)
 
-        table_name = "amplitude_{}_events".format(event_type)
+        table_name = "{}_events".format(event_type)
         DataFrameService.incremental_write(
             filtered_event_exploded_df,
             AmplitudeEvents.CLEAN_FORMAT,
