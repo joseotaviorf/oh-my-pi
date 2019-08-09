@@ -31,7 +31,8 @@ pipeline:
       - make unit-tests-python2
       - make cov-badge
     when:
-      event: push
+      event: [push, pull_request]
+      branch: master
 
   publish-coverage:
     image: plugins/s3
