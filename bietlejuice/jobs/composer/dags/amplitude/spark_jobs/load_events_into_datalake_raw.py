@@ -6,13 +6,15 @@ from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.airflow.environment import Environment
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 
 JOB_NAME = "load_events_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+spark = BaseSparkContext.spark
 
 
 def get_s3_raw_path(environment):
@@ -45,6 +47,7 @@ if __name__ == "__main__":
     amplitude_events = AmplitudeEvents(
         db_raw=db_raw, s3_raw_path=s3_raw_path, keys=keys
     )
+    spark.sql('CREATE DATABASE IF NOT EXISTS {}'.format(db_raw))
     amplitude_events.load_events_into_datalake_raw(
         start_date=start_date, end_date=end_date
     )
