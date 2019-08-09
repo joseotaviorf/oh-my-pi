@@ -16,7 +16,7 @@ JOB_NAME = "load_teravoz_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-
+@logger
 def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):
 
     teravoz = TeravozFactory.factory(
@@ -36,8 +36,8 @@ if __name__ == "__main__":
 
     # args passed by Airflow task
     parser.add_argument("endpoint", type=str, help="which endpoint to call")
-    parser.add_argument("datalake_layer", type=str, help="which endpoint to call")
-    parser.add_argument("execution_date", type=str, help="which endpoint to call")
+    parser.add_argument("datalake_layer", type=str, help="which layer from datalake to load")
+    parser.add_argument("execution_date", type=str, help="execution date in str format")
 
     args = parser.parse_args()
 

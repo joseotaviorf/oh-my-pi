@@ -78,7 +78,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [sub_dag_name, "datalake_raw_spark", "{{ ds }}"],
+                "parameters": [sub_dag_name, "raw", "{{ ds }}"],
             },
         },
     )
