@@ -63,7 +63,7 @@ left join dim_region dr
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 opportunity as (
 select
@@ -545,12 +545,12 @@ select
 	supply_channel,
 	case when is_b2b is true then 'B2B'
 	     else
-    case when mkt_medium_demand = 'Agents' then 'Agents'
-         when mkt_medium_demand = 'Online Classifieds' then 'OnlineClassifieds'
-         when mkt_medium_demand in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
-         when mkt_medium_demand in ('Display','Retargeting','SEM non-branded') then 'Online Paid'
-         when mkt_medium_demand in ('Not Mapped', 'Lost Tracking','Not Tracked', 'Other') then 'Other'
-         else mkt_medium_demand end end as mkt_medium_demand,
+    case when demand_channel = 'Agents' then 'Agents'
+         when demand_channel = 'Online Classifieds' then 'OnlineClassifieds'
+         when demand_channel in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
+         when demand_channel in ('Display','Retargeting','SEM non-branded') then 'Online Paid'
+         when demand_channel in ('Not Mapped', 'Lost Tracking','Not Tracked', 'Other') then 'Other'
+         else demand_channel end end as demand_channel,
 	sum(prospects) as prospects,
   sum(qualifieds) as qualifieds,
   sum(opportunities) as opportunities,
