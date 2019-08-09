@@ -232,7 +232,7 @@ class Marketing(object):
             command=delete_query.format(
                 table_name=table_name,
                 sk_field=Marketing.SK_FIELD_MAP[table_name]
-            ).replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%d%m')),
+            ).replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%m%d')),
             commit=True,
             encoding='utf-8'
         )
