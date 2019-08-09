@@ -228,6 +228,10 @@ class TwitterCampaigns(Marketing):
         """
         logger.info('m=_save_to_s3')
 
+        if len(raw_data) == 0:
+            logger.info('m=_save_to_s3, msg=There\'s no data to be saved.')
+            return
+
         gz_body = BytesIO()
         for _dict in raw_data:
             with GzipFile(fileobj=gz_body, mode='w') as fp:
@@ -592,8 +596,8 @@ class TwitterCampaigns(Marketing):
             prom_tweets_list += self._merge_placements_stats(all_on_twitter_stats,
                                                              publisher_network_stats)
 
-            logger.info('m=_fetch_and_save_promoted_tweets_stats. msg=Now parsing and '
-                        'saving data.')
+            logger.info('m=_fetch_and_save_promoted_tweets_stats, msg=Now parsing and '
+                        'saving data, ads_stats_found={}'.format(len(prom_tweets_list)))
 
         self._save_to_s3(account.id, self.S3_PROMOTED_TWEETS_STATS_FOLDER,
                          prom_tweets_list)
