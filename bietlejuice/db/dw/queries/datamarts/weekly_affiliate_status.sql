@@ -12,7 +12,6 @@ left join public.fact_house_listing_flows fhl on fhl.sk_user_lead_affiliate = du
 left join public.dim_date as dt_lead on fhl.sk_lead_date = dt_lead.sk_date
 where duaf.type = 'Standard'
 group by 1,2,3,4,5
-order by id_affiliate,sk_lead_date,sk_lead
 ),
 last_lead as (
 select sk_lead,id_affiliate,date_affiliate_lead from all_leads
