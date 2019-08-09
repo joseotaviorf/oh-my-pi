@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from gzip import GzipFile
 from io import BytesIO
 
+import petl
 from dateutil.tz import tz
 from qa_python_utils.default_logger import QuintoAndarLogger
 from twitter_ads.campaign import Campaign
@@ -13,6 +14,8 @@ from twitter_ads.creative import PromotedTweet
 from twitter_ads.enum import METRIC_GROUP, GRANULARITY, PLACEMENT
 
 from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing import Marketing
 
 logger = QuintoAndarLogger('TwitterCampaigns')
@@ -23,8 +26,8 @@ class TwitterCampaigns(Marketing):
     S3_LINE_ITEMS_FOLDER = 'ad_groups'
     S3_PROMOTED_TWEETS_FOLDER = 'ads'
     S3_PROMOTED_TWEETS_STATS_FOLDER = 'ads_stats'
-    S3_TWITTER_FOLDER = 'twitter_ads'
-    S3_DATA_LAKE_RAW_TWITTER_PATH = 'raw/marketing/{}'.format(S3_TWITTER_FOLDER)
+    INTEGRATION = 'twitter_ads'
+    S3_DATA_LAKE_RAW_TWITTER_PATH = 'raw/marketing/{}'.format(INTEGRATION)
     CAMPAIGNS_TABLE_NAME = "twitter_campaigns"
     AD_GROUPS_TABLE_NAME = 'twitter_ad_groups'
     ADS_TABLE_NAME = "twitter_ads"
@@ -37,7 +40,7 @@ class TwitterCampaigns(Marketing):
         https://developer.twitter.com/en/apps/16579094
         """
         super(TwitterCampaigns, self).__init__(s3_bucket, execution_date,
-                                               self.S3_TWITTER_FOLDER, account)
+                                               self.INTEGRATION, account)
 
         self._twitter_client = TwitterClient(auth['consumer_key'],
                                              auth['consumer_secret'],
@@ -726,3 +729,81 @@ class TwitterCampaigns(Marketing):
             tweets_stats_list += twt_group.values()
 
         return tweets_stats_list
+
+    @logger
+    def load_to_staging(self, dw_table_name):
+        query = self._get_staging_table_query(dw_table_name)
+        query = query.format(date=self.partition_date)
+        logger.info("m=load_to_staging, query={}".format(query))
+
+        self._load_to_staging(dw_table_name, query)
+
+    @staticmethod
+    @logger
+    def _table_type(table_name):
+        return table_name.split('_')[0]
+
+    @logger
+    def _delete_fact_rows(self, table_name, sk_date):
+        delete_query = "DELETE FROM staging.{table_name} " \
+                       "WHERE sk_date = {date}".format(table_name=table_name,
+                                                       date=sk_date)
+        logger.info("m=_delete_fact_rows, query={}".format(delete_query))
+
+        BaseETL.execute_command(
+            db_enum=EnumDB.BI_DW,
+            command=delete_query,
+            commit=True,
+            encoding='utf-8'
+        )
+
+    @logger
+    def _get_staging_table_query(self, table_name):
+        """
+        Gets the table query to select data from clean tables on Athena
+        If it's a fact table and staging is not empty,
+        then it'l load only the data of the execution day
+        """
+        full_load_query = BaseETL.get_query_from_file_name(
+            '{}/marketing/{}/clean_to_staging/{}.sql'.format(
+                DATALAKE_QUERIES_DIR, self.INTEGRATION, table_name))
+
+        if self._table_type(table_name) == 'fact' and not self._is_staging_table_empty(
+                table_name):
+            sk_date = int(self.execution_date.strftime('%Y%m%d'))
+            self._delete_fact_rows(table_name, sk_date)
+
+            daily_load_query = "{} \nWHERE sk_date = {};".format(full_load_query,
+                                                                 sk_date)
+            return daily_load_query
+
+        return full_load_query
+
+    @logger(exclude="staging_query")
+    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
+
+        logger.info("m=_load_to_staging, schema={}, table_name={}, "
+                    "msg=Inserting into dw".format(Marketing.SCHEMA_NAMES['staging'],
+                                                   dw_table_name))
+
+        pd_df = self.athena_client.execute_query_and_return_dataframe(sql=staging_query)
+
+        logger.info(
+            "m=_load_to_staging, schema={}, table_name={}, msg=Inserting into staging "
+            "table".format(
+                Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+
+        df_table = petl.fromdataframe(df=pd_df)
+
+        BaseETL.bulk_insert(
+            table=df_table,
+            table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=False if self._table_type(dw_table_name) == 'dim' else True,
+            commit=True
+        )
+
+    @logger
+    def load_to_prod(self, table_name):
+        self._load_to_prod(table_name)
