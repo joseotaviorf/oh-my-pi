@@ -117,3 +117,5 @@ airflow_helpers.chain(
 )
 add_amplitude_events_partitions.set_upstream(events_raw_to_clean_task)
 create_clean_external_tables_task.set_upstream(events_raw_to_clean_task)
+terminate_cluster_task.set_upstream(add_amplitude_events_partitions)
+terminate_cluster_task.set_upstream(create_clean_external_tables_task)
