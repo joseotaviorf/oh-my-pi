@@ -2,11 +2,11 @@ import logging
 from argparse import ArgumentParser
 from collections import OrderedDict
 from datetime import datetime
-import os
 from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
+import bietlejuice.jobs.composer.db as db_module
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.base.spark.base_spark import BaseDBUtils
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
@@ -53,12 +53,12 @@ if __name__ == "__main__":
     )
 
     # creating table if not exists
-    with open(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "../../../db/datalake/queries/amplitude/clean_amplitude_events.sql",
-        )
-    ) as f:
+    db_module_path = [path for path in db_module.__path__][0]
+    clean_amplitude_events_athena_ddl = (
+        db_module_path
+        + "/datalake/queries/amplitude/clean_amplitude_events_athena_ddl.sql"
+    )
+    with open(clean_amplitude_events_athena_ddl) as f:
         ddl = f.read()
     AthenaClient.execute_athena_query(
         ddl.format(db=db_clean_athena, path=db_clean_path + table_name), "default"
