@@ -1,4 +1,5 @@
 import re
+from urllib.parse import unquote
 
 from pyspark.sql import session, context
 from pyspark import SparkContext
@@ -24,7 +25,7 @@ class BaseDBUtils:
     @logger(exclude_return=True)
     def discover_partition_values_in_path(self, path, dbutils):
         return [
-            file_info.name.split("=")[1][:-1]
+            unquote(file_info.name.split("=")[1][:-1])
             for file_info in dbutils.fs.ls(path)
             # filter only directories with names in partition format
             if file_info.isDir() and re.search(r".+\=.+", file_info.name)
