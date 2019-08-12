@@ -46,7 +46,7 @@ if __name__ == "__main__":
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
     db_clean_athena = db_info["db_clean_athena"]
     db_clean_path = db_info["db_clean_path"]
-    table_name = "amplitude_events"
+    table_name = "events"
 
     AthenaClient.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(db_clean_athena), "default"
@@ -61,7 +61,10 @@ if __name__ == "__main__":
     with open(clean_amplitude_events_athena_ddl) as f:
         ddl = f.read()
     AthenaClient.execute_athena_query(
-        ddl.format(db=db_clean_athena, path=db_clean_path + table_name), "default"
+        ddl.format(
+            db=db_clean_athena, table_name=table_name, path=db_clean_path + table_name
+        ),
+        "default",
     )
 
     partition_path = db_clean_path + "{}/year={}/month={}/day={}/".format(

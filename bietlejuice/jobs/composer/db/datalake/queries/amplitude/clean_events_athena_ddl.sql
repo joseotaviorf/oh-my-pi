@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS {db}.amplitude_events (
+CREATE EXTERNAL TABLE IF NOT EXISTS {db}.{table_name} (
   `adid` string,
   `dma` string,
   `is_attribution_event` boolean,

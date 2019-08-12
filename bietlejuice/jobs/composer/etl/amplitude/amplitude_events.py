@@ -139,7 +139,7 @@ class AmplitudeEvents:
         with open(
             os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
-                "../../db/datalake/queries/amplitude/clean_amplitude_events.sql",
+                "../../db/datalake/queries/amplitude/clean_events.sql",
             )
         ) as f:
             query = f.read()
