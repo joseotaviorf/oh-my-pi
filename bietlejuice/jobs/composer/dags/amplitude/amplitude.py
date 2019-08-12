@@ -103,7 +103,7 @@ add_amplitude_events_partitions = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": ADD_CLEAN_EVENTS_PARTITIONS,
-            "parameters": [ENV],
+            "parameters": ["{{ ds }}", ENV],
         }
     },
 )

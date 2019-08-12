@@ -37,8 +37,8 @@ def create_partition(args):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    env = args.env
     execution_date = args.execution_date
+    env = args.env
 
     date = datetime.strptime(execution_date, "%Y-%m-%d")
     year, month, day = date.year, date.month, date.day
