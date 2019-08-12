@@ -60,10 +60,9 @@ if __name__ == "__main__":
     df = databricks_consumer.get_table_names_and_sizes()
     tables = (
         df.select("table_name")
-        .filter(col("table_name").rlike(r"^amplitude_"))  # filter just amplitude tables
         .filter(
-            col("table_name").rlike(r"^((?!amplitude_events).)*$")
-        )  # exclude amplitude_events table
+            col("table_name").rlike(r".+_events")
+        )  # get only filtered event type tables
         .collect()
     )
 
