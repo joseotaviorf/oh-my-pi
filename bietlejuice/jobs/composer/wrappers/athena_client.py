@@ -1,5 +1,4 @@
 import time
-import re
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
