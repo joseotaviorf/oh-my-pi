@@ -56,7 +56,7 @@ if __name__ == "__main__":
     db_module_path = [path for path in db_module.__path__][0]
     clean_amplitude_events_athena_ddl = (
         db_module_path
-        + "/datalake/queries/amplitude/clean_amplitude_events_athena_ddl.sql"
+        + "/datalake/queries/amplitude/clean_events_athena_ddl.sql"
     )
     with open(clean_amplitude_events_athena_ddl) as f:
         ddl = f.read()
