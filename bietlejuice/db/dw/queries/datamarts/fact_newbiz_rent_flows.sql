@@ -137,7 +137,7 @@ WITH newbiz_listings AS (
           FROM dim_house_listing dhl
           JOIN datalake_raw.ebdb_imovel_aud ima
             ON dhl.id_house = ima.id
-           AND ima.usuario_id = '908761'
+           AND ima.usuario_id = '994668'
            AND ima.usuario_mod = '1'
           JOIN datalake_raw.ebdb_usuariorevisionentity rev
             ON ima.rev = rev.id
