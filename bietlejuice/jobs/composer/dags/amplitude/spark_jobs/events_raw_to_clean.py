@@ -4,22 +4,19 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
+    AmplitudeDatabaseInfo,
+)
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("events_raw_to_clean")
 
+spark = BaseSparkContext.spark
+
 parser = ArgumentParser(description="events_raw_to_clean")
 parser.add_argument("execution_date")
 parser.add_argument("env")
-
-
-def get_s3_clean_path(env):
-    if env == "forno":
-        return "s3://5a-datalake-forno/clean_spark/amplitude/"
-    elif env == "prod":
-        return "s3://5a-datalake/clean_spark/amplitude/"
-    raise ValueError("The environment do not exists: {}".format(env))
-
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -27,14 +24,20 @@ if __name__ == "__main__":
     env = args.env
 
     date = datetime.strptime(execution_date, "%Y-%m-%d")
-    db_raw = "datalake_raw_spark"
-    db_clean = "datalake_clean_spark"
-    s3_clean_path = get_s3_clean_path(env)
+    db_info = AmplitudeDatabaseInfo.get_db_info(env)
+    db_raw_databricks = db_info["db_raw_databricks"]
+    db_raw_path = db_info["db_raw_path"]
+    db_clean_databricks = db_info["db_clean_databricks"]
+    db_clean_path = db_info["db_clean_path"]
 
     amplitude_events = AmplitudeEvents(
-        db_raw=db_raw, db_clean=db_clean, s3_clean_path=s3_clean_path
+        db_raw=db_raw_databricks,
+        s3_raw_path=db_raw_path,
+        db_clean=db_clean_databricks,
+        s3_clean_path=db_clean_path,
     )
 
+    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_clean_databricks))
     amplitude_events.update_clean_amplitude_events(date=date)
 
     event_types = [

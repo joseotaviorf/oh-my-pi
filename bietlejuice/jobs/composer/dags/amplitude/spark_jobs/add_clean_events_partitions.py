@@ -1,0 +1,83 @@
+import logging
+from argparse import ArgumentParser
+from collections import OrderedDict
+from datetime import datetime
+import os
+from multiprocessing.dummy import Pool
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.base.spark.base_spark import BaseDBUtils
+from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
+    AmplitudeDatabaseInfo,
+)
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger("add_clean_events_partitions")
+
+base_dbutils = BaseDBUtils()
+if base_dbutils.get_dbutils() is not None:
+    dbutils = base_dbutils.get_dbutils()
+
+parser = ArgumentParser(description="add_clean_events_partitions")
+parser.add_argument("execution_date")
+parser.add_argument("env")
+
+NB_THREADS = 8
+
+
+def create_partition(args):
+    year, month, day, event_type, db_clean_athena, table_name = args
+    partition_by_dict = OrderedDict(
+        [("year", year), ("month", month), ("day", day), ("event_type", event_type)]
+    )
+    AthenaClient.add_partition(db_clean_athena, table_name, partition_by_dict)
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    env = args.env
+    execution_date = args.execution_date
+
+    date = datetime.strptime(execution_date, "%Y-%m-%d")
+    year, month, day = date.year, date.month, date.day
+
+    db_info = AmplitudeDatabaseInfo.get_db_info(env)
+    db_clean_athena = db_info["db_clean_athena"]
+    db_clean_path = db_info["db_clean_path"]
+    table_name = "amplitude_events"
+
+    AthenaClient.execute_athena_query(
+        "CREATE DATABASE IF NOT EXISTS `{}`".format(db_clean_athena), "default"
+    )
+
+    # creating table if not exists
+    with open(
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "../../../db/datalake/queries/amplitude/clean_amplitude_events.sql",
+        )
+    ) as f:
+        ddl = f.read()
+    AthenaClient.execute_athena_query(
+        ddl.format(db=db_clean_athena, path=db_clean_path + table_name), "default"
+    )
+
+    partition_path = db_clean_path + "{}/year={}/month={}/day={}/".format(
+        table_name, year, month, day
+    )
+    event_types = base_dbutils.discover_partition_values_in_path(
+        partition_path, dbutils
+    )
+
+    with Pool(NB_THREADS) as p:
+        p.map(
+            create_partition,
+            [
+                (year, month, day, event_type, db_clean_athena, table_name)
+                for event_type in event_types
+            ],
+        )
+
+    logger.info("m=__main__, msg=All raw external tables were created successfully.")

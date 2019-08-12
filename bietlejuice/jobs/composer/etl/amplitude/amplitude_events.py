@@ -2,10 +2,9 @@ import io
 import zipfile
 import gzip
 import os
-from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
+from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
 
 logger = QuintoAndarLogger("AmplitudeEvents")
@@ -21,8 +20,8 @@ class AmplitudeEvents:
     CLEAN_FORMAT = "parquet"
     CLEAN_RECORDS_BY_PARTITION = 250000
 
-    DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
-    CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
+    DROP_TABLE_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
+    CREATE_TABLE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
                             `{database}`.`{table}`
                             (
                               {columns}
@@ -117,7 +116,7 @@ class AmplitudeEvents:
                     )
 
                     df = self.create_events_dataframe(data, len_data)
-                    table_name = "amplitude_events"
+                    table_name = "events"
                     DataFrameService.incremental_write(
                         df,
                         AmplitudeEvents.RAW_FORMAT,
@@ -145,7 +144,7 @@ class AmplitudeEvents:
         ) as f:
             query = f.read()
 
-        table_name = "amplitude_events"
+        table_name = "events"
         df = spark.sql(query.format(self.db_raw, table_name, year, month, day))
 
         len_df = df.count()
@@ -163,7 +162,7 @@ class AmplitudeEvents:
 
     @logger
     def update_filtered_events_table(self, date, event_type):
-        table_name = "amplitude_events"
+        table_name = "events"
         year, month, day = date.year, date.month, date.day
         filtered_event_df = spark.sql(
             "select * from {}.{} where year={} and month={} and day={} and event_type = '{}'".format(
@@ -182,7 +181,7 @@ class AmplitudeEvents:
         partitions = self.get_number_of_partitions(len_df, "clean")
         filtered_event_exploded_df = filtered_event_exploded_df.coalesce(partitions)
 
-        table_name = "amplitude_{}_events".format(event_type)
+        table_name = "{}_events".format(event_type)
         DataFrameService.incremental_write(
             filtered_event_exploded_df,
             AmplitudeEvents.CLEAN_FORMAT,
@@ -191,64 +190,4 @@ class AmplitudeEvents:
             table_name,
             self.s3_clean_path + table_name,
             True,
-        )
-
-    @logger
-    def create_athena_external_table(self, consumer, table, partition_by=None):
-        file_format = AmplitudeEvents.CREATE_QUERY_CLEAN_FORMAT
-
-        drop_query = AmplitudeEvents.DROP_QUERY_TEMPLATE.format(
-            database=self.db_clean, table=table
-        )
-        AthenaClient.execute_athena_query(drop_query, self.db_clean)
-        logger.info(
-            "m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                self.db_clean, table
-            )
-        )
-
-        table_schema = consumer.get_table_schema(table).collect()
-        table_schema = OrderedDict(
-            [
-                (
-                    row["col_name"],
-                    row["col_type"].lower().replace("timestamp", "string"),
-                )
-                for row in table_schema
-            ]
-        )
-
-        columns_section = ",\n  ".join(
-            [
-                "`" + col + "` " + col_type.upper()
-                for col, col_type in table_schema.items()
-                if not partition_by or col not in partition_by
-            ]
-        )
-        partitions_section = ""
-        if partition_by:
-            partitions_section = "PARTITIONED BY (\n  {}\n)".format(
-                ",\n  ".join(
-                    ["`" + col + "` " + table_schema[col] for col in partition_by]
-                )
-            )
-        create_query = AmplitudeEvents.CREATE_QUERY_TEMPLATE.format(
-            database=self.db_clean,
-            table=table,
-            columns=columns_section,
-            partitioned_by=partitions_section,
-            format=file_format,
-            path="{}{}".format(self.s3_clean_path, table),
-        )
-        AthenaClient.execute_athena_query(create_query, self.db_clean)
-        if partition_by:
-            AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(self.db_clean, table),
-                self.db_clean,
-            )
-
-        logger.info(
-            "m=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
-                self.db_clean, table
-            )
         )

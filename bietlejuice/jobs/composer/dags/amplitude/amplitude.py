@@ -9,27 +9,30 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
-logger = QuintoAndarLogger("bietlejuice.amplitude")
-
+DAG_ID = "bietlejuice.amplitude"
 ENV = Variable.get("environment")
 
-DAG_ID = "bietlejuice.amplitude"
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = "{}/spark_jobs/{}/amplitude/load_events_into_datalake_raw.py".format(
-    S3_PREFIX, ENV
+LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = "{}/spark_jobs/amplitude/load_events_into_datalake_raw.py".format(
+    S3_PREFIX
 )
-EVENTS_RAW_TO_CLEAN_FILE_PATH = "{}/spark_jobs/{}/amplitude/events_raw_to_clean.py".format(
-    S3_PREFIX, ENV
+EVENTS_RAW_TO_CLEAN_FILE_PATH = "{}/spark_jobs/amplitude/events_raw_to_clean.py".format(
+    S3_PREFIX
 )
-CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH = "{}/spark_jobs/{}/amplitude/create_clean_external_tables.py".format(
-    S3_PREFIX, ENV
+CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH = "{}/spark_jobs/amplitude/create_clean_external_tables.py".format(
+    S3_PREFIX
 )
 
-LOGS_OUTPUT_PATH = S3_PREFIX + "/logs/" + DAG_ID
+ADD_CLEAN_EVENTS_PARTITIONS = "{}/spark_jobs/amplitude/add_clean_events_partitions.py".format(
+    S3_PREFIX
+)
+
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
+)
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_memory_optimized_cluster", deserialize_json=True
@@ -65,11 +68,10 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-to-datalake-raw",
     dag=dag,
     json={
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
         "spark_python_task": {
             "python_file": LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH,
             "parameters": ["{{ ds }}", ENV],
-        },
+        }
     },
 )
 
@@ -77,11 +79,10 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-raw-to-clean",
     dag=dag,
     json={
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
         "spark_python_task": {
             "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
             "parameters": ["{{ ds }}", ENV],
-        },
+        }
     },
 )
 
@@ -89,11 +90,21 @@ create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-clean-external-tables",
     dag=dag,
     json={
-        "existing_cluster_id": '{{task_instance.xcom_pull(task_ids="create-cluster", key="cluster_id")}}',
         "spark_python_task": {
             "python_file": CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH,
             "parameters": [ENV],
-        },
+        }
+    },
+)
+
+add_amplitude_events_partitions = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="add-amplitude-events-partitions",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": ADD_CLEAN_EVENTS_PARTITIONS,
+            "parameters": [ENV],
+        }
     },
 )
 
@@ -102,9 +113,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 airflow_helpers.chain(
-    create_cluster_task,
-    events_to_datalake_raw_task,
-    events_raw_to_clean_task,
-    create_clean_external_tables_task,
-    terminate_cluster_task,
+    create_cluster_task, events_to_datalake_raw_task, events_raw_to_clean_task
 )
+add_amplitude_events_partitions.set_upstream(events_raw_to_clean_task)
+create_clean_external_tables_task.set_upstream(events_raw_to_clean_task)

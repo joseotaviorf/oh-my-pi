@@ -1,3 +1,5 @@
+import re
+
 from pyspark.sql import session, context
 from pyspark import SparkContext
 
@@ -18,6 +20,15 @@ class BaseDBUtils:
             return DBUtils(spark.sparkContext)
 
         logger.info("m=get_db_utils, msg=dbutils already available")
+
+    @logger(exclude_return=True)
+    def discover_partition_values_in_path(self, path, dbutils):
+        return [
+            file_info.name
+            for file_info in dbutils.fs.ls(path)
+            # filter only directories with names in partition format
+            if file_info.isDir() and re.search(r".+\=.+", file_info.name)
+        ]
 
 
 class BaseSparkContext:
