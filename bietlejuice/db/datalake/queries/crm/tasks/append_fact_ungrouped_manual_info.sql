@@ -9,24 +9,24 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(dc.sk_contract as bigint)
   left join datalake_raw.ebdb_preproposta epp
     on trim(ct.origin) = 'PreProposta'
-        and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(epp.id as bigint))
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(epp.id as bigint)
   left join datalake_raw.ebdb_proposta ep
-    on cast(epp.id as bigint) = try(cast(ep.preproposta_id as bigint))
+    on epp.id = ep.preproposta_id
   left join datalake_raw.ebdb_contrato ec
-    on cast(ep.id as bigint) = try(cast(ec.proposta_id as bigint))
+    on ep.id = ec.proposta_id
   left join datalake_raw.ebdb_offer eof
     on trim(ct.origin) = 'Offer'
-        and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(eof.godfatherid as bigint))
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eof.godfatherid as bigint)
   left join datalake_raw.ebdb_proposta offer_prop
     on offer_prop.offer_id = eof.id
   left join datalake_raw.ebdb_contrato offer_contract
-    on cast(offer_prop.id as bigint) = try(cast(offer_contract.proposta_id as bigint))
+    on try_cast(offer_prop.id as bigint) = try_cast(offer_contract.proposta_id as bigint)
   left join datalake_raw.ebdb_fluxolocacao eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(eo.id as bigint))
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eo.id as bigint)
 ),
 contract_house_listing as (
   select
