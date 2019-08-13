@@ -21,6 +21,12 @@ class MarketingTwitterCampaignsSubDag(MarketingSubDag):
                                                               auth,
                                                               accounts, extra_configs)
 
+        self.dim_tables = [
+            "dim_twitter_campaign",
+            "dim_twitter_ad_group",
+            "dim_twitter_ad"
+        ]
+        self.fact_tables = ["fact_twitter_daily_cost_attributions"]
         self.tables = [TwitterCampaigns.CAMPAIGNS_TABLE_NAME,
                        TwitterCampaigns.AD_GROUPS_TABLE_NAME,
                        TwitterCampaigns.ADS_TABLE_NAME,
