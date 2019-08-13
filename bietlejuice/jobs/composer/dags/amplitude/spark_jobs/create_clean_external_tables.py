@@ -80,4 +80,4 @@ if __name__ == "__main__":
                 for table in tables
             ],
         )
-    logger.info("m=__main__, msg=All raw external tables were created successfully.")
+    logger.info("m=__main__, msg=All clean external tables were created successfully.")
