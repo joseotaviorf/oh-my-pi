@@ -113,7 +113,11 @@ class TeravozLoader:
         """
 
         # create database if not exists in spark catalog
-        self.spark.sql("create database if not exists {}".format(self.SOURCE))
+        self.spark.sql(
+            "create database if not exists datalake_{}_{}".format(
+                self.SOURCE, datalake_layer
+            )
+        )
 
         if endpoint not in self.sqlContext.tableNames(dbName=self.SOURCE):
             # create spark table and load data
