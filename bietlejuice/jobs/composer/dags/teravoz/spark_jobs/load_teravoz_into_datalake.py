@@ -43,7 +43,7 @@ if __name__ == "__main__":
         "datalake_layer", type=str, help="which layer from datalake to load"
     )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
-    parser.add_argument("environment", type=str, help="5a-datalake-(forno/prod) values")
+    parser.add_argument("environment", type=str, help="forno/prod values")
 
     args = parser.parse_args()
 

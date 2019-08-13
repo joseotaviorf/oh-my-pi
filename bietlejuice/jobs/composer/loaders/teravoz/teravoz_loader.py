@@ -55,7 +55,7 @@ class TeravozLoader:
           build s3 path to load the json file including partitions.
         """
 
-        s3_path = "s3://{}/{}/{}/{}".format(
+        s3_path = "s3://5a-datalake-{}/{}/{}/{}".format(
             self.ENV,  # to do: replace with ENV var
             datalake_layer,
             self.SOURCE,
