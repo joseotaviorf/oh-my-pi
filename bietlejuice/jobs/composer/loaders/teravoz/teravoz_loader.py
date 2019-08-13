@@ -16,10 +16,10 @@ class TeravozLoader:
     sqlContext = BaseSparkContext.sqlContext
 
     @logger
-    def __init__(self, api_user, api_pwd, execution_date):
+    def __init__(self, api_user, api_pwd, environment):
         # api_instance
         self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
-        self.execution_date = execution_date
+        self.ENV = environment
 
     @logger
     def _request_api_and_get_dataframe(self, endpoint, params):
@@ -55,8 +55,8 @@ class TeravozLoader:
           build s3 path to load the json file including partitions.
         """
 
-        s3_path = "s3://{}/{}_spark/{}/{}".format(
-            "5a-datalake",  # to do: replace with ENV var
+        s3_path = "s3://{}/{}/{}/{}".format(
+            self.ENV,  # to do: replace with ENV var
             datalake_layer,
             self.SOURCE,
             endpoint,

@@ -7,7 +7,7 @@ logger = QuintoAndarLogger("TeravozFactory")
 
 class TeravozFactory:
     @staticmethod
-    def factory(entity, api_user, api_pwd, execution_date):
+    def factory(entity, api_user, api_pwd, environment, execution_date=None):
         if entity is None:
             raise ValueError("m=factory, class_={}, msg=entity cannot be None")
         class_ = TeravozFactory.__dispatch_dict(entity)
@@ -17,7 +17,12 @@ class TeravozFactory:
                     entity
                 )
             )
-        return class_(api_user=api_user, api_pwd=api_pwd, execution_date=execution_date)
+        return class_(
+            api_user=api_user,
+            api_pwd=api_pwd,
+            environment=environment,
+            execution_date=execution_date,
+        )
 
     @staticmethod
     def __dispatch_dict(entity):

@@ -7,7 +7,7 @@ from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
 
 from quintoandar_logger import QuintoAndarLogger
 
-DATABRICKS_SCOPE = "quintoandar-prod"
+DATABRICKS_SCOPE = "quintoandar"
 
 
 JOB_NAME = "load_teravoz_into_datalake"
@@ -17,12 +17,15 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 @logger
-def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):
+def exec_factory_method(
+    endpoint, method, api_user, api_pwd, environment, execution_date
+):
 
     teravoz = TeravozFactory.factory(
         entity=endpoint,
         api_user=api_user,
         api_pwd=api_pwd,
+        environment=environment,
         execution_date=execution_date,
     )
 
@@ -40,6 +43,7 @@ if __name__ == "__main__":
         "datalake_layer", type=str, help="which layer from datalake to load"
     )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
+    parser.add_argument("environment", type=str, help="5a-datalake-(forno/prod) values")
 
     args = parser.parse_args()
 
@@ -52,7 +56,7 @@ if __name__ == "__main__":
     datalake_layer = args.datalake_layer
     execution_date = args.execution_date
     endpoint = args.endpoint
-
+    environment = args.environment
 
     # start Spark Session
     base_dbutils = BaseDBUtils()
@@ -61,9 +65,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     # get Teravoz credentials stored in Databricks secrets
-    json_credentials = dbutils.secrets.get(
-        scope=DATABRICKS_SCOPE, key="ENV_TERAVOZ"
-    )
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="ENV_TERAVOZ")
 
     credentials = json.loads(json_credentials)
 
@@ -72,6 +74,7 @@ if __name__ == "__main__":
         method="__init__",
         api_user=credentials["teravoz_user"],
         api_pwd=credentials["teravoz_password"],
+        environment=environment,
         execution_date=execution_date,
     )
 

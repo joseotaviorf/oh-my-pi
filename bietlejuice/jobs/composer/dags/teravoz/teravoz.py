@@ -23,7 +23,7 @@ ENV = Variable.get("environment")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-S3_BUCKET = "5a-datalake-forno"
+S3_BUCKET = "5a-datalake-{}".format(ENV)
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -79,7 +79,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [sub_dag_name, "raw", "{{ ds }}"],
+                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV],
             },
         },
     )
@@ -111,27 +111,12 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-# calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-#     dag=dag,
-#     sub_dag_name='calls',
-#     sub_dag_func=sub_dag
-# )
-
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="calls", sub_dag_func=raw_sub_dag
 )
 
-# reports_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-#     dag=dag,
-#     sub_dag_name='reports',
-#     sub_dag_func=sub_dag
-# )
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate_cluster"
 )
-
-# create_cluster_task.set_downstream([calls_sub_dag_task, queues_sub_dag_task, reports_sub_dag_task])
-# terminate_cluster_task.set_upstream([calls_sub_dag_task, queues_sub_dag_task, reports_sub_dag_task])
 
 create_cluster_task >> calls_sub_dag_task >> terminate_cluster_task
