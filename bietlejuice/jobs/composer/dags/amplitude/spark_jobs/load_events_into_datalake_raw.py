@@ -31,8 +31,7 @@ if __name__ == "__main__":
 
     start_date = datetime.strptime(execution_date, "%Y-%m-%d")
     end_date = start_date + timedelta(hours=23)
-    secrets_scope = "quintoandar-{}".format(env)
-    keys = json.loads(dbutils.secrets.get(secrets_scope, "ENV_AMPLITUDE"))
+    keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
     db_raw_databricks = db_info["db_raw_databricks"]
