@@ -2,8 +2,8 @@ with t_range as (
 select
     distinct
     fhl.sk_lead,
-    sk_task_created_date as dt_inicio_pros,
-    case when sk_task_closed_date > 0 then cast(to_char(cast(d.date as date) - interval '1' day, 'yyyyMMdd') as integer)
+    sk_first_task_created_date as dt_inicio_pros,
+    case when sk_first_task_closed_date > 0 then cast(to_char(cast(d.date as date) - interval '1' day, 'yyyyMMdd') as integer)
          when cast(task.sk_first_realized_date as integer) > 0 then task.sk_first_realized_date
          when cast(task.sk_first_resolved_date as integer) > 0 then task.sk_first_resolved_date
         else 20991231 end as dt_fim_pros,
@@ -12,10 +12,10 @@ from fact_house_listing_flows fhl
 left join dim_region dr
   on fhl.sk_region = dr.sk_region
 left join dim_date d
-  on d.sk_date = fhl.sk_task_closed_date
+  on d.sk_date = fhl.sk_first_task_closed_date
 left join crm.fact_lead_tasks task
   on task.sk_lead = fhl.sk_lead
-where sk_task_created_date > '0'
+where sk_first_task_created_date > '0'
 order by 1,2
 ),
 max_dt as (
