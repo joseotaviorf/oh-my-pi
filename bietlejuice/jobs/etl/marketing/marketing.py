@@ -30,7 +30,11 @@ class Marketing(object):
         'dim_classified': 'sk_classified',
         'fact_daily_classifieds_costs': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
-        'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign'
+        'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
+        'dim_twitter_ad': 'sk_ad',
+        'dim_twitter_ad_group': 'sk_ad_group',
+        'dim_twitter_campaign': 'sk_campaign',
+        'fact_twitter_daily_cost_attributions': 'sk_ad'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -215,6 +219,17 @@ class Marketing(object):
         logger.info(
             '__upsert_into_dw, schema={}, table_name={}, msg=ready to reading data!'.format(schema, table_name))
 
+    @staticmethod
+    @logger
+    def _is_staging_table_empty(table_name):
+        result = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from staging.{} limit 1".format(table_name),
+            encoding="utf-8"
+        )
+
+        return len(result) == 1
+
     @logger
     def _is_prod_table_empty(self, table_name):
         result = BaseETL.from_db_query(
@@ -232,7 +247,7 @@ class Marketing(object):
             command=delete_query.format(
                 table_name=table_name,
                 sk_field=Marketing.SK_FIELD_MAP[table_name]
-            ).replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%d%m')),
+            ).replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%m%d')),
             commit=True,
             encoding='utf-8'
         )

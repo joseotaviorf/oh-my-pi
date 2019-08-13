@@ -7,6 +7,7 @@ create table lead_first_event_tracking (
     tracking_content varchar(255),
     tracking_term varchar(255),
     tracking_platform varchar(255),
+    tracking_referring_domain varchar(255),
     tracking_region varchar(255),
     tracking_city varchar(255)
 );
