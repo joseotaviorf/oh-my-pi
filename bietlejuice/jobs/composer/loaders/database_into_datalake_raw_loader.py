@@ -8,7 +8,7 @@ class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
     def __init__(self, environment, source):
         if not Environment.is_valid_environment(environment):
             raise RuntimeError(
-                "msg=environment %s invalid. Environments allowed are: "
+                "m=__init__, msg=environment %s invalid. Environments allowed are: "
                 % ", ".join(Environment.get_valid_environments())
             )
         config = {
