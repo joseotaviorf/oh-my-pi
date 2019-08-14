@@ -59,7 +59,7 @@ class AthenaClient:
         partitions_section = ", ".join(
             [
                 "{} = {}".format(k, v)
-                if type(v) is not str
+                if not isinstance(v, str)
                 else "{} = '{}'".format(k, v)
                 for k, v in partition_by_dict.items()
             ]
