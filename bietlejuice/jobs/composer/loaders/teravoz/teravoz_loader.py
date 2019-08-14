@@ -79,6 +79,10 @@ class TeravozLoader:
         )
 
     @logger
+    def _create_dataframe_columns_to_partition_table(df, partitions):
+        raise NotImplementedError
+
+    @logger
     def _create_spark_table_and_load_data_to_s3(
         self, df, datalake_layer, endpoint, partitions=None
     ):
@@ -86,7 +90,7 @@ class TeravozLoader:
         # to create a partitioned table should pass the columns from df (melhorar)
         if partitions:
             if not partitions.keys().issubset(df.columns):
-                df = self.add_partitions_columns_in_dataframe(df, partitions)
+                df = self._create_dataframe_columns_to_partition_table(df, partitions)
 
         # base path to create table
         s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint)
