@@ -31,7 +31,7 @@ with all_events as (
             coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
             'QuintoAndar' as region,
             'QuintoAndar' as city
-        from datalake_clean_spark.amplitude_events
+        from datalake_amplitude_clean_prod.events
         where year >= 2019
             and event_type in (
               'landing_page_viewed',

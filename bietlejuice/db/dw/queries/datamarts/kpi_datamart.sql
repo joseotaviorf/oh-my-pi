@@ -104,7 +104,7 @@ online_metrics AS (
   	cast(json_extract_path_text(event_properties, 'house_id') as varchar) AS house_id,
     CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
     CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views
-   FROM datalake_clean_spark.amplitude_events
+   FROM datalake_amplitude_clean_prod.events
   	WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed')
   	AND app = 170698
   	AND year >= 2019
