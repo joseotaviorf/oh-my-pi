@@ -31,6 +31,7 @@ create table if not exists photo_job (
 	photographer_contract_type varchar(255),
 	job_problem_reason varchar(255),
 	cancel_reason text,
+	cancel_reason_text text,
 	user_cancel_dt timestamp,
 	user_cancel_id bigint,
 	user_cancel_name varchar(255),

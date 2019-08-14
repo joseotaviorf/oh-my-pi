@@ -32,6 +32,7 @@ create external table datalake_clean.ods_fact_photo_job (
   photographer_contract_type string,
   job_problem_reason string,
   cancel_reason string,
+  cancel_reason_text string,
   rescheduled string,
   user_cancel_type string,
   creation_to_scheduling_diff_minutes string,
