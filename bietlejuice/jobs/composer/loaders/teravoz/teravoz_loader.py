@@ -112,14 +112,12 @@ class TeravozLoader:
           if exists the file, overwrite it.
         """
 
-        # create database if not exists in spark catalog
-        self.spark.sql(
-            "create database if not exists datalake_{}_{}".format(
-                self.SOURCE, datalake_layer
-            )
-        )
+        db_name = "datalake_{}_{}".format(self.SOURCE, datalake_layer)
 
-        if endpoint not in self.sqlContext.tableNames(dbName=self.SOURCE):
+        # create database if not exists in spark catalog
+        self.spark.sql("create database if not exists {}".format(db_name))
+
+        if endpoint not in self.sqlContext.tableNames(dbName=db_name):
             # create spark table and load data
             self.create_spark_table_and_load_data_to_s3(
                 datalake_layer, endpoint, partitions
