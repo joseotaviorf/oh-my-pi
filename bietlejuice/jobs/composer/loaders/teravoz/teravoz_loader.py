@@ -123,7 +123,7 @@ class TeravozLoader:
 
         if endpoint not in self.sqlContext.tableNames(dbName=db_name):
             # create spark table and load data
-            self.create_spark_table_and_load_data_to_s3(
+            self._create_spark_table_and_load_data_to_s3(
                 datalake_layer, endpoint, partitions
             )
 
