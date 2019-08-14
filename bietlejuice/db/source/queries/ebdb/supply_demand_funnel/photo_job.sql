@@ -49,7 +49,7 @@ select
       f.tipoContrato as photographer_contract_type,
       f.problema as job_problem_reason,
       ure.motivo as cancel_reason,
-      f.textoMotivoCancelamento as cancel_reason_text,
+      f.textoMotivoCancelamento as cancel_reason_detailed,
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
       uc.nome as user_cancel_name,

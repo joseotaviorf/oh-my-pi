@@ -33,7 +33,6 @@ create table public.fact_photo_job(
   photographer_contract_type varchar(255),
   job_problem_reason varchar(255),
   cancel_reason varchar(255),
-  cancel_reason_text varchar(255),
   rescheduled boolean,
   user_cancel_type varchar(255),
 	creation_to_scheduling_diff_minutes decimal(10,1),

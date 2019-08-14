@@ -41,7 +41,6 @@ select
 	j1.photographer_contract_type,
 	j1.job_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
-	j1.cancel_reason_text::varchar(100) as cancel_reason_text,
 	(j2.id is not null) as rescheduled,
 	j1.user_cancel_type,
 	j1.creation_to_scheduling_diff_minutes,
