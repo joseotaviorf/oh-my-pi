@@ -46,27 +46,29 @@ WITH newbiz_listings AS (
      AND fpj.creation_origin != 'Teste'
      AND fpj.job_status = 'Publicado'
      AND fpj.sk_date_photos_uploaded != '-1'
-     AND (CASE 
-            WHEN fpj.sk_date_photos_uploaded = -1 
-            THEN NULL 
-            ELSE DATE(fpj.sk_date_photos_uploaded) 
-            END) >= dhl.dt_last_originals_opted_in
-     AND (CASE 
-            WHEN fpj.sk_date_photos_uploaded = -1 
-            THEN NULL 
-            ELSE DATE(fpj.sk_date_photos_uploaded) 
-            END) >= dhl.ts_publication
+     AND DATE(fpj.sk_date_photos_uploaded) >= DATEADD(DAY, -7, dhl.dt_last_originals_opted_in) 
+     AND DATE(fpj.sk_date_photos_uploaded) > dhl.ts_publication
     LEFT JOIN datalake_raw.ebdb_imagem ei
       ON ei.imovel_id = dhl.id_house
-     AND ei.atualizadoem >= dhl.dt_last_originals_opted_in
-     AND ei.atualizadoem >= dhl.ts_publication
+     AND ei.atualizadoem >= DATEADD(DAY, -7, dhl.dt_last_originals_opted_in) 
+     AND ei.atualizadoem > dhl.ts_publication
+    JOIN (SELECT
+            -- max published listing before last originals optedin date
+            dhl.id_house,
+            MAX(dhl.sk_house_listing)   AS sk_house_listing
+          FROM dim_house_listing dhl
+          WHERE dhl.last_originals_type = 'OriginalsReno'
+            AND dhl.dt_last_originals_opted_in >= dhl.ts_publication
+          GROUP BY dhl.id_house
+         ) max_list
+      ON dhl.sk_house_listing = max_list.sk_house_listing
     WHERE dhl.last_originals_type = 'OriginalsReno'
-      AND dhl.sk_house_listing NOT IN (SELECT 
-                                           DISTINCT id 
-                                       FROM datalake_raw.ebdb_imovel_aud 
-                                       WHERE usuario_id = '994668' 
-                                         AND  usuario_mod = '1' 
-                                       )
+      AND dhl.id_house NOT IN (SELECT
+                      	         DISTINCT id
+                               FROM datalake_raw.ebdb_imovel_aud
+                               WHERE usuario_id = '994668'
+                               AND usuario_mod = '1'
+                               )
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
 
@@ -74,7 +76,7 @@ WITH newbiz_listings AS (
 
     -- gets orent info
     SELECT
-        MAX(dhl.sk_house_listing)										AS sk_house_listing,
+        dhl.sk_house_listing    										AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
         DATE(dhl.ts_de_publication)										AS de_publication_date,
@@ -124,23 +126,28 @@ WITH newbiz_listings AS (
      AND fpj.creation_origin != 'Teste'
      AND fpj.job_status = 'Publicado'
      AND fpj.sk_date_photos_uploaded != '-1'
-     AND (CASE 
-            WHEN fpj.sk_date_photos_uploaded = -1 
-            THEN NULL 
-            ELSE DATE(fpj.sk_date_photos_uploaded) 
-            END) >= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
-     AND (CASE 
-            WHEN fpj.sk_date_photos_uploaded = -1 
-            THEN NULL 
-            ELSE DATE(fpj.sk_date_photos_uploaded) 
-            END) >= dhl.ts_publication
+     AND DATE(fpj.sk_date_photos_uploaded) >= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
     LEFT JOIN datalake_raw.ebdb_imagem ei
       ON ei.imovel_id = dhl.id_house
-     AND ei.atualizadoem >= dhl.dt_last_originals_opted_in
-     AND ei.atualizadoem >= dhl.ts_publication
+     AND ei.atualizadoem >= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
+    JOIN (SELECT
+            -- max published listing before owner change
+            dhl.id_house,
+            MAX(dhl.sk_house_listing)   AS sk_house_listing
+          FROM dim_house_listing dhl
+          JOIN datalake_raw.ebdb_imovel_aud ima
+            ON dhl.id_house = ima.id
+           AND ima.usuario_id = '994668'
+           AND ima.usuario_mod = '1'
+          JOIN datalake_raw.ebdb_usuariorevisionentity rev
+            ON ima.rev = rev.id
+          WHERE dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
+          GROUP BY dhl.id_house
+         ) max_list
+      ON dhl.sk_house_listing = max_list.sk_house_listing
     WHERE dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
-    GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22
     
     UNION
 
@@ -172,6 +179,16 @@ WITH newbiz_listings AS (
         DATE(NULL) 								AS date_photos_uploaded,
         DATE(dhl.ts_publication)				AS init_date	
     FROM dim_house_listing dhl
+    JOIN (SELECT
+            -- max published listing before last originals optedin date
+            dhl.id_house,
+            MAX(dhl.sk_house_listing)   AS sk_house_listing
+          FROM dim_house_listing dhl
+          WHERE dhl.last_originals_type = 'OriginalsReady'
+            AND dhl.dt_last_originals_opted_in >= dhl.ts_publication
+          GROUP BY dhl.id_house
+         ) max_list
+      ON dhl.sk_house_listing = max_list.sk_house_listing
     WHERE dhl.last_originals_type = 'OriginalsReady'
       AND dhl.ts_publication IS NOT NULL
 
@@ -179,7 +196,7 @@ WITH newbiz_listings AS (
     
     -- gets irent info
     SELECT
-        MAX(dhl.sk_house_listing)										AS sk_house_listing,
+        dhl.sk_house_listing    										AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
         DATE(dhl.ts_de_publication)										AS de_publication_date,
@@ -211,9 +228,24 @@ WITH newbiz_listings AS (
      AND ima.usuario_mod = '1'
     JOIN datalake_raw.ebdb_usuariorevisionentity rev
       ON ima.rev = rev.id
+    JOIN (SELECT
+            -- max published listing before owner change
+            dhl.id_house,
+            MAX(dhl.sk_house_listing)   AS sk_house_listing
+          FROM dim_house_listing dhl
+          JOIN datalake_raw.ebdb_imovel_aud ima
+            ON dhl.id_house = ima.id
+           AND ima.usuario_id = '908761'
+           AND ima.usuario_mod = '1'
+          JOIN datalake_raw.ebdb_usuariorevisionentity rev
+            ON ima.rev = rev.id
+          WHERE dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
+          GROUP BY dhl.id_house
+         ) max_list
+      ON dhl.sk_house_listing = max_list.sk_house_listing
     WHERE dhl.ts_publication <= DATE(FROM_unixtime(CAST(rev.timestamp AS bigint) / 1000))
-    GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25	
-	) 
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25	
+	)
 
 SELECT
 	nb.sk_house_listing,
@@ -295,9 +327,16 @@ SELECT
 	lrf.sk_rent_flow_taxonomy
 FROM newbiz_listings nb
 LEFT JOIN fact_house_listings hl
-  ON nb.sk_house_listing = hl.sk_house_listing
-LEFT JOIN fact_listing_rent_flows lrf
+  ON nb.sk_house_listing = hl.sk_house_listing 
+LEFT JOIN (SELECT
+				fact_listing_rent_flows.*,
+				dim_date.date AS booking_date
+		   FROM fact_listing_rent_flows
+		   LEFT JOIN dim_date
+		     ON fact_listing_rent_flows.sk_booking_created_date = dim_date.sk_date
+		   ) lrf
   ON nb.sk_house_listing = lrf.sk_house_listing
+ AND nb.init_date <= lrf.booking_date 
 LEFT JOIN dim_date dd1
   ON lrf.sk_booking_created_date = dd1.sk_date
 LEFT JOIN dim_date dd2
@@ -332,8 +371,6 @@ LEFT JOIN dim_date dd16
   ON lrf.sk_contract_annulment_date = dd16.sk_date
 LEFT JOIN dim_date dd17
   ON lrf.sk_contract_canceled_date = dd17.sk_date
-WHERE nb.init_date <= dd1.date
-   OR dd1.date IS NULL
 ORDER BY nb.sk_house_listing,
  		 lrf.sk_rent_flow
 ;
