@@ -113,9 +113,9 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 airflow_helpers.chain(
-    create_cluster_task, events_to_datalake_raw_task, events_raw_to_clean_task
+    create_cluster_task,
+    events_to_datalake_raw_task,
+    events_raw_to_clean_task,
+    [add_amplitude_events_partitions, create_clean_external_tables_task],
+    terminate_cluster_task,
 )
-add_amplitude_events_partitions.set_upstream(events_raw_to_clean_task)
-create_clean_external_tables_task.set_upstream(events_raw_to_clean_task)
-terminate_cluster_task.set_upstream(add_amplitude_events_partitions)
-terminate_cluster_task.set_upstream(create_clean_external_tables_task)

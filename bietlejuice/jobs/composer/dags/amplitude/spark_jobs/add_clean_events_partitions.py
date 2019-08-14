@@ -82,4 +82,6 @@ if __name__ == "__main__":
             ],
         )
 
-    logger.info("m=__main__, table=events, msg=New partitions were created successfully.")
+    logger.info(
+        "m=__main__, table=events, msg=New partitions were created successfully."
+    )

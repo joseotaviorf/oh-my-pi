@@ -34,14 +34,13 @@ if __name__ == "__main__":
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
-    db_raw_databricks = db_info["db_raw_databricks"]
-    db_raw_path = db_info["db_raw_path"]
-
     amplitude_events = AmplitudeEvents(
-        db_raw=db_raw_databricks, s3_raw_path=db_raw_path, keys=keys
+        db_raw=db_info["db_raw_databricks"],
+        s3_raw_path=db_info["db_raw_path"],
+        keys=keys,
     )
 
-    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_raw_databricks))
+    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_info["db_raw_databricks"]))
     amplitude_events.load_events_into_datalake_raw(
         start_date=start_date, end_date=end_date
     )
