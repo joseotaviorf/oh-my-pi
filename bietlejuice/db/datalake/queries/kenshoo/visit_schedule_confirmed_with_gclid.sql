@@ -5,7 +5,7 @@ with amplitude_schedules as (
         -- Appending _k_ so kenshoo client can decode as google client id
 	from datalake_clean.amplitude_events evt
 	where trim(ym) >= '2019-02'
-        and trim(et) = 'visit_schedule_confirmed'''
+        and trim(et) = 'visit_schedule_confirmed'
         and u_utm_source = 'google'
         and u_utm_medium = 'cpc'
         and date(cast(regexp_extract(trim(evt.event_time),
@@ -17,6 +17,7 @@ with amplitude_schedules as (
         -- Appending _k_ so kenshoo client can decode as google client id
     from
         datalake_amplitude_clean_prod.visit_schedule_confirmed_events
+    where year >= 2019
         and user_utm_source = 'google'
         and user_utm_medium = 'cpc'
         and date(cast(regexp_extract(event_time,
