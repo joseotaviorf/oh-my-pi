@@ -8,6 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
@@ -31,13 +32,14 @@ def create_clean_external_table(args):
         ]
     )
     partition_by = ["year", "month", "day"]
-    AthenaClient.create_clean_external_table(
+    AthenaClient.create_external_table(
         database=db_clean_athena,
         table_name=table_name,
         s3_table_path=s3_table_path,
         table_schema=table_schema,
         partition_by=partition_by,
         drop=True,
+        base_format=TableStorageFormat.DEFAULT_CLEAN,
     )
     AthenaClient.repair_table_partitions(db_clean_athena, table_name)
 
