@@ -84,6 +84,18 @@ def docker_login(cli, user, pwd, registry):
 
 
 def convert_to_utc_schedule(cron_expression, tz=pytz.timezone('America/Sao_Paulo')):
+    """
+    @deprecated The returned cron expression is incorrect if hours > 20. To use a cron expression with local time, define the start_date of the DAG with the corresponding time zone. The following DAG is defined to run
+    daily at 01:00 in Brazilian time.
+    local_tz = pendulum.timezone("America/Sao_Paulo")
+    dag = DAG(
+        dag_id='dummy',
+        start_date=datetime(2019, 1, 1, tzinfo=local_tz),
+        schedule_interval="0 1 * * *",
+        max_active_runs=1,
+        catchup=False,
+    )
+    """
     if cron_expression.startswith('timedelta'):
         return cron_expression
     sep = ' '

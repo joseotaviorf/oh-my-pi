@@ -1,5 +1,6 @@
 import json
 import logging
+from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -8,22 +9,29 @@ from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.consumers import MySQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("load_docx_into_datalake")
-
-DATABRICKS_SCOPE = "quintoandar-prod"
+JOB_NAME = "load_docx_into_datalake"
 BLACK_LIST = ["flyway_schema_history"]
 
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
 if __name__ == "__main__":
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
+    args = parser.parse_args()
+    environment = args.env
+    source = "docx"
+
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
-    connection_json = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=DatabaseEnum.DOCX)
+
+    connection_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.DOCX)
     connection = json.loads(connection_json)
     mysql_consumer = MySQLConsumer(connection)
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
-    loader = DatabaseIntoDataLakeRawLoader()
+    loader = DatabaseIntoDataLakeRawLoader(environment, source)
 
     for table in tables:
         if table.table_name not in BLACK_LIST:
