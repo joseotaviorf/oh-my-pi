@@ -84,7 +84,7 @@ class AthenaClient:
         drop_query = "DROP TABLE IF EXISTS {}.{}".format(database, table_name)
         AthenaClient.execute_athena_query(drop_query, database)
         logger.info(
-            "m=create_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
+            "m=overwrite_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
                 database, table_name
             )
         )
