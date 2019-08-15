@@ -18,6 +18,8 @@ class TeravozCallsLoader(TeravozLoader):
 
     def __init__(self, api_user, api_pwd, environment, execution_date):
 
+        super().__init__(api_user, api_pwd, environment)
+        
         # extract to day, month and year to create columns in df
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         self.PARTITIONS["year"] = self.PARTITIONS["year"].format(year=dt_execution.year)
@@ -29,8 +31,6 @@ class TeravozCallsLoader(TeravozLoader):
         # convert to br data format recognized by Teravoz API
         br_date_format = datetime.strftime(dt_execution, "%d-%m-%Y")
         self.PARAMS["date"] = self.PARAMS["date"].format(date=br_date_format)
-
-        super().__init__(api_user, api_pwd, environment)
 
     @staticmethod
     @logger
