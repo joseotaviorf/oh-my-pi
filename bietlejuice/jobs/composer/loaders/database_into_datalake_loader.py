@@ -1,11 +1,13 @@
 from collections import OrderedDict
 
-from pyspark.sql import SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("DatabaseIntoDataLakeLoader")
+
+spark = BaseSparkContext.spark
 
 
 class DatabaseIntoDataLakeLoader:
@@ -51,9 +53,7 @@ class DatabaseIntoDataLakeLoader:
             "msg=Writing data into datalake...".format(db_source, table_name)
         )
         # create the db in spark metastore in case it doesn't exist it
-        SparkSession.builder.getOrCreate().sql(
-            "CREATE DATABASE IF NOT EXISTS {}".format(self.datalake_db)
-        )
+        spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(self.datalake_db))
         write_df = (
             df.write.mode("overwrite")
             .option("compression", self.codec)
@@ -102,7 +102,6 @@ class DatabaseIntoDataLakeLoader:
         ).save(final_path)
 
         # refresh table in spark metastore
-        spark = SparkSession.builder.getOrCreate()
         new_table_name = "{}_{}".format(data_source, table_name)
         spark.sql("MSCK REPAIR TABLE {}.{}".format(self.datalake_db, new_table_name))
         spark.sql("REFRESH TABLE {}.{}".format(self.datalake_db, new_table_name))

@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "{{ cookiecutter.dag_slug }}"
 ENV = Variable.get("environment")

@@ -13,13 +13,15 @@ from qa_python_utils.aws.athena import AthenaClient
 
 class TestKenshoo(object):
 
-    @pytest.mark.parametrize('query_filename, athena_client, file_name',
-                             [[None, '', ''], ['', '', ''], ['query', '', ''], ['sql.sql', None, '']])
+    @pytest.mark.parametrize('query_filename, athena_client, file_name, query_params',
+                             [[None, '', '', None], ['', '', '', None], ['query', '', '', None],
+                              ['sql.sql', None, '', None]])
     def test_save_file_from_athena_query_execution_with_wrong_param(self, kenshoo, query_filename, athena_client,
-                                                                    file_name):
+                                                                    file_name, query_params):
         # act & assert
         with pytest.raises(RuntimeError):
-            kenshoo.save_file_from_athena_query_execution(query_filename, athena_client, file_name)
+            kenshoo.save_file_from_athena_query_execution(query_filename, athena_client, file_name,
+                                                          query_params=query_params)
 
     @pytest.mark.parametrize('query_filename', [None, '', 'query'])
     def test_save_file_from_redshift_query_execution_with_wrong_param(self, kenshoo, query_filename):
@@ -35,6 +37,7 @@ class TestKenshoo(object):
         query_filename = 'query.sql'
         athena_client = 'mock_athena_client'
         file_name = mock.ANY
+        query_params = None
 
         # act
         kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client,
@@ -44,7 +47,8 @@ class TestKenshoo(object):
         mock__save_single_file.assert_called_once_with(df=mock__athena_execute_query_from_file.return_value,
                                                        file_name=file_name)
         mock__athena_execute_query_from_file.assert_called_once_with(query_filename=query_filename,
-                                                                     athena_client=athena_client)
+                                                                     athena_client=athena_client,
+                                                                     query_params=query_params)
 
     @mock.patch.object(Kenshoo, '_redshift_execute_query_from_file',
                        return_value=pd.DataFrame(data=[1], columns=['id']))
@@ -94,13 +98,15 @@ class TestKenshoo(object):
         query_filename = mock.ANY
         athena_client = AthenaClient('')
         expected_result = pd.DataFrame(data=[1], columns=['id'])
+        query_params = None
 
         # act
-        result = kenshoo._athena_execute_query_from_file(query_filename, athena_client)
+        result = kenshoo._athena_execute_query_from_file(query_filename, athena_client, query_params)
 
         # assert
         assert result.equals(expected_result)
-        mock_execute_file_query_and_return_dataframe.assert_called_once_with(filename=full_path)
+        mock_execute_file_query_and_return_dataframe.assert_called_once_with(filename=full_path,
+                                                                             query_params=query_params)
 
     @mock.patch.object(BaseETL, 'from_db_query',
                        return_value=petl.fromdicts([{"id": 1}]))
