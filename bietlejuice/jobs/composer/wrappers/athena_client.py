@@ -78,17 +78,28 @@ class AthenaClient:
 
     @staticmethod
     @logger
+    def overwrite_external_table(
+        database, table_name, s3_table_path, table_schema, partition_by, base_format
+    ):
+        drop_query = "DROP TABLE IF EXISTS {}.{}".format(database, table_name)
+        AthenaClient.execute_athena_query(drop_query, database)
+        logger.info(
+            "m=create_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
+                database, table_name
+            )
+        )
+
+        AthenaClient.create_external_table(
+            database, table_name, s3_table_path, table_schema, partition_by, base_format
+        )
+
+    @staticmethod
+    @logger
     def create_external_table(
-        database,
-        table_name,
-        s3_table_path,
-        table_schema,
-        partition_by,
-        drop,
-        base_format,
+        database, table_name, s3_table_path, table_schema, partition_by, base_format
     ):
         create_query = """
-            CREATE EXTERNAL TABLE IF NOT EXISTS
+            CREATE EXTERNAL TABLE
             `{database}`.`{table}`
             (
               {columns}
@@ -98,15 +109,6 @@ class AthenaClient:
             LOCATION '{path}'
             {properties}
             ;"""
-
-        if drop is True:
-            drop_query = "DROP TABLE IF EXISTS {}.{}".format(database, table_name)
-            AthenaClient.execute_athena_query(drop_query, database)
-            logger.info(
-                "m=create_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                    database, table_name
-                )
-            )
 
         columns_section = ",\n  ".join(
             [
