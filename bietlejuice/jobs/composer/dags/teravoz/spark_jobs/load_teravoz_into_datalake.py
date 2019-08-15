@@ -65,7 +65,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     # get Teravoz credentials stored in Databricks secrets
-    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="ENV_TERAVOZ")
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="teravoz")
 
     credentials = json.loads(json_credentials)
 
