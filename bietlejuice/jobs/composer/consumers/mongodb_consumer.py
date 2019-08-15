@@ -1,9 +1,8 @@
 from pymongo import MongoClient
-
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 
 logger = QuintoAndarLogger("MongoDBConsumer")
 

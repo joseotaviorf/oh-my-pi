@@ -81,3 +81,4 @@ whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
 quintoandar-teravoz-client==0.1.4
+celery==4.3.0

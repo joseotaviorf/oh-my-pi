@@ -1,10 +1,10 @@
 import re
 from collections import OrderedDict
 
-from pyspark.sql.types import StructType
 from pyspark.sql.functions import col, year, month, dayofmonth, to_json
-
+from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext

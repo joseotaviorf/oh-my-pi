@@ -94,7 +94,7 @@ lpv_events as (
             to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
             regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
             uuid
-        FROM datalake_clean_spark.amplitude_listing_page_viewed_events
+        FROM datalake_amplitude_clean_prod.listing_page_viewed_events
         WHERE app = 170698
             AND year >= 2019
     )

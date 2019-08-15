@@ -40,7 +40,7 @@ with all_events as (
              extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _day,
              coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
              true as partial
-      from datalake_clean_spark.amplitude_events
+      from datalake_amplitude_clean_prod.events
       where year >= 2019
              and event_type in ('listing_page_viewed',
                                'search_results_page_viewed',
