@@ -34,7 +34,7 @@ LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
 dag = DAG(
-    dag_id=DAG_ID,
+    dag_id="bietlejuice.{}".format(DAG_ID),
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
