@@ -2,6 +2,7 @@ from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
+
 logger = QuintoAndarLogger("TeravozLoader")
 
 
@@ -70,13 +71,20 @@ class TeravozLoader:
         return s3_path
 
     @logger
-    def _create_partition_table(self, endpoint, s3_path, list_partitions):
-
-        self.spark.sql(
-            "ALTER TABLE {}.{} ".format(self.SOURCE, endpoint)
+    def _create_partition_table(self, db_name, endpoint, s3_path, list_partitions):
+        create_partition = (
+            "ALTER TABLE {}.{} ".format(db_name, endpoint)
             + "ADD IF NOT EXISTS PARTITION ({}) ".format(",".join(list_partitions))
             + "LOCATION '{}'".format(s3_path)
         )
+
+        logger.info(
+            "m=_create_partition_table, msg=Executing command: \n {}".format(
+                create_partition
+            )
+        )
+
+        self.spark.sql(create_partition)
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
@@ -84,12 +92,11 @@ class TeravozLoader:
 
     @logger
     def _create_spark_table_and_load_data_to_s3(
-        self, df, datalake_layer, endpoint, partitions=None
+        self, df, datalake_layer, db_name, endpoint, partitions=None
     ):
-
         # to create a partitioned table should pass the columns from df (melhorar)
         if partitions:
-            if not partitions.keys().issubset(df.columns):
+            if not set(partitions.keys()).issubset(set(df.columns)):
                 df = self._create_dataframe_columns_to_partition_table(df, partitions)
 
         # base path to create table
@@ -104,9 +111,14 @@ class TeravozLoader:
         )
 
         if partitions:
-            df_write.partitions(*partitions.keys())
+            df_write.partitionBy(*partitions.keys())
 
-        df_write.saveAsTable("{}.{}".format(self.SOURCE, endpoint))
+        logger.info(
+            "m=_create_spark_table_and_load_data_to_s3, msg= creating spark table {}.{}".format(
+                db_name, endpoint
+            )
+        )
+        df_write.saveAsTable("{}.{}".format(db_name, endpoint))
 
     @logger
     def _load_data_into_datalake(self, df, endpoint, datalake_layer, partitions=None):
@@ -124,13 +136,19 @@ class TeravozLoader:
         if endpoint not in self.sqlContext.tableNames(dbName=db_name):
             # create spark table and load data
             self._create_spark_table_and_load_data_to_s3(
-                datalake_layer, endpoint, partitions
+                df, datalake_layer, db_name, endpoint, partitions
             )
 
         else:
 
             # partitioned path to create table
             s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint, partitions)
+
+            logger.info(
+                "m=_load_data_into_datalake, msg=save json file in s3 path: {}".format(
+                    s3_path
+                )
+            )
 
             # dataframe to json
             df.write.mode("overwrite").option("compression", "gzip").format(
@@ -144,6 +162,13 @@ class TeravozLoader:
                         "{}={}".format(partition_name, partition_value)
                     )
 
-                self._create_partition_table(endpoint, s3_path, list_partitions)
+                self._create_partition_table(
+                    db_name, endpoint, s3_path, list_partitions
+                )
 
-            self.spark.sql("REFRESH TABLE {}.{}".format(self.SOURCE, endpoint))
+            logger.info(
+                "m=_load_data_into_datalake, msg=refreshing spark table {}.{}".format(
+                    db_name, endpoint
+                )
+            )
+            self.spark.sql("REFRESH TABLE {}.{}".format(db_name, endpoint))
