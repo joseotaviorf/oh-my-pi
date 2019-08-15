@@ -15,7 +15,7 @@ from airflow.operators.dummy_operator import DummyOperator
 import airflow.utils.helpers as airflow_helpers
 
 # dag params
-DAG_ID = "teravoz"
+DAG_ID = "bietlejuice.teravoz"
 MAIN_START_DATE = datetime(2019, 7, 12, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
