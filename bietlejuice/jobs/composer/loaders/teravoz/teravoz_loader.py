@@ -30,7 +30,7 @@ class TeravozLoader:
     def _request_api_and_get_dataframe(self, endpoint, params):
         """
             endpoint: endpoint ..@teravoz.com.br/{endpoint}
-            params: if exists, it's expected the format:
+            params: if exists is expected the format:
                   {
                     "param_name1": "param_value1",
                     "param_name2": "param_value2"
