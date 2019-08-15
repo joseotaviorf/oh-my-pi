@@ -32,7 +32,7 @@ create table public.dim_photo_job (
 	photographer_contract_type varchar(255),
 	job_problem_reason varchar(255),
 	cancel_reason varchar(255),
-	cancel_reason_detailed(255),
+	cancel_reason_detailed varchar(512),
 	user_cancel_dt datetime,
 	user_cancel_id bigint,
 	user_cancel_name varchar(255),
