@@ -35,7 +35,7 @@ def exec_factory_method(
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description="load_teravoz_to_datalake_raw")
+    parser = ArgumentParser(description="load_teravoz_into_datalake")
 
     # args passed by Airflow task
     parser.add_argument("endpoint", type=str, help="which endpoint to call")
