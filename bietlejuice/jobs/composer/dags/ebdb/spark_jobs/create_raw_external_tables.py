@@ -1,24 +1,25 @@
 import logging
+from argparse import ArgumentParser
 from multiprocessing.dummy import Pool
 
-from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
-logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("create_raw_external_tables")
-
+JOB_NAME = "create_raw_external_tables"
 NB_THREADS = 16
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
 
 
 @logger
 def create_raw_external_table(args):
-    table_name, loader, databricks_consumer = args
+    loader, databricks_consumer, table_name, athena_db = args
     loader.create_athena_external_table(
-        consumer=databricks_consumer, table_name=table_name, db_source="ebdb"
+        consumer=databricks_consumer, table_name=table_name, athena_db=athena_db
     )
     logger.info(
         "m=create_raw_external_table, table={}, msg=Finished creating table.".format(
@@ -28,21 +29,29 @@ def create_raw_external_table(args):
 
 
 if __name__ == "__main__":
-    loader = DatabaseIntoDataLakeRawLoader()
-    datalake_db = loader.datalake_db
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env")
+    args = parser.parse_args()
+    environment = args.env
+    source = "ebdb"
+
+    loader = DatabaseIntoDataLakeRawLoader(environment, source)
+    # in glue metastore we need to distinguish schemas between environments
+    athena_db = "{}_{}".format(loader.datalake_db, environment)
     AthenaClient.execute_athena_query(
-        "CREATE DATABASE IF NOT EXISTS `{}`".format(datalake_db), "default"
+        "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
-    connection = {"db": datalake_db}
+    connection = {"db": loader.datalake_db}
     databricks_consumer = DatabricksConsumer(connection)
-    df = databricks_consumer.get_table_names_and_sizes()
-    tables = (
-        df.select("table_name").filter(col("table_name").rlike(r"^ebdb_")).collect()
-    )
+    tables = databricks_consumer.get_table_names_and_sizes().collect()
+
     logger.info("m=__main__, msg=Creating raw external tables...")
     with Pool(NB_THREADS) as p:
         p.map(
             create_raw_external_table,
-            [(table.table_name, loader, databricks_consumer) for table in tables],
+            [
+                (loader, databricks_consumer, table.table_name, athena_db)
+                for table in tables
+            ],
         )
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

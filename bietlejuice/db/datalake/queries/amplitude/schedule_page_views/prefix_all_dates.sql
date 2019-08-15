@@ -50,7 +50,7 @@ with all_events as (
                 cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer))
         else -1
         end as house_id
-      from datalake_clean_spark.amplitude_events
+      from datalake_amplitude_clean_prod.events
       where year >= 2019
             and event_type = 'schedule_page_viewed'
             and app = 170698

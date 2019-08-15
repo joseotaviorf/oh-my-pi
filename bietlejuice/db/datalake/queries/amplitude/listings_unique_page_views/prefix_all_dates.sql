@@ -69,7 +69,7 @@ with unique_views_prev as (
                     cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer))
             else -1
             end as house_id
-        from datalake_clean_spark.amplitude_events
+        from datalake_amplitude_clean_prod.events
         where year >= 2019
             and ((app = 170698 and event_type = 'listing_page_viewed' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
               or (app = 157033 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))

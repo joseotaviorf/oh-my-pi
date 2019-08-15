@@ -46,7 +46,7 @@ with cross_platform as (
 	 			then coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), 'organic')
 	 		else coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '')
 	 	end as media_source
-	  from datalake_clean_spark.amplitude_events
+	  from datalake_amplitude_clean_prod.events
 	  where event_type = 'visit_schedule_confirmed'
 	  and app=170698
 ),

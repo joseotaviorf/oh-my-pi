@@ -11,20 +11,20 @@ with amplitude_schedules as (
         and trim(u_gclid) != ''
         and platform = 'iOS'
         and date(cast(regexp_extract(event_time,
-            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
   union
   select
         distinct
         cast(regexp_extract(event_time, '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp) as dt,
         '_k_' || user_gclid || '_k_'  as gclid
   from
-        datalake_clean_spark.amplitude_visit_schedule_confirmed_events
+        datalake_amplitude_clean_prod.visit_schedule_confirmed_events
   where year >= 2019
         and app = 170698
         and user_gclid is not null
         and platform = 'iOS'
         and date(cast(regexp_extract(event_time,
-            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
 )
 select
   dt as "Date",
