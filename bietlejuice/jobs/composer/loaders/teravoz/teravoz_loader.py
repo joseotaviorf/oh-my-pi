@@ -5,6 +5,11 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("TeravozLoader")
 
+# spark instances
+sc = BaseSparkContext.sc
+spark = BaseSparkContext.spark
+sqlContext = BaseSparkContext.sqlContext
+
 
 class TeravozLoader:
     """
@@ -14,11 +19,6 @@ class TeravozLoader:
 
     # source to create folders and schemas
     SOURCE = "teravoz"
-
-    # spark instances
-    sc = BaseSparkContext.sc
-    spark = BaseSparkContext.spark
-    sqlContext = BaseSparkContext.sqlContext
 
     @logger
     def __init__(self, api_user, api_pwd, environment):
@@ -48,8 +48,8 @@ class TeravozLoader:
         elif "result" in json_data.keys():
             key = "result"
 
-        jsonRDD = self.sc.parallelize(json_data[key])
-        df = self.sqlContext.read.option("multiLine", "true").json(jsonRDD)
+        jsonRDD = sc.parallelize(json_data[key])
+        df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
 
         return df
 
@@ -90,7 +90,7 @@ class TeravozLoader:
             )
         )
 
-        self.spark.sql(create_partition)
+        spark.sql(create_partition)
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
@@ -145,9 +145,9 @@ class TeravozLoader:
         db_name = "datalake_{}_{}".format(self.SOURCE, datalake_layer)
 
         # create database if not exists in spark catalog
-        self.spark.sql("create database if not exists {}".format(db_name))
+        spark.sql("create database if not exists {}".format(db_name))
 
-        if table_name not in self.sqlContext.tableNames(dbName=db_name):
+        if table_name not in sqlContext.tableNames(dbName=db_name):
             # create spark table and load data
             self._create_spark_table_and_load_data_to_s3(
                 df, datalake_layer, db_name, table_name, partitions
@@ -187,4 +187,4 @@ class TeravozLoader:
                     db_name, table_name
                 )
             )
-            self.spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
+            spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))

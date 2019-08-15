@@ -19,7 +19,7 @@ class TeravozCallsLoader(TeravozLoader):
     def __init__(self, api_user, api_pwd, environment, execution_date):
 
         super().__init__(api_user, api_pwd, environment)
-        
+
         # extract to day, month and year to create columns in df
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         self.PARTITIONS["year"] = self.PARTITIONS["year"].format(year=dt_execution.year)
