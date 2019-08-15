@@ -135,8 +135,9 @@ class TeravozLoader:
         )
         df_write.saveAsTable("{}.{}".format(db_name, table_name))
 
+    @staticmethod
     @logger
-    def __upload_dataframe_to_s3(self, df, s3_path):
+    def __upload_dataframe_to_s3(df, s3_path):
 
         logger.info(
             "m=__upload_dataframe_to_s3, msg=save json file in s3 path: {}".format(
