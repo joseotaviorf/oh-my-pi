@@ -63,7 +63,7 @@ class TeravozLoader:
             self.ENV,  # to do: replace with ENV var
             datalake_layer,
             self.SOURCE,
-            table_name
+            table_name,
         )
 
         if partitions:
@@ -156,7 +156,9 @@ class TeravozLoader:
         else:
 
             # partitioned path to create table
-            s3_path = self.__build_s3_path_to_load(datalake_layer, table_name, partitions)
+            s3_path = self.__build_s3_path_to_load(
+                datalake_layer, table_name, partitions
+            )
 
             logger.info(
                 "m=_load_data_into_datalake, msg=save json file in s3 path: {}".format(
