@@ -123,7 +123,10 @@ class DatabaseIntoDataLakeLoader:
             [
                 (
                     row["col_name"],
-                    row["col_type"].lower().replace("timestamp", "string"),
+                    row["col_type"]
+                    .lower()
+                    .replace("timestamp", "string")
+                    .replace("binary", "varchar(53535)"),
                 )
                 for row in table_schema
             ]
