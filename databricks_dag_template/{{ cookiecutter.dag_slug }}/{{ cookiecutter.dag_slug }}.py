@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
+import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -30,6 +31,8 @@ DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_js
 CUSTOM_LIBRARIES = []
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
+local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+
 dag = DAG(
     dag_id="bietlejuice.{}".format(DAG_ID),
     default_args={
@@ -37,10 +40,10 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime.strptime("{{ cookiecutter.dag_start_date }}", '%Y-%m-%d'),
+    start_date=datetime.strptime("{{ cookiecutter.dag_start_date }}", '%Y-%m-%d').astimezone(local_tz),
     schedule_interval="{{ cookiecutter.dag_schedule_interval }}",
-    max_active_runs={{ cookiecutter.dag_max_active_runs }},
-    catchup={{ cookiecutter.dag_catchup }},
+    max_active_runs={{cookiecutter.dag_max_active_runs}},
+    catchup={{cookiecutter.dag_catchup}},
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
