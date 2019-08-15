@@ -32,7 +32,6 @@ pipeline:
       - make cov-badge
     when:
       event: push
-      branch: master
 
   publish-coverage:
     image: plugins/s3
