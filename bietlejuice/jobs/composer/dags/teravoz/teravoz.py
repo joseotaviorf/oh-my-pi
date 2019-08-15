@@ -52,9 +52,9 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 7, 12, 0, 0, 0),
-    schedule_interval="0 5 * * *",
-    catchup=False,
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    catchup=False
 )
 
 
