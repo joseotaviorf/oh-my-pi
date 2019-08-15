@@ -4,10 +4,8 @@ select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
-	dl.origem as lead_origin,
-	fhlf.mkt_channel,
-	fhlf.mkt_medium as supply_channel,
+	null::boolean as is_b2b,
+	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
 	null as demand_channel,
 	count(fhlf.sk_prospect_date) as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
 	null::integer as qualifieds,
@@ -24,27 +22,23 @@ select
   null::integer as contract_created,
   null::integer as contract_signed
 from dim_date dd
-join old_taxonomy_fact_house_listing_flows fhlf
+join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_prospect_date
   and fhlf.sk_prospect_date > 0
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
-left join dim_lead dl
-  on dl.sk_lead = fhlf.sk_lead
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 qualified as (
 select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
-	dl.origem as lead_origin,
-	fhlf.mkt_channel,
-	fhlf.mkt_medium as supply_channel,
+	null::boolean as is_b2b,
+	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
 	null as demand_channel,
 	null::integer as prospects,
 	count(fhlf.sk_qualified_date) as qualifieds, -- this count is done on the qualified date because not all listings come from a lead, and maybe one lead brings multiple house listings
@@ -61,27 +55,23 @@ select
   null::integer as contract_created,
   null::integer as contract_signed
 from dim_date dd
-join old_taxonomy_fact_house_listing_flows fhlf
+join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_qualified_date
   and fhlf.sk_qualified_date > 0
-left join dim_lead dl
-  on dl.sk_lead = fhlf.sk_lead
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 opportunity as (
 select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
-	dl.origem as lead_origin,
-	fhlf.mkt_channel,
-	fhlf.mkt_medium as supply_channel,
+	null::boolean as is_b2b,
+	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
 	null as demand_channel,
 	null::integer as prospects,
 	null::integer as qualifieds,
@@ -98,27 +88,23 @@ select
   null::integer as contract_created,
   null::integer as contract_signed
 from dim_date dd
-join old_taxonomy_fact_house_listing_flows fhlf
+join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_opportunity_date
   and fhlf.sk_opportunity_date > 0
-left join dim_lead dl
-  on dl.sk_lead = fhlf.sk_lead
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 listing as (
 select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	coalesce(dl.is_b2b, false) is true or coalesce(dhl.is_b2b, false) is true as is_b2b,
-	dl.origem as lead_origin,
-	fhlf.mkt_channel,
-	fhlf.mkt_medium as supply_channel,
+	null::boolean as is_b2b,
+	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
 	null as demand_channel,
 	null::integer as prospects,
 	null::integer as qualifieds,
@@ -135,17 +121,15 @@ select
   null::integer as contract_created,
   null::integer as contract_signed
 from dim_date dd
-join old_taxonomy_fact_house_listing_flows fhlf
+join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_first_listing_date
   and fhlf.sk_first_listing_date > 0
-left join dim_lead dl
-  on dl.sk_lead = fhlf.sk_lead
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 visits_booked as (
 select
@@ -153,10 +137,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -182,7 +164,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 visits_completed as (
 select
@@ -190,10 +172,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -219,7 +199,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 offer_submitted as (
 select
@@ -227,10 +207,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -256,7 +234,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date"between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 offer_approved as(
 select
@@ -264,10 +242,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -293,7 +269,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 doc_sent as(
 select
@@ -301,10 +277,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -330,7 +304,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 doc_completed as(
 select
@@ -338,10 +312,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -367,7 +339,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 credit_processed as(
 select
@@ -375,10 +347,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -404,7 +374,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 credit_approved as(
 select
@@ -412,10 +382,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -441,7 +409,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 contract_created as (
 select
@@ -449,10 +417,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -478,7 +444,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 contract_signed as (
 select
@@ -486,10 +452,8 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as lead_origin,
-  null as mkt_channel,
   null as supply_channel,
-  db.mkt_medium as demand_channel,
+  db.mkt_channel as demand_channel,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -515,7 +479,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6
 ),
 union_all as (
 	select * from prospect
@@ -551,8 +515,6 @@ select
 	dd."date",
 	ua.city_group,
   ua.is_b2b,
-  ua.lead_origin,
-  ua.mkt_channel,
   ua.supply_channel,
   ua.demand_channel,
   ua.prospects,
@@ -578,27 +540,15 @@ agg_all as (
 select
 	"date",
 	city_group,
-		case when is_b2b is true then 'B2B'
-	     else
-    case when  lead_origin = 'PriceSuggestion' then 'Calculadora'
-	     else
-	     case when supply_channel in ('SEM non-branded', 'Display', 'Retargeting', 'Online Networks', 'Online Classifieds') then 'OnlinePaid'
-	          when supply_channel in ('SEM branded', 'Social', 'Notifications', 'Direct') then 'Organic'
-	          when supply_channel in ('Crawling', 'Not Mapped', 'Lost Tracking', 'Content', 'Portal', 'Recovered Leads') then 'Other'
-	     else supply_channel end end end as supply_channel,
-	case when is_b2b is true then 'B2B'
-	     else
-    case when demand_channel = 'Agents' then 'Agents'
-         when demand_channel = 'Online Classifieds' then 'OnlineClassifieds'
-         when demand_channel in ('CX','Direct','Notifications','SEM branded','Social') then 'Organic'
-         when demand_channel in ('Display','Retargeting','SEM non-branded') then 'Online Paid'
-         when demand_channel in ('Not Mapped', 'Lost Tracking','Not Tracked', 'Other') then 'Other'
-         else demand_channel end end as demand_channel,
-	sum(prospects) as prospects,
+	supply_channel,
+    case when demand_channel in ('Not Mapped', 'Other') or demand_channel is null then 'Other'
+         else demand_channel end as demand_channel,
+  is_b2b as is_b2b_demand,
+  sum(prospects) as prospects,
   sum(qualifieds) as qualifieds,
   sum(opportunities) as opportunities,
   sum(first_listings) as first_listings,
-	sum(visits_booked) as visits_booked,
+  sum(visits_booked) as visits_booked,
   sum(visits_completed) as visits_completed,
   sum(offer_submitted) as offer_submitted,
   sum(offer_approved) as offer_approved,
@@ -609,8 +559,8 @@ select
   sum(contract_created) as contract_created,
   sum(contract_signed) as contract_signed
 from union_all
-group by "date", city_group, 3, 4
-order by "date", city_group, 3, 4
+group by "date", city_group, 3, 4, 5
+order by "date", city_group, 3, 4, 5
 )
 select * from agg_all
 ;
