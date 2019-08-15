@@ -77,7 +77,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
                     SPARK_JOBS_PATH
                 ),
                 "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV],
-            },
+            }
         },
     )
 
