@@ -451,7 +451,7 @@ applied_taxonomy_flow as (
         case
              when lead_type = 'Proparceria' then 'Non Self-Service'
              when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado') then 'Non Self-Service'
-             when (is_cx_direct_register or is_is_isales_direct_register) then 'Non Self-Service'
+             when (is_cx_direct_register or is_isales_direct_register) then 'Non Self-Service'
              when lead_origin = 'Landing' then 'Non Self-Service'
              when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
              when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
