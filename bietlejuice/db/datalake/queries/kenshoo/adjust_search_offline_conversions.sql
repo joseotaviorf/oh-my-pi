@@ -11,7 +11,7 @@ with amplitude_schedules as (
         and trim(u_gclid) != ''
         and platform = 'iOS'
         and date(cast(regexp_extract(event_time,
-            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
   union
   select
         distinct
@@ -24,7 +24,7 @@ with amplitude_schedules as (
         and user_gclid is not null
         and platform = 'iOS'
         and date(cast(regexp_extract(event_time,
-            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) >= date('{dt}')
+            '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
 )
 select
   dt as "Date",
