@@ -54,7 +54,7 @@ class TeravozLoader:
         return df
 
     @logger
-    def __build_s3_path_to_load(self, datalake_layer, endpoint, partitions=None):
+    def __build_s3_path_to_load(self, datalake_layer, table_name, partitions=None):
         """
           build s3 path to load the json file including partitions.
         """
@@ -63,7 +63,7 @@ class TeravozLoader:
             self.ENV,  # to do: replace with ENV var
             datalake_layer,
             self.SOURCE,
-            endpoint,
+            table_name
         )
 
         if partitions:
@@ -74,12 +74,12 @@ class TeravozLoader:
         return s3_path
 
     @logger
-    def _create_partition_table(self, db_name, endpoint, s3_path, list_partitions):
+    def _create_partition_table(self, db_name, table_name, s3_path, list_partitions):
         """
             Add a specific partition to a spark table
         """
         create_partition = (
-            "ALTER TABLE {}.{} ".format(db_name, endpoint)
+            "ALTER TABLE {}.{} ".format(db_name, table_name)
             + "ADD IF NOT EXISTS PARTITION ({}) ".format(",".join(list_partitions))
             + "LOCATION '{}'".format(s3_path)
         )
@@ -102,7 +102,7 @@ class TeravozLoader:
 
     @logger
     def _create_spark_table_and_load_data_to_s3(
-        self, df, datalake_layer, db_name, endpoint, partitions=None
+        self, df, datalake_layer, db_name, table_name, partitions=None
     ):
         """
             create spark table and database if not exists,
@@ -114,7 +114,7 @@ class TeravozLoader:
             df = self._create_dataframe_columns_to_partition_table(df, partitions)
 
         # base path to create table
-        s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint)
+        s3_path = self.__build_s3_path_to_load(datalake_layer, table_name)
 
         # dataframe to json
         df_write = (
@@ -129,13 +129,13 @@ class TeravozLoader:
 
         logger.info(
             "m=_create_spark_table_and_load_data_to_s3, msg= creating spark table {}.{}".format(
-                db_name, endpoint
+                db_name, table_name
             )
         )
-        df_write.saveAsTable("{}.{}".format(db_name, endpoint))
+        df_write.saveAsTable("{}.{}".format(db_name, table_name))
 
     @logger
-    def _load_data_into_datalake(self, df, endpoint, datalake_layer, partitions=None):
+    def _load_data_into_datalake(self, df, table_name, datalake_layer, partitions=None):
 
         """
           load request from endpoint to s3 without partitions and
@@ -147,16 +147,16 @@ class TeravozLoader:
         # create database if not exists in spark catalog
         self.spark.sql("create database if not exists {}".format(db_name))
 
-        if endpoint not in self.sqlContext.tableNames(dbName=db_name):
+        if table_name not in self.sqlContext.tableNames(dbName=db_name):
             # create spark table and load data
             self._create_spark_table_and_load_data_to_s3(
-                df, datalake_layer, db_name, endpoint, partitions
+                df, datalake_layer, db_name, table_name, partitions
             )
 
         else:
 
             # partitioned path to create table
-            s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint, partitions)
+            s3_path = self.__build_s3_path_to_load(datalake_layer, table_name, partitions)
 
             logger.info(
                 "m=_load_data_into_datalake, msg=save json file in s3 path: {}".format(
@@ -177,12 +177,12 @@ class TeravozLoader:
                     )
 
                 self._create_partition_table(
-                    db_name, endpoint, s3_path, list_partitions
+                    db_name, table_name, s3_path, list_partitions
                 )
 
             logger.info(
                 "m=_load_data_into_datalake, msg=refreshing spark table {}.{}".format(
-                    db_name, endpoint
+                    db_name, table_name
                 )
             )
-            self.spark.sql("REFRESH TABLE {}.{}".format(db_name, endpoint))
+            self.spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))

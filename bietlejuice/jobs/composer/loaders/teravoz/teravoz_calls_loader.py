@@ -56,7 +56,7 @@ class TeravozCallsLoader(TeravozLoader):
 
         super()._load_data_into_datalake(
             df=df,
-            endpoint="calls",
+            table_name="calls",
             datalake_layer=datalake_layer,
             partitions=self.PARTITIONS,
         )

@@ -18,11 +18,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 @logger
 def exec_factory_method(
-    endpoint, method, api_user, api_pwd, environment, execution_date
+    entity, method, api_user, api_pwd, environment, execution_date
 ):
 
     teravoz = TeravozFactory.factory(
-        entity=endpoint,
+        table_name=table_name,
         api_user=api_user,
         api_pwd=api_pwd,
         environment=environment,
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="load_teravoz_into_datalake")
 
     # args passed by Airflow task
-    parser.add_argument("endpoint", type=str, help="which endpoint to call")
+    parser.add_argument("table_name", type=str, help="which endpoint to call and table name")
     parser.add_argument(
         "datalake_layer", type=str, help="which layer from datalake to load"
     )
@@ -48,14 +48,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake, endpoint={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
-            args.endpoint, args.datalake_layer, args.execution_date
+        "m=load_teravoz_into_datalake, table_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
+            args.table_name, args.datalake_layer, args.execution_date
         )
     )
 
     datalake_layer = args.datalake_layer
     execution_date = args.execution_date
-    endpoint = args.endpoint
+    table_name = args.table_name
     environment = args.environment
 
     # start Spark Session
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
 
     teravoz = exec_factory_method(
-        endpoint=endpoint,
+        table_name=table_name,
         method="__init__",
         api_user=credentials["teravoz_user"],
         api_pwd=credentials["teravoz_password"],

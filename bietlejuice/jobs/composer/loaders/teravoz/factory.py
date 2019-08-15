@@ -7,14 +7,14 @@ logger = QuintoAndarLogger("TeravozFactory")
 
 class TeravozFactory:
     @staticmethod
-    def factory(entity, api_user, api_pwd, environment, execution_date=None):
-        if entity is None:
-            raise ValueError("m=factory, class_={}, msg=entity cannot be None")
-        class_ = TeravozFactory.__dispatch_dict(entity)
+    def factory(table_name, api_user, api_pwd, environment, execution_date=None):
+        if table_name is None:
+            raise ValueError("m=factory, class_={}, msg=table_name cannot be None")
+        class_ = TeravozFactory.__dispatch_dict(table_name)
         if not class_:
             raise RuntimeError(
-                "m=factory, entity={}, msg=class type for entity not found".format(
-                    entity
+                "m=factory, table_name={}, msg=class type for table_name not found".format(
+                    table_name
                 )
             )
         return class_(
@@ -25,5 +25,5 @@ class TeravozFactory:
         )
 
     @staticmethod
-    def __dispatch_dict(entity):
-        return {"calls": TeravozCallsLoader}.get(entity)
+    def __dispatch_dict(table_name):
+        return {"calls": TeravozCallsLoader}.get(table_name)
