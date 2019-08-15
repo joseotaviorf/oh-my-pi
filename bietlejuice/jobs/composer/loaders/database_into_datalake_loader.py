@@ -2,8 +2,8 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 logger = QuintoAndarLogger("DatabaseIntoDataLakeLoader")
 
@@ -11,8 +11,8 @@ spark = BaseSparkContext.spark
 
 
 class DatabaseIntoDataLakeLoader:
-    DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
-    CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
+    DROP_TABLE_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
+    CREATE_TABLE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
                                 `{database}`.`{table}`
                                 (
                                   {columns}
@@ -31,9 +31,7 @@ class DatabaseIntoDataLakeLoader:
         self, consumer, table_name, query=None, partition_by=None, concurrency=1
     ):
         db_source = consumer.connection["db"]
-        final_path = "{}/{}/{}".format(
-            self.datalake_path, db_source, table_name.lower()
-        )
+        final_path = "{}/{}".format(self.datalake_path, table_name.lower())
 
         logger.info(
             "load_full_table, table={}.{}, msg=Getting  data...".format(
@@ -63,12 +61,11 @@ class DatabaseIntoDataLakeLoader:
         if partition_by:
             for col in partition_by:
                 write_df = write_df.partitionBy(col)
-        new_table_name = "{}_{}".format(db_source, table_name)
-        write_df.saveAsTable("{}.{}".format(self.datalake_db, new_table_name))
+        write_df.saveAsTable("{}.{}".format(self.datalake_db, table_name))
         logger.info(
             "load_full_table, table={}.{},"
             "msg=Copied table into datalake ({}).".format(
-                self.datalake_db, new_table_name, final_path
+                self.datalake_db, table_name, final_path
             )
         )
 
@@ -82,10 +79,7 @@ class DatabaseIntoDataLakeLoader:
                 "msg=partition_by param is required to not overwrite the"
                 "entire table but a single partition"
             )
-        data_source = consumer.connection["db"]
-        final_path = "{}/{}/{}".format(
-            self.datalake_path, data_source, table_name.lower()
-        )
+        final_path = "{}/{}".format(self.datalake_path, table_name.lower())
         for key, val in partition_by:
             final_path += "/{}={}".format(key, val)
 
@@ -102,34 +96,26 @@ class DatabaseIntoDataLakeLoader:
         ).save(final_path)
 
         # refresh table in spark metastore
-        new_table_name = "{}_{}".format(data_source, table_name)
-        spark.sql("MSCK REPAIR TABLE {}.{}".format(self.datalake_db, new_table_name))
-        spark.sql("REFRESH TABLE {}.{}".format(self.datalake_db, new_table_name))
+        spark.sql("MSCK REPAIR TABLE {}.{}".format(self.datalake_db, table_name))
+        spark.sql("REFRESH TABLE {}.{}".format(self.datalake_db, table_name))
         logger.info(
             "load_incremental_partitioned_table, table={}.{},"
             "msg=Loaded successfully incremental data into datalake ({}).".format(
-                self.datalake_db, new_table_name, final_path
+                self.datalake_db, table_name, final_path
             )
         )
 
     @logger
     def create_athena_external_table(
-        self, consumer, table_name, db_source, partition_by=None
+        self, consumer, table_name, athena_db, partition_by=None
     ):
-        if not table_name.startswith(db_source + "_"):
-            raise RuntimeError(
-                "m=create_athena_external_table, table_name={}, db_source={}, "
-                "msg=Database source must be the prefix of the "
-                "table_name".format(table_name, db_source)
-            )
-
-        drop_query = self.DROP_QUERY_TEMPLATE.format(
-            database=self.datalake_db, table=table_name
+        drop_query = self.DROP_TABLE_QUERY_TEMPLATE.format(
+            database=athena_db, table=table_name
         )
-        AthenaClient.execute_athena_query(drop_query, self.datalake_db)
+        AthenaClient.execute_athena_query(drop_query, athena_db)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped "
-            "table in Athena successfully".format(self.datalake_db, table_name)
+            "table in Athena successfully".format(athena_db, table_name)
         )
 
         table_schema = consumer.get_table_schema(table_name).collect()
@@ -157,26 +143,23 @@ class DatabaseIntoDataLakeLoader:
                     ["`" + col + "` " + table_schema[col] for col in partition_by]
                 )
             )
-        create_query = self.CREATE_QUERY_TEMPLATE.format(
-            database=self.datalake_db,
+        create_query = self.CREATE_TABLE_QUERY_TEMPLATE.format(
+            database=athena_db,
             table=table_name,
             columns=columns_section,
             partitioned_by=partitions_section,
             format=self.create_query_format,
-            path="{}/{}/{}".format(
-                self.datalake_path, db_source, table_name[len(db_source) + 1 :]
-            ),
+            path="{}/{}".format(self.datalake_path, table_name),
         )
-        AthenaClient.execute_athena_query(create_query, self.datalake_db)
+        AthenaClient.execute_athena_query(create_query, athena_db)
         if partition_by:
             AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(self.datalake_db, table_name),
-                self.datalake_db,
+                "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table_name), athena_db
             )
 
         logger.info(
             "m=_create_athena_external_table, table={}.{}, msg=The table was created "
-            "successfully in Athena".format(self.datalake_db, table_name)
+            "successfully in Athena".format(athena_db, table_name)
         )
 
     @property

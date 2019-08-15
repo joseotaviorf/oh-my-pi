@@ -407,7 +407,7 @@ select
     else 'Other'
   end as mkt_branded,
   case
-    when t.mkt_origin is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Other'
     else t.mkt_origin
   end as mkt_origin,
   case
@@ -448,11 +448,16 @@ left join taxonomy t
 applied_taxonomy_flow as (
     select
         *,
-        case when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
+        case
+             when lead_type = 'Proparceria' then 'Non Self-Service'
+             when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado') then 'Non Self-Service'
+             when (is_cx_direct_register or is_isales_direct_register) then 'Non Self-Service'
+             when lead_origin = 'Landing' then 'Non Self-Service'
+             when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
              when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
                   and mkt_source = 'Direct Referral' then 'Self-Service'
              when mkt_origin in ('Other', 'Not Mapped') then mkt_origin
-             else 'Non-Self Service' end as mkt_flow
+             else 'Non Self-Service' end as mkt_flow
     from  applied_taxonomy
 )
 select

@@ -16,7 +16,7 @@ with amplitude_schedules as (
         case when user_gclid is not null then '_k_' || user_gclid || '_k_' end as "GCLID"
         -- Appending _k_ so kenshoo client can decode as google client id
     from
-        datalake_clean_spark.amplitude_visit_schedule_confirmed_events
+        datalake_amplitude_clean_prod.visit_schedule_confirmed_events
     where year >= 2019
         and user_utm_source = 'google'
         and user_utm_medium = 'cpc'

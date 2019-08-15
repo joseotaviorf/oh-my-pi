@@ -19,7 +19,7 @@ class DatabaseConsumer(ABC):
         pass
 
     @abstractmethod
-    def get_data_from_query(self, query, table_name):
+    def get_data_from_query(self, query, table_name=None):
         pass
 
     @abstractmethod
