@@ -91,6 +91,7 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
+        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
@@ -135,6 +136,20 @@ class TeravozLoader:
         df_write.saveAsTable("{}.{}".format(db_name, table_name))
 
     @logger
+    def __upload_dataframe_to_s3(self, df, s3_path):
+
+        logger.info(
+            "m=__upload_dataframe_to_s3, msg=save json file in s3 path: {}".format(
+                s3_path
+            )
+        )
+
+        # dataframe to json
+        df.write.mode("overwrite").option("compression", "gzip").format("json").option(
+            "path", s3_path
+        ).save()
+
+    @logger
     def _load_data_into_datalake(self, df, table_name, datalake_layer, partitions=None):
 
         """
@@ -160,16 +175,7 @@ class TeravozLoader:
                 datalake_layer, table_name, partitions
             )
 
-            logger.info(
-                "m=_load_data_into_datalake, msg=save json file in s3 path: {}".format(
-                    s3_path
-                )
-            )
-
-            # dataframe to json
-            df.write.mode("overwrite").option("compression", "gzip").format(
-                "json"
-            ).option("path", s3_path).save()
+            self.__upload_dataframe_to_s3(df, s3_path)
 
             if partitions:
                 list_partitions = []
@@ -178,13 +184,4 @@ class TeravozLoader:
                         "{}={}".format(partition_name, partition_value)
                     )
 
-                self._create_partition_table(
-                    db_name, table_name, s3_path, list_partitions
-                )
-
-            logger.info(
-                "m=_load_data_into_datalake, msg=refreshing spark table {}.{}".format(
-                    db_name, table_name
-                )
-            )
-            spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
+            self._create_partition_table(db_name, table_name, s3_path, list_partitions)
