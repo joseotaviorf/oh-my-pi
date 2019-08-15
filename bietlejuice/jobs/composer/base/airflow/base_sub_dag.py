@@ -113,8 +113,9 @@ class BaseSubDAG(object):
 
         return entity_dag
 
+    @staticmethod
     @logger
-    def _build_tests_tasks(self, dag, tests):
+    def _build_tests_tasks(dag, tests):
         """
         Builds all the test tasks for a specific dag/subdag
         :param dag: the dag which the tasks will be in

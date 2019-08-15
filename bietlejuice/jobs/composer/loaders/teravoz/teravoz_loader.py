@@ -110,9 +110,8 @@ class TeravozLoader:
         """
 
         # verify if the partitions passed are inside the df.
-        if partitions:
-            if not set(partitions.keys()).issubset(set(df.columns)):
-                df = self._create_dataframe_columns_to_partition_table(df, partitions)
+        if partitions and not set(partitions.keys()).issubset(set(df.columns)):
+            df = self._create_dataframe_columns_to_partition_table(df, partitions)
 
         # base path to create table
         s3_path = self.__build_s3_path_to_load(datalake_layer, endpoint)
