@@ -8,10 +8,10 @@ logger = QuintoAndarLogger("TeravozLoader")
 
 class TeravozLoader:
     """
-        Generic class that contains methods for all Teravoz tables and requests, 
+        Generic class that contains methods for all Teravoz tables and requests,
         such as requests to API, load files to s3 and create spark tables.
     """
-    
+
     # source to create folders and schemas
     SOURCE = "teravoz"
 
@@ -108,7 +108,7 @@ class TeravozLoader:
             create spark table and database if not exists,
             load files to s3 and create partitions within an existing table
         """
-        
+
         # verify if the partitions passed are inside the df.
         if partitions:
             if not set(partitions.keys()).issubset(set(df.columns)):
