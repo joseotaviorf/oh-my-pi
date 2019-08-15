@@ -1,7 +1,9 @@
-from pyspark.context import SparkContext
+from pyspark.sql import session, context
+from pyspark import SparkContext
+
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("BaseDBUtils")
+logger = QuintoAndarLogger("base_spark")
 
 
 class BaseDBUtils:
@@ -16,3 +18,9 @@ class BaseDBUtils:
             return DBUtils(spark.sparkContext)
 
         logger.info("m=get_db_utils, msg=dbutils already available")
+
+
+class BaseSparkContext:
+    sc = SparkContext.getOrCreate()
+    spark = session.SparkSession(sc)
+    sqlContext = context.HiveContext(sc)

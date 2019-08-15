@@ -241,26 +241,6 @@ taxonomy_listings_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
                                                  'listings',
                                                  'taxonomy')
 
-taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                                    materialize_growth_measure_table_from_datalake,
-                                                                    'demand_active_user_sessions',
-                                                                    'taxonomy')
-
-taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                            materialize_growth_measure_table_from_datalake,
-                                                            'demand_active_users',
-                                                            'taxonomy')
-
-taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                                    materialize_growth_measure_table_query,
-                                                                    'supply_active_user_sessions',
-                                                                    'taxonomy')
-
-taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-                                                            materialize_growth_measure_table_query,
-                                                            'supply_active_users',
-                                                            'taxonomy')
-
 create_conversion_points_supply_daily_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='create_conversion_points_supply_daily',
@@ -276,6 +256,28 @@ create_conversion_points_demand_daily_task = BaseDAG.build_python_operator(
     op_kwargs={'table_name': 'conversion_points_demand_daily', 'level': 'taxonomy',
                'sub_level': 'conversion_points_demand'}
 )
+
+# TODO: When migrating jobs to SPARK, also consider the following ones
+# taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+#                                                                     materialize_growth_measure_table_from_datalake,
+#                                                                     'demand_active_user_sessions',
+#                                                                     'taxonomy')
+#
+# taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+#                                                             materialize_growth_measure_table_from_datalake,
+#                                                             'demand_active_users',
+#                                                             'taxonomy')
+#
+# taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+#                                                                     materialize_growth_measure_table_query,
+#                                                                     'supply_active_user_sessions',
+#                                                                     'taxonomy')
+#
+# taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
+#                                                             materialize_growth_measure_table_query,
+#                                                             'supply_active_users',
+#                                                             'taxonomy')
+
 
 create_conversion_points_supply_weekly_task = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -330,18 +332,6 @@ demand_funnel_conversions_subdag = BaseSubDag.get_sub_dag_operator(
 )
 
 # flow
-airflow_helpers.chain(taxonomy_supply_active_users_sub_dag, taxonomy_supply_active_user_sessions_sub_dag,
-                      taxonomy_demand_active_users_sub_dag, taxonomy_demand_active_user_sessions_sub_dag)
-taxonomy_demand_active_user_sessions_sub_dag.set_downstream([taxonomy_leads_sub_dag,
-                                                             taxonomy_prospects_sub_dag,
-                                                             taxonomy_qualifieds_sub_dag,
-                                                             taxonomy_opportunities_sub_dag,
-                                                             taxonomy_listings_sub_dag,
-                                                             taxonomy_visits_booked_sub_dag,
-                                                             taxonomy_visits_completed_sub_dag,
-                                                             taxonomy_offers_submitted_sub_dag,
-                                                             taxonomy_offers_approved_sub_dag,
-                                                             taxonomy_contracts_signed_sub_dag])
 create_conversion_points_supply_daily_task.set_upstream([taxonomy_leads_sub_dag,
                                                          taxonomy_prospects_sub_dag,
                                                          taxonomy_qualifieds_sub_dag,

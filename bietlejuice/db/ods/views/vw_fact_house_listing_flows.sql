@@ -338,7 +338,12 @@ potential_listings as (
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
     coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
-    us_cad.id is not null as is_call_center
+    us_cad.id is not null as is_call_center,
+    lfet.tracking_referring_domain as lead_referring_domain,
+    us_d.subscriptionSource as subscription_source,
+    case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
+		 when u.dados_agente_id is not null then 'Agent'
+		 else ua.affiliateType end as affiliate_type
   from fact_with_reproc f
   left join lead_first_event_tracking lfet 
     on lfet.id_lead = f.lead_id
@@ -365,127 +370,62 @@ potential_listings as (
     on l_b2b.id_lead = f.lead_id
   left join partner_agent pa_b2b_prime 
     on h.usuario_id = pa_b2b_prime.user_id
+  left join usuario u
+	on coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) = u.id
+  left join user_doorman us_d
+    on us_d.id_dados_afiliado = u.dados_afiliado_id
+  left join user_affiliate ua
+    on ua.id = u.dados_afiliado_id
 ), 
 taxonomy as (
-  select 
+  select
+    distinct
     lead_type,
     lead_origin,
-    lead_utm_source,
-    lead_utm_medium,
+    lead_tracking_medium,
+    lead_tracking_source,
+    affiliate_type,
+    lead_referring_domain,
+    subscription_source,
     is_branded::integer::boolean as is_branded,
     is_b2b::integer::boolean as is_b2b,
-    is_doorman::integer::boolean as is_doorman,
     is_isales_direct_register::integer::boolean as is_isales_direct_register,
     is_cx_direct_register::integer::boolean as is_cx_direct_register,
     has_isales_intervention::integer::boolean as has_isales_intervention,
     is_call_center::integer::boolean as is_call_center,
-    mkt_category,
-    mkt_flow,
-    mkt_completion,
     mkt_origin,
     mkt_channel,
-    mkt_platform,
     mkt_medium,
     mkt_source
-  from files.taxonomy_supply
-)
+  from files.taxonomy_growth
+),
+applied_taxonomy as (
 select 
-  pl.sk_house_listing_flow,
-  pl.sk_condo,
-  pl.sk_lead,
-  pl.sk_lead_conversion,
-  pl.sk_first_photo_job,
-  pl.sk_house_listing,
-  pl.sk_user_house_registrant,
-  pl.sk_user_sales_rep,
-  pl.sk_user_lead_affiliate,
-  pl.sk_user_first_task_assignee,
-  pl.sk_user_last_task_assignee,
-  pl.sk_region,
-  pl.sk_city,
-  pl.sk_partner,
-  pl.sk_lead_date,
-  pl.sk_prospect_date,
-  pl.sk_first_task_created_date,
-  pl.sk_first_task_closed_date,
-  pl.sk_last_task_created_date,
-  pl.sk_last_task_closed_date,
-  pl.sk_first_inside_sales_contact_date,
-  pl.sk_conversion_date,
-  pl.sk_qualified_date,
-  pl.sk_opportunity_date,
-  pl.sk_first_listing_date,
-  pl.sk_discard_date,
-  pl.sk_user_lead_first_discarder,
-  pl.sk_user_lead_last_discarder,
-  pl.funnel_step,
-  pl.funnel_drop_reason,
-  pl.hours_lead_to_prospect,
-  pl.hours_prospect_to_qualified,
-  pl.hours_lead_to_first_inside_sales_contact,
-  pl.hours_prospect_to_first_inside_sales_contact,
-  pl.hours_qualified_to_opportunity,
-  pl.hours_opportunity_to_listing,
-  pl.hours_lead_to_listing,
-  pl.days_lead_to_prospect,
-  pl.days_prospect_to_qualified,
-  pl.days_lead_to_first_inside_sales_contact,
-  pl.days_prospect_to_first_inside_sales_contact,
-  pl.days_qualified_to_opportunity,
-  pl.days_opportunity_to_listing,
-  pl.days_lead_to_listing,
-  pl.days_lead_to_processing,
-  pl.is_exclusive,
-  pl.first_isales_intervention,
-  pl.lead_type,
-  pl.lead_origin,
-  pl.utm_source as lead_tracking_source,
-  pl.utm_medium as lead_tracking_medium,
-  pl.tracking_platform as lead_tracking_platform,
-  pl.is_branded,
-  pl.is_b2b,
-  pl.is_doorman,
-  pl.is_isales_direct_register,
-  pl.is_cx_direct_register,
-  pl.has_isales_intervention,
-  pl.is_call_center,
-  pl.reprocessed_flg as is_lead_reprocessed,
+  pl.*,
   case
     when pl.is_branded then 'Branded'
     else 'Other'
   end as mkt_branded,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_category
-  end as mkt_category,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_flow
-  end as mkt_flow,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_completion
-  end as mkt_completion,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_origin
   end as mkt_origin,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_channel
   end as mkt_channel,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_mobile' then 'Web Mobile'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_desktop' then 'Web Desktop'
-    else t.mkt_platform
+    when t.mkt_origin is null then 'Not Mapped'
+    when pl.tracking_platform = 'web_mobile' then 'Web Mobile'
+    when pl.tracking_platform = 'web_desktop' then 'Web Desktop'
+    else 'Not Mapped'
   end as mkt_platform,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_medium
   end as mkt_medium,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_source
   end as mkt_source,
   now() as ts_load
@@ -493,13 +433,108 @@ from potential_listings pl
 left join taxonomy t 
   on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '') 
     and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '') 
-    and coalesce(pl.utm_source, '') = coalesce(t.lead_utm_source, '') 
-    and coalesce(pl.utm_medium, '') = coalesce(t.lead_utm_medium, '') 
+    and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
+    and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
+    and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')
+    and coalesce(pl.lead_referring_domain, '') = coalesce(t.lead_referring_domain, '')
+    and coalesce(pl.subscription_source, '') = coalesce(t.subscription_source, '')
     and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false) 
-    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false) 
-    and coalesce(pl.is_doorman, false) = coalesce(t.is_doorman, false) 
+    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false)
     and coalesce(pl.is_isales_direct_register, false) = coalesce(t.is_isales_direct_register, false) 
     and coalesce(pl.is_cx_direct_register, false) = coalesce(t.is_cx_direct_register, false) 
     and coalesce(pl.has_isales_intervention, false) = coalesce(t.has_isales_intervention, false) 
     and coalesce(pl.is_call_center, false) = coalesce(t.is_call_center, false)
-;
+),
+applied_taxonomy_flow as (
+    select
+        *,
+        case when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
+             when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
+                  and mkt_source = 'Direct Referral' then 'Self-Service'
+             when mkt_origin in ('Other', 'Not Mapped') then mkt_origin
+             else 'Non-Self Service' end as mkt_flow
+    from  applied_taxonomy
+)
+select
+  atax.sk_house_listing_flow,
+  atax.sk_condo,
+  atax.sk_lead,
+  atax.sk_lead_conversion,
+  atax.sk_first_photo_job,
+  atax.sk_house_listing,
+  atax.sk_user_house_registrant,
+  atax.sk_user_sales_rep,
+  atax.sk_user_lead_affiliate,
+  atax.sk_user_first_task_assignee,
+  atax.sk_user_last_task_assignee,
+  atax.sk_region,
+  atax.sk_city,
+  atax.sk_partner,
+  atax.sk_lead_date,
+  atax.sk_prospect_date,
+  atax.sk_first_task_created_date,
+  atax.sk_first_task_closed_date,
+  atax.sk_last_task_created_date,
+  atax.sk_last_task_closed_date,
+  atax.sk_first_inside_sales_contact_date,
+  atax.sk_conversion_date,
+  atax.sk_qualified_date,
+  atax.sk_opportunity_date,
+  atax.sk_first_listing_date,
+  atax.sk_discard_date,
+  atax.sk_user_lead_first_discarder,
+  atax.sk_user_lead_last_discarder,
+  atax.funnel_step,
+  atax.funnel_drop_reason,
+  atax.hours_lead_to_prospect,
+  atax.hours_prospect_to_qualified,
+  atax.hours_lead_to_first_inside_sales_contact,
+  atax.hours_prospect_to_first_inside_sales_contact,
+  atax.hours_qualified_to_opportunity,
+  atax.hours_opportunity_to_listing,
+  atax.hours_lead_to_listing,
+  atax.days_lead_to_prospect,
+  atax.days_prospect_to_qualified,
+  atax.days_lead_to_first_inside_sales_contact,
+  atax.days_prospect_to_first_inside_sales_contact,
+  atax.days_qualified_to_opportunity,
+  atax.days_opportunity_to_listing,
+  atax.days_lead_to_listing,
+  atax.days_lead_to_processing,
+  atax.is_exclusive,
+  atax.first_isales_intervention,
+  atax.lead_type,
+  atax.lead_origin,
+  atax.utm_source as lead_tracking_source,
+  atax.utm_medium as lead_tracking_medium,
+  atax.tracking_platform as lead_tracking_platform,
+  atax.is_branded,
+  atax.is_b2b,
+  atax.is_doorman,
+  atax.is_isales_direct_register,
+  atax.is_cx_direct_register,
+  atax.has_isales_intervention,
+  atax.is_call_center,
+  atax.reprocessed_flg as is_lead_reprocessed,
+  atax.affiliate_type,
+  atax.lead_referring_domain,
+  atax.subscription_source,
+  atax.mkt_branded,
+  case when atax.mkt_flow = 'Self-Service' then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('App', 'Crawling', 'Form', 'Planilha') then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') then 'Inbound'
+       when atax.mkt_flow = 'Not Mapped' then 'Not Mapped'
+       else 'Other' end as mkt_category,
+  atax.mkt_flow,
+  case when atax.mkt_flow = 'Non-Self Service' then 'Non-Self Service'
+       when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
+       when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
+       when atax.mkt_flow in ('Not Mapped', 'Other') then atax.mkt_flow
+       else 'Not Mapped' end as mkt_completion,
+  atax.mkt_origin,
+  atax.mkt_channel,
+  atax.mkt_platform,
+  atax.mkt_medium,
+  atax.mkt_source,
+  atax.ts_load
+from applied_taxonomy_flow atax

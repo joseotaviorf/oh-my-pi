@@ -4,6 +4,7 @@ import mock
 import pandas as pd
 import pytest
 from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl.marketing import Marketing
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -222,16 +223,28 @@ class TestMarketing(object):
         assert mock_from_db_query.call_args[1]['query'] == upsert_query
 
     @mock.patch.object(BaseETL, 'from_db_query')
-    def test__is_prod_table_empty(self, mock_from_db_query, marketing):
-        # arrange
-        table_name = 'table'
-
+    def test__is_staging_table_empty(self, mock_from_db_query, marketing):
         # act
-        marketing._is_prod_table_empty(table_name)
+        marketing._is_staging_table_empty(table_name='table_staging')
 
         # assert
-        assert mock_from_db_query.call_count == 1
-        assert mock_from_db_query.call_args[1]['query'] == 'select 1 from marketing.table limit 1'
+        mock_from_db_query.assert_called_once_with(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from staging.table_staging limit 1",
+            encoding="utf-8"
+        )
+
+    @mock.patch.object(BaseETL, 'from_db_query')
+    def test__is_prod_table_empty(self, mock_from_db_query, marketing):
+        # act
+        marketing._is_prod_table_empty(table_name='table_prod')
+
+        # assert
+        mock_from_db_query.assert_called_once_with(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from marketing.table_prod limit 1",
+            encoding="utf-8"
+        )
 
     @mock.patch.object(BaseETL, 'execute_command')
     def test__delete_old_entries(self, mock_execute_command, marketing):

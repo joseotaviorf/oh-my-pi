@@ -86,7 +86,7 @@ conditional_inactives_new AS (
     SELECT
         *,
         CASE
-            WHEN rt.lifetime_days_cohort > 0 AND rt.lifetime_days_cohort < 10 THEN 'new user'
+            WHEN rt.lifetime_days_cohort >= 0 AND rt.lifetime_days_cohort < 10 THEN 'new user'
             WHEN rt.lifetime_days_cohort < 0 THEN 'different cohort'
             WHEN rt.prospects_last_90_days = 0 THEN
                 CASE WHEN rt.leads = 0 THEN 'curioso'

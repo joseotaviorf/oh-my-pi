@@ -2,6 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 import mock
+import petl
 import pytest
 from dateutil.tz import tz
 from mock import MagicMock, Mock
@@ -10,6 +11,7 @@ from twitter_ads.campaign import Campaign
 from twitter_ads.creative import PromotedTweet
 
 from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
 
 
@@ -957,3 +959,110 @@ class TestTwitterCampaigns(object):
             'segment_value': '18'
         }
         assert twts_list == [expected_dict1, expected_dict2]
+
+    @mock.patch.object(TwitterCampaigns, '_get_staging_table_query')
+    @mock.patch.object(TwitterCampaigns, '_load_to_staging')
+    def test_load_to_staging(self, mock__load_to_staging, mock__get_staging_table_query,
+                             twitter_campaigns):
+        # arrange
+        dw_table_name = 'dim_table_c'
+        query = 'cool_query'
+        mock__get_staging_table_query.return_value = query
+
+        # act
+        twitter_campaigns.load_to_staging(dw_table_name)
+
+        # assert
+        mock__load_to_staging.assert_called_once_with(dw_table_name, query)
+
+    @mock.patch.object(BaseETL, 'execute_command')
+    def test__delete_fact_rows(self, mock_bulk_insert, twitter_campaigns):
+        # act
+        twitter_campaigns._delete_fact_rows('fact_crazy_table', '20190401')
+
+        # assert
+        mock_bulk_insert.assert_called_once_with(
+            db_enum=EnumDB.BI_DW,
+            command="DELETE FROM staging.fact_crazy_table WHERE sk_date = 20190401",
+            commit=True,
+            encoding='utf-8'
+        )
+
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    @mock.patch.object(TwitterCampaigns, '_is_staging_table_empty')
+    def test__get_staging_table_query_for_dim_table(self, mock__is_staging_table_empty,
+                                                    mock__get_query_from_file_name,
+                                                    twitter_campaigns):
+        # arrange
+        table_name = 'dim_table_1'
+        expected_full_load_query = 'full_query'
+        mock__get_query_from_file_name.return_value = expected_full_load_query
+
+        # act
+        query = twitter_campaigns._get_staging_table_query(table_name)
+
+        # assert
+        mock__get_query_from_file_name.assert_called()
+        assert query == expected_full_load_query
+
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    @mock.patch.object(TwitterCampaigns, '_is_staging_table_empty')
+    @mock.patch.object(TwitterCampaigns, '_delete_fact_rows')
+    def test__get_staging_table_query_for_fact_table(self, mock__delete_fact_rows,
+                                                     mock__is_staging_table_empty,
+                                                     mock__get_query_from_file_name,
+                                                     twitter_campaigns):
+        # arrange
+        table_name = 'fact_table_1'
+        expected_full_load_query = 'full_query'
+        mock__get_query_from_file_name.return_value = expected_full_load_query
+        mock__is_staging_table_empty.return_value = False
+        twitter_campaigns.execution_date = datetime(2010, 9, 22)
+
+        # act
+        query = twitter_campaigns._get_staging_table_query(table_name)
+
+        # assert
+        mock__get_query_from_file_name.assert_called()
+        assert query == expected_full_load_query + ' \nWHERE sk_date = 20100922;'
+
+    @mock.patch.object(BaseETL, 'bulk_insert')
+    @mock.patch.object(petl, 'fromdataframe')
+    def test__load_to_staging(self, mock__fromdataframe, mock__bulk_insert,
+                              twitter_campaigns):
+        # arrange
+        dw_table_name = 'dim_table_q'
+        staging_query = 'cool_query'
+        mock_pd_df = MagicMock()
+        fn = MagicMock(return_value=mock_pd_df)
+        twitter_campaigns.athena_client.execute_query_and_return_dataframe = fn
+
+        df_table = MagicMock()
+        mock__fromdataframe.return_value = df_table
+
+        # act
+        twitter_campaigns._load_to_staging(dw_table_name, staging_query)
+
+        # assert
+        twitter_campaigns.athena_client.execute_query_and_return_dataframe \
+            .assert_called_once_with(sql=staging_query)
+        mock__fromdataframe.assert_called_once_with(df=mock_pd_df)
+        mock__bulk_insert.assert_called_once_with(
+            table=df_table,
+            table_name='staging.dim_table_q',
+            db_enum=EnumDB.BI_DW,
+            encoding='utf-8',
+            append=False,
+            commit=True
+        )
+
+    @mock.patch.object(TwitterCampaigns, '_load_to_prod')
+    def test_load_to_prod(self, mock__load_to_prod, twitter_campaigns):
+        # arrange
+        table_name = 'dim_table'
+
+        # act
+        twitter_campaigns.load_to_prod(table_name)
+
+        # assert
+        mock__load_to_prod.assert_called_once_with(table_name)
