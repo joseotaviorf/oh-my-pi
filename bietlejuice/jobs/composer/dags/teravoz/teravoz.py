@@ -74,7 +74,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
         json={
             "existing_cluster_id": '{{task_instance.xcom_pull(dag_id="'
             + DAG_ID
-            + '", task_ids="create_cluster", key="cluster_id")}}',
+            + '", task_ids="create-cluster", key="cluster_id")}}',
             "spark_python_task": {
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
@@ -85,13 +85,13 @@ def raw_sub_dag(sub_dag_name, **kwargs):
     )
 
     create_raw_partition_task = DummyOperator(
-        task_id="create_raw_partition", dag=local_dag
+        task_id="create-raw-partition", dag=local_dag
     )
 
-    load_to_clean_task = DummyOperator(task_id="load_to_clean", dag=local_dag)
+    load_to_clean_task = DummyOperator(task_id="load-to-clean", dag=local_dag)
 
     create_clean_partition_task = DummyOperator(
-        task_id="create_clean_partition", dag=local_dag
+        task_id="create-clean-partition", dag=local_dag
     )
 
     airflow_helpers.chain(
@@ -106,7 +106,7 @@ def raw_sub_dag(sub_dag_name, **kwargs):
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
-    task_id="create_cluster",
+    task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION,
 )
@@ -116,7 +116,7 @@ calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate_cluster"
+    dag=dag, task_id="terminate-cluster"
 )
 
 create_cluster_task >> calls_sub_dag_task >> terminate_cluster_task
