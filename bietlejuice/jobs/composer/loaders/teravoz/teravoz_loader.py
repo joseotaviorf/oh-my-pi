@@ -7,7 +7,11 @@ logger = QuintoAndarLogger("TeravozLoader")
 
 
 class TeravozLoader:
-
+    """
+        Generic class that contains methods for all Teravoz tables and requests, 
+        such as requests to API, load files to s3 and create spark tables.
+    """
+    
     # source to create folders and schemas
     SOURCE = "teravoz"
 
@@ -18,13 +22,12 @@ class TeravozLoader:
 
     @logger
     def __init__(self, api_user, api_pwd, environment):
-        # api_instance
+        # api_instance (temporarily here)
         self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
         self.ENV = environment
 
     @logger
     def _request_api_and_get_dataframe(self, endpoint, params):
-
         """
             endpoint: endpoint ..@teravoz.com.br/{endpoint}
             params: if exists, it's expected the format:
@@ -72,6 +75,9 @@ class TeravozLoader:
 
     @logger
     def _create_partition_table(self, db_name, endpoint, s3_path, list_partitions):
+        """
+            Add a specific partition to a spark table
+        """
         create_partition = (
             "ALTER TABLE {}.{} ".format(db_name, endpoint)
             + "ADD IF NOT EXISTS PARTITION ({}) ".format(",".join(list_partitions))
@@ -88,13 +94,22 @@ class TeravozLoader:
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
+        """
+            create columns into df that contains the table partitions values,
+            the method should be implemented in heiress class
+        """
         raise NotImplementedError
 
     @logger
     def _create_spark_table_and_load_data_to_s3(
         self, df, datalake_layer, db_name, endpoint, partitions=None
     ):
-        # to create a partitioned table should pass the columns from df (melhorar)
+        """
+            create spark table and database if not exists,
+            load files to s3 and create partitions within an existing table
+        """
+        
+        # verify if the partitions passed are inside the df.
         if partitions:
             if not set(partitions.keys()).issubset(set(df.columns)):
                 df = self._create_dataframe_columns_to_partition_table(df, partitions)
