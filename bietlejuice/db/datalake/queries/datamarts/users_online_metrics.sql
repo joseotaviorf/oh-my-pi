@@ -41,7 +41,7 @@ with pre_online_metrics AS (
           CASE WHEN event_type = 'tip_entrydate_confirmed' THEN uuid END AS tip_entrydate_confirmed,
           CASE WHEN event_type = 'tip_description_confirmed' THEN uuid END AS tip_description_confirmed,
           CASE WHEN event_type = 'tip_negotiation_confirmed' THEN uuid END AS tip_negotiation_confirmed
-        FROM datalake_clean_spark.amplitude_events
+        FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed',
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
                              'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed')
