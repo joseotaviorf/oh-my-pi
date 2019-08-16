@@ -143,21 +143,34 @@ class DataFrameService:
             df.rdd.map(lambda r: getattr(r, json_column))
         )
         json_column_names = df_json_column.schema.fieldNames()
+        len_json_column_names = len(json_column_names)
+        if len_json_column_names < 1:
+            logger.warning("m=explode_json_column, msg=json_column is empty")
+            return df.drop(json_column)
+        else:
+            logger.info(
+                "m=explode_json_column, msg=creating {} columns".format(
+                    len_json_column_names
+                )
+            )
 
-        json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
-        if format_column_names:
-            json_column_names = [
-                DataFrameService.column_name_format(name) for name in json_column_names
-            ]
-        json_tuple_alias = ", ".join(
-            ["`{}{}`".format(prefix, x) for x in json_column_names]
-        )
+            json_tuple_columns = ", ".join(
+                ["'{}'".format(x) for x in json_column_names]
+            )
+            if format_column_names:
+                json_column_names = [
+                    DataFrameService.column_name_format(name)
+                    for name in json_column_names
+                ]
+            json_tuple_alias = ", ".join(
+                ["`{}{}`".format(prefix, x) for x in json_column_names]
+            )
 
-        df.registerTempTable("tmp_df")
-        query = "select *, json_tuple({}, {}) as ({}) from tmp_df".format(
-            json_column, json_tuple_columns, json_tuple_alias
-        )
-        return spark.sql(query).drop(json_column)
+            df.registerTempTable("tmp_df")
+            query = "select *, json_tuple({}, {}) as ({}) from tmp_df".format(
+                json_column, json_tuple_columns, json_tuple_alias
+            )
+            return spark.sql(query).drop(json_column)
 
     @staticmethod
     @logger(exclude="df")
