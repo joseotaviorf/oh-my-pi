@@ -11,7 +11,11 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+
+logger = QuintoAndarLogger("amplitude_historical_2019")
 
 DAG_ID = "bietlejuice.amplitude_historical_2019"
 
@@ -48,17 +52,18 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 
 def semaphore():
-    red_flag = datetime.time(13, 40)
-    green_flag = datetime.time(14, 10)
+    red_flag = datetime.time(5, 0)
+    green_flag = datetime.time(6, 15)
     current_time = datetime.datetime.now().time().replace(microsecond=0)
     if red_flag <= current_time <= green_flag:
-        print("Red flag, cant execute")
+        logger.info("m=semaphore, msg=Red flag, can't execute - waiting")
         sleep_seconds = (
             datetime.datetime.strptime(green_flag.isoformat(), "%H:%M:%S")
             - datetime.datetime.strptime(current_time.isoformat(), "%H:%M:%S")
         ).seconds
         time.sleep(sleep_seconds)
-    print("Green flag, can execute")
+    logger.info("m=semaphore, msg=Green flag, can execute")
+    return 0
 
 
 dag = DAG(
@@ -68,10 +73,11 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 1, 1, 0, 0, 0),
+    start_date=datetime.datetime(2019, 1, 1, 0, 0, 0),
+    end_date=datetime.datetime(2019, 7, 17, 0, 0, 0),
     schedule_interval="30 5 * * *",
     max_active_runs=1,
-    catchup=False,
+    catchup=True,
 )
 
 semaphore = PythonOperator(dag=dag, task_id="semaphore", python_callable=semaphore)
