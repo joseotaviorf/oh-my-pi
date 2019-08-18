@@ -75,7 +75,7 @@ if __name__ == "__main__":
         api_user=credentials["teravoz_user"],
         api_pwd=credentials["teravoz_password"],
         environment=environment,
-        execution_date=execution_date,
+        execution_date=execution_date
     )
 
     df = teravoz.request_api_and_get_dataframe()
