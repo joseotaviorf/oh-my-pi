@@ -17,7 +17,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 @logger
-def exec_factory_method(entity, method, api_user, api_pwd, environment, execution_date):
+def exec_factory_method(table_name, method, api_user, api_pwd, environment, execution_date):
 
     teravoz = TeravozFactory.factory(
         table_name=table_name,
