@@ -143,7 +143,15 @@ class DataFrameService:
             df.rdd.map(lambda r: getattr(r, json_column))
         )
         json_column_names = df_json_column.schema.fieldNames()
+        if not json_column_names:
+            logger.warning("m=explode_json_column, msg=json_column is empty")
+            return df.drop(json_column)
 
+        logger.info(
+            "m=explode_json_column, msg=creating {} columns".format(
+                len(json_column_names)
+            )
+        )
         json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
         if format_column_names:
             json_column_names = [
