@@ -34,7 +34,7 @@ with amplitude_affiliate_tracking as(
                 coalesce(city, '') as city,
                 coalesce(client_event_time, '') as client_event_time,
                 event_time
-           FROM datalake_clean_spark.amplitude_events
+           FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
                 AND app = 205027
                 AND year >= 2019

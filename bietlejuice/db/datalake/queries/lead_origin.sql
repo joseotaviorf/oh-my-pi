@@ -46,7 +46,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where event_type in
             ('referral_confirmation_page_viewed',
             'referral_opportunity_confirmed',
@@ -99,7 +99,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where event_type in ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
             and	year >= 2019
             and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
@@ -144,7 +144,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where year >= 2019
             and app = 183047
             and json_extract(user_properties, '$.lead_firestore_id') is not null
@@ -190,7 +190,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where  event_type = 'lead_form_submitted'
             and year >= 2019
             and app = 183047

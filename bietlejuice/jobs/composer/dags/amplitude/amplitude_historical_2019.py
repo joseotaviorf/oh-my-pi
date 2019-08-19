@@ -1,17 +1,24 @@
-from datetime import datetime
+import datetime
+import time
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
+from airflow.operators.python_operator import PythonOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
-DAG_ID = "bietlejuice.amplitude"
+logger = QuintoAndarLogger("amplitude_historical_2019")
+
+DAG_ID = "bietlejuice.amplitude_historical_2019"
+
 ENV = Variable.get("environment")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -44,6 +51,21 @@ LIBRARIES_DESCRIPTION = Variable.get(
 )
 
 
+def semaphore():
+    red_flag = datetime.time(5, 0)
+    green_flag = datetime.time(6, 15)
+    current_time = datetime.datetime.now().time().replace(microsecond=0)
+    if red_flag <= current_time <= green_flag:
+        logger.info("m=semaphore, msg=Red flag, can't execute - waiting")
+        sleep_seconds = (
+            datetime.datetime.strptime(green_flag.isoformat(), "%H:%M:%S")
+            - datetime.datetime.strptime(current_time.isoformat(), "%H:%M:%S")
+        ).seconds
+        time.sleep(sleep_seconds)
+    logger.info("m=semaphore, msg=Green flag, can execute")
+    return 0
+
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -51,11 +73,14 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 1, 1, 0, 0, 0),
+    start_date=datetime.datetime(2019, 1, 1, 0, 0, 0),
+    end_date=datetime.datetime(2019, 7, 17, 0, 0, 0),
     schedule_interval="30 5 * * *",
     max_active_runs=1,
-    catchup=False,
+    catchup=True,
 )
+
+semaphore = PythonOperator(dag=dag, task_id="semaphore", python_callable=semaphore)
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -113,7 +138,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 airflow_helpers.chain(
-    create_cluster_task, events_to_datalake_raw_task, events_raw_to_clean_task
+    semaphore,
+    create_cluster_task,
+    events_to_datalake_raw_task,
+    events_raw_to_clean_task,
 )
 events_raw_to_clean_task >> [
     add_amplitude_events_partitions,
