@@ -6,12 +6,12 @@ from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 from datetime import datetime, timedelta
 from collections import OrderedDict
 
-logger = QuintoAndarLogger("TeravozAgentPerformance")
+logger = QuintoAndarLogger("TeravozReportsLoader")
 
 spark = BaseSparkContext.spark
 
 
-class TeravozAgentPerformanceLoader(TeravozLoader):
+class TeravozReportsLoader(TeravozLoader):
 
     PARAMS = {
         "queue_number": "{queue_number_list}",
@@ -22,8 +22,6 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
     PARTITIONS = OrderedDict(
         [("year", "{year}"), ("month", "{month}"), ("day", "{day}")]
     )
-
-    SOURCE = "report_agent_performance"
 
     @logger
     def __init__(self, api_user, api_pwd, environment, execution_date):
@@ -64,7 +62,7 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
         )
 
         df = super().request_api_and_get_dataframe(
-            endpoint=self.SOURCE, params=self.PARAMS
+            endpoint=endpoint.replace("-", "_"), params=self.PARAMS
         )
 
         return df
@@ -75,7 +73,7 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
 
         super().load_data_into_datalake(
             df=df,
-            table_name=self.SOURCE,
+            table_name=table_name.replace("-", "_"),
             datalake_layer=datalake_layer,
             partitions=self.PARTITIONS,
         )

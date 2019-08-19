@@ -2,7 +2,7 @@ from bietlejuice.jobs.composer.loaders.teravoz.teravoz_loader import TeravozLoad
 from bietlejuice.jobs.composer.loaders.teravoz.teravoz_calls_loader import (
     TeravozCallsLoader,
 )
-from bietlejuice.jobs.composer.loaders.teravoz.teravoz_performance_agent_loader import (
-    TeravozAgentPerformanceLoader,
+from bietlejuice.jobs.composer.loaders.teravoz.teravoz_reports_loader import (
+    TeravozReportsLoader,
 )
 from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
