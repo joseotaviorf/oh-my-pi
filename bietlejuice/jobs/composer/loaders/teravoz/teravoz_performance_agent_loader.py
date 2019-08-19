@@ -23,7 +23,7 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
         [("year", "{year}"), ("month", "{month}"), ("day", "{day}")]
     )
 
-    SOURCE = 'report_agent_performance'
+    SOURCE = "report_agent_performance"
 
     @logger
     def __init__(self, api_user, api_pwd, environment, execution_date):

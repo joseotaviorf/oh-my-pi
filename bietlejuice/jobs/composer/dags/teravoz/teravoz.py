@@ -130,9 +130,12 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 create_cluster_task.set_downstream(
     [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
 )
-queues_sub_dag_task.set_downstream(
-    [report_agent_performance_sub_dag_task]
-)
+queues_sub_dag_task.set_downstream([report_agent_performance_sub_dag_task])
 terminate_cluster_task.set_upstream(
-    [calls_sub_dag_task, report_agent_performance_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
+    [
+        calls_sub_dag_task,
+        report_agent_performance_sub_dag_task,
+        peers_sub_dag_task,
+        ddrs_sub_dag_task,
+    ]
 )
