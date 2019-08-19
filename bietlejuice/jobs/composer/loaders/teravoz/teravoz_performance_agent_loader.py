@@ -23,6 +23,8 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
         [("year", "{year}"), ("month", "{month}"), ("day", "{day}")]
     )
 
+    SOURCE = 'report_agent_performance'
+
     @logger
     def __init__(self, api_user, api_pwd, environment, execution_date):
         super().__init__(api_user, api_pwd, environment, execution_date)
@@ -62,7 +64,7 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
         )
 
         df = super().request_api_and_get_dataframe(
-            endpoint=endpoint, params=self.PARAMS
+            endpoint=self.SOURCE, params=self.PARAMS
         )
 
         return df
@@ -73,7 +75,7 @@ class TeravozAgentPerformanceLoader(TeravozLoader):
 
         super().load_data_into_datalake(
             df=df,
-            table_name=table_name,
+            table_name=self.SOURCE,
             datalake_layer=datalake_layer,
             partitions=self.PARTITIONS,
         )

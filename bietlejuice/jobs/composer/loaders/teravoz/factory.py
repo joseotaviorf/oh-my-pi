@@ -35,5 +35,5 @@ class TeravozFactory:
             "queues": TeravozLoader,
             "peers": TeravozLoader,
             "ddrs": TeravozLoader,
-            "report_agent_performance": TeravozAgentPerformanceLoader,
+            "report-agent-performance": TeravozAgentPerformanceLoader,
         }.get(table_name)
