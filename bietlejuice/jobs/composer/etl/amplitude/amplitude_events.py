@@ -4,7 +4,6 @@ import gzip
 import os
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
 
 logger = QuintoAndarLogger("AmplitudeEvents")
@@ -19,18 +18,6 @@ class AmplitudeEvents:
     RAW_RECORDS_BY_PARTITION = 45000
     CLEAN_FORMAT = "parquet"
     CLEAN_RECORDS_BY_PARTITION = 250000
-
-    DROP_TABLE_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
-    CREATE_TABLE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
-                            `{database}`.`{table}`
-                            (
-                              {columns}
-                            )
-                            {partitioned_by}
-                            {format}
-                            LOCATION '{path}'
-                            tblproperties ("parquet.compress"="SNAPPY");"""
-    CREATE_QUERY_CLEAN_FORMAT = "STORED AS PARQUET"
 
     def __init__(
         self,
@@ -76,56 +63,30 @@ class AmplitudeEvents:
         return data
 
     @logger(exclude="keys")
-    def load_events_into_datalake_raw(self, start_date=None, end_date=None):
-        start = start_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
-        end = end_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
-
-        if not start and not end:
+    def load_events_into_datalake_raw(self, file_from_api=None):
+        if not file_from_api:
             logger.warning(
-                "m=load_events_into_datalake_raw, start_date and end_date are none, nothing to do"
+                "m=load_events_into_datalake_raw, msg=Empty file to load in datalake"
             )
-            return
-
-        logger.info(
-            "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
-                start, end
-            )
-        )
-        for key in self.keys:
-            logger.info(
-                "m=load_events_into_datalake_raw, App id: {}, App name: {}".format(
-                    key["app_id"], key["app_name"]
+        else:
+            with zipfile.ZipFile(file_from_api, "r") as zip_file:
+                data = self.get_data_from_zip_file(zip_file)
+                len_data = len(data)
+                logger.info(
+                    "m=load_events_into_datalake_raw, got {} events".format(len_data)
                 )
-            )
 
-            a = AmplitudeExportApi(key["app_key"], key["secret_key"])
-            logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
-            f = a.get_files_from_extract_api(start, end)
-            if not f:
-                logger.warning(
-                    "m=load_events_into_datalake_raw, msg=None response from get_files_from_extract_api"
+                df = self.create_events_dataframe(data, len_data)
+                table_name = "events"
+                DataFrameService.incremental_write(
+                    df,
+                    AmplitudeEvents.RAW_FORMAT,
+                    ["year", "month", "day", "app"],
+                    self.db_raw,
+                    table_name,
+                    self.s3_raw_path + table_name,
+                    True,
                 )
-            else:
-                with zipfile.ZipFile(f, "r") as zip_file:
-                    data = self.get_data_from_zip_file(zip_file)
-                    len_data = len(data)
-                    logger.info(
-                        "m=load_events_into_datalake_raw, got {} events".format(
-                            len_data
-                        )
-                    )
-
-                    df = self.create_events_dataframe(data, len_data)
-                    table_name = "events"
-                    DataFrameService.incremental_write(
-                        df,
-                        AmplitudeEvents.RAW_FORMAT,
-                        ["year", "month", "day", "app"],
-                        self.db_raw,
-                        table_name,
-                        self.s3_raw_path + table_name,
-                        True,
-                    )
 
     @logger
     def update_clean_amplitude_events(self, date):
