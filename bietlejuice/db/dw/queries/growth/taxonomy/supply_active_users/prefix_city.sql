@@ -7,6 +7,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -20,7 +21,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), weekly as (
 select
 	date,
@@ -30,6 +31,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -43,7 +45,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), monthly as (
 select
 	date,
@@ -53,6 +55,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -66,7 +69,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'supply'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 dim_date as (
 SELECT
@@ -123,6 +126,7 @@ all_dates as (
     mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,

@@ -6,7 +6,7 @@ create external table if not exists datalake_clean.zendesk_tickets (
     priority string,
     raw_subject string,
     subject string,  
-    channel string,
+    ticket_via string,
     via string,
     tags string,
     id_group string,

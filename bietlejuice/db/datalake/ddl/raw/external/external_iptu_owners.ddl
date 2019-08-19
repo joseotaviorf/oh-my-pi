@@ -26,7 +26,7 @@ create external table datalake_raw.external_iptu_owners (
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
-  'separatorChar' = ';'
+  'separatorChar' = ','
 )
 location 's3://5a-datalake/raw/external/direct/iptu_owners/'
 tblproperties (

@@ -10,7 +10,7 @@ create table if not exists offer (
   original_home_insurance bigint,
   original_iptu bigint,
   original_rent bigint,
-  rent bigint,
+  last_rent bigint,
   status varchar(255),
   turn varchar(255),
   client_id bigint,
@@ -22,7 +22,8 @@ create table if not exists offer (
   type varchar(255),
   first_sent_at timestamp,
   last_sent_at timestamp,
-  topic_type varchar(255)
-)
-;
+  topic_type varchar(255),
+  last_rent_offered_by_tenant numeric(18,4),
+  last_rent_offered_by_owner numeric(18,4)
+);
 

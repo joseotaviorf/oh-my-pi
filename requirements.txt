@@ -76,3 +76,4 @@ rtbhouse-sdk==3.3.5
 sshtunnel==0.1.4
 geopy==1.18.1
 pathlib==1.0.1
+twitter-ads==5.1.1

@@ -49,15 +49,15 @@ reschedules as (
     from booking
     where "reagendadoDe_id" is not null
     group by 1 -- guaranteeing there are no future duplication on Product
-),	
+),
 bookings as (
-	select 
+	select
 	    s.id as sk_booking,
 	    s.id as id_booking,
 	    r.id_reschedule is not null as is_rescheduled,
-	    s.data 
-				+ (("slotDia" * 15 / 60)+8) * interval '1 hour' 
-				+ ("slotDia" * 15 % 60) * interval '1 minute' 				
+	    s.data
+				+ (("slotDia" * 15 / 60)+8) * interval '1 hour'
+				+ ("slotDia" * 15 % 60) * interval '1 minute'
 			as dt_booking,
 	    s.tipo as type,
 	    s."fupVisita" is not null
@@ -76,22 +76,74 @@ bookings as (
 	    s.status,
 	    s."slotDia" as slot_dia,
 	    s.reason::varchar(200) as reason,
+	    s.reason_enum as cancellation_reason,
+	    case
+	        when s.status = 'Cancelado' then
+	            case
+                    when s.reason_enum = 'CANCELED_HOUSE_RESERVED' then 'House Reserved'
+                    when s.reason_enum = 'OTHER' then 'Other'
+                    when s.reason_enum = 'CANCELED_CLIENT_GAVE_UP' then 'Tenant'
+                    when s.reason_enum = 'PROPERTY_UNPUBLISHED' then 'House Unlisted'
+                    when s.reason_enum = 'AGENT_SCHEDULE_REALIZED' then 'Agent'
+                    when s.reason_enum = 'CANCELED_PROPERTY_SUSPENDED_ADVANCED_NEGOTIATIONS' then 'House Suspended'
+                    when s.reason_enum = 'CANCELED_OWNER_SUSPENDED' then 'Consequence Management'
+                    when s.reason_enum = 'CANCELED_OTHER_CLIENT' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_AGENT_CAN_NOT_JOIN' then 'Agent'
+                    when s.reason_enum = 'CANCELED_INCORRECT_SCHEDULE' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_CLIENT_GAVE_UP_APARTMENT' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_AGENT_LATE_POOL' then 'Agent'
+                    when s.reason_enum = 'AGENT_TRANSFER' then 'Agent'
+                    when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT' then 'Consequence Management'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_FROM_APP' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_OWNER_CAN_NOT_ATTEND' then 'Owner'
+                    when s.reason_enum = 'SCHEDULE_CHANGE' then 'Reschedule_Tenant'
+                    when s.reason_enum = 'CANCELED_CANT_FIND_ANOTHER_AGENT' then 'Agent'
+                    when s.reason_enum = 'CANCELED_CLIENT_NOT_RENTING' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_OWNER_PROPERTY_ALREADY_RENTED_5A' then 'Owner'
+                    when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED' then 'Consequence Management'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_FROM_CHECK_IN' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_OWNER_PROPERTY_ALREADY_RENTED_OTHER' then 'Owner'
+                    when s.reason_enum = 'CANCELED_OWNER_UNREACHABLE' then 'Owner'
+                    when s.reason_enum = 'CANCELED_OWNER_UNREACHABLE_UNPUBLISHED' then 'Owner'
+                    when s.reason_enum = 'CANCELED_CLIENT_CAN_NOT_ATTEND' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_AGENT_CAN_NOT_ATTEND' then 'Agent'
+                    when s.reason_enum = 'CANCELED_BLOCKED_SCHEDULE' then 'Agent'
+                    when s.reason_enum = 'CANCELED_SCHEDULED_OTHER_TIME' then 'Reschedule_Agent'
+                    when s.reason_enum = 'CANCELED_OWNER_NO_RETURN_NEGOTIATIONS' then 'Owner'
+                    when s.reason_enum = 'CANCELED_AUTOMATICALLY_PROPERTY_UNPUBLISHED' then 'House Unlisted'
+                    when s.reason_enum = 'CANCELED_OWNER_NOT_RENTING' then 'Owner'
+                    when s.reason_enum = 'CANCELED_CHECKIN_NOT_DONE' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_PROPERTY_UNAVAILABLE' then 'Owner'
+                    when s.reason_enum = 'CANCELED_BY_OWNER_FROM_APP' then 'Owner'
+                    when s.reason_enum = 'CANCELED_AGENT_DEACTIVATED' then 'Agent'
+                    when s.reason_enum = 'CANCELED_OTHER_OWNER' then 'Owner'
+                    when s.reason_enum = 'CANCELED_PROPERTY_SUSPENDED_UNAVAILABLE' then 'House Suspended'
+                    when s.reason_enum = 'CANCELED_AGENT_VISIT_TOO_FAR' then 'Agent'
+                    else 'Unknown'
+                end
+	    end as cancellation_reason_category,
 	    coalesce(
-	    	nullif(d."new reason",'CHECK ORIGEM'), 
-	    	case  
+	    	nullif(d."new reason",'CHECK ORIGEM'),
+	    	case
 	    		when s.last_update_source in ('Inquilinos', 'SelfServiceWeb') then 'Tenant'
 	    		when s.last_update_source in ('Proprietarios', 'ProprietariosEmail') then 'Owner'
 	    	end,
-	    	s.reason_category    	
+	    	case
+                when s.reason_enum = 'CANCELED_BY_OWNER_FROM_APP' then 'Owner'
+                when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_SUSPENDED' then 'Consequence Management'
+                when s.reason_enum = 'CANCELED_HOUSE_RESERVED' then 'House Reserved'
+                when s.reason_enum = 'AGENT_TRANSFER' then 'Agent'
+            end,
+	    	s.reason_category
 	   	) as reason_category,
 	   	coalesce(
 	   		nullif(responsible, ''),
-	    	nullif(d."new reason",'CHECK ORIGEM'), 
-	    	case  
+	    	nullif(d."new reason",'CHECK ORIGEM'),
+	    	case
 	    		when s.last_update_source in ('Inquilinos', 'SelfServiceWeb') then 'Tenant'
 	    		when s.last_update_source in ('Proprietarios', 'ProprietariosEmail') then 'Owner'
 	    	end,
-	    	s.reason_category    	
+	    	s.reason_category
 	   	) as responsible,
         s.last_update_source,
         s.first_update_source,
@@ -111,8 +163,8 @@ bookings as (
         s.visitor_missing_reason,
         s.agent_arrived,
         s.agent_missing_reason,
-        s.owner_arrived,
-        s.owner_missing_reason,
+        case when s.troublesome_entrance = 'LandlordNoShow' then false else true end as owner_arrived,
+        case when s.troublesome_entrance = 'LandlordNoShow' then 'Absent' end as owner_missing_reason,
         s.successful_entrance,
         s.troublesome_entrance,
         s.checkin_status,
@@ -158,15 +210,17 @@ select
 	b.status,
 	b.slot_dia,
 	b.reason,
+	b.cancellation_reason,
+	b.cancellation_reason_category,
 	coalesce
 	(
 		nullif(b.reason_category, 'Other'),
 		'Unknown'
 	) as reason_category,
 	case
-		when nullif(b.responsible, 'Other') is null then 'Unknown'
-		when b.responsible = 'Agent' then 'QuintoAndar'
-		else b.responsible
+		when b.cancellation_reason_category in ('Agent','House Suspended','House Reserved','House Unlisted','Consequence Management') then 'QuintoAndar'
+		when b.cancellation_reason_category in ('Reschedule_Tenant','Reschedule_Agent') then 'Reschedule'
+		else b.cancellation_reason_category
 	end as responsible,
 	b.app_type,
   	b.media_source,

@@ -1,9 +1,10 @@
 # coding=utf-8
 
+import re
+
 import googlemaps
 import numpy as np
 import pandas as pd
-import re
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from shapely import wkt
@@ -96,17 +97,28 @@ class CrawlerEntity(object):
         if columns:
             text_columns = columns
         else:
-            text_columns = ['type', 'advertiser_name', 'street', 'neighborhood', 'city', 'state', 'listing_type']
+            text_columns = ['type', 'business', 'advertiser_name', 'street',
+                            'neighborhood', 'city', 'state', 'listing_type']
         for c in text_columns:
             if c in entity:
                 entity[c] = entity[c].apply(self.__sanitize_text)
-
+        if 'common_features' in entity:
+            entity.common_features = entity.common_features.apply(
+                lambda feats: ','.join(self.__sanitize_text(feat) for feat in feats.split(',')).replace('_', '-')
+                if feats else None)
+        if 'unit_features' in entity:
+            entity.unit_features = entity.unit_features.apply(
+                lambda feats: ','.join(self.__sanitize_text(feat) for feat in feats.split(',')).replace('_', '-')
+                if feats else None)
         if 'cep' in entity:
-            entity.cep = entity.cep.astype(str).str.zfill(8)
+            entity.cep = entity.cep.apply(lambda cep: str(cep).ljust(8, '0') if cep else None)
         if 'type' in entity:
             entity.type = entity.type.replace(self.map_types)
         if 'listing_type' in entity:
             entity.listing_type = entity.listing_type.replace(self.map_types)
+        if 'description' in entity:
+            entity.description = entity.description.apply(
+                lambda desc: re.sub('<.*?>', '', desc.lower()) if desc else None)
 
         num_columns = ['lat', 'lng']
         for c in num_columns:

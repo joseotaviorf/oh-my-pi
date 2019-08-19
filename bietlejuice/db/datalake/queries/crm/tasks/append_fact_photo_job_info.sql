@@ -10,10 +10,10 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_fact_photo_job fpj
     on trim(ct.origin) = 'JobFotografo'
-      and cast(ct.id_origin as bigint) = try(cast(fpj.id_photo_job as bigint))
+      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(fpj.id_photo_job as bigint))
   left join datalake_clean.ods_dim_house_listing dhl
     on trim(ct.origin) = 'Imovel'
-      and cast(ct.id_origin as bigint) = try(cast(dhl.id_house as bigint))
+      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(dhl.id_house as bigint))
       and cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
         between cast(regexp_extract(dhl.ts_listing_version_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
           and (case

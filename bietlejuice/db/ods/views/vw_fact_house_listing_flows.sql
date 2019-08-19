@@ -5,26 +5,38 @@ with legacy_doorman as (
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
   from files.porteiros_legado
-  where (porteiros_legado."Status" = (['Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'])) 
+  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
-base_lead_tasks as (
-  with rn_lead as (
+rn_lead as (
     select lead_tasks.rep_id,
-      lead_tasks.lead_id,
-      lead_tasks.dt_created,
-      lead_tasks.dt_closed,
-       row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn
+        lead_tasks.lead_id,
+        lead_tasks.dt_created,
+        lead_tasks.dt_closed,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created asc) as rn_first,
+        row_number() over (partition by lead_tasks.lead_id order by lead_tasks.dt_created desc) as rn_last
     from crm.lead_tasks
-  )
-  select 
-    rn_lead.rep_id,
-    rn_lead.lead_id,
-    rn_lead.dt_created,
-    rn_lead.dt_closed
+),
+-- first conversion task created for a lead
+base_lead_tasks_first as (
+    select
+        rn_lead.rep_id,
+        rn_lead.lead_id,
+        rn_lead.dt_created,
+        rn_lead.dt_closed
+    from rn_lead
+    where rn_first = 1
+),
+-- last conversion task created for a lead
+base_lead_tasks_last as (
+  select
+      rn_lead.rep_id,
+      rn_lead.lead_id,
+      rn_lead.dt_created,
+      rn_lead.dt_closed
   from rn_lead
-  where rn_lead.rn = 1
-), 
+  where rn_last = 1
+),
 base_photo_tasks as (
   select distinct 
     coalesce(i.id, i_direct.id)::integer as imovel_id
@@ -72,7 +84,8 @@ fact_with_reproc as (
       rl.id,
       l.origem,
       l.tipo,
-      l.usuario_que_indicou_id
+      l.usuario_que_indicou_id,
+      l.affiliate_type
     from reprocessed_lead rl
     join lead l 
       on l.id = rl.id_origin_lead
@@ -96,6 +109,7 @@ fact_with_reproc as (
       fhlf.dt_first_listing,
       fhlf.dt_discarded,
       fhlf.user_id_lead_first_discarder,
+      fhlf.user_id_lead_last_discarder,
       fhlf.flow,
       fhlf.acquisition_method,
       fhlf.acquisition_channel,
@@ -122,12 +136,30 @@ fact_with_reproc as (
         when l.origem = 'Reprocessado' then 'Reprocessed Others'
         else fhlf.acquisition_channel
       end as acquisition_channel_rep,
-      rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id
+      rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
+      coalesce(
+            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            or pa_b2b.id is not null
+            or b2b_prime.id_lead is not null
+            , false) as is_b2b
     from fact_house_listing_flows fhlf
     left join lead l 
       on l.id = fhlf.lead_id
     left join reproc_leads rl 
       on rl.id = fhlf.lead_id
+    left join house h
+      on h.id = fhlf.imovel_id
+    left join partner_agent pa_b2b
+      on pa_b2b.user_id = h.usuario_id
+    left join (
+		select distinct le.id as id_lead
+		from lead le
+		join usuario u_b2b
+			on u_b2b.telefone_principal = le.telefone_anunciante
+		join partner_agent pa_b2b
+			on pa_b2b.user_id = u_b2b.id
+	) b2b_prime
+	  on b2b_prime.id_lead = l.id
   )
   select 
     acquisition_channels.id,
@@ -147,6 +179,7 @@ fact_with_reproc as (
     acquisition_channels.dt_first_listing,
     acquisition_channels.dt_discarded,
     acquisition_channels.user_id_lead_first_discarder,
+    acquisition_channels.user_id_lead_last_discarder,
     acquisition_channels.flow,
     acquisition_channels.acquisition_method,
     acquisition_channels.acquisition_channel,
@@ -169,7 +202,8 @@ fact_with_reproc as (
     acquisition_channels.days_lead_to_processing,
     acquisition_channels.acquisition_channel_rep,
     acquisition_channels.origin_lead_usuario_que_indicou_id,
-    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed
+    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
+    acquisition_channels.is_b2b
   from acquisition_channels
 ), 
 acquisitions as (
@@ -200,7 +234,7 @@ acquisitions as (
     on f.imovel_id = d.imovel_id
 ), 
 leads_b2b as (
-  select 
+  select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id,
     pa_b2b_prime.partner_id as prime_partner_id
@@ -236,16 +270,19 @@ potential_listings as (
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
     coalesce(f.imovel_id || '001', '-1') as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
-    coalesce(f.rep_id, bt.rep_id, '-1'::integer) as sk_user_sales_rep,
+    coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
-    coalesce(bt.rep_id, '-1'::integer) as sk_user_task_assignee,
+    coalesce(btf.rep_id, '-1'::integer) as sk_user_first_task_assignee,
+    coalesce(btl.rep_id, '-1'::integer) as sk_user_last_task_assignee,
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
     coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
-    coalesce(to_char(bt.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_task_created_date,
-    coalesce(to_char(bt.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_task_closed_date,
+    coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
+    coalesce(to_char(btf.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_closed_date,
+    coalesce(to_char(btl.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_created_date,
+    coalesce(to_char(btl.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_closed_date,
     coalesce(to_char(f.dt_first_inside_sales_contact::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_inside_sales_contact_date,
     coalesce(to_char(f.dt_conversion::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_conversion_date,
     coalesce(to_char(f.dt_qualified::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_qualified_date,
@@ -253,6 +290,7 @@ potential_listings as (
     coalesce(to_char(f.dt_first_listing::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_listing_date,
     coalesce(to_char(f.dt_discarded::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_discard_date,
     coalesce(f.user_id_lead_first_discarder, '-1'::integer) as sk_user_lead_first_discarder,
+    coalesce(f.user_id_lead_last_discarder, '-1'::integer) as sk_user_lead_last_discarder,
     a.flow,
     a.acquisition_method,
     a.acquisition_channel,
@@ -283,7 +321,7 @@ potential_listings as (
     f.days_lead_to_processing,
     h.exclusivity as is_exclusive,
     case
-      when bt.rep_id is not null then 'Lead'
+      when btf.rep_id is not null then 'Lead'
       when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
@@ -292,21 +330,29 @@ potential_listings as (
     coalesce(lfet.tracking_source, bl.utm_source) as utm_source,
     coalesce(lfet.tracking_medium, bl.utm_medium) as utm_medium,
     lfet.tracking_platform,
-    bl.branded_lead as is_branded,
-    bl.b2b_lead as is_b2b,
+    coalesce(lower(btrim(lfet.tracking_campaign)) ~* '(institucional)|(branded)',
+             bl.branded_lead) as is_branded,
+    (bl.b2b_lead or f.is_b2b) as is_b2b, -- Using business rules for both constraints of old b2b and new one
     bl.reprocessed_flg,
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, bt.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
-    us_cad.id is not null as is_call_center
+    coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
+    us_cad.id is not null as is_call_center,
+    lfet.tracking_referring_domain as lead_referring_domain,
+    us_d.subscriptionSource as subscription_source,
+    case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
+		 when u.dados_agente_id is not null then 'Agent'
+		 else ua.affiliateType end as affiliate_type
   from fact_with_reproc f
   left join lead_first_event_tracking lfet 
     on lfet.id_lead = f.lead_id
   left join acquisitions a 
     on a.id = f.id
-  left join base_lead_tasks bt 
-    on bt.lead_id = f.lead_id
+  left join base_lead_tasks_first btf
+    on btf.lead_id = f.lead_id
+  left join base_lead_tasks_last btl
+    on btl.lead_id = f.lead_id
   left join base_photo_tasks bpt 
     on f.imovel_id = bpt.imovel_id
   left join rep_leads bl 
@@ -324,118 +370,62 @@ potential_listings as (
     on l_b2b.id_lead = f.lead_id
   left join partner_agent pa_b2b_prime 
     on h.usuario_id = pa_b2b_prime.user_id
+  left join usuario u
+	on coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) = u.id
+  left join user_doorman us_d
+    on us_d.id_dados_afiliado = u.dados_afiliado_id
+  left join user_affiliate ua
+    on ua.id = u.dados_afiliado_id
 ), 
 taxonomy as (
-  select 
+  select
+    distinct
     lead_type,
     lead_origin,
-    lead_utm_source,
-    lead_utm_medium,
+    lead_tracking_medium,
+    lead_tracking_source,
+    affiliate_type,
+    lead_referring_domain,
+    subscription_source,
     is_branded::integer::boolean as is_branded,
     is_b2b::integer::boolean as is_b2b,
-    is_doorman::integer::boolean as is_doorman,
     is_isales_direct_register::integer::boolean as is_isales_direct_register,
     is_cx_direct_register::integer::boolean as is_cx_direct_register,
     has_isales_intervention::integer::boolean as has_isales_intervention,
     is_call_center::integer::boolean as is_call_center,
-    mkt_category,
-    mkt_flow,
-    mkt_completion,
+    mkt_origin,
     mkt_channel,
-    mkt_platform,
     mkt_medium,
     mkt_source
-  from files.taxonomy_supply
-)
+  from files.taxonomy_growth
+),
+applied_taxonomy as (
 select 
-  pl.sk_house_listing_flow,
-  pl.sk_condo,
-  pl.sk_lead,
-  pl.sk_lead_conversion,
-  pl.sk_first_photo_job,
-  pl.sk_house_listing,
-  pl.sk_user_house_registrant,
-  pl.sk_user_sales_rep,
-  pl.sk_user_lead_affiliate,
-  pl.sk_user_task_assignee,
-  pl.sk_region,
-  pl.sk_city,
-  pl.sk_partner,
-  pl.sk_lead_date,
-  pl.sk_prospect_date,
-  pl.sk_task_created_date,
-  pl.sk_task_closed_date,
-  pl.sk_first_inside_sales_contact_date,
-  pl.sk_conversion_date,
-  pl.sk_qualified_date,
-  pl.sk_opportunity_date,
-  pl.sk_first_listing_date,
-  pl.sk_discard_date,
-  pl.sk_user_lead_first_discarder,
-  pl.funnel_step,
-  pl.funnel_drop_reason,
-  pl.hours_lead_to_prospect,
-  pl.hours_prospect_to_qualified,
-  pl.hours_lead_to_first_inside_sales_contact,
-  pl.hours_prospect_to_first_inside_sales_contact,
-  pl.hours_qualified_to_opportunity,
-  pl.hours_opportunity_to_listing,
-  pl.hours_lead_to_listing,
-  pl.days_lead_to_prospect,
-  pl.days_prospect_to_qualified,
-  pl.days_lead_to_first_inside_sales_contact,
-  pl.days_prospect_to_first_inside_sales_contact,
-  pl.days_qualified_to_opportunity,
-  pl.days_opportunity_to_listing,
-  pl.days_lead_to_listing,
-  pl.days_lead_to_processing,
-  pl.is_exclusive,
-  pl.first_isales_intervention,
-  pl.lead_type,
-  pl.lead_origin,
-  pl.utm_source as lead_tracking_source,
-  pl.utm_medium as lead_tracking_medium,
-  pl.tracking_platform as lead_tracking_platform,
-  pl.is_branded,
-  pl.is_b2b,
-  pl.is_doorman,
-  pl.is_isales_direct_register,
-  pl.is_cx_direct_register,
-  pl.has_isales_intervention,
-  pl.is_call_center,
-  pl.reprocessed_flg as is_lead_reprocessed,
+  pl.*,
   case
     when pl.is_branded then 'Branded'
     else 'Other'
   end as mkt_branded,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_category
-  end as mkt_category,
+    when t.mkt_origin is null then 'Other'
+    else t.mkt_origin
+  end as mkt_origin,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_flow
-  end as mkt_flow,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
-    else t.mkt_completion
-  end as mkt_completion,
-  case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_channel
   end as mkt_channel,
   case
-    when t.mkt_flow is null then 'Not Mapped'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_mobile' then 'Web Mobile'
-    when t.mkt_platform is null and pl.tracking_platform = 'web_desktop' then 'Web Desktop'
-    else t.mkt_platform
+    when t.mkt_origin is null then 'Not Mapped'
+    when pl.tracking_platform = 'web_mobile' then 'Web Mobile'
+    when pl.tracking_platform = 'web_desktop' then 'Web Desktop'
+    else 'Not Mapped'
   end as mkt_platform,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_medium
   end as mkt_medium,
   case
-    when t.mkt_flow is null then 'Not Mapped'
+    when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_source
   end as mkt_source,
   now() as ts_load
@@ -443,13 +433,113 @@ from potential_listings pl
 left join taxonomy t 
   on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '') 
     and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '') 
-    and coalesce(pl.utm_source, '') = coalesce(t.lead_utm_source, '') 
-    and coalesce(pl.utm_medium, '') = coalesce(t.lead_utm_medium, '') 
+    and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
+    and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
+    and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')
+    and coalesce(pl.lead_referring_domain, '') = coalesce(t.lead_referring_domain, '')
+    and coalesce(pl.subscription_source, '') = coalesce(t.subscription_source, '')
     and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false) 
-    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false) 
-    and coalesce(pl.is_doorman, false) = coalesce(t.is_doorman, false) 
+    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false)
     and coalesce(pl.is_isales_direct_register, false) = coalesce(t.is_isales_direct_register, false) 
     and coalesce(pl.is_cx_direct_register, false) = coalesce(t.is_cx_direct_register, false) 
     and coalesce(pl.has_isales_intervention, false) = coalesce(t.has_isales_intervention, false) 
     and coalesce(pl.is_call_center, false) = coalesce(t.is_call_center, false)
-;
+),
+applied_taxonomy_flow as (
+    select
+        *,
+        case
+             when lead_type = 'Proparceria' then 'Non Self-Service'
+             when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado') then 'Non Self-Service'
+             when (is_cx_direct_register or is_isales_direct_register) then 'Non Self-Service'
+             when lead_origin = 'Landing' then 'Non Self-Service'
+             when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
+             when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
+                  and mkt_source = 'Direct Referral' then 'Self-Service'
+             when mkt_origin in ('Other', 'Not Mapped') then mkt_origin
+             else 'Non Self-Service' end as mkt_flow
+    from  applied_taxonomy
+)
+select
+  atax.sk_house_listing_flow,
+  atax.sk_condo,
+  atax.sk_lead,
+  atax.sk_lead_conversion,
+  atax.sk_first_photo_job,
+  atax.sk_house_listing,
+  atax.sk_user_house_registrant,
+  atax.sk_user_sales_rep,
+  atax.sk_user_lead_affiliate,
+  atax.sk_user_first_task_assignee,
+  atax.sk_user_last_task_assignee,
+  atax.sk_region,
+  atax.sk_city,
+  atax.sk_partner,
+  atax.sk_lead_date,
+  atax.sk_prospect_date,
+  atax.sk_first_task_created_date,
+  atax.sk_first_task_closed_date,
+  atax.sk_last_task_created_date,
+  atax.sk_last_task_closed_date,
+  atax.sk_first_inside_sales_contact_date,
+  atax.sk_conversion_date,
+  atax.sk_qualified_date,
+  atax.sk_opportunity_date,
+  atax.sk_first_listing_date,
+  atax.sk_discard_date,
+  atax.sk_user_lead_first_discarder,
+  atax.sk_user_lead_last_discarder,
+  atax.funnel_step,
+  atax.funnel_drop_reason,
+  atax.hours_lead_to_prospect,
+  atax.hours_prospect_to_qualified,
+  atax.hours_lead_to_first_inside_sales_contact,
+  atax.hours_prospect_to_first_inside_sales_contact,
+  atax.hours_qualified_to_opportunity,
+  atax.hours_opportunity_to_listing,
+  atax.hours_lead_to_listing,
+  atax.days_lead_to_prospect,
+  atax.days_prospect_to_qualified,
+  atax.days_lead_to_first_inside_sales_contact,
+  atax.days_prospect_to_first_inside_sales_contact,
+  atax.days_qualified_to_opportunity,
+  atax.days_opportunity_to_listing,
+  atax.days_lead_to_listing,
+  atax.days_lead_to_processing,
+  atax.is_exclusive,
+  atax.first_isales_intervention,
+  atax.lead_type,
+  atax.lead_origin,
+  atax.utm_source as lead_tracking_source,
+  atax.utm_medium as lead_tracking_medium,
+  atax.tracking_platform as lead_tracking_platform,
+  atax.is_branded,
+  atax.is_b2b,
+  atax.is_doorman,
+  atax.is_isales_direct_register,
+  atax.is_cx_direct_register,
+  atax.has_isales_intervention,
+  atax.is_call_center,
+  atax.reprocessed_flg as is_lead_reprocessed,
+  atax.affiliate_type,
+  atax.lead_referring_domain,
+  atax.subscription_source,
+  atax.mkt_branded,
+  case when atax.mkt_flow = 'Self-Service' then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('App', 'Crawling', 'Form', 'Planilha') then 'Outbound'
+       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') then 'Inbound'
+       when atax.mkt_flow = 'Not Mapped' then 'Not Mapped'
+       else 'Other' end as mkt_category,
+  atax.mkt_flow,
+  case when atax.mkt_flow = 'Non-Self Service' then 'Non-Self Service'
+       when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
+       when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
+       when atax.mkt_flow in ('Not Mapped', 'Other') then atax.mkt_flow
+       else 'Not Mapped' end as mkt_completion,
+  atax.mkt_origin,
+  atax.mkt_channel,
+  atax.mkt_platform,
+  atax.mkt_medium,
+  atax.mkt_source,
+  atax.ts_load
+from applied_taxonomy_flow atax

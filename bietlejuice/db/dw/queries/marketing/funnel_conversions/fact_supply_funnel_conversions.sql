@@ -5,6 +5,7 @@ with fact as  (
 		mkt_category,
 		mkt_flow,
 		mkt_completion,
+		mkt_origin,
 		mkt_channel,
 		mkt_medium,
 		mkt_source,
@@ -16,7 +17,7 @@ with fact as  (
 	from marketing.fact_marketing_daily_costs mkt
 	join public.dim_date dd on dd.sk_date =  mkt.sk_date
 	where funnel_side = 'supply'
-	group by 1,2,3,4,5,6,7,8,9,10,11,12
+	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 s_cube as (
 	select
@@ -25,6 +26,7 @@ s_cube as (
 		mkt_category,
 		mkt_flow,
 		mkt_completion,
+		mkt_origin,
 		mkt_channel,
 		mkt_medium,
 		mkt_source,
@@ -46,7 +48,7 @@ s_cube as (
 		sum(coalesce(total_{2}_opportunities, 0)) as total_{2}_opportunities,
 		sum(coalesce(total_{2}_listings, 0)) as total_{2}_listings
 	from growth.conversion_points_supply_{2}
-	group by 1,2,3,4,5,6,7,8,9,10,11,12
+	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 )
 select
 	coalesce(fact.sk_date, s_cube.sk_date) as sk_date,
@@ -54,6 +56,7 @@ select
 	coalesce(fact.mkt_category, s_cube.mkt_category) as mkt_category,
 	coalesce(fact.mkt_flow, s_cube.mkt_flow) as mkt_flow,
 	coalesce(fact.mkt_completion, s_cube.mkt_completion) as mkt_completion,
+	coalesce(fact.mkt_origin, s_cube.mkt_origin) as mkt_origin,
 	coalesce(fact.mkt_channel, s_cube.mkt_channel) as mkt_channel,
 	coalesce(fact.mkt_medium, s_cube.mkt_medium) as mkt_medium,
 	coalesce(fact.mkt_source, s_cube.mkt_source) as mkt_source,
@@ -77,6 +80,7 @@ full outer join s_cube
 	and coalesce(fact.mkt_category, '') = coalesce(s_cube.mkt_category, '')
 	and coalesce(fact.mkt_flow, '') = coalesce(s_cube.mkt_flow, '')
 	and coalesce(fact.mkt_completion, '') = coalesce(s_cube.mkt_completion, '')
+	and coalesce(fact.mkt_origin, '') = coalesce(s_cube.mkt_origin, '')
 	and coalesce(fact.mkt_channel, '') = coalesce(s_cube.mkt_channel, '')
 	and coalesce(fact.mkt_medium, '') = coalesce(s_cube.mkt_medium, '')
 	and coalesce(fact.mkt_source, '') = coalesce(s_cube.mkt_source, '')

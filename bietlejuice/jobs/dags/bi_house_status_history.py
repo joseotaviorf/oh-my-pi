@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
+
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from datetime import datetime
 
-from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
 
@@ -55,6 +56,7 @@ def house_status_history_sub_dag(sub_dag_name, **kwargs):
         task_id='load_data_into_ods_stg',
         python_callable=execute_class_method,
         dag=local_dag,
+        execution_timeout=timedelta(hours=4),
         op_kwargs={
             'class_': HouseStatusHistory,
             'method': 'load_data_into_ods_stg'

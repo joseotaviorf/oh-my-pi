@@ -15,6 +15,7 @@ select
 		 else 'Outro' end as branded,
 	aaus.utm_content,
 	aaus.utm_term,
+	aaus.event_type,
 	case
 		when aaus.app = '170698' then 'demand'
 		when aaus.app = '183047' then 'supply'
@@ -42,18 +43,23 @@ select
 	coalesce(ts.category, td.category, 'Not Mapped') as mkt_category,
 	coalesce(ts.flow, td.flow, 'Not Mapped') as mkt_flow,
 	coalesce(ts.completion, td.completion, 'Not Mapped') as mkt_completion,
+    case
+	    when app = 'supply' and event_type = 'price_suggestion_page_viewed' then 'PriceSuggestion'
+	    when app = 'supply' then 'OwnerPWA'
+	    else 'Not Mapped'
+	end as mkt_origin,
 	coalesce(ts.channel, td.channel, 'Not Mapped') as mkt_channel,
 	coalesce(ts.medium, td.medium, 'Not Mapped') as mkt_medium,
 	coalesce(ts.source, td.source, 'Not Mapped') as mkt_source,
 	coalesce(ts.platform, td.platform, 'Not Mapped') as mkt_platform
 from t_dau dau
-left join datalake_raw.taxonomy_supply_dau ts
+left join datalake_raw.gsheets_dau_taxonomy_supply ts
 	on dau.app = 'supply'
 	and	lower(trim(ts.utm_medium)) = lower(trim(dau.utm_medium))
 	and lower(trim(ts.utm_source)) = lower(trim(dau.utm_source))
 	and lower(trim(ts.app_type)) = lower(trim(dau.platform))
 	and lower(trim(ts.branded)) = lower(trim(dau.branded))
-left join datalake_raw.taxonomy_demand_dau td
+left join datalake_raw.gsheets_dau_taxonomy_demand td
 	on dau.app = 'demand'
 	and	lower(trim(td.utm_medium)) = lower(trim(dau.utm_medium))
 	and lower(trim(td.utm_source)) = lower(trim(dau.utm_source))
