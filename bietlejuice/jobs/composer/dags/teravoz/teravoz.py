@@ -30,7 +30,7 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
 )
 
 # spark_jobs path
-SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}".format(DAG_ID)
+SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/teravoz"
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
