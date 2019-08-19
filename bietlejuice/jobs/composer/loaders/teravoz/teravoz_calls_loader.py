@@ -18,8 +18,7 @@ class TeravozCallsLoader(TeravozLoader):
 
     def __init__(self, api_user, api_pwd, environment, execution_date):
 
-        super().__init__(api_user, api_pwd, environment)
-
+        super().__init__(api_user, api_pwd, environment, execution_date)
         # extract to day, month and year to create columns in df
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         self.PARTITIONS["year"] = self.PARTITIONS["year"].format(year=dt_execution.year)
@@ -42,21 +41,21 @@ class TeravozCallsLoader(TeravozLoader):
         return df
 
     @logger
-    def request_api_and_get_dataframe(self):
+    def request_api_and_get_dataframe(self, endpoint):
 
-        df = super()._request_api_and_get_dataframe(
-            endpoint="calls", params=self.PARAMS
+        df = super().request_api_and_get_dataframe(
+            endpoint=endpoint, params=self.PARAMS
         )
         return df
 
     @logger
-    def load_data_into_datalake(self, df, datalake_layer):
+    def load_data_into_datalake(self, df, table_name, datalake_layer):
 
         df = self._create_dataframe_columns_to_partition_table(df, self.PARTITIONS)
 
-        super()._load_data_into_datalake(
+        super().load_data_into_datalake(
             df=df,
-            table_name="calls",
+            table_name=table_name,
             datalake_layer=datalake_layer,
             partitions=self.PARTITIONS,
         )

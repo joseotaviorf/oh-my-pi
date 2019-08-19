@@ -1,6 +1,6 @@
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozCallsLoader
+from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader, TeravozCallsLoader
 
 logger = QuintoAndarLogger("TeravozFactory")
 
@@ -26,4 +26,9 @@ class TeravozFactory:
 
     @staticmethod
     def __dispatch_dict(table_name):
-        return {"calls": TeravozCallsLoader}.get(table_name)
+        return {
+            "calls": TeravozCallsLoader,
+            "queues": TeravozLoader,
+            "peers": TeravozLoader,
+            "ddrs": TeravozLoader,
+        }.get(table_name)

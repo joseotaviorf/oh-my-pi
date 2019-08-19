@@ -111,9 +111,23 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="calls", sub_dag_func=raw_sub_dag
 )
+queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="queues", sub_dag_func=raw_sub_dag
+)
+peers_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="peers", sub_dag_func=raw_sub_dag
+)
+ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="ddrs", sub_dag_func=raw_sub_dag
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> calls_sub_dag_task >> terminate_cluster_task
+create_cluster_task.set_downstream(
+    [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
+)
+terminate_cluster_task.set_upstream(
+    [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
+)

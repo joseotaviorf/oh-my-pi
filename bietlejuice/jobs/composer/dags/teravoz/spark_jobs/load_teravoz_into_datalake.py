@@ -80,5 +80,5 @@ if __name__ == "__main__":
         execution_date=execution_date,
     )
 
-    df = teravoz.request_api_and_get_dataframe()
-    teravoz.load_data_into_datalake(df=df, datalake_layer=datalake_layer)
+    df = teravoz.request_api_and_get_dataframe(table_name)
+    teravoz.load_data_into_datalake(df, table_name, datalake_layer)

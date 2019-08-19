@@ -21,13 +21,14 @@ class TeravozLoader:
     SOURCE = "teravoz"
 
     @logger
-    def __init__(self, api_user, api_pwd, environment):
+    def __init__(self, api_user, api_pwd, environment, execution_date=None):
         # api_instance (temporarily here)
         self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
         self.ENV = environment
+        self.execution_date = execution_date
 
     @logger
-    def _request_api_and_get_dataframe(self, endpoint, params):
+    def request_api_and_get_dataframe(self, endpoint, params={}):
         """
             endpoint: endpoint ..@teravoz.com.br/{endpoint}
             params: if exists is expected the format:
@@ -91,7 +92,6 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
-        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
@@ -151,7 +151,7 @@ class TeravozLoader:
         ).save()
 
     @logger
-    def _load_data_into_datalake(self, df, table_name, datalake_layer, partitions=None):
+    def load_data_into_datalake(self, df, table_name, datalake_layer, partitions=None):
 
         """
           load request from endpoint to s3 without partitions and
@@ -185,4 +185,8 @@ class TeravozLoader:
                         "{}={}".format(partition_name, partition_value)
                     )
 
-            self._create_partition_table(db_name, table_name, s3_path, list_partitions)
+                self._create_partition_table(
+                    db_name, table_name, s3_path, list_partitions
+                )
+
+            spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
