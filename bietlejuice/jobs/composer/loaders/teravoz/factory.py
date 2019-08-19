@@ -1,6 +1,10 @@
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader, TeravozCallsLoader
+from bietlejuice.jobs.composer.loaders.teravoz import (
+    TeravozLoader,
+    TeravozCallsLoader,
+    TeravozAgentPerformanceLoader,
+)
 
 logger = QuintoAndarLogger("TeravozFactory")
 
@@ -31,4 +35,5 @@ class TeravozFactory:
             "queues": TeravozLoader,
             "peers": TeravozLoader,
             "ddrs": TeravozLoader,
+            "report_agent_performance": TeravozAgentPerformanceLoader,
         }.get(table_name)
