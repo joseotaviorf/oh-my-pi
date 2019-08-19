@@ -15,9 +15,10 @@ images AS (
 matches AS (
   SELECT
     m.sk_house_listing,
+    m.id_crawled_listing,
     COUNT(*) AS matches_count
   FROM datalake_raw.crawler_matches m
-  GROUP BY 1
+  GROUP BY 1, 2
 ),
 quintoandar_listings AS (
   SELECT
@@ -30,7 +31,6 @@ quintoandar_listings AS (
          array_agg(i.nome) AS photos
   FROM datalake_clean.ods_dim_house_listing l
   LEFT JOIN images i ON l.id_house = i.imovel_id
-  LEFT JOIN matches m ON l.sk_house_listing = m.sk_house_listing
   WHERE status IN ('publicado') AND is_last_version = 'True'
     AND COALESCE(house_lat, '') != '' AND COALESCE(house_lng, '') != ''
     AND COALESCE(
@@ -38,7 +38,6 @@ quintoandar_listings AS (
       , '') != ''
     AND COALESCE(house_bedrooms, '') != ''
     AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '7' DAY -- our listings pulished in the last 7 days
-    AND (m.matches_count <= 3 OR m.matches_count IS NULL)  -- we don't want to consider listings that have had more than 3 matches already
   GROUP BY 1, 2, 3, 4, 5, 6
 ),
 first_listings AS (
@@ -121,5 +120,7 @@ SELECT
   id_crawled_listing,
   crawled_photos,
   CURRENT_DATE AS dt_created
-FROM quintoandar_join_crawled
+FROM quintoandar_join_crawled c
+LEFT JOIN matches m ON c.sk_house_listing = m.sk_house_listing AND c.id_crawled_listing = m.id_crawled_listing
+AND (m.matches_count <= 3 OR m.matches_count IS NULL)  -- we don't want to consider listings + crawler listings combinations that have had more than 3 matches already
 ;

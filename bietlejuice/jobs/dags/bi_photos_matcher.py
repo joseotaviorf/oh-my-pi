@@ -8,7 +8,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR, SOURCE_QUERIES_DIR
+from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 
 # env vars
 env.set_airflow_var_to_local_env('PHOTOS_MATCHER')
@@ -25,7 +25,7 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 @logger
 def extract_data_from_matcher(table_name, ds, **kwargs):
     # connect to external db, extract data, save csv to S3
-    query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(SOURCE_QUERIES_DIR, table_name))
+    query = "SELECT id, id_crawled_listing, sk_house_listing, match, dt_created FROM crawler_matches WHERE dt_created::DATE = '{}'::date;".format(ds)
 
     logger.info('m=extract_data_from_matcher, table_name={}, msg=Extracting data from photos matcher'.format(table_name))
     data_table = BaseETL.from_db_query(
