@@ -27,8 +27,8 @@ class TeravozFactory:
     @staticmethod
     def __dispatch_dict(table_name):
         return {
-          "calls": TeravozCallsLoader,
-          "queues": TeravozLoader,
-          "peers": TeravozLoader,
-          "ddrs": TeravozLoader
+            "calls": TeravozCallsLoader,
+            "queues": TeravozLoader,
+            "peers": TeravozLoader,
+            "ddrs": TeravozLoader,
         }.get(table_name)
