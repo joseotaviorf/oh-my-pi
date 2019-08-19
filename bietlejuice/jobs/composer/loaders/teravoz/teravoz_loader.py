@@ -92,7 +92,6 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
-        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
@@ -186,4 +185,6 @@ class TeravozLoader:
                         "{}={}".format(partition_name, partition_value)
                     )
 
-            self._create_partition_table(db_name, table_name, s3_path, list_partitions)
+                self._create_partition_table(db_name, table_name, s3_path, list_partitions)
+            
+            spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
