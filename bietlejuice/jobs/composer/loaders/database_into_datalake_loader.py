@@ -21,6 +21,7 @@ class DatabaseIntoDataLakeLoader:
                                 {format}
                                 LOCATION '{path}'
                                 ;"""
+    TEST_TABLE_QUERY_TEMPLATE = "SELECT * FROM `{database}`.`{table}` LIMIT 10;"
 
     @logger
     def __init__(self, config):
@@ -159,6 +160,11 @@ class DatabaseIntoDataLakeLoader:
             AthenaClient.execute_athena_query(
                 "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table_name), athena_db
             )
+
+        logger.info(
+            "m=_create_athena_external_table, table={}.{}, msg=Testing the table reading some data".format(athena_db, table_name)
+        )
+        AthenaClient.execute_athena_query(self.TEST_TABLE_QUERY_TEMPLATE.format(athena_db, table_name), athena_db)
 
         logger.info(
             "m=_create_athena_external_table, table={}.{}, msg=The table was created "
