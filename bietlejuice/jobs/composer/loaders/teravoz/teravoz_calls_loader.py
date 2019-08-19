@@ -1,6 +1,6 @@
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 from quintoandar_logger import QuintoAndarLogger
-from pyspark.sql.functions import lit
+
 from datetime import datetime
 from collections import OrderedDict
 
