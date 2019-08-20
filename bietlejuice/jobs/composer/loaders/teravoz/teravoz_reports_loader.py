@@ -1,10 +1,11 @@
-from quintoandar_logger import QuintoAndarLogger
+from datetime import datetime, timedelta
+from collections import OrderedDict
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 
-from datetime import datetime, timedelta
-from collections import OrderedDict
+from quintoandar_logger import QuintoAndarLogger
+
 
 logger = QuintoAndarLogger("TeravozReportsLoader")
 

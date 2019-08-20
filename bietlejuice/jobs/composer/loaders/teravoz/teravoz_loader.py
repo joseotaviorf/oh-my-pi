@@ -1,8 +1,10 @@
+from pyspark.sql.functions import lit
+
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
+
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
-from pyspark.sql.functions import lit
 
 logger = QuintoAndarLogger("TeravozLoader")
 
@@ -42,6 +44,8 @@ class TeravozLoader:
 
         json = getattr(self.api_instance, endpoint)(**params).get()
         json_data = json().data
+
+        print(json_data.keys())
 
         if endpoint in json_data.keys():
             key = endpoint
@@ -95,6 +99,7 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
+        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
     @staticmethod
     @logger
