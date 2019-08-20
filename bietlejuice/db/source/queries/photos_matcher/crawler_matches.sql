@@ -5,5 +5,5 @@ SELECT
   "match",
   "dt_created"
 FROM crawler_matches
-WHERE "dt_created"::DATE = ({execution_date})::DATE
+WHERE "dt_created"::DATE = ('{execution_date}')::DATE
 ;

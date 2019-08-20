@@ -113,12 +113,12 @@ quintoandar_join_crawled AS
     AND TRY(CAST(q.house_bedrooms AS BIGINT)) = TRY(CAST(c.bedrooms AS BIGINT))
 )
 SELECT
-  ROW_NUMBER () OVER (ORDER BY sk_house_listing) AS row_id,
-  sk_house_listing,
-  short_id_house,
-  listing_photos,
-  id_crawled_listing,
-  crawled_photos,
+  ROW_NUMBER () OVER (ORDER BY c.sk_house_listing) AS row_id,
+  c.sk_house_listing,
+  c.short_id_house,
+  c.listing_photos,
+  c.id_crawled_listing,
+  c.crawled_photos,
   CURRENT_DATE AS dt_created
 FROM quintoandar_join_crawled c
 LEFT JOIN matches m ON c.sk_house_listing = m.sk_house_listing AND c.id_crawled_listing = m.id_crawled_listing
