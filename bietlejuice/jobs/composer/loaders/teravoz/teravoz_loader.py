@@ -45,8 +45,6 @@ class TeravozLoader:
         json = getattr(self.api_instance, endpoint)(**params).get()
         json_data = json().data
 
-        print(json_data.keys())
-
         if endpoint in json_data.keys():
             key = endpoint
         elif "list" in json_data.keys():
