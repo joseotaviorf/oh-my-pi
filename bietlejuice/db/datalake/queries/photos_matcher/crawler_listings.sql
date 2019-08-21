@@ -16,7 +16,7 @@ matches AS (
   SELECT
     m.sk_house_listing,
     m.id_crawled_listing,
-    COUNT(*) AS matches_count
+    COUNT(*) AS total_matches
   FROM datalake_raw.crawler_matches m
   GROUP BY 1, 2
 ),
@@ -122,5 +122,5 @@ SELECT
   CURRENT_DATE AS dt_created
 FROM quintoandar_join_crawled c
 LEFT JOIN matches m ON c.sk_house_listing = m.sk_house_listing AND c.id_crawled_listing = m.id_crawled_listing
-WHERE (COALESCE(m.matches_count, 0) <= 3)  -- we don't want to consider listings + crawler listings combinations that have had more than 3 matches already
+WHERE COALESCE(m.total_matches, 0) <= 3  -- we don't want to consider listings + crawler listings combinations that have had more than 3 matches already
 ;
