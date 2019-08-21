@@ -78,6 +78,7 @@ class DataFrameService:
         new_names = [
             DataFrameService.column_name_format(name) for name in existing_names
         ]
+
         for existing_name, new_name in zip(existing_names, new_names):
             df = df.withColumnRenamed(existing_name, new_name)
         return df
