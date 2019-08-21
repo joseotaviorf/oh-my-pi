@@ -1,4 +1,4 @@
-wwith demand_targets_agg as (
+with demand_targets_agg as (
 	/* get demand targets company level by mkt_channel */
 	select 
 		city_group,
@@ -25,7 +25,7 @@ demand_targets as (
 		dtgr.mkt_medium,
 		nullif(trim(dtgr.target_visits_booked), '')::float as share_medium_visits_booked,
 		null as share_medium_marketing_cost, /*placeholder*/
-		nullif(trim(dtgr.target_visits_booked), '')::float * dtdemandco.target_channel_visits_booked as target_medium_visits_booked,
+		nullif(trim(dtgr.target_visits_booked), '')::float * dtco.target_channel_visits_booked as target_medium_visits_booked,
 		null as target_medium_marketing_cost /*placeholder*/
 	from demand_targets_agg dtco 
 	left join datalake_raw.gsheets_growth_demand_targets dtgr

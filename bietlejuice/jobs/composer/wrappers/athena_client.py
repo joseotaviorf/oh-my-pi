@@ -44,9 +44,14 @@ class AthenaClient:
             ):
                 state = response["QueryExecution"]["Status"]["State"]
                 if state == "FAILED":
+                    error_msg = response["QueryExecution"]["Status"][
+                        "StateChangeReason"
+                    ]
                     raise RuntimeError(
                         "m=execute_athena_query, msg=Athena client failed when "
-                        "executing the query., query={}".format(query)
+                        "executing the query., query={}, error={}".format(
+                            query, error_msg
+                        )
                     )
                 elif state == "SUCCEEDED":
                     return execution_id

@@ -1,0 +1,84 @@
+import json
+import logging
+from argparse import ArgumentParser
+
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
+
+from quintoandar_logger import QuintoAndarLogger
+
+DATABRICKS_SCOPE = "quintoandar"
+
+
+JOB_NAME = "load_teravoz_into_datalake"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+@logger
+def exec_factory_method(
+    table_name, method, api_user, api_pwd, environment, execution_date
+):
+
+    teravoz = TeravozFactory.factory(
+        table_name=table_name,
+        api_user=api_user,
+        api_pwd=api_pwd,
+        environment=environment,
+        execution_date=execution_date,
+    )
+
+    getattr(teravoz, method)
+    return teravoz
+
+
+if __name__ == "__main__":
+
+    parser = ArgumentParser(description="load_teravoz_into_datalake")
+
+    # args passed by Airflow task
+    parser.add_argument(
+        "table_name", type=str, help="which endpoint to call and table name"
+    )
+    parser.add_argument(
+        "datalake_layer", type=str, help="which layer from datalake to load"
+    )
+    parser.add_argument("execution_date", type=str, help="execution date in str format")
+    parser.add_argument("environment", type=str, help="forno/prod values")
+
+    args = parser.parse_args()
+
+    logger.info(
+        "m=load_teravoz_into_datalake, table_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
+            args.table_name, args.datalake_layer, args.execution_date
+        )
+    )
+
+    datalake_layer = args.datalake_layer
+    execution_date = args.execution_date
+    table_name = args.table_name
+    environment = args.environment
+
+    # start Spark Session
+    base_dbutils = BaseDBUtils()
+
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    # get Teravoz credentials stored in Databricks secrets
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="teravoz")
+
+    credentials = json.loads(json_credentials)
+
+    teravoz = exec_factory_method(
+        table_name=table_name,
+        method="__init__",
+        api_user=credentials["teravoz_user"],
+        api_pwd=credentials["teravoz_password"],
+        environment=environment,
+        execution_date=execution_date,
+    )
+
+    df = teravoz.request_api_and_get_dataframe(table_name)
+    teravoz.load_data_into_datalake(df, table_name, datalake_layer)
