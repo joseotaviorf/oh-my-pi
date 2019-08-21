@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from airflow.models import DAG
-from airflow.operators.quintoandar_utils import MySqlToS3Operator
+from airflow.operators.quintoandar_plugins import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
@@ -20,35 +20,45 @@ dag = DAG(
     catchup=False,
 )
 
-dump_dag_table_task = MySqlToS3Operator(
-    dag=dag,
-    sql='select * from dag',
-    task_id="dump_dag_table_task",
-    bucket='5a-datalake-forno',
-    filename='data.json',
-    s3_file_path='raw/test_operator/dag',
-    mysql_conn_id='airflow_db',
-    gzip=True
-)
+# dump_dag_table_task = MySqlToS3Operator(
+#     dag=dag,
+#     sql='select * from dag',
+#     task_id="dump_dag_table_task",
+#     bucket='5a-datalake-forno',
+#     filename='data.json',
+#     s3_file_path='raw/test_operator/dag',
+#     mysql_conn_id='airflow_db',
+#     gzip=True
+# )
+#
+# dump_dag_run_table_task = MySqlToS3Operator(
+#     dag=dag,
+#     sql='select * from dag_run',
+#     task_id="dump_dag_run_table_task",
+#     bucket='5a-datalake-forno',
+#     filename='data.json',
+#     s3_file_path='raw/test_operator/dag_run',
+#     mysql_conn_id='airflow_db',
+#     gzip=True
+# )
+#
+# dump_task_fail_table_task = MySqlToS3Operator(
+#     dag=dag,
+#     sql='select * from task_fail',
+#     task_id="dump_task_fail_table_task",
+#     bucket='5a-datalake-forno',
+#     filename='data.json',
+#     s3_file_path='raw/test_operator/task_fail',
+#     mysql_conn_id='airflow_db',
+#     gzip=True
+# )
 
-dump_dag_run_table_task = MySqlToS3Operator(
+test_new_operator = QuintoAndarMySqlToS3Operator(
     dag=dag,
-    sql='select * from dag_run',
-    task_id="dump_dag_run_table_task",
+    table_name='simulation',
+    task_id="test-mysql-operator",
     bucket='5a-datalake-forno',
     filename='data.json',
-    s3_file_path='raw/test_operator/dag_run',
-    mysql_conn_id='airflow_db',
-    gzip=True
-)
-
-dump_task_fail_table_task = MySqlToS3Operator(
-    dag=dag,
-    sql='select * from task_fail',
-    task_id="dump_task_fail_table_task",
-    bucket='5a-datalake-forno',
-    filename='data.json',
-    s3_file_path='raw/test_operator/task_fail',
-    mysql_conn_id='airflow_db',
-    gzip=True
+    s3_file_path='raw/test_operator/simulation',
+    mysql_conn_id='docx',
 )
