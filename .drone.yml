@@ -33,6 +33,17 @@ pipeline:
     when:
       event: push
 
+  unit-tests-python3:
+    group: tests
+    image: python:3.6.7
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make requirements-python3
+      - make unit-tests-python3
+    when:
+      event: push
+
   publish-coverage:
     image: plugins/s3
     pull: true
