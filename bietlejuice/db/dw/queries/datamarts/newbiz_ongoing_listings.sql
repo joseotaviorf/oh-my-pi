@@ -13,14 +13,17 @@ WITH date_base AS (
 	),
 	
 published_listings AS (	
-	SELECT
-		hs.sk_house,
-		hs.status_history,
-		hs.sk_min_status_date,
-		hs.sk_max_status_date
-	FROM fact_house_status hs
-	WHERE hs.status_history = 'publicado'
-	ORDER BY hs.sk_min_status_date
+	SELECT *
+	FROM (
+			SELECT
+					hs.sk_house,
+					hs.status_history,
+					hs.sk_min_status_date,
+					COALESCE(LEAD(hs.sk_min_status_date, 1) OVER (PARTITION BY hs.sk_house ORDER BY hs.sk_min_status_date), 99999999)   AS sk_max_status_date
+			FROM fact_house_status hs
+			ORDER BY hs.sk_min_status_date
+		) base
+	WHERE base.status_history = 'publicado'
 	),
 	
 ongoing_listings AS (
@@ -35,7 +38,12 @@ ongoing_listings AS (
 	  ON ((db.sk_date BETWEEN pl.sk_min_status_date AND pl.sk_max_status_date) OR
 	  	  (db.sk_date >= pl.sk_min_status_date AND pl.sk_max_status_date IS NULL)
 	  	 )
-	ORDER BY db.sk_date
+	GROUP BY db.date,
+    		 db.week_start,
+    		 db.month_start,
+    		 pl.sk_house,
+    		 pl.status_history
+	ORDER BY db.date
 	),
 	
 newbiz_listings AS (
