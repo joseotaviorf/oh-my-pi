@@ -40,11 +40,11 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.4-py3-none-any.whl"
+        "whl": "s3://5a-artifacts/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
     },
     {
-        "whl": "s3://5a-artifacts/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
-    }
+        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.4-py3-none-any.whl"
+    },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
