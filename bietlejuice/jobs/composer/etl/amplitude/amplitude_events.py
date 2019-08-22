@@ -63,7 +63,7 @@ class AmplitudeEvents:
         return data
 
     @logger(exclude="keys")
-    def load_events_into_datalake_raw(self, file_from_api=None):
+    def load_events_into_datalake_raw(self, file_from_api, data_frame_service):
         if not file_from_api:
             logger.warning(
                 "m=load_events_into_datalake_raw, msg=Empty file to load in datalake"
@@ -78,7 +78,7 @@ class AmplitudeEvents:
 
             df = self.create_events_dataframe(data, len_data)
             table_name = "events"
-            DataFrameService.incremental_write(
+            data_frame_service.incremental_write(
                 df,
                 AmplitudeEvents.RAW_FORMAT,
                 ["year", "month", "day", "app"],

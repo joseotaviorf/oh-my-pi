@@ -55,3 +55,20 @@ class TestAmplitudeEvents:
 
         # clean
         shutil.rmtree('/tmp/test_get_data_from_zip_file/', ignore_errors=True)
+
+    def test_load_events_into_datalake_raw(self, mocked_data_frame_service):
+        # arrange
+        json_files = ['{"a": 1, "b": 3}\n{"a": 2, "b": 2}\n', '{"a": 5, "b": 5}']
+
+        os.makedirs('/tmp/test_get_data_from_zip_file/gzips/', exist_ok=True)
+        for i, file in enumerate(json_files):
+            with gzip.GzipFile('/tmp/test_get_data_from_zip_file/gzips/{}.json.gz'.format(i), 'w') as f:
+                f.write(file.encode())
+
+        zipf = zipfile.ZipFile('/tmp/test_get_data_from_zip_file/gzips.zip', 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk('/tmp/test_get_data_from_zip_file/gzips/'):
+            for file in files:
+                zipf.write(os.path.join(root, file))
+        zipf.close()
+
+        expected = ['{"a": 1, "b": 3}', '{"a": 2, "b": 2}', '{"a": 5, "b": 5}']

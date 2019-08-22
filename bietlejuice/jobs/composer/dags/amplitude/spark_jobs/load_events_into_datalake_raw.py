@@ -8,6 +8,7 @@ from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.base.spark import DataFrameService
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
@@ -57,4 +58,4 @@ if __name__ == "__main__":
         amplitude_export_api = AmplitudeExportApi(key["app_key"], key["secret_key"])
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
         file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
-        amplitude_events.load_events_into_datalake_raw(file_from_api)
+        amplitude_events.load_events_into_datalake_raw(file_from_api, DataFrameService)
