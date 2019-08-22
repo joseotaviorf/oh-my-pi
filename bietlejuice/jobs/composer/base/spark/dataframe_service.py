@@ -140,6 +140,9 @@ class DataFrameService:
     def explode_json_column(df, json_column, prefix="", format_column_names=False):
         if not df:
             raise AttributeError("m=explode_json_column, msg=input df is None")
+        if json_column not in df.schema.fieldNames():
+            raise AttributeError("m=explode_json_column, msg=input json_column does not exists")
+
         df_json_column = sqlContext.read.json(
             df.rdd.map(lambda r: getattr(r, json_column))
         )

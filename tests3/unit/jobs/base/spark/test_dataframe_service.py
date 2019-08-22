@@ -1,3 +1,5 @@
+import pytest
+
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
@@ -19,14 +21,53 @@ class TestDataframeService:
         # assert
         assert result_col_names.sort() == expected_col_names.sort()
 
-    def test_df_struct_type_to_json(self, dataframe_service):
+    @pytest.mark.parametrize('data, expected_dtypes', [
+        ([{'a': {'b': 1, 'c':2}, 'd': 3}], [('a', 'string'), ('d', 'bigint')]),
+        ([{'a': 1, 'd': 3}], [('a', 'bigint'), ('d', 'bigint')])
+    ])
+    def test_df_struct_type_to_json(self, data, expected_dtypes, dataframe_service):
         # arrange
-        df = spark.read.json(sc.parallelize([{'a': {'b': 1, 'c':2}, 'd':3}], 1))
-        # input_dtypes = [('a', 'struct<b:bigint,c:bigint>'), ('d', 'bigint')]
-        expected_dtypes = [('a', 'string'), ('d', 'bigint')]
+        df = spark.read.json(sc.parallelize(data, 1))
 
         # act
         result_dtypes = dataframe_service.df_struct_type_to_json(df).dtypes
 
         # assert
         assert result_dtypes == expected_dtypes
+
+    def test_df_struct_type_to_json_invalid_params(self, dataframe_service):
+        # arrange
+        df = None
+
+        # assert
+        with pytest.raises(AttributeError) as ae:
+            assert dataframe_service.df_struct_type_to_json(df)
+
+    @pytest.mark.parametrize('data, expected_cols', [
+        ([{'json': {'abc.abc': 1, 'abc Cba': 2}, 'd': 3}], ['json_abc_abc', 'json_abc__cba', 'd']),
+        ([{'json': '', 'd': 3}], ['d'])
+    ])
+    def test_explode_json_column(self, data, expected_cols, dataframe_service):
+        # arrange
+        df = spark.read.json(sc.parallelize(data, 1))
+
+        # act
+        df = dataframe_service.df_struct_type_to_json(df)
+        df = dataframe_service.explode_json_column(df, 'json', prefix="json_", format_column_names=True)
+        result_cols = df.schema.fieldNames()
+
+        # assert
+        assert result_cols.sort() == expected_cols.sort()
+
+    def test_explode_json_column_invalid_params(self, dataframe_service):
+        # arrange
+        data = [{'a': 1, 'b': 2}]
+        df1 = spark.read.json(sc.parallelize(data, 1))
+        df2 = None
+
+        # assert
+        with pytest.raises(AttributeError) as ae:
+            assert dataframe_service.explode_json_column(df1, 'json')
+
+        with pytest.raises(AttributeError) as ae:
+            assert dataframe_service.explode_json_column(df2, 'json')
