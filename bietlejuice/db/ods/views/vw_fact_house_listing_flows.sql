@@ -531,7 +531,7 @@ select
        when atax.mkt_flow = 'Not Mapped' then 'Not Mapped'
        else 'Other' end as mkt_category,
   atax.mkt_flow,
-  case when atax.mkt_flow = 'Non-Self Service' then 'Non-Self Service'
+  case when atax.mkt_flow = 'Non Self-Service' then 'Non Self-Service'
        when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
        when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
        when atax.mkt_flow in ('Not Mapped', 'Other') then atax.mkt_flow
