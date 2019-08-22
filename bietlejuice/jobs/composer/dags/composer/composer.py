@@ -1,12 +1,58 @@
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
+import pendulum
 from airflow.models import DAG, Variable
+from airflow.operators.quintoandar_athena import QuintoAndarCreateAthenaExternalTableOperator
 from airflow.operators.quintoandar_mysql_to_s3 import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
+from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
+from bietlejuice.jobs.composer.base.etl import BaseETL
 
 DAG_ID = "bietlejuice.composer"
 ENV = Variable.get("environment")
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
+SCHEDULE_INTERVAL = "0 8 * * *"
+S3_BUCKET = "5a-datalake-{}".format(ENV)
+
+
+def move_data_subdag(subdag_name, **kwargs):
+    local_dag = BaseSubDAG(
+        bucket=S3_BUCKET,
+        sub_dag_name=subdag_name,
+        dag_name=DAG_ID,
+        schedule_interval=SCHEDULE_INTERVAL,
+        start_date=START_DATE,
+    )._build_local_dag()
+
+    table_name = kwargs.get('table_name')
+    move_data_to_datalake_task = QuintoAndarMySqlToS3Operator(
+        dag=local_dag,
+        table=table_name,
+        task_id="move-data-to-datalake",
+        bucket=S3_BUCKET,
+        filename='data.json',
+        s3_file_path='raw/composer/{}'.format(table_name),
+        mysql_conn_id='airflow_db',
+        gzip=True
+    )
+
+    ddl_query_raw = BaseETL.get_query_from_file_name(
+        '{}/ddl/raw/composer/test_operator.ddl'.format(DATALAKE_SQL_DIR)).format(ENV=ENV)
+    create_athena_raw_table_task = QuintoAndarCreateAthenaExternalTableOperator(
+        dag=local_dag,
+        task_id='create-athena-raw-table',
+        database='datalake_composer_raw_{}'.format(ENV),
+        table=table_name,
+        ddl_query=ddl_query_raw,
+        output_location="s3://{}/query_results/".format(S3_BUCKET)
+    )
+
+    airflow_helpers.chain(move_data_to_datalake_task, create_athena_raw_table_task)
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -15,64 +61,18 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 8, 1, 0, 0, 0),
-    schedule_interval="0 4 * * *",
+    start_date=START_DATE,
+    schedule_interval=SCHEDULE_INTERVAL,
     max_active_runs=1,
     catchup=False,
 )
 
-dump_dag_table_task = QuintoAndarMySqlToS3Operator(
-    dag=dag,
-    table='dag',
-    task_id="dump_dag_table_task",
-    bucket='5a-datalake-{}'.format(ENV),
-    filename='data.json',
-    s3_file_path='raw/test_operator/dag',
-    mysql_conn_id='airflow_db',
-    gzip=True
+dag_table_subdag = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="dag-table", sub_dag_func=move_data_subdag, table_name='dag'
 )
-
-dump_dag_run_table_task = QuintoAndarMySqlToS3Operator(
-    dag=dag,
-    table='dag_run',
-    task_id="dump_dag_run_table_task",
-    bucket='5a-datalake-{}'.format(ENV),
-    filename='data.json',
-    s3_file_path='raw/test_operator/dag_run',
-    mysql_conn_id='airflow_db',
-    gzip=True
+dag_run_table_subdag = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="dag_run-table", sub_dag_func=move_data_subdag, table_name='dag_run'
 )
-
-dump_task_fail_table_task = QuintoAndarMySqlToS3Operator(
-    dag=dag,
-    sql='task_fail',
-    task_id="dump_task_fail_table_task",
-    bucket='5a-datalake-{}'.format(ENV),
-    filename='data.json',
-    s3_file_path='raw/test_operator/task_fail',
-    mysql_conn_id='airflow_db',
-    gzip=True
+task_failed_subdag = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="task_failed-table", sub_dag_func=move_data_subdag, table_name='task_failed'
 )
-
-# mysql_table_to_raw = QuintoAndarMySqlToS3Operator(
-#     dag=dag,
-#     table='simulation',
-#     task_id="mysql_table_to_raw",
-#     bucket='5a-datalake-forno',
-#     filename='data.json',
-#     s3_file_path='raw/test_operator/simulation',
-#     mysql_conn_id='docx',
-#     export_format='json',
-#     gzip=True
-# )
-#
-# create_raw_table = QuintoAndarCreateAthenaExternalTableOperator(
-#     dag=dag,
-#     task_id='create_raw_table',
-#     database='datalake_test',
-#     table='simulation',
-#     ddl_query=BaseETL.get_query_from_file_name('{}/ddl/raw/composer/test_operator.ddl'.format(DATALAKE_SQL_DIR)),
-#     output_location="s3://5a-datalake-forno/query_results/"
-# )
-#
-# mysql_table_to_raw >> create_raw_table
