@@ -33,7 +33,8 @@ class TwitterCampaigns(Marketing):
     ADS_TABLE_NAME = "twitter_ads"
     ADS_STATS_TABLE_NAME = "twitter_ads_stats"
 
-    def __init__(self, s3_bucket, execution_date, auth, account=None):
+    def __init__(self, s3_bucket, execution_date, auth, account=None,
+                 extra_configs=None):
         """
         The consumer_key, consumer_secret, access_token, and access_token_secret can
         be found on Twitter Developer console:
