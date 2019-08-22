@@ -6,7 +6,7 @@ from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_athena import (
     QuintoAndarCreateAthenaExternalTableOperator,
 )
-from airflow.operators.quintoandar_mysql_to_s3 import QuintoAndarMySqlToS3Operator
+from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
