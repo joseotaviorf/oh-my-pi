@@ -7,4 +7,4 @@ from bietlejuice.jobs.composer.base.db.database_enum import (
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-DATALAKE_SQL_DIR = os.path.join(DIR_PATH, '../../db/datalake')
+DATALAKE_SQL_DIR = os.path.join(DIR_PATH, "../../db/datalake")

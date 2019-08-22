@@ -3,7 +3,9 @@ from datetime import datetime
 import airflow.utils.helpers as airflow_helpers
 import pendulum
 from airflow.models import DAG, Variable
-from airflow.operators.quintoandar_athena import QuintoAndarCreateAthenaExternalTableOperator
+from airflow.operators.quintoandar_athena import (
+    QuintoAndarCreateAthenaExternalTableOperator,
+)
 from airflow.operators.quintoandar_mysql_to_s3 import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
@@ -28,27 +30,28 @@ def move_data_subdag(subdag_name, **kwargs):
         start_date=START_DATE,
     )._build_local_dag()
 
-    table_name = kwargs.get('table_name')
+    table_name = kwargs.get("table_name")
     move_data_to_datalake_task = QuintoAndarMySqlToS3Operator(
         dag=local_dag,
         table=table_name,
         task_id="move-data-to-datalake",
         bucket=S3_BUCKET,
-        filename='data.json',
-        s3_file_path='raw/composer/{}'.format(table_name),
-        mysql_conn_id='airflow_db',
-        gzip=True
+        filename="data.json",
+        s3_file_path="raw/composer/{}".format(table_name),
+        mysql_conn_id="airflow_db",
+        gzip=True,
     )
 
     ddl_query_raw = BaseETL.get_query_from_file_name(
-        '{}/ddl/raw/composer/test_operator.ddl'.format(DATALAKE_SQL_DIR)).format(ENV=ENV)
+        "{}/ddl/raw/composer/{}.ddl".format(DATALAKE_SQL_DIR, table_name)
+    ).format(ENV=ENV)
     create_athena_raw_table_task = QuintoAndarCreateAthenaExternalTableOperator(
         dag=local_dag,
-        task_id='create-athena-raw-table',
-        database='datalake_composer_raw_{}'.format(ENV),
+        task_id="create-athena-raw-table",
+        database="datalake_composer_raw_{}".format(ENV),
         table=table_name,
         ddl_query=ddl_query_raw,
-        output_location="s3://{}/query_results/".format(S3_BUCKET)
+        output_location="s3://{}/query_results/".format(S3_BUCKET),
     )
 
     airflow_helpers.chain(move_data_to_datalake_task, create_athena_raw_table_task)
@@ -68,11 +71,17 @@ dag = DAG(
 )
 
 dag_table_subdag = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="dag-table", sub_dag_func=move_data_subdag, table_name='dag'
+    dag=dag, sub_dag_name="dag-table", sub_dag_func=move_data_subdag, table_name="dag"
 )
 dag_run_table_subdag = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="dag_run-table", sub_dag_func=move_data_subdag, table_name='dag_run'
+    dag=dag,
+    sub_dag_name="dag_run-table",
+    sub_dag_func=move_data_subdag,
+    table_name="dag_run",
 )
 task_failed_subdag = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="task_failed-table", sub_dag_func=move_data_subdag, table_name='task_failed'
+    dag=dag,
+    sub_dag_name="task_failed-table",
+    sub_dag_func=move_data_subdag,
+    table_name="task_failed",
 )
