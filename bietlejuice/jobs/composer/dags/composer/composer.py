@@ -20,6 +20,19 @@ START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "0 8 * * *"
 S3_BUCKET = "5a-datalake-{}".format(ENV)
 
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": BaseDAG.DEFAULT_OWNER,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=START_DATE,
+    schedule_interval=SCHEDULE_INTERVAL,
+    max_active_runs=1,
+    catchup=False,
+)
+
 
 def move_data_subdag(subdag_name, **kwargs):
     local_dag = BaseSubDAG(
@@ -56,19 +69,8 @@ def move_data_subdag(subdag_name, **kwargs):
 
     airflow_helpers.chain(move_data_to_datalake_task, create_athena_raw_table_task)
 
+    return local_dag
 
-dag = DAG(
-    dag_id=DAG_ID,
-    default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
-        "wait_for_downstream": False,
-        "depends_on_past": False,
-    },
-    start_date=START_DATE,
-    schedule_interval=SCHEDULE_INTERVAL,
-    max_active_runs=1,
-    catchup=False,
-)
 
 dag_table_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="dag-table", sub_dag_func=move_data_subdag, table_name="dag"
@@ -79,9 +81,9 @@ dag_run_table_subdag = BaseSubDAG.get_sub_dag_operator(
     sub_dag_func=move_data_subdag,
     table_name="dag_run",
 )
-task_failed_subdag = BaseSubDAG.get_sub_dag_operator(
+task_fail_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="task_failed-table",
+    sub_dag_name="task_fail-table",
     sub_dag_func=move_data_subdag,
-    table_name="task_failed",
+    table_name="task_fail",
 )
