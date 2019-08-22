@@ -22,7 +22,7 @@ with t_all as (
             'referral_opportunity_confirmed',
             'referral_listing_confirmed',
             'referral_form_response_received')
-            and	ym >= '2018-05'
+            and	ym >= '2019-06'
             and ae.app = '205027'
             and regexp_like(e_lead_id, '(^\d+)')
     -- enriching with amplitude from SPARK processing
@@ -46,7 +46,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where event_type in
             ('referral_confirmation_page_viewed',
             'referral_opportunity_confirmed',
@@ -76,7 +76,7 @@ with t_all as (
     from datalake_clean.amplitude_events ae
         where et in ('Affiliate-Lead_referred',
                         'Refer-Lead_referred' )
-            and	ym >= '2018-05'
+            and	ym >= '2019-06'
             and regexp_like(e__lead_id, '(^\d+)')
     -- enriching with amplitude from SPARK processing
     union
@@ -99,7 +99,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where event_type in ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
             and	year >= 2019
             and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
@@ -122,7 +122,7 @@ with t_all as (
             uuid
     from datalake_clean.amplitude_events ae
         where
-            ym >= '2018-01'
+            ym >= '2019-06'
             and app = '183047'
             and trim(u_lead_firestore_id) <> ''
     -- enriching with amplitude from SPARK processing
@@ -144,7 +144,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where year >= 2019
             and app = 183047
             and json_extract(user_properties, '$.lead_firestore_id') is not null
@@ -168,7 +168,7 @@ with t_all as (
     from datalake_clean.amplitude_events ae
         where
             et = 'lead_form_submitted'
-            and ym >= '2018-01'
+            and ym >= '2019-06'
             and trim(app) = '183047'
             AND trim(ae.e_formfield_lead_uuid) <> ''
     -- enriching with amplitude from SPARK processing
@@ -190,7 +190,7 @@ with t_all as (
             coalesce(region, '') as region,
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
-    from datalake_clean_spark.amplitude_events
+    from datalake_amplitude_clean_prod.events
         where  event_type = 'lead_form_submitted'
             and year >= 2019
             and app = 183047

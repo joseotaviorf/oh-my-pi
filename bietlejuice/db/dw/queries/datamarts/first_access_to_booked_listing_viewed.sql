@@ -99,7 +99,7 @@ user_listing_page_views as (
                 case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
                      then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
                      else null end as id_house
-           FROM datalake_clean_spark.amplitude_events
+           FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
                 AND app = 170698
                 AND year >= 2019
@@ -149,7 +149,7 @@ user_sessions as (
                 case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
                      then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
                      else null end as id_house
-           FROM datalake_clean_spark.amplitude_events
+           FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
                 AND app = 170698
                 AND year >= 2019

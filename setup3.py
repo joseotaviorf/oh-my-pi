@@ -7,7 +7,7 @@ __repository_url__ = "https://github.com/quintoandar/bi-etl-ejuice"
 with open('requirements3.txt') as f:
     install_requires = [line for line in f.read().splitlines() if len(line) > 0]
 
-exclude_libs = ['quintoandar-logger==0.1.3']
+exclude_libs = ['quintoandar-logger==0.1.3', 'quintoandar-teravoz-client==0.1.4']
 
 for library in exclude_libs:
     install_requires.remove(library)

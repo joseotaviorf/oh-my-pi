@@ -2,10 +2,8 @@ import io
 import zipfile
 import gzip
 import os
-from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, AthenaClient
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
 
 logger = QuintoAndarLogger("AmplitudeEvents")
@@ -20,18 +18,6 @@ class AmplitudeEvents:
     RAW_RECORDS_BY_PARTITION = 45000
     CLEAN_FORMAT = "parquet"
     CLEAN_RECORDS_BY_PARTITION = 250000
-
-    DROP_QUERY_TEMPLATE = "DROP TABLE IF EXISTS `{database}`.`{table}`;"
-    CREATE_QUERY_TEMPLATE = """CREATE EXTERNAL TABLE IF NOT EXISTS
-                            `{database}`.`{table}`
-                            (
-                              {columns}
-                            )
-                            {partitioned_by}
-                            {format}
-                            LOCATION '{path}'
-                            tblproperties ("parquet.compress"="SNAPPY");"""
-    CREATE_QUERY_CLEAN_FORMAT = "STORED AS PARQUET"
 
     def __init__(
         self,
@@ -77,56 +63,30 @@ class AmplitudeEvents:
         return data
 
     @logger(exclude="keys")
-    def load_events_into_datalake_raw(self, start_date=None, end_date=None):
-        start = start_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
-        end = end_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
-
-        if not start and not end:
+    def load_events_into_datalake_raw(self, file_from_api=None):
+        if not file_from_api:
             logger.warning(
-                "m=load_events_into_datalake_raw, start_date and end_date are none, nothing to do"
+                "m=load_events_into_datalake_raw, msg=Empty file to load in datalake"
             )
             return
-
-        logger.info(
-            "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
-                start, end
-            )
-        )
-        for key in self.keys:
+        with zipfile.ZipFile(file_from_api, "r") as zip_file:
+            data = self.get_data_from_zip_file(zip_file)
+            len_data = len(data)
             logger.info(
-                "m=load_events_into_datalake_raw, App id: {}, App name: {}".format(
-                    key["app_id"], key["app_name"]
-                )
+                "m=load_events_into_datalake_raw, got {} events".format(len_data)
             )
 
-            a = AmplitudeExportApi(key["app_key"], key["secret_key"])
-            logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
-            f = a.get_files_from_extract_api(start, end)
-            if not f:
-                logger.warning(
-                    "m=load_events_into_datalake_raw, msg=None response from get_files_from_extract_api"
-                )
-            else:
-                with zipfile.ZipFile(f, "r") as zip_file:
-                    data = self.get_data_from_zip_file(zip_file)
-                    len_data = len(data)
-                    logger.info(
-                        "m=load_events_into_datalake_raw, got {} events".format(
-                            len_data
-                        )
-                    )
-
-                    df = self.create_events_dataframe(data, len_data)
-                    table_name = "amplitude_events"
-                    DataFrameService.incremental_write(
-                        df,
-                        AmplitudeEvents.RAW_FORMAT,
-                        ["year", "month", "day", "app"],
-                        self.db_raw,
-                        table_name,
-                        self.s3_raw_path + table_name,
-                        True,
-                    )
+            df = self.create_events_dataframe(data, len_data)
+            table_name = "events"
+            DataFrameService.incremental_write(
+                df,
+                AmplitudeEvents.RAW_FORMAT,
+                ["year", "month", "day", "app"],
+                self.db_raw,
+                table_name,
+                self.s3_raw_path + table_name,
+                True,
+            )
 
     @logger
     def update_clean_amplitude_events(self, date):
@@ -140,12 +100,12 @@ class AmplitudeEvents:
         with open(
             os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
-                "../../db/datalake/queries/amplitude/clean_amplitude_events.sql",
+                "../../db/datalake/queries/amplitude/clean_events.sql",
             )
         ) as f:
             query = f.read()
 
-        table_name = "amplitude_events"
+        table_name = "events"
         df = spark.sql(query.format(self.db_raw, table_name, year, month, day))
 
         len_df = df.count()
@@ -163,7 +123,7 @@ class AmplitudeEvents:
 
     @logger
     def update_filtered_events_table(self, date, event_type):
-        table_name = "amplitude_events"
+        table_name = "events"
         year, month, day = date.year, date.month, date.day
         filtered_event_df = spark.sql(
             "select * from {}.{} where year={} and month={} and day={} and event_type = '{}'".format(
@@ -182,7 +142,7 @@ class AmplitudeEvents:
         partitions = self.get_number_of_partitions(len_df, "clean")
         filtered_event_exploded_df = filtered_event_exploded_df.coalesce(partitions)
 
-        table_name = "amplitude_{}_events".format(event_type)
+        table_name = "{}_events".format(event_type)
         DataFrameService.incremental_write(
             filtered_event_exploded_df,
             AmplitudeEvents.CLEAN_FORMAT,
@@ -191,64 +151,4 @@ class AmplitudeEvents:
             table_name,
             self.s3_clean_path + table_name,
             True,
-        )
-
-    @logger
-    def create_athena_external_table(self, consumer, table, partition_by=None):
-        file_format = AmplitudeEvents.CREATE_QUERY_CLEAN_FORMAT
-
-        drop_query = AmplitudeEvents.DROP_QUERY_TEMPLATE.format(
-            database=self.db_clean, table=table
-        )
-        AthenaClient.execute_athena_query(drop_query, self.db_clean)
-        logger.info(
-            "m=create_athena_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                self.db_clean, table
-            )
-        )
-
-        table_schema = consumer.get_table_schema(table).collect()
-        table_schema = OrderedDict(
-            [
-                (
-                    row["col_name"],
-                    row["col_type"].lower().replace("timestamp", "string"),
-                )
-                for row in table_schema
-            ]
-        )
-
-        columns_section = ",\n  ".join(
-            [
-                "`" + col + "` " + col_type.upper()
-                for col, col_type in table_schema.items()
-                if not partition_by or col not in partition_by
-            ]
-        )
-        partitions_section = ""
-        if partition_by:
-            partitions_section = "PARTITIONED BY (\n  {}\n)".format(
-                ",\n  ".join(
-                    ["`" + col + "` " + table_schema[col] for col in partition_by]
-                )
-            )
-        create_query = AmplitudeEvents.CREATE_QUERY_TEMPLATE.format(
-            database=self.db_clean,
-            table=table,
-            columns=columns_section,
-            partitioned_by=partitions_section,
-            format=file_format,
-            path="{}{}".format(self.s3_clean_path, table),
-        )
-        AthenaClient.execute_athena_query(create_query, self.db_clean)
-        if partition_by:
-            AthenaClient.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(self.db_clean, table),
-                self.db_clean,
-            )
-
-        logger.info(
-            "m=_create_athena_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
-                self.db_clean, table
-            )
         )

@@ -152,7 +152,7 @@ pipeline:
     group: updated_jobs
     image: quintoandar/drone-gcs-sync
     pull: true
-    bucket: us-east4-airflow-prod-3f72afaa-bucket
+    bucket: us-east4-airflow-prod-6fc58ef2-bucket
     source: bietlejuice/jobs/composer/
     target: dags/bietlejuice/jobs/composer/
     delete: true
@@ -169,7 +169,7 @@ pipeline:
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py forno
+      - python scripts/upload_spark_jobs_to_s3.py 5a-databricks-forno
     when:
       event: push
       branch: forno
@@ -179,7 +179,7 @@ pipeline:
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
-      - python scripts/upload_spark_jobs_to_s3.py prod
+      - python scripts/upload_spark_jobs_to_s3.py 5a-databricks
     when:
       event: push
       branch: master
