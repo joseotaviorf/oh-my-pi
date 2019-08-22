@@ -35,6 +35,7 @@ class MarketingFactory(object):
             execution_date=execution_date,
             account=account,
             auth=auth,
+            extra_configs=extra_configs
         )
 
     @staticmethod
