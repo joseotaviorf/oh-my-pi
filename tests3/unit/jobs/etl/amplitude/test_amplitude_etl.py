@@ -1,74 +1,109 @@
 import pytest
 import gzip
 import zipfile
-import os
-import shutil
+from io import BytesIO
+from datetime import datetime
+
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from pyspark.sql.functions import to_json
+
+spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 class TestAmplitudeEvents:
-    @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
-    def test_get_number_of_partitions_raw(self, len_data, amplitude_events):
+    # @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
+    # def test_get_number_of_partitions_raw(self, len_data, amplitude_events):
+    #     # arrange
+    #     expected = max(len_data // amplitude_events.RAW_RECORDS_BY_PARTITION, 1)
+    #
+    #     #act
+    #     result = amplitude_events._get_number_of_partitions(len_data, 'raw')
+    #
+    #     #assert
+    #     assert result == expected
+    #
+    # @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
+    # def test_get_number_of_partitions_clean(self, len_data, amplitude_events):
+    #     # arrange
+    #     expected = max(len_data // amplitude_events.CLEAN_RECORDS_BY_PARTITION, 1)
+    #
+    #     # act
+    #     result = amplitude_events._get_number_of_partitions(len_data, 'clean')
+    #
+    #     # assert
+    #     assert result == expected
+
+    def test_create_raw_events_df(self, amplitude_events, dataframe_service):
         # arrange
-        expected = max(len_data // amplitude_events.RAW_RECORDS_BY_PARTITION, 1)
+        json_file_content = '{"event_properties": {"a": 1, "b": 2}, "c": 3, "server_upload_time": "2019-08-22"}'
+        expected_df_schema = [('event_properties', 'string'),
+                              ('c', 'bigint'),
+                              ('server_upload_time', 'string'),
+                              ('year', 'int'),
+                              ('month', 'int'),
+                              ('day', 'int')]
 
-        #act
-        result = amplitude_events.get_number_of_partitions(len_data, 'raw')
+        # creating gzip_file with json content
+        fgz = BytesIO()
+        gzip_obj = gzip.GzipFile(filename='data.json.gz', mode='wb', fileobj=fgz)
+        gzip_obj.write(json_file_content.encode())
+        gzip_obj.close()
 
-        #assert
-        assert result == expected
-
-    @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
-    def test_get_number_of_partitions_clean(self, len_data, amplitude_events):
-        # arrange
-        expected = max(len_data // amplitude_events.CLEAN_RECORDS_BY_PARTITION, 1)
+        # creating zipfile
+        fz = BytesIO()
+        zip_obj = zipfile.ZipFile(fz, 'w')
+        zip_obj.writestr('data.gz', fgz.getvalue())
+        zip_obj.close()
 
         # act
-        result = amplitude_events.get_number_of_partitions(len_data, 'clean')
+        result_df = amplitude_events.create_raw_events_df(fz, dataframe_service)
+        result_df_schema = result_df.dtypes
 
         # assert
-        assert result == expected
+        assert result_df_schema.sort(key=lambda tup: tup[0]) == expected_df_schema.sort(key=lambda tup: tup[0])
 
-    def test_get_data_from_zip_file(self, amplitude_events):
+    def test_create_clean_amplitude_events(self, spark_sql_consumer, amplitude_events, dataframe_service):
         # arrange
-        json_files = ['{"a": 1, "b": 3}\n{"a": 2, "b": 2}\n', '{"a": 5, "b": 5}']
+        data = [{'a' : 1, 'b': 2}]
+        date = datetime(2019, 8, 22, 0, 0, 0, 0)
 
-        os.makedirs('/tmp/test_get_data_from_zip_file/gzips/', exist_ok=True)
-        for i, file in enumerate(json_files):
-            with gzip.GzipFile('/tmp/test_get_data_from_zip_file/gzips/{}.json.gz'.format(i), 'w') as f:
-                f.write(file.encode())
-
-        zipf = zipfile.ZipFile('/tmp/test_get_data_from_zip_file/gzips.zip', 'w', zipfile.ZIP_DEFLATED)
-        for root, dirs, files in os.walk('/tmp/test_get_data_from_zip_file/gzips/'):
-            for file in files:
-                zipf.write(os.path.join(root, file))
-        zipf.close()
-
-        expected = ['{"a": 1, "b": 3}', '{"a": 2, "b": 2}', '{"a": 5, "b": 5}']
+        df = spark.read.json(sc.parallelize(data, 1))
+        spark_sql_consumer.set_query_result(df)
+        expected_values = [date.year, date.month, date.day, 'events']
+        spark_sql_consumer.query_expected_values(expected_values)
 
         # act
-        with zipfile.ZipFile('/tmp/test_get_data_from_zip_file/gzips.zip', "r") as zip_file:
-            result = amplitude_events.get_data_from_zip_file(zip_file)
-
-        print('>>>>>>>>>', result)
+        result_df = amplitude_events.create_clean_events(date, spark_sql_consumer, dataframe_service)
 
         # assert
-        assert expected.sort() == result.sort()
+        assert type(result_df) == type(df)
 
-        # clean
-        shutil.rmtree('/tmp/test_get_data_from_zip_file/', ignore_errors=True)
 
-    def test_load_events_into_datalake_raw(self, mocked_data_frame_service):
+    def test_create_filtered_events_table(self, spark_sql_consumer, amplitude_events, dataframe_service):
         # arrange
-        json_files = ['{"a": 1, "b": 3}\n{"a": 2, "b": 2}\n', '{"a": 5, "b": 5}']
+        data = [{'event_properties': {'a':1}, 'user_properties': {'b':1}, 'year': 2019, 'month': 8, 'day': 22}]
+        date = datetime(2019, 8, 22, 0, 0, 0, 0)
+        event_type = 'listing_page_viewed'
 
-        os.makedirs('/tmp/test_get_data_from_zip_file/gzips/', exist_ok=True)
-        for i, file in enumerate(json_files):
-            with gzip.GzipFile('/tmp/test_get_data_from_zip_file/gzips/{}.json.gz'.format(i), 'w') as f:
-                f.write(file.encode())
+        df = spark.read.json(sc.parallelize(data, 1))
+        df = df.withColumn('event_properties', to_json(df['event_properties']))
+        df = df.withColumn('user_properties', to_json(df['user_properties']))
 
-        zipf = zipfile.ZipFile('/tmp/test_get_data_from_zip_file/gzips.zip', 'w', zipfile.ZIP_DEFLATED)
-        for root, dirs, files in os.walk('/tmp/test_get_data_from_zip_file/gzips/'):
-            for file in files:
-                zipf.write(os.path.join(root, file))
-        zipf.close()
+        spark_sql_consumer.set_query_result(df)
+        expected_values = [date.year, date.month, date.day, event_type]
+        spark_sql_consumer.query_expected_values(expected_values)
 
-        expected = ['{"a": 1, "b": 3}', '{"a": 2, "b": 2}', '{"a": 5, "b": 5}']
+        expected_df_schema = [('event_a', 'bigint'),
+                              ('user_b', 'bigint'),
+                              ('year', 'int'),
+                              ('month', 'int'),
+                              ('day', 'int')]
+
+        # act
+        result_df = amplitude_events.create_filtered_events_table(date,
+                                                                  event_type,
+                                                                  spark_sql_consumer,
+                                                                  dataframe_service)
+        result_df_schema = result_df.dtypes
+
+        # assert
+        assert result_df_schema.sort(key=lambda tup: tup[0]) == expected_df_schema.sort(key=lambda tup: tup[0])

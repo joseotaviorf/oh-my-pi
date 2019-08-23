@@ -13,11 +13,103 @@ logger = QuintoAndarLogger("DataFrameService")
 
 
 class DataFrameService:
+    def __init__(self, df=None):
+        self.df = df
+
+    def input(self, df):
+        return DataFrameService(df)
+
+    def output(self):
+        return self.df
+
+    @staticmethod
+    def column_name_format(column_name):
+        formatted_name = re.sub(
+            r"\W", "", column_name.replace(" ", "_").replace(".", "_")
+        )
+        formatted_name = re.sub(r"^([A-Z])", r"_\g<1>", formatted_name)
+        formatted_name = re.sub(r"(.)_([A-Z])", r"\g<1>__\g<2>", formatted_name)
+        return formatted_name.lower()
+
+    def columns_name_format(self):
+        if not self.df:
+            raise ValueError("m=columns_name_format, msg=input df is None")
+        existing_names = self.df.schema.fieldNames()
+        new_names = [
+            DataFrameService.column_name_format(name) for name in existing_names
+        ]
+        for existing_name, new_name in zip(existing_names, new_names):
+            self.df = self.df.withColumnRenamed(existing_name, new_name)
+        return DataFrameService(self.df)
+
+    def struct_type_to_json(self):
+        if not self.df:
+            raise ValueError("m=struct_type_to_json, msg=input df is None")
+        for field in self.df.schema.fields:
+            if isinstance(field.dataType, StructType):
+                logger.info(
+                    "m=struct_type_to_json, converting struct {} to json".format(field.name)
+                )
+                self.df = self.df.withColumn(field.name, to_json(self.df[field.name]))
+        return DataFrameService(self.df)
+
+    def explode_json_column(self, json_column, prefix="", format_column_names=False):
+        if not self.df:
+            raise ValueError("m=explode_json_column, msg=input df is None")
+        if json_column not in self.df.schema.fieldNames():
+            raise ValueError(
+                "m=explode_json_column, msg=input json_column does not exists"
+            )
+
+        df_json_column = sqlContext.read.json(
+            self.df.rdd.map(lambda r: getattr(r, json_column))
+        )
+        json_column_names = df_json_column.schema.fieldNames()
+        if not json_column_names:
+            logger.warning("m=explode_json_column, msg=json_column is empty")
+            return DataFrameService(self.df.drop(json_column))
+
+        logger.info(
+            "m=explode_json_column, msg=creating {} columns".format(
+                len(json_column_names)
+            )
+        )
+        json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
+        if format_column_names:
+            json_column_names = [
+                DataFrameService.column_name_format(name) for name in json_column_names
+            ]
+        json_tuple_alias = ", ".join(
+            ["`{}{}`".format(prefix, x) for x in json_column_names]
+        )
+
+        self.df.registerTempTable("tmp_df")
+        query = "select *, json_tuple({}, {}) as ({}) from tmp_df".format(
+            json_column, json_tuple_columns, json_tuple_alias
+        )
+        return DataFrameService(spark.sql(query).drop(json_column))
+
+    def create_year_month_day_columns(self, date_column_name):
+        if not self.df:
+            raise ValueError("m=create_year_month_day_columns, msg=input df is None")
+        return DataFrameService(
+            self.df.withColumn("year", year(col(date_column_name)))
+            .withColumn("month", month(col(date_column_name)))
+            .withColumn("day", dayofmonth(col(date_column_name)))
+        )
+
+    def partition_optimize(self, records_by_partition):
+        len_data = self.df.count()
+        partitions = max(len_data // records_by_partition, 1)
+        if partitions > self.df.rdd.getNumPartitions():
+            return DataFrameService(self.df.repartition(partitions))
+        return DataFrameService(self.df.coalesce(partitions))
+
     @staticmethod
     @logger(exclude="df")
     def make_schema_merging(table_name, db, file_format, path, partition_by_list, df):
         if not df:
-            raise AttributeError("m=make_schema_merging, msg=input df is None")
+            raise ValueError("m=make_schema_merging, msg=input df is None")
         df_aux = spark.sql("select * from {}.{} limit 0".format(db, table_name))
         current_schema = OrderedDict(
             field.simpleString().split(":") for field in df_aux.schema.fields
@@ -61,35 +153,12 @@ class DataFrameService:
         spark.sql("msck repair table {}.{}".format(db, table_name))
 
     @staticmethod
-    def column_name_format(column_name):
-        formatted_name = re.sub(
-            r"\W", "", column_name.replace(" ", "_").replace(".", "_")
-        )
-        formatted_name = re.sub(r"^([A-Z])", r"_\g<1>", formatted_name)
-        formatted_name = re.sub(r"(.)_([A-Z])", r"\g<1>__\g<2>", formatted_name)
-        return formatted_name.lower()
-
-    @staticmethod
-    @logger(exclude="df")
-    def df_columns_name_format(df):
-        if not df:
-            raise AttributeError("m=df_columns_name_format, msg=input df is None")
-        existing_names = df.schema.fieldNames()
-        new_names = [
-            DataFrameService.column_name_format(name) for name in existing_names
-        ]
-
-        for existing_name, new_name in zip(existing_names, new_names):
-            df = df.withColumnRenamed(existing_name, new_name)
-        return df
-
-    @staticmethod
     @logger(exclude="df")
     def incremental_write(
         df, file_format, partition_by_list, db, table_name, path, schema_merging=False
     ):
         if not df:
-            raise AttributeError("m=incremental_write, msg=input df is None")
+            raise ValueError("m=incremental_write, msg=input df is None")
         write_df = (
             df.write.mode("overwrite")
             .format(file_format)
@@ -118,68 +187,4 @@ class DataFrameService:
             "m=incremental_write, write finished, new data in: s3 path={} partitions={}".format(
                 path, str(partition_by_list)
             )
-        )
-
-    @staticmethod
-    @logger(exclude="df")
-    def df_struct_type_to_json(df):
-        if not df:
-            raise AttributeError("m=df_struct_type_to_json, msg=input df is None")
-        for f in df.schema.fields:
-            if isinstance(f.dataType, StructType):
-                logger.info(
-                    "m=df_struct_type_to_json, converting struct {} to json".format(
-                        f.name
-                    )
-                )
-                df = df.withColumn(f.name, to_json(df[f.name]))
-        return df
-
-    @staticmethod
-    @logger(exclude="df")
-    def explode_json_column(df, json_column, prefix="", format_column_names=False):
-        if not df:
-            raise AttributeError("m=explode_json_column, msg=input df is None")
-        if json_column not in df.schema.fieldNames():
-            raise AttributeError("m=explode_json_column, msg=input json_column does not exists")
-
-        df_json_column = sqlContext.read.json(
-            df.rdd.map(lambda r: getattr(r, json_column))
-        )
-        json_column_names = df_json_column.schema.fieldNames()
-        if not json_column_names:
-            logger.warning("m=explode_json_column, msg=json_column is empty")
-            return df.drop(json_column)
-
-        logger.info(
-            "m=explode_json_column, msg=creating {} columns".format(
-                len(json_column_names)
-            )
-        )
-        json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
-        if format_column_names:
-            json_column_names = [
-                DataFrameService.column_name_format(name) for name in json_column_names
-            ]
-        json_tuple_alias = ", ".join(
-            ["`{}{}`".format(prefix, x) for x in json_column_names]
-        )
-
-        df.registerTempTable("tmp_df")
-        query = "select *, json_tuple({}, {}) as ({}) from tmp_df".format(
-            json_column, json_tuple_columns, json_tuple_alias
-        )
-        return spark.sql(query).drop(json_column)
-
-    @staticmethod
-    @logger(exclude="df")
-    def df_create_year_month_day_columns(df, date_column_name):
-        if not df:
-            raise AttributeError(
-                "m=df_create_year_month_day_columns, msg=input df is None"
-            )
-        return (
-            df.withColumn("year", year(col(date_column_name)))
-            .withColumn("month", month(col(date_column_name)))
-            .withColumn("day", dayofmonth(col(date_column_name)))
         )

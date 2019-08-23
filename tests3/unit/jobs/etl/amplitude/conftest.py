@@ -1,12 +1,36 @@
 import pytest
 
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.base.spark import DataFrameService
 
-class MockedDataFrameService():
-    @staticmethod
-    def incremental_write(df, file_format, partition_by_list, db, table_name, path, schema_merging=False):
-        return
+class MockedSparkSqlConsumer():
+
+    def __init__(self):
+        self.result = None
+        self.query_values = None
+
+    def set_query_result(self, result):
+        self.result = result
+
+    def query_expected_values(self, values):
+        self.query_values = values
+
+    def get_data_from_query(self, query):
+        if self.query_values:
+            for value in self.query_values:
+                if str(value) not in query:
+                    raise ValueError("m=get_data_from_query, msg= key value={} not in query, query={}"
+                                     .format(value, query))
+        return self.result
 
 @pytest.fixture()
 def amplitude_events():
     return AmplitudeEvents()
+
+@pytest.fixture()
+def spark_sql_consumer():
+    return MockedSparkSqlConsumer()
+
+@pytest.fixture()
+def dataframe_service():
+    return DataFrameService()
