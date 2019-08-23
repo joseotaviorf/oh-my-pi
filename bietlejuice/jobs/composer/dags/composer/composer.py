@@ -52,7 +52,6 @@ def move_data_subdag(subdag_name, **kwargs):
         filename="data.json",
         s3_file_path="raw/composer/{}".format(table_name),
         mysql_conn_id="airflow_db",
-        gzip=True,
     )
 
     ddl_query_raw = BaseETL.get_query_from_file_name(
