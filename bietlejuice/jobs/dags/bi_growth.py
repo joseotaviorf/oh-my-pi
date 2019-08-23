@@ -3,16 +3,19 @@ from datetime import datetime
 from airflow.executors import LocalExecutor
 from airflow.models import DAG
 from airflow.operators.subdag_operator import SubDagOperator
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.amplitude.active_users import ActiveUsers
 from bietlejuice.jobs.etl.amplitude.engaged_users import EngagedUsers
-from bietlejuice.jobs.etl.amplitude.listings_unique_page_views import ListingsWithPageViews
-from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews, OwnerLandingViewsBV
+from bietlejuice.jobs.etl.amplitude.listings_unique_page_views import \
+    ListingsWithPageViews
+from bietlejuice.jobs.etl.amplitude.owner_landing_views import OwnerLandingViews, \
+    OwnerLandingViewsBV
 from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.etl.growth.incurred import Growth
 from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
-from qa_python_utils import QuintoAndarLogger
 
 env.set_airflow_var_to_local_env('BI_DW')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
@@ -489,15 +492,15 @@ ongoing_stranded_listings_sub_dag = get_sub_dag_operator(sub_dag_func_with_filte
 #                                              'engaged_users', 'top_funnel', None, truncate_engaged_users_table)
 
 # Amplitude engaged users
-amplitude_listings_unique_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
-                                                                          materialize_listings_unique_page_views_table_query,
-                                                                          'amplitude_listings_unique_page_views_previous',
-                                                                          'top_funnel', None,
-                                                                          truncate_listings_unique_page_views_table)
-listings_unique_page_views_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
-                                                          materialize_growth_measure_table_query,
-                                                          'listings_unique_page_views', 'top_funnel', None,
-                                                          truncate_listings_unique_page_views_table)
+# amplitude_listings_unique_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
+#                                                                           materialize_listings_unique_page_views_table_query,
+#                                                                           'amplitude_listings_unique_page_views_previous',
+#                                                                           'top_funnel', None,
+#                                                                           truncate_listings_unique_page_views_table)
+# listings_unique_page_views_sub_dag = get_sub_dag_operator(sub_dag_func_with_filters,
+#                                                           materialize_growth_measure_table_query,
+#                                                           'listings_unique_page_views', 'top_funnel', None,
+#                                                           truncate_listings_unique_page_views_table)
 
 # Amplitude schedule page views
 amplitude_schedule_page_views_previous_task = get_sub_dag_operator(sub_dag_func_amplitude,
@@ -624,15 +627,15 @@ amplitude_schedule_page_views_previous_task >> schedule_page_views_sub_dag
 amplitude_active_users_previous_task >> active_users_sub_dag
 amplitude_owner_landing_views_previous_task >> owner_landing_views_sub_dag
 amplitude_owner_landing_views_bv_previous_task >> owner_landing_views_bv_sub_dag
-amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views_sub_dag
+# amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views_sub_dag
 
 # measures flow
 (leads_sub_dag >> new_listings_sub_dag >> new_listings_landing_sub_dag >> new_listings_landing_bv_sub_dag >>
- opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> ongoing_contracts_sub_dag)
+ opportunities_sub_dag >> prospects_sub_dag >> qualifieds_sub_dag >> approved_by_insurer_sub_dag >> documentation_sent_sub_dag >> ongoing_contracts_sub_dag)
 
 (schedule_page_views_sub_dag >> active_users_sub_dag >> owner_landing_views_sub_dag >>
- owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> approved_by_insurer_sub_dag >>
- documentation_sent_sub_dag)
+ # owner_landing_views_bv_sub_dag >> listings_unique_page_views_sub_dag >> approved_by_insurer_sub_dag >>
+ owner_landing_views_bv_sub_dag)
 
 (offerers_sub_dag >> offerers_approved_sub_dag >> offerers_sent_doc_sub_dag >> offers_approved_sub_dag >>
  offers_submitted_sub_dag >> tenant_prospects_sub_dag >> tenants_sub_dag >> ended_rentals_sub_dag)
@@ -640,7 +643,7 @@ amplitude_listings_unique_page_views_previous_task >> listings_unique_page_views
 (visitors_sub_dag >> visits_booked_sub_dag >> visits_completed_sub_dag >> ongoing_listings_sub_dag >>
  ongoing_stranded_listings_sub_dag)
 
-fact_task.set_upstream([ongoing_contracts_sub_dag, documentation_sent_sub_dag,
+fact_task.set_upstream([ongoing_contracts_sub_dag, owner_landing_views_bv_sub_dag,
                         ended_rentals_sub_dag, ongoing_stranded_listings_sub_dag])
 
 fact_task >> fact_append_task
