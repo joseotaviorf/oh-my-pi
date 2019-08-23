@@ -180,6 +180,7 @@ from
 		and DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 	union all
     select
+     distinct
       i.id as imovel_id,
       l.id as lead_id,
       l.status as lead_status,
