@@ -12,6 +12,7 @@ create table public.fact_house_listing_flows (
 	dt_lead timestamp without time zone,
 	dt_prospect timestamp without time zone,
 	dt_first_inside_sales_contact timestamp without time zone,
+	dt_first_contact timestamp without time zone,
 	dt_conversion timestamp without time zone,
 	dt_qualified timestamp without time zone,
 	dt_opportunity timestamp without time zone,

@@ -10,6 +10,7 @@ select
 	dt_lead,
 	dt_prospect,
 	dt_first_inside_sales_contact,
+	dt_first_contact,
 	dt_conversion,
 	dt_qualified,
 	dt_opportunity,
@@ -45,15 +46,15 @@ select
 	end as funnel_step,
 	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/60,1) as hours_lead_to_prospect,
   round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/60,1) as hours_prospect_to_qualified,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/60,1) as hours_lead_to_first_inside_sales_contact_hours,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/60,1) as hours_prospect_to_first_inside_sales_contact,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_contact)/60,1) as hours_lead_to_first_contact_hours,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_contact)/60,1) as hours_prospect_to_first_contact,
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/60,1) as hours_qualified_to_opportunity,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/60,1) as hours_opportunity_to_listing,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/60,1) as hours_lead_to_listing,
 	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_prospect)/1440,1) as days_lead_to_prospect,
   round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_qualified)/1440,1) as days_prospect_to_qualified,
-	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_inside_sales_contact)/1440,1) as days_lead_to_first_inside_sales_contact_days,
-  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_inside_sales_contact)/1440,1) as days_prospect_to_first_inside_sales_contact,
+	round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_contact)/1440,1) as days_lead_to_first_contact_days,
+  round(TIMESTAMPDIFF(MINUTE, dt_prospect, dt_first_contact)/1440,1) as days_prospect_to_first_contact,
   round(TIMESTAMPDIFF(MINUTE, dt_qualified, dt_opportunity)/1440,1) as days_qualified_to_opportunity,
   round(TIMESTAMPDIFF(MINUTE, dt_opportunity, dt_first_listing)/1440,1) as days_opportunity_to_listing,
   round(TIMESTAMPDIFF(MINUTE, dt_lead, dt_first_listing)/1440,1) as days_lead_to_listing,
@@ -81,6 +82,7 @@ from
 		base.dt_lead,
 		base.dt_prospect,
 		base.dt_first_inside_sales_contact,
+		base.dt_first_contact,
 		base.dt_conversion,
 		case
 			when (
@@ -119,6 +121,7 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
+			null as dt_first_contact,
 			null as dt_first_inside_sales_contact,
 			null as dt_conversion,
 			case
@@ -195,7 +198,8 @@ from
         when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
         else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
       end as dt_prospect,
-      isc.dt dt_first_inside_sales_contact,
+      isc.dt as dt_first_inside_sales_contact,
+      fsc.dt as dt_first_contact,
       coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
       case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         when cl.leadConvertido_id is not null
@@ -315,6 +319,19 @@ from
       ) isc
       on isc.id = l.id
     left join
+      (
+        select
+          la.id,
+          min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
+        from
+          Lead_AUD la
+        where
+          (status in ('Prospeccao','Descartado')
+            and reason not in ('OWNER_WONT_ANSWER_PHONE','OWNER_DIDNT_ANSWER_PHONE','ProprietarioNaoAtende','ProprietarioNuncaAtende','CONTACT_DIDNT_EXIST')) or status = 'Convertido'
+        group by la.id
+      ) fsc
+      on fsc.id = l.id
+    left join
       DadosAfiliado da
       on da.id = l.afiliadoQueIndicou_id
     left join
@@ -398,6 +415,7 @@ from
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
 			coalesce(cl.criadoEm, cl.dataConversao) as dt_first_inside_sales_contact,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_first_contact,
 			coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
 			coalesce(cl.criadoEm, cl.dataConversao) as dt_qualified,
 			null as dt_discarded,
