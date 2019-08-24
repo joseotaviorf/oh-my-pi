@@ -26,13 +26,15 @@ class ClassifiedsCosts(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, account=None, auth=None):
+    def __init__(self, s3_bucket, execution_date, account=None, auth=None,
+                 extra_configs=None):
         self.auth = auth
         self.google_api_scope = 'https://www.googleapis.com/auth/spreadsheets.readonly'
         # simulate first day of the month
         execution_date = execution_date.replace(day=1)
         self.sheet_name = execution_date.strftime('%Y-%m-%d')
-        super(ClassifiedsCosts, self).__init__(s3_bucket, execution_date, 'classifieds_costs', account)
+        super(ClassifiedsCosts, self).__init__(s3_bucket, execution_date,
+                                               'classifieds_costs', account)
 
     @logger(exclude='sheet_id')
     def _get_google_sheets_data(self, sheet_id):
