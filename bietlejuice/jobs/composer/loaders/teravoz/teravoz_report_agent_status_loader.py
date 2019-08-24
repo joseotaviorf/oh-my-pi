@@ -5,16 +5,19 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 
 from quintoandar_logger import QuintoAndarLogger
-
+from quintoandar_teravoz_client import TeravozClient
 
 logger = QuintoAndarLogger("TeravozReportAgentStatusLoader")
 
+# spark instances
+sc = BaseSparkContext.sc
 spark = BaseSparkContext.spark
+sqlContext = BaseSparkContext.sqlContext
 
 
 class TeravozReportAgentStatusLoader(TeravozLoader):
     PARAMS = {
-        "queue_number": "600",
+        "queue_number": "{queue_number}",
         "start_date": "{start_date}",
         "end_date": "{end_date}",
     }
@@ -60,7 +63,7 @@ class TeravozReportAgentStatusLoader(TeravozLoader):
                   }
             return: data in json format
         """
-        endpoint = endpoint.replace("-","_")
+        endpoint = endpoint.replace("-", "_")
         response_list = []
         list_queue_numbers = self.get_queue_numbers()
 
