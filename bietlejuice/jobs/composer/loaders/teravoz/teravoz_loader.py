@@ -42,19 +42,24 @@ class TeravozLoader:
             return: data in json format
         """
 
-        json = getattr(self.api_instance, endpoint)(**params).get()
-        json_data = json().data
+        response = getattr(self.api_instance, endpoint)(**params).get()
+        response_list = []
 
-        if endpoint in json_data.keys():
-            key = endpoint
-        elif "list" in json_data.keys():
-            key = "list"
-        elif "result" in json_data.keys():
-            key = "result"
-        elif "queues" in json_data.keys():
-            key = "queues"
-
-        jsonRDD = sc.parallelize(json_data[key])
+        for page in response().pages():
+            json_data = page().data
+            
+            if endpoint in json_data.keys():
+                key = endpoint
+            elif "list" in json_data.keys():
+                key = "list"
+            elif "result" in json_data.keys():
+                key = "result"
+            elif "queues" in json_data.keys():
+                key = "queues"
+        
+            response_list.append(json_data[key])
+        
+        jsonRDD = sc.parallelize(response_list, 1)
         df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
 
         return df
