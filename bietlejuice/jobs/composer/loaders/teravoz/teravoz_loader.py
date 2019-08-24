@@ -1,5 +1,8 @@
+from pyspark.sql.functions import lit
+
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
+
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 
@@ -48,6 +51,8 @@ class TeravozLoader:
             key = "list"
         elif "result" in json_data.keys():
             key = "result"
+        elif "queues" in json_data.keys():
+            key = "queues"
 
         jsonRDD = sc.parallelize(json_data[key])
         df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
@@ -92,14 +97,16 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
+        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
+    @staticmethod
     @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
-        """
-            create columns into df that contains the table partitions values,
-            the method should be implemented in heiress class
-        """
-        raise NotImplementedError
+
+        for partition_name, partition_value in partitions.items():
+            df = df.withColumn(partition_name, lit(partition_value))
+
+        return df
 
     @logger
     def _create_spark_table_and_load_data_to_s3(
