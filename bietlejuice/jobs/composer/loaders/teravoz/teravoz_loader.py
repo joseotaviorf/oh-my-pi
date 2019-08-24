@@ -47,7 +47,7 @@ class TeravozLoader:
 
         for page in response().pages():
             json_data = page().data
-            
+
             if endpoint in json_data.keys():
                 key = endpoint
             elif "list" in json_data.keys():
@@ -56,9 +56,9 @@ class TeravozLoader:
                 key = "result"
             elif "queues" in json_data.keys():
                 key = "queues"
-        
+
             response_list.append(json_data[key])
-        
+
         jsonRDD = sc.parallelize(response_list, 1)
         df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
 
