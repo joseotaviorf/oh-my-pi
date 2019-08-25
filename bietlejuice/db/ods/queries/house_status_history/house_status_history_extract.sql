@@ -126,6 +126,7 @@ select
 	i.suspensionReason,
 	i.areaTerreno,
 	i_aud.REV,
+	cast(from_unixtime(ure.timestamp/1000) as date) as date_status_changed,
 	case when i_aud.status = 'publicado' 
     then from_unixtime(ure_cd.timestamp/1000)
     else from_unixtime(ure_lpub_cd.timestamp/1000)
