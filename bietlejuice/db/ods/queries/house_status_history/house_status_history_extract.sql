@@ -129,7 +129,7 @@ select
 	case when i_aud.status = 'publicado' 
     then from_unixtime(ure_cd.timestamp/1000)
     else from_unixtime(ure_lpub_cd.timestamp/1000)
-  end as "datePublication",
+  end as datePublication,
   case when i_aud.status = 'publicado' then 1 else 0 end as published,
   from_unixtime(ure_cd.timestamp/1000) as status_time,
   date(from_unixtime(ure_cd.timestamp/1000)) as status_date,
