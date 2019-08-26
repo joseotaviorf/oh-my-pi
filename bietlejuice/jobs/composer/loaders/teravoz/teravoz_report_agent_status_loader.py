@@ -46,12 +46,6 @@ class TeravozReportAgentStatusLoader(TeravozLoader):
         self.PARTITIONS["day"] = self.PARTITIONS["day"].format(day=dt_execution.day)
         self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
 
-    @staticmethod
-    @logger
-    def get_queue_numbers():
-        df = spark.sql("select number from datalake_teravoz_raw.queues")
-        return df.select("number").collect()
-
     @logger
     def request_api_and_get_dataframe(self, endpoint):
         """
@@ -65,7 +59,7 @@ class TeravozReportAgentStatusLoader(TeravozLoader):
         """
         endpoint = endpoint.replace("-", "_")
         response_list = []
-        list_queue_numbers = self.get_queue_numbers()
+        list_queue_numbers = super().get_queue_numbers()
 
         for queue in list_queue_numbers:
             self.PARAMS["queue_number"] = queue.number

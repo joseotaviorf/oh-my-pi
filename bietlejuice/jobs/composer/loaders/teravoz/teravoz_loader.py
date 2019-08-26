@@ -106,6 +106,16 @@ class TeravozLoader:
 
     @staticmethod
     @logger
+    def get_queue_numbers():
+        """
+            This method is required for report tables, because
+            their endpoints parametrize the queue number.
+        """
+        df = spark.sql("select number from datalake_teravoz_raw.queues")
+        return df.select("number").collect()
+
+    @staticmethod
+    @logger
     def _create_dataframe_columns_to_partition_table(df, partitions):
 
         for partition_name, partition_value in partitions.items():

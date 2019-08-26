@@ -43,16 +43,10 @@ class TeravozReportsLoader(TeravozLoader):
         )
         self.PARTITIONS["day"] = self.PARTITIONS["day"].format(day=dt_execution.day)
 
-    @staticmethod
-    @logger
-    def get_queue_numbers():
-        df = spark.sql("select number from datalake_teravoz_raw.queues")
-        return df.select("number").collect()
-
     @logger
     def request_api_and_get_dataframe(self, endpoint):
 
-        list_queue_numbers = self.get_queue_numbers()
+        list_queue_numbers = super().get_queue_numbers()
 
         list_queues = []
         for queue in list_queue_numbers:
