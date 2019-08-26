@@ -40,8 +40,11 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.4-py3-none-any.whl"
-    }
+        "whl": "s3://5a-artifacts/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
+    },
+    {
+        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.5-py3-none-any.whl"
+    },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
@@ -126,6 +129,9 @@ report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
 report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
 )
+report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=sub_dag
+)
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -134,7 +140,11 @@ create_cluster_task.set_downstream(
     [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
 )
 queues_sub_dag_task.set_downstream(
-    [report_agent_performance_sub_dag_task, report_queue_stats_sub_dag_task]
+    [
+        report_agent_performance_sub_dag_task,
+        report_queue_stats_sub_dag_task,
+        report_agent_status_sub_dag_task,
+    ]
 )
 terminate_cluster_task.set_upstream(
     [
