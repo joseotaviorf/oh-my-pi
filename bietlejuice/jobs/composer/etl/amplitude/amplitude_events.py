@@ -9,7 +9,6 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameServ
 logger = QuintoAndarLogger("AmplitudeEvents")
 
 spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
-spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 
 
 class AmplitudeEvents:

@@ -15,6 +15,9 @@ class MetastoreService:
     def __init__(self, db):
         self.db = db
 
+    def get_table_names(self):
+        sqlContext.tableNames(dbName=self.db)
+
     @logger(exclude="df")
     def make_schema_merging(self, table_name, file_format, path, partition_by_list, df):
         if not df:
