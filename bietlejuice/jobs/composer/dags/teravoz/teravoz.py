@@ -40,8 +40,11 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.4-py3-none-any.whl"
-    }
+        "whl": "s3://5a-artifacts/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
+    },
+    {
+        "whl": "s3://5a-artifacts/teravoz-client/quintoandar_teravoz_client-0.1.5-py3-none-any.whl"
+    },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
@@ -58,7 +61,7 @@ dag = DAG(
 )
 
 
-def raw_sub_dag(sub_dag_name, **kwargs):
+def sub_dag(sub_dag_name, **kwargs):
 
     local_dag = BaseSubDAG(
         bucket=S3_BUCKET,
@@ -109,18 +112,26 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 )
 
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="calls", sub_dag_func=raw_sub_dag
+    dag=dag, sub_dag_name="calls", sub_dag_func=sub_dag
 )
 queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="queues", sub_dag_func=raw_sub_dag
+    dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag
 )
 peers_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="peers", sub_dag_func=raw_sub_dag
+    dag=dag, sub_dag_name="peers", sub_dag_func=sub_dag
 )
 ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="ddrs", sub_dag_func=raw_sub_dag
+    dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag
 )
-
+report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="report-agent-performance", sub_dag_func=sub_dag
+)
+report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
+)
+report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=sub_dag
+)
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -128,6 +139,19 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 create_cluster_task.set_downstream(
     [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
 )
+queues_sub_dag_task.set_downstream(
+    [
+        report_agent_performance_sub_dag_task,
+        report_queue_stats_sub_dag_task,
+        report_agent_status_sub_dag_task,
+    ]
+)
 terminate_cluster_task.set_upstream(
-    [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
+    [
+        calls_sub_dag_task,
+        report_agent_performance_sub_dag_task,
+        report_queue_stats_sub_dag_task,
+        peers_sub_dag_task,
+        ddrs_sub_dag_task,
+    ]
 )
