@@ -1,5 +1,4 @@
 import re
-from collections import OrderedDict
 
 from pyspark.sql.functions import col, year, month, dayofmonth, to_json
 from pyspark.sql.types import StructType
@@ -48,7 +47,9 @@ class DataFrameService:
         for field in self.df.schema.fields:
             if isinstance(field.dataType, StructType):
                 logger.info(
-                    "m=struct_type_to_json, converting struct {} to json".format(field.name)
+                    "m=struct_type_to_json, converting struct {} to json".format(
+                        field.name
+                    )
                 )
                 self.df = self.df.withColumn(field.name, to_json(self.df[field.name]))
         return DataFrameService(self.df)
@@ -104,4 +105,3 @@ class DataFrameService:
         if partitions > self.df.rdd.getNumPartitions():
             return DataFrameService(self.df.repartition(partitions))
         return DataFrameService(self.df.coalesce(partitions))
-

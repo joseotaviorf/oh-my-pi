@@ -1,8 +1,5 @@
-import re
 from collections import OrderedDict
 
-from pyspark.sql.functions import col, year, month, dayofmonth, to_json
-from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
@@ -11,15 +8,18 @@ spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 logger = QuintoAndarLogger("MetastoreService")
 
+
 class MetastoreService:
-    def __init__(self, db):
+    def __init__(self, db, db_path, spark_sql_client):
         self.db = db
+        self.db_path = db_path
+        self.spark_sql_client = spark_sql_client
 
     def get_table_names(self):
         sqlContext.tableNames(dbName=self.db)
 
     @logger(exclude="df")
-    def make_schema_merging(self, table_name, file_format, path, partition_by_list, df):
+    def make_schema_merging(self, table_name, file_format, partition_by_list, df):
         if not df:
             raise ValueError("m=make_schema_merging, msg=input df is None")
         df_aux = spark.sql("select * from {}.{} limit 0".format(self.db, table_name))
@@ -53,13 +53,22 @@ class MetastoreService:
         )
         partitions_ddl = ", ".join(partition_by_list)
         ddl = "create table {}.{} ({}) using {} partitioned by ({}) location '{}'".format(
-            self.db, table_name, columns_ddl, file_format, partitions_ddl, path
+            self.db,
+            table_name,
+            columns_ddl,
+            file_format,
+            partitions_ddl,
+            self.db_path + table_name,
         )
         logger.info(
             "m=make_schema_merging, the schema is incompatible, new table definition: \n{}".format(
                 ddl
             )
         )
-        spark.sql("drop table {}.{}".format(self.db, table_name))
-        spark.sql(ddl)
-        spark.sql("msck repair table {}.{}".format(self.db, table_name))
+
+        self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
+        self.spark_sql_client.run(ddl)
+        self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
+
+    def update_table_partitions(self, table_name):
+        self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))

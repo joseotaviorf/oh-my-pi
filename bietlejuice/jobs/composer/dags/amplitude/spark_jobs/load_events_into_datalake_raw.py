@@ -8,10 +8,13 @@ from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from bietlejuice.jobs.composer.base.spark import DataFrameService
+from bietlejuice.jobs.composer.base.spark import DataFrameService, MetastoreService
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
+from bietlejuice.jobs.composer.loaders import DataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.base.spark import TableStorageFormat
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -40,9 +43,12 @@ if __name__ == "__main__":
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
     spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_info["db_raw_databricks"]))
-    amplitude_events = AmplitudeEvents(
-        db_raw=db_info["db_raw_databricks"], s3_raw_path=db_info["db_raw_path"]
-    )
+    amplitude_events = AmplitudeEvents()
+    spark_sql_client = SparkSQLCLient(spark)
+    dataframe_service = DataFrameService()
+    metastore_service = MetastoreService(db_info["db_raw_databricks"], db_info["db_raw_path"], spark_sql_client)
+    dataframe_loader = DataframeIntoDatalakeLoader(TableStorageFormat.DEFAULT_RAW, metastore_service)
+    table_name = 'events'
 
     logger.info(
         "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
@@ -58,4 +64,7 @@ if __name__ == "__main__":
         amplitude_export_api = AmplitudeExportApi(key["app_key"], key["secret_key"])
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
         file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
-        amplitude_events.load_events_into_datalake_raw(file_from_api, DataFrameService)
+
+        df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+        dataframe_loader.partition_overwrite_load(df, ["year", "month", "day", "app"], table_name, True)
+        metastore_service.update_table_partitions(table_name)
