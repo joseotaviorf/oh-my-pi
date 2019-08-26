@@ -1,6 +1,6 @@
 class TableStorageFormat:
     JSON = {
-        "format": "ROW FORMAT  serde 'org.apache.hive.hcatalog.data.JsonSerDe'",
+        "format": "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'",
         "properties": "",
     }
     PARQUET = {
