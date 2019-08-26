@@ -37,7 +37,7 @@ quintoandar_listings AS (
       regexp_extract(trim(house_number), '\d+$')
       , '') != ''
     AND COALESCE(house_bedrooms, '') != ''
-    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '7' DAY -- our listings pulished in the last 7 days
+    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '1' DAY -- our listings pulished in the last 1 days
   GROUP BY 1, 2, 3, 4, 5, 6
 ),
 first_listings AS (
@@ -60,7 +60,7 @@ first_listings AS (
     ) as tmp
   WHERE
     row = 1  -- get the first time it was crawled
-    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '1' DAY  -- and only listings posted or updated in the last 1 days
+    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
 ),
 crawled_listings AS (
   SELECT
@@ -78,19 +78,25 @@ crawled_listings AS (
         lng,
         nb_street,
         photos,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row,
+        ROW_NUMBER() OVER(PARTITION BY description, website, advertiser_id, price) AS ad_deduplication_row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
         AND COALESCE(rent, '') != ''
-        AND started_on >= CURRENT_DATE - INTERVAL '1' DAY  -- only query listings from crawler jobs started in the last 1 days
+        AND COALESCE(nb_street, '') != ''
+        AND COALESCE(lat, '') != ''
+        AND COALESCE(lng, '') != ''
+        AND COALESCE(bedrooms, '') != ''
+        AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
         AND COALESCE(photos, '') != ''
         AND cardinality(split(photos, ',')) > 4  -- crawled listing must have at least 4 photos
     ) as listings
   JOIN first_listings ON listings.id = first_listings.id
   WHERE
     listings.row = 1  -- get the first time it was crawled within last 120 days
-    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '1' DAY  -- and only listings posted or updated in the last 1 days
+    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
+    AND listings.ad_deduplication_row = 1  -- we employ this heuristic to try to deduplicate listings even if they have different ids
 ),
 quintoandar_join_crawled AS
 (
