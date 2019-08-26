@@ -83,7 +83,7 @@ unit-tests-python3:
 	@echo "Automated Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest --cov=bietlejuice/jobs/composer --cov-report html:htmlcov --cov-fail-under=10 --cov-config .coveragerc tests3
+	@python -m pytest --cov=bietlejuice/jobs/composer --cov-fail-under=10 --cov-config .coveragerc tests3
 
 ############# common commands #######################
 
