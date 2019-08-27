@@ -1,6 +1,7 @@
 import time
 
 import boto3
+
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("AthenaClient")
@@ -100,34 +101,55 @@ class AthenaClient:
 
     @staticmethod
     @logger
+    def create_database(database):
+        create_query = "CREATE DATABASE IF NOT EXISTS {};".format(database)
+        AthenaClient.execute_athena_query(create_query, database)
+        logger.info(
+            "m=create_database, database={}, msg=The schema was created successfully in Athena".format(
+                database
+            )
+        )
+
+    @staticmethod
+    @logger
     def create_external_table(
         database, table_name, s3_table_path, table_schema, partition_by, base_format
     ):
-        create_query = """
-            CREATE EXTERNAL TABLE
-            `{database}`.`{table}`
-            (
-              {columns}
-            )
-            {partitioned_by}
-            {format}
-            LOCATION '{path}'
-            {properties}
-            ;"""
 
-        columns_section = ",\n  ".join(
+        """
+            Create automatic ddl for Athena tables. Params descriptions:
+
+            database: database from Athena table,
+            table_name: table name for the Athena table created,
+            s3_table_path: files location for Athena table created
+            table_schema: dict with spark table schema
+            partition_by: list with columns to partition the table
+            base_format: dict with file format and additional properties
+        """
+
+        create_query = (
+            "\nCREATE EXTERNAL TABLE IF NOT EXISTS `{database}`.`{table}`("
+            "\n{columns}"
+            "\n) {partitioned_by}"
+            "\n{format} {serdeproperties}"
+            "\nLOCATION '{path}';"
+        )
+
+        # columns builder
+        columns_section = ",\n".join(
             [
-                "`" + col + "` " + col_type.upper()
+                "  `" + col + "` " + col_type
                 for col, col_type in table_schema.items()
                 if not partition_by or col not in partition_by
             ]
         )
 
+        # partitions builder
         partitions_section = ""
         if partition_by:
-            partitions_section = "PARTITIONED BY (\n  {}\n)".format(
+            partitions_section = "\nPARTITIONED BY (\n  {}\n)".format(
                 ",\n  ".join(
-                    ["`" + col + "` " + table_schema[col] for col in partition_by]
+                    [" `" + col + "` " + table_schema[col] for col in partition_by]
                 )
             )
 
@@ -138,9 +160,13 @@ class AthenaClient:
             partitioned_by=partitions_section,
             format=base_format["format"],
             path=s3_table_path,
-            properties=base_format["properties"],
+            serdeproperties=base_format["properties"],
         )
 
+        # create database if not exists
+        AthenaClient.create_database(database)
+
+        # create table
         AthenaClient.execute_athena_query(create_query, database)
         logger.info(
             "m=create_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
