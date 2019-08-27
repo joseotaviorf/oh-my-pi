@@ -14,9 +14,9 @@ class DataframeIntoDatalakeLoader:
         self.metastore_service = metastore_service
 
     def _save_as_table_write_df(self, write_df, table_name):
-        write_df.option("path", self.metastore_service.db_path + table_name).saveAsTable(
-            "{}.{}".format(self.metastore_service.db, table_name)
-        )
+        write_df.option(
+            "path", self.metastore_service.db_path + table_name
+        ).saveAsTable("{}.{}".format(self.metastore_service.db, table_name))
 
     def _save_write_df(self, write_df, table_name):
         write_df.save(self.metastore_service.db_path + table_name)
@@ -34,7 +34,7 @@ class DataframeIntoDatalakeLoader:
             .partitionBy(*partition_by_list)
         )
 
-        self.metastore_service.create_database() # if not exists
+        self.metastore_service.create_database()  # if not exists
         if table_name not in self.metastore_service.get_table_names():
             logger.info(
                 "m=partition_overwrite_load, db={}, table_name={}, ".format(

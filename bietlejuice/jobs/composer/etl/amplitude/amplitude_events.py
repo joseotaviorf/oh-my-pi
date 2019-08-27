@@ -44,16 +44,12 @@ class AmplitudeEvents:
     @logger(exclude="keys")
     def create_raw_events_df(self, file_from_api, dataframe_service):
         if not file_from_api:
-            logger.warning(
-                "m=create_raw_events_df, msg=Empty file to load in datalake"
-            )
+            logger.warning("m=create_raw_events_df, msg=Empty file to load in datalake")
             return
         with zipfile.ZipFile(file_from_api, "r") as zip_file:
             data = self._get_data_from_zip_file(zip_file)
             len_data = len(data)
-            logger.info(
-                "m=create_raw_events_df, got {} events".format(len_data)
-            )
+            logger.info("m=create_raw_events_df, got {} events".format(len_data))
             n = max(len_data // AmplitudeEvents.RAW_RECORDS_BY_PARTITION, 1)
             logger.info(
                 "m=create_raw_events_df, the dataframe will be written in {} partitions".format(

@@ -11,28 +11,6 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class TestAmplitudeEvents:
-    # @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
-    # def test_get_number_of_partitions_raw(self, len_data, amplitude_events):
-    #     # arrange
-    #     expected = max(len_data // amplitude_events.RAW_RECORDS_BY_PARTITION, 1)
-    #
-    #     #act
-    #     result = amplitude_events._get_number_of_partitions(len_data, 'raw')
-    #
-    #     #assert
-    #     assert result == expected
-    #
-    # @pytest.mark.parametrize('len_data', [0, 1, 1000, 100000])
-    # def test_get_number_of_partitions_clean(self, len_data, amplitude_events):
-    #     # arrange
-    #     expected = max(len_data // amplitude_events.CLEAN_RECORDS_BY_PARTITION, 1)
-    #
-    #     # act
-    #     result = amplitude_events._get_number_of_partitions(len_data, 'clean')
-    #
-    #     # assert
-    #     assert result == expected
-
     def test_create_raw_events_df(self, amplitude_events, dataframe_service):
         # arrange
         json_file_content = '{"event_properties": {"a": 1, "b": 2}, "c": 3, "server_upload_time": "2019-08-22"}'
@@ -66,7 +44,7 @@ class TestAmplitudeEvents:
             key=lambda tup: tup[0]
         )
 
-    def test_create_clean_amplitude_events(
+    def test_create_clean_events_df(
         self, spark_sql_consumer, amplitude_events, dataframe_service
     ):
         # arrange
@@ -79,14 +57,14 @@ class TestAmplitudeEvents:
         spark_sql_consumer.query_expected_values(expected_values)
 
         # act
-        result_df = amplitude_events.create_clean_events(
+        result_df = amplitude_events.create_clean_events_df(
             date, spark_sql_consumer, dataframe_service
         )
 
         # assert
         assert type(result_df) == type(df)
 
-    def test_create_filtered_events_table(
+    def test_create_filtered_clean_events_df(
         self, spark_sql_consumer, amplitude_events, dataframe_service
     ):
         # arrange
@@ -119,7 +97,7 @@ class TestAmplitudeEvents:
         ]
 
         # act
-        result_df = amplitude_events.create_filtered_events_table(
+        result_df = amplitude_events.create_filtered_clean_events_df(
             date, event_type, spark_sql_consumer, dataframe_service
         )
         result_df_schema = result_df.dtypes
