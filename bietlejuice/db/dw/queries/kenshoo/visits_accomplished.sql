@@ -22,4 +22,5 @@ select distinct
 city_group,
 f_sha256(email) as email,
 f_sha256(phone) as phone
-from users_with_visits_last7d;
+from users_with_visits_last7d
+where city_group is not null;
