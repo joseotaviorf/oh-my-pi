@@ -15,6 +15,9 @@ class MetastoreService:
         self.db_path = db_path
         self.spark_sql_client = spark_sql_client
 
+    def create_database(self):
+        self.spark_sql_client.run("CREATE DATABASE IF NOT EXISTS {}".format(self.db))
+
     def get_table_names(self):
         sqlContext.tableNames(dbName=self.db)
 

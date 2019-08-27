@@ -43,4 +43,5 @@ class DatabricksConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_query(self, query, table_name=None):
+        spark.sql("USE {}".format(self.connection["db"]))
         return spark.sql(query)

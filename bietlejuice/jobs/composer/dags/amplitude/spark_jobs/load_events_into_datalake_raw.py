@@ -5,16 +5,12 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from bietlejuice.jobs.composer.base.spark import DataFrameService, MetastoreService
+from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, SparkSQLCLient
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext, DataFrameService, MetastoreService, TableStorageFormat
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
 from bietlejuice.jobs.composer.loaders import DataframeIntoDatalakeLoader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
-from bietlejuice.jobs.composer.base.spark import TableStorageFormat
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -42,7 +38,6 @@ if __name__ == "__main__":
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
-    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_info["db_raw_databricks"]))
     amplitude_events = AmplitudeEvents()
     spark_sql_client = SparkSQLCLient(spark)
     dataframe_service = DataFrameService()
@@ -66,5 +61,5 @@ if __name__ == "__main__":
         file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
 
         df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
-        dataframe_loader.partition_overwrite_load(df, ["year", "month", "day", "app"], table_name, True)
+        dataframe_loader.partition_overwrite_load(df, ["year", "month", "day", "app"], table_name, schema_merging=True)
         metastore_service.update_table_partitions(table_name)

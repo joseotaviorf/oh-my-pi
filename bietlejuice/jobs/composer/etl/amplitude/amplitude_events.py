@@ -4,7 +4,7 @@ import gzip
 import os
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext, DataFrameService
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 logger = QuintoAndarLogger("AmplitudeEvents")
 
@@ -45,18 +45,18 @@ class AmplitudeEvents:
     def create_raw_events_df(self, file_from_api, dataframe_service):
         if not file_from_api:
             logger.warning(
-                "m=load_events_into_datalake_raw, msg=Empty file to load in datalake"
+                "m=create_raw_events_df, msg=Empty file to load in datalake"
             )
             return
         with zipfile.ZipFile(file_from_api, "r") as zip_file:
             data = self._get_data_from_zip_file(zip_file)
             len_data = len(data)
             logger.info(
-                "m=load_events_into_datalake_raw, got {} events".format(len_data)
+                "m=create_raw_events_df, got {} events".format(len_data)
             )
             n = max(len_data // AmplitudeEvents.RAW_RECORDS_BY_PARTITION, 1)
             logger.info(
-                "m=create_events_dataframe, the dataframe will be written in {} partitions".format(
+                "m=create_raw_events_df, the dataframe will be written in {} partitions".format(
                     n
                 )
             )
@@ -81,10 +81,10 @@ class AmplitudeEvents:
             # )
 
     @logger
-    def create_clean_events(self, date, spark_sql_consumer, dataframe_service):
+    def create_clean_events_df(self, date, spark_sql_consumer, dataframe_service):
         year, month, day = date.year, date.month, date.day
         logger.info(
-            "m=create_clean_amplitude_events, year={}, month={}, day={}".format(
+            "m=create_clean_events_df, year={}, month={}, day={}".format(
                 year, month, day
             )
         )
@@ -118,11 +118,17 @@ class AmplitudeEvents:
         # )
 
     @logger
-    def create_filtered_events_table(
+    def create_filtered_clean_events_df(
         self, date, event_type, spark_sql_consumer, dataframe_service
     ):
         table_name = "events"
         year, month, day = date.year, date.month, date.day
+        logger.info(
+            "m=create_filtered_clean_events_df, year={}, month={}, day={}, event_type={}".format(
+                year, month, day, event_type
+            )
+        )
+
         filtered_event_df = spark_sql_consumer.get_data_from_query(
             "select * from {}.{} where year={} and month={} and day={} and event_type = '{}'".format(
                 self.db_clean, table_name, year, month, day, event_type

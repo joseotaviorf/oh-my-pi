@@ -27,11 +27,14 @@ class DataframeIntoDatalakeLoader:
     ):
         if not df:
             raise ValueError("m=partition_overwrite_load, msg=input df is None")
+
         write_df = (
             df.write.mode("overwrite")
             .format(self.format)
             .partitionBy(*partition_by_list)
         )
+
+        self.metastore_service.create_database() # if not exists
         if table_name not in self.metastore_service.get_table_names():
             logger.info(
                 "m=partition_overwrite_load, db={}, table_name={}, ".format(
