@@ -1,4 +1,3 @@
-import pytest
 import gzip
 import zipfile
 from io import BytesIO
