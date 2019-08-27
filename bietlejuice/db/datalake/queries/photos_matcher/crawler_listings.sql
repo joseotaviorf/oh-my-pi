@@ -37,7 +37,7 @@ quintoandar_listings AS (
       regexp_extract(trim(house_number), '\d+$')
       , '') != ''
     AND COALESCE(house_bedrooms, '') != ''
-    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '1' DAY -- our listings pulished in the last 1 days
+    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '1' DAY -- our listings pulished in the last 1 day
   GROUP BY 1, 2, 3, 4, 5, 6
 ),
 first_listings AS (
