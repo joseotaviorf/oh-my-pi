@@ -1,38 +1,11 @@
 WITH
-days_published AS (
-  WITH
-  published AS (
-    SELECT
-      sk_house AS sk_house_listing,
-      SUBSTRING(sk_house, 1, 9) AS sk_house,
-      DATE(sk_min_status_date) AS min_status_date,
-      COALESCE(DATE(sk_max_status_date), CURRENT_DATE) AS max_status_date
-    FROM fact_house_status
-    WHERE status_history = 'publicado'
-  ),
-  rows AS (
-    SELECT
-      *,
-      ROW_NUMBER() OVER(PARTITION BY sk_house, max_status_date ORDER BY max_status_date ASC) AS row
-    FROM published
-  )
-  -- HACK: fact_house_status has an issue where it can have two rows with a published status and null max_status_date
-  -- while we don't fix that, here we will take only the first row
-  SELECT
-    sk_house_listing,
-    DATE_DIFF('day', min_status_date, max_status_date) AS days_published
-  FROM rows WHERE row = 1
-),
 rent_flows_contracts AS (
   SELECT
-    *
+    DISTINCT sk_house_listing,
+    MAX(days_house_listing_to_contract_signed) AS days_house_listing_to_contract_signed
   FROM public.fact_listing_rent_flows
   WHERE days_house_listing_to_contract_signed IS NOT NULL
-),
-regions AS (
-  SELECT
-    DISTINCT rf.sk_house_listing, rf.sk_region
-  FROM public.fact_listing_rent_flows rf
+  GROUP BY 1
 ),
 listings_metrics AS (
   SELECT
@@ -46,15 +19,15 @@ listings_metrics AS (
     END AS house_bedrooms_category,
     rf.days_house_listing_to_contract_signed,
     dr.name AS region_name,
+    dr.sk_region,
     dr.region_code,
-    dr.city_group,
-    dp.days_published
+    dr.city_group
   FROM public.dim_house_listing hl
+  LEFT JOIN fact_house_listings fhl ON hl.sk_house_listing = fhl.sk_house_listing
   LEFT JOIN rent_flows_contracts rf ON hl.sk_house_listing = rf.sk_house_listing
-  INNER JOIN regions r ON hl.sk_house_listing = r.sk_house_listing
-  LEFT JOIN public.dim_region dr ON r.sk_region = dr.sk_region
-  LEFT JOIN days_published dp ON hl.sk_house_listing = dp.sk_house_listing
-  WHERE r.sk_region != -1
+  LEFT JOIN public.dim_region dr ON fhl.sk_region = dr.sk_region
+  WHERE dr.sk_region != -1
+    AND hl.ts_publication IS NOT NULL
 ),
 liquidity_metrics AS (
   SELECT
@@ -62,8 +35,7 @@ liquidity_metrics AS (
     m.region_code,
     m.house_bedrooms_category,
     SUM(CASE WHEN m.days_house_listing_to_contract_signed BETWEEN 0 AND 42 THEN 1 ELSE 0 END) AS rented_in_6_weeks,
-    SUM(CASE WHEN m.days_house_listing_to_contract_signed NOT BETWEEN 0 AND 42 AND m.days_published >= 42 THEN 1 ELSE 0 END) AS not_rented_in_6_weeks,
-    rented_in_6_weeks + not_rented_in_6_weeks AS sample_size,
+    COUNT(*) AS sample_size,
     -- percent_rented_in_6_weeks
     rented_in_6_weeks / NULLIF(sample_size, 0)::REAL AS percent_rented_in_6_weeks,
     SQRT((1.96^2 * percent_rented_in_6_weeks * (1 - percent_rented_in_6_weeks)) / sample_size) AS percent_rented_in_6_weeks_error,
@@ -110,7 +82,8 @@ SELECT
   r.house_bedrooms_category,
   r.min_bedrooms,
   r.max_bedrooms,
-  l.sample_size AS rentals_sample_size,
+  l.sample_size AS listings_sample_size,
+  l.rented_in_6_weeks,
   -- percent_rented_in_6_weeks
   ROUND(percent_rented_in_6_weeks, 2) AS percent_rented_in_6_weeks,
   TO_CHAR((percent_rented_in_6_weeks - percent_rented_in_6_weeks_error), '0.00') || '-' || TO_CHAR((percent_rented_in_6_weeks + percent_rented_in_6_weeks_error), '0.00') AS percent_rented_in_6_weeks_interval,
