@@ -101,10 +101,6 @@ def sub_dag(sub_dag_name, **kwargs):
         },
     )
 
-    create_raw_partition_task = DummyOperator(
-        task_id="create-raw-partition", dag=local_dag
-    )
-
     load_to_clean_task = DummyOperator(task_id="load-to-clean", dag=local_dag)
 
     create_clean_partition_task = DummyOperator(
