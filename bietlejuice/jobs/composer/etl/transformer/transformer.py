@@ -1,8 +1,11 @@
+from collections import OrderedDict
+
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.base.databricks import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
+
 
 logger = QuintoAndarLogger("Transformer")
 
@@ -21,7 +24,7 @@ class Transformer:
                 - table_name = table name to be created on Athena
                 - datalake_layer = 'raw' or 'clean'
                 - partition_by = list with columns name to partition
-                   -- for example: partition_by = ['year', 'month', 'day'] 
+                   -- for example: partition_by = ['year', 'month', 'day']
         """
 
         # pattern schemas
