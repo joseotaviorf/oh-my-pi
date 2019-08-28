@@ -325,6 +325,8 @@ from
           min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
         from
           Lead_AUD la
+        join
+          UsuarioRevisionEntity ure on ure.id = la.REV
         where
           (status in ('Prospeccao','Descartado')
             and reason not in ('OWNER_WONT_ANSWER_PHONE','OWNER_DIDNT_ANSWER_PHONE','ProprietarioNaoAtende','ProprietarioNuncaAtende','CONTACT_DIDNT_EXIST')) or status = 'Convertido'
