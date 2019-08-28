@@ -4,7 +4,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
-spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
+sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 logger = QuintoAndarLogger("MetastoreService")
 
@@ -25,7 +25,9 @@ class MetastoreService:
     def make_schema_merging(self, table_name, file_format, partition_by_list, df):
         if not df:
             raise ValueError("m=make_schema_merging, msg=input df is None")
-        df_aux = spark.sql("select * from {}.{} limit 0".format(self.db, table_name))
+        if table_name not in self.get_table_names():
+            raise ValueError("m=make_schema_merging, msg=input df is None")
+        df_aux = self.spark_sql_client.run("select * from {}.{} limit 0".format(self.db, table_name))
         current_schema = OrderedDict(
             field.simpleString().split(":") for field in df_aux.schema.fields
         )
