@@ -56,8 +56,9 @@ if __name__ == "__main__":
         has_partitions=has_partitions,
     )
 
-    transformer.add_partition(
-        datalake_layer=datalake_layer,
-        table_name=table_name,
-        execution_date=execution_date,
-    )
+    if has_partitions:
+        transformer.add_partition(
+            datalake_layer=datalake_layer,
+            table_name=table_name,
+            execution_date=execution_date,
+        )
