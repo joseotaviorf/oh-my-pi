@@ -32,7 +32,7 @@ with vistorias as (
 	uao.utm_campaign as tracking_campaign,
 	uao.utm_content as tracking_content,
 	uao.utm_term as tracking_term,
-	lower(regexp_replace(remove_accentuation(uao.utm_campaign), '\[^a-zA-Z]', '')) as city_campaign,
+	lower(regexp_replace(remove_accentuation(uao.utm_campaign), '[^\w]+|_', '', 'g')) as city_campaign,
 	uao.platform as tracking_platform,
 	uao.device_type as tracking_device_type,
 	uao.country as tracking_country,
