@@ -3,7 +3,7 @@ from collections import OrderedDict
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.wrappers import AthenaClient
-from bietlejuice.jobs.composer.base.databricks import DatabricksConsumer
+from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 
 
