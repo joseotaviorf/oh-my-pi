@@ -70,8 +70,9 @@ if __name__ == "__main__":
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
         file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
 
-        df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
-        dataframe_loader.partition_overwrite_load(
-            df, ["year", "month", "day", "app"], table_name, schema_merging=True
-        )
-        metastore_service.update_table_partitions(table_name)
+        if file_from_api:
+            df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+            dataframe_loader.partition_overwrite_load(
+                df, ["year", "month", "day", "app"], table_name, schema_merging=True
+            )
+            metastore_service.update_table_partitions(table_name)
