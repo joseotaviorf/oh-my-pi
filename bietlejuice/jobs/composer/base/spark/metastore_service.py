@@ -27,7 +27,9 @@ class MetastoreService:
             raise ValueError("m=make_schema_merging, msg=input df is None")
         if table_name not in self.get_table_names():
             raise ValueError("m=make_schema_merging, msg=input df is None")
-        df_aux = self.spark_sql_client.run("select * from {}.{} limit 0".format(self.db, table_name))
+        df_aux = self.spark_sql_client.run(
+            "select * from {}.{} limit 0".format(self.db, table_name)
+        )
         current_schema = OrderedDict(
             field.simpleString().split(":") for field in df_aux.schema.fields
         )
