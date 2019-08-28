@@ -1,13 +1,13 @@
 CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.dag`
 (
   `dag_id` string,
-  `is_paused` boolean,
-  `is_subdag` boolean,
-  `is_active` boolean,
+  `is_paused` tinyint,
+  `is_subdag` tinyint,
+  `is_active` tinyint,
   `last_scheduler_run` string,
   `last_pickled` string,
   `last_expired` string,
-  `scheduler_lock` boolean,
+  `scheduler_lock` tinyint,
   `pickle_id` int,
   `fileloc` string,
   `owners` string,

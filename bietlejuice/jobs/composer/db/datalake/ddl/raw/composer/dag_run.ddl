@@ -5,7 +5,7 @@ CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.dag_run`
   `execution_date` string,
   `state` string,
   `run_id` string,
-  `external_trigger` boolean,
+  `external_trigger` tinyint,
   `conf` varchar(65535),
   `end_date` string,
   `start_date` string
