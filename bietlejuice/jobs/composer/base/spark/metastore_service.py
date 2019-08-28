@@ -4,7 +4,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
-sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
+sqlContext = BaseSparkContext.sqlContext
 
 logger = QuintoAndarLogger("MetastoreService")
 
