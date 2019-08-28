@@ -54,6 +54,7 @@ if __name__ == "__main__":
     dataframe_loader.partition_overwrite_load(
         df, ["year", "month", "day", "event_type"], table_name, schema_merging=False
     )
+    metastore_service.update_table_partitions(table_name)
 
     event_types = [
         "listing_page_viewed",
@@ -75,3 +76,4 @@ if __name__ == "__main__":
         dataframe_loader.partition_overwrite_load(
             df, ["year", "month", "day"], table_name, schema_merging=True
         )
+        metastore_service.update_table_partitions(table_name)

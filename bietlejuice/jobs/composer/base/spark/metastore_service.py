@@ -21,18 +21,22 @@ class MetastoreService:
     def get_table_names(self):
         return sqlContext.tableNames(dbName=self.db)
 
+    def get_table_schema(self, table_name):
+        return OrderedDict(
+            field.simpleString().split(":")
+            for field in sqlContext.table(
+                "{}.{}".format(self.db, table_name)
+            ).schema.fields
+        )
+
     @logger(exclude="df")
     def make_schema_merging(self, table_name, file_format, partition_by_list, df):
         if not df:
             raise ValueError("m=make_schema_merging, msg=input df is None")
         if table_name not in self.get_table_names():
             raise ValueError("m=make_schema_merging, msg=input df is None")
-        df_aux = self.spark_sql_client.run(
-            "select * from {}.{} limit 0".format(self.db, table_name)
-        )
-        current_schema = OrderedDict(
-            field.simpleString().split(":") for field in df_aux.schema.fields
-        )
+
+        current_schema = self.get_table_schema(table_name)
         new_data_schema = OrderedDict(
             field.simpleString().split(":") for field in df.schema.fields
         )
@@ -72,7 +76,6 @@ class MetastoreService:
                 ddl
             )
         )
-
         self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
         self.spark_sql_client.run(ddl)
         self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
