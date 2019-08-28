@@ -9,9 +9,9 @@ from airflow.operators.quintoandar_athena import (
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
-from bietlejuice.jobs.composer.base.etl import BaseETL
+from bietlejuice.jobs.composer.base.etl import FileService
 
 DAG_ID = "bietlejuice.composer"
 ENV = Variable.get("environment")
@@ -34,16 +34,14 @@ dag = DAG(
 )
 
 
-def move_data_subdag(subdag_name, **kwargs):
+def move_data_subdag(subdag_name, table_name):
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=subdag_name,
         dag_name=DAG_ID,
         schedule_interval=SCHEDULE_INTERVAL,
         start_date=START_DATE,
     )._build_local_dag()
 
-    table_name = kwargs.get("table_name")
     move_data_to_datalake_task = QuintoAndarMySqlToS3Operator(
         dag=local_dag,
         table=table_name,
@@ -54,7 +52,7 @@ def move_data_subdag(subdag_name, **kwargs):
         mysql_conn_id="airflow_db",
     )
 
-    ddl_query_raw = BaseETL.get_query_from_file_name(
+    ddl_query_raw = FileService.get_query_from_file_name(
         "{}/ddl/raw/composer/{}.ddl".format(DATALAKE_SQL_DIR, table_name)
     ).format(ENV=ENV)
     create_athena_raw_table_task = QuintoAndarCreateAthenaExternalTableOperator(
@@ -72,17 +70,17 @@ def move_data_subdag(subdag_name, **kwargs):
 
 
 dag_table_subdag = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="dag-table", sub_dag_func=move_data_subdag, table_name="dag"
+    dag=dag, sub_dag_name="dag", sub_dag_func=move_data_subdag, table_name="dag"
 )
 dag_run_table_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="dag_run-table",
+    sub_dag_name="dag_run",
     sub_dag_func=move_data_subdag,
     table_name="dag_run",
 )
 task_fail_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="task_fail-table",
+    sub_dag_name="task_fail",
     sub_dag_func=move_data_subdag,
     table_name="task_fail",
 )

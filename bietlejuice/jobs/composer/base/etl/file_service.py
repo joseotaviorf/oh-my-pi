@@ -1,9 +1,9 @@
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("BaseETL")
+logger = QuintoAndarLogger("FileService")
 
 
-class BaseETL:
+class FileService:
     @staticmethod
     @logger
     def get_query_from_file_name(file_name):

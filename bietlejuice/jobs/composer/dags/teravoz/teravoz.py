@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from bietlejuice.jobs.composer.base.airflow.base_dag import BaseDAG
-from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
 
 from airflow.models import DAG
 from airflow.models import Variable
@@ -64,7 +64,6 @@ dag = DAG(
 def sub_dag(sub_dag_name, **kwargs):
 
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
