@@ -20,7 +20,8 @@ with pre_online_metrics AS (
         FROM datalake_clean.amplitude_events evt
         WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed',
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
-                               'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed')
+                               'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed',
+                               'tip_agendaavalilability_confirmed', 'tip_lockbox_confirmed')
           AND TRIM(platform) IN ('Web', 'iOS')
           AND TRIM(u_platform) IN ('web_mobile', 'web_desktop', 'ios')
           AND ym >= '2019-01'
@@ -44,7 +45,8 @@ with pre_online_metrics AS (
         FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed',
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
-                             'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed')
+                             'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed',
+                             'tip_agendaavalilability_confirmed', 'tip_lockbox_confirmed')
           AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
