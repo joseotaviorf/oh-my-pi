@@ -162,10 +162,10 @@ class AthenaClient:
             format=base_format["format"],
             path=s3_table_path,
             serdeproperties=""
-            if not "serdeproperties" in base_format.keys()
+            if "serdeproperties" not in base_format.keys()
             else "\n" + base_format["serdeproperties"],
             tblproperties=""
-            if not "tblproperties" in base_format.keys()
+            if "tblproperties" not in base_format.keys()
             else "\n" + base_format["tblproperties"],
         )
 
