@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
     parser.add_argument(
-        "has_partitions", type=bool, help="if table will have partitions"
+        "has_partitions", type=str, help="if table will have partitions"
     )  # temp
 
     args = parser.parse_args()
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = args.table_name
     environment = args.environment
-    has_partitions = args.has_partitions
+    has_partitions = True if args.has_partitions == "True" else False
 
     # updating job name
     JOB_NAME = JOB_NAME.format(datalake_layer)
