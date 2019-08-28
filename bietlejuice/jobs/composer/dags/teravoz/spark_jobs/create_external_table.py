@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     datalake_layer = args.datalake_layer
     execution_date = args.execution_date
-    table_name = args.table_name
+    table_name = args.table_name.replace("-","_")
     environment = args.environment
     has_partitions = True if args.has_partitions == "True" else False
 
