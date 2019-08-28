@@ -89,13 +89,7 @@ def sub_dag(sub_dag_name, has_partitions="False"):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
-                "parameters": [
-                    sub_dag_name,
-                    "raw",
-                    "{{ ds }}",
-                    ENV,
-                    has_partitions,
-                ],
+                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV, has_partitions],
             }
         },
     )
@@ -127,13 +121,13 @@ calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="calls", has_partitions="True", sub_dag_func=sub_dag
 )
 queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag,
+    dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag
 )
 peers_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="peers", sub_dag_func=sub_dag,
+    dag=dag, sub_dag_name="peers", sub_dag_func=sub_dag
 )
 ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag,
+    dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag
 )
 report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
