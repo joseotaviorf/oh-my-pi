@@ -8,8 +8,7 @@ from airflow.operators.quintoandar_athena import (
 )
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
 from bietlejuice.jobs.composer.base.etl import FileService
 
