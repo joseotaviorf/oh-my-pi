@@ -13,13 +13,7 @@ class BaseSubDAG(object):
     """
 
     @logger
-    def __init__(
-        self,
-        sub_dag_name,
-        dag_name,
-        schedule_interval,
-        start_date,
-    ):
+    def __init__(self, sub_dag_name, dag_name, schedule_interval, start_date):
         self.sub_dag_name = sub_dag_name
         self.dag_name = dag_name
         self.schedule_interval = schedule_interval
@@ -41,12 +35,7 @@ class BaseSubDAG(object):
 
     @staticmethod
     @logger
-    def get_sub_dag_operator(
-        dag,
-        sub_dag_name,
-        sub_dag_func,
-        **kwargs
-    ):
+    def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func, **kwargs):
         """
         Gets a sub-dag operator.
         :param dag: the main dag which will contain the subdag

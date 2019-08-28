@@ -72,10 +72,7 @@ dag_table_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="dag", sub_dag_func=move_data_subdag, table_name="dag"
 )
 dag_run_table_subdag = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="dag_run",
-    sub_dag_func=move_data_subdag,
-    table_name="dag_run",
+    dag=dag, sub_dag_name="dag_run", sub_dag_func=move_data_subdag, table_name="dag_run"
 )
 task_fail_subdag = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
