@@ -8,7 +8,7 @@ from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
 
 DATABRICKS_SCOPE = "quintoandar"
 
-JOB_NAME = "create_external_{}_table"
+JOB_NAME = "create_external_table"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -43,9 +43,6 @@ if __name__ == "__main__":
     table_name = args.table_name
     environment = args.environment
     has_partitions = True if args.has_partitions == "True" else False
-
-    # updating job name
-    JOB_NAME = JOB_NAME.format(datalake_layer)
 
     # create external table and add partition
     transformer = TeravozTransformer(environment)
