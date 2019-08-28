@@ -19,7 +19,7 @@ class MetastoreService:
         self.spark_sql_client.run("CREATE DATABASE IF NOT EXISTS {}".format(self.db))
 
     def get_table_names(self):
-        sqlContext.tableNames(dbName=self.db)
+        return sqlContext.tableNames(dbName=self.db)
 
     @logger(exclude="df")
     def make_schema_merging(self, table_name, file_format, partition_by_list, df):
