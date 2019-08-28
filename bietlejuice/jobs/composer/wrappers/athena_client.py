@@ -1,5 +1,4 @@
 import time
-
 import boto3
 
 from quintoandar_logger import QuintoAndarLogger
@@ -124,15 +123,17 @@ class AthenaClient:
             s3_table_path: files location for Athena table created
             table_schema: dict with spark table schema
             partition_by: list with columns to partition the table
-            base_format: dict with file format and additional properties
+            base_format: dict with file format and optional [serde/tbl] properties keys.
         """
 
         create_query = (
             "\nCREATE EXTERNAL TABLE IF NOT EXISTS `{database}`.`{table}`("
             "\n{columns}"
             "\n) {partitioned_by}"
-            "\n{format} {serdeproperties}"
-            "\nLOCATION '{path}';"
+            "\n{format}"
+            "{serdeproperties}"
+            "\nLOCATION '{path}'"
+            "{tblproperties};"
         )
 
         # columns builder
@@ -160,7 +161,12 @@ class AthenaClient:
             partitioned_by=partitions_section,
             format=base_format["format"],
             path=s3_table_path,
-            serdeproperties=base_format["properties"],
+            serdeproperties=""
+            if not "serdeproperties" in base_format.keys()
+            else "\n" + base_format["serdeproperties"],
+            tblproperties=""
+            if not "tblproperties" in base_format.keys()
+            else "\n" + base_format["tblproperties"],
         )
 
         # create database if not exists
