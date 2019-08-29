@@ -28,7 +28,7 @@ booking_house_listing as (
     cast(sk_client as bigint) as sk_visitor
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_booking != '-1'
-  group by 1, 2
+  group by 1, 2, 3, 4
 )
 select distinct
   b.sk_task,
