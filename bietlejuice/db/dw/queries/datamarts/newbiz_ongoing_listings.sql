@@ -15,13 +15,18 @@ WITH date_base AS (
 published_listings AS (	
 	SELECT *
 	FROM (
-			SELECT
-					hs.sk_house,
-					hs.status_history,
-					hs.sk_min_status_date,
-					COALESCE(LEAD(hs.sk_min_status_date, 1) OVER (PARTITION BY hs.sk_house ORDER BY hs.sk_min_status_date), 99999999)   AS sk_max_status_date
-			FROM fact_house_status hs
-			ORDER BY hs.sk_min_status_date
+        SELECT
+            i.id																											AS id_house,
+            i.status    																							AS status_history,
+            DATE(FROM_UNIXTIME(CAST(rev.timestamp AS BIGINT) / 1000)) AS min_status_date,
+            COALESCE(LEAD(DATE(FROM_UNIXTIME(CAST(rev.timestamp AS BIGINT) / 1000)), 1) 
+											OVER (PARTITION BY i.id ORDER BY FROM_UNIXTIME(CAST(rev.timestamp AS BIGINT) / 1000)), 
+										 DATE('9999-12-31')) 															AS max_status_date
+        FROM datalake_raw.ebdb_imovel_AUD i
+        LEFT JOIN datalake_raw.ebdb_usuariorevisionentity rev
+          ON i.rev = rev.id
+        WHERE i.status_mod = 1
+        ORDER BY 4
 		) base
 	WHERE base.status_history = 'publicado'
 	),
@@ -31,17 +36,22 @@ ongoing_listings AS (
 		db.date,
 		db.week_start,
 		db.month_start,
-		pl.sk_house,
+		pl.id_house,
+		dhl.sk_house_listing    AS sk_house,
 		pl.status_history
 	FROM date_base db
 	LEFT JOIN published_listings pl
-	  ON ((db.sk_date BETWEEN pl.sk_min_status_date AND pl.sk_max_status_date) OR
-	  	  (db.sk_date >= pl.sk_min_status_date AND pl.sk_max_status_date IS NULL)
+	  ON ((db.date BETWEEN pl.min_status_date AND pl.max_status_date) OR
+	  	  (db.date >= pl.min_status_date AND pl.max_status_date IS NULL)
 	  	 )
+	LEFT JOIN dim_house_listing dhl
+	  ON pl.id_house = dhl.id_house
+	 AND db.date BETWEEN DATE(dhl.ts_listing_version_start) AND DATE(COALESCE(dhl.ts_listing_version_end, '9999-12-31'))
 	GROUP BY db.date,
     		 db.week_start,
     		 db.month_start,
-    		 pl.sk_house,
+    		 pl.id_house,
+			 dhl.sk_house_listing,
     		 pl.status_history
 	ORDER BY db.date
 	),
@@ -53,7 +63,7 @@ newbiz_listings_version AS (
   FROM (
     SELECT
       dhl.id_house,
-      dhl.sk_house_listing								      AS sk_house_listing,
+      dhl.sk_house_listing								    AS sk_house_listing,
       DATE(dhl.ts_publication)							    AS publication_date,
       newbiz_flg.specialconditiontype,
       newbiz_flg.optedinat,

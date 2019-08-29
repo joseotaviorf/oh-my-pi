@@ -398,7 +398,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
-    execution_timeout=timedelta(hours=6),
+    execution_timeout=timedelta(hours=7),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 

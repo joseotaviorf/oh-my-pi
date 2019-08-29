@@ -9,6 +9,7 @@ create table public.fact_house_listing_flows (
 	rep_id integer,
 	affiliate_id integer,
 	region_id integer,
+	first_region_id integer,
 	dt_lead timestamp without time zone,
 	dt_prospect timestamp without time zone,
 	dt_first_inside_sales_contact timestamp without time zone,
