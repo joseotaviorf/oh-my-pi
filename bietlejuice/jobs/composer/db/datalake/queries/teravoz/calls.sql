@@ -12,9 +12,9 @@ select
     status,
     type  as call_direction,
     current_timestamp as ts_load,
-    smallint(year) as year,
-    tinyint(month) as month,
-    tinyint(day) as day
+    year,
+    month,
+    day
 from
     datalake_teravoz_raw.calls
 where
