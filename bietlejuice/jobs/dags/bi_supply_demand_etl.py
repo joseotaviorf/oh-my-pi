@@ -24,7 +24,7 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-supply-demand-etl'
 MAIN_START_DATE = datetime(2018, 4, 29, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
+MAIN_SCHEDULE_INTERVAL = '0 4 * * *'
 
 # create main DAG definition
 main_dag = BaseDAG.build_dag(
@@ -398,7 +398,7 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     task_id='ODS_House_Listing_Flows',
     provide_context=True,
     python_callable=extract_query_dim_from_ebdb_to_ods,
-    execution_timeout=timedelta(hours=6),
+    execution_timeout=timedelta(hours=7),
     op_kwargs={'table_name': 'fact_house_listing_flows'}
 )
 

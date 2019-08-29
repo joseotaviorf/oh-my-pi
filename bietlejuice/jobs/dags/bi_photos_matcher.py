@@ -25,7 +25,7 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 @logger
 def extract_data_from_matcher(table_name, ds, **kwargs):
     # connect to external db, extract data, save csv to S3
-    query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(SOURCE_QUERIES_DIR, table_name))
+    query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(SOURCE_QUERIES_DIR, table_name)).format(execution_date=ds)
 
     logger.info('m=extract_data_from_matcher, table_name={}, msg=Extracting data from photos matcher'.format(table_name))
     data_table = BaseETL.from_db_query(

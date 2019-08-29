@@ -16,6 +16,6 @@ class DatabaseIntoDataLakeRawLoader(DatabaseIntoDataLakeLoader):
             "codec": "gzip",
             "datalake_db": "datalake_{}_raw".format(source),
             "datalake_path": "s3://5a-datalake-{}/raw/{}".format(environment, source),
-            "create_query_format": "ROW FORMAT serde 'org.apache.hive.hcatalog.data.JsonSerDe'",
+            "create_query_format": "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'",
         }
         super().__init__(config)

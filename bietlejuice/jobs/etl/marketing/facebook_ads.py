@@ -24,8 +24,10 @@ class FacebookAds(Marketing):
         'link_clicks': int
     }
 
-    def __init__(self, s3_bucket, execution_date, account, auth=None):
-        super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads', account)
+    def __init__(self, s3_bucket, execution_date, account, auth=None,
+                 extra_configs=None):
+        super(FacebookAds, self).__init__(s3_bucket, execution_date, 'facebook_ads',
+                                          account)
 
     @logger
     def move_ads_to_clean(self):
