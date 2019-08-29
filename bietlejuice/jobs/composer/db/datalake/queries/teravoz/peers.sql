@@ -6,4 +6,4 @@ select
     number as internal_phone_number,
     current_timestamp as ts_load
 from
-    datalake_teravoz_raw.peers;
+    datalake_teravoz_raw.peers
