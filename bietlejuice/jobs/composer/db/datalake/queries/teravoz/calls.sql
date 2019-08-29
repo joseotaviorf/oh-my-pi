@@ -15,7 +15,8 @@ select
     smallint(year) as year,
     tinyint(month) as month,
     tinyint(day) as day
-  from
-      datalake_teravoz_raw.calls
-  where
-      year="{year}" and month="{month}" and day="{day}"
+from
+    datalake_teravoz_raw.calls
+where
+    year="{year}" and month="{month}" and day="{day}"
+;

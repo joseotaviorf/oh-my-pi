@@ -8,4 +8,4 @@ select
 from
     datalake_teravoz_raw.peers
 where
-    year="{year}" and month="{month}" and day="{day}"
+    year="{year}" and month="{month}" and day="{day}";
