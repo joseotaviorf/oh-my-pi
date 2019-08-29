@@ -109,19 +109,6 @@ select
     left join
     (
       SELECT
-        jf.id,
-        min(msi.data) as nxt_pub
-      from
-        JobFotografo jf
-      left join MudancaStatusImovel msi
-        on msi.imovel_id = jf.imovel_id
-        and msi.novoStatus = 'publicado'
-        and date(msi.`data`) >= date(coalesce(jf.dataInicioSessao, jf.dataCriacao, jf.dataAgendamento))
-      group by jf.id
-    ) first_pub on first_pub.id = f.id
-    left join
-    (
-      SELECT
         hrs_aud.photoShoot_id,
         MAX(REV) as rev
       FROM HouseRegistrationStatus_AUD hrs_aud
