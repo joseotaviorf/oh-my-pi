@@ -7,6 +7,7 @@ select
 	rep_id,
 	affiliate_id,
 	region_id,
+	first_region_id,
 	dt_lead,
 	dt_prospect,
 	dt_first_inside_sales_contact,
@@ -77,6 +78,7 @@ from
 		base.affiliate_id,
 		base.owner_id,
 		base.region_id,
+		base.first_region_id as first_region_id,
 		photographer.id as photographer_id,
 		base.dt_lead,
 		base.dt_prospect,
@@ -117,6 +119,7 @@ from
 			null as affiliate_id,
 			i.usuario_id as owner_id,
 			i.regiao_id as region_id,
+			i.regiao_id as first_region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
 			null as dt_first_inside_sales_contact,
@@ -177,6 +180,7 @@ from
 		and DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 	union all
     select
+     distinct
       i.id as imovel_id,
       l.id as lead_id,
       l.status as lead_status,
@@ -189,7 +193,8 @@ from
       end as rep_id,
       uda.id as affiliate_id,
       i.usuario_id as owner_id,
-      coalesce(i.regiao_id, min(pr.regiao_id)) as region_id,
+      coalesce(i.regiao_id, l.region_id) as region_id,
+      coalesce(l_aud_first_region.region_id, i.regiao_id) as first_region_id,
       coalesce(l.criadoEm, l.anuncioCriadoEm, l.captadoEm) as dt_lead,
       case
         when has_aud.id is not null then from_unixtime(ure.timestamp/1000)
@@ -361,29 +366,18 @@ from
     left join
     	UsuarioRevisionEntity ure_disc_max
     	on ure_disc_max.id = d_ure_max.max_id
-    left join -- trying to find regions for leads using lat lng with the region polygons
-    (
-      SELECT
-        p.*,
-        r.cidadeNome as cidade
-      FROM PoligonoRegiao p
-      left join (
-                  select
-                    max(pr.id) as id
-                  from PoligonoRegiao pr
-                  left join MapRegiao mr on pr.regiao_id = mr.id
-                  where mr.id is not null
-                  group by poligono
-                ) latest on latest.id = p.id
-      left join MapRegiao r on r.id = p.regiao_id
-      where latest.id is not null
-    ) pr
-    on pr.cidade = l.cidade -- to avoid too much processing
-    and ST_Contains(
-          ST_GeometryFromText(ST_AsText(pr.poligono)),
-          ST_GeometryFromText(concat('Point(',coalesce(i.lng,l.lng),' ',coalesce(i.lat,l.lat),')'))
-        ) = 1
-    group by 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18 -- this aggregation is to deduplicate overlapping regions
+     left join (
+		SELECT
+	    	laud.id,
+	    	min(laud.REV) as min_rev
+	    FROM Lead_AUD laud
+   		 where laud.region_id IS NOT NULL
+    	group by laud.id
+    ) first_rev_region
+        on first_rev_region.id = l.id
+    left join
+    	Lead_AUD l_aud_first_region
+    	on l_aud_first_region.REV = first_rev_region.min_rev
 	union all
 		select
 			i.id as imovel_id,
@@ -395,6 +389,7 @@ from
 			null as affiliate_id,
 			i.usuario_id as owner_id,
 			i.regiao_id as region_id,
+			i.regiao_id as first_region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
 			coalesce(cl.criadoEm, cl.dataConversao) as dt_first_inside_sales_contact,

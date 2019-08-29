@@ -13,6 +13,7 @@ create table public.fact_house_listing_flows (
 	sk_user_first_task_assignee integer,
 	sk_user_last_task_assignee integer,
 	sk_region integer,
+	sk_first_region integer,
 	sk_city integer,
 	sk_partner integer,
 	sk_lead_date integer,
