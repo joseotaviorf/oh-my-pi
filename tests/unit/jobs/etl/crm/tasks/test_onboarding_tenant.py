@@ -14,7 +14,6 @@ class TestCRMTasksOnboardingTenant(object):
         'ConfirmarLocalChaves',
         'ContatarInquilinoInfoEntregaChaves',
         'EntregaChavesParaInquilino',
-        'EnviarVistoria',
         'InquilinoNaoRecebeuTodasChaves',
         'PagarContasConsumo',
         'SendLongTermEmailOwner',
