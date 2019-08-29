@@ -17,7 +17,7 @@ crawled_listings_first_time AS (
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis', 'olx')
-        AND advertiser_name != 'quintoandar'
+        AND (advertiser_name is null or advertiser_name != 'quintoandar')
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as tmp
   WHERE
@@ -65,7 +65,7 @@ crawled_listings AS (
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis', 'olx')
-        AND advertiser_name != 'quintoandar'  -- ignore our own listings on other sites
+        AND (advertiser_name is null or advertiser_name != 'quintoandar')  -- ignore our own listings on other sites
         AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
     ) as listings
   JOIN crawled_listings_first_time ON listings.id_crawled_listing = crawled_listings_first_time.id_crawled_listing
