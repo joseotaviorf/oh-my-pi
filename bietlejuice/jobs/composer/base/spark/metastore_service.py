@@ -2,14 +2,10 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-
-sqlContext = BaseSparkContext.sqlContext
-
 logger = QuintoAndarLogger("MetastoreService")
 
 
-class MetastoreService:
+class SparkMetastoreService:
     def __init__(self, db, db_path, spark_sql_client):
         self.db = db
         self.db_path = db_path
@@ -19,22 +15,35 @@ class MetastoreService:
         self.spark_sql_client.run("CREATE DATABASE IF NOT EXISTS {}".format(self.db))
 
     def get_table_names(self):
-        return sqlContext.tableNames(dbName=self.db)
+        return self.spark_sql_client.table_names(self.db)
 
     def get_table_schema(self, table_name):
         return OrderedDict(
             field.simpleString().split(":")
-            for field in sqlContext.table(
+            for field in self.spark_sql_client.table(
                 "{}.{}".format(self.db, table_name)
             ).schema.fields
         )
 
     @logger(exclude="df")
-    def make_schema_merging(self, table_name, file_format, partition_by_list, df):
-        if not df:
+    def merge_schemas(self, table_name, file_format, partition_by_list, df):
+        """
+        Method to merge the schemas from the current table in the spark metastore and the input dataframe. If there are any new columns in df that don't exist in the table in metastore, this method will recreate the table with the new columns.
+
+        :param table_name: names of the table in the schema (without schema prefix)
+        :param file_format: file format of the table in spark metastore
+        :param partition_by_list: list of the column names which the table is partitioned
+        :param df: spark dataframe with new data ready to load
+        :return: None
+        """
+        if df is None:
             raise ValueError("m=make_schema_merging, msg=input df is None")
         if table_name not in self.get_table_names():
-            raise ValueError("m=make_schema_merging, msg=input df is None")
+            raise ValueError(
+                "m=make_schema_merging, msg=Table does not exists in schema {}".format(
+                    self.db
+                )
+            )
 
         current_schema = self.get_table_schema(table_name)
         new_data_schema = OrderedDict(
@@ -78,7 +87,7 @@ class MetastoreService:
         )
         self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
         self.spark_sql_client.run(ddl)
-        self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
+        self.update_table_partitions(table_name)
 
     def update_table_partitions(self, table_name):
         self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
