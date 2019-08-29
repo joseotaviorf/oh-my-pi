@@ -51,6 +51,7 @@ class TestTwitterCampaigns(object):
         campaigns_ids = ['c1', 'c2']
         ad_groups_ids = ['ag1', 'ag2']
         prom_twts_ids = ['tw1', 'tw2']
+        twitter_campaigns.execution_date = datetime.today()
 
         acc1 = MagicMock()
         acc2 = MagicMock()
@@ -268,6 +269,14 @@ class TestTwitterCampaigns(object):
         mock__obj_to_s3.assert_called_with(obj_io=mocked_bytes_io,
                                            bucket=twitter_campaigns.s3_bucket,
                                            file_path=expected_s3_file_path)
+
+    @mock.patch.object(BaseETL, 'obj_to_s3')
+    def test_save_to_s3_with_empty_data(self, mock__obj_to_s3, twitter_campaigns):
+        # act
+        twitter_campaigns._save_to_s3(mock.ANY, mock.ANY, [])
+
+        # assert
+        mock__obj_to_s3.assert_not_called()
 
     def test_get_accounts_with_no_accounts(self, twitter_campaigns):
         # arrange
