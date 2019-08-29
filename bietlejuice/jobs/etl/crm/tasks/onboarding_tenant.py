@@ -17,7 +17,6 @@ class CRMTasksOnboardingTenant(CRMTasks):
         'ConfirmarLocalChaves',
         'ContatarInquilinoInfoEntregaChaves',
         'EntregaChavesParaInquilino',
-        'EnviarVistoria',
         'InquilinoNaoRecebeuTodasChaves',
         'PagarContasConsumo',
         'SendLongTermEmailOwner',
