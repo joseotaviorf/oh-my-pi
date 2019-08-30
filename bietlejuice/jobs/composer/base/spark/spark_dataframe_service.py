@@ -22,7 +22,7 @@ class SparkDataFrameService:
         return self.df
 
     @staticmethod
-    def column_name_format(column_name):
+    def format_column_name(column_name):
         formatted_name = re.sub(
             r"\W", "", column_name.replace(" ", "_").replace(".", "_")
         )
@@ -30,24 +30,24 @@ class SparkDataFrameService:
         formatted_name = re.sub(r"(.)_([A-Z])", r"\g<1>__\g<2>", formatted_name)
         return formatted_name.lower()
 
-    def columns_name_format(self):
+    def format_column_names(self):
         if not self.df:
-            raise ValueError("m=columns_name_format, msg=input df is None")
+            raise ValueError("m=format_column_names, msg=input df is None")
         existing_names = self.df.schema.fieldNames()
         new_names = [
-            SparkDataFrameService.column_name_format(name) for name in existing_names
+            SparkDataFrameService.format_column_name(name) for name in existing_names
         ]
         for existing_name, new_name in zip(existing_names, new_names):
             self.df = self.df.withColumnRenamed(existing_name, new_name)
         return SparkDataFrameService(self.df)
 
-    def struct_type_to_json(self):
+    def convert_struct_type_to_json(self):
         if not self.df:
-            raise ValueError("m=struct_type_to_json, msg=input df is None")
+            raise ValueError("m=convert_struct_type_to_json, msg=input df is None")
         for field in self.df.schema.fields:
             if isinstance(field.dataType, StructType):
                 logger.info(
-                    "m=struct_type_to_json, converting struct {} to json".format(
+                    "m=convert_struct_type_to_json, converting struct {} to json".format(
                         field.name
                     )
                 )
@@ -78,7 +78,7 @@ class SparkDataFrameService:
         json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
         if format_column_names:
             json_column_names = [
-                SparkDataFrameService.column_name_format(name)
+                SparkDataFrameService.format_column_name(name)
                 for name in json_column_names
             ]
         json_tuple_alias = ", ".join(
@@ -100,7 +100,7 @@ class SparkDataFrameService:
             .withColumn("day", dayofmonth(col(date_column_name)))
         )
 
-    def partition_optimize(self, records_by_partition):
+    def optimize_partition(self, records_by_partition):
         len_data = self.df.count()
         partitions = max(len_data // records_by_partition, 1)
         if partitions > self.df.rdd.getNumPartitions():
