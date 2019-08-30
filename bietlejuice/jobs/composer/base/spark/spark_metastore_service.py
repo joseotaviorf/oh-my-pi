@@ -15,22 +15,28 @@ class SparkMetastoreService:
         self.spark_sql_client.run("CREATE DATABASE IF NOT EXISTS {}".format(self.db))
 
     def get_table_names(self):
-        return self.spark_sql_client.table_names(self.db)
+        return self.spark_sql_client.get_table_names(self.db)
 
     def get_table_schema(self, table_name):
         return OrderedDict(
             field.simpleString().split(":")
-            for field in self.spark_sql_client.table(
+            for field in self.spark_sql_client.get_table(
                 "{}.{}".format(self.db, table_name)
             ).schema.fields
         )
+
+    def update_table_partitions(self, table_name):
+        self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
+
+    def drop_table(self, table_name):
+        self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
 
     @logger(exclude="df")
     def merge_schemas(self, table_name, file_format, partition_by_list, df):
         """
         Method to merge the schemas from the current table in the spark metastore and the input dataframe. If there are any new columns in df that don't exist in the table in metastore, this method will recreate the table with the new columns.
 
-        :param table_name: names of the table in the schema (without schema prefix)
+        :param table_name: name of the table in the schema (without schema prefix)
         :param file_format: file format of the table in spark metastore
         :param partition_by_list: list of the column names which the table is partitioned
         :param df: spark dataframe with new data ready to load
@@ -40,7 +46,7 @@ class SparkMetastoreService:
             raise ValueError("m=make_schema_merging, msg=input df is None")
         if table_name not in self.get_table_names():
             raise ValueError(
-                "m=make_schema_merging, msg=Table does not exists in schema {}".format(
+                "m=make_schema_merging, msg=Table does not exist in schema {}".format(
                     self.db
                 )
             )
@@ -85,9 +91,6 @@ class SparkMetastoreService:
                 ddl
             )
         )
-        self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
+        self.drop_table(table_name)
         self.spark_sql_client.run(ddl)
         self.update_table_partitions(table_name)
-
-    def update_table_partitions(self, table_name):
-        self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))

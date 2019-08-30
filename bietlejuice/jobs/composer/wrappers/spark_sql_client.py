@@ -6,8 +6,8 @@ class SparkSQLCLient:
     def run(self, query):
         self.spark.sql(query)
 
-    def table_names(self, db):
+    def get_table_names(self, db):
         return self.sqlContext.tableNames(dbName=db)
 
-    def table(self, table_name):
+    def get_table(self, table_name):
         return self.sqlContext.table(table_name)

@@ -38,7 +38,7 @@ class SparkDataframeIntoDatalakeLoader:
 
         :param df: spark dataframe with the data to load
         :param partition_by_list: list of the column names which the table is partitioned
-        :param table_name: names of the table in the schema (without schema prefix)
+        :param table_name: name of the table in the schema (without schema prefix)
         :param schema_merging: boolean field to enable the schema merging between the table in the spark metastore and the df
         :return: None
         """
