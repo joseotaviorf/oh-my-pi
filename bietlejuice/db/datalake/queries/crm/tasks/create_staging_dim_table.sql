@@ -81,10 +81,11 @@ select
   ct.origin,
   ct.type,
   ct.is_task_auto_completed,
-  lpad(ct.description, 5000, '*') as description,
+  substr(string, 
+  substr(ct.description, 1, 5000) as description,
   ct.subject,
   ct.titles,
   ct.workgroups,
   ct.ts_partition
-from tasks ct
+from tasks ct;
 -- because the query can have another where clause (appended at runtime), a semicolon MUST NOT be added
