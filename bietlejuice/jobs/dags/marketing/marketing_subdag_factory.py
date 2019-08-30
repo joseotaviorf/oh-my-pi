@@ -8,6 +8,8 @@ from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import \
     MarketingFacebookAdsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import \
     MarketingGoogleAdsSubDag
+from bietlejuice.jobs.dags.marketing.marketing_linkedin_campaigns_subdag import \
+    MarketingLinkedInCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_rtb_campaigns_subdag import \
     MarketingRtbCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_trovit_campaigns_subdag import \
@@ -54,5 +56,6 @@ class MarketingSubDagFactory(object):
             MarketingEnum.RTB: MarketingRtbCampaignsSubDag,
             MarketingEnum.CLASSIFIEDS_COSTS: MarketingClassifiedsCostsSubDag,
             MarketingEnum.TROVIT: MarketingTrovitCampaignsSubDag,
-            MarketingEnum.TWITTER: MarketingTwitterCampaignsSubDag
+            MarketingEnum.TWITTER: MarketingTwitterCampaignsSubDag,
+            MarketingEnum.LINKEDIN: MarketingLinkedInCampaignsSubDag
         }.get(class_)

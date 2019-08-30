@@ -2,4 +2,4 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['athena_crawled_listings_last_30_days']
+    task_ids: ['dw_crawled_listings_last_30_days']
