@@ -11,7 +11,7 @@ create table if not exists crm.dim_visit_task (
   origin varchar,
   type varchar,
   is_task_auto_completed boolean,
-  description varchar(2000),
+  description varchar(5000),
   subject varchar(100),
   titles varchar,
   workgroups varchar,
