@@ -27,7 +27,12 @@ contract_proposal_house_listing as (
     cast(sk_proposal as bigint) as sk_proposal,
     cast(sk_contract as bigint) as sk_contract,
     cast(sk_owner as bigint) as sk_house_owner,
-    cast(sk_client as bigint) as sk_tenant
+    case
+        when sk_contract != '-1'
+            then cast(sk_client as bigint)
+        else -1::bigint
+    end as sk_tenant,
+    case when sk_proposal != -1 cast(sk_client as bigint) as sk_propopent
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
     or sk_proposal != '-1'

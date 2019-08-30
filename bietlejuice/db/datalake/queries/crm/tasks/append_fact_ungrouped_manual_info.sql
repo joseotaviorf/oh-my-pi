@@ -65,4 +65,4 @@ select distinct
 from contracts c
 left join contract_house_listing chl_rent_flow
     on c.sk_rent_flow = chl_rent_flow.sk_rent_flow
-    and c.sk_contract is null
+--    and c.sk_contract is null
