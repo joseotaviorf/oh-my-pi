@@ -41,6 +41,8 @@ class SparkMetastoreService:
         :param partition_by_list: list of the column names which the table is partitioned
         :param df: spark dataframe with new data ready to load
         :return: None
+
+        TODO: Split this method in two: one the compares schemas and other the recreate the table if necessary.
         """
         if df is None:
             raise ValueError("m=make_schema_merging, msg=input df is None")
