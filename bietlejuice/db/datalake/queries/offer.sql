@@ -2,10 +2,10 @@ with analysis_date as (
   select
     oa.id,
     min(cast(from_unixtime(cast(ure.timestamp as double) / 1000) as timestamp)) as _date
-  from datalake_raw.ebdb_offer_aud oa
-  join datalake_raw.ebdb_usuariorevisionentity ure
+  from datalake_ebdb_raw_prod.offer_aud oa
+  join datalake_ebdb_raw_prod.usuariorevisionentity ure
     on oa.rev = ure.id
-  where oa.status_MOD = '1'
+  where oa.status_MOD = true
 	and oa.status in ('Aprovada', 'Rejeitada')
   group by 1
 ),
@@ -15,8 +15,8 @@ rent_value_offers as (
       godfatherid,
       turn,
       max(rev) as rev_
-    from datalake_raw.ebdb_offer_aud
-    where turn_mod = '1'
+    from datalake_ebdb_raw_prod.offer_aud
+    where turn_mod = true
       and type = 'Price'
     group by 1, 2
   )
@@ -24,7 +24,7 @@ rent_value_offers as (
     o_aud.godfatherid,
     max(case when md.turn = 'Owner' then o_aud.rent end) as last_rent_offered_by_tenant,
 	max(case when md.turn = 'Tenant' then o_aud.rent end) as last_rent_offered_by_owner
-  from datalake_raw.ebdb_offer_aud o_aud
+  from datalake_ebdb_raw_prod.offer_aud o_aud
   join max_date md
     on md.godfatherid = o_aud.godfatherid
       and md.rev_ = o_aud.rev
@@ -56,9 +56,9 @@ select distinct
   gt.type as topic_type,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner
-from datalake_raw.ebdb_offer eo
+from datalake_ebdb_raw_prod.offer eo
 join datalake_raw.godfather_offer go
-  on eo.godfatherid = go.id
+  on eo.godfatherid = try_cast(go.id as bigint)
 left join datalake_raw.godfather_topic gt
   on gt.offer_id = go.id
 left join analysis_date ad
