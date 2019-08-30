@@ -9,14 +9,14 @@ from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, SparkSQLCLien
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
-    DataFrameService,
-    MetastoreService,
-    TableStorageFormat,
+    SparkDataFrameService,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
-from bietlejuice.jobs.composer.loaders import DataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -25,7 +25,7 @@ base_dbutils = BaseDBUtils()
 if base_dbutils.get_dbutils() is not None:
     dbutils = base_dbutils.get_dbutils()
 
-spark = BaseSparkContext.spark
+spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 parser = ArgumentParser(description="load_events_into_datalake_raw")
 parser.add_argument("execution_date")
@@ -45,13 +45,13 @@ if __name__ == "__main__":
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
     amplitude_events = AmplitudeEvents()
-    spark_sql_client = SparkSQLCLient(spark)
-    dataframe_service = DataFrameService()
-    metastore_service = MetastoreService(
+    spark_sql_client = SparkSQLCLient(spark, sqlContext)
+    dataframe_service = SparkDataFrameService()
+    metastore_service = SparkMetastoreService(
         db_info["db_raw_databricks"], db_info["db_raw_path"], spark_sql_client
     )
-    dataframe_loader = DataframeIntoDatalakeLoader(
-        TableStorageFormat.DEFAULT_RAW, metastore_service
+    dataframe_loader = SparkDataframeIntoDatalakeLoader(
+        SparkTableStorageFormat.DEFAULT_RAW, metastore_service
     )
     table_name = "events"
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
-            dataframe_loader.partition_overwrite_load(
+            dataframe_loader.overwrite_partition(
                 df, ["year", "month", "day", "app"], table_name, schema_merging=True
             )
             metastore_service.update_table_partitions(table_name)

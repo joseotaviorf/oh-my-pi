@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("MetastoreService")
+logger = QuintoAndarLogger("SparkMetastoreService")
 
 
 class SparkMetastoreService:
@@ -45,10 +45,10 @@ class SparkMetastoreService:
         TODO: Split this method in two: one the compares schemas and other the recreate the table if necessary.
         """
         if df is None:
-            raise ValueError("m=make_schema_merging, msg=input df is None")
+            raise ValueError("m=merge_schemas, msg=input df is None")
         if table_name not in self.get_table_names():
             raise ValueError(
-                "m=make_schema_merging, msg=Table does not exist in schema {}".format(
+                "m=merge_schemas, msg=Table does not exist in schema {}".format(
                     self.db
                 )
             )
@@ -66,12 +66,12 @@ class SparkMetastoreService:
         ]
         if not new_columns:
             logger.info(
-                "m=make_schema_merging, msg=the schema is compatible no need to recreate table"
+                "m=merge_schemas, msg=the schema is compatible no need to recreate table"
             )
             return None
 
         logger.info(
-            "m=make_schema_merging, msg=the schema is incompatible, creating new columns: {}".format(
+            "m=merge_schemas, msg=the schema is incompatible, creating new columns: {}".format(
                 str(new_columns)
             )
         )
@@ -89,7 +89,7 @@ class SparkMetastoreService:
             self.db_path + table_name,
         )
         logger.info(
-            "m=make_schema_merging, the schema is incompatible, new table definition: \n{}".format(
+            "m=merge_schemas, the schema is incompatible, new table definition: \n{}".format(
                 ddl
             )
         )
