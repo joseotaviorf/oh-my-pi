@@ -20,6 +20,8 @@ create table if not exists staging.fact_inspection_tasks (
   sk_contract bigint,
   sk_inspection bigint,
   sk_house_listing bigint,
+  sk_house_owner bigint,
+  sk_tenant bigint,
   dt_partition date
 )
 ;
