@@ -82,12 +82,13 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        property_listing = BaseDAG.build_python_operator(
-            dag=dag,
+        house_listing_task = BaseDAG.build_python_operator(
             task_id='ODS_house_listing',
-            python_callable=utils.materialize_view_ods,
+            dag=dag,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
-                'view_name': 'house_listing',
+                'table_name': 'house_listing',
+                'file_name': 'house/house_listing.sql',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
@@ -111,5 +112,5 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, property_listing, staging_dim_house_listing_task,
+        return (property_task, affiliate, rent_flow, house_listing_task, staging_dim_house_listing_task,
                 dim_house_listing)
