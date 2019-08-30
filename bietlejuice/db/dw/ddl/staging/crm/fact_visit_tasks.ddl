@@ -19,6 +19,8 @@ create table if not exists staging.fact_visit_tasks (
   task_user_action_resolve_hours numeric(14,2),
   sk_booking bigint,
   sk_house_listing bigint,
+  sk_house_owner bigint,
+  sk_visitor bigint,
   dt_partition date
 )
 ;

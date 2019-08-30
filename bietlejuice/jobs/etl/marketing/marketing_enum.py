@@ -9,3 +9,4 @@ class MarketingEnum(Enum):
     CLASSIFIEDS_COSTS = 'classifieds_costs'
     TROVIT = 'trovit_campaigns'
     TWITTER = 'twitter_ads'
+    LINKEDIN = 'linkedin_campaigns'
