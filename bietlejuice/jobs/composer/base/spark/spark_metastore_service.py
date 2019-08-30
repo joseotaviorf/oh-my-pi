@@ -48,9 +48,7 @@ class SparkMetastoreService:
             raise ValueError("m=merge_schemas, msg=input df is None")
         if table_name not in self.get_table_names():
             raise ValueError(
-                "m=merge_schemas, msg=Table does not exist in schema {}".format(
-                    self.db
-                )
+                "m=merge_schemas, msg=Table does not exist in schema {}".format(self.db)
             )
 
         current_schema = self.get_table_schema(table_name)

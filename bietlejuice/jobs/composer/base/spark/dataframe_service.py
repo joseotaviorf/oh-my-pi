@@ -78,7 +78,8 @@ class SparkDataFrameService:
         json_tuple_columns = ", ".join(["'{}'".format(x) for x in json_column_names])
         if format_column_names:
             json_column_names = [
-                SparkDataFrameService.column_name_format(name) for name in json_column_names
+                SparkDataFrameService.column_name_format(name)
+                for name in json_column_names
             ]
         json_tuple_alias = ", ".join(
             ["`{}{}`".format(prefix, x) for x in json_column_names]
