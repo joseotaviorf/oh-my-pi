@@ -81,7 +81,7 @@ select
   ct.origin,
   ct.type,
   ct.is_task_auto_completed,
-  ct.description,
+  lpad(ct.description, 5000, '*') as description,
   ct.subject,
   ct.titles,
   ct.workgroups,
