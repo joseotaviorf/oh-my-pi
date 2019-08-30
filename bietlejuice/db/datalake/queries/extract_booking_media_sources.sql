@@ -24,6 +24,7 @@ with cross_platform as (
 	where
 		et = 'visit_schedule_confirmed'
 	and trim(app) = '170698'
+	and ym <= '2018-12'
 	-- union with amplitude events via SPARK process
 	union
 	select
@@ -47,7 +48,8 @@ with cross_platform as (
 	 		else coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '')
 	 	end as media_source
 	  from datalake_amplitude_clean_prod.events
-	  where event_type = 'visit_schedule_confirmed'
+	  where year >= 2019
+	  and event_type = 'visit_schedule_confirmed'
 	  and app=170698
 ),
 ios as (

@@ -45,18 +45,6 @@ pre_online_metrics AS (
   WITH
   metrics AS (
         SELECT
-          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(evt.event_time), 1, 10) AS DATE)) AS event_date,
-          TRIM(evt.e_house_id) AS house_id,
-          CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
-          CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views,
-          CASE WHEN TRIM(evt.et) = 'tips_page_viewed' THEN evt.uuid END AS tips_page_views
-        FROM datalake_clean.amplitude_events evt
-        WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-          AND TRIM(platform) IN ('Web', 'iOS')
-          AND TRIM(u_platform) IN ('web_mobile', 'web_desktop', 'ios')
-          AND ym >= '2019-01'
-    union
-        SELECT
           DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
           coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '') as house_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
