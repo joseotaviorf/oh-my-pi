@@ -1,5 +1,4 @@
-with
-imovel_aud as (
+with house_aud as (
 --------------------------------------------------------------------------------------------------------
 -- Bring to IMOVEL_AUD datetime for each revision made 	        				    				  --
 -- Also creates previous_status column so we can identify status changes		    				  --
@@ -15,7 +14,7 @@ imovel_aud as (
     from datalake_ebdb_raw_prod.imovel_aud i
 	inner join datalake_ebdb_raw_prod.usuariorevisionentity rev
 	  on rev.id = i.rev
-    order by i.id, i.rev
+--    order by i.id, i.rev
 ),
 house_status_history as (
 --------------------------------------------------------------------------------------------------------
@@ -30,10 +29,11 @@ select
 	status as status_history,
 	lead(status_time) over(partition by id order by rev) as next_status_change_time,
 	-- last_value(status) over(partition by id rows between unbounded preceding and unbounded following) as current_status,
-	row_number() over(partition by id order by rev) as order_status
-from imovel_aud
+	row_number() over(partition by id order by rev) as order_status,
+	aluguel as rent
+from house_aud
 where (status <> previous_status or previous_status is null)
-order by id, rev
+--order by id, rev
 ),
 house_new_status_new_date as (
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ select
     case when status_history is null then ts_first_publication else ts_status_changed end as new_ts_status_changed,
     max(order_status) over(partition by id_house) as max_order_status
 from house_status_history
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_changes as (
 --------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ select
 	              (new_status_history = 'despublicado' and days_unpublished >= 84) then 1
              else 0 end) over (partition by id_house order by rev rows unbounded preceding) as sum_events_change_version
 from house_new_status_new_date h_new
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_first_publi as (
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ select
 	min(case when new_status_history = 'publicado' then new_ts_status_changed
 	         end) over(partition by id_house, sum_events_change_version order by rev) as first_publication_change_version
 from house_status_version_changes
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_publications as (
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ select
 	*,
 	max(first_publication_change_version) over (partition by id_house order by rev rows unbounded preceding) as publication_version_date
 from house_status_version_first_publi
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_order as (
 --------------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ select
 	*,
 	case when publication_version_date is null then 0 else dense_rank() over(partition by id_house order by publication_version_date) end as order_version
 from house_status_version_publications
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_last_status as (
 --------------------------------------------------------------------------------------------------------
@@ -152,6 +152,9 @@ select
 	hs_v.id_house,
 	hs_v.order_version as version,
 	sc_v.category_change as change_version_status,
+	max(rent) as rent,
+	max(status_history) as status_history,
+	max(ts_status_changed) as ts_status_changed,
 	max(hs_v.last_status) as status,
 	min(cast(hs_v.publication_version_date as timestamp)) as ts_listing_version_start,
 	max(coalesce(hs_v.next_status_change_time,cast('2200-01-01 12:00:00' as timestamp))) as ts_listing_version_end
@@ -160,22 +163,25 @@ left join status_change_version sc_v
   on hs_v.id_house = sc_v.id_house
   and hs_v.order_version = sc_v.order_version
 group by 1, 2, 3
-order by hs_v.id_house, hs_v.order_version
+--order by hs_v.id_house, hs_v.order_version
 ),
 house_listing_full as (
 --------------------------------------------------------------------------------------------------------
 -- Create category                                                                                    --
 --------------------------------------------------------------------------------------------------------
 select
-	cast(cast(id_house as varchar)||'00'||cast(version as varchar) as bigint) as sk_house_listing,
+	cast(cast(id_house as varchar)||'00'||cast(version as varchar) as bigint) as id_house_listing,
 	id_house,
 	version,
-	case when version = 0 then NULL
+	case when version = 0 then null
 	     when version = 1 then 'First Listing'
 	     when version <> 0 and lag(change_version_status) over(partition by id_house order by version) = 'alugado' then 'Re-Listing'
 	     when version <> 0 and lag(change_version_status) over(partition by id_house order by version) in ('despublicado') then 'Recovered'
-	     else NULL end as listing_category_start,
+	     else null end as listing_category_start,
 	status,
+	rent,
+	status_history,
+	ts_status_changed,
 	ts_listing_version_start,
 	nullif(cast(ts_listing_version_end as timestamp),cast('2200-01-01 12:00:00' as timestamp)) as ts_listing_version_end
 from house_listing_plain
@@ -223,13 +229,13 @@ listing_special_conditions as (
 -- selecting the last time a listing had its special condition changed on its version
 -- example:
 -- ----------------------------------------------------------------------------------
--- |  sk_house_listing  |  special_condition_type  |  dt_opted_in  |  dt_opted_out  |
+-- |  id_house_listing  |  special_condition_type  |  dt_opted_in  |  dt_opted_out  |
 -- ----------------------------------------------------------------------------------
 -- |    892812943001    |      OriginalsReady      |   2019-03-04  |   2019-05-12   | -> will be removed
 -- |    892812943001    |      OriginalsReady      |   2019-05-13  |      null      |
 -- ----------------------------------------------------------------------------------
   select
-    hl.sk_house_listing,
+    hl.id_house_listing,
     sc.specialconditiontype,
     max(sc.in_) as dt_opted_in,
     max(sc.out_) as dt_opted_out
@@ -246,19 +252,19 @@ listing_special_conditions_dates as (
 	with multiple_special_conditions as (
 	-- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
   	  select
-  		sk_house_listing,
+  		id_house_listing,
   		specialconditiontype,
   		dt_opted_in,
   		dt_opted_out,
   		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-  		row_number() over (partition by sk_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in desc, coalesce(dt_opted_out, date('2100-01-01')) desc) as rn_last,
-  		row_number() over (partition by sk_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in asc, coalesce(dt_opted_out, date('2100-01-01')) asc) as rn_first
+  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in desc, coalesce(dt_opted_out, date('2100-01-01')) desc) as rn_last,
+  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in asc, coalesce(dt_opted_out, date('2100-01-01')) asc) as rn_first
   	  from listing_special_conditions
     ),
     last_opt as (
     -- select the latest Special Condition type a house listing has entered
       select
-        sk_house_listing,
+        id_house_listing,
         specialconditiontype,
         dt_opted_in,
         dt_opted_out
@@ -268,7 +274,7 @@ listing_special_conditions_dates as (
     first_opt as (
     -- select the oldest Special Condition type a house listing has entered
       select
-        sk_house_listing,
+        id_house_listing,
         specialconditiontype,
         dt_opted_in,
         dt_opted_out
@@ -276,7 +282,7 @@ listing_special_conditions_dates as (
       where rn_first = 1
     )
      select
-        fo.sk_house_listing,
+        fo.id_house_listing,
         lo.specialconditiontype, -- important to select special_condition_type from last_op since we want to show LAST special condition type
         fo.dt_opted_in as dt_first_opted_in,
         fo.dt_opted_out as dt_first_opted_out,
@@ -284,30 +290,37 @@ listing_special_conditions_dates as (
         lo.dt_opted_out as dt_last_opted_out
      from last_opt lo
      join first_opt fo
-       on lo.sk_house_listing = fo.sk_house_listing
+       on lo.id_house_listing = fo.id_house_listing
        and (case when lo.specialconditiontype like 'Originals%' then 'Originals' else lo.specialconditiontype end) = (case when fo.specialconditiontype like 'Originals%' then 'Originals' else fo.specialconditiontype end)
 )
 select
-  hl.sk_house_listing,
+  hl.id_house_listing,
   hl.id_house,
   hl.version,
   hl.status,
-  hl.ts_listing_version_start,
-  hl.ts_listing_version_end,
+  hl.rent,
   hl.listing_category_start,
+  lsc_originals.specialconditiontype as last_originals_type,
+  hl.version = max(hl.version) over (partition by hl.id_house) as is_last_version,
   lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
-  lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
-  lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   lsc_originals.dt_last_opted_in is not null
     and lsc_originals.dt_last_opted_out is null as is_originals_active,
-  lsc_originals.specialconditiontype as last_originals_type,
+  hl.ts_listing_version_start,
+  hl.ts_listing_version_end,
+  case
+    when hl.status_history = 'despublicado'
+      then  hl.ts_status_changed
+    else null
+  end as ts_de_publication,
+  lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
+  lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
-  lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
-  cast(now() as timestamp) as ts_load
+  lsc_originals.dt_last_opted_out as dt_last_originals_opted_out
 from house_listing_full hl
 left join listing_special_conditions_dates lsc_originals
-  on hl.sk_house_listing = lsc_originals.sk_house_listing
+  on hl.id_house_listing = lsc_originals.id_house_listing
     and lsc_originals.specialconditiontype like 'Originals%'
 left join listing_special_conditions_dates lsc_exclusivity
-  on hl.sk_house_listing = lsc_exclusivity.sk_house_listing
-    and lsc_exclusivity.specialconditiontype = 'Exclusivity';
+  on hl.id_house_listing = lsc_exclusivity.id_house_listing
+    and lsc_exclusivity.specialconditiontype = 'Exclusivity'
+;

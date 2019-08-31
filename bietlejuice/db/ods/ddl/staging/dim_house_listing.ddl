@@ -46,7 +46,6 @@ create table staging.dim_house_listing (
   registration_abandoned_reason varchar,
   house_unpublished_reason varchar,
   listing_category_start varchar,
-  listing_category_end varchar,
   is_last_version boolean,
   is_exclusive boolean,
   dt_last_exclusive_opted_in date,

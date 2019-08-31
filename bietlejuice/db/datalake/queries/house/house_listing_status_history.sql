@@ -15,14 +15,15 @@ imovel_aud as (
     from datalake_ebdb_raw_prod.imovel_aud i
 	inner join datalake_ebdb_raw_prod.usuariorevisionentity rev 
 	  on rev.id = i.rev  
-    order by i.id, i.rev
+--    order by i.id, i.rev
 ),
 house_status_history as (
 --------------------------------------------------------------------------------------------------------
 -- Create status_history: for each house show all status changes, with start and end of each status   --
 --------------------------------------------------------------------------------------------------------
 select 
-	id as id_house, 
+	id as id_house,
+	regiao_id as id_region,
 	rev, 
 	status_mod,
 	max(from_iso8601_timestamp(firstpublication)) over(partition by id) as ts_first_publication,
@@ -34,7 +35,7 @@ select
 	motivo as reason
 from imovel_aud 
 where (status <> previous_status or previous_status is null)
-order by id, rev
+--order by id, rev
 ),
 house_new_status_new_date as (
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ select
     case when status_history is null then ts_first_publication else ts_status_changed end as new_ts_status_changed,
     max(order_status) over(partition by id_house) as max_order_status
 from house_status_history
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_changes as (
 --------------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ select
 	              (new_status_history = 'despublicado' and days_unpublished >= 84) then 1 
              else 0 end) over (partition by id_house order by rev rows unbounded preceding) as sum_events_change_version
 from house_new_status_new_date h_new
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_first_publi as (
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -85,7 +86,7 @@ select
 	min(case when new_status_history = 'publicado' then new_ts_status_changed 
 	         end) over(partition by id_house, sum_events_change_version order by rev) as first_publication_change_version
 from house_status_version_changes
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_publications as (
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +97,7 @@ select
 	*,
 	max(first_publication_change_version) over (partition by id_house order by rev rows unbounded preceding) as publication_version_date
 from house_status_version_first_publi
-order by id_house, rev
+--order by id_house, rev
 ),
 house_status_version_order as (
 --------------------------------------------------------------------------------------------------------
@@ -106,17 +107,15 @@ select
 	*,
 	case when publication_version_date is null then 0 else dense_rank() over(partition by id_house order by publication_version_date) end as order_version
 from house_status_version_publications
-order by id_house, rev
+--order by id_house, rev
 )--,
 select 
 	cast(cast(id_house as varchar)||'00'||cast(order_version as varchar) as bigint) as sk_house_listing,
-	id_house,
-	rev,
-	status_mod,
+	id_region as sk_region,
 	new_status_history as status_history,
 	ts_first_publication,
 	cast(new_ts_status_changed as timestamp) as ts_status_start,
 	next_status_change_time as ts_status_end,
-	order_status,
-	reason
+	reason as status_change_reason,
+	cast(now() as timestamp) as ts_load
 from house_status_version_order; 
