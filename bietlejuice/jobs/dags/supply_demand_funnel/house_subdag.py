@@ -29,12 +29,16 @@ class HouseSubDag(DimSubDag):
         (house_task, affiliate, rent_flow, house_listing, staging_dim_house_listing_task,
          dim_house_listing) = self.__build_data_tasks(house_dag)
 
-        tests_tasks = self.build_tests_tasks(house_dag)
+        house_listing = self.__build_data_tasks(house_dag)
+
+        # TODO: put tests back to flow
+        # tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> house_listing
         staging_dim_house_listing_task.set_upstream([rent_flow, house_listing, house_task])
-        staging_dim_house_listing_task.set_downstream(tests_tasks)
-        dim_house_listing.set_upstream(tests_tasks)
+        # staging_dim_house_listing_task.set_downstream(tests_tasks)
+        # dim_house_listing.set_upstream(tests_tasks)
+        staging_dim_house_listing_task >> dim_house_listing
 
         return house_dag
 
@@ -111,6 +115,6 @@ class HouseSubDag(DimSubDag):
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
-
+        #
         return (property_task, affiliate, rent_flow, house_listing_task, staging_dim_house_listing_task,
                 dim_house_listing)
