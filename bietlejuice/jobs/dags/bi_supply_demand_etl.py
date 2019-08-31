@@ -92,14 +92,15 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
 
 
 @logger(exclude='kwargs')
-def create_table_in_dw_from_datalake(table_name, **kwargs):
+def create_table_in_dw_from_datalake(table_name, file_name, **kwargs):
     # setting variables
     file_path = '{}/{}{}.sql'.format(DATALAKE_QUERIES_DIR, kwargs.get('file_path', ''),
-                                     table_name)
+                                     file_name)
     athena_client = AthenaClient(bucket)
 
     # executing methods
-    df = athena_client.execute_file_query_and_return_dataframe(filename=file_path)
+    df = athena_client.execute_file_query_and_return_dataframe(file_path,
+                                                               kwargs.get('query_params'))
 
     if len(df.index) == 0:
         raise ValueError(
@@ -362,119 +363,121 @@ def special_condition_sub_dag(sub_dag_name):
     return sub_dag.build_special_condition()
 
 
-# ods_house_rent_flow = BaseDAG.build_python_operator(
-#     task_id='ODS_house_rent_flow',
-#     dag=main_dag,
-#     python_callable=extract_query_dim_from_ebdb_to_ods,
-#     op_kwargs={'table_name': 'house_rent_flow'}
-# )
-#
-# fact_house_listings = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_Fact_House_Listings',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-# )
-#
-# fact_photo_job = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_fact_photo_job',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-# )
-#
-# fact_listing_rent_flows = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_fact_listing_rent_flows',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
-# )
-
-fact_house_status_task = BaseDAG.build_python_operator(
+ods_house_rent_flow = BaseDAG.build_python_operator(
+    task_id='ODS_house_rent_flow',
     dag=main_dag,
-    task_id='DW_fact_house_status',
+    python_callable=extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'table_name': 'house_rent_flow'}
+)
+
+fact_house_listings = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_Fact_House_Listings',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+fact_photo_job = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_photo_job',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+fact_listing_rent_flows = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_listing_rent_flows',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
+)
+
+fact_house_listing_status_history_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_house_listing_status_history',
     python_callable=create_table_in_dw_from_datalake,
     op_kwargs={
-        'table_name': 'fact_house_status',
+        'table_name': 'fact_house_listing_status_history',
+        'file_name': 'house_listing_status_history',
         'file_path': 'house/'
     }
 )
-#
-# fact_inspection_bookings_task = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_fact_inspection_bookings',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
-# )
-#
-# # new 'supply' flow
-# ods_house_listing_flows = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='ODS_House_Listing_Flows',
-#     provide_context=True,
-#     python_callable=extract_query_dim_from_ebdb_to_ods,
-#     execution_timeout=timedelta(hours=7),
-#     op_kwargs={'table_name': 'fact_house_listing_flows'}
-# )
-#
-# dw_fact_house_listing_flows = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_Fact_House_Listing_Flows',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'house_listing_flows', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
-# )
-#
-# dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='DW_Rent_Flow_Taxonomy',
-#     python_callable=load_dim_from_ods_to_dw,
-#     op_kwargs={'dim_name': 'rent_flow_taxonomy', 'bucket': bucket, 'insert_dummy': True, 'post_command_file': True}
-# )
-#
-# fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='Fact_Lead_Task_Contact_Flows',
-#     python_callable=create_table_in_dw_from_datalake,
-#     op_kwargs={'query_params': {'task_types': "'ConverterLead', 'ConverterLeadPrioritario'"},
-#                'table_name': 'fact_lead_task_contact_flows'}
-# )
-#
-# # flow
-# lead_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=lead_sub_dag,
-#     sub_dag_name='Lead'
-# )
-#
-# lead_conversion_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=lead_conversion_sub_dag,
-#     sub_dag_name='LeadConversion'
-# )
-#
-# photo_job_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=photo_job_sub_dag,
-#     sub_dag_name='PhotoJob'
-# )
-#
-# region_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=region_sub_dag,
-#     sub_dag_name='Region'
-# )
-#
-# user_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=user_sub_dag,
-#     sub_dag_name='User'
-# )
-#
-# inspection_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=inspection_sub_dag,
-#     sub_dag_name='Inspection'
-# )
+
+fact_inspection_bookings_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_inspection_bookings',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
+)
+
+# new 'supply' flow
+ods_house_listing_flows = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='ODS_House_Listing_Flows',
+    provide_context=True,
+    python_callable=extract_query_dim_from_ebdb_to_ods,
+    execution_timeout=timedelta(hours=7),
+    op_kwargs={'table_name': 'fact_house_listing_flows'}
+)
+
+dw_fact_house_listing_flows = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_Fact_House_Listing_Flows',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'house_listing_flows', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+)
+
+dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_Rent_Flow_Taxonomy',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'rent_flow_taxonomy', 'bucket': bucket, 'insert_dummy': True, 'post_command_file': True}
+)
+
+fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='Fact_Lead_Task_Contact_Flows',
+    python_callable=create_table_in_dw_from_datalake,
+    op_kwargs={'query_params': {'task_types': "'ConverterLead', 'ConverterLeadPrioritario'"},
+               'table_name': 'fact_lead_task_contact_flows',
+               'file_name': 'fact_lead_task_contact_flows'}
+)
+
+# flow
+lead_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=lead_sub_dag,
+    sub_dag_name='Lead'
+)
+
+lead_conversion_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=lead_conversion_sub_dag,
+    sub_dag_name='LeadConversion'
+)
+
+photo_job_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=photo_job_sub_dag,
+    sub_dag_name='PhotoJob'
+)
+
+region_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=region_sub_dag,
+    sub_dag_name='Region'
+)
+
+user_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=user_sub_dag,
+    sub_dag_name='User'
+)
+
+inspection_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=inspection_sub_dag,
+    sub_dag_name='Inspection'
+)
 
 house_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -482,162 +485,162 @@ house_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name='House'
 )
 
-# visit_dag = BaseSubDag.get_sub_dag_operator(
+visit_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=visit_sub_dag,
+    sub_dag_name='Visit'
+)
+
+offer_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=offer_sub_dag,
+    sub_dag_name='Offer'
+)
+
+proposal_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=proposal_sub_dag,
+    sub_dag_name='Proposal'
+)
+
+contract_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=contract_sub_dag,
+    sub_dag_name='Contract'
+)
+
+partner_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=partner_sub_dag,
+    sub_dag_name='Partner'
+)
+
+partner_agent_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=partner_agent_sub_dag,
+    sub_dag_name='PartnerAgent'
+)
+
+booking_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=booking_sub_dag,
+    sub_dag_name='Booking'
+)
+
+bank_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=bank_sub_dag,
+    sub_dag_name='Bank'
+)
+
+bank_account_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=bank_account_sub_dag,
+    sub_dag_name='BankAccount'
+)
+
+bank_transaction_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=bank_transaction_sub_dag,
+    sub_dag_name='BankTransaction'
+)
+
+condo_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=condo_sub_dag,
+    sub_dag_name='Condo'
+)
+
+affiliate_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=affiliate_sub_dag,
+    sub_dag_name='Affiliate'
+)
+
+doorman_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=doorman_sub_dag,
+    sub_dag_name='Doorman'
+)
+
+special_condition_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=special_condition_sub_dag,
+    sub_dag_name='SpecialCondition'
+)
+
+xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='XCom_fact_listing_rent_flows',
+    python_callable=xcom_fact_listing_rent_flows_task,
+    provide_context=True
+)
+
+# TODO Recreate amplitude xcom after the data flow is fully fixed
+# check the dependency of amplitude_load_events
+# xcom_amplitude_task = BaseDAG.build_python_operator(
 #     dag=main_dag,
-#     sub_dag_func=visit_sub_dag,
-#     sub_dag_name='Visit'
+#     task_id='xcom_amplitude',
+#     provide_context=True,
+#     python_callable=xcom_dependencies,
+#     op_kwargs={'task_id': 'XCom_amplitude_load_events',
+#                'dag_id': 'bi-amplitude-load-events'},
+#     retry_delay=timedelta(minutes=10),
+#     max_retry_delay=timedelta(minutes=10),
+#     retries=15
 # )
-#
-# offer_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=offer_sub_dag,
-#     sub_dag_name='Offer'
-# )
-#
-# proposal_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=proposal_sub_dag,
-#     sub_dag_name='Proposal'
-# )
-#
-# contract_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=contract_sub_dag,
-#     sub_dag_name='Contract'
-# )
-#
-# partner_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=partner_sub_dag,
-#     sub_dag_name='Partner'
-# )
-#
-# partner_agent_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=partner_agent_sub_dag,
-#     sub_dag_name='PartnerAgent'
-# )
-#
-# booking_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=booking_sub_dag,
-#     sub_dag_name='Booking'
-# )
-#
-# bank_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=bank_sub_dag,
-#     sub_dag_name='Bank'
-# )
-#
-# bank_account_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=bank_account_sub_dag,
-#     sub_dag_name='BankAccount'
-# )
-#
-# bank_transaction_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=bank_transaction_sub_dag,
-#     sub_dag_name='BankTransaction'
-# )
-#
-# condo_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=condo_sub_dag,
-#     sub_dag_name='Condo'
-# )
-#
-# affiliate_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=affiliate_sub_dag,
-#     sub_dag_name='Affiliate'
-# )
-#
-# doorman_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=doorman_sub_dag,
-#     sub_dag_name='Doorman'
-# )
-#
-# special_condition_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=special_condition_sub_dag,
-#     sub_dag_name='SpecialCondition'
-# )
-#
-# xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
-#     dag=main_dag,
-#     task_id='XCom_fact_listing_rent_flows',
-#     python_callable=xcom_fact_listing_rent_flows_task,
-#     provide_context=True
-# )
-#
-# # TODO Recreate amplitude xcom after the data flow is fully fixed
-# # check the dependency of amplitude_load_events
-# # xcom_amplitude_task = BaseDAG.build_python_operator(
-# #     dag=main_dag,
-# #     task_id='xcom_amplitude',
-# #     provide_context=True,
-# #     python_callable=xcom_dependencies,
-# #     op_kwargs={'task_id': 'XCom_amplitude_load_events',
-# #                'dag_id': 'bi-amplitude-load-events'},
-# #     retry_delay=timedelta(minutes=10),
-# #     max_retry_delay=timedelta(minutes=10),
-# #     retries=15
-# # )
-#
-# # trigger bi-growth dag after all tasks have been successfully completed
-# trigger_bi_growth_dag_task = TriggerDagRunOperator(
-#     dag=main_dag,
-#     task_id='trigger_bi_growth_dag',
-#     trigger_dag_id='bi-growth',
-#     execution_date='{{ execution_date }}'
-# )
-#
-# # trigger bi-crm-load dag after all tasks have been successfully completed
-# trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
-#     dag=main_dag,
-#     task_id='trigger_bi_crm_load_dag',
-#     trigger_dag_id='bi-crm-load',
-#     execution_date='{{ execution_date }}'
-# )
-#
-# # trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
-# trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
-#     dag=main_dag,
-#     task_id='trigger_bi_agents_allocation_optimization_dag',
-#     trigger_dag_id='bi-agents-allocation-optimization'
-# )
-#
-# # TODO Recreate tasks flow after the data flow is fully fixed
-# # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
-# affiliate_dag.set_upstream([region_dag, user_dag])
-# [lead_conversion_dag, special_condition_dag] >> house_dag
-#
-# fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag,
-#                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
-#                                       dw_rent_flow_taxonomy_task])
-#
-# fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
-#                                         trigger_bi_agents_allocation_optimization_dag_task])
-#
-# house_dag.set_downstream([fact_photo_job, fact_house_status_task])
-#
-# photo_job_dag >> fact_photo_job
-#
-# fact_house_listings.set_upstream(
-#     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status_task])
-#
-# # new 'supply' flow
-# dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
-#                                           ods_house_listing_flows])
-#
-# # finance flow
-# user_dag.set_downstream([bank_dag, bank_account_dag])
-# bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
-#
-# inspection_dag >> fact_inspection_bookings_task
-#
-# trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
-# trigger_bi_crm_load_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+
+# trigger bi-growth dag after all tasks have been successfully completed
+trigger_bi_growth_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_growth_dag',
+    trigger_dag_id='bi-growth',
+    execution_date='{{ execution_date }}'
+)
+
+# trigger bi-crm-load dag after all tasks have been successfully completed
+trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_crm_load_dag',
+    trigger_dag_id='bi-crm-load',
+    execution_date='{{ execution_date }}'
+)
+
+# trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
+trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
+    dag=main_dag,
+    task_id='trigger_bi_agents_allocation_optimization_dag',
+    trigger_dag_id='bi-agents-allocation-optimization'
+)
+
+# TODO Recreate tasks flow after the data flow is fully fixed
+# xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
+affiliate_dag.set_upstream([region_dag, user_dag])
+[lead_conversion_dag, special_condition_dag] >> house_dag
+
+fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposal_dag, contract_dag,
+                                      user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
+                                      dw_rent_flow_taxonomy_task])
+
+fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
+                                        trigger_bi_agents_allocation_optimization_dag_task])
+
+house_dag.set_downstream([fact_photo_job, fact_house_status_task])
+
+photo_job_dag >> fact_photo_job
+
+fact_house_listings.set_upstream(
+    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status_task])
+
+# new 'supply' flow
+dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
+                                          ods_house_listing_flows])
+
+# finance flow
+user_dag.set_downstream([bank_dag, bank_account_dag])
+bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
+
+inspection_dag >> fact_inspection_bookings_task
+
+trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+trigger_bi_crm_load_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
