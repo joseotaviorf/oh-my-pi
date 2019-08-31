@@ -597,8 +597,7 @@ fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposa
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
 
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
-                                        trigger_bi_agents_allocation_optimization_dag_task])
+fact_listing_rent_flows >> xcom_fact_listing_rent_flows
 
 house_dag.set_downstream([fact_photo_job, fact_house_status])
 
