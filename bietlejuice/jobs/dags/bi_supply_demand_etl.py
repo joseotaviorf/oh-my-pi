@@ -588,13 +588,6 @@ trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
     execution_date='{{ execution_date }}'
 )
 
-# trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
-trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
-    dag=main_dag,
-    task_id='trigger_bi_agents_allocation_optimization_dag',
-    trigger_dag_id='bi-agents-allocation-optimization'
-)
-
 # TODO Recreate tasks flow after the data flow is fully fixed
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
