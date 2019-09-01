@@ -1,4 +1,6 @@
 from pyspark.sql.functions import lit
+from datetime import datetime
+from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -22,38 +24,49 @@ class TeravozLoader:
     SOURCE = "teravoz"
 
     @logger
-    def __init__(self, environment, datalake_layer, table_name):
-        self.ENV = environment
+    def __init__(self, environment, datalake_layer, table_name, execution_date):
+        self.env = environment
         self.datalake_layer = datalake_layer
         self.table_name = table_name
+        self.execution_date = execution_date
+
+        # Teravoz partitions pattern
+        # convert to datetime
+        dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
+
+        self.partitions = OrderedDict(
+            [
+                ("year", str(dt_execution.year)),
+                ("month", str(dt_execution.month)),
+                ("day", str(dt_execution.day)),
+            ]
+        )
+        self.db_name = "datalake_teravoz_{}".format(datalake_layer)
 
     @logger
-    def __build_s3_path_to_load(self, datalake_layer, table_name, partitions=None):
+    def __build_s3_path_to_load(self, table_exist=False):
         """
           build s3 path to load the json file including partitions.
         """
 
         s3_path = "s3://5a-datalake-{}/{}/{}/{}".format(
-            self.ENV,  # to do: replace with ENV var
-            datalake_layer,
-            self.SOURCE,
-            table_name,
+            self.env, self.datalake_layer, self.SOURCE, self.table_name
         )
 
-        if partitions:
-
-            for partition_name, partition_value in partitions.items():
+        if table_exist:
+            for partition_name, partition_value in self.partitions.items():
                 s3_path += "/{}={}".format(partition_name, partition_value)
 
         return s3_path
 
+    # after, this method will be into SparkMetastoreService class (temp here)
     @logger
-    def _create_partition_table(self, db_name, table_name, s3_path, list_partitions):
+    def _create_partition_table(self, s3_path, list_partitions):
         """
             Add a specific partition to a spark table
         """
         create_partition = (
-            "ALTER TABLE {}.{} ".format(db_name, table_name)
+            "ALTER TABLE {}.{} ".format(self.db_name, self.table_name)
             + "ADD IF NOT EXISTS PARTITION ({}) ".format(",".join(list_partitions))
             + "LOCATION '{}'".format(s3_path)
         )
@@ -65,32 +78,30 @@ class TeravozLoader:
         )
 
         spark.sql(create_partition)
-        spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
 
-    @staticmethod
     @logger
-    def _create_dataframe_columns_to_partition_table(df, partitions):
+    def _create_dataframe_columns_to_partition_table(self, df):
 
-        for partition_name, partition_value in partitions.items():
+        for partition_name, partition_value in self.partitions.items():
             df = df.withColumn(partition_name, lit(partition_value))
 
         return df
 
     @logger
-    def _create_spark_table_and_load_data_to_s3(
-        self, df, datalake_layer, db_name, table_name, partitions=None
-    ):
+    def _create_spark_table_and_load_data_to_s3(self, df):
         """
             create spark table and database if not exists,
             load files to s3 and create partitions within an existing table
         """
 
         # verify if the partitions passed are inside the df.
-        if partitions and not set(partitions.keys()).issubset(set(df.columns)):
-            df = self._create_dataframe_columns_to_partition_table(df, partitions)
+        if self.partitions and not set(self.partitions.keys()).issubset(
+            set(df.columns)
+        ):
+            df = self._create_dataframe_columns_to_partition_table(df)
 
         # base path to create table
-        s3_path = self.__build_s3_path_to_load(datalake_layer, table_name)
+        s3_path = self.__build_s3_path_to_load(table_exist=False)
 
         # dataframe to json
         df_write = (
@@ -100,15 +111,14 @@ class TeravozLoader:
             .option("path", s3_path)
         )
 
-        if partitions:
-            df_write.partitionBy(*partitions.keys())
+        df_write.partitionBy(*self.partitions.keys())
 
         logger.info(
             "m=_create_spark_table_and_load_data_to_s3, msg= creating spark table {}.{}".format(
-                db_name, table_name
+                self.db_name, self.table_name
             )
         )
-        df_write.saveAsTable("{}.{}".format(db_name, table_name))
+        df_write.saveAsTable("{}.{}".format(self.db_name, self.table_name))
 
     @staticmethod
     @logger
@@ -126,42 +136,30 @@ class TeravozLoader:
         ).save()
 
     @logger
-    def load_data_into_datalake(self, df, table_name, datalake_layer, partitions=None):
+    def load_data_into_datalake(self, df):
 
         """
           load request from endpoint to s3 without partitions and
           if exists the file, overwrite it.
         """
 
-        db_name = "datalake_{}_{}".format(self.SOURCE, datalake_layer)
-
         # create database if not exists in spark catalog
-        spark.sql("create database if not exists {}".format(db_name))
+        spark.sql("create database if not exists {}".format(self.db_name))
 
-        if table_name not in sqlContext.tableNames(dbName=db_name):
+        if self.table_name not in sqlContext.tableNames(dbName=self.db_name):
             # create spark table and load data
-            self._create_spark_table_and_load_data_to_s3(
-                df, datalake_layer, db_name, table_name, partitions
-            )
-
+            self._create_spark_table_and_load_data_to_s3(df)
         else:
 
             # partitioned path to create table
-            s3_path = self.__build_s3_path_to_load(
-                datalake_layer, table_name, partitions
-            )
+            s3_path = self.__build_s3_path_to_load(table_exist=True)
 
             self.__upload_dataframe_to_s3(df, s3_path)
 
-            if partitions:
-                list_partitions = []
-                for partition_name, partition_value in partitions.items():
-                    list_partitions.append(
-                        "{}={}".format(partition_name, partition_value)
-                    )
+            list_partitions = []
+            for partition_name, partition_value in self.partitions.items():
+                list_partitions.append("{}={}".format(partition_name, partition_value))
 
-                self._create_partition_table(
-                    db_name, table_name, s3_path, list_partitions
-                )
+            self._create_partition_table(s3_path, list_partitions)
 
-            spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
+            spark.sql("REFRESH TABLE {}.{}".format(self.db_name, self.table_name))
