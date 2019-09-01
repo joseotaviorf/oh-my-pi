@@ -412,7 +412,7 @@ dw_fact_house_listing_status_history_task = BaseDAG.build_python_operator(
     task_id='DW_fact_house_listing_status_history',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={
-        'dim_name': 'fact_house_listing_status_history',
+        'dim_name': 'house_listing_status_history',
         'is_fact': True,
         'bucket': bucket
     }
@@ -652,6 +652,7 @@ bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
 inspection_dag >> fact_inspection_bookings_task
 
 trigger_bi_growth_dag_task.set_upstream(
-    [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+    [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows,
+     dw_fact_house_listing_status_history_task])
 trigger_bi_crm_load_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
