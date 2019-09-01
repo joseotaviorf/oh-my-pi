@@ -14,9 +14,9 @@ class TeravozTransformer(Transformer):
         self.env = env
 
     @logger
-    def create_athena_table(self, datalake_layer, table_name, has_partitions=False):
+    def create_athena_table(self, datalake_layer, table_name):
 
-        partition_by = ["year", "month", "day"] if has_partitions else None
+        partition_by = ["year", "month", "day"]
 
         super().create_athena_table(
             table_name=table_name,
