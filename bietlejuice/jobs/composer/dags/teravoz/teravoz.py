@@ -78,7 +78,7 @@ def sub_dag(sub_dag_name, has_partitions="False"):
                 "python_file": "{}/load_teravoz_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV],
+                "parameters": [sub_dag_name, "{{ ds }}", ENV],
             }
         },
     )

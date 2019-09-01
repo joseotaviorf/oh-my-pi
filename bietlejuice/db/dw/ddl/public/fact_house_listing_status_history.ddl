@@ -6,6 +6,6 @@ create table if not exists fact_house_listing_status_history (
   sk_status_start_date bigint,
   sk_status_end_date bigint,
   status_history varchar,
-  status_change_reason varchar,
+  status_change_reason varchar(5000),
   ts_load timestamp
 );
