@@ -19,6 +19,8 @@ select
   sk_contract,
   sk_inspection,
   sk_house_listing,
+  sk_house_owner,
+  sk_tenant,
   getdate() as ts_load
 from staging.{table_name}
 -- because the query can have another where clause (appended at runtime), a semicolon MUST NOT be added

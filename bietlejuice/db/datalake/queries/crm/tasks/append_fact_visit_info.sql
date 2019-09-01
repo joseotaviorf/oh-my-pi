@@ -23,10 +23,12 @@
 booking_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
-    cast(sk_booking as bigint) as sk_booking
+    cast(sk_booking as bigint) as sk_booking,
+    cast(sk_owner as bigint) as sk_house_owner,
+    cast(sk_client as bigint) as sk_visitor
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_booking != '-1'
-  group by 1, 2
+  group by 1, 2, 3, 4
 )
 select distinct
   b.sk_task,
@@ -48,6 +50,8 @@ select distinct
   b.task_user_resolve_hours,
   b.sk_booking,
   coalesce(bhl.sk_house_listing, b.sk_house_listing) as sk_house_listing,
+  coalesce(bhl.sk_house_owner, -1 ) as sk_house_owner,
+  coalesce(bhl.sk_visitor, -1 ) as sk_visitor,
   b.dt_partition
 from bookings b
 left join booking_house_listing bhl

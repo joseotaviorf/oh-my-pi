@@ -12,8 +12,7 @@ class CRMTasksOffboarding(CRMTasks):
 
     MANUAL_TASK_WORKGROUP_IDS = [
         'DEP_OFFBOARDING_2',
-        'DEP_OFFBOARDING_ID',
-        'DEP_VISTORIA_OFFBOARDING'
+        'DEP_OFFBOARDING_ID'
     ]
 
     TABLE_NAMES = {

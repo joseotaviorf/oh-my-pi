@@ -1,0 +1,5 @@
+# Config for all_crawled_listings_last_30_days
+---
+streams:
+  - direction: 'downstream'
+    task_ids: ['dw_crawled_listings_last_30_days']

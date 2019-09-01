@@ -83,7 +83,7 @@ user_listing_page_views as (
                      else null end as id_house
             from datalake_clean.amplitude_events evt
             where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-            and ym >= '2018-06'
+            and ym >= '2018-06' and ym <= '2018-12'
             and app = '170698'
             and session_id != '-1'
         union
@@ -133,7 +133,7 @@ user_sessions as (
                      else null end as id_house
             from datalake_clean.amplitude_events evt
             where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-            and ym >= '2018-06'
+            and ym >= '2018-06' and ym <= '2018-12'
             and app = '170698'
             and session_id != '-1'
         union

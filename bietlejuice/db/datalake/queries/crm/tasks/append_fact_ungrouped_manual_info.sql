@@ -31,10 +31,13 @@
 contract_house_listing as (
   select
     cast(sk_contract as bigint) as sk_contract,
-    cast(sk_rent_flow as bigint) as sk_rent_flow
+    cast(sk_house_listing as bigint) as sk_house_listing,
+    cast(sk_rent_flow as bigint) as sk_rent_flow,
+    cast(sk_owner as bigint) as sk_house_owner,
+    cast(sk_client as bigint) as sk_tenant
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
-  group by 1, 2
+  group by 1, 2, 3, 4, 5
 )
 select distinct
   c.sk_task,
@@ -55,6 +58,9 @@ select distinct
   c.task_user_type as task_action_type,
   c.task_user_resolve_hours,
   coalesce(chl_rent_flow.sk_contract, c.sk_contract, -1) as sk_contract,
+  coalesce(chl_rent_flow.sk_house_listing, -1) as sk_house_listing,
+  coalesce(chl_rent_flow.sk_house_owner, -1) as sk_house_owner,
+  coalesce(chl_rent_flow.sk_tenant, -1) as sk_tenant,
   c.dt_partition
 from contracts c
 left join contract_house_listing chl_rent_flow

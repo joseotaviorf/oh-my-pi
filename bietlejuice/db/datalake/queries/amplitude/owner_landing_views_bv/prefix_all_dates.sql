@@ -9,7 +9,7 @@ with all_events as (
         'QuintoAndar' as region,
         'QuintoAndar' as city
       from datalake_clean.amplitude_events
-      where ym >= '2018-01'
+      where ym >= '2018-01' and ym <= '2018-12'
         and et = 'landing_page_viewed'
         and trim(app) = '183047'
         and trim(e_ub_page_variant) in ('bv','cj','co')

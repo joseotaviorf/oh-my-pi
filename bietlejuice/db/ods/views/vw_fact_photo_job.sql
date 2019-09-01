@@ -18,7 +18,7 @@ select
 	j1.job_status,
 	j1.creation_origin,
 	j1.flexible_schedule,
-	j1.same_day_listing,
+	j1.same_day_upload::boolean as is_same_day_upload,
 	j1.job_on_time::boolean,
 	coalesce(to_char(j1.dt_photographer_accepted::date,'YYYYMMDD')::integer, -1) as sk_date_photographer_accepted,
 	coalesce(to_char(j1.dt_job_created::date,'YYYYMMDD')::integer, -1) as sk_date_job_created,
