@@ -89,7 +89,7 @@ def sub_dag(sub_dag_name, has_partitions="False"):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
-                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV, has_partitions],
+                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV],
             }
         },
     )

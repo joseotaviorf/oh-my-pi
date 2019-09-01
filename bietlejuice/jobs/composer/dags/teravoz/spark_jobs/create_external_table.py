@@ -26,15 +26,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
-    parser.add_argument(
-        "has_partitions", type=str, help="if table will have partitions"
-    )  # temp
 
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake, table_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
-            args.table_name, args.datalake_layer, args.execution_date
+        "m=load_teravoz_into_datalake, table_name={}, datalake_layer={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            args.table_name, args.datalake_layer, args.execution_date, args.environment
         )
     )
 
@@ -42,20 +39,16 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
-    has_partitions = True if args.has_partitions == "True" else False
 
     # create external table and add partition
     transformer = TeravozTransformer(environment)
 
     transformer.create_athena_table(
-        datalake_layer=datalake_layer,
-        table_name=table_name,
-        has_partitions=has_partitions,
+        datalake_layer=datalake_layer, table_name=table_name
     )
 
-    if has_partitions:
-        transformer.add_partition(
-            datalake_layer=datalake_layer,
-            table_name=table_name,
-            execution_date=execution_date,
-        )
+    transformer.add_partition(
+        datalake_layer=datalake_layer,
+        table_name=table_name,
+        execution_date=execution_date,
+    )
