@@ -27,8 +27,9 @@ class HouseSubDag(DimSubDag):
         house_dag = self._build_local_dag()
 
         (
-        house_task, affiliate, rent_flow, house_listing, staging_dim_house_listing_task,
-        dim_house_listing) = self.__build_data_tasks(house_dag)
+            house_task, affiliate, rent_flow, house_listing,
+            staging_dim_house_listing_task,
+            dim_house_listing) = self.__build_data_tasks(house_dag)
 
         # TODO: put tests back to flow
         # tests_tasks = self.build_tests_tasks(house_dag)
