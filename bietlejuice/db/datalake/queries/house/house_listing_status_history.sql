@@ -110,12 +110,13 @@ from house_status_version_publications
 --order by id_house, rev
 )--,
 select 
-	cast(cast(id_house as varchar)||'00'||cast(order_version as varchar) as bigint) as sk_house_listing,
-	id_region as sk_region,
+	cast(cast(id_house as varchar)||'00'||cast(order_version as varchar) as bigint) as id_house_listing,
+	id_region,
 	new_status_history as status_history,
+	reason as status_change_reason,
 	ts_first_publication,
 	cast(new_ts_status_changed as timestamp) as ts_status_start,
 	next_status_change_time as ts_status_end,
-	reason as status_change_reason,
 	cast(now() as timestamp) as ts_load
-from house_status_version_order; 
+from house_status_version_order
+;

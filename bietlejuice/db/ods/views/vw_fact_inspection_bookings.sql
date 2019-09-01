@@ -26,8 +26,8 @@ from inspection insp
 left join booking b
 	on insp.id_booking = b.id
 left join house_listing hl
-  on insp.id_house = hl.id
-  	and insp.ts_created::date between hl.min_version_time::date and coalesce(hl.max_version_time::date - 1, current_date)
+  on insp.id_house = hl.id_house
+  	and insp.ts_created::date between hl.ts_listing_version_start::date and coalesce(hl.ts_listing_version_end::date - 1, current_date)
 left join inspection_booking_retries ibr
 	on ibr.id = insp.id
 ;
