@@ -45,8 +45,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake_raw, endpoint_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
-            args.endpoint_name, args.datalake_layer, args.execution_date
+        "m=load_teravoz_into_datalake_raw, endpoint_name={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            args.endpoint_name, args.execution_date, args.environment
         )
     )
 
