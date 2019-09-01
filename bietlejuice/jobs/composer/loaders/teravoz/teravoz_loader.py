@@ -1,7 +1,6 @@
 from pyspark.sql.functions import lit
 
 from quintoandar_logger import QuintoAndarLogger
-from quintoandar_teravoz_client import TeravozClient
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
@@ -9,60 +8,24 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 logger = QuintoAndarLogger("TeravozLoader")
 
 # spark instances
-sc = BaseSparkContext.sc
 spark = BaseSparkContext.spark
 sqlContext = BaseSparkContext.sqlContext
 
 
 class TeravozLoader:
     """
-        Generic class that contains methods for all Teravoz tables and requests,
-        such as requests to API, load files to s3 and create spark tables.
+        Generic class that contains methods for all Teravoz tables.
+        From spark dataframe load data into s3
     """
 
     # source to create folders and schemas
     SOURCE = "teravoz"
 
     @logger
-    def __init__(self, api_user, api_pwd, environment, execution_date=None):
-        # api_instance (temporarily here)
-        self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
+    def __init__(self, environment, datalake_layer, table_name):
         self.ENV = environment
-        self.execution_date = execution_date
-
-    @logger
-    def request_api_and_get_dataframe(self, endpoint, params={}):
-        """
-            endpoint: endpoint ..@teravoz.com.br/{endpoint}
-            params: if exists is expected the format:
-                  {
-                    "param_name1": "param_value1",
-                    "param_name2": "param_value2"
-                  }
-            return: data in json format
-        """
-
-        response = getattr(self.api_instance, endpoint)(**params).get()
-        response_list = []
-
-        for page in response().pages():
-            json_data = page().data
-
-            if endpoint in json_data.keys():
-                key = endpoint
-            elif "list" in json_data.keys():
-                key = "list"
-            elif "result" in json_data.keys():
-                key = "result"
-            elif "queues" in json_data.keys():
-                key = "queues"
-
-            response_list.append(json_data[key])
-
-        jsonRDD = sc.parallelize(response_list, 1)
-        df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
-
-        return df
+        self.datalake_layer = datalake_layer
+        self.table_name = table_name
 
     @logger
     def __build_s3_path_to_load(self, datalake_layer, table_name, partitions=None):
@@ -103,16 +66,6 @@ class TeravozLoader:
 
         spark.sql(create_partition)
         spark.sql("REFRESH TABLE {}.{}".format(db_name, table_name))
-
-    @staticmethod
-    @logger
-    def get_queue_numbers():
-        """
-            This method is required for report tables, because
-            their endpoints parametrize the queue number.
-        """
-        df = spark.sql("select number from datalake_teravoz_raw.queues")
-        return df.select("number").collect()
 
     @staticmethod
     @logger
