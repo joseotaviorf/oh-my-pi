@@ -92,17 +92,16 @@ def xcom_dependencies(task_id, dag_id, **kwargs):
             task_id))
 
 
-@logger(exclude='kwargs')
-def create_table_in_db_from_datalake(table_name, **kwargs):
+@logger(exclude=['kwargs', 'query_params'])
+def create_table_in_db_from_datalake(table_name, query_params, **kwargs):
     # setting variables
     file_path = '{}/{}{}.sql'.format(DATALAKE_QUERIES_DIR, kwargs.get('file_path', ''),
                                      table_name)
     athena_client = AthenaClient(bucket)
 
     # executing methods
-    df = athena_client.execute_file_query_and_return_dataframe(file_path,
-                                                               kwargs.get(
-                                                                   'query_params'))
+    df = athena_client.execute_file_query_and_return_dataframe(filename=file_path,
+                                                               query_params=query_params)
 
     if len(df.index) == 0:
         raise ValueError(
@@ -455,8 +454,7 @@ fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
     task_id='Fact_Lead_Task_Contact_Flows',
     python_callable=create_table_in_db_from_datalake,
     op_kwargs={'query_params': {'task_types': "'ConverterLead', 'ConverterLeadPrioritario'"},
-               'table_name': 'fact_lead_task_contact_flows',
-               'file_name': 'fact_lead_task_contact_flows'}
+               'table_name': 'fact_lead_task_contact_flows'}
 )
 
 # flow
