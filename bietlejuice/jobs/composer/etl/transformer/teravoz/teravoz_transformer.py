@@ -47,7 +47,7 @@ class TeravozTransformer(Transformer):
             "day": dt_execution.day,
         }
 
-        df = super().create_dataframe_fom_sql_file(
+        df = super().create_dataframe_from_sql_file(
             "datalake", file_name, dict_format_query
         )
 
