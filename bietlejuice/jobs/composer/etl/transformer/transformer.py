@@ -43,9 +43,7 @@ class Transformer:
 
     @logger
     def _get_datalake_query_file_path(self, file_name):
-        return DATALAKE_SQL_DIR + "/queries/{}/{}.sql".format(
-            self.source, file_name
-        )
+        return DATALAKE_SQL_DIR + "/queries/{}/{}.sql".format(self.source, file_name)
 
     @logger
     def create_athena_table(self, table_name, datalake_layer, partition_by=None):
@@ -90,7 +88,9 @@ class Transformer:
         AthenaClient.add_partition(database, table_name, partition_by_dict)
 
     @logger
-    def create_dataframe_from_datalake_sql_file(self, file_name, dict_format_query=None):
+    def create_dataframe_from_datalake_sql_file(
+        self, file_name, dict_format_query=None
+    ):
         file = self._get_datalake_query_file_path(file_name)
         f = open(file, "r")
         query = f.read()
