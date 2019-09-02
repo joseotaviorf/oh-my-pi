@@ -123,7 +123,12 @@ def sub_dag(sub_dag_name):
     list_tasks = raw_tasks(sub_dag_name, local_dag)
     list_tasks.append(clean_tasks(sub_dag_name, local_dag))
 
-    airflow_helpers.chain(**list_tasks)
+    airflow_helpers.chain(
+        list_tasks[0],  # request_api_and_load_to_raw_task
+        list_tasks[1],  # create_raw_partition_task
+        list_tasks[2],  # load_to_clean_task
+        list_tasks[3],  # create_clean_partition_task
+    )
 
     return local_dag
 
@@ -138,7 +143,10 @@ def raw_sub_dag(sub_dag_name):
     )._build_local_dag()
 
     list_tasks = raw_tasks(sub_dag_name, local_dag)
-    airflow_helpers.chain(list_tasks)
+    airflow_helpers.chain(
+        list_tasks[0],  # request_api_and_load_to_raw_task
+        list_tasks[1],  # create_raw_partition_task
+    )
 
     return local_dag
 
@@ -160,10 +168,12 @@ def clean_sub_dag(sub_dag_name):
         start_date=MAIN_START_DATE,
     )._build_local_dag()
 
-    DummyOperator(task_id="to-do-create-query", dag=local_dag)
-    # list_tasks = clean_tasks(sub_dag_name, local_dag)
-    # airflow_helpers.chain(','.join(list_tasks))
+    list_tasks = clean_tasks(sub_dag_name, local_dag)
 
+    airflow_helpers.chain(
+        list_tasks[0],  # load_to_clean_task
+        list_tasks[1],  # create_clean_partition_task
+    )
     return local_dag
 
 
@@ -189,7 +199,7 @@ report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="report-agent-status", sub_dag_func=raw_sub_dag
 )
 report_agents_per_queue_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agents-per-queue", sub_dag_func=clean_sub_dag
+    dag=dag, sub_dag_name="report-agents-queue-metrics", sub_dag_func=clean_sub_dag
 )
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
