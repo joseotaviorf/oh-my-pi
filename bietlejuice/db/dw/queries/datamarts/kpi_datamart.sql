@@ -88,17 +88,6 @@ first_listings AS (
 ),
 online_metrics AS (
   with amplitude as (
-  SELECT
-  	DATE_TRUNC('week', CAST(SUBSTRING(event_time, 1, 10) AS DATE)) AS event_date,
-  	TRIM(evt.e_house_id) AS house_id,
-    CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
-    CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views
-  FROM datalake_clean.amplitude_events evt
-  	WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed')
-  	AND TRIM(app) = '170698'
-  	AND ym >= '2019-05'
-  union
-  -- enriching with amplitude data via SPARK
    SELECT
   	DATE_TRUNC('week', CAST(SUBSTRING(event_time, 1, 10) AS DATE)) AS event_date,
   	cast(json_extract_path_text(event_properties, 'house_id') as varchar) AS house_id,
