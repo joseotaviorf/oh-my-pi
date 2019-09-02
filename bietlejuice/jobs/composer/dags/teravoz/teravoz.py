@@ -23,7 +23,6 @@ ENV = Variable.get("environment")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-S3_BUCKET = "5a-datalake-{}".format(ENV)
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -115,7 +114,6 @@ def clean_tasks(sub_dag_name, local_dag):
 def sub_dag(sub_dag_name):
 
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
@@ -133,7 +131,6 @@ def sub_dag(sub_dag_name):
 def raw_sub_dag(sub_dag_name):
 
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
@@ -157,7 +154,6 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 def clean_sub_dag(sub_dag_name):
 
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
