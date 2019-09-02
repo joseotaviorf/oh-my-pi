@@ -60,6 +60,7 @@ dag = DAG(
 )
 
 
+
 def raw_tasks(sub_dag_name, local_dag):
 
     request_api_and_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -200,6 +201,7 @@ report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
 )
 report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+
     dag=dag, sub_dag_name="report-agent-status", sub_dag_func=raw_sub_dag
 )
 report_agents_per_queue_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
