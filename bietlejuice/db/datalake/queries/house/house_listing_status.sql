@@ -116,7 +116,6 @@ select
 	reason as status_change_reason,
 	ts_first_publication,
 	cast(new_ts_status_changed as timestamp) as ts_status_start,
-	next_status_change_time as ts_status_end,
-	cast(now() as timestamp) as ts_load
+	next_status_change_time as ts_status_end
 from house_status_version_order
 ;

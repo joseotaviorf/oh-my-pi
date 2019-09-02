@@ -396,24 +396,24 @@ fact_listing_rent_flows = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
 )
 
-ods_house_listing_status_history_task = BaseDAG.build_python_operator(
+ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='ODS_fact_house_listing_status_history',
+    task_id='ODS_fact_house_listing_status',
     python_callable=create_table_in_db_from_datalake,
     op_kwargs={
-        'table_name': 'house_listing_status_history',
+        'table_name': 'house_listing_status',
         'file_path': 'house/',
         'query_params': None,
         'enum_db': EnumDB.BI_ODS
     }
 )
 
-dw_fact_house_listing_status_history_task = BaseDAG.build_python_operator(
+dw_fact_house_listing_status_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='DW_fact_house_listing_status_history',
+    task_id='DW_fact_house_listing_status',
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={
-        'dim_name': 'house_listing_status_history',
+        'dim_name': 'house_listing_status',
         'is_fact': True,
         'bucket': bucket
     }
@@ -634,7 +634,7 @@ fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposa
 fact_listing_rent_flows >> xcom_fact_listing_rent_flows
 
 house_dag >> fact_photo_job
-ods_house_listing_status_history_task >> dw_fact_house_listing_status_history_task
+ods_fact_house_listing_status_task >> dw_fact_house_listing_status_task
 
 photo_job_dag >> fact_photo_job
 
@@ -654,6 +654,6 @@ inspection_dag >> fact_inspection_bookings_task
 
 trigger_bi_growth_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows,
-     dw_fact_house_listing_status_history_task])
+     dw_fact_house_listing_status_task])
 trigger_bi_crm_load_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
