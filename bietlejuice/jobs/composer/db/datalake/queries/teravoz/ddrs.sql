@@ -9,3 +9,4 @@ select
     suffix as phone_number_suffix,
     current_timestamp as ts_load
 from datalake_teravoz_raw.ddrs
+where year="{year}" and month="{month}" and day="{day}"
