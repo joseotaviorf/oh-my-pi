@@ -58,5 +58,5 @@ left join
 	on h.id = j1.imovel_id
 left join
 	house_listing pl
-	on pl.imovel_id = j1.imovel_id
+	on pl.id_house = j1.imovel_id
 	and j1.dt_job_created between pl.ts_listing_version_start and coalesce(pl.ts_listing_version_end, current_date)
