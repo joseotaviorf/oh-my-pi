@@ -6,6 +6,7 @@ from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
 
 
 logger = QuintoAndarLogger("Transformer")
@@ -41,9 +42,9 @@ class Transformer:
         )
 
     @logger
-    def _get_query_file_path(self, layer, file_name):
-        return "bietlejuice/jobs/composer/db/{}/queries/{}/{}.sql".format(
-            layer, self.source, file_name
+    def _get_datalake_query_file_path(self, file_name):
+        return DATALAKE_SQL_DIR + "/queries/{}/{}.sql".format(
+            self.source, file_name
         )
 
     @logger
@@ -89,13 +90,10 @@ class Transformer:
         AthenaClient.add_partition(database, table_name, partition_by_dict)
 
     @logger
-    def create_dataframe_from_sql_file(self, layer, file_name, dict_format_query=None):
-
-        file = self._get_query_file_path(layer, file_name)
+    def create_dataframe_from_datalake_sql_file(self, file_name, dict_format_query=None):
+        file = self._get_datalake_query_file_path(file_name)
         f = open(file, "r")
         query = f.read()
-        df = spark.sql(
-            query if not dict_format_query else query.format(**dict_format_query)
-        )
+        df = spark.sql(query)
 
         return df
