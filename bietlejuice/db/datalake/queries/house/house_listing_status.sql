@@ -113,7 +113,7 @@ select
 	cast(cast(id_house as varchar)||'00'||cast(order_version as varchar) as bigint) as id_house_listing,
 	id_region,
 	new_status_history as status_history,
-	reason as status_change_reason,
+	regexp_replace(reason, '\n', '') as status_change_reason,
 	ts_first_publication,
 	cast(new_ts_status_changed as timestamp) as ts_status_start,
 	next_status_change_time as ts_status_end
