@@ -48,3 +48,4 @@ if __name__ == "__main__":
         table_name=table_name,
         execution_date=execution_date,
     )
+    teravoz_loader.load_data_into_datalake(df)
