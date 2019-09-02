@@ -123,7 +123,7 @@ def sub_dag(sub_dag_name):
     list_tasks = raw_tasks(sub_dag_name, local_dag)
     list_tasks.append(clean_tasks(sub_dag_name, local_dag))
 
-    airflow_helpers.chain(list_tasks)
+    airflow_helpers.chain(**list_tasks)
 
     return local_dag
 
