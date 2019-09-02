@@ -3,7 +3,10 @@
     smallint(number) as queue_number,
     description,
     smallint(logged_in) as agents_logged,
-    current_timestamp as ts_load
+    current_timestamp as ts_load,
+    year,
+    month,
+    day
 from
     datalake_teravoz_raw.queues
 where

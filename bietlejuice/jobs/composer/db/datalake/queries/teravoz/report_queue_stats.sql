@@ -5,6 +5,7 @@ select
     smallint(answeredCalls) as calls_answered,
     smallint(receivedCalls) as calls_received,
     smallint(timedOutCalls) as calls_timed_out,
+    current_timestamp as ts_load,
     year,
     month,
     day
