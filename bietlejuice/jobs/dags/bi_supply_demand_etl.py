@@ -1,21 +1,26 @@
 from datetime import datetime, timedelta
 
-import bietlejuice.jobs.base.new_base_etl as utils
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
+
+import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.enum_db import EnumDB
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
-from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, BankSubDag, \
-    HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, UserSubDag, \
-    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, DoormanSubDag, CondoSubDag, \
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR, \
+    DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSubDag, \
+    BankSubDag, \
+    HouseSubDag, LeadSubDag, OfferSubDag, PhotoJobSubDag, ProposalSubDag, RegionSubDag, \
+    UserSubDag, \
+    VisitSubDag, BankAccountSubDag, BankTransactionSubDag, AffiliateSubDag, \
+    DoormanSubDag, CondoSubDag, \
     PartnerSubDag, PartnerAgentSubDag, InspectionSubDag, LeadConversionSubDag, \
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
@@ -36,7 +41,8 @@ main_dag = BaseDAG.build_dag(
 
 
 def extract_query_dim_from_ebdb_to_ods(**kwargs):
-    file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, kwargs['table_name'])
+    file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR,
+                                                             kwargs['table_name'])
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
     if 'execution_date' in kwargs:
@@ -52,7 +58,8 @@ def extract_query_dim_from_ebdb_to_ods(**kwargs):
 
 def load_dim_from_ods_to_dw(**kwargs):
     if 'post_command_file' in kwargs:
-        file_path = '{}/public/post_command_{}.sql'.format(DW_QUERIES_DIR, kwargs['dim_name'])
+        file_path = '{}/public/post_command_{}.sql'.format(DW_QUERIES_DIR,
+                                                           kwargs['dim_name'])
         post_command = BaseETL.get_query_from_file_name(file_name=file_path)
     else:
         post_command = None if 'post_command' not in kwargs else kwargs['post_command']
@@ -71,31 +78,40 @@ def load_dim_from_ods_to_dw(**kwargs):
 def xcom_dependencies(task_id, dag_id, **kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
 
-    status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=task_id, dag_id=dag_id)
+    status = xcom.xcom_pull(task_instance=kwargs['ti'], key=exec_date, task_id=task_id,
+                            dag_id=dag_id)
     if not status:
         raise ValueError(
             'm=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=The process have not finished yet'.format(
                 exec_date, dag_id, task_id))
 
-    logger.info('m=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=REQUIREMENT MET'.format(exec_date,
-                                                                                                       dag_id,
-                                                                                                       task_id))
+    logger.info(
+        'm=xcom_dependencies, exec_date={}, dag_id={}, task_id={}, msg=REQUIREMENT MET'.format(
+            exec_date,
+            dag_id,
+            task_id))
 
 
-@logger(exclude='kwargs')
-def create_table_in_dw_from_datalake(query_params, table_name, **kwargs):
+@logger(exclude=['kwargs', 'query_params'])
+def create_table_in_db_from_datalake(table_name, query_params, **kwargs):
     # setting variables
-    file_path = '{}/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name)
+    file_path = '{}/{}{}.sql'.format(DATALAKE_QUERIES_DIR, kwargs.get('file_path', ''),
+                                     table_name)
     athena_client = AthenaClient(bucket)
 
     # executing methods
-    df = athena_client.execute_file_query_and_return_dataframe(filename=file_path, query_params=query_params)
+    df = athena_client.execute_file_query_and_return_dataframe(filename=file_path,
+                                                               query_params=query_params)
 
     if len(df.index) == 0:
         raise ValueError(
-            'm=create_table_in_dw_from_datalake, filename={}, msg=Query returned empty df'.format(file_path))
+            'm=create_table_in_db_from_datalake, filename={}, msg=Query returned empty df'.format(
+                file_path))
 
-    BaseETL.dataframe_to_db(df=df, table_name=table_name, enum_db=EnumDB.BI_DW, encoding='utf-8', append=False)
+    BaseETL.dataframe_to_db(df=df,
+                            table_name=table_name,
+                            enum_db=kwargs.get('enum_db', EnumDB.BI_DW),
+                            encoding='utf-8', append=False)
 
 
 def lead_sub_dag(sub_dag_name):
@@ -361,14 +377,16 @@ fact_house_listings = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_Fact_House_Listings',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'house_listings', 'is_fact': True, 'bucket': bucket,
+               'insert_dummy': False}
 )
 
 fact_photo_job = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_fact_photo_job',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'photo_job', 'is_fact': True, 'bucket': bucket,
+               'insert_dummy': False}
 )
 
 fact_listing_rent_flows = BaseDAG.build_python_operator(
@@ -378,11 +396,27 @@ fact_listing_rent_flows = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'listing_rent_flows', 'is_fact': True, 'bucket': bucket}
 )
 
-fact_house_status = BaseDAG.build_python_operator(
+ods_house_listing_status_history_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='DW_fact_house_status',
+    task_id='ODS_fact_house_listing_status_history',
+    python_callable=create_table_in_db_from_datalake,
+    op_kwargs={
+        'table_name': 'house_listing_status_history',
+        'file_path': 'house/',
+        'query_params': None,
+        'enum_db': EnumDB.BI_ODS
+    }
+)
+
+dw_fact_house_listing_status_history_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_house_listing_status_history',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'house_status', 'is_fact': True, 'bucket': bucket}
+    op_kwargs={
+        'dim_name': 'house_listing_status_history',
+        'is_fact': True,
+        'bucket': bucket
+    }
 )
 
 fact_inspection_bookings_task = BaseDAG.build_python_operator(
@@ -419,7 +453,7 @@ dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
 fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='Fact_Lead_Task_Contact_Flows',
-    python_callable=create_table_in_dw_from_datalake,
+    python_callable=create_table_in_db_from_datalake,
     op_kwargs={'query_params': {'task_types': "'ConverterLead', 'ConverterLeadPrioritario'"},
                'table_name': 'fact_lead_task_contact_flows'}
 )
@@ -588,13 +622,6 @@ trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
     execution_date='{{ execution_date }}'
 )
 
-# trigger bi-agents-allocation-optimization dag after all tasks have been successfully completed
-trigger_bi_agents_allocation_optimization_dag_task = TriggerDagRunOperator(
-    dag=main_dag,
-    task_id='trigger_bi_agents_allocation_optimization_dag',
-    trigger_dag_id='bi-agents-allocation-optimization'
-)
-
 # TODO Recreate tasks flow after the data flow is fully fixed
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
@@ -604,19 +631,20 @@ fact_listing_rent_flows.set_upstream([booking_dag, visit_dag, offer_dag, proposa
                                       user_dag, house_dag, ods_house_rent_flow, condo_dag, affiliate_dag, doorman_dag,
                                       dw_rent_flow_taxonomy_task])
 
-fact_listing_rent_flows.set_downstream([xcom_fact_listing_rent_flows,
-                                        trigger_bi_agents_allocation_optimization_dag_task])
+fact_listing_rent_flows >> xcom_fact_listing_rent_flows
 
-house_dag.set_downstream([fact_photo_job, fact_house_status])
+house_dag >> fact_photo_job
+ods_house_listing_status_history_task >> dw_fact_house_listing_status_history_task
 
 photo_job_dag >> fact_photo_job
 
 fact_house_listings.set_upstream(
-    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag, fact_house_status])
+    [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag])
 
 # new 'supply' flow
-dw_fact_house_listing_flows.set_upstream([lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
-                                          ods_house_listing_flows])
+dw_fact_house_listing_flows.set_upstream(
+    [lead_dag, photo_job_dag, region_dag, user_dag, house_dag, condo_dag,
+     ods_house_listing_flows])
 
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
@@ -624,5 +652,8 @@ bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
 
 inspection_dag >> fact_inspection_bookings_task
 
-trigger_bi_growth_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
-trigger_bi_crm_load_dag_task.set_upstream([dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+trigger_bi_growth_dag_task.set_upstream(
+    [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows,
+     dw_fact_house_listing_status_history_task])
+trigger_bi_crm_load_dag_task.set_upstream(
+    [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])

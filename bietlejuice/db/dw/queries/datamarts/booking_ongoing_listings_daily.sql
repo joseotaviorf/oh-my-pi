@@ -99,7 +99,7 @@ lpv_events as (
             uuid
         from datalake_clean.amplitude_events evt
         where et = 'listing_page_viewed'
-            and ym >= '2018-01'
+            and ym >= '2018-01' and ym <= '2018-12'
             and app = '170698'
     union
     -- enriching with amplitude data via SPARK

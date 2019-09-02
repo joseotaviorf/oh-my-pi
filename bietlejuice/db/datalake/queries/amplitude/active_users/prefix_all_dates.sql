@@ -7,7 +7,7 @@ with all_events as (
         trim(amplitude_id) as amplitude_id,
         false as partial
       from datalake_clean.amplitude_events
-      where ym >= '2017-01'
+      where ym >= '2017-01' and ym <= '2018-12'
         and et in ('listing_page_viewed',
                    'search_results_page_viewed',
                    'schedule_page_viewed',
