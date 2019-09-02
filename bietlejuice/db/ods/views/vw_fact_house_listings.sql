@@ -7,7 +7,7 @@ with house_listing_contracts as (
     	max(c.id) as id_contract
    from house_listing hl
    join contract c
-    on hl.id_house = c.id
+    on hl.id_house = c.id_house
     	and c.ts_created::date between hl.ts_listing_version_start::date and hl.ts_listing_version_end::date
    group by 1
   )
