@@ -28,7 +28,7 @@ _fact as (
 	  coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
 	  coalesce(to_char(vdh.ts_listing_version_start, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
 	  vdh.ts_listing_version_start as dt_house_listing,
-	  coalesce(to_char(vdh.ts_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
+	  coalesce(to_char(vdh.ts_last_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
 	  coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
 	  coalesce(vfhl.sk_region, -1) as sk_region,
 	  coalesce(vfhl.sk_condo, -1) as sk_condo,
