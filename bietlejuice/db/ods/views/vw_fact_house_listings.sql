@@ -37,7 +37,7 @@ select
   coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
   coalesce(to_char(st.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
   date_part('day', hlc.ts_contract_signed - hl.ts_listing_version_start)::integer as days_listing_to_contract_signed,
-  date_part('day', hl.ts_de_publication - hl.ts_listing_version_start)::integer as days_listing_to_depublication,
+  date_part('day', hl.ts_last_de_publication - hl.ts_listing_version_start)::integer as days_listing_to_depublication,
   date_part('day', hl.ts_listing_version_end - hlc.dt_contract_annulment)::integer as days_ended_rental_to_relisting,
   date_part('day', hlc.ts_next_contract_signed - hl.ts_listing_version_end)::integer as days_relisting_to_re_rental,
   date_part('day', hlc.ts_next_contract_signed - hlc.dt_contract_annulment)::integer as days_ended_rental_to_re_rented,
