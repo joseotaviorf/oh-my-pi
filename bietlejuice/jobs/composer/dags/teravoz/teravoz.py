@@ -62,8 +62,6 @@ dag = DAG(
 
 def raw_tasks(sub_dag_name, local_dag):
 
-    raw_tasks_list = []
-
     request_api_and_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="request-api-load-to-raw",
         dag=local_dag,
@@ -77,8 +75,6 @@ def raw_tasks(sub_dag_name, local_dag):
         },
     )
 
-    raw_tasks_list.append(request_api_and_load_to_raw_task)
-
     create_raw_partition_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="create-raw-partition",
         dag=local_dag,
@@ -90,8 +86,7 @@ def raw_tasks(sub_dag_name, local_dag):
         },
     )
 
-    raw_tasks_list.append(create_raw_partition_task)
-
+    raw_tasks_list = [request_api_and_load_to_raw_task, create_raw_partition_task]
     return raw_tasks_list
 
 
@@ -116,8 +111,7 @@ def clean_tasks(sub_dag_name, local_dag):
         task_id="create-clean-partition", dag=local_dag
     )
 
-    clean_tasks_list.append(create_clean_partition_task)
-
+    clean_tasks_list = [load_to_clean_task, create_clean_partition_task]
     return clean_tasks_list
 
 
