@@ -270,7 +270,7 @@ potential_listings as (
     coalesce(f.lead_id, '-1'::integer) as sk_lead,
     coalesce(f.conversao_id, '-1'::integer) as sk_lead_conversion,
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
-    coalesce(f.imovel_id || '001', '-1') as sk_house_listing,
+    coalesce(f.imovel_id || '000', '-1') as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
     coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,

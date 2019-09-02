@@ -1,10 +1,12 @@
-drop table if exists fact_house_listing_status_history;
-create table if not exists fact_house_listing_status_history (
+drop table if exists fact_house_listing_status;
+create table if not exists fact_house_listing_status (
   sk_house_listing bigint,
   sk_region bigint,
   sk_first_publication_date bigint,
   sk_status_start_date bigint,
   sk_status_end_date bigint,
+  ts_status_start timestamp,
+  ts_status_end timestamp,
   status_history varchar,
   status_change_reason varchar(5000),
   ts_load timestamp
