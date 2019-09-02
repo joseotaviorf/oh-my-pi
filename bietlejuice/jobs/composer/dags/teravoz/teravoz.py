@@ -99,7 +99,7 @@ def sub_dag(sub_dag_name):
         dag=local_dag,
         json={
             "spark_python_task": {
-                "python_file": "{}/move_data_to_clean.py".format(SPARK_JOBS_PATH),
+                "python_file": "{}/load_data_to_clean.py".format(SPARK_JOBS_PATH),
                 "parameters": [sub_dag_name, "{{ ds }}", ENV],
             }
         },
