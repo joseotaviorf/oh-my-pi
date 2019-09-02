@@ -46,7 +46,6 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   registration_abandoned_reason string,
   house_unpublished_reason string,
   listing_category_start string,
-  listing_category_end string,
   is_last_version string,
   is_exclusive string,
   dt_last_exclusive_opted_in string,
