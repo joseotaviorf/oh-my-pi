@@ -26,8 +26,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_data_to_clean, file_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
-            args.file_name, args.datalake_layer, args.execution_date
+        "m=load_data_to_clean, file_name={}, execution_date={}, msg=print args spark jobs params".format(
+            args.file_name, args.execution_date
         )
     )
 
