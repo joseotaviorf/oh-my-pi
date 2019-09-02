@@ -61,14 +61,7 @@ dag = DAG(
 )
 
 
-def sub_dag(sub_dag_name):
-    local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
-        sub_dag_name=sub_dag_name,
-        dag_name=DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )._build_local_dag()
+def raw_tasks(sub_dag_name, local_dag):
 
     request_api_and_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="request-api-load-to-raw",
@@ -94,6 +87,12 @@ def sub_dag(sub_dag_name):
         },
     )
 
+    list_raw_tasks = [request_api_and_load_to_raw_task, create_raw_partition_task]
+    return list_raw_tasks
+
+
+def clean_tasks(sub_dag_name, local_dag):
+
     load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="move-data-to-clean",
         dag=local_dag,
@@ -109,12 +108,40 @@ def sub_dag(sub_dag_name):
         task_id="create-clean-partition", dag=local_dag
     )
 
-    airflow_helpers.chain(
-        request_api_and_load_to_raw_task,
-        create_raw_partition_task,
-        load_to_clean_task,
-        create_clean_partition_task,
-    )
+    list_clean_tasks = [load_to_clean_task, create_clean_partition_task]
+    return list_clean_tasks
+
+
+def sub_dag(sub_dag_name):
+
+    local_dag = BaseSubDAG(
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    list_tasks = raw_tasks(sub_dag_name, local_dag)
+    list_tasks.append(clean_tasks(sub_dag_name, local_dag))
+
+    airflow_helpers.chain(",".join(list_tasks))
+
+    return local_dag
+
+
+def raw_sub_dag(sub_dag_name):
+
+    local_dag = BaseSubDAG(
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    list_tasks = raw_tasks(sub_dag_name, local_dag)
+    airflow_helpers.chain(",".join(list_tasks))
 
     return local_dag
 
@@ -125,6 +152,24 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION,
 )
+
+
+def clean_sub_dag(sub_dag_name):
+
+    local_dag = BaseSubDAG(
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    DummyOperator(task_id="to-do-create-query", dag=local_dag)
+    # list_tasks = clean_tasks(sub_dag_name, local_dag)
+    # airflow_helpers.chain(','.join(list_tasks))
+
+    return local_dag
+
 
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="calls", sub_dag_func=sub_dag
@@ -139,13 +184,16 @@ ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag
 )
 report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-performance", sub_dag_func=sub_dag
+    dag=dag, sub_dag_name="report-agent-performance", sub_dag_func=raw_sub_dag
 )
 report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
 )
 report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=sub_dag
+    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=raw_sub_dag
+)
+report_agents_per_queue_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag, sub_dag_name="report-agents-per-queue", sub_dag_func=clean_sub_dag
 )
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
@@ -161,12 +209,14 @@ queues_sub_dag_task.set_downstream(
         report_agent_status_sub_dag_task,
     ]
 )
+report_agents_per_queue_sub_dag_task.set_upstream(
+    [report_agent_performance_sub_dag_task, report_agent_status_sub_dag_task]
+)
 terminate_cluster_task.set_upstream(
     [
         calls_sub_dag_task,
-        report_agent_performance_sub_dag_task,
         report_queue_stats_sub_dag_task,
-        report_agent_status_sub_dag_task,
+        report_agents_per_queue_sub_dag_task,
         peers_sub_dag_task,
         ddrs_sub_dag_task,
     ]
