@@ -138,7 +138,7 @@ def raw_sub_dag(sub_dag_name):
     )._build_local_dag()
 
     list_tasks = raw_tasks(sub_dag_name, local_dag)
-    airflow_helpers.chain(",".join(list_tasks))
+    airflow_helpers.chain(list_tasks)
 
     return local_dag
 
