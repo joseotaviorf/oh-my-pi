@@ -94,7 +94,16 @@ def sub_dag(sub_dag_name, has_partitions="False"):
         },
     )
 
-    load_to_clean_task = DummyOperator(task_id="load-to-clean", dag=local_dag)
+    load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="move-data-to-clean",
+        dag=local_dag,
+        json={
+            "spark_python_task": {
+                "python_file": "{}/move_data_to_clean.py".format(SPARK_JOBS_PATH),
+                "parameters": [sub_dag_name, "{{ ds }}", ENV],
+            }
+        },
+    )
 
     create_clean_partition_task = DummyOperator(
         task_id="create-clean-partition", dag=local_dag
