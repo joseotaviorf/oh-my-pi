@@ -403,6 +403,7 @@ ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
     op_kwargs={
         'table_name': 'house_listing_status',
         'file_path': 'house/',
+        'query_params': None,
         'enum_db': EnumDB.BI_ODS
     }
 )
