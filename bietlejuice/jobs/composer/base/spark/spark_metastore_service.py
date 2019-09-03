@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -34,7 +35,9 @@ class SparkMetastoreService:
     @logger(exclude="df")
     def merge_schemas(self, table_name, file_format, partition_by_list, df):
         """
-        Method to merge the schemas from the current table in the spark metastore and the input dataframe. If there are any new columns in df that don't exist in the table in metastore, this method will recreate the table with the new columns.
+        Method to merge the schemas from the current table in the spark metastore and the input dataframe. If there are
+        any new columns in df that don't exist in the table in metastore, this method will recreate the table with the
+        new columns.
 
         :param table_name: name of the table in the schema (without schema prefix)
         :param file_format: file format of the table in spark metastore
@@ -94,3 +97,40 @@ class SparkMetastoreService:
         self.drop_table(table_name)
         self.spark_sql_client.run(ddl)
         self.update_table_partitions(table_name)
+
+    def create_add_partition_query(self, table_name, partition_by_dict):
+        add_partition_query = "ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION ({})"
+        partitions_section = ", ".join(
+            [
+                "{} = {}".format(k, v)
+                if not isinstance(v, str)
+                else "{} = '{}'".format(k, v)
+                for k, v in partition_by_dict.items()
+            ]
+        )
+        add_partition_query = add_partition_query.format(
+            self.db, table_name, partitions_section
+        )
+        return add_partition_query
+
+    def add_partition(self, table_name, partition_by_dict):
+        query = self.create_add_partition_query(table_name, partition_by_dict)
+        self.spark_sql_client.run(query)
+
+    def create_new_partitions_from_df(
+        self, table_name, df, partition_by_list, parallelism=4
+    ):
+        df_partition_values = df.select(partition_by_list).distinct()
+        partition_tuple_values = df_partition_values.rdd.map(tuple).collect()
+        partition_by_dicts = [
+            {x[0]: x[1] for x in zip(partition_by_list, partition_tuple_value)}
+            for partition_tuple_value in partition_tuple_values
+        ]
+        with Pool(parallelism) as p:
+            p.map(
+                lambda partition_by_dict: self.add_partition(
+                    table_name, partition_by_dict
+                ),
+                partition_by_dicts,
+            )
+        self.spark_sql_client.run("REFRESH TABLE {}.{}".format(self.db, table_name))
