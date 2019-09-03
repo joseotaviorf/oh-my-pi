@@ -11,7 +11,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from airflow.operators.dummy_operator import DummyOperator
 import airflow.utils.helpers as airflow_helpers
 
 # dag params
@@ -108,8 +107,15 @@ def clean_tasks(sub_dag_name, local_dag):
 
     clean_tasks_list.append(load_to_clean_task)
 
-    create_clean_partition_task = DummyOperator(
-        task_id="create-clean-partition", dag=local_dag
+    create_clean_partition_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-clean-partition",
+        dag=local_dag,
+        json={
+            "spark_python_task": {
+                "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
+                "parameters": [sub_dag_name, "clean", "{{ ds }}", ENV],
+            }
+        },
     )
 
     clean_tasks_list = [load_to_clean_task, create_clean_partition_task]
