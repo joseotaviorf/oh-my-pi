@@ -12,12 +12,15 @@ class SparkMetastoreService:
         self.db_path = db_path
         self.spark_sql_client = spark_sql_client
 
+    @logger
     def create_database(self):
         self.spark_sql_client.run("CREATE DATABASE IF NOT EXISTS {}".format(self.db))
 
+    @logger
     def get_table_names(self):
         return self.spark_sql_client.get_table_names(self.db)
 
+    @logger
     def get_table_schema(self, table_name):
         return OrderedDict(
             field.simpleString().split(":")
@@ -26,7 +29,8 @@ class SparkMetastoreService:
             ).schema.fields
         )
 
-    def update_table_partitions(self, table_name):
+    @logger
+    def rapair_table_partitions(self, table_name):
         """
         Method that execute a 'msck repair table' on the Spark metastore. The time to execute this command can get
         really slow if the table has too many partitions, so it's better to use other methods like add_partition or
@@ -36,6 +40,7 @@ class SparkMetastoreService:
         """
         self.spark_sql_client.run("msck repair table {}.{}".format(self.db, table_name))
 
+    @logger
     def drop_table(self, table_name):
         self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
 
@@ -96,16 +101,14 @@ class SparkMetastoreService:
             partitions_ddl,
             self.db_path + table_name,
         )
-        logger.info(
-            "m=merge_schemas, the schema is incompatible, new table definition: \n{}".format(
-                ddl
-            )
-        )
+        logger.info("m=merge_schemas, msg=new table definition: \n{}".format(ddl))
         self.drop_table(table_name)
         self.spark_sql_client.run(ddl)
-        self.update_table_partitions(table_name)
+        logger.info("m=merge_schemas, msg=table created with new schema")
+        self.rapair_table_partitions(table_name)
 
-    def create_add_partition_query(self, table_name, partition_by_dict):
+    @logger
+    def _create_add_partition_query(self, table_name, partition_by_dict):
         """
         Method that creates the query to add a new partition for a table in Spark metastore.
 
@@ -138,7 +141,7 @@ class SparkMetastoreService:
         the partition values.
         :return: None
         """
-        query = self.create_add_partition_query(table_name, partition_by_dict)
+        query = self._create_add_partition_query(table_name, partition_by_dict)
         self.spark_sql_client.run(query)
 
     @logger(exclude="df")
