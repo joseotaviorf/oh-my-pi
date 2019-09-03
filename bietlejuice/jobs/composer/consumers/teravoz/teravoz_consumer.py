@@ -19,14 +19,22 @@ class TeravozConsumer:
         self.execution_date = execution_date
         self.dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
 
-    @staticmethod
     @logger
-    def _get_queue_numbers():
+    def _get_queue_numbers(self):
         """
             This method is required for report tables, because
             their endpoints parametrize the queue number.
         """
-        df = spark.sql("select number from datalake_teravoz_raw.queues")
+        df = spark.sql(
+            """
+            select number from datalake_teravoz_raw.queues
+            where year={year} and month={month} and day={day}
+        """.format(
+                year=self.dt_execution.year,
+                month=self.dt_execution.month,
+                day=self.dt_execution.day,
+            )
+        )
         return df.select("number").collect()
 
     @logger
