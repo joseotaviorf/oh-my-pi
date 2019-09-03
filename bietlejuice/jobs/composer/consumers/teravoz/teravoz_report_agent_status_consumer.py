@@ -17,7 +17,6 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
     @logger
     def __init__(self, api_user, api_pwd, execution_date):
         super().__init__(api_user, api_pwd, execution_date)
-        self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
 
     @logger
     def __build_api_params(self):
