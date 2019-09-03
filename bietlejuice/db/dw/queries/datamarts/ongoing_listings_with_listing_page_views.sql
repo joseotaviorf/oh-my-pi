@@ -113,7 +113,7 @@ listing_dimensions as (
 	coalesce(dhl.ts_listing_version_start, dhl.ts_publication) as ts_listing_version_start_mod,
 	coalesce(dhl.ts_listing_version_end, CURRENT_TIMESTAMP) as ts_listing_version_end_mod,
 	dhl.ts_publication,
-	dhl.ts_de_publication,
+	dhl.ts_last_de_publication,
 	dr.city_group,
     dr.city_name as city,
     dr.macro_name as macro_region,
