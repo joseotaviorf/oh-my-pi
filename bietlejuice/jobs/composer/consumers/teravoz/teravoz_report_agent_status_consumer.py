@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from quintoandar_teravoz_client import TeravozClient
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.teravoz import TeravozConsumer
