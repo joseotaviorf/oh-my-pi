@@ -303,8 +303,12 @@ select
   lsc_originals.specialconditiontype as last_originals_type,
   hl.version = max(hl.version) over (partition by hl.id_house) as is_last_version,
   lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
-  lsc_originals.dt_last_opted_in is not null
-    and lsc_originals.dt_last_opted_out is null as is_originals_active,
+  case
+    when (lsc_originals.dt_last_opted_in is not null and lsc_originals.dt_last_opted_out is null)
+      or (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)
+    then true
+    else false
+    end as is_originals_active,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
   ts_last_de_publication,
