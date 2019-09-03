@@ -75,7 +75,7 @@ def sub_dag(sub_dag_name):
         dag=local_dag,
         json={
             "spark_python_task": {
-                "python_file": "{}/load_teravoz_into_datalake.py".format(
+                "python_file": "{}/load_teravoz_into_datalake_raw.py".format(
                     SPARK_JOBS_PATH
                 ),
                 "parameters": [sub_dag_name, "{{ ds }}", ENV],
