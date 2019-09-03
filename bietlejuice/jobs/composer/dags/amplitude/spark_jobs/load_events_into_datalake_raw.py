@@ -5,12 +5,18 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, SparkSQLCLient
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    BaseSparkContext,
+    SparkDataFrameService,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
+from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -19,7 +25,7 @@ base_dbutils = BaseDBUtils()
 if base_dbutils.get_dbutils() is not None:
     dbutils = base_dbutils.get_dbutils()
 
-spark = BaseSparkContext.spark
+spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 parser = ArgumentParser(description="load_events_into_datalake_raw")
 parser.add_argument("execution_date")
@@ -38,10 +44,16 @@ if __name__ == "__main__":
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
-    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_info["db_raw_databricks"]))
-    amplitude_events = AmplitudeEvents(
-        db_raw=db_info["db_raw_databricks"], s3_raw_path=db_info["db_raw_path"]
+    amplitude_events = AmplitudeEvents()
+    spark_sql_client = SparkSQLCLient(spark, sqlContext)
+    dataframe_service = SparkDataFrameService()
+    metastore_service = SparkMetastoreService(
+        db_info["db_raw_databricks"], db_info["db_raw_path"], spark_sql_client
     )
+    dataframe_loader = SparkDataframeIntoDatalakeLoader(
+        SparkTableStorageFormat.DEFAULT_RAW, metastore_service
+    )
+    table_name = "events"
 
     logger.info(
         "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
@@ -57,4 +69,10 @@ if __name__ == "__main__":
         amplitude_export_api = AmplitudeExportApi(key["app_key"], key["secret_key"])
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
         file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
-        amplitude_events.load_events_into_datalake_raw(file_from_api)
+
+        if file_from_api:
+            df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+            dataframe_loader.overwrite_partition(
+                df, ["year", "month", "day", "app"], table_name, schema_merging=True
+            )
+            metastore_service.update_table_partitions(table_name)

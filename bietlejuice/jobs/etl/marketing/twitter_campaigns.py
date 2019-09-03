@@ -57,6 +57,12 @@ class TwitterCampaigns(Marketing):
         Promoted Tweets details and Promoted Tweets stats on data lake raw
         """
 
+        delta = datetime.today() - self.execution_date
+        if delta.days >= 90:
+            logger.info('m=move_twitter_ads_to_raw, msg=Ignoring raw task due Twitter '
+                        'API does not provide data older than 90 days')
+            return
+
         for acc in self.get_accounts():
             campaigns_ids = self._fetch_and_save_campaigns(acc)
             ad_groups_ids = self._fetch_and_save_ad_groups(acc, campaigns_ids)

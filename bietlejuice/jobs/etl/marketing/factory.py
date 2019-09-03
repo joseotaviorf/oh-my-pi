@@ -6,6 +6,7 @@ from bietlejuice.jobs.etl.marketing.classifieds_costs import ClassifiedsCosts
 from bietlejuice.jobs.etl.marketing.criteo_campaigns import CriteoCampaigns
 from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
+from bietlejuice.jobs.etl.marketing.linkedin_campaigns import LinkedInCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns
 from bietlejuice.jobs.etl.marketing.trovit_campaigns import TrovitCampaigns
@@ -48,7 +49,8 @@ class MarketingFactory(object):
             MarketingEnum.RTB: RtbCampaigns,
             MarketingEnum.CLASSIFIEDS_COSTS: ClassifiedsCosts,
             MarketingEnum.TROVIT: TrovitCampaigns,
-            MarketingEnum.TWITTER: TwitterCampaigns
+            MarketingEnum.TWITTER: TwitterCampaigns,
+            MarketingEnum.LINKEDIN: LinkedInCampaigns
         }.get(class_)
 
     @staticmethod

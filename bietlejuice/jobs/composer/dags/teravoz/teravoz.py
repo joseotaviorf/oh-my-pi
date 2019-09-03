@@ -59,7 +59,7 @@ dag = DAG(
 )
 
 
-def sub_dag(sub_dag_name, **kwargs):
+def sub_dag(sub_dag_name, has_partitions="False"):
     local_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
@@ -80,8 +80,15 @@ def sub_dag(sub_dag_name, **kwargs):
         },
     )
 
-    create_raw_partition_task = DummyOperator(
-        task_id="create-raw-partition", dag=local_dag
+    create_raw_partition_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-raw-partition",
+        dag=local_dag,
+        json={
+            "spark_python_task": {
+                "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
+                "parameters": [sub_dag_name, "raw", "{{ ds }}", ENV, has_partitions],
+            }
+        },
     )
 
     load_to_clean_task = DummyOperator(task_id="load-to-clean", dag=local_dag)
@@ -108,7 +115,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 )
 
 calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="calls", sub_dag_func=sub_dag
+    dag=dag, sub_dag_name="calls", has_partitions="True", sub_dag_func=sub_dag
 )
 queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag
@@ -120,13 +127,22 @@ ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag
 )
 report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-performance", sub_dag_func=sub_dag
+    dag=dag,
+    sub_dag_name="report-agent-performance",
+    has_partitions="True",
+    sub_dag_func=sub_dag,
 )
 report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
+    dag=dag,
+    sub_dag_name="report-queue-stats",
+    has_partitions="True",
+    sub_dag_func=sub_dag,
 )
 report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=sub_dag
+    dag=dag,
+    sub_dag_name="report-agent-status",
+    has_partitions="True",
+    sub_dag_func=sub_dag,
 )
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

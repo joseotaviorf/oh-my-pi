@@ -42,7 +42,7 @@ newbiz_listings AS (
         dhl.sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)                AS publication_date,
-        DATE(dhl.ts_de_publication)             AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)             AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -77,7 +77,7 @@ newbiz_listings AS (
       ON dhl.id_house = nlv.id_house
      AND dhl.sk_house_listing >= nlv.sk_house_listing -- make sure we do not get listing older versions
     LEFT JOIN fact_photo_job fpj
-      ON dhl.sk_house_listing = fpj.sk_property
+      ON dhl.sk_house_listing = fpj.sk_house_listing
      AND fpj.creation_origin != 'Teste'
      AND fpj.job_status = 'Publicado'
      AND fpj.sk_date_photos_uploaded != '-1'
@@ -98,7 +98,7 @@ newbiz_listings AS (
         dhl.sk_house_listing    										AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
-        DATE(dhl.ts_de_publication)									AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)									AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -133,7 +133,7 @@ newbiz_listings AS (
       ON dhl.id_house = nlv.id_house
      AND dhl.sk_house_listing >= nlv.sk_house_listing -- make sure we do not get listing older versions
     LEFT JOIN fact_photo_job fpj
-      ON dhl.sk_house_listing = fpj.sk_property
+      ON dhl.sk_house_listing = fpj.sk_house_listing
      AND fpj.creation_origin != 'Teste'
      AND fpj.job_status = 'Publicado'
      AND fpj.sk_date_photos_uploaded != '-1'
@@ -154,7 +154,7 @@ newbiz_listings AS (
         dhl.sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
-        DATE(dhl.ts_de_publication)   AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)   AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -184,7 +184,7 @@ newbiz_listings AS (
         dhl.sk_house_listing    			AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
-        DATE(dhl.ts_de_publication)   AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)   AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,

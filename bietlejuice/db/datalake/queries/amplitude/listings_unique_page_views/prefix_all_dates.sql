@@ -29,7 +29,7 @@ with unique_views_prev as (
           else -1
         end as house_id
       from datalake_clean.amplitude_events ae
-      where ym >= '2017-01'
+      where ym >= '2017-01' and ym <= '2018-12'
         and ((trim(app) = '170698' and et = 'listing_page_viewed' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
           or (trim(app) = '157033' and et = 'Listing-View' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
           or (trim(app) = '160023' and et = 'Listing-Views_listing' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
