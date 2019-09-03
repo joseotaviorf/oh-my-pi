@@ -35,7 +35,7 @@ pipeline:
 
   unit-tests-python3:
     group: tests
-    image: rafaelleinio/pyspark
+    image: quintoandar/pyspark:0.1
     pull: true
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
