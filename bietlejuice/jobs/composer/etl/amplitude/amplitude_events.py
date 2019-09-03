@@ -60,10 +60,9 @@ class AmplitudeEvents:
             df = spark.read.json(sc.parallelize(data, n))
             return (
                 dataframe_service.input(df)
-                .columns_name_format()
-                .struct_type_to_json()
+                .format_column_names()
+                .convert_struct_type_to_json()
                 .create_year_month_day_columns("server_upload_time")
-                .output()
             )
 
             # data_frame_service.incremental_write(
@@ -100,7 +99,7 @@ class AmplitudeEvents:
 
         return (
             dataframe_service.input(df)
-            .partition_optimize(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
+            .optimize_partition(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
             .output()
         )
 
@@ -135,7 +134,7 @@ class AmplitudeEvents:
             dataframe_service.input(filtered_event_df)
             .explode_json_column("user_properties", "user_", True)
             .explode_json_column("event_properties", "event_", True)
-            .partition_optimize(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
+            .optimize_partition(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
             .output()
         )
 
