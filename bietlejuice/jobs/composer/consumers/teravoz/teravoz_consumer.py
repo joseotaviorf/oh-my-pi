@@ -1,3 +1,4 @@
+from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
 

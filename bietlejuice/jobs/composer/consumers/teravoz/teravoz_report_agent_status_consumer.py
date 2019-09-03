@@ -23,7 +23,9 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
         params = {
             "queue_number": "",
             "start_date": self.execution_date,
-            "end_date": datetime.strftime(self.dt_execution + timedelta(days=1), "%Y-%m-%d"),
+            "end_date": datetime.strftime(
+                self.dt_execution + timedelta(days=1), "%Y-%m-%d"
+            ),
         }
 
         return params
