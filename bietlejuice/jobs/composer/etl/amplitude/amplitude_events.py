@@ -63,6 +63,7 @@ class AmplitudeEvents:
                 .format_column_names()
                 .convert_struct_type_to_json()
                 .create_year_month_day_columns("server_upload_time")
+                .output()
             )
 
     @logger
