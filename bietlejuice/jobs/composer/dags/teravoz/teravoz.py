@@ -91,8 +91,6 @@ def raw_tasks(sub_dag_name, local_dag):
 
 def clean_tasks(sub_dag_name, local_dag):
 
-    clean_tasks_list = []
-
     load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="move-data-to-clean",
         dag=local_dag,
@@ -103,8 +101,6 @@ def clean_tasks(sub_dag_name, local_dag):
             }
         },
     )
-
-    clean_tasks_list.append(load_to_clean_task)
 
     create_clean_partition_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id="create-clean-partition",
