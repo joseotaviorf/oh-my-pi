@@ -1,5 +1,6 @@
 select
 	da.id,
+	da.indicadoPor_id,
 	da.inicioAtuacao,
 	da.tipoAfiliado,
 	da.cidadeAtuacao,
