@@ -43,7 +43,7 @@ class SparkDataframeIntoDatalakeLoader:
         :return: None
         """
         if not df:
-            raise ValueError("m=partition_overwrite_load, msg=input df is None")
+            raise ValueError("m=overwrite_partition, msg=input df is None")
 
         write_df = (
             df.write.mode("overwrite")
@@ -54,7 +54,7 @@ class SparkDataframeIntoDatalakeLoader:
         self.metastore_service.create_database()  # if not exists
         if table_name not in self.metastore_service.get_table_names():
             logger.info(
-                "m=partition_overwrite_load, db={}, table_name={}, ".format(
+                "m=overwrite_partition, db={}, table_name={}, ".format(
                     self.metastore_service.db, table_name
                 )
                 + "msg=table does not exist in db, creating new..."
@@ -62,18 +62,18 @@ class SparkDataframeIntoDatalakeLoader:
             self._save_df_as_table(write_df, table_name)
         else:
             if schema_merging:
-                self.metastore_service.make_schema_merging(
+                self.metastore_service.merge_schemas(
                     table_name, self.format, partition_by_list, df
                 )
             logger.info(
-                "m=partition_overwrite_load, db={}, table_name={}, ".format(
+                "m=overwrite_partition, db={}, table_name={}, ".format(
                     self.metastore_service.db, table_name
                 )
                 + "insert overwrite on right partition"
             )
             self._save_df(write_df, table_name)
         logger.info(
-            "m=partition_overwrite_load, write finished, new data in: s3 path={} partitions={}".format(
+            "m=overwrite_partition, write finished, new data in: s3 path={} partitions={}".format(
                 self.metastore_service.db_path + table_name, str(partition_by_list)
             )
         )

@@ -4,15 +4,23 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.base.spark import (
+    BaseSparkContext,
+    SparkDataFrameService,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
     AmplitudeDatabaseInfo,
 )
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("events_raw_to_clean")
 
-spark = BaseSparkContext.spark
+spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 parser = ArgumentParser(description="events_raw_to_clean")
 parser.add_argument("execution_date")
@@ -27,14 +35,26 @@ if __name__ == "__main__":
     db_info = AmplitudeDatabaseInfo.get_db_info(env)
 
     amplitude_events = AmplitudeEvents(
-        db_raw=db_info["db_raw_databricks"],
-        s3_raw_path=db_info["db_raw_path"],
-        db_clean=db_info["db_clean_databricks"],
-        s3_clean_path=db_info["db_clean_path"],
+        db_raw=db_info["db_raw_databricks"], db_clean=db_info["db_clean_databricks"]
     )
+    spark_sql_client = SparkSQLCLient(spark, sqlContext)
+    metastore_service = SparkMetastoreService(
+        db_info["db_clean_databricks"], db_info["db_clean_path"], spark_sql_client
+    )
+    dataframe_loader = SparkDataframeIntoDatalakeLoader(
+        SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service
+    )
+    dataframe_service = SparkDataFrameService()
 
-    spark.sql("CREATE DATABASE IF NOT EXISTS {}".format(db_info["db_clean_databricks"]))
-    amplitude_events.update_clean_amplitude_events(date=date)
+    table_name = "events"
+    spark_sql_consumer = DatabricksConsumer({"db": db_info["db_raw_databricks"]})
+    df = amplitude_events.create_clean_events_df(
+        date, spark_sql_consumer, dataframe_service
+    )
+    dataframe_loader.overwrite_partition(
+        df, ["year", "month", "day", "event_type"], table_name, schema_merging=False
+    )
+    metastore_service.update_table_partitions(table_name)
 
     event_types = [
         "listing_page_viewed",
@@ -48,4 +68,12 @@ if __name__ == "__main__":
         "signup_user_created",
     ]
     for event_type in event_types:
-        amplitude_events.update_filtered_events_table(date=date, event_type=event_type)
+        table_name = "{}_events".format(event_type)
+        spark_sql_consumer = DatabricksConsumer({"db": db_info["db_clean_databricks"]})
+        df = amplitude_events.create_filtered_clean_events_df(
+            date, event_type, spark_sql_consumer, dataframe_service
+        )
+        dataframe_loader.overwrite_partition(
+            df, ["year", "month", "day"], table_name, schema_merging=True
+        )
+        metastore_service.update_table_partitions(table_name)

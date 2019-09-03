@@ -12,7 +12,7 @@ create table if not exists house_listing (
   is_originals_active boolean,
   ts_listing_version_start timestamp,
   ts_listing_version_end timestamp,
-  ts_de_publication timestamp,
+  ts_last_de_publication timestamp,
   dt_last_exclusive_opted_in date,
   dt_last_exclusive_opted_out date,
   dt_last_originals_opted_in date,

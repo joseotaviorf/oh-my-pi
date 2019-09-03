@@ -14,7 +14,6 @@ with house_aud as (
     from datalake_ebdb_raw_prod.imovel_aud i
 	inner join datalake_ebdb_raw_prod.usuariorevisionentity rev
 	  on rev.id = i.rev
---    order by i.id, i.rev
 ),
 house_status_history as (
 --------------------------------------------------------------------------------------------------------
@@ -33,7 +32,6 @@ select
 	aluguel as rent
 from house_aud
 where (status <> previous_status or previous_status is null)
---order by id, rev
 ),
 house_new_status_new_date as (
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +49,6 @@ select
     case when status_history is null then ts_first_publication else ts_status_changed end as new_ts_status_changed,
     max(order_status) over(partition by id_house) as max_order_status
 from house_status_history
---order by id_house, rev
 ),
 house_status_version_changes as (
 --------------------------------------------------------------------------------------------------------
@@ -72,7 +69,6 @@ select
 	              (new_status_history = 'despublicado' and days_unpublished >= 84) then 1
              else 0 end) over (partition by id_house order by rev rows unbounded preceding) as sum_events_change_version
 from house_new_status_new_date h_new
---order by id_house, rev
 ),
 house_status_version_first_publi as (
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +80,6 @@ select
 	min(case when new_status_history = 'publicado' then new_ts_status_changed
 	         end) over(partition by id_house, sum_events_change_version order by rev) as first_publication_change_version
 from house_status_version_changes
---order by id_house, rev
 ),
 house_status_version_publications as (
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,7 +90,6 @@ select
 	*,
 	max(first_publication_change_version) over (partition by id_house order by rev rows unbounded preceding) as publication_version_date
 from house_status_version_first_publi
---order by id_house, rev
 ),
 house_status_version_order as (
 --------------------------------------------------------------------------------------------------------
@@ -105,7 +99,6 @@ select
 	*,
 	case when publication_version_date is null then 0 else dense_rank() over(partition by id_house order by publication_version_date) end as order_version
 from house_status_version_publications
---order by id_house, rev
 ),
 house_status_version_last_status as (
 --------------------------------------------------------------------------------------------------------
@@ -122,6 +115,12 @@ house_status_version_last_status as (
 	)
 	select
 	   hs_vo.*,
+	   max(
+	     case
+	       when hs_vo.new_status_history = 'despublicado'
+	         then new_ts_status_changed
+	     end
+	   ) over(partition by hs_vo.id_house, hs_vo.order_version) as ts_last_de_publication,
 	   case when ms_o.max_order_status is not null then hs_vo.new_status_history end as last_status
     from house_status_version_order hs_vo
     left join max_status_order ms_o
@@ -152,6 +151,7 @@ select
 	hs_v.id_house,
 	hs_v.order_version as version,
 	sc_v.category_change as change_version_status,
+	hs_v.ts_last_de_publication,
 	max(rent) as rent,
 	max(status_history) as status_history,
 	max(ts_status_changed) as ts_status_changed,
@@ -162,8 +162,7 @@ from house_status_version_last_status hs_v
 left join status_change_version sc_v
   on hs_v.id_house = sc_v.id_house
   and hs_v.order_version = sc_v.order_version
-group by 1, 2, 3
---order by hs_v.id_house, hs_v.order_version
+group by 1, 2, 3, 4
 ),
 house_listing_full as (
 --------------------------------------------------------------------------------------------------------
@@ -183,7 +182,8 @@ select
 	status_history,
 	ts_status_changed,
 	ts_listing_version_start,
-	nullif(cast(ts_listing_version_end as timestamp),cast('2200-01-01 12:00:00' as timestamp)) as ts_listing_version_end
+	nullif(cast(ts_listing_version_end as timestamp),cast('2200-01-01 12:00:00' as timestamp)) as ts_listing_version_end,
+	ts_last_de_publication
 from house_listing_plain
 ),
 special_conditions as (
@@ -307,11 +307,7 @@ select
     and lsc_originals.dt_last_opted_out is null as is_originals_active,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
-  case
-    when hl.status_history = 'despublicado'
-      then  hl.ts_status_changed
-    else null
-  end as ts_de_publication,
+  ts_last_de_publication,
   lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
   lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
