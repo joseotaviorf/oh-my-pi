@@ -16,6 +16,7 @@ class TeravozConsumer:
     def __init__(self, api_user, api_pwd, execution_date):
         self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
         self.execution_date = execution_date
+        self.dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
 
     @staticmethod
     @logger

@@ -14,7 +14,6 @@ class TeravozReportsConsumer(TeravozConsumer):
 
     @logger
     def __build_api_params(self):
-        dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
 
         list_queue_numbers = super()._get_queue_numbers()
 
@@ -25,7 +24,7 @@ class TeravozReportsConsumer(TeravozConsumer):
         params = {
             "queue_number": "&queues[]=".join(list_queues),
             "start_date": self.execution_date,
-            "end_date": datetime.strftime(dt_execution + timedelta(days=1), "%Y-%m-%d"),
+            "end_date": datetime.strftime(self.dt_execution + timedelta(days=1), "%Y-%m-%d"),
         }
 
         return params
