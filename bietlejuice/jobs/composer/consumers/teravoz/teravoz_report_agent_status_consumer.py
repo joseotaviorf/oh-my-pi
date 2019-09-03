@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from quintoandar_teravoz_client import TeravozClient
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.teravoz import TeravozConsumer
@@ -17,17 +16,16 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
     @logger
     def __init__(self, api_user, api_pwd, execution_date):
         super().__init__(api_user, api_pwd, execution_date)
-        self.execution_date = execution_date
-        self.api_instance = TeravozClient(api_user=api_user, api_pwd=api_pwd)
 
     @logger
     def __build_api_params(self):
-        dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
 
         params = {
             "queue_number": "",
             "start_date": self.execution_date,
-            "end_date": datetime.strftime(dt_execution + timedelta(days=1), "%Y-%m-%d"),
+            "end_date": datetime.strftime(
+                self.dt_execution + timedelta(days=1), "%Y-%m-%d"
+            ),
         }
 
         return params

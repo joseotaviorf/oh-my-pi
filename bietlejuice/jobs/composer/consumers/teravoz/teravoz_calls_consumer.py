@@ -11,14 +11,11 @@ class TeravozCallsConsumer(TeravozConsumer):
     @logger
     def __init__(self, api_user, api_pwd, execution_date):
         super().__init__(api_user, api_pwd, execution_date)
-        self.execution_date = execution_date
 
     @logger
     def __build_api_params(self):
-        # convert to datetime
-        dt_execution = datetime.strptime(self.execution_date, "%Y-%m-%d")
         # convert data to br format
-        br_date_format = datetime.strftime(dt_execution, "%d-%m-%Y")
+        br_date_format = datetime.strftime(self.dt_execution, "%d-%m-%Y")
 
         params = {"date": br_date_format}
         return params

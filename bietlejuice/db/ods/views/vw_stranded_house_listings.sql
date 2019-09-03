@@ -15,7 +15,7 @@ select
     case when date_trunc('day',hl.ts_listing_version_start) + interval '8 week' <= dmin.date
           or date_trunc('day',hl.ts_listing_version_start) + interval '8 week' <= dmax.date
       then 'stranded' end as type_stranded
-from house_listing_status_history fhs
+from house_listing_status fhs
 left join house_listing hl
   on fhs.id_house_listing = hl.id_house_listing
 left join dim_date dmin

@@ -12,7 +12,7 @@ create table dim_house_listing (
   ts_house_first_publication timestamp,
   ts_house_last_publication timestamp,
   ts_publication timestamp,
-  ts_de_publication timestamp,
+  ts_last_de_publication timestamp,
   rent numeric(14,2),
   house_rent numeric(14,2),
   house_neighborhood varchar,

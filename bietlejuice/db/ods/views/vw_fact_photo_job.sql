@@ -10,7 +10,7 @@ with base_jobs as (
 )
 select
 	j1.id as id_photo_job,
-	((j1.imovel_id || '00') || COALESCE(pl.version, 1))::bigint AS sk_house_listing,
+	((j1.imovel_id || '00') || COALESCE(pl.version, 0))::bigint AS sk_house_listing,
 	coalesce(h.regiao_id, -1) as sk_region,
 	coalesce(j1.user_cancel_id, -1) as sk_user_cancel,
 	coalesce(j1.photographer_id, -1) as sk_user_photographer,
@@ -57,6 +57,6 @@ left join
 	house h
 	on h.id = j1.imovel_id
 left join
-	property_listing pl
-	on pl.id = j1.imovel_id
-	and j1.dt_job_created between pl.min_version_time and coalesce(pl.max_version_time, current_date)
+	house_listing pl
+	on pl.id_house = j1.imovel_id
+	and j1.dt_job_created between pl.ts_listing_version_start and coalesce(pl.ts_listing_version_end, current_date)
