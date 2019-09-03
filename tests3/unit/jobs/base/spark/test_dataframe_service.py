@@ -36,7 +36,9 @@ class TestDataframeService:
             ([{"a": 1, "d": 3}], [("a", "bigint"), ("d", "bigint")]),
         ],
     )
-    def test_convert_struct_type_to_json(self, data, expected_dtypes, dataframe_service):
+    def test_convert_struct_type_to_json(
+        self, data, expected_dtypes, dataframe_service
+    ):
         # arrange
         df = spark.read.json(sc.parallelize(data, 1))
 
@@ -91,23 +93,35 @@ class TestDataframeService:
             assert dataframe_service.input(df).explode_json_column("json").output()
 
     @pytest.mark.parametrize(
-        "records, records_by_partition",
-        [(10000, 10), (10000, 100), (0, 1), (10000, 5000)],
+        "data, expected_cols, expected_values",
+        [
+            (
+                [{"date": "2018-11-06"}],
+                ["date", "year", "month", "day"],
+                ["2018-11-06", 2018, 11, 6],
+            ),
+            (
+                [{"date": "2019-08-01"}],
+                ["date", "year", "month", "day"],
+                ["2019-08-01", 2019, 8, 1],
+            ),
+        ],
     )
-    def test_optimize_partition(self, records, records_by_partition, dataframe_service):
+    def test_year_month_day_columns(
+        self, data, expected_cols, expected_values, dataframe_service
+    ):
         # arrange
-        data = [{"a": "abc"}] * records
         df = spark.read.json(sc.parallelize(data))
-        expected_partitions = max(records // records_by_partition, 1)
+
         # act
-        df = (
-            dataframe_service.input(df)
-            .optimize_partition(records_by_partition)
-            .output()
-        )
+        df = dataframe_service.input(df).create_year_month_day_columns("date").output()
+        result_cols = df.schema.fieldNames()
+        row = df.collect()[0]
+        result_values = [row["date"], row["year"], row["month"], row["day"]]
 
         # assert
-        assert expected_partitions == df.rdd.getNumPartitions()
+        assert result_cols.sort() == expected_cols.sort()
+        assert result_values == expected_values
 
     @pytest.mark.parametrize(
         "records, records_by_partition",
@@ -118,6 +132,7 @@ class TestDataframeService:
         data = [{"a": "abc"}] * records
         df = spark.read.json(sc.parallelize(data))
         expected_partitions = max(records // records_by_partition, 1)
+
         # act
         df = (
             dataframe_service.input(df)
