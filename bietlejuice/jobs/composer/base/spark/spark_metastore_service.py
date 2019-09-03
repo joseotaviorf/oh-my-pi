@@ -113,10 +113,12 @@ class SparkMetastoreService:
         )
         return add_partition_query
 
+    @logger
     def add_partition(self, table_name, partition_by_dict):
         query = self.create_add_partition_query(table_name, partition_by_dict)
         self.spark_sql_client.run(query)
 
+    @logger(exclude="df")
     def create_new_partitions_from_df(
         self, table_name, df, partition_by_list, parallelism=4
     ):
