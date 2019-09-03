@@ -65,16 +65,6 @@ class AmplitudeEvents:
                 .create_year_month_day_columns("server_upload_time")
             )
 
-            # data_frame_service.incremental_write(
-            #     df,
-            #     AmplitudeEvents.RAW_FORMAT,
-            #     ["year", "month", "day", "app"],
-            #     self.db_raw,
-            #     table_name,
-            #     self.s3_raw_path + table_name,
-            #     True,
-            # )
-
     @logger
     def create_clean_events_df(self, date, spark_sql_consumer, dataframe_service):
         year, month, day = date.year, date.month, date.day
@@ -103,15 +93,6 @@ class AmplitudeEvents:
             .output()
         )
 
-        # DataFrameService.incremental_write(
-        #     df,
-        #     AmplitudeEvents.CLEAN_FORMAT,
-        #     ["year", "month", "day", "event_type"],
-        #     self.db_clean,
-        #     table_name,
-        #     self.s3_clean_path + table_name,
-        # )
-
     @logger
     def create_filtered_clean_events_df(
         self, date, event_type, spark_sql_consumer, dataframe_service
@@ -137,14 +118,3 @@ class AmplitudeEvents:
             .optimize_partition(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
             .output()
         )
-
-        # table_name = "{}_events".format(event_type)
-        # DataFrameService.incremental_write(
-        #     filtered_event_exploded_df,
-        #     AmplitudeEvents.CLEAN_FORMAT,
-        #     ["year", "month", "day"],
-        #     self.db_clean,
-        #     table_name,
-        #     self.s3_clean_path + table_name,
-        #     True,
-        # )
