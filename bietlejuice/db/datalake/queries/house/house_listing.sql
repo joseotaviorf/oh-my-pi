@@ -162,7 +162,7 @@ from house_status_version_last_status hs_v
 left join status_change_version sc_v
   on hs_v.id_house = sc_v.id_house
   and hs_v.order_version = sc_v.order_version
-group by 1, 2, 3
+group by 1, 2, 3, 4
 ),
 house_listing_full as (
 --------------------------------------------------------------------------------------------------------
