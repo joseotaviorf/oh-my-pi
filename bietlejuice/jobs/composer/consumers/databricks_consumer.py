@@ -7,8 +7,6 @@ from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsum
 logger = QuintoAndarLogger("DatabricksConsumer")
 spark = BaseSparkContext.spark
 
-spark = BaseSparkContext.spark
-
 
 class DatabricksConsumer(DatabaseConsumer):
     def __init__(self, connection):
@@ -45,4 +43,5 @@ class DatabricksConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_query(self, query, table_name=None):
-        raise NotImplementedError()
+        spark.sql("USE {}".format(self.connection["db"]))
+        return spark.sql(query)
