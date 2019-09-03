@@ -71,7 +71,7 @@ crawled_listings AS (
   JOIN crawled_listings_first_time ON listings.id_crawled_listing = crawled_listings_first_time.id_crawled_listing
   WHERE
     listings.row = 1  -- get the most recent time it was crawled within last 30 days
-    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
+    AND DATE(crawled_listings_first_time.first_time_updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
 )
 SELECT
   *
