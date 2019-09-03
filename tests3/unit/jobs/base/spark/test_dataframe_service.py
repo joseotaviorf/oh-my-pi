@@ -6,7 +6,7 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class TestDataframeService:
-    def test_columns_name_format(self, dataframe_service):
+    def test_format_column_names(self, dataframe_service):
         # arrange
         input_col_names = ["Abb", "ab", "abc cba", "Abc abc", "abc.abc", "Abc.abc abc"]
         expected_col_names = [
@@ -23,7 +23,7 @@ class TestDataframeService:
         df.show()
 
         # act
-        df = dataframe_service.input(df).columns_name_format().output()
+        df = dataframe_service.input(df).format_column_names().output()
         result_col_names = df.schema.fieldNames()
 
         # assert
@@ -36,25 +36,25 @@ class TestDataframeService:
             ([{"a": 1, "d": 3}], [("a", "bigint"), ("d", "bigint")]),
         ],
     )
-    def test_struct_type_to_json(self, data, expected_dtypes, dataframe_service):
+    def test_convert_struct_type_to_json(self, data, expected_dtypes, dataframe_service):
         # arrange
         df = spark.read.json(sc.parallelize(data, 1))
 
         # act
         result_dtypes = (
-            dataframe_service.input(df).struct_type_to_json().output().dtypes
+            dataframe_service.input(df).convert_struct_type_to_json().output().dtypes
         )
 
         # assert
         assert result_dtypes == expected_dtypes
 
-    def test_struct_type_to_json_invalid_params(self, dataframe_service):
+    def test_convert_struct_type_to_json_invalid_params(self, dataframe_service):
         # arrange
         df = None
 
         # assert
         with pytest.raises(ValueError) as ae:
-            assert dataframe_service.input(df).struct_type_to_json().output()
+            assert dataframe_service.input(df).convert_struct_type_to_json().output()
 
     @pytest.mark.parametrize(
         "data, expected_cols",
@@ -73,7 +73,7 @@ class TestDataframeService:
         # act
         df = (
             dataframe_service.input(df)
-            .struct_type_to_json()
+            .convert_struct_type_to_json()
             .explode_json_column("json", prefix="json_", format_column_names=True)
             .output()
         )
@@ -94,7 +94,7 @@ class TestDataframeService:
         "records, records_by_partition",
         [(10000, 10), (10000, 100), (0, 1), (10000, 5000)],
     )
-    def test_partition_optimize(self, records, records_by_partition, dataframe_service):
+    def test_optimize_partition(self, records, records_by_partition, dataframe_service):
         # arrange
         data = [{"a": "abc"}] * records
         df = spark.read.json(sc.parallelize(data))
@@ -102,7 +102,26 @@ class TestDataframeService:
         # act
         df = (
             dataframe_service.input(df)
-            .partition_optimize(records_by_partition)
+            .optimize_partition(records_by_partition)
+            .output()
+        )
+
+        # assert
+        assert expected_partitions == df.rdd.getNumPartitions()
+
+    @pytest.mark.parametrize(
+        "records, records_by_partition",
+        [(10000, 10), (10000, 100), (0, 1), (10000, 5000)],
+    )
+    def test_optimize_partition(self, records, records_by_partition, dataframe_service):
+        # arrange
+        data = [{"a": "abc"}] * records
+        df = spark.read.json(sc.parallelize(data))
+        expected_partitions = max(records // records_by_partition, 1)
+        # act
+        df = (
+            dataframe_service.input(df)
+            .optimize_partition(records_by_partition)
             .output()
         )
 

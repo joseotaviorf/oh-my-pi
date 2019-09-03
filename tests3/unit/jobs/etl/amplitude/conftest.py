@@ -1,7 +1,7 @@
 import pytest
 
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.base.spark import DataFrameService
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 
 
 class MockedSparkSqlConsumer:
@@ -39,4 +39,4 @@ def spark_sql_consumer():
 
 @pytest.fixture()
 def dataframe_service():
-    return DataFrameService()
+    return SparkDataFrameService()
