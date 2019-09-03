@@ -1,18 +1,16 @@
 from datetime import datetime
 
-from bietlejuice.jobs.composer.base.airflow.base_dag import BaseDAG
-from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
-
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from airflow.operators.dummy_operator import DummyOperator
-import airflow.utils.helpers as airflow_helpers
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # dag params
 DAG_ID = "bietlejuice.teravoz"
@@ -63,7 +61,6 @@ dag = DAG(
 
 def sub_dag(sub_dag_name, has_partitions="False"):
     local_dag = BaseSubDAG(
-        bucket=S3_BUCKET,
         sub_dag_name=sub_dag_name,
         dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
