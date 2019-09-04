@@ -6,18 +6,21 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class TestDataframeService:
-    def test_format_column_names(self, dataframe_service):
+    @pytest.mark.parametrize(
+        "input_col_names, expected_col_names",
+        [
+            (["Abb"], ["_abb"]),
+            (["ab"], ["ab"]),
+            (["abc cba"], ["abc_cba"]),
+            (["Abc abc"], ["_abc_abc"]),
+            (["abc.abc"], ["abc_abc"]),
+            (["Abc.abc abc"], ["_abc_abc_abc"]),
+        ],
+    )
+    def test_format_column_names(
+        self, input_col_names, expected_col_names, dataframe_service
+    ):
         # arrange
-        input_col_names = ["Abb", "ab", "abc cba", "Abc abc", "abc.abc", "Abc.abc abc"]
-        expected_col_names = [
-            "_abb",
-            "ab",
-            "abc_cba",
-            "_abc_abc",
-            "abc_abc",
-            "_abc_abc_abc",
-        ]
-
         data = [{k: 1 for k in input_col_names}]
         df = spark.read.json(sc.parallelize(data, 1))
         df.show()
@@ -107,7 +110,7 @@ class TestDataframeService:
             ),
         ],
     )
-    def test_year_month_day_columns(
+    def test_create_year_month_day_columns(
         self, data, expected_cols, expected_values, dataframe_service
     ):
         # arrange
