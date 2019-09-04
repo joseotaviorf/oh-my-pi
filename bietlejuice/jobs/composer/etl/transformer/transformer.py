@@ -92,8 +92,8 @@ class Transformer:
         self, file_name, dict_format_query=None
     ):
         file = self._get_datalake_query_file_path(file_name)
-        f = open(file, "r")
-        query = f.read()
-        df = spark.sql(query)
 
-        return df
+        with open(file, "r") as f:
+            query = f.read()
+            df = spark.sql(query)
+            return df
