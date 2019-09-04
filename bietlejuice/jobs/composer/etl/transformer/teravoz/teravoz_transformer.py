@@ -36,3 +36,19 @@ class TeravozTransformer(Transformer):
         )
 
         super().add_partition(table_name, datalake_layer, partition_by_dict)
+
+    @logger
+    def create_dataframe_from_datalake_sql_file(self, file_name, execution_date):
+        # filter by day
+        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+        dict_format_query = {
+            "year": dt_execution.year,
+            "month": dt_execution.month,
+            "day": dt_execution.day,
+        }
+
+        df = super().create_dataframe_from_datalake_sql_file(
+            file_name, dict_format_query
+        )
+
+        return df

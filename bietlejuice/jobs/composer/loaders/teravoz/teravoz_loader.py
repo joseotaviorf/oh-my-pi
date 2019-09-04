@@ -43,6 +43,10 @@ class TeravozLoader:
         )
         self.db_name = "datalake_teravoz_{}".format(datalake_layer)
 
+        # file attributes in s3
+        self.file_format = "json" if datalake_layer == "raw" else "parquet"
+        self.file_compression = "gzip" if datalake_layer == "raw" else "snappy"
+
     @logger
     def __build_s3_path_to_load(self, table_exist=False):
         """
@@ -106,8 +110,8 @@ class TeravozLoader:
         # dataframe to json
         df_write = (
             df.write.mode("overwrite")
-            .option("compression", "gzip")
-            .format("json")
+            .option("compression", self.file_compression)
+            .format(self.file_format)
             .option("path", s3_path)
         )
 
@@ -120,9 +124,8 @@ class TeravozLoader:
         )
         df_write.saveAsTable("{}.{}".format(self.db_name, self.table_name))
 
-    @staticmethod
     @logger
-    def __upload_dataframe_to_s3(df, s3_path):
+    def __upload_dataframe_to_s3(self, df, s3_path):
 
         logger.info(
             "m=__upload_dataframe_to_s3, msg=save json file in s3 path: {}".format(
@@ -131,9 +134,9 @@ class TeravozLoader:
         )
 
         # dataframe to json
-        df.write.mode("overwrite").option("compression", "gzip").format("json").option(
-            "path", s3_path
-        ).save()
+        df.write.mode("overwrite").option("compression", self.file_compression).format(
+            self.file_format
+        ).option("path", s3_path).save()
 
     @logger
     def load_data_into_datalake(self, df):
@@ -149,6 +152,7 @@ class TeravozLoader:
         if self.table_name not in sqlContext.tableNames(dbName=self.db_name):
             # create spark table and load data
             self._create_spark_table_and_load_data_to_s3(df)
+
         else:
 
             # partitioned path to create table
