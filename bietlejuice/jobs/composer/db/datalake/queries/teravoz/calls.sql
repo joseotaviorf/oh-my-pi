@@ -1,7 +1,7 @@
 select
     call_id as id, --format xxxx-xxxxxxxx.xxxxxxxx
-    timestamp(call_date) as ts_started_local,
-    to_utc_timestamp(call_date, 'America/Sao_Paulo') as ts_started,
+    timestamp(call_date) as ts_started,
+    from_utc_timestamp(call_date, 'America/Sao_Paulo') as ts_started_local,
     called_number as called_phone_number,
     caller_number as caller_phone_number,
     extension as internal_phone_number,

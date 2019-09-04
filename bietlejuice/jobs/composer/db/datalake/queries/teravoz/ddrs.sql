@@ -1,7 +1,7 @@
 select
     int(id) as id,
-    timestamp(activationDate) as ts_activated_local,
-    to_utc_timestamp(activationDate, 'America/Sao_Paulo') as ts_activated,
+    timestamp(activationDate) as ts_activated,
+    from_utc_timestamp(activationDate, 'America/Sao_Paulo') as ts_activated_local,
     tinyint(cityCode) as city_code,
     tinyint(countryCode) as country_code,
     number as phone_number,
