@@ -30,7 +30,7 @@ class SparkMetastoreService:
         )
 
     @logger
-    def rapair_table_partitions(self, table_name):
+    def repair_table_partitions(self, table_name):
         """
         Method that execute a 'msck repair table' on the Spark metastore. The time to execute this command can get
         really slow if the table has too many partitions, so it's better to use other methods like add_partition or
