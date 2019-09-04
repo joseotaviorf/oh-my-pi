@@ -82,4 +82,3 @@ WTForms==2.2.1
 zope.deprecation==4.4.0
 quintoandar-teravoz-client==0.1.5
 celery==4.3.0
-mysqlclient==1.4.4
