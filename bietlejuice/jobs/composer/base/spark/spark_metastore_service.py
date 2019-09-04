@@ -32,9 +32,9 @@ class SparkMetastoreService:
     @logger
     def repair_table_partitions(self, table_name):
         """
-        Method that execute a 'msck repair table' on the Spark metastore. The time to execute this command can get
-        really slow if the table has too many partitions, so it's better to use other methods like add_partition or
-        create_new_partitions_from_df.
+        Execute a 'msck repair table' command on the Spark metastore.
+        The time to execute this command can get really slow if the table has too many partitions, so it's better
+        to use other methods like add_partition or create_new_partitions_from_df.
         :param table_name: name of the table in the schema (without schema prefix).
         :return: None.
         """
@@ -47,9 +47,9 @@ class SparkMetastoreService:
     @logger(exclude="df")
     def merge_schemas(self, table_name, file_format, partition_by_list, df):
         """
-        Method to merge the schemas from the current table in the spark metastore and the input dataframe. If there are
-        any new columns in df that don't exist in the table in metastore, this method will recreate the table with the
-        new columns.
+        Merge the schemas from the current table in the spark metastore and the input dataframe.
+        If there are any new columns in the df that doesn't exist in the table in metastore, this method will recreate
+        the table with the new columns.
 
         :param table_name: name of the table in the schema (without schema prefix).
         :param file_format: file format of the table in spark metastore.
@@ -108,16 +108,15 @@ class SparkMetastoreService:
         self.rapair_table_partitions(table_name)
 
     @logger
-    def _create_add_partition_query(self, table_name, partition_by_dict):
+    def add_partition(self, table_name, partition_by_dict):
         """
-        Method that creates the query to add a new partition for a table in Spark metastore.
+        Add a new partition to a table in Spark metastore given the table name and a partition dict.
 
         :param table_name: name of the table to be modified (without database prefix).
         :param partition_by_dict: python dict where the keys are the column names of the partitions and the values are
         the partition values.
-        :return: string of the query.
+        :return: None
         """
-        add_partition_query = "ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION ({})"
         partitions_section = ", ".join(
             [
                 "{} = {}".format(k, v)
@@ -126,32 +125,19 @@ class SparkMetastoreService:
                 for k, v in partition_by_dict.items()
             ]
         )
-        add_partition_query = add_partition_query.format(
+        add_partition_query = "ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION ({})".format(
             self.db, table_name, partitions_section
         )
-        return add_partition_query
-
-    @logger
-    def add_partition(self, table_name, partition_by_dict):
-        """
-        Method that add a new partition to a table in Spark metastore given the table name and a partition dict.
-
-        :param table_name: name of the table to be modified (without database prefix).
-        :param partition_by_dict: python dict where the keys are the column names of the partitions and the values are
-        the partition values.
-        :return: None
-        """
-        query = self._create_add_partition_query(table_name, partition_by_dict)
-        self.spark_sql_client.run(query)
+        self.spark_sql_client.run(add_partition_query)
 
     @logger(exclude="df")
     def create_new_partitions_from_df(
         self, table_name, df, partition_by_list, parallelism=4
     ):
         """
-        Method that adds new partitions to a table in Spark metastore for each unique partition value found in a
-        given a dataframe. Normally this method can be called after write a dataframe to the storage layer and the
-        partitions of the respective table in the metastore need to be updated with the new partitions.
+        Adds new partitions to a table in Spark metastore for each unique partition value found in a given a dataframe.
+        Normally this method can be called after write a dataframe to the storage layer and the partitions of the
+        respective table in the metastore need to be updated with the new partitions.
 
         :param table_name: name of the table to be modified (without database prefix).
         :param df: dataframe to extract partition values.
