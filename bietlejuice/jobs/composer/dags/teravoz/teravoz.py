@@ -3,7 +3,6 @@ from datetime import datetime
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
