@@ -21,7 +21,7 @@ crawled_listings_first_time AS (
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as tmp
   WHERE
-    row = 1  -- get the first time it was crawled
+    row = 1  -- get the first time it was crawled within the last 120 days
     AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
 ),
 crawled_listings AS (
@@ -62,7 +62,7 @@ crawled_listings AS (
         city,
         state,
         photos,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) DESC) AS row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis', 'olx')
         AND (advertiser_name is null or advertiser_name != 'quintoandar')  -- ignore our own listings on other sites
@@ -70,8 +70,8 @@ crawled_listings AS (
     ) as listings
   JOIN crawled_listings_first_time ON listings.id_crawled_listing = crawled_listings_first_time.id_crawled_listing
   WHERE
-    listings.row = 1  -- get the first time it was crawled within last 120 days
-    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
+    listings.row = 1  -- get the most recent time it was crawled within last 30 days
+    AND DATE(crawled_listings_first_time.first_time_updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
 )
 SELECT
   *

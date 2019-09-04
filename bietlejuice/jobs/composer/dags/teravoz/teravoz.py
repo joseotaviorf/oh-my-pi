@@ -1,17 +1,15 @@
 from datetime import datetime
 
-from bietlejuice.jobs.composer.base.airflow.base_dag import BaseDAG
-from bietlejuice.jobs.composer.base.airflow.base_sub_dag import BaseSubDAG
-
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-
-import airflow.utils.helpers as airflow_helpers
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # dag params
 DAG_ID = "bietlejuice.teravoz"

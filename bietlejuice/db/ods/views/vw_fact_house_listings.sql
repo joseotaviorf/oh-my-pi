@@ -8,7 +8,7 @@ with house_listing_contracts as (
    from house_listing hl
    join contract c
     on hl.id_house = c.id_house
-    	and c.ts_created::date between hl.ts_listing_version_start::date and hl.ts_listing_version_end::date
+    	and c.ts_created between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
    group by 1
   )
   select
@@ -17,8 +17,8 @@ with house_listing_contracts as (
     c.id as id_contract,
     c.ts_signature as ts_contract_signed,
     c.dt_annulment as dt_contract_annulment,
-    lag(c.id) over (partition by hl.id_house_listing order by hl.version) as id_prev_contract,
-    lead(c.ts_signature) over (partition by hl.id_house_listing order by hl.version) as ts_next_contract_signed,
+    lag(c.id,1) over (partition by hl.id_house order by hl.version) as id_prev_contract,
+    lead(c.ts_signature,1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed,
     count(c.id) over (partition by c.id_house) as nr_renting
   from house_listing hl
   left join latest_contract lc
