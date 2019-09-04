@@ -42,7 +42,7 @@ with b2b_info as (
 ),
 house_listings as (
   select
-    ((h.id || '00') || coalesce(hl.version, 1))::bigint as sk_house_listing,
+    hl.id_house_listing as sk_house_listing,
     h.id as id_house,
     h.id % 892700000 as short_id_house,
     hl.version,
@@ -102,7 +102,7 @@ house_listings as (
     hl.dt_last_originals_opted_in,
     hl.dt_last_originals_opted_out
   from house h
-  left join house_listing hl
+  join house_listing hl
     on hl.id_house = h.id
 )
 select
