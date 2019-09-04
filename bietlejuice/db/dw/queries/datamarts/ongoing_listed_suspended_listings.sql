@@ -1,3 +1,11 @@
+with
+fact_house_listing_status_dates as (
+  select
+    *,
+    case when sk_status_start_date = -1 then null else sk_status_start_date end as status_start_date,
+    case when sk_status_end_date = -1 then null else sk_status_end_date end as status_end_date
+  from fact_house_listing_status
+)
 select
     week_start,
     weeks_since_publication,
