@@ -1,7 +1,7 @@
 select 
-  smallint(st.agent) as id_agent,
-  smallint(pe.peer) as internal_phone_number,
-  smallint(ifnull(pe.queue, st.queue)) as queue_number,
+  int(st.agent) as id_agent,
+  int(pe.peer) as internal_phone_number,
+  int(ifnull(pe.queue, st.queue)) as queue_number,
   ifnull(pe.name, st.fullName) as name,
   smallint(pe.answered) as calls_answered,
   smallint(pe.notAnswered) as calls_missed,
@@ -38,5 +38,5 @@ from
       where year="{year}" and month="{month}" and day="{day}") pe 
 full join 
   (select queue, year, month, day, inline(agents) from datalake_teravoz_raw.report_agent_status
-      where year="{year}" and month="{month}" and day="{day}") st 
-on pe.queue=st.queue and pe.name=st.fullName
+      where year="{year}" and month="{month}" and day="{day}") st
+on st.queue=pe.queue and st.fullName=pe.name and st.agent=pe.peer

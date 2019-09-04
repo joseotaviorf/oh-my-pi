@@ -3,11 +3,11 @@ select
     tinyint(areaCode) as area_code,
     email,
     fullName as name,
-    number as internal_phone_number,
+    int(number) as internal_phone_number,
     current_timestamp as ts_load,
-    year,
-    month,
-    day
+    smallint(year) as year,
+    tinyint(month) as month,
+    tinyint(day) as day
 from
     datalake_teravoz_raw.peers
 where
