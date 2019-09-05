@@ -105,7 +105,7 @@ class SparkMetastoreService:
         self.drop_table(table_name)
         self.spark_sql_client.run(ddl)
         logger.info("m=merge_schemas, msg=table created with new schema")
-        self.rapair_table_partitions(table_name)
+        self.repair_table_partitions(table_name)
 
     @logger
     def add_partition(self, table_name, partition_by_dict):
