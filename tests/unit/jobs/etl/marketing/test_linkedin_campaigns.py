@@ -56,9 +56,24 @@ class TestLinkedInCampaigns(object):
         assert header_list == ['col1', 'col2', 'col3']
 
     @mock.patch.object(LinkedInCampaigns, '_get_header_list')
+    def test_validate_csv_header_invalid_col_len(self, mock__get_header_list,
+                                                 linkedin_campaigns):
+        header_list = list(linkedin_campaigns.CSV_HEADER)
+        header_list.append('invalid_col')
+        mock__get_header_list.return_value = header_list
+
+        # assert
+        with raises(RuntimeError):
+            # act
+            linkedin_campaigns._validate_csv_header('tmp_filename')
+
+    @mock.patch.object(LinkedInCampaigns, '_get_header_list')
     def test_validate_csv_header_invalid_column(self, mock__get_header_list,
                                                 linkedin_campaigns):
-        mock__get_header_list.return_value = ['invalid_col']
+        header_list = list(linkedin_campaigns.CSV_HEADER)
+        header_list.append('invalid_col')
+        del header_list[0]
+        mock__get_header_list.return_value = header_list
 
         # assert
         with raises(RuntimeError):
@@ -269,7 +284,8 @@ class TestLinkedInCampaigns(object):
     @mock.patch.object(BaseETL, 'get_query_from_file_name')
     @mock.patch.object(LinkedInCampaigns, '_is_staging_table_empty')
     @mock.patch.object(LinkedInCampaigns, '_delete_staging_fact_rows')
-    def test__get_staging_table_query_for_fact_table(self, mock__delete_staging_fact_rows,
+    def test__get_staging_table_query_for_fact_table(self,
+                                                     mock__delete_staging_fact_rows,
                                                      mock__is_staging_table_empty,
                                                      mock__get_query_from_file_name,
                                                      linkedin_campaigns):

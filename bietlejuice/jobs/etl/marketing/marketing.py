@@ -36,6 +36,7 @@ class Marketing(object):
         'dim_twitter_campaign': 'sk_campaign',
         'fact_twitter_daily_cost_attributions': 'sk_ad',
         'dim_linkedin_campaign': 'sk_campaign',
+        'dim_linkedin_ad': 'sk_ad',
         'fact_linkedin_daily_cost_attributions': 'sk_ad || sk_campaign || sk_date'
     }
 

@@ -115,22 +115,21 @@ class LinkedInCampaigns(Marketing):
     def _validate_csv_header(self, tmp_file):
         header_list = self._get_header_list(tmp_file)
 
+        if len(header_list) != len(self.CSV_HEADER):
+            raise RuntimeError(
+                'm=_validate_csv_header, column={}, expected_columns={}, '
+                'msg=Columns length are not equal expected_columns'.format(
+                    self.CSV_HEADER,
+                    tmp_file))
+
         i = 0
-        has_invalid_column = False
         for column in header_list:
             col = column.replace('\n', '')
             if col != self.CSV_HEADER[i]:
-                logger.error(
+                raise RuntimeError(
                     'm=_validate_csv_header, column={}, msg=Invalid column'.format(col))
-                has_invalid_column = True
-                break
             i += 1
 
-        if has_invalid_column or len(header_list) != len(self.CSV_HEADER):
-            raise RuntimeError(
-                'm=_validate_csv_header, column={}, expected_columns={}, '
-                'msg=Columns are not equal expected_columns'.format(self.CSV_HEADER,
-                                                                    tmp_file))
         return True
 
     @logger(exclude='result')
