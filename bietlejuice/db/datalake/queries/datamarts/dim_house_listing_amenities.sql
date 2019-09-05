@@ -63,7 +63,8 @@ SELECT
     condo_gas_encanado,
     condo_portao_automatico,
     condo_espaco_gourmet_na_area_comum,
-    condo_perto_de_metro_ou_trem
+    condo_perto_de_metro_ou_trem,
+    house_condition
 FROM (
     SELECT
     --
@@ -132,6 +133,7 @@ FROM (
     portao_automatico.temcaracteristica             AS condo_portao_automatico,
     espaco_gourmet_na_area_comum.temcaracteristica  AS condo_espaco_gourmet_na_area_comum,
     perto_de_metro_ou_trem.temcaracteristica        AS condo_perto_de_metro_ou_trem,
+    house_condition.maintenancecondition            AS house_condition,
     row_number() over 
         (partition by dhl.sk_house_listing
         order by
@@ -198,7 +200,8 @@ FROM (
         gas_encanado.atualizadoem desc,
         portao_automatico.atualizadoem desc,
         espaco_gourmet_na_area_comum.atualizadoem desc,
-        perto_de_metro_ou_trem.atualizadoem desc
+        perto_de_metro_ou_trem.atualizadoem desc,
+        house_condition.atualizadoem desc
         ) as rn
     --
     FROM dim_house_listing dhl
@@ -459,6 +462,8 @@ FROM (
       ON dhl.id_house = perto_de_metro_ou_trem.imovel_id
      AND perto_de_metro_ou_trem.instalacao_id = 12
     --
+    LEFT JOIN datalake_raw.ebdb_housemaintenancecondition house_condition
+      ON dhl.id_house = house_condition.houseid
     ) base
 WHERE base.rn = 1
 ORDER BY 1
