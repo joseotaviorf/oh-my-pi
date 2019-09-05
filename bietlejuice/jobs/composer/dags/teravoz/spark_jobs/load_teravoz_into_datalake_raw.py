@@ -3,34 +3,32 @@ import logging
 from argparse import ArgumentParser
 
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.loaders.teravoz.factory import TeravozFactory
+from bietlejuice.jobs.composer.consumers.teravoz import TeravozFactoryConsumer
+from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 
 from quintoandar_logger import QuintoAndarLogger
 
 DATABRICKS_SCOPE = "quintoandar"
 
 
-JOB_NAME = "load_teravoz_into_datalake"
+JOB_NAME = "load_teravoz_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
 @logger
-def exec_factory_method(
-    table_name, method, api_user, api_pwd, environment, execution_date
-):
+def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):
 
-    teravoz = TeravozFactory.factory(
-        table_name=table_name,
+    teravoz_consumer = TeravozFactoryConsumer.factory(
+        endpoint=endpoint,
         api_user=api_user,
         api_pwd=api_pwd,
-        environment=environment,
         execution_date=execution_date,
     )
 
-    getattr(teravoz, method)
-    return teravoz
+    getattr(teravoz_consumer, method)
+    return teravoz_consumer
 
 
 if __name__ == "__main__":
@@ -39,10 +37,7 @@ if __name__ == "__main__":
 
     # args passed by Airflow task
     parser.add_argument(
-        "table_name", type=str, help="which endpoint to call and table name"
-    )
-    parser.add_argument(
-        "datalake_layer", type=str, help="which layer from datalake to load"
+        "endpoint_name", type=str, help="which endpoint to call and table name"
     )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
@@ -50,14 +45,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake, table_name={}, datalake_layer={}, execution_date={}, msg=print args spark jobs params".format(
-            args.table_name, args.datalake_layer, args.execution_date
+        "m=load_teravoz_into_datalake_raw, endpoint_name={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            args.endpoint_name, args.execution_date, args.environment
         )
     )
 
-    datalake_layer = args.datalake_layer
     execution_date = args.execution_date
-    table_name = args.table_name
+    endpoint_name = args.endpoint_name
     environment = args.environment
 
     # start Spark Session
@@ -71,14 +65,22 @@ if __name__ == "__main__":
 
     credentials = json.loads(json_credentials)
 
-    teravoz = exec_factory_method(
-        table_name=table_name,
+    # request api and get dataframe
+    teravoz_consumer = exec_factory_method(
+        endpoint=endpoint_name,
         method="__init__",
         api_user=credentials["teravoz_user"],
         api_pwd=credentials["teravoz_password"],
-        environment=environment,
         execution_date=execution_date,
     )
+    df = teravoz_consumer.request_api_and_get_dataframe(endpoint_name)
 
-    df = teravoz.request_api_and_get_dataframe(table_name)
-    teravoz.load_data_into_datalake(df, table_name, datalake_layer)
+    table_name = endpoint_name.replace("-", "_")
+    # load dataframe to raw datalake and create spark table
+    teravoz_loader = TeravozLoader(
+        environment=environment,
+        datalake_layer="raw",
+        table_name=table_name,
+        execution_date=execution_date,
+    )
+    teravoz_loader.load_data_into_datalake(df)
