@@ -23,16 +23,15 @@ class MarketingLinkedInCampaignsSubDag(MarketingSubDag):
 
     @logger
     def build_clean_tasks(self, dag):
-        for account in self.accounts:
-            for table in self.datalake_tables:
-                BaseDAG.build_python_operator(
-                    dag=dag,
-                    task_id='table-{}-acc-{}'.format(table, account),
-                    python_callable=self.transfer_files_to_clean,
-                    provide_context=True,
-                    op_kwargs={
-                        'bucket': self.bucket,
-                        'datalake_table': table,
-                        'account': account
-                    }
-                )
+        for table in self.datalake_tables:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id='table-{}'.format(table),
+                python_callable=self.transfer_files_to_clean,
+                provide_context=True,
+                op_kwargs={
+                    'bucket': self.bucket,
+                    'datalake_table': table,
+                    'account': None
+                }
+            )
