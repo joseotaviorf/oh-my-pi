@@ -54,6 +54,7 @@ if __name__ == "__main__":
         SparkTableStorageFormat.DEFAULT_RAW, metastore_service
     )
     table_name = "events"
+    partition_by_list = ["year", "month", "day", "app"]
 
     logger.info(
         "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
@@ -73,6 +74,8 @@ if __name__ == "__main__":
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
             dataframe_loader.overwrite_partition(
-                df, ["year", "month", "day", "app"], table_name, schema_merging=True
+                df, partition_by_list, table_name, schema_merging=True
             )
-            metastore_service.update_table_partitions(table_name)
+            metastore_service.create_new_partitions_from_df(
+                table_name, df, partition_by_list, parallelism=8
+            )
