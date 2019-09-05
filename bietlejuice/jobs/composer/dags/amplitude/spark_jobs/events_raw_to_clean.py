@@ -47,14 +47,17 @@ if __name__ == "__main__":
     dataframe_service = SparkDataFrameService()
 
     table_name = "events"
+    partition_by_list = ["year", "month", "day", "event_type"]
     spark_sql_consumer = DatabricksConsumer({"db": db_info["db_raw_databricks"]})
     df = amplitude_events.create_clean_events_df(
         date, spark_sql_consumer, dataframe_service
     )
     dataframe_loader.overwrite_partition(
-        df, ["year", "month", "day", "event_type"], table_name, schema_merging=False
+        df, partition_by_list, table_name, schema_merging=False
     )
-    metastore_service.update_table_partitions(table_name)
+    metastore_service.create_new_partitions_from_df(
+        table_name, df, partition_by_list, parallelism=8
+    )
 
     event_types = [
         "listing_page_viewed",
@@ -69,11 +72,14 @@ if __name__ == "__main__":
     ]
     for event_type in event_types:
         table_name = "{}_events".format(event_type)
+        partition_by_list = ["year", "month", "day"]
         spark_sql_consumer = DatabricksConsumer({"db": db_info["db_clean_databricks"]})
         df = amplitude_events.create_filtered_clean_events_df(
             date, event_type, spark_sql_consumer, dataframe_service
         )
         dataframe_loader.overwrite_partition(
-            df, ["year", "month", "day"], table_name, schema_merging=True
+            df, partition_by_list, table_name, schema_merging=True
         )
-        metastore_service.update_table_partitions(table_name)
+        metastore_service.create_new_partitions_from_df(
+            table_name, df, partition_by_list, parallelism=8
+        )
