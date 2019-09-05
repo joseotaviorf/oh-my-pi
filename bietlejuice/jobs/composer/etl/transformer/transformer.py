@@ -95,5 +95,5 @@ class Transformer:
 
         with open(file, "r") as f:
             query = f.read()
-            df = spark.sql(query)
+            df = spark.sql(query.format(**dict_format_query))
             return df
