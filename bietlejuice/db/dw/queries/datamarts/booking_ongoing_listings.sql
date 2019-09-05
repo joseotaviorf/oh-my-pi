@@ -4,7 +4,7 @@ with house_status as (
 		fhs.sk_house_listing as sk_house,
 		fhs.sk_region,
 		fhs.status_history as status,
-		min(nullif(fhs.sk_status_start_date,-1)) as sk_min_status_date,
+		min(fhs.sk_status_start_date) as sk_min_status_date,
 		coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
 	from fact_house_listing_status fhs
 	group by 1, 2, 3, 5
