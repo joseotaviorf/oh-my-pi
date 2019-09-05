@@ -149,6 +149,9 @@ class TeravozLoader:
         # create database if not exists in spark catalog
         spark.sql("create database if not exists {}".format(self.db_name))
 
+        # limits the number of partitions in df, consequently the number of files created in s3
+        df = df.coalesce(5)
+
         if self.table_name not in sqlContext.tableNames(dbName=self.db_name):
             # create spark table and load data
             self._create_spark_table_and_load_data_to_s3(df)
