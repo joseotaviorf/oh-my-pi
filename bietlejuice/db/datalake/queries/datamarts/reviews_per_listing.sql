@@ -9,7 +9,7 @@ reviews as (
         try(cast(max(case when feature.name='furniture' then rating_selected[1] else null end) as bigint)) as furniture,
         cast(max(case when feature.name='naturallight' then rating_selected[1] else null end) as bigint) as naturallight,
         cast(max(case when feature.name='indoorsilence' then rating_selected[1] else null end) as bigint) as indoorsilence
-        -- max(review.comment) as comment
+        
     from datalake_insider_raw_prod.review as review
     inner join datalake_insider_raw_prod.review_feature as feature_rev on review.id = feature_rev.review_id
     inner join datalake_insider_raw_prod.feature as feature on feature_rev.feature_id = feature.id
