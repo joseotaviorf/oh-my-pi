@@ -3,7 +3,7 @@ with pre_online_metrics AS (
   metrics AS (
         SELECT
           DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
-          coalesce(cast(json_extract(event_properties, '$.user_id') as varchar), '') as user_id,
+          user_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
           CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views,
