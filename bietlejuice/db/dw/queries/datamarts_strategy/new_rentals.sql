@@ -3,7 +3,7 @@
 -- Contracts of type DealOnly are considered
 
 select
-	distinct coalesce(dc.dt_start, dc.dt_entrance) as rental_date,
+	coalesce(dc.dt_start, dc.dt_entrance) as rental_date,
 	date_trunc('week',coalesce(dc.dt_start, dc.dt_entrance)) as rental_week_start,
 	date_trunc('month',coalesce(dc.dt_start, dc.dt_entrance)) as rental_month_start,
 	rf.sk_region,
