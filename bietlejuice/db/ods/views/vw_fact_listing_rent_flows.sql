@@ -205,7 +205,6 @@ select
   flg_visit_created_from_app,
   visit_created_type,
   flg_visit_last_updated_from_app,
-  visit_last_updated_type,
   sk_rent_flow_taxonomy,
   booking_utm_campaign,
   booking_utm_content,
