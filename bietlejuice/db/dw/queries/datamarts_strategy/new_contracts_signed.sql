@@ -3,7 +3,7 @@
 -- Contracts of type DealOnly are considered
 
 select
-  distinct coalesce(dc.ts_signature, dc.dt_start) as contract_signed_date,
+  coalesce(dc.ts_signature, dc.dt_start) as contract_signed_date,
   date_trunc('week',coalesce(dc.ts_signature, dc.dt_start)) as contract_week_start,
   date_trunc('month',coalesce(dc.ts_signature, dc.dt_start)) as contract_month_start,
   rf.sk_region,
