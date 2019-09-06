@@ -1,5 +1,5 @@
-DROP TABLE staging.fact_linkedin_daily_cost_attributions;
-CREATE TABLE IF NOT EXISTS staging.fact_linkedin_daily_cost_attributions(
+DROP TABLE marketing.fact_linkedin_daily_cost_attributions;
+CREATE TABLE IF NOT EXISTS marketing.fact_linkedin_daily_cost_attributions (
   sk_ad        VARCHAR(50),
   sk_campaign  VARCHAR(50),
   sk_date      INTEGER,

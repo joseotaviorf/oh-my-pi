@@ -2,6 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 import mock
+import pandas as pd
 import petl
 from mock import MagicMock, Mock
 from pytest import raises
@@ -29,21 +30,59 @@ class TestLinkedInCampaigns(object):
         # assert
         assert folder_id == '1234'
 
+    @mock.patch("os.path.exists")
+    def test__get_header_list_with_no_file(self, mock_exists, linkedin_campaigns):
+        # arrange
+        mock_exists.return_value = False
+
+        # assert
+        with raises(RuntimeError):
+            # act
+            linkedin_campaigns._get_header_list(mock.ANY)
+
     @mock.patch("__builtin__.next")
     @mock.patch("__builtin__.open")
-    def test_validate_csv_header_invalid_column(self, mock_open, mock_next,
-                                                linkedin_campaigns):
-        mock_next.return_value = ['invalid_col']
+    @mock.patch("os.path.exists")
+    def test__get_header_list(self, mock_exists, mock_open, mock_next,
+                              linkedin_campaigns):
+        # arrange
+        mock_exists.return_value = True
+        mock_next.return_value = 'col1\tcol2\tcol3'
+
+        # act
+        header_list = linkedin_campaigns._get_header_list(mock.ANY)
+
+        # assert
+        assert header_list == ['col1', 'col2', 'col3']
+
+    @mock.patch.object(LinkedInCampaigns, '_get_header_list')
+    def test_validate_csv_header_invalid_col_len(self, mock__get_header_list,
+                                                 linkedin_campaigns):
+        header_list = list(linkedin_campaigns.CSV_HEADER)
+        header_list.append('invalid_col')
+        mock__get_header_list.return_value = header_list
 
         # assert
         with raises(RuntimeError):
             # act
             linkedin_campaigns._validate_csv_header('tmp_filename')
 
-    @mock.patch("__builtin__.next")
-    @mock.patch("__builtin__.open")
-    def test_validate_csv_header(self, mock_open, mock_next, linkedin_campaigns):
-        mock_next.return_value = ['account_id', 'campaign_id', 'campaign_name']
+    @mock.patch.object(LinkedInCampaigns, '_get_header_list')
+    def test_validate_csv_header_invalid_column(self, mock__get_header_list,
+                                                linkedin_campaigns):
+        header_list = list(linkedin_campaigns.CSV_HEADER)
+        header_list.append('invalid_col')
+        del header_list[0]
+        mock__get_header_list.return_value = header_list
+
+        # assert
+        with raises(RuntimeError):
+            # act
+            linkedin_campaigns._validate_csv_header('tmp_filename')
+
+    @mock.patch.object(LinkedInCampaigns, '_get_header_list')
+    def test_validate_csv_header(self, mock__get_header_list, linkedin_campaigns):
+        mock__get_header_list.return_value = linkedin_campaigns.CSV_HEADER
 
         # act
         result = linkedin_campaigns._validate_csv_header('tmp_filename')
@@ -122,7 +161,9 @@ class TestLinkedInCampaigns(object):
     @mock.patch.object(LinkedInCampaigns, '_validate_csv_header')
     @mock.patch.object(LinkedInCampaigns, '_get_google_drive_folder_id')
     @mock.patch.object(LinkedInCampaigns, '_validate_result')
-    def test__get_process_file(self, mock__validate_result,
+    @mock.patch.object(pd, 'read_csv')
+    # @mock.patch.object(pd.DataFrame, 'to_csv')
+    def test__get_process_file(self, mock_read_csv, mock__validate_result,
                                mock_get_google_drive_folder_id,
                                mock__validate_csv_header, linkedin_campaigns):
         # arrange
@@ -134,15 +175,17 @@ class TestLinkedInCampaigns(object):
         google_drive_client.download_file.return_value = 'tmp_filename'
 
         # act
-        file = linkedin_campaigns._get_process_file(google_drive_client)
+        raw_file = linkedin_campaigns._get_process_file(google_drive_client)
 
         # assert
-        assert 'tmp_filename' == file
+        assert 'raw-tmp_filename' == raw_file
         mock__validate_result.assert_called_once_with(mock_file)
         google_drive_client.download_file.assert_called_once_with(
             file_id=mock_file[0]['id'],
             path='/tmp')
         mock__validate_csv_header.assert_called_once_with('/tmp/tmp_filename')
+        mock_read_csv.assert_called_once()
+        # mock_to_csv.assert_called_once()
 
     @mock.patch.object(LinkedInCampaigns, '_move_to_clean')
     def test_move_linkedin_campaigns_to_clean(self, mock__move_to_clean,
@@ -153,13 +196,22 @@ class TestLinkedInCampaigns(object):
         # assert
         raw_table_query_file = 'campaigns.sql'
         raw_cols = OrderedDict([
-            ('id_account', str),
+            ('account_name', str),
             ('id_campaign', str),
             ('campaign_name', str),
+            ('id_ad', str),
+            ('ad_name', str),
+            ('currency', str),
+            ('daily_budget', str),
+            ('account_total_budget', str),
+            ('total_spent', str),
             ('impressions', str),
             ('clicks', str),
-            ('ctr', str),
-            ('cpc', str)
+            ('other_clicks', str),
+            ('total_engagements', str),
+            ('conversions', str),
+            ('cost_per_conversion', str),
+            ('cost_per_lead', str)
         ])
 
         mock__move_to_clean.assert_called_once_with(
@@ -167,6 +219,22 @@ class TestLinkedInCampaigns(object):
             sql_file_name=raw_table_query_file,
             r_cols=raw_cols,
             c_cols=raw_cols)
+
+    @mock.patch.object(BaseETL, 'get_query_from_file_name')
+    def test__move_to_clean(self, mock_get_query_from_file_name, linkedin_campaigns):
+        # arrange
+        table_name = 'cool_table'
+        sql_file_name = 'some query'
+        r_cols = 'r_cols'
+        linkedin_campaigns.athena_client.add_partition = Mock()
+        linkedin_campaigns.athena_client.create_parquet_from_query = Mock()
+
+        # act
+        linkedin_campaigns._move_to_clean(table_name, sql_file_name, r_cols, r_cols)
+
+        # assert
+        mock_get_query_from_file_name.assert_called_once()
+        assert linkedin_campaigns.athena_client.add_partition.call_count == 2
 
     @mock.patch.object(LinkedInCampaigns, '_get_staging_table_query')
     @mock.patch.object(LinkedInCampaigns, '_load_to_staging')
@@ -184,9 +252,9 @@ class TestLinkedInCampaigns(object):
         mock__load_to_staging.assert_called_once_with(dw_table_name, query)
 
     @mock.patch.object(BaseETL, 'execute_command')
-    def test__delete_fact_rows(self, mock_bulk_insert, linkedin_campaigns):
+    def test__delete_staging_fact_rows(self, mock_bulk_insert, linkedin_campaigns):
         # act
-        linkedin_campaigns._delete_fact_rows('fact_crazy_table', '20190401')
+        linkedin_campaigns._delete_staging_fact_rows('fact_crazy_table', '20190401')
 
         # assert
         mock_bulk_insert.assert_called_once_with(
@@ -215,8 +283,9 @@ class TestLinkedInCampaigns(object):
 
     @mock.patch.object(BaseETL, 'get_query_from_file_name')
     @mock.patch.object(LinkedInCampaigns, '_is_staging_table_empty')
-    @mock.patch.object(LinkedInCampaigns, '_delete_fact_rows')
-    def test__get_staging_table_query_for_fact_table(self, mock__delete_fact_rows,
+    @mock.patch.object(LinkedInCampaigns, '_delete_staging_fact_rows')
+    def test__get_staging_table_query_for_fact_table(self,
+                                                     mock__delete_staging_fact_rows,
                                                      mock__is_staging_table_empty,
                                                      mock__get_query_from_file_name,
                                                      linkedin_campaigns):
@@ -263,3 +332,14 @@ class TestLinkedInCampaigns(object):
             append=False,
             commit=True
         )
+
+    @mock.patch.object(LinkedInCampaigns, '_load_to_prod')
+    def test_load_to_prod(self, mock__load_to_prod, linkedin_campaigns):
+        # arrange
+        table_name = 'dim_table'
+
+        # act
+        linkedin_campaigns.load_to_prod(table_name)
+
+        # assert
+        mock__load_to_prod.assert_called_once_with(table_name)

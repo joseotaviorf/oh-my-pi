@@ -34,7 +34,10 @@ class Marketing(object):
         'dim_twitter_ad': 'sk_ad',
         'dim_twitter_ad_group': 'sk_ad_group',
         'dim_twitter_campaign': 'sk_campaign',
-        'fact_twitter_daily_cost_attributions': 'sk_ad'
+        'fact_twitter_daily_cost_attributions': 'sk_ad',
+        'dim_linkedin_campaign': 'sk_campaign',
+        'dim_linkedin_ad': 'sk_ad',
+        'fact_linkedin_daily_cost_attributions': 'sk_ad || sk_campaign || sk_date'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
