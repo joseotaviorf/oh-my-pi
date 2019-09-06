@@ -17,22 +17,21 @@ class MarketingLinkedInCampaignsSubDag(MarketingSubDag):
                                                                start_date, end_date,
                                                                auth,
                                                                accounts, extra_configs)
-        self.dim_tables = ["dim_linkedin_campaign"]
+        self.dim_tables = ["dim_linkedin_campaign", "dim_linkedin_ad"]
         self.fact_tables = ["fact_linkedin_daily_cost_attributions"]
-        self.datalake_tables = ['linkedin_campaigns']
+        self.datalake_tables = ["linkedin_campaigns"]
 
     @logger
     def build_clean_tasks(self, dag):
-        for account in self.accounts:
-            for table in self.datalake_tables:
-                BaseDAG.build_python_operator(
-                    dag=dag,
-                    task_id='table-{}-acc-{}'.format(table, account),
-                    python_callable=self.transfer_files_to_clean,
-                    provide_context=True,
-                    op_kwargs={
-                        'bucket': self.bucket,
-                        'datalake_table': table,
-                        'account': account
-                    }
-                )
+        for table in self.datalake_tables:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id='table-{}'.format(table),
+                python_callable=self.transfer_files_to_clean,
+                provide_context=True,
+                op_kwargs={
+                    'bucket': self.bucket,
+                    'datalake_table': table,
+                    'account': None
+                }
+            )
