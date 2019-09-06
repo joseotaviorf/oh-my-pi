@@ -111,8 +111,6 @@ select
   hl.status,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
-  hl.ts_house_registration_first_verification,
-  hl.ts_house_last_confirmation_availability,
   hl.ts_house_first_publication,
   hl.ts_house_last_publication,
   hl.ts_publication,
