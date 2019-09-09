@@ -149,8 +149,7 @@ doorman_join_apts_owners AS (
     AND
     CAST(a.numero_imovel AS INTEGER) = CAST(d.extracted_work_house_number AS INTEGER)
   GROUP BY a.property_person_id
-),
-iptu_apartment_owners_doorman as (
+)
 SELECT
   d.doorman_ct,
   d.doorman_phone,
@@ -178,24 +177,3 @@ SELECT
 FROM apts a
 LEFT JOIN doorman_join_apts_owners d ON a.property_person_id = d.property_person_id
 ORDER BY a.google_formatted_address, a.complemento_imovel
-),
-subregions AS (
-    SELECT r.*, p.poligono AS geometry
-    FROM datalake_clean.ods_dim_region r
-    JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
-    WHERE level = 'SubRegiao'
-)
-select
-	ia.*,
-	r.city_name,
-	r.macro_name,
-	r.region_code,
-	r.sk_region,
-	r.name as region_name				   
-from iptu_apartment_owners_doorman ia
-LEFT JOIN subregions AS r
-    ON ST_WITHIN(
-      ST_POINT(CAST(ia.lng AS double), CAST(ia.lat AS DOUBLE)),
-      r.geometry
-    	)
-
