@@ -51,7 +51,6 @@ from (
 	  vo_cr.isApp as visit_created_from_app,
 	  vo_cr.nome as visit_created_type,
 	  coalesce(vo_up.isApp, FALSE) as visit_last_updated_from_app,
-	  coalesce(vo_up.nome, FALSE) as visit_last_updated_type,
 	  fl.id as id_rental_flow,
 	  n.id as id_negotiation,
 	  n.criadoEm as dt_negotiation,

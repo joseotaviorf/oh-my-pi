@@ -44,7 +44,6 @@ select
 			o.visit_created_from_app,
 			o.visit_created_type,
 			o.visit_last_updated_from_app,
-			o.visit_last_updated_type,
 			o.id_rent_flow,
 			o.dt_rent_flow_created,
 			o.id_offer,
@@ -105,7 +104,6 @@ select
 					  vo_cr.isApp as visit_created_from_app,
 					  vo_cr.nome as visit_created_type,
 					  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
-					  coalesce(vo_up.nome, false) as visit_last_updated_type,
 					  fl.id as id_rent_flow,
 					  fl.criadoEm as dt_rent_flow_created,
 					  case
@@ -318,7 +316,6 @@ select
 			null as visit_created_from_app,
 			null as visit_created_type,
 			null as visit_last_updated_from_app,
-			null as visit_last_updated_type,
 			fl.id as id_rent_flow,
 			fl.criadoEm as dt_rent_flow_created,
 			p.offer_id as id_offer,
