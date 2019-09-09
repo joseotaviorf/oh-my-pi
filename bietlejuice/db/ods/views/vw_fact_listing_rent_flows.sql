@@ -118,7 +118,6 @@ _fact as (
 	  hrf.visit_created_from_app as flg_visit_created_from_app,
 	  hrf.visit_created_type,
 	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
-	  hrf.visit_last_updated_type,
 	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
 	  now()::timestamp as ts_load,
     coalesce(rs.id, -1) as sk_reservation,
