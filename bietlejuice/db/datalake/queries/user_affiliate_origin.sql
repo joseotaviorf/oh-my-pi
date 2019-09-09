@@ -15,7 +15,8 @@ with amplitude_affiliate_tracking as(
                 client_event_time,
                 event_time
             from datalake_clean.amplitude_events
-            where et in ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
+            where ym <= '2018-12'
+                and et in ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
                 and app='205027'
                 and user_id <> ''
         union

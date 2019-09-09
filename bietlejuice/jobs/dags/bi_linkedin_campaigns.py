@@ -37,7 +37,7 @@ def raw_sub_dag(sub_dag_name, class_):
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
         auth=None,
-        extra_configs={'days_offset': 0, 'gdrive_dir_id': linkedin_gdrive_dir_id}
+        extra_configs={'gdrive_dir_id': linkedin_gdrive_dir_id}
     )
 
     return sub_dag.build_tasks('raw')
@@ -52,7 +52,7 @@ def clean_sub_dag(sub_dag_name, class_):
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
         auth=None,
-        accounts=accounts['linkedin_campaigns']
+        accounts=None
     )
 
     return sub_dag.build_tasks('clean')
@@ -67,10 +67,24 @@ def load_to_staging_sub_dag(sub_dag_name, class_):
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
         auth=None,
-        accounts=accounts['linkedin_campaigns']
+        accounts=None
     )
 
     return sub_dag.build_tasks('staging')
+
+
+def load_to_dw_sub_dag(sub_dag_name, class_):
+    sub_dag = MarketingSubDagFactory.factory(
+        class_=class_,
+        bucket=S3_BUCKET,
+        sub_dag_name=sub_dag_name,
+        dag_name=BI_LINKEDIN_CAMPAIGNS_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+        auth=None
+    )
+
+    return sub_dag.build_tasks('dw')
 
 
 main_dag = DAG(
@@ -83,7 +97,7 @@ main_dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
-    catchup=False
+    catchup=True
 )
 
 linkedin_raw_sub_dag = BaseSubDag.get_sub_dag_operator(
@@ -107,6 +121,14 @@ linkedin_staging_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.LINKEDIN
 )
 
+linkedin_ads_load_to_prod_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='linkedin-load-to-dw',
+    class_=MarketingEnum.LINKEDIN,
+)
+
 airflow_helpers.chain(linkedin_raw_sub_dag,
                       linkedin_clean_sub_dag,
-                      linkedin_staging_sub_dag)
+                      linkedin_staging_sub_dag,
+                      linkedin_ads_load_to_prod_sub_dag)

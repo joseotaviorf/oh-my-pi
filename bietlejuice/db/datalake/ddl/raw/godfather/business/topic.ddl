@@ -1,4 +1,4 @@
-drop table if not exists datalake_raw.godfather_topic;
+drop table if exists datalake_raw.godfather_topic;
 create external table if not exists datalake_raw.godfather_topic (
   id string,
   created_at string,
@@ -7,7 +7,8 @@ create external table if not exists datalake_raw.godfather_topic (
   firestore_id string,
   status string,
   type string,
-  offer_id string
+  offer_id string,
+  offer_firestore_id string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

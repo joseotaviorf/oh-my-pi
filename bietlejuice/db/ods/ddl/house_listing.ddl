@@ -1,24 +1,25 @@
-drop table if exists public.house_listing;
-CREATE TABLE public.house_listing (
-	id int8 NOT NULL,
-	status varchar,
-	aluguel int4,
-	tipo_porteiro varchar,
-	"version" int8 NOT NULL,
-	min_version_time timestamp,
-	max_version_time timestamp,
-	nr_renting int8,
-	first_publication_date timestamp,
-	de_publication_date timestamp,
-	start_version_category varchar,
-	end_version_category varchar,
-	contract_id int8,
-	is_last_version int8,
-	CONSTRAINT house_listing_pk PRIMARY KEY (id,"version")
+drop table if exists house_listing;
+create table if not exists house_listing (
+  id_house_listing bigint,
+  id_house bigint,
+  version smallint,
+  status varchar,
+  rent decimal,
+  listing_category_start varchar,
+  last_originals_type varchar,
+  is_last_version boolean,
+  is_exclusive boolean,
+  is_originals_active boolean,
+  ts_listing_version_start timestamp,
+  ts_listing_version_end timestamp,
+  ts_last_de_publication timestamp,
+  dt_last_exclusive_opted_in date,
+  dt_last_exclusive_opted_out date,
+  dt_last_originals_opted_in date,
+  dt_last_originals_opted_out date
 )
-WITH (
-	OIDS=FALSE
-) ;
-CREATE INDEX house_listing_idx_max_v ON public.house_listing (max_version_time DESC) ;
-CREATE INDEX house_listing_idx_min_v ON public.house_listing (min_version_time DESC) ;
-CREATE INDEX house_listing_idx ON public.house_listing (id ASC) ;
+
+create index house_listing_idx_end_v on house_listing (ts_listing_version_end desc);
+create index house_listing_idx_start_v on house_listing (ts_listing_version_start desc);
+create index house_listing_idx on house_listing (id_house asc);
+create index house_listing_idx_listing on house_listing (id_house_listing asc);

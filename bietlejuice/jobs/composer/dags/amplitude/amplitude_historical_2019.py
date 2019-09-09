@@ -74,7 +74,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=datetime.datetime(2019, 1, 1, 0, 0, 0),
-    end_date=datetime.datetime(2019, 7, 17, 0, 0, 0),
+    end_date=datetime.datetime(2019, 7, 19, 0, 0, 0),
     schedule_interval="30 5 * * *",
     max_active_runs=1,
     catchup=True,

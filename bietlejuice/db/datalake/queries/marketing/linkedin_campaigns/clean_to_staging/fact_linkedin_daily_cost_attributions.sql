@@ -1,12 +1,12 @@
 select * from (
     select
+        id_ad as sk_ad,
         id_campaign as sk_campaign,
-        id_account,
         cast(date_format(cast(dt_created as date), '%Y%m%d') as integer) as sk_date,
+        total_spent,
         impressions,
         clicks,
-        ctr,
-        cpc,
+        other_clicks,
         current_timestamp as ts_load
-     from datalake_clean.marketing_linkedin_campaigns
+    from datalake_clean.marketing_linkedin_campaigns
 )

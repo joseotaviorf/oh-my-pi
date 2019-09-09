@@ -27,7 +27,7 @@ WITH newbiz_listings_version AS (
         AND sc.optedoutat IS NULL
         ) newbiz_flg
       ON dhl.id_house = newbiz_flg.house_id
-    WHERE (dhl.sk_house_listing LIKE '%001' AND (dhl.is_last_version = true OR dhl.is_last_version IS NULL))
+    WHERE (dhl.sk_house_listing LIKE '%000' AND (dhl.is_last_version = true OR dhl.is_last_version IS NULL))
           OR
           (DATE(dhl.ts_publication) <= newbiz_flg.optedinat)
     ) base
@@ -42,7 +42,7 @@ newbiz_listings AS (
         dhl.sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)                AS publication_date,
-        DATE(dhl.ts_de_publication)             AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)        AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -98,7 +98,7 @@ newbiz_listings AS (
         dhl.sk_house_listing    										AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
-        DATE(dhl.ts_de_publication)									AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)						AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -154,7 +154,7 @@ newbiz_listings AS (
         dhl.sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
-        DATE(dhl.ts_de_publication)   AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)   AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
@@ -184,7 +184,7 @@ newbiz_listings AS (
         dhl.sk_house_listing    			AS sk_house_listing,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
-        DATE(dhl.ts_de_publication)   AS de_publication_date,
+        DATE(dhl.ts_last_de_publication)   AS de_publication_date,
         dhl.status,
         dhl.is_last_version,
         dhl.house_status,
