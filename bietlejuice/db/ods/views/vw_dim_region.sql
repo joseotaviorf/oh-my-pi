@@ -14,7 +14,6 @@ SELECT
   ar.region_code as region_code,
   ar.region_code_deprecated as region_code_deprecated,
 	ar.state as short_region_name,
-	ar.long_region_name as long_region_name,
 	case
 		when coalesce(r."cidadeNome", ar.city) in ('Rio de Janeiro') then coalesce(r."cidadeNome", ar.city)
 		when coalesce(r."cidadeNome", ar.city) in ('Campinas') then coalesce(r."cidadeNome", ar.city)
@@ -33,8 +32,7 @@ SELECT
   r."atualizadoEm" as dt_updated,
   r.dt_timestamp::date as dt_timestamp,
   i.dt_first_property_created,
-  age.dt_first_booking,
-  (current_date - age.dt_first_booking) as days_from_first_booking
+  age.dt_first_booking
 FROM
   public.region r
 left join

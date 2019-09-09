@@ -7,8 +7,6 @@ create table staging.dim_house_listing (
   status varchar,
   ts_listing_version_start timestamp,
   ts_listing_version_end timestamp,
-  ts_house_registration_first_verification timestamp,
-  ts_house_last_confirmation_availability timestamp,
   ts_house_first_publication timestamp,
   ts_house_last_publication timestamp,
   ts_publication timestamp,
