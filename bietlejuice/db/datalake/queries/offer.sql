@@ -12,7 +12,7 @@ with analysis_date as (
 rent_value_offers as (
   with max_date as (
     select
-      godfatherid,
+      firestoreid,
       turn,
       max(rev) as rev_
     from datalake_ebdb_raw_prod.offer_aud
@@ -26,9 +26,23 @@ rent_value_offers as (
 	max(case when md.turn = 'Tenant' then o_aud.rent end) as last_rent_offered_by_owner
   from datalake_ebdb_raw_prod.offer_aud o_aud
   join max_date md
-    on md.godfatherid = o_aud.godfatherid
+    on md.firestoreid = o_aud.firestoreid
       and md.rev_ = o_aud.rev
   group by 1
+),
+max_topic_type as (
+  with max_topic_created as (
+    select
+      offer_id,
+      max(created_at) as created_at
+    from datalake_raw.godfather_topic
+    group by 1
+  )
+  select gt.*
+  from datalake_raw.godfather_topic gt
+  join max_topic_created mtc
+    on gt.offer_id = mtc.offer_id
+      and gt.created_at = mtc.created_at
 )
 select distinct
   eo.id,
@@ -53,14 +67,14 @@ select distinct
   go.type,
   go.first_sent_at,
   go.last_sent_at,
-  gt.type as topic_type,
+  mtt.type as topic_type,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner
 from datalake_ebdb_raw_prod.offer eo
 join datalake_raw.godfather_offer go
   on eo.firestoreid = go.firestore_id
-left join datalake_raw.godfather_topic gt
-  on gt.offer_id = go.id
+left join max_topic_type mtt
+  on mtt.offer_id = go.id
 left join analysis_date ad
   on ad.id = eo.id
 left join rent_value_offers rvo
