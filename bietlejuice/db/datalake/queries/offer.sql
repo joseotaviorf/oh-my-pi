@@ -34,7 +34,7 @@ max_topic_type as (
   with max_topic_created as (
     select
       offer_id,
-      max(created_at) as created_at
+      max(id) as id
     from datalake_raw.godfather_topic
     group by 1
   )
@@ -42,7 +42,7 @@ max_topic_type as (
   from datalake_raw.godfather_topic gt
   join max_topic_created mtc
     on gt.offer_id = mtc.offer_id
-      and gt.created_at = mtc.created_at
+      and gt.id = mtc.id
 )
 select distinct
   eo.id,
