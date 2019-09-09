@@ -5,8 +5,8 @@ with listing_versions as (
 	case is_exclusive when 'True' then True else False end as is_exclusive,
 	cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as publication_date,
 	cast(regexp_extract(trim(lv.ts_last_de_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
-	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
-	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
+	cast(regexp_extract(lv.ts_listing_version_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
+	cast(regexp_extract(lv.ts_listing_version_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
 	lv.status
 	from datalake_clean.ods_dim_house_listing as lv
 ),
