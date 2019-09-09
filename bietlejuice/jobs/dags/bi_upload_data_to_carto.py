@@ -54,12 +54,6 @@ def load_data_and_upload_to_carto(sql_filename, carto_table_name, db, final_sql,
         carto_api.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name))
         if final_sql is not None:
             carto_api.run_sql(final_sql)
-        # # write result to S3
-        # df_export = df
-        # cols = df_export.columns.values.tolist()
-        # df_export[cols] = df_export[cols].astype(str)
-        # key = 'clean/external/{}/{}.parq'.format(carto_table_name, carto_table_name)
-        # athena.create_parquet_from_df(key=key, df=df_export)
 
 
 tasks = [
