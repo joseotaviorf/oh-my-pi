@@ -8,7 +8,8 @@ with house_listing_contracts as (
    from house_listing hl
    join contract c
     on hl.id_house = c.id_house
-    	and c.ts_created::date between hl.ts_listing_version_start::date and hl.ts_listing_version_end::date
+    	and c.ts_created between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
+    	  and c.status in ('Ativo', 'Finalizado')
    group by 1
   )
   select
