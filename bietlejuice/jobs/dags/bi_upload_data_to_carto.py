@@ -64,9 +64,9 @@ dag = DAG(
         'wait_for_downstream': False,
         'depends_on_past': False,
         'retries': 1,
-        'retry_delay': timedelta(minutes=30),
+        'retry_delay': timedelta(minutes=3),
     },
-    start_date=datetime(2019, 2, 16, 0, 0, 0),
+    start_date=datetime(2019, 9, 7, 0, 0, 0),
     schedule_interval='30 9 * * *',
     max_active_runs=1,
     catchup=False
