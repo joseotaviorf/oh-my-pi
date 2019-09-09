@@ -58,7 +58,7 @@ select distinct
   rvo.last_rent_offered_by_owner
 from datalake_ebdb_raw_prod.offer eo
 join datalake_raw.godfather_offer go
-  on eo.godfatherid = try_cast(go.id as bigint)
+  on eo.firestoreid = go.firestore_id
 left join datalake_raw.godfather_topic gt
   on gt.offer_id = go.id
 left join analysis_date ad
