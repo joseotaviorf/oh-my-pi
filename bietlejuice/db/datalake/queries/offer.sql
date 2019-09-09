@@ -12,7 +12,7 @@ with analysis_date as (
 rent_value_offers as (
   with max_date as (
     select
-      firestoreid,
+      id,
       turn,
       max(rev) as rev_
     from datalake_ebdb_raw_prod.offer_aud
@@ -21,12 +21,12 @@ rent_value_offers as (
     group by 1, 2
   )
   select
-    o_aud.godfatherid,
+    o_aud.id,
     max(case when md.turn = 'Owner' then o_aud.rent end) as last_rent_offered_by_tenant,
 	max(case when md.turn = 'Tenant' then o_aud.rent end) as last_rent_offered_by_owner
   from datalake_ebdb_raw_prod.offer_aud o_aud
   join max_date md
-    on md.firestoreid = o_aud.firestoreid
+    on md.id = o_aud.id
       and md.rev_ = o_aud.rev
   group by 1
 ),
@@ -64,19 +64,25 @@ select distinct
   eo.rejectionreason,
   eo.iteration,
   eo.expirationdate,
-  go.type,
-  go.first_sent_at,
-  go.last_sent_at,
-  mtt.type as topic_type,
+  coalesce(go_godfather.type, go_firestore.type) as type,
+  coalesce(go_godfather.first_sent_at, go_firestore.first_sent_at) as first_sent_at,
+  coalesce(go_godfather.last_sent_at, go_firestore.last_sent_at) as last_sent_at,
+  coalesce(mtt_godfather.type, mtt_firestore.type) as topic_type,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner
 from datalake_ebdb_raw_prod.offer eo
-join datalake_raw.godfather_offer go
-  on eo.firestoreid = go.firestore_id
-left join max_topic_type mtt
-  on mtt.offer_id = go.id
+left join datalake_raw.godfather_offer go_godfather
+  on eo.godfatherid = try_cast(go_godfather.id as bigint)
+    and eo.godfatherid is not null
+left join datalake_raw.godfather_offer go_firestore
+  on eo.firestoreid = go_firestore.firestore_id
+    and eo.godfatherid is null
+left join max_topic_type mtt_godfather
+  on mtt_godfather.offer_id = go_godfather.id
+left join max_topic_type mtt_firestore
+  on mtt_firestore.offer_firestore_id = go_firestore.firestore_id
 left join analysis_date ad
   on ad.id = eo.id
 left join rent_value_offers rvo
-  on rvo.godfatherid = eo.godfatherid
+  on rvo.id = eo.id
 ;
