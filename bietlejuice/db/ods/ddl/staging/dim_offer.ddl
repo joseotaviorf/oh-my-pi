@@ -3,9 +3,9 @@ create table staging.dim_offer (
   sk_offer integer,
   id_offer integer,
   id_godfather integer,
-  renting_value integer,
-  renting_original_value integer,
-  condo_original_value integer,
+  last_offered_rent integer,
+  original_rent integer,
+  original_condo integer,
   dt_approved timestamp,
   editing varchar(255),
   status varchar(255),
@@ -19,9 +19,8 @@ create table staging.dim_offer (
   dt_first_sent timestamp,
   last_updated_date timestamp,
   expiration_date timestamp,
-  last_rent_value_tenant decimal(18,4),
-  last_rent_value_landlord decimal(18,4),
-  total_rent_value decimal(18,4),
+  last_rent_offered_by_tenant decimal(18,4),
+  last_rent_offered_by_owner decimal(18,4),
   rejection_reason varchar(255),
   animais_condition integer,
   quando_vai_mudar_condition integer,
@@ -33,7 +32,6 @@ create table staging.dim_offer (
   replace_or_modify_conditions integer,
   price_conditions integer,
   other_conditions integer,
-  type varchar(255),
-  constraint dim_offer_pkey primary key(sk_offer)
+  type varchar(255)
 )
 ;

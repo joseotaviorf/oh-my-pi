@@ -9,6 +9,7 @@ with all_dates as (
     drft.mkt_category,
 	drft.mkt_flow,
 	drft.mkt_completion,
+	'Not Mapped' as mkt_origin,
 	drft.mkt_channel,
 	drft.mkt_medium,
 	drft.mkt_source,

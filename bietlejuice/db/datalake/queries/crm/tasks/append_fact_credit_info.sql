@@ -9,7 +9,7 @@
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_proposta ep
     on trim(ct.origin) = 'Proposta'
-      and cast(ct.id_origin as bigint) = try(cast(ep.id as bigint))
+      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(ep.id as bigint))
   left join datalake_raw.ebdb_imovel epi
     on epi.id = ep.imovel_id
 ),

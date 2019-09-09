@@ -15,6 +15,10 @@ class CRMTasksClosing(CRMTasks):
         'AnalisarDocumentacaoProprietario'
     ]
 
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_CLOSING_ID'
+    ]
+
     TABLE_NAMES = {
         'fact': 'fact_closing_tasks',
         'dim': 'dim_closing_task'
@@ -38,6 +42,7 @@ class CRMTasksClosing(CRMTasks):
         self._move_fact_to_staging(
             table_name=CRMTasksClosing.TABLE_NAMES['fact'],
             queues=CRMTasksClosing.QUEUES,
+            manual_task_workgroups=CRMTasksClosing.MANUAL_TASK_WORKGROUP_IDS,
             append_query_filename=CRMTasksClosing.QUERY_FILENAMES['staging']
         )
 
@@ -45,7 +50,8 @@ class CRMTasksClosing(CRMTasks):
     def move_dim_to_staging(self):
         self._move_dim_to_staging(
             table_name=CRMTasksClosing.TABLE_NAMES['dim'],
-            queues=CRMTasksClosing.QUEUES
+            queues=CRMTasksClosing.QUEUES,
+            manual_task_workgroups=CRMTasksClosing.MANUAL_TASK_WORKGROUP_IDS,
         )
 
     @logger

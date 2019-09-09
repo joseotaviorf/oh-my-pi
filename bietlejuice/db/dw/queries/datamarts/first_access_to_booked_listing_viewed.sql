@@ -31,7 +31,7 @@ house_status_per_day as (
 		dd.week_start
 	from house_status hsp
 	join dim_date dd on dd.sk_date between hsp.sk_min_status_date and sk_max_status_date
-	where dd.date > date('2018-12-01')
+	where dd.date > date('2018-06-01')
 ),
 house_status_and_dimensions as (
 /* returns all breakdowns for all listing versions for each day in publication */
@@ -61,41 +61,100 @@ house_status_and_dimensions as (
 	join dim_region dr on dr.sk_region = hsd.sk_region
 	join dim_house_listing dhl on hsd.sk_house = dhl.sk_house_listing
 ),
-user_session_events as (
-/* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
-	select
-		amplitude_id,
-		regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-		session_id,
-		et,
-		case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-			 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-			 else null end as id_house
-	from datalake_clean.amplitude_events evt
-	where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-	and ym >= '2018-12'
-	and app = '170698'
-	and session_id != '-1'
-),
 user_listing_page_views as (
 /*
- * returns for each amplitude_id and house_id first listing_page_view ts and first visit_schedule_confirmed ts
+ * returns for each amplitude_id and house_id first listing_page_view ts, first visit_schedule_confirmed ts and user_id
  * must have listing_page_view
  * must have visit_schedule_confirmed
  * listing_page_view must have happened before visit_schedule_confirmed
  */
+    with user_session_events as (
+        /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
+        select
+                amplitude_id,
+                case when regexp_substr(user_id, '^\\d+$') != ''
+                     then regexp_substr(user_id, '^\\d+$')::bigint
+                     else null end as user_id,
+                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+                session_id,
+                et,
+                case when regexp_substr(e_house_id, '^\\d{9}$') != ''
+                     then regexp_substr(e_house_id, '^\\d{9}$')::bigint
+                     else null end as id_house
+            from datalake_clean.amplitude_events evt
+            where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+            and ym >= '2018-06'
+            and app = '170698'
+            and session_id != '-1'
+        union
+            -- enriching with amplitude data via SPARK
+            SELECT
+                amplitude_id::varchar,
+                case when nullif(regexp_substr(user_id::varchar, '^\\d+$'), '') is not null
+                     then regexp_substr(user_id::varchar, '^\\d+$')::bigint
+                     else null end as user_id,
+                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+                session_id::varchar,
+                event_type,
+                case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
+                     then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
+                     else null end as id_house
+           FROM datalake_amplitude_clean_prod.events
+           WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+                AND app = 170698
+                AND year >= 2019
+                AND coalesce(session_id, -1) <> -1
+    )
 	select
 		amplitude_id,
 		id_house,
+		min(case when et='visit_schedule_confirmed' then user_id end) as user_id,
 		min(case when et='listing_page_viewed' then event_ts end) as ts_first_listing_page_view,
 		min(case when et='visit_schedule_confirmed' then event_ts end) as ts_first_visit_schedule_confirmed
-	from user_session_events use
+	from user_session_events
 	where et in ('listing_page_viewed', 'visit_schedule_confirmed')
 	and id_house is not null
 	group by 1, 2 having min(case when et='listing_page_viewed' then event_ts end) < min(case when et='visit_schedule_confirmed' then event_ts end)
 ),
 user_sessions as (
 /* returns for each amplitude_id the sessions and their start timestamps */
+    with user_session_events as (
+        /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
+        select
+                amplitude_id,
+                case when regexp_substr(user_id, '^\\d+$') != ''
+                     then regexp_substr(user_id, '^\\d+$')::bigint
+                     else null end as user_id,
+                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+                session_id,
+                et,
+                case when regexp_substr(e_house_id, '^\\d{9}$') != ''
+                     then regexp_substr(e_house_id, '^\\d{9}$')::bigint
+                     else null end as id_house
+            from datalake_clean.amplitude_events evt
+            where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+            and ym >= '2018-06'
+            and app = '170698'
+            and session_id != '-1'
+        union
+            -- enriching with amplitude data via SPARK
+            SELECT
+                amplitude_id::varchar,
+                case when nullif(regexp_substr(user_id::varchar, '^\\d+$'), '') is not null
+                     then regexp_substr(user_id::varchar, '^\\d+$')::bigint
+                     else null end as user_id,
+                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+                session_id::varchar,
+                event_type,
+                case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
+                     then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
+                     else null end as id_house
+           FROM datalake_amplitude_clean_prod.events
+           WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
+                AND app = 170698
+                AND year >= 2019
+                AND coalesce(session_id, -1) <> -1
+    )
 	select
 		amplitude_id,
 		session_id,
@@ -124,10 +183,12 @@ user_sessions_during_publication_enriched as (
 		hsd.house_rent,
 		hsd.house_total_value,
 		hsd.house_total_area,
-		lpv.ts_first_visit_schedule_confirmed = min(lpv.ts_first_visit_schedule_confirmed) over (partition by lpv.amplitude_id) as is_users_first_booking
+		lpv.ts_first_visit_schedule_confirmed = min(lpv.ts_first_visit_schedule_confirmed) over (partition by lpv.amplitude_id) as is_users_first_booking,
+		coalesce(lrf.sk_contract_signed_date, -1) > 0 as contract_signed
 	from user_listing_page_views lpv
 	join user_sessions sns on sns.amplitude_id = lpv.amplitude_id and sns.ts_session_start_proxy <= lpv.ts_first_listing_page_view
 	join house_status_and_dimensions hsd on hsd.id_house = lpv.id_house and hsd.sk_date = sns.sk_dt_session_start_proxy
+	left join fact_listing_rent_flows lrf on lrf.sk_house_listing/1000 = lpv.id_house and lrf.sk_client = lpv.user_id
 )
 select
 	amplitude_id || id_house as fluxo_id,
@@ -137,6 +198,7 @@ select
 	ts_first_listing_page_view,
 	ts_first_visit_schedule_confirmed,
 	is_users_first_booking,
+	contract_signed,
 	city_group,
 	city,
 	macro_region,
@@ -145,7 +207,14 @@ select
 	is_b2b,
 	house_rent,
 	house_total_value,
-	house_total_area
+	house_total_area,
+	datediff(second,ts_first_session_pos_publ,ts_first_listing_page_view) as seconds_to_lpv,
+	datediff(hour,ts_first_session_pos_publ,ts_first_listing_page_view) as hours_to_lpv,
+	datediff(day,ts_first_session_pos_publ,ts_first_listing_page_view) as days_to_lpv,
+	ntile(100) over(order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all,
+	ntile(100) over(partition by city_group order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_city_group,
+	ntile(100) over(partition by is_users_first_booking order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all_first_bk,
+	ntile(100) over(partition by is_users_first_booking, city_group order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all_first_bk_city_group
 from user_sessions_during_publication_enriched
 where ts_session_start_proxy = ts_first_session_pos_publ
 ;

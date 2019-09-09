@@ -8,7 +8,7 @@ logger = QuintoAndarLogger('MarketingRtbCampaignsSubDag')
 class MarketingTrovitCampaignsSubDag(MarketingSubDag):
     def __init__(self, class_, bucket, sub_dag_name, dag_name,
                  schedule_interval, start_date, auth, end_date=None, integration=None,
-                 accounts=None):
+                 accounts=None, extra_configs=None):
         super(MarketingTrovitCampaignsSubDag, self).__init__(class_, bucket,
                                                              sub_dag_name,
                                                              dag_name,

@@ -16,6 +16,7 @@ select
 	dt_first_listing,
 	dt_discarded,
 	user_id_lead_first_discarder,
+	user_id_lead_last_discarder,
 	flow,
 	acquisition_method,
 	acquisition_channel,
@@ -72,7 +73,7 @@ from
 		base.conversao_id,
 		jf2.id as photo_job_id,
 		base.imovel_id,
-		coalesce(base.rep_id, photo_ure.usuario_id) as rep_id,
+		coalesce(base.rep_id, photo_rep_ure.usuario_id) as rep_id,
 		base.affiliate_id,
 		base.owner_id,
 		base.region_id,
@@ -93,6 +94,7 @@ from
 		i.firstPublication as dt_first_listing,
 		dt_discarded,
 		user_id_lead_first_discarder,
+		user_id_lead_last_discarder,
 		base.flow,
 		base.acquisition_method,
 		base.acquisition_channel,
@@ -126,6 +128,7 @@ from
 			end as dt_qualified,
 			null as dt_discarded,
 			null as user_id_lead_first_discarder,
+			null as user_id_lead_last_discarder,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service Flow'
@@ -193,15 +196,16 @@ from
         else coalesce(l.atualizadoEm, l.criadoEm) -- if there is no AUD records, we assume lead update or creation
       end as dt_prospect,
       isc.dt dt_first_inside_sales_contact,
-      coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
+      coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
       case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         when cl.leadConvertido_id is not null
-          then coalesce(cl.dataConversao, cl.criadoEm, from_unixtime(ure.timestamp/1000))
+          then coalesce(cl.criadoEm, cl.dataConversao, from_unixtime(ure.timestamp/1000))
         when l.lead_reason in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada')
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
       from_unixtime(dure.timestamp/1000) as dt_discarded,
       ure_disc.usuario_id as user_id_lead_first_discarder,
+      ure_disc_max.usuario_id as user_id_lead_last_discarder,
       case
         when l.origem = 'OwnerPWA' then 'Self-Service Flow'
         else 'Lead Flow'
@@ -341,6 +345,22 @@ from
     left join
     	UsuarioRevisionEntity ure_disc
     	on ure_disc.id = d_ure.min_id
+    left join (
+		SELECT
+	    	laud.id,
+	    	max(ure.id) as max_id
+	    FROM Lead_AUD laud
+	    join UsuarioRevisionEntity ure
+	    	on laud.REV = ure.id
+   		 where laud.status = 'Descartado'
+                    and laud.automaticallyDiscarded = 0
+                    and (status_MOD + recurringStatusCount_MOD >= 1)
+    	group by laud.id
+    ) d_ure_max
+        on d_ure_max.id = l.id
+    left join
+    	UsuarioRevisionEntity ure_disc_max
+    	on ure_disc_max.id = d_ure_max.max_id
     left join -- trying to find regions for leads using lat lng with the region polygons
     (
       SELECT
@@ -377,11 +397,12 @@ from
 			i.regiao_id as region_id,
 			i.dataCriacao as dt_lead,
 			i.dataCriacao as dt_prospect,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_first_inside_sales_contact,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_conversion,
-			coalesce(cl.dataConversao, cl.criadoEm) as dt_qualified,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_first_inside_sales_contact,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_conversion,
+			coalesce(cl.criadoEm, cl.dataConversao) as dt_qualified,
 			null as dt_discarded,
 			null as user_id_lead_first_discarder,
+			null as user_id_lead_last_discarder,
 			'Organic Flow' as flow,
 			'Non-Self Service' as acquisition_method,
 			'Inside Sales' as acquisition_channel,
@@ -420,14 +441,25 @@ from
 		on l.id = base.lead_id
 	left join
 	(
-		select min(REV) as REV, ja.id from
-		JobFotografo_AUD ja
-		inner join UsuarioRevisionEntity ure on ure.id = ja.REV
-		inner join Usuario u on u.id = ure.usuario_id
-		where (u.dadosVendedor_id is not null)
-		group by ja.id
-	) photo_rep
-		on photo_rep.id = jf.id
-	left join	UsuarioRevisionEntity photo_ure	on photo_ure.id = photo_rep.REV
+		SELECT
+            i.id,
+            MIN(jaud.REV) as min_REV
+        FROM Imovel i
+        JOIN JobFotografo_AUD jaud
+            ON i.id = jaud.imovel_id
+            AND jaud.status_MOD = 1
+            AND jaud.status = 'Agendado'
+        JOIN UsuarioRevisionEntity ure
+            ON ure.id = jaud.REV
+            AND (i.firstPublication IS NULL  OR
+                DATE(from_unixtime(ure.timestamp/1000)) <= DATE(i.firstPublication))
+        JOIN Usuario u
+            ON u.id = ure.usuario_id
+            AND dadosVendedor_id IS NOT NULL
+        GROUP BY 1
+	) photo_rep_via_imovel
+		on photo_rep_via_imovel.id = i.id
+	left join	UsuarioRevisionEntity photo_rep_ure
+	    on photo_rep_ure.id = photo_rep_via_imovel.min_REV
 	CROSS JOIN (SELECT @cnt := 0) AS dummy
 ) tbl;

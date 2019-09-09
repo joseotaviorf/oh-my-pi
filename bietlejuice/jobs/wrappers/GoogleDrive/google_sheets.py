@@ -1,6 +1,11 @@
 import re
+from datetime import datetime
+from io import BytesIO
 
-from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
+import petl
+from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.base.data_frame_service import DataFrameJsonService
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
 
@@ -14,26 +19,40 @@ class GoogleSheets(object):
         self.google_api_scope = google_api_scope
 
     @logger(exclude=['google_sheets_files'])
-    def move_sheets_data_to_datalake(self, google_sheets_files):
-        if not google_sheets_files['files']:
+    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None,
+                                        csv=False, date_versioning=False):
+        if not google_sheets_files:
             raise ValueError(
-                'm=move_sheets_data_to_datalake, msg=no files set in json google sheets schema.')
+                'm=move_sheets_data_to_destination, msg=no files set.')
 
         gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
-        s3 = S3ToODS(s3_bucket=self.s3_bucket)
 
-        for item in google_sheets_files['files']:
+        for item in google_sheets_files:
             df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'],
                                                           sheet_id=item['sheetId'])
             if df_gsheets is None:
                 raise ValueError(
-                    "m=move_sheets_data_to_datalake, sheet_id={}, sheet_name={}, "
+                    "m=move_sheets_data_to_destination, sheet_id={}, sheet_name={}, "
                     "msg=no data found in google sheets.".format(
                         item['sheetId'], item['sheetName']))
 
             snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
             df_gsheets.rename(columns=snake_case_columns, inplace=True)
-            s3.move_df_to_datalake(df=df_gsheets, tablename=item['s3_path'])
+
+            if enumdb_destination == EnumDB.QuintoAndar_datalake:
+                self._move_df_to_datalake(df=df_gsheets,
+                                          table_name=item['s3_path'] if 'full_s3_path' not in item else item[
+                                              'fileName'],
+                                          csv=csv,
+                                          file_path=item['full_s3_path'] if 'full_s3_path' in item else None,
+                                          date_versioning=date_versioning)
+
+                if athena_client:
+                    GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
+                                                      table_name=item['s3_path'], athena_client=athena_client)
+
+            if enumdb_destination == EnumDB.BI_ODS:
+                GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets')
 
     @staticmethod
     @logger(exclude='old_columns')
@@ -50,3 +69,106 @@ class GoogleSheets(object):
             new_columns.update({old_column: new_column})
 
         return new_columns
+
+    @logger(exclude='df')
+    def _move_df_to_datalake(self, df, table_name, file_path=None, csv=False, date_versioning=False):
+        if csv:
+            object_ = GoogleSheets.get_csv_io_object(df=df)
+        else:
+            object_ = GoogleSheets.get_json_io_object(df=df)
+
+        full_file_path = '{0}/gsheets/{1}/{1}.gz'.format('raw', table_name) if not file_path else file_path
+        full_file_path = full_file_path.format(
+            date=datetime.now().strftime("%d-%m-%Y")) if date_versioning else full_file_path
+
+        BaseETL.obj_to_s3(
+            obj_io=object_,
+            bucket=self.s3_bucket,
+            file_path=full_file_path
+        )
+
+        # clear obj allocation
+        # only flushing does not clear the buffer
+        object_.seek(0)
+        object_.flush()
+
+    @staticmethod
+    @logger(exclude='df')
+    def get_json_io_object(df):
+        df_json_service = DataFrameJsonService(df=df)
+        object_ = df_json_service.to_json_bytes()
+        return object_
+
+    @staticmethod
+    @logger(exclude='df')
+    def get_csv_io_object(df):
+        object_ = BytesIO()
+        df.to_csv(object_, index=False, sep=',', encoding='utf-8', header=True)
+        return object_
+
+    @staticmethod
+    @logger(exclude='df')
+    def _move_df_to_ods(df, table_name, schema):
+        exists = BaseETL.table_exists(
+            db_enum=EnumDB.BI_ODS,
+            table_name=table_name,
+            schema=schema
+        )
+        if exists:
+            logger.info(
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Dropping table'.format(table_name, schema))
+            BaseETL.drop_table(db_enum=EnumDB.BI_ODS, table_name=table_name, schema=schema)
+
+        logger.info(
+            'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
+        BaseETL.create_table(
+            conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
+            table=petl.fromdataframe(df),
+            tablename=table_name,
+            schema=schema
+        )
+
+        try:
+            logger.info(
+                'm=_move_df_to_ods, table_name={0},schema={1}, msg=Sending df to ods'.format(table_name, schema))
+            BaseETL.dataframe_to_ods(
+                df=df,
+                table_name='{}."{}"'.format(schema, table_name),
+                append=False,
+                encoding='utf-8'
+            )
+        except Exception as e:
+            raise RuntimeError('m=_move_df_to_ods, table_name={0}, schema={1}, error={2}, '
+                               'msg=Problem in send df to ods'.format(table_name, schema, str(e.message)))
+
+    @staticmethod
+    @logger(exclude='df')
+    def _create_athena_table(df, schema_name, schema_folder, table_name, athena_client):
+        columns_definition = GoogleSheets._get_df_columns_definition(df)
+
+        logger.info(
+            'm=_create_athena_table, schema={0}, table_name={1}, msg=dropping table'.format(schema_name, table_name))
+        athena_client.execute_query_and_wait_for_results(
+            sql='drop table if exists {0}.{1}_{2};'.format(schema_name, 'gsheets', table_name))
+
+        logger.info(
+            'm=_create_athena_table, schema={0}, table_name={1}, msg=creating table'.format(schema_name, table_name))
+        athena_client.execute_file_query_and_wait_for_results(
+            filename='{0}/gsheets/base_create_table.sql'.format(DATALAKE_QUERIES_DIR),
+            query_params={
+                'schema_name': schema_name,
+                'schema_folder': schema_folder,
+                'table_name': table_name,
+                'columns': columns_definition
+            }
+        )
+
+        logger.info('m=_create_athena_table, schema={0}, table_name=gsheets_{1}, msg=table created'.format(schema_name,
+                                                                                                           table_name))
+
+    @staticmethod
+    @logger(exclude='df')
+    def _get_df_columns_definition(df):
+        column_list = df.columns.values.tolist()
+        logger.info('m=_get_df_columns_definition, column_list={0}'.format(', '.join(map(str, column_list))))
+        return ' string,'.join(map(str, column_list)) + ' string'

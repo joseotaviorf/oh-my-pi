@@ -1,8 +1,8 @@
 with t_dates as (
 	select
-		cast(id_origin as bigint) as lead_id,
-		cast(score_factor as bigint) as score_factor,
-		row_number() over (partition by id_origin order by dt, ts_start) as rn
+		cast(cast(id_origin as decimal) as bigint) as lead_id,
+		cast(cast(score_factor as decimal) as bigint) as score_factor,
+		row_number() over (partition by cast(cast(id_origin as decimal) as bigint) order by dt, ts_start) as rn
 	from
 		datalake_clean.crm_tasks
 	where origin = 'Lead'

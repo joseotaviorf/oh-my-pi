@@ -19,6 +19,8 @@ create table if not exists dim_booking (
   status varchar(255),
   slot_dia integer,
   reason varchar(255),
+  cancellation_reason varchar(255),
+  cancellation_reason_category varchar(255),
   reason_category varchar(255),
   responsible varchar(255),
   app_type varchar(255),

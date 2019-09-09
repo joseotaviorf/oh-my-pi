@@ -156,6 +156,9 @@ class AmplitudeEventsETL(BaseETL):
             df_final = df_final.append(df_raw_json)
             i += 1
 
+        # grouping by same name columns
+        df_final = df_final.groupby(df_final.columns, axis=1).first()
+
         self.create_parquets(athena_client=athena_client, execution_date=execution_date, df=df_final)
 
     @logger
@@ -198,6 +201,9 @@ class AmplitudeEventsETL(BaseETL):
     def expand_columns(self, athena_client, df, df_props, df_json, properties, prefix):
         logger.info('m=expand_columns, properties={}, prefix={}'.format(properties, prefix))
 
+        # create adhoc exception list
+        adjust_header = ['utm_source', 'utm_medium']
+
         props_list = list(
             df_props[df_props[0].str.contains(prefix).fillna(False)][2].apply(lambda x: x.strip()))
         already_added_list = []
@@ -209,6 +215,10 @@ class AmplitudeEventsETL(BaseETL):
             up_diff = list(set(event_json[properties]) - set(props_list))
             for up in up_diff:
                 if up in already_added_list:
+                    continue
+
+                if up in adjust_header:
+                    already_added_list.append(up)
                     continue
 
                 str_type, formatted_up = self.__format_properties(
@@ -331,6 +341,7 @@ class AmplitudeEventsETL(BaseETL):
             ('mkt_category', str),
             ('mkt_flow', str),
             ('mkt_completion', str),
+            ('mkt_origin', str),
             ('mkt_channel', str),
             ('mkt_medium', str),
             ('mkt_source', str),

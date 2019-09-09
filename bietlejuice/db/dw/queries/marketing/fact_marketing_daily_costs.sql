@@ -1,4 +1,67 @@
-with campaigns_full as (
+with manual_google_costs as (
+    with t_prep as (
+        select
+          replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
+          campaign_name,
+          to_char(cast(g.date as date), 'yyyyMMdd')::integer as sk_date,
+          cast(replace(desktop_cost, ',', '') as numeric(10,2)) as desktop_cost,
+          cast(replace(mobile_cost, ',', '') as numeric(10,2)) as mobile_cost,
+          cast(replace(tablet_cost, ',', '') as numeric(10,2)) as tablet_cost
+        from datalake_raw.gsheets_marketing_manual_costs_google g
+    )
+    select
+        case when prep_account_name = 'quintoandar_display_and_video' then 'quintoandar_dra'
+			else prep_account_name end as account_name,
+		*
+	    from t_prep
+),
+google_consolidated_cost as (
+    with t_google as (
+        select
+            fg.sk_date,
+            coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
+            coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
+            dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
+            cast(dga.ad_id as varchar) as utm_content,
+            fg.desktop_cost,
+            fg.mobile_cost
+        from marketing.fact_google_daily_cost_attributions fg
+        left join marketing.dim_google_keyword dgk
+            on dgk.sk_keyword = fg.sk_keyword
+        left join marketing.dim_google_ad dga
+            on dga.sk_ad = fg.sk_ad
+        left join marketing.dim_google_campaign dgc
+            on dgc.sk_campaign = fg.sk_campaign
+        )
+    select
+		coalesce(m.sk_date, g.sk_date) as sk_date,
+		case when m.sk_date is not null then m.campaign_name
+		    else g.campaign_name end
+		    as campaign_name,
+		case when m.sk_date is not null then m.account_name
+		    else g.account_name end
+		    as account_name,
+		case when m.sk_date is not null then m.campaign_name
+		    else g.campaign_name end
+		    as utm_campaign,
+		case when m.sk_date is null then g.utm_term end
+		    as utm_term,
+		case when m.sk_date is null then g.utm_content end
+		    as utm_content,
+		case when m.sk_date is not null then m.desktop_cost
+		    else g.desktop_cost end
+		    as desktop_cost,
+		case when m.sk_date is not null then m.mobile_cost
+		    else g.mobile_cost end
+		    as mobile_cost
+	from t_google g
+	full outer join manual_google_costs m
+	    on m.sk_date = g.sk_date
+	    and m.account_name = g.account_name
+	    and m.campaign_name = g.campaign_name
+	where coalesce(m.sk_date, g.sk_date) >= 20180101
+),
+campaigns_full as (
     select
 		ff.sk_date,
 		'facebook'  as origin,
@@ -21,33 +84,26 @@ with campaigns_full as (
 	where ff.sk_date >= 20180101
 UNION
     select
-		fg.sk_date,
+		sk_date,
 		'google' as origin,
 		'fact_google_daily_cost_attributions' as fact_cost,
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
-		lower(case when SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2) ~ '^[0-9]+$' then
-		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 3)
+		campaign_name,
+		lower(case when SPLIT_PART(campaign_name, '.', 2) ~ '^[0-9]+$' then
+		    SPLIT_PART(campaign_name, '.', 3)
 		    else
-		    SPLIT_PART(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name), '.', 2)
+		    SPLIT_PART(campaign_name, '.', 2)
 		    end) as campaign_city,
-		coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
-		lower(coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name)) as campaign_name_l,
-		lower(coalesce(dgk.account_name, dga.account_name, dgc.account_name)) as account_name_l,
-		coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as utm_campaign,
-		dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
-		cast(dga.ad_id as varchar) as utm_content,
-		fg.desktop_cost as desktop_cost,
-		fg.mobile_cost as mobile_cost,
+		account_name,
+		lower(campaign_name) as campaign_name_l,
+		lower(account_name) as account_name_l,
+		cast(utm_campaign as varchar) as utm_campaign,
+		cast(utm_term as varchar) as utm_term,
+		cast(utm_content as varchar) as utm_content,
+		desktop_cost,
+		mobile_cost,
 		null as other_cost,
 		null as total_cost
-	from marketing.fact_google_daily_cost_attributions fg
-	left join marketing.dim_google_keyword dgk
-		on dgk.sk_keyword = fg.sk_keyword
-	left join marketing.dim_google_ad dga
-		on dga.sk_ad = fg.sk_ad
-	left join marketing.dim_google_campaign dgc
-		on dgc.sk_campaign = fg.sk_campaign
-	where fg.sk_date >= 20180101
+	from google_consolidated_cost
 UNION
     select 
         ftc.sk_date,
@@ -146,6 +202,7 @@ UNION
 		mccc.city_group as cost_city_group,
 		-- city via campaign_name full name written
 		case
+	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
 			when cf.campaign_name_l like '%s_o_paulo%' or cf.campaign_name_l like '%sp detailed%' then 'RMSP'
 			when cf.campaign_name_l like 'sp %' then 'RMSP'
 			when cf.campaign_name_l like '%all cities%' then 'RMSP'
@@ -158,9 +215,8 @@ UNION
 			when cf.campaign_name_l like '%santo_andr%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_bernardo%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
-	 	    when cf.campaign_name_l like '%rio de janeiro%' then 'Rio de Janeiro'
+	 	    when cf.campaign_name_l like '%rio_de_janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
-	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
 	     	when cf.campaign_name_l like '%bh%' or cf.campaign_name_l like '%belo%h%' then 'Belo Horizonte'
 	 	    when cf.campaign_name_l like '%minas_gerais%' then 'Belo Horizonte'
 	     	when cf.campaign_name_l like '%goi_nia%' or cf.campaign_name_l like '%goi_s%' then 'Goiânia'
@@ -170,8 +226,8 @@ UNION
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
-		case when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
-			 when campaign_city = 'campinas' then 'Campinas'
+		case when campaign_city = 'campinas' then 'Campinas'
+		     when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
 			 when campaign_city = 'goiania' then 'Goiânia'
@@ -185,6 +241,10 @@ UNION
 	    tx.mkt_category,
 	    tx.mkt_flow,
 	    tx.mkt_completion,
+	    -- due to higher granularity it was not possible to add this column in taxonomy table
+	    case when tx.side = 'supply' and cf.campaign_name_l like '%calculadora%' then 'PriceSuggestion'
+	         when tx.side = 'supply' then 'OwnerPWA'
+	    end as mkt_origin,
 	    tx.mkt_channel,
 	    tx.mkt_medium,
 	    tx.mkt_source,
@@ -217,9 +277,9 @@ UNION
 		         or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
 		   end as side
 	from campaigns_full cf
-		left join datalake_raw.mkt_cost_campaign_city as mccc
+		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l
-		left join datalake_raw.taxonomy_mkt_cost as tx 
+		left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
 			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '') 
 				and cf.fact_cost = tx.fact_cost
 				and cf.origin = tx.origin
@@ -233,6 +293,7 @@ city_group_final as city_group,
 mkt_category,
 mkt_flow,
 mkt_completion,
+mkt_origin,
 mkt_channel,
 mkt_medium,
 mkt_source,

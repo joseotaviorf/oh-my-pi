@@ -6,6 +6,7 @@ with leads as (
  tx1.mkt_category,
  tx1.mkt_flow,
  tx1.mkt_completion,
+ tx1.mkt_origin,
  tx1.mkt_channel,
  tx1.mkt_medium,
  tx1.mkt_source,
@@ -16,7 +17,7 @@ with leads as (
  sum(coalesce(tx1.daily_count, 0)) as total_daily_leads
 from
  growth.taxonomy_leads tx1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 prospects as (
  select
@@ -26,6 +27,7 @@ prospects as (
  p.mkt_category,
  p.mkt_flow,
  p.mkt_completion,
+ p.mkt_origin,
  p.mkt_channel,
  p.mkt_medium,
  p.mkt_source,
@@ -36,7 +38,7 @@ prospects as (
  sum(coalesce(p.daily_count, 0)) as total_daily_prospects
 from
  growth.taxonomy_prospects p
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 qualifieds as (
  select
@@ -46,6 +48,7 @@ qualifieds as (
  q.mkt_category,
  q.mkt_flow,
  q.mkt_completion,
+ q.mkt_origin,
  q.mkt_channel,
  q.mkt_medium,
  q.mkt_source,
@@ -56,7 +59,7 @@ qualifieds as (
  sum(coalesce(q.daily_count, 0)) as total_daily_qualifieds
 from
  growth.taxonomy_qualifieds q
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 opportunities as (
  select
@@ -66,6 +69,7 @@ opportunities as (
  op.mkt_category,
  op.mkt_flow,
  op.mkt_completion,
+ op.mkt_origin,
  op.mkt_channel,
  op.mkt_medium,
  op.mkt_source,
@@ -76,7 +80,7 @@ opportunities as (
  sum(coalesce(op.daily_count, 0)) as total_daily_opportunities
 from
  growth.taxonomy_opportunities op
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 listings as (
 select
@@ -86,6 +90,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -96,7 +101,7 @@ select
  sum(coalesce(ls1.daily_count, 0)) as total_daily_listings
 from
  growth.taxonomy_listings ls1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 sessions as (
 select
@@ -106,6 +111,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -116,7 +122,7 @@ select
  sum(coalesce(ls1.daily_count, 0)) as total_daily_sessions
 from
  growth.taxonomy_supply_active_user_sessions ls1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 active_users as (
 select
@@ -126,6 +132,7 @@ select
  ls1.mkt_category,
  ls1.mkt_flow,
  ls1.mkt_completion,
+ ls1.mkt_origin,
  ls1.mkt_channel,
  ls1.mkt_medium,
  ls1.mkt_source,
@@ -136,7 +143,7 @@ select
  sum(coalesce(ls1.daily_count, 0)) as total_daily_active_users
 from
  growth.taxonomy_supply_active_users ls1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ), supply as (
 select
  tx1.*,
@@ -153,6 +160,7 @@ left join prospects p
  and (coalesce(p.mkt_category,'') = coalesce(tx1.mkt_category,''))
  and (coalesce(p.mkt_flow,'') = coalesce(tx1.mkt_flow,''))
  and (coalesce(p.mkt_completion,'') = coalesce(tx1.mkt_completion,''))
+ and (coalesce(p.mkt_origin,'') = coalesce(tx1.mkt_origin,''))
  and (coalesce(p.mkt_channel,'') = coalesce(tx1.mkt_channel,''))
  and (coalesce(p.mkt_medium,'') = coalesce(tx1.mkt_medium,''))
  and (coalesce(p.mkt_source,'') = coalesce(tx1.mkt_source,''))
@@ -167,6 +175,7 @@ left join qualifieds q
  and (coalesce(q.mkt_category,'') = coalesce(tx1.mkt_category,''))
  and (coalesce(q.mkt_flow,'') = coalesce(tx1.mkt_flow,''))
  and (coalesce(q.mkt_completion,'') = coalesce(tx1.mkt_completion,''))
+ and (coalesce(q.mkt_origin,'') = coalesce(tx1.mkt_origin,''))
  and (coalesce(q.mkt_channel,'') = coalesce(tx1.mkt_channel,''))
  and (coalesce(q.mkt_medium,'') = coalesce(tx1.mkt_medium,''))
  and (coalesce(q.mkt_source,'') = coalesce(tx1.mkt_source,''))
@@ -181,6 +190,7 @@ left join opportunities op
  and (coalesce(op.mkt_category,'') = coalesce(tx1.mkt_category,''))
  and (coalesce(op.mkt_flow,'') = coalesce(tx1.mkt_flow,''))
  and (coalesce(op.mkt_completion,'') = coalesce(tx1.mkt_completion,''))
+ and (coalesce(op.mkt_origin,'') = coalesce(tx1.mkt_origin,''))
  and (coalesce(op.mkt_channel,'') = coalesce(tx1.mkt_channel,''))
  and (coalesce(op.mkt_medium,'') = coalesce(tx1.mkt_medium,''))
  and (coalesce(op.mkt_source,'') = coalesce(tx1.mkt_source,''))
@@ -195,6 +205,7 @@ left join listings ls1
  and (coalesce(ls1.mkt_category,'') = coalesce(tx1.mkt_category,''))
  and (coalesce(ls1.mkt_flow,'') = coalesce(tx1.mkt_flow,''))
  and (coalesce(ls1.mkt_completion,'') = coalesce(tx1.mkt_completion,''))
+ and (coalesce(ls1.mkt_origin,'') = coalesce(tx1.mkt_origin,''))
  and (coalesce(ls1.mkt_channel,'') = coalesce(tx1.mkt_channel,''))
  and (coalesce(ls1.mkt_medium,'') = coalesce(tx1.mkt_medium,''))
  and (coalesce(ls1.mkt_source,'') = coalesce(tx1.mkt_source,''))
@@ -216,6 +227,7 @@ left join active_users ls1
  and (ls1.mkt_category = tx1.mkt_category)
  and (ls1.mkt_flow = tx1.mkt_flow)
  and (ls1.mkt_completion = tx1.mkt_completion)
+ and (ls1.mkt_origin = tx1.mkt_origin)
  and (ls1.mkt_channel = tx1.mkt_channel)
  and (ls1.mkt_medium = tx1.mkt_medium)
  and (ls1.mkt_source = tx1.mkt_source)
@@ -237,13 +249,14 @@ left join users us
  and (coalesce(us.mkt_category,'') = coalesce(supply.mkt_category,''))
  and (coalesce(us.mkt_flow,'') = coalesce(supply.mkt_flow,''))
  and (coalesce(us.mkt_completion,'') = coalesce(supply.mkt_completion,''))
+ and (coalesce(us.mkt_origin,'') = coalesce(supply.mkt_origin,''))
  and (coalesce(us.mkt_channel,'') = coalesce(supply.mkt_channel,''))
  and (coalesce(us.mkt_medium,'') = coalesce(supply.mkt_medium,''))
  and (coalesce(us.mkt_source,'') = coalesce(supply.mkt_source,''))
  and (coalesce(us.mkt_platform,'') = coalesce(supply.mkt_platform,''))
  and (coalesce(us.utm_campaign,'') = coalesce(supply.utm_campaign,''))
- and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
  and (coalesce(us.utm_term,'') = coalesce(supply.utm_term,''))
+ and (coalesce(us.utm_content,'') = coalesce(supply.utm_content,''))
 UNION
 select
 	 us.sk_date,
@@ -252,6 +265,7 @@ select
 	 us.mkt_category,
 	 us.mkt_flow,
 	 us.mkt_completion,
+	 us.mkt_origin,
 	 us.mkt_channel,
 	 us.mkt_medium,
 	 us.mkt_source,
@@ -275,6 +289,7 @@ left join supply supply
  and (coalesce(us.mkt_category,'') = coalesce(supply.mkt_category,''))
  and (coalesce(us.mkt_flow,'') = coalesce(supply.mkt_flow,''))
  and (coalesce(us.mkt_completion,'') = coalesce(supply.mkt_completion,''))
+ and (coalesce(us.mkt_origin,'') = coalesce(supply.mkt_origin,''))
  and (coalesce(us.mkt_channel,'') = coalesce(supply.mkt_channel,''))
  and (coalesce(us.mkt_medium,'') = coalesce(supply.mkt_medium,''))
  and (coalesce(us.mkt_source,'') = coalesce(supply.mkt_source,''))
