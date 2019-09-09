@@ -19,6 +19,7 @@ create external table datalake_clean.ods_dim_date (
   year_calendar_week string,
   weekend string,
   is_brz_holiday string,
+  working_day_month string,
   brz_season string,
   week_start string,
   week_end string,

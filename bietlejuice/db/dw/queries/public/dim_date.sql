@@ -20,6 +20,7 @@ CREATE TABLE public.dim_date (
   year_calendar_week VARCHAR(10),
   weekend VARCHAR(10),
   is_brz_holiday VARCHAR(10),
+  working_day_month INTEGER,
   brz_season VARCHAR(10),
   week_start DATE,
   week_end DATE,
@@ -67,6 +68,11 @@ SELECT
       CASE WHEN to_char(sk_date, 'MMDD') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225')
       THEN 'Holiday' ELSE 'No holiday' END
       AS Is_Brz_Holiday,
+    -- weekdays in a month
+    SUM(CASE WHEN
+    	((CASE WHEN EXTRACT(dow FROM sk_date) IN (6, 0) THEN 'Weekend' ELSE 'Weekday' END) = 'Weekend' OR
+    	(CASE WHEN to_char(sk_date, 'MMDD') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') THEN 'Holiday' ELSE 'No holiday' END) = 'Holiday')
+    THEN 0 ELSE 1 END) OVER(PARTITION BY date_trunc('month',sk_date) ORDER BY EXTRACT(DAY FROM sk_date) rows unbounded preceding) AS working_day_month,
 	-- Some periods of the year, adjust for your organisation and country
 
     CASE

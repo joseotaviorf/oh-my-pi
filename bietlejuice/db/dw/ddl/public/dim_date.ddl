@@ -18,6 +18,7 @@ CREATE TABLE public.dim_date (
 	year_calendar_week varchar(10) NULL,
 	weekend varchar(10) NULL,
 	is_brz_holiday varchar(10) NULL,
+  working_day_month int4 NULL,
 	brz_season varchar(10) NULL,
 	week_start date NULL,
 	week_end date NULL,

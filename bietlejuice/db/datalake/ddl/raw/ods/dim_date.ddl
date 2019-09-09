@@ -20,6 +20,7 @@ CREATE external TABLE datalake_raw.dim_date (
   year_calendar_week STRING,
   weekend STRING,
   is_brz_holiday STRING,
+  working_day_month STRING,
   brz_season STRING,
   week_start STRING,
   week_end STRING,
