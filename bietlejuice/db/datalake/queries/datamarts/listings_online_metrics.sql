@@ -10,11 +10,11 @@ days_published AS (
   WITH
   published AS (
     SELECT
-      sk_house AS sk_house_listing,
-      SUBSTRING(sk_house, 1, 9) AS sk_house,
-      DATE_PARSE(sk_min_status_date, '%Y%m%d') AS min_status_date,
-      COALESCE(TRY(DATE_PARSE(sk_max_status_date, '%Y%m%d')), CURRENT_DATE) AS max_status_date
-    FROM datalake_clean.ods_fact_house_status
+      sk_house_listing,
+      CASE WHEN sk_house_listing <> '-1' THEN SUBSTRING(sk_house_listing, 1, 9) ELSE '-1' END AS sk_house,
+      CASE WHEN sk_status_start_date <> '-1' THEN DATE_PARSE(sk_status_start_date, '%Y%m%d') ELSE NULL END AS min_status_date,
+      COALESCE(CASE WHEN sk_status_end_date<>'-1' THEN DATE_PARSE(sk_status_end_date, '%Y%m%d') ELSE NULL END, CURRENT_DATE) AS max_status_date
+    FROM datalake_clean.ods_fact_house_listing_status
     WHERE status_history = 'publicado'
   ),
   rows AS (

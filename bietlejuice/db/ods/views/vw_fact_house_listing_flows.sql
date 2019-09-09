@@ -279,7 +279,7 @@ potential_listings as (
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
-    coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, '-1'::integer::bigint) as sk_partner,
+    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, l_b2b.prime_partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
     coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,

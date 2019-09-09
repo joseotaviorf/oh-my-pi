@@ -42,15 +42,13 @@ with b2b_info as (
 ),
 house_listings as (
   select
-    ((h.id || '00') || coalesce(hl.version, 1))::bigint as sk_house_listing,
+    hl.id_house_listing as sk_house_listing,
     h.id as id_house,
     h.id % 892700000 as short_id_house,
     hl.version,
     hl.status::varchar(255),
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
-    h.data_primeiro_verificado as ts_house_registration_first_verification,
-    h.last_confirmation_availability as ts_house_last_confirmation_availability,
     h.first_publication as ts_house_first_publication,
     h.ultima_publicacao as ts_house_last_publication,
     hl.ts_listing_version_start::date as ts_publication,
@@ -102,7 +100,7 @@ house_listings as (
     hl.dt_last_originals_opted_in,
     hl.dt_last_originals_opted_out
   from house h
-  left join house_listing hl
+  join house_listing hl
     on hl.id_house = h.id
 )
 select
@@ -113,8 +111,6 @@ select
   hl.status,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
-  hl.ts_house_registration_first_verification,
-  hl.ts_house_last_confirmation_availability,
   hl.ts_house_first_publication,
   hl.ts_house_last_publication,
   hl.ts_publication,
