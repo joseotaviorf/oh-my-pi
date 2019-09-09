@@ -17,8 +17,10 @@ logger = QuintoAndarLogger('RtbCampaigns')
 class RtbCampaigns(Marketing):
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
 
-    def __init__(self, s3_bucket, execution_date, auth, account=None):
-        super(RtbCampaigns, self).__init__(s3_bucket, execution_date, 'rtb_campaigns', account)
+    def __init__(self, s3_bucket, execution_date, auth, account=None,
+                 extra_configs=None):
+        super(RtbCampaigns, self).__init__(s3_bucket, execution_date, 'rtb_campaigns',
+                                           account)
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
 

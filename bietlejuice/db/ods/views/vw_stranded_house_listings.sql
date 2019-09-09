@@ -4,25 +4,25 @@ with
 status_all as (
 --select all status from each listing, calculate date_to_be_stranded using publication_date and find in which status was the stranded date
 select
-	fhs.sk_house_listing as sk_house,
+	fhs.id_house_listing as sk_house,
     fhs.status_history,
-    fhs.sk_min_status_date,
+    coalesce(to_char(fhs.ts_status_start::date, 'YYYYMMDD')::integer, -1::integer) as sk_status_start_date,
     dmin.date as min_status_date,
-    fhs.sk_max_status_date,
+    coalesce(to_char(fhs.ts_status_end::date, 'YYYYMMDD')::integer, -1::integer) as sk_status_end_date,
     dmax.date as max_status_date,
-    date_trunc('day',hl.min_version_time) as ts_publication,
-    date_trunc('day',hl.min_version_time)::timestamp::date + interval '8 week' as date_to_be_stranded,
-    case when date_trunc('day',hl.min_version_time) + interval '8 week' <= dmin.date
-          or date_trunc('day',hl.min_version_time) + interval '8 week' <= dmax.date
+    date_trunc('day',hl.ts_listing_version_start) as ts_publication,
+    date_trunc('day',hl.ts_listing_version_start)::timestamp::date + interval '8 week' as date_to_be_stranded,
+    case when date_trunc('day',hl.ts_listing_version_start) + interval '8 week' <= dmin.date
+          or date_trunc('day',hl.ts_listing_version_start) + interval '8 week' <= dmax.date
       then 'stranded' end as type_stranded
-from vw_fact_house_status fhs
+from house_listing_status fhs
 left join house_listing hl
-  on fhs.sk_house_listing = ((hl.id || '00') || coalesce(hl.version, 1))::bigint
+  on fhs.id_house_listing = hl.id_house_listing
 left join dim_date dmin
-  on dmin.sk_date = fhs.sk_min_status_date
+  on dmin."date" = fhs.ts_status_start::date
 left join dim_date dmax
-  on dmax.sk_date = coalesce(fhs.sk_max_status_date,to_char(current_date -1, 'YYYYMMDD')::bigint)
-order by sk_house_listing desc, sk_min_status_date
+  on dmax."date" = coalesce(fhs.ts_status_end::date, current_date -1)
+order by fhs.id_house_listing desc, fhs.ts_status_start
 ),
 rank_stranded as (
 --select only status where stranded date already happened
@@ -93,3 +93,4 @@ select
 	else greatest(coalesce(min_date_stranded,'3000-01-01'), min_date_to_be_stranded)::timestamp::date end as stranded_date
 from stranded_status
 where rk = 1
+;

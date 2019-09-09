@@ -1,65 +1,75 @@
-with funnel_counts as (
-	SELECT
-	   dbt.date as date,
-	   co.city_group as city_group,
-	   co.mkt_medium as mkt_medium,
-	   co.mkt_channel as mkt_channel,
-	   sum(co.total_daily_visits_booked) as visits_booked,
-	   round(sum(co.cost)) as marketing_cost
-	FROM
-	marketing.fact_daily_demand_funnel_conversions co
-	left join dim_date dbt on dbt.sk_date = co.sk_date
-	WHERE dbt.date BETWEEN '2019-01-01' AND CURRENT_DATE - interval '1 day'
-	group by 1, 2, 3, 4
-),
-dates as (
-	select distinct 
-		date,
+with demand_targets_agg as (
+	/* get demand targets company level by mkt_channel */
+	select 
+		city_group,
+		"date"::date,
+		"month",
 		week_start,
-		weekday_name
-	from dim_date
-	where date >= date('2019-01-01')
-	and date < date('2020-01-01')
-	order by 1
+		demand_channel,
+		sum(visits_booked::float) as target_channel_visits_booked,
+		null as target_channel_marketing_cost /** placeholder for target marketing cost **/
+	from datalake_raw.gsheets_demand_targets 
+	group by 1, 2, 3, 4, 5
 ),
-city_groups as (
-	select distinct dr.regional, dr.city_group 
-	from funnel_counts fc
-	join dim_region dr on dr.city_group = fc.city_group
-	where fc.city_group is not null
+demand_targets as (
+	/* get demand targets growth level by mkt_channel & mkt_medium */
+	select 
+		dtco.city_group,
+		dtco."date",
+		dtco."month",
+		dtco.week_start,
+		dtco.demand_channel,
+		dtco.target_channel_visits_booked,
+		dtco.target_channel_marketing_cost,
+		dtgr.mkt_channel,
+		dtgr.mkt_medium,
+		nullif(trim(dtgr.target_visits_booked), '')::float as share_medium_visits_booked,
+		null as share_medium_marketing_cost, /*placeholder*/
+		nullif(trim(dtgr.target_visits_booked), '')::float * dtco.target_channel_visits_booked as target_medium_visits_booked,
+		null as target_medium_marketing_cost /*placeholder*/
+	from demand_targets_agg dtco 
+	left join datalake_raw.gsheets_growth_demand_targets dtgr
+		on dtgr.dt = dtco."date"
+		and dtgr.city_group = dtco.city_group
+		and dtgr.mkt_channel = dtco.demand_channel
 ),
-mkt_channels_mediums as (
-	select distinct mkt_channel, mkt_medium 
-	from funnel_counts
-	where mkt_channel is not null
-),
-growth_dimensions as (
-	select * 
-	from dates, city_groups, mkt_channels_mediums
-	order by 1, 2, 3, 4
+demand_realized as (
+	select distinct
+		dbt.date as date,
+		dbt.week_start as week_start,
+		dbt.weekday_name as weekday_name,
+		trim(dbt.month_name) as month_name,
+		co.city_group as city_group,
+		co.mkt_channel as mkt_channel,
+		co.mkt_medium as mkt_medium,
+		sum(co.total_daily_visits_booked) over (partition by dbt.date, co.city_group, co.mkt_channel) ::decimal as realized_channel_visits_booked,
+		sum(co.total_daily_visits_booked) over (partition by dbt.date, co.city_group, co.mkt_channel, co.mkt_medium) ::decimal as realized_medium_visits_booked,
+		sum(co.cost) over (partition by dbt.date, co.city_group, co.mkt_channel) ::float as realized_channel_marketing_cost,
+		sum(co.cost) over (partition by dbt.date, co.city_group, co.mkt_channel, co.mkt_medium) ::float as realized_medium_marketing_cost
+	from marketing.fact_daily_demand_funnel_conversions co
+	left join dim_date dbt on dbt.sk_date = co.sk_date
 )
 select 
-	gd.date,
-	gd.week_start,
-	gd.weekday_name,
-	gd.regional,
-	gd.city_group,
-	gd.mkt_channel,
-	gd.mkt_medium,
-	coalesce(fc.visits_booked, 0) as visits_booked,
-	coalesce(fc.marketing_cost, 0) as marketing_cost,
-	gt.target_visits_booked,
-	gt.target_marketing_cost
-from growth_dimensions gd 
-left join funnel_counts fc 
-	on fc.date = gd.date
-	and fc.city_group = gd.city_group
-	and fc.mkt_channel = gd.mkt_channel
-	and fc.mkt_medium = gd.mkt_medium
-left join datalake_raw.gsheets_growth_targets gt
-	on gt.dt = gd.date
-	and gt.city_group = gd.city_group
-	and gt.mkt_channel = gd.mkt_channel
-	and gt.mkt_medium = gd.mkt_medium
-order by 1, 4, 5, 6, 7
+	dt.city_group,
+	dt."date",
+	dt."month",
+	dt.week_start,
+	dt.mkt_channel,
+	dt.mkt_medium,
+	dt.target_channel_visits_booked,
+	dt.target_channel_marketing_cost,
+	dt.target_medium_visits_booked,
+	dt.target_medium_marketing_cost,
+	dr.realized_channel_visits_booked,
+	dr.realized_medium_visits_booked,
+	dr.realized_channel_marketing_cost,
+	dr.realized_medium_marketing_cost
+from demand_targets dt
+left join demand_realized dr
+	on dr."date" = dt."date"
+	and dr.city_group = dt.city_group
+	and dr.mkt_channel = dt.mkt_channel
+	and dr.mkt_medium = dt.mkt_medium
+where dt."date" >= date('2019-01-01')
+order by 1, 2, 5, 6
 ;

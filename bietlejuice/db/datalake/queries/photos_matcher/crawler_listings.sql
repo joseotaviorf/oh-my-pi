@@ -15,9 +15,10 @@ images AS (
 matches AS (
   SELECT
     m.sk_house_listing,
-    COUNT(*) AS matches_count
+    m.id_crawled_listing,
+    COUNT(*) AS total_matches
   FROM datalake_raw.crawler_matches m
-  GROUP BY 1
+  GROUP BY 1, 2
 ),
 quintoandar_listings AS (
   SELECT
@@ -30,15 +31,13 @@ quintoandar_listings AS (
          array_agg(i.nome) AS photos
   FROM datalake_clean.ods_dim_house_listing l
   LEFT JOIN images i ON l.id_house = i.imovel_id
-  LEFT JOIN matches m ON l.sk_house_listing = m.sk_house_listing
   WHERE status IN ('publicado') AND is_last_version = 'True'
     AND COALESCE(house_lat, '') != '' AND COALESCE(house_lng, '') != ''
     AND COALESCE(
       regexp_extract(trim(house_number), '\d+$')
       , '') != ''
     AND COALESCE(house_bedrooms, '') != ''
-    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '7' DAY -- our listings pulished in the last 7 days
-    AND (m.matches_count <= 3 OR m.matches_count IS NULL)  -- we don't want to consider listings that have had more than 3 matches already
+    AND TRY(CAST(l.ts_publication AS TIMESTAMP)) >= CURRENT_DATE - INTERVAL '1' DAY -- our listings pulished in the last 1 day
   GROUP BY 1, 2, 3, 4, 5, 6
 ),
 first_listings AS (
@@ -61,7 +60,7 @@ first_listings AS (
     ) as tmp
   WHERE
     row = 1  -- get the first time it was crawled
-    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '1' DAY  -- and only listings posted or updated in the last 1 days
+    AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
 ),
 crawled_listings AS (
   SELECT
@@ -79,19 +78,25 @@ crawled_listings AS (
         lng,
         nb_street,
         photos,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
+        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row,
+        ROW_NUMBER() OVER(PARTITION BY description, website, advertiser_id, price) AS ad_deduplication_row
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND advertiser_name != 'quintoandar'
         AND COALESCE(rent, '') != ''
-        AND started_on >= CURRENT_DATE - INTERVAL '1' DAY  -- only query listings from crawler jobs started in the last 1 days
+        AND COALESCE(nb_street, '') != ''
+        AND COALESCE(lat, '') != ''
+        AND COALESCE(lng, '') != ''
+        AND COALESCE(bedrooms, '') != ''
+        AND started_on >= CURRENT_DATE - INTERVAL '30' DAY  -- only query listings from crawler jobs started in the last 30 days
         AND COALESCE(photos, '') != ''
         AND cardinality(split(photos, ',')) > 4  -- crawled listing must have at least 4 photos
     ) as listings
   JOIN first_listings ON listings.id = first_listings.id
   WHERE
     listings.row = 1  -- get the first time it was crawled within last 120 days
-    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '1' DAY  -- and only listings posted or updated in the last 1 days
+    AND DATE(listings.updated_on) >= CURRENT_DATE - INTERVAL '30' DAY  -- and only listings posted or updated in the last 30 days
+    AND listings.ad_deduplication_row = 1  -- we employ this heuristic to try to deduplicate listings even if they have different ids
 ),
 quintoandar_join_crawled AS
 (
@@ -114,12 +119,14 @@ quintoandar_join_crawled AS
     AND TRY(CAST(q.house_bedrooms AS BIGINT)) = TRY(CAST(c.bedrooms AS BIGINT))
 )
 SELECT
-  ROW_NUMBER () OVER (ORDER BY sk_house_listing) AS row_id,
-  sk_house_listing,
-  short_id_house,
-  listing_photos,
-  id_crawled_listing,
-  crawled_photos,
+  ROW_NUMBER () OVER (ORDER BY c.sk_house_listing) AS row_id,
+  c.sk_house_listing,
+  c.short_id_house,
+  c.listing_photos,
+  c.id_crawled_listing,
+  c.crawled_photos,
   CURRENT_DATE AS dt_created
-FROM quintoandar_join_crawled
+FROM quintoandar_join_crawled c
+LEFT JOIN matches m ON c.sk_house_listing = m.sk_house_listing AND c.id_crawled_listing = m.id_crawled_listing
+WHERE COALESCE(m.total_matches, 0) <= 3  -- we don't want to consider listings + crawler listings combinations that have had more than 3 matches already
 ;

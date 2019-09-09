@@ -15,7 +15,8 @@ logger = QuintoAndarLogger('TrovitCampaigns')
 
 class TrovitCampaigns(Marketing):
 
-    def __init__(self, s3_bucket, execution_date, auth, account=None):
+    def __init__(self, s3_bucket, execution_date, auth, account=None,
+                 extra_configs=None):
         super(TrovitCampaigns, self).__init__(s3_bucket, execution_date,
                                               'trovit_campaigns', account)
 

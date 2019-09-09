@@ -14,7 +14,6 @@ CREATE TABLE staging.dim_region (
 	region_code varchar(10),
 	region_code_deprecated varchar(10),
 	short_region_name varchar(255),
-	long_region_name varchar(510),
 	greater_region varchar(255),
 	regional varchar(255),
 	dt_created timestamp,
@@ -22,6 +21,5 @@ CREATE TABLE staging.dim_region (
 	dt_timestamp timestamp,
 	dt_first_property_created timestamp,
 	dt_first_booking timestamp,
-	days_from_first_booking int4,
 	CONSTRAINT dim_region_pkey PRIMARY KEY (sk_region)
 ) ;

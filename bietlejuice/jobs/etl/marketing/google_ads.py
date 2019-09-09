@@ -41,8 +41,10 @@ class GoogleAds(Marketing):
         }
     }
 
-    def __init__(self, s3_bucket, execution_date, account, auth=None):
-        super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads', account)
+    def __init__(self, s3_bucket, execution_date, account, auth=None,
+                 extra_configs=None):
+        super(GoogleAds, self).__init__(s3_bucket, execution_date, 'google_ads',
+                                        account)
 
     @logger
     def move_campaigns_to_clean(self):

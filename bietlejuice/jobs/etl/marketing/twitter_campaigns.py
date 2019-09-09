@@ -33,7 +33,8 @@ class TwitterCampaigns(Marketing):
     ADS_TABLE_NAME = "twitter_ads"
     ADS_STATS_TABLE_NAME = "twitter_ads_stats"
 
-    def __init__(self, s3_bucket, execution_date, auth, account=None):
+    def __init__(self, s3_bucket, execution_date, auth, account=None,
+                 extra_configs=None):
         """
         The consumer_key, consumer_secret, access_token, and access_token_secret can
         be found on Twitter Developer console:
@@ -55,6 +56,12 @@ class TwitterCampaigns(Marketing):
         Fetch all accounts on Twitter Ads platform and save all its Campaigns, AdGroups,
         Promoted Tweets details and Promoted Tweets stats on data lake raw
         """
+
+        delta = datetime.today() - self.execution_date
+        if delta.days >= 90:
+            logger.info('m=move_twitter_ads_to_raw, msg=Ignoring raw task due Twitter '
+                        'API does not provide data older than 90 days')
+            return
 
         for acc in self.get_accounts():
             campaigns_ids = self._fetch_and_save_campaigns(acc)

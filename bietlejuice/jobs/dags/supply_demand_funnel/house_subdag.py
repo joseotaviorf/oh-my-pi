@@ -26,15 +26,20 @@ class HouseSubDag(DimSubDag):
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        (house_task, affiliate, rent_flow, house_listing, staging_dim_house_listing_task,
-         dim_house_listing) = self.__build_data_tasks(house_dag)
+        (
+            house_task, affiliate, rent_flow, house_listing,
+            staging_dim_house_listing_task,
+            dim_house_listing) = self.__build_data_tasks(house_dag)
 
-        tests_tasks = self.build_tests_tasks(house_dag)
+        # TODO: put tests back to flow
+        # tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> house_listing
-        staging_dim_house_listing_task.set_upstream([rent_flow, house_listing, house_task])
-        staging_dim_house_listing_task.set_downstream(tests_tasks)
-        dim_house_listing.set_upstream(tests_tasks)
+        staging_dim_house_listing_task.set_upstream(
+            [rent_flow, house_listing, house_task])
+        # staging_dim_house_listing_task.set_downstream(tests_tasks)
+        # dim_house_listing.set_upstream(tests_tasks)
+        staging_dim_house_listing_task >> dim_house_listing
 
         return house_dag
 
@@ -43,11 +48,14 @@ class HouseSubDag(DimSubDag):
         exec_date = kwargs['execution_date']
         dim = 'house'
 
-        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, dim)
+        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR,
+                                                                 dim)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim,
+                                                 bucket=DimSubDag.S3_BUCKET,
+                                                 command=query,
                                                  table_name='house')
 
     @logger
@@ -82,12 +90,13 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        property_listing = BaseDAG.build_python_operator(
-            dag=dag,
+        house_listing_task = BaseDAG.build_python_operator(
             task_id='ODS_house_listing',
-            python_callable=utils.materialize_view_ods,
+            dag=dag,
+            python_callable=utils.load_athena_file_query_to_ods,
             op_kwargs={
-                'view_name': 'house_listing',
+                'table_name': 'house_listing',
+                'file_name': 'house/house_listing.sql',
                 'bucket': DimSubDag.S3_BUCKET
             }
         )
@@ -111,5 +120,6 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, property_listing, staging_dim_house_listing_task,
+        return (property_task, affiliate, rent_flow, house_listing_task,
+                staging_dim_house_listing_task,
                 dim_house_listing)

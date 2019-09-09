@@ -1,33 +1,6 @@
 with t_all as (
     with prep_ref as (
-    select  cast(regexp_extract(e_lead_id, '(^\d+)') as bigint) as id_lead,
-            null as firestore_id,
-            null as e_formfield_lead_uuid,
-            1 as rule_num,
-            'referral' as rule,
-            event_time,
-            u_initial_utm_campaign,
-            u_initial_utm_medium,
-            u_initial_utm_source,
-            u_initial_utm_content,
-            u_initial_utm_term,
-            u_platform,
-            u_referring_domain,
-            region,
-            city,
-            uuid
-    from datalake_clean.amplitude_events ae
-        where et in
-            ('referral_confirmation_page_viewed',
-            'referral_opportunity_confirmed',
-            'referral_listing_confirmed',
-            'referral_form_response_received')
-            and	ym >= '2018-05'
-            and ae.app = '205027'
-            and regexp_like(e_lead_id, '(^\d+)')
-    -- enriching with amplitude from SPARK processing
-    union
-        select
+    select
             cast(regexp_extract(
                 coalesce(cast(json_extract(event_properties, '$.lead_id') as varchar), '')
                 , '(^\d+)') as bigint) as id_lead,
@@ -57,29 +30,6 @@ with t_all as (
             and regexp_like(cast(json_extract(event_properties, '$.lead_id') as varchar), '(^\d+)')
     ),
     prep_ref_2 as (
-        select 	cast(regexp_extract(e__lead_id, '(^\d+)') as bigint) as id_lead,
-            null as firestore_id,
-            null as e_formfield_lead_uuid,
-            2 as rule_num,
-            'referral_2' as rule,
-            event_time,
-            u_initial_utm_campaign,
-            u_initial_utm_medium,
-            u_initial_utm_source,
-            u_initial_utm_content,
-            u_initial_utm_term,
-            u_platform,
-            u_referring_domain,
-            region,
-            city,
-            uuid
-    from datalake_clean.amplitude_events ae
-        where et in ('Affiliate-Lead_referred',
-                        'Refer-Lead_referred' )
-            and	ym >= '2018-05'
-            and regexp_like(e__lead_id, '(^\d+)')
-    -- enriching with amplitude from SPARK processing
-    union
         select
             cast(regexp_extract(
                 coalesce(cast(json_extract(event_properties, '$.Lead_id') as varchar), '')
@@ -104,29 +54,6 @@ with t_all as (
             and	year >= 2019
             and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
     ), prep_firestore as (
-    select 	null as id_lead,
-            u_lead_firestore_id as firestore_id,
-            null as e_formfield_lead_uuid,
-            3 as rule_num,
-            'firestore' as rule,
-            event_time,
-            u_initial_utm_campaign,
-            u_initial_utm_medium,
-            u_initial_utm_source,
-            u_initial_utm_content,
-            u_initial_utm_term,
-            u_platform,
-            u_referring_domain,
-            region,
-            city,
-            uuid
-    from datalake_clean.amplitude_events ae
-        where
-            ym >= '2018-01'
-            and app = '183047'
-            and trim(u_lead_firestore_id) <> ''
-    -- enriching with amplitude from SPARK processing
-    union
     select
             null as id_lead,
             coalesce(cast(json_extract(user_properties, '$.lead_firestore_id') as varchar), '') as firestore_id,
@@ -149,30 +76,6 @@ with t_all as (
             and app = 183047
             and json_extract(user_properties, '$.lead_firestore_id') is not null
     ), prep_form as (
-    select 	null as id_lead,
-            null as firestore_id,
-            ae.e_formfield_lead_uuid as e_formfield_lead_uuid,
-            4 as rule_num,
-            'formfield' as rule,
-            event_time,
-            u_initial_utm_campaign,
-            u_initial_utm_medium,
-            u_initial_utm_source,
-            u_initial_utm_content,
-            u_initial_utm_term,
-            u_platform,
-            u_referring_domain,
-            region,
-            city,
-            uuid
-    from datalake_clean.amplitude_events ae
-        where
-            et = 'lead_form_submitted'
-            and ym >= '2018-01'
-            and trim(app) = '183047'
-            AND trim(ae.e_formfield_lead_uuid) <> ''
-    -- enriching with amplitude from SPARK processing
-    union
     select
             null as id_lead,
             null as firestore_id,
@@ -227,7 +130,7 @@ select
     u_initial_utm_source,
     u_initial_utm_content,
     u_initial_utm_term,
-    u_platform,
+    platform as u_platform,
     u_referring_domain,
     region,
     city,

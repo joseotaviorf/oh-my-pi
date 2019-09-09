@@ -5,7 +5,7 @@ create table if not exists photo_job (
 	job_status varchar(255),
 	creation_origin varchar(20),
 	flexible_schedule integer,
-    same_day_listing integer,
+    same_day_upload integer,
     job_on_time integer,
 	dt_photographer_accepted timestamp,
 	dt_job_created timestamp,
