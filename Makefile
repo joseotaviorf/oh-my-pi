@@ -77,6 +77,13 @@ check-style-python3:
 package-python3:
 	@PYTHONPATH=. python -m setup3 sdist bdist_wheel
 
+.PHONY: unit-tests-python3
+unit-tests-python3:
+	@echo ""
+	@echo "Automated Tests"
+	@echo "=========="
+	@echo ""
+	@python -m pytest --cov=bietlejuice/jobs/composer --cov-fail-under=10 --cov-config .coveragerc tests3
 
 ############# common commands #######################
 
