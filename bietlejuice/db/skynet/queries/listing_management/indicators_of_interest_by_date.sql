@@ -2,10 +2,10 @@ with listing_versions as (
 	select distinct
 	cast(lv.sk_house_listing as bigint) as sk_house_listing,
 	lv.id_house as house_id,
-	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
-	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
+	cast(regexp_extract(lv.ts_listing_version_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
+	cast(regexp_extract(lv.ts_listing_version_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
 	cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as publication_date,
-	cast(regexp_extract(trim(lv.ts_de_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
+	cast(regexp_extract(trim(lv.ts_last_de_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
 	lv.status as last_status_version, -- last status of this version of the imovel
 	lv.house_status as status,  -- status of the imovel today
 	lv.house_unpublished_reason,

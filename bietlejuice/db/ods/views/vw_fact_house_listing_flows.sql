@@ -270,7 +270,7 @@ potential_listings as (
     coalesce(f.lead_id, '-1'::integer) as sk_lead,
     coalesce(f.conversao_id, '-1'::integer) as sk_lead_conversion,
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
-    coalesce(f.imovel_id || '001', '-1') as sk_house_listing,
+    coalesce(f.imovel_id || '00' || coalesce(hl_version_one.version, hl_version_zero.version, 0)::varchar, '-1')::bigint as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
     coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
@@ -279,7 +279,7 @@ potential_listings as (
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
-    coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, '-1'::integer::bigint) as sk_partner,
+    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, l_b2b.prime_partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
     coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
@@ -379,6 +379,12 @@ potential_listings as (
     on us_d.id_dados_afiliado = u.dados_afiliado_id
   left join user_affiliate ua
     on ua.id = u.dados_afiliado_id
+  left join house_listing hl_version_zero
+  	on hl_version_zero.id_house = f.imovel_id
+  	  and hl_version_zero.version = 0
+  left join house_listing hl_version_one
+  	on hl_version_one.id_house = f.imovel_id
+  	  and hl_version_one.version = 1
 ), 
 taxonomy as (
   select
