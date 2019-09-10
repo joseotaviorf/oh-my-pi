@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
-from bietlejuice.jobs.composer.wrappers import SparkSQLClient
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreInfo().get_db_info("forno", "bigfone")
 
     # get spark client
-    spark_sql_client = SparkSQLClient(spark, sqlContext)
+    spark_sql_client = SparkSQLCLient(spark, sqlContext)
     spark_service = SparkMetastoreService(
         datalake_info["db_raw_databricks"],
         datalake_info["db_raw_path"],
