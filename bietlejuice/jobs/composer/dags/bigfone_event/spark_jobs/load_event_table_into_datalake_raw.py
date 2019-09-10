@@ -8,7 +8,7 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreInfo
+from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR, DatalakeMetastoreInfo
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
@@ -17,6 +17,7 @@ from bietlejuice.jobs.composer.base.spark import (
 )
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 from bietlejuice.jobs.composer.wrappers import SparkSQLClient
+
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -32,21 +33,20 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="load_teravoz_into_datalake")
 
     # args passed by Airflow task
-    parser.add_argument("table_name", type=str, help="spark table name")
     parser.add_argument("environment", type=str, help="forno/prod values")
     parser.add_argument("execution_date", type=str, help="execution date in str format")
 
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake_raw, table_name={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
-            args.table_name, args.execution_date, args.environment
+        "m=load_teravoz_into_datalake_raw, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            args.execution_date, args.environment
         )
     )
 
     execution_date = args.execution_date
     environment = args.environment
-    table_name = args.table_name
+    table_name = "event"
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     partitions = OrderedDict(
@@ -57,8 +57,10 @@ if __name__ == "__main__":
         ]
     )
 
-    with open(table_name, "r") as f:
-        query = f.read()
+    query_path = DATALAKE_SQL_DIR + "/queries/raw/bigfone/{}.sql".format(table_name)
+
+    with open(query_path, "r") as f:
+        query_file = f.read()
 
     # start Spark Session
     base_dbutils = BaseDBUtils()
@@ -72,7 +74,7 @@ if __name__ == "__main__":
     # establish connection and get data from Event table
     connection = json.loads(json_connection)
     consumer = PostgreSQLConsumer(connection)
-    event_table_data = consumer.get_data_from_query(query.format(**partitions))
+    event_table_data = consumer.get_data_from_query(query_file.format(**partitions))
 
     datalake_info = DatalakeMetastoreInfo().get_db_info("forno", "bigfone")
 
