@@ -1,6 +1,6 @@
 import os
 
-from bietlejuice.jobs.compose.base.db.datalake_metastore_info import (
+from bietlejuice.jobs.composer.base.db.datalake_metastore_info import (
     DatalakeMetastoreInfo,
 )
 from bietlejuice.jobs.composer.base.db.database_enum import (
