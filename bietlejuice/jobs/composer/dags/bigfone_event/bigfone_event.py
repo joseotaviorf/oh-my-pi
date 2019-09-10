@@ -13,7 +13,7 @@ import airflow.utils.helpers as airflow_helpers
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 # dag params
-DAG_ID = "bietlejuice.bigfone-event"
+DAG_ID = "bietlejuice.bigfone_event"
 MAIN_START_DATE = datetime(2019, 9, 9, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
