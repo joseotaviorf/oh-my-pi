@@ -33,8 +33,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="load_teravoz_into_datalake")
 
     # args passed by Airflow task
-    parser.add_argument("environment", type=str, help="forno/prod values")
     parser.add_argument("execution_date", type=str, help="execution date in str format")
+    parser.add_argument("environment", type=str, help="forno/prod values")
 
     args = parser.parse_args()
 
