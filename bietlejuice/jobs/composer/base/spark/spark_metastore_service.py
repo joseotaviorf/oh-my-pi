@@ -43,6 +43,10 @@ class SparkMetastoreService:
     @logger
     def drop_table(self, table_name):
         self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
+    
+    @logger
+    def refresh_table(self, table_name):
+        self.spark_sql_client.run("refresh table {}.{}".format(self.db, table_name))
 
     @logger(exclude="df")
     def merge_schemas(self, table_name, file_format, partition_by_list, df):
