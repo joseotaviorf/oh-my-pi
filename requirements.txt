@@ -72,6 +72,6 @@ win-inet-pton==1.0.1
 xlrd # lib to process xls files in s3 - old_etl
 xmltodict==0.10.2
 snakebite==2.11.0
-rtbhouse-sdk==3.3.5
+git+git://github.com/LucasMMota/rtbhouse-python-sdk.git@quintoandar-4.0.1
 sshtunnel==0.1.4
 twitter-ads==5.1.1
