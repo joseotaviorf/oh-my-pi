@@ -60,7 +60,7 @@ house_status_and_dimensions as (
 	join dim_region dr on dr.sk_region = hsd.sk_region
 	join dim_house_listing dhl on hsd.sk_house = dhl.sk_house_listing
 	left join fact_house_listings_unique fhlu on fhlu.sk_house_listing = dhl.sk_house_listing
-	left join dim_partner dp on dp.sk_partner = fhlu .sk_partner
+	left join dim_partner dp on dp.sk_partner = fhlu.sk_partner
 ),
 ongoing_listings_wk_snapshot as (
 	-- returns for each week and dimension the sunday count/snapshot of publicated listings
@@ -195,4 +195,3 @@ results as (
 	order by 5, 6, 1, 2, 3, 4, 7, 8, 9, 10
 )
 select * from results
-;
