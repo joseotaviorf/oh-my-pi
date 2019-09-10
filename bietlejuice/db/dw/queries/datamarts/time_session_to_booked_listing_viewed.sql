@@ -80,9 +80,9 @@ user_session_mapping as (
 	session_id,
 	id_house,
 	min(event_ts) over(partition by amplitude_id, session_id) as ts_session_start,
-	min(case when et='listing_page_viewed' then event_ts end) over(partition by amplitude_id, session_id, id_house) as ts_first_lpv_session,
-	min(case when et='visit_schedule_confirmed' then event_ts end) over(partition by amplitude_id, id_house) as ts_visit_schedule_confirmed,
-	min(case when et='search_results_page_viewed' then event_ts end) over(partition by amplitude_id, session_id) as ts_first_search_session
+	min(case when event_type='listing_page_viewed' then event_ts end) over(partition by amplitude_id, session_id, id_house) as ts_first_lpv_session,
+	min(case when event_type='visit_schedule_confirmed' then event_ts end) over(partition by amplitude_id, id_house) as ts_visit_schedule_confirmed,
+	min(case when event_type='search_results_page_viewed' then event_ts end) over(partition by amplitude_id, session_id) as ts_first_search_session
 	from user_session_events use
 ),
 house_conversion_sessions as (
