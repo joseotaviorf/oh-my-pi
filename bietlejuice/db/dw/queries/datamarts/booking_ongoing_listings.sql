@@ -25,7 +25,7 @@ house_status_per_day as (
 		dd.week_start
 	from house_status hsp
 	join dim_date dd on dd.sk_date between hsp.sk_min_status_date and sk_max_status_date
-	where dd.date > date('2019-09-01')
+	where dd.date > date('2018-01-01')
 ),
 fact_house_listings_unique as (
 	select sk_house_listing, sk_partner from 
