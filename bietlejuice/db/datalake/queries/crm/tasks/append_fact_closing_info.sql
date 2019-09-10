@@ -27,20 +27,12 @@ contract_proposal_house_listing as (
     cast(sk_proposal as bigint) as sk_proposal,
     cast(sk_contract as bigint) as sk_contract,
     cast(sk_owner as bigint) as sk_house_owner,
-    case
-        when sk_contract != '-1'
-            then cast(sk_client as bigint)
-        else -1::bigint
-    end as sk_tenant,
-    case
-        when sk_proposal != '-1'
-            then cast(sk_client as bigint)
-        else -1::bigint
-    end as sk_proponent,
+    cast(coalesce(if(sk_contract != '-1',sk_client),'-1') as bigint) as sk_tenant,
+    cast(coalesce(if(sk_proposal != '-1',sk_client),'-1') as bigint) as sk_proponent
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
     or sk_proposal != '-1'
-  group by 1, 2, 3, 4, 5
+  group by 1, 2, 3, 4, 5, 6
 )
 select distinct
   pc.sk_task,
