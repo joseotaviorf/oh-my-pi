@@ -22,6 +22,7 @@ create table if not exists staging.fact_closing_tasks (
   sk_house_listing bigint,
   sk_house_owner bigint,
   sk_tenant bigint,
+  sk_proponent bigint,
   dt_partition date
 )
 ;
