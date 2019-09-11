@@ -24,8 +24,8 @@ CARTO_CREDENTIALS = json.loads(env.get_airflow_env_var('CARTO_CREDENTIALS'))
 carto_api = CartoApi(CARTO_CREDENTIALS)
 
 
-def load_data_and_upload_to_carto(queries_dir, sql_filename, carto_table_name, db, final_sql, **kwargs):
-    file_name = '{}/{}/{}.sql'.format(queries_dir, CARTO_PATH, sql_filename)
+def load_data_and_upload_to_carto(query_dir, sql_filename, carto_table_name, db, final_sql, **kwargs):
+    file_name = '{}/{}/{}.sql'.format(query_dir, CARTO_PATH, sql_filename)
     logger.info('m=load_data_and_upload_to_carto, file={}, msg=reading data'.format(file_name))
     query = BaseETL.get_query_from_file_name(file_name)
 
@@ -72,28 +72,28 @@ dag = DAG(
     catchup=False
 )
 
-# operators
-operators = [
-    {'queries_dir': DW_QUERIES_DIR, 'db': 'dw'},
-    {'queries_dir': DATALAKE_QUERIES_DIR, 'db': 'athena'}
+# query_directories
+query_directories = [
+    {'query_dir': DW_QUERIES_DIR, 'db': 'dw'},
+    {'query_dir': DATALAKE_QUERIES_DIR, 'db': 'athena'}
 ]
 
 tasks = []
 
-for operator in operators:
+for dir in query_directories:
     '''
-    Gets all config files from queries_dir/carto/
+    Gets all config files from query_dir/carto/
     '''
-    for file_name in os.listdir('{}/{}'.format(operator['queries_dir'], CARTO_PATH)):
+    for file_name in os.listdir('{}/{}'.format(dir['query_dir'], CARTO_PATH)):
         file_name_split = file_name.split('.')
         table_name = file_name_split[0]
-        file_path = '{}/{}/{}'.format(operator['queries_dir'], CARTO_PATH, file_name)
+        file_path = '{}/{}/{}'.format(dir['query_dir'], CARTO_PATH, file_name)
         if file_name.endswith(('.yml', 'yaml')):
             with open(file_path, 'r') as stream:
                 config = yaml.safe_load(stream)
                 task_dict = {
-                    'queries_dir': operator['queries_dir'],
-                    'db': operator['db'],
+                    'query_dir': dir['query_dir'],
+                    'db': dir['db'],
                     'sql_filename': config['sql_filename'],
                     'carto_table_name': config['carto_table_name'],
                     'final_sql': config['final_sql'],
