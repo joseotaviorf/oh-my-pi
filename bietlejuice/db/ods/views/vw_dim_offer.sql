@@ -49,16 +49,6 @@ old_pre_proposal as (
       last_rent_value_tenant as last_rent_offered_by_tenant,
       last_rent_value_landlord as last_rent_offered_by_owner,
       p.rejection_reason,
-      p.animais_condition,
-      p.quando_vai_mudar_condition,
-      p.quem_vai_morar_condition,
-      p.special_conditions_count,
-      p.remove_conditions,
-      p.include_conditions,
-      p.maintenance_or_repair_conditions,
-      p.replace_or_modify_conditions,
-      null::integer as price_conditions,
-      p.other_conditions,
       'Other'::varchar as type
     from
       pre_proposal p
@@ -89,16 +79,6 @@ new_offer as (
       last_rent_offered_by_tenant,
       last_rent_offered_by_owner,
       rejection_reason,
-      0 as animais_condition,
-      0 as quando_vai_mudar_condition,
-      0 as quem_vai_morar_condition,
-      count(topic_type) over w as special_conditions_count,
-	    max((topic_type = 'Remove')::integer) over w as remove_conditions,
-      max((topic_type = 'Add')::integer) over w as include_conditions,
-	    max((topic_type = 'RepairMaintenance')::integer) over w as maintenance_or_repair_conditions,
-	    max((topic_type = 'ModifyReplace')::integer) over w as replace_or_modify_conditions,
-	    max((topic_type = 'Price')::integer) over w as price_conditions,
-	    max((topic_type not in ('Add', 'Remove', 'RepairMaintenance', 'ModifyReplace', 'Price'))::integer) over w as other_conditions,
 	    type
    from offer
    window w as (partition by id)

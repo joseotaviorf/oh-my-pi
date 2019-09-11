@@ -22,16 +22,6 @@ create table staging.dim_offer (
   last_rent_offered_by_tenant decimal(18,4),
   last_rent_offered_by_owner decimal(18,4),
   rejection_reason varchar(255),
-  animais_condition integer,
-  quando_vai_mudar_condition integer,
-  quem_vai_morar_condition integer,
-  special_conditions_count integer,
-  remove_conditions integer,
-  include_conditions integer,
-  maintenance_or_repair_conditions integer,
-  replace_or_modify_conditions integer,
-  price_conditions integer,
-  other_conditions integer,
   type varchar(255)
 )
 ;
