@@ -30,7 +30,7 @@ spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description="load_bigfone_event_into_datalake")
+    parser = ArgumentParser(description="load_event_table_into_datalake_raw")
 
     # args passed by Airflow task
     parser.add_argument("execution_date", type=str, help="execution date in str format")
