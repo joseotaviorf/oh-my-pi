@@ -1,4 +1,7 @@
 ---
 carto_table_name: qa_bookings
 sql_filename: qa_bookings
-final_sql: UPDATE qa_bookings SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326) WHERE the_geom IS NULL
+final_sql: >-
+  UPDATE qa_bookings
+  SET the_geom = ST_SetSRID(ST_MakePoint(house_lng::float, house_lat::float), 4326)
+  WHERE the_geom IS NULL

@@ -1,4 +1,7 @@
 ---
 carto_table_name: iptu_apartment_owners_doorman
 sql_filename: iptu_apartment_owners_doorman
-final_sql: UPDATE iptu_apartment_owners_doorman SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326) WHERE the_geom IS NULL
+final_sql: >-
+  UPDATE iptu_apartment_owners_doorman
+  SET the_geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326)
+  WHERE the_geom IS NULL
