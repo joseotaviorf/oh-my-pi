@@ -22,7 +22,6 @@ CREATE TABLE public.dim_date (
   year_calendar_week VARCHAR(10),
   weekend VARCHAR(10),
   is_brz_holiday VARCHAR(10),
-  working_day_month INTEGER,
   brz_season VARCHAR(10),
   week_start DATE,
   week_end DATE,
@@ -57,6 +56,13 @@ SELECT
     EXTRACT(dow FROM sk_date) as Week_Day,
 	to_char(sk_date, 'Day') AS Weekday_Name,
 	EXTRACT(week FROM sk_date) AS Calendar_Week,
+	-- weekdays in a month
+    SUM(CASE WHEN
+    	((CASE WHEN EXTRACT(dow FROM date) IN (6, 0) THEN 'Weekend' ELSE 'Weekday' END) = 'Weekend' OR
+    	(CASE WHEN to_char(date, 'MMDD') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') THEN 'Holiday' ELSE 'No holiday' END) = 'Holiday')
+    THEN 0 ELSE 1 END) OVER(PARTITION BY date_trunc('month',date) ORDER BY EXTRACT(DAY FROM date) rows unbounded preceding) AS working_days_in_month,
+	-- Some periods of the year, adjust for your organisation and country
+    max(working_days_in_month) over (partition by year, month) as total_working_days_in_month,
 	to_char(sk_date, 'dd/mm/yyyy') AS Brz_Date,
     to_char(sk_date, 'mm/dd/yyyy') AS Usa_Date,
     to_char(sk_date, 'yyyy/mm/dd') AS Universal_Date,
@@ -70,13 +76,6 @@ SELECT
       CASE WHEN to_char(sk_date, 'MMDD') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225')
       THEN 'Holiday' ELSE 'No holiday' END
       AS Is_Brz_Holiday,
-    -- weekdays in a month
-    SUM(CASE WHEN
-    	((CASE WHEN EXTRACT(dow FROM date) IN (6, 0) THEN 'Weekend' ELSE 'Weekday' END) = 'Weekend' OR
-    	(CASE WHEN to_char(date, 'MMDD') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') THEN 'Holiday' ELSE 'No holiday' END) = 'Holiday')
-    THEN 0 ELSE 1 END) OVER(PARTITION BY date_trunc('month',date) ORDER BY EXTRACT(DAY FROM date) rows unbounded preceding) AS working_days_in_month,
-	-- Some periods of the year, adjust for your organisation and country
-    max(working_days_in_month) over (partition by year, month) as total_working_days_in_month,
     CASE
     	WHEN to_char(sk_date, 'MMDD') BETWEEN '0320' AND '0619' THEN 'Autumn'
         WHEN to_char(sk_date, 'MMDD') BETWEEN '0620' AND '0921' THEN 'Winter'
