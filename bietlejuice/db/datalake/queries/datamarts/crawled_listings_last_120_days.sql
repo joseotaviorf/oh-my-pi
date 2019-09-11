@@ -16,7 +16,7 @@ crawled_listings_first_time AS (
         updated_on,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
       FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')  -- ignore olx
         AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
         AND (advertiser_name is null or advertiser_name != 'quintoandar')
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
@@ -65,7 +65,7 @@ crawled_listings AS (
         photos,
         ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) DESC) AS row
       FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
+      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')  -- ignore olx
         AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
         AND (advertiser_name is null or advertiser_name != 'quintoandar')  -- ignore our own listings on other sites
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
