@@ -18,8 +18,6 @@ crawled_listings_first_time AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
-        AND COALESCE(lat, '') != ''
-        AND COALESCE(lng, '') != ''
         AND (advertiser_name is null or advertiser_name != 'quintoandar')
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as tmp
@@ -69,8 +67,6 @@ crawled_listings AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')
         AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
-        AND COALESCE(lat, '') != ''
-        AND COALESCE(lng, '') != ''
         AND (advertiser_name is null or advertiser_name != 'quintoandar')  -- ignore our own listings on other sites
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as listings
