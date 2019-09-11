@@ -50,7 +50,7 @@ select distinct
   ad._date as analysis_date,
   eo.criadoem,
   eo.firestoreid,
-  eo.godfatherid,
+  coalesce(eo.godfatherid, try_cast(go_firestore.id as bigint)) as godfatherid,
   eo.originalcondo,
   eo.originalhomeinsurance,
   eo.originaliptu,

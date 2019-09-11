@@ -44,7 +44,6 @@ create external table datalake_clean.ods_fact_listing_rent_flows (
   flg_visit_created_from_app string,
   visit_created_type string,
   flg_visit_last_updated_from_app string,
-  visit_last_updated_type string,
   sk_rent_flow_taxonomy string,
   booking_utm_campaign string,
   booking_utm_content string,
