@@ -2,7 +2,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.etl.elasticsearch import ESLogsFetcher
 
-logger = QuintoAndarLogger('SkynetModelLogsFetcher')
+logger = QuintoAndarLogger('CasioLogsFetcher')
 
 
 class CasioLogsFetcher(ESLogsFetcher):
@@ -11,9 +11,9 @@ class CasioLogsFetcher(ESLogsFetcher):
     DOC_TYPE = 'flb_type'
 
     @logger
-    def __init__(self, es_logs__hostname):
+    def __init__(self, es_logs__hostname, model_logger_name):
         super(CasioLogsFetcher, self).__init__(es_logs__hostname)
-        self.model_logger_name = "casio"
+        self.model_logger_name = model_logger_name
 
     @logger
     def build_query(self, message_level):

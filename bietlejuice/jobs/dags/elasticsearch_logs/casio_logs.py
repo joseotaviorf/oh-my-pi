@@ -14,9 +14,11 @@ MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
 config = {
-    'es_extractor': CasioLogsFetcher(es_logs__hostname=os.getenv('ES_LOGS__HOSTNAME')),
+    'es_extractor': CasioLogsFetcher(
+        es_logs__hostname=os.getenv('ES_LOGS__HOSTNAME'), model_logger_name='CasioModel'
+    ),
     'APP_NAME': 'casio',
-    'MODEL_NAME': 'casio',
+    'MODEL_NAME': 'CasioModel',
 }
 
 dag = DAG(
