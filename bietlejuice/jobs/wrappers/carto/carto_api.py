@@ -14,12 +14,10 @@ class CartoApi(object):
         self.CARTO_CREDENTIALS = credentials_json
         self.CARTO_API_KEY = self.CARTO_CREDENTIALS['api_key']
         self.BASE_URL = self.CARTO_CREDENTIALS['base_url']
-        self.BASE_URL_SQL = self.BASE_URL + 'sql'
-        self.BASE_URL_COPY = self.BASE_URL + 'sql/copyfrom'
 
     def run_sql(self, sql, data_format='JSON'):
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}&format={}'.format(self.BASE_URL_SQL, url_params_encoded, self.CARTO_API_KEY, data_format)
+        url = '{}?q={}&api_key={}&format={}'.format(self.BASE_URL + 'sql', url_params_encoded, self.CARTO_API_KEY, data_format)
         logger.info('m=run_sql, msg=running SQL on CARTO, sql={}'.format(sql))
         try:
             response = requests.get(url)
@@ -40,7 +38,7 @@ class CartoApi(object):
             f_out.writelines(f_in)
         sql = 'COPY {} ({}) FROM stdin WITH (FORMAT csv, HEADER true)'.format(table_name, cols)
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}'.format(self.BASE_URL_COPY, url_params_encoded, self.CARTO_API_KEY)
+        url = '{}?q={}&api_key={}'.format(self.BASE_URL + 'sql/copyfrom', url_params_encoded, self.CARTO_API_KEY)
         headers = {
             'Content-Encoding': 'gzip',
             'Content-Type': 'application/octet-stream'
