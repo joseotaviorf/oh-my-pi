@@ -2,12 +2,12 @@ import logging
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.etl.elasticsearch import ESLogsFetcher, SkynetModelLogsFetcher
+from bietlejuice.jobs.etl.elasticsearch import SkynetModelLogsFetcher
 
 logger = QuintoAndarLogger('skynet_logs_to_s3')
 
 
-def ml_logs_to_s3(es_extractor: ESLogsFetcher = None, **kwargs):
+def ml_logs_to_s3(es_extractor=None, **kwargs):
     # required arguments
     app_name = kwargs.get('APP_NAME', "skynet")
     model_name = kwargs['MODEL_NAME']
