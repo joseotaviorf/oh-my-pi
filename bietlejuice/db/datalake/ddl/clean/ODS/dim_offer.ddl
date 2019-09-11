@@ -15,7 +15,6 @@ create external table if not exists datalake_clean.ods_dim_offer (
   dt_updated string,
   dt_string string,
   offer_submitted string,
-  ultimo_update_edicao string,
   dt_first_sent string,
   last_updated_date string,
   expiration_date string,

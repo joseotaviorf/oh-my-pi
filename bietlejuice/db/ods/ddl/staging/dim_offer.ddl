@@ -15,7 +15,6 @@ create table staging.dim_offer (
   dt_updated timestamp,
   dt_timestamp timestamp without time zone,
   offer_submitted boolean,
-  ultimo_update_edicao integer,
   dt_first_sent timestamp,
   last_updated_date timestamp,
   expiration_date timestamp,
