@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 DATABRICKS_SCOPE = "quintoandar"
 
-JOB_NAME = "load_teravoz_into_datalake_raw"
+JOB_NAME = "load_event_table_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
