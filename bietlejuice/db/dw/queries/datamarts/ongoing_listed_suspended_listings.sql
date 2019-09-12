@@ -10,6 +10,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
+    status_change_reason,
    	sk_house_listing
 from(
 select
