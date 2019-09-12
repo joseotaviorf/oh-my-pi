@@ -77,7 +77,7 @@ dag = DAG(
     start_date=datetime(2018, 2, 6, 0, 0, 0),
     schedule_interval='0 3 * * *',
     max_active_runs=3,
-    catchup=False
+    catchup=True
 )
 
 load_events_to_raw_task = BaseDAG.build_python_operator(
