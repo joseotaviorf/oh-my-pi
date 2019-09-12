@@ -360,7 +360,7 @@ class BaseETL(object):
         s3.meta.client.copy(copy_source, bucket_destination, full_filename_dest)
 
     @classmethod
-    def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
+    def get_table_ddl_query_from_dataframe(cls, df, table_name):
         df_columns = []
         # list with all column names and max length
         for column in df:
@@ -381,11 +381,17 @@ class BaseETL(object):
                 length_text = '({})'.format(max_length)
             else:
                 length_text = ''
-            column_text = ' {} varchar{}'.format(column['name'], length_text)
+            column_text = ' "{}" varchar{}'.format(column['name'], length_text)
             df_columns_text.append(column_text)
         df_columns_text = ', '.join(df_columns_text)
+        statement = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(table_name, df_columns_text)
+        return statement
+
+    @classmethod
+    def create_table_from_dataframe(cls, df, table_name, enum_db, encoding='LATIN1', commit=True):
+        statement = BaseETL.get_table_ddl_query_from_dataframe(df, table_name)
         BaseETL.execute_command(
-            command='create table {} ({})'.format(table_name, df_columns_text),
+            command=statement,
             db_enum=enum_db,
             encoding=encoding,
             commit=commit
