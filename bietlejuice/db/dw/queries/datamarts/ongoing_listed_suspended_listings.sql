@@ -10,7 +10,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
-    status_change_reason,
+    case when status_history = 'publicado' then null	else status_change_reason end,
    	sk_house_listing
 from(
 select
