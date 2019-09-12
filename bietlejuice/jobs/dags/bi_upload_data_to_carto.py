@@ -10,7 +10,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.new_base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 
-from bietlejuice.jobs.wrappers.carto.carto_api import CartoApi
+from bietlejuice.jobs.wrappers.carto import CartoApi
 
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
