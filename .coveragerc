@@ -10,3 +10,6 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
     super
+
+[run]
+omit = bietlejuice/jobs/composer/dags/*

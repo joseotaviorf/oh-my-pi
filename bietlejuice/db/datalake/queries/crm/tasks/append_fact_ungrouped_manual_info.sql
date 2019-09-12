@@ -58,11 +58,13 @@ select distinct
   c.task_user_type as task_action_type,
   c.task_user_resolve_hours,
   coalesce(chl_rent_flow.sk_contract, c.sk_contract, -1) as sk_contract,
-  coalesce(chl_rent_flow.sk_house_listing, -1) as sk_house_listing,
-  coalesce(chl_rent_flow.sk_house_owner, -1) as sk_house_owner,
-  coalesce(chl_rent_flow.sk_tenant, -1) as sk_tenant,
+  coalesce(chl_rent_flow.sk_house_listing, chl_contract.sk_house_listing, -1) as sk_house_listing,
+  coalesce(chl_rent_flow.sk_house_owner, chl_contract.sk_house_owner, -1) as sk_house_owner,
+  coalesce(chl_rent_flow.sk_tenant, chl_contract.sk_tenant, -1) as sk_tenant,
   c.dt_partition
 from contracts c
 left join contract_house_listing chl_rent_flow
     on c.sk_rent_flow = chl_rent_flow.sk_rent_flow
-    and c.sk_contract is null
+left join contract_house_listing chl_contract
+    on c.sk_contract = chl_contract.sk_contract
+;

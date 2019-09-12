@@ -38,8 +38,7 @@ s_cube as (
 		-- Due to limitations in Google API we need to remove excess data for each type of medium
 		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium = 'Display' then NULL
 			else utm_term end as utm_term,
-		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium <> 'Display' then NULL
-			else utm_content end as utm_content,
+		utm_content,
 		sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
 		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
 		sum(coalesce(total_{2}_leads, 0)) as total_{2}_leads,
