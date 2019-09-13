@@ -45,7 +45,7 @@ select distinct
   c.ts_task_user_end as ts_task_action_end,
   c.task_user_type as task_action_type,
   c.task_user_resolve_hours,
-  coalesce(chl_contract.sk_contract, chl_rent_flow.sk_contract, -1) as sk_contract,
+  coalesce(chl_contract.sk_contract, -1) as sk_contract,
   coalesce(chl_contract.sk_house_listing, chl_rent_flow.sk_house_listing, -1) as sk_house_listing,
   coalesce(chl_contract.sk_house_owner, chl_rent_flow.sk_house_owner, -1) as sk_house_owner,
   coalesce(chl_contract.sk_tenant, chl_rent_flow.sk_tenant, -1) as sk_tenant,
