@@ -8,9 +8,7 @@ logger = QuintoAndarLogger('skynet_logs_to_s3')
 
 
 @logger
-def ml_logs_to_s3(model_name, app_name=None, es_extractor=None, **kwargs):
-    if app_name is None:
-        app_name = "skynet"
+def ml_logs_to_s3(model_name, app_name="skynet", es_extractor=None, **kwargs):
     if es_extractor is None:
         es_logs__hostname = kwargs['ES_LOGS__HOSTNAME']
         es_extractor = SkynetModelLogsFetcher(
