@@ -15,6 +15,20 @@ class TestDataframeService:
             (["Abc abc"], ["_abc_abc"]),
             (["abc.abc"], ["abc_abc"]),
             (["Abc.abc abc"], ["_abc_abc_abc"]),
+            (
+                [
+                    "search_rank.resultsOrigin",
+                    "search_rank.resultsorigin",
+                    "search_rank.searchMode",
+                    "search_rank.searchmode",
+                ],
+                [
+                    "search_rank_results_origin",
+                    "search_rank_resultsorigin",
+                    "search_rank_search_mode",
+                    "search_rank_searchmode",
+                ],
+            ),
         ],
     )
     def test_format_column_names(
