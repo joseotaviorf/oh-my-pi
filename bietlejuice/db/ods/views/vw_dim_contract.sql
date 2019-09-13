@@ -65,6 +65,7 @@ select
   c.home_insurance_installments,
   c.home_insurance_value,
   c.first_rental_commission,
+  c.tax_adm,
   c.condo,
   c.iptu,
   c.signature_type,
