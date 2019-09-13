@@ -20,6 +20,7 @@ select
   c.seguroResidencial_parcelas as home_insurance_installments,
   c.seguroResidencial_valor as home_insurance_value,
   c.taxacomissaoprimeiroaluguel as first_rental_commission,
+  cf.taxaAdministracaoMensal as taxa_adm,
   c.valorCondominio as condo,
   c.iptu_valor as iptu,
   c.tipoAssinatura as signature_type,
@@ -91,5 +92,7 @@ left join (
     on max_cancellations.max_rev = ure.id
 ) c_reasons
   on c_reasons.id = c.id
+left join ContratoFull cf
+    on cf.id = c.id
 where date(coalesce(c.criadoEm, '1900-01-01 00:00:00')) <= date('{}')
 ;
