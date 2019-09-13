@@ -17,8 +17,8 @@ config = {
     'es_extractor': CasioLogsFetcher(
         es_logs__hostname=os.getenv('ES_LOGS__HOSTNAME'), model_logger_name='CasioModel'
     ),
-    'APP_NAME': 'casio',
-    'MODEL_NAME': 'CasioModel',
+    'app_name': 'casio',
+    'model_name': 'CasioModel',
 }
 
 dag = DAG(

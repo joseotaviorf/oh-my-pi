@@ -14,7 +14,7 @@ env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
 config = {
     'ES_LOGS__HOSTNAME': os.getenv('ES_LOGS__HOSTNAME'),
-    'MODEL_NAME': 'OfferPredictor',
+    'model_name': 'OfferPredictor',
 }
 
 dag = DAG(
