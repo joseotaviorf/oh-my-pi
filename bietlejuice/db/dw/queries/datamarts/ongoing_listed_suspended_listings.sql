@@ -10,7 +10,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
-    case when status_history = 'suspenso' then status_change_reason	else null end,
+    case when status_history = 'suspenso' then status_change_reason	else null end as status_change_reason,
    	sk_house_listing
 from(
 select
