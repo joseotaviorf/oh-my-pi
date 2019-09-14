@@ -8,7 +8,7 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
-from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR, DatalakeMetastoreInfo
+from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR, DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_event_table_into_datalake_raw, execution_date={}, environment={}, msg=print args spark jobs params".format(
-            args.execution_date, args.environment
+        "m={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            JOB_NAME, args.execution_date, args.environment
         )
     )
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     consumer = PostgreSQLConsumer(connection)
     event_table_data = consumer.get_data_from_query(query_file.format(**partitions))
 
-    datalake_info = DatalakeMetastoreInfo().get_db_info("forno", "bigfone")
+    datalake_info = DatalakeMetastoreService().get_db_info(environment, "bigfone")
 
     # get spark client
     spark_sql_client = SparkSQLCLient(spark, sqlContext)

@@ -1,7 +1,7 @@
 from bietlejuice.jobs.composer.base.airflow import Environment
 
 
-class DatalakeMetastoreInfo:
+class DatalakeMetastoreService:
     @staticmethod
     def get_db_info(env, source):
         if not Environment.is_valid_environment(env):
