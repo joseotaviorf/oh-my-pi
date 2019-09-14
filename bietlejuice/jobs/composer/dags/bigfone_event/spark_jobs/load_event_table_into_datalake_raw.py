@@ -47,13 +47,17 @@ if __name__ == "__main__":
     table_name = "events"
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-    partitions = OrderedDict(
+    query_filter = OrderedDict(
         [
             ("year", int(dt_execution.year)),
             ("month", int(dt_execution.month)),
             ("day", int(dt_execution.day)),
         ]
     )
+
+    # creation date and event type partitions
+    list_partitions = list(query_filter.keys())
+    list_partitions.append("type")
 
     # get query to create event table
     query = FileService().get_destination_datalake_query(SOURCE, "raw", table_name)
@@ -67,7 +71,7 @@ if __name__ == "__main__":
     # establish connection and get data from Event table
     connection = json.loads(json_connection)
     consumer = PostgreSQLConsumer(connection)
-    event_table_data = consumer.get_data_from_query(query.format(**partitions))
+    event_table_data = consumer.get_data_from_query(query.format(**query_filter))
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
@@ -83,14 +87,12 @@ if __name__ == "__main__":
     )
     loader.overwrite_partition(
         df=event_table_data,
-        partition_by_list=list(partitions.keys()),
+        partition_by_list=list_partitions,
         table_name=table_name,
         schema_merging=True,
     )
 
     # create partition into spark table
     spark_service.create_new_partitions_from_df(
-        table_name=table_name,
-        df=event_table_data,
-        partition_by_list=list(partitions.keys()),
+        table_name=table_name, df=event_table_data, partition_by_list=list_partitions
     )
