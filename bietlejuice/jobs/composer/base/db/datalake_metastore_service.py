@@ -9,12 +9,12 @@ class DatalakeMetastoreService:
                 "m=__init__, msg=environment %s invalid. Environments allowed are: %s"
                 % (env, ", ".join(Environment.get_valid_environments()))
             )
-        else:
-            return {
-                "db_raw_databricks": "datalake_{}_raw".format(source),
-                "db_raw_athena": "datalake_{}_raw_{}".format(source, env),
-                "db_raw_path": "s3://5a-datalake-{}/raw/{}/".format(env, source),
-                "db_clean_databricks": "datalake_{}_clean".format(source),
-                "db_clean_athena": "datalake_{}_clean_{}".format(source, env),
-                "db_clean_path": "s3://5a-datalake-{}/clean/{}/".format(env, source),
-            }
+
+        return {
+            "db_raw_databricks": "datalake_{}_raw".format(source),
+            "db_raw_athena": "datalake_{}_raw_{}".format(source, env),
+            "db_raw_path": "s3://5a-datalake-{}/raw/{}/".format(env, source),
+            "db_clean_databricks": "datalake_{}_clean".format(source),
+            "db_clean_athena": "datalake_{}_clean_{}".format(source, env),
+            "db_clean_path": "s3://5a-datalake-{}/clean/{}/".format(env, source),
+        }
