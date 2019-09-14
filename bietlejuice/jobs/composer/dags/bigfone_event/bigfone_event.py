@@ -1,4 +1,5 @@
 from datetime import datetime
+import pendulum
 
 from airflow.models import DAG
 from airflow.models import Variable
@@ -14,8 +15,10 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 # dag params
 DAG_ID = "bietlejuice.bigfone_event"
-MAIN_START_DATE = datetime(2019, 9, 9, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2019, 9, 9, 0, 0, 0, tz_info=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+
 
 ENV = Variable.get("environment")
 
