@@ -1,5 +1,4 @@
 import json
-import logging
 from argparse import ArgumentParser
 
 from collections import OrderedDict
@@ -8,25 +7,24 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
-from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    BaseSparkContext,
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
+    SOURCE,
+    DATABRICKS_SCOPE,
+    base_dbutils,
+    spark_sql_client,
+)
 
-
-DATABRICKS_SCOPE = "quintoandar"
 
 JOB_NAME = "load_event_table_into_datalake_raw"
-
-logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 if __name__ == "__main__":
 
@@ -46,7 +44,7 @@ if __name__ == "__main__":
 
     execution_date = args.execution_date
     environment = args.environment
-    table_name = "event"
+    table_name = "events"
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     partitions = OrderedDict(
@@ -57,29 +55,22 @@ if __name__ == "__main__":
         ]
     )
 
-    query_path = DATALAKE_SQL_DIR + "/queries/raw/bigfone/{}.sql".format(table_name)
-
-    with open(query_path, "r") as f:
-        query_file = f.read()
-
-    # start Spark Session
-    base_dbutils = BaseDBUtils()
+    # get query to create event table
+    query = FileService().get_destination_datalake_query(SOURCE, "raw", table_name)
 
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
     # get BigFone credentials stored in Databricks secrets
-    json_connection = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="bigfone")
+    json_connection = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=SOURCE)
 
     # establish connection and get data from Event table
     connection = json.loads(json_connection)
     consumer = PostgreSQLConsumer(connection)
-    event_table_data = consumer.get_data_from_query(query_file.format(**partitions))
+    event_table_data = consumer.get_data_from_query(query.format(**partitions))
 
-    datalake_info = DatalakeMetastoreService().get_db_info(environment, "bigfone")
+    datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
-    # get spark client
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
     spark_service = SparkMetastoreService(
         datalake_info["db_raw_databricks"],
         datalake_info["db_raw_path"],
