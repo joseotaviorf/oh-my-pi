@@ -1,5 +1,6 @@
 select
     *,
+    type as event,
     extract(year from event_timestamp)::int as year,
     extract(month from event_timestamp)::int as month,
     extract(day from event_timestamp)::int as day

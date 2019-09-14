@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     # creation date and event type partitions
     list_partitions = list(query_filter.keys())
-    list_partitions.append("type")
+    list_partitions.append("event")
 
     # get query to create event table
     query = FileService().get_destination_datalake_query(SOURCE, "raw", table_name)
