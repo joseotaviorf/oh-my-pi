@@ -74,19 +74,6 @@ vb as (
 ),
 lpv_events as (
     with amplitude as (
-        select
-            case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-                 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-                 else null end as id_house,
-            to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
-            regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
-            uuid
-        from datalake_clean.amplitude_events evt
-        where et = 'listing_page_viewed'
-            and ym >= '2018-01' and ym <= '2018-12'
-            and app = '170698'
-    union
-    -- enriching with amplitude data via SPARK
         SELECT
             case when nullif(regexp_substr(event_house_id::varchar, '^\\d{9}$'), '') is not null
                  then regexp_substr(event_house_id::varchar, '^\\d{9}$')::bigint
@@ -96,7 +83,6 @@ lpv_events as (
             uuid
         FROM datalake_amplitude_clean_prod.listing_page_viewed_events
         WHERE app = 170698
-            AND year >= 2019
     )
     select
         id_house,

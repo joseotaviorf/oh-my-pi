@@ -71,7 +71,6 @@ user_session_events as (
        FROM datalake_amplitude_clean_prod.events
        WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
         AND app = 170698
-        AND year >= 2019
 ),
 user_session_mapping as (
 	-- returns min event timestamps for different partitions like user, session and house id
