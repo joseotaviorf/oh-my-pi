@@ -27,8 +27,7 @@ with all_events as (
         'QuintoAndar' as region,
         'QuintoAndar' as city
       from datalake_amplitude_clean_prod.landing_page_viewed_events
-      where year >= 2019
-        and app = 183047
+      where app = 183047
         and event_ub_page_variant in ('bv','cj','co')
         and event_ub_page_name = 'Proprietário'
         and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2018-05-07' as date)

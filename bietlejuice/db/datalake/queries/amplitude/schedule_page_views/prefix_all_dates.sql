@@ -51,8 +51,7 @@ with all_events as (
         else -1
         end as house_id
       from datalake_amplitude_clean_prod.events
-      where year >= 2019
-            and event_type = 'schedule_page_viewed'
+      where event_type = 'schedule_page_viewed'
             and app = 170698
             and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date)
             and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast(now() as date)

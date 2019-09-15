@@ -48,8 +48,7 @@ with cross_platform as (
 	 		else coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '')
 	 	end as media_source
 	  from datalake_amplitude_clean_prod.events
-	  where year >= 2019
-	  and event_type = 'visit_schedule_confirmed'
+	  where event_type = 'visit_schedule_confirmed'
 	  and app=170698
 ),
 ios as (

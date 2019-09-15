@@ -41,8 +41,7 @@ with all_events as (
              coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
              true as partial
       from datalake_amplitude_clean_prod.events
-      where year >= 2019
-             and event_type in ('listing_page_viewed',
+      where event_type in ('listing_page_viewed',
                                'search_results_page_viewed',
                                'schedule_page_viewed',
                                'offer_submission_page_viewed',

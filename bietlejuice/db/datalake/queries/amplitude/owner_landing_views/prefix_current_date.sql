@@ -32,8 +32,7 @@ with all_events as (
             'QuintoAndar' as region,
             'QuintoAndar' as city
         from datalake_amplitude_clean_prod.events
-        where year >= 2019
-            and event_type in (
+        where event_type in (
               'landing_page_viewed',
               'Owner_Landing-Views_register_form'
             )

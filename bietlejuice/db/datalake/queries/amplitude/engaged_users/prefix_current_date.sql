@@ -65,8 +65,7 @@ with all_events as (
             else -1
             end as house_id
         from datalake_amplitude_clean_prod.events
-        where year >= 2019
-            and ((app = 170698 and event_type = 'listing_page_viewed' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
+        where ((app = 170698 and event_type = 'listing_page_viewed' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
               or (app = 157033 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
               or (app = 160023 and event_type = 'Listing-Views_listing' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
               or (app = 156118 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))

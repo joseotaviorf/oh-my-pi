@@ -52,8 +52,7 @@ with all_events as (
         else -1
         end as house_id
       from datalake_amplitude_clean_prod.events
-      where year >= 2019
-            and event_type = 'schedule_page_viewed'
+      where event_type = 'schedule_page_viewed'
             and app = 170698
             and extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) = extract(year from (now() - interval '1' month))
 		    and extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) = extract(month from (now() - interval '1' month))
