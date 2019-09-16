@@ -4,12 +4,13 @@ from gzip import GzipFile
 from io import BytesIO
 
 import petl
+from qa_python_utils.default_logger import QuintoAndarLogger
+from rtbhouse_sdk.reports_api import ReportsApiSession
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
-from qa_python_utils.default_logger import QuintoAndarLogger
-from rtbhouse_sdk.reports_api import ReportsApiSession
 
 logger = QuintoAndarLogger('RtbCampaigns')
 
@@ -30,11 +31,15 @@ class RtbCampaigns(Marketing):
     def __make_request(self, client_id, client_secret):
         api = ReportsApiSession(client_id, client_secret)
         advertisers = api.get_advertisers()
-        stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                         self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
+        stats = api.get_rtb_stats(advertisers[0]['hash'],
+                                  self.execution_date.strftime('%Y-%m-%d'),
+                                  self.execution_date.strftime('%Y-%m-%d'),
+                                  ['day', 'deviceType'])
         # dpa values are not included in above request
-        dpa_stats = api.get_dpa_campaign_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                               self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        dpa_stats = api.get_dpa_campaign_stats(advertisers[0]['hash'],
+                                               self.execution_date.strftime('%Y-%m-%d'),
+                                               self.execution_date.strftime('%Y-%m-%d'),
+                                               ['day'])
         for item in dpa_stats:
             item[u'deviceType'] = 'MOBILE'
 
