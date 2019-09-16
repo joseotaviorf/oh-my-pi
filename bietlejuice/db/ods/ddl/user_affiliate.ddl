@@ -4,11 +4,9 @@ create table if not exists user_affiliate (
     indicadoPor_id bigint,
     inicioAtuacao timestamp,
     tipoAfiliado varchar(255),
-    cidadeAtuacao varchar(255),
     ativo boolean,
     atualizadoEm timestamp,
     criadoEm timestamp,
-    numeroCreci varchar(255),
     origin varchar(255),
     affiliateType varchar(255)
 );

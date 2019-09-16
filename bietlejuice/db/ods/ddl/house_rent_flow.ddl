@@ -17,7 +17,6 @@ create table if not exists house_rent_flow (
   visit_created_from_app integer,
   visit_created_type varchar(255),
   visit_last_updated_from_app integer,
-  visit_last_updated_type varchar(255),
   id_rent_flow integer,
   dt_rent_flow_created timestamp,
   id_offer integer,

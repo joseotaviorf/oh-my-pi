@@ -50,7 +50,8 @@ select distinct
   ad._date as analysis_date,
   eo.criadoem,
   eo.firestoreid,
-  eo.godfatherid,
+  -- FIXME: bug in Product attaching the same firestore id to different godfather entries
+  max(coalesce(eo.godfatherid, try_cast(go_firestore.id as bigint))) over (partition by eo.firestoreid) as godfatherid,
   eo.originalcondo,
   eo.originalhomeinsurance,
   eo.originaliptu,

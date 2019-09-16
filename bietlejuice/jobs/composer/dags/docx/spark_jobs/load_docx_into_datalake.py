@@ -6,7 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.consumers import MySQLConsumer
+from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
 JOB_NAME = "load_docx_into_datalake"
@@ -28,11 +28,13 @@ if __name__ == "__main__":
 
     connection_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.DOCX)
     connection = json.loads(connection_json)
-    mysql_consumer = MySQLConsumer(connection)
+    posgresql_consumer = PostgreSQLConsumer(connection)
 
-    tables = mysql_consumer.get_table_names_and_sizes().collect()
+    tables = posgresql_consumer.get_table_names_and_sizes().collect()
     loader = DatabaseIntoDataLakeRawLoader(environment, source)
 
     for table in tables:
         if table.table_name not in BLACK_LIST:
-            loader.load_full_table(consumer=mysql_consumer, table_name=table.table_name)
+            loader.load_full_table(
+                consumer=posgresql_consumer, table_name=table.table_name
+            )
