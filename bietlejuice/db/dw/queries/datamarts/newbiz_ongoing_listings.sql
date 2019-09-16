@@ -85,7 +85,7 @@ newbiz_listings_version AS (
         AND sc.optedoutat IS NULL
         ) newbiz_flg
       ON dhl.id_house = newbiz_flg.house_id
-    WHERE (dhl.sk_house_listing LIKE '%000' AND (dhl.is_last_version = true OR dhl.is_last_version IS NULL))
+    WHERE (dhl.sk_house_listing LIKE '%000' AND DATE(dhl.ts_listing_version_end) >= newbiz_flg.optedinat)
           OR
           (DATE(dhl.ts_publication) <= newbiz_flg.optedinat)
     ) base
@@ -499,6 +499,7 @@ LEFT JOIN contract_created cc
 LEFT JOIN contract_signed cs
   ON nol.date = cs.date
  AND nol.sk_house_listing = cs.sk_house_listing
+WHERE nol.sk_house_listing NOT LIKE '%000'
 ORDER BY nol.date,
 		 nol.sk_house_listing
  ;
