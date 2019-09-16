@@ -1,7 +1,3 @@
--- Define ongoing contracts daily
--- Contracts that signed
--- Contracts of type DealOnly should only be considered in the first month as a ongoing contract
-
 select
   dd.date,
   dr.sk_region,
