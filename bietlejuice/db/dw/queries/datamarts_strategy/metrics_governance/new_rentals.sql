@@ -1,7 +1,3 @@
--- Define new_rentals
--- Rentals that signed contract and didn't ended before start/entrance date
--- Contracts of type DealOnly are considered
-
 select
 	coalesce(dc.dt_start, dc.dt_entrance) as rental_date,
 	date_trunc('week',coalesce(dc.dt_start, dc.dt_entrance)) as rental_week_start,

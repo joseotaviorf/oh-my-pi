@@ -10,36 +10,36 @@ with all_dates as (
                                     dd.year,
     																dd.month,
     																dd.calendar_week,
-    																dd.day order by f.sk_house asc)
+    																dd.day order by f.sk_house_listing  asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
     																		dd.month,
     																		dd.calendar_week,
-    																		dd.day order by f.sk_house desc)
+    																		dd.day order by f.sk_house_listing  desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     dd.year,
-    																dd.calendar_week order by f.sk_house asc)
+    																dd.calendar_week order by f.sk_house_listing  asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
-    																		dd.calendar_week order by f.sk_house desc)
+    																		dd.calendar_week order by f.sk_house_listing  desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     dd.year,
-    																dd.month order by f.sk_house asc)
+    																dd.month order by f.sk_house_listing  asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  dd.year,
-    																		dd.month order by f.sk_house desc)
+    																		dd.month order by f.sk_house_listing  desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    dd.year order by f.sk_house asc)
+                                    dd.year order by f.sk_house_listing  asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  dd.year order by f.sk_house desc)
+    	                                  dd.year order by f.sk_house_listing  desc)
 			- 1 as yearly_count
-	from fact_house_status f
+	from fact_house_listing_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-		  and datediff('day', to_date(f.sk_min_version_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+		  and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
@@ -55,11 +55,11 @@ all_dates_last_month as (
     dd.month as _month,
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
-    count(distinct f.sk_house) as monthly_count
-	from fact_house_status f
+    count(distinct f.sk_house_listing ) as monthly_count
+	from fact_house_listing_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(f.sk_min_version_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
@@ -75,11 +75,11 @@ all_dates_last_year as (
 		dd.year as _year,
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
-    count(distinct f.sk_house) as yearly_count
-  from fact_house_status f
+    count(distinct f.sk_house_listing ) as yearly_count
+  from fact_house_listing_status f
 	join dim_date dd
-		on dd.sk_date between f.sk_min_version_status_date and coalesce(f.sk_max_status_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(f.sk_min_version_status_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region

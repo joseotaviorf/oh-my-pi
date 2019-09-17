@@ -43,8 +43,6 @@ CREATE EXTERNAL TABLE datalake_clean.ods_dim_user (
   `dadosfotografo_ativo` string,
   `dadosvendedor_inicio_contrato` string,
   `dadosafiliado_inicio_atuacao` string,
-  `dadosafiliado_verificado` string,
-  `dadosafiliado_tipo` string,
   `dadosafiliado_cidade_atuacao` string,
   `dadosafiliado_preferencia_pagamento` string,
   `dadosafiliado_numero_creci` string,
