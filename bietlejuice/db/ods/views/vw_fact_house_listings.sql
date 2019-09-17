@@ -61,5 +61,5 @@ left join lead l
 left join partner_agent pa_b2b_online
   on pa_b2b_online.user_id = l.usuario_que_indicou_id
 left join vw_stranded_house_listings st
-  on hl.id_house_listing = st.sk_house
+  on hl.id_house_listing = st.sk_house_listing
 ;

@@ -5,12 +5,12 @@
 with house_status as (
 /* merging of redundant house status records (subsequent status without sk_max_status_date, reasoned by minor status changes < 1 day) */
 	select
-		fhs.sk_house,
+		fhs.sk_house_listing as sk_house,
 		fhs.sk_region,
 		fhs.status_history as status,
-		min(fhs.sk_min_status_date) as sk_min_status_date,
-		coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
-	from fact_house_status fhs
+		min(nullif(fhs.sk_status_start_date,-1)) as sk_min_status_date,
+		coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
+	from fact_house_listing_status fhs
 	where fhs.status_history = 'publicado'
 	group by 1, 2, 3, 5
 ),

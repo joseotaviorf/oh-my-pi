@@ -1,5 +1,5 @@
 with
-fact_house_status_filter as (
+fact_house_listing_status_filter as (
 -- new step so we can filter last version and also last status (in case there are two status in the same day)
 select
     fhs.*,
@@ -8,11 +8,11 @@ select
     dd.month,
     dd.calendar_week,
     dd.day
-from fact_house_status fhs
+from fact_house_listing_status fhs
 join dim_date dd
-		on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+		on dd.sk_date between fhs.sk_status_start_date and coalesce(to_char(to_date(fhs.sk_status_end_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 left join dim_house_listing dh
-  on fhs.sk_house = dh.sk_house_listing
+  on fhs.sk_house_listing = dh.sk_house_listing
 ),
 all_dates as (
 	select distinct
@@ -26,33 +26,33 @@ all_dates as (
                                     f.year,
     																f.month,
     																f.calendar_week,
-    																f.day order by f.sk_house asc)
+    																f.day order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  f.year,
     																		f.month,
     																		f.calendar_week,
-    																		f.day order by f.sk_house desc)
+    																		f.day order by f.sk_house_listing desc)
 			- 1 as daily_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     f.year,
-    																f.calendar_week order by f.sk_house asc)
+    																f.calendar_week order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  f.year,
-    																		f.calendar_week order by f.sk_house desc)
+    																		f.calendar_week order by f.sk_house_listing desc)
 			- 1 as weekly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
                                     f.year,
-    																f.month order by f.sk_house asc)
+    																f.month order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
     	                                  f.year,
-    																		f.month order by f.sk_house desc)
+    																		f.month order by f.sk_house_listing desc)
 			- 1 as monthly_count,
     dense_rank() over (partition by coalesce(dr.city_name, ''),
-                                    f.year order by f.sk_house asc)
+                                    f.year order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by coalesce(dr.city_name, ''),
-    	                                  f.year order by f.sk_house desc)
+    	                                  f.year order by f.sk_house_listing desc)
 			- 1 as yearly_count
-	from fact_house_status_filter f
+	from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where f."date" < current_date and f.status_history = 'publicado'
@@ -68,7 +68,7 @@ all_dates_last_month as (
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_house) as monthly_count
-	from fact_house_status_filter f
+	from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where f."date" < current_date and f.status_history = 'publicado'
@@ -84,7 +84,7 @@ all_dates_last_year as (
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
     count(distinct f.sk_house) as yearly_count
-  from fact_house_status_filter f
+  from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where f."date" < current_date and f.status_history = 'publicado'

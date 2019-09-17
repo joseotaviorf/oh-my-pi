@@ -27,9 +27,9 @@ dates AS (
 days_published AS (
   SELECT
     sk_house AS sk_house_listing,
-    DATE(sk_min_status_date) AS min_status_date,
-    COALESCE(DATE(sk_max_status_date), CURRENT_DATE) AS max_status_date
-  FROM fact_house_status
+    DATE(sk_status_start_date) AS min_status_date,
+    COALESCE(DATE(sk_status_end_date), CURRENT_DATE) AS max_status_date
+  FROM fact_house_listing_status
   WHERE status_history = 'publicado'
 ),
 days_published_in_period AS (
