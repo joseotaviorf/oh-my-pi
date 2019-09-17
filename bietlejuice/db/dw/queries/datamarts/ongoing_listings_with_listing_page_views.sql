@@ -12,7 +12,7 @@ with ol as (
 		     when house_bedrooms >= 4 then 4
 		     end as house_bedrooms,
 		is_b2b,
-		count(distinct case when status_history = 'publicado' then sk_house end) as "ongoing_listings"
+		count(distinct case when status_history = 'publicado' then sk_house_listing end) as "ongoing_listings"
 		from(
 	SELECT
 	    fhs.*,
@@ -28,18 +28,18 @@ with ol as (
 	    dh.ts_publication,
 	    dh.house_bedrooms,
 	    date_trunc('week',dh.ts_publication) as week_start_publication
-	FROM fact_house_status fhs
+	FROM fact_house_listing_status fhs
 	join dim_date dd
-	  on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+	  on dd.sk_date between nullif(fhs.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 	left join dim_region dr
 	     using(sk_region)
 	left join dim_house_listing dh
-	  on fhs.sk_house = dh.sk_house_listing
+	  on fhs.sk_house_listing = dh.sk_house_listing
 	where dd.weekday_name = 'Sunday'
 	)
 	where week_start >= '2018-01-01'
 	group by 1, 2, 3, 4, 5, 6, 7, 8
-	having count(distinct case when status_history = 'publicado' then sk_house end) > 0
+	having count(distinct case when status_history = 'publicado' then sk_house_listing end) > 0
 	order by 2 desc, 1 asc, 3 desc, 4
 ),
 vb as (

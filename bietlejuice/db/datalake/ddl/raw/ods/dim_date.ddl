@@ -11,6 +11,8 @@ CREATE external TABLE datalake_raw.dim_date (
   week_day STRING,
   weekday_name STRING,
   calendar_week STRING,
+  working_days_in_month STRING,
+  total_working_days_in_month STRING,
   brz_date STRING,
   usa_date STRING,
   universal_date STRING,

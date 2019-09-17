@@ -23,7 +23,7 @@ days_published AS (
       ROW_NUMBER() OVER(PARTITION BY sk_house, max_status_date ORDER BY max_status_date ASC) AS row
     FROM published
   )
-  -- HACK: fact_house_status has an issue where it can have two rows with a published status and null max_status_date
+  -- HACK: fact_house_listing_status has an issue where it can have two rows with a published status and null max_status_date
   -- while we don't fix that, here we will take only the first row
   SELECT * FROM rows WHERE row = 1
 ),

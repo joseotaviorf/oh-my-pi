@@ -9,6 +9,8 @@ CREATE TABLE public.dim_date (
 	week_day int4 NULL,
 	weekday_name varchar(15) NULL,
 	calendar_week int4 NULL,
+	working_days_in_month int4 NULL,
+	total_working_days_in_month int4 NULL,
 	brz_date varchar(10) NULL,
 	usa_date varchar(10) NULL,
 	universal_date varchar(10) NULL,
