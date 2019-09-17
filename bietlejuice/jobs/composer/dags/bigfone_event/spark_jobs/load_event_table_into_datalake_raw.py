@@ -14,6 +14,9 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.dags.bigfone_event import (
+    QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
+)
 from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
     SOURCE,
     DATABRICKS_SCOPE,
@@ -60,7 +63,9 @@ if __name__ == "__main__":
     list_partitions.append("event")
 
     # get query to create event table
-    query = FileService().get_destination_datalake_query(SOURCE, "raw", table_name)
+    query = FileService().get_query_from_file_name(
+        QUERIES_BIGFONE_EVENT_DATALAKE_PATH + "/raw/" + table_name + ".sql"
+    )
 
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()

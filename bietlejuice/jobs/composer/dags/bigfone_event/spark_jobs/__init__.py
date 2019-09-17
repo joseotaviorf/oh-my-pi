@@ -3,6 +3,7 @@ import logging
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
+
 SPARK, SQLCONTEXT = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 SOURCE = "bigfone"

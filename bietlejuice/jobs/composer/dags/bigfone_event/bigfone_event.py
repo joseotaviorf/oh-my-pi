@@ -12,9 +12,10 @@ from airflow.operators.quintoandar_databricks import (
 import airflow.utils.helpers as airflow_helpers
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.bigfone_event import DAG_NAME
 
 # dag params
-DAG_ID = "bietlejuice.bigfone_event"
+DAG_ID = "bietlejuice.{}".format(DAG_NAME)
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 9, 9, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
