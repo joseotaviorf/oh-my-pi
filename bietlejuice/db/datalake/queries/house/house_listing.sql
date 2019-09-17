@@ -208,7 +208,7 @@ special_conditions as (
       max(date(from_iso8601_timestamp(optedoutat))) as out_
     from datalake_ebdb_raw_prod.specialcondition_aud
     where specialconditionstatus in ('OptedIn', 'OptedOut')
-      and specialconditiontype in ('Exclusivity', 'OriginalsReady', 'OriginalsReno')
+      and specialconditiontype in ('Exclusivity', 'OriginalsReady', 'OriginalsReno', 'ORent', 'IRent')
       -- TODO: check special_condition_mod = 0 and revType = 1 conditions
       -- to avoid excessive data scan
     group by 1, 2, 3
@@ -256,9 +256,11 @@ listing_special_conditions_dates as (
   		specialconditiontype,
   		dt_opted_in,
   		dt_opted_out,
-  		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in desc, coalesce(dt_opted_out, date('2100-01-01')) desc) as rn_last,
-  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else specialconditiontype end order by dt_opted_in asc, coalesce(dt_opted_out, date('2100-01-01')) asc) as rn_first
+  		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type and ioRents' type
+  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else case when specialconditiontype like '%Rent' then 'ioRent'
+                                                          else specialconditiontype end end order by dt_opted_in desc, coalesce(dt_opted_out, date('2100-01-01')) desc) as rn_last,
+  		row_number() over (partition by id_house_listing, case when specialconditiontype like 'Originals%' then 'Originals' else case when specialconditiontype like '%Rent' then 'ioRent'
+                                                          else specialconditiontype end end order by dt_opted_in asc, coalesce(dt_opted_out, date('2100-01-01')) asc) as rn_first
   	  from listing_special_conditions
     ),
     last_opt as (
@@ -291,7 +293,15 @@ listing_special_conditions_dates as (
      from last_opt lo
      join first_opt fo
        on lo.id_house_listing = fo.id_house_listing
-       and (case when lo.specialconditiontype like 'Originals%' then 'Originals' else lo.specialconditiontype end) = (case when fo.specialconditiontype like 'Originals%' then 'Originals' else fo.specialconditiontype end)
+       and (case
+              when lo.specialconditiontype like 'Originals%' then 'Originals'
+              when lo.specialconditiontype like '%Rent' then 'ioRent'
+              else lo.specialconditiontype
+            end) = (case
+                      when fo.specialconditiontype like 'Originals%' then 'Originals'
+                      when fo.specialconditiontype like '%Rent' then 'ioRent'
+                      else fo.specialconditiontype
+                    end)
 )
 select
   hl.id_house_listing,
@@ -301,17 +311,22 @@ select
   hl.rent,
   hl.listing_category_start,
   lsc_originals.specialconditiontype as last_originals_type,
+  lsc_iorent.specialconditiontype as last_iorent_type,
   hl.version = max(hl.version) over (partition by hl.id_house) as is_last_version,
   lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
   ((lsc_originals.dt_last_opted_in is not null and lsc_originals.dt_last_opted_out is null) 
       or (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)) as is_originals_active,
+  ((lsc_iorent.dt_last_opted_in is not null and lsc_iorent.dt_last_opted_out is null) 
+      or (lsc_iorent.dt_last_opted_in > lsc_iorent.dt_last_opted_out)) as is_iorent_active,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
   ts_last_de_publication,
   lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
   lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
   lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
-  lsc_originals.dt_last_opted_out as dt_last_originals_opted_out
+  lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
+  lsc_iorent.dt_last_opted_in as dt_last_iorent_opted_in,
+  lsc_iorent.dt_last_opted_out as dt_last_iorent_opted_out
 from house_listing_full hl
 left join listing_special_conditions_dates lsc_originals
   on hl.id_house_listing = lsc_originals.id_house_listing
@@ -319,4 +334,7 @@ left join listing_special_conditions_dates lsc_originals
 left join listing_special_conditions_dates lsc_exclusivity
   on hl.id_house_listing = lsc_exclusivity.id_house_listing
     and lsc_exclusivity.specialconditiontype = 'Exclusivity'
+left join listing_special_conditions_dates lsc_iorent
+  on hl.id_house_listing = lsc_iorent.id_house_listing
+    and lsc_iorent.specialconditiontype like '%Rent'
 ;
