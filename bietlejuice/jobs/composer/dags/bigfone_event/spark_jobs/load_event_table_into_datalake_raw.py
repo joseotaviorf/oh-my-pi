@@ -40,8 +40,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
-            JOB_NAME, args.execution_date, args.environment
+        "m=__main__, execution_date={}, environment={}, msg=print args spark jobs params".format(
+            args.execution_date, args.environment
         )
     )
 
