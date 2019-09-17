@@ -293,9 +293,15 @@ listing_special_conditions_dates as (
      from last_opt lo
      join first_opt fo
        on lo.id_house_listing = fo.id_house_listing
-       and (case when lo.specialconditiontype like 'Originals%' then 'Originals' else case when lo.specialconditiontype like '%Rent' then 'ioRent'
-              else lo.specialconditiontype end end) = (case when fo.specialconditiontype like 'Originals%' then 'Originals' else case when fo.specialconditiontype like '%Rent' then 'ioRent'
-                                                        else fo.specialconditiontype end end)
+       and (case
+              when lo.specialconditiontype like 'Originals%' then 'Originals'
+              when lo.specialconditiontype like '%Rent' then 'ioRent'
+              else lo.specialconditiontype
+            end) = (case
+                      when fo.specialconditiontype like 'Originals%' then 'Originals'
+                      when fo.specialconditiontype like '%Rent' then 'ioRent'
+                      else fo.specialconditiontype
+                    end)
 )
 select
   hl.id_house_listing,
