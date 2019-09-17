@@ -1,4 +1,22 @@
-with manual_google_costs as (
+with cities_share_by_ol as (
+    select distinct
+        dd.sk_date,
+        dr.city_group,
+        (dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing) +
+            dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing desc) - 1) /
+        (dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing) +
+            dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing desc) - 1)::float as share
+    from dim_date dd
+    join fact_house_listing_status fhs
+        on dd.sk_date between fhs.sk_status_start_date and coalesce(nullif(fhs.sk_status_end_date, -1), to_char(current_date - 1, 'YYYYMMDD')::bigint)
+        and fhs.status_history = 'publicado'
+        and fhs.sk_status_start_date != -1
+    join dim_region dr
+        on dr.sk_region = fhs.sk_region
+        and city_group is not null
+    where dd.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+),
+manual_google_costs as (
     with t_prep as (
         select
           replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
@@ -171,24 +189,25 @@ UNION
       where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
-     select 
+    select
         fcl.sk_cost_date,
         dcl.name as origin,
         'fact_daily_classifieds_costs' as fact_cost,
-        null as campaign_name, 
-        'rmsp' as campaign_city, 
-        null as account_name, 
-        null as campaign_name_l, 
-        null as account_name_l, 
+        null as campaign_name,
+        csol.city_group as campaign_city,
+        null as account_name,
+        null as campaign_name_l,
+        null as account_name_l,
         null as utm_campaign,
-        null as utm_term, 
+        null as utm_term,
         null as utm_content,
         null as desktop_cost,
         null as mobile_cost,
         null as other_cost,
-        fcl.cost as total_cost
+        fcl.cost * csol.share as total_cost
       from marketing.fact_daily_classifieds_costs fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
+      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
       -- filter with 'between' because there is future cost
       where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 )
@@ -226,7 +245,10 @@ UNION
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
-		case when campaign_city = 'campinas' then 'Campinas'
+		case
+             when campaign_city in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre')
+		        then campaign_city
+		     when campaign_city = 'campinas' then 'Campinas'
 		     when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
