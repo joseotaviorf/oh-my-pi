@@ -14,6 +14,10 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.house_listing (
   last_originals_type string,
   dt_last_originals_opted_in string,
   dt_last_originals_opted_out string,
+  is_iorent_active string,
+  last_iorent_type string,
+  dt_last_iorent_opted_in string,
+  dt_last_iorent_opted_out string,
   ts_load string
  )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

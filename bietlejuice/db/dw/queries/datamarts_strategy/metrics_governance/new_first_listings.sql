@@ -1,5 +1,3 @@
--- Define new_first_listings
-
 select
     dd.date as first_listing_date,
     date_trunc('week', dd.date) as first_listing_week_start,
