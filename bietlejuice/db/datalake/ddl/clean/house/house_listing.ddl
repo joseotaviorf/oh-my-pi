@@ -15,6 +15,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.house_listing (
   dt_last_originals_opted_in string,
   dt_last_originals_opted_out string,
   is_iorent_active string,
+  last_iorent_type string,
   dt_last_iorent_opted_in string,
   dt_last_iorent_opted_out string,
   ts_load string

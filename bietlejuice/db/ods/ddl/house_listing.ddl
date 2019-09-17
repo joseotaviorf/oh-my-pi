@@ -7,6 +7,7 @@ create table if not exists house_listing (
   rent decimal,
   listing_category_start varchar,
   last_originals_type varchar,
+  last_iorent_type varchar,
   is_last_version boolean,
   is_exclusive boolean,
   is_originals_active boolean,

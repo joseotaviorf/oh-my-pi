@@ -61,6 +61,7 @@ create table staging.dim_house_listing (
   dt_last_originals_opted_in date,
   dt_last_originals_opted_out date,
   is_iorent_active boolean,
+  last_iorent_type varchar,
   dt_last_iorent_opted_in date,
   dt_last_iorent_opted_out date,
   ts_load timestamp
