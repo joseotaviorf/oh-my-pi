@@ -87,7 +87,7 @@ users_schedule_viz_per_day as (
 ),
 first_favorite_set as (
   select
-	cast(json_extract(event_properties, '$.house_id') as varchar) as house_id,
+	event_house_id as house_id,
 	amplitude_id,
 	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
   from datalake_amplitude_clean_prod.schedule_page_viewed_events
@@ -110,7 +110,7 @@ users_favorites_per_day as (
 ),
 first_discard as (
   select
-	cast(json_extract(event_properties, '$.house_id') as varchar) as house_id,
+	event_house_id as house_id,
 	amplitude_id,
 	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
   from datalake_amplitude_clean_prod.schedule_page_viewed_events

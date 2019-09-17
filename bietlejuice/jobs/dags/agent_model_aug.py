@@ -184,7 +184,7 @@ def create_agent_status_history():
 
 
 dag = DAG(
-    dag_id='bi-load-agent_model',
+    dag_id='bi-load-agent_model-AUG',
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
