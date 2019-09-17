@@ -18,7 +18,6 @@ discarded_leads AS (
     dim_lead.lng AS "lng",
     dim_lead.lat AS "lat",
     dim_lead.endereco AS "endereco",
-    dim_lead.endereco_captado AS "endereco_captado",
     dim_lead.cidade AS "cidade",
     dim_lead.captado_em AS "captado_em_date",
     fact_house_listing_flows.mkt_channel AS "mkt_channel",
@@ -33,7 +32,7 @@ discarded_leads AS (
   WHERE (dim_lead.reason = 'ForaArea') AND (dim_lead.status = 'Descartado')
     AND TRY(DATE(dim_date_lead.date))  >= CURRENT_DATE - INTERVAL '30' day
     AND fact_house_listing_flows.sk_prospect_date = '-1'
-  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 subregions AS (
 	SELECT r.*, p.poligono AS geometry

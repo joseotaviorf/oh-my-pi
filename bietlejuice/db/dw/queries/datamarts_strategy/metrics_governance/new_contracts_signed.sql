@@ -1,7 +1,3 @@
--- Define new_contracts_signed
--- Contracts that Signed
--- Contracts of type DealOnly are considered
-
 select
   coalesce(dc.ts_signature, dc.dt_start) as contract_signed_date,
   date_trunc('week',coalesce(dc.ts_signature, dc.dt_start)) as contract_week_start,

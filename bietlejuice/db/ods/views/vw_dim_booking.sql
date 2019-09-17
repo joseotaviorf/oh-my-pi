@@ -119,6 +119,11 @@ bookings as (
                     when s.reason_enum = 'CANCELED_OTHER_OWNER' then 'Owner'
                     when s.reason_enum = 'CANCELED_PROPERTY_SUSPENDED_UNAVAILABLE' then 'House Suspended'
                     when s.reason_enum = 'CANCELED_AGENT_VISIT_TOO_FAR' then 'Agent'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_CAN_NOT_ATTEND' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_NOT_INTERESTED' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_NOT_RENTING' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_NOT_RENTING_BY_5A' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_BY_TENANT_OTHER_REASON' then 'Tenant'
                     else 'Unknown'
                 end
 	    end as cancellation_reason_category,
