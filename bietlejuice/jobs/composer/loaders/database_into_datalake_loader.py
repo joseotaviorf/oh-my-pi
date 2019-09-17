@@ -127,7 +127,8 @@ class DatabaseIntoDataLakeLoader:
                     row["col_type"]
                     .lower()
                     .replace("timestamp", "string")
-                    .replace("binary", "varchar(53535)"),
+                    .replace("date", "string")
+                    .replace("binary", "varchar(53535)")
                 )
                 for row in table_schema
             ]
