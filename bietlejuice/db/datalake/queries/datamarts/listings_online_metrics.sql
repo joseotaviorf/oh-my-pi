@@ -52,7 +52,6 @@ pre_online_metrics AS (
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views
         FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-          AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )

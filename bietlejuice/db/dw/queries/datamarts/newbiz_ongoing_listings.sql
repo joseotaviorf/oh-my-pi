@@ -297,26 +297,25 @@ newbiz_ongoing_listings AS (
 	
 webmetrics AS (		
 	SELECT
-		DATE(event_time),
-		TRIM(e_house_id) 			AS house_id,
+		date(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}')) as event_time,
+		cast(json_extract(event_properties, '$.house_id') as varchar) 			AS house_id,
 		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'listing_page_viewed'
+						WHEN event_type = 'listing_page_viewed'
 						THEN uuid
 						ELSE NULL
 						END)		AS listing_page_viewed,
 		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'visit_intent_clicked'
+						WHEN event_type = 'visit_intent_clicked'
 						THEN uuid
 						ELSE NULL
 						END)		AS visit_intent_clicked,
 		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'schedule_page_viewed'
+						WHEN event_type = 'schedule_page_viewed'
 						THEN uuid
 						ELSE NULL
 						END)		AS schedule_page_viewed
-	FROM datalake_clean.amplitude_events
-	WHERE TRIM(et) IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
-	  AND DATE(event_time) >= '2019-01-01'
+	FROM datalake_amplitude_clean_prod.events
+	WHERE event_type IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
 	GROUP BY 1, 2
 	ORDER BY 1, 2
 	),

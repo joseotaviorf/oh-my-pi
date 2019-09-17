@@ -70,24 +70,6 @@ user_listing_page_views as (
  */
     with user_session_events as (
         /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
-        select
-                amplitude_id,
-                case when regexp_substr(user_id, '^\\d+$') != ''
-                     then regexp_substr(user_id, '^\\d+$')::bigint
-                     else null end as user_id,
-                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-                session_id,
-                et,
-                case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-                     then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-                     else null end as id_house
-            from datalake_clean.amplitude_events evt
-            where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-            and ym >= '2018-06' and ym <= '2018-12'
-            and app = '170698'
-            and session_id != '-1'
-        union
-            -- enriching with amplitude data via SPARK
             SELECT
                 amplitude_id::varchar,
                 case when nullif(regexp_substr(user_id::varchar, '^\\d+$'), '') is not null
@@ -102,7 +84,6 @@ user_listing_page_views as (
            FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
                 AND app = 170698
-                AND year >= 2019
                 AND coalesce(session_id, -1) <> -1
     )
 	select
@@ -120,23 +101,6 @@ user_sessions as (
 /* returns for each amplitude_id the sessions and their start timestamps */
     with user_session_events as (
         /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
-        select
-                amplitude_id,
-                case when regexp_substr(user_id, '^\\d+$') != ''
-                     then regexp_substr(user_id, '^\\d+$')::bigint
-                     else null end as user_id,
-                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-                session_id,
-                et,
-                case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-                     then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-                     else null end as id_house
-            from datalake_clean.amplitude_events evt
-            where evt.et in ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-            and ym >= '2018-06' and ym <= '2018-12'
-            and app = '170698'
-            and session_id != '-1'
-        union
             -- enriching with amplitude data via SPARK
             SELECT
                 amplitude_id::varchar,
@@ -152,7 +116,6 @@ user_sessions as (
            FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
                 AND app = 170698
-                AND year >= 2019
                 AND coalesce(session_id, -1) <> -1
     )
 	select
