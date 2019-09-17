@@ -3,18 +3,22 @@ from airflow.models import DAG
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.elasticsearch_logs import ml_logs_to_s3
+from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.etl.elasticsearch import CasioLogsFetcher
 
-MAIN_DAG_NAME = 'offer-predictor-logs'
-MAIN_START_DATE = datetime(2019, 2, 26)
+MAIN_DAG_NAME = 'casio-logs'
+MAIN_START_DATE = datetime(2019, 9, 11)
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 
 env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
 config = {
-    'ES_LOGS__HOSTNAME': os.getenv('ES_LOGS__HOSTNAME'),
-    'model_name': 'OfferPredictor',
+    'es_extractor': CasioLogsFetcher(
+        es_logs__hostname=os.getenv('ES_LOGS__HOSTNAME'), model_logger_name='CasioModel'
+    ),
+    'app_name': 'casio',
+    'model_name': 'CasioModel',
 }
 
 dag = DAG(

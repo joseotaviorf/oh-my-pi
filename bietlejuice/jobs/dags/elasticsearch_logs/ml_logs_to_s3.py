@@ -7,10 +7,14 @@ from bietlejuice.jobs.etl.elasticsearch import SkynetModelLogsFetcher
 logger = QuintoAndarLogger('skynet_logs_to_s3')
 
 
-def skynet_logs_to_s3(**kwargs):
-    # required arguments
-    es_logs__hostname = kwargs['ES_LOGS__HOSTNAME']
-    model_name = kwargs['MODEL_NAME']
+@logger
+def ml_logs_to_s3(model_name, app_name="skynet", es_extractor=None, **kwargs):
+    if es_extractor is None:
+        es_logs__hostname = kwargs['ES_LOGS__HOSTNAME']
+        es_extractor = SkynetModelLogsFetcher(
+            es_logs__hostname=es_logs__hostname,
+            model_logger_name=model_name
+        )
     execution_date = kwargs['execution_date']
 
     # optional arguments
@@ -25,22 +29,17 @@ def skynet_logs_to_s3(**kwargs):
     # build base s3 key
     base_key = (
         'raw/elasticsearch/ml_logs/' +
-        'app=skynet/' +
+        'app={app_name}/' +
         'model={model_name}/' +
         'logging_level={logging_level}/' +
         'dt={dt}/' +
         '{filename}.gz'
     )
 
-    es_extractor = SkynetModelLogsFetcher(
-        es_logs__hostname=es_logs__hostname,
-        model_logger_name=model_name
-    )
-
     for level in logging_levels:
         level_name = logging.getLevelName(level)
         logger.info(
-            'm=skynet_logs_to_s3, msg=querying for {}'.format(level_name))
+            'm=ml_logs_to_s3, msg=querying for {}'.format(level_name))
         logs_paginator = es_extractor.run(
             date_=execution_date,
             message_level=level_name,
@@ -51,6 +50,7 @@ def skynet_logs_to_s3(**kwargs):
 
         for page, log in enumerate(logs_paginator):
             key = base_key.format(
+                app_name=app_name,
                 model_name=model_name,
                 dt=execution_date.strftime('%Y-%m-%d'),
                 logging_level=level_name,
@@ -58,7 +58,7 @@ def skynet_logs_to_s3(**kwargs):
             )
 
             logger.info(
-                'm=skynet_logs_to_s3, msg=writing file {}'.format(key))
+                'm=ml_logs_to_s3, msg=writing file {}'.format(key))
 
             BaseETL().json_to_s3(
                 dict_list=log['hits']['hits'],

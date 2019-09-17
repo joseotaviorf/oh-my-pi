@@ -1,7 +1,3 @@
--- Define ongoing rentals monthly
--- Contracts that signed contract and didn't ended before start/entrance date
--- Contracts of type DealOnly should only be considered in the first month as a ongoing rental
-
 select
 	  dd.month_start,
 	  rf.sk_region,
