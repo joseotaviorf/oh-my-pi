@@ -22,7 +22,6 @@ with pre_online_metrics AS (
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
                              'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed',
                              'tip_agendaavalilability_confirmed', 'tip_lockbox_confirmed')
-          AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )

@@ -25,7 +25,6 @@ with t_all as (
             'referral_opportunity_confirmed',
             'referral_listing_confirmed',
             'referral_form_response_received')
-            and	year >= 2019
             and app = 205027
             and regexp_like(cast(json_extract(event_properties, '$.lead_id') as varchar), '(^\d+)')
     ),
@@ -51,7 +50,6 @@ with t_all as (
             coalesce(uuid, '') as uuid
     from datalake_amplitude_clean_prod.events
         where event_type in ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
-            and	year >= 2019
             and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
     ), prep_firestore as (
     select
@@ -72,8 +70,7 @@ with t_all as (
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
     from datalake_amplitude_clean_prod.events
-        where year >= 2019
-            and app = 183047
+        where app = 183047
             and json_extract(user_properties, '$.lead_firestore_id') is not null
     ), prep_form as (
     select
@@ -95,7 +92,6 @@ with t_all as (
             coalesce(uuid, '') as uuid
     from datalake_amplitude_clean_prod.events
         where  event_type = 'lead_form_submitted'
-            and year >= 2019
             and app = 183047
             and json_extract(event_properties, '$.formfield_lead_uuid') is not null
     )

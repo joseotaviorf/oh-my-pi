@@ -77,3 +77,5 @@ class SparkDataframeIntoDatalakeLoader:
                 self.metastore_service.db_path + table_name, str(partition_by_list)
             )
         )
+        # after rewriting an existing partition, we must refresh the table
+        self.metastore_service.refresh_table(table_name)
