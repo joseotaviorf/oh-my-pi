@@ -10,7 +10,7 @@ select
     dd.day
 from fact_house_listing_status fhs
 join dim_date dd
-    on dd.sk_date between fhs.sk_status_start_date and coalesce(to_char(to_date(fhs.sk_status_end_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+    on dd.sk_date between fhs.sk_status_start_date and coalesce(to_char(to_date(nullif(fhs.sk_status_end_date, -1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 left join dim_house_listing dh
   on fhs.sk_house_listing = dh.sk_house_listing
 ),
