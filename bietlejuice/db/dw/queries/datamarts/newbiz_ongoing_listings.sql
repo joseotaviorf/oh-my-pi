@@ -295,30 +295,30 @@ newbiz_ongoing_listings AS (
 			 base.sk_house_listing
 	),
 	
-webmetrics AS (		
+webmetrics AS (
 	SELECT
-		DATE(event_time),
-		TRIM(e_house_id) 			AS house_id,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'listing_page_viewed'
-						THEN uuid
-						ELSE NULL
-						END)		AS listing_page_viewed,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'visit_intent_clicked'
-						THEN uuid
-						ELSE NULL
-						END)		AS visit_intent_clicked,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'schedule_page_viewed'
-						THEN uuid
-						ELSE NULL
-						END)		AS schedule_page_viewed
-	FROM datalake_clean.amplitude_events
-	WHERE TRIM(et) IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
-	  AND DATE(event_time) >= '2019-01-01'
-	GROUP BY 1, 2
-	ORDER BY 1, 2
+    DATE(regexp_substr(event_time, '\\d{4}-\\d{2}-\\d{2}')) 								AS event_time,
+    CAST(json_extract_path_text(event_properties, 'house_id') AS VARCHAR)   AS house_id,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'listing_page_viewed'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS listing_page_viewed,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'visit_intent_clicked'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS visit_intent_clicked,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'schedule_page_viewed'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS schedule_page_viewed
+    FROM datalake_amplitude_clean_prod.events
+    WHERE event_type IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
+      AND DATE(regexp_substr(event_time, '\\d{4}-\\d{2}-\\d{2}')) >= '2019-01-01'
+    GROUP BY 1, 2
+    ORDER BY 1, 2
 	),
 	
 bookings AS (
@@ -470,7 +470,7 @@ SELECT
 	COALESCE(cs.contract_signed, 0)					AS contract_signed
 FROM newbiz_ongoing_listings nol
 LEFT JOIN webmetrics w
-  ON nol.date = w.date
+  ON nol.date = w.event_time
  AND nol.id_house = house_id
 LEFT JOIN bookings b
   ON nol.date = b.date
