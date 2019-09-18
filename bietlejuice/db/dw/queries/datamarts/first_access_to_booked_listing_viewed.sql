@@ -89,13 +89,13 @@ user_listing_page_views as (
 	select
 		amplitude_id,
 		id_house,
-		min(case when et='visit_schedule_confirmed' then user_id end) as user_id,
-		min(case when et='listing_page_viewed' then event_ts end) as ts_first_listing_page_view,
-		min(case when et='visit_schedule_confirmed' then event_ts end) as ts_first_visit_schedule_confirmed
+		min(case when event_type='visit_schedule_confirmed' then user_id end) as user_id,
+		min(case when event_type='listing_page_viewed' then event_ts end) as ts_first_listing_page_view,
+		min(case when event_type='visit_schedule_confirmed' then event_ts end) as ts_first_visit_schedule_confirmed
 	from user_session_events
-	where et in ('listing_page_viewed', 'visit_schedule_confirmed')
+	where event_type in ('listing_page_viewed', 'visit_schedule_confirmed')
 	and id_house is not null
-	group by 1, 2 having min(case when et='listing_page_viewed' then event_ts end) < min(case when et='visit_schedule_confirmed' then event_ts end)
+	group by 1, 2 having min(case when event_type='listing_page_viewed' then event_ts end) < min(case when event_type='visit_schedule_confirmed' then event_ts end)
 ),
 user_sessions as (
 /* returns for each amplitude_id the sessions and their start timestamps */
