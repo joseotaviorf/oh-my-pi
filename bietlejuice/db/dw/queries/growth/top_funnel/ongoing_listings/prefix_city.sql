@@ -67,7 +67,7 @@ all_dates_last_month as (
     f.month as _month,
     'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
-    count(distinct f.sk_house) as monthly_count
+    count(distinct f.sk_house_listing) as monthly_count
 	from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
@@ -83,7 +83,7 @@ all_dates_last_year as (
 		f.year as _year,
 		'QuintoAndar'::varchar as region,
     coalesce(dr.city_name, '') as city,
-    count(distinct f.sk_house) as yearly_count
+    count(distinct f.sk_house_listing) as yearly_count
   from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region

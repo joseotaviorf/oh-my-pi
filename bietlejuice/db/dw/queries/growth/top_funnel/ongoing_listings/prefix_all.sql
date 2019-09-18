@@ -58,7 +58,7 @@ all_dates_last_month as (
 	  month as _month,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_house) as monthly_count
+  	count(distinct f.sk_house_listing) as monthly_count
 	from fact_house_listing_status_filter f
 	where f."date" < current_date
 	  and f.status_history = 'publicado'
@@ -73,7 +73,7 @@ all_dates_last_year as (
 	   year as _year,
 	  'QuintoAndar'::varchar as region,
 	  'QuintoAndar'::varchar as city,
-  	count(distinct f.sk_house) as yearly_count
+  	count(distinct f.sk_house_listing) as yearly_count
 	from fact_house_listing_status_filter f
 	where f."date" < current_date and f.status_history = 'publicado'
 	  and f.year = date_part('year', add_months(current_date, -12))
