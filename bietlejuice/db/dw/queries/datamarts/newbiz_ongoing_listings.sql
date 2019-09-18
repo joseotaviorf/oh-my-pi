@@ -273,6 +273,7 @@ newbiz_ongoing_listings AS (
 		db.year_quarter,
 		db.year,
 		base.sk_house_listing,
+		base.version,
 		base.id_house,
 		base.newbiz_type
 	FROM date_base db
@@ -282,6 +283,7 @@ newbiz_ongoing_listings AS (
 			ol.week_start,
 			ol.month_start,
 			nbl.sk_house_listing,
+			nbl.version,
 			nbl.id_house,
 			nbl.newbiz_type
 		FROM ongoing_listings ol
@@ -499,7 +501,7 @@ LEFT JOIN contract_created cc
 LEFT JOIN contract_signed cs
   ON nol.date = cs.date
  AND nol.sk_house_listing = cs.sk_house_listing
-WHERE nol.sk_house_listing NOT LIKE '%000'
+WHERE nol.version > 0
 ORDER BY nol.date,
 		 nol.sk_house_listing
  ;
