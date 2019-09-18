@@ -1,0 +1,19 @@
+with
+total_cost_daily as (
+select
+	dd.date,
+	dd.week_start,
+	dd.month_start,
+	mdc.city_group,
+	sum(mdc.cost) as costs_daily
+from marketing.fact_marketing_daily_costs mdc
+join dim_date dd
+  on mdc.sk_date = dd.sk_date
+where mdc.funnel_side = 'demand'
+group by 1, 2, 3, 4
+)
+select
+	*,
+	sum(costs_daily) over(partition by week_start, city_group) as costs_weekly,
+	sum(costs_daily) over(partition by month_start, city_group) as costs_monthly
+from total_cost_daily
