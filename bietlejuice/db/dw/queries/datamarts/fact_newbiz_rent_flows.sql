@@ -27,7 +27,7 @@ WITH newbiz_listings_version AS (
         AND sc.optedoutat IS NULL
         ) newbiz_flg
       ON dhl.id_house = newbiz_flg.house_id
-    WHERE (dhl.sk_house_listing LIKE '%000' AND (dhl.is_last_version = true OR dhl.is_last_version IS NULL))
+    WHERE (dhl.version = 0 AND DATE(dhl.ts_listing_version_end) >= newbiz_flg.optedinat)
           OR
           (DATE(dhl.ts_publication) <= newbiz_flg.optedinat)
     ) base
@@ -40,6 +40,7 @@ newbiz_listings AS (
     -- get renos info
     SELECT
         dhl.sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)                AS publication_date,
         DATE(dhl.ts_last_de_publication)        AS de_publication_date,
@@ -324,6 +325,7 @@ LEFT JOIN dim_date dd16
   ON lrf.sk_contract_annulment_date = dd16.sk_date
 LEFT JOIN dim_date dd17
   ON lrf.sk_contract_canceled_date = dd17.sk_date
+WHERE nb.version > 0
 ORDER BY nb.sk_house_listing,
  		 lrf.sk_rent_flow
 ;
