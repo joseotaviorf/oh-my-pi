@@ -56,8 +56,7 @@ class SparkDataFrameService:
         formatted_name = re.sub(
             r"\W", "", column_name.replace(" ", "_").replace(".", "_")
         )
-        formatted_name = re.sub(r"^([A-Z])", r"_\g<1>", formatted_name)
-        formatted_name = re.sub(r"(.)_([A-Z])", r"\g<1>__\g<2>", formatted_name)
+        formatted_name = re.sub(r"([A-Z])", r"_\g<1>", formatted_name)
         return formatted_name.lower()
 
     def format_column_names(self):
