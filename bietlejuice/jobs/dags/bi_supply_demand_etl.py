@@ -426,6 +426,21 @@ fact_inspection_bookings_task = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
 )
 
+ods_fact_affiliate_engagement_cost = BaseDAG.build_python_operator(
+    task_id='ODS_fact_affiliate_engagement_cost',
+    dag=main_dag,
+    python_callable=extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'table_name': 'fact_affiliate_engagement_cost'}
+)
+
+dw_fact_affiliate_engagement_cost = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_affiliate_engagement_cost',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'affiliate_engagement_cost', 'is_fact': True,
+               'bucket': bucket, 'insert_dummy': False}
+)
+
 # new 'supply' flow
 ods_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -657,3 +672,5 @@ trigger_bi_growth_dag_task.set_upstream(
      dw_fact_house_listing_status_task])
 trigger_bi_crm_load_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+
+ods_fact_affiliate_engagement_cost >> dw_fact_affiliate_engagement_cost
