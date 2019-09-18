@@ -20,7 +20,7 @@ select
   c.seguroResidencial_parcelas as home_insurance_installments,
   c.seguroResidencial_valor as home_insurance_value,
   c.taxacomissaoprimeiroaluguel as first_rental_commission,
-  cf.taxaAdministracaoMensal as tax_adm,
+  cf.taxaAdministracaoMensal as monthly_administration_fee,
   c.valorCondominio as condo,
   c.iptu_valor as iptu,
   c.tipoAssinatura as signature_type,
