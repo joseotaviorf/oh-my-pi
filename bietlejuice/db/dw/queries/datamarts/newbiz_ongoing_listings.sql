@@ -316,7 +316,7 @@ webmetrics AS (
                     END)        AS schedule_page_viewed
     FROM datalake_amplitude_clean_prod.events
     WHERE event_type IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
-      AND DATE(regexp_substr(event_time, '\\d{4}-\\d{2}-\\d{2}')) >= '2019-01-01'
+      AND year >= 2019
     GROUP BY 1, 2
     ORDER BY 1, 2
 	),
