@@ -85,7 +85,7 @@ newbiz_listings_version AS (
         AND sc.optedoutat IS NULL
         ) newbiz_flg
       ON dhl.id_house = newbiz_flg.house_id
-    WHERE (dhl.sk_house_listing LIKE '%000' AND (dhl.is_last_version = true OR dhl.is_last_version IS NULL))
+    WHERE (dhl.version = 0 AND DATE(dhl.ts_listing_version_end) >= newbiz_flg.optedinat)
           OR
           (DATE(dhl.ts_publication) <= newbiz_flg.optedinat)
     ) base
@@ -97,6 +97,7 @@ newbiz_listings AS (
     -- get renos info
     SELECT
         dhl.sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)                AS publication_date,
         DATE(dhl.ts_last_de_publication)        AS de_publication_date,
@@ -146,13 +147,14 @@ newbiz_listings AS (
      AND ei.atualizadoem > dhl.ts_publication
     WHERE nlv.specialconditiontype = 'OriginalsReno'
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 
     UNION
 
     -- gets orent info
     SELECT
         dhl.sk_house_listing    										AS sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
         DATE(dhl.ts_last_de_publication)						AS de_publication_date,
@@ -202,13 +204,14 @@ newbiz_listings AS (
      AND ei.atualizadoem > dhl.ts_publication
     WHERE nlv.specialconditiontype = 'ORent'
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 
     UNION
 
     -- gets ready info
     SELECT
         dhl.sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
         DATE(dhl.ts_last_de_publication)   AS de_publication_date,
@@ -239,6 +242,7 @@ newbiz_listings AS (
     -- gets irent info
     SELECT
         dhl.sk_house_listing    			AS sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
         DATE(dhl.ts_last_de_publication)   AS de_publication_date,
@@ -273,6 +277,7 @@ newbiz_ongoing_listings AS (
 		db.year_quarter,
 		db.year,
 		base.sk_house_listing,
+		base.version,
 		base.id_house,
 		base.newbiz_type
 	FROM date_base db
@@ -282,6 +287,7 @@ newbiz_ongoing_listings AS (
 			ol.week_start,
 			ol.month_start,
 			nbl.sk_house_listing,
+			nbl.version,
 			nbl.id_house,
 			nbl.newbiz_type
 		FROM ongoing_listings ol
@@ -295,30 +301,30 @@ newbiz_ongoing_listings AS (
 			 base.sk_house_listing
 	),
 	
-webmetrics AS (		
+webmetrics AS (
 	SELECT
-		DATE(event_time),
-		TRIM(e_house_id) 			AS house_id,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'listing_page_viewed'
-						THEN uuid
-						ELSE NULL
-						END)		AS listing_page_viewed,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'visit_intent_clicked'
-						THEN uuid
-						ELSE NULL
-						END)		AS visit_intent_clicked,
-		COUNT(DISTINCT CASE
-						WHEN TRIM(et) = 'schedule_page_viewed'
-						THEN uuid
-						ELSE NULL
-						END)		AS schedule_page_viewed
-	FROM datalake_clean.amplitude_events
-	WHERE TRIM(et) IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
-	  AND DATE(event_time) >= '2019-01-01'
-	GROUP BY 1, 2
-	ORDER BY 1, 2
+    DATE(regexp_substr(event_time, '\\d{4}-\\d{2}-\\d{2}')) 								AS event_time,
+    CAST(json_extract_path_text(event_properties, 'house_id') AS VARCHAR)   AS house_id,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'listing_page_viewed'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS listing_page_viewed,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'visit_intent_clicked'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS visit_intent_clicked,
+    COUNT(DISTINCT CASE
+                    WHEN event_type = 'schedule_page_viewed'
+                    THEN uuid
+                    ELSE NULL
+                    END)        AS schedule_page_viewed
+    FROM datalake_amplitude_clean_prod.events
+    WHERE event_type IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
+      AND year >= 2019
+    GROUP BY 1, 2
+    ORDER BY 1, 2
 	),
 	
 bookings AS (
@@ -470,7 +476,7 @@ SELECT
 	COALESCE(cs.contract_signed, 0)					AS contract_signed
 FROM newbiz_ongoing_listings nol
 LEFT JOIN webmetrics w
-  ON nol.date = w.date
+  ON nol.date = w.event_time
  AND nol.id_house = house_id
 LEFT JOIN bookings b
   ON nol.date = b.date
@@ -499,6 +505,7 @@ LEFT JOIN contract_created cc
 LEFT JOIN contract_signed cs
   ON nol.date = cs.date
  AND nol.sk_house_listing = cs.sk_house_listing
+WHERE nol.version > 0
 ORDER BY nol.date,
 		 nol.sk_house_listing
  ;

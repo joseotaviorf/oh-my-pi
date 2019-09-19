@@ -22,6 +22,7 @@ create external table if not exists datalake_clean.ods_dim_contract (
   home_insurance_installments string,
   home_insurance_value string,
   first_rental_commission string,
+  monthly_administration_fee string,
   condo string,
   iptu string,
   signature_type string,

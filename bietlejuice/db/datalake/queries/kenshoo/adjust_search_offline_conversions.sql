@@ -5,8 +5,7 @@ with amplitude_schedules as (
         '_k_' || user_gclid || '_k_'  as gclid
   from
         datalake_amplitude_clean_prod.visit_schedule_confirmed_events
-  where year >= 2019
-        and app = 170698
+  where app = 170698
         and user_gclid is not null
         and platform = 'iOS'
         and date(cast(regexp_extract(event_time,

@@ -9,6 +9,7 @@ class DatabaseEnum:
     ODS = "ENV_ODS"
     DW = "ENV_DW"
     INSIDER = "ENV_INSIDER"
+    WOLOLO = "WOLOLO"
 
 
 class DatabaseTypeEnum:

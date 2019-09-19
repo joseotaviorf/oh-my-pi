@@ -1,12 +1,12 @@
 with house_status as (
 	-- merging of redundant house status records (subsequent status without sk_max_status_date, reasoned by minor status changes < 1 day)
 	select
-		fhs.sk_house,
+		fhs.sk_house_listing as sk_house,
 		fhs.sk_region,
 		fhs.status_history as status,
-		min(fhs.sk_min_status_date) as sk_min_status_date,
-		coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
-	from fact_house_status fhs
+		min(nullif(fhs.sk_status_start_date,-1)) as sk_min_status_date,
+		coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
+	from fact_house_listing_status fhs
 	group by 1, 2, 3, 5
 ),
 house_status_per_day as (
@@ -71,7 +71,6 @@ user_session_events as (
        FROM datalake_amplitude_clean_prod.events
        WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
         AND app = 170698
-        AND year >= 2019
 ),
 user_session_mapping as (
 	-- returns min event timestamps for different partitions like user, session and house id
@@ -80,9 +79,9 @@ user_session_mapping as (
 	session_id,
 	id_house,
 	min(event_ts) over(partition by amplitude_id, session_id) as ts_session_start,
-	min(case when et='listing_page_viewed' then event_ts end) over(partition by amplitude_id, session_id, id_house) as ts_first_lpv_session,
-	min(case when et='visit_schedule_confirmed' then event_ts end) over(partition by amplitude_id, id_house) as ts_visit_schedule_confirmed,
-	min(case when et='search_results_page_viewed' then event_ts end) over(partition by amplitude_id, session_id) as ts_first_search_session
+	min(case when event_type='listing_page_viewed' then event_ts end) over(partition by amplitude_id, session_id, id_house) as ts_first_lpv_session,
+	min(case when event_type='visit_schedule_confirmed' then event_ts end) over(partition by amplitude_id, id_house) as ts_visit_schedule_confirmed,
+	min(case when event_type='search_results_page_viewed' then event_ts end) over(partition by amplitude_id, session_id) as ts_first_search_session
 	from user_session_events use
 ),
 house_conversion_sessions as (
