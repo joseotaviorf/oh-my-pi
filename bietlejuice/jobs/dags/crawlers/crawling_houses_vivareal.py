@@ -36,7 +36,7 @@ def submit_vr(**kwargs):
         job_name='crawl-vivareal',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=16384,
+        memory=25600,
         command=['./crawlers/vivareal_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
