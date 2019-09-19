@@ -68,7 +68,7 @@ all_dates_last_month as (
     coalesce(dr.region_code, '') as region,
     'QuintoAndar'::varchar as city,
     count(distinct f.sk_house_listing) as monthly_count
-	from fact_house_status_filter f
+	from fact_house_listing_status_filter f
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
 	where f."date" < current_date and f.status_history = 'publicado'

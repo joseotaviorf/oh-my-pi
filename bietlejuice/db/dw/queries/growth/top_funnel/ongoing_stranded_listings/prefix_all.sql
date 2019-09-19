@@ -28,7 +28,7 @@ with all_dates as (
     dense_rank() over (partition by dd.year order by f.sk_house_listing asc)
     	+ dense_rank() over (partition by dd.year order by f.sk_house_listing desc)
 			- 1 as yearly_count
-	from fact_house_listing_tatus f
+	from fact_house_listing_status f
 	join dim_date dd
 		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
