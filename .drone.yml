@@ -246,5 +246,6 @@ pipeline:
     channel: data-ops
     secrets: [ slack_webhook ]
     when:
+      event: [ push, tag ]
       branch: [ forno, master ]
       status: [ success, failure ]
