@@ -90,13 +90,14 @@ newbiz_listings AS (
      AND ei.atualizadoem > dhl.ts_publication
     WHERE nlv.specialconditiontype = 'OriginalsReno'
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 
     UNION
 
     -- gets orent info
     SELECT
         dhl.sk_house_listing    										AS sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)										AS publication_date,
         DATE(dhl.ts_last_de_publication)						AS de_publication_date,
@@ -146,13 +147,14 @@ newbiz_listings AS (
      AND ei.atualizadoem > dhl.ts_publication
     WHERE nlv.specialconditiontype = 'ORent'
       AND COALESCE(fpj.sk_date_photos_uploaded::VARCHAR, ei.atualizadoem::VARCHAR) IS NOT NULL
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
 
     UNION
 
     -- gets ready info
     SELECT
         dhl.sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
         DATE(dhl.ts_last_de_publication)   AS de_publication_date,
@@ -183,6 +185,7 @@ newbiz_listings AS (
     -- gets irent info
     SELECT
         dhl.sk_house_listing    			AS sk_house_listing,
+        dhl.version,
         dhl.id_house,
         DATE(dhl.ts_publication)			AS publication_date,
         DATE(dhl.ts_last_de_publication)   AS de_publication_date,
