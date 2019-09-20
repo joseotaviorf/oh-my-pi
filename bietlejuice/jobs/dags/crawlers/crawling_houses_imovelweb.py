@@ -36,7 +36,7 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=8192,
+        memory=10024,
         command=['./crawlers/imovelweb_crawler.py', '--listing_date', execution_date,
                  '--states'] + states
     )
