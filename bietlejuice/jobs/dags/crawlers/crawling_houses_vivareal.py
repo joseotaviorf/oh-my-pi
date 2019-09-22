@@ -153,8 +153,8 @@ crawl_vr = BaseDAG.build_python_operator(
 
 vr_success_test = QuintoAndarAWSBatchSensor(
     task_id='vr-success-test',
-    poke_interval=20 * 60,
-    timeout=22 * 3600,
+    poke_interval=30 * 60,
+    timeout=23 * 3600,
     provide_context=True,
     xcom_task_id='crawl-vivareal'
 )
