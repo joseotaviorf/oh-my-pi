@@ -10,6 +10,7 @@ select
     week_start,
     weeks_since_publication,
     status_history,
+    case when status_history = 'suspenso' then status_change_reason	else null end as status_change_reason,
    	sk_house_listing
 from(
 select
@@ -31,4 +32,5 @@ where dd.weekday_name = 'Sunday'
 where
 	rk = 1
 	and status_history in ('suspenso','publicado')
+	and sk_house_listing % 1000 <> 0
 ;

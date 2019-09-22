@@ -1,4 +1,22 @@
-with manual_google_costs as (
+with cities_share_by_ol as (
+    select distinct
+        dd.sk_date,
+        dr.city_group,
+        (dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing) +
+            dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing desc) - 1) /
+        (dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing) +
+            dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing desc) - 1)::float as share
+    from dim_date dd
+    join fact_house_listing_status fhs
+        on dd.sk_date between fhs.sk_status_start_date and coalesce(nullif(fhs.sk_status_end_date, -1), to_char(current_date - 1, 'YYYYMMDD')::bigint)
+        and fhs.status_history = 'publicado'
+        and fhs.sk_status_start_date != -1
+    join dim_region dr
+        on dr.sk_region = fhs.sk_region
+        and city_group is not null
+    where dd.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+),
+manual_google_costs as (
     with t_prep as (
         select
           replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
@@ -104,46 +122,99 @@ UNION
 		null as other_cost,
 		null as total_cost
 	from google_consolidated_cost
-UNION
-    select 
-        ftc.sk_date,
+UNION (
+    -- selects costs from each cities, mapping campaigns to use OL share
+    with trovit_city_costs as (
+        select
+            ftc.sk_date,
+            dtc.campaign_name,
+            case
+                when lower(dtc.campaign_name) like '%campinas%' then 'Campinas'
+                when lower(dtc.campaign_name) like '%s_o_paulo%' or lower(dtc.campaign_name) like '%sp detailed%' then 'RMSP'
+                when lower(dtc.campaign_name) like 'sp %' then 'RMSP'
+                when lower(dtc.campaign_name) like '%all cities%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%rmsp%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%guarulhos%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%abc%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%barueri%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%osasco%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%jundia%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%santo_andr%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%s_o_bernardo%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%s_o_caetano%' then 'RMSP'
+                when lower(dtc.campaign_name) like '%rio_de_janeiro%' then 'Rio de Janeiro'
+                when lower(dtc.campaign_name) like '%niter_i%' then 'Rio de Janeiro'
+                when lower(dtc.campaign_name) like '%bh%' or lower(dtc.campaign_name) like '%belo%h%' then 'Belo Horizonte'
+                when lower(dtc.campaign_name) like '%minas_gerais%' then 'Belo Horizonte'
+                when lower(dtc.campaign_name) like '%goi_nia%' or lower(dtc.campaign_name) like '%goi_s%' then 'Goiânia'
+                when lower(dtc.campaign_name) like '%bras_lia%' or lower(dtc.campaign_name) like '%distrito_federal%' then 'Brasília'
+                when lower(dtc.campaign_name) like '%porto%alegre%' then 'Porto Alegre'
+                when lower(dtc.campaign_name) like '%curitiba%' or lower(dtc.campaign_name) like '%paran_%' then 'Curitiba'
+                when lower(dtc.campaign_name) like '%florian_polis%' or lower(dtc.campaign_name) like '%santa_catarina%' then 'Florianópolis'
+                else 'SHARE_BY_OL_CITIES'
+            end as city_group,
+            ftc.desktop_cost as desktop_cost,
+            ftc.mobile_cost as mobile_cost
+        from marketing.fact_trovit_daily_cost_attributions ftc
+        left join marketing.dim_trovit_campaign dtc
+            on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
+        where ftc.sk_date >= 20180101
+    ),
+    -- adds OL share to the campaigns not mapped from campaign name
+    trovit_share_by_ol_cities as (
+        select
+            tcc.sk_date,
+            tcc.campaign_name,
+            csol.city_group as city_group,
+            tcc.desktop_cost * csol.share  as desktop_cost,
+            tcc.mobile_cost * csol.share as mobile_cost
+        from trovit_city_costs as tcc
+        join cities_share_by_ol csol
+            on tcc.sk_date = csol.sk_date
+        where tcc.city_group = 'SHARE_BY_OL_CITIES'
+    )
+    -- merges campaigns with city mapped and from OL (not mapped)
+    select
+        sk_date,
         'trovit' as origin,
         'fact_trovit_daily_cost_attributions' as fact_cost,
-        dtc.campaign_name,
+        campaign_name,
         null as campaign_city,
         null as account_name,
-        lower(dtc.campaign_name) as campaign_name_l,
-        null as account_name_l, 
-        null as utm_campaign, 
-        null as utm_term, 
-        null as utm_content, 
-        ftc.desktop_cost as desktop_cost,
-        ftc.mobile_cost as mobile_cost,
+        city_group as campaign_name_l,
+        null as account_name_l,
+        null as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        desktop_cost,
+        mobile_cost,
         null as other_cost,
         null as total_cost
-    from marketing.fact_trovit_daily_cost_attributions ftc
-    left join marketing.dim_trovit_campaign dtc 
-    	on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
-    where ftc.sk_date >= 20180101
+    from (
+        select * from trovit_city_costs where city_group != 'SHARE_BY_OL_CITIES'
+        union all
+        select * from trovit_share_by_ol_cities
+    )
+)
 UNION
-	select 
+	select
         fct.sk_date,
         'criteo' as origin,
         'fact_criteo_daily_cost_attributions' as fact_cost,
         dct.campaign_name,
         null as campaign_city,
-        null as account_name, 
+        null as account_name,
         lower(dct.campaign_name) as campaign_name_l,
-        null as account_name_l, 
-        null as utm_campaign, 
-        null as utm_term, 
-        null as utm_content, 
-        null as desktop_cost, 
-        null as mobile_cost, 
-        null as other_cost, 
+        null as account_name_l,
+        null as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        null as desktop_cost,
+        null as mobile_cost,
+        null as other_cost,
         fct.cost as total_cost
 	from marketing.fact_criteo_daily_cost_attributions fct
-	left join marketing.dim_criteo_campaign dct 
+	left join marketing.dim_criteo_campaign dct
 		on fct.sk_criteo_campaign = dct.sk_criteo_campaign
 	where fct.sk_date >= 20180101
 UNION
@@ -153,47 +224,48 @@ UNION
         'fact_rtb_daily_cost_attributions' as fact_cost,
         drt.campaign_name,
         'rmsp' as campaign_city,
-        null as account_name, 
+        null as account_name,
         lower(drt.campaign_name) as campaign_name_l,
-        null as account_name_l, 
-        null as utm_campaign, 
-        null as utm_term, 
-        null as utm_content, 
-        sum(coalesce(case when device = 'Desktop' then cost end, 0)) as desktop_cost, 
-        sum(coalesce(case when device = 'Mobile' then cost end, 0)) as mobile_cost, 
-        sum(coalesce(case when device = 'Other' then cost end, 0)) as other_cost, 
+        null as account_name_l,
+        null as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        sum(coalesce(case when device = 'Desktop' then cost end, 0)) as desktop_cost,
+        sum(coalesce(case when device = 'Mobile' then cost end, 0)) as mobile_cost,
+        sum(coalesce(case when device = 'Other' then cost end, 0)) as other_cost,
         null as total_cost
       from marketing.fact_rtb_daily_cost_attributions frt
-      left join 
+      left join
       	-- records in dim table are repeated
-      	(select distinct * from marketing.dim_rtb_campaign) drt 
+      	(select distinct * from marketing.dim_rtb_campaign) drt
       	on frt.sk_rtb_campaign = drt.sk_rtb_campaign
       where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
-     select 
+    select
         fcl.sk_cost_date,
         dcl.name as origin,
         'fact_daily_classifieds_costs' as fact_cost,
-        null as campaign_name, 
-        'rmsp' as campaign_city, 
-        null as account_name, 
-        null as campaign_name_l, 
-        null as account_name_l, 
+        null as campaign_name,
+        csol.city_group as campaign_city,
+        null as account_name,
+        null as campaign_name_l,
+        null as account_name_l,
         null as utm_campaign,
-        null as utm_term, 
+        null as utm_term,
         null as utm_content,
         null as desktop_cost,
         null as mobile_cost,
         null as other_cost,
-        fcl.cost as total_cost
+        fcl.cost * csol.share as total_cost
       from marketing.fact_daily_classifieds_costs fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
+      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
       -- filter with 'between' because there is future cost
       where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 )
 ,demand_tax as (
-	select 
+	select
 		cf.origin,
 		cf.sk_date,
 		cf.account_name,
@@ -202,6 +274,8 @@ UNION
 		mccc.city_group as cost_city_group,
 		-- city via campaign_name full name written
 		case
+		    when campaign_name_l in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre')
+		        then campaign_name_l
 	 	    when cf.campaign_name_l like '%campinas%' then 'Campinas'
 			when cf.campaign_name_l like '%s_o_paulo%' or cf.campaign_name_l like '%sp detailed%' then 'RMSP'
 			when cf.campaign_name_l like 'sp %' then 'RMSP'
@@ -226,7 +300,10 @@ UNION
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
-		case when campaign_city = 'campinas' then 'Campinas'
+		case
+             when campaign_city in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre')
+		        then campaign_city
+		     when campaign_city = 'campinas' then 'Campinas'
 		     when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
 			 when campaign_city in ('rj', 'niteroi', 'rio_de_janeiro', 'rio') then 'Rio de Janeiro'
 			 when campaign_city in ('bh', 'belo_horizonte') then 'Belo Horizonte'
