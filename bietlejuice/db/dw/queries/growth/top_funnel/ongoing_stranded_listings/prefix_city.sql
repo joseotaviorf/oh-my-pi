@@ -59,7 +59,7 @@ all_dates_last_month as (
 	from fact_house_listing_status f
 	join dim_date dd
 		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(nullif(f.sk_status_start_date, -1_, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+			and datediff('day', to_date(nullif(f.sk_status_start_date, -1), 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	left join dim_region dr
 		on f.sk_region = dr.sk_region
