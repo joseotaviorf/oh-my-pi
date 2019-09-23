@@ -1,18 +1,15 @@
 drop view if exists vw_fact_affiliate_engagement_cost;
 create view vw_fact_affiliate_engagement_cost as
     SELECT
-        data_operacao,
-        usuario_id,
+        sk_date,
+        sk_user,
+        sk_region,
         dadosafiliado_id,
         dadosagente_id,
-        region_id,
-        afiliado_ativo,
+        flg_affiliate_active,
         affiliate_type,
-        tipo_comissao,
-        comissao_lead,
-        comissao_por_locacao,
-        comissao_indicacao_afiliado,
-        comissao_total,
+        commission_type,
+        value_brl,
         now()::timestamp as ts_load
     FROM
       public.fact_affiliate_engagement_cost
