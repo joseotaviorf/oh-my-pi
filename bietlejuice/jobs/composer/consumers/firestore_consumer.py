@@ -42,10 +42,6 @@ class FirestoreConsumer(DatabaseConsumer):
         return self._get_default_read_format_and_options(data_json)
 
     @logger
-    def get_data_from_table_in_parallel(self, table_name, concurrency):
-        raise NotImplementedError()
-
-    @logger
     def get_data_from_query(self, query, table_name=None):
         doc_ref = self.db.collection(u'{}'.format(table_name))
 
@@ -92,10 +88,6 @@ class FirestoreConsumer(DatabaseConsumer):
                 row[k] = 'false'
         return row
 
-    @logger
-    def get_table_schema(self, table_name):
-        raise NotImplementedError()
-
     @logger(exclude=['json_parsed', 'df'])
     def _get_default_read_format_and_options(self, json_parsed):
         rdd = sc.parallelize(json_parsed)
@@ -106,7 +98,3 @@ class FirestoreConsumer(DatabaseConsumer):
             .format_column_names()
             .output()
         )
-
-    @logger
-    def _get_partition_column_from_table(self, table):
-        raise NotImplementedError()
