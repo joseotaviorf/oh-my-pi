@@ -28,7 +28,8 @@ class FirestoreConsumer(DatabaseConsumer):
     @logger
     def get_table_names_and_sizes(self):
         all_collections = self.db.collections()
-        return [{'table_name': collection.id, 'size': 0} for collection in all_collections]
+        tables = [{'table_name': collection.id, 'size': 0} for collection in all_collections]
+        return self._get_default_read_format_and_options(tables)
 
     @logger
     def get_data_from_table(self, table):
