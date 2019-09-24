@@ -1,13 +1,11 @@
+import json
 from quintoandar_logger import QuintoAndarLogger
 
 import firebase_admin
 from firebase_admin import (credentials, firestore)
 from bietlejuice.jobs.composer.base.db import DatabaseTypeEnum
 from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
-from bietlejuice.jobs.composer.base.spark import (
-    BaseSparkContext,
-    SparkDataFrameService
-)
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 
 logger = QuintoAndarLogger("FirestoreConsumer")
@@ -26,7 +24,6 @@ class FirestoreConsumer(DatabaseConsumer):
         firebase_admin.initialize_app(cred)
 
         self.db = firestore.client()
-        # self.client = self.db._firestore_api()
 
     @logger
     def get_table_names_and_sizes(self):
@@ -64,37 +61,31 @@ class FirestoreConsumer(DatabaseConsumer):
 
     def parse_file(self, docs):
         parse_doc = []
+
         for doc in docs:
             row = doc.to_dict()
-            row = self.extract_nested_json(row)
-            row = self.parse_boolean_column(row)
             row['firestore_id'] = doc.id
             parse_doc.append(row)
-        return parse_doc
 
-    def extract_nested_json(self, row):
-        for k in list(row):
-            if type(row[k]) == dict:
-                for key in row[k]:
-                    row[f'{k}.{key}'] = row[k][key]
-                row.pop(k)
-        return row
+        if len(parse_doc) > 0:
+            data_json = json.dumps(
+                [doc for doc in parse_doc],
+                default=self.convert_to_serializable_obj,
+                sort_keys=True
+            )
 
-    def parse_boolean_column(self, row):
-        for k in list(row):
-            if str(row[k]) == 'True':
-                row[k] = 'true'
-            if str(row[k]) == 'False':
-                row[k] = 'false'
-        return row
+            return data_json
 
-    @logger(exclude=['json_parsed', 'df'])
+    @logger(exclude='json_parsed')
     def _get_default_read_format_and_options(self, json_parsed):
-        rdd = sc.parallelize(json_parsed)
-        df = spark.read.json(rdd, multiLine=True)
+        rdd = sc.parallelize([json_parsed], 20)
+        return spark.read.option('multiline', "true").json(rdd)
 
-        return (
-            SparkDataFrameService().input(df)
-            .format_column_names()
-            .output()
-        )
+    def convert_to_serializable_obj(self, obj):
+        return obj.rfc3339()
+
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
+        raise NotImplementedError
+
+    def get_table_schema(self, table_name):
+        raise NotImplementedError
