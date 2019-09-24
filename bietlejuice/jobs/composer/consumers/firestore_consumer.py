@@ -13,6 +13,8 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class FirestoreConsumer(DatabaseConsumer):
+    BATCH_SIZE = 5000
+
     def __init__(self, connection):
         if connection['dbtype'].lower() != DatabaseTypeEnum.FIRESTORE:
             raise RuntimeError(
@@ -32,12 +34,29 @@ class FirestoreConsumer(DatabaseConsumer):
         return self._get_default_read_format_and_options(tables)
 
     @logger
-    def get_data_from_table(self, table):
-        doc_ref = self.db.collection('{}'.format(table)).limit(100)
-        docs = doc_ref.get()
+    def get_data_from_table(self, table, order_by_column, last_doc=None):
+        doc_ref = self.db.collection(f'{table}')
 
-        data_json = self.parse_file(docs)
-        return self._get_default_read_format_and_options(data_json)
+        if not last_doc:
+            first_query = doc_ref.order_by(f'{order_by_column}').limit(FirestoreConsumer.BATCH_SIZE)
+            docs = first_query.stream()
+            data_json, last_document = self.parse_file(docs)
+
+            return self._get_default_read_format_and_options(data_json), last_document
+
+        last_pop = last_doc[f'{order_by_column}']
+        next_query = (
+            doc_ref
+            .order_by(f'{order_by_column}')
+            .start_after({
+                f'{order_by_column}': last_pop
+            })
+            .limit(FirestoreConsumer.BATCH_SIZE)
+        )
+        docs = next_query.stream()
+        data_json, last_document = self.parse_file(docs)
+
+        return self._get_default_read_format_and_options(data_json), last_document
 
     @logger
     def get_data_from_query(self, query, table_name=None):
@@ -58,7 +77,7 @@ class FirestoreConsumer(DatabaseConsumer):
 
         docs = doc_ref.stream()
         data_json = self.parse_file(docs)
-        return self._get_default_read_format_and_options(data_json)
+        return self._get_default_read_format_and_options(data_json[0])
 
     def parse_file(self, docs):
         parse_doc = []
@@ -75,11 +94,12 @@ class FirestoreConsumer(DatabaseConsumer):
                 sort_keys=True
             )
 
-            return data_json
+            last_document = parse_doc[-1]
+            return data_json, last_document
 
     @logger(exclude='json_parsed')
     def _get_default_read_format_and_options(self, json_parsed):
-        rdd = sc.parallelize([json_parsed], 20)
+        rdd = sc.parallelize([json_parsed], 3)
         return spark.read.option('multiline', "true").json(rdd)
 
     def convert_to_serializable_obj(self, obj):
