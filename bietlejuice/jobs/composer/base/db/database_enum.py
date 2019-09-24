@@ -17,3 +17,4 @@ class DatabaseTypeEnum:
     POSTGRESQL = "postgres"
     MYSQL = "mysql"
     REDSHIFT = "postgres"
+    FIRESTORE = "firestore"
