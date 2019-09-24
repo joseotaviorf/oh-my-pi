@@ -1,9 +1,9 @@
-import json
 from quintoandar_logger import QuintoAndarLogger
 
 import firebase_admin
 from firebase_admin import (credentials, firestore)
 from bietlejuice.jobs.composer.base.db import DatabaseTypeEnum
+from bietlejuice.jobs.composer.parsers.firestore_parser import FirestoreParser
 from bietlejuice.jobs.composer.consumers.database_consumer import DatabaseConsumer
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
@@ -26,6 +26,7 @@ class FirestoreConsumer(DatabaseConsumer):
         firebase_admin.initialize_app(cred)
 
         self.db = firestore.client()
+        self.parser = FirestoreParser()
 
     @logger
     def get_table_names_and_sizes(self):
@@ -41,69 +42,31 @@ class FirestoreConsumer(DatabaseConsumer):
             first_query = doc_ref.order_by(f'{order_by_column}').limit(FirestoreConsumer.BATCH_SIZE)
             docs = first_query.stream()
             data_json, last_document = self.parse_file(docs)
-
             return self._get_default_read_format_and_options(data_json), last_document
 
         last_pop = last_doc[f'{order_by_column}']
-        next_query = (
-            doc_ref
-            .order_by(f'{order_by_column}')
-            .start_after({
-                f'{order_by_column}': last_pop
-            })
-            .limit(FirestoreConsumer.BATCH_SIZE)
-        )
+        next_query = self.parser.parse_chunk_query(doc_ref, order_by_column, last_pop,
+                                                   FirestoreConsumer.BATCH_SIZE)
         docs = next_query.stream()
         data_json, last_document = self.parse_file(docs)
-
         return self._get_default_read_format_and_options(data_json), last_document
 
     @logger
     def get_data_from_query(self, query, table_name=None):
         doc_ref = self.db.collection(u'{}'.format(table_name))
 
-        for clause in query.keys():
-            if clause == 'select':
-                doc_ref = doc_ref.select(query[clause])
-            if clause == 'where':
-                for query_filter in query[clause]:
-                    doc_ref = doc_ref.where(query_filter['field'],
-                                            query_filter['op'],
-                                            query_filter['value'])
-            if clause == 'order_by':
-                doc_ref = doc_ref.order_by(query[clause]['field'], query[clause]['direction'])
-            if clause == 'limit':
-                doc_ref = doc_ref.limit(query[clause])
-
-        docs = doc_ref.stream()
+        doc_ref_parsed = self.parser.parse_query(doc_ref, query)
+        docs = doc_ref_parsed.stream()
         data_json = self.parse_file(docs)
         return self._get_default_read_format_and_options(data_json[0])
-
-    def parse_file(self, docs):
-        parse_doc = []
-
-        for doc in docs:
-            row = doc.to_dict()
-            row['firestore_id'] = doc.id
-            parse_doc.append(row)
-
-        if len(parse_doc) > 0:
-            data_json = json.dumps(
-                [doc for doc in parse_doc],
-                default=self.convert_to_serializable_obj,
-                sort_keys=True
-            )
-
-            last_document = parse_doc[-1]
-            return data_json, last_document
 
     @logger(exclude='json_parsed')
     def _get_default_read_format_and_options(self, json_parsed):
         rdd = sc.parallelize([json_parsed], 3)
         return spark.read.option('multiline', "true").json(rdd)
 
-    def convert_to_serializable_obj(self, obj):
-        return obj.rfc3339()
+    def parse_file(self, docs):
+        return self.parser.parse_document_type(docs)
 
     def get_data_from_table_in_parallel(self, table_name, concurrency):
         raise NotImplementedError
