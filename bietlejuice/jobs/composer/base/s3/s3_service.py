@@ -7,7 +7,8 @@ class S3Service:
     def __init__(self, boto3_s3_resource):
         self.s3 = boto3_s3_resource
 
-    def _split_s3_path(self, s3_path):
+    @staticmethod
+    def _split_s3_path(s3_path):
         split = s3_path.split("/")
         bucket_name = split[2]
         suffix = "/".join(split[3:])
