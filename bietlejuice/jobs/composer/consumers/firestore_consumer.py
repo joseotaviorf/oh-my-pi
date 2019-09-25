@@ -19,7 +19,7 @@ class FirestoreConsumer(DatabaseConsumer):
         if connection['dbtype'].lower() != DatabaseTypeEnum.FIRESTORE:
             raise RuntimeError(
                 f"m=__init__, con_type={connection.get('dbtype')}, "
-                f"msg=Connection is not a postgresql connection"
+                f"msg=Connection is not a firestore connection"
             )
 
         cred = credentials.Certificate(connection['credentials'])
@@ -36,6 +36,13 @@ class FirestoreConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_table(self, table, order_by_column, last_doc=None):
+        """Get all data from table in chunks.
+
+        :param table: Table name
+        :param order_by_column: Column name to sort the query
+        :param last_doc: Last value from query returned by this method
+        :return: Tuple (spark dataframe, last_document)
+        """
         doc_ref = self.db.collection(f'{table}')
 
         if not last_doc:
@@ -53,6 +60,34 @@ class FirestoreConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_query(self, query, table_name=None):
+        """Get data from query.
+
+        :param query: Json with statements. For example:
+            {
+                "select": ["createdDate", "iteration", "firestore_id", "ownerId"],
+                "where": [
+                    {
+                        "field": "lastSentDate",
+                        "op": ">=",
+                        "value": "2018-9-19"
+                    },
+                    {
+                        "field": "lastSentDate",
+                        "op": "<",
+                        "value": "2019-9-20"
+                    }
+                ],
+                "order_by": [
+                    {
+                        "field": "lastSentDate",
+                        "direction": "ASCENDING"
+                    }
+                ],
+                "limit": 5000
+            }
+        :param table_name: string
+        :return: spark dataframe
+        """
         doc_ref = self.db.collection(u'{}'.format(table_name))
 
         doc_ref_parsed = self.parser.parse_query(doc_ref, query)
@@ -63,7 +98,7 @@ class FirestoreConsumer(DatabaseConsumer):
     @logger(exclude='json_parsed')
     def _get_default_read_format_and_options(self, json_parsed):
         rdd = sc.parallelize([json_parsed], 3)
-        return spark.read.option('multiline', "true").json(rdd)
+        return spark.read.option('multiline', 'true').json(rdd)
 
     def parse_file(self, docs):
         return self.parser.parse_document_type(docs)
