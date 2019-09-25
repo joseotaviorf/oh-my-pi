@@ -172,18 +172,13 @@ UNION (
         join cities_share_by_ol csol
             on tcc.sk_date = csol.sk_date
         where tcc.city_group = 'SHARE_BY_OL_CITIES'
-    ),
-    -- merges campaigns with city mapped and from OL (not mapped)
-    trovit_final_fact_costs as (
-        select * from trovit_city_costs where city_group != 'SHARE_BY_OL_CITIES'
-    union all
-        select * from trovit_share_by_ol_cities
     )
+    -- merges campaigns with city mapped and from OL (not mapped)
     select
         sk_date,
         'trovit' as origin,
         'fact_trovit_daily_cost_attributions' as fact_cost,
-        max(campaign_name) as campaign_name,
+        campaign_name,
         null as campaign_city,
         null as account_name,
         city_group as campaign_name_l,
@@ -191,12 +186,15 @@ UNION (
         null as utm_campaign,
         null as utm_term,
         null as utm_content,
-        sum(desktop_cost) as desktop_cost,
-        sum(mobile_cost) as mobile_cost,
+        desktop_cost,
+        mobile_cost,
         null as other_cost,
         null as total_cost
-    from trovit_final_fact_costs
-    group by sk_date,origin,fact_cost,campaign_name_l
+    from (
+        select * from trovit_city_costs where city_group != 'SHARE_BY_OL_CITIES'
+        union all
+        select * from trovit_share_by_ol_cities
+    )
 )
 UNION
 	select

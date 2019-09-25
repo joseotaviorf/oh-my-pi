@@ -10,6 +10,7 @@ class DatabaseEnum:
     DW = "ENV_DW"
     INSIDER = "ENV_INSIDER"
     WOLOLO = "WOLOLO"
+    LINHADIRETA = "ENV_LINHADIRETA"
 
 
 class DatabaseTypeEnum:
