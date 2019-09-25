@@ -10,6 +10,6 @@ SELECT
   c.lng,
   c.nome AS name,
   c.numero AS number,
-  c.condoManager_id AS condo_manager_id,
+  c.condoManager_id AS id_condo_manager,
   c.rules
 FROM datalake_ebdb_raw.Condominio c
