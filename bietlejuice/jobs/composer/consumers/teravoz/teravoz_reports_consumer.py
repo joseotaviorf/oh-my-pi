@@ -11,6 +11,8 @@ class TeravozReportsConsumer(TeravozConsumer):
     @logger
     def __init__(self, api_user, api_pwd, execution_date):
         super().__init__(api_user, api_pwd, execution_date)
+        self.utc_hour_start = "T03:00:00.000Z"
+        self.utc_hour_end = "T02:59:59.999Z"
 
     @logger
     def __build_api_params(self):
@@ -23,10 +25,11 @@ class TeravozReportsConsumer(TeravozConsumer):
 
         params = {
             "queue_number": "&queues[]=".join(list_queues),
-            "start_date": self.execution_date,
+            "start_date": self.execution_date + self.utc_hour_start,
             "end_date": datetime.strftime(
                 self.dt_execution + timedelta(days=1), "%Y-%m-%d"
-            ),
+            )
+            + self.utc_hour_end,
         }
 
         return params
