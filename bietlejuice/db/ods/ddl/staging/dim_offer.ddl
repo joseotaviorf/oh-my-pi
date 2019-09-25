@@ -3,6 +3,7 @@ create table staging.dim_offer (
   sk_offer integer,
   id_offer integer,
   id_godfather integer,
+  id_firestore varchar(255),
   last_offered_rent integer,
   original_rent integer,
   original_condo integer,
