@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
@@ -16,10 +15,10 @@ spark = BaseSparkContext.spark
 
 class Transformer:
     @logger
-    def __init__(self, env, source):
+    def __init__(self, env, source, athena_client):
         self.env = env
         self.source = source
-        self.client = AthenaClient()
+        self.client = athena_client
 
     @logger
     def _get_database(self, datalake_layer):
