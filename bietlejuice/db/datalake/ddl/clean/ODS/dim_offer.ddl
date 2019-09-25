@@ -3,6 +3,7 @@ create external table if not exists datalake_clean.ods_dim_offer (
   sk_offer string,
   id_offer string,
   id_godfather string,
+  id_firestore string,
   last_offered_rent string,
   original_rent string,
   original_condo string,
