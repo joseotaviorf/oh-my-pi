@@ -5,6 +5,34 @@ class FirestoreParser:
 
     @staticmethod
     def parse_query(doc_ref, query):
+        """Parse query.
+
+        :param doc_ref: Collection reference object
+        :param query: Json with statements. For example:
+            {
+                "select": ["createdDate", "iteration", "firestore_id", "ownerId"],
+                "where": [
+                    {
+                        "field": "lastSentDate",
+                        "op": ">=",
+                        "value": "2018-9-19"
+                    },
+                    {
+                        "field": "lastSentDate",
+                        "op": "<",
+                        "value": "2019-9-20"
+                    }
+                ],
+                "order_by": [
+                    {
+                        "field": "lastSentDate",
+                        "direction": "ASCENDING"
+                    }
+                ],
+                "limit": 5000
+            }
+        :return: Filtered collection reference object
+        """
         for clause in query.keys():
             if clause == 'select':
                 doc_ref = doc_ref.select(query[clause])
@@ -14,13 +42,21 @@ class FirestoreParser:
                                             query_filter['op'],
                                             query_filter['value'])
             if clause == 'order_by':
-                doc_ref = doc_ref.order_by(query[clause]['field'], query[clause]['direction'])
+                doc_ref = doc_ref.order_by(query[clause][0]['field'], query[clause][0]['direction'])
             if clause == 'limit':
                 doc_ref = doc_ref.limit(query[clause])
         return doc_ref
 
     @staticmethod
     def parse_chunk_query(doc_ref, order_by_column, last_value, batch):
+        """Parse chunk query with some statements.
+
+        :param doc_ref: Collection reference
+        :param order_by_column: Column name to sort the query
+        :param last_value: Last value from order_by_column returned by this method
+        :param batch: Number of documents to be returned
+        :return: Query structure with parameters
+        """
         next_query = (
             doc_ref
             .order_by(f'{order_by_column}')
@@ -32,6 +68,11 @@ class FirestoreParser:
         return next_query
 
     def parse_document_type(self, docs):
+        """Parse GCP Document type to json.
+
+        :param docs: Iterator from RunQueryResponse messages.
+        :return: Tuple (data_json, last_document)
+        """
         parse_doc = []
 
         for doc in docs:
@@ -50,4 +91,9 @@ class FirestoreParser:
 
     @staticmethod
     def convert_to_serializable_obj(obj):
+        """Convert a DatetimeWithNanoSeconds object to serializable object.
+
+        :param obj: DatetimeWithNanoSeconds object
+        :return: RFC 3339-compliant timestamp (string)
+        """
         return obj.rfc3339()
