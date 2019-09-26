@@ -6,6 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.etl.transformer import Transformer
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 sqlContext = BaseSparkContext.sqlContext
 
@@ -49,8 +50,8 @@ if __name__ == "__main__":
             env, datalake_layer, source, tables, all
         )
     )
-
-    transformer = Transformer(env, source)
+    athena_client = AthenaClient()
+    transformer = Transformer(env, source, athena_client)
     if all:
         logger.info(
             "m=__main__, tables=all, msg=Creating {} external tables...".format(
