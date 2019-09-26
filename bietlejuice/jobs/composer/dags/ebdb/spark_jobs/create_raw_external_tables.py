@@ -17,9 +17,12 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 @logger
 def create_raw_external_table(args):
-    loader, databricks_consumer, table_name, athena_db = args
+    loader, databricks_consumer, table_name, athena_db, athena_client = args
     loader.create_athena_external_table(
-        consumer=databricks_consumer, table_name=table_name, athena_db=athena_db
+        athena_client=athena_client,
+        consumer=databricks_consumer,
+        table_name=table_name,
+        athena_db=athena_db,
     )
     logger.info(
         "m=create_raw_external_table, table={}, msg=Finished creating table.".format(
@@ -38,7 +41,8 @@ if __name__ == "__main__":
     loader = DatabaseIntoDataLakeRawLoader(environment, source)
     # in glue metastore we need to distinguish schemas between environments
     athena_db = "{}_{}".format(loader.datalake_db, environment)
-    AthenaClient.execute_athena_query(
+    athena_client = AthenaClient()
+    athena_client.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
     connection = {"db": loader.datalake_db}
@@ -50,7 +54,13 @@ if __name__ == "__main__":
         p.map(
             create_raw_external_table,
             [
-                (loader, databricks_consumer, table.table_name, athena_db)
+                (
+                    loader,
+                    databricks_consumer,
+                    table.table_name,
+                    athena_db,
+                    athena_client,
+                )
                 for table in tables
             ],
         )
