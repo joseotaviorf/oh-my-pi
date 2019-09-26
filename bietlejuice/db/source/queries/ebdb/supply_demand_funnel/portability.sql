@@ -8,6 +8,8 @@ select
     ownerType as owner_type,
     criadoEm as ts_created,
     atualizadoEm as ts_updated,
+    contractStartDate as ts_contract_started,
+    contractFinalDate as ts_contract_ended,
     currentCondoFee as current_condo_fee,
     currentIptuTwelth as current_iptu_twelth,
     currentRent as current_rent,
@@ -29,9 +31,7 @@ select
     tenantData_gender as tenant_data_gender,
     tenantData_name as tenant_data_name,
     tenantData_phoneNumber as tenant_data_phone_number,
-    contractFinalDate as ts_contract_ended,
-    contractObservations as contract_observations,
-    contractStartDate as ts_contract_started
+    contractObservations as contract_observations
   from
     Portability
 where date(coalesce(criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')
