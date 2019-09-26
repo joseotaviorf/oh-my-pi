@@ -29,6 +29,7 @@ select
       split(pe.minimumServiceTime, ":")[1]*60 +
       split(pe.minimumServiceTime, ":")[2]) as seconds_minimum_service_time,
     current_timestamp as ts_load,
+    date(concat(st.year,"-",st.month,"-",st.day)) as dt_created,
     smallint(st.year) as year,
     tinyint(st.month) as month,
     tinyint(st.day) as day
