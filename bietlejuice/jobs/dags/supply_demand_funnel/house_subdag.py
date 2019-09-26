@@ -26,17 +26,16 @@ class HouseSubDag(DimSubDag):
     def build_house_with_tests(self):
         house_dag = self._build_local_dag()
 
-        (
-            house_task, affiliate, rent_flow, house_listing,
-            staging_dim_house_listing_task,
-            dim_house_listing) = self.__build_data_tasks(house_dag)
+        (portability, house_task, affiliate, rent_flow, house_listing,
+         staging_dim_house_listing_task,
+         dim_house_listing) = self.__build_data_tasks(house_dag)
 
         # TODO: put tests back to flow
         # tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> house_listing
         staging_dim_house_listing_task.set_upstream(
-            [rent_flow, house_listing, house_task])
+            [portability, rent_flow, house_listing, house_task])
         # staging_dim_house_listing_task.set_downstream(tests_tasks)
         # dim_house_listing.set_upstream(tests_tasks)
         staging_dim_house_listing_task >> dim_house_listing
@@ -44,19 +43,15 @@ class HouseSubDag(DimSubDag):
         return house_dag
 
     @logger
-    def get_house_query(self, **kwargs):
-        exec_date = kwargs['execution_date']
-        dim = 'house'
-
+    def extract_from_ebdb_to_ods_with_query(self, table_name, execution_date, **kwargs):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR,
-                                                                 dim)
+                                                                 table_name)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
-        query = query.format(str(exec_date))
+        query = query.format(str(execution_date))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=table_name,
                                                  bucket=DimSubDag.S3_BUCKET,
-                                                 command=query,
-                                                 table_name='house')
+                                                 command=query)
 
     @logger
     def __build_data_tasks(self, dag):
@@ -64,7 +59,16 @@ class HouseSubDag(DimSubDag):
             dag=dag,
             task_id='ODS_imovel',
             provide_context=True,
-            python_callable=self.get_house_query
+            python_callable=self.extract_from_ebdb_to_ods_with_query,
+            op_kwargs={'table_name': 'house'}
+        )
+
+        portability = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_portability',
+            provide_context=True,
+            python_callable=self.extract_from_ebdb_to_ods_with_query,
+            op_kwargs={'table_name': 'portability'}
         )
 
         affiliate = BaseDAG.build_python_operator(
@@ -120,6 +124,6 @@ class HouseSubDag(DimSubDag):
             }
         )
 
-        return (property_task, affiliate, rent_flow, house_listing_task,
+        return (portability, property_task, affiliate, rent_flow, house_listing_task,
                 staging_dim_house_listing_task,
                 dim_house_listing)
