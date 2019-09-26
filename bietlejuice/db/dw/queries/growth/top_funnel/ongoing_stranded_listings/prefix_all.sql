@@ -31,7 +31,7 @@ with all_dates as (
 	from fact_house_listing_status f
 	join dim_date dd
 		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+			and datediff('day', to_date(nullif(f.sk_status_start_date, -1), 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
   order by 1, 2, 3, 4
@@ -49,7 +49,7 @@ all_dates_last_month as (
 	from fact_house_listing_status f
 	join dim_date dd
 		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+			and datediff('day', to_date(nullif(f.sk_status_start_date, -1), 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
 		and dd.year = date_part('year', add_months(current_date, -1))
@@ -67,7 +67,7 @@ all_dates_last_year as (
 	from fact_house_listing_status f
 	join dim_date dd
 		on dd.sk_date between f.sk_status_start_date and coalesce(f.sk_status_end_date, to_char(current_date - 1, 'YYYYMMDD')::bigint)
-			and datediff('day', to_date(f.sk_status_start_date, 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
+			and datediff('day', to_date(nullif(f.sk_status_start_date, -1), 'YYYYMMDD')::date, to_date(dd.sk_date, 'YYYYMMDD')) >= 84
 			and f.status_history = 'publicado'
 	where dd."date" < current_date
 	  and dd.year = date_part('year', add_months(current_date, -12))
