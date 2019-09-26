@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
+from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -34,9 +35,12 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = file_name = args.file_name.replace("-", "_")
     environment = args.environment
+    athena_client = AthenaClient()
 
     # execute query and get dataframe
-    teravoz_transformer = TeravozTransformer(env=environment)
+    teravoz_transformer = TeravozTransformer(
+        env=environment, athena_client=athena_client
+    )
     df = teravoz_transformer.create_dataframe_from_datalake_sql_file(
         file_name=file_name, execution_date=execution_date
     )

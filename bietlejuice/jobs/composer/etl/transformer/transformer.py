@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
@@ -16,9 +15,10 @@ spark = BaseSparkContext.spark
 
 class Transformer:
     @logger
-    def __init__(self, env, source):
+    def __init__(self, env, source, athena_client):
         self.env = env
         self.source = source
+        self.client = athena_client
 
     @logger
     def _get_database(self, datalake_layer):
@@ -59,7 +59,7 @@ class Transformer:
         s3_base_path = self._get_s3_base_path(datalake_layer)
         table_schema = self._get_spark_table_schema(datalake_layer, table_name)
 
-        AthenaClient.create_external_table(
+        self.client.create_external_table(
             database=database,
             table_name=table_name,
             s3_table_path=s3_base_path + table_name,
@@ -85,7 +85,7 @@ class Transformer:
         """
 
         database = self._get_database(datalake_layer)
-        AthenaClient.add_partition(database, table_name, partition_by_dict)
+        self.client.add_partition(database, table_name, partition_by_dict)
 
     @logger
     def create_dataframe_from_datalake_sql_file(

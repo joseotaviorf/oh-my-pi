@@ -21,7 +21,8 @@ if __name__ == "__main__":
 
     loader = DatabaseIntoDataLakeRawLoader(environment, source)
     athena_db = "{}_{}".format(loader.datalake_db, environment)
-    AthenaClient.execute_athena_query(
+    athena_client = AthenaClient()
+    athena_client.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db), "default"
     )
     connection = {"db": loader.datalake_db}
@@ -31,6 +32,7 @@ if __name__ == "__main__":
     logger.info("m=__main__, msg=Creating raw external tables...")
     for table in tables:
         loader.create_athena_external_table(
+            athena_client=athena_client,
             consumer=databricks_consumer,
             table_name=table.table_name,
             athena_db=athena_db,

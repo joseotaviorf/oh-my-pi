@@ -40,6 +40,16 @@ with b2b_info as (
   left join photo_job pj
     on pj.imovel_id = h.id
 ),
+house_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
+),
 house_listings as (
   select
     hl.id_house_listing as sk_house_listing,
@@ -163,7 +173,10 @@ select
   hl.house_predicted_price,
   bi.is_b2b,
   bi.b2b_type,
-  bi.b2b_prime_type,
+  case
+      when hp.id_house_listing is not null then 'portability'
+      else bi.b2b_prime_type
+  end as b2b_prime_type,
   hl.is_originals_active,
   hl.last_originals_type,
   hl.dt_last_originals_opted_in,
@@ -176,4 +189,6 @@ select
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
+left join house_portability hp
+    on hp.id_house_listing = hl.sk_house_listing
 ;
