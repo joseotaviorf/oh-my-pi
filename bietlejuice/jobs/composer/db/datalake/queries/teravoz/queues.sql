@@ -1,7 +1,7 @@
 select
     int(id) as id,
     smallint(number) as number,
-    name,
+    description as name,
     smallint(logged_in) as agents_logged,
     current_timestamp as ts_load,
     smallint(year) as year,
