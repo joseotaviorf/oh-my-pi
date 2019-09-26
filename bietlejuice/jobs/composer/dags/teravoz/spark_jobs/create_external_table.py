@@ -4,7 +4,7 @@ import logging
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
-
+from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -39,9 +39,10 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
+    athena_client = AthenaClient()
 
     # create external table and add partition
-    transformer = TeravozTransformer(environment)
+    transformer = TeravozTransformer(environment, athena_client)
 
     transformer.create_athena_table(
         datalake_layer=datalake_layer, table_name=table_name
