@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.consumers import MySQLConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
 JOB_NAME = "load_ebdb_into_datalake"
-BLACK_LIST = ["REVCHANGES", "Negociacao"]
+BLACK_LIST = ["REVCHANGES"]
 PARTITION_SIZE = 512
 NB_THREADS = 20
 

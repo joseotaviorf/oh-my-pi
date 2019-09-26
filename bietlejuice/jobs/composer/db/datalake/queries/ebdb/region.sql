@@ -7,9 +7,8 @@ SELECT
     mr.id AS id_macro,
     mr.nome AS macro_name,
     c.id AS id_city,
-    c.nome AS city_name,
-    now() AS dt_timestamp
-from
+    c.nome AS city_name
+FROM
     datalake_ebdb_raw.regiao r
     LEFT JOIN datalake_ebdb_raw.regiao mr ON
         mr.id = r.regiaoPai_id
