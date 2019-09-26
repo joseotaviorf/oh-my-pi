@@ -13,7 +13,7 @@ sqlContext = BaseSparkContext.sqlContext
 
 
 class TeravozReportAgentStatusConsumer(TeravozConsumer):
-    
+
     UTC_HOUR = "T03:00:00.000Z"
 
     @logger

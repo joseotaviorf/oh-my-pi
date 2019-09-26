@@ -8,7 +8,7 @@ logger = QuintoAndarLogger("TeravozReportsConsumer")
 
 
 class TeravozReportsConsumer(TeravozConsumer):
-    
+
     UTC_HOUR_START = "T03:00:00.000Z"
     UTC_HOUR_END = "T02:59:59.999Z"
 
