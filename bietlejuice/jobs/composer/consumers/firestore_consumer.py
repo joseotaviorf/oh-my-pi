@@ -25,12 +25,12 @@ class FirestoreConsumer(DatabaseConsumer):
         cred = credentials.Certificate(connection["credentials"])
         firebase_admin.initialize_app(cred)
 
-        self.db = firestore.client()
+        self.firestore_client = firestore.client()
         self.parser = FirestoreParser()
 
     @logger
     def get_table_names_and_sizes(self):
-        all_collections = self.db.collections()
+        all_collections = self.firestore_client.collections()
         tables = [
             {"table_name": collection.id, "size": 0} for collection in all_collections
         ]
@@ -45,7 +45,7 @@ class FirestoreConsumer(DatabaseConsumer):
         :param last_doc: Last value from query returned by this method
         :return: Tuple (spark dataframe, last_document)
         """
-        doc_ref = self.db.collection(f"{table}")
+        doc_ref = self.firestore_client.collection(f"{table}")
 
         if not last_doc:
             first_query = doc_ref.order_by(f"{order_by_column}").limit(
@@ -93,7 +93,7 @@ class FirestoreConsumer(DatabaseConsumer):
         :param table_name: string
         :return: spark dataframe
         """
-        doc_ref = self.db.collection("{}".format(table_name))
+        doc_ref = self.firestore_client.collection("{}".format(table_name))
 
         doc_ref_parsed = self.parser.parse_query(doc_ref, query)
         docs = doc_ref_parsed.stream()
