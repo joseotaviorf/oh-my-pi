@@ -9,42 +9,45 @@ logger = QuintoAndarLogger('QuintoAndarAWSBatchSensor')
 
 
 class QuintoAndarAWSBatchSensor(BaseSensorOperator):
+    INTERMEDIATE_STATES = ('SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING')
+    FAILURE_STATES = ("FAILED",)
+    SUCCESS_STATES = ("SUCCEEDED",)
 
     @apply_defaults
-    def __init__(self, *args, **kwargs):
+    def __init__(self, job_id=None, xcom_task_id=None, mode='poke', *args, **kwargs):
+        if not job_id and not xcom_task_id:
+            raise RuntimeError(
+                'm=__init__, msg=job_id and xcom_task_id cannot be both None!')
+
+        kwargs['mode'] = mode
         super(QuintoAndarAWSBatchSensor, self).__init__(*args, **kwargs)
 
-        if 'job_id' not in kwargs:
-            if 'xcom_task_id' not in kwargs:
-                raise Exception('job_id and xcom_task_id cannot be both None!')
-
-            self.xcom_task_id = kwargs['xcom_task_id']
-        else:
-            self.job_id = kwargs['job_id']
+        self.job_id = job_id
+        self.xcom_task_id = xcom_task_id
+        self.batch_client = BatchClient()
 
     def poke(self, context):
         # check if there is a job to poke
-        if not hasattr(self, 'job_id'):
-            self.xcom_job_id(task_instance=context['ti'])
+        if not self.job_id:
+            self.job_id = xcom.xcom_pull(task_instance=context['ti'],
+                                         task_id=self.xcom_task_id)
 
-        batch_client = BatchClient()
-        logger.info('m=poke, job_id={}'.format(self.job_id))
-        job_status = batch_client.get_job_status_by_id(job_id=self.job_id)
-        logger.info('m=poke, job_id={}, job_status={}'.format(self.job_id, job_status))
+        job_status = self.batch_client.get_job_status_by_id(job_id=self.job_id)
+        logger.info(
+            'm=poke, job_id={}, job_status={}, msg=poked job'.format(self.job_id,
+                                                                     job_status))
 
         if job_status is None:
-            raise Exception('Job not found')
-        if job_status in ('SUBMITTED', 'PENDING', 'RUNNABLE', 'STARTING', 'RUNNING'):
+            raise RuntimeError(
+                'm=poke, job_id={}, msg=Job not found'.format(self.job_id))
+        elif job_status in self.INTERMEDIATE_STATES:
             return False
-        if job_status == 'SUCCEEDED':
+        elif job_status in self.SUCCESS_STATES:
             return True
-        if job_status == 'FAILED':
-            raise Exception('Job has failed!')
-
-        raise Exception('Status not expected!')
-
-    def xcom_job_id(self, task_instance):
-        if not self.xcom_task_id:
-            raise Exception('There must be an xcom_task_id to receive an xcom value!')
-
-        self.job_id = xcom.xcom_pull(task_instance=task_instance, task_id=self.xcom_task_id)
+        elif job_status in self.FAILURE_STATES:
+            raise RuntimeError(
+                'm=poke, job_id={}, msg=Job has failed!'.format(self.job_id))
+        else:
+            raise RuntimeError(
+                'm=poke, job_id={}, status={}, msg=status not expected!'.format(
+                    self.job_id, job_status))
