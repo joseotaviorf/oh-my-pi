@@ -78,7 +78,7 @@ class FirestoreParser:
             row["firestore_id"] = doc.id
             parse_doc.append(row)
 
-        if len(parse_doc) > 0:
+        if parse_doc:
             data_json = json.dumps(
                 [doc for doc in parse_doc],
                 default=self.convert_to_serializable_obj,

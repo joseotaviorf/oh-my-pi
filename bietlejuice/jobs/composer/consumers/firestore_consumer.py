@@ -107,9 +107,3 @@ class FirestoreConsumer(DatabaseConsumer):
 
     def parse_file(self, docs):
         return self.parser.parse_document_type(docs)
-
-    def get_data_from_table_in_parallel(self, table_name, concurrency):
-        raise NotImplementedError
-
-    def get_table_schema(self, table_name):
-        raise NotImplementedError
