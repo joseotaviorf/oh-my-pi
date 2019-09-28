@@ -1,7 +1,7 @@
 drop table if exists datalake_teravoz_clean_prod.report_agents_queue_metrics;
 create external table if not exists datalake_teravoz_clean_prod.report_agents_queue_metrics (
-    extension_number string,
-    queue_number string,
+    extension_number smallint,
+    queue_number smallint,
     agent_name string,
     hours_available_agent float,
     hours_agent_logged_out float,
