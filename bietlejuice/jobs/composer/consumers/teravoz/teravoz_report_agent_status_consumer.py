@@ -13,6 +13,9 @@ sqlContext = BaseSparkContext.sqlContext
 
 
 class TeravozReportAgentStatusConsumer(TeravozConsumer):
+
+    UTC_HOUR = "T03:00:00.000Z"
+
     @logger
     def __init__(self, api_user, api_pwd, execution_date):
         super().__init__(api_user, api_pwd, execution_date)
@@ -22,10 +25,11 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
 
         params = {
             "queue_number": "",
-            "start_date": self.execution_date,
+            "start_date": self.execution_date + self.UTC_HOUR,
             "end_date": datetime.strftime(
                 self.dt_execution + timedelta(days=1), "%Y-%m-%d"
-            ),
+            )
+            + self.UTC_HOUR,
         }
 
         return params
