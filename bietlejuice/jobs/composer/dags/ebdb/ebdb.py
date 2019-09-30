@@ -122,7 +122,6 @@ def condo_sub_dag(sub_dag_name):
     create_clean_external_tables_task = create_external_tables_task(
         local_dag, ENV, "clean", "ebdb", ["condo"]
     )
-
     create_clean_condo_in_datalake_task >> [
         create_dim_condo_in_datalake_task,
         create_clean_external_tables_task,
@@ -144,17 +143,10 @@ def region_sub_dag(sub_dag_name):
     create_dim_condo_task = create_dw_table_in_datalake_task(
         local_dag, "dim_condo", "public", ENV, DAG_ID
     )
-    create_clean_agent_region_task = create_clean_table_in_datalake_task(
-        local_dag, "agent_region", "ebdb", ENV, DAG_ID
-    )
     create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", "ebdb", ["region", "agent_region"]
+        local_dag, ENV, "clean", "ebdb", ["region"]
     )
-
-    [
-        create_clean_region_task,
-        create_clean_agent_region_task,
-    ] >> create_dim_condo_task >> create_clean_external_tables_task
+    create_clean_region_task >> create_dim_condo_task >> create_clean_external_tables_task
 
     return local_dag
 
