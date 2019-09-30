@@ -21,7 +21,6 @@ class FileService:
     @staticmethod
     @logger
     def get_dict_from_yaml_file(file_path):
-        response = {}
         try:
             with open(file_path, "r") as stream:
                 try:
@@ -39,4 +38,4 @@ class FileService:
             )
             raise ex
 
-        return response
+        return response or {}
