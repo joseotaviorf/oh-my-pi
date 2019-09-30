@@ -49,9 +49,7 @@ class Transformer:
         return DATALAKE_SQL_DIR + "/queries/{}/{}.sql".format(self.source, file_name)
 
     @logger
-    def create_athena_table(
-        self, table_name, datalake_layer, partition_by=None, overwrite=False
-    ):
+    def create_athena_table(self, table_name, datalake_layer, partition_by=None):
 
         """
             Parameters:
@@ -65,6 +63,31 @@ class Transformer:
         table_schema = self._get_spark_table_schema(datalake_layer, table_name)
 
         self.client.create_external_table(
+            database=database,
+            table_name=table_name,
+            s3_table_path=s3_base_path + table_name,
+            table_schema=table_schema,
+            partition_by=partition_by,
+            base_format=getattr(
+                TableStorageFormat, "DEFAULT_{}".format(datalake_layer.upper())
+            ),
+        )
+
+    @logger
+    def overwrite_athena_table(self, table_name, datalake_layer, partition_by=None):
+
+        """
+            Parameters:
+                - table_name = table name to be created on Athena
+                - datalake_layer = 'raw' or 'clean'
+                - partition_by = list with columns name to partition
+                   -- for example: partition_by = ['year', 'month', 'day']
+        """
+        database = self._get_athena_schema(datalake_layer)
+        s3_base_path = self._get_s3_base_path(datalake_layer)
+        table_schema = self._get_spark_table_schema(datalake_layer, table_name)
+
+        self.client.overwrite_external_table(
             database=database,
             table_name=table_name,
             s3_table_path=s3_base_path + table_name,

@@ -29,7 +29,7 @@ parser.add_argument(
 @logger
 def create_external_table(args):
     transformer, datalake_layer, table_name = args
-    transformer.create_athena_table(table_name, datalake_layer, overwrite=True)
+    transformer.overwrite_athena_table(table_name, datalake_layer)
     logger.info(
         "m=create_external_table, table={}, msg=Finished creating table.".format(
             table_name
