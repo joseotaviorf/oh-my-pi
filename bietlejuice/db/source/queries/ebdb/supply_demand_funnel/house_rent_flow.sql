@@ -177,8 +177,11 @@ select
 						on poa.offer_id = _offer.o_id
 					left join Contrato c
 					  on c.proposta_id = coalesce(poa.id, pof.id)
-					where (_offer.o_id = o.id) is null
-						or _offer.o_id = o.id
+					left join Portability port
+	                  on port.house_id = i.id
+					where ((_offer.o_id = o.id) is null
+						    or _offer.o_id = o.id)
+				        and port.id is null
 				) int_offer
 			) o
 		  left join (
@@ -285,12 +288,15 @@ select
 						on _pre_proposal.a_id = a.id
 					left join Proposta ppf
 					  on ppf.preProposta_id = prep.id
-				  left join Proposta ppa
+				    left join Proposta ppa
 					  on ppa.preProposta_id = _pre_proposal.pp_id
 					left join Contrato c
 					  on c.proposta_id = coalesce(ppa.id, ppf.id)
-					where (_pre_proposal.pp_id = prep.id) is null
-						or _pre_proposal.pp_id = prep.id
+					left join Portability port
+	                  on port.house_id = i.id
+					where ((_pre_proposal.pp_id = prep.id) is null
+						    or _pre_proposal.pp_id = prep.id)
+						and port.id is null
 				) int_pre_proposal
 		) pp
 		on pp.id_house = o.id_house
