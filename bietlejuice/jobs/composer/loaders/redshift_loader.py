@@ -77,7 +77,7 @@ class RedshiftLoader:
             target_schema, target_table_name, manifest_path
         )
         if overwrite:
-            self.redshift_client.run(
+            self.redshift_client.run_command(
                 "DELETE FROM {}.{}".format(target_schema, target_table_name)
             )
-        self.redshift_client.run(command)
+        self.redshift_client.run_command(command)

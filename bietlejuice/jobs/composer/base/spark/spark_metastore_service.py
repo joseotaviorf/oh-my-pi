@@ -200,11 +200,11 @@ class SparkMetastoreService:
         table_path = self.get_table_path(table_name)
         table_format = self.get_table_format(table_name)
 
-        all_objs = s3_client.list_objects(table_path, with_size=True)
+        all_objs = s3_client.list_objects(table_path, include_size=True)
 
         # filter only the files that finishes with table_format extension, for example: '.json'
         data_files = [
-            (path, size) for path, size in all_objs if "." + table_format in path
+            (path, size) for path, size in all_objs if path.endswith(table_format)
         ]
 
         return data_files
