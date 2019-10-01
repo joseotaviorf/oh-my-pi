@@ -303,24 +303,6 @@ from
           min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
         from
           Lead_AUD la
-        left join
-          UsuarioRevisionEntity ure
-          on ure.id = la.REV
-        left join
-          Usuario u
-          on u.id = ure.usuario_id
-        where
-          (u.dadosVendedor_id is not null)
-        group by la.id
-      ) isc
-      on isc.id = l.id
-    left join
-      (
-        select
-          la.id,
-          min(FROM_UNIXTIME(ure.timestamp/1000)) as dt
-        from
-          Lead_AUD la
         join
           UsuarioRevisionEntity ure on ure.id = la.REV
         where
