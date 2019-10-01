@@ -325,7 +325,9 @@ from
           UsuarioRevisionEntity ure on ure.id = la.REV
         where
           (status in ('Prospeccao','Descartado')
-            and reason not in ('OWNER_WONT_ANSWER_PHONE','OWNER_DIDNT_ANSWER_PHONE','ProprietarioNaoAtende','ProprietarioNuncaAtende','CONTACT_DIDNT_EXIST')) or status = 'Convertido'
+            and reason not in ('OWNER_WONT_ANSWER_PHONE','OWNER_DIDNT_ANSWER_PHONE','ProprietarioNaoAtende','ProprietarioNuncaAtende','CONTACT_DIDNT_EXIST')
+            and not coalesce(la.automaticallyDiscarded, false))
+          or status = 'Convertido'
         group by la.id
       ) fsc
       on fsc.id = l.id
