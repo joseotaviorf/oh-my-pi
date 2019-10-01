@@ -78,6 +78,6 @@ class RedshiftLoader:
         )
         if overwrite:
             self.redshift_client.run_command(
-                "DROP TABLE IF EXISTS {}.{}".format(target_schema, target_table_name)
+                "DELETE FROM {}.{}".format(target_schema, target_table_name)
             )
         self.redshift_client.run_command(command)
