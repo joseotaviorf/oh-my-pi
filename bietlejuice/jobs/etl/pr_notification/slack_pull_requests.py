@@ -7,8 +7,9 @@ logger = QuintoAndarLogger('SlackPullRequests')
 
 class SlackPullRequests(SlackService):
     SLACK_MESSAGE_TITLES = {
-        'open': 'PRs still open for *review*! :face_with_monocle:\n\n',
-        'approved': '\n\n\nPRs still open for *merge*! :approved:\n\n'
+        'no_reviewed_prs': 'PRs still open for *review*! :face_with_monocle:\n\n',
+        'reviewed_prs': '\n\n\nPRs *reviewed* but require action! :construction:\n\n',
+        'approved': '\n\n\nPRs ready to *merge*! :approved:\n\n'
     }
 
     def __init__(self, webhook_url):
