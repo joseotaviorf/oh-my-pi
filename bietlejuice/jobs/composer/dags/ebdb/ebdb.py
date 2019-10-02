@@ -157,8 +157,9 @@ condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     sub_dag_name="condo",
     sub_dag_func=create_clean_and_dim_tables_sub_dag,
     source="ebdb",
-    clean_tables="condo",
-    dim_tables="dim_condo",
+    clean_table="condo",
+    schema="public",
+    dim_table="dim_condo",
 )
 
 region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
@@ -166,8 +167,9 @@ region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     sub_dag_name="region",
     sub_dag_func=create_clean_and_dim_tables_sub_dag,
     source="ebdb",
-    clean_tables="region",
-    dim_tables="dim_region",
+    clean_table="region",
+    schema="public",
+    dim_table="dim_region",
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
