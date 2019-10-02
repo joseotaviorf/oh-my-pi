@@ -26,14 +26,6 @@ parser.add_argument(
 )
 
 
-def log_starting():
-    logger.info("m=__main__, msg=Creating external tables...")
-
-
-def log_finishing():
-    logger.info("m=__main__, msg=External tables were created successfully.")
-
-
 @logger
 def create_external_table(args):
     transformer, datalake_layer, table_name = args
@@ -60,31 +52,27 @@ if __name__ == "__main__":
     )
     athena_client = AthenaClient()
     transformer = Transformer(env, source, athena_client)
-
-    if all:
-        log_starting()
-        tables = sqlContext.tableNames(
-            dbName=transformer._get_spark_schema(datalake_layer)
-        )
-        with Pool(NB_THREADS) as p:
-            p.map(
-                create_external_table,
-                [(transformer, datalake_layer, table) for table in tables],
-            )
-        log_finishing()
-
-    elif tables:
-        log_starting()
-        with Pool(NB_THREADS) as p:
-            p.map(
-                create_external_table,
-                [(transformer, datalake_layer, table) for table in tables],
-            )
-        log_finishing()
-
-    else:
+    if not all and not tables:
         logger.warning(
             "m=__main__, msg=No tables or all flag passed, nothing to do.".format(
                 str(tables), datalake_layer
             )
         )
+    else:
+        logger.info("m=__main__, msg=Creating external tables...")
+        if all:
+            tables = sqlContext.tableNames(
+                dbName=transformer._get_spark_schema(datalake_layer)
+            )
+            with Pool(NB_THREADS) as p:
+                p.map(
+                    create_external_table,
+                    [(transformer, datalake_layer, table) for table in tables],
+                )
+        else:
+            with Pool(NB_THREADS) as p:
+                p.map(
+                    create_external_table,
+                    [(transformer, datalake_layer, table) for table in tables],
+                )
+        logger.info("m=__main__, msg=External tables were created successfully.")
