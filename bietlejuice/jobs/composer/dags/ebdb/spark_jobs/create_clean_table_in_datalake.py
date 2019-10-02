@@ -50,4 +50,4 @@ if __name__ == "__main__":
     df = SparkDataFrameService(spark.sql(query)).optimize_partition(250000).output()
 
     # load
-    loader.overwrite(df, table_name)
+    loader.overwrite_table(df, table_name)

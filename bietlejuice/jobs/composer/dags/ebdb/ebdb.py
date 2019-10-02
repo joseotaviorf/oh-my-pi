@@ -11,6 +11,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # DAG params
 DAG_ID = "ebdb"
+FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
 ENV = Variable.get("environment")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
@@ -36,7 +37,7 @@ CUSTOM_LIBRARIES = [
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 
-# methods to create tasks
+# methods to create tasks and subdags
 def create_clean_table_in_datalake_task(local_dag, table_name, source, env, dag_name):
     return QuintoAndarDatabricksSubmitRunOperator(
         task_id="create-clean-{}-in-datalake".format(table_name.replace("_", "-")),
@@ -91,9 +92,32 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
     )
 
 
-# Dag and sub-dags definitions
+def create_clean_and_dim_sub_dag(sub_dag_name, source, clean_tables, dim_tables):
+    local_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=FULL_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+    clean_table_tasks = [
+        create_clean_table_in_datalake_task(local_dag, table, source, ENV, DAG_ID)
+        for table in clean_tables
+    ]
+    dim_table_tasks = [
+        create_dw_table_in_datalake_task(local_dag, table, "public", ENV, DAG_ID)
+        for table in dim_tables
+    ]
+    create_clean_external_tables_task = create_external_tables_task(
+        local_dag, ENV, "clean", source, clean_tables
+    )
+
+    clean_table_tasks >> dim_table_tasks + [create_clean_external_tables_task]
+    return local_dag
+
+
+# dag definition
 dag = DAG(
-    dag_id="bietlejuice.{}".format(DAG_ID),
+    dag_id=FULL_DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -105,56 +129,7 @@ dag = DAG(
     catchup=False,
 )
 
-
-def condo_sub_dag(sub_dag_name):
-    local_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name="bietlejuice.{}".format(DAG_ID),
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )._build_local_dag()
-    create_clean_condo_in_datalake_task = create_clean_table_in_datalake_task(
-        local_dag, "condo", "ebdb", ENV, DAG_ID
-    )
-    create_dim_condo_in_datalake_task = create_dw_table_in_datalake_task(
-        local_dag, "dim_condo", "public", ENV, DAG_ID
-    )
-    create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", "ebdb", ["condo"]
-    )
-    create_clean_condo_in_datalake_task >> [
-        create_dim_condo_in_datalake_task,
-        create_clean_external_tables_task,
-    ]
-
-    return local_dag
-
-
-def region_sub_dag(sub_dag_name):
-    local_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name="bietlejuice.{}".format(DAG_ID),
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )._build_local_dag()
-    create_clean_region_task = create_clean_table_in_datalake_task(
-        local_dag, "region", "ebdb", ENV, DAG_ID
-    )
-    create_dim_condo_task = create_dw_table_in_datalake_task(
-        local_dag, "dim_region", "public", ENV, DAG_ID
-    )
-    create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", "ebdb", ["region"]
-    )
-    create_clean_region_task >> [
-        create_dim_condo_task,
-        create_clean_external_tables_task,
-    ]
-
-    return local_dag
-
-
-# tasks definitions
+# tasks and subdags definitions
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -178,11 +153,21 @@ create_raw_external_tables_task = create_all_external_tables_task(
 )
 
 condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="condo", sub_dag_func=condo_sub_dag
+    dag=dag,
+    sub_dag_name="condo",
+    sub_dag_func=create_clean_and_dim_sub_dag,
+    source="ebdb",
+    clean_tables=["condo"],
+    dim_tables=["dim_condo"],
 )
 
 region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="region", sub_dag_func=region_sub_dag
+    dag=dag,
+    sub_dag_name="region",
+    sub_dag_func=create_clean_and_dim_sub_dag,
+    source="ebdb",
+    clean_tables=["region"],
+    dim_tables=["dim_region"],
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

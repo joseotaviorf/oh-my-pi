@@ -26,6 +26,14 @@ parser.add_argument(
 )
 
 
+def log_starting():
+    logger.info("m=__main__, msg=Creating external tables...")
+
+
+def log_finishing():
+    logger.info("m=__main__, msg=External tables were created successfully.")
+
+
 @logger
 def create_external_table(args):
     transformer, datalake_layer, table_name = args
@@ -52,12 +60,9 @@ if __name__ == "__main__":
     )
     athena_client = AthenaClient()
     transformer = Transformer(env, source, athena_client)
+
     if all:
-        logger.info(
-            "m=__main__, tables=all, msg=Creating {} external tables...".format(
-                datalake_layer
-            )
-        )
+        log_starting()
         tables = sqlContext.tableNames(
             dbName=transformer._get_spark_schema(datalake_layer)
         )
@@ -66,25 +71,17 @@ if __name__ == "__main__":
                 create_external_table,
                 [(transformer, datalake_layer, table) for table in tables],
             )
-        logger.info(
-            "m=__main__, tables=all, msg=External tables were created successfully."
-        )
+        log_finishing()
+
     elif tables:
-        logger.info(
-            "m=__main__, tables={}, msg=Creating {} external tables...".format(
-                str(tables), datalake_layer
-            )
-        )
+        log_starting()
         with Pool(NB_THREADS) as p:
             p.map(
                 create_external_table,
                 [(transformer, datalake_layer, table) for table in tables],
             )
-        logger.info(
-            "m=__main__, tables={}, msg=External tables were created successfully.".format(
-                str(tables)
-            )
-        )
+        log_finishing()
+
     else:
         logger.warning(
             "m=__main__, msg=No tables or all flag passed, nothing to do.".format(

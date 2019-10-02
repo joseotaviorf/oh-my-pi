@@ -82,7 +82,7 @@ class SparkDataframeIntoDatalakeLoader:
         self.metastore_service.refresh_table(table_name)
 
     @logger(exclude="df")
-    def overwrite(self, df, table_name):
+    def overwrite_table(self, df, table_name):
         """
         Load the data into datalake in overwrite mode.
         This mode will replace the definition of the table completely. This method don't expected the df to be
