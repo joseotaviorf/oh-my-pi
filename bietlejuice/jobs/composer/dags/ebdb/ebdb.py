@@ -108,7 +108,7 @@ def create_clean_and_dim_tables_sub_dag(
         local_dag, dim_table, schema, ENV, DAG_ID
     )
     create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", source, clean_table
+        local_dag, ENV, "clean", source, [clean_table]
     )
     clean_table_task >> [dim_table_task, create_clean_external_tables_task]
 
