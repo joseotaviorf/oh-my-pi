@@ -84,7 +84,7 @@ class AthenaClient:
         partition_by,
         base_format,
     ):
-        drop_query = "DROP TABLE IF EXISTS {}.{}".format(database, table_name)
+        drop_query = "DROP TABLE IF EXISTS `{}`.`{}`".format(database, table_name)
         self.execute_athena_query(drop_query, database)
         logger.info(
             "m=overwrite_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
