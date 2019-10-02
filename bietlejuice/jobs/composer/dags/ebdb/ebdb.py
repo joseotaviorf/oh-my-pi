@@ -92,26 +92,26 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
     )
 
 
-def create_clean_and_dim_sub_dag(sub_dag_name, source, clean_tables, dim_tables):
+def create_clean_and_dim_tables_sub_dag(
+    sub_dag_name, source, clean_table, schema, dim_table
+):
     local_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
         dag_name=FULL_DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
     )._build_local_dag()
-    clean_table_tasks = [
-        create_clean_table_in_datalake_task(local_dag, table, source, ENV, DAG_ID)
-        for table in clean_tables
-    ]
-    dim_table_tasks = [
-        create_dw_table_in_datalake_task(local_dag, table, "public", ENV, DAG_ID)
-        for table in dim_tables
-    ]
-    create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", source, clean_tables
+    clean_table_task = create_clean_table_in_datalake_task(
+        local_dag, clean_table, source, ENV, DAG_ID
     )
+    dim_table_task = create_dw_table_in_datalake_task(
+        local_dag, dim_table, schema, ENV, DAG_ID
+    )
+    create_clean_external_tables_task = create_external_tables_task(
+        local_dag, ENV, "clean", source, clean_table
+    )
+    clean_table_task >> [dim_table_task, create_clean_external_tables_task]
 
-    clean_table_tasks >> dim_table_tasks + [create_clean_external_tables_task]
     return local_dag
 
 
@@ -155,19 +155,19 @@ create_raw_external_tables_task = create_all_external_tables_task(
 condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="condo",
-    sub_dag_func=create_clean_and_dim_sub_dag,
+    sub_dag_func=create_clean_and_dim_tables_sub_dag,
     source="ebdb",
-    clean_tables=["condo"],
-    dim_tables=["dim_condo"],
+    clean_tables="condo",
+    dim_tables="dim_condo",
 )
 
 region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="region",
-    sub_dag_func=create_clean_and_dim_sub_dag,
+    sub_dag_func=create_clean_and_dim_tables_sub_dag,
     source="ebdb",
-    clean_tables=["region"],
-    dim_tables=["dim_region"],
+    clean_tables="region",
+    dim_tables="dim_region",
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
