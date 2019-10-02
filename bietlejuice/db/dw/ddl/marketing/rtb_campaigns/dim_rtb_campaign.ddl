@@ -1,9 +1,0 @@
-DROP TABLE if EXISTS marketing.dim_rtb_campaign;
-CREATE TABLE if NOT EXISTS marketing.dim_rtb_campaign (
-    sk_rtb_campaign INTEGER,
-    campaign_name VARCHAR,
-    status VARCHAR(100),
-    hash VARCHAR(300),
-    url VARCHAR(300)
-)
-;
