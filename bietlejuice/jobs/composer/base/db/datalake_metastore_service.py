@@ -28,6 +28,7 @@ class DatalakeMetastoreService:
             )
 
         return {
+            "dw_bucket": "5a-dw-{}".format(env),
             "dw_schema_databricks": "dw_{}".format(schema),
             "dw_schema_path": "s3://5a-dw-{}/{}/".format(env, schema),
         }

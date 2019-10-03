@@ -66,6 +66,21 @@ def create_dw_table_in_datalake_task(local_dag, table_name, schema, env, dag_nam
     )
 
 
+def load_dw_table_into_redshift_task(local_dag, table_name, schema, env):
+    return QuintoAndarDatabricksSubmitRunOperator(
+        task_id="load-dw-{}-{}-in-datalake".format(
+            schema, table_name.replace("_", "-")
+        ),
+        dag=local_dag,
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
+                "parameters": [table_name, schema, env],
+            }
+        },
+    )
+
+
 def create_all_external_tables_task(local_dag, env, datalake_layer, source):
     return QuintoAndarDatabricksSubmitRunOperator(
         task_id="create-all-{}-{}-external-tables".format(source, datalake_layer),
@@ -107,10 +122,14 @@ def create_clean_and_dim_tables_sub_dag(
     dim_table_task = create_dw_table_in_datalake_task(
         local_dag, dim_table, schema, ENV, DAG_ID
     )
+    load_dim_table_task = load_dw_table_into_redshift_task(
+        local_dag, dim_table, schema, ENV
+    )
     create_clean_external_tables_task = create_external_tables_task(
         local_dag, ENV, "clean", source, [clean_table]
     )
-    clean_table_task >> [dim_table_task, create_clean_external_tables_task]
+    clean_table_task >> dim_table_task >> load_dim_table_task
+    clean_table_task >> create_clean_external_tables_task
 
     return local_dag
 
