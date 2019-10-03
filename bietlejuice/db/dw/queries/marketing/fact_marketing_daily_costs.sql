@@ -223,10 +223,10 @@ UNION
         'rtb' as origin,
         'fact_rtb_daily_cost_attributions' as fact_cost,
         drt.campaign_name,
-        'rmsp' as campaign_city,
-        null as account_name,
+        null as campaign_city,
+        drt.account_name as account_name,
         lower(drt.campaign_name) as campaign_name_l,
-        null as account_name_l,
+        lower(drt.account_name) as account_name_l,
         null as utm_campaign,
         null as utm_term,
         null as utm_content,
@@ -235,10 +235,8 @@ UNION
         sum(coalesce(case when device = 'Other' then cost end, 0)) as other_cost,
         null as total_cost
       from marketing.fact_rtb_daily_cost_attributions frt
-      left join
-      	-- records in dim table are repeated
-      	(select distinct * from marketing.dim_rtb_campaign) drt
-      	on frt.sk_rtb_campaign = drt.sk_rtb_campaign
+      left join marketing.dim_rtb_sub_campaign drt
+      	on frt.sk_sub_campaign = drt.sk_sub_campaign
       where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
@@ -289,7 +287,7 @@ UNION
 			when cf.campaign_name_l like '%santo_andr%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_bernardo%' then 'RMSP'
 			when cf.campaign_name_l like '%s_o_caetano%' then 'RMSP'
-	 	    when cf.campaign_name_l like '%rio_de_janeiro%' then 'Rio de Janeiro'
+	 	    when cf.campaign_name_l like '%rio%de%janeiro%' then 'Rio de Janeiro'
 	 	    when cf.campaign_name_l like '%niter_i%' then 'Rio de Janeiro'
 	     	when cf.campaign_name_l like '%bh%' or cf.campaign_name_l like '%belo%h%' then 'Belo Horizonte'
 	 	    when cf.campaign_name_l like '%minas_gerais%' then 'Belo Horizonte'

@@ -9,8 +9,8 @@ logger = QuintoAndarLogger("TeravozTransformer")
 
 class TeravozTransformer(Transformer):
     @logger
-    def __init__(self, env):
-        super().__init__(env, "teravoz")
+    def __init__(self, env, athena_client):
+        super().__init__(env, "teravoz", athena_client)
         self.env = env
 
     @logger

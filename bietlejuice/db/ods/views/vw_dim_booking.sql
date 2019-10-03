@@ -76,7 +76,9 @@ bookings as (
 	    s.status,
 	    s."slotDia" as slot_dia,
 	    s.reason::varchar(200) as reason,
-	    s.reason_enum as cancellation_reason,
+	    case
+            when s.status = 'Cancelado' then s.reason_enum
+        end as cancellation_reason,
 	    case
 	        when s.status = 'Cancelado' then
 	            case

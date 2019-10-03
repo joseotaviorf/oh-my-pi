@@ -78,7 +78,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
             )
 
         remote_table = remote_table.option(
-            "dbtable", self.connection["schema"] + "." + '."' + table + '"'
+            "dbtable", self.connection["schema"] + '."' + table + '"'
         ).load()
 
         return remote_table

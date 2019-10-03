@@ -3,7 +3,6 @@ from collections import OrderedDict
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 logger = QuintoAndarLogger("DatabaseIntoDataLakeLoader")
 
@@ -108,12 +107,12 @@ class DatabaseIntoDataLakeLoader:
 
     @logger
     def create_athena_external_table(
-        self, consumer, table_name, athena_db, partition_by=None
+        self, athena_client, consumer, table_name, athena_db, partition_by=None
     ):
         drop_query = self.DROP_TABLE_QUERY_TEMPLATE.format(
             database=athena_db, table=table_name
         )
-        AthenaClient.execute_athena_query(drop_query, athena_db)
+        athena_client.execute_athena_query(drop_query, athena_db)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped "
             "table in Athena successfully".format(athena_db, table_name)
@@ -156,9 +155,9 @@ class DatabaseIntoDataLakeLoader:
             format=self.create_query_format,
             path="{}/{}".format(self.datalake_path, table_name),
         )
-        AthenaClient.execute_athena_query(create_query, athena_db)
+        athena_client.execute_athena_query(create_query, athena_db)
         if partition_by:
-            AthenaClient.execute_athena_query(
+            athena_client.execute_athena_query(
                 "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table_name), athena_db
             )
 
@@ -167,7 +166,7 @@ class DatabaseIntoDataLakeLoader:
                 athena_db, table_name
             )
         )
-        AthenaClient.execute_athena_query(
+        athena_client.execute_athena_query(
             self.TEST_TABLE_QUERY_TEMPLATE.format(database=athena_db, table=table_name),
             athena_db,
         )
