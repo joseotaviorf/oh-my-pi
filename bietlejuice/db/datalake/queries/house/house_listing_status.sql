@@ -11,8 +11,12 @@ imovel_aud as (
 	  rev.usuario_id, -- user responsible to change status
 	  rev.motivo, -- reason status changed
 	  lag(i.status) over(partition by i.id order by i.rev) as previous_status, -- previous status ordered by the datetime that happened
+	  --first_value(i.regiao_id) over(partition by i.id order by i.rev desc) as id_region, -- last region_id
+	  im.regiao_id as id_region,
 	  i.* -- all information from Imovel table
     from datalake_ebdb_raw_prod.imovel_aud i
+    join datalake_ebdb_raw_prod.imovel im
+      on i.id = im.id
 	inner join datalake_ebdb_raw_prod.usuariorevisionentity rev 
 	  on rev.id = i.rev  
 --    order by i.id, i.rev
@@ -23,7 +27,7 @@ house_status_history as (
 --------------------------------------------------------------------------------------------------------
 select 
 	id as id_house,
-	regiao_id as id_region,
+	id_region,
 	rev, 
 	status_mod,
 	max(from_iso8601_timestamp(firstpublication)) over(partition by id) as ts_first_publication,
