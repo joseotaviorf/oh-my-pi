@@ -48,15 +48,14 @@ class FirestoreConsumer(DatabaseConsumer):
         :return: spark dataframe
         """
         all_json = []
-        current_id = None
 
         doc_ref = self.firestore_client.collection(f"{table_name}")
         first_query = doc_ref.order_by("__name__").limit(FirestoreConsumer.BATCH_SIZE)
 
-        docs = first_query.stream()
-        data_json, last_doc = self.parse_file(docs)
-        old_id = last_doc["firestore_id"]
-        snapshot = doc_ref.document(old_id).get()
+        old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
+            first_query, doc_ref
+        )
+        all_json.append(data_json)
 
         while old_id != current_id:
             logger.info(
@@ -68,14 +67,11 @@ class FirestoreConsumer(DatabaseConsumer):
                 .start_at(snapshot)
                 .limit(FirestoreConsumer.BATCH_SIZE)
             )
-            docs = next_query.stream()
-            old_id = current_id
 
-            data_json, last_doc = self.parse_file(docs)
+            old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
+                next_query, doc_ref, last_doc["firestore_id"]
+            )
             all_json.append(data_json)
-
-            current_id = last_doc["firestore_id"]
-            snapshot = doc_ref.document(current_id).get()
         return self._get_default_read_format_and_options(all_json)
 
     @logger
@@ -123,6 +119,19 @@ class FirestoreConsumer(DatabaseConsumer):
 
         rdd = sc.parallelize(json_parsed, len(json_parsed))
         return spark.read.option("multiline", "true").json(rdd)
+
+    def _get_parameters_from_query_result(self, query, doc_ref, current_id=None):
+        if current_id:
+            old_id = current_id
+        else:
+            old_id = ""
+
+        docs = query.stream()
+        data_json, last_doc = self.parse_file(docs)
+
+        current_id = last_doc["firestore_id"]
+        snapshot = doc_ref.document(current_id).get()
+        return old_id, current_id, snapshot, data_json, last_doc
 
     def parse_file(self, docs):
         return self.parser.parse_document_type(docs)
