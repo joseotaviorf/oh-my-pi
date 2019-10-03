@@ -73,7 +73,7 @@ class LinkedInCampaigns(Marketing):
                 filename, gdrive_folder_id))
 
         files = google_drive_client.list_files(None, query)
-        self._validate_result(files)
+        self._validate_file(files)
 
         logger.info(
             'm=move_linkedin_campaigns_to_raw, process_file={}, msg=Downloading file to'
@@ -133,14 +133,14 @@ class LinkedInCampaigns(Marketing):
         return True
 
     @logger(exclude='result')
-    def _validate_result(self, result):
-        if len(result) > 1:
+    def _validate_file(self, files):
+        if len(files) > 1:
             raise RuntimeError(
-                'm=_validate_result, len(result)={}, msg=More than one entity found. '
-                'I don\'t know which of them to read!'.format(len(result)))
-        elif len(result) == 0:
+                'm=_validate_file, len(files)={}, msg=More than one file found. '
+                'I don\'t know which of them to read!'.format(len(files)))
+        elif not files:
             raise RuntimeError(
-                'm=_validate_result, msg=No entity found in directory')
+                'm=_validate_file, msg=No file found')
 
         return True
 
