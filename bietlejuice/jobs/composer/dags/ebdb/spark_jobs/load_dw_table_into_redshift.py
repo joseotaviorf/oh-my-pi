@@ -28,6 +28,24 @@ parser.add_argument("table_name")
 parser.add_argument("dw_schema")
 parser.add_argument("env")
 
+
+@logger
+def validate_load(spark_schema, redshift_schema, table_name):
+    base_query = "select count(*) from {}." + table_name
+    spark_query = base_query.format(spark_schema)
+    redshift_query = base_query.format(redshift_schema)
+
+    spark_result = spark_sql_client.run(spark_query).collect()[0][0]
+    redshift_result = redshift_client.run_query(redshift_query)[0][0]
+
+    logger.info(
+        "m=__main__, spark_result={}, redshift_result={}, msg=Validating results".format(
+            spark_result, redshift_result
+        )
+    )
+    assert spark_result == redshift_result
+
+
 if __name__ == "__main__":
     # job execution information
     args = parser.parse_args()
@@ -35,6 +53,12 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     env = args.env
     dw_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
+
+    logger.info(
+        "m=__main__, table_name={}, dw_schema={}, env={}, msg=Job execution started".format(
+            env, table_name, dw_schema
+        )
+    )
 
     # instances setup
     s3_client = S3Service(boto3.resource("s3"))
@@ -55,3 +79,6 @@ if __name__ == "__main__":
         target_table_name=table_name,
         overwrite=True,
     )
+
+    # load validation
+    validate_load(dw_info["dw_schema_databricks"], dw_schema, table_name)
