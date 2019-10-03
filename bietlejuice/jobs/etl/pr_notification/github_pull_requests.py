@@ -1,6 +1,5 @@
-from qa_python_utils.default_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.etl.pr_notification.github_service import GithubService
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('GithubPullRequests')
 
@@ -45,7 +44,8 @@ class GithubPullRequests(GithubService):
 
     @logger
     def extract_pull_requests(self):
-        open_prs = []
+        no_reviewed_prs = []
+        reviewed_prs = []
         approved_prs = []
 
         json_response = self.get_json_response(self.graphql_query)
@@ -61,23 +61,29 @@ class GithubPullRequests(GithubService):
 
             pr_append = '*<{}|{}>* ({})\n'.format(_url, _title, _author)
 
+            # No one reviewed
             if not prs['node']['reviews']['edges']:
-                open_prs.append(pr_append)
-                continue
+                no_reviewed_prs.append(pr_append)
+            else:
+                is_approved = False
+                is_reviewed = False
+                for rev in prs['node']['reviews']['edges']:
+                    if rev['node']['state'] == 'APPROVED':
+                        # If approved, nothing else matters
+                        approved_prs.append(pr_append)
+                        is_approved = True
+                        break
 
-            is_pr_approved = False
-            for rev in prs['node']['reviews']['edges']:
-                if rev['node']['state'] == 'APPROVED':
-                    approved_prs.append(pr_append)
-                    is_pr_approved = True
-                    continue
+                    if rev['node']['state'] in ('CHANGES_REQUESTED', 'COMMENTED'):
+                        is_reviewed = True
 
-                if rev['node']['state'] == 'CHANGES_REQUESTED':
-                    approved_prs.append(pr_append)
-                    is_pr_approved = False
-                    break
+                # If reviewed only consider if not approved, otherwise it will be duplicated
+                if is_reviewed and not is_approved:
+                    reviewed_prs.append(pr_append)
 
-            if not is_pr_approved:
-                open_prs.append(pr_append)
+        # sort
+        no_reviewed_prs.sort()
+        reviewed_prs.sort()
+        approved_prs.sort()
 
-        return open_prs, approved_prs
+        return no_reviewed_prs, reviewed_prs, approved_prs
