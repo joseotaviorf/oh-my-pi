@@ -30,15 +30,15 @@ class TestGithubPullRequests(object):
                        })
     def test_extract_pull_requests_with_empty_edges(self, mock_get_json_response, github_pull_requests):
         # act
-        open_prs, approved_prs = github_pull_requests.extract_pull_requests()
+        no_reviewed_prs, reviewed_prs, approved_prs = github_pull_requests.extract_pull_requests()
 
         # assert
-        assert (not open_prs) == (not approved_prs)
+        assert (not no_reviewed_prs) and (not reviewed_prs) and (not approved_prs)
 
     @pytest.mark.parametrize('review_edges, approved_prs_length',
                              [[[], 0],
-                              [[{'node': {'state': 'COMMENT'}}], 0],
-                              [[{'node': {'state': 'CHANGES_REQUESTED'}}], 1]])
+                              [[{'node': {'state': 'COMMENTED'}}], 0],
+                              [[{'node': {'state': 'CHANGES_REQUESTED'}}], 0]])
     @mock.patch.object(GithubService, 'get_json_response')
     def test_extract_pull_requests_with_no_approved_prs(self, mock_get_json_response, github_pull_requests,
                                                         review_edges, approved_prs_length):
@@ -67,10 +67,10 @@ class TestGithubPullRequests(object):
         }
 
         # act
-        open_prs, approved_prs = github_pull_requests.extract_pull_requests()
+        no_reviewed_prs, reviewed_prs, approved_prs = github_pull_requests.extract_pull_requests()
 
         # assert
-        assert open_prs
+        assert no_reviewed_prs or reviewed_prs
         assert len(approved_prs) == approved_prs_length
 
     @mock.patch.object(GithubService, 'get_json_response', return_value={
@@ -101,8 +101,8 @@ class TestGithubPullRequests(object):
     })
     def test_extract_pull_requests_with_approved_prs(self, mock_get_json_response, github_pull_requests):
         # act
-        open_prs, approved_prs = github_pull_requests.extract_pull_requests()
+        no_reviewed_prs, reviewed_prs, approved_prs = github_pull_requests.extract_pull_requests()
 
         # assert
-        assert not open_prs
+        assert not no_reviewed_prs and not reviewed_prs
         assert approved_prs
