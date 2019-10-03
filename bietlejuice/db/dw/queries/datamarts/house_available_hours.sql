@@ -1,14 +1,11 @@
 WITH
 imovel_aud as (
 	select
-		"timestamp",
-    	date(timestamp 'epoch' + (cast(timestamp as bigint)/1000)* interval '1 second') as date_timestamp,
     	from_unixtime(cast(timestamp as bigint)/1000) as date_time,
 		hou.*
 	from datalake_ebdb_raw_prod.horariosemanalimovel_aud hou
 		join datalake_ebdb_raw_prod.usuariorevisionentity ure
 			on hou.rev = ure.id
-	--where imovel_id = 892763775
 ),
 house_available as (
 	select 
