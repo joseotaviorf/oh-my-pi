@@ -140,18 +140,19 @@ class AthenaClient:
         )
 
         # Athena has problems with some types in spark, so we have to convert to string
-        # these problems were observed in json format, but we converting everything for safety
+        # these problems were observed in json format, so will only be applied for this base_format
         # TODO: search more about this problem and find a better possible approach
-        table_schema = OrderedDict(
-            (
-                col,
-                col_type.lower()
-                .replace("timestamp", "string")
-                .replace("date", "string")
-                .replace("binary", "varchar(53535)"),
+        if "json" in base_format["format"].lower():
+            table_schema = OrderedDict(
+                (
+                    col,
+                    col_type.lower()
+                    .replace("timestamp", "string")
+                    .replace("date", "string")
+                    .replace("binary", "varchar(53535)"),
+                )
+                for col, col_type in table_schema.items()
             )
-            for col, col_type in table_schema.items()
-        )
 
         # columns builder
         columns_section = ",\n".join(
