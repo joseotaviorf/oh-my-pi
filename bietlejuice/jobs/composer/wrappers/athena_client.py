@@ -1,5 +1,6 @@
 import time
 import boto3
+from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -84,7 +85,7 @@ class AthenaClient:
         partition_by,
         base_format,
     ):
-        drop_query = "DROP TABLE IF EXISTS {}.{}".format(database, table_name)
+        drop_query = "DROP TABLE IF EXISTS `{}`.`{}`".format(database, table_name)
         self.execute_athena_query(drop_query, database)
         logger.info(
             "m=overwrite_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
@@ -136,6 +137,20 @@ class AthenaClient:
             "{serdeproperties}"
             "\nLOCATION '{path}'"
             "{tblproperties};"
+        )
+
+        # Athena has problems with some types in spark, so we have to convert to string
+        # these problems were observed in json format, but we converting everything for safety
+        # TODO: search more about this problem and find a better possible approach
+        table_schema = OrderedDict(
+            (
+                col,
+                col_type.lower()
+                .replace("timestamp", "string")
+                .replace("date", "string")
+                .replace("binary", "varchar(53535)"),
+            )
+            for col, col_type in table_schema.items()
         )
 
         # columns builder
