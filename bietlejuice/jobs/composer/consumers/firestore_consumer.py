@@ -13,7 +13,7 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class FirestoreConsumer(DatabaseConsumer):
-    BATCH_SIZE = 5000
+    BATCH_SIZE = 10000
 
     def __init__(self, connection):
         if connection["dbtype"].lower() != DatabaseTypeEnum.FIRESTORE:
@@ -37,31 +37,46 @@ class FirestoreConsumer(DatabaseConsumer):
         return self._get_default_read_format_and_options(tables)
 
     @logger
-    def get_data_from_table(self, table, order_by_column, last_doc=None):
+    def get_data_from_table(self, table_name):
+        return self.get_data_from_table_in_chunks(table_name)
+
+    @logger
+    def get_data_from_table_in_chunks(self, table_name):
         """Get all data from table in chunks.
 
-        :param table: Table name
-        :param order_by_column: Column name to sort the query
-        :param last_doc: Last value from query returned by this method
-        :return: Tuple (spark dataframe, last_document)
+        :param table_name: str
+        :return: spark dataframe
         """
-        doc_ref = self.firestore_client.collection(f"{table}")
+        all_json = []
+        current_id = None
 
-        if not last_doc:
-            first_query = doc_ref.order_by(f"{order_by_column}").limit(
-                FirestoreConsumer.BATCH_SIZE
+        doc_ref = self.firestore_client.collection(f"{table_name}")
+        first_query = doc_ref.order_by("__name__").limit(FirestoreConsumer.BATCH_SIZE)
+
+        docs = first_query.stream()
+        data_json, last_doc = self.parse_file(docs)
+        old_id = last_doc["firestore_id"]
+        snapshot = doc_ref.document(old_id).get()
+
+        while old_id != current_id:
+            logger.info(
+                f"m=get_data_from_table_in_chunks, msg=getting chunk data starting at id: {last_doc['firestore_id']}"
             )
-            docs = first_query.stream()
-            data_json, last_document = self.parse_file(docs)
-            return self._get_default_read_format_and_options(data_json), last_document
 
-        last_pop = last_doc[f"{order_by_column}"]
-        next_query = self.parser.parse_chunk_query(
-            doc_ref, order_by_column, last_pop, FirestoreConsumer.BATCH_SIZE
-        )
-        docs = next_query.stream()
-        data_json, last_document = self.parse_file(docs)
-        return self._get_default_read_format_and_options(data_json), last_document
+            next_query = (
+                doc_ref.order_by("__name__")
+                .start_at(snapshot)
+                .limit(FirestoreConsumer.BATCH_SIZE)
+            )
+            docs = next_query.stream()
+            old_id = current_id
+
+            data_json, last_doc = self.parse_file(docs)
+            all_json.append(data_json)
+
+            current_id = last_doc["firestore_id"]
+            snapshot = doc_ref.document(current_id).get()
+        return self._get_default_read_format_and_options(all_json)
 
     @logger
     def get_data_from_query(self, query, table_name=None):
@@ -98,11 +113,15 @@ class FirestoreConsumer(DatabaseConsumer):
         doc_ref_parsed = self.parser.parse_query(doc_ref, query)
         docs = doc_ref_parsed.stream()
         data_json = self.parse_file(docs)
-        return self._get_default_read_format_and_options(data_json[0])
+        return self._get_default_read_format_and_options([data_json[0]])
 
     @logger(exclude="json_parsed")
     def _get_default_read_format_and_options(self, json_parsed):
-        rdd = sc.parallelize([json_parsed], 3)
+        logger.info(
+            f"m=_get_default_read_format_and_options, the dataframe will be written in {len(json_parsed)} partitions"
+        )
+
+        rdd = sc.parallelize(json_parsed, len(json_parsed))
         return spark.read.option("multiline", "true").json(rdd)
 
     def parse_file(self, docs):
