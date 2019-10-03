@@ -1,21 +1,21 @@
-with max_dt as (
-    SELECT id, max(dt) as max_dt
-    FROM datalake_clean.crm_tasks
-    WHERE type in ('ConverterLead', 'ConverterLeadPrioritario')
-    GROUP BY 1
-),
-tasks_updated as (
+with tasks_updated as (
+    with max_dt as (
+        SELECT id, max(dt) as max_dt
+        FROM datalake_clean.crm_tasks
+        WHERE type in ('ConverterLead', 'ConverterLeadPrioritario')
+        GROUP BY 1
+    )
     SELECT ct.id, ct.score_factor, ct.dt, ct.id_origin
     FROM datalake_clean.crm_tasks ct
     JOIN max_dt m on m.id = ct.id AND ct.dt = m.max_dt
     WHERE type in ('ConverterLead', 'ConverterLeadPrioritario')
 ),
-max_id_hosanna as (
-    SELECT m.codigo, max(id) as max_id
-    FROM datalake_raw.autodialer_mailing_list m
-    GROUP BY 1
-),
 mailing_list_updated as (
+        with max_id_hosanna as (
+        SELECT m.codigo, max(id) as max_id
+        FROM datalake_raw.autodialer_mailing_list m
+        GROUP BY 1
+    )
     SELECT m.codigo, m.id
     FROM datalake_raw.autodialer_mailing_list m
     JOIN max_id_hosanna mh on mh.codigo = m.codigo AND mh.max_id = m.id
