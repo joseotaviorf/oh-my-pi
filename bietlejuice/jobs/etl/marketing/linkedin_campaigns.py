@@ -132,7 +132,7 @@ class LinkedInCampaigns(Marketing):
 
         return True
 
-    @logger(exclude='result')
+    @logger(exclude='files')
     def _validate_file(self, files):
         if len(files) > 1:
             raise RuntimeError(
