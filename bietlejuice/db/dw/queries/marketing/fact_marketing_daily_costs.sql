@@ -262,7 +262,7 @@ UNION
       -- filter with 'between' because there is future cost
       where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 )
-,demand_tax as (
+,cost_taxonomy as (
 	select
 		cf.origin,
 		cf.sk_date,
@@ -360,10 +360,10 @@ UNION
 				and cf.origin = tx.origin
 ), kenshoo as (
 	select
-		dt.sk_date,
-		dt.side as funnel_side,
+		ct.sk_date,
+		ct.side as funnel_side,
 		tx.account_name as account_name,
-		dt.city_group_final as city_group,
+		ct.city_group_final as city_group,
 		tx.mkt_category,
 		tx.mkt_flow,
 		tx.mkt_completion,
@@ -371,19 +371,19 @@ UNION
 		tx.mkt_medium,
 		tx.mkt_source,
 		tx.mkt_platform,
-		dt.cost * cast(k.rate as float) as cost
-		from demand_tax dt
+		ct.cost * cast(k.rate as float) as cost
+		from cost_taxonomy ct
 	join datalake_raw.gsheets_marketing_kenshoo_configuration k
 		on
-		dt.mkt_source = k.mkt_source
-		and dt.mkt_medium = k.mkt_medium
-		and dt.sk_date between
+		ct.mkt_source = k.mkt_source
+		and ct.mkt_medium = k.mkt_medium
+		and ct.sk_date between
 			cast(to_char(to_date(k.date_from, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
 			and
 			cast(to_char(to_date(k.date_until, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
 	left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
 			on tx.origin = 'kenshoo'
-			and tx.side = dt.side
+			and tx.side = ct.side
 )
 select 
     sk_date,
@@ -404,25 +404,25 @@ select
     utm_content,
     cost,
     getdate() as ts_load
-    from demand_tax
+    from cost_taxonomy
 union all
 select
     sk_date,
     funnel_side,
     account_name,
-	null as campaign_name,
+    null as campaign_name,
     city_group,
     mkt_category,
     mkt_flow,
     mkt_completion,
-	null as mkt_origin,
+    null as mkt_origin,
     mkt_channel,
     mkt_medium,
     mkt_source,
     mkt_platform,
-	null as utm_campaign,
-	null as utm_term,
-	null as utm_content,
+    null as utm_campaign,
+    null as utm_term,
+    null as utm_content,
     sum(cost) as cost,
     getdate() as ts_load
 from kenshoo
