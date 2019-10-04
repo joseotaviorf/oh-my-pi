@@ -89,7 +89,17 @@ fact_with_reproc as (
     from reprocessed_lead rl
     join lead l 
       on l.id = rl.id_origin_lead
-  ), 
+  ),
+  house_b2b_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
+  ),
   acquisition_channels as (
     select 
       fhlf.id,
@@ -139,7 +149,8 @@ fact_with_reproc as (
       end as acquisition_channel_rep,
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
       coalesce(
-            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            port.id is not null
+            or coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or pa_b2b.id is not null
             or b2b_prime.id_lead is not null
             , false) as is_b2b
@@ -161,6 +172,12 @@ fact_with_reproc as (
 			on pa_b2b.user_id = u_b2b.id
 	) b2b_prime
 	  on b2b_prime.id_lead = l.id
+	left join house_listing hl
+        on hl.id_house = fhlf.imovel_id
+        and hl.version = 0
+    left join portability port
+        on port.id_house = hl.id_house
+        and port.owner_type = 'B2B'
   )
   select 
     acquisition_channels.id,

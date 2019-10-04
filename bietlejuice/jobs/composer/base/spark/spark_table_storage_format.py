@@ -3,3 +3,4 @@ class SparkTableStorageFormat:
     PARQUET = "PARQUET"
     DEFAULT_RAW = JSON
     DEFAULT_CLEAN = PARQUET
+    DEFAULT_DW = PARQUET
