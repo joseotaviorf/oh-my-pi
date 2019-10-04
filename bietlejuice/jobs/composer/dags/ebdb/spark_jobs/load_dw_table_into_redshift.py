@@ -31,7 +31,7 @@ parser.add_argument("env")
 
 @logger
 def validate_load(spark_schema, redshift_schema, table_name):
-    base_query = "select count(*) from {}." + table_name
+    base_query = "select count(1) from {}." + table_name
     spark_query = base_query.format(spark_schema)
     redshift_query = base_query.format(redshift_schema)
 
