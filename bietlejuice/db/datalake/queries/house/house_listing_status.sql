@@ -11,7 +11,7 @@ imovel_aud as (
 	  rev.usuario_id, -- user responsible to change status
 	  rev.motivo, -- reason status changed
 	  lag(i.status) over(partition by i.id order by i.rev) as previous_status, -- previous status ordered by the datetime that happened
-	  --first_value(i.regiao_id) over(partition by i.id order by i.rev desc) as id_region, -- last region_id
+-- since there's manual updates in the Imovel table that mismatches the last value of Imovel_AUD, we need to consider the current region value.
 	  im.regiao_id as id_region,
 	  i.* -- all information from Imovel table
     from datalake_ebdb_raw_prod.imovel_aud i
