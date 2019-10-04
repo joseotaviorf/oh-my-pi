@@ -1,6 +1,5 @@
 import logging
 from argparse import ArgumentParser
-from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -9,37 +8,18 @@ from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 JOB_NAME = "create_raw_external_tables"
-NB_THREADS = 16
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-
-@logger
-def create_raw_external_table(args):
-    loader, databricks_consumer, table_name, athena_db, athena_client = args
-    loader.create_athena_external_table(
-        athena_client=athena_client,
-        consumer=databricks_consumer,
-        table_name=table_name,
-        athena_db=athena_db,
-    )
-    logger.info(
-        "m=create_raw_external_table, table={}, msg=Finished creating table.".format(
-            table_name
-        )
-    )
-
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     args = parser.parse_args()
     environment = args.env
-    source = "ebdb"
+    source = "vans"
 
     loader = DatabaseIntoDataLakeRawLoader(environment, source)
-    # in glue metastore we need to distinguish schemas between environments
     athena_db = "{}_{}".format(loader.datalake_db, environment)
     athena_client = AthenaClient()
     athena_client.execute_athena_query(
@@ -50,18 +30,12 @@ if __name__ == "__main__":
     tables = databricks_consumer.get_table_names_and_sizes().collect()
 
     logger.info("m=__main__, msg=Creating raw external tables...")
-    with Pool(NB_THREADS) as p:
-        p.map(
-            create_raw_external_table,
-            [
-                (
-                    loader,
-                    databricks_consumer,
-                    table.table_name,
-                    athena_db,
-                    athena_client,
-                )
-                for table in tables
-            ],
+    for table in tables:
+        loader.create_athena_external_table(
+            athena_client=athena_client,
+            consumer=databricks_consumer,
+            table_name=table.table_name,
+            athena_db=athena_db,
         )
+
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

@@ -42,7 +42,9 @@ class SparkMetastoreService:
 
     @logger
     def drop_table(self, table_name):
-        self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
+        self.spark_sql_client.run(
+            "drop table if exists {}.{}".format(self.db, table_name)
+        )
 
     @logger
     def refresh_table(self, table_name):
@@ -163,3 +165,48 @@ class SparkMetastoreService:
                 partition_by_dicts,
             )
         self.spark_sql_client.run("REFRESH TABLE {}.{}".format(self.db, table_name))
+
+    @logger
+    def get_table_path(self, table_name):
+        """Get the folder full path on s3 where the table is saved"""
+        return (
+            self.spark_sql_client.run(
+                "describe formatted {}.{}".format(self.db, table_name)
+            )
+            .where("col_name = 'Location'")
+            .select("data_type")
+            .collect()[0][0]
+        )
+
+    @logger
+    def get_table_format(self, table_name):
+        """Get the format in which the files of the table were saved"""
+        return (
+            self.spark_sql_client.run(
+                "describe formatted {}.{}".format(self.db, table_name)
+            )
+            .where("col_name = 'Provider'")
+            .select("data_type")
+            .collect()[0][0]
+            .lower()
+        )
+
+    @logger
+    def get_file_paths_from_table(self, s3_client, table_name):
+        """
+        Get all the s3 files on datalake belonging to the table
+        :param s3_client: S3Client object
+        :param table_name: name of the table (without database prefix).
+        :return: list of path and size tuples of all the files belonging to the table
+        """
+        table_path = self.get_table_path(table_name)
+        table_format = self.get_table_format(table_name)
+
+        all_objs = s3_client.list_objects(table_path, include_size=True)
+
+        # filter only the files that finishes with table_format extension, for example: '.json'
+        data_files = [
+            (path, size) for path, size in all_objs if path.endswith(table_format)
+        ]
+
+        return data_files
