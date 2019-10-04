@@ -181,7 +181,7 @@ condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     sub_dag_func=create_clean_and_dim_tables_sub_dag,
     source=SOURCE,
     clean_table="condo",
-    dw_schema="public",
+    dw_schema=DW_SCHEMA,
     dim_table="dim_condo",
 )
 
