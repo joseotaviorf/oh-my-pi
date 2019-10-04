@@ -261,6 +261,51 @@ UNION
       left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
       -- filter with 'between' because there is future cost
       where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+UNION
+    select
+        ftw.sk_date,
+        'twitter' as origin,
+        'fact_twitter_daily_cost_attributions' as fact_cost,
+        dtwc.campaign_name,
+        null as campaign_city,
+        dtwc.account_name as account_name,
+        lower(dtwc.campaign_name) as campaign_name_l,
+        lower(dtwc.account_name) as account_name_l,
+        replace(dtwc.campaign_name, ' ', '_') as utm_campaign,
+        upper(dtag.ad_group_name) as utm_term,
+        null as utm_content,
+        sum(desktop_cost) as desktop_cost,
+        sum(mobile_cost) as mobile_cost,
+        sum(other_cost) as other_cost,
+        null as total_cost
+    from marketing.fact_twitter_daily_cost_attributions ftw
+    join marketing.dim_twitter_campaign dtwc
+        on ftw.sk_campaign = dtwc.sk_campaign
+    join marketing.dim_twitter_ad_group dtag
+        on ftw.sk_ad_group = dtag.sk_ad_group
+    where ftw.sk_date >= 20180101
+    group by 1,2,3,4,5,6,7,8,9,10,11
+UNION
+    select
+        fli.sk_date,
+        'linkedin' as origin,
+        'fact_linkedin_daily_cost_attributions' as fact_cost,
+        dlc.campaign_name,
+        null as campaign_city,
+        dlc.account_name as account_name,
+        lower(dlc.campaign_name) as campaign_name_l,
+        lower(dlc.account_name) as account_name_l,
+        dlc.campaign_name as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        null as desktop_cost,
+        null as mobile_cost,
+        null as other_cost,
+        sum(total_spent) as total_cost
+    from marketing.fact_linkedin_daily_cost_attributions fli
+    join marketing.dim_linkedin_campaign dlc
+        on dlc.sk_campaign = fli.sk_campaign
+    group by 1,2,3,4,5,6,7,8,9,10,11
 )
 ,demand_tax as (
 	select
@@ -296,6 +341,12 @@ UNION
 	     	when cf.campaign_name_l like '%porto%alegre%' then 'Porto Alegre' 
 	     	when cf.campaign_name_l like '%curitiba%' or cf.campaign_name_l like '%paran_%' then 'Curitiba'
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
+	     	when cf.campaign_name_l like '%poa%' then 'Porto Alegre'
+	     	when cf.campaign_name_l like '%ctba%' then 'Curitiba'
+	     	when cf.campaign_name_l like '%fln%' then 'Florianópolis'
+	     	when cf.campaign_name_l like '%cps%' then 'Campinas'
+	     	when cf.campaign_name_l like '%bsb%' then 'Brasília'
+	     	when cf.campaign_name_l like '%rj%' then 'Rio de Janeiro'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
 		case
@@ -328,14 +379,14 @@ UNION
 	    cf.utm_campaign,
 		cf.utm_term,
 		cf.utm_content,
-		case when total_cost is null then
-			case when tx.mkt_platform = 'Mobile' then mobile_cost
-				 when tx.mkt_platform = 'Desktop' then desktop_cost
-				 when tx.mkt_platform = 'Other' then other_cost
-			end   
-			else total_cost end
-			* cast(coalesce(fator_custo, '0') as numeric(3,2))
-			as cost,
+		case
+		    when total_cost is null then
+                case when tx.mkt_platform = 'Mobile' then mobile_cost
+                     when tx.mkt_platform = 'Desktop' then desktop_cost
+                     when tx.mkt_platform = 'Other' then other_cost
+                end
+            else total_cost
+        end * cast(coalesce(fator_custo, '0') as numeric(3,2)) as cost,
 		case when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
 					and coalesce(cf.account_name_l,'') != 'supply_affiliates')
 					OR
@@ -360,22 +411,22 @@ UNION
 				and cf.origin = tx.origin
 )
 select 
-sk_date,
-side as funnel_side,
-account_name,
-campaign_name,
-city_group_final as city_group,
-mkt_category,
-mkt_flow,
-mkt_completion,
-mkt_origin,
-mkt_channel,
-mkt_medium,
-mkt_source,
-mkt_platform,
-utm_campaign,
-utm_term,
-utm_content,
-cost,
-getdate() as ts_load
+    sk_date,
+    side as funnel_side,
+    account_name,
+    campaign_name,
+    city_group_final as city_group,
+    mkt_category,
+    mkt_flow,
+    mkt_completion,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    mkt_platform,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    cost,
+    getdate() as ts_load
 from demand_tax
