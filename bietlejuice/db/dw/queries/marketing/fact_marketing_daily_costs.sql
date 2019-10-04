@@ -271,8 +271,8 @@ UNION
         dtwc.account_name as account_name,
         lower(dtwc.campaign_name) as campaign_name_l,
         lower(dtwc.account_name) as account_name_l,
-        null as utm_campaign,
-        null as utm_term,
+        replace(dtwc.campaign_name, ' ', '_') as utm_campaign,
+        upper(dtag.ad_group_name) as utm_term,
         null as utm_content,
         sum(desktop_cost) as desktop_cost,
         sum(mobile_cost) as mobile_cost,
@@ -281,6 +281,8 @@ UNION
     from marketing.fact_twitter_daily_cost_attributions ftw
     left join marketing.dim_twitter_campaign dtwc
         on ftw.sk_campaign = dtwc.sk_campaign
+    left join marketing.dim_twitter_ad_group dtag
+        on ftw.sk_ad_group = dtag.sk_ad_group
     where ftw.sk_date >= 20180101
     group by 1,2,3,4,5,6,7,8,9,10,11
 )
