@@ -235,4 +235,7 @@ ebdb_to_datalake_raw_task >> [
     create_raw_external_tables_task,
     condo_sub_dag_task,
     region_sub_dag_task,
+    visit_sub_dag_task,
+    contract_sub_dag_task,
+    inspection_sub_dag_task,
 ] >> terminate_cluster_task
