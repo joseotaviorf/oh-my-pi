@@ -38,41 +38,17 @@ class FirestoreConsumer(DatabaseConsumer):
 
     @logger
     def get_data_from_table(self, table_name):
-        return self.get_data_from_table_in_chunks(table_name)
-
-    @logger
-    def get_data_from_table_in_chunks(self, table_name):
-        """Get all data from table in chunks.
-
-        :param table_name: str
-        :return: spark dataframe
-        """
         all_json = []
 
         doc_ref = self.firestore_client.collection(f"{table_name}")
-        first_query = doc_ref.order_by("__name__").limit(FirestoreConsumer.BATCH_SIZE)
-
-        old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
-            first_query, doc_ref
+        old_id, current_id, snapshot, data_json, last_doc = self._get_first_chunk(
+            doc_ref
         )
         all_json.append(data_json)
 
-        while old_id != current_id:
-            logger.info(
-                f"m=get_data_from_table_in_chunks, msg=getting chunk data starting at id: {last_doc['firestore_id']}"
-            )
-
-            next_query = (
-                doc_ref.order_by("__name__")
-                .start_at(snapshot)
-                .limit(FirestoreConsumer.BATCH_SIZE)
-            )
-
-            old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
-                next_query, doc_ref, last_doc["firestore_id"]
-            )
-            all_json.append(data_json)
-        return self._get_default_read_format_and_options(all_json)
+        return self._get_data_in_chunks(
+            doc_ref, snapshot, last_doc["firestore_id"], old_id, current_id, all_json
+        )
 
     @logger
     def get_data_from_query(self, query, table_name=None):
@@ -86,6 +62,7 @@ class FirestoreConsumer(DatabaseConsumer):
                         "field": "lastSentDate",
                         "op": ">=",
                         "value": "2018-9-19"
+
                     },
                     {
                         "field": "lastSentDate",
@@ -119,6 +96,29 @@ class FirestoreConsumer(DatabaseConsumer):
 
         rdd = sc.parallelize(json_parsed, len(json_parsed))
         return spark.read.option("multiline", "true").json(rdd)
+
+    def _get_first_chunk(self, doc_ref):
+        first_query = doc_ref.order_by("__name__").limit(FirestoreConsumer.BATCH_SIZE)
+        return self._get_parameters_from_query_result(first_query, doc_ref)
+
+    def _get_data_in_chunks(
+        self, doc_ref, snapshot, firestore_id, old_id, current_id, all_json
+    ):
+        while old_id != current_id:
+            logger.info(
+                f"m=get_data_from_table_in_chunks, msg=getting data chunk starting at id: {firestore_id}"
+            )
+
+            next_query = (
+                doc_ref.order_by("__name__")
+                .start_at(snapshot)
+                .limit(FirestoreConsumer.BATCH_SIZE)
+            )
+            old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
+                next_query, doc_ref, firestore_id
+            )
+            all_json.append(data_json)
+        return self._get_default_read_format_and_options(all_json)
 
     def _get_parameters_from_query_result(self, query, doc_ref, current_id=None):
         if current_id:
