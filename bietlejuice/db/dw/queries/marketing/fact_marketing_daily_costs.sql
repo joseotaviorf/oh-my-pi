@@ -261,6 +261,28 @@ UNION
       left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
       -- filter with 'between' because there is future cost
       where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+UNION
+    select
+        ftw.sk_date,
+        'twitter' as origin,
+        'fact_twitter_daily_cost_attributions' as fact_cost,
+        dtwc.campaign_name,
+        null as campaign_city,
+        dtwc.account_name as account_name,
+        lower(dtwc.campaign_name) as campaign_name_l,
+        lower(dtwc.account_name) as account_name_l,
+        null as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        sum(desktop_cost) as desktop_cost,
+        sum(mobile_cost) as mobile_cost,
+        sum(other_cost) as other_cost,
+        null as total_cost
+    from marketing.fact_twitter_daily_cost_attributions ftw
+    left join marketing.dim_twitter_campaign dtwc
+        on ftw.sk_campaign = dtwc.sk_campaign
+    where ftw.sk_date >= 20180101
+    group by 1,2,3,4,5,6,7,8,9,10,11
 )
 ,demand_tax as (
 	select
@@ -296,6 +318,12 @@ UNION
 	     	when cf.campaign_name_l like '%porto%alegre%' then 'Porto Alegre' 
 	     	when cf.campaign_name_l like '%curitiba%' or cf.campaign_name_l like '%paran_%' then 'Curitiba'
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
+	     	when cf.campaign_name_l like '%poa%' then 'Porto Alegre'
+	     	when cf.campaign_name_l like '%ctba%' then 'Curitiba'
+	     	when cf.campaign_name_l like '%fln%' then 'Florianópolis'
+	     	when cf.campaign_name_l like '%cps%' then 'Campinas'
+	     	when cf.campaign_name_l like '%bsb%' then 'Brasília'
+	     	when cf.campaign_name_l like '%rj%' then 'Rio de Janeiro'
 		end as city_campaign_mapping_rule,
 		-- city via campaign_name name convention
 		case
