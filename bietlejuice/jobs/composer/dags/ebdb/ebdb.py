@@ -19,7 +19,7 @@ MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
 
 # Job params
 SOURCE = "ebdb"
-DW_SCHEMA = "public"
+DW_SCHEMA = "public_spark"
 
 # s3 path setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
