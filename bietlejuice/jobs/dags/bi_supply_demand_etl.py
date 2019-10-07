@@ -70,7 +70,10 @@ def load_dim_from_ods_to_dw(**kwargs):
         insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
-        post_command=post_command
+        post_command=post_command,
+        schema_dest='public' if 'schema_dest' not in kwargs else kwargs['schema_dest'],
+        schema_source='public' if 'schema_source' not in kwargs else kwargs[
+            'schema_source']
     )
 
 
@@ -437,8 +440,9 @@ dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='DW_fact_affiliate_daily_engagement_cost',
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'affiliate_daily_engagement_cost', 'is_fact': True,
-               'bucket': bucket, 'insert_dummy': False}
+    op_kwargs={'dim_name': 'affiliate_daily_engagement_cost',
+               'schema_dest': 'marketing', 'is_fact': True, 'bucket': bucket,
+               'insert_dummy': False}
 )
 
 # new 'supply' flow

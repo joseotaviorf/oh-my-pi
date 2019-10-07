@@ -31,7 +31,7 @@ from (
 		   and from_unixtime(ua_ure_int.timestamp/1000) <= occ.dataOperacao) as u_max_rev,
 		sum(occ.valor) as value_brl
 	from OperacaoContaCorrente occ
-	join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
+	left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
 	join Imovel i on i.id = occ.imovel_id
 	where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
 	group by 1,2,3,4,5,6,7
@@ -50,7 +50,7 @@ select
 	case when da_aud.affiliateType = 'Doorman' and u_aud.dadosagente_id is not null then 'Doorman & Agent'
 	     when u_aud.dadosagente_id is not null then 'Agent'
 		 else da_aud.affiliateType end as affiliate_type,
-	'comissaoSobreAfiliadoIndicado_CALC' as commission_type,
+	'comissaoSobreAfiliadoIndicado' as commission_type,
 	sum(res.value_brl * 0.1) as value_brl
 from (
 	select
@@ -86,7 +86,7 @@ from (
 			   and from_unixtime(da_ure_int.timestamp/1000) <= occ.dataOperacao) as da_max_rev,
 			sum(occ.valor) as value_brl
 		from OperacaoContaCorrente occ
-		join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
+		left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
 		join Imovel i on i.id = occ.imovel_id
 		where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
 		group by 1,2,3,4,5,6
