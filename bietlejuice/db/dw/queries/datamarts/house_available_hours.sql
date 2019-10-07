@@ -11,7 +11,7 @@ house_available as (
 	select 
 		ia.imovel_id as house_id,
 		ia.date_time as available_start_date,
-		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_end_date,
+		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_ended_date,
 		ia.diadasemana as day_of_week,
 		horarios_disponivel08as09 as hours_available_08to09,
 		horarios_disponivel09as10 as hours_available_09to10,
