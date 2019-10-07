@@ -3,8 +3,8 @@ select
 	cast(res.user_id as SIGNED) as sk_user,
 	cast(res.region_id as SIGNED) as sk_region,
 	res.dadosafiliado_id,
-	u_aud.dadosagente_id,
-	da_aud.ativo as flg_affiliate_active,
+	u_aud.dadosagente_id as sk_user_agent,
+	da_aud.ativo as is_affiliate_active,
 	case when da_aud.affiliateType = 'Doorman' and u_aud.dadosagente_id is not null then 'Doorman & Agent'
 	     when u_aud.dadosagente_id is not null then 'Agent'
 		 else da_aud.affiliateType end as affiliate_type,
@@ -46,11 +46,11 @@ select
 	cast(res.region_id as SIGNED) as sk_region,
 	res.dadosafiliado_id,
 	u_aud.dadosagente_id,
-	da_aud.ativo as flg_affiliate_active,
+	da_aud.ativo as is_affiliate_active,
 	case when da_aud.affiliateType = 'Doorman' and u_aud.dadosagente_id is not null then 'Doorman & Agent'
 	     when u_aud.dadosagente_id is not null then 'Agent'
 		 else da_aud.affiliateType end as affiliate_type,
-	'comissaoSobreAfiliadoIndicado' as commission_type,
+	'comissaoSobreAfiliadoIndicado_CALC' as commission_type,
 	sum(res.value_brl * 0.1) as value_brl
 from (
 	select

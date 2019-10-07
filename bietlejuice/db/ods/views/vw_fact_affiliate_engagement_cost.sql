@@ -1,12 +1,12 @@
-drop view if exists vw_fact_affiliate_engagement_cost;
-create view vw_fact_affiliate_engagement_cost as
+drop view if exists vw_fact_affiliate_daily_engagement_cost;
+create view vw_fact_affiliate_daily_engagement_cost as
     SELECT
         sk_date,
         sk_user,
         sk_region,
         dadosafiliado_id,
-        dadosagente_id,
-        flg_affiliate_active,
+        sk_user_agent,
+        is_affiliate_active,
         affiliate_type,
         commission_type,
         value_brl,
