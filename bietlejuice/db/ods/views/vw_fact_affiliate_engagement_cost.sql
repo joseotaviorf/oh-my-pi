@@ -12,5 +12,5 @@ create view vw_fact_affiliate_daily_engagement_cost as
         value_brl,
         now()::timestamp as ts_load
     FROM
-      public.fact_affiliate_engagement_cost
+      public.fact_affiliate_daily_engagement_cost
 ;

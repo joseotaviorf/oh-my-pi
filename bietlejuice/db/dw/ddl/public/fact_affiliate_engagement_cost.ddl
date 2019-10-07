@@ -1,6 +1,6 @@
-drop table if exists marketing.fact_affiliate_engagement_cost;
+drop table if exists marketing.fact_affiliate_daily_engagement_cost;
 
-create table marketing.fact_affiliate_engagement_cost (
+create table marketing.fact_affiliate_daily_engagement_cost (
       sk_date integer,
       sk_user integer,
       sk_region integer,
