@@ -112,7 +112,7 @@ class Transformer:
                    }
         """
 
-        database = self._get_spark_schema(datalake_layer)
+        database = self._get_athena_schema(datalake_layer)
         self.client.add_partition(database, table_name, partition_by_dict)
 
     @logger
