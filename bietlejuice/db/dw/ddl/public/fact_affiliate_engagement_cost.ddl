@@ -4,7 +4,7 @@ create table marketing.fact_affiliate_engagement_cost (
       sk_date integer,
       sk_user integer,
       sk_region integer,
-      dadosafiliado_id integer,
+      sk_user_affiliate integer,
       sk_user_agent integer,
       is_affiliate_active smallint,
       affiliate_type varchar(64),

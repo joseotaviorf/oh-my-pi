@@ -4,7 +4,7 @@ create view vw_fact_affiliate_daily_engagement_cost as
         sk_date,
         sk_user,
         sk_region,
-        dadosafiliado_id,
+        sk_user_affiliate,
         sk_user_agent,
         is_affiliate_active,
         affiliate_type,
