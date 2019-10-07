@@ -287,7 +287,7 @@ potential_listings as (
     coalesce(f.lead_id, '-1'::integer) as sk_lead,
     coalesce(f.conversao_id, '-1'::integer) as sk_lead_conversion,
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
-    coalesce(f.imovel_id || '00' || coalesce(hl_version_one.version, hl_version_zero.version, 0)::varchar, '-1')::bigint as sk_house_listing,
+    coalesce(f.imovel_id || '00' || coalesce(hl_version_zero.version, 0)::varchar, '-1')::bigint as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
     coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
@@ -399,9 +399,6 @@ potential_listings as (
   left join house_listing hl_version_zero
   	on hl_version_zero.id_house = f.imovel_id
   	  and hl_version_zero.version = 0
-  left join house_listing hl_version_one
-  	on hl_version_one.id_house = f.imovel_id
-  	  and hl_version_one.version = 1
 ), 
 taxonomy as (
   select
