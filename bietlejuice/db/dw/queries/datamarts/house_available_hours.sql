@@ -9,7 +9,7 @@ imovel_aud as (
 ),
 house_available as (
 	select 
-		ia.imovel_id as house_id,
+		ia.imovel_id as id_house,
 		ia.date_time as available_started_date,
 		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_ended_date,
 		ia.diadasemana as day_of_week,
