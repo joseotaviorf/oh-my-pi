@@ -26,7 +26,6 @@ house_available as (
 		horarios_disponivel18as19 as hours_available_18to19,
 		horarios_disponivel19as20 as hours_available_19to20
 	from imovel_aud ia
-	order by imovel_id, day_of_week
 )
 select 
 	house_id,
