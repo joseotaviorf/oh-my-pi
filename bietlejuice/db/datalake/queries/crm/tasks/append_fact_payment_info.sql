@@ -7,13 +7,13 @@
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
     on trim(ct.origin) = 'Contrato'
-      and ct.id_origin = ec.id
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(ec.id as bigint)
   left join datalake_raw.ebdb_onboarding eo
     on trim(ct.origin) = 'Onboarding'
-      and ct.id_origin = eo.id
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eo.id as bigint)
   left join datalake_raw.ebdb_contrato ec_refund
     on trim(ct.origin) in ('Refund', 'TenantRefund')
-      and regexp_extract(ct.metadata, 'contract_id":(\d+)', 1) = ec_refund.id
+      and try_cast(try_cast(regexp_extract(ct.metadata, 'contract_id":(\d+)', 1) as decimal) as bigint) = try_cast(ec_refund.id as bigint)
 ),
 contract_house_listing as (
   select

@@ -135,39 +135,37 @@ class TestLinkedInCampaigns(object):
             partition="dt='2012-01-02'"
         )
 
-    def test__validate_result_with_two_files_with_the_same_name(self,
-                                                                linkedin_campaigns):
+    def test__validate_file_with_two_files_with_the_same_name(self,
+                                                              linkedin_campaigns):
         # arrange
         elements = ['a', 'b']
 
         # assert
         with raises(RuntimeError):
             # act
-            linkedin_campaigns._validate_result(elements)
+            linkedin_campaigns._validate_file(elements)
 
-    def test__validate_result_with_no_file_found(self, linkedin_campaigns):
+    def test__validate_file_with_no_file_found(self, linkedin_campaigns):
         # assert
         with raises(RuntimeError):
             # act
-            linkedin_campaigns._validate_result([])
+            linkedin_campaigns._validate_file([])
 
-    def test__validate_result(self, linkedin_campaigns):
+    def test__validate_file(self, linkedin_campaigns):
         # act
-        result = linkedin_campaigns._validate_result(['a'])
+        result = linkedin_campaigns._validate_file(['a'])
 
         # assert
         assert result
 
     @mock.patch.object(LinkedInCampaigns, '_validate_csv_header')
     @mock.patch.object(LinkedInCampaigns, '_get_google_drive_folder_id')
-    @mock.patch.object(LinkedInCampaigns, '_validate_result')
+    @mock.patch.object(LinkedInCampaigns, '_validate_file')
     @mock.patch.object(pd, 'read_csv')
-    # @mock.patch.object(pd.DataFrame, 'to_csv')
-    def test__get_process_file(self, mock_read_csv, mock__validate_result,
+    def test__get_process_file(self, mock_read_csv, mock__validate_file,
                                mock_get_google_drive_folder_id,
                                mock__validate_csv_header, linkedin_campaigns):
         # arrange
-        mock_get_google_drive_folder_id.return_value = ''
         mock_file = [{'id': 1}]
         google_drive_client = MagicMock()
         google_drive_client.list_files.return_value = mock_file
@@ -179,13 +177,12 @@ class TestLinkedInCampaigns(object):
 
         # assert
         assert 'raw-tmp_filename' == raw_file
-        mock__validate_result.assert_called_once_with(mock_file)
+        mock__validate_file.assert_called_once_with(mock_file)
         google_drive_client.download_file.assert_called_once_with(
             file_id=mock_file[0]['id'],
             path='/tmp')
         mock__validate_csv_header.assert_called_once_with('/tmp/tmp_filename')
         mock_read_csv.assert_called_once()
-        # mock_to_csv.assert_called_once()
 
     @mock.patch.object(LinkedInCampaigns, '_move_to_clean')
     def test_move_linkedin_campaigns_to_clean(self, mock__move_to_clean,

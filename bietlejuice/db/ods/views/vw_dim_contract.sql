@@ -41,6 +41,16 @@ with b2b_info as (
 	on pa_b2b.user_id = h.usuario_id
   left join photo_job pj
     on pj.imovel_id = h.id
+),
+house_b2b_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
 )
 select
   c.id as sk_contract,
@@ -74,13 +84,18 @@ select
   c.ts_updated,
   c.ts_canceled,
   c.cancellation_reason,
-  bi.is_b2b,
+  (hp.id_house_listing is not null) or bi.is_b2b as is_b2b,
   bi.b2b_type,
-  bi.b2b_prime_type,
-  now()::timestamp as ts_load
+  case
+      when hp.id_house_listing is not null then 'portability'
+      else bi.b2b_prime_type
+  end as b2b_prime_type
 from contract c
 left join b2b_info bi
   on c.id = bi.id_contract
+left join house_listing hl
+	on hl.id_house = c.id_house
+	and c.ts_created between coalesce(hl.ts_listing_version_start, '1900-01-01') and coalesce(hl.ts_listing_version_end, now())
+left join house_b2b_portability hp
+    on hp.id_house_listing = hl.id_house_listing
 ;
-
-
