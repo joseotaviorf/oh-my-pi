@@ -24,9 +24,12 @@ apts_iptu_sp AS (
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 listings AS (
-  SELECT *,
-    regexp_extract(house_number, '\d+$') AS extracted_house_number
-  FROM datalake_clean.ods_dim_house_listing
+  SELECT
+    l.sk_house_listing,
+    l.house_lat,
+    l.house_lng,
+    regexp_extract(l.house_number, '\d+$') AS extracted_house_number
+  FROM datalake_clean.ods_dim_house_listing l
 ),
 radius AS (
   SELECT 1.0 AS "radius_km"
