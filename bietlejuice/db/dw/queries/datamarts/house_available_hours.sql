@@ -31,7 +31,7 @@ select
 	house_id,
 	to_char(available_start_date, 'YYYYMMDD')::bigint as sk_available_started_date,
 	to_char(available_end_date, 'YYYYMMDD')::bigint as sk_available_ended_date,
-	available_start_date,
+	available_started_date,
 	available_end_date,
 	day_of_week,
 	hours_available_08to09
