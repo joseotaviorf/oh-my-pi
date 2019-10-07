@@ -29,7 +29,7 @@ house_available as (
 )
 select 
 	id_house,
-	to_char(available_start_date, 'YYYYMMDD')::bigint as sk_available_started_date,
+	to_char(available_started_date, 'YYYYMMDD')::bigint as sk_available_started_date,
 	to_char(available_end_date, 'YYYYMMDD')::bigint as sk_available_ended_date,
 	available_started_date,
 	available_ended_date,
