@@ -505,6 +505,7 @@ select
   atax.sk_first_task_closed_date,
   atax.sk_last_task_created_date,
   atax.sk_last_task_closed_date,
+  atax.sk_first_contact_date,
   atax.sk_conversion_date,
   atax.sk_qualified_date,
   atax.sk_opportunity_date,
