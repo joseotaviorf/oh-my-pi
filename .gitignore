@@ -116,3 +116,6 @@ db/.dbeaver-data-sources.xml
 
 # vscode
 .vscode/*
+
+# spark stuff
+metastore_db/

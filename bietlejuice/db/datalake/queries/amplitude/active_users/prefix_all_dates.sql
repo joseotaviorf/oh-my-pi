@@ -1,38 +1,5 @@
 with all_events as (
       select
-        extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _year,
-        extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _month,
-        extract(week from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _week,
-        extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _day,
-        trim(amplitude_id) as amplitude_id,
-        false as partial
-      from datalake_clean.amplitude_events
-      where ym >= '2017-01'
-        and et in ('listing_page_viewed',
-                   'search_results_page_viewed',
-                   'schedule_page_viewed',
-                   'offer_submission_page_viewed',
-                   'offer_conditions_page_viewed',
-                   'login_page_viewed',
-                   'documentation_page_viewed',
-                   'home_page_viewed',
-                   'Listing-View',
-                   'Listing-Views_listing',
-                   'listing_photo_viewed',
-                   'Map-Views_map',
-                   'Home-Views_home',
-                   'Listing-View',
-                   'App_open',
-                   'session_start'
-           )
-         and ((trim(app) = '170698' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
-          or (trim(app) = '157033' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-          or (trim(app) = '160023' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-          or (trim(app) = '156118' and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))
-         and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast(now() as date)
-         and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-01-01' as date)
-  union
-      select
          extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _year,
          extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _month,
          extract(week from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _week,
@@ -40,8 +7,7 @@ with all_events as (
          coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
          false as partial
       from datalake_amplitude_clean_prod.events
-      where year >= 2019
-         and event_type in ('listing_page_viewed',
+      where event_type in ('listing_page_viewed',
                            'search_results_page_viewed',
                            'schedule_page_viewed',
                            'offer_submission_page_viewed',

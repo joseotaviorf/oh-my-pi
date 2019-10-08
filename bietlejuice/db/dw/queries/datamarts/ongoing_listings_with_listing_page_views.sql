@@ -12,7 +12,7 @@ with ol as (
 		     when house_bedrooms >= 4 then 4
 		     end as house_bedrooms,
 		is_b2b,
-		count(distinct case when status_history = 'publicado' then sk_house end) as "ongoing_listings"
+		count(distinct case when status_history = 'publicado' then sk_house_listing end) as "ongoing_listings"
 		from(
 	SELECT
 	    fhs.*,
@@ -28,18 +28,18 @@ with ol as (
 	    dh.ts_publication,
 	    dh.house_bedrooms,
 	    date_trunc('week',dh.ts_publication) as week_start_publication
-	FROM fact_house_status fhs
+	FROM fact_house_listing_status fhs
 	join dim_date dd
-	  on dd.sk_date between fhs.sk_min_status_date and coalesce(to_char(to_date(fhs.sk_max_status_date, 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
+	  on dd.sk_date between nullif(fhs.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint)
 	left join dim_region dr
 	     using(sk_region)
 	left join dim_house_listing dh
-	  on fhs.sk_house = dh.sk_house_listing
+	  on fhs.sk_house_listing = dh.sk_house_listing
 	where dd.weekday_name = 'Sunday'
 	)
 	where week_start >= '2018-01-01'
 	group by 1, 2, 3, 4, 5, 6, 7, 8
-	having count(distinct case when status_history = 'publicado' then sk_house end) > 0
+	having count(distinct case when status_history = 'publicado' then sk_house_listing end) > 0
 	order by 2 desc, 1 asc, 3 desc, 4
 ),
 vb as (
@@ -74,19 +74,6 @@ vb as (
 ),
 lpv_events as (
     with amplitude as (
-        select
-            case when regexp_substr(e_house_id, '^\\d{9}$') != ''
-                 then regexp_substr(e_house_id, '^\\d{9}$')::bigint
-                 else null end as id_house,
-            to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
-            regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
-            uuid
-        from datalake_clean.amplitude_events evt
-        where et = 'listing_page_viewed'
-            and ym >= '2018-01'
-            and app = '170698'
-    union
-    -- enriching with amplitude data via SPARK
         SELECT
             case when nullif(regexp_substr(event_house_id::varchar, '^\\d{9}$'), '') is not null
                  then regexp_substr(event_house_id::varchar, '^\\d{9}$')::bigint
@@ -96,7 +83,6 @@ lpv_events as (
             uuid
         FROM datalake_amplitude_clean_prod.listing_page_viewed_events
         WHERE app = 170698
-            AND year >= 2019
     )
     select
         id_house,
@@ -113,7 +99,7 @@ listing_dimensions as (
 	coalesce(dhl.ts_listing_version_start, dhl.ts_publication) as ts_listing_version_start_mod,
 	coalesce(dhl.ts_listing_version_end, CURRENT_TIMESTAMP) as ts_listing_version_end_mod,
 	dhl.ts_publication,
-	dhl.ts_de_publication,
+	dhl.ts_last_de_publication,
 	dr.city_group,
     dr.city_name as city,
     dr.macro_name as macro_region,

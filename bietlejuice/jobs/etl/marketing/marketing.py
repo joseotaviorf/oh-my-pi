@@ -25,8 +25,8 @@ class Marketing(object):
         'fact_facebook_daily_cost_attributions': 'sk_ad',
         'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
         'dim_criteo_campaign': 'sk_criteo_campaign',
-        'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
-        'dim_rtb_campaign': 'sk_rtb_campaign',
+        'fact_rtb_daily_cost_attributions': 'sk_sub_campaign',
+        'dim_rtb_sub_campaign': 'sk_sub_campaign',
         'dim_classified': 'sk_classified',
         'fact_daily_classifieds_costs': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
@@ -34,7 +34,10 @@ class Marketing(object):
         'dim_twitter_ad': 'sk_ad',
         'dim_twitter_ad_group': 'sk_ad_group',
         'dim_twitter_campaign': 'sk_campaign',
-        'fact_twitter_daily_cost_attributions': 'sk_ad'
+        'fact_twitter_daily_cost_attributions': 'sk_ad',
+        'dim_linkedin_campaign': 'sk_campaign',
+        'dim_linkedin_ad': 'sk_ad',
+        'fact_linkedin_daily_cost_attributions': 'sk_ad || sk_campaign || sk_date'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):

@@ -10,11 +10,11 @@ days_published AS (
   WITH
   published AS (
     SELECT
-      sk_house AS sk_house_listing,
-      SUBSTRING(sk_house, 1, 9) AS sk_house,
-      DATE_PARSE(sk_min_status_date, '%Y%m%d') AS min_status_date,
-      COALESCE(TRY(DATE_PARSE(sk_max_status_date, '%Y%m%d')), CURRENT_DATE) AS max_status_date
-    FROM datalake_clean.ods_fact_house_status
+      sk_house_listing,
+      CASE WHEN sk_house_listing <> '-1' THEN SUBSTRING(sk_house_listing, 1, 9) ELSE '-1' END AS sk_house,
+      CASE WHEN sk_status_start_date <> '-1' THEN DATE_PARSE(sk_status_start_date, '%Y%m%d') ELSE NULL END AS min_status_date,
+      COALESCE(CASE WHEN sk_status_end_date<>'-1' THEN DATE_PARSE(sk_status_end_date, '%Y%m%d') ELSE NULL END, CURRENT_DATE) AS max_status_date
+    FROM datalake_clean.ods_fact_house_listing_status
     WHERE status_history = 'publicado'
   ),
   rows AS (
@@ -23,7 +23,7 @@ days_published AS (
       ROW_NUMBER() OVER(PARTITION BY sk_house, max_status_date ORDER BY max_status_date ASC) AS row
     FROM published
   )
-  -- HACK: fact_house_status has an issue where it can have two rows with a published status and null max_status_date
+  -- HACK: fact_house_listing_status has an issue where it can have two rows with a published status and null max_status_date
   -- while we don't fix that, here we will take only the first row
   SELECT * FROM rows WHERE row = 1
 ),
@@ -45,18 +45,6 @@ pre_online_metrics AS (
   WITH
   metrics AS (
         SELECT
-          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(evt.event_time), 1, 10) AS DATE)) AS event_date,
-          TRIM(evt.e_house_id) AS house_id,
-          CASE WHEN TRIM(evt.et) = 'listing_page_viewed' THEN evt.uuid END AS listing_page_views,
-          CASE WHEN TRIM(evt.et) = 'schedule_page_viewed' THEN evt.uuid END AS schedule_page_views,
-          CASE WHEN TRIM(evt.et) = 'tips_page_viewed' THEN evt.uuid END AS tips_page_views
-        FROM datalake_clean.amplitude_events evt
-        WHERE TRIM(evt.et) IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-          AND TRIM(platform) IN ('Web', 'iOS')
-          AND TRIM(u_platform) IN ('web_mobile', 'web_desktop', 'ios')
-          AND ym >= '2019-01'
-    union
-        SELECT
           DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
           coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '') as house_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
@@ -64,7 +52,6 @@ pre_online_metrics AS (
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views
         FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-          AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )

@@ -89,7 +89,17 @@ fact_with_reproc as (
     from reprocessed_lead rl
     join lead l 
       on l.id = rl.id_origin_lead
-  ), 
+  ),
+  house_b2b_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
+  ),
   acquisition_channels as (
     select 
       fhlf.id,
@@ -100,6 +110,7 @@ fact_with_reproc as (
       fhlf.rep_id,
       fhlf.affiliate_id,
       fhlf.region_id,
+      fhlf.first_region_id,
       fhlf.dt_lead,
       fhlf.dt_prospect,
       fhlf.dt_first_contact,
@@ -138,7 +149,8 @@ fact_with_reproc as (
       end as acquisition_channel_rep,
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
       coalesce(
-            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            port.id is not null
+            or coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or pa_b2b.id is not null
             or b2b_prime.id_lead is not null
             , false) as is_b2b
@@ -160,6 +172,12 @@ fact_with_reproc as (
 			on pa_b2b.user_id = u_b2b.id
 	) b2b_prime
 	  on b2b_prime.id_lead = l.id
+	left join house_listing hl
+        on hl.id_house = fhlf.imovel_id
+        and hl.version = 0
+    left join portability port
+        on port.id_house = hl.id_house
+        and port.owner_type = 'B2B'
   )
   select 
     acquisition_channels.id,
@@ -170,6 +188,7 @@ fact_with_reproc as (
     acquisition_channels.rep_id,
     acquisition_channels.affiliate_id,
     acquisition_channels.region_id,
+    acquisition_channels.first_region_id,
     acquisition_channels.dt_lead,
     acquisition_channels.dt_prospect,
     acquisition_channels.dt_first_contact,
@@ -268,15 +287,16 @@ potential_listings as (
     coalesce(f.lead_id, '-1'::integer) as sk_lead,
     coalesce(f.conversao_id, '-1'::integer) as sk_lead_conversion,
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
-    coalesce(f.imovel_id || '001', '-1') as sk_house_listing,
+    coalesce(f.imovel_id || '00' || coalesce(hl_version_one.version, hl_version_zero.version, 0)::varchar, '-1')::bigint as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
     coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
     coalesce(btf.rep_id, '-1'::integer) as sk_user_first_task_assignee,
     coalesce(btl.rep_id, '-1'::integer) as sk_user_last_task_assignee,
     coalesce(f.region_id, '-1'::integer) as sk_region,
+    coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
-    coalesce(l_b2b.online_partner_id, l_b2b.prime_partner_id, pa_b2b_prime.partner_id, '-1'::integer::bigint) as sk_partner,
+    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, l_b2b.prime_partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
     coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
@@ -376,6 +396,12 @@ potential_listings as (
     on us_d.id_dados_afiliado = u.dados_afiliado_id
   left join user_affiliate ua
     on ua.id = u.dados_afiliado_id
+  left join house_listing hl_version_zero
+  	on hl_version_zero.id_house = f.imovel_id
+  	  and hl_version_zero.version = 0
+  left join house_listing hl_version_one
+  	on hl_version_one.id_house = f.imovel_id
+  	  and hl_version_one.version = 1
 ), 
 taxonomy as (
   select
@@ -473,6 +499,7 @@ select
   atax.sk_user_first_task_assignee,
   atax.sk_user_last_task_assignee,
   atax.sk_region,
+  atax.sk_first_region,
   atax.sk_city,
   atax.sk_partner,
   atax.sk_lead_date,

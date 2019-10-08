@@ -20,7 +20,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_prospect_date
@@ -53,7 +54,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_qualified_date
@@ -86,7 +88,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_opportunity_date
@@ -119,7 +122,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_house_listing_flows fhlf
   on dd.sk_date = fhlf.sk_first_listing_date
@@ -152,7 +156,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_booking_created_date
@@ -187,7 +192,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_visit_date
@@ -222,7 +228,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_offer_submitted_date
@@ -257,7 +264,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_offer_approved_date
@@ -292,7 +300,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_tenant_first_doc_sent_date
@@ -327,7 +336,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_credit_analysis_init_date
@@ -362,7 +372,8 @@ select
   count(distinct rf.sk_offer) as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_credit_analysis_end_date
@@ -397,7 +408,8 @@ select
   null::integer as credit_processed,
   count(distinct rf.sk_offer) as credit_approved,
   null::integer as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_credit_analysis_approved_date
@@ -432,7 +444,8 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   count(distinct rf.sk_contract) as contract_created,
-  null::integer as contract_signed
+  null::integer as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_contract_created_date
@@ -467,11 +480,48 @@ select
   null::integer as credit_processed,
   null::integer as credit_approved,
   null::integer as contract_created,
-  count(distinct rf.sk_contract) as contract_signed
+  count(distinct rf.sk_contract) as contract_signed,
+  null::integer  as contract_ended
 from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_contract_signed_date
   and rf.sk_contract_signed_date > 0
+join dim_house_listing dhl
+  on rf.sk_house_listing = dhl.sk_house_listing
+left join dim_booking db
+  on rf.sk_booking = db.sk_booking
+left join dim_region dr
+  on rf.sk_region = dr.sk_region
+where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
+group by 1, 2, 3, 4, 5, 6
+),
+contract_ended as (
+select
+  dd."date",
+  dd.sk_date,
+  dr.city_group,
+  dhl.is_b2b,
+  null as supply_channel,
+  db.mkt_channel as demand_channel,
+  null::integer as prospects,
+  null::integer as qualifieds,
+  null::integer as opportunities,
+  null::integer as first_listings,
+  null::integer as visits_booked,
+  null::integer as visits_completed,
+  null::integer as offer_submitted,
+  null::integer as offer_approved,
+  null::integer as doc_sent,
+  null::integer as doc_completed,
+  null::integer as credit_processed,
+  null::integer as credit_approved,
+  null::integer as contract_created,
+  null::integer as contract_signed,
+  count(distinct rf.sk_contract) as contract_ended
+from dim_date dd
+join fact_listing_rent_flows rf
+  on dd.sk_date = rf.sk_contract_annulment_date
+  and rf.sk_contract_signed_date > 0 and rf.sk_contract_annulment_date > 0
 join dim_house_listing dhl
   on rf.sk_house_listing = dhl.sk_house_listing
 left join dim_booking db
@@ -509,6 +559,8 @@ union_all as (
 	select * from contract_created
 	union all
 	select * from contract_signed
+	union all
+	select * from contract_ended
 ),
 union_all_date as (
 select
@@ -530,7 +582,8 @@ select
   ua.credit_processed,
   ua.credit_approved,
   ua.contract_created,
-  ua.contract_signed
+  ua.contract_signed,
+  ua.contract_ended
 from union_all ua
 right join dim_date dd
   on ua.sk_date = dd.sk_date
@@ -557,7 +610,8 @@ select
   sum(credit_processed) as credit_processed,
   sum(credit_approved) as credit_approved,
   sum(contract_created) as contract_created,
-  sum(contract_signed) as contract_signed
+  sum(contract_signed) as contract_signed,
+  sum(contract_ended) as contract_ended
 from union_all
 group by "date", city_group, 3, 4, 5
 order by "date", city_group, 3, 4, 5

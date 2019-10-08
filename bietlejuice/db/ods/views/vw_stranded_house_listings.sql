@@ -4,57 +4,54 @@ with
 status_all as (
 --select all status from each listing, calculate date_to_be_stranded using publication_date and find in which status was the stranded date
 select
-	fhs.sk_house_listing as sk_house,
+	fhs.id_house_listing as sk_house_listing,
     fhs.status_history,
-    fhs.sk_min_status_date,
-    dmin.date as min_status_date,
-    fhs.sk_max_status_date,
-    dmax.date as max_status_date,
-    date_trunc('day',hl.min_version_time) as ts_publication,
-    date_trunc('day',hl.min_version_time)::timestamp::date + interval '8 week' as date_to_be_stranded,
-    case when date_trunc('day',hl.min_version_time) + interval '8 week' <= dmin.date
-          or date_trunc('day',hl.min_version_time) + interval '8 week' <= dmax.date
-      then 'stranded' end as type_stranded
-from vw_fact_house_status fhs
+    fhs.ts_status_start,
+    coalesce(fhs.ts_status_end, (current_timestamp - interval '1 day')::timestamp) as ts_status_end,
+    hl.ts_listing_version_start,
+    hl.ts_listing_version_start + interval '8 week' as ts_to_be_stranded,
+    case when hl.ts_listing_version_start + interval '8 week' <= fhs.ts_status_start
+          or hl.ts_listing_version_start + interval '8 week' <= coalesce(fhs.ts_status_end, (current_timestamp - interval '1 day')::timestamp)
+      then 'stranded' end as type_stranded,
+    lag(fhs.status_history) over(partition by fhs.id_house_listing order by fhs.ts_status_start, coalesce(fhs.ts_status_end, (current_timestamp - interval '1 day')::timestamp)) as previous_status_history
+from house_listing_status fhs
 left join house_listing hl
-  on fhs.sk_house_listing = ((hl.id || '00') || coalesce(hl.version, 1))::bigint
-left join dim_date dmin
-  on dmin.sk_date = fhs.sk_min_status_date
-left join dim_date dmax
-  on dmax.sk_date = coalesce(fhs.sk_max_status_date,to_char(current_date -1, 'YYYYMMDD')::bigint)
-order by sk_house_listing desc, sk_min_status_date
+  on fhs.id_house_listing = hl.id_house_listing
+order by fhs.id_house_listing desc, fhs.ts_status_start
 ),
 rank_stranded as (
 --select only status where stranded date already happened
 select
-	sk_house,
+	  sk_house_listing,
     status_history,
-    min_status_date,
-    max_status_date,
-    ts_publication,
-    date_to_be_stranded,
+		previous_status_history,
+    ts_status_start,
+    ts_status_end,
+    ts_listing_version_start,
+    ts_to_be_stranded,
     type_stranded,
-    rank() over (partition by sk_house, type_stranded order by max_status_date) as rk,
+    row_number() over (partition by sk_house_listing, type_stranded order by ts_status_start) as rn,
     --calculate min date of all status, because if it is a valid status that is the date that will be used
-    min(case when type_stranded = 'stranded' then min_status_date end) over (partition by sk_house) as min_date_all_status,
+    min(case when type_stranded = 'stranded' then ts_status_start end) over (partition by sk_house_listing) as min_ts_all_status,
     --calculate min date of valid status to define stranded
     min(case when type_stranded = 'stranded'
                   and status_history in ('publicado','suspenso','edicao','aguardando_publicacao')
-             then min_status_date end) over (partition by sk_house) as min_date_valid_status,
-    min(case when type_stranded = 'stranded' then date_to_be_stranded end) over (partition by sk_house) as min_date_to_be_stranded
+						      and (previous_status_history <> 'alugado' OR previous_status_history is null)
+             then ts_status_start end) over (partition by sk_house_listing) as min_ts_valid_status,
+    min(case when type_stranded = 'stranded' then ts_to_be_stranded end) over (partition by sk_house_listing) as min_ts_to_be_stranded
 from status_all
 where type_stranded is not null
-order by sk_house desc, min_status_date
+order by sk_house_listing desc, ts_status_start
 ),
 stranded_status as (
 select
 	*,
-	case when rk = 1 and status_history = 'alugado' then NULL
-	     when rk = 1 and status_history in ('despublicado','excluido')
-	       then min(min_date_valid_status) over (partition by sk_house)
-	     when rk = 1 and status_history in ('publicado','suspenso','edicao','aguardando_publicacao')
-	       then min(min_date_valid_status) over (partition by sk_house)
-	     end as min_date_stranded
+	case when rn = 1 and status_history = 'alugado' then NULL
+	     when rn = 1 and status_history in ('despublicado','excluido')
+	       then min(min_ts_valid_status) over (partition by sk_house_listing)
+	     when rn = 1 and status_history in ('publicado','suspenso','edicao','aguardando_publicacao')
+	       then min(min_ts_valid_status) over (partition by sk_house_listing)
+	     end as min_ts_stranded
 	    /*
 		 * case needed in order to ignore cases where stranded date happened on not valid status
 		 * (such as 'alugado', 'despublicado', 'excluido'), but if it was 'despublicado' consider next valid status
@@ -85,11 +82,12 @@ select
  		 *  --------------------------------------------------------------------------------------------------------------------
  	     */
 from rank_stranded
-order by sk_house desc
+order by sk_house_listing desc
 )
 select
-	distinct sk_house,
-	case when greatest(coalesce(min_date_stranded,'3000-01-01'), min_date_to_be_stranded) = '3000-01-01' then NULL
-	else greatest(coalesce(min_date_stranded,'3000-01-01'), min_date_to_be_stranded)::timestamp::date end as stranded_date
+	distinct sk_house_listing,
+	case when greatest(coalesce(min_ts_stranded,'3000-01-01'), min_ts_to_be_stranded) = '3000-01-01' then NULL
+	else greatest(coalesce(min_ts_stranded,'3000-01-01'), min_ts_to_be_stranded)::timestamp::date end as stranded_date
 from stranded_status
-where rk = 1
+where rn = 1
+;

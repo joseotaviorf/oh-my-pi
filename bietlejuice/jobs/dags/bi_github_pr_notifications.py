@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
-
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.pr_notification import GithubPullRequests, SlackPullRequests
@@ -21,7 +20,8 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9-20/3 * * 1-5')
 def send_notifications_to_slack():
     full_message = ''
     all_prs = {
-        'open': [],
+        'no_reviewed_prs': [],
+        'reviewed_prs': [],
         'approved': []
     }
     for repo_name in GITHUB_REPOS['names']:
@@ -30,11 +30,17 @@ def send_notifications_to_slack():
             repo_name=repo_name
         )
 
-        open_prs, approved_prs = github_pull_requests.extract_pull_requests()
-        if open_prs:
-            all_prs['open'].append({
+        no_reviewed_prs, reviewed_prs, approved_prs = github_pull_requests.extract_pull_requests()
+        if no_reviewed_prs:
+            all_prs['no_reviewed_prs'].append({
                 'repo': repo_name,
-                'prs': open_prs
+                'prs': no_reviewed_prs
+            })
+
+        if reviewed_prs:
+            all_prs['reviewed_prs'].append({
+                'repo': repo_name,
+                'prs': reviewed_prs
             })
 
         if approved_prs:
@@ -43,10 +49,14 @@ def send_notifications_to_slack():
                 'prs': approved_prs
             })
 
-    # build slack messages for opened and approved Github PRs
+    # build slack messages for Github PRs
     full_message += SlackPullRequests.build_slack_message(
-        pull_requests=all_prs['open'],
-        message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['open']
+        pull_requests=all_prs['no_reviewed_prs'],
+        message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['no_reviewed_prs']
+    )
+    full_message += SlackPullRequests.build_slack_message(
+        pull_requests=all_prs['reviewed_prs'],
+        message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['reviewed_prs']
     )
     full_message += SlackPullRequests.build_slack_message(
         pull_requests=all_prs['approved'],

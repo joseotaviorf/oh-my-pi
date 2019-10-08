@@ -22,6 +22,7 @@ create table dim_contract (
   home_insurance_installments smallint,
   home_insurance_value numeric(14,2),
   first_rental_commission numeric(14,2),
+  monthly_administration_fee numeric(14,2),
   condo numeric(14,2),
   iptu numeric(14,2),
   signature_type varchar,

@@ -1,32 +1,5 @@
 with cross_platform as (
 	select
-		app,
-		event_time,
-		u_platform as platform,
-		coalesce(
-			nullif(regexp_replace(e__visita_id, '\[|\]', ''),''),
-			nullif(e_visit_code,''),
-			e_visita_code
-		) as visit_code,
-		u_utm_source as utm_source,
-		u_utm_medium as utm_medium,
-		u_utm_campaign as utm_campaign,
-		u_utm_content as utm_content,
-        u_utm_term as utm_term,
-		u_adjust_network as adjust_network,
-		case
-			when u_platform in ('web_desktop','web_mobile')
-				then coalesce(nullif(u_utm_source, ''), 'organic')
-			else u_adjust_network
-		end as media_source
-	from
-		datalake_clean.amplitude_events
-	where
-		et = 'visit_schedule_confirmed'
-	and trim(app) = '170698'
-	-- union with amplitude events via SPARK process
-	union
-	select
 	    cast(app as varchar) as app,
 	    event_time,
 	    cast(json_extract(user_properties, '$.platform') as varchar) as platform,
@@ -52,79 +25,79 @@ with cross_platform as (
 ),
 ios as (
 	select
-		app,
-		event_time,
-		'ios' as platform,
-		coalesce(
-			nullif(regexp_replace(e__visita_id, '\[|\]', ''),''),
-			nullif(e_visit_code,''),
-			e_visita_code
+		cast(app as varchar) as app,
+	    event_time,
+	    'ios' as platform,
+	    coalesce(
+				nullif(regexp_replace(cast(json_extract(event_properties, '$.Visita_id') as varchar), '\[|\]', ''),''),
+				nullif(cast(json_extract(event_properties, '$.visit_code') as varchar),''),
+				coalesce(cast(json_extract(event_properties, '$.visita_code') as varchar), '')
 		) as visit_code,
-		u_utm_source as utm_source,
-		u_utm_medium as utm_medium,
-		u_utm_campaign as utm_campaign,
-		u_utm_content as utm_content,
-        u_utm_term as utm_term,
-		u_adjust_network as adjust_network,
-		u_adjust_network as media_source
+	    coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as utm_source,
+	    coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as utm_medium,
+	    coalesce(cast(json_extract(user_properties, '$.utm_campaign') as varchar), '') as utm_campaign,
+	    coalesce(cast(json_extract(user_properties, '$.utm_content') as varchar), '') as utm_content,
+	    coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as media_source
 	from
-		datalake_clean.amplitude_events
+		datalake_amplitude_clean_prod.events
 	where
-		et = 'Confirmation-Visit_confirmed'
-	and trim(app) = '156118'
+		event_type = 'Confirmation-Visit_confirmed'
+	and app = 156118
 	and
 	cast(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date) < cast('2017-08-17' as date)
 ),
 web as (
 	select
-		app,
+		cast(app as varchar) as app,
 		event_time,
 		case
 			when device_type in ('Linux','Windows','Mac') then 'web_desktop'
 			else 'web_mobile'
 		end	as platform,
 		coalesce(
-			nullif(regexp_replace(e__visita_id, '\[|\]', ''),''),
-			nullif(e_visit_code,''),
-			e_visita_code
+				nullif(regexp_replace(cast(json_extract(event_properties, '$.Visita_id') as varchar), '\[|\]', ''),''),
+				nullif(cast(json_extract(event_properties, '$.visit_code') as varchar),''),
+				coalesce(cast(json_extract(event_properties, '$.visita_code') as varchar), '')
 		) as visit_code,
-		coalesce(u_utm_source,'organic') as utm_source,
-		u_utm_medium as utm_medium,
-		u_utm_campaign as utm_campaign,
-		u_utm_content as utm_content,
-        u_utm_term as utm_term,
-		u_adjust_network as adjust_network,
-		coalesce(u_utm_source,'organic') as media_source
+	    coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), 'organic') as utm_source,
+	    coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as utm_medium,
+	    coalesce(cast(json_extract(user_properties, '$.utm_campaign') as varchar), '') as utm_campaign,
+	    coalesce(cast(json_extract(user_properties, '$.utm_content') as varchar), '') as utm_content,
+	    coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), 'organic') as media_source
 	from
-		datalake_clean.amplitude_events
+		datalake_amplitude_clean_prod.events
 	where
-		et = 'Confirmation-Visit_confirmed'
-	and trim(app) = '160023'
+		event_type = 'Confirmation-Visit_confirmed'
+	and app = 160023
 	and
 	cast(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date) < cast('2017-08-17' as date)
 ),
 android as (
 	select
-		app,
+		cast(app as varchar) as app,
 		event_time,
-		'android' as platform,
+		'android'	as platform,
 		coalesce(
-			nullif(regexp_replace(e__visita_id, '\[|\]', ''),''),
-			nullif(e_visit_code,''),
-			e_visita_code
+				nullif(regexp_replace(cast(json_extract(event_properties, '$.Visita_id') as varchar), '\[|\]', ''),''),
+				nullif(cast(json_extract(event_properties, '$.visit_code') as varchar),''),
+				coalesce(cast(json_extract(event_properties, '$.visita_code') as varchar), '')
 		) as visit_code,
-		u_utm_source as utm_source,
-		u_utm_medium as utm_medium,
-		u_utm_campaign as utm_campaign,
-		u_utm_content as utm_content,
-        u_utm_term as utm_term,
-		u_adjust_network as adjust_network,
-		u_adjust_network as media_source
+	    coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as utm_source,
+	    coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as utm_medium,
+	    coalesce(cast(json_extract(user_properties, '$.utm_campaign') as varchar), '') as utm_campaign,
+	    coalesce(cast(json_extract(user_properties, '$.utm_content') as varchar), '') as utm_content,
+	    coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
+	    coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as media_source
 	from
-		datalake_clean.amplitude_events
+		datalake_amplitude_clean_prod.events
 	where
-		et = 'Confirmation-Visit_confirmed'
-	and trim(app) = '157033'
+		event_type = 'Confirmation-Visit_confirmed'
+	and app = 157033
 	and
 	cast(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as date) < cast('2017-08-23' as date)
 ),

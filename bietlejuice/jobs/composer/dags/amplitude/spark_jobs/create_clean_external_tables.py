@@ -23,7 +23,7 @@ NB_THREADS = 8
 
 
 def create_clean_external_table(args):
-    db_clean_athena, table_name, s3_table_path, consumer = args
+    db_clean_athena, table_name, s3_table_path, consumer, athena_client = args
     table_schema = consumer.get_table_schema(table_name).collect()
     table_schema = OrderedDict(
         [
@@ -32,7 +32,7 @@ def create_clean_external_table(args):
         ]
     )
     partition_by = ["year", "month", "day"]
-    AthenaClient.overwrite_external_table(
+    athena_client.overwrite_external_table(
         database=db_clean_athena,
         table_name=table_name,
         s3_table_path=s3_table_path,
@@ -40,7 +40,7 @@ def create_clean_external_table(args):
         partition_by=partition_by,
         base_format=TableStorageFormat.DEFAULT_CLEAN,
     )
-    AthenaClient.repair_table_partitions(db_clean_athena, table_name)
+    athena_client.repair_table_partitions(db_clean_athena, table_name)
 
 
 if __name__ == "__main__":
@@ -52,7 +52,8 @@ if __name__ == "__main__":
     db_clean_athena = db_info["db_clean_athena"]
     db_clean_path = db_info["db_clean_path"]
 
-    AthenaClient.execute_athena_query(
+    athena_client = AthenaClient()
+    athena_client.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(db_clean_athena), "default"
     )
 
@@ -77,6 +78,7 @@ if __name__ == "__main__":
                     table.table_name,
                     db_clean_path + table.table_name,
                     databricks_consumer,
+                    athena_client,
                 )
                 for table in tables
             ],

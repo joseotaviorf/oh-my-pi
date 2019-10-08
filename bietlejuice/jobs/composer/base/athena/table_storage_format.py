@@ -1,11 +1,8 @@
 class TableStorageFormat:
-    JSON = {
-        "format": "ROW FORMAT  serde 'org.apache.hive.hcatalog.data.JsonSerDe'",
-        "properties": "",
-    }
+    JSON = {"format": "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'"}
     PARQUET = {
         "format": "STORED AS PARQUET",
-        "properties": 'tblproperties ("parquet.compress"="SNAPPY")',
+        "tblproperties": 'tblproperties ("parquet.compress"="SNAPPY")',
     }
     DEFAULT_RAW = JSON
     DEFAULT_CLEAN = PARQUET

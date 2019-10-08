@@ -1,25 +1,5 @@
 with amplitude_affiliate_tracking as(
 	with amplitude as (
-             select
-                user_id,
-                u_utm_source,
-                u_utm_medium,
-                u_utm_campaign,
-                u_utm_content,
-                u_utm_term,
-                u_platform,
-                device_type,
-                country,
-                region,
-                city,
-                client_event_time,
-                event_time
-            from datalake_clean.amplitude_events
-            where et in ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
-                and app='205027'
-                and user_id <> ''
-        union
-            -- enriching with amplitude data via SPARK
             SELECT
                 cast(user_id as varchar) as user_id,
                 coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as u_utm_source,
@@ -37,7 +17,6 @@ with amplitude_affiliate_tracking as(
            FROM datalake_amplitude_clean_prod.events
            WHERE event_type IN ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
                 AND app = 205027
-                AND year >= 2019
                 AND user_id is not null
         )
         select

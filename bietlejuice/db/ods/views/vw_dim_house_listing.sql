@@ -40,58 +40,30 @@ with b2b_info as (
   left join photo_job pj
     on pj.imovel_id = h.id
 ),
-special_conditions as (
-  with special_conditions_prev as (
-  -- filter multiple changes in a single day
-  -- example:
-  -- ----------------------------------------------------------------------------------------------------------------------------------
-  -- |     id      |  special_condition_type  |       ts_opted_in      |       ts_opted_out      |    special_condition_status_mod    |
-  -- ----------------------------------------------------------------------------------------------------------------------------------
-  -- |    33713	   |       Exclusivity	      |   2019-04-24 21:01:08	 |           null          |                1 (opt-in)          | -> will be removed
-  -- |    33713	   |       Exclusivity	      |   2019-04-24 21:01:08	 |    2019-04-24 21:01:10  |                1 (opt-out)         | -> will be removed
-  -- |    33713	   |       Exclusivity	      |   2019-04-24 21:05:17	 |           null          |                1 (opt-in)          | -> will be removed
-  -- |    33713	   |       Exclusivity	      |   2019-04-24 21:05:17	 |    2019-04-24 21:05:35  |                1 (opt-out)         |
-  -- ----------------------------------------------------------------------------------------------------------------------------------
+house_portability as (
     select
-      id,
-      special_condition_type,
-      date(ts_opted_in) as in_,
-      max(date(ts_opted_out)) as out_
-    from special_condition_aud
-    where special_condition_status in ('OptedIn', 'OptedOut')
-      and special_condition_type in ('Exclusivity', 'OriginalsReady', 'OriginalsReno')
-      -- TODO: check special_condition_mod = 0 and revType = 1 conditions
-      -- to avoid excessive data scan
-    group by 1, 2, 3
-  )
-  select
-    hsc.id_house,
-    scp.special_condition_type,
-    scp.in_,
-    max(scp.out_) as out_
-  from house_special_condition hsc
-  join special_condition sc
-    on id_special_condition = sc.id
-  join special_conditions_prev scp
-    on scp.id = sc.id
-  group by 1, 2, 3
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
 ),
 house_listings as (
   select
-    ((h.id || '00') || coalesce(hl.version, 1))::bigint as sk_house_listing,
+    hl.id_house_listing as sk_house_listing,
     h.id as id_house,
     h.id % 892700000 as short_id_house,
-    hl.version as version,
+    hl.version,
     hl.status::varchar(255),
-    hl.min_version_time as ts_listing_version_start,
-    hl.max_version_time as ts_listing_version_end,
-    h.data_primeiro_verificado as ts_house_registration_first_verification,
-    h.last_confirmation_availability as ts_house_last_confirmation_availability,
+    hl.ts_listing_version_start,
+    hl.ts_listing_version_end,
     h.first_publication as ts_house_first_publication,
     h.ultima_publicacao as ts_house_last_publication,
-    hl.min_version_time::date as ts_publication,
-    hl.de_publication_date as ts_de_publication,
-    hl.aluguel as rent,
+    hl.ts_listing_version_start::date as ts_publication,
+    hl.ts_last_de_publication,
+    hl.rent,
     h.aluguel as house_rent,
     h.bairro as house_neighborhood,
     h.cep as house_zipcode,
@@ -123,86 +95,27 @@ house_listings as (
     h.atualizado_em as ts_house_update,
     h.registration_abandoned_reason as registration_abandoned_reason,
     h.unpublished_reason as house_unpublished_reason,
-    hl.start_version_category as listing_category_start,
-    hl.end_version_category as listing_category_end,
-    hl.is_last_version::integer::boolean,
-    h.exclusivity::integer::boolean as is_exclusive,
+    hl.listing_category_start,
+    hl.is_last_version,
+    hl.is_exclusive,
     h.house_occupant as who_is_living,
     h.key_type,
     h.key_location,
     coalesce(h.visit_restriction = 'Restriction', false) as has_visit_restriction,
-    h.predicted_price as house_predicted_price
+    h.predicted_price as house_predicted_price,
+    hl.dt_last_exclusive_opted_in,
+    hl.dt_last_exclusive_opted_out,
+    hl.is_originals_active,
+    hl.last_originals_type,
+    hl.dt_last_originals_opted_in,
+    hl.dt_last_originals_opted_out,
+    hl.is_iorent_active,
+    hl.last_iorent_type,
+    hl.dt_last_iorent_opted_in,
+    hl.dt_last_iorent_opted_out
   from house h
-  left join house_listing hl
-    on hl.id = h.id
-),
-listing_special_conditions as (
--- selecting the last time a listing had its special condition changed on its version
--- example:
--- ----------------------------------------------------------------------------------
--- |  sk_house_listing  |  special_condition_type  |  dt_opted_in  |  dt_opted_out  |
--- ----------------------------------------------------------------------------------
--- |    892812943001    |      OriginalsReady      |   2019-03-04  |   2019-05-12   | -> will be removed
--- |    892812943001    |      OriginalsReady      |   2019-05-13  |      null      |
--- ----------------------------------------------------------------------------------
-  select
-    hl.sk_house_listing,
-    sc.special_condition_type,
-    max(sc.in_) as dt_opted_in,
-    max(sc.out_) as dt_opted_out
-  from house_listings hl
-  join special_conditions sc
-    on hl.id_house = sc.id_house
-      and greatest(sc.in_, hl.ts_listing_version_start::date) >= hl.ts_listing_version_start::date
-      and greatest(sc.in_, hl.ts_listing_version_start::date) < coalesce(hl.ts_listing_version_end::date, (now() - interval '1 day')::date)
-      and greatest(coalesce(sc.out_, (now() - interval '1 day')::date), coalesce(hl.ts_listing_version_end::date, (now() - interval '1 day')::date)) >= coalesce(hl.ts_listing_version_end::date, (now() - interval '1 day')::date)
-      and greatest(coalesce(sc.out_, (now() - interval '1 day')::date), coalesce(hl.ts_listing_version_end::date, (now() - interval '1 day')::date)) >= hl.ts_listing_version_start::date
-  group by 1, 2
-),
-listing_special_conditions_dates as (
-	with multiple_special_conditions as (
-	-- in case a house listing has more than one Special Condition types: exclusivity, ready and reno on the same version
-  	  select
-  		sk_house_listing,
-  		special_condition_type,
-  		dt_opted_in,
-  		dt_opted_out,
-  		-- selecting the maximum opt-in/out of a house listing, not considering the Originals' type
-  		row_number() over (partition by sk_house_listing, case when special_condition_type like 'Originals%' then 'Originals' else special_condition_type end order by dt_opted_in desc, coalesce(dt_opted_out, '2100-01-01'::date) desc) as rn_last,
-  		row_number() over (partition by sk_house_listing, case when special_condition_type like 'Originals%' then 'Originals' else special_condition_type end order by dt_opted_in asc, coalesce(dt_opted_out, '2100-01-01'::date) asc) as rn_first
-  	  from listing_special_conditions
-    ),
-    last_opt as (
-    -- select the latest Special Condition type a house listing has entered
-      select
-        sk_house_listing,
-        special_condition_type,
-        dt_opted_in,
-        dt_opted_out
-      from multiple_special_conditions
-      where rn_last = 1
-    ),
-    first_opt as (
-    -- select the oldest Special Condition type a house listing has entered
-      select
-        sk_house_listing,
-        special_condition_type,
-        dt_opted_in,
-        dt_opted_out
-      from multiple_special_conditions
-      where rn_first = 1
-    )
-     select
-        fo.sk_house_listing,
-        lo.special_condition_type, -- important to select special_condition_type from last_op since we want to show LAST special condition type
-        fo.dt_opted_in as dt_first_opted_in,
-        fo.dt_opted_out as dt_first_opted_out,
-        lo.dt_opted_in as dt_last_opted_in,
-        lo.dt_opted_out as dt_last_opted_out
-     from last_opt lo
-     join first_opt fo
-       on lo.sk_house_listing = fo.sk_house_listing
-       and (case when lo.special_condition_type like 'Originals%' then 'Originals' else lo.special_condition_type end) = (case when fo.special_condition_type like 'Originals%' then 'Originals' else fo.special_condition_type end)
+  join house_listing hl
+    on hl.id_house = h.id
 )
 select
   hl.sk_house_listing,
@@ -212,12 +125,10 @@ select
   hl.status,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
-  hl.ts_house_registration_first_verification,
-  hl.ts_house_last_confirmation_availability,
   hl.ts_house_first_publication,
   hl.ts_house_last_publication,
   hl.ts_publication,
-  hl.ts_de_publication,
+  hl.ts_last_de_publication,
   hl.rent,
   hl.house_rent,
   hl.house_neighborhood,
@@ -251,11 +162,10 @@ select
   hl.registration_abandoned_reason,
   hl.house_unpublished_reason,
   hl.listing_category_start,
-  hl.listing_category_end,
   hl.is_last_version,
-  lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
-  lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
-  lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
+  hl.is_exclusive,
+  hl.dt_last_exclusive_opted_in,
+  hl.dt_last_exclusive_opted_out,
   hl.who_is_living,
   hl.key_type,
   hl.key_location,
@@ -263,20 +173,22 @@ select
   hl.house_predicted_price,
   bi.is_b2b,
   bi.b2b_type,
-  bi.b2b_prime_type,
-  lsc_originals.dt_last_opted_in is not null
-    and lsc_originals.dt_last_opted_out is null as is_originals_active,
-  lsc_originals.special_condition_type as last_originals_type,
-  lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
-  lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
+  case
+      when hp.id_house_listing is not null then 'portability'
+      else bi.b2b_prime_type
+  end as b2b_prime_type,
+  hl.is_originals_active,
+  hl.last_originals_type,
+  hl.dt_last_originals_opted_in,
+  hl.dt_last_originals_opted_out,
+  hl.is_iorent_active,
+  hl.last_iorent_type,
+  hl.dt_last_iorent_opted_in,
+  hl.dt_last_iorent_opted_out,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
-left join listing_special_conditions_dates lsc_originals
-  on hl.sk_house_listing = lsc_originals.sk_house_listing
-    and lsc_originals.special_condition_type like 'Originals%'
-left join listing_special_conditions_dates lsc_exclusivity
-  on hl.sk_house_listing = lsc_exclusivity.sk_house_listing
-    and lsc_exclusivity.special_condition_type = 'Exclusivity'
+left join house_portability hp
+    on hp.id_house_listing = hl.sk_house_listing
 ;

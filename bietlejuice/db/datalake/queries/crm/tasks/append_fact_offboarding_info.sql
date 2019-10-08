@@ -8,13 +8,13 @@
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
     on trim(ct.origin) = 'Contrato'
-      and ct.id_origin = ec.id
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(ec.id as bigint)
   left join datalake_raw.ebdb_fluxolocacao eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and ct.id_origin = eo.id
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eo.id as bigint)
   left join datalake_raw.ebdb_vistoria ev
     on trim(ct.origin) = 'Vistoria'
-        and ct.id_origin = ev.id
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(ev.id as bigint)
 ),
 contract_house_listing as (
   select
@@ -45,7 +45,7 @@ select distinct
   c.ts_task_user_end as ts_task_action_end,
   c.task_user_type as task_action_type,
   c.task_user_resolve_hours,
-  coalesce(chl_contract.sk_contract, chl_rent_flow.sk_contract, -1) as sk_contract,
+  coalesce(chl_contract.sk_contract, -1) as sk_contract,
   coalesce(chl_contract.sk_house_listing, chl_rent_flow.sk_house_listing, -1) as sk_house_listing,
   coalesce(chl_contract.sk_house_owner, chl_rent_flow.sk_house_owner, -1) as sk_house_owner,
   coalesce(chl_contract.sk_tenant, chl_rent_flow.sk_tenant, -1) as sk_tenant,

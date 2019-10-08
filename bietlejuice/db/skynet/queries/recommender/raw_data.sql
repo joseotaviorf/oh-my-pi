@@ -2,21 +2,21 @@ with prev as (
   select
     amplitude_id as user_id,
     session_id,
-    et as "action",
-    try(cast(
+    event_type as "action",
+    try_cast(
       coalesce(
-        regexp_extract(trim(e_house_id), '^(\d+)(\.0)?$', 1),
-        regexp_extract(trim(e__id__imovel), '^(\d+)(\.0)?$', 1),
-        regexp_extract(trim(e_imovel_id), '^(\d+)(\.0)?$', 1),
-        regexp_extract(trim(e__imovel_id), '^(\d+)(\.0)?$', 1)
+        regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '^(\d+)(\.0)?$', 1),
+        regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '^(\d+)(\.0)?$', 1),
+        regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '^(\d+)(\.0)?$', 1),
+        regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '^(\d+)(\.0)?$', 1)
       ) as integer
-    )) as house_id,
-    cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}') as timestamp) as action_time
-  from datalake_clean.amplitude_events
-  where ym between '__START_YM__' and '__END_YM__'
-    and et in ('listing_page_viewed', 'visit_intent_clicked')
-    and trim(app) = '170698'
-    and trim(ip_address) not in ('187.72.188.226', '127.0.0.1', '201.49.126.67')
+    ) as house_id,
+    cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}') as timestamp) as action_time
+  from datalake_amplitude_clean_prod.events
+  where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between '__START_YM__' and '__END_YM__'
+    and event_type in ('listing_page_viewed', 'visit_intent_clicked')
+    and app = 170698
+    and ip_address not in ('187.72.188.226', '127.0.0.1', '201.49.126.67')
 ),
 flg_lag as (
   select

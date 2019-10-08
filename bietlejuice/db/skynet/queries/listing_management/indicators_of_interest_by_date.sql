@@ -2,10 +2,10 @@ with listing_versions as (
 	select distinct
 	cast(lv.sk_house_listing as bigint) as sk_house_listing,
 	lv.id_house as house_id,
-	cast(regexp_extract(lv.listing_category_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
-	cast(regexp_extract(lv.listing_category_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
+	cast(regexp_extract(lv.ts_listing_version_start, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as min_version_time,
+	cast(regexp_extract(lv.ts_listing_version_end, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as max_version_time,
 	cast(regexp_extract(lv.ts_publication, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as publication_date,
-	cast(regexp_extract(trim(lv.ts_de_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
+	cast(regexp_extract(trim(lv.ts_last_de_publication), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as de_publication_date,
 	lv.status as last_status_version, -- last status of this version of the imovel
 	lv.house_status as status,  -- status of the imovel today
 	lv.house_unpublished_reason,
@@ -42,26 +42,24 @@ with listing_versions as (
 	-- left join price_predictions pp on pp.imovel_id = lv.id
 ),
 first_listing_viz as (
-	select 
-	trim(evt.e_house_id) as house_id,
-	trim(evt.amplitude_id) as amplitude_id,
-	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
-	from datalake_clean.amplitude_events evt
-	where trim(evt.et) = 'listing_page_viewed'
-	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
-	and trim(app) = '170698'
-	group by 1, 2
+  select
+	event_house_id as house_id,
+	amplitude_id,
+	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
+  from datalake_amplitude_clean_prod.listing_page_viewed_events
+  where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
+    and app = 170698
+  group by 1, 2
 ),
 first_schedule_viz as (
-	select 
-	trim(evt.e_house_id) as house_id,
-	trim(evt.amplitude_id) as amplitude_id, 
-	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
-	from datalake_clean.amplitude_events evt
-	where trim(evt.et) = 'schedule_page_viewed'
-	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
-	and trim(app) = '170698'
-	group by 1, 2
+  select
+	event_house_id as house_id,
+	amplitude_id,
+	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
+  from datalake_amplitude_clean_prod.schedule_page_viewed_events
+  where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
+    and app = 170698
+  group by 1, 2
 ),
 users_listing_viz_per_day as (
 	select
@@ -88,15 +86,15 @@ users_schedule_viz_per_day as (
 	group by 1, 2, 3
 ),
 first_favorite_set as (
-	select 
-	trim(evt.e_house_id) as house_id,
-	trim(evt.amplitude_id) as amplitude_id, 
-	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
-	from datalake_clean.amplitude_events evt
-	where trim(evt.et) = 'listing_favorite_set'
-	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
-	and trim(app) = '170698'
-	group by 1, 2
+  select
+	event_house_id as house_id,
+	amplitude_id,
+	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
+  from datalake_amplitude_clean_prod.schedule_page_viewed_events
+  where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
+    and app = 170698
+    and event_type = 'listing_favorite_set'
+  group by 1, 2
 ),
 users_favorites_per_day as (
 	select
@@ -111,15 +109,15 @@ users_favorites_per_day as (
 	group by 1, 2, 3
 ),
 first_discard as (
-	select 
-	trim(evt.e_house_id) as house_id,
-	trim(evt.amplitude_id) as amplitude_id, 
-	min(date(cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
-	from datalake_clean.amplitude_events evt
-	where trim(evt.et) = 'listing_discard_confirmed'
-	and trim(ym) between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m') 
-	and trim(app) = '170698'
-	group by 1, 2
+  select
+	event_house_id as house_id,
+	amplitude_id,
+	min(date(cast(regexp_extract(event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp))) as first_event_date
+  from datalake_amplitude_clean_prod.schedule_page_viewed_events
+  where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
+    and app = 170698
+    and event_type = 'listing_discard_confirmed'
+  group by 1, 2
 ),
 users_discarded_per_day as (
 	select
