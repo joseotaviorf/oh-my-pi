@@ -1,10 +1,10 @@
 select 
     int(queue) as queue_number,
-    date(callDate) as dt_created,
     int(abandonedCalls) as calls_abandoned,
     int(answeredCalls) as calls_answered,
     int(receivedCalls) as calls_received,
     int(timedOutCalls) as calls_timed_out,
+    date(callDate) as dt_created,
     current_timestamp as ts_load,
     smallint(year) as year,
     tinyint(month) as month,

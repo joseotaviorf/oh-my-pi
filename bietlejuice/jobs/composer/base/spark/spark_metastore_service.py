@@ -42,7 +42,9 @@ class SparkMetastoreService:
 
     @logger
     def drop_table(self, table_name):
-        self.spark_sql_client.run("drop table {}.{}".format(self.db, table_name))
+        self.spark_sql_client.run(
+            "drop table if exists {}.{}".format(self.db, table_name)
+        )
 
     @logger
     def refresh_table(self, table_name):
