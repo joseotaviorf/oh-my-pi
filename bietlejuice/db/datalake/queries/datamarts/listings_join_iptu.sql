@@ -22,7 +22,7 @@ apts_iptu_sp AS (
     CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_terreno, '\,', '.') AS REAL)))) AS BIGINT) AS valor_m2_terreno,
     CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_construcao, '\,', '.') AS REAL)))) AS BIGINT) AS valor_m2_construcao
   FROM datalake_raw.external_sp_apts AS ea
-  LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
+  JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
     ON ea.bldg_address_id = geo.bldg_address_id
   WHERE ea.numero_imovel IS NOT NULL AND TRY_CAST(ea.numero_imovel AS BIGINT) IS NOT NULL
     AND geo.lat IS NOT NULL AND geo.lat != ''
