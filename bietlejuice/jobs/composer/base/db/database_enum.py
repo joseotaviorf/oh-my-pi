@@ -11,8 +11,6 @@ class DatabaseEnum:
     INSIDER = "ENV_INSIDER"
     WOLOLO = "WOLOLO"
     LINHADIRETA = "ENV_LINHADIRETA"
-    VANS = "ENV_VANS"
-    RETSUKO = "ENV_RETSUKO"
 
 
 class DatabaseTypeEnum:

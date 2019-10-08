@@ -18,17 +18,3 @@ class DatalakeMetastoreService:
             "db_clean_athena": "datalake_{}_clean_{}".format(source, env),
             "db_clean_path": "s3://5a-datalake-{}/clean/{}/".format(env, source),
         }
-
-    @staticmethod
-    def get_dw_info(env, schema):
-        if not Environment.is_valid_environment(env):
-            raise RuntimeError(
-                "m=__init__, msg=environment %s invalid. Environments allowed are: %s"
-                % (env, ", ".join(Environment.get_valid_environments()))
-            )
-
-        return {
-            "dw_bucket": "5a-dw-{}".format(env),
-            "dw_schema_databricks": "dw_{}".format(schema),
-            "dw_schema_path": "s3://5a-dw-{}/{}/".format(env, schema),
-        }

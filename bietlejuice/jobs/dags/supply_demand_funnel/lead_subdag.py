@@ -80,8 +80,7 @@ class LeadSubDag(DimSubDag):
                 'table_name': 'lead_origin',
                 'file_name': 'lead_origin.sql',
                 'bucket': DimSubDag.S3_BUCKET
-            },
-            retries=8
+            }
         )
 
         ods_lead_first_event_tracking_task = BaseDAG.build_python_operator(

@@ -70,13 +70,9 @@ class AutodialerETL(object):
             # save file
             dt = 'dt_extraction={}'.format(
                 dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
-
-            file_part = 0
-            for df_split in np.array_split(df, 3):
-                key = 'clean/autodialer/{0}/{1}/file_{2}.parq'.format(table_name, dt, str(file_part))
-                self.athena_client.create_parquet_from_df(key=key, df=df_split)
-                logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
-                file_part += 1
+            key = 'clean/autodialer/{0}/{1}/file.parq'.format(table_name, dt)
+            self.athena_client.create_parquet_from_df(key=key, df=df)
+            logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
 
             self.athena_client.add_partition(
                 database='datalake_clean',

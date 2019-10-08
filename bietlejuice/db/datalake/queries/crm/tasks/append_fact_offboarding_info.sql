@@ -8,13 +8,13 @@
     on t.sk_task = trim(ct.id)
   left join datalake_raw.ebdb_contrato ec
     on trim(ct.origin) = 'Contrato'
-      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(ec.id as bigint)
+      and ct.id_origin = ec.id
   left join datalake_raw.ebdb_fluxolocacao eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eo.id as bigint)
+        and ct.id_origin = eo.id
   left join datalake_raw.ebdb_vistoria ev
     on trim(ct.origin) = 'Vistoria'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(ev.id as bigint)
+        and ct.id_origin = ev.id
 ),
 contract_house_listing as (
   select

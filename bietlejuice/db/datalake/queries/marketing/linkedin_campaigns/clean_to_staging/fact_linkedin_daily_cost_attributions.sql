@@ -1,13 +1,4 @@
-select
-    sk_ad,
-    sk_campaign,
-    sk_date,
-    total_spent,
-    impressions,
-    clicks,
-    other_clicks,
-    ts_load
-from (
+select * from (
     select
         id_ad as sk_ad,
         id_campaign as sk_campaign,

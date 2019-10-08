@@ -19,8 +19,8 @@ report_agent_performance as (
     where year="{year}" and month="{month}" and day="{day}"
 )
 select
-    smallint(st.agent) as extension_number,
-    smallint(st.queue) as queue_number,
+    st.agent as extension_number,
+    st.queue as queue_number,
     ifnull(st.fullName, pe.name) as agent_name,
     format_number(float(split(st.availableTime, ':')[0] +
       split(st.availableTime, ':')[1]/60 +
