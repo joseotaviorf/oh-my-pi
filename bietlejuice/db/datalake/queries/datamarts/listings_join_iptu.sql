@@ -36,10 +36,11 @@ listings AS (
     regexp_extract(l.house_number, '\d+$') AS extracted_house_number
   FROM datalake_clean.ods_dim_house_listing l
 ),
-radius AS (
-  SELECT 1.0 AS "radius_km"
-),
 listings_join_iptu AS (
+  WITH
+  radius AS (
+    SELECT 1.0 AS "radius_km"
+  )
   SELECT
     l.sk_house_listing,
     i.building_address_sk,
