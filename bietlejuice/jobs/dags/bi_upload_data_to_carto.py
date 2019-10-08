@@ -45,9 +45,9 @@ def load_data_and_upload_to_carto(query_dir, sql_filename, carto_table_name, db,
     df.to_csv(csv_file_path, index=False, encoding='utf-8')
     if len(df) > 0:
         # upload csv to carto
+        carto_api.run_sql('DROP TABLE IF EXISTS {}'.format(carto_table_name))
         create_table_statement = BaseETL.get_table_ddl_query_from_dataframe(df, carto_table_name)
         carto_api.run_sql(create_table_statement)
-        carto_api.run_sql('TRUNCATE TABLE {}'.format(carto_table_name))
         carto_api.upload_csv(csv_file_path, carto_table_name)
         carto_api.run_sql("SELECT cdb_cartodbfytable('dev', '{}')".format(carto_table_name))
         if final_sql is not None:

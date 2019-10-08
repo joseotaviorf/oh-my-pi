@@ -81,7 +81,7 @@ ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES(
 'separatorChar' = '\t',
 'quoteChar' = '\"',
-'skip.header.line.count' = '6'
+'skip.header.line.count' = '1'
 )
 LOCATION 's3://5a-datalake/raw/marketing/linkedin_campaigns/campaigns'
 
