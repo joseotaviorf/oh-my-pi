@@ -307,7 +307,7 @@ UNION
         on dlc.sk_campaign = fli.sk_campaign
     group by 1,2,3,4,5,6,7,8,9,10,11
 )
-,demand_tax as (
+,cost_taxonomy as (
 	select
 		cf.origin,
 		cf.sk_date,
@@ -401,7 +401,7 @@ UNION
 		         (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
 		         or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
 		         or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
-		   end as side
+		   else tx.side end as side
 	from campaigns_full cf
 		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l
@@ -409,6 +409,31 @@ UNION
 			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '') 
 				and cf.fact_cost = tx.fact_cost
 				and cf.origin = tx.origin
+), kenshoo as (
+	select
+		ct.sk_date,
+		ct.side as funnel_side,
+		tx.account_name as account_name,
+		ct.city_group_final as city_group,
+		tx.mkt_category,
+		tx.mkt_flow,
+		tx.mkt_completion,
+		tx.mkt_channel,
+		tx.mkt_medium,
+		tx.mkt_source,
+		tx.mkt_platform,
+		ct.cost * cast(k.rate as float) as cost
+	from cost_taxonomy ct
+    join datalake_raw.gsheets_marketing_kenshoo_configuration k
+		on	ct.mkt_source = k.mkt_source
+		and ct.mkt_medium = k.mkt_medium
+		and ct.sk_date between
+			cast(to_char(to_date(k.date_from, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
+			and
+			cast(to_char(to_date(k.date_until, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
+	left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
+			on tx.origin = 'kenshoo'
+			and tx.side = ct.side
 )
 select 
     sk_date,
@@ -429,4 +454,26 @@ select
     utm_content,
     cost,
     getdate() as ts_load
-from demand_tax
+from cost_taxonomy
+union all
+select
+    sk_date,
+    funnel_side,
+    account_name,
+	null as campaign_name,
+	city_group,
+    mkt_category,
+    mkt_flow,
+    mkt_completion,
+	null as mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    mkt_platform,
+	null as utm_campaign,
+	null as utm_term,
+	null as utm_content,
+    sum(cost) as cost,
+    getdate() as ts_load
+from kenshoo
+group by 1,2,3,5,6,7,8,10,11,12,13
