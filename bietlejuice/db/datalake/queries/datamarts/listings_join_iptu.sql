@@ -13,7 +13,7 @@ apts_iptu_sp AS (
     geo.geocoded_address AS google_formatted_address,
     'SP' as uf,
     'São Paulo' as municipio,
-    COUNT(*) as number_of_units,
+    COUNT(1) as number_of_units,
     CAST(ROUND(AVG(TRY(CAST(ea.quantidade_pavimentos AS REAL)))) AS BIGINT) AS quantidade_pavimentos,
     CAST(ROUND(AVG(TRY(CAST(ea.ano_construcao_corrigido AS REAL)))) AS BIGINT) AS ano_construcao_corrigido,
     CAST(ROUND(AVG(TRY(CAST(ea.area_terreno AS REAL)))) AS BIGINT) AS area_terreno,
