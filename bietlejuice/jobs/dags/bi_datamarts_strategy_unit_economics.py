@@ -17,7 +17,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
 MAIN_DAG_ID = 'bi-datamarts-strategy-unit-economics'
-MAIN_START_DATE = datetime(2018, 8, 22)
+MAIN_START_DATE = datetime(2019, 10, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * 2')
 
 DATAMARTS_SCHEMA = 'datamarts_strategy'
@@ -97,7 +97,7 @@ task_configs = []
 
 for operator in operators:
     '''
-    Gets all queries and config files from queries_dir/datamarts/
+    Gets all queries and config files from queries_dir/datamarts_strategy/unit_economics_map
     '''
     for file_name in os.listdir('{}/{}/unit_economics_map'.format(operator['queries_dir'], DATAMARTS_SCHEMA)):
         file_name_split = file_name.split('.')
