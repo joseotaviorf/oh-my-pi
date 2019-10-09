@@ -7,7 +7,7 @@ WITH
             datalake_ebdb_raw.contrato_aud
         WHERE
             status = 'Cancelado'
-            AND status_mod = '1'
+            AND status_mod IS TRUE
         GROUP BY
             id
     ),
