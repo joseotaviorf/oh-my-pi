@@ -16,9 +16,9 @@ env.set_airflow_var_to_local_env('BI_DW')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 
-MAIN_DAG_ID = 'bi-datamarts-unit-economics'
+MAIN_DAG_ID = 'bi-datamarts-strategy-unit-economics'
 MAIN_START_DATE = datetime(2018, 8, 22)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * 2')
 
 DATAMARTS_SCHEMA = 'datamarts_strategy'
 
@@ -32,7 +32,7 @@ def create_datamart_from_dw(table_name, **kwargs):
 
     logger.info('m=create_datamart_from_dw, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
-        command='drop table if exists {}/unit_economics_map.{}'.format(DATAMARTS_SCHEMA, table_name),
+        command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
@@ -40,7 +40,7 @@ def create_datamart_from_dw(table_name, **kwargs):
 
     logger.info('m=create_datamart_from_dw, table_name={}, msg=Creating table'.format(table_name))
     BaseETL.execute_command(
-        command='create table {}/unit_economics_map.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', '')),
+        command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', '')),
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
