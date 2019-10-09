@@ -2,6 +2,8 @@ import time
 import boto3
 from collections import OrderedDict
 
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
+
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("AthenaClient")
@@ -142,7 +144,7 @@ class AthenaClient:
         # Athena has problems with some types in spark, so we have to convert to string
         # these problems were observed in json format, so will only be applied for this base_format
         # TODO: search more about this problem and find a better possible approach
-        if "json" in base_format["format"].lower():
+        if base_format == TableStorageFormat.JSON:
             table_schema = OrderedDict(
                 (
                     col,
