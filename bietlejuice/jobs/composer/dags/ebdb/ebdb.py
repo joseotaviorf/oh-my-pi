@@ -17,6 +17,10 @@ local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
 
+# Job params
+SOURCE = "ebdb"
+DW_SCHEMA = "public_spark"
+
 # s3 path setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/".format(DAG_ID)
@@ -66,6 +70,21 @@ def create_dw_table_in_datalake_task(local_dag, table_name, schema, env, dag_nam
     )
 
 
+def load_dw_table_into_redshift_task(local_dag, table_name, schema, env):
+    return QuintoAndarDatabricksSubmitRunOperator(
+        task_id="load-dw-{}-{}-in-datalake".format(
+            schema, table_name.replace("_", "-")
+        ),
+        dag=local_dag,
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
+                "parameters": [table_name, schema, env],
+            }
+        },
+    )
+
+
 def create_all_external_tables_task(local_dag, env, datalake_layer, source):
     return QuintoAndarDatabricksSubmitRunOperator(
         task_id="create-all-{}-{}-external-tables".format(source, datalake_layer),
@@ -93,7 +112,7 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
 
 
 def create_clean_and_dim_tables_sub_dag(
-    sub_dag_name, source, clean_table, schema, dim_table
+    sub_dag_name, source, clean_table, dw_schema, dim_table
 ):
     local_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
@@ -105,12 +124,16 @@ def create_clean_and_dim_tables_sub_dag(
         local_dag, clean_table, source, ENV, DAG_ID
     )
     dim_table_task = create_dw_table_in_datalake_task(
-        local_dag, dim_table, schema, ENV, DAG_ID
+        local_dag, dim_table, dw_schema, ENV, DAG_ID
+    )
+    load_dim_table_task = load_dw_table_into_redshift_task(
+        local_dag, dim_table, dw_schema, ENV
     )
     create_clean_external_tables_task = create_external_tables_task(
         local_dag, ENV, "clean", source, [clean_table]
     )
-    clean_table_task >> [dim_table_task, create_clean_external_tables_task]
+    clean_table_task >> dim_table_task >> load_dim_table_task
+    clean_table_task >> create_clean_external_tables_task
 
     return local_dag
 
@@ -156,9 +179,9 @@ condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="condo",
     sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    source="ebdb",
+    source=SOURCE,
     clean_table="condo",
-    schema="public",
+    dw_schema=DW_SCHEMA,
     dim_table="dim_condo",
 )
 
@@ -166,9 +189,9 @@ region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="region",
     sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    source="ebdb",
+    source=SOURCE,
     clean_table="region",
-    schema="public",
+    dw_schema=DW_SCHEMA,
     dim_table="dim_region",
 )
 
