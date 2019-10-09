@@ -76,6 +76,8 @@ new_offer as (
       first_sent_at as dt_first_sent,
       atualizado_em as last_update_date,
       expiration_date,
+      first_rent_offered_by_tenant,
+      first_rent_offered_by_owner,
       last_rent_offered_by_tenant,
       last_rent_offered_by_owner,
       rejection_reason,
