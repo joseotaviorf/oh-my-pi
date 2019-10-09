@@ -1,7 +1,7 @@
 /*
  * Query to save the regions of each listing used during nano region test
 */
-insert into temp_imoveis_nano_regiao
+insert into staging.temp_imoveis_nano_regiao
 select distinct
     dhl.sk_house_listing,
     sk_region
