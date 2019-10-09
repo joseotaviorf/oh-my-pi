@@ -15,12 +15,12 @@ apts_iptu_sp AS (
     'São Paulo' as municipio,
     COUNT(1) as number_of_units,
     CAST(ROUND(AVG(TRY(CAST(ea.quantidade_pavimentos AS REAL)))) AS BIGINT) AS quantidade_pavimentos,
-    CAST(ROUND(AVG(TRY(CAST(ea.ano_construcao_corrigido AS REAL)))) AS BIGINT) AS ano_construcao_corrigido,
-    CAST(ROUND(AVG(TRY(CAST(ea.area_terreno AS REAL)))) AS BIGINT) AS area_terreno,
-    CAST(ROUND(AVG(TRY(CAST(ea.area_construida AS REAL)))) AS BIGINT) AS area_construida,
-    CAST(ROUND(AVG(TRY(CAST(ea.area_ocupada AS REAL)))) AS BIGINT) AS area_ocupada,
-    CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_terreno, '\,', '.') AS REAL)))) AS BIGINT) AS valor_m2_terreno,
-    CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_construcao, '\,', '.') AS REAL)))) AS BIGINT) AS valor_m2_construcao
+    CAST(ROUND(AVG(TRY(CAST(ea.ano_construcao_corrigido AS REAL)))) AS BIGINT) AS media_ano_construcao_corrigido,
+    CAST(ROUND(AVG(TRY(CAST(ea.area_terreno AS REAL)))) AS BIGINT) AS media_area_terreno,
+    CAST(ROUND(AVG(TRY(CAST(ea.area_construida AS REAL)))) AS BIGINT) AS media_area_construida,
+    CAST(ROUND(AVG(TRY(CAST(ea.area_ocupada AS REAL)))) AS BIGINT) AS media_area_ocupada,
+    CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_terreno, '\,', '.') AS REAL)))) AS BIGINT) AS media_valor_m2_terreno,
+    CAST(ROUND(AVG(TRY(CAST(regexp_replace(ea.valor_m2_construcao, '\,', '.') AS REAL)))) AS BIGINT) AS media_valor_m2_construcao
   FROM datalake_raw.external_sp_apts AS ea
   JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
     ON ea.bldg_address_id = geo.bldg_address_id
@@ -63,7 +63,7 @@ listings_join_iptu_min_distance AS (
   ordered AS (
     SELECT
       *,
-      ROW_NUMBER() OVER(PARTITION BY sk_house_listing, building_address_sk ORDER BY distance_meters DESC) AS distance_order
+      ROW_NUMBER() OVER(PARTITION BY sk_house_listing ORDER BY distance_meters DESC) AS distance_order
     FROM listings_join_iptu
   )
   SELECT * FROM ordered WHERE distance_order = 1

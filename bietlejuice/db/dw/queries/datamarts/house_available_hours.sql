@@ -34,7 +34,7 @@ select
 	available_started_date,
 	available_ended_date,
 	day_of_week,
-	hours_available_08to09
+	hours_available_08to09,
 	hours_available_09to10,
 	hours_available_10to11,
 	hours_available_11to12,
