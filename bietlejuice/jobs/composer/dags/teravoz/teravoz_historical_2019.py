@@ -51,7 +51,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
         "retries": 3,
-        "retry_delay": timedelta(minutes=5)
+        "retry_delay": timedelta(minutes=5),
     },
     start_date=MAIN_START_DATE,
     end_date=MAIN_END_DATE,
