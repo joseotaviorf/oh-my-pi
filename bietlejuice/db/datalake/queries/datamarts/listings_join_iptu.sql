@@ -63,7 +63,7 @@ listings_join_iptu_min_distance AS (
   ordered AS (
     SELECT
       *,
-      ROW_NUMBER() OVER(PARTITION BY sk_house_listing ORDER BY distance_meters DESC) AS distance_order
+      ROW_NUMBER() OVER(PARTITION BY sk_house_listing ORDER BY distance_meters ASC) AS distance_order
     FROM listings_join_iptu
   )
   SELECT * FROM ordered WHERE distance_order = 1

@@ -13,5 +13,5 @@ SELECT
   source as name,
   cast(dt_created as date) as dt_cost,
   current_timestamp as ts_load
-FROM datalake_clean.marketing_classifieds_costs
+FROM datalake_clean.marketing_demand_classifieds_costs
 WHERE dt_created  = '{date}' and acc = '{account}'

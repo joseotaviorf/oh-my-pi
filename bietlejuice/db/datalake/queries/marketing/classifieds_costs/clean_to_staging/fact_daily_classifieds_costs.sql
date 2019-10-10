@@ -20,7 +20,7 @@ SELECT
   cast(dd.sk_date as bigint) as sk_cost_date,
   cast(cost as decimal(14,2)) / dd.qtd_days as cost,
   current_timestamp as ts_load
-FROM datalake_clean.marketing_classifieds_costs
+FROM datalake_clean.marketing_demand_classifieds_costs
 left join month_days dd
 	on to_char(cast(dt_created as date), 'YYYYMM') = dd.ym
 WHERE dt_created = '{date}' and acc = '{account}'
