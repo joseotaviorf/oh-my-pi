@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 # dag params
 DAG_ID = "bietlejuice.teravoz_historical_2019"
 MAIN_START_DATE = datetime(2019, 4, 17, 0, 0, 0)
-MAIN_END_DATE = datetime(2019, 8, 1, 0, 0, 0)
+MAIN_END_DATE = datetime(2019, 9, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
@@ -50,6 +50,8 @@ dag = DAG(
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "retries": 3,
+        "retry_delay": timedelta(minutes=5),
     },
     start_date=MAIN_START_DATE,
     end_date=MAIN_END_DATE,
