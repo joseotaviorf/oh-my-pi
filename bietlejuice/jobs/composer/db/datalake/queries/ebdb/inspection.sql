@@ -2,9 +2,9 @@ WITH
     comments AS (
         SELECT
             vistoria_id,
-            max(comentario is null) AS has_inspector_comment,
-            max(comentarioInquilino is null) AS has_tenant_comment,
-            max(comentarioProprietario is null) AS has_owner_comment
+            max(comentario IS NOT NULL) AS has_inspector_comment,
+            max(comentarioInquilino IS NOT NULL) AS has_tenant_comment,
+            max(comentarioProprietario IS NOT NULL) AS has_owner_comment
         FROM
             datalake_ebdb_raw.itemvistoria
         GROUP BY

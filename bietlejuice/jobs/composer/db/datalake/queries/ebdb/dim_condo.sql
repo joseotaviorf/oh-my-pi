@@ -10,6 +10,7 @@ SELECT
     c.name,
     c.number,
     c.ts_created,
-    c.ts_updated
+    c.ts_updated,
+    now() AS ts_load
 FROM
     datalake_ebdb_clean.condo AS c

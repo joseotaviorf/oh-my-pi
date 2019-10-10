@@ -9,6 +9,7 @@ SELECT
     is_owner_approved,
     has_inspector_comment,
     has_tenant_comment,
-    has_owner_comment
+    has_owner_comment,
+    now() AS ts_load
 FROM
     datalake_ebdb_clean.inspection

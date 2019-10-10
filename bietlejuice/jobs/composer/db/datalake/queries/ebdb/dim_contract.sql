@@ -29,6 +29,7 @@ SELECT
     contract.ts_created,
     contract.ts_updated,
     contract.ts_canceled,
-    contract.cancellation_reason
+    contract.cancellation_reason,
+    now() AS ts_load
 FROM
     datalake_ebdb_clean.contract
