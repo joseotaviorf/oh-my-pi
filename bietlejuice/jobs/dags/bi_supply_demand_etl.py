@@ -1,10 +1,7 @@
 from datetime import datetime, timedelta
 
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -21,6 +18,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
@@ -429,22 +428,6 @@ fact_inspection_bookings_task = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
 )
 
-ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
-    task_id='ODS_fact_affiliate_daily_engagement_cost',
-    dag=main_dag,
-    python_callable=extract_query_dim_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'fact_affiliate_daily_engagement_cost'}
-)
-
-dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='DW_fact_affiliate_daily_engagement_cost',
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={'dim_name': 'affiliate_daily_engagement_cost',
-               'schema_dest': 'marketing', 'is_fact': True, 'bucket': bucket,
-               'insert_dummy': False}
-)
-
 # new 'supply' flow
 ods_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -676,5 +659,3 @@ trigger_bi_growth_dag_task.set_upstream(
      dw_fact_house_listing_status_task])
 trigger_bi_crm_load_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
-
-ods_fact_affiliate_daily_engagement_cost >> dw_fact_affiliate_daily_engagement_cost

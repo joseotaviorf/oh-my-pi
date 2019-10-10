@@ -13,7 +13,7 @@ QUERIES_DIR = os.path.join(dir_path, '../../db/datalake/queries')
 now = datetime.now()
 
 
-def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None, exec_date=None):
+def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=None, exec_date=None, append=False):
     if table_name is None:
         table_name = dim_name
 
@@ -33,7 +33,7 @@ def extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name=Non
         table_name=table_name,
         db_enum=EnumDB.BI_ODS,
         encoding='UTF8',
-        append=False,
+        append=append,
         commit=True,
         bucket_name='{}/raw/ods/{}'.format(bucket, dim_name)
     )
