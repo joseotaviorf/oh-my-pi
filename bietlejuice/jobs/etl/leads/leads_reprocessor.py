@@ -32,6 +32,7 @@ class LeadsReprocessor(object):
         self.sleep = config_dict.get('sleep', 10)
         self.batchSize = config_dict.get('batchSize', 100)
         self.additionalColumns = config_dict.get('additionalColumns')
+        self.queue = config_dict.get('queue', 'FornoCrawlerLeads')
         # Required
         self.query = config_dict['query']
         self.defaultColumns = config_dict['defaultColumns']
@@ -44,16 +45,16 @@ class LeadsReprocessor(object):
         return treated_leads
 
     @logger(exclude='json_list')
-    def send_leads(self, json_list, queue='CrawlerLeads'):
+    def send_leads(self, json_list):
         list_splited = list(self._split_into_chunks(json.loads(json_list), self.batchSize))
 
         for item in list_splited:
             logger.info('m=send_leads, batch_size={}, queue={}, msg=Sending Batch to queue'.format(str(len(item)),
-                                                                                                   queue))
+                                                                                                   self.queue))
             BaseETL.publish_messages(
                 messages=[json.dumps(row, default=decimal_default, ensure_ascii=False, encoding='utf-8') for row in
                           item],
-                queue_name=queue
+                queue_name=self.queue
             )
 
             # breathe

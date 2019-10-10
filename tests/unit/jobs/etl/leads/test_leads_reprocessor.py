@@ -43,12 +43,11 @@ class TestLeadsReprocessor(object):
     def test_send_leads(self, mock_sleep, mock_publish_messages, leads_reprocessor):
         # arrange
         json_list = """[{"id":1}, {"id":2}, {"id":3}]"""
-        queue = 'queue'
         leads_reprocessor.batchSize = 1
         leads_reprocessor.sleep = 2
 
         # act
-        leads_reprocessor.send_leads(json_list=json_list, queue=queue)
+        leads_reprocessor.send_leads(json_list=json_list)
 
         # assert
         assert mock_publish_messages.call_count == 3
