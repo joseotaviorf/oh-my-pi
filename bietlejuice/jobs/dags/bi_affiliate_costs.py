@@ -21,7 +21,7 @@ GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCO
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('AFFILIATE_COSTS_GOOGLE_SHEETS_FILES'))
 MAIN_DAG_ID = 'bi-affiliate-costs'
-MAIN_START_DATE = datetime(2019, 10, 1)  # TODO Define start date
+MAIN_START_DATE = datetime(2019, 10, 14)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 10 * * *')
 
 
@@ -78,12 +78,12 @@ dag = DAG(
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
-        'depends_on_past': False  # TODO Change to True after adjusting start date
+        'depends_on_past': True
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
-    catchup=False  # TODO Change to True after adjusting start date
+    catchup=True
 )
 
 load_affiliates_cost_to_datalake_task = BaseDAG.build_python_operator(
