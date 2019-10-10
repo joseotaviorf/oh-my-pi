@@ -14,7 +14,6 @@ class MarketingClassifiedsCostsSubDag(MarketingSubDag):
         self.auth = auth
         self.dim_tables = ["dim_classified"]
         self.fact_tables = ["fact_daily_classifieds_costs"]
-        self.datalake_tables = ["marketing_classifieds_costs"]
 
     @logger
     def build_clean_tasks(self, dag):
