@@ -50,7 +50,7 @@ base as (
     JOIN mailing_list_updated m on m.codigo = r.task_id
     LEFT JOIN datalake_clean.ods_dim_region dr on dr.sk_region = fhl.sk_region
     WHERE taskReferenceEventOrigin = 'WEB_HOOK_BEFORE_NOTIFICATION'
-        AND cast(substr(l.criadoEm, 1, 10) as date) >= CURRENT_DATE - interval '30' day
+        AND cast(substr(l.criadoEm, 1, 10) as date) >= CURRENT_DATE - interval '120' day
         AND l.criadoEm <> ''
         AND reason = 'OWNER_WONT_ANSWER_PHONE'
         AND status = 'Prospeccao'

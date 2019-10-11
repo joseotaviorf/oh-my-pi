@@ -19,6 +19,7 @@ class ClassifiedsCosts(Marketing):
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
     TABLE_PARTITION_ACCOUNT = '__PARTITION_ACCOUNT__'
 
+    # Deprecated
     COLUMN_TYPE_MAP = {
         'marketing_classifieds_costs': {
             'source': str,
@@ -61,7 +62,7 @@ class ClassifiedsCosts(Marketing):
                 fp.write((json.dumps(_json, ensure_ascii=False, cls=UnidecodeHandler)).encode('utf-8'))
                 fp.write('\n')
 
-        file_suffix = 'raw/marketing/classifieds_costs/acc=default/dt={}/data.gz'.format(
+        file_suffix = 'raw/marketing/classifieds_costs/demand/acc=default/dt={}/data.gz'.format(
             self.execution_date.strftime('%Y-%m-%d'))
         BaseETL.obj_to_s3(
             obj_io=gz_body,
@@ -82,7 +83,7 @@ class ClassifiedsCosts(Marketing):
 
         self.athena_client.add_partition(
             database='datalake_raw',
-            table_name='marketing_classifieds_costs',
+            table_name='marketing_demand_classifieds_costs',
             partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
 
@@ -101,7 +102,7 @@ class ClassifiedsCosts(Marketing):
         ])
 
         self._move_to_clean(
-            table_name='marketing_classifieds_costs',
+            table_name='marketing_demand_classifieds_costs',
             sql_file_name='classifieds_costs.sql',
             r_cols=r_cols,
             c_cols=c_cols

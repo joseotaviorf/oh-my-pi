@@ -70,7 +70,10 @@ def load_dim_from_ods_to_dw(**kwargs):
         insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
-        post_command=post_command
+        post_command=post_command,
+        schema_dest='public' if 'schema_dest' not in kwargs else kwargs['schema_dest'],
+        schema_source='public' if 'schema_source' not in kwargs else kwargs[
+            'schema_source']
     )
 
 
@@ -426,6 +429,22 @@ fact_inspection_bookings_task = BaseDAG.build_python_operator(
     op_kwargs={'dim_name': 'inspection_bookings', 'is_fact': True, 'bucket': bucket}
 )
 
+ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
+    task_id='ODS_fact_affiliate_daily_engagement_cost',
+    dag=main_dag,
+    python_callable=extract_query_dim_from_ebdb_to_ods,
+    op_kwargs={'table_name': 'fact_affiliate_daily_engagement_cost'}
+)
+
+dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='DW_fact_affiliate_daily_engagement_cost',
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={'dim_name': 'affiliate_daily_engagement_cost',
+               'schema_dest': 'marketing', 'is_fact': True, 'bucket': bucket,
+               'insert_dummy': False}
+)
+
 # new 'supply' flow
 ods_house_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -657,3 +676,5 @@ trigger_bi_growth_dag_task.set_upstream(
      dw_fact_house_listing_status_task])
 trigger_bi_crm_load_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows])
+
+ods_fact_affiliate_daily_engagement_cost >> dw_fact_affiliate_daily_engagement_cost
