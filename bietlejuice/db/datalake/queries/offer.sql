@@ -34,7 +34,7 @@ rent_value_offers as (
   left join min_max_date mnd
     on mnd.id = o_aud.id
       and mnd.min_rev = o_aud.rev
-  where o_aud.type != 'Express' and o_aud.type != ''
+  where o_aud.type != 'Express'
   group by 1
 ),
 max_topic_type as (
