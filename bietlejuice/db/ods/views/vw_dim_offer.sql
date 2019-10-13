@@ -46,6 +46,8 @@ old_pre_proposal as (
       p."dataPrimerioEnvio" as dt_first_sent,
       pp_aud.last_updated_date,
       pp_aud.expiration_date,
+      null::numeric(18,4) as first_rent_offered_by_tenant,
+      null::numeric(18,4) as first_rent_offered_by_owner,
       last_rent_value_tenant as last_rent_offered_by_tenant,
       last_rent_value_landlord as last_rent_offered_by_owner,
       p.rejection_reason,
