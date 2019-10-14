@@ -10,7 +10,7 @@ with affiliate_manual_costs as (
 						replace(replace(promotional_bonus, 'R$', ''), ',', '')
 						, '')
 					, '0')
-			as numeric(14,2))
+			as numeric(10,2))
 			) as promotional_bonus,
 		sum(
 			cast(
@@ -19,7 +19,7 @@ with affiliate_manual_costs as (
 						replace(replace(notification, 'R$', ''), ',', '')
 						, '')
 					, '0')
-			as numeric(14,2))
+			as numeric(10,2))
 			) as notification,
 		sum(
 			cast(
@@ -28,7 +28,7 @@ with affiliate_manual_costs as (
 						replace(replace(other, 'R$', ''), ',', '')
 						, '')
 					, '0')
-			as numeric(14,2))
+			as numeric(10,2))
 			) as other
 	from datalake_raw.gsheets_affiliates_manual_cost_engagement gh
 	group by 1,2,3
@@ -70,7 +70,7 @@ select
 					replace(replace(commission_listing, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as commission_listing,
 	sum(
 		cast(
@@ -79,7 +79,7 @@ select
 					replace(replace(commission_rent, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as commission_rent,
 	sum(
 		cast(
@@ -88,7 +88,7 @@ select
 					replace(replace(commission_mgm, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as commission_mgm,
 	sum(
 		cast(
@@ -97,7 +97,7 @@ select
 					replace(replace(notification, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as notification,
 	sum(
 		cast(
@@ -106,7 +106,7 @@ select
 					replace(replace(promotional_bonus, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as promotional_bonus,
 	sum(
 		cast(
@@ -115,7 +115,7 @@ select
 					replace(replace(other, 'R$', ''), ',', '')
 					, '')
 				, '0')
-		as numeric(14,2))
+		as numeric(10,2))
 		) as other
 from datalake_raw.gsheets_affiliates_manual_cost_engagement_history gh
 group by 1,2,3
