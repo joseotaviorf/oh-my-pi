@@ -130,22 +130,40 @@ order by 1,2,3
 		coalesce(aec.commission_mgm, 0) as commission_mgm,
 		coalesce(amc.promotional_bonus, 0) as promotional_bonus,
 		coalesce(amc.notification, 0) as notification,
-		coalesce(amc.other, 0) as other
+		coalesce(amc.other, 0) as other,
+		coalesce(cast(tcm.rate as numeric(10,2)),0) *
+		    (coalesce(aec.commission_listing, 0) +
+            coalesce(aec.commission_rent, 0) +
+            coalesce(aec.commission_mgm, 0) +
+            coalesce(amc.promotional_bonus, 0)) as commission_tradecom
 	from affiliate_eng_cost aec
 	full outer join affiliate_manual_costs amc
 		on amc.sk_date = aec.sk_date
 		and amc.city_group = aec.city_group
 		and amc.mkt_origin = aec.mkt_origin
+	left join datalake_raw.gsheets_affiliates_cost_tradecom_configuration tcm
+	    on coalesce(aec.sk_date, amc.sk_date)
+	        between cast(to_char(cast(date_from as date), 'YYYYMMDD') as integer)
+	            and cast(to_char(cast(date_until as date), 'YYYYMMDD') as integer)
 union
 	select
-		sk_date,
-		city_group,
-		mkt_origin,
-		commission_listing,
-		commission_rent,
-		commission_mgm,
-		promotional_bonus,
-		notification,
-		other
+		ah.sk_date,
+		ah.city_group,
+		ah.mkt_origin,
+		ah.commission_listing,
+		ah.commission_rent,
+		ah.commission_mgm,
+		ah.promotional_bonus,
+		ah.notification,
+		ah.other,
+		coalesce(cast(tcm.rate as numeric(10,2)),0) *
+            (ah.commission_listing +
+            ah.commission_rent +
+            ah.commission_mgm +
+            ah.promotional_bonus) as commission_tradecom
 	from
-		affiliate_hist
+		affiliate_hist ah
+	left join datalake_raw.gsheets_affiliates_cost_tradecom_configuration tcm
+	    on ah.sk_date
+	        between cast(to_char(cast(date_from as date), 'YYYYMMDD') as integer)
+	            and cast(to_char(cast(date_until as date), 'YYYYMMDD') as integer)
