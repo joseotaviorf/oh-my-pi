@@ -41,26 +41,15 @@ def extract_query_from_ebdb_to_ods(table_name, date_column, **kwargs):
     file_path = '{}/ebdb/affiliates/{}.sql'.format(SOURCE_QUERIES_DIR, table_name)
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
-    if BaseETL.get_table_count(db_enum=EnumDB.BI_ODS, table_name=table_name) > 0:
-        # not empty
-        operator = '='
-        str_date = str(kwargs['execution_date'])
-        append = True
-        delete_daily_rows(db_enum=EnumDB.BI_ODS, table_name=table_name, date_column=date_column, value=str_date)
-    else:
-        # empty
-        operator = '>='
-        str_date = str(MAIN_START_DATE)
-        append = False
-
-    query = query.format(operator=operator, str_date=str_date)
+    delete_daily_rows(db_enum=EnumDB.BI_ODS, table_name=table_name, date_column=date_column,
+                      value=str(kwargs['execution_date']))
 
     utils.extract_query_dim_from_ebdb_to_ods(
         dim_name=table_name,
         bucket=s3_bucket,
-        command=query,
+        command=query.format(str_date=str(kwargs['execution_date'])),
         table_name=table_name,
-        append=append
+        append=True
     )
 
 
@@ -106,7 +95,7 @@ ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=extract_query_from_ebdb_to_ods,
     op_kwargs={'table_name': 'affiliate_daily_engagement_cost',
-               'date_column': 'cost_date'}
+               'date_column': 'dt_cost'}
 )
 
 dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
