@@ -75,7 +75,19 @@ load_event_table_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-move_data_to_clean_task = DummyOperator(task_id="move-data-to-clean", dag=dag)
+load_event_table_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load-event-table-to-clean",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": "{}/load_event_table_into_datalake_clean.py".format(
+                SPARK_JOBS_PATH
+            ),
+            "parameters": ["{{ ds }}", ENV],
+        }
+    },
+)
+
 create_clean_partition_task = DummyOperator(task_id="create-clean-partition", dag=dag)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -85,7 +97,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 airflow_helpers.chain(
     create_cluster_task,
     load_event_table_to_raw_task,
-    move_data_to_clean_task,
+    load_event_table_to_clean_task,
     create_clean_partition_task,
     terminate_cluster_task,
 )

@@ -19,6 +19,8 @@ create external table if not exists datalake_clean.ods_dim_offer (
   dt_first_sent string,
   last_updated_date string,
   expiration_date string,
+  first_rent_offered_by_tenant string,
+  first_rent_offered_by_owner string,
   last_rent_offered_by_tenant string,
   last_rent_offered_by_owner string,
   rejection_reason string,
