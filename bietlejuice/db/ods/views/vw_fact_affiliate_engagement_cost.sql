@@ -1,7 +1,7 @@
 drop view if exists vw_fact_affiliate_daily_engagement_cost;
 create view vw_fact_affiliate_daily_engagement_cost as
     SELECT
-        to_char(cost_date::date::timestamp with time zone, 'YYYYMMDD')::integer as sk_date,
+        to_char(dt_cost::date::timestamp with time zone, 'YYYYMMDD')::integer as sk_date,
         sk_user,
         sk_region,
         sk_user_affiliate,

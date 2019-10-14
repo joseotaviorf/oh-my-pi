@@ -28,7 +28,8 @@ SELECT
     END AS greater_region,
     ar.regional,
     r.ts_created,
-    r.ts_updated
+    r.ts_updated,
+    now() AS ts_load
 FROM
     datalake_ebdb_clean.region AS r
     LEFT JOIN files.aux_regiao AS ar

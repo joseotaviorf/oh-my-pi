@@ -19,7 +19,7 @@ logger = QuintoAndarLogger('AffiliateCostsDAG')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
-GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('AFFILIATE_COSTS_GOOGLE_SHEETS_FILES'))
+GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('BI_AFFILIATE_COSTS_GOOGLE_SHEETS_FILES'))
 MAIN_DAG_ID = 'bi-affiliate-costs'
 MAIN_START_DATE = datetime(2019, 10, 14)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 10 * * *')
@@ -41,26 +41,15 @@ def extract_query_from_ebdb_to_ods(table_name, date_column, **kwargs):
     file_path = '{}/ebdb/affiliates/{}.sql'.format(SOURCE_QUERIES_DIR, table_name)
     query = BaseETL.get_query_from_file_name(file_name=file_path)
 
-    if BaseETL.get_table_count(db_enum=EnumDB.BI_ODS, table_name=table_name) > 0:
-        # not empty
-        operator = '='
-        str_date = str(kwargs['execution_date'])
-        append = True
-        delete_daily_rows(db_enum=EnumDB.BI_ODS, table_name=table_name, date_column=date_column, value=str_date)
-    else:
-        # empty
-        operator = '>='
-        str_date = str(MAIN_START_DATE)
-        append = False
-
-    query = query.format(operator=operator, str_date=str_date)
+    delete_daily_rows(db_enum=EnumDB.BI_ODS, table_name=table_name, date_column=date_column,
+                      value=str(kwargs['execution_date']))
 
     utils.extract_query_dim_from_ebdb_to_ods(
         dim_name=table_name,
         bucket=s3_bucket,
-        command=query,
+        command=query.format(str_date=str(kwargs['execution_date'])),
         table_name=table_name,
-        append=append
+        append=True
     )
 
 
@@ -106,7 +95,7 @@ ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=extract_query_from_ebdb_to_ods,
     op_kwargs={'table_name': 'affiliate_daily_engagement_cost',
-               'date_column': 'cost_date'}
+               'date_column': 'dt_cost'}
 )
 
 dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(

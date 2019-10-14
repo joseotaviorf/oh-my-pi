@@ -18,7 +18,7 @@ futures==3.0.5
 google-api-python-client>=1.6.2
 googlemaps==2.5.1
 gspread==3.1.0
-httplib2==0.9.2
+httplib2==0.14.0
 idna==2.1
 ipaddress==1.0.17
 jdcal==1.3
