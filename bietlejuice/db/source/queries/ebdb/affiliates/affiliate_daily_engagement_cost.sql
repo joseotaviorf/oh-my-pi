@@ -34,7 +34,7 @@ from (
         left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
         join Imovel i on i.id = occ.imovel_id
         where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
-        and occ.dataOperacao {operator} date('{str_date}')
+        and occ.dataOperacao = date('{str_date}')
         group by 1,2,3,4,5,6,7
     ) res
     join DadosAfiliado_AUD da_aud on da_aud.id = res.dadosAfiliado_id and da_aud.REV = res.da_max_rev
@@ -90,7 +90,7 @@ from (
             left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
             join Imovel i on i.id = occ.imovel_id
             where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
-            and occ.dataOperacao {operator} date('{str_date}')
+            and occ.dataOperacao = date('{str_date}')
             group by 1,2,3,4,5,6
         ) resf
         join DadosAfiliado_AUD da_aud on da_aud.id = resf.dadosAfiliado_id and da_aud.REV = resf.da_max_rev
