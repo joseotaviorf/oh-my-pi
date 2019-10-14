@@ -135,7 +135,8 @@ order by 1,2,3
 		    (coalesce(aec.commission_listing, 0) +
             coalesce(aec.commission_rent, 0) +
             coalesce(aec.commission_mgm, 0) +
-            coalesce(amc.promotional_bonus, 0)), 2) as commission_tradecom
+            coalesce(amc.promotional_bonus, 0)), 2) as commission_tradecom,
+        now() as ts_load
 	from affiliate_eng_cost aec
 	full outer join affiliate_manual_costs amc
 		on amc.sk_date = aec.sk_date
@@ -160,7 +161,8 @@ union
             (ah.commission_listing +
             ah.commission_rent +
             ah.commission_mgm +
-            ah.promotional_bonus), 2) as commission_tradecom
+            ah.promotional_bonus), 2) as commission_tradecom,
+        now() as ts_load
 	from
 		affiliate_hist ah
 	left join datalake_raw.gsheets_affiliates_cost_tradecom_configuration tcm
