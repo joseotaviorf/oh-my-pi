@@ -76,7 +76,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(replace(commision_rent, 'R$', ''), ',', '') --fix typpo
+					replace(replace(commission_rent, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
