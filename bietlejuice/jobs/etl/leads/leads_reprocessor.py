@@ -20,7 +20,7 @@ def decimal_default(obj):
 class LeadsReprocessor(object):
     def __init__(self, config_json):
         # Configuring
-        required_columns = ['query', 'defaultColumns', 'infosExtras']
+        required_columns = ['query', 'defaultColumns', 'infosExtras', 'queue']
 
         # Checks
         self._check_config_json(config_json)
@@ -32,11 +32,12 @@ class LeadsReprocessor(object):
         self.sleep = config_dict.get('sleep', 10)
         self.batchSize = config_dict.get('batchSize', 100)
         self.additionalColumns = config_dict.get('additionalColumns')
-        self.queue = config_dict.get('queue', 'FornoCrawlerLeads')
+
         # Required
         self.query = config_dict['query']
         self.defaultColumns = config_dict['defaultColumns']
         self.infosExtras = config_dict['infosExtras']
+        self.queue = config_dict['queue']
 
     @logger
     def get_leads(self):
