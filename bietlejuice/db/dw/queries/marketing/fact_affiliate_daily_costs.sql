@@ -7,7 +7,7 @@ with affiliate_manual_costs as (
 			cast(
 				coalesce(
 					NULLIF(
-						replace(promotional_bonus, 'R$', '')
+						replace(replace(promotional_bonus, 'R$', ''), ',', '')
 						, '')
 					, '0')
 			as numeric(14,2))
@@ -16,7 +16,7 @@ with affiliate_manual_costs as (
 			cast(
 				coalesce(
 					NULLIF(
-						replace(notification, 'R$', '')
+						replace(replace(notification, 'R$', ''), ',', '')
 						, '')
 					, '0')
 			as numeric(14,2))
@@ -25,7 +25,7 @@ with affiliate_manual_costs as (
 			cast(
 				coalesce(
 					NULLIF(
-						replace(other, 'R$', '')
+						replace(replace(other, 'R$', ''), ',', '')
 						, '')
 					, '0')
 			as numeric(14,2))
@@ -67,7 +67,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(commission_listing, 'R$', '')
+					replace(replace(commission_listing, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -76,7 +76,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(commision_rent, 'R$', '') -- fix typpo
+					replace(replace(commision_rent, 'R$', ''), ',', '') --fix typpo
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -85,7 +85,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(commission_mgm, 'R$', '')
+					replace(replace(commission_mgm, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -94,7 +94,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(notification, 'R$', '')
+					replace(replace(notification, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -103,7 +103,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(promotional_bonus, 'R$', '')
+					replace(replace(promotional_bonus, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -112,7 +112,7 @@ select
 		cast(
 			coalesce(
 				NULLIF(
-					replace(other, 'R$', '')
+					replace(replace(other, 'R$', ''), ',', '')
 					, '')
 				, '0')
 		as numeric(14,2))
@@ -131,11 +131,11 @@ order by 1,2,3
 		coalesce(amc.promotional_bonus, 0) as promotional_bonus,
 		coalesce(amc.notification, 0) as notification,
 		coalesce(amc.other, 0) as other,
-		coalesce(cast(tcm.rate as numeric(10,2)),0) *
+		round(coalesce(cast(tcm.rate as numeric(10,2)),0) *
 		    (coalesce(aec.commission_listing, 0) +
             coalesce(aec.commission_rent, 0) +
             coalesce(aec.commission_mgm, 0) +
-            coalesce(amc.promotional_bonus, 0)) as commission_tradecom
+            coalesce(amc.promotional_bonus, 0)), 2) as commission_tradecom
 	from affiliate_eng_cost aec
 	full outer join affiliate_manual_costs amc
 		on amc.sk_date = aec.sk_date
@@ -156,11 +156,11 @@ union
 		ah.promotional_bonus,
 		ah.notification,
 		ah.other,
-		coalesce(cast(tcm.rate as numeric(10,2)),0) *
+		round(coalesce(cast(tcm.rate as numeric(10,2)),0) *
             (ah.commission_listing +
             ah.commission_rent +
             ah.commission_mgm +
-            ah.promotional_bonus) as commission_tradecom
+            ah.promotional_bonus), 2) as commission_tradecom
 	from
 		affiliate_hist ah
 	left join datalake_raw.gsheets_affiliates_cost_tradecom_configuration tcm
