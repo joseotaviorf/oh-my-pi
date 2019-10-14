@@ -21,9 +21,12 @@ class TestMarketingFactory(object):
                 'access_token_secret': 'access_token_secret',
                 'client_id': 'client_id', 'client_secret': 'client_secret',
                 'user': 'user'}
+        extra_configs = {
+            'side': ''} if class_ == MarketingEnum.CLASSIFIEDS_COSTS else {}
 
         # act
-        result = factory.factory(class_, 's3_bucket', datetime(2018, 1, 1), auth, 'acc')
+        result = factory.factory(class_, 's3_bucket', datetime(2018, 1, 1), auth, 'acc',
+                                 extra_configs)
 
         # assert
         assert result.__class__ == expected

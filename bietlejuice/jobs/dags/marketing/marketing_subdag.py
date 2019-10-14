@@ -38,9 +38,11 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
+            execution_date=self.__get_execution_date(kwargs['execution_date']),
             account=account,
             auth=self.auth,
-            execution_date=self.__get_execution_date(kwargs['execution_date'])
+            extra_configs=self.extra_configs
+
         )
 
         getattr(marketing_class, 'move_{}_to_clean'.format(datalake_table))()

@@ -1,17 +1,25 @@
-SELECT
-  cast(
-    CASE source
-      WHEN 'Zap Imóveis' THEN 1
-      WHEN 'VivaReal' THEN 2
-      WHEN 'Mitula' THEN 3
-      WHEN 'OLX' THEN 4
-      WHEN 'Mercado Livre' THEN 5
-      WHEN 'Imovelweb' THEN 6
-      WHEN '123i' THEN 7
-    END
-  as SMALLINT) as sk_classified,
-  source as name,
-  cast(dt_created as date) as dt_cost,
-  current_timestamp as ts_load
-FROM datalake_clean.marketing_demand_classifieds_costs
-WHERE dt_created  = '{date}' and acc = '{account}'
+with demand_classifieds as (
+  select
+      to_hex(md5(to_utf8(source))) as sk_classified,
+      source as name,
+      current_timestamp as ts_load
+    from datalake_clean.marketing_demand_classifieds_costs
+),
+supply_classifieds as (
+  select
+      to_hex(md5(to_utf8(source))) as sk_classified,
+      source as name,
+      current_timestamp as ts_load
+    from datalake_clean.marketing_supply_classifieds_costs
+)
+select
+  sk_classified,
+  name,
+  ts_load
+from demand_classifieds
+union
+select
+  sk_classified,
+  name,
+  ts_load
+from supply_classifieds
