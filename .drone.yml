@@ -135,7 +135,7 @@ pipeline:
       event: push
       branch: [ master ]
 
-  load-jobs-ec2-prod:
+  load-jobs-ec2-forno:
     group: updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
