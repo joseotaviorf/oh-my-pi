@@ -1,6 +1,6 @@
 DROP TABLE if EXISTS marketing.fact_affiliate_daily_cost_attributions;
 CREATE TABLE if NOT EXISTS marketing.fact_affiliate_daily_cost_attributions (
-    sk_date BIGINT,
+    sk_date INTEGER,
     city_group VARCHAR(64),
     mkt_origin VARCHAR(128),
     commission_listing NUMERIC(14,2),
