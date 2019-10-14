@@ -241,9 +241,9 @@ UNION
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
     select
-        fcl.sk_cost_date,
+        fcl.sk_date,
         dcl.name as origin,
-        'fact_daily_classifieds_costs' as fact_cost,
+        'fact_classified_daily_cost_attributions' as fact_cost,
         null as campaign_name,
         csol.city_group as campaign_city,
         null as account_name,
@@ -256,11 +256,11 @@ UNION
         null as mobile_cost,
         null as other_cost,
         fcl.cost * csol.share as total_cost
-      from marketing.fact_daily_classifieds_costs fcl
+      from marketing.fact_classified_daily_cost_attributions fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
-      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
+      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_date
       -- filter with 'between' because there is future cost
-      where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+      where fcl.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 UNION
     select
         ftw.sk_date,

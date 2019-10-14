@@ -28,7 +28,7 @@ class Marketing(object):
         'fact_rtb_daily_cost_attributions': 'sk_sub_campaign',
         'dim_rtb_sub_campaign': 'sk_sub_campaign',
         'dim_classified': 'sk_classified',
-        'fact_daily_classifieds_costs': 'sk_classified',
+        'fact_classified_daily_cost_attributions': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
         'dim_twitter_ad': 'sk_ad',
@@ -134,7 +134,7 @@ class Marketing(object):
         )
 
     @logger(exclude=['staging_query', 'column_types'])
-    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
+    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):  # Todo: remove column_types
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))
