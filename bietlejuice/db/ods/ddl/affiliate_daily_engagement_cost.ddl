@@ -1,7 +1,7 @@
-drop table if exists public.fact_affiliate_daily_engagement_cost;
+drop table if exists public.affiliate_daily_engagement_cost;
 
-create table public.fact_affiliate_daily_engagement_cost (
-      sk_date integer,
+create table public.affiliate_daily_engagement_cost (
+      dt_cost date,
       sk_user integer,
       sk_region integer,
       sk_user_affiliate integer,
