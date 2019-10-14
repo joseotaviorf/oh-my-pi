@@ -91,8 +91,8 @@ with t_all as (
             coalesce(city, '') as city,
             coalesce(uuid, '') as uuid
     from datalake_amplitude_clean_prod.events
-        where  event_type in ('lead_form_submitted',
-                              'price_suggestion_form_submitted')
+        where event_type in ('lead_form_submitted',
+                             'price_suggestion_form_submitted')
             and app = 183047
             and json_extract(event_properties, '$.formfield_lead_uuid') is not null
     )
