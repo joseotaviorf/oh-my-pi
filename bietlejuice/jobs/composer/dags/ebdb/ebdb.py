@@ -195,6 +195,36 @@ region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dim_table="dim_region",
 )
 
+visit_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="visit",
+    sub_dag_func=create_clean_and_dim_tables_sub_dag,
+    source=SOURCE,
+    clean_table="visit",
+    dw_schema=DW_SCHEMA,
+    dim_table="dim_visit",
+)
+
+contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="contract",
+    sub_dag_func=create_clean_and_dim_tables_sub_dag,
+    source=SOURCE,
+    clean_table="contract",
+    dw_schema=DW_SCHEMA,
+    dim_table="dim_contract",
+)
+
+inspection_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="inspection",
+    sub_dag_func=create_clean_and_dim_tables_sub_dag,
+    source=SOURCE,
+    clean_table="inspection",
+    dw_schema=DW_SCHEMA,
+    dim_table="dim_inspection",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -205,4 +235,7 @@ ebdb_to_datalake_raw_task >> [
     create_raw_external_tables_task,
     condo_sub_dag_task,
     region_sub_dag_task,
+    visit_sub_dag_task,
+    contract_sub_dag_task,
+    inspection_sub_dag_task,
 ] >> terminate_cluster_task

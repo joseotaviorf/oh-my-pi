@@ -241,9 +241,9 @@ UNION
       group by 1,2,3,4,5,6,7,8,9,10,11
 UNION
     select
-        fcl.sk_cost_date,
+        fcl.sk_date,
         dcl.name as origin,
-        'fact_daily_classifieds_costs' as fact_cost,
+        'fact_classified_daily_cost_attributions' as fact_cost,
         null as campaign_name,
         csol.city_group as campaign_city,
         null as account_name,
@@ -256,11 +256,11 @@ UNION
         null as mobile_cost,
         null as other_cost,
         fcl.cost * csol.share as total_cost
-      from marketing.fact_daily_classifieds_costs fcl
+      from marketing.fact_classified_daily_cost_attributions fcl
       left join marketing.dim_classified dcl on fcl.sk_classified = dcl.sk_classified
-      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_cost_date
+      left join cities_share_by_ol csol on csol.sk_date = fcl.sk_date
       -- filter with 'between' because there is future cost
-      where fcl.sk_cost_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
+      where fcl.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
 UNION
     select
         ftw.sk_date,
@@ -387,21 +387,28 @@ UNION
                 end
             else total_cost
         end * cast(coalesce(fator_custo, '0') as numeric(3,2)) as cost,
-		case when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
-					and coalesce(cf.account_name_l,'') != 'supply_affiliates')
-					OR
-					-- abbreviation rule
-					(SPLIT_PART(cf.campaign_name, '.', 2) = 'S'
-						or SPLIT_PART(cf.campaign_name, '.', 1) = '0'
-						or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
-			when (coalesce(cf.account_name,'') not like '%supply%' 
-		            and coalesce(cf.account_name, '') not like '%display%'
-		            and coalesce(cf.account_name, '') != 'indica_ai')
-		            OR
-		         (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
-		         or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
-		         or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
-		   else tx.side end as side
+        case
+            -- cases with supply and demand costs in the same account
+            when cf.origin in ('google', 'facebook', 'trovit') then
+                    case
+                        when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
+                                and coalesce(cf.account_name_l,'') != 'supply_affiliates')
+                                OR
+                                -- abbreviation rule
+                                (SPLIT_PART(cf.campaign_name, '.', 2) = 'S'
+                                    or SPLIT_PART(cf.campaign_name, '.', 1) = '0'
+                                    or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
+                        when (coalesce(cf.account_name,'') not like '%supply%'
+                                and coalesce(cf.account_name, '') not like '%display%'
+                                and coalesce(cf.account_name, '') != 'indica_ai')
+                                OR
+                             (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
+                             or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
+                             or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
+                        else tx.side
+                    end
+            else tx.side
+            end as side
 	from campaigns_full cf
 		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l

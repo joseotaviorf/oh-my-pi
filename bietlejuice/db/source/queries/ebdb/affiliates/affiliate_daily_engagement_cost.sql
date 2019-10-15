@@ -1,5 +1,5 @@
 select
-	cast(date_format(substring(res.date_operation, 1, 10), '%Y%m%d') as SIGNED) as sk_date,
+	date_format(substring(res.date_operation, 1, 10), '%Y-%m-%d') as cost_date,
 	cast(res.user_id as SIGNED) as sk_user,
 	cast(res.region_id as SIGNED) as sk_region,
 	res.dadosafiliado_id as sk_user_affiliate,
@@ -34,6 +34,7 @@ from (
         left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
         join Imovel i on i.id = occ.imovel_id
         where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
+        and occ.dataOperacao = date('{str_date}')
         group by 1,2,3,4,5,6,7
     ) res
     join DadosAfiliado_AUD da_aud on da_aud.id = res.dadosAfiliado_id and da_aud.REV = res.da_max_rev
@@ -41,7 +42,7 @@ from (
     group by 1, 2, 3, 4, 5, 6, 7, 8
 union all
 select
-	cast(date_format(substring(res.date_operation, 1, 10), '%Y%m%d') as SIGNED) as sk_date,
+	date_format(substring(res.date_operation, 1, 10), '%Y-%m-%d') as cost_date,
 	cast(res.user_id as SIGNED) as sk_user,
 	cast(res.region_id as SIGNED) as sk_region,
 	res.dadosafiliado_id as sk_user_affiliate,
@@ -89,6 +90,7 @@ from (
             left join Usuario u on u.ContaCorrente_id = occ.ContaCorrente_id
             join Imovel i on i.id = occ.imovel_id
             where occ.tipo in ('valorFixoPorIndicacaoDeImovel', 'porcentagemPorIndicacaoDeImovel')
+            and occ.dataOperacao = date('{str_date}')
             group by 1,2,3,4,5,6
         ) resf
         join DadosAfiliado_AUD da_aud on da_aud.id = resf.dadosAfiliado_id and da_aud.REV = resf.da_max_rev

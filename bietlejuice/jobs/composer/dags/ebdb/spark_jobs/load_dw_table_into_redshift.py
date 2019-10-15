@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     logger.info(
         "m=__main__, table_name={}, dw_schema={}, env={}, msg=Job execution started".format(
-            env, table_name, dw_schema
+            table_name, dw_schema, env
         )
     )
 
