@@ -1,8 +1,7 @@
-import time
-
 import mock
 import pytest
 import requests
+from mock import Mock
 from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -81,36 +80,39 @@ class TestSeuBarrigaReport(object):
         # assert
         assert mock_requests_get.call_args[1] == requests_get_call_args
 
-    @mock.patch.object(time, 'sleep')
+    @mock.patch('bietlejuice.jobs.etl.seu_barriga.invoice.time')
     @mock.patch.object(SeuBarrigaInvoice, 'is_job_finished', return_value=True)
-    def test_wait_for_results(self, mock_is_job_finished, mock_time_sleep, seu_barriga_invoice):
+    def test_wait_for_results(self, mock_is_job_finished, mock_time, seu_barriga_invoice):
         # arrange
         status_url = mock.ANY
+        mock_time.sleep = Mock()
 
         # act
         seu_barriga_invoice.wait_for_results(status_url=status_url)
 
         # assert
-        assert mock_time_sleep.call_count == 0
+        assert mock_time.sleep.call_count == 0
 
-    @mock.patch.object(time, 'sleep')
+    @mock.patch('bietlejuice.jobs.etl.seu_barriga.invoice.time')
     @mock.patch.object(SeuBarrigaInvoice, 'is_job_finished')
-    def test_wait_for_results_with_sleep(self, mock_time_sleep, mock_is_job_finished, seu_barriga_invoice):
+    def test_wait_for_results_with_sleep(self, mock_is_job_finished, mock_time, seu_barriga_invoice):
         # arrange
         status_url = mock.ANY
         mock_is_job_finished.side_effect = [False, True]
+        mock_time.sleep = Mock()
 
         # act
         seu_barriga_invoice.wait_for_results(status_url=status_url)
 
         # assert
-        assert mock_time_sleep.call_count == 1
+        assert mock_time.sleep.call_count == 1
 
-    @mock.patch.object(time, 'sleep')
+    @mock.patch('bietlejuice.jobs.etl.seu_barriga.invoice.time')
     @mock.patch.object(SeuBarrigaInvoice, 'is_job_finished', return_value=False)
-    def test_wait_for_results_with_wait_time_out(self, mock_is_job_finished, mock_time_sleep, seu_barriga_invoice):
+    def test_wait_for_results_with_wait_time_out(self, mock_is_job_finished, mock_time, seu_barriga_invoice):
         # arrange
         status_url = mock.ANY
+        mock_time.sleep = Mock()
 
         # act & assert
         with pytest.raises(RuntimeError):
