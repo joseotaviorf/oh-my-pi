@@ -22,7 +22,7 @@ SELECT
 	s.sk_agent_id,
 	u.dados_fotografo_id,
 	s.sk_date,
-    s.ts_slot_hour,
+	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	s.available_slots,
 	s.available_slots_0,
     CASE d.week_day
@@ -60,20 +60,20 @@ SELECT
 		    END
 	END = 1 AS is_allocation_available,
 	COALESCE(a.area_deprecated, '-1') AS region_code,
-	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	getdate() as ts_load,
-    uwi.workcontract_id
+	uwi.workcontract_id,
+	s.ts_slot_hour,
+	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
 	ON d.sk_date = s.sk_date
-LEFT JOIN public.dim_agent_region a
+JOIN public.dim_agent_region a
 	ON a.sk_regions_date = (to_char('{0}'::DATE,'YYYYMMDD')::INTEGER)
 		AND a.sk_agent = s.sk_agent_id
-LEFT JOIN public.dim_user u
+JOIN public.dim_user u
     ON s.sk_agent_id = u.dados_agente_id
 LEFT JOIN user_workcontract_id uwi
     ON uwi.agent_id = s.sk_agent_id
 LEFT JOIN datalake_raw.ebdb_horariosemanalmascara hsa
 	ON uwi.workcontract_id = hsa.workcontract_id
         AND hsa.diadasemana = date_part('dow', s.ts_slot_hour)
-ORDER BY 1, 4;
+;
