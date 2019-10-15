@@ -22,7 +22,7 @@ left join fact_house_listings fhl
   on dhl.sk_house_listing = fhl.sk_house_listing
 left join dim_region dr
   on fhl.sk_region = dr.sk_region
-where version > 0 and dhl.ts_house_first_publication >= '2018-01-01'
+where version > 0 and dhl.ts_listing_version_start >= '2018-01-01'
 ),
 house_listing_all_days as (
 select
