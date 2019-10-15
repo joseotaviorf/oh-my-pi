@@ -54,7 +54,8 @@ listing_bookings_daily as (
 select
     *,
     max(total_bookings_daily) over(partition by sk_house_listing) as max_daily_bookings,
-    sum(total_bookings_daily) over(partition by sk_house_listing) as total_bookings_listing
+    sum(total_bookings_daily) over(partition by sk_house_listing) as total_bookings_listing,
+    sum(total_bookings_listing_daily) over(partition by date, city_group) as total_bookings_daily
 from house_listing_all_days_booking
 )
 select *
