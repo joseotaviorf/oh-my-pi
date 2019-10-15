@@ -114,8 +114,8 @@ house_listings as (
     hl.dt_last_iorent_opted_in,
     hl.dt_last_iorent_opted_out,
     h.sale_price,
-    h.is_for_rent,
-    h.is_for_sale
+    h.is_for_rent::integer::boolean as is_for_rent,
+    h.is_for_sale::integer::boolean as is_for_sale
   from house h
   join house_listing hl
     on hl.id_house = h.id

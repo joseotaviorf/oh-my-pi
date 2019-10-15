@@ -128,8 +128,8 @@ create table public.house (
   predicted_price numeric(14,2),
   registration_abandoned_reason varchar(255),
   sale_price bigint,
-  is_for_rent boolean,
-  is_for_sale boolean
+  is_for_rent smallint,
+  is_for_sale smallint
 );
 
 create unique index house_id_idx on house (id);
