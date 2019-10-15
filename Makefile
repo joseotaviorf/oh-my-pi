@@ -8,7 +8,7 @@ environment-python2:
 
 .PHONY: requirements-python2
 requirements-python2:
-	@pip install -U -r requirements.txt
+	@python -m pip install -r requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2
 
@@ -18,7 +18,7 @@ requirements-test-python2:
 
 .PHONY: requirements-lint-python2
 requirements-lint-python2:
-	@python -m pip install -q flake8==3.5.0
+	@python -m pip install flake8
 
 .PHONY: check-style-python2
 check-style-python2:

@@ -112,7 +112,10 @@ house_listings as (
     hl.is_iorent_active,
     hl.last_iorent_type,
     hl.dt_last_iorent_opted_in,
-    hl.dt_last_iorent_opted_out
+    hl.dt_last_iorent_opted_out,
+    h.sale_price,
+    h.is_for_rent,
+    h.is_for_sale
   from house h
   join house_listing hl
     on hl.id_house = h.id
@@ -185,6 +188,9 @@ select
   hl.last_iorent_type,
   hl.dt_last_iorent_opted_in,
   hl.dt_last_iorent_opted_out,
+  hl.sale_price,
+  hl.is_for_rent,
+  hl.is_for_sale,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi

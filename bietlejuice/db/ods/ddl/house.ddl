@@ -1,4 +1,4 @@
-drop table if exists public.house ;
+drop table if exists public.house;
 create table public.house (
   id bigint default '0'::bigint not null,
   aluguel integer,
@@ -126,7 +126,10 @@ create table public.house (
   key_location varchar(255),
   visit_restriction varchar(255),
   predicted_price numeric(14,2),
-  registration_abandoned_reason varchar(255)
+  registration_abandoned_reason varchar(255),
+  sale_price bigint,
+  is_for_rent boolean,
+  is_for_sale boolean
 );
 
 create unique index house_id_idx on house (id);
