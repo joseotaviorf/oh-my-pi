@@ -18,7 +18,7 @@ requirements-test-python2:
 
 .PHONY: requirements-lint-python2
 requirements-lint-python2:
-	@python -m pip install flake8
+	@python -m pip install -q flake8==3.5.0
 
 .PHONY: check-style-python2
 check-style-python2:
