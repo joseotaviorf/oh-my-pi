@@ -9,5 +9,6 @@ CREATE TABLE public.fact_photographer_hourly_allocations(
   is_allocation_available  BOOLEAN,
   region_code              VARCHAR(10),
   sk_agent_region          VARCHAR(20),
-  ts_load                  TIMESTAMP default getdate()
+  ts_load                  TIMESTAMP default getdate(),
+  work_contract_id         INTEGER
 );
