@@ -11,7 +11,6 @@ create external table if not exists datalake_clean.ods_dim_user_doorman (
     work_lat string,
     work_lng string,
     work_place_id string,
-    code string,
     recruiter string,
     subscription_source string,
     occupation_id string,
