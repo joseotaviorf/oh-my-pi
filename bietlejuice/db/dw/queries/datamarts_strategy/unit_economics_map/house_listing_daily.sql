@@ -42,7 +42,7 @@ left join dim_date dd
 house_listing_all_days_booking as (
 select
     hlad.*,
-    count(distinct rf_b.sk_booking) as total_bookings_daily
+    count(distinct rf_b.sk_booking) as total_bookings_listing_daily
 from house_listing_all_days hlad
 left join fact_listing_rent_flows rf_b
   on hlad.sk_house_listing = rf_b.sk_house_listing
@@ -53,8 +53,8 @@ group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 listing_bookings_daily as (
 select
     *,
-    max(total_bookings_daily) over(partition by sk_house_listing) as max_daily_bookings,
-    sum(total_bookings_daily) over(partition by sk_house_listing) as total_bookings_listing,
+    max(total_bookings_listing_daily) over(partition by sk_house_listing) as max_daily_bookings,
+    sum(total_bookings_listing_daily) over(partition by sk_house_listing) as total_bookings_listing,
     sum(total_bookings_listing_daily) over(partition by date, city_group) as total_bookings_daily
 from house_listing_all_days_booking
 )
