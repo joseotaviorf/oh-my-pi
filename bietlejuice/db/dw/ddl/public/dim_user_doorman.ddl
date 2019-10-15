@@ -12,7 +12,6 @@ create table public.dim_user_doorman(
     work_lat decimal,
     work_lng decimal,
     work_place_id varchar(255),
-    code varchar(255),
     recruiter varchar(255),
     subscription_source varchar(255),
     occupation_id bigint,
