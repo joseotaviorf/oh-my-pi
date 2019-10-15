@@ -6,7 +6,7 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_etl import EnumDB
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
+from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
 from qa_python_utils import QuintoAndarLogger
@@ -89,7 +89,7 @@ load_tradecom_config_to_datalake_task = BaseDAG.build_python_operator(
     op_kwargs={'files': GOOGLE_SHEETS_FILES['tradecom_config']}
 )
 
-ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
+ods_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
     task_id='ODS_fact_affiliate_daily_engagement_cost',
     dag=dag,
     provide_context=True,
@@ -98,13 +98,31 @@ ods_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
                'date_column': 'dt_cost'}
 )
 
-dw_fact_affiliate_daily_engagement_cost = BaseDAG.build_python_operator(
+dw_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
     dag=dag,
     task_id='DW_fact_affiliate_daily_engagement_cost',
     python_callable=utils.load_dim_from_ods_to_dw,
     op_kwargs={'dim_name': 'affiliate_daily_engagement_cost',
-               'schema_dest': 'marketing', 'is_fact': True, 'bucket': s3_bucket,
+               'schema_dest': 'marketing',
+               'is_fact': True,
+               'bucket': s3_bucket,
                'insert_dummy': False}
 )
 
-ods_fact_affiliate_daily_engagement_cost >> dw_fact_affiliate_daily_engagement_cost
+dw_fact_affiliate_daily_cost_attributions_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='DW_fact_affiliate_daily_cost_attributions',
+    python_callable=BaseETL.move_file_query_data_to_db,
+    op_kwargs={'schema': 'marketing',
+               'file_name': '{}/marketing/affiliates_costs/fact_affiliate_daily_cost_attributions.sql'.format(
+                   DW_QUERIES_DIR),
+               'table_name': 'fact_affiliate_daily_cost_attributions',
+               'append': False,
+               'db_enum_source': EnumDB.BI_DW,
+               'db_enum_destination': EnumDB.BI_DW}
+)
+
+ods_fact_affiliate_daily_engagement_cost_task >> dw_fact_affiliate_daily_engagement_cost_task
+dw_fact_affiliate_daily_cost_attributions_task.set_upstream([dw_fact_affiliate_daily_engagement_cost_task,
+                                                             load_affiliates_cost_to_datalake_task,
+                                                             load_tradecom_config_to_datalake_task])

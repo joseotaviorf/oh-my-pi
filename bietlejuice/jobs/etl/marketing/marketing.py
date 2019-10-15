@@ -133,8 +133,8 @@ class Marketing(object):
             commit=True,
         )
 
-    @logger(exclude=['staging_query', 'column_types'])
-    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):  # Todo: remove column_types
+    @logger(exclude=['staging_query'])
+    def _load_to_staging(self, dw_table_name, staging_query):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))

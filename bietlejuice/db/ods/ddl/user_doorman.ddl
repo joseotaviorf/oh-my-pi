@@ -10,7 +10,6 @@ create table public.user_doorman (
     lat decimal,
     lng decimal,
     placeid varchar(255),
-    code varchar(255),
     recruiter varchar(255),
     subscriptionsource varchar(255),
     doorman_occupation_id integer,

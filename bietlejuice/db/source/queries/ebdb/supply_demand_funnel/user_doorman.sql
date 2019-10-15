@@ -9,7 +9,6 @@ SELECT
 	dad.lat,
 	dad.lng,
 	dad.placeId,
-	dad.code,
 	dad.recruiter,
 	dad.subscriptionSource,
 	dad.doorman_occupation_id,
