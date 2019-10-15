@@ -32,7 +32,6 @@ with affiliate_manual_costs as (
 			) as other
 	from datalake_raw.gsheets_affiliates_manual_cost_engagement gh
 	group by 1,2,3
-	order by 1,2,3
 ), affiliate_eng_cost as (
 select
 	sk_date,
@@ -57,7 +56,6 @@ select
 from marketing.fact_affiliate_daily_engagement_cost fa
 left join dim_region dr on fa.sk_region = dr.sk_region
 group by 1, 2, 3
-order by 1 desc, 2, 3
 ), affiliate_hist as (
 select
 	cast(to_char(to_date(gh.date, 'YYYY-MM-DD'), 'YYYYMMDD') as integer) as sk_date,
@@ -119,7 +117,6 @@ select
 		) as other
 from datalake_raw.gsheets_affiliates_manual_cost_engagement_history gh
 group by 1,2,3
-order by 1,2,3
 )
 	select
 		coalesce(aec.sk_date, amc.sk_date) as sk_date,
