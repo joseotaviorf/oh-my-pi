@@ -7,5 +7,6 @@ CREATE TABLE crm.photo_tasks (
 	origin_id integer,
 	number_of_reschedules integer,
 	dt_created timestamp,
-	dt_closed timestamp
+	dt_closed timestamp,
+	task_type varchar(64)
 );
