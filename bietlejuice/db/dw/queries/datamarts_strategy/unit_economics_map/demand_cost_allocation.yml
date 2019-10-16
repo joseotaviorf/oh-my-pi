@@ -2,4 +2,4 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: [['house_listings','demand_daily_costs','house_listing_daily_events']]
+    task_ids: ['dw_house_listings','dw_demand_daily_costs','dw_house_listing_daily_events']
