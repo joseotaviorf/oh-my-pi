@@ -1,0 +1,5 @@
+# Config for demand_cost_allocation
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['house_listings','demand_daily_costs','house_listing_daily_events']
