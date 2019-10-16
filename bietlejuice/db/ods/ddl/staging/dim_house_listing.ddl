@@ -64,6 +64,9 @@ create table staging.dim_house_listing (
   last_iorent_type varchar,
   dt_last_iorent_opted_in date,
   dt_last_iorent_opted_out date,
+  sale_price bigint,
+  is_for_rent boolean,
+  is_for_sale boolean,
   ts_load timestamp
 ) with oids
 ;

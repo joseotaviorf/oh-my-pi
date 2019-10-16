@@ -8,7 +8,7 @@ environment-python2:
 
 .PHONY: requirements-python2
 requirements-python2:
-	@pip install -U -r requirements.txt
+	@python -m pip install -r requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2
 
