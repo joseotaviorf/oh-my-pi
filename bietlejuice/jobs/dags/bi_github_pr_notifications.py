@@ -50,17 +50,26 @@ def send_notifications_to_slack():
             })
 
     # build slack messages for Github PRs
-    full_message += SlackPullRequests.build_slack_message(
+    no_reviewed_prs_msg = SlackPullRequests.build_slack_message(
         pull_requests=all_prs['no_reviewed_prs'],
         message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['no_reviewed_prs']
     )
-    full_message += SlackPullRequests.build_slack_message(
+    reviewed_prs_msg = SlackPullRequests.build_slack_message(
         pull_requests=all_prs['reviewed_prs'],
         message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['reviewed_prs']
     )
-    full_message += SlackPullRequests.build_slack_message(
+    approved_msg = SlackPullRequests.build_slack_message(
         pull_requests=all_prs['approved'],
         message_title=SlackPullRequests.SLACK_MESSAGE_TITLES['approved'])
+
+    if no_reviewed_prs_msg:
+        full_message += no_reviewed_prs_msg
+
+    if reviewed_prs_msg:
+        full_message += reviewed_prs_msg
+
+    if approved_msg:
+        full_message += approved_msg
 
     # send only one message to Slack
     slack_service = SlackPullRequests(webhook_url=PR_NOTIFICATION_AUTH['github_auth']['slack_webhook'])
