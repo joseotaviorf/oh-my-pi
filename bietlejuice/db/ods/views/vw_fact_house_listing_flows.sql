@@ -39,17 +39,17 @@ base_lead_tasks_last as (
 ),
 base_photo_tasks as (
   select distinct 
-    coalesce(i.id, i_direct.id)::integer as imovel_id,
+    coalesce(h.id, h_direct.id)::integer as house_id,
     max((task_type = 'AgendarJobDeFotografo')::integer)::boolean as has_job_photo,
     max((task_type = 'FupFoto')::integer)::boolean as has_fup_photo
   from crm.photo_tasks pt
   left join photo_job pj 
     on pt.origin_id = pj.id
-  left join imovel i 
-    on i.id = pj.imovel_id
-  left join imovel i_direct 
-    on i_direct.id = pt.origin_id
-  where coalesce(i.id, i_direct.id) is not null
+  left join house h
+    on h.id = pj.imovel_id
+  left join house h_direct
+    on h_direct.id = pt.origin_id
+  where coalesce(h.id, h_direct.id) is not null
   group by 1
 ), 
 base_leads as (
@@ -347,7 +347,7 @@ potential_listings as (
     h.exclusivity as is_exclusive,
     case
       when btf.rep_id is not null then 'Lead'
-      when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
+      when coalesce(bpt.house_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
     bl.lead_type,
@@ -382,7 +382,7 @@ potential_listings as (
   left join base_lead_tasks_last btl
     on btl.lead_id = f.lead_id
   left join base_photo_tasks bpt 
-    on f.imovel_id = bpt.imovel_id
+    on f.imovel_id = bpt.house_id
   left join rep_leads bl 
     on bl.lead_id = f.lead_id
   left join house h 
