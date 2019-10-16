@@ -21,6 +21,7 @@ class SlackPullRequests(SlackService):
         if pull_requests is None or not pull_requests:
             logger.info('m=build_slack_message, msg=no pull requests to send')
             return
+
         message = message_title
         for pr_entry in pull_requests:
             if not pr_entry['prs']:
