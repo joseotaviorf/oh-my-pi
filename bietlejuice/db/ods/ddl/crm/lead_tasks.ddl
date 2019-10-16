@@ -7,7 +7,8 @@ CREATE TABLE crm.lead_tasks (
 	lead_id integer,
 	number_of_reschedules integer,
 	dt_created timestamp,
-	dt_closed timestamp
+	dt_closed timestamp,
+	task_type varchar(64)
 );
 
 create index lead_tasks_lead_id_idx on crm.lead_tasks (lead_id);

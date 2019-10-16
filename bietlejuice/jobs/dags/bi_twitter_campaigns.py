@@ -14,7 +14,7 @@ from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 BI_TWITTER_CAMPAIGNS_DAG_NAME = 'bi-twitter-campaigns'
 MAIN_START_DATE = datetime(2019, 7, 1, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 6 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 6,9 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')

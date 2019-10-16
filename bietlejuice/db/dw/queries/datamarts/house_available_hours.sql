@@ -1,20 +1,17 @@
 WITH
 imovel_aud as (
 	select
-		"timestamp",
-    	date(timestamp 'epoch' + (cast(timestamp as bigint)/1000)* interval '1 second') as date_timestamp,
     	from_unixtime(cast(timestamp as bigint)/1000) as date_time,
 		hou.*
 	from datalake_ebdb_raw_prod.horariosemanalimovel_aud hou
 		join datalake_ebdb_raw_prod.usuariorevisionentity ure
 			on hou.rev = ure.id
-	--where imovel_id = 892763775
 ),
 house_available as (
 	select 
-		ia.imovel_id as house_id,
-		ia.date_time as available_start_date,
-		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_end_date,
+		ia.imovel_id as id_house,
+		ia.date_time as available_started_date,
+		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_ended_date,
 		ia.diadasemana as day_of_week,
 		horarios_disponivel08as09 as hours_available_08to09,
 		horarios_disponivel09as10 as hours_available_09to10,
@@ -29,16 +26,15 @@ house_available as (
 		horarios_disponivel18as19 as hours_available_18to19,
 		horarios_disponivel19as20 as hours_available_19to20
 	from imovel_aud ia
-	order by imovel_id, day_of_week
 )
 select 
-	house_id,
-	to_char(available_start_date, 'YYYYMMDD')::bigint as sk_available_start_date,
-	to_char(available_end_date, 'YYYYMMDD')::bigint as sk_available_end_date,
-	available_start_date,
-	available_end_date,
+	id_house,
+	to_char(available_started_date, 'YYYYMMDD')::bigint as sk_available_started_date,
+	to_char(available_ended_date, 'YYYYMMDD')::bigint as sk_available_ended_date,
+	available_started_date,
+	available_ended_date,
 	day_of_week,
-	hours_available_08to09
+	hours_available_08to09,
 	hours_available_09to10,
 	hours_available_10to11,
 	hours_available_11to12,

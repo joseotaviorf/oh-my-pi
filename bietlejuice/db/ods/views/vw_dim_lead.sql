@@ -60,6 +60,9 @@ create or replace view vw_dim_lead as
     when b2b_prime.id_lead is not null
      then 'prime'
   end as b2b_type,
+  l.sale_price,
+  l.is_for_rent::integer::boolean as is_for_rent,
+  l.is_for_sale::integer::boolean as is_for_sale,
   now() as load_timestamp
 FROM
   public.lead l

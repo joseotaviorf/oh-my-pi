@@ -13,7 +13,6 @@ CREATE VIEW public.vw_dim_user_doorman as
         lat AS work_lat,
         lng AS work_lng,
         placeId AS work_place_id,
-        code as code,
         recruiter AS recruiter,
         subscriptionSource AS subscription_source,
         doorman_occupation_id AS occupation_id,

@@ -1,10 +1,7 @@
 from datetime import datetime, timedelta
 
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
-
 import bietlejuice.jobs.base.new_base_etl as utils
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -21,6 +18,8 @@ from bietlejuice.jobs.dags.supply_demand_funnel import BookingSubDag, ContractSu
     SpecialConditionSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('bi-supply-demand-etl')
 
@@ -70,7 +69,10 @@ def load_dim_from_ods_to_dw(**kwargs):
         insert_dummy=True if 'insert_dummy' not in kwargs else kwargs['insert_dummy'],
         is_fact=False if 'is_fact' not in kwargs else kwargs['is_fact'],
         pre_command=None if 'pre_command' not in kwargs else kwargs['pre_command'],
-        post_command=post_command
+        post_command=post_command,
+        schema_dest='public' if 'schema_dest' not in kwargs else kwargs['schema_dest'],
+        schema_source='public' if 'schema_source' not in kwargs else kwargs[
+            'schema_source']
     )
 
 

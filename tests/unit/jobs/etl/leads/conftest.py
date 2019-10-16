@@ -6,7 +6,8 @@ config_json = """
                 {
                     "query": "",
                     "defaultColumns": {"id": 1},
-                    "infosExtras": ""
+                    "infosExtras": "",
+                    "queue": "FornoCrawlerLeads"
                 }
                 """
 
