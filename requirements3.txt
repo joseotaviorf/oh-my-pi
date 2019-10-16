@@ -82,3 +82,4 @@ WTForms==2.2.1
 zope.deprecation==4.4.0
 quintoandar-teravoz-client==0.1.5
 celery==4.3.0
+firebase_admin==3.0.0

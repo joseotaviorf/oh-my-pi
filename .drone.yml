@@ -33,6 +33,18 @@ pipeline:
     when:
       event: push
 
+  unit-tests-python3:
+    group: tests
+    image: quintoandar/pyspark:0.1
+    pull: true
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make requirements-python3
+      - make unit-tests-python3
+    when:
+      event: push
+
   publish-coverage:
     image: plugins/s3
     pull: true
@@ -83,6 +95,26 @@ pipeline:
       event: [ push, tag ]
       branch: [ master, forno ]
 
+  install-dependencies-ec2-forno:
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: .
+    target: ~/bi
+    include: [ 'requirements.txt', 'variables.json' ]
+    exclude: [ '*' ]
+    args: '-vI'
+    script:
+      - cd /var/www/airflow/
+      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt
+      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
+    secrets: [ rsync_key ]
+    when:
+      event: push
+      branch: [ forno ]
+
   install-dependencies-ec2-prod:
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
@@ -103,6 +135,21 @@ pipeline:
       event: push
       branch: [ master ]
 
+  load-jobs-ec2-forno:
+    group: updated_jobs
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: "bietlejuice/*"
+    exclude: "jobs/composer/*"
+    target: /var/www/airflow/dags/bietlejuice
+    args: '--force -vI'
+    delete: true
+    secrets: [ rsync_key ]
+    when:
+      event: push
+      branch: [ forno ]
+
   load-jobs-ec2-prod:
     group: updated_jobs
     image: drillster/drone-rsync
@@ -117,6 +164,20 @@ pipeline:
     when:
       event: push
       branch: [ master ]
+
+  load-plugins-ec2-forno:
+    group: updated_jobs
+    image: drillster/drone-rsync
+    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+    user: airflow
+    source: plugins/*
+    target: /var/www/airflow/plugins
+    args: '--force -vI'
+    delete: true
+    secrets: [ rsync_key ]
+    when:
+      event: push
+      branch: [ forno ]
 
   load-plugins-ec2-prod:
     group: updated_jobs
@@ -231,8 +292,9 @@ pipeline:
 
   notify:
     image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
     channel: data-ops
+    secrets: [ slack_webhook ]
     when:
+      event: [ push, tag ]
       branch: [ forno, master ]
       status: [ success, failure ]

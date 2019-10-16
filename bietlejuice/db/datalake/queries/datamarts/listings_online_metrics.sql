@@ -23,7 +23,7 @@ days_published AS (
       ROW_NUMBER() OVER(PARTITION BY sk_house, max_status_date ORDER BY max_status_date ASC) AS row
     FROM published
   )
-  -- HACK: fact_house_status has an issue where it can have two rows with a published status and null max_status_date
+  -- HACK: fact_house_listing_status has an issue where it can have two rows with a published status and null max_status_date
   -- while we don't fix that, here we will take only the first row
   SELECT * FROM rows WHERE row = 1
 ),
@@ -52,7 +52,6 @@ pre_online_metrics AS (
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views
         FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
-          AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )

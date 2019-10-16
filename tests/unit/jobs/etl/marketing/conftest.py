@@ -1,7 +1,8 @@
 import pytest
 from datetime import datetime
 
-from bietlejuice.jobs.etl.marketing import CriteoCampaigns
+from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns, \
+    ClassifiedsCosts
 from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
 from bietlejuice.jobs.etl.marketing import Marketing
@@ -62,7 +63,7 @@ def criteo_campaigns():
     return CriteoCampaigns(
         s3_bucket=S3_BUCKET,
         execution_date=EXECUTION_DATE,
-        auth=AUTH,
+        auth=AUTH
     )
 
 
@@ -74,7 +75,7 @@ def twitter_campaigns():
         auth={"consumer_key": "consumer_key",
               "consumer_secret": "consumer_secret",
               "access_token": "access_token",
-              "access_token_secret": "access_token_secret"},
+              "access_token_secret": "access_token_secret"}
     )
 
 
@@ -84,4 +85,29 @@ def linkedin_campaigns():
         s3_bucket=S3_BUCKET,
         execution_date=EXECUTION_DATE,
         auth=None
+    )
+
+
+@pytest.fixture
+def rtb_campaigns():
+    return RtbCampaigns(
+        s3_bucket=S3_BUCKET,
+        execution_date=EXECUTION_DATE,
+        auth={
+            "client_id": "client_id",
+            "client_secret": "client_secret"
+        }
+    )
+
+
+@pytest.fixture
+def classifieds_costs():
+    return ClassifiedsCosts(
+        s3_bucket=S3_BUCKET,
+        execution_date=EXECUTION_DATE,
+        auth={
+            "GSA_CREDENTIALS": "GSA_CREDENTIALS",
+            "GOOGLE_API_SCOPE": "GOOGLE_API_SCOPE"
+        },
+        extra_configs={'side': 'side'}
     )

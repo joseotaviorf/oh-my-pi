@@ -7,8 +7,6 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   status string,
   ts_listing_version_start string,
   ts_listing_version_end string,
-  ts_house_registration_first_verification string,
-  ts_house_last_confirmation_availability string,
   ts_house_first_publication string,
   ts_house_last_publication string,
   ts_publication string,
@@ -62,6 +60,10 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   last_originals_type string,
   dt_last_originals_opted_in string,
   dt_last_originals_opted_out string,
+  is_iorent_active string,
+  last_iorent_type string,
+  dt_last_iorent_opted_in string,
+  dt_last_iorent_opted_out string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

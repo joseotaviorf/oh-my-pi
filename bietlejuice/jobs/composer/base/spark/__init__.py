@@ -11,3 +11,9 @@ from bietlejuice.jobs.composer.base.spark.spark_metastore_service import (
 from bietlejuice.jobs.composer.base.spark.spark_table_storage_format import (
     SparkTableStorageFormat,
 )
+
+sc, spark, sqlContext = (
+    BaseSparkContext.sc,
+    BaseSparkContext.spark,
+    BaseSparkContext.sqlContext,
+)

@@ -40,6 +40,16 @@ with b2b_info as (
   left join photo_job pj
     on pj.imovel_id = h.id
 ),
+house_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
+),
 house_listings as (
   select
     hl.id_house_listing as sk_house_listing,
@@ -49,8 +59,6 @@ house_listings as (
     hl.status::varchar(255),
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
-    h.data_primeiro_verificado as ts_house_registration_first_verification,
-    h.last_confirmation_availability as ts_house_last_confirmation_availability,
     h.first_publication as ts_house_first_publication,
     h.ultima_publicacao as ts_house_last_publication,
     hl.ts_listing_version_start::date as ts_publication,
@@ -100,7 +108,11 @@ house_listings as (
     hl.is_originals_active,
     hl.last_originals_type,
     hl.dt_last_originals_opted_in,
-    hl.dt_last_originals_opted_out
+    hl.dt_last_originals_opted_out,
+    hl.is_iorent_active,
+    hl.last_iorent_type,
+    hl.dt_last_iorent_opted_in,
+    hl.dt_last_iorent_opted_out
   from house h
   join house_listing hl
     on hl.id_house = h.id
@@ -113,8 +125,6 @@ select
   hl.status,
   hl.ts_listing_version_start,
   hl.ts_listing_version_end,
-  hl.ts_house_registration_first_verification,
-  hl.ts_house_last_confirmation_availability,
   hl.ts_house_first_publication,
   hl.ts_house_last_publication,
   hl.ts_publication,
@@ -163,13 +173,22 @@ select
   hl.house_predicted_price,
   bi.is_b2b,
   bi.b2b_type,
-  bi.b2b_prime_type,
+  case
+      when hp.id_house_listing is not null then 'portability'
+      else bi.b2b_prime_type
+  end as b2b_prime_type,
   hl.is_originals_active,
   hl.last_originals_type,
   hl.dt_last_originals_opted_in,
   hl.dt_last_originals_opted_out,
+  hl.is_iorent_active,
+  hl.last_iorent_type,
+  hl.dt_last_iorent_opted_in,
+  hl.dt_last_iorent_opted_out,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
   on bi.id_house = hl.id_house
+left join house_portability hp
+    on hp.id_house_listing = hl.sk_house_listing
 ;

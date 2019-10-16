@@ -37,7 +37,7 @@ def submit_zap(**kwargs):
         job_name='crawl-zapimoveis',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=16384,
+        memory=20480,
         command=['./crawlers/zapimoveis_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_vr, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
@@ -152,8 +152,8 @@ crawl_zap = BaseDAG.build_python_operator(
 
 zap_success_test = QuintoAndarAWSBatchSensor(
     task_id='zap-success-test',
-    poke_interval=20 * 60,
-    timeout=22 * 3600,
+    poke_interval=30 * 60,
+    timeout=23 * 3600,
     provide_context=True,
     xcom_task_id='crawl-zapimoveis'
 )

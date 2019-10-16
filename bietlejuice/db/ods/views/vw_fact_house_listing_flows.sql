@@ -89,7 +89,17 @@ fact_with_reproc as (
     from reprocessed_lead rl
     join lead l 
       on l.id = rl.id_origin_lead
-  ), 
+  ),
+  house_b2b_portability as (
+    select
+        hl.id_house_listing
+    from house_listing hl
+    join house h
+        on h.id = hl.id_house
+    join portability por
+        on por.id_house = hl.id_house and por.owner_type = 'B2B'
+    where hl.version = 0 and por.ts_created >= h.data_criacao
+  ),
   acquisition_channels as (
     select 
       fhlf.id,
@@ -103,7 +113,7 @@ fact_with_reproc as (
       fhlf.first_region_id,
       fhlf.dt_lead,
       fhlf.dt_prospect,
-      fhlf.dt_first_inside_sales_contact,
+      fhlf.dt_first_contact,
       fhlf.dt_conversion,
       fhlf.dt_qualified,
       fhlf.dt_opportunity,
@@ -118,15 +128,15 @@ fact_with_reproc as (
       fhlf.funnel_step,
       fhlf.hours_lead_to_prospect,
       fhlf.hours_prospect_to_qualified,
-      fhlf.hours_lead_to_first_inside_sales_contact,
-      fhlf.hours_prospect_to_first_inside_sales_contact,
+      fhlf.hours_lead_to_first_contact,
+      fhlf.hours_prospect_to_first_contact,
       fhlf.hours_qualified_to_opportunity,
       fhlf.hours_opportunity_to_listing,
       fhlf.hours_lead_to_listing,
       fhlf.days_lead_to_prospect,
       fhlf.days_prospect_to_qualified,
-      fhlf.days_lead_to_first_inside_sales_contact,
-      fhlf.days_prospect_to_first_inside_sales_contact,
+      fhlf.days_lead_to_first_contact,
+      fhlf.days_prospect_to_first_contact,
       fhlf.days_qualified_to_opportunity,
       fhlf.days_opportunity_to_listing,
       fhlf.days_lead_to_listing,
@@ -139,7 +149,8 @@ fact_with_reproc as (
       end as acquisition_channel_rep,
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
       coalesce(
-            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            port.id is not null
+            or coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or pa_b2b.id is not null
             or b2b_prime.id_lead is not null
             , false) as is_b2b
@@ -161,6 +172,12 @@ fact_with_reproc as (
 			on pa_b2b.user_id = u_b2b.id
 	) b2b_prime
 	  on b2b_prime.id_lead = l.id
+	left join house_listing hl
+        on hl.id_house = fhlf.imovel_id
+        and hl.version = 0
+    left join portability port
+        on port.id_house = hl.id_house
+        and port.owner_type = 'B2B'
   )
   select 
     acquisition_channels.id,
@@ -174,7 +191,7 @@ fact_with_reproc as (
     acquisition_channels.first_region_id,
     acquisition_channels.dt_lead,
     acquisition_channels.dt_prospect,
-    acquisition_channels.dt_first_inside_sales_contact,
+    acquisition_channels.dt_first_contact,
     acquisition_channels.dt_conversion,
     acquisition_channels.dt_qualified,
     acquisition_channels.dt_opportunity,
@@ -189,15 +206,15 @@ fact_with_reproc as (
     acquisition_channels.funnel_step,
     acquisition_channels.hours_lead_to_prospect,
     acquisition_channels.hours_prospect_to_qualified,
-    acquisition_channels.hours_lead_to_first_inside_sales_contact,
-    acquisition_channels.hours_prospect_to_first_inside_sales_contact,
+    acquisition_channels.hours_lead_to_first_contact,
+    acquisition_channels.hours_prospect_to_first_contact,
     acquisition_channels.hours_qualified_to_opportunity,
     acquisition_channels.hours_opportunity_to_listing,
     acquisition_channels.hours_lead_to_listing,
     acquisition_channels.days_lead_to_prospect,
     acquisition_channels.days_prospect_to_qualified,
-    acquisition_channels.days_lead_to_first_inside_sales_contact,
-    acquisition_channels.days_prospect_to_first_inside_sales_contact,
+    acquisition_channels.days_lead_to_first_contact,
+    acquisition_channels.days_prospect_to_first_contact,
     acquisition_channels.days_qualified_to_opportunity,
     acquisition_channels.days_opportunity_to_listing,
     acquisition_channels.days_lead_to_listing,
@@ -270,7 +287,7 @@ potential_listings as (
     coalesce(f.lead_id, '-1'::integer) as sk_lead,
     coalesce(f.conversao_id, '-1'::integer) as sk_lead_conversion,
     coalesce(f.photo_job_id, '-1'::integer) as sk_first_photo_job,
-    coalesce(f.imovel_id || '00' || coalesce(hl_version_one.version, hl_version_zero.version, 0)::varchar, '-1')::bigint as sk_house_listing,
+    coalesce(f.imovel_id || '00' || coalesce(hl_version_zero.version, 1)::varchar, '-1')::bigint as sk_house_listing,
     coalesce(f.rep_id, '-1'::integer) as sk_user_house_registrant,
     coalesce(f.rep_id, btl.rep_id, '-1'::integer) as sk_user_sales_rep,
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as sk_user_lead_affiliate,
@@ -286,7 +303,7 @@ potential_listings as (
     coalesce(to_char(btf.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_closed_date,
     coalesce(to_char(btl.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_created_date,
     coalesce(to_char(btl.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_closed_date,
-    coalesce(to_char(f.dt_first_inside_sales_contact::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_inside_sales_contact_date,
+    coalesce(to_char(f.dt_first_contact::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_contact_date,
     coalesce(to_char(f.dt_conversion::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_conversion_date,
     coalesce(to_char(f.dt_qualified::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_qualified_date,
     coalesce(to_char(f.dt_opportunity::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_opportunity_date,
@@ -309,15 +326,15 @@ potential_listings as (
     f.funnel_step as funnel_drop_reason,
     f.hours_lead_to_prospect,
     f.hours_prospect_to_qualified,
-    f.hours_lead_to_first_inside_sales_contact,
-    f.hours_prospect_to_first_inside_sales_contact,
+    f.hours_lead_to_first_contact,
+    f.hours_prospect_to_first_contact,
     f.hours_qualified_to_opportunity,
     f.hours_opportunity_to_listing,
     f.hours_lead_to_listing,
     f.days_lead_to_prospect,
     f.days_prospect_to_qualified,
-    f.days_lead_to_first_inside_sales_contact,
-    f.days_prospect_to_first_inside_sales_contact,
+    f.days_lead_to_first_contact,
+    f.days_prospect_to_first_contact,
     f.days_qualified_to_opportunity,
     f.days_opportunity_to_listing,
     f.days_lead_to_listing,
@@ -382,9 +399,6 @@ potential_listings as (
   left join house_listing hl_version_zero
   	on hl_version_zero.id_house = f.imovel_id
   	  and hl_version_zero.version = 0
-  left join house_listing hl_version_one
-  	on hl_version_one.id_house = f.imovel_id
-  	  and hl_version_one.version = 1
 ), 
 taxonomy as (
   select
@@ -491,7 +505,7 @@ select
   atax.sk_first_task_closed_date,
   atax.sk_last_task_created_date,
   atax.sk_last_task_closed_date,
-  atax.sk_first_inside_sales_contact_date,
+  atax.sk_first_contact_date,
   atax.sk_conversion_date,
   atax.sk_qualified_date,
   atax.sk_opportunity_date,
@@ -503,15 +517,15 @@ select
   atax.funnel_drop_reason,
   atax.hours_lead_to_prospect,
   atax.hours_prospect_to_qualified,
-  atax.hours_lead_to_first_inside_sales_contact,
-  atax.hours_prospect_to_first_inside_sales_contact,
+  atax.hours_lead_to_first_contact,
+  atax.hours_prospect_to_first_contact,
   atax.hours_qualified_to_opportunity,
   atax.hours_opportunity_to_listing,
   atax.hours_lead_to_listing,
   atax.days_lead_to_prospect,
   atax.days_prospect_to_qualified,
-  atax.days_lead_to_first_inside_sales_contact,
-  atax.days_prospect_to_first_inside_sales_contact,
+  atax.days_lead_to_first_contact,
+  atax.days_prospect_to_first_contact,
   atax.days_qualified_to_opportunity,
   atax.days_opportunity_to_listing,
   atax.days_lead_to_listing,

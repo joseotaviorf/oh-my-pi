@@ -7,8 +7,6 @@ create table dim_house_listing (
   status varchar,
   ts_listing_version_start timestamp,
   ts_listing_version_end timestamp,
-  ts_house_registration_first_verification timestamp,
-  ts_house_last_confirmation_availability timestamp,
   ts_house_first_publication timestamp,
   ts_house_last_publication timestamp,
   ts_publication timestamp,
@@ -62,6 +60,10 @@ create table dim_house_listing (
   last_originals_type varchar,
   dt_last_originals_opted_in date,
   dt_last_originals_opted_out date,
+  is_iorent_active boolean,
+  last_iorent_type varchar,
+  dt_last_iorent_opted_in date,
+  dt_last_iorent_opted_out date,
   ts_load timestamp
 )
 ;

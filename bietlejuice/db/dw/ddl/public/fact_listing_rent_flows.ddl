@@ -44,7 +44,6 @@ create table fact_listing_rent_flows(
   flg_visit_created_from_app boolean,
   visit_created_type varchar,
   flg_visit_last_updated_from_app boolean,
-  visit_last_updated_type varchar,
   sk_rent_flow_taxonomy bigint,
   booking_utm_campaign varchar,
   booking_utm_content varchar,

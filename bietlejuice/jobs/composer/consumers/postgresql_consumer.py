@@ -49,7 +49,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
     def get_data_from_table(self, table):
         remote_table = (
             self._get_default_read_format_and_options()
-            .option("dbtable", self.connection["schema"] + "." + table)
+            .option("dbtable", self.connection["schema"] + '."' + table + '"')
             .load()
         )
 
@@ -78,7 +78,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
             )
 
         remote_table = remote_table.option(
-            "dbtable", self.connection["schema"] + "." + table
+            "dbtable", self.connection["schema"] + '."' + table + '"'
         ).load()
 
         return remote_table

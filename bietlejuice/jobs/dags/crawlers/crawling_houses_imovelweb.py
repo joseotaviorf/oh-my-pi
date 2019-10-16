@@ -36,7 +36,7 @@ def submit_iw(**kwargs):
         job_name='crawl-imovelweb',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=8192,
+        memory=10024,
         command=['./crawlers/imovelweb_crawler.py', '--listing_date', execution_date,
                  '--states'] + states
     )
@@ -148,8 +148,8 @@ crawl_iw = BaseDAG.build_python_operator(
 
 iw_success_test = QuintoAndarAWSBatchSensor(
     task_id='iw-success-test',
-    poke_interval=5 * 60,
-    timeout=22 * 3600,
+    poke_interval=30 * 60,
+    timeout=23 * 3600,
     provide_context=True,
     xcom_task_id='crawl-iw'
 )

@@ -3,7 +3,7 @@ from airflow.models import DAG
 from datetime import datetime
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.dags.elasticsearch_logs import skynet_logs_to_s3
+from bietlejuice.jobs.dags.elasticsearch_logs import ml_logs_to_s3
 from bietlejuice.jobs.dags.util import environment as env
 
 MAIN_DAG_NAME = 'closing-predictor-logs'
@@ -14,7 +14,7 @@ env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
 config = {
     'ES_LOGS__HOSTNAME': os.getenv('ES_LOGS__HOSTNAME'),
-    'MODEL_NAME': 'ClosingPredictor',
+    'model_name': 'ClosingPredictor',
 }
 
 dag = DAG(
@@ -33,6 +33,6 @@ dump_logs_to_datalake_raw_op = BaseDAG.build_python_operator(
     dag=dag,
     task_id='dump_logs_to_datalake_raw',
     provide_context=True,
-    python_callable=skynet_logs_to_s3,
+    python_callable=ml_logs_to_s3,
     op_kwargs=config
 )

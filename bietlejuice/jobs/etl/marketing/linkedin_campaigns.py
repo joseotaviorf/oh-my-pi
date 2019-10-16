@@ -1,7 +1,8 @@
-import csv
+import os
 import re
 from collections import OrderedDict
 
+import pandas as pd
 import petl
 from qa_python_utils.default_logger import QuintoAndarLogger
 from qa_python_utils.google.drive import Drive as GoogleDriveClient
@@ -18,11 +19,31 @@ class LinkedInCampaigns(Marketing):
     INTEGRATION = 'linkedin_campaigns'
     S3_DATA_LAKE_RAW_LINKEDIN_PATH = 'raw/marketing/{}/campaigns'.format(INTEGRATION)
     CAMPAIGN_TABLE_NAME = 'linkedin_campaigns'
-    CSV_HEADER = ['account_id', 'campaign_id', 'campaign_name', 'creative_id',
-                  'date_sk', 'unique_reach', 'impressions', 'freq', 'CPM',
-                  'imp_cost_USD', 'engaje', 'clicks', 'CTR', 'CPC', 'eng_cost_USD',
-                  'vd_imps', 'VD_REACH', 'VD_engage', 'vd_unique_3rd_quartile',
-                  'vd_unique_midpoint', 'vd_unique_1st_quartile', 'cpv']
+    CSV_HEADER = ['Start Date (in UTC)', 'Account Name', 'Currency',
+                  'Salesforce Opportunity ID', 'Salesforce Opportunity Line Item ID',
+                  'Account Total Budget', 'Account Total Budget End Date (in UTC)',
+                  'Campaign ID', 'Campaign Name', 'Campaign Type', 'Campaign Status',
+                  'Cost Type', 'Daily Budget', 'Creative Name', 'Ad ID',
+                  'Creative Status', 'Ad Introduction Text', 'Ad Headline', 'Ad Line',
+                  'Click URL', 'Sponsored Update Type', 'DSC Name', 'Total Spent',
+                  'Impressions', 'Clicks', 'Click Through Rate', 'Average CPM',
+                  'Average CPC', 'Reactions', 'Comments', 'Shares', 'Follows',
+                  'Other Clicks', 'Total Social Actions', 'Total Engagements',
+                  'Engagement Rate', 'Viral Impressions', 'Viral Clicks',
+                  'Viral Reactions', 'Viral Comments', 'Viral Shares', 'Viral Follows',
+                  'Viral Other Clicks', 'Conversions', 'Post-Click Conversions',
+                  'View-Through Conversions', 'Conversion Rate', 'Cost per Conversion',
+                  'Total Conversion Value', 'Return on Ad Spend', 'Viral Conversions',
+                  'Viral Post-Click Conversions', 'Viral View-Through Conversions',
+                  'Leads', 'Lead Forms Opened', 'Lead Form Completion Rate',
+                  'Cost per Lead', 'Video Length (in Seconds)', 'Video Plays',
+                  'Video Views', 'Video View Rate', 'Video Views at 25%',
+                  'Video Views at 50%', 'Video Views at 75%', 'Video Completions',
+                  'Video Completion Rate', 'Full Screen Plays', 'eCPV',
+                  'Viral Video Plays', 'Viral Video Views', 'Viral Video Views at 25%',
+                  'Viral Video Views at 50%', 'Viral Video Views at 75%',
+                  'Viral Video Completions', 'Viral Video Completion Rate',
+                  'Viral Video Full Screen Plays']
 
     def __init__(self, s3_bucket, execution_date, auth, account=None,
                  extra_configs=None):
@@ -52,7 +73,7 @@ class LinkedInCampaigns(Marketing):
                 filename, gdrive_folder_id))
 
         files = google_drive_client.list_files(None, query)
-        self._validate_result(files)
+        self._validate_file(files)
 
         logger.info(
             'm=move_linkedin_campaigns_to_raw, process_file={}, msg=Downloading file to'
@@ -62,33 +83,64 @@ class LinkedInCampaigns(Marketing):
                                                      path='/tmp')
         self._validate_csv_header('/tmp/{}'.format(tmp_file))
 
-        return tmp_file
+        data = pd.read_csv('/tmp/' + tmp_file, sep='\t', skiprows=5,
+                           encoding="UTF-16LE", quotechar='"')
+        data.drop(columns=['Ad Introduction Text', 'Ad Headline'], inplace=True)
+
+        raw_file = 'raw-{}'.format(tmp_file)
+        data.to_csv('/tmp/{}'.format(raw_file), sep='\t', header='true', index=False)
+
+        return raw_file
+
+    @logger
+    def _get_header_list(self, file_name):
+        header_list = []
+
+        if not os.path.exists(file_name):
+            raise RuntimeError('m=_get_header_list, file_name={}, msg=No file found on'
+                               ' (Data_Performance)-LinkedInCosts'.format(file_name))
+
+        with open(file_name) as f:
+            line = 0
+            while line < 6:
+                line += 1
+                str_header = next(f)
+
+            header_list = str_header.split('\t')
+            header_list = [re.sub('\x00|\n', '', a) for a in header_list]
+
+        return header_list
 
     @logger
     def _validate_csv_header(self, tmp_file):
-        header = None
-        with open(tmp_file, "rb") as f:
-            reader = csv.reader(f)
-            header = next(reader)
+        header_list = self._get_header_list(tmp_file)
 
-        for column in header:
-            if re.sub('\\xef|\\xbb|\\xbf', '', column) not in self.CSV_HEADER:
+        if len(header_list) != len(self.CSV_HEADER):
+            raise RuntimeError(
+                'm=_validate_csv_header, column={}, expected_columns={}, '
+                'msg=Columns length are not equal expected_columns'.format(
+                    self.CSV_HEADER,
+                    tmp_file))
+
+        i = 0
+        for column in header_list:
+            col = column.replace('\n', '')
+            if col != self.CSV_HEADER[i]:
                 raise RuntimeError(
-                    'm=_validate_csv_header, column={}, expected_columns={}, '
-                    'msg=Unknown column on file {}'.format(column, self.CSV_HEADER,
-                                                           tmp_file))
+                    'm=_validate_csv_header, column={}, msg=Invalid column'.format(col))
+            i += 1
 
         return True
 
-    @logger(exclude='result')
-    def _validate_result(self, result):
-        if len(result) > 1:
+    @logger(exclude='files')
+    def _validate_file(self, files):
+        if len(files) > 1:
             raise RuntimeError(
-                'm=_validate_result, len(result)={}, msg=More than one entity found. '
-                'I don\'t know which of them to read!'.format(len(result)))
-        elif len(result) == 0:
+                'm=_validate_file, len(files)={}, msg=More than one file found. '
+                'I don\'t know which of them to read!'.format(len(files)))
+        elif not files:
             raise RuntimeError(
-                'm=_validate_result, msg=No entity found in directory')
+                'm=_validate_file, msg=No file found')
 
         return True
 
@@ -102,21 +154,62 @@ class LinkedInCampaigns(Marketing):
     @logger
     def move_linkedin_campaigns_to_clean(self):
         raw_table_query_file = 'campaigns.sql'
-        raw_cols = OrderedDict([
-            ('id_account', str),
+        raw_query_cols = OrderedDict([
+            ('account_name', str),
             ('id_campaign', str),
             ('campaign_name', str),
+            ('id_ad', str),
+            ('ad_name', str),
+            ('currency', str),
+            ('daily_budget', str),
+            ('account_total_budget', str),
+            ('total_spent', str),
             ('impressions', str),
             ('clicks', str),
-            ('ctr', str),
-            ('cpc', str),
+            ('other_clicks', str),
+            ('total_engagements', str),
+            ('conversions', str),
+            ('cost_per_conversion', str),
+            ('cost_per_lead', str)
         ])
 
         self._move_to_clean(
             table_name='marketing_' + self.CAMPAIGN_TABLE_NAME,
             sql_file_name=raw_table_query_file,
-            r_cols=raw_cols,
-            c_cols=raw_cols
+            r_cols=raw_query_cols,
+            c_cols=raw_query_cols
+        )
+
+    @logger(exclude=['r_cols', 'c_cols'])
+    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
+        key = 'clean/marketing/{integration}/{table_name}/' \
+              'dt_created={date_partition}/{file_name}.parquet' \
+            .format(integration=self.integration, table_name=table_name,
+                    date_partition=self.partition_date, file_name=self.partition_date)
+
+        query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/{query_path}/{file_name}'.format(
+                query_base_dir=DATALAKE_QUERIES_DIR,
+                query_path=self.raw_query_path,
+                file_name=sql_file_name))
+
+        self.athena_client.add_partition(
+            database=self.database,
+            table_name=table_name,
+            partition="dt='{dt}'".format(dt=self.partition_date)
+        )
+
+        self.athena_client.create_parquet_from_query(
+            key=key,
+            query=query.format(date=self.partition_date),
+            raw_columns=r_cols,
+            clean_columns=c_cols
+        )
+
+        self.athena_client.add_partition(
+            database='datalake_clean',
+            table_name=table_name,
+            partition="dt_created='{dt}'".format(dt=self.partition_date)
         )
 
     @logger
@@ -179,11 +272,11 @@ class LinkedInCampaigns(Marketing):
         return table_name.split('_')[0]
 
     @logger
-    def _delete_fact_rows(self, table_name, sk_date):
+    def _delete_staging_fact_rows(self, table_name, sk_date):
         delete_query = "DELETE FROM staging.{table_name} " \
                        "WHERE sk_date = {date}".format(table_name=table_name,
                                                        date=sk_date)
-        logger.info("m=_delete_fact_rows, query={}".format(delete_query))
+        logger.info("m=_delete_staging_fact_rows, query={}".format(delete_query))
 
         BaseETL.execute_command(
             db_enum=EnumDB.BI_DW,
@@ -201,10 +294,14 @@ class LinkedInCampaigns(Marketing):
         if self._table_type(table_name) == 'fact' and not self._is_staging_table_empty(
                 table_name):
             sk_date = int(self.execution_date.strftime('%Y%m%d'))
-            self._delete_fact_rows(table_name, sk_date)
+            self._delete_staging_fact_rows(table_name, sk_date)
 
             daily_load_query = "{} \nWHERE sk_date = {};".format(full_load_query,
                                                                  sk_date)
             return daily_load_query
 
         return full_load_query
+
+    @logger
+    def load_to_prod(self, table_name):
+        self._load_to_prod(table_name)

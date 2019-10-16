@@ -13,15 +13,13 @@ create external table if not exists datalake_clean.ods_dim_region (
   region_code string,
   region_code_deprecated string,
   short_region_name string,
-  long_region_name string,
   greater_region string,
   regional string,
   dt_created string,
   dt_updated string,
   dt_timestamp string,
   dt_first_property_created string,
-  dt_first_booking string,
-  days_from_first_booking string
+  dt_first_booking string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

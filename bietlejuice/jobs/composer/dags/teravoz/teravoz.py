@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
@@ -49,10 +49,13 @@ dag = DAG(
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "retries": 3,
+        "retry_delay": timedelta(minutes=5),
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     catchup=False,
+    max_active_runs=1,
 )
 
 

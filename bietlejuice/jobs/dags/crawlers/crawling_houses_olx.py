@@ -35,7 +35,7 @@ def submit_olx(**kwargs):
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
-        memory=8192,
+        memory=16384,
         command=['./crawlers/olx_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
     logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
@@ -146,8 +146,8 @@ crawl_olx = BaseDAG.build_python_operator(
 
 olx_success_test = QuintoAndarAWSBatchSensor(
     task_id='olx-success-test',
-    poke_interval=20 * 60,
-    timeout=22 * 3600,
+    poke_interval=30 * 60,
+    timeout=23 * 3600,
     provide_context=True,
     xcom_task_id='crawl-olx'
 )

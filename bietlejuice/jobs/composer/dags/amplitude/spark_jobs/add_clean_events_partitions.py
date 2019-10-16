@@ -28,11 +28,11 @@ NB_THREADS = 8
 
 
 def create_partition(args):
-    year, month, day, event_type, db_clean_athena, table_name = args
+    year, month, day, event_type, db_clean_athena, table_name, athena_client = args
     partition_by_dict = OrderedDict(
         [("year", year), ("month", month), ("day", day), ("event_type", event_type)]
     )
-    AthenaClient.add_partition(db_clean_athena, table_name, partition_by_dict)
+    athena_client.add_partition(db_clean_athena, table_name, partition_by_dict)
 
 
 if __name__ == "__main__":
@@ -48,7 +48,8 @@ if __name__ == "__main__":
     db_clean_path = db_info["db_clean_path"]
     table_name = "events"
 
-    AthenaClient.execute_athena_query(
+    athena_client = AthenaClient()
+    athena_client.execute_athena_query(
         "CREATE DATABASE IF NOT EXISTS `{}`".format(db_clean_athena), "default"
     )
 
@@ -59,7 +60,8 @@ if __name__ == "__main__":
     )
     with open(clean_amplitude_events_athena_ddl) as f:
         ddl = f.read()
-    AthenaClient.execute_athena_query(
+
+    athena_client.execute_athena_query(
         ddl.format(
             db=db_clean_athena, table_name=table_name, path=db_clean_path + table_name
         ),
@@ -77,7 +79,15 @@ if __name__ == "__main__":
         p.map(
             create_partition,
             [
-                (year, month, day, event_type, db_clean_athena, table_name)
+                (
+                    year,
+                    month,
+                    day,
+                    event_type,
+                    db_clean_athena,
+                    table_name,
+                    athena_client,
+                )
                 for event_type in event_types
             ],
         )

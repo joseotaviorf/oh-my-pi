@@ -57,7 +57,7 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
     client = MongoClient(_uri)
     db = client.tasks
     conversion_columns = ['task_id', 'task_status', 'rep_id', 'first_rep_id', id_column, 'number_of_reschedules',
-                          'dt_created', 'dt_closed']
+                          'dt_created', 'dt_closed', 'task_type']
     _filter = {
         "type": {"$in": task_types}
     }
@@ -74,7 +74,8 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
         "dataInicio": 1,
         "realizadaEm": 1,
         "silenciadaAte": 1,
-        "actions": 1
+        "actions": 1,
+        "type": 1
     }
 
     tasks = list()
@@ -92,6 +93,7 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
         origem_id = row['origemId']
         number_of_reschedules = 0
         dt_created = row['dataInicio']
+        t_type = row['type']
         dt_closed = None
         first_rep_id = None
 
@@ -127,7 +129,8 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
             "number_of_reschedules": number_of_reschedules,
             "first_rep_id": int(first_rep_id),
             "dt_created": dt_created,
-            "dt_closed": dt_closed
+            "dt_closed": dt_closed,
+            "task_type": t_type
         }
         tasks.append(task)
 

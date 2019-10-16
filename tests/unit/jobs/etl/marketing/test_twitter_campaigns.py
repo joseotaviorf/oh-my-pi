@@ -256,11 +256,14 @@ class TestTwitterCampaigns(object):
         mock_pendulum.strftime = MagicMock(return_value='2019-09-22')
         twitter_campaigns.execution_date = mock_pendulum
 
-        expected_s3_file_path = mock.ANY
-
         account_id = '1a1b1c'
         entity_name = 'ad_groups'
         raw_data = [{'abada': 'badoo'}]
+        expected_s3_file_path = '{}/{}/acc={}/dt={}/data.gz'.format(
+            twitter_campaigns.S3_DATA_LAKE_RAW_TWITTER_PATH,
+            entity_name,
+            account_id,
+            twitter_campaigns.execution_date.strftime('%Y-%m-%d'))
 
         # act
         twitter_campaigns._save_to_s3(account_id, entity_name, raw_data)

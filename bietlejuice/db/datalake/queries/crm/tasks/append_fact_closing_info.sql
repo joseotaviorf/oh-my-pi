@@ -25,9 +25,10 @@ contract_proposal_house_listing as (
   select
     cast(sk_house_listing as bigint) as sk_house_listing,
     cast(sk_proposal as bigint) as sk_proposal,
-    cast(sk_contract as bigint) as sk_contract,
     cast(sk_owner as bigint) as sk_house_owner,
-    cast(sk_client as bigint) as sk_tenant
+    cast(coalesce(if(sk_contract != '-1',sk_client),'-1') as bigint) as sk_tenant,
+    cast(coalesce(if(sk_proposal != '-1',sk_client),'-1') as bigint) as sk_proponent,
+    max(cast(sk_contract as bigint)) as sk_contract
   from datalake_clean.ods_fact_listing_rent_flows
   where sk_contract != '-1'
     or sk_proposal != '-1'
@@ -56,6 +57,7 @@ select distinct
   coalesce(proposal.sk_house_listing, contract.sk_house_listing, -1) as sk_house_listing,
   coalesce(contract.sk_house_owner, proposal.sk_house_owner, pc.sk_house_owner) as sk_house_owner,
   coalesce(contract.sk_tenant, proposal.sk_tenant, pc.sk_tenant) as sk_tenant,
+  coalesce(contract.sk_proponent, proposal.sk_proponent) as sk_proponent,
   pc.dt_partition
 from proposals_contracts pc
 left join contract_proposal_house_listing proposal

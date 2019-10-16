@@ -16,7 +16,6 @@ select
   visit_created_from_app,
   visit_created_type,
   visit_last_updated_from_app,
-  visit_last_updated_type,
   id_rent_flow,
   dt_rent_flow_created,
   id_offer,
@@ -45,7 +44,6 @@ select
 			o.visit_created_from_app,
 			o.visit_created_type,
 			o.visit_last_updated_from_app,
-			o.visit_last_updated_type,
 			o.id_rent_flow,
 			o.dt_rent_flow_created,
 			o.id_offer,
@@ -76,7 +74,6 @@ select
 				  visit_created_from_app,
 				  visit_created_type,
 				  visit_last_updated_from_app,
-				  visit_last_updated_type,
 				  id_rent_flow,
 				  dt_rent_flow_created,
 				  id_offer,
@@ -107,7 +104,6 @@ select
 					  vo_cr.isApp as visit_created_from_app,
 					  vo_cr.nome as visit_created_type,
 					  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
-					  coalesce(vo_up.nome, false) as visit_last_updated_type,
 					  fl.id as id_rent_flow,
 					  fl.criadoEm as dt_rent_flow_created,
 					  case
@@ -181,8 +177,11 @@ select
 						on poa.offer_id = _offer.o_id
 					left join Contrato c
 					  on c.proposta_id = coalesce(poa.id, pof.id)
-					where (_offer.o_id = o.id) is null
-						or _offer.o_id = o.id
+					left join Portability port
+	                  on port.house_id = i.id
+					where ((_offer.o_id = o.id) is null
+						    or _offer.o_id = o.id)
+				        and port.id is null
 				) int_offer
 			) o
 		  left join (
@@ -217,7 +216,6 @@ select
 					  vo_cr.isApp as visit_created_from_app,
 					  vo_cr.nome as visit_created_type,
 					  coalesce(vo_up.isApp, false) as visit_last_updated_from_app,
-					  coalesce(vo_up.nome, false) as visit_last_updated_type,
 					  fl.id as id_rent_flow,
 					  fl.criadoEm as dt_rent_flow_created,
 					  null as id_offer,
@@ -290,12 +288,15 @@ select
 						on _pre_proposal.a_id = a.id
 					left join Proposta ppf
 					  on ppf.preProposta_id = prep.id
-				  left join Proposta ppa
+				    left join Proposta ppa
 					  on ppa.preProposta_id = _pre_proposal.pp_id
 					left join Contrato c
 					  on c.proposta_id = coalesce(ppa.id, ppf.id)
-					where (_pre_proposal.pp_id = prep.id) is null
-						or _pre_proposal.pp_id = prep.id
+					left join Portability port
+	                  on port.house_id = i.id
+					where ((_pre_proposal.pp_id = prep.id) is null
+						    or _pre_proposal.pp_id = prep.id)
+						and port.id is null
 				) int_pre_proposal
 		) pp
 		on pp.id_house = o.id_house
@@ -321,7 +322,6 @@ select
 			null as visit_created_from_app,
 			null as visit_created_type,
 			null as visit_last_updated_from_app,
-			null as visit_last_updated_type,
 			fl.id as id_rent_flow,
 			fl.criadoEm as dt_rent_flow_created,
 			p.offer_id as id_offer,

@@ -1,3 +1,3 @@
-from .skynet_logs_to_s3 import skynet_logs_to_s3
+from .ml_logs_to_s3 import ml_logs_to_s3
 
-__all__ = ['skynet_logs_to_s3']
+__all__ = ['ml_logs_to_s3']

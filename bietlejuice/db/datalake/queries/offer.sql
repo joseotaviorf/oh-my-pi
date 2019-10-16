@@ -10,25 +10,46 @@ with analysis_date as (
   group by 1
 ),
 rent_value_offers as (
-  with max_date as (
+ with min_max_date as (
     select
-      godfatherid,
+      id,
       turn,
-      max(rev) as rev_
+      max(rev) as max_rev,
+      min(rev) as min_rev
     from datalake_ebdb_raw_prod.offer_aud
-    where turn_mod = true
-      and type = 'Price'
+    where
+    turn_mod = true and (type = 'Price' or (type = 'Custom' and originalrent != rent))
     group by 1, 2
   )
   select
-    o_aud.godfatherid,
-    max(case when md.turn = 'Owner' then o_aud.rent end) as last_rent_offered_by_tenant,
-	max(case when md.turn = 'Tenant' then o_aud.rent end) as last_rent_offered_by_owner
+    o_aud.id,
+    min(case when mnd.turn = 'Owner' and o_aud.iteration = 2 then o_aud.rent end) as first_rent_offered_by_tenant,
+  min(case when mnd.turn = 'Tenant' and o_aud.iteration = 3 then o_aud.rent end) as first_rent_offered_by_owner,
+    max(case when mxd.turn = 'Owner' then o_aud.rent end) as last_rent_offered_by_tenant,
+  max(case when mxd.turn = 'Tenant'then o_aud.rent end) as last_rent_offered_by_owner
   from datalake_ebdb_raw_prod.offer_aud o_aud
-  join max_date md
-    on md.godfatherid = o_aud.godfatherid
-      and md.rev_ = o_aud.rev
+  left join min_max_date mxd
+    on mxd.id = o_aud.id
+    and mxd.max_rev = o_aud.rev
+  left join min_max_date mnd
+    on mnd.id = o_aud.id
+      and mnd.min_rev = o_aud.rev
+  where o_aud.type != 'Express'
   group by 1
+),
+max_topic_type as (
+  with max_topic_created as (
+    select
+      offer_id,
+      max(id) as id
+    from datalake_raw.godfather_topic
+    group by 1
+  )
+  select gt.*
+  from datalake_raw.godfather_topic gt
+  join max_topic_created mtc
+    on gt.offer_id = mtc.offer_id
+      and gt.id = mtc.id
 )
 select distinct
   eo.id,
@@ -36,7 +57,8 @@ select distinct
   ad._date as analysis_date,
   eo.criadoem,
   eo.firestoreid,
-  eo.godfatherid,
+  -- FIXME: bug in Product attaching the same firestore id to different godfather entries
+  max(coalesce(eo.godfatherid, try_cast(go_firestore.id as bigint))) over (partition by eo.firestoreid) as godfatherid,
   eo.originalcondo,
   eo.originalhomeinsurance,
   eo.originaliptu,
@@ -50,19 +72,27 @@ select distinct
   eo.rejectionreason,
   eo.iteration,
   eo.expirationdate,
-  go.type,
-  go.first_sent_at,
-  go.last_sent_at,
-  gt.type as topic_type,
+  coalesce(go_godfather.type, go_firestore.type) as type,
+  coalesce(go_godfather.first_sent_at, go_firestore.first_sent_at) as first_sent_at,
+  coalesce(go_godfather.last_sent_at, go_firestore.last_sent_at) as last_sent_at,
+  coalesce(mtt_godfather.type, mtt_firestore.type) as topic_type,
+  rvo.first_rent_offered_by_tenant,
+  rvo.first_rent_offered_by_owner,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner
 from datalake_ebdb_raw_prod.offer eo
-join datalake_raw.godfather_offer go
-  on eo.godfatherid = try_cast(go.id as bigint)
-left join datalake_raw.godfather_topic gt
-  on gt.offer_id = go.id
+left join datalake_raw.godfather_offer go_godfather
+  on eo.godfatherid = try_cast(go_godfather.id as bigint)
+    and eo.godfatherid is not null
+left join datalake_raw.godfather_offer go_firestore
+  on eo.firestoreid = go_firestore.firestore_id
+    and eo.godfatherid is null
+left join max_topic_type mtt_godfather
+  on mtt_godfather.offer_id = go_godfather.id
+left join max_topic_type mtt_firestore
+  on mtt_firestore.offer_firestore_id = go_firestore.firestore_id
 left join analysis_date ad
   on ad.id = eo.id
 left join rent_value_offers rvo
-  on rvo.godfatherid = eo.godfatherid
+  on rvo.id = eo.id
 ;

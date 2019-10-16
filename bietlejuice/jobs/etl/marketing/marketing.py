@@ -25,16 +25,19 @@ class Marketing(object):
         'fact_facebook_daily_cost_attributions': 'sk_ad',
         'fact_criteo_daily_cost_attributions': 'sk_criteo_campaign',
         'dim_criteo_campaign': 'sk_criteo_campaign',
-        'fact_rtb_daily_cost_attributions': 'sk_rtb_campaign',
-        'dim_rtb_campaign': 'sk_rtb_campaign',
+        'fact_rtb_daily_cost_attributions': 'sk_sub_campaign',
+        'dim_rtb_sub_campaign': 'sk_sub_campaign',
         'dim_classified': 'sk_classified',
-        'fact_daily_classifieds_costs': 'sk_classified',
+        'fact_classified_daily_cost_attributions': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
         'dim_twitter_ad': 'sk_ad',
         'dim_twitter_ad_group': 'sk_ad_group',
         'dim_twitter_campaign': 'sk_campaign',
-        'fact_twitter_daily_cost_attributions': 'sk_ad'
+        'fact_twitter_daily_cost_attributions': 'sk_ad',
+        'dim_linkedin_campaign': 'sk_campaign',
+        'dim_linkedin_ad': 'sk_ad',
+        'fact_linkedin_daily_cost_attributions': 'sk_ad || sk_campaign || sk_date'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -130,8 +133,8 @@ class Marketing(object):
             commit=True,
         )
 
-    @logger(exclude=['staging_query', 'column_types'])
-    def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
+    @logger(exclude=['staging_query'])
+    def _load_to_staging(self, dw_table_name, staging_query):
 
         logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
             Marketing.SCHEMA_NAMES['staging'], dw_table_name))

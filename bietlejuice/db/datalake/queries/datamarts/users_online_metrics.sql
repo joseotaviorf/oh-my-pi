@@ -3,7 +3,7 @@ with pre_online_metrics AS (
   metrics AS (
         SELECT
           DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
-          coalesce(cast(json_extract(event_properties, '$.user_id') as varchar), '') as user_id,
+          user_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
           CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views,
@@ -22,7 +22,6 @@ with pre_online_metrics AS (
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
                              'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed',
                              'tip_agendaavalilability_confirmed', 'tip_lockbox_confirmed')
-          AND year >= 2019
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')
   )

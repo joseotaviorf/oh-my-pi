@@ -4,208 +4,244 @@ from gzip import GzipFile
 from io import BytesIO
 
 import petl
+from qa_python_utils.default_logger import QuintoAndarLogger
+from rtbhouse_sdk.reports_api import ReportsApiSession
+
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.etl.marketing.marketing import Marketing
-from qa_python_utils.default_logger import QuintoAndarLogger
-from rtbhouse_sdk.reports_api import ReportsApiSession
 
 logger = QuintoAndarLogger('RtbCampaigns')
 
 
 class RtbCampaigns(Marketing):
-    TABLE_PARTITION_DATE = '__PARTITION_DATE__'
+    CAMPAIGNS_TABLE_NAME = "rtb_sub_campaigns"
+    STATS_TABLE_NAME = "rtb_stats"
+    INTEGRATION = 'rtb_ads'
+    S3_DATA_LAKE_RAW_RTB_PATH = 'raw/marketing/{}'.format(INTEGRATION)
 
     def __init__(self, s3_bucket, execution_date, auth, account=None,
                  extra_configs=None):
-        super(RtbCampaigns, self).__init__(s3_bucket, execution_date, 'rtb_campaigns',
+        super(RtbCampaigns, self).__init__(s3_bucket, execution_date, self.INTEGRATION,
                                            account)
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
+        self.S3_STATS_FOLDER = 'stats'
+        self.S3_CAMPAIGNS_FOLDER = 'campaigns'
+        self.rtb_client = ReportsApiSession(self.client_id, self.client_secret)
 
+    @logger
     def move_rtb_campaigns_to_raw(self):
-        self._save_to_s3(self.client_id, self.client_secret)
+        for acc in self.get_accounts():
+            self._fetch_and_save_campaigns(acc)
+            self._fetch_and_save_stats(acc)
 
-    def __make_request(self, client_id, client_secret):
-        api = ReportsApiSession(client_id, client_secret)
-        advertisers = api.get_advertisers()
-        stats = api.get_rtb_device_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                         self.execution_date.strftime('%Y-%m-%d'), ['day', 'deviceType'])
+    @logger
+    def get_accounts(self):
+        accounts = self.rtb_client.get_advertisers()
+        if not accounts:
+            logger.info('m=get_accounts, msg=No accounts found')
+            return []
+
+        return accounts
+
+    @logger(exclude='account')
+    def _fetch_and_save_campaigns(self, account):
+        campaigns_list = self.rtb_client.get_advertiser_campaigns(account['hash'])
+        campaigns_list = self.del_cols(['creativeIds'], campaigns_list)
+
+        for stat in campaigns_list:
+            stat['account_hash'] = account['hash']
+            stat['account_name'] = account['name']
+            stat['account_currency'] = account['currency']
+            stat['account_status'] = account['status']
+
+        self._save_to_s3(account['hash'], self.S3_CAMPAIGNS_FOLDER, campaigns_list)
+
+    @logger(exclude=['cols_list', 'dict_list'])
+    def del_cols(self, cols_list, dict_list):
+        for c in cols_list:
+            for d in dict_list:
+                del (d[c])
+        return dict_list
+
+    @logger(exclude='account')
+    def _fetch_and_save_stats(self, account):
+        stats_list = self._get_stats(account['hash'])
+        self._save_to_s3(account['hash'], self.S3_STATS_FOLDER, stats_list)
+
+    @logger
+    def _get_stats(self, advertiser_hash):
+        stats = self.rtb_client.get_rtb_stats(advertiser_hash,
+                                              self.execution_date.strftime('%Y-%m-%d'),
+                                              self.execution_date.strftime('%Y-%m-%d'),
+                                              ['day', 'deviceType', 'subcampaign'])
+
         # dpa values are not included in above request
-        dpa_stats = api.get_dpa_campaign_stats(advertisers[0]['hash'], self.execution_date.strftime('%Y-%m-%d'),
-                                               self.execution_date.strftime('%Y-%m-%d'), ['day'])
+        dpa_stats = self.rtb_client.get_dpa_campaign_stats(
+            advertiser_hash,
+            self.execution_date.strftime('%Y-%m-%d'),
+            self.execution_date.strftime('%Y-%m-%d'),
+            ['day'])
+
         for item in dpa_stats:
             item[u'deviceType'] = 'MOBILE'
 
-        # stats are the total number of clicks, costs etc
-        # advertisers are the information about our campaign (currency, start date etc)
-        return (stats + dpa_stats), advertisers
+        return stats + dpa_stats
 
-    def _save_to_s3(self, client_id, client_secret):
-        logger.info('m=_save_to_s3, client_id={}'.format(client_id))
-        dic_stats, array_ads = self.__make_request(client_id, client_secret)
-
-        dic_ads = array_ads[0]
-        columns_to_remove = ('ecc', 'roas', 'conversionsValue')
-
-        for i in range(len(dic_stats)):
-            for k in columns_to_remove:
-                del dic_stats[i][k]
-
-            columns_to_merge = ('status', 'name', 'url', 'hash', 'currency')
-            for j in columns_to_merge:
-                dic_stats[i][j] = dic_ads[j]
+    @logger(exclude='raw_data')
+    def _save_to_s3(self, id_account, entity_name, raw_data):
+        if not raw_data:
+            logger.info('m=_save_to_s3, msg=There\'s no data to be saved.')
+            return
 
         gz_body = BytesIO()
-        with GzipFile(fileobj=gz_body, mode='w') as fp:
-            for row in dic_stats:
-                fp.write((json.dumps(row, ensure_ascii=False)).encode('utf-8'))
+        for _dict in raw_data:
+            with GzipFile(fileobj=gz_body, mode='w') as fp:
+                fp.write((json.dumps(_dict, ensure_ascii=False)).encode('utf-8'))
                 fp.write('\n')
 
-        file_suffix = 'raw/marketing/rtb_campaigns/acc=default/dt={}/data.gz'.format(
+        s3_file_path = '{}/{}/acc={}/dt={}/data.gz'.format(
+            self.S3_DATA_LAKE_RAW_RTB_PATH, entity_name, id_account,
             self.execution_date.strftime('%Y-%m-%d'))
 
         BaseETL.obj_to_s3(
             obj_io=gz_body,
             bucket=self.s3_bucket,
-            file_path=file_suffix
+            file_path=s3_file_path
         )
+
+        logger.info('m=_save_to_s3, dest={}, msg=Saving RTBHouse data into s3 '
+                    'bucket'.format(s3_file_path))
 
         gz_body.seek(0)
         gz_body.flush()
 
     @logger
-    def move_rtb_campaigns_to_clean(self):
-        r_cols = OrderedDict([
-            ('status', str),
-            ('hash', str),
-            ('name', str),
-            ('currency', str),
-            ('url', str),
-            ('devicetype', str),
-            ('cost_attribution_date', str),
-            ('impscount', str),
-            ('clickscount', str),
-            ('ctr', str),
-            ('campaigncost', str),
-            ('conversionscount', str),
-            ('conversionsrate', str),
-            ('cpc', str)
-        ])
-
+    def move_rtb_stats_to_clean(self):
         c_cols = OrderedDict([
-            ('status', str),
-            ('hash', str),
-            ('name', str),
-            ('currency', str),
-            ('url', str),
-            ('device_type', str),
+            ('sub_campaign', str),
+            ('sub_campaign_hash', str),
             ('cost_attribution_date', str),
+            ('device_type', str),
             ('impressions_count', str),
             ('clicks_count', str),
             ('ctr', str),
-            ('campaign_cost', str),
+            ('cost', str),
             ('conversions_count', str),
-            ('conversions_rate', str),
-            ('cpc', str)
+            ('cr', str),
+            ('cpc', str),
+            ('ecps', str),
+            ('ecc', str),
+            ('roas', str),
+            ('conversions_value', str)
         ])
+
         self._move_to_clean(
-            table_name='marketing_rtb_campaigns',
-            sql_file_name='rtb_campaigns.sql',
-            r_cols=r_cols,
+            table_name='marketing_' + self.STATS_TABLE_NAME,
+            sql_file_name='stats.sql',
+            r_cols=c_cols,
             c_cols=c_cols
         )
 
-    # this method calls the query for both fact and dim tables
-    # the load table method will select if dim or fact
+    @logger
+    def move_rtb_sub_campaigns_to_clean(self):
+        c_cols = OrderedDict([
+            ('hash', str),
+            ('name', str),
+            ('status', str),
+            ('is_editable', str),
+            ('rate_card_id', str),
+            ('updated_at', str),
+            ('account_status', str),
+            ('placement', str),
+            ('account_hash', str),
+            ('account_name', str),
+            ('account_currency', str)
+        ])
+
+        self._move_to_clean(
+            table_name='marketing_' + self.CAMPAIGNS_TABLE_NAME,
+            sql_file_name='campaigns.sql',
+            r_cols=c_cols,
+            c_cols=c_cols
+        )
+
+    @logger
     def load_to_staging(self, dw_table_name):
-        query = self.__load_table(dw_table_name)
-        # this line will pass the attributes to the called query and format correctly
-        query = query.format(date=self.partition_date, account='default')
+        query = self._get_staging_table_query(dw_table_name)
+        query = query.format(date=self.partition_date)
         logger.info("m=load_to_staging, query={}".format(query))
+
         self._load_to_staging(dw_table_name, query)
 
-    def __load_table(self, table_name):
-        table_type = table_name.split('_')[0]
-        return getattr(self, '_load_{}_to_staging'.format(table_type))(table_name)
+    @staticmethod
+    @logger
+    def _table_type(table_name):
+        return table_name.split('_')[0]
 
-    # this is the method that returns the dim query
-    def _load_dim_to_staging(self, table_name):
-        dim_query = BaseETL.get_query_from_file_name(
+    @logger
+    def _delete_fact_rows(self, table_name, sk_date):
+        delete_query = "DELETE FROM staging.{table_name} " \
+                       "WHERE sk_date = {date}".format(table_name=table_name,
+                                                       date=sk_date)
+        logger.info("m=_delete_fact_rows, query={}".format(delete_query))
+
+        BaseETL.execute_command(
+            db_enum=EnumDB.BI_DW,
+            command=delete_query,
+            commit=True,
+            encoding='utf-8'
+        )
+
+    @logger
+    def _get_staging_table_query(self, table_name):
+        """
+        Gets the table query to select data from clean tables on Athena
+        If it's a fact table and staging is not empty,
+        then it'll load only the data of the execution day
+        """
+        full_load_query = BaseETL.get_query_from_file_name(
             '{}/marketing/{}/clean_to_staging/{}.sql'.format(
-                DATALAKE_QUERIES_DIR,
-                'rtb_campaigns',
-                table_name))
+                DATALAKE_QUERIES_DIR, self.INTEGRATION, table_name))
 
-        return dim_query
+        if self._table_type(table_name) == 'fact' and not self._is_staging_table_empty(
+                table_name):
+            sk_date = int(self.execution_date.strftime('%Y%m%d'))
+            self._delete_fact_rows(table_name, sk_date)
 
-    # this is the method that returns the fact query
-    def _load_fact_to_staging(self, table_name):
-        int_date = int(self.execution_date.strftime("%Y%m%d"))
+            daily_load_query = "{} \nWHERE sk_date = {};".format(full_load_query,
+                                                                 sk_date)
+            return daily_load_query
 
-        fact_query = BaseETL.get_query_from_file_name(
-            '{}/marketing/{}/clean_to_staging/{}.sql'.format(
-                DATALAKE_QUERIES_DIR,
-                'rtb_campaigns',
-                table_name))
-
-        empty = self._is_prod_table_empty(table_name)
-        if empty:
-            logger.info(
-                'm=load_to_staging, schema={}, table_name={}, msg=table already empty'.format(
-                    Marketing.SCHEMA_NAMES['prod'], table_name))
-        else:
-            delete_query = "DELETE FROM {schema}.{table_name} where sk_date = {date_partition}"
-
-            BaseETL.execute_command(
-                command=delete_query.format(
-                    schema=Marketing.SCHEMA_NAMES['staging'],
-                    table_name=table_name,
-                    date_partition=int_date),
-                db_enum=EnumDB.BI_DW,
-                encoding='utf-8',
-                commit=True
-            )
-
-            BaseETL.execute_command(
-                command=delete_query.format(
-                    schema=Marketing.SCHEMA_NAMES['prod'],
-                    table_name=table_name,
-                    date_partition=int_date),
-                db_enum=EnumDB.BI_DW,
-                encoding='utf-8',
-                commit=True
-            )
-
-        return fact_query
-
-    # this is the final method that load the data from clean to staging, using the
-    # queries returned above for both dims and facts
+        return full_load_query
 
     @logger(exclude="staging_query")
     def _load_to_staging(self, dw_table_name, staging_query, column_types=None):
 
-        logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
-            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+        logger.info("m=_load_to_staging, schema={}, table_name={}, "
+                    "msg=Inserting into dw".format(Marketing.SCHEMA_NAMES['staging'],
+                                                   dw_table_name))
 
-        df = self.athena_client.execute_query_and_return_dataframe(sql=staging_query)
+        pd_df = self.athena_client.execute_query_and_return_dataframe(sql=staging_query)
 
-        logger.info("m=_load_to_staging, schema={}, table_name={}, msg=inserting into staging table".format(
-            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+        logger.info(
+            "m=_load_to_staging, schema={}, table_name={}, msg=Inserting into staging "
+            "table".format(
+                Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
-        df_table = petl.fromdataframe(df=df)
+        df_table = petl.fromdataframe(df=pd_df)
 
         BaseETL.bulk_insert(
             table=df_table,
             table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
             db_enum=EnumDB.BI_DW,
             encoding='utf-8',
-            append=False,
-            commit=True,
+            append=(self._table_type(dw_table_name) != 'dim'),
+            commit=True
         )
 
-    # this is a simple method that select and copy all the table from staging to dw
-    # the select is not a separate query, it's just a select distinct * hard-coded
+    @logger
     def load_to_prod(self, table_name):
         self._load_to_prod(table_name)
