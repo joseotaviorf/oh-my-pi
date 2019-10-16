@@ -66,7 +66,8 @@ select
 	dhl.is_originals_active,
 	info_im.shorturl,
 	
--- Listing localization 	
+-- Listing localization
+    dr.sk_region,
 	dr.regional,
 	dr.city_group,
 	dr.city_name,

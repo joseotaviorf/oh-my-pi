@@ -114,6 +114,18 @@ def create_fact_photographer(**kwargs):
     ar.create_table_dw(table_name=table_name, append=True, dt=exec_date)
 
 
+def create_fact_photographer_hourly_allocations(**kwargs):
+    exec_date = kwargs['execution_date']
+    table_name = 'fact_photographer_hourly_allocations'
+    ar = Agent(bucket_datalake)
+    ar.clean_greater_than_daily_data_in_table(enum=EnumDB.BI_DW,
+                                              schema='public',
+                                              dim_name=table_name,
+                                              date_column='sk_slot_date',
+                                              dt=exec_date)
+    ar.create_table_dw(table_name=table_name, append=True, dt=exec_date)
+
+
 def create_dim_agent_review(**kwargs):
     exec_date = kwargs['execution_date']
     ar = Agent(bucket_datalake)
@@ -267,6 +279,15 @@ create_fact_photographer = BaseDAG.build_python_operator(
     op_kwargs=None
 )
 
+# Creates fact_photographer_hourly_allocations in DW
+create_fact_photographer_hourly_allocations = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='create_fact_photographer_hourly_allocations',
+    provide_context=True,
+    python_callable=create_fact_photographer_hourly_allocations,
+    op_kwargs=None
+)
+
 # Creates dim_agent_review in ODS
 create_dim_agent_review = BaseDAG.build_python_operator(
     dag=dag,
@@ -311,9 +332,11 @@ update_agent_region_ods >> group_agent_region_ods
 group_agent_region_ods >> load_group_agent_region_dw
 load_group_agent_region_dw >> create_dim_agent_region_dw
 create_dim_agent_region_dw.set_downstream(
-    [create_fact_photographer, create_fact_agent_daily_allocations, create_fact_agent_hourly_allocations])
+    [create_fact_photographer, create_fact_agent_daily_allocations, create_fact_agent_hourly_allocations,
+     create_fact_photographer_hourly_allocations])
 create_agent_contract_dw >> create_dim_agent_contract_type_dw_task >> create_fact_agent_daily_allocations
 create_fact_agent_daily_allocations >> xcom_fact_agent_daily_allocations
 create_dim_agent_review >> load_dim_agent_review_dw
 agent_status_history_task.set_downstream(
-    [create_fact_agent_daily_allocations, create_fact_photographer, create_fact_agent_hourly_allocations])
+    [create_fact_agent_daily_allocations, create_fact_photographer, create_fact_agent_hourly_allocations,
+     create_fact_photographer_hourly_allocations])
