@@ -19,11 +19,11 @@ with visits_booked as (
 	join fact_listing_rent_flows rf
 	  	on dd.sk_date = rf.sk_booking_created_date
 	  		and rf.sk_booking_created_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 visits_completed as (
-	select
+	selectdate('2019-09-30')
 		  dd."date",
 		  dd.sk_date,
 		  rf.sk_client,
@@ -43,7 +43,7 @@ visits_completed as (
 	join fact_listing_rent_flows rf
 	  	on dd.sk_date = rf.sk_visit_date
 	  		and rf.sk_visit_date > 0 and rf.flg_visit_completed = 1
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 offer_submitted as (
@@ -67,7 +67,7 @@ offer_submitted as (
 	join fact_listing_rent_flows rf
 	  	on dd.sk_date = rf.sk_offer_submitted_date
 	  		and rf.sk_offer_submitted_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 offer_approved as (
@@ -91,7 +91,7 @@ offer_approved as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_offer_approved_date
 	  and rf.sk_offer_approved_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 doc_sent as (
@@ -115,7 +115,7 @@ doc_sent as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_tenant_first_doc_sent_date
 	  and rf.sk_tenant_first_doc_sent_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 doc_completed as (
@@ -139,7 +139,7 @@ doc_completed as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_credit_analysis_init_date
 	  and rf.sk_credit_analysis_init_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 credit_processed as (
@@ -163,7 +163,7 @@ credit_processed as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_credit_analysis_end_date
 	  and rf.sk_credit_analysis_end_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 credit_approved as (
@@ -187,7 +187,7 @@ credit_approved as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_credit_analysis_approved_date
 	  and rf.sk_credit_analysis_approved_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 contract_created as (
@@ -211,7 +211,7 @@ contract_created as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_contract_created_date
 	  and rf.sk_contract_created_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 contract_signed as (
@@ -235,7 +235,7 @@ contract_signed as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_contract_signed_date
 	  and rf.sk_contract_signed_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 contract_ended as (
@@ -259,7 +259,7 @@ contract_ended as (
 	join fact_listing_rent_flows rf
 	  on dd.sk_date = rf.sk_contract_annulment_date
 	  and rf.sk_contract_signed_date > 0 and rf.sk_contract_annulment_date > 0
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 	group by 1,2,3,4
 ),
 union_demand_metrics as (
@@ -352,7 +352,7 @@ house_status_per_day as (
 	from house_status hsp
 	join dim_date dd
 		on dd.sk_date between hsp.sk_min_status_date and sk_max_status_date
-	where dd."date" >= date('2019-09-30')
+	where dd."date" > date('2019-09-30')
 ),
 published_listings as (
 	select
