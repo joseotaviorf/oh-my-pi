@@ -45,7 +45,10 @@ select distinct
   l.utmSource as utm_source,
   ua.id as usuario_que_indicou_id,
   l.codigoImobiliaria as codigo_imobiliaria,
-  coalesce(infosExtras like '%source=b2b_%', 0) as flg_b2b
+  coalesce(infosExtras like '%source=b2b_%', 0) as flg_b2b,
+  l.salePrice as sale_price,
+  coalesce(l.forRent+0, 1) as is_for_rent,
+  l.forSale+0 as is_for_sale
 from
   Lead l
 left join
