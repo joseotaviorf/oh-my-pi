@@ -20,6 +20,7 @@ create table public.fact_house_listing_flows (
 	dt_discarded timestamp without time zone,
 	user_id_lead_first_discarder integer,
 	user_id_lead_last_discarder integer,
+	is_self_service_photo_job_scheduled boolean,
 	flow character varying(255) DEFAULT NULL::character varying,
 	acquisition_method character varying(255) DEFAULT NULL::character varying,
 	acquisition_channel character varying(255) DEFAULT NULL::character varying,
