@@ -45,7 +45,10 @@ create table if not exists lead (
   utm_source varchar(255),
   usuario_que_indicou_id bigint,
   codigo_imobiliaria varchar(255),
-  flg_b2b boolean
+  flg_b2b boolean,
+  sale_price bigint,
+  is_for_rent smallint,
+  is_for_sale smallint
 );
 
 create unique index lead_id_idx on lead (id);
