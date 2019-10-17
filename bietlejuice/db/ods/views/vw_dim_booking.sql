@@ -58,6 +58,7 @@ bookings as (
 	    s.data
 				+ (("slotDia" * 15 / 60)+8) * interval '1 hour'
 				+ ("slotDia" * 15 % 60) * interval '1 minute'
+				+ interval '3 hour' -- Standardizing date columns as UTC
 			as dt_booking,
 	    s.tipo as type,
 	    s."fupVisita" is not null
