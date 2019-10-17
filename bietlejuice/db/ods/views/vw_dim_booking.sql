@@ -158,7 +158,6 @@ bookings as (
 	   	s.cancel_timestamp,
 	   	s."criadoEm" as dt_created,
 		s."atualizadoEm" as dt_updated,
-		now()::timestamp as dt_timestamp,
 		sources.app_type,
 		coalesce(sources.media_source, 'Unknown') as media_source,
 		sources.adjust_network,
@@ -241,7 +240,6 @@ select
 	b.cancel_timestamp,
 	b.dt_created,
 	b.dt_updated,
-	b.dt_timestamp,
 	b.last_update_source,
 	b.first_update_source,
 	b.visitor_arrived,
@@ -253,8 +251,15 @@ select
     b.successful_entrance,
     b.troublesome_entrance,
     b.checkin_status,
+    -- Columns in BRZ time
+    b.dt_booking - interval '3 hour' as ts_scheduling_brz,
+    b.cancel_timestamp - interval '3 hour' as ts_cancel_brz,
+    b.dt_created - interval '3 hour' as ts_created_brz,
+    b.dt_visit_follow_up - interval '3 hour' as ts_visit_follow_up_brz,
+    -- Columns used in demand taxonomy
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
+    -- Demand taxonomy
     case when td.mkt_flow is null then -1 else td.id end as sk_rent_flow_taxonomy,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
@@ -262,7 +267,8 @@ select
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_channel end as mkt_channel,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_medium end as mkt_medium,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_source end as mkt_source,
-	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_platform end as mkt_platform
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_platform end as mkt_platform,
+    now()::timestamp as ts_load
 from
 	bookings b
 left join taxonomy_demand td

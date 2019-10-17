@@ -34,7 +34,6 @@ create table if not exists dim_booking (
   dt_cancel timestamp,
   dt_created timestamp,
   dt_updated timestamp,
-  dt_timestamp timestamp,
   last_update_source varchar(255),
   first_update_source varchar(255),
   visitor_arrived varchar(255),
@@ -46,6 +45,10 @@ create table if not exists dim_booking (
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
   checkin_status varchar(255),
+  ts_scheduling_brz timestamp,
+  ts_cancel_brz timestamp,
+  ts_created_brz timestamp,
+  ts_visit_follow_up_brz timestamp,
   flg_branded boolean,
   flg_via_reschedule boolean,
   sk_rent_flow_taxonomy bigint,
@@ -55,5 +58,6 @@ create table if not exists dim_booking (
   mkt_channel varchar(255),
   mkt_medium varchar(255),
   mkt_source varchar(255),
-  mkt_platform varchar(255)
+  mkt_platform varchar(255),
+  ts_load timestamp
 );
