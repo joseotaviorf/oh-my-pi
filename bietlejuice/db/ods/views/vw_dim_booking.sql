@@ -56,11 +56,11 @@ bookings as (
 	    s.id as id_booking,
 	    r.id_reschedule is not null as is_rescheduled,
 	    -- Standardizing date columns as UTC
-	    timezone('UTC',
+	    timezone('America/Sao_Paulo',
 	        s.data
             + (("slotDia" * 15 / 60)+8) * interval '1 hour'
-            + ("slotDia" * 15 % 60) * interval '1 minute'
-            , at TIME zone 'America/Sao_Paulo')
+            + ("slotDia" * 15 % 60) * interval '1 minute')
+            at time zone ('UTC')
 		as dt_booking,
 	    s.tipo as type,
 	    s."fupVisita" is not null
@@ -254,11 +254,10 @@ select
     b.troublesome_entrance,
     b.checkin_status,
     -- Columns in BRZ time
-    -- ODS Postgres is configure in timezone 'America/Sao_Paulo'
-    timezone('UTC', b.dt_booking) as ts_scheduling_brz,
-    timezone('UTC', b.cancel_timestamp) as ts_cancel_brz,
-    timezone('UTC', b.dt_created) as ts_created_brz,
-    timezone('UTC', b.dt_visit_follow_up) as ts_visit_follow_up_brz,
+    TIMEZONE('UTC', b.dt_booking) at time zone 'America/Sao_Paulo' as ts_scheduling_brz,
+    TIMEZONE('UTC', b.cancel_timestamp) at time zone 'America/Sao_Paulo'  as ts_cancel_brz,
+    TIMEZONE('UTC', b.dt_created) at time zone 'America/Sao_Paulo' as ts_created_brz,
+    TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'America/Sao_Paulo' as ts_visit_follow_up_brz,
     -- Columns used in demand taxonomy
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
