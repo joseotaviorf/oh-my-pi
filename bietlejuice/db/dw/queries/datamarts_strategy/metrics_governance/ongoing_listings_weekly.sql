@@ -25,9 +25,7 @@ select
     fhs.month_end,
     fhs.order_status,
     fhs.status_history,
-    dr.city_name,
-    dr.city_group,
-    dr.regional
+    fhl.sk_region
 from daily_published_listings fhs
 left join fact_house_listings fhl
   on fhs.sk_house_listing = fhl.sk_house_listing
