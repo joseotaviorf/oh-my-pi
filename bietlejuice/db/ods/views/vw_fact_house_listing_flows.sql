@@ -155,9 +155,9 @@ fact_with_reproc as (
             or b2b_prime.id_lead is not null
             , false) as is_b2b
     from fact_house_listing_flows fhlf
-    left join lead l 
+    left join lead l
       on l.id = fhlf.lead_id
-    left join reproc_leads rl 
+    left join reproc_leads rl
       on rl.id = fhlf.lead_id
     left join house h
       on h.id = fhlf.imovel_id
@@ -178,8 +178,9 @@ fact_with_reproc as (
     left join portability port
         on port.id_house = hl.id_house
         and port.owner_type = 'B2B'
+    where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
   )
-  select 
+  select
     acquisition_channels.id,
     acquisition_channels.lead_id,
     acquisition_channels.conversao_id,
@@ -224,9 +225,9 @@ fact_with_reproc as (
     acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
     acquisition_channels.is_b2b
   from acquisition_channels
-), 
+),
 acquisitions as (
-  select 
+  select
     f.id,
     case
       when d.imovel_id is not null and f.is_not_reprocessed then 'Lead Flow'
@@ -249,18 +250,18 @@ acquisitions as (
       else f.acquisition_source = 'Doorman'
     end as is_doorman
   from fact_with_reproc f
-  left join legacy_doorman d 
+  left join legacy_doorman d
     on f.imovel_id = d.imovel_id
-), 
+),
 leads_b2b as (
   select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id,
     pa_b2b_prime.partner_id as prime_partner_id
   from lead l
-  left join usuario u_b2b_prime 
+  left join usuario u_b2b_prime
     on u_b2b_prime.telefone_principal = l.telefone_anunciante
-  left join partner_agent pa_b2b_prime 
+  left join partner_agent pa_b2b_prime
     on pa_b2b_prime.user_id = u_b2b_prime.id
   left join partner_agent pa_b2b_online 
     on pa_b2b_online.user_id = l.usuario_que_indicou_id
