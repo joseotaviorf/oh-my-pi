@@ -34,6 +34,8 @@ select
   extra_income_origin,
   extra_income_value,
   proposal_id,
-  boavista_score
+  boavista_score,
+  serasa_score,
+  screening_result_id
 from "Proponent"
 ;

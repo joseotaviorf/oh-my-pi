@@ -35,7 +35,9 @@ create external table datalake_raw.sortinghat_proponent (
   extra_income_origin string,
   extra_income_value string,
   proposal_id string,
-  boavista_score string
+  boavista_score string,
+  serasa_score string,
+  screening_result_id string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
