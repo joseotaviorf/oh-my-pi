@@ -25,6 +25,7 @@ select
     fhs.month_end,
     fhs.order_status,
     fhs.status_history,
+    fhl.sk_region,
     dr.city_name,
     dr.city_group,
     dr.regional
