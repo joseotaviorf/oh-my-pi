@@ -253,7 +253,7 @@ select
     b.successful_entrance,
     b.troublesome_entrance,
     b.checkin_status,
-    -- Columns in BRZ time
+    -- Columns in local time
     TIMEZONE('UTC', b.dt_booking) at time zone 'Brazil/East' as ts_scheduling_local,
     TIMEZONE('UTC', b.cancel_timestamp) at time zone 'Brazil/East'  as ts_cancel_local,
     TIMEZONE('UTC', b.dt_created) at time zone 'Brazil/East' as ts_created_local,
