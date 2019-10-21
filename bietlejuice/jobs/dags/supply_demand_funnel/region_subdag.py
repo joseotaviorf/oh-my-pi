@@ -57,7 +57,8 @@ class RegionSubDag(DimSubDag):
         airflow_helpers.chain(save_polygons_geojson_to_local,
                               convert_polygons_geojson_to_topojson,
                               upload_polygons_topojson_to_s3)
-        dim_region.set_upstream([agent_region, region, load_aux_regiao_to_datalake_task])
+        load_aux_regiao_to_datalake_task.set_downstream([agent_region, region])
+        dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
         load_region.set_upstream(tests_tasks)
 
@@ -74,7 +75,8 @@ class RegionSubDag(DimSubDag):
                 'table_name': 'DadosAgente_Regiao',
                 'copy_to_clean': False,
                 'bucket': DimSubDag.S3_BUCKET
-            }
+            },
+            trigger_rule='all_done'
         )
 
         region = BaseDAG.build_python_operator(
@@ -84,7 +86,8 @@ class RegionSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'region',
                 'bucket': DimSubDag.S3_BUCKET
-            }
+            },
+            trigger_rule='all_done'
         )
 
         polygon_region = BaseDAG.build_python_operator(
