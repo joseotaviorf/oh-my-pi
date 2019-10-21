@@ -48,7 +48,7 @@ class RegionSubDag(DimSubDag):
          upload_polygons_topojson_to_s3,
          dim_region,
          load_region,
-         load_aux_regiao_to_datalake_task) = self.__build_data_tasks(
+         load_aux_regiao_to_datalake_and_ods_task) = self.__build_data_tasks(
             region_dag)
 
         tests_tasks = self.build_tests_tasks(region_dag)
@@ -57,7 +57,7 @@ class RegionSubDag(DimSubDag):
         airflow_helpers.chain(save_polygons_geojson_to_local,
                               convert_polygons_geojson_to_topojson,
                               upload_polygons_topojson_to_s3)
-        load_aux_regiao_to_datalake_task.set_downstream([agent_region, region])
+        load_aux_regiao_to_datalake_and_ods_task.set_downstream([agent_region, region])
         dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
         load_region.set_upstream(tests_tasks)
@@ -143,10 +143,10 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        load_aux_regiao_to_datalake_task = BaseDAG.build_python_operator(
+        load_aux_regiao_to_datalake_and_ods_task = BaseDAG.build_python_operator(
             dag=dag,
-            task_id='load_aux_regiao_to_datalake_task',
-            python_callable=self.load_google_sheet_files_to_datalake,
+            task_id='load_aux_regiao_to_datalake_and_ods_task',
+            python_callable=self.load_google_sheet_files_to_datalake_and_ods,
             op_kwargs={'files': GOOGLE_SHEETS_FILES['regiao']}
         )
 
@@ -158,7 +158,7 @@ class RegionSubDag(DimSubDag):
                 upload_polygons_topojson_to_s3,
                 dim_region,
                 load_region,
-                load_aux_regiao_to_datalake_task
+                load_aux_regiao_to_datalake_and_ods_task
                 )
 
     @logger
@@ -234,10 +234,12 @@ class RegionSubDag(DimSubDag):
         )
 
     @logger
-    def load_google_sheet_files_to_datalake(self, files):
+    def load_google_sheet_files_to_datalake_and_ods(self, files):
         athena_client = AthenaClient(s3_bucket)
         gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                           google_api_scope=GOOGLE_API_SCOPE)
         gs.move_sheets_data_to_destination(google_sheets_files=files,
                                            enumdb_destination=EnumDB.QuintoAndar_datalake,
                                            athena_client=athena_client)
+        gs.move_sheets_data_to_destination(google_sheets_files=files,
+                                           enumdb_destination=EnumDB.BI_ODS)
