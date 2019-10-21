@@ -53,7 +53,7 @@ select
   id_rent_flow,
   actions,
   ts_start,
-  receiver_name,
+  REPLACE(receiver_name, ',', '') as receiver_name,
   ts_completed,
   "comment",
   id_origin,
