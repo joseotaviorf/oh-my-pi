@@ -176,7 +176,10 @@ select
     aat.name as key_location,
     rt.name as visit_restriction,
     i.predictedPrice as predicted_price,
-    hrs.registrationAbandonedReason as registration_abandoned_reason
+    hrs.registrationAbandonedReason as registration_abandoned_reason,
+  salePrice as sale_price,
+  coalesce(forRent+0, 1) as is_for_rent,
+  forSale+0 as is_for_sale
 from
   Imovel i
 left join

@@ -55,6 +55,9 @@ create external table if not exists datalake_clean.ods_dim_lead (
   score_factor string,
   is_b2b string,
   b2b_type string,
+  sale_price string,
+  is_for_rent string,
+  is_for_sale string,
   load_timestamp string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

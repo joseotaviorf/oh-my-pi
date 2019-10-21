@@ -102,7 +102,6 @@ class LeadsReprocessor(object):
                                        str) if 'infosExtras' in df_leads.columns else '') +
                                    '; id_origin_lead=' +
                                    df_leads['id'].astype(str)).str.strip()
-        df_leads.drop(columns=['id'], inplace=True)
 
         # Change origin
         df_leads['origem'] = 'Reprocessado'

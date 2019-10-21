@@ -54,5 +54,8 @@ create table if not exists dim_lead (
   score_factor bigint,
   is_b2b boolean,
   b2b_type varchar,
+  sale_price bigint,
+  is_for_rent boolean,
+  is_for_sale boolean,
   load_timestamp timestamp without time zone
 ) ;
