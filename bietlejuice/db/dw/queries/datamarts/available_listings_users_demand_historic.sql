@@ -23,7 +23,7 @@ with visits_booked as (
 	group by 1,2,3,4
 ),
 visits_completed as (
-	selectdate('2019-09-30')
+	select
 		  dd."date",
 		  dd.sk_date,
 		  rf.sk_client,
