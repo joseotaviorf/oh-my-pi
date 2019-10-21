@@ -56,7 +56,7 @@ bookings as (
 	    s.id as id_booking,
 	    r.id_reschedule is not null as is_rescheduled,
 	    -- Standardizing date columns as UTC
-	    timezone('America/Sao_Paulo',
+	    timezone('Brazil/East',
 	        s.data
             + (("slotDia" * 15 / 60)+8) * interval '1 hour'
             + ("slotDia" * 15 % 60) * interval '1 minute')
@@ -254,10 +254,10 @@ select
     b.troublesome_entrance,
     b.checkin_status,
     -- Columns in BRZ time
-    TIMEZONE('UTC', b.dt_booking) at time zone 'America/Sao_Paulo' as ts_scheduling_brz,
-    TIMEZONE('UTC', b.cancel_timestamp) at time zone 'America/Sao_Paulo'  as ts_cancel_brz,
-    TIMEZONE('UTC', b.dt_created) at time zone 'America/Sao_Paulo' as ts_created_brz,
-    TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'America/Sao_Paulo' as ts_visit_follow_up_brz,
+    TIMEZONE('UTC', b.dt_booking) at time zone 'Brazil/East' as ts_scheduling_local,
+    TIMEZONE('UTC', b.cancel_timestamp) at time zone 'Brazil/East'  as ts_cancel_local,
+    TIMEZONE('UTC', b.dt_created) at time zone 'Brazil/East' as ts_created_local,
+    TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'Brazil/East' as ts_visit_follow_up_local,
     -- Columns used in demand taxonomy
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
