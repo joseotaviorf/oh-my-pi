@@ -34,7 +34,6 @@ create external table if not exists datalake_clean.ods_dim_booking (
   dt_cancel string,
   dt_created string,
   dt_updated string,
-  dt_timestamp string,
   last_update_source string,
   first_update_source string,
   visitor_arrived string,
@@ -46,6 +45,10 @@ create external table if not exists datalake_clean.ods_dim_booking (
   successful_entrance string,
   troublesome_entrance string,
   checkin_status string,
+  ts_scheduling_local string,
+  ts_cancel_local string,
+  ts_created_local string,
+  ts_visit_follow_up_local string,
   flg_branded string,
   flg_via_reschedule string,
   sk_rent_flow_taxonomy string,
@@ -56,7 +59,8 @@ create external table if not exists datalake_clean.ods_dim_booking (
   mkt_channel_type string,
   mkt_channel string,
   mkt_medium string,
-  mkt_source string
+  mkt_source string,
+  ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

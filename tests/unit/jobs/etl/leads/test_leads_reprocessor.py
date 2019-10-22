@@ -63,9 +63,9 @@ class TestLeadsReprocessor(object):
 
     @pytest.mark.parametrize('input, expected',
                              [(pd.DataFrame(data=[[1, 'test', '']], columns=['id', 'infosExtras', 'origem']),
-                               '[{"infosExtras":"infosExtras test; id_origin_lead=1","origem":"Reprocessado"}]'),
+                               '[{"id":1,"infosExtras":"infosExtras test; id_origin_lead=1","origem":"Reprocessado"}]'),
                               (pd.DataFrame(data=[[1, '']], columns=['id', 'origem']),
-                               '[{"origem":"Reprocessado","infosExtras":"infosExtras; id_origin_lead=1"}]')])
+                               '[{"id":1,"origem":"Reprocessado","infosExtras":"infosExtras; id_origin_lead=1"}]')])
     def test__treat_leads_with_id(self, leads_reprocessor, input, expected):
         # arrange
         leads_reprocessor.infosExtras = 'infosExtras'
