@@ -55,10 +55,13 @@ bookings as (
 	    s.id as sk_booking,
 	    s.id as id_booking,
 	    r.id_reschedule is not null as is_rescheduled,
-	    s.data
-				+ (("slotDia" * 15 / 60)+8) * interval '1 hour'
-				+ ("slotDia" * 15 % 60) * interval '1 minute'
-			as dt_booking,
+	    -- Standardizing date columns as UTC
+	    timezone('Brazil/East',
+	        s.data
+            + (("slotDia" * 15 / 60)+8) * interval '1 hour'
+            + ("slotDia" * 15 % 60) * interval '1 minute')
+            at time zone ('UTC')
+		as dt_booking,
 	    s.tipo as type,
 	    s."fupVisita" is not null
 	      and s."fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
@@ -157,7 +160,6 @@ bookings as (
 	   	s.cancel_timestamp,
 	   	s."criadoEm" as dt_created,
 		s."atualizadoEm" as dt_updated,
-		now()::timestamp as dt_timestamp,
 		sources.app_type,
 		coalesce(sources.media_source, 'Unknown') as media_source,
 		sources.adjust_network,
@@ -240,7 +242,6 @@ select
 	b.cancel_timestamp,
 	b.dt_created,
 	b.dt_updated,
-	b.dt_timestamp,
 	b.last_update_source,
 	b.first_update_source,
 	b.visitor_arrived,
@@ -252,8 +253,15 @@ select
     b.successful_entrance,
     b.troublesome_entrance,
     b.checkin_status,
+    -- Columns in local time
+    TIMEZONE('UTC', b.dt_booking) at time zone 'Brazil/East' as ts_scheduling_local,
+    TIMEZONE('UTC', b.cancel_timestamp) at time zone 'Brazil/East'  as ts_cancel_local,
+    TIMEZONE('UTC', b.dt_created) at time zone 'Brazil/East' as ts_created_local,
+    TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'Brazil/East' as ts_visit_follow_up_local,
+    -- Columns used in demand taxonomy
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
+    -- Demand taxonomy
     case when td.mkt_flow is null then -1 else td.id end as sk_rent_flow_taxonomy,
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
@@ -261,7 +269,8 @@ select
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_channel end as mkt_channel,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_medium end as mkt_medium,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_source end as mkt_source,
-	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_platform end as mkt_platform
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_platform end as mkt_platform,
+    now()::timestamp as ts_load
 from
 	bookings b
 left join taxonomy_demand td

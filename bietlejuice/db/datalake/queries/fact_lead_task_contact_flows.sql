@@ -57,3 +57,4 @@ LEFT JOIN mailing_list_updated_max m1 on m1.codigo = r.task_id
 LEFT JOIN mailing_list_updated_min m2 on m2.codigo = r.task_id
 LEFT JOIN first_call events on events.task_id = t.id
 LEFT JOIN datalake_raw.autodialer_mailing_list_conf mlc on mlc.id = m1.easy_disc_mailing_conf_id
+WHERE cast(coalesce(NULLIF(l.forrent, ''), '1') as boolean)
