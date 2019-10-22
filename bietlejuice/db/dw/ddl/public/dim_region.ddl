@@ -12,7 +12,7 @@ create table if not exists dim_region (
   city_ddd varchar(2),
   region_code varchar,
   region_code_deprecated varchar,
-  region_code_inspector varchar,
+  region_code_inspector varchar(10),
   short_region_name varchar,
   greater_region varchar,
   regional varchar,
