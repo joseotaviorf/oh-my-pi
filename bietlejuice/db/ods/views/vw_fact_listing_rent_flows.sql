@@ -158,7 +158,7 @@ _fact as (
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
     left join vw_dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
-    where vdh.is_for_rent::int:boolean
+    where vdh.is_for_rent::int::boolean
 )
 select
   ods_id,
