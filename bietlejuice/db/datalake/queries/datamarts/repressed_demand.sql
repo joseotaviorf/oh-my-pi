@@ -113,7 +113,7 @@ encaixe_to_booking as (
 ),
 encaixes_raw as (
   select
-        cast(regexp_extract(trim(evt.event_time), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as event_date,
+        cast(SUBSTR(trim(evt.event_time), 1,19)as timestamp) as event_date,
         trim(evt.user_id) as user_id,
         trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '')) as house_id,
         cast(date_parse(cast(json_extract(event_properties, '$.alert_target_date') as varchar), '%a, %d %b %Y %T GMT') as date) as target_date,
