@@ -13,6 +13,7 @@ SELECT
   ar.ddd as city_ddd,
   ar.region_code as region_code,
   ar.region_code_deprecated as region_code_deprecated,
+  ar.region_code_inspector as region_code_inspector,
 	ar.state as short_region_name,
 	case
 		when coalesce(r."cidadeNome", ar.city) in ('Rio de Janeiro') then coalesce(r."cidadeNome", ar.city)
@@ -49,7 +50,7 @@ left join
 	) i
   on i.regiao_id = r.id
 left join
-	files.aux_regiao ar
+	gsheets.aux_regiao ar
 	on r.id = ar.id
 left join
 	(
