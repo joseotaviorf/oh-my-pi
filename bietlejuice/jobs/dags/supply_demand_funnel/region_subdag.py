@@ -4,12 +4,21 @@ from datetime import datetime
 import airflow.utils.helpers as airflow_helpers
 from airflow.operators.bash_operator import BashOperator
 from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, ODS_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
+from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
+from bietlejuice.jobs.dags.util import environment as env
+
+s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
+GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
+GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('BI_AUX_REGIAO_GOOGLE_SHEETS_FILES'))
+
 
 logger = QuintoAndarLogger('RegionSubDag')
 
@@ -38,7 +47,8 @@ class RegionSubDag(DimSubDag):
          convert_polygons_geojson_to_topojson,
          upload_polygons_topojson_to_s3,
          dim_region,
-         load_region) = self.__build_data_tasks(
+         load_region,
+         load_aux_regiao_to_datalake_and_ods_task) = self.__build_data_tasks(
             region_dag)
 
         tests_tasks = self.build_tests_tasks(region_dag)
@@ -47,6 +57,7 @@ class RegionSubDag(DimSubDag):
         airflow_helpers.chain(save_polygons_geojson_to_local,
                               convert_polygons_geojson_to_topojson,
                               upload_polygons_topojson_to_s3)
+        load_aux_regiao_to_datalake_and_ods_task.set_downstream([agent_region, region])
         dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
         load_region.set_upstream(tests_tasks)
@@ -64,7 +75,8 @@ class RegionSubDag(DimSubDag):
                 'table_name': 'DadosAgente_Regiao',
                 'copy_to_clean': False,
                 'bucket': DimSubDag.S3_BUCKET
-            }
+            },
+            trigger_rule='all_done'
         )
 
         region = BaseDAG.build_python_operator(
@@ -74,7 +86,8 @@ class RegionSubDag(DimSubDag):
             op_kwargs={
                 'dim_name': 'region',
                 'bucket': DimSubDag.S3_BUCKET
-            }
+            },
+            trigger_rule='all_done'
         )
 
         polygon_region = BaseDAG.build_python_operator(
@@ -130,6 +143,13 @@ class RegionSubDag(DimSubDag):
             }
         )
 
+        load_aux_regiao_to_datalake_and_ods_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='load_aux_regiao_to_datalake_and_ods_task',
+            python_callable=self.load_google_sheet_files_to_datalake_and_ods,
+            op_kwargs={'files': GOOGLE_SHEETS_FILES['regiao']}
+        )
+
         return (agent_region,
                 region,
                 polygon_region,
@@ -137,7 +157,8 @@ class RegionSubDag(DimSubDag):
                 convert_polygons_geojson_to_topojson,
                 upload_polygons_topojson_to_s3,
                 dim_region,
-                load_region
+                load_region,
+                load_aux_regiao_to_datalake_and_ods_task
                 )
 
     @logger
@@ -211,3 +232,14 @@ class RegionSubDag(DimSubDag):
             dir_path=dir_path,
             bucket_folder_path=bucket_folder_path_prefix
         )
+
+    @logger
+    def load_google_sheet_files_to_datalake_and_ods(self, files):
+        athena_client = AthenaClient(s3_bucket)
+        gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
+                          google_api_scope=GOOGLE_API_SCOPE)
+        gs.move_sheets_data_to_destination(google_sheets_files=files,
+                                           enumdb_destination=EnumDB.QuintoAndar_datalake,
+                                           athena_client=athena_client)
+        gs.move_sheets_data_to_destination(google_sheets_files=files,
+                                           enumdb_destination=EnumDB.BI_ODS)

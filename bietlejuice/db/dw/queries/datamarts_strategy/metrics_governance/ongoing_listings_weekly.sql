@@ -1,9 +1,8 @@
 with
-daily_published_and_suspended_listings as (
+daily_published_listings as (
 select
     f.sk_house_listing,
     f.status_history,
-    f.status_change_reason,
     d.date,
     d.week_start,
     d.weekday_name,
@@ -13,10 +12,10 @@ select
 from fact_house_listing_status f
 join dim_date d
   on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
-where f.status_history in ('publicado','suspenso') -- consider published and suspended status
+where f.status_history = 'publicado' -- consider only published status
   and substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
 ),
-daily_published_suspended_listings_adjusted as (
+daily_published_listings_adjusted as (
 select
     fhs.sk_house_listing,
     fhs.date,
@@ -26,19 +25,18 @@ select
     fhs.month_end,
     fhs.order_status,
     fhs.status_history,
-    fhs.status_change_reason,
-    date_diff('week', dhl.ts_publication, fhs.week_start) as weeks_since_publication
-from daily_published_and_suspended_listings fhs
-left join dim_house_listing dhl
-  on fhs.sk_house_listing = dhl.sk_house_listing
-where fhs.order_status = 1 -- consider last status on the day
+    fhl.sk_region
+from daily_published_listings fhs
+left join fact_house_listings fhl
+  on fhs.sk_house_listing = fhl.sk_house_listing
+left join dim_region dr
+  on fhl.sk_region = dr.sk_region
+where fhs.order_status = 1
   and fhs.weekday_name = 'Sunday' -- filter that indicates it will be grouped by week
 )
 select
-	week_start,
-	weeks_since_publication,
-	status_history,
-	case when status_history = 'suspenso' then status_change_reason	else null end as status_change_reason,
-	sk_house_listing
-from daily_published_suspended_listings_adjusted
-;
+    week_start,
+    sk_region,
+    count(distinct sk_house_listing) as ongoing_listings_weekly
+from daily_published_listings_adjusted
+group by 1, 2
