@@ -18,6 +18,7 @@ select
 	dt_discarded,
 	user_id_lead_first_discarder,
 	user_id_lead_last_discarder,
+	is_self_service_photo_job_scheduled,
 	flow,
 	acquisition_method,
 	acquisition_channel,
@@ -102,7 +103,8 @@ from
 		base.acquisition_channel,
 		base.acquisition_source,
 		l.cidade,
-		l.bairro
+		l.bairro,
+		(first_rev_photo_job_user.id is not null) as is_self_service_photo_job_scheduled
 	from
 	(
 		select
@@ -415,6 +417,17 @@ from
 	left join
 		(select imovel_id, min(id) as id from JobFotografo group by imovel_id) first_job
 		on base.imovel_id = first_job.imovel_id
+	-- The following 3 joins are to identify if the first photo job was scheduled via self service
+    left join
+        (select id, min(REV) as REV from JobFotografo_AUD group by 1) first_rev_photo_job
+        on first_job.id = first_rev_photo_job.id
+    left join
+        UsuarioRevisionEntity first_rev_photo_job_ure
+            on first_rev_photo_job_ure.id = first_rev_photo_job.REV
+    left join
+        Usuario first_rev_photo_job_user
+            on first_rev_photo_job_user.id = first_rev_photo_job_ure.usuario_id
+            and first_rev_photo_job_user.dadosVendedor_id is null
 	left join
 		JobFotografo jf
 		on jf.id = first_job.id

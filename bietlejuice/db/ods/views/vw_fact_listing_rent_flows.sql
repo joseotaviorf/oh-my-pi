@@ -22,142 +22,143 @@ with _reservation as (
 ),
 _fact as (
 	select
-	  hrf.id_house_rent_flow as ods_id,
-	  coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house_listing,
-	  hrf.id_house,
-	  coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
-	  coalesce(to_char(vdh.ts_listing_version_start, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
-	  vdh.ts_listing_version_start as dt_house_listing,
-	  coalesce(to_char(vdh.ts_last_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
-	  coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
-	  coalesce(vfhl.sk_region, -1) as sk_region,
-	  coalesce(vfhl.sk_condo, -1) as sk_condo,
-	  coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
-	  coalesce(hrf.id_booking, -1) as sk_booking,
-	  coalesce(to_char(hrf.dt_booking_created, 'YYYYMMDD')::integer, -1) as sk_booking_created_date,
-	  hrf.dt_booking_created,
-	  coalesce(to_char(hrf.dt_visit, 'YYYYMMDD')::integer, -1) as sk_visit_date,
-	  hrf.dt_visit,
-	  hrf.visit_completed as flg_visit_completed,
-	  hrf.visit_performed as flg_visit_performed,
-	  coalesce(hrf.id_owner, -1) as sk_owner,
-	  coalesce(hrf.id_user_agent, -1) as sk_user_agent,
-	  coalesce(to_char(hrf.dt_agent_sign_up, 'YYYYMMDD')::integer, -1) as sk_agent_sign_up_date,
-	  coalesce(hrf.id_client, -1) as sk_client,
-	  coalesce(to_char(hrf.dt_client_sign_up, 'YYYYMMDD')::integer, -1) as sk_client_sign_up_date,
-	  hrf.dt_client_sign_up,
-	  coalesce(hrf.id_visit, -1) as sk_visit,
-	  coalesce(vdo.sk_offer, -1) as sk_offer,
-	  coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
-	  vdo.dt_first_sent as dt_offer_submitted,
-	  case
-	    when vdo.status = 'Aprovada'
-	      then coalesce(to_char(vdo.dt_analysis, 'YYYYMMDD')::integer, -1)
-	    else -1
-	  end as sk_offer_approved_date,
-	  case
-	    when vdo.status = 'Aprovada'
-	      then vdo.dt_analysis
-	    else null::timestamp
-	  end as dt_offer_approved,
-	  case
-	    when vdo.status in ('Aprovada', 'Rejeitada')
-	      then vdo.dt_analysis
-	    else null::timestamp
-	  end dt_internal_analysis,
-	  coalesce(hrf.id_proposal, -1) as sk_proposal,
-	  coalesce(to_char(hrf.dt_proposal_approved, 'YYYYMMDD')::integer, -1) as sk_proposal_approved_date,
-	  hrf.dt_proposal_approved,
-	  coalesce(to_char(vdp.dt_tenant_first_document_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_manual_first_doc_sent_date,
-	  coalesce(to_char(vdp.dt_tenant_auto_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_auto_first_doc_sent_date,
-	  vdp.dt_tenant_first_document_sent as dt_tenant_manual_first_doc_sent,
-	  vdp.dt_tenant_auto_first_doc_sent,
-	  coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) as dt_tenant_first_doc_sent,
-	  dt_owner_document_sent as dt_owner_document_sent,
-	  case
-      when vdp.status in ('Aprovada', 'Rejeitada')
-       then vdp.dt_updated
-      else null::timestamp
-    end as dt_credit_analysis, -- old credit analysis date
-	  coalesce(hrf.id_contract, -1) as sk_contract,
-	  coalesce(to_char(hrf.dt_contract_created, 'YYYYMMDD')::integer, -1) as sk_contract_created_date,
-	  hrf.dt_contract_created,
-	  coalesce(to_char(hrf.dt_contract_signed, 'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
-	  hrf.dt_contract_signed,
-	  coalesce(to_char(hrf.dt_contract_annulment, 'YYYYMMDD')::integer, -1) as sk_contract_annulment_date,
-	  case
-      when c.status in ('Ativo', 'Finalizado')
-          then c.ts_signature
-      else null::timestamp
-    end as ts_contract_valid_signature,
-    coalesce(to_char(c.ts_canceled, 'YYYYMMDD')::integer, -1) as sk_contract_canceled_date,
-    c.ts_canceled as ts_contract_canceled,
-    coalesce(to_char(vdp.dt_credit_analysis_init, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_init_date,
-    vdp.dt_credit_analysis_init,
-    coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_end_date,
-    vdp.dt_credit_analysis_end,
-    case
-      when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
-        then coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1)
-      else -1
-    end as sk_credit_analysis_approved_date,
-    case
-      when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
-        then vdp.dt_credit_analysis_end
-      else null::timestamp
-    end as dt_credit_analysis_approved,
-    coalesce(to_char(vdp.ts_processed, 'YYYYMMDD')::integer, -1) as sk_proposal_processed_date,
-    vdp.ts_processed as ts_proposal_processed,
-    case
-    when vdp.status = 'Rejeitada'
-      then vdp.ts_processed
-    else null::timestamp
-    end as ts_proposal_rejected,
-    vdp.status as proposal_status,
-    vdp.tenant_document_sent as has_tenant_sent_doc,
-	  hrf.visit_created_from_app as flg_visit_created_from_app,
-	  hrf.visit_created_type,
-	  hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
-	  coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
-	  now()::timestamp as ts_load,
-    coalesce(rs.id, -1) as sk_reservation,
-    coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
-    rs.reservation_attempts as reservation_attempts,
-    vdb.sk_rent_flow_taxonomy,
-    vdb.utm_campaign as booking_utm_campaign,
-    vdb.utm_content as booking_utm_content,
-  	vdb.utm_term as booking_utm_term
-	from house_rent_flow hrf
-	left join vw_dim_house_listing vdh
-	  on vdh.id_house = hrf.id_house
-	  	and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01')
-		                                              and coalesce(vdh.ts_listing_version_end, now())
-  left join vw_fact_house_listings vfhl
-    on vfhl.sk_house_listing = vdh.sk_house_listing
-  left join vw_dim_offer vdo
-    on vdo.sk_offer = case
-                        when hrf.id_offer > 0
-                          then (hrf.id_offer * 100) + 2
-                        when hrf.id_pre_proposal > 0
-                          then (hrf.id_pre_proposal * 100) + 1
-                        else -1
-                      end
+        hrf.id_house_rent_flow as ods_id,
+        coalesce((hrf.id_house || lpad(coalesce(vdh."version"::varchar(3), '1'), 3, '0'))::bigint, -1::bigint) as sk_house_listing,
+        hrf.id_house,
+        coalesce(to_char(hrf.dt_house_first_listing, 'YYYYMMDD')::integer, -1) as sk_house_first_listing_date,
+        coalesce(to_char(vdh.ts_listing_version_start, 'YYYYMMDD')::integer, -1) as sk_house_listing_date,
+        vdh.ts_listing_version_start as dt_house_listing,
+        coalesce(to_char(vdh.ts_last_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
+        coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
+        coalesce(vfhl.sk_region, -1) as sk_region,
+        coalesce(vfhl.sk_condo, -1) as sk_condo,
+        coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
+        coalesce(hrf.id_booking, -1) as sk_booking,
+        coalesce(to_char(hrf.dt_booking_created, 'YYYYMMDD')::integer, -1) as sk_booking_created_date,
+        hrf.dt_booking_created,
+        coalesce(to_char(hrf.dt_visit, 'YYYYMMDD')::integer, -1) as sk_visit_date,
+        hrf.dt_visit,
+        hrf.visit_completed as flg_visit_completed,
+        hrf.visit_performed as flg_visit_performed,
+        coalesce(hrf.id_owner, -1) as sk_owner,
+        coalesce(hrf.id_user_agent, -1) as sk_user_agent,
+        coalesce(to_char(hrf.dt_agent_sign_up, 'YYYYMMDD')::integer, -1) as sk_agent_sign_up_date,
+        coalesce(hrf.id_client, -1) as sk_client,
+        coalesce(to_char(hrf.dt_client_sign_up, 'YYYYMMDD')::integer, -1) as sk_client_sign_up_date,
+        hrf.dt_client_sign_up,
+        coalesce(hrf.id_visit, -1) as sk_visit,
+        coalesce(vdo.sk_offer, -1) as sk_offer,
+        coalesce(to_char(vdo.dt_first_sent, 'YYYYMMDD')::integer, -1) as sk_offer_submitted_date,
+        vdo.dt_first_sent as dt_offer_submitted,
+        case
+            when vdo.status = 'Aprovada'
+              then coalesce(to_char(vdo.dt_analysis, 'YYYYMMDD')::integer, -1)
+            else -1
+        end as sk_offer_approved_date,
+        case
+            when vdo.status = 'Aprovada'
+              then vdo.dt_analysis
+            else null::timestamp
+        end as dt_offer_approved,
+        case
+            when vdo.status in ('Aprovada', 'Rejeitada')
+              then vdo.dt_analysis
+            else null::timestamp
+        end dt_internal_analysis,
+        coalesce(hrf.id_proposal, -1) as sk_proposal,
+        coalesce(to_char(hrf.dt_proposal_approved, 'YYYYMMDD')::integer, -1) as sk_proposal_approved_date,
+        hrf.dt_proposal_approved,
+        coalesce(to_char(vdp.dt_tenant_first_document_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_manual_first_doc_sent_date,
+        coalesce(to_char(vdp.dt_tenant_auto_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_auto_first_doc_sent_date,
+        vdp.dt_tenant_first_document_sent as dt_tenant_manual_first_doc_sent,
+        vdp.dt_tenant_auto_first_doc_sent,
+        coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) as dt_tenant_first_doc_sent,
+        dt_owner_document_sent as dt_owner_document_sent,
+        case
+            when vdp.status in ('Aprovada', 'Rejeitada')
+                then vdp.dt_updated
+            else null::timestamp
+        end as dt_credit_analysis, -- old credit analysis date
+        coalesce(hrf.id_contract, -1) as sk_contract,
+        coalesce(to_char(hrf.dt_contract_created, 'YYYYMMDD')::integer, -1) as sk_contract_created_date,
+        hrf.dt_contract_created,
+        coalesce(to_char(hrf.dt_contract_signed, 'YYYYMMDD')::integer, -1) as sk_contract_signed_date,
+        hrf.dt_contract_signed,
+        coalesce(to_char(hrf.dt_contract_annulment, 'YYYYMMDD')::integer, -1) as sk_contract_annulment_date,
+        case
+            when c.status in ('Ativo', 'Finalizado')
+              then c.ts_signature
+            else null::timestamp
+        end as ts_contract_valid_signature,
+        coalesce(to_char(c.ts_canceled, 'YYYYMMDD')::integer, -1) as sk_contract_canceled_date,
+        c.ts_canceled as ts_contract_canceled,
+        coalesce(to_char(vdp.dt_credit_analysis_init, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_init_date,
+        vdp.dt_credit_analysis_init,
+        coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_end_date,
+        vdp.dt_credit_analysis_end,
+        case
+            when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
+                then coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1)
+            else -1
+        end as sk_credit_analysis_approved_date,
+        case
+            when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
+                then vdp.dt_credit_analysis_end
+            else null::timestamp
+        end as dt_credit_analysis_approved,
+        coalesce(to_char(vdp.ts_processed, 'YYYYMMDD')::integer, -1) as sk_proposal_processed_date,
+        vdp.ts_processed as ts_proposal_processed,
+        case
+            when vdp.status = 'Rejeitada'
+                then vdp.ts_processed
+            else null::timestamp
+        end as ts_proposal_rejected,
+        vdp.status as proposal_status,
+        vdp.tenant_document_sent as has_tenant_sent_doc,
+        hrf.visit_created_from_app as flg_visit_created_from_app,
+        hrf.visit_created_type,
+        hrf.visit_last_updated_from_app as flg_visit_last_updated_from_app,
+        coalesce(to_char(ar.dt_rating, 'YYYYMMDD')::integer, -1) as sk_agent_review_rating_date,
+        now()::timestamp as ts_load,
+        coalesce(rs.id, -1) as sk_reservation,
+        coalesce(to_char(rs.created_at, 'YYYYMMDD')::integer, -1) as sk_reservation_created_date,
+        rs.reservation_attempts as reservation_attempts,
+        vdb.sk_rent_flow_taxonomy,
+        vdb.utm_campaign as booking_utm_campaign,
+        vdb.utm_content as booking_utm_content,
+        vdb.utm_term as booking_utm_term
+    from house_rent_flow hrf
+    join vw_dim_house_listing vdh
+        on vdh.id_house = hrf.id_house
+            and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01')
+                                                  and coalesce(vdh.ts_listing_version_end, now())
+    left join vw_fact_house_listings vfhl
+        on vfhl.sk_house_listing = vdh.sk_house_listing
+    left join vw_dim_offer vdo
+        on vdo.sk_offer = case
+                            when hrf.id_offer > 0
+                              then (hrf.id_offer * 100) + 2
+                            when hrf.id_pre_proposal > 0
+                              then (hrf.id_pre_proposal * 100) + 1
+                            else -1
+                          end
       and vdo.sk_offer != -1
-  left join pre_proposal pp
-    on hrf.id_pre_proposal = pp.id
-  left join vw_dim_proposal vdp
-    on hrf.id_proposal = vdp.id_proposal
-  left join vw_dim_contract c
-    on hrf.id_contract = c.id_contract
-  left join agent_review ar
-    on hrf.id_booking = ar.id_booking
-  left join _reservation rs
-    on hrf.id_house = rs.id_house
+    left join pre_proposal pp
+        on hrf.id_pre_proposal = pp.id
+    left join vw_dim_proposal vdp
+        on hrf.id_proposal = vdp.id_proposal
+    left join vw_dim_contract c
+        on hrf.id_contract = c.id_contract
+    left join agent_review ar
+        on hrf.id_booking = ar.id_booking
+    left join _reservation rs
+        on hrf.id_house = rs.id_house
         and hrf.id_client = id_tenant
         and vdo.status = 'Aprovada'
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
-  left join vw_dim_booking vdb
-    on vdb.sk_booking = hrf.id_booking
+    left join vw_dim_booking vdb
+        on vdb.sk_booking = hrf.id_booking
+    where vdh.is_for_rent::int::boolean
 )
 select
   ods_id,

@@ -34,7 +34,6 @@ CREATE TABLE staging.dim_booking (
   dt_cancel TIMESTAMP WITHOUT TIME ZONE,
   dt_created TIMESTAMP WITHOUT TIME ZONE,
   dt_updated TIMESTAMP WITHOUT TIME ZONE,
-  dt_timestamp TIMESTAMP WITHOUT TIME ZONE,
   last_update_source VARCHAR(255),
   first_update_source VARCHAR(255),
   visitor_arrived varchar(255),
@@ -46,6 +45,10 @@ CREATE TABLE staging.dim_booking (
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
   checkin_status varchar(255),
+  ts_scheduling_local TIMESTAMP WITHOUT TIME ZONE,
+  ts_cancel_local TIMESTAMP WITHOUT TIME ZONE,
+  ts_created_local TIMESTAMP WITHOUT TIME ZONE,
+  ts_visit_follow_up_local TIMESTAMP WITHOUT TIME ZONE,
   flg_branded boolean,
   flg_via_reschedule boolean,
   sk_rent_flow_taxonomy bigint,
@@ -56,5 +59,6 @@ CREATE TABLE staging.dim_booking (
   mkt_medium varchar(255),
   mkt_source varchar(255),
   mkt_platform varchar(255),
+  ts_load TIMESTAMP WITHOUT TIME ZONE,
   CONSTRAINT dim_booking_pkey PRIMARY KEY(sk_booking)
 );

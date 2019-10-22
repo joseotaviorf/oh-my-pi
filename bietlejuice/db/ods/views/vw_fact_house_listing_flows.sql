@@ -39,15 +39,18 @@ base_lead_tasks_last as (
 ),
 base_photo_tasks as (
   select distinct 
-    coalesce(i.id, i_direct.id)::integer as imovel_id
+    coalesce(h.id, h_direct.id)::integer as house_id,
+    max((task_type = 'AgendarJobDeFotografo')::integer)::boolean as has_job_photo,
+    max((task_type = 'FupFoto')::integer)::boolean as has_fup_photo
   from crm.photo_tasks pt
   left join photo_job pj 
     on pt.origin_id = pj.id
-  left join imovel i 
-    on i.id = pj.imovel_id
-  left join imovel i_direct 
-    on i_direct.id = pt.origin_id
-  where coalesce(i.id, i_direct.id) is not null
+  left join house h
+    on h.id = pj.imovel_id
+  left join house h_direct
+    on h_direct.id = pt.origin_id
+  where coalesce(h.id, h_direct.id) is not null
+  group by 1
 ), 
 base_leads as (
   select 
@@ -121,6 +124,7 @@ fact_with_reproc as (
       fhlf.dt_discarded,
       fhlf.user_id_lead_first_discarder,
       fhlf.user_id_lead_last_discarder,
+      fhlf.is_self_service_photo_job_scheduled,
       fhlf.flow,
       fhlf.acquisition_method,
       fhlf.acquisition_channel,
@@ -155,9 +159,9 @@ fact_with_reproc as (
             or b2b_prime.id_lead is not null
             , false) as is_b2b
     from fact_house_listing_flows fhlf
-    left join lead l 
+    left join lead l
       on l.id = fhlf.lead_id
-    left join reproc_leads rl 
+    left join reproc_leads rl
       on rl.id = fhlf.lead_id
     left join house h
       on h.id = fhlf.imovel_id
@@ -178,8 +182,9 @@ fact_with_reproc as (
     left join portability port
         on port.id_house = hl.id_house
         and port.owner_type = 'B2B'
+    where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
   )
-  select 
+  select
     acquisition_channels.id,
     acquisition_channels.lead_id,
     acquisition_channels.conversao_id,
@@ -199,6 +204,7 @@ fact_with_reproc as (
     acquisition_channels.dt_discarded,
     acquisition_channels.user_id_lead_first_discarder,
     acquisition_channels.user_id_lead_last_discarder,
+    acquisition_channels.is_self_service_photo_job_scheduled,
     acquisition_channels.flow,
     acquisition_channels.acquisition_method,
     acquisition_channels.acquisition_channel,
@@ -224,9 +230,9 @@ fact_with_reproc as (
     acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
     acquisition_channels.is_b2b
   from acquisition_channels
-), 
+),
 acquisitions as (
-  select 
+  select
     f.id,
     case
       when d.imovel_id is not null and f.is_not_reprocessed then 'Lead Flow'
@@ -249,18 +255,18 @@ acquisitions as (
       else f.acquisition_source = 'Doorman'
     end as is_doorman
   from fact_with_reproc f
-  left join legacy_doorman d 
+  left join legacy_doorman d
     on f.imovel_id = d.imovel_id
-), 
+),
 leads_b2b as (
   select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id,
     pa_b2b_prime.partner_id as prime_partner_id
   from lead l
-  left join usuario u_b2b_prime 
+  left join usuario u_b2b_prime
     on u_b2b_prime.telefone_principal = l.telefone_anunciante
-  left join partner_agent pa_b2b_prime 
+  left join partner_agent pa_b2b_prime
     on pa_b2b_prime.user_id = u_b2b_prime.id
   left join partner_agent pa_b2b_online 
     on pa_b2b_online.user_id = l.usuario_que_indicou_id
@@ -342,7 +348,7 @@ potential_listings as (
     h.exclusivity as is_exclusive,
     case
       when btf.rep_id is not null then 'Lead'
-      when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
+      when coalesce(bpt.house_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
     bl.lead_type,
@@ -357,7 +363,10 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
+    coalesce(f.rep_id, btf.rep_id) is not null
+    or bpt.has_fup_photo = true
+    or (bpt.has_job_photo = true and not f.is_self_service_photo_job_scheduled)
+        as has_isales_intervention,
     us_cad.id is not null as is_call_center,
     lfet.tracking_referring_domain as lead_referring_domain,
     us_d.subscriptionSource as subscription_source,
@@ -374,7 +383,7 @@ potential_listings as (
   left join base_lead_tasks_last btl
     on btl.lead_id = f.lead_id
   left join base_photo_tasks bpt 
-    on f.imovel_id = bpt.imovel_id
+    on f.imovel_id = bpt.house_id
   left join rep_leads bl 
     on bl.lead_id = f.lead_id
   left join house h 
