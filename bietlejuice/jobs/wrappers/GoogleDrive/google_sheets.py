@@ -20,7 +20,7 @@ class GoogleSheets(object):
 
     @logger(exclude=['google_sheets_files'])
     def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None,
-                                        csv=False, date_versioning=False):
+                                        csv=False, date_versioning=False, drop_table=True):
         if not google_sheets_files:
             raise ValueError(
                 'm=move_sheets_data_to_destination, msg=no files set.')
@@ -52,7 +52,8 @@ class GoogleSheets(object):
                                                       table_name=item['s3_path'], athena_client=athena_client)
 
             if enumdb_destination == EnumDB.BI_ODS:
-                GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets')
+                GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets',
+                                             drop_table=drop_table)
 
     @staticmethod
     @logger(exclude='old_columns')
@@ -108,26 +109,43 @@ class GoogleSheets(object):
 
     @staticmethod
     @logger(exclude='df')
-    def _move_df_to_ods(df, table_name, schema):
+    def _move_df_to_ods(df, table_name, schema, drop_table):
         exists = BaseETL.table_exists(
             db_enum=EnumDB.BI_ODS,
             table_name=table_name,
             schema=schema
         )
-        if exists:
+        if exists and drop_table:
             logger.info(
                 'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Dropping table'.format(table_name, schema))
             BaseETL.drop_table(db_enum=EnumDB.BI_ODS, table_name=table_name, schema=schema)
 
-        logger.info(
-            'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
-        BaseETL.create_table(
-            conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
-            table=petl.fromdataframe(df),
-            tablename=table_name,
-            schema=schema,
-            sample=0
-        )
+            logger.info(
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
+            BaseETL.create_table(
+                conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
+                table=petl.fromdataframe(df),
+                tablename=table_name,
+                schema=schema,
+                sample=0
+            )
+
+        if not drop_table:
+            logger.info(
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Truncating table'.format(table_name,
+                                                                                             schema))
+            BaseETL.truncate_table(db_enum=EnumDB.BI_ODS, table_name=table_name, schema=schema)
+
+        if not exists:
+            logger.info(
+                'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Creating table'.format(table_name, schema))
+            BaseETL.create_table(
+                conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
+                table=petl.fromdataframe(df),
+                tablename=table_name,
+                schema=schema,
+                sample=0
+            )
 
         try:
             logger.info(
