@@ -221,7 +221,7 @@ encaixes_clean as (
     left join house_available_hours hs 
         on cast(t.house_id as bigint) = hs.id_house
         and cast(hs.day_of_week as bigint) = dow(t.target_date)
-        and target_date between hs.available_started_date and coalesce(hs.available_ended_date, current_date)
+        and target_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',7,current_date)))
         left join blocked_houses bh 
         on (cast(t.house_id as bigint) = bh.house_id 
         and t.target_date between bh.init and bh."end")
