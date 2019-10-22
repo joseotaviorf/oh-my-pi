@@ -30,5 +30,7 @@ create table sortinghat.proposal (
   home_insurance_value numeric(14,4),
   risk_level varchar,
   risk_level_best_subset varchar,
-  process_date timestamp
+  process_date timestamp,
+  home_exclusive_5A varchar,
+  home_last_published_at timestamp
 );
