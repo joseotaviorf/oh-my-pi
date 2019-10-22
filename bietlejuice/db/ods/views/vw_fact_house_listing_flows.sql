@@ -39,15 +39,18 @@ base_lead_tasks_last as (
 ),
 base_photo_tasks as (
   select distinct 
-    coalesce(i.id, i_direct.id)::integer as imovel_id
+    coalesce(h.id, h_direct.id)::integer as house_id,
+    max((task_type = 'AgendarJobDeFotografo')::integer)::boolean as has_job_photo,
+    max((task_type = 'FupFoto')::integer)::boolean as has_fup_photo
   from crm.photo_tasks pt
   left join photo_job pj 
     on pt.origin_id = pj.id
-  left join imovel i 
-    on i.id = pj.imovel_id
-  left join imovel i_direct 
-    on i_direct.id = pt.origin_id
-  where coalesce(i.id, i_direct.id) is not null
+  left join house h
+    on h.id = pj.imovel_id
+  left join house h_direct
+    on h_direct.id = pt.origin_id
+  where coalesce(h.id, h_direct.id) is not null
+  group by 1
 ), 
 base_leads as (
   select 
@@ -121,6 +124,7 @@ fact_with_reproc as (
       fhlf.dt_discarded,
       fhlf.user_id_lead_first_discarder,
       fhlf.user_id_lead_last_discarder,
+      fhlf.is_self_service_photo_job_scheduled,
       fhlf.flow,
       fhlf.acquisition_method,
       fhlf.acquisition_channel,
@@ -200,6 +204,7 @@ fact_with_reproc as (
     acquisition_channels.dt_discarded,
     acquisition_channels.user_id_lead_first_discarder,
     acquisition_channels.user_id_lead_last_discarder,
+    acquisition_channels.is_self_service_photo_job_scheduled,
     acquisition_channels.flow,
     acquisition_channels.acquisition_method,
     acquisition_channels.acquisition_channel,
@@ -343,7 +348,7 @@ potential_listings as (
     h.exclusivity as is_exclusive,
     case
       when btf.rep_id is not null then 'Lead'
-      when coalesce(bpt.imovel_id, f.rep_id) is not null then 'Photojob'
+      when coalesce(bpt.house_id, f.rep_id) is not null then 'Photojob'
       else null
     end as first_isales_intervention,
     bl.lead_type,
@@ -358,7 +363,10 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, btf.rep_id, bpt.imovel_id) is not null as has_isales_intervention,
+    coalesce(f.rep_id, btf.rep_id) is not null
+    or bpt.has_fup_photo = true
+    or (bpt.has_job_photo = true and not f.is_self_service_photo_job_scheduled)
+        as has_isales_intervention,
     us_cad.id is not null as is_call_center,
     lfet.tracking_referring_domain as lead_referring_domain,
     us_d.subscriptionSource as subscription_source,
@@ -375,7 +383,7 @@ potential_listings as (
   left join base_lead_tasks_last btl
     on btl.lead_id = f.lead_id
   left join base_photo_tasks bpt 
-    on f.imovel_id = bpt.imovel_id
+    on f.imovel_id = bpt.house_id
   left join rep_leads bl 
     on bl.lead_id = f.lead_id
   left join house h 
