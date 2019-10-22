@@ -30,7 +30,7 @@ select
   risk_level,
   risk_level_best_subset,
   process_date,
-  home_exclusive_5A,
+  "home_exclusive_5A",
   home_last_published_at
 from "Proposal"
 where date(analysis_date) <= date('{execution_date}')
