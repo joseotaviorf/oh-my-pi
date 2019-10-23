@@ -289,12 +289,3 @@ pipeline:
     when:
       event: push
       branch: [ master ]
-
-  notify:
-    image: plugins/slack
-    channel: data-ops
-    secrets: [ slack_webhook ]
-    when:
-      event: [ push, tag ]
-      branch: [ forno, master ]
-      status: [ success, failure ]
