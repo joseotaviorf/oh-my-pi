@@ -130,7 +130,7 @@ class GoogleSheets(object):
                 sample=0
             )
 
-        if not drop_table:
+        if not drop_table and exists:
             logger.info(
                 'm=_move_df_to_ods, table_name={0}, schema={1}, msg=Truncating table'.format(table_name,
                                                                                              schema))
