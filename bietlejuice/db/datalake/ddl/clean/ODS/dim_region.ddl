@@ -12,6 +12,7 @@ create external table if not exists datalake_clean.ods_dim_region (
   city_ddd string,
   region_code string,
   region_code_deprecated string,
+  region_code_inspector string,
   short_region_name string,
   greater_region string,
   regional string,

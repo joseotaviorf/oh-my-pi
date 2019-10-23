@@ -108,6 +108,17 @@ external_score_task = BaseDAG.build_python_operator(
     }
 )
 
+screening_result_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='extract_screening_result',
+    python_callable=extract_table,
+    provide_context=True,
+    op_kwargs={
+        'table_name': 'ScreeningResult',
+        'query_file_path_suffix': 'screening_result.sql'
+    }
+)
+
 # unit tests
 proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -140,8 +151,16 @@ external_score_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     use_query_param=True
 )
 
+screening_result_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=unit_tests_sub_dag,
+    sub_dag_name='screening_result_unit_tests',
+    entity='screening_result'
+)
+
 # flow
 proposal_task >> proposal_unit_tests_dag
 proposal_version_task >> proposal_version_unit_tests_dag
 proponent_task >> proponent_unit_tests_dag
 external_score_task >> external_score_unit_tests_dag
+screening_result_task >> screening_result_unit_tests_dag
