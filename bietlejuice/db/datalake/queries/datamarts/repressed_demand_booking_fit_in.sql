@@ -249,7 +249,8 @@ encaixes_clean as (
     on cast(t.house_id as bigint) = hs.id_house
       and cast(hs.day_of_week as bigint) = dow(t.target_date)
       and target_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',7,current_date)))
-    (t.house_id = bh.house_id
+   left join blocked_houses bh on
+      (t.house_id = bh.house_id
     and t.target_date between bh.init and bh."end")
   left join suspended_houses sh on
     (t.house_id = sh.house_id
