@@ -65,7 +65,7 @@ if __name__ == "__main__":
         "landing_page_viewed",
         "lead_form_submitted",
         "visit_schedule_confirmed",
-        "visit_intent_clicked",
+        #         "visit_intent_clicked",
         "login_confirmation_viewed",
         "home_page_viewed",
         "signup_user_created",
