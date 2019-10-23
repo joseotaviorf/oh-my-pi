@@ -35,7 +35,6 @@ create table usuario (
   dadosbancarios_tipo_conta varchar(255),
   tipo_admin varchar(255),
   google_id varchar(255),
-  account_kit_id varchar(255),
   dadosfotografo_inicio_contrato timestamp,
   dadosfotografo_tipo_contrato varchar(255),
   dadosfotografo_ativo integer,

@@ -37,7 +37,6 @@ CREATE EXTERNAL TABLE datalake_clean.ods_dim_user (
   `dadosbancarios_tipo_conta` string,
   `tipo_admin` string,
   `google_id` string,
-  `account_kit_id` string,
   `dadosfotografo_inicio_contrato` string,
   `dadosfotografo_tipo_contrato` string,
   `dadosfotografo_ativo` string,

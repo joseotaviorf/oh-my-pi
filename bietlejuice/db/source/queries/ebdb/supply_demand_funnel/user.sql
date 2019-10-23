@@ -34,7 +34,6 @@ select
     u.dadosBancarios_tipoConta as dadosbancarios_tipo_conta,
     u.tipoAdmin as tipo_admin,
     u.googleId as google_id,
-    u.accountKitId as account_kit_id,
     df.inicioContrato as dadosfotografo_inicio_contrato,
     df.tipoContrato as dadosfotografo_tipo_contrato,
     df.ativo+0 as dadosfotografo_ativo,

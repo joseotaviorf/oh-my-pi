@@ -42,7 +42,6 @@ SELECT
   dadosbancarios_tipo_conta,
   tipo_admin,
   google_id,
-  account_kit_id,
   dadosfotografo_inicio_contrato,
   dadosfotografo_tipo_contrato,
   dadosfotografo_ativo,
