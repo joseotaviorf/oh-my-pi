@@ -125,7 +125,8 @@ class GoogleSheets(object):
             conn=BaseETL.get_connection(db_enum=EnumDB.BI_ODS),
             table=petl.fromdataframe(df),
             tablename=table_name,
-            schema=schema
+            schema=schema,
+            sample=0
         )
 
         try:
@@ -135,7 +136,7 @@ class GoogleSheets(object):
                 df=df,
                 table_name='{}."{}"'.format(schema, table_name),
                 append=False,
-                encoding='utf-8'
+                encoding='LATIN1'
             )
         except Exception as e:
             raise RuntimeError('m=_move_df_to_ods, table_name={0}, schema={1}, error={2}, '

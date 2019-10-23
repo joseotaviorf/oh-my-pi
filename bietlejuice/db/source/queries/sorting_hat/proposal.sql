@@ -29,7 +29,9 @@ select
   home_insurance_value,
   risk_level,
   risk_level_best_subset,
-  process_date
+  process_date,
+  "home_exclusive_5A",
+  home_last_published_at
 from "Proposal"
 where date(analysis_date) <= date('{execution_date}')
 ;

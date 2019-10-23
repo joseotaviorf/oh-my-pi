@@ -13,6 +13,7 @@ CREATE TABLE staging.dim_region (
 	city_ddd varchar(2),
 	region_code varchar(10),
 	region_code_deprecated varchar(10),
+	region_code_inspector varchar(10),
 	short_region_name varchar(255),
 	greater_region varchar(255),
 	regional varchar(255),
