@@ -117,9 +117,7 @@ encaixes_raw as (
         trim(evt.user_id) as user_id,
         trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '')) as house_id,
         cast(date_parse(cast(json_extract(event_properties, '$.alert_target_date') as varchar), '%a, %d %b %Y %T GMT') as date) as target_date,
-        --
         cast(trim(cast(json_extract(event_properties, '$.alert_slot_from') as varchar)) as double) alert_slot_from,
-        --
         cast(trim(cast(json_extract(event_properties, '$.alert_slot_to') as varchar)) as double) alert_slot_to,
         case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
         rank() over (partition by trim(evt.user_id), trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '')) order by evt.event_time desc) as rank_enc
@@ -137,6 +135,7 @@ encaixes_temp as (
         house_id,
         i.regiao_id as region_id,
         target_date,
+        event_date,
         slot,
         1 / cast(count(slot) over (partition by enc.user_id, enc.house_id, enc.target_date) as double) as slot_share_encaixe
     from encaixes_raw enc
@@ -221,7 +220,7 @@ encaixes_clean as (
     left join house_available_hours hs 
         on cast(t.house_id as bigint) = hs.id_house
         and cast(hs.day_of_week as bigint) = dow(t.target_date)
-        and target_date between hs.available_started_date and coalesce(hs.available_ended_date, current_date)
+        and event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',7,current_date)))
         left join blocked_houses bh 
         on (cast(t.house_id as bigint) = bh.house_id 
         and t.target_date between bh.init and bh."end")
