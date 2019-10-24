@@ -242,4 +242,5 @@ class RegionSubDag(DimSubDag):
                                            enumdb_destination=EnumDB.QuintoAndar_datalake,
                                            athena_client=athena_client)
         gs.move_sheets_data_to_destination(google_sheets_files=files,
-                                           enumdb_destination=EnumDB.BI_ODS)
+                                           enumdb_destination=EnumDB.BI_ODS,
+                                           drop_table=False)

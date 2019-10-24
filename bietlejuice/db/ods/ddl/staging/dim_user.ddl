@@ -37,7 +37,6 @@ CREATE TABLE staging.dim_user (
   dadosbancarios_tipo_conta varchar(255) DEFAULT NULL,
   tipo_admin varchar(255) DEFAULT NULL,
   google_id varchar(255) DEFAULT NULL,
-  account_kit_id varchar(255) DEFAULT NULL,
   dadosfotografo_inicio_contrato timestamp,
   dadosfotografo_tipo_contrato varchar(255) DEFAULT NULL,
   dadosfotografo_ativo integer DEFAULT NULL,
