@@ -9,6 +9,8 @@ spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 
 
 class SparkDataframeIntoDatalakeLoader:
+    MAX_RECORDS_PER_FILE = 250000
+
     def __init__(self, format, metastore_service):
         self.format = format
         self.metastore_service = metastore_service
@@ -31,6 +33,13 @@ class SparkDataframeIntoDatalakeLoader:
         """
         df.save(self.metastore_service.db_path + table_name)
 
+    def _apply_default_overwrite_options(self, df):
+        return (
+            df.write.mode("overwrite")
+            .format(self.format)
+            .option("maxRecordsPerFile", self.MAX_RECORDS_PER_FILE)
+        )
+
     @logger(exclude="df")
     def overwrite_partition(self, df, partition_by_list, table_name, schema_merging):
         """
@@ -46,10 +55,8 @@ class SparkDataframeIntoDatalakeLoader:
         if not df:
             raise ValueError("m=overwrite_partition, msg=input df is None")
 
-        write_df = (
-            df.write.mode("overwrite")
-            .format(self.format)
-            .partitionBy(*partition_by_list)
+        write_df = self._apply_default_overwrite_options(df).partitionBy(
+            *partition_by_list
         )
 
         self.metastore_service.create_database()  # if not exists
@@ -97,7 +104,7 @@ class SparkDataframeIntoDatalakeLoader:
         self.metastore_service.create_database()  # if not exists
 
         self.metastore_service.drop_table(table_name)
-        write_df = df.write.mode("overwrite").format(self.format)
+        write_df = self._apply_default_overwrite_options(df)
         self._save_df_as_table(write_df, table_name)
 
         logger.info(

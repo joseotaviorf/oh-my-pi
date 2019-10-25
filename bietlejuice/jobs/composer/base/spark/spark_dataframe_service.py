@@ -164,3 +164,13 @@ class SparkDataFrameService:
         if partitions > self.df.rdd.getNumPartitions():
             return SparkDataFrameService(self.df.repartition(partitions))
         return SparkDataFrameService(self.df.coalesce(partitions))
+
+    def optimize_partitions_by_partition_columns(self, partition_by_list):
+        """
+        You can use this method if you want to have just one dataframe partition for each unique tuple from "partition
+        by columns". For example, if you want to save a df as a table partitioned by year, month, day, using this
+        method before saving guarantee that will be just one file in each partition on S3.
+        :param partition_by_list: a python list with the name of the columns
+        :return: SparkDataFrameService object with the result df
+        """
+        return SparkDataFrameService(self.df.repartition(*partition_by_list))
