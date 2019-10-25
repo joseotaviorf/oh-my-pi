@@ -37,6 +37,8 @@ with actions_prev as (
     regexp_extract_all(actions, '{[^}]+[^,]+[^{]+}') as action_array
   from datalake_clean.crm_tasks
   where dt = '__PARTITION_DATE__'
+  -- Filtering out bugged tasks with more than 500 actions
+  and cardinality(regexp_extract_all(actions, '{[^}]+[^,]+[^{]+}')) <= 500
 ),
 actions as (
   select
