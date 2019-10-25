@@ -16,7 +16,7 @@ GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 ACTION_LINE_GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('ACTION_LINE_GOOGLE_SHEETS_FILES'))
 MAIN_DAG_ID = 'bi-action-line'
 MAIN_START_DATE = datetime(2019, 7, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 11,18 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 11,20 * * *')
 
 
 def load_google_sheet_files_to_datalake(file_name):
@@ -36,7 +36,7 @@ def load_google_sheet_files_to_datalake(file_name):
 def verify_execution_time(execution_date, **kwargs):
     if int(execution_date.hour) == 14:
         return 'load_discarded_leads'
-    elif int(execution_date.hour) == 21:
+    elif int(execution_date.hour) == 23:
         return 'load_reorganize_leads'
 
     raise ValueError(
