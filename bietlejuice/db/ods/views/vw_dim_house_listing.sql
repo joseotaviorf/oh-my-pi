@@ -174,7 +174,7 @@ select
   hl.key_location,
   hl.has_visit_restriction,
   hl.house_predicted_price,
-  bi.is_b2b,
+  (bi.is_b2b or hp.id_house_listing is not null) as is_b2b,
   bi.b2b_type,
   case
       when hp.id_house_listing is not null then 'portability'

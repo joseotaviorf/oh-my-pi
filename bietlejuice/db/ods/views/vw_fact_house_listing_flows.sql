@@ -156,7 +156,6 @@ fact_with_reproc as (
             port.id is not null
             or coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or pa_b2b.id is not null
-            or b2b_prime.id_lead is not null
             , false) as is_b2b
     from fact_house_listing_flows fhlf
     left join lead l
@@ -167,21 +166,12 @@ fact_with_reproc as (
       on h.id = fhlf.imovel_id
     left join partner_agent pa_b2b
       on pa_b2b.user_id = h.usuario_id
-    left join (
-		select distinct le.id as id_lead
-		from lead le
-		join usuario u_b2b
-			on u_b2b.telefone_principal = le.telefone_anunciante
-		join partner_agent pa_b2b
-			on pa_b2b.user_id = u_b2b.id
-	) b2b_prime
-	  on b2b_prime.id_lead = l.id
-	left join house_listing hl
-        on hl.id_house = fhlf.imovel_id
-        and hl.version = 0
+	  left join house_listing hl
+      on hl.id_house = fhlf.imovel_id
+      and hl.version = 0
     left join portability port
-        on port.id_house = hl.id_house
-        and port.owner_type = 'B2B'
+      on port.id_house = hl.id_house
+      and port.owner_type = 'B2B'
     where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
   )
   select
@@ -261,16 +251,11 @@ acquisitions as (
 leads_b2b as (
   select distinct
     l.id as id_lead,
-    pa_b2b_online.partner_id as online_partner_id,
-    pa_b2b_prime.partner_id as prime_partner_id
+    pa_b2b_online.partner_id as online_partner_id
   from lead l
-  left join usuario u_b2b_prime
-    on u_b2b_prime.telefone_principal = l.telefone_anunciante
-  left join partner_agent pa_b2b_prime
-    on pa_b2b_prime.user_id = u_b2b_prime.id
   left join partner_agent pa_b2b_online 
     on pa_b2b_online.user_id = l.usuario_que_indicou_id
-  where coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id) is not null
+  where pa_b2b_online.partner_id is not null
 ), 
 lead_city_region as (
   with city_region as (
@@ -302,7 +287,7 @@ potential_listings as (
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
-    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, l_b2b.prime_partner_id, '-1'::integer::bigint) as sk_partner,
+    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
     coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
