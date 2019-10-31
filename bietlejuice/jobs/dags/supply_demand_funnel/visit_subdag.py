@@ -28,11 +28,10 @@ class VisitSubDag(DimSubDag):
     def build_visit_with_tests(self):
         visit_dag = self._build_local_dag()
 
-        visits, house_visit_information, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
+        visits, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
 
         tests_tasks = self.build_tests_tasks(visit_dag)
 
-        house_visit_information >> visits
         visits >> staging_dim_visit_task
         staging_dim_visit_task.set_downstream(tests_tasks)
         dim_visit.set_upstream(tests_tasks)
@@ -60,18 +59,6 @@ class VisitSubDag(DimSubDag):
             python_callable=self.get_visit_query
         )
 
-        house_visit_information = BaseDAG.build_python_operator(
-            task_id='ODS_house_visit_information',
-            dag=dag,
-            python_callable=utils.load_athena_file_query_to_ods,
-            op_kwargs={
-                'table_name': 'house_visit_information',
-                'append': True,
-                'file_name': 'house_visit_information.sql',
-                'bucket': DimSubDag.S3_BUCKET
-            }
-        )
-
         staging_dim_visit_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='STAGING_dim_visit',
@@ -93,4 +80,4 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        return visits, house_visit_information, staging_dim_visit_task, dim_visit
+        return visits, staging_dim_visit_task, dim_visit

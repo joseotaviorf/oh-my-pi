@@ -125,22 +125,6 @@ left join
 left join
 	(
 		select
-			date_part('year', "date"::date) as campaign_year,
-			date_part('month', "date"::date) as campaign_month,
-			sum(spend::decimal) as campaign_total
-		from facebook_ads_campaigns
-			where campaign_name like '%IA%'
-			or campaign_name like '%indica%'
-			or campaign_name like '%Indica%'
-		group by
-			date_part('year', "date"::date),
-			date_part('month', "date"::date)
-	) afiliate_campaigns
-	on campaign_year = date_part('year', dadosafiliado_inicio_atuacao)
-	and campaign_month = date_part('month', dadosafiliado_inicio_atuacao)
-left join
-	(
-		select
 			visitante_id,
 			count(1) as visits_booked,
 			sum(case when "fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho') then 1 else 0 end) as visits_realized,

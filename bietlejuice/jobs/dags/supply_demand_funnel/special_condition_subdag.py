@@ -25,7 +25,7 @@ class SpecialConditionSubDag(DimSubDag):
     @logger
     def build_special_condition(self):
         special_condition_dag = self._build_local_dag()
-        special_condition_task, special_condition_aud_task, house_special_condition_task = self.__build_data_tasks(
+        special_condition_task, special_condition_aud_task = self.__build_data_tasks(
             special_condition_dag)
 
         return special_condition_dag
@@ -63,13 +63,4 @@ class SpecialConditionSubDag(DimSubDag):
             }
         )
 
-        house_special_condition_task = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='ODS_house_special_condition',
-            provide_context=True,
-            python_callable=self.__get_query,
-            op_kwargs={
-                'table_name': 'house_special_condition'
-            }
-        )
-        return special_condition_task, special_condition_aud_task, house_special_condition_task
+        return special_condition_task, special_condition_aud_task
