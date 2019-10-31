@@ -109,6 +109,7 @@ with
     )
     select
         faal.week_start as week_start_al,
+        faal.week_start + interval '1 week' as next_week_al,
         faal.city_group as city_group_al,
         faal.city_name as city_name_al,
         faal.regional as regional_al,
@@ -123,13 +124,19 @@ with
 ),
 OL_AL_week as (
 -- Query cross ongoing listing of current week and all listings of next week.
-    select
+select
         ow.*,
-        aw.*
-    from OL_week ow
+        aw.*,
+        ot.status_history_al as status_history_alo,
+        ot.sk_house_listing_al as sk_house_listing_alo
+        from OL_week ow
     full outer join AL_week aw
        on (ow.next_week_ol = aw.week_start_al
            and ow.sk_house_listing_ol = aw.sk_house_listing_al)
+    left join AL_week ot
+       on ot.next_week_al = aw.week_start_al
+           and ot.sk_house_listing_al = aw.sk_house_listing_al
+    	   and ot.status_history_al <> 'publicado'
 ),
 ol_flows as (
 -- Query to select distinct listings by status.
@@ -144,12 +151,14 @@ select
     regional_al,
     status_history_ol,
     status_history_al,
+    coalesce(status_history_ol,status_history_alo) as status_history_alo,
     listing_category_start_al,
     listing_version_start_al,
     count(distinct sk_house_listing_ol) as listings_ol,
-    count(distinct sk_house_listing_al) as listings_al
+    count(distinct sk_house_listing_al) as listings_al,
+    count(distinct sk_house_listing_alo) as listings_alo
 from OL_AL_week
-group by 1,2,3,4,5,6,7,8,9,10,11,12
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 order by 1,2
 ),
 week_flows as (
@@ -188,11 +197,20 @@ select
 				  	   listing_version_start_al < date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '2 week'))
 				  then listings_al end) as al_new_published,
 	sum(case when status_history_ol is null and status_history_al = 'publicado' then listings_al end) as al_published,
+	sum(case when status_history_al = 'publicado'
+				  and status_history_alo = 'despublicado'
+				  then listings_al end) as al_unpublished_to_published,
+	sum(case when status_history_al = 'publicado'
+				  and status_history_alo = 'suspenso'
+				  then listings_al end) as al_suspended_to_published,
+	sum(case when status_history_al = 'publicado'
+				  and status_history_alo in ('edicao', 'aguardando_publicacao')
+				  then listings_al end) as al_other_listings,
 	sum(case when status_history_al = 'publicado' then listings_al end) as ol_next_week,
 	date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week') as next_week_start
 from ol_flows
-group by 1,2,3,4, 15
-order by 1 desc, 15 desc
+group by 1,2,3,4,18
+order by 1 desc, 18 desc
 )
 select
 -- Query to calculate the ongoing listing flow by week.
@@ -204,13 +222,17 @@ select
 	sum(coalesce(wf.ol_unpublished,0)) as ol_unpublished,
 	sum(coalesce(wf.ol_suspended,0)) as ol_suspended,
 	sum(coalesce(wf.ol_rented,0)) as ol_rented,
-	sum(coalesce(wf.al_new_first_listing,0)) as al_new_first_listing,
-	sum(coalesce(wf.al_new_re_listing,0)) as al_new_re_listing,
-	sum(coalesce(wf.al_new_recovered,0)) as al_new_recovered,
-	sum(coalesce(wf.al_published,0)) - sum(coalesce(wf.al_new_first_listing,0) + coalesce(wf.al_new_re_listing,0) + coalesce(wf.al_new_recovered,0)) as other_listings,
+	sum(coalesce(wf.al_new_first_listing,0)) as new_first_listing,
+	sum(coalesce(wf.al_new_re_listing,0)) as new_re_listing,
+	sum(coalesce(wf.al_new_recovered,0)) as new_recovered,
+	sum(coalesce(wf.al_unpublished_to_published,0)) as unpublished_to_published,
+	sum(coalesce(wf.al_suspended_to_published,0)) as suspended_to_published,
+	sum(coalesce(wf.al_other_listings,0)) as other_listings,
 	sum(coalesce(wf.ol_next_week,0)) as ol_next_week,
 	wf.next_week_start
 from week_flows wf
 where wf.week_start < date_trunc('week',current_date) - interval '1 week'
-group by 1,2,3,4,14
+group by 1,2,3,4,16
 order by 1 desc
+
+
