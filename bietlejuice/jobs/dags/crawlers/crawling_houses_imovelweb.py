@@ -149,7 +149,7 @@ crawl_iw = BaseDAG.build_python_operator(
 iw_success_test = QuintoAndarAWSBatchSensor(
     task_id='iw-success-test',
     poke_interval=30 * 60,
-    timeout=23 * 3600,
+    timeout=30 * 3600,
     provide_context=True,
     xcom_task_id='crawl-iw'
 )
