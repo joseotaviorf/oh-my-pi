@@ -85,6 +85,40 @@ from public.fact_house_listing_flows lf
 group by 1, 2, 3, 4
 order by 1 desc, 2, 3, 4
 ),
+re_rentals as (
+with ordered_rentals as (
+select
+	coalesce(dc.dt_start, dc.dt_entrance) as rental_date,
+	date_trunc('week',coalesce(dc.dt_start, dc.dt_entrance)) as rental_week_start,
+	date_trunc('month',coalesce(dc.dt_start, dc.dt_entrance)) as rental_month_start,
+	fhl.sk_house_listing,
+	fhl.nr_renting,
+	dc.status,
+	dc.sk_contract,
+	row_number() over (partition by substring(fhl.sk_house_listing,1,9) order by fhl.sk_house_listing) as row_number_renting,
+	fhl.sk_region
+from dim_contract dc
+left join fact_house_listings fhl
+  on dc.sk_contract = fhl.sk_contract
+left join dim_house_listing dhl
+  on dhl.sk_house_listing = fhl.sk_house_listing
+where date(coalesce(dc.dt_start, dc.dt_entrance)) < current_date -- we know we may have future dates for dt_start
+  and fhl.nr_renting > 1
+order by 1 desc, 2
+)
+select
+	ord.rental_date,
+	ord.rental_week_start,
+	ord.rental_month_start,
+	ord.sk_region,
+	count(distinct ord.sk_contract) as re_rentals_daily,
+	sum(count(distinct ord.sk_contract)) over(partition by date_trunc('week',ord.rental_week_start), ord.sk_region) as re_rentals_weekly,
+	sum(count(distinct ord.sk_contract)) over(partition by date_trunc('month',ord.rental_month_start), ord.sk_region) as re_rentals_monthly
+from ordered_rentals ord
+where ord.row_number_renting > 1 and ord.status in ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
+group by 1, 2, 3, 4
+order by 1 desc, 2, 3, 4
+),
 ended_rentals as (
 select
 	dc.dt_annulment as date_date,
@@ -100,16 +134,18 @@ left join fact_listing_rent_flows rf
 where dc.status = 'Finalizado'
       and dc.dt_annulment < current_date
 group by 1, 2, 3, 4
+order by 1 desc, 2, 3, 4
 ),
 weekly_metrics as (
 select
-	distinct coalesce(ocont.week_start,orent.week_start,nrent.rental_week_start,ncont.contract_week_start,nfl.first_listing_week_start, er.week_date) as week_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region) as sk_region,
+	distinct coalesce(ocont.week_start,orent.week_start,nrent.rental_week_start,ncont.contract_week_start,nfl.first_listing_week_start,rr.rental_week_start, er.week_date) as week_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,rr.sk_region, er.sk_region) as sk_region,
 	ocont.ongoing_contracts_weekly,
 	orent.ongoing_rentals_weekly,
 	nrent.new_rentals_weekly,
 	ncont.new_contracts_signed_weekly,
 	nfl.new_first_listings_weekly,
+	rr.re_rentals_weekly,
 	er.ended_rentals_weekly
 from ongoing_contracts_weekly ocont
 full outer join ongoing_rentals_weekly orent
@@ -120,6 +156,8 @@ full outer join new_contracts ncont
   on ocont.week_start = ncont.contract_week_start and ocont.sk_region = ncont.sk_region
 full outer join new_first_listings nfl
   on ocont.week_start = nfl.first_listing_week_start and ocont.sk_region = nfl.sk_region
+full outer join re_rentals rr
+  on ocont.week_start = rr.rental_week_start and ocont.sk_region = rr.sk_region
 full outer join ended_rentals er
   on ocont.week_start = er.week_date and ocont.sk_region = er.sk_region
 )
@@ -133,6 +171,7 @@ select
 	sum(dm.new_rentals_weekly) as new_rentals_weekly,
 	sum(dm.new_contracts_signed_weekly) as new_contracts_signed_weekly,
 	sum(dm.new_first_listings_weekly) as new_first_listings_weekly,
+	sum(dm.re_rentals_weekly) as re_rentals_weekly,
 	sum(dm.ended_rentals_weekly) as ended_rentals_weekly
 from weekly_metrics dm
 left join dim_region dr
