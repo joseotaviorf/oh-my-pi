@@ -31,7 +31,7 @@ class PostgreSQLConsumer(DatabaseConsumer):
         query = """
             SELECT
                 table_name,
-                pg_relation_size(quote_ident(table_name)) / 1024 / 1024 AS size
+                pg_relation_size('{schema}' || '.' || table_name) / 1024 / 1024 AS size
             FROM
                 information_schema.tables
             WHERE
