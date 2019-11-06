@@ -60,6 +60,7 @@ create table public.fact_house_listing_flows (
 	is_isales_direct_register boolean,
 	is_cx_direct_register boolean,
 	has_isales_intervention boolean,
+	has_fup_photo_task boolean,
 	is_call_center boolean,
 	is_lead_reprocessed boolean,
 	affiliate_type varchar(512),

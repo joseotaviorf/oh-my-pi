@@ -60,6 +60,7 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	is_isales_direct_register string,
 	is_cx_direct_register string,
 	has_isales_intervention string,
+	has_fup_photo_task string,
 	is_callcenter string,
 	is_lead_reprocessed string,
 	affiliate_type string,

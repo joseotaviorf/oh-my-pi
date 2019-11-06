@@ -111,6 +111,7 @@ fact_with_reproc as (
       fhlf.photo_job_id,
       fhlf.imovel_id,
       fhlf.rep_id,
+      fhlf.isales_registrant_id,
       fhlf.affiliate_id,
       fhlf.region_id,
       fhlf.first_region_id,
@@ -181,6 +182,7 @@ fact_with_reproc as (
     acquisition_channels.photo_job_id,
     acquisition_channels.imovel_id,
     acquisition_channels.rep_id,
+    acquisition_channels.isales_registrant_id,
     acquisition_channels.affiliate_id,
     acquisition_channels.region_id,
     acquisition_channels.first_region_id,
@@ -348,10 +350,10 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
-    coalesce(f.rep_id, btf.rep_id) is not null
-    or bpt.has_fup_photo = true
+    coalesce(f.isales_registrant_id, btf.rep_id) is not null
     or (bpt.has_job_photo = true and not f.is_self_service_photo_job_scheduled)
         as has_isales_intervention,
+    bpt.has_fup_photo as has_fup_photo_task,
     us_cad.id is not null as is_call_center,
     lfet.tracking_referring_domain as lead_referring_domain,
     us_d.subscriptionSource as subscription_source,
@@ -537,6 +539,7 @@ select
   atax.is_isales_direct_register,
   atax.is_cx_direct_register,
   atax.has_isales_intervention,
+  atax.has_fup_photo_task,
   atax.is_call_center,
   atax.reprocessed_flg as is_lead_reprocessed,
   atax.affiliate_type,

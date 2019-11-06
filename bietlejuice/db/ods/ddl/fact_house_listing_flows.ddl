@@ -7,6 +7,7 @@ create table public.fact_house_listing_flows (
 	photo_job_id integer,
 	imovel_id bigint,
 	rep_id integer,
+	isales_registrant_id integer,
 	affiliate_id integer,
 	region_id integer,
 	first_region_id integer,
