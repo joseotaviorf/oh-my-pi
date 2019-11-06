@@ -121,7 +121,8 @@ house_status_version_last_status as (
 	         then new_ts_status_changed
 	     end
 	   ) over(partition by hs_vo.id_house, hs_vo.order_version) as ts_last_de_publication,
-	   case when ms_o.max_order_status is not null then hs_vo.new_status_history end as last_status
+	   case when ms_o.max_order_status is not null then hs_vo.new_status_history end as last_status,
+	   max(hs_vo.order_status) over(partition by hs_vo.id_house, hs_vo.order_version) as max_order_status_version
     from house_status_version_order hs_vo
     left join max_status_order ms_o
       on hs_vo.id_house = ms_o.id_house
@@ -152,7 +153,7 @@ select
 	hs_v.order_version as version,
 	sc_v.category_change as change_version_status,
 	hs_v.ts_last_de_publication,
-	max(rent) as rent,
+	max(case when hs_v.max_order_status_version = hs_v.order_status then hs_v.rent end) as rent,
 	max(status_history) as status_history,
 	max(ts_status_changed) as ts_status_changed,
 	max(hs_v.last_status) as status,
