@@ -26,6 +26,7 @@ region_census_stats AS (
          SUM(CAST(hr.households_ct AS REAL)) AS households,
          SUM(CAST(hr.rented_sum AS REAL)) AS rented_households,
          SUM(CAST(hr.apts_sum AS REAL)) AS apartment_households,
+         SUM(CAST(hr.rented_apts_sum AS REAL)) AS rented_apartment_households,
          SUM(CAST(hr.inc_bt_2_3_mw_sum AS REAL)) AS income_between_2_and_3_minimum_wages_households,
          SUM(CAST(hr.inc_bt_3_5_mw_sum AS REAL)) AS income_between_3_and_5_minimum_wages_households,
          SUM(CAST(hr.inc_gt_5_mw_sum AS REAL)) AS income_greater_than_5_minimum_wages_households,
