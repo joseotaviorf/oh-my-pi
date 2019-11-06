@@ -22,8 +22,11 @@ SELECT
 	s.sk_agent,
 	s.sk_slot_date,
   to_char(s.ts_slot_hour,'YYYYMMDDHH24')::bigint as sk_slot_date_hour,
+	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_slot_date AS VARCHAR) + CAST(s.sk_agent AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
-  u.dados_fotografo_id as id_dados_fotografo,
+	COALESCE(acr.workcontract_id, -1) as id_work_contract,
+	u.dados_fotografo_id as id_dados_fotografo,
+	s.ts_slot_hour,
 	s.allocated_slots,
 	s.allocated_slots_0,
   CASE date_part('h', s.ts_slot_hour)
@@ -42,8 +45,6 @@ SELECT
 		ELSE 0
 	END = 1 AS is_allocation_available,
 	COALESCE(a.area_deprecated, '-1') AS area,
-  COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
-	COALESCE(acr.workcontract_id, -1) as id_work_contract,
 	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
