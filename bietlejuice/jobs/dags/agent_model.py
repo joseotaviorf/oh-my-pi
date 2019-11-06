@@ -15,7 +15,6 @@ bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 GOOGLE_S_A_CREDENTIALS = json.loads(
     env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
-GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('GOOGLE_SHEETS_FILES'))
 
 
 def group_agent_region(**kwargs):
