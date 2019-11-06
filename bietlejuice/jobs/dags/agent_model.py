@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 from airflow.models import DAG
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -67,27 +68,6 @@ def create_agent_contract_dw():
                                 schema='agent')
 
 
-def create_dim_agent_contract_type():
-    ar = Agent(bucket_datalake)
-    ar.move_sheets_data_to_datalake(
-        google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
-        google_api_scope=GOOGLE_API_SCOPE,
-        google_sheets_files=GOOGLE_SHEETS_FILES,
-        filename='[Agent] Contracts_Hours',
-        path='agent_contract_type')
-    table = ar.get_agent_data(table_name='dim_agent_contract_type',
-                              db_enum=EnumDB.BI_DW,
-                              schema='agent')
-    ar.move_data_to_destination(data=table,
-                                table_name='dim_agent_contract_type',
-                                enumdb=EnumDB.BI_DW,
-                                append=False,
-                                schema='agent',
-                                decode=False)
-    ar.insert_dummy(table_name='dim_agent_contract_type',
-                    key_column='sk_agent_contract_type', schema='agent')
-
-
 def create_fact_agent_allocations(table_name, execution_date, **kwargs):
     ar = Agent(bucket_datalake)
     ar.clean_greater_than_daily_data_in_table(enum=EnumDB.BI_DW,
@@ -95,7 +75,8 @@ def create_fact_agent_allocations(table_name, execution_date, **kwargs):
                                               dim_name=table_name,
                                               date_column='sk_slot_date',
                                               dt=execution_date)
-    ar.create_table_dw(table_name=table_name, append=True, dt=execution_date, schema='agent')
+    ar.create_table_dw(table_name=table_name, append=True, dt=execution_date,
+                       schema='agent')
     ar.insert_dummy(table_name=table_name,
                     key_column='sk_slot_date_agent',
                     previous_check=True,
@@ -241,13 +222,6 @@ create_agent_contract_dw = BaseDAG.build_python_operator(
     op_kwargs=None
 )
 
-create_dim_agent_contract_type_dw_task = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='create_dim_agent_contract_type_dw',
-    python_callable=create_dim_agent_contract_type,
-    op_kwargs=None
-)
-
 # Creates fact_agent_daily_allocations in DW
 create_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     dag=dag,
@@ -328,15 +302,15 @@ agent_status_history_task = BaseDAG.build_python_operator(
     python_callable=create_agent_status_history
 )
 
-update_agent_region_ods >> group_agent_region_ods
-group_agent_region_ods >> load_group_agent_region_dw
-load_group_agent_region_dw >> create_dim_agent_region_dw
+update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
 create_dim_agent_region_dw.set_downstream(
-    [create_fact_photographer, create_fact_agent_daily_allocations, create_fact_agent_hourly_allocations,
+    [create_fact_photographer, create_fact_agent_daily_allocations,
+     create_fact_agent_hourly_allocations,
      create_fact_photographer_hourly_allocations])
-create_agent_contract_dw >> create_dim_agent_contract_type_dw_task >> create_fact_agent_daily_allocations
+create_agent_contract_dw.set_downstream(
+    [create_fact_photographer, create_fact_agent_daily_allocations,
+     create_fact_agent_hourly_allocations,
+     create_fact_photographer_hourly_allocations]
+)
 create_fact_agent_daily_allocations >> xcom_fact_agent_daily_allocations
 create_dim_agent_review >> load_dim_agent_review_dw
-agent_status_history_task.set_downstream(
-    [create_fact_agent_daily_allocations, create_fact_photographer, create_fact_agent_hourly_allocations,
-     create_fact_photographer_hourly_allocations])

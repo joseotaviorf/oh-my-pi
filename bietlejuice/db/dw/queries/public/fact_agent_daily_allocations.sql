@@ -11,7 +11,7 @@ GROUP BY 1, 2
 first_visits AS
 (SELECT
 	id_agent,
-	min(dt_scheduling) as dt_first_visit
+	min(dt_scheduling) as ts_first_visit
  FROM public.dim_booking db
  WHERE db.type = 'Visita'
  GROUP BY id_agent
@@ -24,17 +24,30 @@ SELECT
 	WHERE "timestamp" <= CAST('{0}' AS TIMESTAMP)
 )
 SELECT
-	s.*,
-	CASE d.week_day
-		WHEN 0 THEN 0	                                    -- Sunday
-		WHEN 6 THEN COALESCE(dact.slots_per_saturday, 0)	-- Saturday
-		ELSE COALESCE(dact.slots_per_weekday, 0)			-- Other days
-	END AS max_slots_allocation_available,
-	COALESCE(a.area, '-1') AS area,
+	s.sk_agent,
+	s.sk_slot_date,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_slot_date AS VARCHAR) + CAST(s.sk_agent AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
-	dt_first_visit,
-	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
+	COALESCE(acr.workcontract_id, -1) as id_work_contract,
+	s.allocated_slots,
+	s.allocated_slots_0,
+
+	(
+		coalesce(cast(hsm.horarios_disponivel08as09 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel09as10 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel10as11 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel11as12 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel12as13 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel13as14 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel14as15 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel15as16 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel16as17 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel17as18 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel18as19 as integer),0) +
+		coalesce(cast(hsm.horarios_disponivel19as20 as integer),0)
+	) * 4 AS max_slots_allocation_available,
+	COALESCE(a.area, '-1') AS area,
+	ts_first_visit,
 	getdate() as ts_load
 FROM schedule s
 JOIN public.dim_date d
@@ -46,6 +59,7 @@ LEFT JOIN first_visits fv
 	ON fv.id_agent = s.sk_agent
 LEFT JOIN agent_contract_rank acr
     ON acr.agent_id = s.sk_agent AND acr."rank" = 1
-LEFT JOIN agent.dim_agent_contract_type dact
-    ON dact.sk_agent_contract_type = acr.workcontract_id
-ORDER BY s.sk_slot_date;
+LEFT JOIN datalake_ebdb_raw_prod.horariosemanalmascara hsm
+    ON hsm.workcontract_id  = acr.workcontract_id and mod(hsm.diadasemana, 7) = mod(d.week_day, 7)
+ORDER BY s.sk_slot_date
+;

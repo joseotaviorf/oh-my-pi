@@ -5,7 +5,7 @@ create table agent.fact_agent_hourly_allocations (
   sk_slot_date_hour bigint,
   sk_agent_region varchar(20),
   sk_slot_date_agent bigint,
-  sk_contract_type integer,
+  id_work_contract integer,
   ts_slot_hour timestamp,
   allocated_slots integer,
   allocated_slots_0 integer,

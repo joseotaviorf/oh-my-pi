@@ -30,39 +30,24 @@ SELECT
 	to_char(s.ts_slot_hour,'YYYYMMDDHH24')::bigint as sk_slot_date_hour,
 	COALESCE(a.sk_agent_region, -1) AS sk_agent_region,
 	CAST(CAST(s.sk_slot_date AS VARCHAR) + CAST(s.sk_agent AS VARCHAR) AS BIGINT) as sk_slot_date_agent,
-	COALESCE(acr.workcontract_id, -1) as sk_contract_type,
+	COALESCE(acr.workcontract_id, -1) as id_work_contract,
 	s.ts_slot_hour,
 	s.allocated_slots,
 	s.allocated_slots_0,
-	CASE d.week_day
-		WHEN 0 THEN 0	                           -- Sunday
-		WHEN 6 THEN                                -- Saturday
-            CASE date_part('h', s.ts_slot_hour)
-                WHEN  8 THEN coalesce(cast(achd.is_saturday_available_at_08 as integer),0)
-                WHEN  9 THEN coalesce(cast(achd.is_saturday_available_at_09 as integer),0)
-                WHEN 10 THEN coalesce(cast(achd.is_saturday_available_at_10 as integer),0)
-                WHEN 11 THEN coalesce(cast(achd.is_saturday_available_at_11 as integer),0)
-                WHEN 12 THEN coalesce(cast(achd.is_saturday_available_at_12 as integer),0)
-                WHEN 13 THEN coalesce(cast(achd.is_saturday_available_at_13 as integer),0)
-                WHEN 14 THEN coalesce(cast(achd.is_saturday_available_at_14 as integer),0)
-                WHEN 15 THEN coalesce(cast(achd.is_saturday_available_at_15 as integer),0)
-                WHEN 16 THEN coalesce(cast(achd.is_saturday_available_at_16 as integer),0)
-            END
-		ELSE                                       -- Weekdays
-		    CASE date_part('h', s.ts_slot_hour)
-		        WHEN  8 THEN coalesce(cast(achd.is_weekday_available_at_08 as integer),0)
-		        WHEN  9 THEN coalesce(cast(achd.is_weekday_available_at_09 as integer),0)
-		        WHEN 10 THEN coalesce(cast(achd.is_weekday_available_at_10 as integer),0)
-		        WHEN 11 THEN coalesce(cast(achd.is_weekday_available_at_11 as integer),0)
-		        WHEN 12 THEN coalesce(cast(achd.is_weekday_available_at_12 as integer),0)
-		        WHEN 13 THEN coalesce(cast(achd.is_weekday_available_at_13 as integer),0)
-		        WHEN 14 THEN coalesce(cast(achd.is_weekday_available_at_14 as integer),0)
-		        WHEN 15 THEN coalesce(cast(achd.is_weekday_available_at_15 as integer),0)
-		        WHEN 16 THEN coalesce(cast(achd.is_weekday_available_at_16 as integer),0)
-		        WHEN 17 THEN coalesce(cast(achd.is_weekday_available_at_17 as integer),0)
-		        WHEN 18 THEN coalesce(cast(achd.is_weekday_available_at_18 as integer),0)
-		        ELSE 0
-		    END
+	CASE date_part('h', s.ts_slot_hour)
+		WHEN  8 THEN coalesce(cast(hsm.horarios_disponivel08as09 as integer),0)
+		WHEN  9 THEN coalesce(cast(hsm.horarios_disponivel09as10 as integer),0)
+		WHEN 10 THEN coalesce(cast(hsm.horarios_disponivel10as11 as integer),0)
+		WHEN 11 THEN coalesce(cast(hsm.horarios_disponivel11as12 as integer),0)
+		WHEN 12 THEN coalesce(cast(hsm.horarios_disponivel12as13 as integer),0)
+		WHEN 13 THEN coalesce(cast(hsm.horarios_disponivel13as14 as integer),0)
+		WHEN 14 THEN coalesce(cast(hsm.horarios_disponivel14as15 as integer),0)
+		WHEN 15 THEN coalesce(cast(hsm.horarios_disponivel15as16 as integer),0)
+		WHEN 16 THEN coalesce(cast(hsm.horarios_disponivel16as17 as integer),0)
+		WHEN 17 THEN coalesce(cast(hsm.horarios_disponivel17as18 as integer),0)
+		WHEN 18 THEN coalesce(cast(hsm.horarios_disponivel18as19 as integer),0)
+		WHEN 19 THEN coalesce(cast(hsm.horarios_disponivel19as20 as integer),0)
+		ELSE 0
 	END = 1 AS is_allocation_available,
 	COALESCE(a.area, '-1') AS area,
 	ts_first_visit,
@@ -77,6 +62,7 @@ LEFT JOIN first_visits fv
 	ON fv.id_agent = s.sk_agent
 LEFT JOIN agent_contract_rank acr
     ON acr.agent_id = s.sk_agent AND acr."rank" = 1
-LEFT JOIN datalake_raw.gsheets_agent_contract_hours_detailed achd
-    ON cast(achd.id as integer) = acr.workcontract_id
-ORDER BY s.sk_slot_date;
+LEFT JOIN datalake_ebdb_raw_prod.horariosemanalmascara hsm
+    ON hsm.workcontract_id  = acr.workcontract_id and mod(hsm.diadasemana, 7) = mod(d.week_day, 7)
+ORDER BY s.sk_slot_date
+;
