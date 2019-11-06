@@ -67,7 +67,9 @@ class AmplitudeEvents:
             )
 
     @logger
-    def create_clean_events_df(self, date, spark_sql_consumer, dataframe_service):
+    def create_clean_events_df(
+        self, date, spark_sql_consumer, dataframe_service, partition_by_list
+    ):
         year, month, day = date.year, date.month, date.day
         logger.info(
             "m=create_clean_events_df, year={}, month={}, day={}".format(
@@ -90,7 +92,7 @@ class AmplitudeEvents:
 
         return (
             dataframe_service.input(df)
-            .optimize_partition(AmplitudeEvents.CLEAN_RECORDS_BY_PARTITION)
+            .optimize_partitions_by_partition_columns(partition_by_list)
             .output()
         )
 

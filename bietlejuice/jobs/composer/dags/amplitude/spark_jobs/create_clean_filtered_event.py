@@ -16,22 +16,20 @@ from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("events_repartitioned_raw_to_clean")
+logger = QuintoAndarLogger("events_raw_to_clean")
 
 spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
-parser = ArgumentParser(description="events_repartitioned_raw_to_clean")
+parser = ArgumentParser(description="events_raw_to_clean")
 parser.add_argument("execution_date")
 parser.add_argument("env")
-parser.add_argument("table_name")
-parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
+parser.add_argument("event_type")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
-    table_name = args.table_name
-    partition_by = args.partition_by
+    event_type = args.event_type
 
     # setup
     date = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -49,15 +47,17 @@ if __name__ == "__main__":
         SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service
     )
     dataframe_service = SparkDataFrameService()
-    spark_sql_consumer = DatabricksConsumer({"db": db_info["db_raw_databricks"]})
 
-    # create events_repartitioned in datalake
-    df = amplitude_events.create_clean_events_df(
-        date, spark_sql_consumer, dataframe_service, partition_by
+    # create filtered events table
+    table_name = "{}_events".format(event_type)
+    partition_by_list = ["year", "month", "day"]
+    spark_sql_consumer = DatabricksConsumer({"db": db_info["db_clean_databricks"]})
+    df = amplitude_events.create_filtered_clean_events_df(
+        date, event_type, spark_sql_consumer, dataframe_service
     )
     dataframe_loader.overwrite_partition(
-        df, partition_by, table_name, schema_merging=False
+        df, partition_by_list, table_name, schema_merging=True
     )
     metastore_service.create_new_partitions_from_df(
-        table_name, df, partition_by, parallelism=1
+        table_name, df, partition_by_list, parallelism=1
     )

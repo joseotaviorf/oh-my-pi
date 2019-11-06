@@ -1,6 +1,5 @@
 from datetime import datetime
-
-import airflow.utils.helpers as airflow_helpers
+import pendulum
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -9,41 +8,94 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
+# variable definitions
 DAG_ID = "bietlejuice.amplitude"
 ENV = Variable.get("environment")
+local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
+MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
+EVENT_TYPES = Variable.get("amplitude_event_types", deserialize_json=True)
+DEFAULT_PARTITION_BY = ["year", "month", "day"]
 
+# s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-
-LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = "{}/spark_jobs/amplitude/load_events_into_datalake_raw.py".format(
-    S3_PREFIX
+AMPLITUDE_SPARK_JOBS_PATH = "{}/spark_jobs/amplitude/".format(S3_PREFIX)
+ADD_CLEAN_EVENTS_PARTITIONS_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "add_clean_events_partitions.py"
 )
-EVENTS_RAW_TO_CLEAN_FILE_PATH = "{}/spark_jobs/amplitude/events_raw_to_clean.py".format(
-    S3_PREFIX
+CREATE_ATHENA_EXTERNAL_TABLE_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "create_athena_external_table.py"
 )
-CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH = "{}/spark_jobs/amplitude/create_clean_external_tables.py".format(
-    S3_PREFIX
+EVENTS_RAW_TO_CLEAN_FILE_PATH = AMPLITUDE_SPARK_JOBS_PATH + "events_raw_to_clean.py"
+LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "load_events_into_datalake_raw.py"
 )
-
-ADD_CLEAN_EVENTS_PARTITIONS = "{}/spark_jobs/amplitude/add_clean_events_partitions.py".format(
-    S3_PREFIX
+CREATE_CLEAN_FILTERED_EVENT_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_filtered_event.py"
 )
-
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
 
+# cluster configuration
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_memory_optimized_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
+# libraries dependencies
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
 
+# task builders
+def create_clean_filtered_event_task(dag, event_type):
+    return QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-{}-event-table".format(event_type.replace("_", "-")),
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": CREATE_CLEAN_FILTERED_EVENT_FILE_PATH,
+                "parameters": ["{{ ds }}", ENV, event_type],
+            }
+        },
+    )
+
+
+def create_athena_external_table_task(dag, table_name, partition_by):
+    return QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-{}-athena-external-table".format(table_name.replace("_", "-")),
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": CREATE_ATHENA_EXTERNAL_TABLE_FILE_PATH,
+                "parameters": [ENV, table_name, "--partition_by"] + partition_by,
+            }
+        },
+    )
+
+
+def create_filtered_events_sub_dag(sub_dag_name):
+    local_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+    for event_type in EVENT_TYPES:
+        t1 = create_clean_filtered_event_task(local_dag, event_type)
+        table_name = "{}_events".format(event_type)
+        t2 = create_athena_external_table_task(
+            local_dag, table_name, DEFAULT_PARTITION_BY
+        )
+        t1 >> t2
+    return local_dag
+
+
+# Dag definition
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -51,12 +103,13 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 1, 1, 0, 0, 0),
-    schedule_interval="30 2 * * *",
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     catchup=False,
 )
 
+# tasks definition
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -81,41 +134,39 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
+            "parameters": ["{{ ds }}", ENV, "events", "--partition_by"]
+            + DEFAULT_PARTITION_BY
+            + ["event_type"],
+        }
+    },
+)
+
+add_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="add-clean-events-partitions",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": ADD_CLEAN_EVENTS_PARTITIONS_FILE_PATH,
             "parameters": ["{{ ds }}", ENV],
         }
     },
 )
 
-create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-clean-external-tables",
+create_filtered_events_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV],
-        }
-    },
-)
-
-add_amplitude_events_partitions = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="add-amplitude-events-partitions",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": ADD_CLEAN_EVENTS_PARTITIONS,
-            "parameters": ["{{ ds }}", ENV],
-        }
-    },
+    sub_dag_name="create-filtered-events",
+    sub_dag_func=create_filtered_events_sub_dag,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-airflow_helpers.chain(
-    create_cluster_task, events_to_datalake_raw_task, events_raw_to_clean_task
-)
+
+# tasks dependencies definition
+create_cluster_task >> events_to_datalake_raw_task >> events_raw_to_clean_task
+
 events_raw_to_clean_task >> [
-    add_amplitude_events_partitions,
-    create_clean_external_tables_task,
+    add_clean_events_partitions_task,
+    create_filtered_events_sub_dag_task,
 ] >> terminate_cluster_task

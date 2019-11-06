@@ -9,9 +9,7 @@ from quintoandar_logger import QuintoAndarLogger
 import bietlejuice.jobs.composer.db as db_module
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.base.spark.base_spark import BaseDBUtils
-from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
-    AmplitudeDatabaseInfo,
-)
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("add_clean_events_partitions")
@@ -43,7 +41,8 @@ if __name__ == "__main__":
     date = datetime.strptime(execution_date, "%Y-%m-%d")
     year, month, day = date.year, date.month, date.day
 
-    db_info = AmplitudeDatabaseInfo.get_db_info(env)
+    source = "amplitude"
+    db_info = DatalakeMetastoreService.get_db_info(env, source)
     db_clean_athena = db_info["db_clean_athena"]
     db_clean_path = db_info["db_clean_path"]
     table_name = "events"

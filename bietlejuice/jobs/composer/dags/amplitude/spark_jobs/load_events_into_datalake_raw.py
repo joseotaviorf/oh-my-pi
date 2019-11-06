@@ -13,9 +13,7 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.dags.amplitude.spark_jobs.db_info import (
-    AmplitudeDatabaseInfo,
-)
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -43,7 +41,8 @@ if __name__ == "__main__":
 
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
-    db_info = AmplitudeDatabaseInfo.get_db_info(env)
+    source = "amplitude"
+    db_info = DatalakeMetastoreService.get_db_info(env, source)
     amplitude_events = AmplitudeEvents()
     spark_sql_client = SparkSQLCLient(spark, sqlContext)
     dataframe_service = SparkDataFrameService()

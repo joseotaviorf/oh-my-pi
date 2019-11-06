@@ -57,7 +57,7 @@ class TestAmplitudeEvents:
 
         # act
         result_df = amplitude_events.create_clean_events_df(
-            date, spark_sql_consumer, dataframe_service
+            date, spark_sql_consumer, dataframe_service, partition_by_list=['a']
         )
 
         # assert
