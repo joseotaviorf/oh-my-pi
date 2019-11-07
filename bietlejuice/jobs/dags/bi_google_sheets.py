@@ -24,7 +24,7 @@ def load_google_sheet_files_to_datalake(file):
     athena_client = AthenaClient(s3_bucket)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
-    gs.move_sheets_data_to_destination(google_sheets_files=file,
+    gs.move_sheets_data_to_destination(google_sheets_file=file,
                                        enumdb_destination=EnumDB.QuintoAndar_datalake,
                                        athena_client=athena_client)
 
@@ -33,7 +33,7 @@ def load_google_sheet_files_to_ods(file):
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
 
-    gs.move_sheets_data_to_destination(google_sheets_files=file,
+    gs.move_sheets_data_to_destination(google_sheets_file=file,
                                        enumdb_destination=EnumDB.BI_ODS,
                                        drop_table=file['drop_table'])
 
