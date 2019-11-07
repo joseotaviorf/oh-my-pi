@@ -21,7 +21,7 @@ GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCO
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('BI_AFFILIATE_COSTS_GOOGLE_SHEETS_FILES'))
 MAIN_DAG_ID = 'bi-affiliate-costs'
-MAIN_START_DATE = datetime(2019, 10, 14)
+MAIN_START_DATE = datetime(2019, 11, 5)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 10 * * *')
 
 
