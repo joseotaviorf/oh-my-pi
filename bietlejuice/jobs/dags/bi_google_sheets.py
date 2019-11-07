@@ -1,7 +1,8 @@
+import re
 import json
 from datetime import datetime
+from unidecode import unidecode
 
-import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import EnumDB
@@ -19,25 +20,40 @@ GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('GOOGLE_SHEETS_FILES'))
 env.set_airflow_var_to_local_env('BI_ODS')
 
 
-def load_google_sheet_files_to_datalake():
+def load_google_sheet_files_to_datalake(file):
     athena_client = AthenaClient(s3_bucket)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
-    gs.move_sheets_data_to_destination(google_sheets_files=GOOGLE_SHEETS_FILES['files'],
+    gs.move_sheets_data_to_destination(google_sheets_files=file,
                                        enumdb_destination=EnumDB.QuintoAndar_datalake,
                                        athena_client=athena_client)
 
 
-def load_google_sheet_files_to_ods():
+def load_google_sheet_files_to_ods(file):
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
-    filtered_files = []
 
-    for i in GOOGLE_SHEETS_FILES['files']:
-        i['send_to_ods'] and filtered_files.append(i)
+    gs.move_sheets_data_to_destination(google_sheets_files=file,
+                                       enumdb_destination=EnumDB.BI_ODS,
+                                       drop_table=file['drop_table'])
 
-    gs.move_sheets_data_to_destination(google_sheets_files=filtered_files,
-                                       enumdb_destination=EnumDB.BI_ODS)
+
+def create_task_to_load_in_datalake(file):
+    return BaseDAG.build_python_operator(
+        dag=dag,
+        task_id='load_{}_to_datalake'.format(file['fileName']),
+        python_callable=load_google_sheet_files_to_datalake,
+        op_kwargs={'file': file}
+    )
+
+
+def create_task_to_load_in_ods(file):
+    return BaseDAG.build_python_operator(
+        dag=dag,
+        task_id='load_{}_to_ods'.format(file['fileName']),
+        python_callable=load_google_sheet_files_to_ods,
+        op_kwargs={'file': file}
+    )
 
 
 dag = DAG(
@@ -53,17 +69,11 @@ dag = DAG(
     catchup=False
 )
 
-load_google_sheet_files_to_datalake_task = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_google_sheet_files_to_datalake',
-    python_callable=load_google_sheet_files_to_datalake
-)
 
-load_google_sheet_files_to_ods_task = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_google_sheet_files_to_ods',
-    python_callable=load_google_sheet_files_to_ods
-)
+for file in GOOGLE_SHEETS_FILES['files']:
+    file['fileName'] = re.sub('[^A-Za-z0-9]+', '_', unidecode(file['fileName'])).lower()
 
-airflow_helpers.chain(load_google_sheet_files_to_datalake_task,
-                      load_google_sheet_files_to_ods_task)
+    datalake_task = create_task_to_load_in_datalake(file)
+    if file['send_to_ods']:
+        ods_task = create_task_to_load_in_ods(file)
+        datalake_task >> ods_task

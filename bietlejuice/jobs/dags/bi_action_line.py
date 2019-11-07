@@ -22,15 +22,13 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 11,20 * * *')
 def load_google_sheet_files_to_datalake(file_name):
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
-    files = []
+
     for item in ACTION_LINE_GOOGLE_SHEETS_FILES['files']:
         if item['fileName'] == file_name:
-            files.append(item)
-
-    gs.move_sheets_data_to_destination(google_sheets_files=files,
-                                       enumdb_destination=EnumDB.QuintoAndar_datalake,
-                                       date_versioning=True,
-                                       csv=True)
+            gs.move_sheets_data_to_destination(google_sheets_file=item,
+                                               enumdb_destination=EnumDB.QuintoAndar_datalake,
+                                               date_versioning=True,
+                                               csv=True)
 
 
 def verify_execution_time(execution_date, **kwargs):

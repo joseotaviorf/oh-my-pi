@@ -18,42 +18,43 @@ class GoogleSheets(object):
         self.google_s_a_credentials = google_s_a_credentials
         self.google_api_scope = google_api_scope
 
-    @logger(exclude=['google_sheets_files'])
-    def move_sheets_data_to_destination(self, google_sheets_files, enumdb_destination, athena_client=None,
+    @logger(exclude=['google_sheets_file'])
+    def move_sheets_data_to_destination(self, google_sheets_file, enumdb_destination, athena_client=None,
                                         csv=False, date_versioning=False, drop_table=True):
-        if not google_sheets_files:
+        if not google_sheets_file:
             raise ValueError(
                 'm=move_sheets_data_to_destination, msg=no files set.')
 
         gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
 
-        for item in google_sheets_files:
-            df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=item['sheetName'],
-                                                          sheet_id=item['sheetId'])
-            if df_gsheets is None:
-                raise ValueError(
-                    "m=move_sheets_data_to_destination, sheet_id={}, sheet_name={}, "
-                    "msg=no data found in google sheets.".format(
-                        item['sheetId'], item['sheetName']))
+        df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=google_sheets_file['sheetName'],
+                                                      sheet_id=google_sheets_file['sheetId'])
+        if df_gsheets is None:
+            raise ValueError(
+                "m=move_sheets_data_to_destination, sheet_id={}, sheet_name={}, "
+                "msg=no data found in google sheets.".format(
+                    google_sheets_file['sheetId'], google_sheets_file['sheetName']))
 
-            snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
-            df_gsheets.rename(columns=snake_case_columns, inplace=True)
+        snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
+        df_gsheets.rename(columns=snake_case_columns, inplace=True)
 
-            if enumdb_destination == EnumDB.QuintoAndar_datalake:
-                self._move_df_to_datalake(df=df_gsheets,
-                                          table_name=item['s3_path'] if 'full_s3_path' not in item else item[
-                                              'fileName'],
-                                          csv=csv,
-                                          file_path=item['full_s3_path'] if 'full_s3_path' in item else None,
-                                          date_versioning=date_versioning)
+        if enumdb_destination == EnumDB.QuintoAndar_datalake:
+            self._move_df_to_datalake(
+                df=df_gsheets,
+                table_name=google_sheets_file['s3_path'] if 'full_s3_path' not in google_sheets_file
+                                                            else google_sheets_file['fileName'],
+                csv=csv,
+                file_path=google_sheets_file['full_s3_path'] if 'full_s3_path' in google_sheets_file else None,
+                date_versioning=date_versioning
+            )
 
-                if athena_client:
-                    GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
-                                                      table_name=item['s3_path'], athena_client=athena_client)
+            if athena_client:
+                GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
+                                                  table_name=google_sheets_file['s3_path'], athena_client=athena_client)
 
-            if enumdb_destination == EnumDB.BI_ODS:
-                GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=item['s3_path'], schema='gsheets',
-                                             drop_table=drop_table)
+        if enumdb_destination == EnumDB.BI_ODS:
+            GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=google_sheets_file['s3_path'], schema='gsheets',
+                                         drop_table=drop_table)
 
     @staticmethod
     @logger(exclude='old_columns')
