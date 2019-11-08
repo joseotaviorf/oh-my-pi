@@ -15,6 +15,27 @@ from bietlejuice.jobs.etl.marketing import ClassifiedsCosts
 
 class TestClassifiedsCosts(object):
 
+    @pytest.mark.parametrize(
+        'execution_date, partition_date, ed_first_day,pd_first_day',
+        [(datetime(2025, 12, 31), '2025-12-31', datetime(2025, 12, 1), '2025-12-01'),
+         (datetime(2016, 3, 24), '2016-03-24', datetime(2016, 3, 1), '2016-03-01'),
+         (datetime(2012, 2, 29), '2012-02-29', datetime(2012, 2, 1), '2012-02-01'),
+         ])
+    def test_reset_execution_date(self, execution_date, partition_date, ed_first_day,
+                                  pd_first_day, classifieds_costs):
+        # arrange
+        classifieds_costs.execution_date = execution_date
+        classifieds_costs.partition_date = partition_date
+
+        # act & assert
+        classifieds_costs._force_month_first_day()
+        assert classifieds_costs.execution_date == ed_first_day
+        assert classifieds_costs.partition_date == pd_first_day
+
+        classifieds_costs._reset_execution_date()
+        assert classifieds_costs.execution_date == execution_date
+        assert classifieds_costs.partition_date == partition_date
+
     @mock.patch.object(ClassifiedsCosts, '_save_to_s3')
     @mock.patch.object(ClassifiedsCosts, '_get_google_sheets_data')
     def test_move_classifieds_costs_to_raw(self, mock__get_google_sheets_data,
@@ -22,11 +43,15 @@ class TestClassifiedsCosts(object):
         # arrange
         mock_df_gsheets = Mock()
         mock__get_google_sheets_data.return_value = mock_df_gsheets
+        classifieds_costs.execution_date = datetime(2019, 10, 21)
+        classifieds_costs.partition_date = '2019-10-21'
 
         # act
         classifieds_costs.move_classifieds_costs_to_raw()
 
         # assert
+        assert classifieds_costs.execution_date == datetime(2019, 10, 21)
+        assert classifieds_costs.partition_date == '2019-10-21'
         mock__get_google_sheets_data.assert_called_once_with()
         mock__save_to_s3.assert_called_once_with(mock_df_gsheets)
 
@@ -36,11 +61,14 @@ class TestClassifiedsCosts(object):
                               (datetime(2012, 2, 29), datetime(2012, 2, 1)),
                               ])
     def test_force_month_first_day(self, date, expected_date, classifieds_costs):
+        # arrange
+        classifieds_costs.execution_date = date
+
         # act
-        new_execution_date = classifieds_costs._force_month_first_day(date)
+        classifieds_costs._force_month_first_day()
 
         # assert
-        assert new_execution_date == expected_date
+        assert classifieds_costs.execution_date == expected_date
 
     @mock.patch.object(ClassifiedsCosts, '_get_extra_config')
     @mock.patch('bietlejuice.jobs.etl.marketing.classifieds_costs.GoogleSheetsClient')

@@ -21,22 +21,32 @@ class ClassifiedsCosts(Marketing):
 
     def __init__(self, s3_bucket, execution_date, account=None, auth=None,
                  extra_configs=None):
-        month_first_day = self._force_month_first_day(execution_date)
-        super(ClassifiedsCosts, self).__init__(s3_bucket, month_first_day,
+        super(ClassifiedsCosts, self).__init__(s3_bucket, execution_date,
                                                self.INTEGRATION, account)
         self.auth = auth
-        self.sheet_name = self.partition_date
         self.funnel_side = self._extract_extra_config(extra_configs, 'side')
         self.sheet_id = self._extract_extra_config(extra_configs, 'sheet_id')
 
-    @staticmethod
-    def _force_month_first_day(execution_date):
-        return execution_date.replace(day=1)
+    def _force_month_first_day(self):
+        """Used to fetch only the sheet tab from the current month on raw task and to
+        save once per month on clean task"""
+        self.old_execution_date = self.execution_date
+        self.old_partition_date = self.partition_date
+        self.execution_date = self.execution_date.replace(day=1)
+        self.partition_date = self.execution_date.strftime('%Y-%m-%d')
+
+    def _reset_execution_date(self):
+        """Restore the execution date value to ensure next methods that could use this
+        will have the expected date"""
+        self.execution_date = self.old_execution_date
+        self.partition_date = self.old_partition_date
 
     @logger
     def move_classifieds_costs_to_raw(self):
+        self._force_month_first_day()
         df_gsheets = self._get_google_sheets_data()
         self._save_to_s3(df_gsheets)
+        self._reset_execution_date()
 
     @staticmethod
     def _extract_extra_config(extra_configs, config):
@@ -59,8 +69,9 @@ class ClassifiedsCosts(Marketing):
             self.auth['GSA_CREDENTIALS'],
             self.auth['GOOGLE_API_SCOPE']
         )
-        return g_sheets.get_dataframe_from_sheet(self.sheet_name, str(
-            self._get_extra_config('sheet_id')))
+        return g_sheets.get_dataframe_from_sheet(sheet_name=self.partition_date,
+                                                 sheet_id=str(self._get_extra_config(
+                                                     'sheet_id')))
 
     @logger(exclude='df')
     def _save_to_s3(self, raw_data):
@@ -99,6 +110,7 @@ class ClassifiedsCosts(Marketing):
 
     @logger
     def move_classifieds_demand_costs_to_clean(self):
+        self._force_month_first_day()
         c_cols = OrderedDict([
             ('medium', str),
             ('source', str),
@@ -111,9 +123,11 @@ class ClassifiedsCosts(Marketing):
             r_cols=c_cols,
             c_cols=c_cols
         )
+        self._reset_execution_date()
 
     @logger
     def move_classifieds_supply_costs_to_clean(self):
+        self._force_month_first_day()
         c_cols = OrderedDict([
             ('medium', str),
             ('source', str),
@@ -126,11 +140,12 @@ class ClassifiedsCosts(Marketing):
             r_cols=c_cols,
             c_cols=c_cols
         )
+        self._reset_execution_date()
 
     @logger
     def load_to_staging(self, dw_table_name):
         query = self._get_staging_table_query(dw_table_name)
-        query = query.format(date=self.partition_date)  # todo remove add das queries
+        query = query.format(date=self.partition_date)
         logger.info("m=load_to_staging, query={}".format(query))
 
         self._load_to_staging(dw_table_name, query)

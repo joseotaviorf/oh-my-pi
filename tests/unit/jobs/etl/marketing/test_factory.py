@@ -38,7 +38,7 @@ class TestMarketingFactory(object):
                               (MarketingEnum.GOOGLE_ADS, GoogleAds,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.CLASSIFIEDS_COSTS, ClassifiedsCosts,
-                               datetime(2017, 12, 1)),
+                               datetime(2017, 12, 31)),
                               (MarketingEnum.CRITEO, CriteoCampaigns,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.RTB, RtbCampaigns, datetime(2017, 12, 31)),
