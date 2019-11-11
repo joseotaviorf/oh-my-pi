@@ -110,6 +110,7 @@ class MySqlConsumer(DBConsumer):
                 format="jdbc",
                 options={
                     **self.spark_common_options,
+                    "dbtable": table_name,
                     "partitionColumn": partition_column,
                     "lowerBound": lower_bound,
                     "upperBound": upper_bound,
