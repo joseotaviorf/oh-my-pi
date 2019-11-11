@@ -5,30 +5,25 @@ WITH
 -- if a listing has been there for longer than 120 days we'll ignore its previous history
 crawled_listings_first_time AS (
   SELECT
-    id_crawled_listing,
-    crawled_on AS first_time_crawled_on,
-    updated_on AS first_time_updated_on
-  FROM
-    (
-      SELECT
-        ws || '-' || id AS id_crawled_listing,
-        crawled_on,
-        updated_on,
-        ROW_NUMBER() OVER(PARTITION BY ws || '-' || id ORDER BY DATE(crawled_on) ASC) AS row
-      FROM datalake_clean.crawlers
-      WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')  -- do not select from olx
-        AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
-        AND (advertiser_name is null or advertiser_name != 'quintoandar')
-        AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
-    ) as tmp
-  WHERE
-    row = 1  -- get the first time it was crawled within the last 120 days
+    ws || '-' || id AS id_crawled_listing,
+    MIN(DATE(crawled_on)) AS first_time_crawled_on,
+    MAX(DATE(crawled_on)) AS lastest_time_crawled_on,
+    MIN(DATE(updated_on)) AS first_time_updated_on,
+    MAX(DATE(updated_on)) AS lastest_time_updated_on
+  FROM datalake_clean.crawlers
+  WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')  -- do not select from olx
+    AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
+    AND COALESCE(advertiser_name, '') NOT IN ('quintoandar', 'quinto-andar-servicos-imobiliarios-ltda')
+    AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     AND DATE(updated_on) >= CURRENT_DATE - INTERVAL '120' DAY  -- and only listings posted or updated in the last 120 days
+  GROUP BY 1
 ),
 crawled_listings AS (
   SELECT
     crawled_listings_first_time.first_time_crawled_on,
+    crawled_listings_first_time.lastest_time_crawled_on,
     crawled_listings_first_time.first_time_updated_on,
+    crawled_listings_first_time.lastest_time_updated_on,
     listings.*
   FROM
     (
@@ -67,7 +62,7 @@ crawled_listings AS (
       FROM datalake_clean.crawlers
       WHERE ws IN ('imovelweb', 'vivareal', 'zapimoveis')  -- do not select from olx
         AND COALESCE(rent, '') != ''  -- only listings for rent, not if only for sale
-        AND (advertiser_name is null or advertiser_name != 'quintoandar')  -- ignore our own listings on other sites
+        AND COALESCE(advertiser_name, '') NOT IN ('quintoandar', 'quinto-andar-servicos-imobiliarios-ltda')
         AND started_on >= CURRENT_DATE - INTERVAL '120' DAY  -- only query listings from crawler jobs started in the last 120 days
     ) as listings
   JOIN crawled_listings_first_time ON listings.id_crawled_listing = crawled_listings_first_time.id_crawled_listing
