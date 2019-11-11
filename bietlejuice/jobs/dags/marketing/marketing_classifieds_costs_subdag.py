@@ -1,6 +1,7 @@
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.marketing import MarketingSubDag
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('MarketingClassifiedsCostsSubDag')
 
@@ -33,3 +34,7 @@ class MarketingClassifiedsCostsSubDag(MarketingSubDag):
                 'account': 'default'
             }
         )
+
+    @logger(exclude='execution_date')
+    def _get_execution_date(self, execution_date):
+        return execution_date

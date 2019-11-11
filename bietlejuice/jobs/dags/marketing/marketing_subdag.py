@@ -28,7 +28,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__get_execution_date(kwargs.get('execution_date')),
+            execution_date=self._get_execution_date(kwargs.get('execution_date')),
             auth=self.auth,
             extra_configs=extra_configs
         )
@@ -38,7 +38,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__get_execution_date(kwargs['execution_date']),
+            execution_date=self._get_execution_date(kwargs['execution_date']),
             account=account,
             auth=self.auth,
             extra_configs=self.extra_configs
@@ -52,7 +52,7 @@ class MarketingSubDag(BaseSubDag):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
-            execution_date=self.__get_execution_date(kwargs['execution_date'])
+            execution_date=self._get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_pre_staging(clean_table=clean_table,
                                             prod_table=prod_table,
@@ -64,7 +64,7 @@ class MarketingSubDag(BaseSubDag):
             class_=self.class_,
             s3_bucket=bucket,
             auth=self.auth,
-            execution_date=self.__get_execution_date(kwargs['execution_date'])
+            execution_date=self._get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_staging(dw_table_name=dw_table)
 
@@ -74,7 +74,7 @@ class MarketingSubDag(BaseSubDag):
             class_=self.class_,
             s3_bucket=bucket,
             auth=self.auth,
-            execution_date=self.__get_execution_date(kwargs['execution_date'])
+            execution_date=self._get_execution_date(kwargs['execution_date'])
         )
         marketing_class.load_to_prod(table_name=dw_table)
 
@@ -180,5 +180,5 @@ class MarketingSubDag(BaseSubDag):
         )
 
     @logger(exclude='execution_date')
-    def __get_execution_date(self, execution_date):
+    def _get_execution_date(self, execution_date):
         return execution_date - timedelta(1)
