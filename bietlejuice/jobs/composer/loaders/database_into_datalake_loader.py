@@ -30,7 +30,7 @@ class DatabaseIntoDataLakeLoader:
     def load_full_table(
         self, consumer, table_name, query=None, partition_by=None, concurrency=1
     ):
-        db_source = consumer.connection["db"]
+        db_source = consumer.conn_config["db"]
         final_path = "{}/{}".format(self.datalake_path, table_name.lower())
 
         logger.info(
@@ -112,7 +112,7 @@ class DatabaseIntoDataLakeLoader:
         drop_query = self.DROP_TABLE_QUERY_TEMPLATE.format(
             database=athena_db, table=table_name
         )
-        athena_client.execute_athena_query(drop_query, athena_db)
+        athena_client.run(drop_query)
         logger.info(
             "m=create_athena_external_table, table={}.{}, msg=Dropped "
             "table in Athena successfully".format(athena_db, table_name)
@@ -155,10 +155,10 @@ class DatabaseIntoDataLakeLoader:
             format=self.create_query_format,
             path="{}/{}".format(self.datalake_path, table_name),
         )
-        athena_client.execute_athena_query(create_query, athena_db)
+        athena_client.run(create_query)
         if partition_by:
-            athena_client.execute_athena_query(
-                "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table_name), athena_db
+            athena_client.run(
+                "MSCK REPAIR TABLE `{}`.`{}`;".format(athena_db, table_name)
             )
 
         logger.info(
@@ -166,9 +166,8 @@ class DatabaseIntoDataLakeLoader:
                 athena_db, table_name
             )
         )
-        athena_client.execute_athena_query(
-            self.TEST_TABLE_QUERY_TEMPLATE.format(database=athena_db, table=table_name),
-            athena_db,
+        athena_client.run(
+            self.TEST_TABLE_QUERY_TEMPLATE.format(database=athena_db, table=table_name)
         )
 
         logger.info(

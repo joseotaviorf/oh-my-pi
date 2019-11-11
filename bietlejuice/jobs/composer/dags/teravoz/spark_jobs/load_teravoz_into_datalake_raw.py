@@ -2,34 +2,22 @@ import json
 import logging
 from argparse import ArgumentParser
 
+from quintoandar_logger import QuintoAndarLogger
+from quintoandar_teravoz_client import TeravozClient
+
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.consumers.teravoz import TeravozFactoryConsumer
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz import (
+    TeravozFactoryConsumer,
+)
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
 
-from quintoandar_logger import QuintoAndarLogger
-
 DATABRICKS_SCOPE = "quintoandar"
-
 
 JOB_NAME = "load_teravoz_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-
-@logger
-def exec_factory_method(endpoint, method, api_user, api_pwd, execution_date):
-
-    teravoz_consumer = TeravozFactoryConsumer.factory(
-        endpoint=endpoint,
-        api_user=api_user,
-        api_pwd=api_pwd,
-        execution_date=execution_date,
-    )
-
-    getattr(teravoz_consumer, method)
-    return teravoz_consumer
-
 
 if __name__ == "__main__":
 
@@ -45,7 +33,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_teravoz_into_datalake_raw, endpoint_name={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+        "m=load_teravoz_into_datalake_raw, endpoint_name={}, execution_date={}, "
+        "environment={}, msg=print args spark jobs params".format(
             args.endpoint_name, args.execution_date, args.environment
         )
     )
@@ -66,11 +55,15 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
 
     # request api and get dataframe
-    teravoz_consumer = exec_factory_method(
+    teravoz_client = TeravozClient(
+        api_user=credentials["teravoz_user"], api_pwd=credentials["teravoz_password"]
+    )
+    spark_sql_client = SparkClient()
+
+    teravoz_consumer = TeravozFactoryConsumer.factory(
+        teravoz_client=teravoz_client,
+        spark_client=spark_sql_client,
         endpoint=endpoint_name,
-        method="__init__",
-        api_user=credentials["teravoz_user"],
-        api_pwd=credentials["teravoz_password"],
         execution_date=execution_date,
     )
     df = teravoz_consumer.request_api_and_get_dataframe(endpoint_name)

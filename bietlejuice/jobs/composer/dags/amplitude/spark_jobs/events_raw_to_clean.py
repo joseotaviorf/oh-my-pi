@@ -3,6 +3,8 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
@@ -12,7 +14,7 @@ from bietlejuice.jobs.composer.base.spark import (
 )
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
-from bietlejuice.jobs.composer.consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -49,7 +51,9 @@ if __name__ == "__main__":
         SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service
     )
     dataframe_service = SparkDataFrameService()
-    spark_sql_consumer = DatabricksConsumer({"db": db_info["db_raw_databricks"]})
+    spark_sql_consumer = DatabricksConsumer(
+        {"db": db_info["db_raw_databricks"]}, SparkClient()
+    )
 
     # create events_repartitioned in datalake
     df = amplitude_events.create_clean_events_df(

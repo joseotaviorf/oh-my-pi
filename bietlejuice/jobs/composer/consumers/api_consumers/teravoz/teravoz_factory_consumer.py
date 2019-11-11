@@ -1,10 +1,16 @@
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers.teravoz import (
-    TeravozConsumer,
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_calls_consumer import (
     TeravozCallsConsumer,
-    TeravozReportsConsumer,
+)
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_consumer import (
+    TeravozConsumer,
+)
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_report_agent_status_consumer import (
     TeravozReportAgentStatusConsumer,
+)
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_reports_consumer import (
+    TeravozReportsConsumer,
 )
 
 logger = QuintoAndarLogger("TeravozFactoryConsumer")
@@ -12,7 +18,7 @@ logger = QuintoAndarLogger("TeravozFactoryConsumer")
 
 class TeravozFactoryConsumer:
     @staticmethod
-    def factory(endpoint, api_user, api_pwd, execution_date):
+    def factory(teravoz_client, spark_client, endpoint, execution_date):
         if endpoint is None:
             raise ValueError("m=factory, class_={}, msg=endpoint can't be None")
         class_ = TeravozFactoryConsumer.__dispatch_dict(endpoint)
@@ -22,7 +28,7 @@ class TeravozFactoryConsumer:
                     endpoint
                 )
             )
-        return class_(api_user=api_user, api_pwd=api_pwd, execution_date=execution_date)
+        return class_(teravoz_client, spark_client, execution_date)
 
     @staticmethod
     def __dispatch_dict(endpoint):

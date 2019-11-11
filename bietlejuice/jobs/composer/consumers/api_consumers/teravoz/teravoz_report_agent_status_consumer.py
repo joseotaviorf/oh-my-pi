@@ -2,23 +2,19 @@ from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers.teravoz import TeravozConsumer
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_consumer import (
+    TeravozConsumer,
+)
 
 logger = QuintoAndarLogger("TeravozReportAgentStatusConsumer")
 
-# spark instances
-sc = BaseSparkContext.sc
-sqlContext = BaseSparkContext.sqlContext
-
 
 class TeravozReportAgentStatusConsumer(TeravozConsumer):
-
     UTC_HOUR = "T03:00:00.000Z"
 
     @logger
-    def __init__(self, api_user, api_pwd, execution_date):
-        super().__init__(api_user, api_pwd, execution_date)
+    def __init__(self, teravoz_client, spark_client, execution_date):
+        super().__init__(teravoz_client, spark_client, execution_date)
 
     @logger
     def __build_api_params(self):
@@ -46,12 +42,14 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
 
         for queue in list_queue_numbers:
             params["queue_number"] = queue.number
-            response = getattr(self.api_instance, endpoint)(**params).get()
+            response = getattr(self.teravoz_client, endpoint)(**params).get()
 
             for page in response().pages():
                 json_data = page().data
-                response_list.append(json_data["result"])
+                if isinstance(json_data["result"], list):
+                    for elem in json_data["result"]:
+                        response_list.append(elem)
 
-        jsonRDD = sc.parallelize(response_list, 1)
-        df = sqlContext.read.option("multiLine", "true").json(jsonRDD)
+        df = self.spark_client.create_dataframe(response_list)
+
         return df

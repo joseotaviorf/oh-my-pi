@@ -1,33 +1,30 @@
 import json
 from argparse import ArgumentParser
-
 from collections import OrderedDict
 from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
 from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
-    SOURCE,
     DATABRICKS_SCOPE,
+    SOURCE,
     base_dbutils,
     spark_sql_client,
 )
-
+from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 JOB_NAME = "load_event_table_into_datalake_raw"
 logger = QuintoAndarLogger(JOB_NAME)
-
 
 if __name__ == "__main__":
 
@@ -40,9 +37,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=__main__, execution_date={}, environment={}, msg=print args spark jobs params".format(
-            args.execution_date, args.environment
-        )
+        "m=__main__, execution_date={}, environment={}, msg=print args spark jobs "
+        "params".format(args.execution_date, args.environment)
     )
 
     execution_date = args.execution_date
@@ -71,11 +67,11 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     # get BigFone credentials stored in Databricks secrets
-    json_connection = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=SOURCE)
+    conn_config_json = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=SOURCE)
 
     # establish connection and get data from Event table
-    connection = json.loads(json_connection)
-    consumer = PostgreSQLConsumer(connection)
+    conn_config = json.loads(conn_config_json)
+    consumer = PostgresConsumer(conn_config, spark_sql_client)
     event_table_data = consumer.get_data_from_query(query.format(**query_filter))
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)

@@ -1,18 +1,16 @@
 from argparse import ArgumentParser
-
 from collections import OrderedDict
 from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
@@ -20,12 +18,12 @@ from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
     SOURCE,
     spark_sql_client,
 )
+from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 JOB_NAME = "load_event_table_into_datalake_clean"
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description="load_event_table_into_datalake_clean")
 
     # args passed by Airflow task
@@ -35,9 +33,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=__main__, execution_date={}, environment={}, msg=print args spark jobs params".format(
-            args.execution_date, args.environment
-        )
+        "m=__main__, execution_date={}, environment={}, msg=print args spark jobs "
+        "params".format(args.execution_date, args.environment)
     )
 
     execution_date = args.execution_date
@@ -64,8 +61,8 @@ if __name__ == "__main__":
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
-    connection = {"db": datalake_info["db_clean_databricks"]}
-    databricks_consumer = DatabricksConsumer(connection)
+    conn_config = {"db": datalake_info["db_clean_databricks"]}
+    databricks_consumer = DatabricksConsumer(conn_config, spark_sql_client)
     event_table_data = databricks_consumer.get_data_from_query(
         query.format(**query_filter)
     )

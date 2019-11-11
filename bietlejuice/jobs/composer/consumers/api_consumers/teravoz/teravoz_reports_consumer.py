@@ -2,23 +2,23 @@ from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers.teravoz import TeravozConsumer
+from bietlejuice.jobs.composer.consumers.api_consumers.teravoz.teravoz_consumer import (
+    TeravozConsumer,
+)
 
 logger = QuintoAndarLogger("TeravozReportsConsumer")
 
 
 class TeravozReportsConsumer(TeravozConsumer):
-
     UTC_HOUR_START = "T03:00:00.000Z"
     UTC_HOUR_END = "T02:59:59.999Z"
 
     @logger
-    def __init__(self, api_user, api_pwd, execution_date):
-        super().__init__(api_user, api_pwd, execution_date)
+    def __init__(self, teravoz_client, spark_client, execution_date):
+        super().__init__(teravoz_client, spark_client, execution_date)
 
     @logger
     def __build_api_params(self):
-
         list_queue_numbers = super()._get_queue_numbers()
 
         list_queues = []
@@ -38,7 +38,6 @@ class TeravozReportsConsumer(TeravozConsumer):
 
     @logger
     def request_api_and_get_dataframe(self, endpoint):
-
         # build params to call API
         params = self.__build_api_params()
         endpoint = endpoint.replace("-", "_")

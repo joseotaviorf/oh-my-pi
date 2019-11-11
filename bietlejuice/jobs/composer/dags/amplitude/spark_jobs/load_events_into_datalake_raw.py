@@ -4,8 +4,10 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.wrappers import AmplitudeExportApi, SparkSQLCLient
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
@@ -66,9 +68,9 @@ if __name__ == "__main__":
                 key["app_id"], key["app_name"]
             )
         )
-        amplitude_export_api = AmplitudeExportApi(key["app_key"], key["secret_key"])
+        amplitude_export_api = AmplitudeClient(key["app_key"], key["secret_key"])
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
-        file_from_api = amplitude_export_api.get_files_from_extract_api(start, end)
+        file_from_api = amplitude_export_api.get_event_data_files(start, end)
 
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)

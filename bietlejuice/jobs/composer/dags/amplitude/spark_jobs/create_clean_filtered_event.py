@@ -3,6 +3,8 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
@@ -12,7 +14,7 @@ from bietlejuice.jobs.composer.base.spark import (
 )
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
-from bietlejuice.jobs.composer.consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -51,7 +53,9 @@ if __name__ == "__main__":
     # create filtered events table
     table_name = "{}_events".format(event_type)
     partition_by_list = ["year", "month", "day"]
-    spark_sql_consumer = DatabricksConsumer({"db": db_info["db_clean_databricks"]})
+    spark_sql_consumer = DatabricksConsumer(
+        {"db": db_info["db_clean_databricks"]}, SparkClient()
+    )
     df = amplitude_events.create_filtered_clean_events_df(
         date, event_type, spark_sql_consumer, dataframe_service
     )

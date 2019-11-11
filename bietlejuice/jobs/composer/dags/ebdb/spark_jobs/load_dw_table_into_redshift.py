@@ -1,22 +1,21 @@
-import boto3
 import json
-from argparse import ArgumentParser
 import logging
+from argparse import ArgumentParser
 
+import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext, BaseDBUtils
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.s3 import S3Service
-from bietlejuice.jobs.composer.wrappers import RedshiftClient
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.jobs.composer.base.spark import SparkMetastoreService
+from bietlejuice.jobs.composer.clients.db_clients import PostgresClient
 from bietlejuice.jobs.composer.loaders import RedshiftLoader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
-from bietlejuice.jobs.composer.base.spark import SparkMetastoreService
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 
 JOB_NAME = "load_dw_table_into_redshift"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
 spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
 base_dbutils = BaseDBUtils()
@@ -36,12 +35,11 @@ def validate_load(spark_schema, redshift_schema, table_name):
     redshift_query = base_query.format(redshift_schema)
 
     spark_result = spark_sql_client.run(spark_query).collect()[0][0]
-    redshift_result = redshift_client.run_query(redshift_query)[0][0]
+    redshift_result = redshift_client.get_records(redshift_query)[0][0]
 
     logger.info(
-        "m=__main__, spark_result={}, redshift_result={}, msg=Validating results".format(
-            spark_result, redshift_result
-        )
+        "m=validate_load, spark_result={}, redshift_result={}, msg=Validating "
+        "results".format(spark_result, redshift_result)
     )
     assert spark_result == redshift_result
 
@@ -55,9 +53,8 @@ if __name__ == "__main__":
     dw_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
 
     logger.info(
-        "m=__main__, table_name={}, dw_schema={}, env={}, msg=Job execution started".format(
-            table_name, dw_schema, env
-        )
+        "m=__main__, table_name={}, dw_schema={}, env={}, msg=Job execution "
+        "started".format(table_name, dw_schema, env)
     )
 
     # instances setup
@@ -67,8 +64,17 @@ if __name__ == "__main__":
         dw_info["dw_schema_databricks"], dw_info["dw_schema_path"], spark_sql_client
     )
 
+    # todo: use the EnumDB class to pass the environment
     redshift_connection = json.loads(dbutils.secrets.get("quintoandar", "ENV_DW"))
-    redshift_client = RedshiftClient(redshift_connection)
+
+    redshift_client = PostgresClient(
+        dbname=redshift_connection["db"],
+        host=redshift_connection["host"],
+        port=redshift_connection["port"],
+        user=redshift_connection["user"],
+        password=redshift_connection["pwd"],
+        keepalives_idle=200,
+    )
     redshift_loader = RedshiftLoader(redshift_client, s3_client, dw_info["dw_bucket"])
 
     # load

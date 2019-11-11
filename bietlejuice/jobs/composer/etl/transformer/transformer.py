@@ -2,7 +2,8 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
@@ -31,7 +32,8 @@ class Transformer:
     @logger
     def _get_spark_table_schema(self, datalake_layer, table_name):
         spark_table_schema = self._get_spark_schema(datalake_layer)
-        consumer = DatabricksConsumer({"db": spark_table_schema})
+        spark_sql_client = SparkClient()
+        consumer = DatabricksConsumer({"db": spark_table_schema}, spark_sql_client)
         table_schema = consumer.get_table_schema(table_name).collect()
         table_schema = OrderedDict(
             [(row["col_name"], row["col_type"].lower()) for row in table_schema]

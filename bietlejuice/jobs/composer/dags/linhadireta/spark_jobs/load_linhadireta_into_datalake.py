@@ -6,7 +6,8 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.consumers import PostgreSQLConsumer
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
 
 JOB_NAME = "load_linhadireta_into_datalake"
@@ -26,11 +27,12 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    connection_json = dbutils.secrets.get(
+    conn_config_json = dbutils.secrets.get(
         scope="quintoandar", key=DatabaseEnum.LINHADIRETA
     )
-    connection = json.loads(connection_json)
-    postgresql_consumer = PostgreSQLConsumer(connection)
+    conn_config = json.loads(conn_config_json)
+    spark_sql_client = SparkClient()
+    postgresql_consumer = PostgresConsumer(conn_config, spark_sql_client)
 
     tables = postgresql_consumer.get_table_names_and_sizes().collect()
     loader = DatabaseIntoDataLakeRawLoader(environment, source)

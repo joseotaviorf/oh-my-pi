@@ -4,7 +4,8 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
@@ -31,8 +32,8 @@ if __name__ == "__main__":
     db_clean_path = db_info["db_clean_path"]
 
     athena_client = AthenaClient()
-    connection = {"db": db_clean_databricks}
-    databricks_consumer = DatabricksConsumer(connection)
+    conn_config = {"db": db_clean_databricks}
+    databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
 
     # create athena external table
     logger.info(
