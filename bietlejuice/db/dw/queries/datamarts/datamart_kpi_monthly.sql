@@ -128,17 +128,63 @@ where dc.status = 'Finalizado'
       and dc.dt_annulment < current_date
 group by 1, 2, 3, 4
 ),
+ongoing_listings_monthly as (
+with
+daily_published_listings as (
+select
+    f.sk_house_listing,
+    f.status_history,
+    d.date,
+    d.week_start,
+    d.weekday_name,
+    d.month_start,
+    d.month_end,
+    row_number() over(partition by f.sk_house_listing, d.date order by f.ts_status_start desc) as order_status -- daily order status
+from fact_house_listing_status f
+join dim_date d
+  on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+where f.status_history = 'publicado' -- consider only published status
+  and substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
+),
+daily_published_listings_adjusted as (
+select
+    fhs.sk_house_listing,
+    fhs.date,
+    fhs.week_start,
+    fhs.weekday_name,
+    fhs.month_start,
+    fhs.month_end,
+    fhs.order_status,
+    fhs.status_history,
+    fhl.sk_region
+from daily_published_listings fhs
+left join fact_house_listings fhl
+  on fhs.sk_house_listing = fhl.sk_house_listing
+left join dim_region dr
+  on fhl.sk_region = dr.sk_region
+where fhs.order_status = 1
+  and dr.city_group is not null
+  and fhs.date = fhs.month_end -- filter that indicates it will be grouped by month
+)
+select
+    month_start,
+    sk_region,
+    count(distinct sk_house_listing) as ongoing_listings_monthly
+from daily_published_listings_adjusted
+group by 1, 2
+),
 monthly_metrics as (
 select
-	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,rr.rental_month_start) as month_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,rr.sk_region) as sk_region,
+	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,rr.rental_month_start,olist.month_start) as month_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,rr.sk_region, olist.sk_region ) as sk_region,
 	ocont.ongoing_contracts_monthly,
 	orent.ongoing_rentals_monthly,
 	nrent.new_rentals_monthly,
 	ncont.new_contracts_signed_monthly,
 	rr.re_rentals_monthly,
 	nfl.new_first_listings_monthly,
-	er.ended_rentals_monthly
+	er.ended_rentals_monthly,
+	olist.ongoing_listings_monthly
 from ongoing_contracts_monthly ocont
 full outer join ongoing_rentals_monthly orent
   on ocont.month_start = orent.month_start and ocont.sk_region = orent.sk_region
@@ -152,6 +198,8 @@ full outer join new_first_listings nfl
   on ocont.month_start = nfl.first_listing_month_start and ocont.sk_region = nfl.sk_region
 full outer join ended_rentals er
   on ocont.month_start = er.month_date and ocont.sk_region = er.sk_region
+full outer join ongoing_listings_monthly olist
+  on ocont.month_start = olist.month_start and ocont.sk_region = olist.sk_region
 )
 select
 	dm.month_date,
@@ -164,7 +212,8 @@ select
 	sum(dm.new_contracts_signed_monthly) as new_contracts_signed_monthly,
 	sum(dm.new_first_listings_monthly) as new_first_listings_monthly,
 	sum(dm.re_rentals_monthly) as re_rentals_monthly,
-	sum(dm.ended_rentals_monthly) as ended_rentals_monthly
+	sum(dm.ended_rentals_monthly) as ended_rentals_monthly,
+	sum(dm.ongoing_listings_monthly) as ongoing_listings_monthly
 from monthly_metrics dm
 left join dim_region dr
   using(sk_region)

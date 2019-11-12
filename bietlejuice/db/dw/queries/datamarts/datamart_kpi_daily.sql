@@ -127,17 +127,63 @@ where dc.status = 'Finalizado'
 group by 1, 2, 3, 4
 order by 1 desc, 2, 3, 4
 ),
+ongoing_listings_daily as (
+with
+daily_published_listings as (
+select
+    f.sk_house_listing,
+    f.status_history,
+    d.date,
+    d.week_start,
+    d.weekday_name,
+    d.month_start,
+    d.month_end,
+    row_number() over(partition by f.sk_house_listing, d.date order by f.ts_status_start desc) as order_status -- daily order status
+from fact_house_listing_status f
+join dim_date d
+  on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+where f.status_history = 'publicado' -- consider only published status
+  and substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
+),
+daily_published_listings_adjusted as (
+select
+    fhs.sk_house_listing,
+    fhs.date,
+    fhs.week_start,
+    fhs.weekday_name,
+    fhs.month_start,
+    fhs.month_end,
+    fhs.order_status,
+    fhs.status_history,
+    fhl.sk_region
+from daily_published_listings fhs
+left join fact_house_listings fhl
+  on fhs.sk_house_listing = fhl.sk_house_listing
+left join dim_region dr
+  on fhl.sk_region = dr.sk_region
+where fhs.order_status = 1
+  and dr.city_group is not null
+)
+select
+    date,
+    sk_region,
+    count(distinct sk_house_listing) as ongoing_listings_daily
+from daily_published_listings_adjusted
+group by 1, 2
+),
 daily_metrics as (
 select
-	distinct coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, rr.rental_date) as date_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, rr.sk_region) as sk_region,
+	distinct
+	coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, rr.rental_date, olist.date) as date_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, rr.sk_region, olist.sk_region) as sk_region,
 	ocont.ongoing_contracts_daily,
 	orent.ongoing_rentals_daily,
 	nrent.new_rentals_daily,
 	ncont.new_contracts_signed_daily,
 	nfl.new_first_listings_daily,
 	rr.re_rentals_daily,
-	er.ended_rentals_daily
+	er.ended_rentals_daily,
+	olist.ongoing_listings_daily
 from ongoing_contracts_daily ocont
 full outer join ongoing_rentals_daily orent
   on ocont.date = orent.date and ocont.sk_region = orent.sk_region
@@ -151,6 +197,8 @@ full outer join re_rentals rr
   on ocont.date = rr.rental_date and ocont.sk_region = rr.sk_region
 full outer join ended_rentals er
   on ocont.date = er.date_date and ocont.sk_region = er.sk_region
+full outer join ongoing_listings_daily olist
+  on ocont.date = olist.date and ocont.sk_region = olist.sk_region
 )
 select
 	dm.date_date,
@@ -163,7 +211,8 @@ select
 	sum(dm.new_contracts_signed_daily) as new_contracts_signed,
 	sum(dm.new_first_listings_daily) as new_first_listings,
 	sum(dm.re_rentals_daily) as re_rentals,
-	sum(dm.ended_rentals_daily) as ended_rentals
+	sum(dm.ended_rentals_daily) as ended_rentals,
+	sum(dm.ongoing_listings_daily) as ongoing_listings_daily
 from daily_metrics dm
 left join dim_region dr
   using(sk_region)

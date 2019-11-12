@@ -32,6 +32,7 @@ left join fact_house_listings fhl
 left join dim_region dr
   on fhl.sk_region = dr.sk_region
 where fhs.order_status = 1
+  and dr.city_group is not null
 )
 select
     date,
