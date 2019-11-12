@@ -1,13 +1,14 @@
-DROP TABLE IF EXISTS datalake_raw.marketing_trovit_campaigns;
+DROP TABLE IF EXISTS datalake_raw.marketing_lifull_campaigns;
 
-CREATE EXTERNAL TABLE datalake_raw.marketing_trovit_campaigns(
+CREATE EXTERNAL TABLE datalake_raw.marketing_lifull_campaigns(
   `id`          string,
   `name`        string,
   `clicks`      string,
   `desktop_cost`  string,
   `mobile_cost`  string,
   `total_cost`  string,
-  `curr_date`   string)
+  `curr_date`   string,
+  `group_name` string)
 PARTITIONED BY(
   acc string,
   dt  string)
@@ -20,6 +21,6 @@ STORED AS INPUTFORMAT
 OUTPUTFORMAT
   'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
 LOCATION
-  's3://5a-datalake/raw/marketing/trovit_campaigns/';
+  's3://5a-datalake/raw/marketing/lifull_campaigns/';
 
-MSCK REPAIR TABLE datalake_raw.marketing_trovit_campaigns;
+MSCK REPAIR TABLE datalake_raw.marketing_lifull_campaigns;

@@ -1,13 +1,14 @@
-import pytest
 from datetime import datetime
 
+import pytest
 from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns, \
     ClassifiedsCosts
 from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
+from bietlejuice.jobs.etl.marketing import LifullCampaigns
 from bietlejuice.jobs.etl.marketing import Marketing
-from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
 from bietlejuice.jobs.etl.marketing import TwitterCampaigns
+from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
 from bietlejuice.jobs.etl.marketing.linkedin_campaigns import LinkedInCampaigns
 
 S3_BUCKET = 's3_bucket'
@@ -110,4 +111,14 @@ def classifieds_costs():
             "GOOGLE_API_SCOPE": "GOOGLE_API_SCOPE"
         },
         extra_configs={'side': 'side'}
+    )
+
+
+@pytest.fixture
+def lifull_campaigns():
+    return LifullCampaigns(
+        s3_bucket=S3_BUCKET,
+        execution_date=EXECUTION_DATE,
+        auth=None,
+        account=None
     )

@@ -1,16 +1,15 @@
 from datetime import timedelta
 
-from qa_python_utils import QuintoAndarLogger
-
 from bietlejuice.jobs.etl.marketing.classifieds_costs import ClassifiedsCosts
 from bietlejuice.jobs.etl.marketing.criteo_campaigns import CriteoCampaigns
 from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
+from bietlejuice.jobs.etl.marketing.lifull_campaigns import LifullCampaigns
 from bietlejuice.jobs.etl.marketing.linkedin_campaigns import LinkedInCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns
-from bietlejuice.jobs.etl.marketing.trovit_campaigns import TrovitCampaigns
 from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
+from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger("MarketingFactory")
 
@@ -48,9 +47,9 @@ class MarketingFactory(object):
             MarketingEnum.CRITEO: CriteoCampaigns,
             MarketingEnum.RTB: RtbCampaigns,
             MarketingEnum.CLASSIFIEDS_COSTS: ClassifiedsCosts,
-            MarketingEnum.TROVIT: TrovitCampaigns,
             MarketingEnum.TWITTER: TwitterCampaigns,
-            MarketingEnum.LINKEDIN: LinkedInCampaigns
+            MarketingEnum.LINKEDIN: LinkedInCampaigns,
+            MarketingEnum.LIFULL: LifullCampaigns
         }.get(class_)
 
     @staticmethod

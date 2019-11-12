@@ -31,6 +31,8 @@ class Marketing(object):
         'fact_classified_daily_cost_attributions': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
+        'dim_mitula_campaign': 'sk_mitula_campaign',
+        'fact_mitula_daily_cost_attributions': 'sk_mitula_campaign',
         'dim_twitter_ad': 'sk_ad',
         'dim_twitter_ad_group': 'sk_ad_group',
         'dim_twitter_campaign': 'sk_campaign',

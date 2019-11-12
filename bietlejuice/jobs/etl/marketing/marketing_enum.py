@@ -7,6 +7,6 @@ class MarketingEnum(Enum):
     CRITEO = 'criteo_campaigns'
     RTB = 'rtb_campaigns'
     CLASSIFIEDS_COSTS = 'classifieds_costs'
-    TROVIT = 'trovit_campaigns'
     TWITTER = 'twitter_ads'
     LINKEDIN = 'linkedin_campaigns'
+    LIFULL = 'lifull_campaigns'

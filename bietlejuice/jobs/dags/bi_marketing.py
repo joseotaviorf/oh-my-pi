@@ -27,7 +27,7 @@ auth = {
     MarketingEnum.CRITEO: json.loads(env.get_airflow_env_var('criteo_login')),
     MarketingEnum.FACEBOOK_ADS: None,
     MarketingEnum.GOOGLE_ADS: None,
-    MarketingEnum.TROVIT: None
+    MarketingEnum.LIFULL: None,
 }
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
@@ -48,7 +48,7 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    catchup=True,
+    catchup=False,
     max_active_runs=1
 )
 
@@ -242,33 +242,33 @@ rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.RTB,
 )
 
-trovit_raw_dag = BaseSubDag.get_sub_dag_operator(
+lifull_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
-    sub_dag_name='trovit-load-to-raw',
-    class_=MarketingEnum.TROVIT
+    sub_dag_name='lifull-load-to-raw',
+    class_=MarketingEnum.LIFULL
 )
 
-trovit_clean_dag = BaseSubDag.get_sub_dag_operator(
+lifull_clean_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=clean_sub_dag,
-    sub_dag_name='trovit-raw-to-clean',
-    class_=MarketingEnum.TROVIT,
+    sub_dag_name='lifull-raw-to-clean',
+    class_=MarketingEnum.LIFULL,
     accounts='default'
 )
 
-trovit_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+lifull_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='trovit-load-to-staging',
-    class_=MarketingEnum.TROVIT
+    sub_dag_name='lifull-load-to-staging',
+    class_=MarketingEnum.LIFULL
 )
 
-trovit_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+lifull_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='trovit-load-to-dw',
-    class_=MarketingEnum.TROVIT
+    sub_dag_name='lifull-load-to-dw',
+    class_=MarketingEnum.LIFULL
 )
 
 airflow_helpers.chain(google_ads_clean_dag,
@@ -287,7 +287,7 @@ airflow_helpers.chain(rtb_raw_dag,
                       rtb_clean_dag,
                       rtb_load_to_staging_dag,
                       rtb_load_to_dw_dag)
-airflow_helpers.chain(trovit_raw_dag,
-                      trovit_clean_dag,
-                      trovit_load_to_staging_dag,
-                      trovit_load_to_dw_dag)
+airflow_helpers.chain(lifull_raw_dag,
+                      lifull_clean_dag,
+                      lifull_load_to_staging_dag,
+                      lifull_load_to_dw_dag)

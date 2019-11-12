@@ -13,8 +13,6 @@ from bietlejuice.jobs.dags.marketing.marketing_rtb_campaigns_subdag import \
     MarketingRtbCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import \
     MarketingSubDagFactory
-from bietlejuice.jobs.dags.marketing.marketing_trovit_campaigns_subdag import \
-    MarketingTrovitCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_twitter_campaigns_subdag import \
     MarketingTwitterCampaignsSubDag
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
@@ -28,7 +26,6 @@ class TestMarketingSubdagFactory(object):
         (MarketingEnum.CRITEO, MarketingCriteoCampaignsSubDag),
         (MarketingEnum.RTB, MarketingRtbCampaignsSubDag),
         (MarketingEnum.CLASSIFIEDS_COSTS, MarketingClassifiedsCostsSubDag),
-        (MarketingEnum.TROVIT, MarketingTrovitCampaignsSubDag),
         (MarketingEnum.TWITTER, MarketingTwitterCampaignsSubDag)
     ])
     def test_factory(self, class_, expected):
