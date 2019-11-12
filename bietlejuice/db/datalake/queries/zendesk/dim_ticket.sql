@@ -1,5 +1,5 @@
 with tickets_filter as (
-	select distinct t.* 
+	select distinct t.*
     from datalake_clean.zendesk_tickets t
 	where (t.ticket_via<>'api' or (t.ticket_via='api' and t.tags not like '%hsm%'))
 	and t.dt_extracted='{extraction_date}'
@@ -24,19 +24,19 @@ custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
 	        f1.field,
-	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
+	        json_extract(f1.field, '$.id') as id_field,
+	        json_extract(f1.field, '$.value') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
-	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
+	    cross join unnest(regexp_extract_all(tf.custom_fields, '{[^}]+[^,]+[^{]+')) as f1(field)
 	)
 	select f.id_ticket,
         map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
     inner join datalake_clean.zendesk_ticket_fields cf
-       on cf.id_ticket_fields = f.id_field
-    where f.value is not null
+       on cast(cf.id_ticket_fields as JSON) = f.id_field
+    where f.value != cast('null' as JSON)
     group by 1
 )
 select
@@ -44,7 +44,7 @@ select
     t.subject,
     t.description,
     t.ticket_via,
-    case 
+    case
         when t.ticket_via in ('api', 'web') and (tags like '%call_contato_ativo%' or tags like '%call_contato_receptivo%') then 'call'
         when t.ticket_via in ('api') and tags like '%form%' then 'form_faq'
         when t.ticket_via in ('web', 'email', 'chat') then t.ticket_via
@@ -65,8 +65,8 @@ select
     cast(t.ts_created as timestamp with time zone) as ts_created,
     cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
     cast(t.ts_updated as timestamp with time zone) as ts_updated,
-    -- bug caused by start delay of daylight saving time 
-    if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and 
+    -- bug caused by start delay of daylight saving time
+    if(cast(t.ts_updated as timestamp with time zone) >= cast('2018-10-23 02:00:00 UTC' as timestamp with time zone) and
 	cast(t.ts_updated as timestamp with time zone) <= cast('2018-11-04 03:00:00 UTC' as timestamp with time zone),
 		cast(t.ts_updated as timestamp with time zone) at time zone 'GMT-3',
 		cast(t.ts_updated as timestamp with time zone) at time zone 'Brazil/East') as ts_updated_local,
