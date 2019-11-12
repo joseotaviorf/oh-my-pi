@@ -120,3 +120,6 @@ db/.dbeaver-data-sources.xml
 
 # spark stuff
 metastore_db/
+
+# Airflow
+airflow/*

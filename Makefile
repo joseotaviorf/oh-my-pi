@@ -34,7 +34,7 @@ unit-tests-python2:
 	@echo "Automated Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=25 --cov-config .coveragerc tests
+	@python -m pytest --cov=bietlejuice/jobs/etl --cov-report html:htmlcov --cov-fail-under=40 --cov-config .coveragerc tests
 
 ############# PYTHON3 commands #######################
 
