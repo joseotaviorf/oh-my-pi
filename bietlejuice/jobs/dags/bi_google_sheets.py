@@ -64,7 +64,7 @@ dag = DAG(
         'depends_on_past': False
     },
     start_date=datetime(2019, 1, 1, 0, 0, 0),
-    schedule_interval='0 0 * * *',
+    schedule_interval=env.convert_to_utc_schedule('0 0,11 * * *'),
     max_active_runs=1,
     catchup=False
 )
