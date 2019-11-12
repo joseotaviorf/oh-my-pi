@@ -46,9 +46,7 @@ class TeravozReportAgentStatusConsumer(TeravozConsumer):
 
             for page in response().pages():
                 json_data = page().data
-                if isinstance(json_data["result"], list):
-                    for elem in json_data["result"]:
-                        response_list.append(elem)
+                response_list.append(json_data["result"])
 
         df = self.spark_client.create_dataframe(response_list)
 
