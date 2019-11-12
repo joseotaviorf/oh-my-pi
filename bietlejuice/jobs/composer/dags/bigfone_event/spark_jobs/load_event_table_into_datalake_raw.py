@@ -10,7 +10,10 @@ from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
+    spark,
+    sqlContext,
 )
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
@@ -19,9 +22,9 @@ from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
     DATABRICKS_SCOPE,
     SOURCE,
     base_dbutils,
-    spark_sql_client,
 )
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_event_table_into_datalake_raw"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -71,20 +74,21 @@ if __name__ == "__main__":
 
     # establish connection and get data from Event table
     conn_config = json.loads(conn_config_json)
-    consumer = PostgresConsumer(conn_config, spark_sql_client)
+    consumer = PostgresConsumer(conn_config, SparkClient())
     event_table_data = consumer.get_data_from_query(query.format(**query_filter))
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
-    spark_service = SparkMetastoreService(
+    spark_metastore_service = SparkMetastoreService(
         datalake_info["db_raw_databricks"],
         datalake_info["db_raw_path"],
-        spark_sql_client,
+        SparkSQLCLient(spark, sqlContext),
     )
 
     # loaders
     loader = SparkDataframeIntoDatalakeLoader(
-        format=SparkTableStorageFormat.DEFAULT_RAW, metastore_service=spark_service
+        format=SparkTableStorageFormat.DEFAULT_RAW,
+        metastore_service=spark_metastore_service,
     )
     loader.overwrite_partition(
         df=event_table_data,
@@ -94,6 +98,6 @@ if __name__ == "__main__":
     )
 
     # create partition into spark table
-    spark_service.create_new_partitions_from_df(
+    spark_metastore_service.create_new_partitions_from_df(
         table_name=table_name, df=event_table_data, partition_by_list=list_partitions
     )

@@ -9,16 +9,17 @@ from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
+    spark,
+    sqlContext,
 )
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
-from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
-    SOURCE,
-    spark_sql_client,
-)
+from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import SOURCE
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_event_table_into_datalake_clean"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
     conn_config = {"db": datalake_info["db_clean_databricks"]}
-    databricks_consumer = DatabricksConsumer(conn_config, spark_sql_client)
+    databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
     event_table_data = databricks_consumer.get_data_from_query(
         query.format(**query_filter)
     )
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     spark_service = SparkMetastoreService(
         datalake_info["db_clean_databricks"],
         datalake_info["db_clean_path"],
-        spark_sql_client,
+        SparkSQLCLient(spark, sqlContext),
     )
 
     # loaders
