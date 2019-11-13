@@ -19,8 +19,7 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6,9 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
-
-linkedin_gdrive_dir_id = env.get_airflow_env_var('LINKEDIN_GOOGLE_DRIVE_FOLDER_ID')
+AUTH = env.get_airflow_env_var('LINKEDIN_AUTH_TOKEN')
 
 logger = QuintoAndarLogger(BI_LINKEDIN_CAMPAIGNS_DAG_NAME)
 
@@ -33,8 +32,7 @@ def raw_sub_dag(sub_dag_name, class_):
         dag_name=BI_LINKEDIN_CAMPAIGNS_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=None,
-        extra_configs={'gdrive_dir_id': linkedin_gdrive_dir_id}
+        auth=AUTH
     )
 
     return sub_dag.build_tasks('raw')
@@ -48,7 +46,7 @@ def clean_sub_dag(sub_dag_name, class_):
         dag_name=BI_LINKEDIN_CAMPAIGNS_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=None,
+        auth=AUTH,
         accounts=None
     )
 
@@ -125,7 +123,5 @@ linkedin_ads_load_to_prod_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.LINKEDIN,
 )
 
-airflow_helpers.chain(linkedin_raw_sub_dag,
-                      linkedin_clean_sub_dag,
-                      linkedin_staging_sub_dag,
-                      linkedin_ads_load_to_prod_sub_dag)
+airflow_helpers.chain(linkedin_raw_sub_dag, linkedin_clean_sub_dag,
+                      linkedin_staging_sub_dag, linkedin_ads_load_to_prod_sub_dag)
