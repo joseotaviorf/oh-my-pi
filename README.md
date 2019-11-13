@@ -32,8 +32,9 @@ Repository with implementation of Airflow DAGs.
     - [Setup the python environment for the project](#2-setup-the-python-environment-for-the-project)
     - [Install dependencies](#3-install-dependencies)
     - [Set necessary environment variables](#4-set-necessary-environment-variables)
-    - [Set up Airflow](#5-set-up-airflow)
-    - [Set up Git hooks](#6-set-necessary-environment-variables)
+    - [Export AWS credentials](#5-export-aws-credentials)
+    - [Set up Airflow](#6-set-up-airflow)
+    - [Set up Git hooks](#7-set-necessary-environment-variables)
 - [Useful commands](#useful-commands)
 - [Improving local Airflow Performance](#improving-local-airflow-performance)
 - [Architecture](#architecture)
@@ -92,17 +93,29 @@ If you use a Python version >2.7.16, you can follow the steps below to set your 
 
 **Zsh note**: Modify your ~/.zshrc file instead of ~/.bash_profile.
 
-#### 5. Set up Airflow
+#### 5. Export AWS credentials
 
-##### 5.1 Initialize the metadata database:
+Go to https://5a.awsapps.com/start#/.
+ 
+Click at __Command line or programmatic access__, copy your credentials and export them.
+
+```
+export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
+export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
+export AWS_SESSION_TOKEN=<AWS_SESSION_TOKEN>
+```
+
+#### 6. Set up Airflow
+
+##### 6.1 Initialize the metadata database:
 
     $ airflow initdb
 
-##### 5.2. Open $AIRFLOW_HOME/airflow.cfg and edit dags_folder
+##### 6.2. Open $AIRFLOW_HOME/airflow.cfg and edit dags_folder
 
     $ dags_folder = $BIETLEJUICE_HOME/bietlejuice/jobs/dags
 
-##### 5.3. Start a Airflow webserver instance. 
+##### 6.3. Start a Airflow webserver instance. 
 Will open Airflow UI on [http://localhost:8080](http://localhost:8080) by default (you will need two terminals).
 ```
     $ airflow webserver
@@ -113,7 +126,7 @@ To run the jobs call scheduler:
     $ airflow scheduler
 ```
 
-##### 5.4. Export Airflow prod variables and import on you local installation
+##### 6.4. Export Airflow prod variables and import on you local installation
 
 Exporting:
 - Go to https://airflow.quintoandar.com.br/admin/variable/
@@ -133,7 +146,7 @@ You need to re-start the webserver. Stop the proccess you started on step 5.3 an
     $ airflow webserver
 ```
  
-##### 5.5. Create a connection variable inside the Airflow UI:
+##### 6.5. Create a connection variable inside the Airflow UI:
 
 Go to: http://localhost:8080/admin/connection/
 
@@ -148,7 +161,7 @@ Create a new connection like example below:
     Port: 5439
 ```
 
-#### Set up git hooks
+#### 7. Set up git hooks
 
 ```
     $ pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
