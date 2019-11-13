@@ -8,7 +8,7 @@ environment-python2:
 
 .PHONY: requirements-python2
 requirements-python2:
-	@python -m pip install -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+	@python -m pip install -r requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2
 

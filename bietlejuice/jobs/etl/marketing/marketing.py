@@ -1,10 +1,9 @@
 import petl
-from qa_python_utils.aws.athena import AthenaClient
-from qa_python_utils.default_logger import QuintoAndarLogger
-
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from qa_python_utils.aws.athena import AthenaClient
+from qa_python_utils.default_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger('Marketing')
 
@@ -38,10 +37,9 @@ class Marketing(object):
         'dim_twitter_ad_group': 'sk_ad_group',
         'dim_twitter_campaign': 'sk_campaign',
         'fact_twitter_daily_cost_attributions': 'sk_ad',
-        'dim_linkedin_campaign_group': 'sk_campaign_group',
         'dim_linkedin_campaign': 'sk_campaign',
-        'dim_linkedin_creative': 'sk_creative',
-        'fact_linkedin_daily_cost_attributions': 'sk_creative || sk_date'
+        'dim_linkedin_ad': 'sk_ad',
+        'fact_linkedin_daily_cost_attributions': 'sk_ad || sk_campaign || sk_date'
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
@@ -51,13 +49,11 @@ class Marketing(object):
         self.partition_date = self.execution_date.strftime('%Y-%m-%d')
         self.athena_client = AthenaClient(self.s3_bucket)
         self.integration = integration
-        self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(
-            integration=self.integration)
+        self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(integration=self.integration)
         self.database = 'datalake_raw'
 
     @logger(exclude=['r_cols', 'c_cols'])
-    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None,
-                       validate_data=False):
+    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None, validate_data=False):
         key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/' \
               'dt_created={date_partition}/{file_name}.parquet' \
             .format(
@@ -77,8 +73,7 @@ class Marketing(object):
         self.athena_client.add_partition(
             database=self.database,
             table_name=table_name,
-            partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date,
-                                                      acc=self.account)
+            partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
 
         if validate_data:
@@ -94,8 +89,7 @@ class Marketing(object):
         self.athena_client.add_partition(
             database='datalake_clean',
             table_name=table_name,
-            partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date,
-                                                              acc=self.account)
+            partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
         )
 
     @logger(exclude=['table_schema', 'accounts'])
@@ -108,8 +102,7 @@ class Marketing(object):
             schema=Marketing.SCHEMA_NAMES['staging']
         )
 
-        pre_staging_query = "select distinct * from {}.{}".format(clean_schema_name,
-                                                                  clean_table)
+        pre_staging_query = "select distinct * from {}.{}".format(clean_schema_name, clean_table)
 
         empty = self._is_prod_table_empty(prod_table)
         if empty:
@@ -117,20 +110,16 @@ class Marketing(object):
                 'm=load_to_staging, schema={}, table_name={}, msg=table already empty'.format(
                     Marketing.SCHEMA_NAMES['prod'], prod_table))
 
-            self.athena_client.execute_raw_query(
-                "msck repair table {}.{}".format(clean_schema_name, clean_table))
+            self.athena_client.execute_raw_query("msck repair table {}.{}".format(clean_schema_name, clean_table))
 
         else:
             self._update_table_partitions(clean_schema_name, clean_table, accounts)
-            pre_staging_query = '{}\nwhere dt_created = \'{}\';'.format(
-                pre_staging_query, self.partition_date)
+            pre_staging_query = '{}\nwhere dt_created = \'{}\';'.format(pre_staging_query, self.partition_date)
 
-        df = self.athena_client.execute_query_and_return_dataframe(
-            sql=pre_staging_query)
+        df = self.athena_client.execute_query_and_return_dataframe(sql=pre_staging_query)
 
-        logger.info(
-            "m=_load_to_pre_staging, schema={}, table_name={}, msg=inserting into staging table".format(
-                Marketing.SCHEMA_NAMES['staging'], clean_table))
+        logger.info("m=_load_to_pre_staging, schema={}, table_name={}, msg=inserting into staging table".format(
+            Marketing.SCHEMA_NAMES['staging'], clean_table))
 
         df_table = petl.fromdataframe(df=df)
 
@@ -149,9 +138,8 @@ class Marketing(object):
     @logger(exclude=['staging_query'])
     def _load_to_staging(self, dw_table_name, staging_query):
 
-        logger.info(
-            "m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
-                Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=truncating table".format(
+            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
         BaseETL.truncate_table(
             db_enum=EnumDB.BI_DW,
@@ -159,9 +147,8 @@ class Marketing(object):
             schema=Marketing.SCHEMA_NAMES['staging']
         )
 
-        logger.info(
-            "m=load_to_staging, schema={}, table_name={}, msg=inserting into dw".format(
-                Marketing.SCHEMA_NAMES['staging'], dw_table_name))
+        logger.info("m=load_to_staging, schema={}, table_name={}, msg=inserting into dw".format(
+            Marketing.SCHEMA_NAMES['staging'], dw_table_name))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
@@ -181,8 +168,7 @@ class Marketing(object):
     def _load_to_prod(self, table_name):
         table_type = table_name.split("_")[0]
 
-        upsert_query = "SELECT DISTINCT * FROM {}.{}".format(
-            Marketing.SCHEMA_NAMES['staging'], table_name)
+        upsert_query = "SELECT DISTINCT * FROM {}.{}".format(Marketing.SCHEMA_NAMES['staging'], table_name)
 
         empty = self._is_prod_table_empty(table_name)
         if empty:
@@ -194,34 +180,28 @@ class Marketing(object):
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_fact_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self._delete_old_entries(table_name=table_name,
-                                         delete_query=delete_query)
-                upsert_query = "{} \nwhere sk_date = {};".format(upsert_query,
-                                                                 self.execution_date.strftime(
-                                                                     '%Y%m%d'))
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
+                upsert_query = "{} \nwhere sk_date = {};".format(upsert_query, self.execution_date.strftime('%Y%m%d'))
             else:
                 delete_query = BaseETL.get_query_from_file_name(
                     '{}/marketing/delete_dim_old_entries.sql'.format(DW_QUERIES_DIR))
 
-                self._delete_old_entries(table_name=table_name,
-                                         delete_query=delete_query)
+                self._delete_old_entries(table_name=table_name, delete_query=delete_query)
                 upsert_query = """
                     SELECT * FROM staging.{dim_table}
                     WHERE {sk_field} not in (
                         SELECT {sk_field} from marketing.{dim_table}
                     )
-                """.format(sk_field=Marketing.SK_FIELD_MAP[table_name],
-                           dim_table=table_name)
+                """.format(sk_field=Marketing.SK_FIELD_MAP[table_name], dim_table=table_name)
 
         self._upsert_into_dw(upsert_query, table_name, Marketing.SCHEMA_NAMES['prod'])
 
     @logger(exclude='df')
     def _upsert_into_dw(self, upsert_query, table_name, schema):
         logger.info(
-            'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(
-                schema,
-                table_name,
-                upsert_query))
+            'm=__upsert_into_dw, schema={}, table_name={}, msg=getting data from DW, query={}'.format(schema,
+                                                                                                      table_name,
+                                                                                                      upsert_query))
 
         table_data = BaseETL.from_db_query(
             db_enum=EnumDB.BI_DW,
@@ -230,8 +210,7 @@ class Marketing(object):
         )
 
         logger.info(
-            '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(
-                schema, table_name))
+            '__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...'.format(schema, table_name))
 
         BaseETL.bulk_insert(
             table=table_data,
@@ -243,8 +222,7 @@ class Marketing(object):
         )
 
         logger.info(
-            '__upsert_into_dw, schema={}, table_name={}, msg=ready to reading data!'.format(
-                schema, table_name))
+            '__upsert_into_dw, schema={}, table_name={}, msg=ready to reading data!'.format(schema, table_name))
 
     @staticmethod
     @logger
@@ -274,8 +252,7 @@ class Marketing(object):
             command=delete_query.format(
                 table_name=table_name,
                 sk_field=Marketing.SK_FIELD_MAP[table_name]
-            ).replace(Marketing.TABLE_PARTITION_DATE,
-                      self.execution_date.strftime('%Y%m%d')),
+            ).replace(Marketing.TABLE_PARTITION_DATE, self.execution_date.strftime('%Y%m%d')),
             commit=True,
             encoding='utf-8'
         )
@@ -286,8 +263,7 @@ class Marketing(object):
             self.athena_client.add_partition(
                 database=schema_name,
                 table_name=table,
-                partition="dt_created='{dt}', acc='{acc}'".format(
-                    dt=self.partition_date, acc=acc)
+                partition="dt_created='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=acc)
             )
 
     @logger
@@ -297,11 +273,10 @@ class Marketing(object):
                 query_base_dir=DATALAKE_QUERIES_DIR,
                 query_path=self.raw_query_path))
 
-        df = self.athena_client.execute_file_query_and_return_dataframe(
-            filename=file_query,
-            query_params={'table_name': table_name,
-                          'date': self.partition_date,
-                          'account': self.account})
+        df = self.athena_client.execute_file_query_and_return_dataframe(filename=file_query,
+                                                                        query_params={'table_name': table_name,
+                                                                                      'date': self.partition_date,
+                                                                                      'account': self.account})
 
         try:
             # Due to a issue in comparing numpy.bool_ type we compare it using pandas
@@ -310,9 +285,8 @@ class Marketing(object):
         except Exception as e:
             raise ValueError(
                 'm=_validate_data_with_previous_execution, file_query_path={0}, date={1}, account={2}, error={3}, '
-                'msg=Validation query did not return any expected result'.format(
-                    file_query, self.partition_date,
-                    self.account, str(e.message)))
+                'msg=Validation query did not return any expected result'.format(file_query, self.partition_date,
+                                                                                 self.account, str(e.message)))
         if not result:
             raise ValueError(
                 'm=_validate_data_with_previous_execution, file_query_path={0}, date={1}, account={2}, '
@@ -320,5 +294,4 @@ class Marketing(object):
                                                        self.account))
 
         logger.info('m=_validate_data_with_previous_execution, date={0}, account={1}, '
-                    'msg=Validation successful'.format(self.partition_date,
-                                                       self.account))
+                    'msg=Validation successful'.format(self.partition_date, self.account))

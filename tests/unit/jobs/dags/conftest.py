@@ -1,8 +1,6 @@
 import pytest
 from airflow.models import DagBag
 
-from bietlejuice.jobs.dags.marketing.marketing_linkedin_campaigns_subdag import \
-    MarketingLinkedInCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_twitter_campaigns_subdag import \
     MarketingTwitterCampaignsSubDag
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
@@ -20,12 +18,3 @@ def twitter_campaigns_subdag():
                                            'schedule_interval', 'start_date', 'auth',
                                            end_date=None, accounts=None,
                                            extra_configs=None)
-
-
-@pytest.fixture
-def linkedin_campaigns_subdag():
-    return MarketingLinkedInCampaignsSubDag(MarketingEnum.LINKEDIN, 'bucket',
-                                            'sub_dag_name', 'dag_name',
-                                            'schedule_interval', 'start_date', 'auth',
-                                            end_date=None, accounts=None,
-                                            extra_configs=None)

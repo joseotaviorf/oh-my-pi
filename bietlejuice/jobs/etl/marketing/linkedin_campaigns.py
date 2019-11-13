@@ -1,14 +1,11 @@
-import json
+import os
+import re
 from collections import OrderedDict
-from gzip import GzipFile
-from io import BytesIO
 
+import pandas as pd
 import petl
 from qa_python_utils.default_logger import QuintoAndarLogger
-from quintoandar_linkedin_client.constants import ENTITIES, ENTITIES_URN_PREFIX, \
-    ENTITIES_SEARCH_KEYS
-from quintoandar_linkedin_client.linkedin_client import LinkedInClient
-from quintoandar_linkedin_client.request import Request
+from qa_python_utils.google.drive import Drive as GoogleDriveClient
 
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
@@ -19,435 +16,222 @@ logger = QuintoAndarLogger('LinkedInCampaigns')
 
 
 class LinkedInCampaigns(Marketing):
-    INTEGRATION = 'linkedin_ads'
-    S3_DATA_LAKE_RAW_LINKEDIN_PATH = 'raw/marketing/{}'.format(INTEGRATION)
-    S3_CAM_GROUPS_FOLDER = 'campaign_groups'
-    S3_CAMPAIGNS_FOLDER = 'campaigns'
-    S3_CREATIVES_FOLDER = 'creatives'
-    S3_CREATIVES_STATS_FOLDER = 'creatives_stats'
-    CAMPAIGN_GROUPS_TABLE_NAME = 'linkedin_campaign_groups'
-    CAMPAIGNS_TABLE_NAME = 'linkedin_campaigns'
-    CREATIVES_TABLE_NAME = 'linkedin_creatives'
-    CREATIVES_STATS_TABLE_NAME = 'linkedin_creatives_stats'
+    INTEGRATION = 'linkedin_campaigns'
+    S3_DATA_LAKE_RAW_LINKEDIN_PATH = 'raw/marketing/{}/campaigns'.format(INTEGRATION)
+    CAMPAIGN_TABLE_NAME = 'linkedin_campaigns'
+    CSV_HEADER = ['Start Date (in UTC)', 'Account Name', 'Currency',
+                  'Salesforce Opportunity ID', 'Salesforce Opportunity Line Item ID',
+                  'Account Total Budget', 'Account Total Budget End Date (in UTC)',
+                  'Campaign ID', 'Campaign Name', 'Campaign Type', 'Campaign Status',
+                  'Cost Type', 'Daily Budget', 'Creative Name', 'Ad ID',
+                  'Creative Status', 'Ad Introduction Text', 'Ad Headline', 'Ad Line',
+                  'Click URL', 'Sponsored Update Type', 'DSC Name', 'Total Spent',
+                  'Impressions', 'Clicks', 'Click Through Rate', 'Average CPM',
+                  'Average CPC', 'Reactions', 'Comments', 'Shares', 'Follows',
+                  'Other Clicks', 'Total Social Actions', 'Total Engagements',
+                  'Engagement Rate', 'Viral Impressions', 'Viral Clicks',
+                  'Viral Reactions', 'Viral Comments', 'Viral Shares', 'Viral Follows',
+                  'Viral Other Clicks', 'Conversions', 'Post-Click Conversions',
+                  'View-Through Conversions', 'Conversion Rate', 'Cost per Conversion',
+                  'Total Conversion Value', 'Return on Ad Spend', 'Viral Conversions',
+                  'Viral Post-Click Conversions', 'Viral View-Through Conversions',
+                  'Leads', 'Lead Forms Opened', 'Lead Form Completion Rate',
+                  'Cost per Lead', 'Video Length (in Seconds)', 'Video Plays',
+                  'Video Views', 'Video View Rate', 'Video Views at 25%',
+                  'Video Views at 50%', 'Video Views at 75%', 'Video Completions',
+                  'Video Completion Rate', 'Full Screen Plays', 'eCPV',
+                  'Viral Video Plays', 'Viral Video Views', 'Viral Video Views at 25%',
+                  'Viral Video Views at 50%', 'Viral Video Views at 75%',
+                  'Viral Video Completions', 'Viral Video Completion Rate',
+                  'Viral Video Full Screen Plays']
 
     def __init__(self, s3_bucket, execution_date, auth, account=None,
                  extra_configs=None):
         super(LinkedInCampaigns, self).__init__(s3_bucket, execution_date,
                                                 self.INTEGRATION, account)
         self.extra_configs = extra_configs
-        self.auth = auth
-        self._sdk_client = None
-
-    @property
-    def client(self):
-        if self._sdk_client is not None:
-            return self._sdk_client
-
-        self._sdk_client = LinkedInClient(access_token=self.auth)
-        return self._sdk_client
-
-    @staticmethod
-    def _split_into_chunks(raw_list, chunk_size):
-        for i in range(0, len(raw_list), chunk_size):
-            yield raw_list[i:i + chunk_size]
-
-    @staticmethod
-    def __get_ids(dict_list):
-        return [d['id'] for d in dict_list]
 
     @logger
-    def get_accounts(self):
-        accounts_cursor = self.client.get_accounts()
-        logger.info(
-            'm=_get_accounts, msg=Found {} accounts.'.format(accounts_cursor.count))
+    def _get_google_drive_folder_id(self):
+        if self.extra_configs and 'gdrive_dir_id' in self.extra_configs and \
+                self.extra_configs['gdrive_dir_id'] is not None:
+            return self.extra_configs['gdrive_dir_id']
 
-        return [] if accounts_cursor.count == 0 else accounts_cursor
+        raise RuntimeError(
+            'm=_get_google_drive_folder_id, extra_configs={} msg=Google Drive LinkedIn '
+            'Costs folder id not found.'.format(self.extra_configs))
+
+    @logger(exclude='google_drive_client')
+    def _get_process_file(self, google_drive_client):
+        gdrive_folder_id = self._get_google_drive_folder_id()
+        filename = '{}.csv'.format(self.execution_date.strftime('%Y-%m-%d'))
+        query = "'{}' in parents and mimeType != 'application/vnd.google-apps.folder'" \
+                " and name = '{}'".format(gdrive_folder_id, filename)
+
+        logger.info(
+            'm=_get_process_file, filename={}, folder_id={}, msg=Fetching file'.format(
+                filename, gdrive_folder_id))
+
+        files = google_drive_client.list_files(None, query)
+        self._validate_file(files)
+
+        logger.info(
+            'm=move_linkedin_campaigns_to_raw, process_file={}, msg=Downloading file to'
+            ' temporary local dir.'.format(files[0]))
+
+        tmp_file = google_drive_client.download_file(file_id=files[0]['id'],
+                                                     path='/tmp')
+        self._validate_csv_header('/tmp/{}'.format(tmp_file))
+
+        data = pd.read_csv('/tmp/' + tmp_file, sep='\t', skiprows=5,
+                           encoding="UTF-16LE", quotechar='"')
+        data.drop(columns=['Ad Introduction Text', 'Ad Headline'], inplace=True)
+
+        raw_file = 'raw-{}'.format(tmp_file)
+        data.to_csv('/tmp/{}'.format(raw_file), sep='\t', header='true', index=False)
+
+        return raw_file
 
     @logger
-    def _get_campaign_groups(self, acc):
-        p = Request.build_args(ENTITIES_SEARCH_KEYS.ACCOUNT,
-                               ENTITIES_URN_PREFIX.ACCOUNT,
-                               [acc.id])
+    def _get_header_list(self, file_name):
+        header_list = []
 
-        cg_list = []
-        for cg in self.client.get_campaign_groups(params=p):
-            cg_dict = {
-                'id': cg.id,
-                'name': cg.name,
-                'backfilled': cg.backfilled,
-                'run_schedule_start': cg.run_schedule_start,
-                'run_schedule_end': cg.run_schedule_end,
-                'serving_statuses': cg.serving_statuses,
-                'status': cg.status,
-                'total_budget_amount': cg.total_budget_amount,
-                'total_budget_currency_code': cg.total_budget_currency_code,
-                'account_id': acc.id,
-                'account_name': acc.name
-            }
-            cg_list.append(cg_dict)
+        if not os.path.exists(file_name):
+            raise RuntimeError('m=_get_header_list, file_name={}, msg=No file found on'
+                               ' (Data_Performance)-LinkedInCosts'.format(file_name))
 
-        logger.info('m=_get_campaign_groups, msg=Found {} campaign groups.'.
-                    format(len(cg_list)))
-        return cg_list
+        with open(file_name) as f:
+            line = 0
+            while line < 6:
+                line += 1
+                str_header = next(f)
 
-    @logger(exclude='cg_id_ls')
-    def _get_campaigns(self, cg_id_ls):
-        p = Request.build_args(ENTITIES_SEARCH_KEYS.CAMPAIGN_GROUP,
-                               ENTITIES_URN_PREFIX.CAMPAIGN_GROUP, cg_id_ls)
+            header_list = str_header.split('\t')
+            header_list = [re.sub('\x00|\n', '', a) for a in header_list]
 
-        cam_list = []
-        for cam in self.client.get_campaigns(params=p):
-            cg_dict = {
-                'id': cam.id,
-                'name': cam.name,
-                'associated_entity': cam.associated_entity,
-                'audience_expansion_enabled': cam.audience_expansion_enabled,
-                'campaign_group_id': cam.campaign_group[len(ENTITIES_URN_PREFIX.
-                                                            CAMPAIGN_GROUP):],
-                'cost_type': cam.cost_type,
-                'creative_selection': cam.creative_selection,
-                'daily_budget_amount': cam.daily_budget_amount,
-                'daily_budget_currencyCode': cam.daily_budget_currencyCode,
-                'locale_country': cam.locale_country,
-                'locale_language': cam.locale_language,
-                'objective_type': cam.objective_type,
-                'offsite_preferences': cam.offsite_preferences,
-                'run_schedule_start': cam.run_schedule_start,
-                'run_schedule_end': cam.run_schedule_end,
-                'targeting_excluded_targeting_facets':
-                    cam.targeting_excluded_targeting_facets,
-                'targeting_included_targeting_facets':
-                    cam.targeting_included_targeting_facets,
-                'targeting_criteria': cam.targeting_criteria,
-                'total_budget_amount': cam.total_budget_amount,
-                'total_budget_currencyCode': cam.total_budget_currencyCode,
-                'type': cam.type,
-                'unit_cost_amount': cam.unit_cost_amount,
-                'unit_cost_currency_code': cam.unit_cost_currency_code,
-                'version_tag': cam.version_tag,
-                'status': cam.status,
-                'optimizationTargetType': cam.optimizationTargetType,
-                'format': cam.format,
-                'account_id': cam.account[len(ENTITIES_URN_PREFIX.ACCOUNT):]
-            }
-            cam_list.append(cg_dict)
-
-        logger.info('m=_get_campaigns, msg=Found {} campaigns.'.format(len(cam_list)))
-        return cam_list
-
-    @logger(exclude='campaigns_ids')
-    def _get_creatives(self, campaigns_ids):
-        p_cam_ids = Request.build_args(ENTITIES_SEARCH_KEYS.CAMPAIGN,
-                                       ENTITIES_URN_PREFIX.CAMPAIGN,
-                                       campaigns_ids)
-
-        creative_list = []
-        for cr in self.client.get_creatives(params=p_cam_ids):
-            cr_dict = {
-                'id': cr.id,
-                'campaign': cr.campaign,
-                'processing_state': cr.processing_state,
-                'reference': cr.reference,
-                'review': cr.review,
-                'serving_statuses': cr.serving_statuses,
-                'status': cr.status,
-                'type': cr.type,
-                'variables': cr.variables
-            }
-            creative_list.append(cr_dict)
-
-        logger.info(
-            'm=_get_creatives, msg=Found {} creatives.'.format(len(creative_list)))
-        return creative_list
-
-    @logger(exclude=['creative_ids'])
-    def _get_creatives_stats(self, creative_ids):
-        today = self.execution_date.date()
-
-        # The API returns a max of 100 elements by request, so it makes more sense
-        # making a call by each batch part
-        batch_ids = self._split_into_chunks(creative_ids, 100)
-        ads_stats_ls = []
-        for _ids in batch_ids:
-            stats_cursor = self.client.ads_analytics(entity=ENTITIES.CREATIVES,
-                                                     creative_ids=_ids,
-                                                     start_date=today,
-                                                     end_date=today)
-            for stat in stats_cursor:
-                stat_dict = {
-                    'external_website_post_click_conversions': stat.external_website_post_click_conversions,
-                    'ad_unit_clicks': stat.ad_unit_clicks,
-                    'company_page_clicks': stat.company_page_clicks,
-                    'viral_one_click_leads': stat.viral_one_click_leads,
-                    'text_url_clicks': stat.text_url_clicks,
-                    'viral_comment_likes': stat.viral_comment_likes,
-                    'viral_external_website_conversions': stat.viral_external_website_conversions,
-                    'pivot': stat.pivot,
-                    'card_clicks': stat.card_clicks,
-                    'likes': stat.likes,
-                    'viral_comments': stat.viral_comments,
-                    'one_click_leads': stat.one_click_leads,
-                    'viral_card_impressions': stat.viral_card_impressions,
-                    'follows': stat.follows,
-                    'viral_one_click_lead_form_opens': stat.viral_one_click_lead_form_opens,
-                    'conversion_value_in_local_currency': stat.conversion_value_in_local_currency,
-                    'viral_follows': stat.viral_follows,
-                    'other_engagements': stat.other_engagements,
-                    'card_impressions': stat.card_impressions,
-                    'lead_generation_mail_interested_clicks': stat.lead_generation_mail_interested_clicks,
-                    'opens': stat.opens,
-                    'total_engagements': stat.total_engagements,
-                    'viral_reactions': stat.viral_reactions,
-                    'viral_impressions': stat.viral_impressions,
-                    'date_range': stat.date_range,
-                    'cost_in_local_currency': stat.cost_in_local_currency,
-                    'viral_likes': stat.viral_likes,
-                    'viral_other_engagements': stat.viral_other_engagements,
-                    'shares': stat.shares,
-                    'viral_card_clicks': stat.viral_card_clicks,
-                    'viral_external_website_post_view_conversions': stat.viral_external_website_post_view_conversions,
-                    'viral_total_engagements': stat.viral_total_engagements,
-                    'viral_company_page_clicks': stat.viral_company_page_clicks,
-                    'action_clicks': stat.action_clicks,
-                    'viral_shares': stat.viral_shares,
-                    'pivot_value': stat.pivot_value,
-                    'comments': stat.comments,
-                    'external_website_post_view_conversions': stat.external_website_post_view_conversions,
-                    'cost_in_usd': stat.cost_in_usd,
-                    'landing_page_clicks': stat.landing_page_clicks,
-                    'one_click_lead_form_opens': stat.one_click_lead_form_opens,
-                    'impressions': stat.impressions,
-                    'sends': stat.sends,
-                    'viral_landing_page_clicks': stat.viral_landing_page_clicks,
-                    'viral_external_website_post_click_conversions': stat.viral_external_website_post_click_conversions,
-                    'external_website_conversions': stat.external_website_conversions,
-                    'lead_generation_mail_contact_info_shares': stat.lead_generation_mail_contact_info_shares,
-                    'clicks': stat.clicks,
-                    'reactions': stat.reactions,
-                    'viral_clicks': stat.viral_clicks,
-                    'pivot_values': stat.pivot_values,
-                }
-                ads_stats_ls.append(stat_dict)
-
-        logger.info(
-            'm=_get_creatives_stats, msg=Found {} creative stats.'.format(
-                len(ads_stats_ls)))
-        return ads_stats_ls
+        return header_list
 
     @logger
-    def _fetch_and_save_campaign_groups(self, acc):
-        cam_groups = self._get_campaign_groups(acc)
-        self._save_to_s3(acc.id, self.S3_CAM_GROUPS_FOLDER, cam_groups)
+    def _validate_csv_header(self, tmp_file):
+        header_list = self._get_header_list(tmp_file)
 
-        return self.__get_ids(cam_groups)
+        if len(header_list) != len(self.CSV_HEADER):
+            raise RuntimeError(
+                'm=_validate_csv_header, column={}, expected_columns={}, '
+                'msg=Columns length are not equal expected_columns'.format(
+                    self.CSV_HEADER,
+                    tmp_file))
 
-    @logger(exclude=['cam_group_ids'])
-    def _fetch_and_save_campaigns(self, acc, cam_group_ids):
-        campaigns = self._get_campaigns(cam_group_ids)
-        self._save_to_s3(acc.id, self.S3_CAMPAIGNS_FOLDER, campaigns)
+        i = 0
+        for column in header_list:
+            col = column.replace('\n', '')
+            if col != self.CSV_HEADER[i]:
+                raise RuntimeError(
+                    'm=_validate_csv_header, column={}, msg=Invalid column'.format(col))
+            i += 1
 
-        return self.__get_ids(campaigns)
+        return True
 
-    @logger(exclude=['campaigns_ids'])
-    def _fetch_and_save_creatives(self, acc, campaigns_ids):
-        creatives = self._get_creatives(campaigns_ids)
-        self._save_to_s3(acc.id, self.S3_CREATIVES_FOLDER, creatives)
+    @logger(exclude='files')
+    def _validate_file(self, files):
+        if len(files) > 1:
+            raise RuntimeError(
+                'm=_validate_file, len(files)={}, msg=More than one file found. '
+                'I don\'t know which of them to read!'.format(len(files)))
+        elif not files:
+            raise RuntimeError(
+                'm=_validate_file, msg=No file found')
 
-        return self.__get_ids(creatives)
-
-    @logger(exclude=['creative_ids'])
-    def _fetch_and_save_creatives_stats(self, acc, creative_ids):
-        creatives = self._get_creatives_stats(creative_ids)
-        self._save_to_s3(acc.id, self.S3_CREATIVES_STATS_FOLDER, creatives)
+        return True
 
     @logger
     def move_linkedin_campaigns_to_raw(self):
-        accs_cursor = self.get_accounts()
-        if not accs_cursor:
-            raise RuntimeError(
-                'm=move_linkedin_campaigns_to_raw, msg=No accounts where found!')
+        google_drive_client = GoogleDriveClient()
+        tmp_file = self._get_process_file(google_drive_client)
 
-        for acc in accs_cursor:
-            cam_group_ids = self._fetch_and_save_campaign_groups(acc)
-            if cam_group_ids:
-                campaigns_ids = self._fetch_and_save_campaigns(acc, cam_group_ids)
-
-                if campaigns_ids:
-                    creatives_ids = self._fetch_and_save_creatives(acc, campaigns_ids)
-
-                    if creatives_ids:
-                        self._fetch_and_save_creatives_stats(acc, creatives_ids)
-
-    @logger
-    def move_linkedin_campaign_groups_to_clean(self):
-        raw_table_query_file = 'campaign_groups.sql'
-        raw_query_cols = OrderedDict([
-            ('id', str),
-            ('name', str),
-            ('status', str),
-            ('total_cost', str),
-            ('total_cost_currency_code', str),
-            ('run_schedule_start', str),
-            ('run_schedule_end', str),
-            ('backfilled', str),
-            ('id_account', str),
-            ('account_name', str)
-        ])
-
-        self._move_to_clean(
-            table_name='marketing_{}'.format(self.CAMPAIGN_GROUPS_TABLE_NAME),
-            sql_file_name=raw_table_query_file,
-            r_cols=raw_query_cols,
-            c_cols=raw_query_cols
-        )
+        self._save_file_to_s3(tmp_file)
 
     @logger
     def move_linkedin_campaigns_to_clean(self):
         raw_table_query_file = 'campaigns.sql'
         raw_query_cols = OrderedDict([
-            ('id', str),
-            ('name', str),
-            ('id_campaign_group', str),
-            ('id_account', str),
-            ('cost_type', str),
-            ('daily_cost', str),
-            ('daily_currency_code', str),
-            ('total_cost', str),
-            ('total_cost_currency_code', str),
-            ('unit_cost', str),
-            ('unit_cost_currency_code', str),
-            ('objective_type', str),
-            ('run_schedule_start', str),
-            ('run_schedule_end', str),
-            ('type', str),
-            ('status', str),
-            ('locale_country', str),
-            ('locale_language', str)
-        ])
-
-        self._move_to_clean(
-            table_name='marketing_{}'.format(self.CAMPAIGNS_TABLE_NAME),
-            sql_file_name=raw_table_query_file,
-            r_cols=raw_query_cols,
-            c_cols=raw_query_cols
-        )
-
-    @logger
-    def move_linkedin_creatives_to_clean(self):
-        raw_table_query_file = 'creatives.sql'
-        raw_query_cols = OrderedDict([
-            ('id', str),
+            ('account_name', str),
             ('id_campaign', str),
-            ('status', str),
-            ('type', str)
+            ('campaign_name', str),
+            ('id_ad', str),
+            ('ad_name', str),
+            ('currency', str),
+            ('daily_budget', str),
+            ('account_total_budget', str),
+            ('total_spent', str),
+            ('impressions', str),
+            ('clicks', str),
+            ('other_clicks', str),
+            ('total_engagements', str),
+            ('conversions', str),
+            ('cost_per_conversion', str),
+            ('cost_per_lead', str)
         ])
 
         self._move_to_clean(
-            table_name='marketing_{}'.format(self.CREATIVES_TABLE_NAME),
+            table_name='marketing_' + self.CAMPAIGN_TABLE_NAME,
             sql_file_name=raw_table_query_file,
             r_cols=raw_query_cols,
             c_cols=raw_query_cols
+        )
+
+    @logger(exclude=['r_cols', 'c_cols'])
+    def _move_to_clean(self, table_name, sql_file_name, r_cols, c_cols=None):
+        key = 'clean/marketing/{integration}/{table_name}/' \
+              'dt_created={date_partition}/{file_name}.parquet' \
+            .format(integration=self.integration, table_name=table_name,
+                    date_partition=self.partition_date, file_name=self.partition_date)
+
+        query = BaseETL.get_query_from_file_name(
+            '{query_base_dir}/{query_path}/{file_name}'.format(
+                query_base_dir=DATALAKE_QUERIES_DIR,
+                query_path=self.raw_query_path,
+                file_name=sql_file_name))
+
+        self.athena_client.add_partition(
+            database=self.database,
+            table_name=table_name,
+            partition="dt='{dt}'".format(dt=self.partition_date)
+        )
+
+        self.athena_client.create_parquet_from_query(
+            key=key,
+            query=query.format(date=self.partition_date),
+            raw_columns=r_cols,
+            clean_columns=c_cols
+        )
+
+        self.athena_client.add_partition(
+            database='datalake_clean',
+            table_name=table_name,
+            partition="dt_created='{dt}'".format(dt=self.partition_date)
         )
 
     @logger
-    def move_linkedin_creatives_stats_to_clean(self):
-        raw_table_query_file = 'creatives_stats.sql'
-        raw_query_cols = OrderedDict([
-            ('id_creative', str),
-            ('cost_in_local_currency', str),
-            ('cost_in_usd', str),
-            ('card_clicks', str),
-            ('likes', str),
-            ('impressions', str),
-            ('action_clicks', str),
-            ('comments', str),
-            ('external_website_post_click_conversions', str),
-            ('ad_unit_clicks', str),
-            ('company_page_clicks', str),
-            ('one_click_leads', str),
-            ('text_url_clicks', str),
-            ('card_impressions', str),
-            ('follows', str),
-            ('conversion_value_in_local_currency', str),
-            ('other_engagements', str),
-            ('lead_generation_mail_interested_clicks', str),
-            ('opens', str),
-            ('total_engagements', str),
-            ('shares', str),
-            ('external_website_post_view_conversions', str),
-            ('landing_page_clicks', str),
-            ('one_click_lead_form_opens', str),
-            ('sends', str),
-            ('external_website_conversions', str),
-            ('lead_generation_mail_contact_info_shares', str),
-            ('clicks', str),
-            ('reactions', str),
-            ('viral_shares', str),
-            ('viral_card_impressions', str),
-            ('viral_one_click_leads', str),
-            ('viral_external_website_conversions', str),
-            ('viral_comment_likes', str),
-            ('viral_comments', str),
-            ('viral_impressions', str),
-            ('viral_one_click_lead_form_opens', str),
-            ('viral_follows', str),
-            ('viral_reactions', str),
-            ('viral_likes', str),
-            ('viral_other_engagements', str),
-            ('viral_card_clicks', str),
-            ('viral_external_website_post_view_conversions', str),
-            ('viral_total_engagements', str),
-            ('viral_company_page_clicks', str),
-            ('viral_landing_page_clicks', str),
-            ('viral_external_website_post_click_conversions', str),
-            ('viral_clicks', str)
-        ])
-
-        self._move_to_clean(
-            table_name='marketing_{}'.format(self.CREATIVES_STATS_TABLE_NAME),
-            sql_file_name=raw_table_query_file,
-            r_cols=raw_query_cols,
-            c_cols=raw_query_cols
-        )
-
-    @logger(exclude='raw_data')
-    def _save_to_s3(self, id_account, entity_name, raw_data):
-        """
-            This method saves the json on the data lake raw as a compacted gzip file
-            Every row is broken in lines, so that Athena will compute
-        """
-
-        if len(raw_data) == 0:
-            logger.info('m=_save_to_s3, msg=There\'s no data to be saved.')
-            return
-
-        gz_body = BytesIO()
-        for _dict in raw_data:
-            with GzipFile(fileobj=gz_body, mode='w') as fp:
-                fp.write((json.dumps(_dict, ensure_ascii=False)).encode('utf-8'))
-                fp.write('\n')
-
-        s3_file_path = '{}/{}/acc={}/dt={}/data.gz'.format(
+    def _save_file_to_s3(self, tmp_filename):
+        bucket_folder_path = '{}/{}/dt={}'.format(
+            self.s3_bucket,
             self.S3_DATA_LAKE_RAW_LINKEDIN_PATH,
-            entity_name,
-            id_account,
             self.execution_date.strftime('%Y-%m-%d'))
 
         logger.info(
-            'm=_save_to_s3, dest={}, msg=Saving LinkedIn {} data into s3 bucket'.format(
-                s3_file_path, entity_name))
+            'm=_save_file_to_s3, tmp_file={}, s3_path={}, msg=Uploading tmp '
+            'file to S3.'.format(tmp_filename, bucket_folder_path))
 
-        BaseETL.obj_to_s3(
-            obj_io=gz_body,
-            bucket=self.s3_bucket,
-            file_path=s3_file_path
+        BaseETL.file_to_s3(filename=tmp_filename, bucket_folder_path=bucket_folder_path)
+
+        logger.info('m=_save_file_to_s3, msg=Successfully uploaded file')
+
+        self.athena_client.add_partition(
+            database='datalake_raw',
+            table_name='marketing_' + self.CAMPAIGN_TABLE_NAME,
+            partition="dt='{dt}'".format(dt=self.partition_date)
         )
-
-        # always flush after using!
-        gz_body.seek(0)
-        gz_body.flush()
-
-        logger.info('m=_save_to_s3, msg=Saved with success!')
 
     @logger
     def load_to_staging(self, dw_table_name):

@@ -1,47 +1,88 @@
 DROP TABLE IF EXISTS datalake_raw.marketing_linkedin_campaigns;
 
-CREATE EXTERNAL TABLE IF NOT EXISTS datalake_raw.marketing_linkedin_campaigns(
-  id                                  string,
-  name                                string,
-  associated_entity                   string,
-  audience_expansion_enabled          string,
-  campaign_group_id                   string,
-  cost_type                           string,
-  creative_selection                  string,
-  daily_budget_amount                 string,
-  daily_budget_currencyCode           string,
-  locale_country                      string,
-  locale_language                     string,
-  objective_type                      string,
-  offsite_preferences                 string,
-  run_schedule_start                  string,
-  run_schedule_end                    string,
-  targeting_excluded_targeting_facets string,
-  targeting_included_targeting_facets string,
-  targeting_criteria                  string,
-  total_budget_amount                 string,
-  total_budget_currencyCode           string,
-  type                                string,
-  unit_cost_amount                    string,
-  unit_cost_currency_code             string,
-  version_tag                         string,
-  status                              string,
-  optimizationTargetType              string,
-  format                              string,
-  account_id                          string
+CREATE EXTERNAL TABLE IF NOT EXISTS datalake_raw.marketing_linkedin_campaigns (
+  start_date_utc string,
+  account_name string,
+  currency string,
+  salesforce_opportunity_id string,
+  salesforce_opportunity_line_item_id string,
+  account_total_budget string,
+  account_total_budget_end_date_utc string,
+  campaign_id string,
+  campaign_name string,
+  campaign_type string,
+  campaign_status string,
+  cost_type string,
+  daily_budget string,
+  creative_name string,
+  ad_id string,
+  ad_headline string,
+  ad_line string,
+  click_url string,
+  sponsored_update_type string,
+  dsc_name string,
+  total_spent string,
+  impressions string,
+  clicks string,
+  click_through_rate string,
+  average_cpm string,
+  average_cpc string,
+  reactions string,
+  comments string,
+  shares string,
+  follows string,
+  other_clicks string,
+  total_social_actions string,
+  total_engagements string,
+  engagement_rate string,
+  viral_impressions string,
+  viral_clicks string,
+  viral_reactions string,
+  viral_comments string,
+  viral_shares string,
+  viral_follows string,
+  viral_other_clicks string,
+  conversions string,
+  post_click_conversions string,
+  view_through_conversions string,
+  conversion_rate string,
+  cost_per_conversion string,
+  total_conversion_value string,
+  return_on_ad_spend string,
+  viral_conversions string,
+  viral_post_click_conversions string,
+  viral_view_through_conversions string,
+  leads string,
+  lead_forms_opened string,
+  lead_form_completion_rate string,
+  cost_per_lead string,
+  video_length_in_seconds string,
+  video_plays string,
+  video_views string,
+  video_view_rate string,
+  video_views_at_25_pct string,
+  video_views_at_50_pct string,
+  video_views_at_75_pct string,
+  video_completions string,
+  video_completion_rate string,
+  full_screen_plays string,
+  ecpv string,
+  viral_video_plays string,
+  viral_video_views string,
+  viral_video_views_at_25_pct string,
+  viral_video_views_at_50_pct string,
+  viral_video_views_at_75_pct string,
+  viral_video_completions string,
+  viral_video_completion_rate string,
+  viral_video_full_screen_plays string
+)PARTITIONED BY(
+dt string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES(
+'separatorChar' = '\t',
+'quoteChar' = '\"',
+'skip.header.line.count' = '1'
 )
-PARTITIONED BY(
-  acc string,
-  dt  string
-)
-ROW FORMAT SERDE
-  'org.openx.data.jsonserde.JsonSerDe'
-WITH SERDEPROPERTIES ('ignore.malformed.json' = 'true')
-STORED AS INPUTFORMAT
-  'org.apache.hadoop.mapred.TextInputFormat'
-OUTPUTFORMAT
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION
-  's3://5a-datalake/raw/marketing/linkedin_ads/campaigns'
+LOCATION 's3://5a-datalake/raw/marketing/linkedin_campaigns/campaigns'
 
 MSCK REPAIR TABLE datalake_raw.marketing_linkedin_campaigns;
