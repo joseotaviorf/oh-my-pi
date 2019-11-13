@@ -95,13 +95,16 @@ dimensions as (
       when ss.slot between 24 and 27 then 14
       when ss.slot between 28 and 31 then 15
       when ss.slot between 32 and 35 then 16
+      when ss.slot between 36 and 39 then 17
+      when ss.slot between 40 and 43 then 18
     end as hour,
     case 
       when ds.week_day between 1 and 5 and ss.slot between 0 and 3 then '1) Weekday 8-9h'
       when ds.week_day between 1 and 5 and ss.slot between 4 and 19 then '2) Weekday 9-13h'
       when ds.week_day between 1 and 5 and ss.slot between 20 and 31 then '3) Weekday 13-16h'
       when ds.week_day between 1 and 5 and ss.slot between 32 and 35 then '4) Weekday 16-17h'
-      when ds.week_day = 6 then '5) Weekend all hours'
+      when ds.week_day between 1 and 5 and ss.slot between 36 and 43 then '5) Extended hours'
+      when ds.week_day = 6 then '6) Weekend all hours'
     end as faixa
   from
     regions r
@@ -131,7 +134,7 @@ encaixes_raw as (
      left join encaixe_to_booking etb on etb.user_id = trim(evt.user_id) and etb.house_id = trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), ''))
   where trim(evt.event_type) = 'visit_hoursalert_confirmed'
     and evt.year >= 2019
-    and evt.month >= 9
+    and evt.month >= 8
     and evt.app = 170698
 ),
 encaixes_temp as (
@@ -166,9 +169,7 @@ blocked_houses as (
       imovel_id as house_id,
       status,
       from_unixtime(cast(timestamp as bigint)/ 1000) as init,
-      coalesce(from_unixtime(cast(lead(timestamp) over (partition by imovel_id
-    order by
-      timestamp)as bigint)/ 1000),
+      coalesce(from_unixtime(cast(lead(timestamp) over (partition by imovel_id order by timestamp)as bigint)/ 1000),
       current_date) as "end"
     from
       datalake_raw.ebdb_housevisitstatus_aud vs
@@ -224,7 +225,9 @@ select
                         or (cast(slot as bigint) between 20 and 23 and hs.hours_available_13to14 = false)
                         or (cast(slot as bigint) between 24 and 27 and hs.hours_available_14to15 = false)
                         or (cast(slot as bigint) between 28 and 31 and hs.hours_available_15to16 = false)
-                        or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)) 
+                        or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)
+                        or (cast(slot as bigint) between 36 and 39 and hs.hours_available_17to18 = false)
+                        or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false)) 
     then slot_share_encaixe
   end as slot_share_nao_realizados_por_agenda,
   case
@@ -237,11 +240,14 @@ select
     or (cast(slot as bigint) between 20 and 23 and hs.hours_available_13to14 = false)
     or (cast(slot as bigint) between 24 and 27 and hs.hours_available_14to15 = false)
     or (cast(slot as bigint) between 28 and 31 and hs.hours_available_15to16 = false)
-    or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false))) then slot_share_encaixe
+    or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)
+    or (cast(slot as bigint) between 36 and 39 and hs.hours_available_17to18 = false)
+    or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false))) then slot_share_encaixe
   end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
   cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
   cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
-  cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) as slots_disponiveis_target_date
+  cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
+  cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date
 from
   encaixes_temp t
 left join house_available_hours hs 
