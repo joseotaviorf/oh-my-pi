@@ -54,34 +54,6 @@ class TestMarketingTwitterCampaignsSubdag(object):
         # assert
         mock__build_python_operator.assert_not_called()
 
-        @mock.patch(
-            'bietlejuice.jobs.dags.marketing.marketing_twitter_campaigns_subdag.'
-            'TwitterCampaigns')
-        @mock.patch.object(BaseDAG, 'build_python_operator')
-        def test_build_clean_tasks_with_no_tables(self, mock__build_python_operator,
-                                                  mock__twitter_campaigns,
-                                                  twitter_campaigns_subdag):
-            # arrange
-            mock_accounts = MagicMock()
-            mock_accounts.__iter__.return_value = [1, 2, 3, 4]
-
-            mock_instance = MagicMock()
-            mock_instance.get_accounts.return_value = mock_accounts
-
-            mock__twitter_campaigns.return_value = mock_instance
-
-            mocked_dag = Mock()
-            mock__build_python_operator.return_value = MagicMock()
-            twitter_campaigns_subdag.transfer_files_to_clean = MagicMock()
-
-            twitter_campaigns_subdag.tables = []
-
-            # act
-            twitter_campaigns_subdag.build_clean_tasks(mocked_dag)
-
-            # assert
-            mock__build_python_operator.assert_not_called()
-
     @mock.patch('bietlejuice.jobs.dags.marketing.marketing_twitter_campaigns_subdag.'
                 'TwitterCampaigns')
     @mock.patch.object(BaseDAG, 'build_python_operator')

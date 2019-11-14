@@ -316,19 +316,21 @@ UNION
         'fact_linkedin_daily_cost_attributions' as fact_cost,
         dlc.campaign_name,
         null as campaign_city,
-        dlc.account_name as account_name,
+        dlcc.account_name as account_name,
         lower(dlc.campaign_name) as campaign_name_l,
-        lower(dlc.account_name) as account_name_l,
+        lower(dlcc.account_name) as account_name_l,
         dlc.campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
         null as desktop_cost,
         null as mobile_cost,
         null as other_cost,
-        sum(total_spent) as total_cost
+        sum(total_cost) as total_cost
     from marketing.fact_linkedin_daily_cost_attributions fli
     join marketing.dim_linkedin_campaign dlc
         on dlc.sk_campaign = fli.sk_campaign
+    join marketing.dim_linkedin_campaign_group dlcc
+        on dlcc.sk_campaign_group = fli.sk_campaign_group
     group by 1,2,3,4,5,6,7,8,9,10,11
 )
 ,cost_taxonomy as (
