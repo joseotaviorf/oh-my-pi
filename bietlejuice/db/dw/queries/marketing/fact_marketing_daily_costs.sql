@@ -197,6 +197,30 @@ UNION (
     )
 )
 UNION
+    select
+        fm.sk_date,
+        'mitula' as origin,
+        'fact_mitula_daily_cost_attributions' as fact_cost,
+        campaign_name,
+        null as campaign_city,
+        null as account_name,
+        csol.city_group as campaign_name_l,
+        null as account_name_l,
+        null as utm_campaign,
+        null as utm_term,
+        null as utm_content,
+        fm.desktop_cost * csol.share as desktop_cost,
+        fm.mobile_cost * csol.share as mobile_cost,
+        null as other_cost,
+        null as total_cost
+    from
+        marketing.fact_mitula_daily_cost_attributions fm
+    join marketing.dim_mitula_campaign dm
+        on fm.sk_mitula_campaign = dm.sk_mitula_campaign
+    join cities_share_by_ol csol
+        on fm.sk_date = csol.sk_date
+    where fm.sk_date >= 20180101
+UNION
 	select
         fct.sk_date,
         'criteo' as origin,
