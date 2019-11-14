@@ -453,9 +453,9 @@ class BaseETL(object):
         aws_session_token = os.environ.get('AWS_SESSION_TOKEN')
         if aws_session_token:
             print 'm=bulk_insert_from_s3_to_dw, msg=Using aws_session_token in credentials'
-            session_token_str = 'token={}'.format(aws_session_token)
+            session_token_str = ';token={}'.format(aws_session_token)
 
-        credentials_str = """CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={};{}'""".format(
+        credentials_str = """CREDENTIALS 'aws_access_key_id={};aws_secret_access_key={}{}'""".format(
             aws_access_key_id, aws_secret_access_key, session_token_str)
 
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
