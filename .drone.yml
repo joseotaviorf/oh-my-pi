@@ -310,3 +310,31 @@ pipeline:
     when:
       event: push
       branch: [ master ]
+
+  schemaspy:
+    image: quintoandar/drone-schemaspy:v1.1.0
+    pull: true
+    commands:
+      - |-
+        java -jar /dependencies/schemaspy-6.1.0.jar \
+            -t redshift \
+            -dp /dependencies/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar \
+            -db dw \
+            -host "quintoandar-bi.c6wy0orj1cqf.us-east-1.redshift.amazonaws.com" \
+            -port "5439" \
+            -schemas "public","growth","agent","asterisk","bank","call","crm","datamarts","datamarts_credit","zendesk","marketing","datamarts_strategy" \
+            -u $${DB_USER} \
+            -p $${DB_PASSWORD} \
+            -I "(view|pg|vw)_.*" \
+            -o ./output
+
+        echo "====== Uploading documentation to S3 ======"
+        aws s3 cp output/ s3://dbschema.quintoandar.com.br/dw --recursive --acl private
+    secrets:
+      - source: dw_db_password_prod
+        target: DB_PASSWORD
+      - source: dw_db_user_prod
+        target: DB_USER
+    when:
+      branch: master
+      event: push
