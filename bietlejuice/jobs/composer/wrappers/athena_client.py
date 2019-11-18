@@ -11,8 +11,8 @@ logger = QuintoAndarLogger("AthenaClient")
 
 class AthenaClient:
     """
-    This a temporary client for Athena. In the future we are going to use an AWS
-    client existing in its own repository.
+    This class is deprecated, and must be removed the sooner the better. Please use the
+    AthenaClient that is located in composer/clients/db_clients/athena_client.py
     """
 
     QUERY_OUTPUT_PATH = "s3://5a-datalake/temp/databricks_output/"
