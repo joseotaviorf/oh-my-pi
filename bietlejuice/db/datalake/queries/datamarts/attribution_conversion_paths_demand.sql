@@ -60,6 +60,7 @@ touchpoints as (
 	join conversions conv on conv.amplitude_id = evt.amplitude_id and conv.event_time >= evt.event_time
 	where evt.rnk_event_of_session = 1
 	group by 1,2,3,4,5,6,7,8,9,10
+	order by 1,11,10
 )
 -- aggregate touchpoints to unique conversions with their path concatenated in one column
 -- conversions July - September 2019
@@ -77,5 +78,4 @@ select
 from touchpoints
 where conversion_time >= date('2019-07-01')
 and date_diff('month', session_start_time, conversion_time) <= 6
-group by 1, 2
-;
+group by 1, 2;
