@@ -1,11 +1,10 @@
-from pyspark.sql.functions import lit
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
+from pyspark.sql.functions import lit
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-
 
 logger = QuintoAndarLogger("TeravozLoader")
 
@@ -16,6 +15,10 @@ sqlContext = BaseSparkContext.sqlContext
 
 class TeravozLoader:
     """
+        This class is deprecated and must be removed the sooner the better. The
+        clients of this class can use the S3Loader class to put SparkDataFrames into
+        S3 and the MetastoreServices to do Metastore operations.
+
         Generic class that contains methods for all Teravoz tables.
         From spark dataframe load data into s3
     """
@@ -118,9 +121,8 @@ class TeravozLoader:
         df_write.partitionBy(*self.partitions.keys())
 
         logger.info(
-            "m=_create_spark_table_and_load_data_to_s3, msg= creating spark table {}.{}".format(
-                self.db_name, self.table_name
-            )
+            "m=_create_spark_table_and_load_data_to_s3, msg= creating spark table {"
+            "}.{}".format(self.db_name, self.table_name)
         )
         df_write.saveAsTable("{}.{}".format(self.db_name, self.table_name))
 
@@ -149,7 +151,8 @@ class TeravozLoader:
         # create database if not exists in spark catalog
         spark.sql("create database if not exists {}".format(self.db_name))
 
-        # limits the number of partitions in df, consequently the number of files created in s3
+        # limits the number of partitions in df, consequently the number of files
+        # created in s3
         df = df.coalesce(5)
 
         if self.table_name not in sqlContext.tableNames(dbName=self.db_name):
