@@ -1,21 +1,21 @@
-from datetime import datetime
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
     SparkDataFrameService,
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("events_raw_to_clean")
@@ -39,7 +39,9 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source)
 
     amplitude_events = AmplitudeEvents(
-        db_raw=db_info["db_raw_databricks"], db_clean=db_info["db_clean_databricks"]
+        spark_client=SparkClient(),
+        db_raw=db_info["db_raw_databricks"],
+        db_clean=db_info["db_clean_databricks"],
     )
     spark_sql_client = SparkSQLCLient(spark, sqlContext)
     metastore_service = SparkMetastoreService(

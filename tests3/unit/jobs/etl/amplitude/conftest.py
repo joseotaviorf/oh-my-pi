@@ -1,7 +1,8 @@
 import pytest
 
-from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 
 
 class MockedSparkSqlConsumer:
@@ -20,7 +21,8 @@ class MockedSparkSqlConsumer:
             for value in self.query_values:
                 if str(value) not in query:
                     raise ValueError(
-                        "m=get_data_from_query, msg= key value={} not in query, query={}".format(
+                        "m=get_data_from_query, msg= key value={} not in query, "
+                        "query={}".format(
                             value, query
                         )
                     )
@@ -29,7 +31,7 @@ class MockedSparkSqlConsumer:
 
 @pytest.fixture()
 def amplitude_events():
-    return AmplitudeEvents()
+    return AmplitudeEvents(SparkClient())
 
 
 @pytest.fixture()

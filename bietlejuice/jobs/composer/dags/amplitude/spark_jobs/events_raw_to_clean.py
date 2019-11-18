@@ -41,7 +41,9 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source)
 
     amplitude_events = AmplitudeEvents(
-        db_raw=db_info["db_raw_databricks"], db_clean=db_info["db_clean_databricks"]
+        spark_client=SparkClient(),
+        db_raw=db_info["db_raw_databricks"],
+        db_clean=db_info["db_clean_databricks"],
     )
     spark_sql_client = SparkSQLCLient(spark, sqlContext)
     metastore_service = SparkMetastoreService(

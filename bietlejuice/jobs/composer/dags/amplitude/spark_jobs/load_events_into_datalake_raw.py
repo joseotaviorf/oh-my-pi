@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 from bietlejuice.jobs.composer.base.spark import (
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     source = "amplitude"
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    amplitude_events = AmplitudeEvents()
+    amplitude_events = AmplitudeEvents(SparkClient())
     spark_sql_client = SparkSQLCLient(spark, sqlContext)
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(

@@ -1,10 +1,11 @@
 import gzip
 import zipfile
-from io import BytesIO
 from datetime import datetime
+from io import BytesIO
+
+from pyspark.sql.functions import to_json
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from pyspark.sql.functions import to_json
 
 spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
@@ -12,7 +13,8 @@ spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 class TestAmplitudeEvents:
     def test_create_raw_events_df(self, amplitude_events, dataframe_service):
         # arrange
-        json_file_content = '{"event_properties": {"a": 1, "b": 2}, "c": 3, "server_upload_time": "2019-08-22"}'
+        json_file_content = '{"event_properties": {"a": 1, "b": 2}, "c": 3, ' \
+                            '"server_upload_time": "2019-08-22"}'
         expected_df_schema = [
             ("event_properties", "string"),
             ("c", "bigint"),
