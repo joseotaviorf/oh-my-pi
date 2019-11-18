@@ -24,8 +24,8 @@ custom_fields as (
     with parse_fields as (
 		select tf.id_ticket,
 	        f1.field,
-	        json_extract(f1.field, '$.id') as id_field,
-	        json_extract(f1.field, '$.value') as value
+	        regexp_replace(json_format(json_extract(f1.field, '$.id')), '^"|"$', '') as id_field,
+                regexp_replace(json_format(json_extract(f1.field, '$.value')), '^"|"$', '') as value
 	    from tickets_filter tf
         inner join last_updated_ticket l
             on tf.id_ticket=l.id_ticket
@@ -35,8 +35,8 @@ custom_fields as (
         map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
     inner join datalake_clean.zendesk_ticket_fields cf
-       on cast(cf.id_ticket_fields as JSON) = f.id_field
-    where f.value != cast('null' as JSON)
+       on cf.id_ticket_fields = f.id_field
+    where f.value != 'null'
     group by 1
 )
 select
@@ -56,7 +56,7 @@ select
     t.tags,
     t.status,
     coalesce(cast(t.is_public as boolean), false) as has_public_comments,
-	json_format(cast(c.cols as JSON)) as custom_fields,
+    json_format(cast(c.cols as JSON)) as custom_fields,
     cast(json_extract(t.satisfaction_rating,'$.score') as varchar) as score,
     cast(json_extract(t.satisfaction_rating,'$.reason') as varchar) as reason,
     cast(json_extract(t.satisfaction_rating,'$.comment') as varchar) as comment,
