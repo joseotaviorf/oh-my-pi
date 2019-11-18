@@ -1,6 +1,6 @@
 drop table if exists dim_partner;
 create table dim_partner (
-    sk_partner bigint,
+    sk_partner bigint primary key,
     id_partner bigint,
     name varchar(255)  DEFAULT NULL,
     trade_name varchar(255)  DEFAULT NULL,

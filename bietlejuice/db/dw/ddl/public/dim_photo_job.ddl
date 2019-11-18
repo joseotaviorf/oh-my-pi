@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS public.dim_photo_job;
 create table public.dim_photo_job (
-  sk_photo_job bigint,
+  sk_photo_job bigint primary key,
 	id bigint,
 	imovel_id bigint,
 	rep_id bigint,

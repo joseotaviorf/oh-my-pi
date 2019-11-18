@@ -1,6 +1,6 @@
 drop table if exists crm.dim_closing_task;
 create table if not exists crm.dim_closing_task (
-  sk_task varchar,
+  sk_task varchar primary key,
   flg_solved boolean,
   score_factor numeric(14,2),
   ts_start timestamp,
@@ -16,5 +16,4 @@ create table if not exists crm.dim_closing_task (
   titles varchar,
   workgroups varchar,
   ts_load timestamp
-)
-;
+);

@@ -1,6 +1,6 @@
 drop table if exists dim_visit;
 create table if not exists dim_visit (
-  sk_visit integer,
+  sk_visit integer primary key,
   id_visit integer,
   cd_visit varchar(200),
   day_visit date,

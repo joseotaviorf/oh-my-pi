@@ -1,6 +1,6 @@
 drop table if exists dim_house_listing;
 create table dim_house_listing (
-  sk_house_listing bigint,
+  sk_house_listing bigint primary key,
   id_house bigint,
   short_id_house bigint,
   version smallint,

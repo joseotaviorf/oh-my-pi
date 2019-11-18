@@ -1,6 +1,6 @@
 drop table if exists dim_inspection;
 create table if not exists dim_inspection (
-  sk_inspection bigint,
+  sk_inspection bigint primary key,
   id_inspection bigint,
   type varchar,
   status varchar,

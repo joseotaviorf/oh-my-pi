@@ -1,6 +1,6 @@
 drop table if exists dim_partner_agent;
 create table dim_partner_agent (
-    sk_partner_agent bigint,
+    sk_partner_agent bigint primary key,
     id_partner_agent bigint,
     status_partner_agent varchar, 
     id_user bigint,

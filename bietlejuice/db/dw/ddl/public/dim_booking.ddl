@@ -1,6 +1,6 @@
 drop table if exists dim_booking;
 create table if not exists dim_booking (
-  sk_booking integer,
+  sk_booking integer primary key,
   id_booking integer,
   is_rescheduled boolean,
   dt_scheduling timestamp,

@@ -1,5 +1,5 @@
 CREATE TABLE public.dim_date (
-	sk_date int8 NOT NULL,
+	sk_date int8 primary key,
 	"date" date NULL,
 	"year" int4 NULL,
 	"month" int4 NULL,

@@ -1,6 +1,6 @@
 drop table if exists zendesk.dim_ticket;
 create table if not exists zendesk.dim_ticket (
-    sk_ticket bigint,
+    sk_ticket bigint primary key,
     subject varchar(MAX),
     description varchar(MAX),
     ticket_via varchar(15),

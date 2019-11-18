@@ -1,6 +1,6 @@
 drop table if exists dim_region;
 create table if not exists dim_region (
-  sk_region integer,
+  sk_region integer primary key,
   id integer,
   level varchar,
   name varchar,

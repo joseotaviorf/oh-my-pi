@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS marketing.dim_twitter_campaign;
 CREATE TABLE IF NOT EXISTS marketing.dim_twitter_campaign(
-  sk_campaign        VARCHAR(50),
+  sk_campaign        VARCHAR(50) primary key,
   id_campaign        VARCHAR(50),
   campaign_name      VARCHAR(100),
   id_account         VARCHAR(50),

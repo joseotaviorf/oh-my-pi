@@ -1,7 +1,6 @@
 DROP TABLE marketing.dim_google_ad;
-
 CREATE TABLE IF NOT EXISTS marketing.dim_google_ad (
-	sk_ad BIGINT,
+	sk_ad BIGINT primary key,
 	ad_id BIGINT,
 	account_name VARCHAR,
 	campaign_name VARCHAR,
@@ -9,4 +8,4 @@ CREATE TABLE IF NOT EXISTS marketing.dim_google_ad (
 	image_creative_name VARCHAR,
 	ad_type VARCHAR,
 	ts_load TIMESTAMP
-)
+);

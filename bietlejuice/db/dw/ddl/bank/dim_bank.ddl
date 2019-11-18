@@ -1,7 +1,6 @@
 drop table if exists bank.dim_bank;
-
 create table if not exists bank.dim_bank (
-  sk_bank bigint,
+  sk_bank bigint primary key,
   id_bank bigint,
   ts_updated timestamp,
   ts_created timestamp,
@@ -10,5 +9,4 @@ create table if not exists bank.dim_bank (
   febraban_name varchar,
   featured_rank integer,
   ts_load timestamp
-)
-;
+);

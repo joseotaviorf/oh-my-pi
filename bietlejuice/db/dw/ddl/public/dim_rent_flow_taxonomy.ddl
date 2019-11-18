@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS public.dim_rent_flow_taxonomy;
 
 CREATE TABLE public.dim_rent_flow_taxonomy (
-	sk_rent_flow_taxonomy bigint,
+	sk_rent_flow_taxonomy bigint primary key,
 	id_rent_flow_taxonomy bigint,
 	mkt_category varchar(255),
 	mkt_flow varchar(255),

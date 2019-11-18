@@ -1,6 +1,6 @@
 drop table if exists dim_proposal;
 create table if not exists dim_proposal (
-  sk_proposal integer,
+  sk_proposal integer primary key,
   id_proposal integer,
   dt_proposal timestamp,
   guarantee varchar(50),

@@ -1,7 +1,7 @@
 drop table public.dim_reservation;
 
 CREATE TABLE public.dim_reservation(
-sk_reservation bigint not null,
+sk_reservation bigint primary key,
 id_reservation bigint,
 ts_created timestamp,
 ts_updated timestamp,

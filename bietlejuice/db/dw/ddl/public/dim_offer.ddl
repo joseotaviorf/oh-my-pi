@@ -1,6 +1,6 @@
 drop table if exists dim_offer;
 create table dim_offer (
-  sk_offer integer,
+  sk_offer integer primary key,
   id_offer integer,
   id_godfather integer,
   id_firestore varchar(255),

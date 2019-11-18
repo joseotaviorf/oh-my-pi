@@ -1,6 +1,6 @@
 drop table if exists dim_contract;
 create table dim_contract (
-  sk_contract bigint,
+  sk_contract bigint primary key,
   id_contract bigint,
   rent numeric(14,2),
   day_month_due smallint,

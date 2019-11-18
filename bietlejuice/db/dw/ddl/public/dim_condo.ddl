@@ -1,6 +1,6 @@
 drop table if exists dim_condo;
 create table dim_condo (
-  sk_condo bigint,
+  sk_condo bigint primary key,
   id_condo bigint,
   neighborhood varchar,
   zipcode varchar,
