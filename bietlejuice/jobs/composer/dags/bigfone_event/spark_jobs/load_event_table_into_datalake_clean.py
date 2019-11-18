@@ -62,21 +62,25 @@ if __name__ == "__main__":
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
-    conn_config = {"db": datalake_info["db_clean_databricks"]}
+    conn_config = {"db": datalake_info["db_raw_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
     event_table_data = databricks_consumer.get_data_from_query(
         query.format(**query_filter)
     )
 
-    spark_service = SparkMetastoreService(
+    spark_metastore_service = SparkMetastoreService(
         datalake_info["db_clean_databricks"],
         datalake_info["db_clean_path"],
         SparkSQLCLient(spark, sqlContext),
     )
 
+    # create database if not exists
+    spark_metastore_service.create_database()
+
     # loaders
     loader = SparkDataframeIntoDatalakeLoader(
-        format=SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service=spark_service
+        format=SparkTableStorageFormat.DEFAULT_CLEAN,
+        metastore_service=spark_metastore_service,
     )
     loader.overwrite_partition(
         df=event_table_data,
@@ -86,6 +90,6 @@ if __name__ == "__main__":
     )
 
     # create partition into spark table
-    spark_service.create_new_partitions_from_df(
+    spark_metastore_service.create_new_partitions_from_df(
         table_name=table_name, df=event_table_data, partition_by_list=list_partitions
     )

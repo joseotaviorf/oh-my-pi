@@ -85,6 +85,9 @@ if __name__ == "__main__":
         SparkSQLCLient(spark, sqlContext),
     )
 
+    # create database if not exists
+    spark_metastore_service.create_database()
+
     # loaders
     loader = SparkDataframeIntoDatalakeLoader(
         format=SparkTableStorageFormat.DEFAULT_RAW,
