@@ -19,7 +19,6 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-marketing-funnels-conversions'
 MAIN_START_DATE = datetime(2019, 1, 5)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 7 * * *')
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -33,7 +32,7 @@ main_dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,  # will get triggered by bi-marketing-daily-costs
     max_active_runs=1,
     catchup=False,
     orientation='TB'
@@ -167,7 +166,7 @@ def move_file_query_data_to_dw(schema, file_name):
 def create_supply_funnel_conversions_sub_dag(sub_dag_name):
     sub_dag = FunnelConversionSubDag(
         bucket=bucket,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        schedule_interval=None,
         start_date=MAIN_START_DATE,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -180,7 +179,7 @@ def create_supply_funnel_conversions_sub_dag(sub_dag_name):
 def create_demand_funnel_conversions_sub_dag(sub_dag_name):
     sub_dag = FunnelConversionSubDag(
         bucket=bucket,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        schedule_interval=None,
         start_date=MAIN_START_DATE,
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
@@ -311,14 +310,6 @@ create_conversion_points_demand_monthly_task = BaseDAG.build_python_operator(
                'sub_level': 'conversion_points_demand'}
 )
 
-load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id='load_fact_marketing_daily_costs',
-    python_callable=move_file_query_data_to_dw,
-    op_kwargs={'schema': 'marketing',
-               'file_name': 'fact_marketing_daily_costs'}
-)
-
 supply_funnel_conversions_subdag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=create_supply_funnel_conversions_sub_dag,
@@ -350,6 +341,5 @@ airflow_helpers.chain(create_conversion_points_demand_daily_task,
                       create_conversion_points_demand_monthly_task)
 supply_funnel_conversions_subdag.set_upstream([create_conversion_points_supply_monthly_task,
                                                create_conversion_points_demand_monthly_task])
-airflow_helpers.chain(load_fact_marketing_daily_costs_task,
-                      supply_funnel_conversions_subdag,
+airflow_helpers.chain(supply_funnel_conversions_subdag,
                       demand_funnel_conversions_subdag)
