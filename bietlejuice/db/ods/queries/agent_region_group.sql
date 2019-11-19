@@ -9,7 +9,7 @@ SELECT
 FROM
 	public.agent_region_hist t_out
 LEFT join
-	files.aux_regiao aux ON aux.id = t_out.regiao_id
+	gsheets.aux_regiao aux ON aux.id = t_out.regiao_id
 WHERE
 	TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS') BETWEEN dt_start AND dt_end
 	AND TO_TIMESTAMP('{0}', 'YYYY-MM-DD HH24:MI:SS') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS')  -- limit date, where aud started to be implemented
@@ -31,7 +31,7 @@ FROM
 	public.agents_schedule ag
 LEFT JOIN public.usuario us
 	ON us.id = ag.agent_user_id
-LEFT JOIN files.aux_regiao aux
+LEFT JOIN gsheets.aux_regiao aux
 	ON aux.id = ag.region_id
 WHERE
 	ag.region_id IS NOT NULL
