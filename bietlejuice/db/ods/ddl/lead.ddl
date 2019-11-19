@@ -32,6 +32,7 @@ create table if not exists lead (
   external_id varchar(255),
   mencionar integer,
   automatically_discarded integer,
+  id_lead_owner bigint,
   proprietario_nome varchar(255),
   proprietario_email varchar(255),
   affiliate_type varchar(255),

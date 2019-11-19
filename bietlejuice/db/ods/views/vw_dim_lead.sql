@@ -53,11 +53,11 @@ create or replace view vw_dim_lead as
   coalesce(l.utm_source, an.network) as network, -- add the network of the campaign (currenlty only present for leads from the landing page), or network of the afiliado (if the lead was recommended by an affiliate)
   coalesce(lo.usuario_que_indicou_id, l.usuario_que_indicou_id) as usuario_que_indicou_id,
   lsf.score_factor,
-  coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or b2b_prime.id_lead is not null, false) as is_b2b,
+  coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or pa.id is not null, false) as is_b2b,
   case
     when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
      then 'online'
-    when b2b_prime.id_lead is not null
+    when pa.id is not null
      then 'prime'
   end as b2b_type,
   l.sale_price,
@@ -89,14 +89,6 @@ left join lateral
   limit 1
 )  an
   on true
-left join (
-	select distinct
-	    l.id as id_lead
-	from lead l
-	join usuario u_b2b
-		on u_b2b.telefone_principal = l.telefone_anunciante
-	join partner_agent pa_b2b
-		on pa_b2b.user_id = u_b2b.id
-) b2b_prime
-  on b2b_prime.id_lead = l.id
+left join partner_agent pa
+  on l.id_lead_owner = pa.user_id
 ;

@@ -32,6 +32,7 @@ select distinct
   l.externalId as external_id,
   l.mencionar+0 as mencionar,
   l.automaticallyDiscarded+0 as automatically_discarded,
+  pl.id as id_lead_owner,
   pl.nome as proprietario_nome,
   pl.email as proprietario_email,
   da.affiliateType as affiliate_type,
