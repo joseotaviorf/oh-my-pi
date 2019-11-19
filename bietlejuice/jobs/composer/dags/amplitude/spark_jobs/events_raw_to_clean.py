@@ -1,21 +1,21 @@
-from datetime import datetime
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
     SparkDataFrameService,
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("events_repartitioned_raw_to_clean")
@@ -45,13 +45,12 @@ if __name__ == "__main__":
         db_raw=db_info["db_raw_databricks"],
         db_clean=db_info["db_clean_databricks"],
     )
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
     metastore_service = SparkMetastoreService(
-        db_info["db_clean_databricks"], db_info["db_clean_path"], spark_sql_client
+        db_info["db_clean_databricks"],
+        db_info["db_clean_path"],
+        SparkSQLCLient(spark, sqlContext),
     )
-    dataframe_loader = SparkDataframeIntoDatalakeLoader(
-        SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service
-    )
+    s3_loader = S3Loader(metastore_service)
     dataframe_service = SparkDataFrameService()
     spark_sql_consumer = DatabricksConsumer(
         {"db": db_info["db_raw_databricks"]}, SparkClient()
@@ -61,8 +60,8 @@ if __name__ == "__main__":
     df = amplitude_events.create_clean_events_df(
         date, spark_sql_consumer, dataframe_service, partition_by
     )
-    dataframe_loader.overwrite_partition(
-        df, partition_by, table_name, schema_merging=False
+    s3_loader.load_incremental_table(
+        df, table_name, SparkTableStorageFormat.DEFAULT_CLEAN, partition_by
     )
     metastore_service.create_new_partitions_from_df(
         table_name, df, partition_by, parallelism=1

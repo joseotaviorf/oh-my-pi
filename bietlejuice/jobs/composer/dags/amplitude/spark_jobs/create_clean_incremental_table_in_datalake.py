@@ -1,21 +1,21 @@
 import logging
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
+from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
+    SparkDataFrameService,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
     spark,
     sqlContext,
-    SparkMetastoreService,
-    SparkDataFrameService,
-    SparkTableStorageFormat,
 )
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.etl import FileService
-from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_clean_incremental_table_in_datalake")
@@ -47,13 +47,12 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
     metastore_service = SparkMetastoreService(
-        db_info["db_clean_databricks"], db_info["db_clean_path"], spark_sql_client
+        db_info["db_clean_databricks"],
+        db_info["db_clean_path"],
+        SparkSQLCLient(spark, sqlContext),
     )
-    loader = SparkDataframeIntoDatalakeLoader(
-        SparkTableStorageFormat.DEFAULT_CLEAN, metastore_service
-    )
+    s3_loader = S3Loader(metastore_service)
 
     query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
     query = FileService.get_query_from_file_name(query_path).format(
@@ -64,7 +63,9 @@ if __name__ == "__main__":
     df = SparkDataFrameService(spark.sql(query)).optimize_partition(250000).output()
 
     # load df
-    loader.overwrite_partition(df, partition_by, table_name, False)
+    s3_loader.load_incremental_table(
+        df, table_name, SparkTableStorageFormat.DEFAULT_CLEAN, partition_by
+    )
 
     # add new partition
     metastore_service.create_new_partitions_from_df(

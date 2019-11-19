@@ -1,14 +1,13 @@
 import logging
 from argparse import ArgumentParser
 
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
-from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
-from bietlejuice.jobs.composer.wrappers import AthenaClient
-
 from quintoandar_logger import QuintoAndarLogger
 
-DATABRICKS_SCOPE = "quintoandar"
+from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
+from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
+from bietlejuice.jobs.composer.wrappers import AthenaClient
 
+DATABRICKS_SCOPE = "quintoandar"
 
 JOB_NAME = "load_data_to_clean"
 
@@ -16,7 +15,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description="load_teravoz_into_datalake")
 
     # args passed by Airflow task
@@ -27,9 +25,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_data_to_clean, file_name={}, execution_date={}, msg=print args spark jobs params".format(
-            args.file_name, args.execution_date
-        )
+        "m=load_data_to_clean, file_name={}, execution_date={}, msg=print args spark "
+        "jobs params".format(args.file_name, args.execution_date)
     )
 
     execution_date = args.execution_date

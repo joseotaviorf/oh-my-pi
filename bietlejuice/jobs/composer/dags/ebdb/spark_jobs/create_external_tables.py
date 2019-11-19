@@ -4,8 +4,8 @@ from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.etl.transformer import Transformer
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.etl.transformer import Transformer
 from bietlejuice.jobs.composer.wrappers import AthenaClient
 
 sqlContext = BaseSparkContext.sqlContext
@@ -46,12 +46,10 @@ if __name__ == "__main__":
     all = args.all
 
     logger.info(
-        "m=__main__, env={}, datalake_layer={}, source={}, tables={}, all={}, msg=Job execution started".format(
-            env, datalake_layer, source, tables, all
-        )
+        "m=__main__, env={}, datalake_layer={}, source={}, tables={}, all={}, "
+        "msg=Job execution started".format(env, datalake_layer, source, tables, all)
     )
-    athena_client = AthenaClient()
-    transformer = Transformer(env, source, athena_client)
+    transformer = Transformer(env, source, AthenaClient())
     if not all and not tables:
         logger.warning(
             "m=__main__, msg=No tables or all flag passed, nothing to do.".format(

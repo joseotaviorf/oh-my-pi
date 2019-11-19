@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.base.spark import spark, sqlContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_godfather_into_datalake"
@@ -40,28 +40,29 @@ if __name__ == "__main__":
         scope="quintoandar", key=DatabaseEnum.GODFATHER
     )
     conn_config = json.loads(conn_config_json)
-    postgresql_consumer = PostgresConsumer(conn_config, SparkClient())
-    postgresql_consumer.conn_config["schema"] = schema
+    postgres_consumer = PostgresConsumer(conn_config, SparkClient())
+    postgres_consumer.conn_config["schema"] = schema
 
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
     metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"], db_info["db_raw_path"], spark_sql_client
+        db_info["db_raw_databricks"],
+        db_info["db_raw_path"],
+        SparkSQLCLient(spark, sqlContext),
     )
-    loader = SparkDataframeIntoDatalakeLoader(
-        SparkTableStorageFormat.DEFAULT_RAW, metastore_service
-    )
+    loader = S3Loader(metastore_service)
 
     # load db schema into datalake
     tables = [
         row.table_name
-        for row in postgresql_consumer.get_table_names_and_sizes().collect()
+        for row in postgres_consumer.get_table_names_and_sizes().collect()
     ]
     logger.info(
         "m=__main__, schema={}, tables={}, msg=Loading tables in datalake raw".format(
             schema, tables
         )
     )
-    for table in tables:
-        df = postgresql_consumer.get_data_from_table(table)
-        loader.overwrite_table(df, "{}_{}".format(schema, table))
+    for table_name in tables:
+        df = postgres_consumer.get_data_from_table(table_name)
+        loader.load_full_table(
+            df, "{}_{}".format(schema, table_name), SparkTableStorageFormat.DEFAULT_RAW
+        )

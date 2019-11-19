@@ -1,12 +1,14 @@
 import logging
 from argparse import ArgumentParser
+from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
-from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
+from bietlejuice.jobs.composer.wrappers.athena_client import AthenaClient
 
 JOB_NAME = "create_all_raw_external_tables_in_schema"
 
@@ -25,11 +27,11 @@ if __name__ == "__main__":
     schema = args.schema
 
     # setup
-    loader = DatabaseIntoDataLakeRawLoader(environment, source)
-    athena_db = "{}_{}".format(loader.datalake_db, environment)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    athena_db = db_info["db_raw_athena"]
     athena_client = AthenaClient()
-    athena_client.run("CREATE DATABASE IF NOT EXISTS `{}`".format(athena_db))
-    conn_config = {"db": loader.datalake_db}
+
+    conn_config = {"db": db_info["db_raw_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
 
     # create all raw external tables in schema
@@ -43,12 +45,22 @@ if __name__ == "__main__":
             schema, tables
         )
     )
-    for table in tables:
-        loader.create_athena_external_table(
-            athena_client=athena_client,
-            consumer=databricks_consumer,
-            table_name=table,
-            athena_db=athena_db,
+    for table_name in tables:
+        table_schema = OrderedDict(
+            [
+                (row["col_name"], row["col_type"].lower())
+                for row in databricks_consumer.get_table_schema(table_name).collect()
+            ]
+        )
+        athena_client.overwrite_external_table(
+            database=athena_db,
+            table_name=table_name,
+            s3_table_path=db_info["db_raw_path"] + table_name,
+            table_schema=table_schema,
+            partition_by=None,
+            base_format=TableStorageFormat.DEFAULT_RAW,
         )
 
-    logger.info("m=__main__, msg=All raw external tables were created successfully.")
+        logger.info(
+            "m=__main__, msg=All raw external tables were created successfully."
+        )

@@ -6,15 +6,24 @@ from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatabaseEnum
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
+    spark,
+    sqlContext,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
-from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_ebdb_into_datalake"
 BLACK_LIST = ["REVCHANGES"]
+# todo: check this value and argument the choice
 PARTITION_SIZE = 512
+# todo: check this value and argument the choice
 NB_THREADS = 20
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -25,9 +34,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 def load_table_into_datalake(args):
     loader, consumer, table_name, table_size = args
     num_partitions = int(math.ceil(float(table_size) / PARTITION_SIZE))
-    loader.load_full_table(
-        consumer=consumer, table_name=table_name, concurrency=num_partitions
-    )
+    if num_partitions > 1:
+        df = consumer.get_data_from_table_in_parallel(table_name, num_partitions)
+    else:
+        df = consumer.get_data_from_table(table_name)
+    loader.load_full_table(df, table_name, SparkTableStorageFormat.DEFAULT_RAW)
     logger.info(
         "m=load_table_into_datalake, table={}, msg=Finished loading table.".format(
             table_name
@@ -47,12 +58,17 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.EBDB)
-    spark_sql_client = SparkClient()
     conn_config = json.loads(conn_config_json)
-    mysql_consumer = MySqlConsumer(conn_config, spark_sql_client)
+    mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
-    loader = DatabaseIntoDataLakeRawLoader(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    spark_metastore_service = SparkMetastoreService(
+        db_info["db_raw_databricks"],
+        db_info["db_raw_path"],
+        SparkSQLCLient(spark, sqlContext),
+    )
+    loader = S3Loader(spark_metastore_service)
 
     with Pool(NB_THREADS) as p:
         p.map(

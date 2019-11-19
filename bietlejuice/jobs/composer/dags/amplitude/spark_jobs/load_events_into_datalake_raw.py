@@ -1,14 +1,11 @@
-from datetime import datetime, timedelta
 import json
 import logging
 from argparse import ArgumentParser
+from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
@@ -16,8 +13,10 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkMetastoreService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
+from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -46,17 +45,16 @@ if __name__ == "__main__":
 
     source = "amplitude"
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    amplitude_events = AmplitudeEvents(SparkClient())
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
+    amplitude_events = AmplitudeEvents()
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"], db_info["db_raw_path"], spark_sql_client
+        db_info["db_raw_databricks"],
+        db_info["db_raw_path"],
+        SparkSQLCLient(spark, sqlContext),
     )
-    dataframe_loader = SparkDataframeIntoDatalakeLoader(
-        SparkTableStorageFormat.DEFAULT_RAW, metastore_service
-    )
+    s3_loader = S3Loader(metastore_service)
     table_name = "events"
-    partition_by_list = ["year", "month", "day", "app"]
+    partitions = ["year", "month", "day", "app"]
 
     logger.info(
         "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
@@ -75,9 +73,13 @@ if __name__ == "__main__":
 
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
-            dataframe_loader.overwrite_partition(
-                df, partition_by_list, table_name, schema_merging=True
+            s3_loader.load_incremental_table(
+                df,
+                table_name,
+                SparkTableStorageFormat.DEFAULT_RAW,
+                partitions,
+                schema_merging=True,
             )
             metastore_service.create_new_partitions_from_df(
-                table_name, df, partition_by_list, parallelism=8
+                table_name, df, partitions, parallelism=8
             )

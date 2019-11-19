@@ -1,10 +1,10 @@
 import time
-import boto3
 from collections import OrderedDict
 
-from bietlejuice.jobs.composer.base.athena import TableStorageFormat
-
+import boto3
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 
 logger = QuintoAndarLogger("AthenaClient")
 
@@ -90,9 +90,8 @@ class AthenaClient:
         drop_query = "DROP TABLE IF EXISTS `{}`.`{}`".format(database, table_name)
         self.execute_athena_query(drop_query, database)
         logger.info(
-            "m=overwrite_external_table, table={}.{}, msg=Dropped table in Athena successfully".format(
-                database, table_name
-            )
+            "m=overwrite_external_table, table={}.{}, msg=Dropped table in Athena "
+            "successfully".format(database, table_name)
         )
 
         self.create_external_table(
@@ -104,9 +103,8 @@ class AthenaClient:
         create_query = "CREATE DATABASE IF NOT EXISTS {};".format(database)
         self.execute_athena_query(create_query, database)
         logger.info(
-            "m=create_database, database={}, msg=The schema was created successfully in Athena".format(
-                database
-            )
+            "m=create_database, database={}, msg=The schema was created successfully "
+            "in Athena".format(database)
         )
 
     @logger
@@ -142,7 +140,8 @@ class AthenaClient:
         )
 
         # Athena has problems with some types in spark, so we have to convert to string
-        # these problems were observed in json format, so will only be applied for this base_format
+        # these problems were observed in json format, so will only be applied for
+        # this base_format
         # TODO: search more about this problem and find a better possible approach
         if base_format == TableStorageFormat.JSON:
             table_schema = OrderedDict(
@@ -195,7 +194,6 @@ class AthenaClient:
         # create table
         self.execute_athena_query(create_query, database)
         logger.info(
-            "m=create_external_table, table={}.{}, msg=The table was created successfully in Athena".format(
-                database, table_name
-            )
+            "m=create_external_table, table={}.{}, msg=The table was created "
+            "successfully in Athena".format(database, table_name)
         )

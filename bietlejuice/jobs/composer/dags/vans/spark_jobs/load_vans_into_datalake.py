@@ -4,11 +4,18 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatabaseEnum
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    SparkMetastoreService,
+    SparkTableStorageFormat,
+    spark,
+    sqlContext,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
-from bietlejuice.jobs.composer.loaders import DatabaseIntoDataLakeRawLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_vans_into_datalake"
 BLACK_LIST = ["schema_migrations"]
@@ -29,12 +36,20 @@ if __name__ == "__main__":
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.VANS)
     conn_config = json.loads(conn_config_json)
-    spark_sql_client = SparkClient()
-    mysql_consumer = MySqlConsumer(conn_config, spark_sql_client)
+    mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
-    loader = DatabaseIntoDataLakeRawLoader(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    spark_metastore_service = SparkMetastoreService(
+        db_info["db_raw_databricks"],
+        db_info["db_raw_path"],
+        SparkSQLCLient(spark, sqlContext),
+    )
+    loader = S3Loader(spark_metastore_service)
 
     for table in tables:
         if table.table_name not in BLACK_LIST:
-            loader.load_full_table(consumer=mysql_consumer, table_name=table.table_name)
+            df = mysql_consumer.get_data_from_table(table.table_name)
+            loader.load_full_table(
+                df, table.table_name, SparkTableStorageFormat.DEFAULT_RAW
+            )

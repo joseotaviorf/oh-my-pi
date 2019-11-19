@@ -18,7 +18,7 @@ from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
 from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import SOURCE
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_event_table_into_datalake_clean"
@@ -78,14 +78,12 @@ if __name__ == "__main__":
     spark_metastore_service.create_database()
 
     # loaders
-    loader = SparkDataframeIntoDatalakeLoader(
-        format=SparkTableStorageFormat.DEFAULT_CLEAN,
-        metastore_service=spark_metastore_service,
-    )
-    loader.overwrite_partition(
+    s3_loader = S3Loader(spark_metastore_service)
+    s3_loader.load_incremental_table(
         df=event_table_data,
-        partition_by_list=list_partitions,
         table_name=table_name,
+        format=SparkTableStorageFormat.DEFAULT_CLEAN,
+        partitions=list_partitions,
         schema_merging=True,
     )
 

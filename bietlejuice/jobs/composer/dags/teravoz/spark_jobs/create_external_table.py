@@ -1,5 +1,5 @@
-from argparse import ArgumentParser
 import logging
+from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -14,7 +14,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description="create_external_table")
 
     # args passed by Airflow task
@@ -30,7 +29,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=create_external_table, table_name={}, datalake_layer={}, execution_date={}, environment={}, msg=print args spark jobs params".format(
+        "m=create_external_table, table_name={}, datalake_layer={}, execution_date={"
+        "}, environment={}, msg=print args spark jobs params".format(
             args.table_name, args.datalake_layer, args.execution_date, args.environment
         )
     )

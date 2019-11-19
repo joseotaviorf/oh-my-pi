@@ -23,7 +23,7 @@ from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
     SOURCE,
     base_dbutils,
 )
-from bietlejuice.jobs.composer.loaders import SparkDataframeIntoDatalakeLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 
 JOB_NAME = "load_event_table_into_datalake_raw"
@@ -58,8 +58,8 @@ if __name__ == "__main__":
     )
 
     # creation date and event type partitions
-    list_partitions = list(query_filter.keys())
-    list_partitions.append("event")
+    partitions = list(query_filter.keys())
+    partitions.append("event")
 
     # get query to create event table
     query = FileService().get_query_from_file_name(
@@ -89,18 +89,16 @@ if __name__ == "__main__":
     spark_metastore_service.create_database()
 
     # loaders
-    loader = SparkDataframeIntoDatalakeLoader(
-        format=SparkTableStorageFormat.DEFAULT_RAW,
-        metastore_service=spark_metastore_service,
-    )
-    loader.overwrite_partition(
+    loader = S3Loader(spark_metastore_service)
+    loader.load_incremental_table(
         df=event_table_data,
-        partition_by_list=list_partitions,
         table_name=table_name,
+        format=SparkTableStorageFormat.DEFAULT_RAW,
+        partitions=partitions,
         schema_merging=True,
     )
 
     # create partition into spark table
     spark_metastore_service.create_new_partitions_from_df(
-        table_name=table_name, df=event_table_data, partition_by_list=list_partitions
+        table_name=table_name, df=event_table_data, partition_by_list=partitions
     )
