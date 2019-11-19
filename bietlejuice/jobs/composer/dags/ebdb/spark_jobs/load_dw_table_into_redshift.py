@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.s3 import S3Service
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
 from bietlejuice.jobs.composer.base.spark import SparkMetastoreService
@@ -64,8 +64,9 @@ if __name__ == "__main__":
         dw_info["dw_schema_databricks"], dw_info["dw_schema_path"], spark_sql_client
     )
 
-    # todo: use the EnumDB class to pass the environment
-    redshift_connection = json.loads(dbutils.secrets.get("quintoandar", "ENV_DW"))
+    redshift_connection = json.loads(
+        dbutils.secrets.get("quintoandar", DatabaseEnum.DW)
+    )
 
     redshift_client = PostgresClient(
         dbname=redshift_connection["db"],
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     redshift_loader = RedshiftLoader(redshift_client, s3_client, dw_info["dw_bucket"])
 
     # load
-    redshift_loader.load_spark_table_into_redshift(
+    redshift_loader.load_table_from_metastore(
         metastore_service=spark_metastore_service,
         source_table_name=table_name,
         target_schema=dw_schema,

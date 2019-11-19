@@ -7,6 +7,17 @@ logger = QuintoAndarLogger("RedshiftLoader")
 
 
 class RedshiftLoader:
+    """
+    Loads data into Redshift.
+
+    :param redshift_client: a client to handle the connection with Redshift
+    :type redshift_client: PostgresClient
+    :param s3_service: a service to interact with S3
+    :type s3_service: S3Service
+    :param dw_bucket: S3 bucket containing the analytical tables
+    :type dw_bucket: str
+    """
+
     COPY_COMMAND_TEMPLATE = """
     COPY {}.{}
     FROM '{}'
@@ -17,6 +28,7 @@ class RedshiftLoader:
     MANIFEST_PATH_TEMPLATE = (
         "s3://{}/redshift-load-manifests/{}/{}/year={}/month={}/day={}/manifest.json"
     )
+    # todo: please remove me!!!
     IAM_ROLE = "arn:aws:iam::632540934959:role/SpectrumAccess"
 
     def __init__(self, redshift_client, s3_service, dw_bucket):
@@ -39,7 +51,7 @@ class RedshiftLoader:
         )
 
     @logger
-    def load_spark_table_into_redshift(
+    def load_table_from_metastore(
         self,
         metastore_service,
         source_table_name,
@@ -48,14 +60,20 @@ class RedshiftLoader:
         overwrite,
     ):
         """
-        Load the data from a table created on spark metastore to a table in Redshift
+        Loads the data from a table on a Metastore into a table in Redshift.
 
-        :param metastore_service: MetastoreService object
-        :param source_table_name: name of the table in spark metastore without db prefix
+        :param metastore_service: a metastore service
+        :type metastore_service: MetastoreService
+        :param source_table_name: name of the table in the metastore without db prefix
+        :type source_table_name: str
         :param target_schema: name of the target schema in redshift
-        :param target_table_name: name of the target table in redshift without schema prefix
-        :param overwrite: boolean parameter to decide if the method should perform a delete on
-                          the table before load the data
+        :type target_schema: str
+        :param target_table_name: name of the target table in Redshift without schema
+        prefix
+        :type: target_table_name: str
+        :param overwrite: option to perform a delete on the table before loading the
+        data
+        :type overwrite: bool
         :return: None
         """
         now = datetime.now()
