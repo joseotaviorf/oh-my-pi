@@ -15,7 +15,7 @@ env.set_airflow_var_to_local_env('QA_PYTHON_UTILS_CREDENTIALS_JSON')
 
 BI_LINKEDIN_CAMPAIGNS_DAG_NAME = 'bi-linkedin-campaigns'
 MAIN_START_DATE = datetime(2019, 8, 1, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6,9 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
