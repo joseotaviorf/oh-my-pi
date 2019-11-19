@@ -6,8 +6,9 @@ from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_etl import EnumDB
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR, DW_QUERIES_DIR
+from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
+from bietlejuice.jobs.etl.affiliate.affiliate import AffiliateETL
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -25,34 +26,6 @@ MAIN_START_DATE = datetime(2019, 11, 5)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 11 * * *')
 
 
-def delete_daily_rows(db_enum, table_name, date_column, value):
-    BaseETL.execute_command(
-        command="delete from {} where date({}) = date('{}')".format(table_name, date_column, value),
-        db_enum=db_enum,
-        encoding='utf-8',
-        commit=True
-    )
-
-
-def extract_query_from_ebdb_to_ods(table_name, date_column, **kwargs):
-    if 'execution_date' not in kwargs:
-        raise ValueError('m=extract_query_from_ebdb_to_ods, msg=execution_date is mandatory.')
-
-    file_path = '{}/ebdb/affiliates/{}.sql'.format(SOURCE_QUERIES_DIR, table_name)
-    query = BaseETL.get_query_from_file_name(file_name=file_path)
-
-    delete_daily_rows(db_enum=EnumDB.BI_ODS, table_name=table_name, date_column=date_column,
-                      value=str(kwargs['execution_date']))
-
-    utils.extract_query_dim_from_ebdb_to_ods(
-        dim_name=table_name,
-        bucket=s3_bucket,
-        command=query.format(str_date=str(kwargs['execution_date'])),
-        table_name=table_name,
-        append=True
-    )
-
-
 def load_google_sheet_files_to_datalake(files):
     athena_client = AthenaClient(s3_bucket)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
@@ -61,6 +34,17 @@ def load_google_sheet_files_to_datalake(files):
         gs.move_sheets_data_to_destination(google_sheets_file=file,
                                            enumdb_destination=EnumDB.QuintoAndar_datalake,
                                            athena_client=athena_client)
+
+
+def affiliate_append_monthly_data_to_dw_table(schema, file_name, table_name, date_column, **kwargs):
+    AffiliateETL.append_monthly_data_to_dw_table(file_name=file_name, schema=schema, table_name=table_name,
+                                                 execution_date=kwargs.get('execution_date'), date_column=date_column)
+
+
+def affiliate_extract_query_from_ebdb_to_ods(schema, table_name, date_column, **kwargs):
+    AffiliateETL.extract_query_from_ebdb_to_ods(s3_bucket=s3_bucket, schema=schema, table_name=table_name,
+                                                date_column=date_column,
+                                                execution_date=kwargs.get('execution_date'))
 
 
 dag = DAG(
@@ -94,8 +78,9 @@ ods_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
     task_id='ODS_fact_affiliate_daily_engagement_cost',
     dag=dag,
     provide_context=True,
-    python_callable=extract_query_from_ebdb_to_ods,
-    op_kwargs={'table_name': 'affiliate_daily_engagement_cost',
+    python_callable=affiliate_extract_query_from_ebdb_to_ods,
+    op_kwargs={'schema': 'public',
+               'table_name': 'affiliate_daily_engagement_cost',
                'date_column': 'dt_cost'}
 )
 
@@ -121,6 +106,25 @@ dw_fact_affiliate_daily_cost_attributions_task = BaseDAG.build_python_operator(
                'append': False,
                'db_enum_source': EnumDB.BI_DW,
                'db_enum_destination': EnumDB.BI_DW}
+)
+
+dw_affiliates_national_campaigns_share_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='DW_affiliates_national_campaigns_share',
+    python_callable=affiliate_append_monthly_data_to_dw_table,
+    provide_context=True,
+    op_kwargs={'schema': 'marketing',
+               'file_name': '{}/marketing/affiliates_costs/affiliates_national_campaigns_share.sql'.format(
+                   DW_QUERIES_DIR),
+               'table_name': 'affiliates_national_campaigns_share',
+               'date_column': 'year_month'}
+)
+
+load_historic_national_cost_to_datalake_task = BaseDAG.build_python_operator(
+    dag=dag,
+    task_id='load_historic_national_cost_to_datalake',
+    python_callable=load_google_sheet_files_to_datalake,
+    op_kwargs={'files': GOOGLE_SHEETS_FILES['historic_national_costs']}
 )
 
 ods_fact_affiliate_daily_engagement_cost_task >> dw_fact_affiliate_daily_engagement_cost_task
