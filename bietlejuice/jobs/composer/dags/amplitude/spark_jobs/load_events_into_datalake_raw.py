@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     source = "amplitude"
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    amplitude_events = AmplitudeEvents()
+    amplitude_events = AmplitudeEvents(SparkClient())
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(
         db_info["db_raw_databricks"],
