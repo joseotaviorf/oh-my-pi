@@ -17,6 +17,13 @@ class DatalakeMetastoreService:
             "db_clean_databricks": "datalake_{}_clean".format(source),
             "db_clean_athena": "datalake_{}_clean_{}".format(source, env),
             "db_clean_path": "s3://5a-datalake-{}/clean/{}/".format(env, source),
+            "db_clean_staging_databricks": "datalake_{}_clean_staging".format(source),
+            "db_clean_staging_athena": "datalake_{}_clean_staging_{}".format(
+                source, env
+            ),
+            "db_clean_staging_path": "s3://5a-datalake-{}/clean_staging/{}/".format(
+                env, source
+            ),
         }
 
     @staticmethod

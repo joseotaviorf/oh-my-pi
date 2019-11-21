@@ -38,6 +38,9 @@ CREATE_CLEAN_FILTERED_EVENT_FILE_PATH = (
 EVENTS_REPARTITIONED_RAW_TO_CLEAN_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_incremental_table_in_datalake.py"
 )
+CREATE_CLEAN_STAGING_EVENTS_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_repartitioned_table.py"
+)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -185,6 +188,26 @@ events_repartitioned_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-clean-staging-events",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": CREATE_CLEAN_STAGING_EVENTS_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                "amplitude",
+                "events_repartitioned",
+                "events",
+                "--partition_by",
+            ]
+            + ["id_app", "event_type"]
+            + DEFAULT_PARTITION_BY,
+        }
+    },
+)
+
 # tasks dependencies definition
 create_cluster_task >> events_to_datalake_raw_task >> [
     events_raw_to_clean_task,
@@ -195,3 +218,5 @@ events_raw_to_clean_task >> [
     add_clean_events_partitions_task,
     create_filtered_events_sub_dag_task,
 ] >> terminate_cluster_task
+
+events_repartitioned_raw_to_clean_task >> create_clean_staging_events_task >> terminate_cluster_task
