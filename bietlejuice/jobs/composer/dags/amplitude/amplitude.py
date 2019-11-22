@@ -41,6 +41,12 @@ EVENTS_REPARTITIONED_RAW_TO_CLEAN_FILE_PATH = (
 CREATE_CLEAN_STAGING_EVENTS_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_repartitioned_table.py"
 )
+CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_subpartitioned_tables.py"
+)
+UPDATE_CLEAN_STAGING_SUBPARTITIONS_VALUES_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "update_clean_staging_table_subpartitions_values.py"
+)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -208,6 +214,60 @@ create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+update_clean_staging_subpartitions_values_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="update-clean-staging-subpartitions-values",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONS_VALUES_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                "amplitude",
+                "events_repartitioned",
+                "--subpartitions",
+            ]
+            + ["id_app", "event_type"],
+        }
+    },
+)
+
+create_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-clean-staging-subpartitioned-tables-spark",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                "amplitude",
+                "events_repartitioned",
+                "events",
+                "--spark",
+            ],
+        }
+    },
+)
+
+create_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-clean-staging-subpartitioned-tables-athena",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                "amplitude",
+                "events_repartitioned",
+                "events",
+                "--athena",
+            ],
+        }
+    },
+)
+
 # tasks dependencies definition
 create_cluster_task >> events_to_datalake_raw_task >> [
     events_raw_to_clean_task,
@@ -219,4 +279,8 @@ events_raw_to_clean_task >> [
     create_filtered_events_sub_dag_task,
 ] >> terminate_cluster_task
 
-events_repartitioned_raw_to_clean_task >> create_clean_staging_events_task >> terminate_cluster_task
+events_repartitioned_raw_to_clean_task >> [
+    create_clean_staging_events_task,
+    update_clean_staging_subpartitions_values_task,
+] >> create_clean_staging_subpartitioned_tables_spark_task >> create_clean_staging_subpartitioned_tables_athena_task
+create_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task

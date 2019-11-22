@@ -6,3 +6,4 @@ class TableStorageFormat:
     }
     DEFAULT_RAW = JSON
     DEFAULT_CLEAN = PARQUET
+    DEFAULT_CLEAN_STAGING = PARQUET
