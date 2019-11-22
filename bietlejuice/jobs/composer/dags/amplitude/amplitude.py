@@ -47,6 +47,9 @@ CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
 UPDATE_CLEAN_STAGING_SUBPARTITIONS_VALUES_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "update_clean_staging_table_subpartitions_values.py"
 )
+UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "update_clean_staging_subpartitioned_tables.py"
+)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -268,6 +271,28 @@ create_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     },
 )
 
+update_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="update-clean-staging-subpartitioned-tables-spark",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+            "parameters": ["{{ ds }}", ENV, "amplitude", "--spark"],
+        }
+    },
+)
+
+update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="update-clean-staging-subpartitioned-tables-athena",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+            "parameters": ["{{ ds }}", ENV, "amplitude", "--athena"],
+        }
+    },
+)
+
 # tasks dependencies definition
 create_cluster_task >> events_to_datalake_raw_task >> [
     events_raw_to_clean_task,
@@ -282,5 +307,10 @@ events_raw_to_clean_task >> [
 events_repartitioned_raw_to_clean_task >> [
     create_clean_staging_events_task,
     update_clean_staging_subpartitions_values_task,
-] >> create_clean_staging_subpartitioned_tables_spark_task >> create_clean_staging_subpartitioned_tables_athena_task
-create_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task
+] >> create_clean_staging_subpartitioned_tables_spark_task
+create_clean_staging_subpartitioned_tables_spark_task >> [
+    create_clean_staging_subpartitioned_tables_athena_task,
+    update_clean_staging_subpartitioned_tables_spark_task,
+] >> terminate_cluster_task
+create_clean_staging_subpartitioned_tables_athena_task >> update_clean_staging_subpartitioned_tables_athena_task
+update_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task

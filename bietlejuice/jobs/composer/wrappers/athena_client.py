@@ -57,7 +57,7 @@ class AthenaClient:
 
     @logger
     def add_partition(self, database, table_name, partition_by_dict):
-        add_partition_query = "ALTER TABLE {}.{} ADD IF NOT EXISTS PARTITION ({});"
+        add_partition_query = "ALTER TABLE `{}`.`{}` ADD IF NOT EXISTS PARTITION ({});"
         partitions_section = ", ".join(
             [
                 "{} = {}".format(k, v)
