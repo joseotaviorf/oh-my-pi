@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     for table in tables:
         df = postgres_consumer.get_data_from_table(table.table_name)
+        # the table names in the datalake must be lowercase
         loader.load_full_table(
-            df, table.table_name, SparkTableStorageFormat.DEFAULT_RAW
+            df, table.table_name.lower(), SparkTableStorageFormat.DEFAULT_RAW
         )

@@ -38,7 +38,8 @@ def load_table_into_datalake(args):
         df = consumer.get_data_from_table_in_parallel(table_name, num_partitions)
     else:
         df = consumer.get_data_from_table(table_name)
-    loader.load_full_table(df, table_name, SparkTableStorageFormat.DEFAULT_RAW)
+    # the table names in the datalake must be lowercase
+    loader.load_full_table(df, table_name.lower(), SparkTableStorageFormat.DEFAULT_RAW)
     logger.info(
         "m=load_table_into_datalake, table={}, msg=Finished loading table.".format(
             table_name
