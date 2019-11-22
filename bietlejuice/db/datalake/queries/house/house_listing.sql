@@ -5,11 +5,12 @@ with house_aud as (
 -- (status_MOD = 1 may not work sometimes)  	        				            				  --
 --------------------------------------------------------------------------------------------------------
     select
-	  from_unixtime(cast(rev.timestamp as bigint)/1000) as status_time, -- datetime status started
+	  from_unixtime(cast(rev.timestamp as bigint)/1000) as revision_time, -- datetime status started
 	  cast(from_unixtime(cast(rev.timestamp as bigint)/1000) as date) as status_date, -- date status started
 	  rev.usuario_id, -- user responsible to change status
 	  rev.motivo, -- reason status changed
 	  lag(i.status) over(partition by i.id order by i.rev) as previous_status, -- previous status ordered by the datetime that happened
+	  lag(i.aluguel) over(partition by i.id order by i.rev) as previous_rent_price,
 	  i.* -- all information from Imovel table
     from datalake_ebdb_raw_prod.imovel_aud i
 	inner join datalake_ebdb_raw_prod.usuariorevisionentity rev
@@ -24,12 +25,11 @@ select
 	rev,
 	status_mod,
 	max(from_iso8601_timestamp(firstpublication)) over(partition by id) as ts_first_publication,
-	status_time as ts_status_changed,
+	revision_time as ts_status_changed,
 	status as status_history,
-	lead(status_time) over(partition by id order by rev) as next_status_change_time,
+	lead(revision_time) over(partition by id order by rev) as next_status_change_time,
 	-- last_value(status) over(partition by id rows between unbounded preceding and unbounded following) as current_status,
-	row_number() over(partition by id order by rev) as order_status,
-	aluguel as rent
+	row_number() over(partition by id order by rev) as order_status
 from house_aud
 where (status <> previous_status or previous_status is null)
 ),
@@ -153,7 +153,6 @@ select
 	hs_v.order_version as version,
 	sc_v.category_change as change_version_status,
 	hs_v.ts_last_de_publication,
-	max(case when hs_v.max_order_status_version = hs_v.order_status then hs_v.rent end) as rent,
 	max(status_history) as status_history,
 	max(ts_status_changed) as ts_status_changed,
 	max(hs_v.last_status) as status,
@@ -179,13 +178,48 @@ select
 	     when version <> 0 and lag(change_version_status) over(partition by id_house order by version) in ('despublicado') then 'Recovered'
 	     else null end as listing_category_start,
 	status,
-	rent,
 	status_history,
 	ts_status_changed,
 	ts_listing_version_start,
 	nullif(cast(ts_listing_version_end as timestamp),cast('2200-01-01 12:00:00' as timestamp)) as ts_listing_version_end,
 	ts_last_de_publication
 from house_listing_plain
+),
+listing_rent_last as (
+--------------------------------------------------------------------------------------------------------------------
+-- Create rent_price_history: for each house show all rent price changes, with start and end of each rent price   --
+--------------------------------------------------------------------------------------------------------------------
+with
+house_rent_history as (
+select
+	id as id_house,
+	rev,
+	aluguel_mod,
+	revision_time as ts_rent_price_changed,
+	aluguel as rent_price_history,
+	lead(revision_time) over(partition by id order by rev) as ts_next_rent_price_change,
+	row_number() over(partition by id order by rev) as order_rent_price
+from house_aud
+where (aluguel <> previous_rent_price or previous_rent_price is null)
+),
+house_rent_max as (
+select
+	hlf.id_house_listing,
+	hlf.id_house,
+	hlf.version,
+	rh.rev,
+	rh.rent_price_history,
+	rh.order_rent_price,
+	max(rh.order_rent_price) over(partition by hlf.id_house, hlf.version) as max_order_status_version
+from house_listing_full hlf
+join house_rent_history rh
+ on hlf.id_house = rh.id_house and rh.ts_rent_price_changed between hlf.ts_listing_version_start and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp)
+)
+select
+	id_house_listing,
+	max(case when max_order_status_version = order_rent_price then rent_price_history end) as rent
+from house_rent_max
+group by 1
 ),
 special_conditions as (
 --------------------------------------------------------------------------------------------------------
@@ -309,7 +343,7 @@ select
   hl.id_house,
   hl.version,
   hl.status,
-  hl.rent,
+  rent_last.rent,
   hl.listing_category_start,
   lsc_originals.specialconditiontype as last_originals_type,
   lsc_iorent.specialconditiontype as last_iorent_type,
@@ -338,4 +372,6 @@ left join listing_special_conditions_dates lsc_exclusivity
 left join listing_special_conditions_dates lsc_iorent
   on hl.id_house_listing = lsc_iorent.id_house_listing
     and lsc_iorent.specialconditiontype like '%Rent'
+left join listing_rent_last rent_last
+  on hl.id_house_listing = rent_last.id_house_listing
 ;

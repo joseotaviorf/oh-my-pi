@@ -78,8 +78,8 @@ select
 	dp.trade_name as partner_name,
 	
 -- Listing general attributes 	
-	dhl.rent,
-	dhl.house_rent,
+	dhl.rent as house_listing_rent_price_published,
+	dhl.house_rent as house_rent_price_published,
 	dhl.house_predicted_price,
 	dhl.house_condo,
 	dhl.house_iptu,
@@ -131,6 +131,7 @@ select
 --Information about contract	
 	rf.sk_contract,
 	dc.status as contract_status,
+	dc.rent as house_listing_rent_price_contract,
 	
 --Quantities
 	rfc.total_bookings,
