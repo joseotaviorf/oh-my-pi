@@ -1,12 +1,46 @@
 with
+lead_ as (
+select
+	dd."date",
+	dd.sk_date,
+	dr.city_group,
+	null::boolean as is_b2b,
+	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	null as demand_channel,
+  count(fhlf.sk_lead_date) as leads,
+	null::integer as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
+	null::integer as qualifieds,
+	null::integer as opportunities,
+	null::integer as first_listings,
+	null::integer as visits_booked,
+  null::integer as visits_completed,
+  null::integer as offer_submitted,
+  null::integer as offer_approved,
+  null::integer as doc_sent,
+  null::integer as doc_completed,
+  null::integer as credit_processed,
+  null::integer as credit_approved,
+  null::integer as contract_created,
+  null::integer as contract_signed,
+  null::integer  as contract_ended
+from dim_date dd
+join fact_house_listing_flows fhlf
+  on dd.sk_date = fhlf.sk_lead_date
+  and fhlf.sk_lead_date > 0
+left join dim_region dr
+  on dr.sk_region = fhlf.sk_region
+where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
+group by 1, 2, 3, 4, 5, 6
+),
 prospect as (
 select
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
 	null::boolean as is_b2b,
-	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
+	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
 	null as demand_channel,
+  null::integer as leads,
 	count(fhlf.sk_prospect_date) as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
 	null::integer as qualifieds,
 	null::integer as opportunities,
@@ -28,8 +62,6 @@ join fact_house_listing_flows fhlf
   and fhlf.sk_prospect_date > 0
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
 group by 1, 2, 3, 4, 5, 6
 ),
@@ -39,8 +71,9 @@ select
 	dd.sk_date,
 	dr.city_group,
 	null::boolean as is_b2b,
-	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
+	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
 	null as demand_channel,
+  null::integer as leads,
 	null::integer as prospects,
 	count(fhlf.sk_qualified_date) as qualifieds, -- this count is done on the qualified date because not all listings come from a lead, and maybe one lead brings multiple house listings
 	null::integer as opportunities,
@@ -62,8 +95,6 @@ join fact_house_listing_flows fhlf
   and fhlf.sk_qualified_date > 0
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
 group by 1, 2, 3, 4, 5, 6
 ),
@@ -73,8 +104,9 @@ select
 	dd.sk_date,
 	dr.city_group,
 	null::boolean as is_b2b,
-	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
+	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
 	null as demand_channel,
+  null::integer as leads,
 	null::integer as prospects,
 	null::integer as qualifieds,
 	count(distinct fhlf.sk_house_listing) as opportunities,
@@ -96,8 +128,6 @@ join fact_house_listing_flows fhlf
   and fhlf.sk_opportunity_date > 0
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
 group by 1, 2, 3, 4, 5, 6
 ),
@@ -107,8 +137,9 @@ select
 	dd.sk_date,
 	dr.city_group,
 	null::boolean as is_b2b,
-	case when mkt_origin = 'Owner PWA' then mkt_origin||'-'||mkt_channel else mkt_origin end as supply_channel,
+	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
 	null as demand_channel,
+  null::integer as leads,
 	null::integer as prospects,
 	null::integer as qualifieds,
 	null::integer as opportunities,
@@ -130,8 +161,6 @@ join fact_house_listing_flows fhlf
   and fhlf.sk_first_listing_date > 0
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = fhlf.sk_house_listing
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
 group by 1, 2, 3, 4, 5, 6
 ),
@@ -143,6 +172,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -179,6 +209,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -215,6 +246,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -251,6 +283,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -287,6 +320,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -323,6 +357,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -359,6 +394,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -395,6 +431,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -431,6 +468,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -467,6 +505,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -503,6 +542,7 @@ select
   dhl.is_b2b,
   null as supply_channel,
   db.mkt_channel as demand_channel,
+  null::integer as leads,
   null::integer as prospects,
   null::integer as qualifieds,
   null::integer as opportunities,
@@ -532,6 +572,8 @@ where dd."date" between date_trunc('year',current_date) - interval '4 year' and 
 group by 1, 2, 3, 4, 5, 6
 ),
 union_all as (
+  select * from lead_
+	union all
 	select * from prospect
 	union all
 	select * from qualified
@@ -569,6 +611,7 @@ select
   ua.is_b2b,
   ua.supply_channel,
   ua.demand_channel,
+  ua.leads,
   ua.prospects,
   ua.qualifieds,
   ua.opportunities,
@@ -597,6 +640,7 @@ select
     case when demand_channel in ('Not Mapped', 'Other') or demand_channel is null then 'Other'
          else demand_channel end as demand_channel,
   is_b2b as is_b2b_demand,
+  sum(leads) as leads,
   sum(prospects) as prospects,
   sum(qualifieds) as qualifieds,
   sum(opportunities) as opportunities,
