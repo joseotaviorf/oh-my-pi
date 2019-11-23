@@ -127,6 +127,47 @@ where dc.status = 'Finalizado'
       and dc.dt_annulment < current_date
 group by 1, 2, 3, 4
 ),
+bookers as (
+select
+    date_trunc('week',dd.date) as booking_created_week,
+    rf.sk_region,
+    count(distinct rf.sk_client) as bookers_weekly
+from fact_listing_rent_flows rf
+left join dim_date dd
+  on rf.sk_booking_created_date = dd.sk_date
+group by 1, 2
+),
+new_bookers as (
+	with
+	first_booking as (
+		select *
+		from (
+		    select
+		    rf.ods_id,
+		    rf.sk_client,
+		    rf.sk_region,
+		    db.dt_created as first_booking_created_date,
+		    row_number() over (partition by rf.sk_client order by db.dt_created asc) as rk
+		    from fact_listing_rent_flows rf
+		    join dim_booking db
+		    	on db.sk_booking = rf.sk_booking
+		    where rf.sk_booking_created_date
+		)
+		where rk = 1
+		)
+	select
+	    date_trunc('week',fb.first_booking_created_date) as first_booking_created_week,
+	    dr.sk_region,
+	    count(distinct fb.sk_client) as new_bookers_weekly
+	from first_booking fb
+	left join fact_listing_rent_flows rf
+	  on (fb.sk_client = rf.sk_client)
+	left join dim_date dd
+	  on rf.sk_contract_signed_date = dd.sk_date
+	left join dim_region dr
+	 on fb.sk_region = dr.sk_region
+	group by 1, 2
+),
 ongoing_listings_weekly as (
 with
 daily_published_listings as (
@@ -174,8 +215,8 @@ group by 1, 2
 ),
 weekly_metrics as (
 select
-	distinct coalesce(ocont.week_start,orent.week_start,nrent.rental_week_start,ncont.contract_week_start,nfl.first_listing_week_start,rr.rental_week_start, er.week_date, olist.week_start) as week_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,rr.sk_region, er.sk_region, olist.sk_region) as sk_region,
+	distinct coalesce(ocont.week_start,orent.week_start,nrent.rental_week_start,ncont.contract_week_start,nfl.first_listing_week_start,rr.rental_week_start, er.week_date, olist.week_start, bk.booking_created_week, nbk.first_booking_created_week) as week_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,rr.sk_region, er.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
 	ocont.ongoing_contracts_weekly,
 	orent.ongoing_rentals_weekly,
 	nrent.new_rentals_weekly,
@@ -183,7 +224,9 @@ select
 	nfl.new_first_listings_weekly,
 	rr.re_rentals_weekly,
 	er.ended_rentals_weekly,
-	olist.ongoing_listings_weekly
+	olist.ongoing_listings_weekly,
+	bk.bookers_weekly,
+	nbk.new_bookers_weekly
 from ongoing_contracts_weekly ocont
 full outer join ongoing_rentals_weekly orent
   on ocont.week_start = orent.week_start and ocont.sk_region = orent.sk_region
@@ -199,6 +242,10 @@ full outer join ended_rentals er
   on ocont.week_start = er.week_date and ocont.sk_region = er.sk_region
 full outer join ongoing_listings_weekly olist
   on ocont.week_start = olist.week_start and ocont.sk_region = olist.sk_region
+full outer join bookers bk
+  on ocont.week_start = bk.booking_created_week and ocont.sk_region = bk.sk_region
+full outer join new_bookers nbk
+  on ocont.week_start = nbk.first_booking_created_week and ocont.sk_region = bk.sk_region
 )
 select
 	dm.week_date,
@@ -212,7 +259,9 @@ select
 	sum(dm.new_first_listings_weekly) as new_first_listings_weekly,
 	sum(dm.re_rentals_weekly) as re_rentals_weekly,
 	sum(dm.ended_rentals_weekly) as ended_rentals_weekly,
-	sum(dm.ongoing_listings_weekly) as ongoing_listings_weekly
+	sum(dm.ongoing_listings_weekly) as ongoing_listings_weekly,
+	sum(dm.bookers_weekly) as bookers_weekly,
+	sum(dm.new_bookers_weekly) as new_bookers_weekly
 from weekly_metrics dm
 left join dim_region dr
   using(sk_region)
