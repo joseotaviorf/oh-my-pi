@@ -126,7 +126,11 @@ _fact as (
         vdb.sk_rent_flow_taxonomy,
         vdb.utm_campaign as booking_utm_campaign,
         vdb.utm_content as booking_utm_content,
-        vdb.utm_term as booking_utm_term
+        vdb.utm_term as booking_utm_term,
+        c.cancellation_reason as dimcon_cancellation_reason,
+		vdb.cancellation_reason as dimboo_cancellation_reason,
+		vdo.rejection_reason as dimoff_cancellation_reason,
+        vdp.rejection_reason as dimprop_cancellation_reason
     from house_rent_flow hrf
     join vw_dim_house_listing vdh
         on vdh.id_house = hrf.id_house
@@ -159,141 +163,337 @@ _fact as (
     left join vw_dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
     where vdh.is_for_rent::int::boolean
+),
+base as (
+	select
+	  ods_id,
+	  sk_house_listing,
+	  sk_house_first_listing_date,
+	  sk_house_listing_date,
+	  sk_house_listing_de_publication_date,
+	  sk_house_listing_first_offer_submitted_date,
+	  sk_region,
+	  sk_condo,
+	  sk_rent_flow,
+	  sk_booking,
+	  sk_booking_created_date,
+	  sk_visit_date,
+	  sk_owner,
+	  sk_user_agent,
+	  sk_agent_sign_up_date,
+	  sk_client,
+	  sk_client_sign_up_date,
+	  sk_visit,
+	  sk_offer,
+	  sk_offer_submitted_date,
+	  min(sk_offer_submitted_date) filter (where sk_offer_submitted_date != -1) over (partition by id_house) as sk_min_offer_submitted_date,
+	  sk_offer_approved_date,
+	  sk_reservation,
+	  sk_reservation_created_date,
+	  reservation_attempts,
+	  sk_proposal,
+	  sk_proposal_approved_date,
+	  sk_proposal_processed_date,
+	  case when sk_tenant_auto_first_doc_sent_date = -1 then sk_tenant_manual_first_doc_sent_date else sk_tenant_auto_first_doc_sent_date end as sk_tenant_first_doc_sent_date,
+	  sk_tenant_manual_first_doc_sent_date,
+	  sk_tenant_auto_first_doc_sent_date,
+	  sk_contract,
+	  sk_contract_created_date,
+	  sk_contract_signed_date,
+	  sk_contract_annulment_date,
+	  sk_contract_canceled_date,
+	  sk_credit_analysis_init_date,
+	  sk_credit_analysis_end_date,
+	  sk_credit_analysis_approved_date,
+	  flg_visit_completed,
+	  flg_visit_performed,
+	  flg_visit_created_from_app,
+	  visit_created_type,
+	  flg_visit_last_updated_from_app,
+	  sk_rent_flow_taxonomy,
+	  booking_utm_campaign,
+	  booking_utm_content,
+	  booking_utm_term,
+	  ((date_part('day', dt_visit - dt_booking_created) * 1440 +
+	    date_part('hour', dt_visit - dt_booking_created) * 60 +
+			date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_visit,
+	  ((date_part('day', dt_visit - dt_client_sign_up) * 1440 +
+	    date_part('hour', dt_visit - dt_client_sign_up) * 60 +
+			date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_created_to_visit,
+	  ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
+	    date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
+			date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analysis,
+	  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
+	    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
+			date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
+	  ((date_part('day', dt_owner_document_sent - dt_offer_approved) * 1440 +
+	    date_part('hour', dt_owner_document_sent - dt_offer_approved) * 60 +
+			date_part('minute', dt_owner_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_owner_doc_sent,
+	  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 1440 +
+	    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 60 +
+			date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_credit_processed,
+	  ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
+	    date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
+			date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_doc_completed,
+	  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
+	    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
+			date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_doc_completed_to_credit_processed,
+	  ((date_part('day', dt_contract_created - dt_credit_analysis_approved) * 1440 +
+	    date_part('hour', dt_contract_created - dt_credit_analysis_approved) * 60 +
+			date_part('minute', dt_contract_created - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_contract_created,
+	  ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
+			date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_contract_signed,
+	  ((date_part('day', dt_contract_signed - dt_contract_created) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_contract_created) * 60 +
+			date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as days_contract_created_to_contract_signed,
+	  ((date_part('day', dt_contract_signed - dt_booking_created) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_booking_created) * 60 +
+			date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_contract_signed,
+	  ((date_part('day', dt_contract_signed - dt_visit) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_visit) * 60 +
+			date_part('minute', dt_contract_signed - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_contract_signed,
+	  ((date_part('day', dt_offer_submitted - dt_visit) * 1440 +
+	    date_part('hour', dt_offer_submitted - dt_visit) * 60 +
+			date_part('minute', dt_offer_submitted - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_offer_submitted,
+	  ((date_part('day', dt_offer_submitted - dt_booking_created) * 1440 +
+	    date_part('hour', dt_offer_submitted - dt_booking_created) * 60 +
+			date_part('minute', dt_offer_submitted - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_offer_submitted,
+	  ((date_part('day', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 1440 +
+	    date_part('hour', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 60 +
+			date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_insurance_approved,
+	  ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
+			date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approved_to_contract_signed,
+	  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
+	    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
+			date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_first_doc_sent,
+	  ((date_part('day', dt_offer_approved - dt_offer_submitted) * 1440 +
+	    date_part('hour', dt_offer_approved - dt_offer_submitted) * 60 +
+			date_part('minute', dt_offer_approved - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_offer_approved,
+	  ((date_part('day', dt_credit_analysis_init - dt_offer_approved) * 1440 +
+	    date_part('hour', dt_credit_analysis_init - dt_offer_approved) * 60 +
+			date_part('minute', dt_credit_analysis_init - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_credit_init,
+	  ((date_part('day', dt_contract_signed - dt_offer_submitted) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_offer_submitted) * 60 +
+			date_part('minute', dt_contract_signed - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_contract_signed,
+	  ((date_part('day', dt_contract_signed - dt_offer_approved) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_offer_approved) * 60 +
+			date_part('minute', dt_contract_signed - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_contract_signed,
+	  ((date_part('day', dt_credit_analysis_approved - dt_credit_analysis_init) * 1440 +
+	    date_part('hour', dt_credit_analysis_approved - dt_credit_analysis_init) * 60 +
+			date_part('minute', dt_credit_analysis_approved - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_tenant_doc_completed_to_credit_approved,
+	  ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
+	    date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
+			date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_doc_completed,
+	  ((date_part('day', dt_contract_signed - dt_house_listing) * 1440 +
+	    date_part('hour', dt_contract_signed - dt_house_listing) * 60 +
+			date_part('minute', dt_contract_signed - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_contract_signed,
+	  ((date_part('day', dt_visit - dt_house_listing) * 1440 +
+	    date_part('hour', dt_visit - dt_house_listing) * 60 +
+			date_part('minute', dt_visit - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_visit,
+	  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 1440 +
+	    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 60 +
+			date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
+	  ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
+	    date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
+			date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,
+		sk_agent_review_rating_date,
+		dimcon_cancellation_reason,
+		dimboo_cancellation_reason,
+		dimoff_cancellation_reason,
+		dimprop_cancellation_reason,
+	    ts_load
+	from _fact
+),
+total as (
+  select
+      ods_id,
+      sk_house_listing,
+      sk_house_first_listing_date,
+      sk_house_listing_date,
+      sk_house_listing_de_publication_date,
+      sk_house_listing_first_offer_submitted_date,
+      sk_region,
+      sk_condo,
+      sk_rent_flow,
+      sk_booking,
+      sk_booking_created_date,
+      sk_visit_date,
+      sk_owner,
+      sk_user_agent,
+      sk_agent_sign_up_date,
+      sk_client,
+      sk_client_sign_up_date,
+      sk_visit,
+      sk_offer,
+      sk_offer_submitted_date,
+      sk_min_offer_submitted_date,
+      sk_offer_approved_date,
+      sk_reservation,
+      sk_reservation_created_date,
+      reservation_attempts,
+      sk_proposal,
+      sk_proposal_approved_date,
+      sk_proposal_processed_date,
+      sk_tenant_first_doc_sent_date,
+      sk_tenant_manual_first_doc_sent_date,
+      sk_tenant_auto_first_doc_sent_date,
+      sk_contract,
+      sk_contract_created_date,
+      sk_contract_signed_date,
+      sk_contract_annulment_date,
+      sk_contract_canceled_date,
+      sk_credit_analysis_init_date,
+      sk_credit_analysis_end_date,
+      sk_credit_analysis_approved_date,
+      flg_visit_completed,
+      flg_visit_performed,
+      flg_visit_created_from_app,
+      visit_created_type,
+      flg_visit_last_updated_from_app,
+      sk_rent_flow_taxonomy,
+      booking_utm_campaign,
+      booking_utm_content,
+      booking_utm_term,
+      days_booking_created_to_visit,
+      days_user_created_to_visit,
+      days_offer_submitted_to_internal_analysis,
+      days_offer_approved_to_doc_first_sent,
+      days_offer_approved_to_owner_doc_sent,
+      days_first_doc_sent_to_credit_processed,
+      days_first_doc_sent_to_doc_completed,
+      days_doc_completed_to_credit_processed,
+      days_credit_approved_to_contract_created,
+      days_credit_approved_to_contract_signed,
+      days_contract_created_to_contract_signed,
+      days_booking_created_to_contract_signed,
+      days_visit_to_contract_signed,
+      days_visit_to_offer_submitted,
+      days_booking_created_to_offer_submitted,
+      days_tenant_first_doc_sent_to_insurance_approved,
+      days_insurance_approved_to_contract_signed,
+      days_offer_approved_to_tenant_first_doc_sent,
+      days_offer_submitted_to_offer_approved,
+      days_offer_approved_to_credit_init,
+      days_offer_submitted_to_contract_signed,
+      days_offer_approved_to_contract_signed,
+      days_tenant_doc_completed_to_credit_approved,
+      days_tenant_first_doc_sent_to_doc_completed,
+      days_house_listing_to_contract_signed,
+      days_house_listing_to_visit,
+      days_credit_approved_to_closing_processed,
+      days_offer_approved_to_doc_contact,
+      sk_agent_review_rating_date,
+      case
+          when sk_contract_signed_date > 0 then 'contract_signed'
+          when sk_contract_created_date > 0 and sk_contract_signed_date < 0 then 'contract_created'
+          when sk_credit_analysis_approved_date > 0 and (sk_credit_analysis_approved_date >= sk_booking_created_date or sk_contract_created_date < 0) then 'credit_approved'
+          when sk_credit_analysis_init_date > 0 and sk_credit_analysis_approved_date < 0 then 'document_completed'
+          when sk_tenant_first_doc_sent_date > 0 and sk_credit_analysis_init_date < 0 then 'document_sent'
+          when sk_offer_approved_date > 0 and sk_tenant_first_doc_sent_date < 0  then 'offer_aproved'
+          when sk_offer_submitted_date > 0 and sk_offer_approved_date<0 then 'offer_submitted'
+          when (sk_booking_created_date > 0 or sk_booking > 0) and flg_visit_completed = 1 then 'visit_completed'
+          when (sk_booking_created_date > 0 or sk_booking > 0) and flg_visit_completed != 1 then 'visit_booked'
+      else null end as funnel_step,
+      dimcon_cancellation_reason,
+      dimboo_cancellation_reason,
+      dimoff_cancellation_reason,
+      dimprop_cancellation_reason,
+      ts_load
+  from base
 )
 select
-  ods_id,
-  sk_house_listing,
-  sk_house_first_listing_date,
-  sk_house_listing_date,
-  sk_house_listing_de_publication_date,
-  sk_house_listing_first_offer_submitted_date,
-  sk_region,
-  sk_condo,
-  sk_rent_flow,
-  sk_booking,
-  sk_booking_created_date,
-  sk_visit_date,
-  sk_owner,
-  sk_user_agent,
-  sk_agent_sign_up_date,
-  sk_client,
-  sk_client_sign_up_date,
-  sk_visit,
-  sk_offer,
-  sk_offer_submitted_date,
-  min(sk_offer_submitted_date) filter (where sk_offer_submitted_date != -1) over (partition by id_house) as sk_min_offer_submitted_date,
-  sk_offer_approved_date,
-  sk_reservation,
-  sk_reservation_created_date,
-  reservation_attempts,
-  sk_proposal,
-  sk_proposal_approved_date,
-  sk_proposal_processed_date,
-  case when sk_tenant_auto_first_doc_sent_date = -1 then sk_tenant_manual_first_doc_sent_date else sk_tenant_auto_first_doc_sent_date end as sk_tenant_first_doc_sent_date,
-  sk_tenant_manual_first_doc_sent_date,
-  sk_tenant_auto_first_doc_sent_date,
-  sk_contract,
-  sk_contract_created_date,
-  sk_contract_signed_date,
-  sk_contract_annulment_date,
-  sk_contract_canceled_date,
-  sk_credit_analysis_init_date,
-  sk_credit_analysis_end_date,
-  sk_credit_analysis_approved_date,
-  flg_visit_completed,
-  flg_visit_performed,
-  flg_visit_created_from_app,
-  visit_created_type,
-  flg_visit_last_updated_from_app,
-  sk_rent_flow_taxonomy,
-  booking_utm_campaign,
-  booking_utm_content,
-  booking_utm_term,
-  ((date_part('day', dt_visit - dt_booking_created) * 1440 +
-    date_part('hour', dt_visit - dt_booking_created) * 60 +
-		date_part('minute', dt_visit - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_visit,
-  ((date_part('day', dt_visit - dt_client_sign_up) * 1440 +
-    date_part('hour', dt_visit - dt_client_sign_up) * 60 +
-		date_part('minute', dt_visit - dt_client_sign_up)) / 1440.)::numeric(14,2) as days_user_created_to_visit,
-  ((date_part('day', dt_internal_analysis - dt_offer_submitted) * 1440 +
-    date_part('hour', dt_internal_analysis - dt_offer_submitted) * 60 +
-		date_part('minute', dt_internal_analysis - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_internal_analysis,
-  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
-    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
-		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_first_sent,
-  ((date_part('day', dt_owner_document_sent - dt_offer_approved) * 1440 +
-    date_part('hour', dt_owner_document_sent - dt_offer_approved) * 60 +
-		date_part('minute', dt_owner_document_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_owner_doc_sent,
-  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 1440 +
-    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_credit_processed,
-  ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
-    date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_first_doc_sent_to_doc_completed,
-  ((date_part('day', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 1440 +
-    date_part('hour', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init) * 60 +
-		date_part('minute', coalesce(dt_credit_analysis_end, dt_credit_analysis) - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_doc_completed_to_credit_processed,
-  ((date_part('day', dt_contract_created - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', dt_contract_created - dt_credit_analysis_approved) * 60 +
-		date_part('minute', dt_contract_created - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_contract_created,
-  ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
-		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_contract_signed,
-  ((date_part('day', dt_contract_signed - dt_contract_created) * 1440 +
-    date_part('hour', dt_contract_signed - dt_contract_created) * 60 +
-		date_part('minute', dt_contract_signed - dt_contract_created)) / 1440.)::numeric(14,2) as days_contract_created_to_contract_signed,
-  ((date_part('day', dt_contract_signed - dt_booking_created) * 1440 +
-    date_part('hour', dt_contract_signed - dt_booking_created) * 60 +
-		date_part('minute', dt_contract_signed - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_contract_signed,
-  ((date_part('day', dt_contract_signed - dt_visit) * 1440 +
-    date_part('hour', dt_contract_signed - dt_visit) * 60 +
-		date_part('minute', dt_contract_signed - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_contract_signed,
-  ((date_part('day', dt_offer_submitted - dt_visit) * 1440 +
-    date_part('hour', dt_offer_submitted - dt_visit) * 60 +
-		date_part('minute', dt_offer_submitted - dt_visit)) / 1440.)::numeric(14,2) as days_visit_to_offer_submitted,
-  ((date_part('day', dt_offer_submitted - dt_booking_created) * 1440 +
-    date_part('hour', dt_offer_submitted - dt_booking_created) * 60 +
-		date_part('minute', dt_offer_submitted - dt_booking_created)) / 1440.)::numeric(14,2) as days_booking_created_to_offer_submitted,
-  ((date_part('day', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 1440 +
-    date_part('hour', dt_credit_analysis_approved - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_approved - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_insurance_approved,
-  ((date_part('day', dt_contract_signed - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', dt_contract_signed - dt_credit_analysis_approved) * 60 +
-		date_part('minute', dt_contract_signed - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_insurance_approved_to_contract_signed,
-  ((date_part('day', dt_tenant_first_doc_sent - dt_offer_approved) * 1440 +
-    date_part('hour', dt_tenant_first_doc_sent - dt_offer_approved) * 60 +
-		date_part('minute', dt_tenant_first_doc_sent - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_tenant_first_doc_sent,
-  ((date_part('day', dt_offer_approved - dt_offer_submitted) * 1440 +
-    date_part('hour', dt_offer_approved - dt_offer_submitted) * 60 +
-		date_part('minute', dt_offer_approved - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_offer_approved,
-  ((date_part('day', dt_credit_analysis_init - dt_offer_approved) * 1440 +
-    date_part('hour', dt_credit_analysis_init - dt_offer_approved) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_credit_init,
-  ((date_part('day', dt_contract_signed - dt_offer_submitted) * 1440 +
-    date_part('hour', dt_contract_signed - dt_offer_submitted) * 60 +
-		date_part('minute', dt_contract_signed - dt_offer_submitted)) / 1440.)::numeric(14,2) as days_offer_submitted_to_contract_signed,
-  ((date_part('day', dt_contract_signed - dt_offer_approved) * 1440 +
-    date_part('hour', dt_contract_signed - dt_offer_approved) * 60 +
-		date_part('minute', dt_contract_signed - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_contract_signed,
-  ((date_part('day', dt_credit_analysis_approved - dt_credit_analysis_init) * 1440 +
-    date_part('hour', dt_credit_analysis_approved - dt_credit_analysis_init) * 60 +
-		date_part('minute', dt_credit_analysis_approved - dt_credit_analysis_init)) / 1440.)::numeric(14,2) as days_tenant_doc_completed_to_credit_approved,
-  ((date_part('day', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 1440 +
-    date_part('hour', dt_credit_analysis_init - dt_tenant_first_doc_sent) * 60 +
-		date_part('minute', dt_credit_analysis_init - dt_tenant_first_doc_sent)) / 1440.)::numeric(14,2) as days_tenant_first_doc_sent_to_doc_completed,
-  ((date_part('day', dt_contract_signed - dt_house_listing) * 1440 +
-    date_part('hour', dt_contract_signed - dt_house_listing) * 60 +
-		date_part('minute', dt_contract_signed - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_contract_signed,
-  ((date_part('day', dt_visit - dt_house_listing) * 1440 +
-    date_part('hour', dt_visit - dt_house_listing) * 60 +
-		date_part('minute', dt_visit - dt_house_listing)) / 1440.)::numeric(14,2) as days_house_listing_to_visit,
-  ((date_part('day', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 1440 +
-    date_part('hour', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved) * 60 +
-		date_part('minute', coalesce(ts_contract_valid_signature, ts_contract_canceled, ts_proposal_rejected) - dt_credit_analysis_approved)) / 1440.)::numeric(14,2) as days_credit_approved_to_closing_processed,
-  ((date_part('day', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 1440 +
-    date_part('hour', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved) * 60 +
-		date_part('minute', coalesce(dt_tenant_first_doc_sent, case when proposal_status = 'Rejeitada' and has_tenant_sent_doc = 0 then ts_proposal_processed else null end) - dt_offer_approved)) / 1440.)::numeric(14,2) as days_offer_approved_to_doc_contact,
+	ods_id,
+	sk_house_listing,
+  	sk_house_first_listing_date,
+	sk_house_listing_date,
+	sk_house_listing_de_publication_date,
+	sk_house_listing_first_offer_submitted_date,
+	sk_region,
+	sk_condo,
+	sk_rent_flow,
+	sk_booking,
+	sk_booking_created_date,
+	sk_visit_date,
+	sk_owner,
+	sk_user_agent,
+	sk_agent_sign_up_date,
+	sk_client,
+	sk_client_sign_up_date,
+	sk_visit,
+	sk_offer,
+	sk_offer_submitted_date,
+	sk_min_offer_submitted_date,
+	sk_offer_approved_date,
+	sk_reservation,
+	sk_reservation_created_date,
+	reservation_attempts,
+	sk_proposal,
+	sk_proposal_approved_date,
+	sk_proposal_processed_date,
+	sk_tenant_first_doc_sent_date,
+	sk_tenant_manual_first_doc_sent_date,
+	sk_tenant_auto_first_doc_sent_date,
+	sk_contract,
+	sk_contract_created_date,
+	sk_contract_signed_date,
+	sk_contract_annulment_date,
+	sk_contract_canceled_date,
+	sk_credit_analysis_init_date,
+	sk_credit_analysis_end_date,
+	sk_credit_analysis_approved_date,
+	flg_visit_completed,
+	flg_visit_performed,
+	flg_visit_created_from_app,
+	visit_created_type,
+	flg_visit_last_updated_from_app,
+	sk_rent_flow_taxonomy,
+	booking_utm_campaign,
+	booking_utm_content,
+	booking_utm_term,
+	days_booking_created_to_visit,
+	days_user_created_to_visit,
+	days_offer_submitted_to_internal_analysis,
+	days_offer_approved_to_doc_first_sent,
+	days_offer_approved_to_owner_doc_sent,
+	days_first_doc_sent_to_credit_processed,
+	days_first_doc_sent_to_doc_completed,
+	days_doc_completed_to_credit_processed,
+	days_credit_approved_to_contract_created,
+	days_credit_approved_to_contract_signed,
+	days_contract_created_to_contract_signed,
+	days_booking_created_to_contract_signed,
+	days_visit_to_contract_signed,
+	days_visit_to_offer_submitted,
+	days_booking_created_to_offer_submitted,
+	days_tenant_first_doc_sent_to_insurance_approved,
+	days_insurance_approved_to_contract_signed,
+	days_offer_approved_to_tenant_first_doc_sent,
+	days_offer_submitted_to_offer_approved,
+	days_offer_approved_to_credit_init,
+	days_offer_submitted_to_contract_signed,
+	days_offer_approved_to_contract_signed,
+	days_tenant_doc_completed_to_credit_approved,
+	days_tenant_first_doc_sent_to_doc_completed,
+	days_house_listing_to_contract_signed,
+	days_house_listing_to_visit,
+	days_credit_approved_to_closing_processed,
+	days_offer_approved_to_doc_contact,
 	sk_agent_review_rating_date,
-    ts_load
-from _fact
+	funnel_step,
+    case
+        when funnel_step = 'contract_signed' then dimcon_cancellation_reason
+        when funnel_step = 'contract_created' then dimcon_cancellation_reason
+        when funnel_step = 'credit_approved' then dimcon_cancellation_reason
+        when funnel_step = 'document_completed' then dimoff_cancellation_reason
+        when funnel_step = 'document_sent' then dimoff_cancellation_reason
+        when funnel_step = 'offer_aproved' then dimprop_cancellation_reason
+        when funnel_step = 'offer_submitted' then dimoff_cancellation_reason
+        when funnel_step = 'visit_completed' then dimboo_cancellation_reason
+        when funnel_step = 'visit_booked' then dimboo_cancellation_reason
+        else 'Not Mapped'
+    end as funnel_step_drop_reason,
+	ts_load
+from total
 ;

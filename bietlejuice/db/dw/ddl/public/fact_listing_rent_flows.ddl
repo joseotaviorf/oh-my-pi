@@ -77,6 +77,8 @@ create table fact_listing_rent_flows(
   days_credit_approved_to_closing_processed numeric(14,2),
   days_offer_approved_to_doc_contact numeric(14,2),
   sk_agent_review_rating_date bigint,
+  funnel_step varchar(255),
+  funnel_step_drop_reason varchar(255),
   ts_load timestamp
 )
 ;
