@@ -89,7 +89,7 @@ select
     from DadosAgente as _da
     left join DadosAgente_businessContextsServed _dabc
         on _dabc.DadosAgente_id = _da.id
-    group by 1,2,3,4,5,6
+    group by 1,2,3,4,5
   ) dabc
     on dabc.dadosagente_id = u.dadosAgente_id
   left join
