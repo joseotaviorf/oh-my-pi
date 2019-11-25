@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import gzip
 import json
+import time
 
 from qa_python_utils import QuintoAndarLogger
 
@@ -17,7 +18,7 @@ class CartoApi(object):
 
     def run_sql(self, sql, data_format='JSON'):
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}&format={}'.format(self.BASE_URL + 'sql', url_params_encoded, self.CARTO_API_KEY, data_format)
+        url = '{}?q={}&api_key={}&format={}'.format(self.BASE_URL + 'v2/sql', url_params_encoded, self.CARTO_API_KEY, data_format)
         logger.info('m=run_sql, msg=running SQL on CARTO, sql={}'.format(sql))
         try:
             response = requests.get(url)
@@ -38,7 +39,7 @@ class CartoApi(object):
             f_out.writelines(f_in)
         sql = 'COPY {} ({}) FROM stdin WITH (FORMAT csv, HEADER true)'.format(table_name, cols)
         url_params_encoded = urllib.pathname2url(sql)
-        url = '{}?q={}&api_key={}'.format(self.BASE_URL + 'sql/copyfrom', url_params_encoded, self.CARTO_API_KEY)
+        url = '{}?q={}&api_key={}'.format(self.BASE_URL + 'v2/sql/copyfrom', url_params_encoded, self.CARTO_API_KEY)
         headers = {
             'Content-Encoding': 'gzip',
             'Content-Type': 'application/octet-stream'
@@ -55,3 +56,28 @@ class CartoApi(object):
         if u'error' in response_json:
             logger.error('m=upload_csv, msg=error uploding CSV to CARTO, table={}, e={}'.format(table_name, response_json[u'error']))
             raise ValueError(response_json[u'error'])
+
+    def import_file(self, file_path, collision_strategy='overwrite'):
+        """Imports a file into CARTO using the Import API (http://carto.com/developers/import-api/guides/quickstart/).
+        Preferable to the upload_csv method as it doesn't require dropping the table every time, thus
+        preserving access permissions and displaying correctly in the CARTO interface.
+        """
+        url = '{}?type_guessing=false&quoted_fields_guessing=false&collision_strategy={}&api_key={}'.format(self.BASE_URL + 'v1/imports/', collision_strategy, self.CARTO_API_KEY)
+        gzip_file_path = file_path + '.gz'
+        with open(file_path, 'rb') as f_in, gzip.open(gzip_file_path, 'wb') as f_out:
+            f_out.writelines(f_in)
+        file = open(gzip_file_path, 'rb')
+        response = requests.post(url, files={'file': file})
+        post_response_json = json.loads(response.content)
+        status_url = '{}{}?api_key={}'.format(self.BASE_URL + 'v1/imports/', post_response_json['item_queue_id'], self.CARTO_API_KEY)
+        final_responses = ['complete', 'failure']
+        response_state = None
+        while response_state not in final_responses:
+            response = requests.get(status_url)
+            status_response_json = json.loads(response.content)
+            response_state = status_response_json['state']
+            if response_state not in final_responses:
+                time.sleep(3)
+        if response_state == 'failure':
+            logger.error('m=import_file, msg=error importing file to CARTO, file={}, e={}'.format(file_path, status_response_json))
+            raise ValueError(status_response_json)
