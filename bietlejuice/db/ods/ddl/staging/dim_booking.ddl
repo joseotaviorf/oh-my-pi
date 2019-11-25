@@ -4,6 +4,7 @@ CREATE TABLE staging.dim_booking (
   id_booking INTEGER,
   is_rescheduled boolean,
   dt_scheduling TIMESTAMP,
+  visit_intent VARCHAR(100),
   type VARCHAR(255),
   confirmed VARCHAR(100),
   closed VARCHAR(100),

@@ -2,6 +2,7 @@ select
   a.id,
   a.data,
   a.status,
+  a.businesscontext as visit_intent,
   a.tipo,
   a.confirmado,
   a.encerrado,

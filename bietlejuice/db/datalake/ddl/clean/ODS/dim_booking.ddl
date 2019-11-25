@@ -4,6 +4,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   id_booking string,
   is_rescheduled string,
   dt_scheduling string,
+  visit_intent string,
   type string,
   confirmed string,
   closed string,

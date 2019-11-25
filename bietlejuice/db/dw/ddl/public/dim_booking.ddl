@@ -4,6 +4,7 @@ create table if not exists dim_booking (
   id_booking integer,
   is_rescheduled boolean,
   dt_scheduling timestamp,
+  visit_intent VARCHAR(100),
   type varchar(255),
   confirmed varchar(100),
   closed varchar(100),

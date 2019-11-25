@@ -62,6 +62,7 @@ bookings as (
             + ("slotDia" * 15 % 60) * interval '1 minute')
             at time zone ('UTC')
 		as dt_booking,
+		s.visit_intent,
 	    s.tipo as type,
 	    s."fupVisita" is not null
 	      and s."fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
@@ -204,6 +205,7 @@ select
 	b.id_booking,
 	b.is_rescheduled,
 	b.dt_booking,
+	b.visit_intent,
 	b.type,
 	b.confirmed,
 	b.closed,
