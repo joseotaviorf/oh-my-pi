@@ -3,7 +3,7 @@ create table if not exists booking (
   id integer not null,
   data date not null,
   status varchar(255) NOT NULL,
-  visit_intent varchar(100) NOT NULL,
+  visit_intent varchar(100),
   tipo varchar(255) NOT NULL,
   confirmado varchar(100),
   encerrado varchar(100),
