@@ -23,6 +23,8 @@ create table usuario (
   dadosagente_perfil varchar(255),
   dadosagente_numero_creci varchar(255),
   dadosagente_ativo integer,
+  is_sale_agent smallint,
+  is_rent_agent smallint,
   aceita_sms integer,
   data_clickanuncie timestamp,
   dadosbancarios_banco_codigo varchar(255),

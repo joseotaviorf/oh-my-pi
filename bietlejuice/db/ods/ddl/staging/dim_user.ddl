@@ -58,6 +58,8 @@ CREATE TABLE staging.dim_user (
   tem_app_inquilino varchar(10),
   tem_contrato_ativo varchar(10),
   inquilino varchar(10),
+  is_sale_agent boolean,
+  is_rent_agent boolean,
   first_booking_date timestamp,
   first_booking_confirmed_date timestamp,
   first_visit_date timestamp,

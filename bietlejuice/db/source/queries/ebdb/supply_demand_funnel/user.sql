@@ -19,9 +19,11 @@ select
     e.nome as estado_nome,
     u.bloqueado+0 as bloqueado,
     u.rg,
-    da.perfil as dadosagente_perfil,
-    da.numeroCRECI as dadosagente_numero_creci,
-    da.ativo+0 as dadosagente_ativo,
+    dabc.perfil as dadosagente_perfil,
+    dabc.numeroCRECI as dadosagente_numero_creci,
+    dabc.ativo+0 as dadosagente_ativo,
+    dabc.is_sale_agent,
+    dabc.is_rent_agent,
     u.aceitaSms+0 as aceita_sms,
     u.dataClickAnuncie as data_clickanuncie,
     b.codigo as dadosbancarios_banco_codigo,
@@ -66,12 +68,33 @@ select
   left join
     Estado e
     on e.id = u.estado_id
-  left join
-    DadosAgente da
-    on da.id = u.dadosAgente_id
+  left join (
+    select
+        _da.id as dadosagente_id,
+        _da.numeroCRECI,
+        _da.perfil,
+        _da.ativo,
+        _da.cidade_id,
+        max(case
+            -- non existent agents on businessContextsServed table are assumed as RENT
+            when coalesce(_dabc.businessContextsServed, 'RENT') = 'RENT'
+            then 1
+            else 0
+        end) as is_sale_agent,
+        max(case
+            when _dabc.businessContextsServed = 'SALE'
+            then 1
+            else 0
+        end) as is_rent_agent
+    from DadosAgente as _da
+    left join DadosAgente_businessContextsServed _dabc
+        on _dabc.DadosAgente_id = _da.id
+    group by 1,2,3,4,5,6
+  ) dabc
+    on dabc.dadosagente_id = u.dadosAgente_id
   left join
     Municipio m
-    on m.id = da.cidade_id
+    on m.id = dabc.cidade_id
   left join
     Banco b
     on b.id = u.dadosBancarios_banco_id

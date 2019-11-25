@@ -58,6 +58,8 @@ CREATE EXTERNAL TABLE datalake_clean.ods_dim_user (
   `tem_app_inquilino` string,
   `tem_contrato_ativo` string,
   `inquilino` string,
+  `is_sale_agent` string,
+  `is_rent_agent` string,
   `first_booking_date` string,
   `first_booking_confirmed_date` string,
   `first_visit_date` string,
