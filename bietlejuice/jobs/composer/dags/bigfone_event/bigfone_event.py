@@ -3,7 +3,6 @@ import pendulum
 
 from airflow.models import DAG
 from airflow.models import Variable
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -88,7 +87,18 @@ load_event_table_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_clean_partition_task = DummyOperator(task_id="create-clean-partition", dag=dag)
+create_clean_partition_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-partition-on-events-table",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": "{}/create_partition_on_events_table.py".format(
+                SPARK_JOBS_PATH
+            ),
+            "parameters": ["{{ ds }}", ENV],
+        }
+    },
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

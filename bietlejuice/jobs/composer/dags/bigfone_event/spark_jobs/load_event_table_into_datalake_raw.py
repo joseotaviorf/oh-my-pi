@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     execution_date = args.execution_date
     environment = args.environment
-    table_name = "events"
+    table_name = "event"
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     query_filter = OrderedDict(

@@ -1,5 +1,5 @@
 with events_filter as (
-    select * from datalake_bigfone_raw.events
+    select * from datalake_bigfone_raw.event
     where provider='teravoz' and year={year} and month={month} and day={day}
 ),
 -- we need to do this filter because there is a Teravoz bug that generates service.command 
