@@ -3,7 +3,7 @@ with events as (
 	-- use entrance_uri user property to identify sessions UTM (more accurate than utm_ user props)
 	-- merge amplitude users to leading amplitude user (NEEDS MANUAL UPDATE) 
 	select
-	    cast(regexp_extract(evt.event_time, '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})') as timestamp) as event_time,
+	    cast(regexp_extract(evt.event_time, '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})') as timestamp) as event_time,
 	    evt.amplitude_id,
 	    umg.merged_amplitude_id,
 	    coalesce(umg.merged_amplitude_id, evt.amplitude_id) as leading_amplitude_id,
