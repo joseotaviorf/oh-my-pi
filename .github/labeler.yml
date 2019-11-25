@@ -1,0 +1,2 @@
+# Add 'db-change' to any file containing .sql/.ddl
+db-changes: .{ddl|sql}
