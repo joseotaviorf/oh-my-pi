@@ -75,17 +75,10 @@ select
         _da.perfil,
         _da.ativo,
         _da.cidade_id,
-        max(case
-            -- non existent agents on businessContextsServed table are assumed as RENT
-            when coalesce(_dabc.businessContextsServed, 'RENT') = 'RENT'
-            then 1
-            else 0
-        end) as is_sale_agent,
-        max(case
-            when _dabc.businessContextsServed = 'SALE'
-            then 1
-            else 0
-        end) as is_rent_agent
+        max(cast(_dabc.businessContextsServed = 'SALE' as unsigned)) as is_sale_agent,
+        -- non existent agents on businessContextsServed table are assumed as RENT
+        max(cast(coalesce(_dabc.businessContextsServed, 'RENT') = 'RENT' as unsigned))
+            as is_rent_agent
     from DadosAgente as _da
     left join DadosAgente_businessContextsServed _dabc
         on _dabc.DadosAgente_id = _da.id
