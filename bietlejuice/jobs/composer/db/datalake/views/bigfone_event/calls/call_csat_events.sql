@@ -13,7 +13,7 @@ select
     max(ts_created) as ts_ended,
     max(ts_created_local) as ts_ended_local,
     date_diff('second', min(ts_created), max(ts_created)) as seconds_csat_duration,
-    concat(cast(year as varchar(4)), '-', cast(month as varchar(2)), '-', cast(day as varchar(2))) as dt_event
+    date(concat(cast(year as varchar(4)), '-', cast(month as varchar(2)), '-', cast(day as varchar(2)))) as dt_event
 from     
     datalake_bigfone_clean_prod.events
 where
