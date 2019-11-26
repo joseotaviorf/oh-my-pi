@@ -26,12 +26,12 @@ class MongoConsumer(DBConsumer):
     def get_table_names_and_sizes(self):
         db = self.connection["db"]
         client = MongoClient(self.connection["uri"])
+        mb_size = 1048576
+
         collections = [
             {
                 "table_name": collection,
-                "size": client["tasks"].command("collstats", collection)["size"]
-                / 1024
-                / 1024,
+                "size": client[db].command("collstats", collection)["size"] / mb_size,
             }
             for collection in client[db].list_collection_names()
         ]
