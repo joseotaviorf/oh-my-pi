@@ -245,7 +245,7 @@ full outer join ongoing_listings_weekly olist
 full outer join bookers bk
   on ocont.week_start = bk.booking_created_week and ocont.sk_region = bk.sk_region
 full outer join new_bookers nbk
-  on ocont.week_start = nbk.first_booking_created_week and ocont.sk_region = bk.sk_region
+  on ocont.week_start = nbk.first_booking_created_week and ocont.sk_region = nbk.sk_region
 )
 select
 	dm.week_date,
