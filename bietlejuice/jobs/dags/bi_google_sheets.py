@@ -41,7 +41,7 @@ def load_google_sheet_files_to_ods(file):
 def create_task_to_load_in_datalake(file):
     return BaseDAG.build_python_operator(
         dag=dag,
-        task_id='load_{}_to_datalake'.format(file['fileName']),
+        task_id='load_{}_to_datalake'.format(file['s3_path']),
         python_callable=load_google_sheet_files_to_datalake,
         op_kwargs={'file': file}
     )
@@ -50,7 +50,7 @@ def create_task_to_load_in_datalake(file):
 def create_task_to_load_in_ods(file):
     return BaseDAG.build_python_operator(
         dag=dag,
-        task_id='load_{}_to_ods'.format(file['fileName']),
+        task_id='load_{}_to_ods'.format(file['s3_path']),
         python_callable=load_google_sheet_files_to_ods,
         op_kwargs={'file': file}
     )
@@ -71,7 +71,7 @@ dag = DAG(
 
 
 for file in GOOGLE_SHEETS_FILES['files']:
-    file['fileName'] = re.sub('[^A-Za-z0-9]+', '_', unidecode(file['fileName'])).lower()
+    file['s3_path'] = re.sub('[^A-Za-z0-9]+', '_', unidecode(file['s3_path'])).lower()
 
     datalake_task = create_task_to_load_in_datalake(file)
     if file['send_to_ods']:
