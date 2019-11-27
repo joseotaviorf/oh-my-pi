@@ -1,4 +1,0 @@
----
-carto_table_name: qa_subregions
-sql_filename: qa_subregions
-final_sql: UPDATE qa_subregions SET the_geom = ST_GeomFromText(geometry, 4326)
