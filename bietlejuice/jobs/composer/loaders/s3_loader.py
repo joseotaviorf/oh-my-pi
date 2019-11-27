@@ -74,6 +74,11 @@ class S3Loader:
         This method will only overwrite the data of the partitions values contained in
         the Spark DataFrame. It doesn't refresh the table in the Spark Metastore,
         so you would need to do it later in the caller side if this is your desire.
+
+        The method is only allowed to execute if spark.sql.sources.partitionOverwriteMode
+        is set to 'dynamic', if other behaviour is necessary when loading the data,
+        the data in S3 need to be deleted manually.
+
         :param df: an Spark DataFrame
         :type df: SparkDataFrame
         :param table_name: the table name
@@ -88,13 +93,22 @@ class S3Loader:
         :param options: all other string options
         :type options: keyworded, variable-length argument list
         """
-        # todo: remove the two lines below and set the conf param by the
-        #  SparkClient class
-        spark = BaseSparkContext.spark
-        spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 
         if not df:
             raise ValueError("m=load_incremental_table, msg=Spark DataFrame is empty")
+
+        # check spark conf
+        spark = BaseSparkContext.spark
+        partition_overwrite_mode = spark.conf.get(
+            "spark.sql.sources.partitionOverwriteMode"
+        ).lower()
+        if partition_overwrite_mode != "dynamic":
+            raise RuntimeError(
+                "m=load_incremental_table, spark.sql.sources.partitionOverwriteMode={}, "
+                "msg=partitionOverwriteMode have to be configured to 'dynamic'".format(
+                    partition_overwrite_mode
+                )
+            )
 
         s3_path = self.metastore_service.db_path + table_name
         mod_df = (
