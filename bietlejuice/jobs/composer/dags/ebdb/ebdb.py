@@ -7,6 +7,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # DAG params
@@ -111,6 +112,24 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
     )
 
 
+def create_clean_tables_sub_dag(sub_dag_name, source, clean_table):
+    local_sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=FULL_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+    clean_table_task = create_clean_table_in_datalake_task(
+        local_sub_dag, clean_table, source, ENV, DAG_ID
+    )
+    create_clean_external_tables_task = create_external_tables_task(
+        local_sub_dag, ENV, "clean", source, [clean_table]
+    )
+    clean_table_task >> create_clean_external_tables_task
+
+    return local_sub_dag
+
+
 def create_clean_and_dim_tables_sub_dag(
     sub_dag_name, source, clean_table, dw_schema, dim_table
 ):
@@ -123,17 +142,17 @@ def create_clean_and_dim_tables_sub_dag(
     clean_table_task = create_clean_table_in_datalake_task(
         local_dag, clean_table, source, ENV, DAG_ID
     )
+    create_clean_external_tables_task = create_external_tables_task(
+        local_dag, ENV, "clean", source, [clean_table]
+    )
     dim_table_task = create_dw_table_in_datalake_task(
         local_dag, dim_table, dw_schema, ENV, DAG_ID
     )
     load_dim_table_task = load_dw_table_into_redshift_task(
         local_dag, dim_table, dw_schema, ENV
     )
-    create_clean_external_tables_task = create_external_tables_task(
-        local_dag, ENV, "clean", source, [clean_table]
-    )
-    clean_table_task >> dim_table_task >> load_dim_table_task
     clean_table_task >> create_clean_external_tables_task
+    clean_table_task >> dim_table_task >> load_dim_table_task
 
     return local_dag
 
@@ -225,6 +244,22 @@ inspection_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dim_table="dim_inspection",
 )
 
+access_type_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="access_type",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="access_type",
+)
+
+access_authorization_type_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="access_authorization_type",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="access_authorization_type",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -238,4 +273,6 @@ ebdb_to_datalake_raw_task >> [
     visit_sub_dag_task,
     contract_sub_dag_task,
     inspection_sub_dag_task,
+    access_type_sub_dag_task,
+    access_authorization_type_sub_dag_task,
 ] >> terminate_cluster_task
