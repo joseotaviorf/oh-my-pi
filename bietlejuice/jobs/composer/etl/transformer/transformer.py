@@ -76,7 +76,9 @@ class Transformer:
         )
 
     @logger
-    def overwrite_athena_table(self, table_name, datalake_layer, partition_by=None):
+    def overwrite_athena_table(
+        self, table_name, datalake_layer, partition_by=None, table_location=None
+    ):
 
         """
             Parameters:
@@ -85,14 +87,16 @@ class Transformer:
                 - partition_by = list with columns name to partition
                    -- for example: partition_by = ['year', 'month', 'day']
         """
+        if not table_location:
+            s3_base_path = self._get_s3_base_path(datalake_layer)
+            table_location = s3_base_path + table_name
         database = self._get_athena_schema(datalake_layer)
-        s3_base_path = self._get_s3_base_path(datalake_layer)
         table_schema = self._get_spark_table_schema(datalake_layer, table_name)
 
         self.client.overwrite_external_table(
             database=database,
             table_name=table_name,
-            s3_table_path=s3_base_path + table_name,
+            s3_table_path=table_location,
             table_schema=table_schema,
             partition_by=partition_by,
             base_format=getattr(

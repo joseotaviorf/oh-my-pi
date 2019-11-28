@@ -59,10 +59,12 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
 
 
 def create_subpartitioned_table_in_athena(subpartitioned_table_name):
+    table_location = spark_metastore_service.get_table_path(subpartitioned_table_name)
     transformer.overwrite_athena_table(
         subpartitioned_table_name,
         "clean_staging",
         partition_by=["year", "month", "day"],
+        table_location=table_location,
     )
     old_athena_client.repair_table_partitions(
         db_info["db_clean_staging_athena"], subpartitioned_table_name
