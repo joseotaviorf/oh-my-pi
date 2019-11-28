@@ -350,12 +350,19 @@ potential_listings as (
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
     f.acquisition_channel_rep = 'Admin' as is_cx_direct_register,
+    (f.acquisition_channel_rep = 'Inside Sales') or (f.acquisition_channel_rep = 'Admin') as is_ops_direct_register,
     coalesce(f.isales_registrant_id, btf.rep_id) is not null
     or (bpt.has_job_photo = true and not f.is_self_service_photo_job_scheduled)
         as has_isales_intervention,
     bpt.has_fup_photo as has_fup_photo_task,
     us_cad.id is not null as is_call_center,
     lfet.tracking_referring_domain as lead_referring_domain,
+    case
+    	when lower(lfet.tracking_referring_domain) LIKE '%corretor%' THEN 'Agents'
+    	when lower(lfet.tracking_referring_domain) LIKE '%indicaai%' THEN 'Indica Ai'
+    	when lower(lfet.tracking_referring_domain) LIKE '%proprietario%' THEN 'Owner'
+    	else 'Other'
+    end as lead_referring_category,
     us_d.subscriptionSource as subscription_source,
     case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
 		 when u.dados_agente_id is not null then 'Agent'
@@ -404,19 +411,18 @@ taxonomy as (
     lead_tracking_medium,
     lead_tracking_source,
     affiliate_type,
-    lead_referring_domain,
-    subscription_source,
+    lead_referring_category,
     is_branded::integer::boolean as is_branded,
-    is_b2b::integer::boolean as is_b2b,
-    is_isales_direct_register::integer::boolean as is_isales_direct_register,
-    is_cx_direct_register::integer::boolean as is_cx_direct_register,
-    has_isales_intervention::integer::boolean as has_isales_intervention,
-    is_call_center::integer::boolean as is_call_center,
+    is_ops_direct_register::integer::boolean as is_ops_direct_register,
     mkt_origin,
     mkt_channel,
     mkt_medium,
     mkt_source
-  from files.taxonomy_growth
+  from
+    files.taxonomy_growth
+  where
+    mkt_medium <> 'Doorman User'
+    and mkt_origin <> 'B2B'
 ),
 applied_taxonomy as (
 select 
@@ -426,10 +432,14 @@ select
     else 'Other'
   end as mkt_branded,
   case
+    when pl.is_b2b then 'B2B'
+    when pl.affiliate_type = 'Doorman' then 'Doorman'
     when t.mkt_origin is null then 'Other'
     else t.mkt_origin
   end as mkt_origin,
   case
+    when pl.is_b2b then null
+    when pl.affiliate_type = 'Doorman' then 'Envio'
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_channel
   end as mkt_channel,
@@ -440,10 +450,21 @@ select
     else 'Not Mapped'
   end as mkt_platform,
   case
+    when pl.is_b2b then null
+    when pl.affiliate_type = 'Doorman' then 'Doorman User'
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_medium
   end as mkt_medium,
   case
+    when pl.is_b2b then null
+    when pl.affiliate_type = 'Doorman' then (
+        case
+            when COALESCE(pl.subscription_source, '') in ('', 'Desconhecida')   then 'Cadastro Orgânico'
+            when pl.subscription_source = 'LeadOutbound'                        then 'Captação Call Center'
+            when pl.subscription_source = 'Trade'                               then 'Captação Offline'
+            else t.mkt_source
+        end
+    )
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_source
   end as mkt_source,
@@ -455,28 +476,24 @@ left join taxonomy t
     and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
     and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
     and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')
-    and coalesce(pl.lead_referring_domain, '') = coalesce(t.lead_referring_domain, '')
-    and coalesce(pl.subscription_source, '') = coalesce(t.subscription_source, '')
-    and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false) 
-    and coalesce(pl.is_b2b, false) = coalesce(t.is_b2b, false)
-    and coalesce(pl.is_isales_direct_register, false) = coalesce(t.is_isales_direct_register, false) 
-    and coalesce(pl.is_cx_direct_register, false) = coalesce(t.is_cx_direct_register, false) 
-    and coalesce(pl.has_isales_intervention, false) = coalesce(t.has_isales_intervention, false) 
-    and coalesce(pl.is_call_center, false) = coalesce(t.is_call_center, false)
+    and coalesce(pl.lead_referring_category, '') = coalesce(t.lead_referring_category, '')
+    and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false)
+    and coalesce(pl.is_ops_direct_register, false) = coalesce(t.is_ops_direct_register, false)
 ),
 applied_taxonomy_flow as (
     select
         *,
         case
-             when lead_type = 'Proparceria' then 'Non Self-Service'
-             when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado') then 'Non Self-Service'
-             when (is_cx_direct_register or is_isales_direct_register) then 'Non Self-Service'
-             when lead_origin = 'Landing' then 'Non Self-Service'
-             when mkt_origin in ('Owner PWA', 'Price Calculator') then 'Self-Service'
+             when lead_type = 'Proparceria'                                                 then 'Non Self-Service'
+             when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado')   then 'Non Self-Service'
+             when is_ops_direct_register                                                        then 'Non Self-Service'
+             when lead_origin = 'Landing'                                                   then 'Non Self-Service'
+             when mkt_origin in ('Owner PWA', 'Price Calculator')                           then 'Self-Service'
              when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
-                  and mkt_source = 'Direct Referral' then 'Self-Service'
-             when mkt_origin in ('Other', 'Not Mapped') then mkt_origin
-             else 'Non Self-Service' end as mkt_flow
+                  and mkt_source = 'Direct Referral'                                        then 'Self-Service'
+             when mkt_origin in ('Other', 'Not Mapped')                                     then mkt_origin
+             else 'Non Self-Service'
+        end as mkt_flow
     from  applied_taxonomy
 )
 select
@@ -538,12 +555,14 @@ select
   atax.is_doorman,
   atax.is_isales_direct_register,
   atax.is_cx_direct_register,
+  atax.is_ops_direct_register,
   atax.has_isales_intervention,
   atax.has_fup_photo_task,
   atax.is_call_center,
   atax.reprocessed_flg as is_lead_reprocessed,
   atax.affiliate_type,
   atax.lead_referring_domain,
+  atax.lead_referring_category,
   atax.subscription_source,
   atax.mkt_branded,
   case when atax.mkt_flow = 'Self-Service' then 'Outbound'
