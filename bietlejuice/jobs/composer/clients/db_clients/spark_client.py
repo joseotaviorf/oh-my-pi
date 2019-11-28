@@ -55,7 +55,7 @@ class SparkClient(DBClient):
 
         return df
 
-    @logger
+    @logger(exclude="data")
     def create_dataframe(
         self, data, schema=None, sampling_ratio=None, verify_schema=True
     ):

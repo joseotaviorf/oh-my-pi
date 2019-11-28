@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
@@ -124,17 +125,49 @@ class TestDataframeService:
             ),
         ],
     )
-    def test_create_year_month_day_columns(
+    def test_create_year_month_day_columns_from_dataframe_column(
         self, data, expected_cols, expected_values, dataframe_service
     ):
         # arrange
         df = spark.read.json(sc.parallelize(data))
 
         # act
-        df = dataframe_service.input(df).create_year_month_day_columns("date").output()
+        df = dataframe_service.input(df).create_year_month_day_columns_from_dataframe_column("date").output()
         result_cols = df.schema.fieldNames()
         row = df.collect()[0]
         result_values = [row["date"], row["year"], row["month"], row["day"]]
+
+        # assert
+        assert result_cols.sort() == expected_cols.sort()
+        assert result_values == expected_values
+
+    @pytest.mark.parametrize(
+        "data, expected_cols, expected_values",
+        [
+            (
+                [{"test": "bla"}],
+                ["test", "year", "month", "day"],
+                ["bla", "2018", "11", "6"],
+            ),
+            (
+                [{"test": "bla2"}],
+                ["test", "year", "month", "day"],
+                ["bla2", "2018", "11", "6"],
+            ),
+        ],
+    )
+    def test_create_year_month_day_columns_from_date(
+        self, data, expected_cols, expected_values, dataframe_service
+    ):
+        # arrange
+        df = spark.read.json(sc.parallelize(data))
+
+        # act
+        df = dataframe_service.input(df).create_year_month_day_columns_from_date(
+            datetime.strptime("2018-11-06", "%Y-%m-%d")).output()
+        result_cols = df.schema.fieldNames()
+        row = df.collect()[0]
+        result_values = [row["test"], row["year"], row["month"], row["day"]]
 
         # assert
         assert result_cols.sort() == expected_cols.sort()

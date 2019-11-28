@@ -74,7 +74,7 @@ class AmplitudeEvents:
             dataframe_service.input(df)
             .format_column_names()
             .convert_struct_type_to_json()
-            .create_year_month_day_columns("server_upload_time")
+            .create_year_month_day_columns_from_dataframe_column("server_upload_time")
             .output()
         )
 

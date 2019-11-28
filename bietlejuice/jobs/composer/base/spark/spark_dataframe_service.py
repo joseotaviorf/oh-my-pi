@@ -1,6 +1,6 @@
 import re
 
-from pyspark.sql.functions import col, year, month, dayofmonth, to_json
+from pyspark.sql.functions import col, year, month, dayofmonth, to_json, lit
 from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
@@ -137,7 +137,7 @@ class SparkDataFrameService:
         )
         return SparkDataFrameService(spark.sql(query).drop(json_column))
 
-    def create_year_month_day_columns(self, date_column_name):
+    def create_year_month_day_columns_from_dataframe_column(self, date_column_name):
         """
         Given a name of date type column in the dataframe this operation will create three new columns:
         year, month, day extracted from the given column.
@@ -145,11 +145,30 @@ class SparkDataFrameService:
         :return: SparkDataFrameService object with the result df
         """
         if not self.df:
-            raise ValueError("m=create_year_month_day_columns, msg=input df is None")
+            raise ValueError(
+                "m=create_year_month_day_columns_from_dataframe_column, msg=input df is None"
+            )
         return SparkDataFrameService(
             self.df.withColumn("year", year(col(date_column_name)))
             .withColumn("month", month(col(date_column_name)))
             .withColumn("day", dayofmonth(col(date_column_name)))
+        )
+
+    def create_year_month_day_columns_from_date(self, date):
+        """
+        Given a datetime this operation will create three new columns:
+        year, month, day extracted from the given datetime.
+        :param date: the datetime to extract the year, month and day values
+        :return: SparkDataFrameService object with the result df
+        """
+        if not self.df:
+            raise ValueError(
+                "m=create_year_month_day_columns_from_date, msg=input df is None"
+            )
+        return SparkDataFrameService(
+            self.df.withColumn("year", lit(str(date.year)))
+            .withColumn("month", lit(str(date.month)))
+            .withColumn("day", lit(str(date.day)))
         )
 
     def optimize_partition(self, records_by_partition):
