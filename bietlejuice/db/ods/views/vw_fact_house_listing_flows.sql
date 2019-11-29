@@ -421,7 +421,7 @@ taxonomy as (
   from
     files.taxonomy_growth
   where
-    mkt_medium <> 'Doorman User'
+    coalesce(mkt_medium, '') <> 'Doorman User'
     and mkt_origin <> 'B2B'
 ),
 applied_taxonomy as (
