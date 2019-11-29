@@ -47,7 +47,7 @@ class MongoConsumer(DBConsumer):
         db = self.connection["db"]
         # todo: remove this
         df = (
-            spark.read.format("mongo")
+            spark.read.format("com.mongodb.spark.sql.DefaultSource")
             .option("uri", self.connection["uri"])
             .option("database", db)
             .option("collection", table_name)
@@ -64,7 +64,7 @@ class MongoConsumer(DBConsumer):
         db = self.connection["db"]
         # todo: remove this
         df = (
-            spark.read.format("mongo")
+            spark.read.format("com.mongodb.spark.sql.DefaultSource")
             .option("uri", self.connection["uri"])
             .option("database", db)
             .option("collection", table_name)

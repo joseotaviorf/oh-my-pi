@@ -8,3 +8,6 @@ from bietlejuice.jobs.composer.consumers.db_consumers.mysql_consumer import (
 from bietlejuice.jobs.composer.consumers.db_consumers.postgres_consumer import (
     PostgresConsumer,
 )
+from bietlejuice.jobs.composer.consumers.db_consumers.mongo_consumer import (
+    MongoConsumer,
+)

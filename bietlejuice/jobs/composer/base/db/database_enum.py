@@ -13,6 +13,7 @@ class DatabaseEnum:
     LINHADIRETA = "ENV_LINHADIRETA"
     VANS = "ENV_VANS"
     RETSUKO = "ENV_RETSUKO"
+    HEIMDALL = "HEIMDALL"
 
 
 class DatabaseTypeEnum:
@@ -20,3 +21,4 @@ class DatabaseTypeEnum:
     MYSQL = "mysql"
     REDSHIFT = "postgres"
     FIRESTORE = "firestore"
+    MONGO = "mongo"

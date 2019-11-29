@@ -1,7 +1,7 @@
 import re
 
 from pyspark.sql.functions import col, year, month, dayofmonth, to_json, lit
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, ArrayType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
@@ -85,6 +85,23 @@ class SparkDataFrameService:
             if isinstance(field.dataType, StructType):
                 logger.info(
                     "m=convert_struct_type_to_json, converting struct {} to json".format(
+                        field.name
+                    )
+                )
+                self.df = self.df.withColumn(field.name, to_json(self.df[field.name]))
+        return SparkDataFrameService(self.df)
+
+    def convert_array_type_to_json(self):
+        """
+        This operation cast all array type columns in the dataframe to string/json type
+        :return: SparkDataFrameService object with the result df
+        """
+        if not self.df:
+            raise ValueError("m=convert_array_type_to_json, msg=input df is None")
+        for field in self.df.schema.fields:
+            if isinstance(field.dataType, ArrayType):
+                logger.info(
+                    "m=convert_array_type_to_json, converting array {} to json".format(
                         field.name
                     )
                 )
