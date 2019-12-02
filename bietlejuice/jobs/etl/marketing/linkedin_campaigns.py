@@ -43,7 +43,8 @@ class LinkedInCampaigns(Marketing):
         if self._sdk_client is not None:
             return self._sdk_client
 
-        self._sdk_client = LinkedInClient(access_token=self.auth)
+        self._sdk_client = LinkedInClient(self.auth['API_KEY'], self.auth['API_SECRET'],
+                                          refresh_token=self.auth['REFRESH_TOKEN'])
         return self._sdk_client
 
     @staticmethod

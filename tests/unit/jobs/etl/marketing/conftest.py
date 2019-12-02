@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+
 from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns, \
     ClassifiedsCosts
 from bietlejuice.jobs.etl.marketing import FacebookAds
@@ -85,7 +86,10 @@ def linkedin_campaigns():
     return LinkedInCampaigns(
         s3_bucket=S3_BUCKET,
         execution_date=EXECUTION_DATE,
-        auth=None
+        auth={"API_KEY": "api_key",
+              "API_SECRET": "api_secret",
+              "REFRESH_TOKEN": "refresh_token"
+              }
     )
 
 
