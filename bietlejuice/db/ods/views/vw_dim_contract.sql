@@ -89,7 +89,9 @@ select
   case
       when hp.id_house_listing is not null then 'portability'
       else bi.b2b_prime_type
-  end as b2b_prime_type
+  end as b2b_prime_type,
+  c.ts_analyst_annulment_input,
+  now() as ts_load
 from contract c
 left join b2b_info bi
   on c.id = bi.id_contract

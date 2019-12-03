@@ -34,6 +34,7 @@ create external table if not exists datalake_clean.ods_dim_contract (
   is_b2b string,
   b2b_type string,
   b2b_prime_type string,
+  ts_analyst_annulment_input string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'

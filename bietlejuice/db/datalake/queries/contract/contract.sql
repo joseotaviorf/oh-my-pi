@@ -57,6 +57,42 @@ with contract_cancellation_reasons as (
 from max_cancellations max_cancel
 join datalake_ebdb_raw_prod.usuariorevisionentity ure
   on max_cancel.max_rev = ure.id
+),
+contract_analyst_date as (
+  with end_dates as (
+    select
+      c_aud.id as contract_id,
+      c_aud.imovel_id,
+      c_aud.rev,
+	  cast(regexp_extract(c_aud.datarescisao, '\d{4}-\d{2}-\d{2}') as date) as datarescisao,
+	  cast(lag(regexp_extract(c_aud.datarescisao, '\d{4}-\d{2}-\d{2}')) over(partition by c_aud.id order by c_aud.rev) as date) as previous_datarescisao,
+      from_unixtime(u.timestamp/1000) as ts_analista,
+      c_aud.datarescisao_mod
+    from datalake_ebdb_raw_prod.contrato_aud c_aud
+    join datalake_ebdb_raw_prod.usuariorevisionentity u
+      on c_aud.rev = u.id
+  ),
+  end_dates_changes as (
+    select
+  	  ed.contract_id,
+	  ed.imovel_id,
+      ed.rev,
+      row_number() over(partition by ed.contract_id order by ed.ts_analista) as rn,
+      count(ed.rev) over(partition by ed.contract_id) as count_changes,
+      ed.datarescisao_mod,
+      coalesce(ed.ts_analista,  ed.datarescisao) as ts_analista
+    from end_dates as ed
+    where ed.datarescisao != ed.previous_datarescisao
+      or (ed.datarescisao is not null and ed.previous_datarescisao is null)
+  )
+  select
+	c.id,
+	edc.ts_analista as ts_analyst_annulment_input
+  from datalake_ebdb_raw_prod.contrato c
+  join end_dates_changes edc
+    on edc.contract_id = c.id
+  where edc.rn = 1
+    and edc.ts_analista is not null
 )
 select
   c.id,
@@ -90,10 +126,13 @@ select
   ccr.ts_canceled,
   ccr.cancellation_reason,
   c.proposta_id as id_proposal,
-  c.imovel_id as id_house
+  c.imovel_id as id_house,
+  cad.ts_analyst_annulment_input
 from datalake_ebdb_raw_prod.contrato c
 left join contract_cancellation_reasons ccr
   on ccr.id = c.id
 left join datalake_ebdb_raw_prod.contratofull cf
     on cf.id = c.id
+left join contract_analyst_date cad
+	on cad.id = c.id
 ;

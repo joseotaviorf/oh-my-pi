@@ -34,6 +34,7 @@ create table staging.dim_contract (
   is_b2b boolean,
   b2b_type varchar,
   b2b_prime_type varchar,
+  ts_analyst_annulment_input timestamp,
   ts_load timestamp
 )
 ;
