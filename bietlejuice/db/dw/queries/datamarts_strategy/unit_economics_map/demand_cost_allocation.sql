@@ -40,12 +40,12 @@ select
          when dhl.house_bedrooms = 3 then '3 bedrooms'
          when dhl.house_bedrooms >= 4 then '4 or more bedrooms'
          end as n_bedrooms,
-    dhl.house_rent as house_rent_price,
-    case when dhl.house_rent <= 1000 then '0 - 1000 reais'
-         when (dhl.house_rent > 1000 and dhl.house_rent <= 2000) then '1000 - 2000 reais'
-         when (dhl.house_rent > 2000 and dhl.house_rent <= 4000) then '2000 - 4000 reais'
-         when dhl.house_rent > 4000 then '4000 reais or more'
-         end as house_rent,
+    dhl.house_listing_rent_price_published as house_listing_rent_price_published,
+    case when dhl.house_listing_rent_price_published <= 1000 then '0 - 1000 reais'
+         when (dhl.house_listing_rent_price_published > 1000 and dhl.house_listing_rent_price_published <= 2000) then '1000 - 2000 reais'
+         when (dhl.house_listing_rent_price_published > 2000 and dhl.house_listing_rent_price_published <= 4000) then '2000 - 4000 reais'
+         when dhl.house_listing_rent_price_published > 4000 then '4000 reais or more'
+         end as house_listing_rent_price_grouped,
     dhl.house_total_value as total_package_value,
     sum(cost_alloc.listing_cost_booking) as demand_cost_booking,
     sum(cost_alloc.listing_cost_days_published) as demand_cost_days_published,
