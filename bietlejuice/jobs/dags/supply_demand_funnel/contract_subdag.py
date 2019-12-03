@@ -1,7 +1,7 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.base.base_etl import BaseETL
-from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
+import bietlejuice.jobs.base.new_base_etl as utils
+from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 logger = QuintoAndarLogger('ContractSubDag')
@@ -22,7 +22,49 @@ class ContractSubDag(DimSubDag):
 
     @logger
     def build_contract_with_tests(self):
-        file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, 'contract')
-        query = BaseETL.get_query_from_file_name(file_name=file_path)
+        contract_dag = self._build_local_dag()
 
-        return self.build_with_tests(source_command=query)
+        (contract_task, staging_dim_contract_task, dim_contract) = self.__build_data_tasks(contract_dag)
+
+        # TODO: put tests back to flow
+        # tests_tasks = self.build_tests_tasks(contract_dag)
+
+        contract_task >> staging_dim_contract_task
+        # staging_dim_contracttask.set_downstream(tests_tasks)
+        # dim_contract.set_upstream(tests_tasks)
+        staging_dim_contract_task >> dim_contract
+
+        return contract_dag
+
+    @logger
+    def __build_data_tasks(self, dag):
+        contract_task = BaseDAG.build_python_operator(
+            task_id='ODS_contract',
+            dag=dag,
+            python_callable=utils.load_athena_file_query_to_ods,
+            op_kwargs={
+                'table_name': 'contract',
+                'file_name': 'contract/contract.sql',
+                'bucket': DimSubDag.S3_BUCKET
+            }
+        )
+        staging_dim_contract_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='STAGING_dim_contract',
+            python_callable=utils.load_dim_from_ods_to_staging,
+            op_kwargs={
+                'dim_name': 'contract'
+            }
+        )
+
+        dim_contract = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='DW_dim_contract',
+            python_callable=utils.load_dim_from_staging_to_dw,
+            op_kwargs={
+                'dim_name': 'contract',
+                'bucket': DimSubDag.S3_BUCKET
+            }
+        )
+
+        return (contract_task, staging_dim_contract_task, dim_contract)
