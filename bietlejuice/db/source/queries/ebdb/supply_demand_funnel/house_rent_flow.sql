@@ -346,4 +346,48 @@ select
 		where (p.id is null) or
 		(p.id is not null and p.offer_id is null and p.preProposta_id is null)
 	)
+    union
+	(
+	  select
+	    c_portability.imovel_id as id_house,
+		i.firstPublication as dt_house_first_listing,
+		null as id_booking,
+		null as dt_booking_created,
+		null as dt_visit,
+		null as visit_completed,
+		null as visit_performed,
+	  	i.usuario_id as id_owner,
+		null as id_user_agent,
+		fl.cliente_id as id_client,
+		null as dt_client_sign_up,
+		null as dt_agent_sign_up,
+		null as id_visit,
+		null as visit_created_from_app,
+		null as visit_created_type,
+		null as visit_last_updated_from_app,
+		fl.id as id_rent_flow,
+		fl.criadoEm as dt_rent_flow_created,
+		p.offer_id as id_offer,
+		null as id_pre_proposal,
+		c_portability.id as o,
+		null as pp,
+		c_portability.proposta_id as id_proposal,
+		p.dataAprovacao as dt_proposal_approved,
+		c_portability.id as id_contract,
+		c_portability.criadoEm as dt_contract_created,
+    	c_portability.dataAssinado as dt_contract_signed,
+		c_portability.dataRescisao as dt_contract_annulment
+	  from Contrato c_portability
+	  join FluxoLocacao fl
+	    on c_portability.imovel_id = fl.imovel_id
+		  and c_portability.usuario_id = fl.cliente_id
+	  join Imovel i
+	    on i.id = fl.imovel_id
+	  join Portability port
+	    on port.flow_id = fl.id
+	  left join Proposta p
+	    on c_portability.proposta_id = p.id
+	  left join Offer o
+	    on o.id = p.offer_id
+	)
 ) _final, (SELECT @rank:=0) AS dummy
