@@ -21,9 +21,9 @@ env.set_airflow_var_to_local_env('BI_DW')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 AUTH = dict()
 AUTH['API_KEY'] = env.get_airflow_env_var('LINKEDIN_SECRETS_API_KEY')
-AUTH['API_SECRET'] = LINKEDIN_SECRETS_API_SECRET = env.get_airflow_env_var(
+AUTH['API_SECRET'] = env.get_airflow_env_var(
     'LINKEDIN_SECRETS_API_SECRET')
-AUTH['REFRESH_TOKEN'] = LINKEDIN_SECRETS_REFRESH_TOKEN = env.get_airflow_env_var(
+AUTH['REFRESH_TOKEN'] = env.get_airflow_env_var(
     'LINKEDIN_SECRETS_REFRESH_TOKEN')
 
 logger = QuintoAndarLogger(BI_LINKEDIN_CAMPAIGNS_DAG_NAME)
