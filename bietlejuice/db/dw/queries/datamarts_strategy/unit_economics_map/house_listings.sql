@@ -65,6 +65,9 @@ select
 	dhl.is_exclusive,
 	dhl.is_originals_active,
 	info_im.shorturl,
+	lf.mkt_origin,
+	lf.mkt_completion,
+
 	
 -- Listing localization
     dr.sk_region,
@@ -142,7 +145,7 @@ select
 	
 from dim_house_listing dhl
 left join fact_house_listing_flows lf
-  on dhl.id_house = substring(lf.sk_house_listing,1,9) and lf.sk_house_listing > 0 
+  on dhl.id_house = substring(lf.sk_house_listing,1,9) and lf.sk_first_listing_date > 0
 left join dim_partner dp
   on lf.sk_partner = dp.sk_partner	
 left join fact_listing_rent_flows rf
