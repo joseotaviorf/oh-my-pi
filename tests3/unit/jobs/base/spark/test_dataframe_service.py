@@ -147,12 +147,12 @@ class TestDataframeService:
             (
                 [{"test": "bla"}],
                 ["test", "year", "month", "day"],
-                ["bla", "2018", "11", "6"],
+                ["bla", 2018, 11, 6],
             ),
             (
                 [{"test": "bla2"}],
                 ["test", "year", "month", "day"],
-                ["bla2", "2018", "11", "6"],
+                ["bla2", 2018, 11, 6],
             ),
         ],
     )

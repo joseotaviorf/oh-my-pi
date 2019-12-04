@@ -183,9 +183,9 @@ class SparkDataFrameService:
                 "m=create_year_month_day_columns_from_date, msg=input df is None"
             )
         return SparkDataFrameService(
-            self.df.withColumn("year", lit(str(date.year)))
-            .withColumn("month", lit(str(date.month)))
-            .withColumn("day", lit(str(date.day)))
+            self.df.withColumn("year", lit(date.year))
+            .withColumn("month", lit(date.month))
+            .withColumn("day", lit(date.day))
         )
 
     def optimize_partition(self, records_by_partition):
