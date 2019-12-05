@@ -4,7 +4,7 @@ as
 SELECT
   u.id as sk_user,
   u.id,
-  nome,
+  left(nome, 200) as nome,
   bairro,
   cep,
   cidade,
