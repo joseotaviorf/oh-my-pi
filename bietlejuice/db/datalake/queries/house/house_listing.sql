@@ -216,7 +216,7 @@ from house_listing_full hlf
 join house_rent_history rh
  on hlf.id_house = rh.id_house
  and ((rh.ts_rent_price_changed between hlf.ts_listing_version_start and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp))
-  # TODO: remove OR condition and add to another LEFT JOIN
+  -- TODO: remove OR condition and add to another LEFT JOIN
   or (coalesce(rh.ts_next_rent_price_change,current_timestamp) between hlf.ts_listing_version_start and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp))
   or (rh.max_ts_rent_price_changed <= hlf.ts_listing_version_start))
 )
