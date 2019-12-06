@@ -17,5 +17,7 @@ select
   ct.workgroups,
   ct.ts_partition
 from tasks ct
-left join datalake_heimdall_clean_forno.activity activity
-  on json_extract_scalar(activity.id, '$.oid') = ct.sk_task
+join datalake_clean.crm_tasks tasks
+    on ct.sk_task = tasks.id
+left join datalake_heimdall_clean_prod.activity activity
+  on cast(id_external_contract as varchar) = json_extract_scalar(tasks.metadata, '$.contract_id')
