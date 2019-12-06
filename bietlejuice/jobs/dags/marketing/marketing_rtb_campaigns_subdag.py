@@ -34,7 +34,7 @@ class MarketingRtbCampaignsSubDag(MarketingSubDag):
             for table in self.tables:
                 BaseDAG.build_python_operator(
                     dag=dag,
-                    task_id='{}_task'.format(table),
+                    task_id='{}_{}_task'.format(account['name'], table),
                     python_callable=self.transfer_files_to_clean,
                     provide_context=True,
                     op_kwargs={
