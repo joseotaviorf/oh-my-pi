@@ -66,7 +66,8 @@ class TestCRMTasksPayment(object):
         assert mock__move_dim_to_staging.call_args[1] == {
             'table_name': table_name,
             'queues': queues,
-            'manual_task_workgroups': manual_task_workgroups
+            'manual_task_workgroups': manual_task_workgroups,
+            'append_query_filename': 'append_dim_payment_task_info.sql'
         }
 
     @mock.patch.object(CRMTasksPayment, '_append_fact_to_dw')
@@ -95,7 +96,10 @@ class TestCRMTasksPayment(object):
 
         # assert
         assert mock__append_dim_to_dw.call_count == 1
-        assert mock__append_dim_to_dw.call_args[1] == {'table_name': table_name}
+        assert mock__append_dim_to_dw.call_args[1] == {
+            'table_name': table_name,
+            'query_filename': 'append_dim_payment_table.sql'
+        }
 
     @mock.patch.object(CRMTasksPayment, '_delete_staging_entries')
     def test_delete_staging_fact_entries(self, mock__delete_staging_entries, payment):

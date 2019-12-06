@@ -2,6 +2,7 @@ drop table if exists staging.dim_payment_task;
 create table if not exists staging.dim_payment_task (
   sk_task varchar,
   flg_solved boolean,
+  tenant_refund_status varchar,
   score_factor numeric(14,2),
   ts_start timestamp,
   ts_completed timestamp,

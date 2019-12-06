@@ -30,7 +30,9 @@ class CRMTasksPayment(CRMTasks):
 
     QUERY_FILENAMES = {
         'staging': 'append_fact_payment_info.sql',
-        'prod': 'append_fact_payment_table.sql'
+        'prod': 'append_fact_payment_table.sql',
+        'payment_task': 'append_dim_payment_task_info.sql',
+        'payment_to_prod': 'append_dim_payment_table.sql'
     }
 
     @logger(exclude='mongo_client_uri')
@@ -55,7 +57,8 @@ class CRMTasksPayment(CRMTasks):
         self._move_dim_to_staging(
             table_name=CRMTasksPayment.TABLE_NAMES['dim'],
             queues=CRMTasksPayment.QUEUES,
-            manual_task_workgroups=CRMTasksPayment.MANUAL_TASK_WORKGROUP_IDS
+            manual_task_workgroups=CRMTasksPayment.MANUAL_TASK_WORKGROUP_IDS,
+            append_query_filename=CRMTasksPayment.QUERY_FILENAMES['payment_task']
         )
 
     @logger
@@ -67,7 +70,10 @@ class CRMTasksPayment(CRMTasks):
 
     @logger
     def append_dim_to_dw(self):
-        self._append_dim_to_dw(table_name=CRMTasksPayment.TABLE_NAMES['dim'])
+        self._append_dim_to_dw(
+            table_name=CRMTasksPayment.TABLE_NAMES['dim'],
+            query_filename=CRMTasksPayment.QUERY_FILENAMES['payment_to_prod']
+        )
 
     @logger
     def delete_staging_fact_entries(self):

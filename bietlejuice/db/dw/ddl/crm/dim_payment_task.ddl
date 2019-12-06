@@ -2,6 +2,7 @@ drop table if exists crm.dim_payment_task;
 create table if not exists crm.dim_payment_task (
   sk_task varchar primary key,
   flg_solved boolean,
+  tenant_refund_status varchar,
   score_factor numeric(14,2),
   ts_start timestamp,
   ts_completed timestamp,

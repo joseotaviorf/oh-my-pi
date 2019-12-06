@@ -403,12 +403,14 @@ class CRMTasks(object):
                              table_name,
                              queues=None,
                              query_filename='create_staging_dim_table.sql',
-                             manual_task_workgroups=None):
+                             manual_task_workgroups=None,
+                             append_query_filename='append_dim_default_info.sql'):
         self._move_to_staging(
             table_name=table_name,
             queues=queues,
             query_filename=query_filename,
-            manual_task_workgroups=manual_task_workgroups
+            manual_task_workgroups=manual_task_workgroups,
+            append_query_filename=append_query_filename
         )
 
     @logger
@@ -435,11 +437,11 @@ class CRMTasks(object):
         )
 
     @logger
-    def _append_dim_to_dw(self, table_name, quey_filename='append_dim_table.sql'):
+    def _append_dim_to_dw(self, table_name, query_filename='append_dim_table.sql'):
         self.__append_to_dw(
             schema=CRMTasks.SCHEMA_NAMES['prod'],
             table_name=table_name,
-            query_filename=quey_filename
+            query_filename=query_filename
         )
 
     @logger
