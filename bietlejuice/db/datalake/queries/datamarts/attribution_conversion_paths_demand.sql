@@ -68,13 +68,13 @@ touchpoints as (
 select 
 	cast(date_format(date(conversion_time), '%Y%m%d') as integer) as sk_conversion_date,
 	cast(amplitude_id * 1000 + nst_conversion as bigint) as unique_conversion_id,
-	array_join(array_agg(utm_source_medium), '; ') as path_utm_source_medium,
-	array_join(array_agg(utm_source_medium_branded), '; ') as path_utm_source_medium_branded,
-	array_join(array_agg(utm_source), '; ') as path_utm_source,
-	array_join(array_agg(utm_medium), '; ') as path_utm_medium,
-	array_join(array_agg(utm_campaign), '; ') as path_utm_campaign,
-	array_join(array_agg(utm_content), '; ') as path_utm_content,
-	array_join(array_agg(utm_term), '; ') as path_utm_term
+	cast(array_join(array_agg(utm_source_medium), '; ') as varchar(20000)) as path_utm_source_medium,
+	cast(array_join(array_agg(utm_source_medium_branded), '; ') as varchar(20000)) as path_utm_source_medium_branded,
+	cast(array_join(array_agg(utm_source), '; ') as varchar(20000)) as path_utm_source,
+	cast(array_join(array_agg(utm_medium), '; ') as varchar(20000)) as path_utm_medium,
+	cast(array_join(array_agg(utm_campaign), '; ') as varchar(20000)) as path_utm_campaign,
+	cast(array_join(array_agg(utm_content), '; ') as varchar(20000)) as path_utm_content,
+	cast(array_join(array_agg(utm_term), '; ') as varchar(20000)) as path_utm_term
 from touchpoints
 where conversion_time >= date('2019-07-01')
 and date_diff('month', session_start_time, conversion_time) <= 6
