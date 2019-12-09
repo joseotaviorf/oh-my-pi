@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -22,6 +21,9 @@ LOAD_HEIMDALL_INTO_DATALAKE_RAW_FILE_PATH = (
 CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
     S3_PREFIX + "/spark_jobs/{}/create_raw_external_tables.py".format(DAG_ID)
 )
+CREATE_CLEAN_TABLE_FILE_PATH = (
+    S3_PREFIX + "/spark_jobs/{}/create_clean_table_in_datalake.py".format(DAG_ID)
+)
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -33,10 +35,11 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "jar": "s3://5a-artifacts/mongo-spark-connector/mongo-spark-connector_2.11-2.4.0.jar"
-    },
-    {"jar": "s3://5a-artifacts/mongo-spark-connector/mongo-java-driver-3.9.0.jar"},
-    {"jar": "s3://5a-artifacts/mongo-spark-connector/scala-library-2.11.12.jar"},
+        "maven": {
+            "coordinates": "org.mongodb.spark:mongo-spark-connector_2.11:2.4.0",
+            "repo": "https://mvnrepository.com/artifact/org.mongodb.spark/mongo-spark-connector",
+        }
+    }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
@@ -84,14 +87,22 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+create_clean_table_in_datalake = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create_clean_table_in_datalake",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": CREATE_CLEAN_TABLE_FILE_PATH,
+            "parameters": ["heimdall", ENV, DAG_ID],
+        }
+    },
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-airflow_helpers.chain(
-    create_cluster_task,
-    heimdall_to_datalake_raw_task,
+create_cluster_task >> heimdall_to_datalake_raw_task >> [
     create_raw_external_tables_task,
-    terminate_cluster_task,
-)
+    create_clean_table_in_datalake,
+] >> terminate_cluster_task

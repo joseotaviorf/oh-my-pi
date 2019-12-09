@@ -54,6 +54,8 @@ if __name__ == "__main__":
             .convert_array_type_to_json()
             .convert_struct_type_to_json()
             .output()
+            .withColumn("updatedAt", df.updatedAt.cast(dataType="string"))
+            .withColumn("createdAt", df.createdAt.cast(dataType="string"))
         )
 
         loader.load_full_table(
