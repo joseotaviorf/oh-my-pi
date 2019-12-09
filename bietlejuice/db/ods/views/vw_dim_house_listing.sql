@@ -48,7 +48,7 @@ house_portability as (
         on h.id = hl.id_house
     join portability por
         on por.id_house = hl.id_house and por.owner_type = 'B2B'
-    where hl.version = 0 and por.ts_created >= h.data_criacao
+    where por.ts_created between coalesce(hl.ts_listing_version_start, '1900-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, now())
 ),
 house_listings as (
   select
