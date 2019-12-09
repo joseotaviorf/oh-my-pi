@@ -129,7 +129,13 @@ class FirestoreConsumer(DBConsumer):
                 .start_at(snapshot)
                 .limit(FirestoreConsumer.BATCH_SIZE)
             )
-            old_id, current_id, snapshot, data_json, last_doc = self._get_parameters_from_query_result(
+            (
+                old_id,
+                current_id,
+                snapshot,
+                data_json,
+                last_doc,
+            ) = self._get_parameters_from_query_result(
                 next_query, doc_ref, firestore_id
             )
             all_json.append(data_json)

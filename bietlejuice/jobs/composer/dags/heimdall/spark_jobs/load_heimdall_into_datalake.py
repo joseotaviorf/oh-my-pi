@@ -6,16 +6,14 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
-    SparkMetastoreService,
     SparkTableStorageFormat,
-    spark,
-    sqlContext,
+    SparkDataFrameService,
 )
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
 JOB_NAME = "load_heimdall_into_datalake"
@@ -39,14 +37,12 @@ if __name__ == "__main__":
     )
     connection = json.loads(connection_json)
     mongo_consumer = MongoConsumer(connection)
+    spark_client = SparkClient()
 
     tables = mongo_consumer.get_table_names_and_sizes().collect()
+
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    spark_metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"],
-        db_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
+    spark_metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(spark_metastore_service)
 
     for table in tables:
@@ -61,5 +57,9 @@ if __name__ == "__main__":
         )
 
         loader.load_full_table(
-            df, table.table_name.lower(), SparkTableStorageFormat.DEFAULT_RAW
+            df=df,
+            database_name=db_info["db_raw_databricks"],
+            table_name=table.table_name.lower(),
+            format=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=db_info["db_raw_path"],
         )

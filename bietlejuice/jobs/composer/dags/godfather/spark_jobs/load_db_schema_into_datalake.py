@@ -7,13 +7,11 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.base.spark import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
-from bietlejuice.jobs.composer.base.spark import spark, sqlContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_godfather_into_datalake"
 
@@ -40,15 +38,12 @@ if __name__ == "__main__":
         scope="quintoandar", key=DatabaseEnum.GODFATHER
     )
     conn_config = json.loads(conn_config_json)
-    postgres_consumer = PostgresConsumer(conn_config, SparkClient())
+    spark_client = SparkClient()
+    postgres_consumer = PostgresConsumer(conn_config, spark_client)
     postgres_consumer.conn_config["schema"] = schema
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"],
-        db_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
+    metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
     # load db schema into datalake
@@ -65,7 +60,9 @@ if __name__ == "__main__":
         df = postgres_consumer.get_data_from_table(table_name)
         # the table names in the datalake must be lowercase
         loader.load_full_table(
-            df,
-            "{}_{}".format(schema, table_name).lower(),
-            SparkTableStorageFormat.DEFAULT_RAW,
+            df=df,
+            database_name=db_info["db_raw_databricks"],
+            table_name="{}_{}".format(schema, table_name).lower(),
+            format=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=db_info["db_raw_path"],
         )

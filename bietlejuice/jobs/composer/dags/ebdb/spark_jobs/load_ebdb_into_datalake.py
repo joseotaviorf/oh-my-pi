@@ -7,17 +7,11 @@ from multiprocessing.dummy import Pool
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkMetastoreService,
-    SparkTableStorageFormat,
-    spark,
-    sqlContext,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
 BLACK_LIST = ["REVCHANGES"]
@@ -32,14 +26,19 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 @logger
 def load_table_into_datalake(args):
-    loader, consumer, table_name, table_size = args
+    loader, consumer, table_name, table_size, db_info = args
     num_partitions = int(math.ceil(float(table_size) / PARTITION_SIZE))
     if num_partitions > 1:
         df = consumer.get_data_from_table_in_parallel(table_name, num_partitions)
     else:
         df = consumer.get_data_from_table(table_name)
-    # the table names in the datalake must be lowercase
-    loader.load_full_table(df, table_name.lower(), SparkTableStorageFormat.DEFAULT_RAW)
+    loader.load_full_table(
+        df=df,
+        database_name=db_info["db_raw_databricks"],
+        table_name=table_name.lower(),
+        format=SparkTableStorageFormat.DEFAULT_RAW,
+        database_location=db_info["db_raw_path"],
+    )
     logger.info(
         "m=load_table_into_datalake, table={}, msg=Finished loading table.".format(
             table_name
@@ -64,18 +63,15 @@ if __name__ == "__main__":
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    spark_metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"],
-        db_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
-    loader = S3Loader(spark_metastore_service)
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
+    loader = S3Loader(metastore_service)
 
     with Pool(NB_THREADS) as p:
         p.map(
             load_table_into_datalake,
             [
-                (loader, mysql_consumer, t.table_name, t.size)
+                (loader, mysql_consumer, t.table_name, t.size, db_info)
                 for t in tables
                 if t.table_name not in BLACK_LIST and t.table_name and t.size
             ],

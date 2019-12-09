@@ -8,7 +8,8 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
+from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
 from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 
@@ -23,7 +24,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def add_partition(args):
-    athena_client, db, table_name, dt_execution, event = args
+    athena_metastore_service, db, table_name, dt_execution, event = args
     partition_by_dict = OrderedDict(
         [
             ("year", dt_execution.year),
@@ -32,7 +33,7 @@ def add_partition(args):
             ("event", event),
         ]
     )
-    athena_client.add_partition(db, table_name, partition_by_dict)
+    athena_metastore_service.add_partitions(db, table_name, [partition_by_dict])
 
 
 if __name__ == "__main__":
@@ -76,13 +77,14 @@ if __name__ == "__main__":
     )
 
     athena_client = AthenaClient()
+    athena_metastore_service = AthenaMetastoreService(athena_client)
 
     with Pool(NB_THREADS) as p:
         p.map(
             add_partition,
             [
                 (
-                    athena_client,
+                    athena_metastore_service,
                     datalake_info["db_clean_athena"],
                     table_name,
                     dt_execution,

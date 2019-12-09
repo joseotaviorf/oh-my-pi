@@ -13,14 +13,11 @@ from bietlejuice.jobs.composer.consumers.api_consumers.zendesk import (
 from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     SparkDataFrameService,
-    SparkMetastoreService,
     SparkTableStorageFormat,
-    spark,
-    sqlContext,
 )
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -92,21 +89,29 @@ if __name__ == "__main__":
             .create_year_month_day_columns_from_date(dt_execution)
             .output()
         )
+
         db_info = DatalakeMetastoreService.get_db_info(environment, source)
-        spark_metastore_service = SparkMetastoreService(
-            db_info["db_raw_databricks"],
-            db_info["db_raw_path"],
-            SparkSQLCLient(spark, sqlContext),
-        )
-        spark_metastore_service.create_database()
+        database_name = db_info["db_raw_databricks"]
+
+        spark_client = SparkClient()
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service.create_database(database_name)
 
         loader = S3Loader(spark_metastore_service)
 
         partition = ["year", "month", "day"]
         loader.load_incremental_table(
-            df, endpoint_name, SparkTableStorageFormat.DEFAULT_RAW, partition
+            df=df,
+            database_name=database_name,
+            table_name=endpoint_name,
+            format_options=SparkTableStorageFormat.DEFAULT_RAW,
+            database_location=db_info["db_raw_path"],
+            partition_cols=partition,
+            schema_merging=True,
         )
 
         spark_metastore_service.create_new_partitions_from_df(
-            endpoint_name, df, partition, parallelism=1
+            database_name, endpoint_name, df, partition
         )
+
+        spark_metastore_service.refresh_table(database_name, endpoint_name)

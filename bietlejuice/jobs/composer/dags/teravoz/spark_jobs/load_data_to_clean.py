@@ -3,9 +3,10 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
 from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
-from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -32,12 +33,10 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = file_name = args.file_name.replace("-", "_")
     environment = args.environment
-    athena_client = AthenaClient()
+    athena_metastore_service = AthenaMetastoreService(AthenaClient())
 
     # execute query and get dataframe
-    teravoz_transformer = TeravozTransformer(
-        env=environment, athena_client=athena_client
-    )
+    teravoz_transformer = TeravozTransformer(environment, athena_metastore_service)
     df = teravoz_transformer.create_dataframe_from_datalake_sql_file(
         file_name=file_name, execution_date=execution_date
     )

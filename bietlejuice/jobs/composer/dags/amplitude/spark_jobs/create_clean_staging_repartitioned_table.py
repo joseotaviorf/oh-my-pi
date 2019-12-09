@@ -5,15 +5,14 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import (
-    spark,
     sqlContext,
-    SparkMetastoreService,
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_clean_staging_repartitioned_table")
@@ -48,12 +47,10 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
-    metastore_service = SparkMetastoreService(
-        db_info["db_clean_staging_databricks"],
-        db_info["db_clean_staging_path"],
-        spark_sql_client,
-    )
+    spark_client = SparkClient()
+    dataframe_service = SparkDataFrameService()
+    metastore_service = SparkMetastoreService(spark_client)
+
     loader = S3Loader(metastore_service)
 
     # create df
@@ -74,7 +71,13 @@ if __name__ == "__main__":
     #  not a big deal
     loader.load_incremental_table(
         df=df_repartitioned,
+        database_name=db_info["db_clean_staging_databricks"],
         table_name=target_table_name,
-        format=SparkTableStorageFormat.DEFAULT_CLEAN_STAGING,
-        partitions=partition_by,
+        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=db_info["db_clean_staging_path"],
+        partition_cols=partition_by,
+    )
+
+    metastore_service.refresh_table(
+        db_info["db_clean_staging_databricks"], target_table_name
     )

@@ -3,8 +3,9 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
-from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -29,8 +30,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=create_external_table, table_name={}, datalake_layer={}, execution_date={"
-        "}, environment={}, msg=print args spark jobs params".format(
+        "m=create_external_table, table_name={}, datalake_layer={}, execution_date={}, "
+        "environment={}, msg=print args spark jobs params".format(
             args.table_name, args.datalake_layer, args.execution_date, args.environment
         )
     )
@@ -39,10 +40,10 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
-    athena_client = AthenaClient()
+    athena_metastore_service = AthenaMetastoreService(AthenaClient())
 
     # create external table and add partition
-    transformer = TeravozTransformer(environment, athena_client)
+    transformer = TeravozTransformer(environment, athena_metastore_service)
 
     transformer.create_athena_table(
         datalake_layer=datalake_layer, table_name=table_name

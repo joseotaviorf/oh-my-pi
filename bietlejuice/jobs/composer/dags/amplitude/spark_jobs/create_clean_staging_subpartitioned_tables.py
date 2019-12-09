@@ -1,26 +1,22 @@
 import logging
-from datetime import datetime
-from argparse import ArgumentParser
 import re
+from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import (
-    spark,
-    sqlContext,
-    SparkMetastoreService,
-)
-from bietlejuice.jobs.composer.wrappers import (
-    SparkSQLCLient,
-    AthenaClient as OldAthenaClient,
-)
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import (
     DatalakeMetastoreService,
     DDL_DATALAKE_PATH,
 )
 from bietlejuice.jobs.composer.base.etl import FileService
-from bietlejuice.jobs.composer.etl.transformer import Transformer
-from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
+from bietlejuice.jobs.composer.base.spark import spark, sqlContext
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
+from bietlejuice.jobs.composer.services.metastore_services import (
+    AthenaMetastoreService,
+    SparkMetastoreService,
+)
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_clean_staging_subpartitioned_tables")
@@ -52,23 +48,38 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
         ),
     )
     spark.sql(ddl)
-    spark_metastore_service.repair_table_partitions(subpartitioned_table_name)
+    spark_metastore_service.repair_table_partitions(
+        db_info["db_clean_staging_databricks"], subpartitioned_table_name
+    )
     logger.info(
         "m=__main__, msg=Table created in spark metastore and partitions repaired"
+    )
+    spark_metastore_service.refresh_table(
+        db_info["db_clean_staging_databricks"], subpartitioned_table_name
     )
 
 
 def create_subpartitioned_table_in_athena(subpartitioned_table_name):
-    table_location = spark_metastore_service.get_table_path(subpartitioned_table_name)
-    transformer.overwrite_athena_table(
-        subpartitioned_table_name,
-        "clean_staging",
-        partition_by=["year", "month", "day"],
+    db_clean_athena = db_info["db_clean_staging_athena"]
+    table_location = spark_metastore_service.get_table_path(
+        db_info["db_clean_staging_databricks"], subpartitioned_table_name
+    )
+    table_schema = spark_metastore_service.get_table_schema(
+        db_info["db_clean_staging_databricks"], subpartitioned_table_name
+    )
+    athena_metastore_service.create_external_table(
+        database_name=db_clean_athena,
+        table_name=subpartitioned_table_name,
         table_location=table_location,
+        table_schema=table_schema,
+        partition_cols=["year", "month", "day"],
+        format_options=TableStorageFormat.DEFAULT_CLEAN,
     )
-    old_athena_client.repair_table_partitions(
-        db_info["db_clean_staging_athena"], subpartitioned_table_name
+
+    athena_metastore_service.repair_table_partitions(
+        db_info["db_clean_staging_athena"], "`{}`".format(subpartitioned_table_name)
     )
+
     logger.info(
         "m=__main__, msg=Table created in athena metastore and partitions repaired"
     )
@@ -122,22 +133,15 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
-    spark_metastore_service = SparkMetastoreService(
-        db_info["db_clean_staging_databricks"],
-        db_info["db_clean_staging_path"],
-        spark_sql_client,
-    )
+    spark_client = SparkClient()
+    spark_metastore_service = SparkMetastoreService(spark_client)
+
     ddl_template = FileService.get_query_from_file_name(
         DDL_DATALAKE_PATH
         + "clean_staging/clean_staging_subpartitioned_table_template.ddl"
     )
 
-    # TODO: remove old athena client and transformer from the code when
-    #  AthenaMetastoreService and new transformer are available
-    old_athena_client = OldAthenaClient()
-    transformer = Transformer(env, source, old_athena_client)
-    athena_client = AthenaClient()
+    athena_metastore_service = AthenaMetastoreService(AthenaClient())
 
     # get subpartitions values
     subpartitions_values = sqlContext.table(
@@ -146,16 +150,16 @@ if __name__ == "__main__":
 
     # get existing tables
     if spark_flag:
-        spark_existing_tables = spark_metastore_service.get_table_names()
+        spark_existing_tables = spark_metastore_service.get_table_names(
+            db_info["db_clean_staging_databricks"]
+        )
 
     if athena_flag:
-        old_athena_client.create_database(
-            db_info["db_clean_staging_athena"]
-        )  # if not exists
+        athena_metastore_service.create_database(db_info["db_clean_staging_athena"])
         athena_existing_tables = [
             row["Data"][0]["VarCharValue"]
-            for row in athena_client.get_records(
-                "show tables in {}".format(db_info["db_clean_staging_athena"])
+            for row in athena_metastore_service.get_table_names(
+                db_info["db_clean_staging_athena"]
             )["ResultSet"]["Rows"]
         ]
 

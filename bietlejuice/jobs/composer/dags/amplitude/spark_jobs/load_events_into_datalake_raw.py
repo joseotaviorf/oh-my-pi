@@ -10,14 +10,13 @@ from bietlejuice.jobs.composer.base.spark import (
     BaseDBUtils,
     BaseSparkContext,
     SparkDataFrameService,
-    SparkMetastoreService,
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("load_events_into_datalake_raw")
@@ -46,16 +45,14 @@ if __name__ == "__main__":
 
     source = "amplitude"
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    amplitude_events = AmplitudeEvents(SparkClient())
+    spark_client = SparkClient()
+    amplitude_events = AmplitudeEvents(spark_client)
     dataframe_service = SparkDataFrameService()
-    metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"],
-        db_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
+    metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader(metastore_service)
+    database_name = db_info["db_raw_databricks"]
     table_name = "events"
-    partitions = ["year", "month", "day", "app"]
+    partition_cols = ["year", "month", "day", "app"]
 
     logger.info(
         "m=load_events_into_datalake_raw, Param Start String: start={} end={}".format(
@@ -75,12 +72,14 @@ if __name__ == "__main__":
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
             s3_loader.load_incremental_table(
-                df,
-                table_name,
-                SparkTableStorageFormat.DEFAULT_RAW,
-                partitions,
+                df=df,
+                database_name=db_info["db_raw_databricks"],
+                table_name=table_name,
+                format_options=SparkTableStorageFormat.DEFAULT_RAW,
+                database_location=db_info["db_raw_path"],
+                partition_cols=partition_cols,
                 schema_merging=True,
             )
             metastore_service.create_new_partitions_from_df(
-                table_name, df, partitions, parallelism=8
+                database_name, table_name, df, partition_cols, parallelism=8
             )

@@ -8,13 +8,11 @@ from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.base.etl import FileService
 from bietlejuice.jobs.composer.base.spark import (
     SparkDataFrameService,
-    SparkMetastoreService,
     SparkTableStorageFormat,
-    spark,
-    sqlContext,
 )
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("create_dw_table_in_datalake")
@@ -38,15 +36,20 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_dw_info(env, schema)
-    metastore_service = SparkMetastoreService(
-        db_info["dw_schema_databricks"],
-        db_info["dw_schema_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
     # create
-    df = SparkDataFrameService(spark.sql(query)).optimize_partition(250000).output()
+    # todo: use DatabricksConsumer to read data
+    df = spark_client.get_records(query)
+    df = SparkDataFrameService(df).optimize_partition(250000).output()
 
     # load
-    loader.load_full_table(df, table_name, SparkTableStorageFormat.DEFAULT_DW)
+    loader.load_full_table(
+        df=df,
+        database_name=db_info["dw_schema_databricks"],
+        table_name=table_name,
+        format=SparkTableStorageFormat.DEFAULT_DW,
+        database_location=db_info["dw_schema_path"],
+    )

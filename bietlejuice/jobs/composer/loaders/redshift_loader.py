@@ -54,6 +54,7 @@ class RedshiftLoader:
     def load_table_from_metastore(
         self,
         metastore_service,
+        source_schema,
         source_table_name,
         target_schema,
         target_table_name,
@@ -64,6 +65,8 @@ class RedshiftLoader:
 
         :param metastore_service: a metastore service
         :type metastore_service: MetastoreService
+        :param source_schema: name of the source schema in the metastore
+        type source_schema: str
         :param source_table_name: name of the table in the metastore without db prefix
         :type source_table_name: str
         :param target_schema: name of the target schema in redshift
@@ -80,8 +83,8 @@ class RedshiftLoader:
         year, month, day = now.year, now.month, now.day
 
         # create manifest file
-        files = metastore_service.get_file_paths_from_table(
-            self.s3_service, source_table_name
+        files = metastore_service.get_file_paths_and_sizes_from_table(
+            source_schema, source_table_name, self.s3_service
         )
         manifest_dict = self._create_manifest_dict(files)
         manifest_json = json.dumps(manifest_dict)

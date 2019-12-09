@@ -4,11 +4,12 @@ from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
 from bietlejuice.jobs.composer.etl.transformer import Transformer
-from bietlejuice.jobs.composer.wrappers import AthenaClient
-
-sqlContext = BaseSparkContext.sqlContext
+from bietlejuice.jobs.composer.services.metastore_services import (
+    AthenaMetastoreService,
+    SparkMetastoreService,
+)
 
 JOB_NAME = "create_external_tables"
 NB_THREADS = 16
@@ -49,7 +50,8 @@ if __name__ == "__main__":
         "m=__main__, env={}, datalake_layer={}, source={}, tables={}, all={}, "
         "msg=Job execution started".format(env, datalake_layer, source, tables, all)
     )
-    transformer = Transformer(env, source, AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    transformer = Transformer(env, source, athena_metastore_service)
     if not all and not tables:
         logger.warning(
             "m=__main__, msg=No tables or all flag passed, nothing to do.".format(
@@ -59,9 +61,9 @@ if __name__ == "__main__":
     else:
         logger.info("m=__main__, msg=Creating external tables...")
         if all:
-            tables = sqlContext.tableNames(
-                dbName=transformer._get_spark_schema(datalake_layer)
-            )
+            spark_metastore_service = SparkMetastoreService(SparkClient())
+            dbName = transformer._get_spark_schema(datalake_layer)
+            tables = spark_metastore_service.get_table_names(dbName)
             with Pool(NB_THREADS) as p:
                 p.map(
                     create_external_table,

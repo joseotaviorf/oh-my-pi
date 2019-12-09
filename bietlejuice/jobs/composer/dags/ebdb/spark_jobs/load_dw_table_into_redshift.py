@@ -8,10 +8,9 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.s3 import S3Service
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
-from bietlejuice.jobs.composer.base.spark import SparkMetastoreService
-from bietlejuice.jobs.composer.clients.db_clients import PostgresClient
+from bietlejuice.jobs.composer.clients.db_clients import PostgresClient, SparkClient
 from bietlejuice.jobs.composer.loaders import RedshiftLoader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_dw_table_into_redshift"
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -34,7 +33,8 @@ def validate_load(spark_schema, redshift_schema, table_name):
     spark_query = base_query.format(spark_schema)
     redshift_query = base_query.format(redshift_schema)
 
-    spark_result = spark_sql_client.run(spark_query).collect()[0][0]
+    # todo: use DatabricksConsumer to read data
+    spark_result = spark_client.get_records(spark_query).collect()[0][0]
     redshift_result = redshift_client.get_records(redshift_query)[0][0]
 
     logger.info(
@@ -59,10 +59,8 @@ if __name__ == "__main__":
 
     # instances setup
     s3_client = S3Service(boto3.resource("s3"))
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
-    spark_metastore_service = SparkMetastoreService(
-        dw_info["dw_schema_databricks"], dw_info["dw_schema_path"], spark_sql_client
-    )
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
 
     redshift_connection = json.loads(
         dbutils.secrets.get("quintoandar", DatabaseEnum.DW)
@@ -80,7 +78,8 @@ if __name__ == "__main__":
 
     # load
     redshift_loader.load_table_from_metastore(
-        metastore_service=spark_metastore_service,
+        metastore_service=metastore_service,
+        source_schema=dw_info["dw_schema_databricks"],
         source_table_name=table_name,
         target_schema=dw_schema,
         target_table_name=table_name,

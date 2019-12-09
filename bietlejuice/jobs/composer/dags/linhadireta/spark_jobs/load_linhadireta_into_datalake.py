@@ -5,17 +5,11 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkMetastoreService,
-    SparkTableStorageFormat,
-    spark,
-    sqlContext,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_linhadireta_into_datalake"
 WHITE_LIST = ["User", "User_chats", "Chat", "Chat_users"]
@@ -38,21 +32,22 @@ if __name__ == "__main__":
         scope="quintoandar", key=DatabaseEnum.LINHADIRETA
     )
     conn_config = json.loads(conn_config_json)
-    postgres_consumer = PostgresConsumer(conn_config, SparkClient())
+    spark_client = SparkClient()
+    postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    spark_metastore_service = SparkMetastoreService(
-        db_info["db_raw_databricks"],
-        db_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
-    loader = S3Loader(spark_metastore_service)
+    metastore_service = SparkMetastoreService(spark_client)
+    loader = S3Loader(metastore_service)
 
     for table in tables:
         if table.table_name in WHITE_LIST:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             loader.load_full_table(
-                df, table.table_name.lower(), SparkTableStorageFormat.DEFAULT_RAW
+                df=df,
+                database_name=db_info["db_raw_databricks"],
+                table_name=table.table_name.lower(),
+                format=SparkTableStorageFormat.DEFAULT_RAW,
+                database_location=db_info["db_raw_path"],
             )

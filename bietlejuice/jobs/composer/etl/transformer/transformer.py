@@ -2,12 +2,11 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.athena import TableStorageFormat
+from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.base.athena import TableStorageFormat
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
-
 
 logger = QuintoAndarLogger("Transformer")
 
@@ -16,10 +15,10 @@ spark = BaseSparkContext.spark
 
 class Transformer:
     @logger
-    def __init__(self, env, source, athena_client):
+    def __init__(self, env, source, athena_metastore_service):
         self.env = env
         self.source = source
-        self.client = athena_client
+        self.athena_metastore_service = athena_metastore_service
 
     @logger
     def _get_athena_schema(self, datalake_layer):
@@ -52,7 +51,6 @@ class Transformer:
 
     @logger
     def create_athena_table(self, table_name, datalake_layer, partition_by=None):
-
         """
             Parameters:
                 - table_name = table name to be created on Athena
@@ -64,13 +62,13 @@ class Transformer:
         s3_base_path = self._get_s3_base_path(datalake_layer)
         table_schema = self._get_spark_table_schema(datalake_layer, table_name)
 
-        self.client.create_external_table(
-            database=database,
+        self.athena_metastore_service.create_external_table(
+            database_name=database,
             table_name=table_name,
-            s3_table_path=s3_base_path + table_name,
+            table_location=s3_base_path + table_name,
             table_schema=table_schema,
-            partition_by=partition_by,
-            base_format=getattr(
+            partition_cols=partition_by,
+            format_options=getattr(
                 TableStorageFormat, "DEFAULT_{}".format(datalake_layer.upper())
             ),
         )
@@ -93,13 +91,14 @@ class Transformer:
         database = self._get_athena_schema(datalake_layer)
         table_schema = self._get_spark_table_schema(datalake_layer, table_name)
 
-        self.client.overwrite_external_table(
-            database=database,
+        self.athena_metastore_service.drop_table(database, table_name)
+        self.athena_metastore_service.create_external_table(
+            database_name=database,
             table_name=table_name,
-            s3_table_path=table_location,
+            table_location=table_location,
             table_schema=table_schema,
-            partition_by=partition_by,
-            base_format=getattr(
+            partition_cols=partition_by,
+            format_options=getattr(
                 TableStorageFormat, "DEFAULT_{}".format(datalake_layer.upper())
             ),
         )
@@ -119,7 +118,9 @@ class Transformer:
         """
 
         database = self._get_athena_schema(datalake_layer)
-        self.client.add_partition(database, table_name, partition_by_dict)
+        self.athena_metastore_service.add_partitions(
+            database, table_name, [partition_by_dict]
+        )
 
     @logger
     def create_dataframe_from_datalake_sql_file(

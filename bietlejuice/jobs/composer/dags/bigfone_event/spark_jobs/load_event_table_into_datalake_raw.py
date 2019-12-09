@@ -7,12 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.etl import FileService
-from bietlejuice.jobs.composer.base.spark import (
-    SparkMetastoreService,
-    SparkTableStorageFormat,
-    spark,
-    sqlContext,
-)
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.dags.bigfone_event import (
@@ -24,7 +19,7 @@ from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import (
     base_dbutils,
 )
 from bietlejuice.jobs.composer.loaders import S3Loader
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_event_table_into_datalake_raw"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -58,8 +53,8 @@ if __name__ == "__main__":
     )
 
     # creation date and event type partitions
-    partitions = list(query_filter.keys())
-    partitions.append("event")
+    partition_cols = list(query_filter.keys())
+    partition_cols.append("event")
 
     # get query to create event table
     query = FileService().get_query_from_file_name(
@@ -74,31 +69,34 @@ if __name__ == "__main__":
 
     # establish connection and get data from Event table
     conn_config = json.loads(conn_config_json)
-    consumer = PostgresConsumer(conn_config, SparkClient())
+    spark_client = SparkClient()
+    consumer = PostgresConsumer(conn_config, spark_client)
     event_table_data = consumer.get_data_from_query(query.format(**query_filter))
 
     datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
 
-    spark_metastore_service = SparkMetastoreService(
-        datalake_info["db_raw_databricks"],
-        datalake_info["db_raw_path"],
-        SparkSQLCLient(spark, sqlContext),
-    )
+    metastore_service = SparkMetastoreService(spark_client)
 
     # create database if not exists
-    spark_metastore_service.create_database()
+    database_name = datalake_info["db_raw_databricks"]
+    metastore_service.create_database(database_name)
 
     # loaders
-    loader = S3Loader(spark_metastore_service)
+    loader = S3Loader(metastore_service)
     loader.load_incremental_table(
         df=event_table_data,
+        database_name=datalake_info["db_raw_databricks"],
         table_name=table_name,
-        format=SparkTableStorageFormat.DEFAULT_RAW,
-        partitions=partitions,
+        format_options=SparkTableStorageFormat.DEFAULT_RAW,
+        database_location=datalake_info["db_raw_path"],
+        partition_cols=partition_cols,
         schema_merging=True,
     )
 
     # create partition into spark table
-    spark_metastore_service.create_new_partitions_from_df(
-        table_name=table_name, df=event_table_data, partition_by_list=partitions
+    metastore_service.create_new_partitions_from_df(
+        database_name=database_name,
+        table_name=table_name,
+        df=event_table_data,
+        partition_cols=partition_cols,
     )

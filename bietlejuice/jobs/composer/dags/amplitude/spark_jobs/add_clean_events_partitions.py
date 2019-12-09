@@ -7,9 +7,10 @@ from multiprocessing.dummy import Pool
 from quintoandar_logger import QuintoAndarLogger
 
 import bietlejuice.jobs.composer.db as db_module
-from bietlejuice.jobs.composer.wrappers import AthenaClient
-from bietlejuice.jobs.composer.base.spark.base_spark import BaseDBUtils
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.spark.base_spark import BaseDBUtils
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
+from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("add_clean_events_partitions")
@@ -26,11 +27,19 @@ NB_THREADS = 8
 
 
 def create_partition(args):
-    year, month, day, event_type, db_clean_athena, table_name, athena_client = args
-    partition_by_dict = OrderedDict(
+    (
+        year,
+        month,
+        day,
+        event_type,
+        db_clean_athena,
+        table_name,
+        athena_metastore_service,
+    ) = args
+    partition = OrderedDict(
         [("year", year), ("month", month), ("day", day), ("event_type", event_type)]
     )
-    athena_client.add_partition(db_clean_athena, table_name, partition_by_dict)
+    athena_metastore_service.add_partitions(db_clean_athena, table_name, [partition])
 
 
 if __name__ == "__main__":
@@ -48,9 +57,8 @@ if __name__ == "__main__":
     table_name = "events"
 
     athena_client = AthenaClient()
-    athena_client.execute_athena_query(
-        "CREATE DATABASE IF NOT EXISTS `{}`".format(db_clean_athena), "default"
-    )
+    athena_metastore_service = AthenaMetastoreService(athena_client)
+    athena_metastore_service.create_database(db_clean_athena)
 
     # creating table if not exists
     db_module_path = [path for path in db_module.__path__][0]
@@ -60,11 +68,10 @@ if __name__ == "__main__":
     with open(clean_amplitude_events_athena_ddl) as f:
         ddl = f.read()
 
-    athena_client.execute_athena_query(
+    athena_client.run(
         ddl.format(
             db=db_clean_athena, table_name=table_name, path=db_clean_path + table_name
-        ),
-        "default",
+        )
     )
 
     partition_path = db_clean_path + "{}/year={}/month={}/day={}/".format(
@@ -85,7 +92,7 @@ if __name__ == "__main__":
                     event_type,
                     db_clean_athena,
                     table_name,
-                    athena_client,
+                    athena_metastore_service,
                 )
                 for event_type in event_types
             ],

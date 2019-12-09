@@ -1,0 +1,217 @@
+import copy
+from collections import OrderedDict
+from multiprocessing.dummy import Pool
+
+from pyspark.sql.functions import col
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.services.metastore_services.metastore_service import (
+    MetastoreService,
+)
+
+logger = QuintoAndarLogger("SparkMetastoreService")
+
+
+class SparkMetastoreService(MetastoreService):
+    """
+    Service to interact with the Spark Metastore (Hive Metastore).
+
+    :param spark_client: a client to interact with Spark Metastore
+    :type spark_client: SparkClient
+    """
+
+    def __init__(self, spark_client):
+        self._client = spark_client
+
+    @property
+    def client(self):
+        return self._client
+
+    @logger
+    def get_table_names(self, database_name, regex="*"):
+        """
+        Gets the names of the tables and views in a database
+        :param database_name: database name
+        :type database_name: str
+        :param regex: regular expression to filter table and view names. Only the
+        wildcard *, which indicates any character, or |, which indicates a choice
+        between characters, can be used.
+        :type regex: str
+        :return list with the table names
+        """
+        query = f"SHOW TABLES IN {database_name} LIKE '{regex}'"
+        df = self.client.get_records(query).collect()
+        res = [table.tableName for table in df]
+
+        return res
+
+    @logger
+    def get_table_schema(self, database_name, table_name):
+        """
+        Gets the schema (columns' names and types) of a table
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: OrderedDict with col names as keys and col types as values
+        """
+        df = super().get_table_description(database_name, table_name)
+        df = df.select("col_name", "data_type").filter(col("col_name").rlike(r"^\w"))
+
+        res = OrderedDict(
+            [(row["col_name"], row["data_type"].lower()) for row in df.collect()]
+        )
+
+        return res
+
+    @logger
+    def refresh_table(self, database_name, table_name):
+        """
+        Refresh all cached entries associated with a table. If the table was
+        previously cached, then it would be cached lazily the next time it is scanned.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        """
+        command = f"REFRESH TABLE {database_name}.{table_name}"
+        self.client.run(command)
+
+    @logger
+    def get_table_path(self, database_name, table_name):
+        """
+        Gets the location of the data files of a table.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: location of the table data as a str
+        """
+        df = super().get_table_description(database_name, table_name, True)
+        res = df.where("col_name = 'Location'").select("data_type").collect()[0][0]
+
+        return res
+
+    @logger
+    def get_table_format(self, database_name, table_name):
+        """
+        Gets the format of the data files of a table.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: the format of the data files as a str
+        """
+        df = super().get_table_description(database_name, table_name, True)
+        res = (
+            df.where("col_name = 'Provider'")
+            .select("data_type")
+            .collect()[0][0]
+            .lower()
+        )
+
+        return res
+
+    @logger
+    def get_file_paths_and_sizes_from_table(self, database_name, table_name, s3_client):
+        """
+        Gets the path and size of each data file of a table.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :param s3_client: a client to interact with S3
+        :type s3_client: S3Service
+        :return: list of path and size tuples of all the data files belonging to the
+        table
+        """
+        table_path = self.get_table_path(database_name, table_name)
+        table_format = self.get_table_format(database_name, table_name)
+
+        all_objs = s3_client.list_objects(table_path, include_size=True)
+
+        # filter only the files that finishes with table_format extension,
+        # for example: '.json'
+        data_files = [
+            (path, size) for path, size in all_objs if path.endswith(table_format)
+        ]
+
+        return data_files
+
+    @logger(exclude="df")
+    def create_new_partitions_from_df(
+        self, database_name, table_name, df, partition_cols, parallelism=1
+    ):
+        """
+        Adds a partition to a table for each unique partition value found in a given
+        dataframe. The partitions can be added concurrently running more than one
+        command at the same time. At the end, the method refresh the table.
+
+        This method can be called to update the table metadata after writing the
+        dataframe into the storage layer (S3).
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :param df: dataframe that probably updated the table data on S3
+        :type SparkDataFrame
+        :param partition_cols: names of the partition columns to be created
+        :type partition_cols: list
+        :param parallelism: number of commands to run in parallel to create the
+        partitions.
+        """
+        df_partition_values = df.select(partition_cols).distinct()
+        partition_tuple_values = df_partition_values.rdd.map(tuple).collect()
+        partition_by_dicts = [
+            {x[0]: x[1] for x in zip(partition_cols, partition_tuple_value)}
+            for partition_tuple_value in partition_tuple_values
+        ]
+        # todo: check if running more than a command, each one with only one
+        #  partition to add, against the metastore is faster than running a single
+        #  command with all partitions to add.
+        with Pool(parallelism) as p:
+            p.map(
+                lambda partition_by_dict: self.add_partitions(
+                    database_name, table_name, [partition_by_dict]
+                ),
+                partition_by_dicts,
+            )
+
+        # # todo: check if we want to enforce this every time the method is call
+        # self.refresh_table(database_name, table_name)
+
+    @logger(exclude="df")
+    def merge_table_and_dataframe_schemas(self, database_name, table_name, df):
+        """
+        Merges the schemas of an existing table and a dataframe by an union operation.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :param df: a dataframe
+        :type df: SparkDataFrame
+        :return: a schema formed by an union operation as an OrderedDict.
+        """
+
+        if not df:
+            raise ValueError(
+                "m=merge_table_and_dataframe_schemas, msg=input dataframe is empty"
+            )
+        if table_name not in self.get_table_names(database_name):
+            raise ValueError(
+                f"m=merge_table_and_dataframe_schemas, table={table_name}, "
+                f"database={database_name}, msg=table "
+                "does not exist in database "
+            )
+
+        table_schema = self.get_table_schema(database_name, table_name)
+        df_schema = OrderedDict(
+            field.simpleString().split(":") for field in df.schema.fields
+        )
+
+        new_schema = copy.deepcopy(table_schema)
+        for col_df in df_schema:
+            if col_df not in new_schema:
+                new_schema[col_df] = df_schema[col_df]
+
+        return new_schema

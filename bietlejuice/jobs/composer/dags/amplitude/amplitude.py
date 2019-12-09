@@ -125,7 +125,6 @@ dag = DAG(
 )
 
 # tasks definition
-
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",

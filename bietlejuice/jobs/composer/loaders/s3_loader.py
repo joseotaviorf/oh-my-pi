@@ -21,18 +21,31 @@ class S3Loader:
         self.metastore_service = metastore_service
 
     @logger(exclude="df")
-    def load_full_table(self, df, table_name, format, partitions=[], **options):
+    def load_full_table(
+        self,
+        df,
+        database_name,
+        table_name,
+        format,
+        database_location,
+        partitions=[],
+        **options
+    ):
         """
         Loads the content of an Spark DataFrame as a table in S3.
 
         If the table already exits, this method overwrites the existing data while
         recreates the table with the schema of the DataFrame.
-        :param df: an Spark DataFrame
+        :param df: a dataframe
         :type df: SparkDataFrame
+        :param database_name: the database name
+        :type database_name: str
         :param table_name: the table name
         :type table_name: str
         :param format: the file format used to save
         :type format: str
+        :param database_location: location of the database in the object storage
+        :type database_location: str
         :param partitions: names of partitioning columns
         :type partitions: list
         :param options: all other string options
@@ -41,7 +54,7 @@ class S3Loader:
         if not df:
             raise ValueError("m=load_full_table, msg=Spark DataFrame is empty")
 
-        s3_path = self.metastore_service.db_path + table_name
+        s3_path = database_location + table_name
         mod_df = (
             df.write.mode("overwrite")
             .format(format)
@@ -53,19 +66,25 @@ class S3Loader:
             mod_df = mod_df.option(op, val)
 
         mod_df.option("path", s3_path).saveAsTable(
-            "{}.{}".format(self.metastore_service.db, table_name)
+            "{}.{}".format(database_name, table_name)
         )
 
         logger.info(
             "m=load_full_table, table={}.{}, s3_path={}, "
-            "msg=loaded table into S3.".format(
-                self.metastore_service.db, table_name, s3_path
-            )
+            "msg=loaded table into S3.".format(database_name, table_name, s3_path)
         )
 
     @logger(exclude="df")
     def load_incremental_table(
-        self, df, table_name, format, partitions, schema_merging=False, **options
+        self,
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        schema_merging=False,
+        **options
     ):
         """
         Loads the content of an Spark DataFrame into a table in S3 overwriting the
@@ -79,14 +98,18 @@ class S3Loader:
         is set to 'dynamic', if other behaviour is necessary when loading the data,
         the data in S3 need to be deleted manually.
 
-        :param df: an Spark DataFrame
+        :param df: a dataframe
         :type df: SparkDataFrame
+        :param database_name: the database name
+        :type database_name: str
         :param table_name: the table name
         :type table_name: str
-        :param format: the file format used to save
-        :type format: str
-        :param partitions: names of partitioning columns
-        :type partitions: list
+        :param format_options: the file format used to save
+        :type format_options: str
+        :param database_location: location of the database in the object storage
+        :type database_location: str
+        :param partition_cols: names of partitioning columns
+        :type partition_cols: list
         :param schema_merging: enables the schema merging between the table in the
         Spark Metastore and the SparkDataFrame
         :type schema_merging: bool
@@ -110,40 +133,56 @@ class S3Loader:
                 )
             )
 
-        s3_path = self.metastore_service.db_path + table_name
+        s3_path = database_location + table_name
         mod_df = (
             df.write.mode("overwrite")
-            .format(format)
+            .format(format_options)
             .option("maxRecordsPerFile", self.MAX_RECORDS_PER_FILE)
-            .partitionBy(*partitions)
+            .partitionBy(*partition_cols)
         )
         for op, val in options.items():
             mod_df = mod_df.option(op, val)
 
-        if table_name in self.metastore_service.get_table_names():
+        if table_name in self.metastore_service.get_table_names(database_name):
             if schema_merging:
-                self.metastore_service.merge_schemas(table_name, format, partitions, df)
+                table_schema = self.metastore_service.get_table_schema(
+                    database_name, table_name
+                )
+                new_schema = self.metastore_service.merge_table_and_dataframe_schemas(
+                    database_name, table_name, df
+                )
+                if new_schema != table_schema:
+                    self.metastore_service.drop_table(database_name, table_name)
+                    self.metastore_service.create_external_table(
+                        database_name=database_name,
+                        table_name=table_name,
+                        table_location=s3_path,
+                        table_schema=new_schema,
+                        partition_cols=partition_cols,
+                        format_options=format_options,
+                    )
+                    self.metastore_service.repair_table_partitions(
+                        database_name, table_name
+                    )
             logger.info(
                 "m=load_incremental_table, db={}, table_name={}, msg=updating relevant "
                 "partitions with the DataFrame content".format(
-                    self.metastore_service.db, table_name
+                    database_name, table_name
                 )
             )
             mod_df.save(s3_path)
         else:
             logger.info(
                 "m=load_incremental_table, db={}, table_name={}, msg=table does not "
-                "exist in db, creating it...".format(
-                    self.metastore_service.db, table_name
-                )
+                "exist in db, creating it...".format(database_name, table_name)
             )
             mod_df.option("path", s3_path).saveAsTable(
-                "{}.{}".format(self.metastore_service.db, table_name)
+                "{}.{}".format(database_name, table_name)
             )
 
         logger.info(
             "m=load_incremental_table, path={}, "
             "partitions={}, msg=loaded partitions successfully".format(
-                s3_path, partitions
+                s3_path, partition_cols
             )
         )

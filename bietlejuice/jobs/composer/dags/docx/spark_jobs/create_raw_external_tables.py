@@ -1,14 +1,15 @@
 import logging
 from argparse import ArgumentParser
-from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.wrappers import AthenaClient
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
+from bietlejuice.jobs.composer.services.metastore_services import (
+    AthenaMetastoreService,
+    SparkMetastoreService,
+)
 
 JOB_NAME = "create_raw_external_tables"
 
@@ -25,27 +26,26 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
     athena_db = db_info["db_raw_athena"]
     athena_client = AthenaClient()
+    athena_metastore_service = AthenaMetastoreService(athena_client)
 
-    conn_config = {"db": db_info["db_raw_databricks"]}
-    databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
-    tables = databricks_consumer.get_table_names_and_sizes().collect()
+    spark_metastore_service = SparkMetastoreService(SparkClient())
+    tables = spark_metastore_service.get_table_names(
+        database_name=db_info["db_raw_databricks"]
+    )
 
     logger.info("m=__main__, msg=Creating raw external tables...")
-    for table in tables:
-        table_name = table.table_name
-        table_schema = OrderedDict(
-            [
-                (row["col_name"], row["col_type"].lower())
-                for row in databricks_consumer.get_table_schema(table_name).collect()
-            ]
+    for table_name in tables:
+        table_schema = spark_metastore_service.get_table_schema(
+            database_name=db_info["db_raw_databricks"], table_name=table_name
         )
-        athena_client.overwrite_external_table(
-            database=athena_db,
+        athena_metastore_service.drop_table(athena_db, table_name)
+        athena_metastore_service.create_external_table(
+            database_name=athena_db,
             table_name=table_name,
-            s3_table_path=db_info["db_raw_path"] + table_name,
+            table_location=db_info["db_raw_path"] + table_name,
             table_schema=table_schema,
-            partition_by=None,
-            base_format=TableStorageFormat.DEFAULT_RAW,
+            partition_cols=[],
+            format_options=TableStorageFormat.DEFAULT_RAW,
         )
 
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

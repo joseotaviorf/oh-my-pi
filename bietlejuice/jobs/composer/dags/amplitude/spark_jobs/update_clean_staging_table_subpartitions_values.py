@@ -4,15 +4,12 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import (
-    spark,
-    sqlContext,
-    SparkMetastoreService,
-    SparkTableStorageFormat,
-)
-from bietlejuice.jobs.composer.wrappers import SparkSQLCLient
+from bietlejuice.jobs.composer.base.spark import sqlContext, SparkTableStorageFormat
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger("update_clean_staging_subpartitions_values_table.")
@@ -45,16 +42,15 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source)
-    spark_sql_client = SparkSQLCLient(spark, sqlContext)
-    spark_metastore_service = SparkMetastoreService(
-        db_info["db_clean_staging_databricks"],
-        db_info["db_clean_staging_path"],
-        spark_sql_client,
-    )
-    loader = S3Loader(spark_metastore_service)
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
+    loader = S3Loader(metastore_service)
+
+    # create database if not exists
+    database_name = db_info["db_clean_staging_databricks"]
+    metastore_service.create_database(database_name)
 
     # create daily unique subpartitions values table
-    spark_metastore_service.create_database()  # if not exists
     df = (
         sqlContext.table(
             "{}.{}".format(db_info["db_clean_databricks"], source_table_name)
@@ -64,6 +60,13 @@ if __name__ == "__main__":
         .distinct()
     )
 
+    table_name = "subpartitions_values"
     loader.load_full_table(
-        df, "subpartitions_values", SparkTableStorageFormat.DEFAULT_CLEAN
+        df=df,
+        database_name=database_name,
+        table_name=table_name,
+        format=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=db_info["db_clean_staging_path"],
     )
+
+    metastore_service.refresh_table(db_info["db_clean_staging_databricks"], table_name)
