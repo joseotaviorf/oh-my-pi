@@ -55,7 +55,7 @@ class MetastoreService(ABC):
         :type table_name: str
         :return:
         """
-        command = f"DROP TABLE IF EXISTS {database_name}.{table_name}"
+        command = f"DROP TABLE IF EXISTS `{database_name}`.`{table_name}`"
         self.client.run(command)
 
     @logger
@@ -111,7 +111,7 @@ class MetastoreService(ABC):
         :type partitions: a list of dict where each dict correspond to a single
         partition
         """
-        command = f"ALTER TABLE {database_name}.{table_name} ADD IF NOT EXISTS"
+        command = f"ALTER TABLE `{database_name}`.`{table_name}` ADD IF NOT EXISTS"
         for partition in partitions:
             part_section = ", ".join(
                 [
