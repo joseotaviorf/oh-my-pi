@@ -59,13 +59,15 @@ class TestKenshoo(object):
         query_filename = 'query.sql'
         query_params = mock.ANY
         split_by_column = None
+        file_name = mock.ANY
 
         # act
         kenshoo.save_file_from_redshift_query_execution(query_filename=query_filename, query_params=query_params,
-                                                        split_by_column=split_by_column)
+                                                        split_by_column=split_by_column, file_name=file_name)
 
         # assert
-        mock__save_single_file.assert_called_once_with(df=mock__redshift_execute_query_from_file.return_value)
+        mock__save_single_file.assert_called_once_with(df=mock__redshift_execute_query_from_file.return_value,
+                                                       file_name=file_name)
         mock__redshift_execute_query_from_file.assert_called_once_with(query_filename=query_filename,
                                                                        query_params=query_params)
 

@@ -82,7 +82,8 @@ class Kenshoo(object):
         self._save_single_file(df=df, file_name=file_name)
 
     @logger
-    def save_file_from_redshift_query_execution(self, query_filename, query_params=None, split_by_column=None):
+    def save_file_from_redshift_query_execution(self, query_filename, query_params=None, split_by_column=None,
+                                                file_name=''):
         if query_filename is None or '.sql' not in query_filename:
             raise RuntimeError('m=save_file_from_redshift_query_execution, msg=query_filename is invalid')
 
@@ -91,4 +92,4 @@ class Kenshoo(object):
         if split_by_column:
             self._save_multiple_files(df=df, query_filename=query_filename, split_by_column=split_by_column)
         else:
-            self._save_single_file(df=df)
+            self._save_single_file(df=df, file_name=file_name)
