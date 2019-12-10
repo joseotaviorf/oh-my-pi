@@ -1,66 +1,62 @@
-with house_status as (
-	-- merging of redundant house status records (subsequent status without sk_max_status_date, reasoned by minor status changes < 1 day)
-	select
-		fhs.sk_house_listing as sk_house,
-		fhs.sk_region,
-		fhs.status_history as status,
-		min(fhs.sk_status_start_date) as sk_min_status_date,
-		coalesce(to_char(to_date(nullif(fhs.sk_status_end_date,-1), 'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date - 1, 'YYYYMMDD')::bigint) as sk_max_status_date
-	from fact_house_listing_status fhs
-	group by 1, 2, 3, 5
-),
-house_status_per_day as (
-	-- create date series for each house and day in status publication
-	--  ongoing listings = week_day = 0 (sunday)
-	--  use daily status to filter listing_page_views that occured on not publicated listings (product/tracking bug)
-	select
-		hsp.sk_house,
-		hsp.sk_region,
-		hsp.status,
-		hsp.sk_min_status_date,
-		hsp.sk_max_status_date,
-		dd.sk_date,
-		dd.date,
-		dd.week_day,
-		dd.week_start
-	from house_status hsp
-	join dim_date dd on dd.sk_date between hsp.sk_min_status_date and sk_max_status_date
-	where dd.date > date('2018-01-01')
-),
-fact_house_listings_unique as (
-	select sk_house_listing, sk_partner from 
-		(select sk_house_listing, sk_partner, row_number() over(partition by sk_house_listing order by sk_stranded_date desc) as rn_stranded 
-		from fact_house_listings) 
-		where rn_stranded = 1
+with
+daily_published_listings as (
+select
+    f.sk_house_listing,
+    f.status_history,
+    d.sk_date,
+    d.date,
+    d.week_start,
+    d.week_day,
+    d.weekday_name,
+    d.month_start,
+    d.month_end,
+    row_number() over(partition by f.sk_house_listing, d.date order by f.ts_status_start desc) as order_status -- daily order status
+from fact_house_listing_status f
+join dim_date d
+  on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+where f.status_history = 'publicado' -- consider only published status
+  and substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
 ),
 house_status_and_dimensions as (
-	-- returns all breakdowns for all listing versions for each day in publication
-		select
-		hsd.sk_date,
-		hsd.date,
-		hsd.week_day,
-		hsd.week_start,
-		hsd.sk_house,
-       		dhl.id_house,
-		hsd.status,
-		dr.city_group,
-	    dr.city_name as city,
-	    dr.region_code,
-	    dr.name as neighborhood,
-	    date(date_trunc('week', dhl.ts_publication)) as week_start_publication,
-	    case when dhl.house_bedrooms in (0,1) then 1
-	     	 when dhl.house_bedrooms = 2 then 2
-	     	 when dhl.house_bedrooms = 3 then 3
-	     	 when dhl.house_bedrooms >= 4 then 4
-	   	end as house_bedrooms,
-		dhl.is_b2b,
-		dp.sk_partner,
-		dp.trade_name
-	from house_status_per_day hsd
-	join dim_region dr on dr.sk_region = hsd.sk_region
-	join dim_house_listing dhl on hsd.sk_house = dhl.sk_house_listing
-	left join fact_house_listings_unique fhlu on fhlu.sk_house_listing = dhl.sk_house_listing
-	left join dim_partner dp on dp.sk_partner = fhlu.sk_partner
+select
+    fhs.sk_date,
+    fhs.sk_house_listing,
+    fhs.date,
+    fhs.week_day,
+    fhs.week_start,
+    fhs.weekday_name,
+    dhl.id_house,
+    fhs.month_start,
+    fhs.month_end,
+    fhs.order_status,
+    fhs.status_history,
+    fhl.sk_region,
+    dr.city_group,
+    dr.city_name as city,
+    dr.region_code,
+    dr.name as neighborhood,
+    date(date_trunc('week', dhl.ts_publication)) as week_start_publication,
+    case 
+        when dhl.house_bedrooms in (0,1) then 1
+        when dhl.house_bedrooms = 2 then 2
+        when dhl.house_bedrooms = 3 then 3
+        when dhl.house_bedrooms >= 4 then 4
+    end as house_bedrooms,
+    dhl.is_b2b,
+    dp.sk_partner,
+    dp.trade_name
+from daily_published_listings fhs
+left join fact_house_listings fhl
+  on fhs.sk_house_listing = fhl.sk_house_listing
+left join dim_region dr
+  on fhl.sk_region = dr.sk_region
+left join dim_house_listing dhl 
+  on fhs.sk_house_listing = dhl.sk_house_listing
+left join dim_partner dp 
+  on dp.sk_partner = fhl.sk_partner
+where fhs.order_status = 1
+  and dr.city_group is not null
+  and fhs.weekday_name = 'Sunday'
 ),
 ongoing_listings_wk_snapshot as (
 	-- returns for each week and dimension the sunday count/snapshot of publicated listings
@@ -75,10 +71,8 @@ ongoing_listings_wk_snapshot as (
 		hsd.is_b2b,
 		hsd.sk_partner,
 		hsd.trade_name,
-		count(distinct hsd.sk_house) as ongoing_listings
+		count(distinct hsd.sk_house_listing) as ongoing_listings
 	from house_status_and_dimensions hsd
-	where hsd.week_day = 0
-	and hsd.status = 'publicado'
 	group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 bookings as (
@@ -96,7 +90,7 @@ bookings as (
 		hsd.trade_name,
 		count(distinct flrf.sk_booking) as visits_booked
 	from fact_listing_rent_flows flrf
-	join house_status_and_dimensions hsd on hsd.sk_house = flrf.sk_house_listing and hsd.sk_date = flrf.sk_booking_created_date
+	join house_status_and_dimensions hsd on hsd.sk_house_listing = flrf.sk_house_listing and hsd.sk_date = flrf.sk_booking_created_date
 	where flrf.sk_booking >= 0
 	group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
