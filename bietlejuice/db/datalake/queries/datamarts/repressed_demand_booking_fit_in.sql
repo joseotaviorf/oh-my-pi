@@ -54,7 +54,10 @@ date_series as (
     cast(week_day as integer) as week_day,
     weekday_name,
     week_start,
-    case when week_day = '6' then 'Saturday' else 'Weekday'
+    case 
+        when week_day = '6' then 'Saturday'
+        when week_day = '0' then 'Sunday' 
+        else 'Weekday'
     end as week_day_type
   from
     datalake_clean.ods_dim_date dd
@@ -104,7 +107,8 @@ dimensions as (
       when ds.week_day between 1 and 5 and ss.slot between 20 and 31 then '3) Weekday 13-16h'
       when ds.week_day between 1 and 5 and ss.slot between 32 and 35 then '4) Weekday 16-17h'
       when ds.week_day between 1 and 5 and ss.slot between 36 and 43 then '5) Extended hours'
-      when ds.week_day = 6 then '6) Weekend all hours'
+      when ds.week_day = 6 then '6) Saturday all hours'
+      when ds.week_day = 0 then '7) Sunday all hours'
     end as faixa
   from
     regions r
