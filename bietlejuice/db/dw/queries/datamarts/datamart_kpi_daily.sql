@@ -126,6 +126,22 @@ where dc.status = 'Finalizado'
       and dc.dt_annulment < current_date
 group by 1, 2, 3, 4
 ),
+ended_rentals_confirmed as (
+select
+	date(coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) as date_date,
+	date_trunc('week',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) as week_date,
+	date_trunc('month',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) as month_date,
+	rf.sk_region,
+	count(distinct dc.sk_contract) as ended_rentals_confirmed_daily,
+	sum(count(distinct dc.sk_contract)) over(partition by date_trunc('week',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)), rf.sk_region) as ended_rentals_confirmed_weekly,
+	sum(count(distinct dc.sk_contract)) over(partition by date_trunc('month',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment))) as ended_rentals_confirmed_monthly
+from dim_contract dc
+left join fact_listing_rent_flows rf
+  using(sk_contract)
+where dc.status = 'Finalizado'
+      and coalesce(ts_analyst_annulment_input,dc.dt_annulment) < current_date
+group by 1, 2, 3, 4
+),
 bookers as (
 select
     dd.date as booking_created_date,
@@ -212,8 +228,8 @@ group by 1, 2
 daily_metrics as (
 select
 	distinct
-	coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, rr.rental_date, olist.date, bk.booking_created_date, nbk.first_booking_created_date) as date_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, rr.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
+	coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, erc.date_date, rr.rental_date, olist.date, bk.booking_created_date, nbk.first_booking_created_date) as date_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, erc.sk_region, rr.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
 	ocont.ongoing_contracts_daily,
 	orent.ongoing_rentals_daily,
 	nrent.new_rentals_daily,
@@ -221,6 +237,7 @@ select
 	nfl.new_first_listings_daily,
 	rr.re_rentals_daily,
 	er.ended_rentals_daily,
+	erc.ended_rentals_confirmed_daily,
 	olist.ongoing_listings_daily,
 	bk.bookers_daily,
 	nbk.new_bookers_daily
@@ -237,6 +254,8 @@ full outer join re_rentals rr
   on ocont.date = rr.rental_date and ocont.sk_region = rr.sk_region
 full outer join ended_rentals er
   on ocont.date = er.date_date and ocont.sk_region = er.sk_region
+full outer join ended_rentals_confirmed erc
+  on ocont.date = erc.date_date and ocont.sk_region = erc.sk_region
 full outer join ongoing_listings_daily olist
   on ocont.date = olist.date and ocont.sk_region = olist.sk_region
 full outer join bookers bk
@@ -256,6 +275,7 @@ select
 	sum(dm.new_first_listings_daily) as new_first_listings,
 	sum(dm.re_rentals_daily) as re_rentals,
 	sum(dm.ended_rentals_daily) as ended_rentals,
+	sum(dm.ended_rentals_confirmed_daily) as ended_rentals_confirmed_daily,
 	sum(dm.ongoing_listings_daily) as ongoing_listings_daily,
 	sum(dm.bookers_daily) as bookers_daily,
 	sum(dm.new_bookers_daily) as new_bookers_daily
