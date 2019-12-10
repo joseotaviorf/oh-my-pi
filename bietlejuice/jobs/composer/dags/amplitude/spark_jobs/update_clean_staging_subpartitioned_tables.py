@@ -33,7 +33,7 @@ def update_daily_partition(row):
     if spark_flag and subpartitioned_table_name in spark_existing_tables:
         spark_metastore_service.add_partitions(
             database_name=db_info["db_clean_staging_databricks"],
-            table_name="`{}`".format(subpartitioned_table_name),
+            table_name="{}".format(subpartitioned_table_name),
             partitions=partitions,
         )
         logger.info("m=__main__, msg=Table in Spark metastore daily partition repaired")
@@ -41,7 +41,7 @@ def update_daily_partition(row):
     if athena_flag and subpartitioned_table_name in athena_existing_tables:
         athena_metastore_service.add_partitions(
             database_name=db_info["db_clean_staging_athena"],
-            table_name="`{}`".format(subpartitioned_table_name),
+            table_name="{}".format(subpartitioned_table_name),
             partitions=partitions,
         )
         logger.info(
