@@ -28,6 +28,7 @@ listings_metrics AS (
   LEFT JOIN public.dim_region dr ON fhl.sk_region = dr.sk_region
   WHERE dr.sk_region != -1
     AND hl.ts_publication IS NOT NULL
+    AND hl.ts_publication >= CURRENT_DATE-365
 ),
 liquidity_metrics AS (
   SELECT
