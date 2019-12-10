@@ -215,3 +215,66 @@ class SparkMetastoreService(MetastoreService):
                 new_schema[col_df] = df_schema[col_df]
 
         return new_schema
+
+    @logger
+    def create_external_table(
+        self,
+        database_name,
+        table_name,
+        table_location,
+        table_schema,
+        partition_cols,
+        format_options,
+    ):
+        """
+        Creates an external table based on underlying data files that exists in
+        Amazon S3. When you create an external table, the data referenced must comply
+        with the default format or the format that you specify in format_options.
+        clauses.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :param table_location: specifies the location of the underlying data,
+        for example, 's3://mystorage/'
+        :param table_schema: specifies the name and type for each column to be
+        created (including partitioning columns).
+        :type table_schema: OrderedDict
+        :param partition_cols: specifies the names of partition columns in case of
+        existence. A table can have one or more partitions, which consist of a
+        distinct column name and value combination. A separate data directory is
+        created for each specified combination, which can improve query performance
+        in some circumstances. Partitioned columns don't exist within the table data
+        itself.
+        :type partition_cols: list
+        :param format_options: specifies the format of the data files.
+        :type format_options: str
+        """
+
+        # columns builder
+        columns_section = ",\n".join(
+            ["  `" + col + "` " + col_type for col, col_type in table_schema.items()]
+        )
+
+        # partitions builder
+        partitions_section = ""
+        if partition_cols:
+            partitions_section = "\nPARTITIONED BY (\n  {}\n)".format(
+                ",\n  ".join([" `" + col + "`" for col in partition_cols])
+            )
+
+        command = (
+            f"CREATE TABLE IF NOT EXISTS `{database_name}`.`{table_name}`\n"
+            f"(\n"
+            f"{columns_section}\n"
+            ")\n"
+            f"USING {format_options}\n"
+            f"{partitions_section}\n"
+            f"LOCATION '{table_location}'"
+        )
+
+        self.client.run(command)
+        logger.info(
+            f"m=create_external_table, table={database_name}.{table_name}, msg=the "
+            f"table was created successfully in the metastore."
+        )
