@@ -125,6 +125,7 @@ class MetastoreService(ABC):
 
         self.client.run(command)
 
+    @abstractmethod
     def create_external_table(
         self,
         database_name,
@@ -160,40 +161,4 @@ class MetastoreService(ABC):
         :type format_options: dict
         """
 
-        # columns builder
-        columns_section = ",\n".join(
-            [
-                "  `" + col + "` " + col_type
-                for col, col_type in table_schema.items()
-                if not partition_cols or col not in partition_cols
-            ]
-        )
-
-        # partitions builder
-        partitions_section = ""
-        if partition_cols:
-            partitions_section = "\nPARTITIONED BY (\n  {}\n)".format(
-                ",\n  ".join(
-                    [" `" + col + "` " + table_schema[col] for col in partition_cols]
-                )
-            )
-        format_section = format_options.get("format", "")
-        serde_section = format_options.get("serdeproperties", "")
-        tlb_section = format_options.get("tblproperties", "")
-
-        command = (
-            f"CREATE EXTERNAL TABLE IF NOT EXISTS `{database_name}`.`{table_name}`\n"
-            f"(\n"
-            f"{columns_section}\n"
-            ")\n"
-            f"{partitions_section}\n"
-            f"{format_section}\n"
-            f"{serde_section}\n"
-            f"LOCATION '{table_location}'\n"
-            f"{tlb_section};"
-        )
-        self.client.run(command)
-        logger.info(
-            f"m=create_external_table, table={database_name}.{table_name}, msg=the "
-            f"table was created successfully in the metastore."
-        )
+        raise NotImplementedError("m=create_external_table, msg=method not implemented")
