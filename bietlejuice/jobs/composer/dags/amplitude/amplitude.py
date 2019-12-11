@@ -38,6 +38,9 @@ CREATE_CLEAN_FILTERED_EVENT_FILE_PATH = (
 EVENTS_REPARTITIONED_RAW_TO_CLEAN_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_incremental_table_in_datalake.py"
 )
+UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "update_athena_table_daily_partition.py"
+)
 CREATE_CLEAN_STAGING_EVENTS_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_repartitioned_table.py"
 )
@@ -196,6 +199,23 @@ events_repartitioned_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+update_clean_events_repartitioned_daily_partition_athena_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="update-clean-events-repartitioned-daily-partition-athena",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                "amplitude",
+                "events_repartitioned",
+                "clean",
+            ],
+        }
+    },
+)
+
 create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-clean-staging-events",
     dag=dag,
@@ -303,6 +323,8 @@ events_raw_to_clean_task >> [
     create_filtered_events_sub_dag_task,
 ] >> terminate_cluster_task
 
+events_repartitioned_raw_to_clean_task >> update_clean_events_repartitioned_daily_partition_athena_task
+update_clean_events_repartitioned_daily_partition_athena_task >> terminate_cluster_task
 events_repartitioned_raw_to_clean_task >> [
     create_clean_staging_events_task,
     update_clean_staging_subpartitions_values_task,
