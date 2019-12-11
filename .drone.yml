@@ -319,6 +319,9 @@ pipeline:
       - export CHANGED_PATHS=$(git --no-pager diff --name-only master | grep .ddl)
       - |-
         if [ -z $CHANGED_PATHS ]; then
+          echo "No changes in DDL files! Skipping..."
+          exit 0
+        else
           echo "Changes in DDL files detected! Updating SchemaSpy..."
           java -jar /dependencies/schemaspy-6.1.0.jar \
             -t redshift \
@@ -334,9 +337,6 @@ pipeline:
 
           echo "====== Uploading documentation to S3 ======"
           aws s3 cp output/ s3://dbschema.quintoandar.com.br/dw --recursive --acl private
-        else
-          echo "No changes in DDL files! Skipping..."
-          exit 0
         fi
     secrets:
       - source: dw_db_password_prod
