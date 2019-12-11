@@ -11,21 +11,23 @@ from bietlejuice.jobs.composer.services.metastore_services import (
     SparkMetastoreService,
 )
 
-JOB_NAME = "create_raw_external_tables"
+JOB_NAME = "create_external_tables"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
+    parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("storage", type=str, help="raw/clean values")
     args = parser.parse_args()
     environment = args.env
+    storage = args.storage
     source = "zendesk"
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    spark_db = db_info["db_raw_databricks"]
-    athena_db = db_info["db_raw_athena"]
+    spark_db = db_info["db_" + storage + "_databricks"]
+    athena_db = db_info["db_" + storage + "_athena"]
 
     athena_client = AthenaClient()
     athena_metastore_service = AthenaMetastoreService(athena_client)
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(SparkClient())
     table_names = spark_metastore_service.get_table_names(spark_db)
 
-    logger.info("m=__main__, msg=Creating raw external tables...")
+    logger.info("m=__main__, msg=Creating {} external tables...".format(storage))
 
     for table_name in table_names:
         table_schema = spark_metastore_service.get_table_schema(spark_db, table_name)
@@ -42,11 +44,15 @@ if __name__ == "__main__":
         athena_metastore_service.create_external_table(
             database_name=athena_db,
             table_name=table_name,
-            table_location=db_info["db_raw_path"] + table_name,
+            table_location=db_info["db_" + storage + "_path"] + table_name,
             table_schema=table_schema,
             partition_cols=["year", "month", "day"],
-            format_options=TableStorageFormat.DEFAULT_RAW,
+            format_options=TableStorageFormat.get_storage(storage),
         )
         athena_metastore_service.repair_table_partitions(athena_db, table_name)
 
-    logger.info("m=__main__, msg=All raw external tables were created successfully.")
+    logger.info(
+        "m=__main__, msg=All {} external tables were created successfully.".format(
+            storage
+        )
+    )

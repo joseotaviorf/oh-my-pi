@@ -75,7 +75,7 @@ if __name__ == "__main__":
     spark_sql_client = SparkClient()
 
     dt_exec = datetime.strptime(execution_date, "%Y-%m-%d")
-    for delta_day in range(days_interval_start, days_interval_end + 1):
+    for delta_day in range(days_interval_start - 1, days_interval_end):
         dt_execution = dt_exec + timedelta(days=-delta_day)
         zendesk_consumer = ZendeskFactoryConsumer.factory(
             zendesk_client=zendesk_client,
