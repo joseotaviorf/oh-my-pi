@@ -315,8 +315,12 @@ pipeline:
     image: quintoandar/drone-schemaspy:v1.1.0
     pull: true
     commands:
+      - apt-get install -y git > /dev/null
+      - export CHANGED_PATHS=$(git --no-pager diff --name-only master | grep .ddl)
       - |-
-        java -jar /dependencies/schemaspy-6.1.0.jar \
+        if [ -z $CHANGED_PATHS ]; then
+          echo "Changes in DDL files detected! Updating SchemaSpy..."
+          java -jar /dependencies/schemaspy-6.1.0.jar \
             -t redshift \
             -dp /dependencies/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar \
             -db dw \
@@ -328,8 +332,12 @@ pipeline:
             -I "(view|pg|vw)_.*" \
             -o ./output
 
-        echo "====== Uploading documentation to S3 ======"
-        aws s3 cp output/ s3://dbschema.quintoandar.com.br/dw --recursive --acl private
+          echo "====== Uploading documentation to S3 ======"
+          aws s3 cp output/ s3://dbschema.quintoandar.com.br/dw --recursive --acl private
+        else
+          echo "No changes in DDL files! Skipping..."
+          exit 0
+        fi
     secrets:
       - source: dw_db_password_prod
         target: DB_PASSWORD
