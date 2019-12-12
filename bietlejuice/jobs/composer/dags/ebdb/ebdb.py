@@ -224,14 +224,24 @@ visit_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dim_table="dim_visit",
 )
 
-contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+
+# TO DO: dim_contract
+# contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+#     dag=dag,
+#     sub_dag_name="contract",
+#     sub_dag_func=create_clean_and_dim_tables_sub_dag,
+#     source=SOURCE,
+#     clean_table="contract",
+#     dw_schema=DW_SCHEMA,
+#     dim_table="dim_contract",
+# )
+
+visit_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="contract",
-    sub_dag_func=create_clean_and_dim_tables_sub_dag,
+    sub_dag_name="visit_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
     source=SOURCE,
-    clean_table="contract",
-    dw_schema=DW_SCHEMA,
-    dim_table="dim_contract",
+    clean_table="visit_aud",
 )
 
 inspection_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
@@ -260,10 +270,527 @@ access_authorization_type_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="access_authorization_type",
 )
 
+ownerlead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="ownerlead",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="ownerlead",
+)
+
+
+agent_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="agent",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="agent",
+)
+
+
+conversion_lead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="conversion_lead",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="conversion_lead",
+)
+
+
+visitor_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="visitor",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="visitor",
+)
+
+
+user_revision_entity_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="user_revision_entity",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="user_revision_entity",
+)
+
+
+keytype_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="keytype",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="keytype",
+)
+
+contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="contract",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="contract",
+)
+
+contract_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="contract_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="contract_aud",
+)
+
+full_contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="full_contract",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="full_contract",
+)
+
+lead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="lead",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="lead",
+)
+
+lead_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="lead_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="lead_aud",
+)
+
+real_estate_agency_lead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="real_estate_agency_lead",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="real_estate_agency_lead",
+)
+
+account_transaction_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="account_transaction",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="account_transaction",
+)
+
+polygon_region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="polygon_region",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="polygon_region",
+)
+
+
+bank_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="bank",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="bank",
+)
+
+house_guarantees_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_guarantees_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_guarantees_aud",
+)
+
+affiliated_data_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="affiliated_data",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="affiliated_data",
+)
+
+affiliated_data_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="affiliated_data_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="affiliated_data_aud",
+)
+
+leads_grouped_by_phone_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="leads_grouped_by_phone",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="leads_grouped_by_phone",
+)
+
+house_registration_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_registration_status",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_registration_status",
+)
+
+house_registration_status_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_registration_status_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_registration_status_aud",
+)
+
+portability_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="portability",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="portability",
+)
+
+portability_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="portability_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="portability_aud",
+)
+
+visit_origin_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="visit_origin",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="visit_origin",
+)
+
+house_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house",
+)
+
+house_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_aud",
+)
+
+appointment_change_reason_category_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="appointment_change_reason_category",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="appointment_change_reason_category",
+)
+
+follow_up_details_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="follow_up_details",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="follow_up_details",
+)
+
+house_visit_information_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_visit_information",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_visit_information",
+)
+
+offer_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="offer",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="offer",
+)
+
+offer_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="offer_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="offer_aud",
+)
+
+rent_flow_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="rent_flow",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="rent_flow",
+)
+
+house_special_condition_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_special_condition",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_special_condition",
+)
+
+local_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="local",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="local",
+)
+
+occupant_type_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="occupant_type",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="occupant_type",
+)
+
+device_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="device",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="device",
+)
+
+sales_rep_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="sales_rep",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="sales_rep",
+)
+
+pre_proposal_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="pre_proposal",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="pre_proposal",
+)
+
+pre_proposal_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="pre_proposal_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="pre_proposal_aud",
+)
+
+pre_proposal_condition_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="pre_proposal_condition",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="pre_proposal_condition",
+)
+
+proposal_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="proposal",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="proposal",
+)
+
+proposal_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="proposal_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="proposal_aud",
+)
+
+account_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="account",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="account",
+)
+
+proposal_condition_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="proposal_condition",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="proposal_condition",
+)
+
+proposal_condition_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="proposal_condition_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="proposal_condition_aud",
+)
+
+state_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="state",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="state",
+)
+
+state_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="state_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="state_aud",
+)
+
+special_condition_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="special_condition",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="special_condition",
+)
+
+special_condition_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="special_condition_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="special_condition_aud",
+)
+
+restriction_type_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="restriction_type",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="restriction_type",
+)
+
+restriction_type_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="restriction_type_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="restriction_type_aud",
+)
+
+booking_status_change_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="booking_status_change",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="booking_status_change",
+)
+
+photographer_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="photographer",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="photographer",
+)
+
+city_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="city",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="city",
+)
+
+partner_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="partner",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="partner",
+)
+
+partner_agent_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="partner_agent",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="partner_agent",
+)
+
+user_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="user",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="user",
+)
+
+entrance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="entrance",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="entrance",
+)
+
+doorman_affiliate_data_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="doorman_affiliate_data",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="doorman_affiliate_data",
+)
+
+doorman_affiliate_occupation_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="doorman_affiliate_occupation",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="doorman_affiliate_occupation",
+)
+
+photo_job_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="photo_job",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="photo_job",
+)
+
+photo_job_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="photo_job_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="photo_job_aud",
+)
+
+booking_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="booking",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="booking",
+)
+
+booking_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="booking_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="booking_aud",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
-
 # tasks dependencies
 create_cluster_task >> ebdb_to_datalake_raw_task
 ebdb_to_datalake_raw_task >> [
@@ -271,8 +798,72 @@ ebdb_to_datalake_raw_task >> [
     condo_sub_dag_task,
     region_sub_dag_task,
     visit_sub_dag_task,
+    visit_aud_sub_dag_task,
     contract_sub_dag_task,
+    contract_aud_sub_dag_task,
+    full_contract_sub_dag_task,
     inspection_sub_dag_task,
     access_type_sub_dag_task,
     access_authorization_type_sub_dag_task,
+    ownerlead_sub_dag_task,
+    agent_sub_dag_task,
+    conversion_lead_sub_dag_task,
+    visitor_sub_dag_task,
+    user_revision_entity_sub_dag_task,
+    keytype_sub_dag_task,
+    lead_sub_dag_task,
+    lead_aud_sub_dag_task,
+    real_estate_agency_lead_sub_dag_task,
+    bank_sub_dag_task,
+    house_guarantees_aud_sub_dag_task,
+    affiliated_data_sub_dag_task,
+    affiliated_data_aud_sub_dag_task,
+    leads_grouped_by_phone_sub_dag_task,
+    house_registration_status_sub_dag_task,
+    house_registration_status_aud_sub_dag_task,
+    portability_sub_dag_task,
+    portability_aud_sub_dag_task,
+    visit_origin_sub_dag_task,
+    house_sub_dag_task,
+    house_aud_sub_dag_task,
+    appointment_change_reason_category_sub_dag_task,
+    follow_up_details_sub_dag_task,
+    house_visit_information_sub_dag_task,
+    offer_sub_dag_task,
+    offer_aud_sub_dag_task,
+    rent_flow_sub_dag_task,
+    house_special_condition_sub_dag_task,
+    local_sub_dag_task,
+    occupant_type_sub_dag_task,
+    device_sub_dag_task,
+    polygon_region_sub_dag_task,
+    sales_rep_sub_dag_task,
+    pre_proposal_sub_dag_task,
+    pre_proposal_aud_sub_dag_task,
+    pre_proposal_condition_sub_dag_task,
+    proposal_sub_dag_task,
+    proposal_aud_sub_dag_task,
+    account_sub_dag_task,
+    proposal_condition_sub_dag_task,
+    proposal_condition_aud_sub_dag_task,
+    state_sub_dag_task,
+    state_aud_sub_dag_task,
+    special_condition_sub_dag_task,
+    special_condition_aud_sub_dag_task,
+    restriction_type_sub_dag_task,
+    restriction_type_aud_sub_dag_task,
+    booking_status_change_sub_dag_task,
+    photographer_sub_dag_task,
+    account_transaction_sub_dag_task,
+    city_sub_dag_task,
+    partner_sub_dag_task,
+    partner_agent_sub_dag_task,
+    user_sub_dag_task,
+    entrance_sub_dag_task,
+    doorman_affiliate_data_sub_dag_task,
+    doorman_affiliate_occupation_sub_dag_task,
+    photo_job_sub_dag_task,
+    photo_job_aud_sub_dag_task,
+    booking_sub_dag_task,
+    booking_aud_sub_dag_task,
 ] >> terminate_cluster_task

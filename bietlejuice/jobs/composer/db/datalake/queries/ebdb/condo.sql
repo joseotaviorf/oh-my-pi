@@ -8,8 +8,19 @@ SELECT
   c.endereco AS address,
   c.lat,
   c.lng,
+  c.latlng,
   c.nome AS name,
   c.numero AS number,
   c.condoManager_id AS id_condo_manager,
-  c.rules
+  c.rules,
+  c.referenciaExterna AS external_reference,
+  c.condoManager_id AS id_condo_manager,
+  c.expirationDay AS dt_expiration,
+  c.weekendEndMovingSchedule AS ts_weekend_moving_schedule_ended,
+  c.weekendStartMovingSchedule AS ts_weekend_moving_schedule_started,
+  c.workDaysEndMovingSchedule AS ts_workdays_moving_schedule_ended,
+  c.workDaysStartMovingSchedule AS ts_workdays_moving_schedule_started,
+  c.entryAuthorization AS entry_authorization,
+  c.entryAuthorizationInfo AS entry_authorization_info,
+  c.hasCondominiumPage AS has_condo_page
 FROM datalake_ebdb_raw.Condominio c

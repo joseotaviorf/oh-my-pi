@@ -1,7 +1,7 @@
 SELECT
-    id_visit AS sk_visit,
-    id_visit,
-    cd_visit,
+    id AS sk_visit,
+    id AS id_visit,
+    code AS cd_visit,
     dt_visit,
     slot,
     slot_count,
