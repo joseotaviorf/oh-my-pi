@@ -27,14 +27,15 @@ class LeadSubDag(DimSubDag):
     def build_lead_with_tests(self):
         lead_dag = self._build_local_dag()
 
-        ods_reprocessed_lead_task, ods_lead_score_factor_task, ods_lead_origin_task, \
-            ods_lead_first_event_tracking_task, ods_lead_task, \
+        ods_lead_sales_company_task, ods_reprocessed_lead_task, ods_lead_score_factor_task, \
+            ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead_task, \
             staging_dim_lead_task, dw_dim_lead_task = self.__build_data_tasks(lead_dag)
 
         tests_tasks = self.build_tests_tasks(lead_dag)
 
         ods_lead_task.set_upstream(
-            [ods_lead_score_factor_task, ods_reprocessed_lead_task, ods_lead_origin_task])
+            [ods_lead_score_factor_task, ods_reprocessed_lead_task, ods_lead_origin_task,
+             ods_lead_sales_company_task])
         airflow_helpers.chain(ods_lead_task, ods_lead_first_event_tracking_task, staging_dim_lead_task)
         staging_dim_lead_task.set_downstream(tests_tasks)
         dw_dim_lead_task.set_upstream(tests_tasks)
@@ -52,6 +53,17 @@ class LeadSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
+        ods_lead_sales_company_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_lead_sales_company',
+            python_callable=utils.load_athena_file_query_to_ods,
+            op_kwargs={
+                'table_name': 'lead_sales_company',
+                'file_name': 'wololo/lead_sales_company.sql',
+                'bucket': DimSubDag.S3_BUCKET
+            }
+        )
+
         ods_reprocessed_lead_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_reprocessed_lead',
@@ -126,5 +138,6 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        return ods_reprocessed_lead_task, ods_lead_score_factor_task, ods_lead_origin_task, \
-            ods_lead_first_event_tracking_task, ods_lead, staging_dim_lead_task, dw_dim_lead_task
+        return ods_lead_sales_company_task, ods_reprocessed_lead_task, ods_lead_score_factor_task, \
+            ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead, staging_dim_lead_task, \
+            dw_dim_lead_task
