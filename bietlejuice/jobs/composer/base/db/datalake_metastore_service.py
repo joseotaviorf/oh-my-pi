@@ -4,38 +4,48 @@ from bietlejuice.jobs.composer.base.airflow import Environment
 class DatalakeMetastoreService:
     @staticmethod
     def get_db_info(env, source):
-        if not Environment.is_valid_environment(env):
-            raise RuntimeError(
-                "m=__init__, msg=environment %s invalid. Environments allowed are: %s"
-                % (env, ", ".join(Environment.get_valid_environments()))
-            )
+        Environment.validate_env(env)
 
-        return {
-            "db_raw_databricks": "datalake_{}_raw".format(source),
-            "db_raw_athena": "datalake_{}_raw_{}".format(source, env),
-            "db_raw_path": "s3://5a-datalake-{}/raw/{}/".format(env, source),
-            "db_clean_databricks": "datalake_{}_clean".format(source),
-            "db_clean_athena": "datalake_{}_clean_{}".format(source, env),
-            "db_clean_path": "s3://5a-datalake-{}/clean/{}/".format(env, source),
-            "db_clean_staging_databricks": "datalake_{}_clean_staging".format(source),
-            "db_clean_staging_athena": "datalake_{}_clean_staging_{}".format(
-                source, env
-            ),
-            "db_clean_staging_path": "s3://5a-datalake-{}/clean_staging/{}/".format(
-                env, source
-            ),
+        # TODO: if clause should be removed
+        # Forno is under new AWS accounts, then use new structure
+        # Prod is temporarily under old AWS account and will be migrated soon, then this
+        if env == Environment.FORNO:
+            bucket = f"datalake.s3.{env}.data.quintoandar.com.br"
+            schema_suffix = ""
+        else:
+            schema_suffix = f"_{env}"
+            bucket = f"5a-datalake-{env}"
+
+        spark_db_infos = {
+            "db_raw_databricks": f"datalake_{source}_raw",
+            "db_clean_databricks": f"datalake_{source}_clean",
+            "db_clean_staging_databricks": f"datalake_{source}_clean_staging",
         }
+
+        athena_db_infos = {
+            "db_raw_athena": f"datalake_{source}_raw{schema_suffix}",
+            "db_clean_athena": f"datalake_{source}_clean{schema_suffix}",
+            "db_clean_staging_athena": f"datalake_{source}_clean_staging{schema_suffix}",
+        }
+
+        s3_infos = {
+            "db_raw_path": f"s3://{bucket}/raw/{source}/",
+            "db_clean_path": f"s3://{bucket}/clean/{source}/",
+            "db_clean_staging_path": f"s3://{bucket}/clean_staging/{source}/",
+        }
+
+        db_infos = {}
+        db_infos.update(spark_db_infos)
+        db_infos.update(athena_db_infos)
+        db_infos.update(s3_infos)
+        return db_infos
 
     @staticmethod
     def get_dw_info(env, schema):
-        if not Environment.is_valid_environment(env):
-            raise RuntimeError(
-                "m=__init__, msg=environment %s invalid. Environments allowed are: %s"
-                % (env, ", ".join(Environment.get_valid_environments()))
-            )
+        Environment.validate_env(env)
 
         return {
-            "dw_bucket": "5a-dw-{}".format(env),
-            "dw_schema_databricks": "dw_{}".format(schema),
-            "dw_schema_path": "s3://5a-dw-{}/{}/".format(env, schema),
+            "dw_bucket": f"5a-dw-{env}",
+            "dw_schema_databricks": f"dw_{schema}",
+            "dw_schema_path": f"s3://5a-dw-{env}/{schema}/",
         }
