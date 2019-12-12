@@ -93,16 +93,6 @@ fact_with_reproc as (
     join lead l 
       on l.id = rl.id_origin_lead
   ),
-  house_b2b_portability as (
-    select
-        hl.id_house_listing
-    from house_listing hl
-    join house h
-        on h.id = hl.id_house
-    join portability por
-        on por.id_house = hl.id_house and por.owner_type = 'B2B'
-    where hl.version = 0 and por.ts_created >= h.data_criacao
-  ),
   acquisition_channels as (
     select 
       fhlf.id,
@@ -154,9 +144,8 @@ fact_with_reproc as (
       end as acquisition_channel_rep,
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
       coalesce(
-            port.id is not null
-            or coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
-            or pa_b2b.id is not null
+            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
             , false) as is_b2b
     from fact_house_listing_flows fhlf
     left join lead l
@@ -165,14 +154,32 @@ fact_with_reproc as (
       on rl.id = fhlf.lead_id
     left join house h
       on h.id = fhlf.imovel_id
-    left join partner_agent pa_b2b
-      on pa_b2b.user_id = h.usuario_id
-	  left join house_listing hl
+    left join (
+	  select
+	    lc.id_lead
+	  from lead_conversion lc
+	  join house h
+		on lc.id_house = h.id
+	  join partner_agent pa
+		on h.usuario_id = pa.user_id
+	  group by 1
+    ) b2b_prime
+	  on b2b_prime.id_lead = l.id
+    left join (
+	  select
+	    l.id as id_lead
+	  from lead l
+	  join usuario u_b2b
+		on u_b2b.telefone_principal = l.telefone_anunciante
+	  join partner_agent pa_b2b
+		on pa_b2b.user_id = u_b2b.id
+	  where l.origem = 'OwnerPWA'
+	  group by 1
+    ) b2b_prime_draft
+      on b2b_prime_draft.id_lead = l.id
+	left join house_listing hl
       on hl.id_house = fhlf.imovel_id
-      and hl.version = 0
-    left join portability port
-      on port.id_house = hl.id_house
-      and port.owner_type = 'B2B'
+        and hl.version = 0
     where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
   )
   select

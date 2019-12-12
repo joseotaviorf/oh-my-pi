@@ -5,7 +5,10 @@ with b2b_info as (
     h.id as id_house,
     -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
-    coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' or pa_b2b.id is not null, false) as is_b2b,
+    coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' 
+      or pa_b2b.id is not null
+      or coalesce(lo.codigo_imobiliaria, l.codigo_imobiliaria) is not null
+  	  or lo.flg_b2b or l.flg_b2b, false) as is_b2b,
     case
       when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
         then 'online'

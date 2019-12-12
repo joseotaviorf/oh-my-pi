@@ -54,7 +54,9 @@ create or replace view vw_dim_lead as
   coalesce(lo.usuario_que_indicou_id, l.usuario_que_indicou_id) as usuario_que_indicou_id,
   lsf.score_factor,
   coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-  	or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null, false) as is_b2b,
+  	or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
+  	or coalesce(lo.codigo_imobiliaria, l.codigo_imobiliaria) is not null
+  	or lo.flg_b2b or l.flg_b2b, false) as is_b2b,
   case
     when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
      then 'online'
