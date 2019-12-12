@@ -63,6 +63,8 @@ create or replace view vw_dim_lead as
     when coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
      then 'prime'
   end as b2b_type,
+  lsc.sales_company,
+  lsc.ts_sales_company_sent,
   l.sale_price,
   l.is_for_rent::integer::boolean as is_for_rent,
   l.is_for_sale::integer::boolean as is_for_sale,
@@ -115,4 +117,7 @@ left join (
 	group by 1
 ) b2b_prime_draft
   on b2b_prime_draft.id_lead = l.id
+left join
+    lead_sales_company lsc
+    on lsc.id_lead = l.id
 ;

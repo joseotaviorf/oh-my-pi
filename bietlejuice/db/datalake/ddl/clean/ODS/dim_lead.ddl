@@ -55,6 +55,8 @@ create external table if not exists datalake_clean.ods_dim_lead (
   score_factor string,
   is_b2b string,
   b2b_type string,
+  sales_company string,
+  ts_sales_company_sent string,
   sale_price string,
   is_for_rent string,
   is_for_sale string,

@@ -113,6 +113,7 @@ fact_with_reproc as (
       fhlf.dt_opportunity,
       fhlf.dt_first_listing,
       fhlf.dt_discarded,
+      lsc.ts_sales_company_sent,
       fhlf.user_id_lead_first_discarder,
       fhlf.user_id_lead_last_discarder,
       fhlf.is_self_service_photo_job_scheduled,
@@ -180,6 +181,9 @@ fact_with_reproc as (
 	left join house_listing hl
       on hl.id_house = fhlf.imovel_id
         and hl.version = 0
+      and hl.version = 0
+    left join lead_sales_company lsc
+      on lsc.id_lead = l.id
     where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
   )
   select
@@ -201,6 +205,7 @@ fact_with_reproc as (
     acquisition_channels.dt_opportunity,
     acquisition_channels.dt_first_listing,
     acquisition_channels.dt_discarded,
+    acquisition_channels.ts_sales_company_sent,
     acquisition_channels.user_id_lead_first_discarder,
     acquisition_channels.user_id_lead_last_discarder,
     acquisition_channels.is_self_service_photo_job_scheduled,
@@ -309,6 +314,7 @@ potential_listings as (
     coalesce(to_char(f.dt_opportunity::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_opportunity_date,
     coalesce(to_char(f.dt_first_listing::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_listing_date,
     coalesce(to_char(f.dt_discarded::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_discard_date,
+    coalesce(to_char(f.ts_sales_company_sent, 'YYYYMMDD')::integer, '-1'::integer) as sk_sales_company_lead_sent_date,
     coalesce(f.user_id_lead_first_discarder, '-1'::integer) as sk_user_lead_first_discarder,
     coalesce(f.user_id_lead_last_discarder, '-1'::integer) as sk_user_lead_last_discarder,
     a.flow,
@@ -520,6 +526,7 @@ select
   atax.sk_city,
   atax.sk_partner,
   atax.sk_lead_date,
+  atax.sk_sales_company_lead_sent_date,
   atax.sk_prospect_date,
   atax.sk_first_task_created_date,
   atax.sk_first_task_closed_date,
