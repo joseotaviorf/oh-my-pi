@@ -404,20 +404,20 @@ house_guarantees_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="house_guarantees_aud",
 )
 
-affiliated_data_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+affiliate_data_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="affiliated_data",
+    sub_dag_name="affiliate_data",
     sub_dag_func=create_clean_tables_sub_dag,
     source=SOURCE,
-    clean_table="affiliated_data",
+    clean_table="affiliate_data",
 )
 
-affiliated_data_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+affiliate_data_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="affiliated_data_aud",
+    sub_dag_name="affiliate_data_aud",
     sub_dag_func=create_clean_tables_sub_dag,
     source=SOURCE,
-    clean_table="affiliated_data_aud",
+    clean_table="affiliate_data_aud",
 )
 
 leads_grouped_by_phone_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
@@ -756,20 +756,20 @@ doorman_affiliate_occupation_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="doorman_affiliate_occupation",
 )
 
-photo_job_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+photographer_job_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="photo_job",
+    sub_dag_name="photographer_job",
     sub_dag_func=create_clean_tables_sub_dag,
     source=SOURCE,
-    clean_table="photo_job",
+    clean_table="photographer_job",
 )
 
-photo_job_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+photographer_job_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
-    sub_dag_name="photo_job_aud",
+    sub_dag_name="photographer_job_aud",
     sub_dag_func=create_clean_tables_sub_dag,
     source=SOURCE,
-    clean_table="photo_job_aud",
+    clean_table="photographer_job_aud",
 )
 
 booking_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
@@ -816,8 +816,8 @@ ebdb_to_datalake_raw_task >> [
     real_estate_agency_lead_sub_dag_task,
     bank_sub_dag_task,
     house_guarantees_aud_sub_dag_task,
-    affiliated_data_sub_dag_task,
-    affiliated_data_aud_sub_dag_task,
+    affiliate_data_sub_dag_task,
+    affiliate_data_aud_sub_dag_task,
     leads_grouped_by_phone_sub_dag_task,
     house_registration_status_sub_dag_task,
     house_registration_status_aud_sub_dag_task,
@@ -862,8 +862,8 @@ ebdb_to_datalake_raw_task >> [
     entrance_sub_dag_task,
     doorman_affiliate_data_sub_dag_task,
     doorman_affiliate_occupation_sub_dag_task,
-    photo_job_sub_dag_task,
-    photo_job_aud_sub_dag_task,
+    photographer_job_sub_dag_task,
+    photographer_job_aud_sub_dag_task,
     booking_sub_dag_task,
     booking_aud_sub_dag_task,
 ] >> terminate_cluster_task

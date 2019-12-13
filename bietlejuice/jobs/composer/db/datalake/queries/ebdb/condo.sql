@@ -14,7 +14,6 @@ SELECT
   c.condoManager_id AS id_condo_manager,
   c.rules,
   c.referenciaExterna AS external_reference,
-  c.condoManager_id AS id_condo_manager,
   c.expirationDay AS dt_expiration,
   c.weekendEndMovingSchedule AS ts_weekend_moving_schedule_ended,
   c.weekendStartMovingSchedule AS ts_weekend_moving_schedule_started,
