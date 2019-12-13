@@ -2,7 +2,7 @@ drop view if exists datalake_bigfone_clean_prod.call_csat_events;
 create or replace view datalake_bigfone_clean_prod.call_csat_events as
 select
     id_call,
-    if(json_extract_scalar(metadata, '$.Resposta')='0',false,true) as is_csat_set,
+    cast(sum(if(json_extract_scalar(metadata, '$.Resposta')='0',0, 1)) as boolean) as is_csat_set,
     max(case
         when json_extract_scalar(metadata, '$.CSat1')='1' then true
         when json_extract_scalar(metadata, '$.CSat1')='2' then false
@@ -21,4 +21,4 @@ where
     and (json_extract_scalar(metadata, '$.CSat1') is not null or 
          json_extract_scalar(metadata, '$.CSat2') is not null or
          json_extract_scalar(metadata, '$.Resposta') is not null)
-group by 1, 2, 10;
+group by 1, 10;

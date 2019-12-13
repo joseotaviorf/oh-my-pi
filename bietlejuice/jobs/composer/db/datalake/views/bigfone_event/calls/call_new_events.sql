@@ -4,7 +4,7 @@ select
     id,
     id_call,
     json_extract_scalar(metadata, '$.direction') as call_direction,
-    json_extract_scalar(metadata, '$.from') as called_phone_number,
+    json_extract_scalar(metadata, '$.from') as caller_phone_number,
     json_extract_scalar(metadata, '$.our_number') as inside_phone_number,
     json_extract_scalar(metadata, '$.their_number') as outside_phone_number,
     json_extract_scalar(metadata, '$.their_number_type') as outside_phone_type,

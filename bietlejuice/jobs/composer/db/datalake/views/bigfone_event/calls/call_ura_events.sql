@@ -43,7 +43,7 @@ select
     ck.ts_created_local,
     ck.ts_received,
     ck.ts_received_local,
-    concat(cast(ck.year as varchar(4)), '-', cast(ck.month as varchar(2)), '-', cast(ck.day as varchar(2))) as dt_event
+    date(concat(cast(ck.year as varchar(4)), '-', cast(ck.month as varchar(2)), '-', cast(ck.day as varchar(2)))) as dt_event
 from extract_ura_custom_keys_from_metadata ck
 left join events_with_ura_step step
 on 
