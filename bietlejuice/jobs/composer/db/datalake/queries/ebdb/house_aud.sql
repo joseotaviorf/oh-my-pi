@@ -37,7 +37,7 @@ SELECT
     suspensionReason_MOD AS mod_suspension_reason,
     areaTerreno_MOD AS mod_land_area,
     vacantOn_MOD AS mod_dt_vacant_on,
-    parkingSlots_MOD AS mod_parking_slots,
+    parkingSlots_MOD AS mod_parking_slots_description,
     accessType_MOD AS mod_access_type,
     unpublishedReason_MOD AS mod_unpublished_reason,
     iptuDetails_MOD AS mod_iptu_details,
