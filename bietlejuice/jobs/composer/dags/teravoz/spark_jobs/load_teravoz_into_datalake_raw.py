@@ -1,16 +1,27 @@
 import json
 import logging
+
 from argparse import ArgumentParser
+from datetime import datetime
+from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
 
-from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.api_consumers.teravoz import (
     TeravozFactoryConsumer,
 )
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.loaders import S3Loader
+
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -50,7 +61,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     # get Teravoz credentials stored in Databricks secrets
-    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="teravoz")
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="TERAVOZ_API")
 
     credentials = json.loads(json_credentials)
 
@@ -58,22 +69,53 @@ if __name__ == "__main__":
     teravoz_client = TeravozClient(
         api_user=credentials["teravoz_user"], api_pwd=credentials["teravoz_password"]
     )
-    spark_sql_client = SparkClient()
+    spark_client = SparkClient()
 
     teravoz_consumer = TeravozFactoryConsumer.factory(
         teravoz_client=teravoz_client,
-        spark_client=spark_sql_client,
+        spark_client=spark_client,
         endpoint=endpoint_name,
         execution_date=execution_date,
     )
     df = teravoz_consumer.request_api_and_get_dataframe(endpoint_name)
-
     table_name = endpoint_name.replace("-", "_")
-    # load dataframe to raw datalake and create spark table
-    teravoz_loader = TeravozLoader(
-        environment=environment,
-        datalake_layer="raw",
-        table_name=table_name,
-        execution_date=execution_date,
+
+    datalake_info = DatalakeMetastoreService().get_db_info(environment, "teravoz")
+
+    spark_metastore_service = SparkMetastoreService(spark_client)
+
+    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+    partitions = OrderedDict(
+        [
+            ("year", int(dt_execution.year)),
+            ("month", int(dt_execution.month)),
+            ("day", int(dt_execution.day)),
+        ]
     )
-    teravoz_loader.load_data_into_datalake(df)
+    partitions_cols = list(partitions.keys())
+    df = SparkDataFrameService(df).create_columns_from_dict(partitions).output()
+
+    # create database if not exists
+    spark_metastore_service.create_database(datalake_info["db_raw_databricks"])
+
+    # loaders
+    loader = S3Loader(spark_metastore_service)
+    loader.load_incremental_table(
+        df=df,
+        database_name=datalake_info["db_raw_databricks"],
+        table_name=table_name,
+        format_options=SparkTableStorageFormat.DEFAULT_RAW,
+        database_location=datalake_info["db_raw_path"],
+        partition_cols=partitions_cols,
+        schema_merging=True,
+    )
+
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=datalake_info["db_raw_databricks"],
+        table_name=table_name,
+        df=df,
+        partition_cols=partitions_cols,
+    )
+    spark_metastore_service.refresh_table(
+        datalake_info["db_raw_databricks"], table_name
+    )

@@ -26,6 +26,20 @@ class AthenaMetastoreService(MetastoreService):
         return self._client
 
     @logger
+    def create_database(self, database_name):
+        """
+        Creates a database with database_name on metastore
+        :param database_name: database name
+        :type database_name: str
+        """
+        command = f"CREATE DATABASE IF NOT EXISTS {database_name}"
+        self.client.run(command)
+        logger.info(
+            f"m=create_database, database_name={database_name}, msg=the "
+            f"database was created successfully in the metastore."
+        )
+
+    @logger
     def create_external_table(
         self,
         database_name,

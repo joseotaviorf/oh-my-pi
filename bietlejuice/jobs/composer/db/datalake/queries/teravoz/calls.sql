@@ -18,4 +18,4 @@ select
 from
     datalake_teravoz_raw.calls
 where
-    year="{year}" and month="{month}" and day="{day}"
+    year={year} and month={month} and day={day}

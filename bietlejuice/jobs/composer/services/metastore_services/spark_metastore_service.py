@@ -138,6 +138,20 @@ class SparkMetastoreService(MetastoreService):
 
         return data_files
 
+    @logger
+    def create_database(self, database_name):
+        """
+        Creates a database spark with database_name on metastore
+        :param database_name: database name
+        :type database_name: str
+        """
+        command = f"CREATE DATABASE IF NOT EXISTS {database_name}"
+        self.client.run(command)
+        logger.info(
+            f"m=create_database, database_name={database_name}, msg=the "
+            f"database was created successfully in the metastore."
+        )
+
     @logger(exclude="df")
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1
@@ -206,7 +220,7 @@ class SparkMetastoreService(MetastoreService):
 
         table_schema = self.get_table_schema(database_name, table_name)
         df_schema = OrderedDict(
-            field.simpleString().split(":") for field in df.schema.fields
+            field.simpleString().split(":", 1) for field in df.schema.fields
         )
 
         new_schema = copy.deepcopy(table_schema)

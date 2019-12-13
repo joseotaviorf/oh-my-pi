@@ -154,6 +154,21 @@ class SparkDataFrameService:
         )
         return SparkDataFrameService(spark.sql(query).drop(json_column))
 
+    def create_columns_from_dict(self, columns):
+        """
+        Given a OrderedDict with the desired column name and its corresponding value.
+        This method will create the columns and fill them with the given value.
+        :param columns: dict with name of the columns and its correponding values
+        :return: SparkDataFrameService object with the result df
+        """
+        if not self.df:
+            raise ValueError("m=create_columns_from_dict, msg=input df is None")
+
+        for column_name, column_value in columns.items():
+            self.df = self.df.withColumn(column_name, lit(column_value))
+
+        return SparkDataFrameService(self.df)
+
     def create_year_month_day_columns_from_dataframe_column(self, date_column_name):
         """
         Given a name of date type column in the dataframe this operation will create three new columns:

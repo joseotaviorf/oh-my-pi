@@ -1,12 +1,22 @@
 import logging
+
 from argparse import ArgumentParser
+from collections import OrderedDict
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.dags.teravoz import SOURCE, QUERIES_TERAVOZ_DATALAKE_PATH
+
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
-from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
-from bietlejuice.jobs.composer.loaders.teravoz import TeravozLoader
-from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.loaders import S3Loader
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -33,19 +43,55 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = file_name = args.file_name.replace("-", "_")
     environment = args.environment
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
 
-    # execute query and get dataframe
-    teravoz_transformer = TeravozTransformer(environment, athena_metastore_service)
-    df = teravoz_transformer.create_dataframe_from_datalake_sql_file(
-        file_name=file_name, execution_date=execution_date
+    athena_client = AthenaClient()
+
+    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+    partitions = OrderedDict(
+        [
+            ("year", int(dt_execution.year)),
+            ("month", int(dt_execution.month)),
+            ("day", int(dt_execution.day)),
+        ]
+    )
+    partitions_cols = list(partitions.keys())
+
+    # get query to create event table
+    query = FileService().get_query_from_file_name(
+        QUERIES_TERAVOZ_DATALAKE_PATH + "/" + table_name + ".sql"
     )
 
-    # load dataframe into datalake
-    teravoz_loader = TeravozLoader(
-        environment=environment,
-        datalake_layer="clean",
+    datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
+
+    conn_config = {"db": datalake_info["db_raw_databricks"]}
+    databricks_consumer = DatabricksConsumer(conn_config, SparkClient())
+    df = databricks_consumer.get_data_from_query(query.format(**partitions))
+
+    spark_metastore_service = SparkMetastoreService(SparkClient())
+
+    # create database if not exists
+    spark_metastore_service.create_database(datalake_info["db_clean_databricks"])
+
+    # loaders
+    loader = S3Loader(spark_metastore_service)
+    loader.load_incremental_table(
+        df=df,
+        database_name=datalake_info["db_clean_databricks"],
         table_name=table_name,
-        execution_date=execution_date,
+        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=datalake_info["db_clean_path"],
+        partition_cols=partitions_cols,
+        schema_merging=True,
     )
-    teravoz_loader.load_data_into_datalake(df)
+
+    # create partition into spark table
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=datalake_info["db_clean_databricks"],
+        table_name=table_name,
+        df=df,
+        partition_cols=partitions_cols,
+    )
+
+    spark_metastore_service.refresh_table(
+        datalake_info["db_clean_databricks"], table_name
+    )

@@ -12,4 +12,4 @@ select
     tinyint(month) as month,
     tinyint(day) as day
 from datalake_teravoz_raw.ddrs
-where year="{year}" and month="{month}" and day="{day}"
+where year={year} and month={month} and day={day}

@@ -8,6 +8,8 @@ from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 
+from bietlejuice.jobs.composer.base.airflow import Environment
+
 logger = QuintoAndarLogger("Transformer")
 
 spark = BaseSparkContext.spark
@@ -20,9 +22,21 @@ class Transformer:
         self.source = source
         self.athena_metastore_service = athena_metastore_service
 
+        # Forno is under new AWS accounts, then use new structure
+        # Prod is temporarily under old AWS account and will be migrated soon, then this
+        # if clause should be removed
+        if self.env == Environment.FORNO:
+            self.bucket = f"datalake.s3.{env}.data.quintoandar.com.br"
+            self.schema_suffix = ""
+        else:
+            self.schema_suffix = f"_{env}"
+            self.bucket = f"5a-datalake-{env}"
+
     @logger
     def _get_athena_schema(self, datalake_layer):
-        return "datalake_{}_{}_{}".format(self.source, datalake_layer, self.env)
+        return "datalake_{}_{}{}".format(
+            self.source, datalake_layer, self.schema_suffix
+        )
 
     @logger
     def _get_spark_schema(self, datalake_layer):
@@ -41,9 +55,7 @@ class Transformer:
 
     @logger
     def _get_s3_base_path(self, datalake_layer):
-        return "s3://5a-datalake-{}/{}/{}/".format(
-            self.env, datalake_layer, self.source
-        )
+        return "s3://{}/{}/{}/".format(self.bucket, datalake_layer, self.source)
 
     @logger
     def _get_datalake_query_file_path(self, file_name):

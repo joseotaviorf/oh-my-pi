@@ -6,6 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.composer.etl.transformer.teravoz import TeravozTransformer
 from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -21,26 +22,27 @@ if __name__ == "__main__":
     parser.add_argument(
         "table_name", type=str, help="which endpoint to call and table name"
     )
-    parser.add_argument(
-        "datalake_layer", type=str, help="which layer from datalake to load"
-    )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
 
     args = parser.parse_args()
 
     logger.info(
-        "m=create_external_table, table_name={}, datalake_layer={}, execution_date={}, "
+        "m=create_external_table, table_name={}, execution_date={}, "
         "environment={}, msg=print args spark jobs params".format(
-            args.table_name, args.datalake_layer, args.execution_date, args.environment
+            args.table_name, args.execution_date, args.environment
         )
     )
 
-    datalake_layer = args.datalake_layer
+    datalake_layer = "clean"
     execution_date = args.execution_date
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
+
+    db_info = DatalakeMetastoreService().get_db_info(environment, "teravoz")
+
     athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service.create_database(db_info["db_clean_athena"])
 
     # create external table and add partition
     transformer = TeravozTransformer(environment, athena_metastore_service)
