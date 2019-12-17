@@ -58,6 +58,46 @@ where fhs.order_status = 1
   and dr.city_group is not null
   and fhs.weekday_name = 'Sunday'
 ),
+house_status_and_dimensions_book as (
+select
+    fhs.sk_date,
+    fhs.sk_house_listing,
+    fhs.date,
+    fhs.week_day,
+    fhs.week_start,
+    fhs.weekday_name,
+    dhl.id_house,
+    fhs.month_start,
+    fhs.month_end,
+    fhs.order_status,
+    fhs.status_history,
+    fhl.sk_region,
+    dr.city_group,
+    dr.city_name as city,
+    dr.region_code,
+    dr.name as neighborhood,
+    date(date_trunc('week', dhl.ts_publication)) as week_start_publication,
+    case 
+        when dhl.house_bedrooms in (0,1) then 1
+        when dhl.house_bedrooms = 2 then 2
+        when dhl.house_bedrooms = 3 then 3
+        when dhl.house_bedrooms >= 4 then 4
+    end as house_bedrooms,
+    dhl.is_b2b,
+    dp.sk_partner,
+    dp.trade_name
+from daily_published_listings fhs
+join fact_house_listings fhl
+  on fhs.sk_house_listing = fhl.sk_house_listing
+join dim_region dr
+  on fhl.sk_region = dr.sk_region
+left join dim_house_listing dhl 
+  on fhs.sk_house_listing = dhl.sk_house_listing
+left join dim_partner dp 
+  on dp.sk_partner = fhl.sk_partner
+where fhs.order_status = 1
+  and dr.city_group is not null
+), 
 ongoing_listings_wk_snapshot as (
 	-- returns for each week and dimension the sunday count/snapshot of publicated listings
 	select
@@ -77,20 +117,20 @@ ongoing_listings_wk_snapshot as (
 ),
 bookings as (
 	-- returns number of bookings, independently of house status on booking_creation_date
-	select
-		hsd.city_group,
-		hsd.city,
-		hsd.region_code,
-		hsd.neighborhood,
-	    	hsd.week_start,
-	  	hsd.week_start_publication,
-	  	hsd.house_bedrooms,
-		hsd.is_b2b,
-		hsd.sk_partner,
-		hsd.trade_name,
+	select 
+		hsdb.city_group,
+		hsdb.city,
+		hsdb.region_code,
+		hsdb.neighborhood,
+	    hsdb.week_start,
+	    hsdb.week_start_publication,
+	    hsdb.house_bedrooms,
+		hsdb.is_b2b,
+		hsdb.sk_partner,
+		hsdb.trade_name,
 		count(distinct flrf.sk_booking) as visits_booked
 	from fact_listing_rent_flows flrf
-	join house_status_and_dimensions hsd on hsd.sk_house_listing = flrf.sk_house_listing and hsd.sk_date = flrf.sk_booking_created_date
+	join house_status_and_dimensions_book hsdb on hsdb.sk_house_listing = flrf.sk_house_listing and hsdb.sk_date = flrf.sk_booking_created_date
 	where flrf.sk_booking >= 0
 	group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
@@ -118,19 +158,19 @@ lpv_events as (
 listing_page_views as (
 	-- returns number of listing_page_view events per house and date, independently of house status on event date
 	select
-		hsd.city_group,
-		hsd.city,
-		hsd.region_code,
-		hsd.neighborhood,
-	    hsd.week_start,
-	    hsd.week_start_publication,
-	    hsd.house_bedrooms,
-		hsd.is_b2b,
-		hsd.sk_partner,
-		hsd.trade_name,
+		hsdb.city_group,
+		hsdb.city,
+		hsdb.region_code,
+		hsdb.neighborhood,
+	    hsdb.week_start,
+	    hsdb.week_start_publication,
+	    hsdb.house_bedrooms,
+		hsdb.is_b2b,
+		hsdb.sk_partner,
+		hsdb.trade_name,
 		sum(le.cnt_listing_page_view) as listing_page_views
 	from lpv_events le
-	join house_status_and_dimensions hsd on hsd.id_house = le.id_house and hsd.sk_date = le.sk_event_dt
+	join house_status_and_dimensions_book hsdb on hsdb.id_house = le.id_house and hsdb.sk_date = le.sk_event_dt
 	group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 results as (
