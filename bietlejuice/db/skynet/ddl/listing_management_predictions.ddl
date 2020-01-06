@@ -21,7 +21,7 @@ partitioned by(
   dt date
 )
 ROW FORMAT  serde 'org.openx.data.jsonserde.JsonSerDe'
-LOCATION 's3://5a-skynet-forno/listing-mgmt/data/predictions';
+LOCATION 's3://skynet.s3.forno.data.quintoandar.com.br/listing-mgmt/data/predictions';
 
 
 CREATE EXTERNAL TABLE skynet.listing_management_predictions(
