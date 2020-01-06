@@ -20,7 +20,7 @@ class BaseSubDAG(object):
         self.start_date = start_date
 
     @logger
-    def _build_local_dag(self):
+    def _build_local_dag(self):  # Todo: make public method
         """
         Builds a subdag with its default parameters
         :return: the new subdag

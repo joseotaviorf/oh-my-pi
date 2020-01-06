@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "load_godfather_into_datalake"
+JOB_NAME = "load_db_schema_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -52,9 +52,8 @@ if __name__ == "__main__":
         for row in postgres_consumer.get_table_names_and_sizes().collect()
     ]
     logger.info(
-        "m=__main__, schema={}, tables={}, msg=Loading tables in datalake raw".format(
-            schema, tables
-        )
+        f"m=__main__, schema={schema}, tables={tables}, msg=Loading tables in "
+        f"datalake raw"
     )
     for table_name in tables:
         df = postgres_consumer.get_data_from_table(table_name)
@@ -62,7 +61,7 @@ if __name__ == "__main__":
         loader.load_full_table(
             df=df,
             database_name=db_info["db_raw_databricks"],
-            table_name="{}_{}".format(schema, table_name).lower(),
+            table_name=f"{schema}_{table_name}".lower(),
             format=SparkTableStorageFormat.DEFAULT_RAW,
             database_location=db_info["db_raw_path"],
         )
