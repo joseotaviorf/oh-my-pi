@@ -1,15 +1,16 @@
+--refactoring
 -- returns listings with more than 200 unique page views from the last 7 days
 with unique_views_prev as (
 -- get unique amplitude ids from the listing page view event (considering old ones) from last month
         select
             false as partial,
-            cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) as dt,
-            cast(replace(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint) as dt_int,
-            extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _year,
-            extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _month,
-            extract(week from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _week,
-            extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _day,
-            coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
+            date(ts_event) as dt,
+            cast(replace(regexp_extract(cast(ts_event as varchar), '\d{4}-\d{2}-\d{2}'),'-','') as bigint) as dt_int,
+            extract(year from ts_event) as _year,
+            extract(month from ts_event) as _month,
+            extract(week from ts_event) as _week,
+            extract(day from ts_event) as _day,
+            coalesce(cast(id_amplitude as varchar), '') as amplitude_id,
             case
               when json_extract(event_properties, '$.house_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') is not null
                 then if(length(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+')) < 9,
@@ -33,14 +34,14 @@ with unique_views_prev as (
                     cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer))
             else -1
             end as house_id
-        from datalake_amplitude_clean_prod.events
-        where ((app = 170698 and event_type = 'listing_page_viewed' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
-              or (app = 157033 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-              or (app = 160023 and event_type = 'Listing-Views_listing' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-              or (app = 156118 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))
-              and extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) = extract(year from (current_date - interval '1' month))
-              and extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) = extract(month from (current_date - interval '1' month))
-              and extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) < extract(day from current_date)
+        from datalake_amplitude_clean_prod.events_repartitioned
+        where ((id_app = 170698 and event_type = 'listing_page_viewed' and date(ts_event)  >= cast('2017-08-23' as date))
+              or (id_app = 157033 and event_type = 'Listing-View' and date(ts_event) < cast('2017-08-23' as date))
+              or (id_app = 160023 and event_type = 'Listing-Views_listing' and date(ts_event) < cast('2017-08-23' as date))
+              or (id_app = 156118 and event_type = 'Listing-View' and date(ts_event) < cast('2017-08-23' as date)))
+              and extract(year from ts_event) = extract(year from (now() - interval '1' month))
+              and extract(month from ts_event) = extract(month from (now() - interval '1' month))
+              and extract(day from ts_event) < extract(day from now())
       )
       select
         partial,
