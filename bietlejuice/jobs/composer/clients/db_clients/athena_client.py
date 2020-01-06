@@ -41,7 +41,8 @@ class AthenaClient(DBClient):
     @property
     def conn(self):
         if not self._conn:
-            self._conn = boto3.client("athena", self.region_name)
+            session = boto3.session.Session()
+            self._conn = session.client("athena", self.region_name)
         return self._conn
 
     @logger
