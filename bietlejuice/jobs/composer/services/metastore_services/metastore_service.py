@@ -31,6 +31,10 @@ class MetastoreService(ABC):
         """
         command = f"CREATE DATABASE IF NOT EXISTS {database_name}"
         self.client.run(command)
+        logger.info(
+            f"m=create_database, database_name={database_name}, msg=the "
+            f"database was created successfully in the metastore."
+        )
 
     @logger
     def repair_table_partitions(self, database_name, table_name):
