@@ -21,16 +21,24 @@ class AthenaClient(DBClient):
     :type sleep_time: int
     """
 
-    # todo: check if we want to set the default output location here and if we want
+    # TODO: check if we want to set the default output location here and if we want
     #  to create an own bucket for this purpose.
+    #  the init receives the arg output_location temporary during AWS accs migration,
+    #  after this we should think if we want to maintain this or not
     DEFAULT_OUTPUT_LOCATION = "s3://5a-datalake/query_results/"
 
     INTERMEDIATE_STATES = ("QUEUED", "RUNNING")
     FAILURE_STATES = ("FAILED", "CANCELLED")
     SUCCESS_STATES = ("SUCCEEDED",)
 
-    def __init__(self, database="default", region_name="us-east-1", sleep_time=5):
-        self.output_location = self.DEFAULT_OUTPUT_LOCATION
+    def __init__(
+        self,
+        database="default",
+        region_name="us-east-1",
+        sleep_time=5,
+        output_location=None,
+    ):
+        self.output_location = output_location or self.DEFAULT_OUTPUT_LOCATION
         self.database = database
         self.query_context = {"Database": self.database}
         self.result_configuration = {"OutputLocation": self.output_location}
