@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW datalake_amplitude_clean_prod."170698_visit_schedule_confirmed_events" AS
     SELECT
         *,
+        json_extract_scalar(user_properties, '$["gclid"]') as up_gclid,
         json_extract_scalar(user_properties, '$["utm_source"]') as up_utm_source,
         json_extract_scalar(user_properties, '$["utm_medium"]') as up_utm_medium,
         json_extract_scalar(user_properties, '$["utm_campaign"]') as up_utm_campaign,
