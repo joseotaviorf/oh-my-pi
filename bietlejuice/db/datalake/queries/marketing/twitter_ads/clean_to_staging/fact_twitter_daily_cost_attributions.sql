@@ -48,5 +48,7 @@ from (
 		on adgroups.id = ads.id_line_item
 	join datalake_clean.marketing_twitter_campaigns as cam
 		on cam.id = adgroups.id_campaign
+ -- filtering out accounts that have mixed taxonomy levels
+ WHERE stats.acc <> '18ce54ealak'
  GROUP BY 1,2,3,4,5,6,7
 )

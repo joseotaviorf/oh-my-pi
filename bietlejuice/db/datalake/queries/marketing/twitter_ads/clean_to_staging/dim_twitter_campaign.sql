@@ -5,4 +5,6 @@ select distinct
     id_account,
     account_name,
     current_timestamp as ts_load
-from datalake_clean.marketing_twitter_campaigns;
+from datalake_clean.marketing_twitter_campaigns
+-- filtering out accounts that have mixed taxonomy levels
+where acc <> '18ce54ealak';
