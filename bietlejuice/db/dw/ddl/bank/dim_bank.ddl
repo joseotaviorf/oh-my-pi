@@ -1,4 +1,5 @@
 drop table if exists bank.dim_bank;
+
 create table if not exists bank.dim_bank (
   sk_bank bigint primary key,
   id_bank bigint,

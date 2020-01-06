@@ -71,20 +71,23 @@ user_listing_page_views as (
     with user_session_events as (
         /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
             SELECT
-                amplitude_id::varchar,
-                case when nullif(regexp_substr(user_id::varchar, '^\\d+$'), '') is not null
-                     then regexp_substr(user_id::varchar, '^\\d+$')::bigint
+                id_amplitude::varchar as amplitude_id,
+                case when nullif(regexp_substr(id_user::varchar, '^\\d+$'), '') is not null
+                     then regexp_substr(id_user::varchar, '^\\d+$')::bigint
                      else null end as user_id,
-                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-                session_id::varchar,
+                ts_event as event_ts,
+                id_session::varchar as session_id,
                 event_type,
                 case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
                      then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
                      else null end as id_house
-           FROM datalake_amplitude_clean_prod.events
-           WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-                AND app = 170698
-                AND coalesce(session_id, -1) <> -1
+           FROM datalake_amplitude_clean_prod.events_repartitioned
+           WHERE event_type IN ('listing_page_viewed',
+                                'search_results_page_viewed',
+                                'home_page_viewed',
+                                'visit_schedule_confirmed')
+                AND id_app = 170698
+                AND coalesce(id_session, -1) <> -1
     )
 	select
 		amplitude_id,
@@ -103,20 +106,23 @@ user_sessions as (
         /* returns top amplitude events that we use as proxy for session start, listing view and booking confirmation */
             -- enriching with amplitude data via SPARK
             SELECT
-                amplitude_id::varchar,
-                case when nullif(regexp_substr(user_id::varchar, '^\\d+$'), '') is not null
-                     then regexp_substr(user_id::varchar, '^\\d+$')::bigint
+                id_amplitude::varchar as amplitude_id,
+                case when nullif(regexp_substr(id_user::varchar, '^\\d+$'), '') is not null
+                     then regexp_substr(id_user::varchar, '^\\d+$')::bigint
                      else null end as user_id,
-                regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-                session_id::varchar,
+                regexp_substr(ts_event, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
+                id_session::varchar as session_id,
                 event_type,
                 case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
                      then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
-                     else null end as id_house
-           FROM datalake_amplitude_clean_prod.events
-           WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-                AND app = 170698
-                AND coalesce(session_id, -1) <> -1
+                         else null end as id_house
+            FROM datalake_amplitude_clean_prod.events_repartitioned
+            WHERE event_type IN ('listing_page_viewed',
+                                 'search_results_page_viewed',
+                                 'home_page_viewed',
+                                 'visit_schedule_confirmed')
+                AND id_app = 170698
+                AND coalesce(id_session, -1) <> -1
     )
 	select
 		amplitude_id,

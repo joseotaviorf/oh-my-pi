@@ -59,18 +59,21 @@ house_status_and_dimensions as (
 user_session_events as (
 	-- returns top amplitude events that we use as proxy for session start, listing view and booking confirmation
     SELECT
-        amplitude_id::varchar,
-        to_char(to_date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})'), 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
-        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date AS event_dt,
-        regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})', 1)::timestamp as event_ts,
-        session_id::varchar,
+        id_amplitude::varchar as amplitude_id,
+        to_char(to_date(ts_event, 'YYYY-MM-DD'), 'YYYYMMDD')::bigint as sk_event_dt,
+        ts_event::date AS event_dt,
+        ts_event::timestamp as event_ts,
+        id_session::varchar as session_id,
         event_type,
         case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
              then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
              else null end as id_house
-       FROM datalake_amplitude_clean_prod.events
-       WHERE event_type IN ('listing_page_viewed', 'search_results_page_viewed', 'home_page_viewed', 'visit_schedule_confirmed')
-        AND app = 170698
+       FROM datalake_amplitude_clean_prod.events_repartitioned
+       WHERE event_type IN ('listing_page_viewed',
+                            'search_results_page_viewed',
+                            'home_page_viewed',
+                            'visit_schedule_confirmed')
+        AND id_app = 170698
 ),
 user_session_mapping as (
 	-- returns min event timestamps for different partitions like user, session and house id

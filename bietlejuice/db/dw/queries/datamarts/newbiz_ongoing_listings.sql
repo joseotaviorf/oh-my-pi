@@ -303,28 +303,29 @@ newbiz_ongoing_listings AS (
 	
 webmetrics AS (
 	SELECT
-    DATE(regexp_substr(event_time, '\\d{4}-\\d{2}-\\d{2}')) 								AS event_time,
-    CAST(json_extract_path_text(event_properties, 'house_id') AS VARCHAR)   AS house_id,
-    COUNT(DISTINCT CASE
-                    WHEN event_type = 'listing_page_viewed'
-                    THEN uuid
-                    ELSE NULL
-                    END)        AS listing_page_viewed,
-    COUNT(DISTINCT CASE
-                    WHEN event_type = 'visit_intent_clicked'
-                    THEN uuid
-                    ELSE NULL
-                    END)        AS visit_intent_clicked,
-    COUNT(DISTINCT CASE
-                    WHEN event_type = 'schedule_page_viewed'
-                    THEN uuid
-                    ELSE NULL
-                    END)        AS schedule_page_viewed
-    FROM datalake_amplitude_clean_prod.events
-    WHERE event_type IN ('listing_page_viewed', 'visit_intent_clicked', 'schedule_page_viewed')
-      AND year >= 2019
+        DATE(ts_event) AS event_time,
+        CAST(json_extract_path_text(event_properties, 'house_id') AS VARCHAR) AS house_id,
+        COUNT(DISTINCT CASE
+                        WHEN event_type = 'listing_page_viewed'
+                        THEN uuid
+                        ELSE NULL
+                        END) AS listing_page_viewed,
+        COUNT(DISTINCT CASE
+                        WHEN event_type = 'visit_intent_clicked'
+                        THEN uuid
+                        ELSE NULL
+                        END) AS visit_intent_clicked,
+        COUNT(DISTINCT CASE
+                        WHEN event_type = 'schedule_page_viewed'
+                        THEN uuid
+                        ELSE NULL
+                        END) AS schedule_page_viewed
+    FROM datalake_amplitude_clean_prod.events_repartitioned
+    WHERE year >= 2019
+        and event_type IN ('listing_page_viewed',
+                           'visit_intent_clicked',
+                           'schedule_page_viewed')
     GROUP BY 1, 2
-    ORDER BY 1, 2
 	),
 	
 bookings AS (
