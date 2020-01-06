@@ -1,12 +1,12 @@
 with all_events as (
       select
-         extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _year,
-         extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _month,
-         extract(week from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _week,
-         extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _day,
-         coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
+         extract(year from ts_event) as _year,
+         extract(month from ts_event) as _month,
+         extract(week from ts_event) as _week,
+         extract(day from ts_event) as _day,
+         coalesce(cast(id_amplitude as varchar), '') as amplitude_id,
          false as partial
-      from datalake_amplitude_clean_prod.events
+      from datalake_amplitude_clean_prod.events_repartitioned
       where event_type in ('listing_page_viewed',
                            'search_results_page_viewed',
                            'schedule_page_viewed',
@@ -23,10 +23,10 @@ with all_events as (
                            'Listing-View',
                            'App_open',
                            'session_start')
-         and ((app = 170698 and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
-          or (app = 157033 and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-          or (app = 160023 and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-          or (app = 156118 and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))
-         and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < cast(now() as date)
-         and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-01-01' as date)
+         and ((id_app = 170698 and date(ts_event) >= cast('2017-08-23' as date))
+          or (id_app = 157033 and date(ts_event) < cast('2017-08-23' as date))
+          or (id_app = 160023 and date(ts_event) < cast('2017-08-23' as date))
+          or (id_app = 156118 and date(ts_event) < cast('2017-08-23' as date)))
+         and date(ts_event) < cast(now() as date)
+         and date(ts_event) >= cast('2017-01-01' as date)
 ),
