@@ -6,9 +6,9 @@ class DatalakeMetastoreService:
     def get_db_info(env, source):
         Environment.validate_env(env)
 
-        # TODO: if clause should be removed
-        # Forno is under new AWS accounts, then use new structure
+        # TODO: Forno is under new AWS accounts, then use new structure
         # Prod is temporarily under old AWS account and will be migrated soon, then this
+        # if clause should be removed
         if env == Environment.FORNO:
             bucket = f"datalake.s3.{env}.data.quintoandar.com.br"
             schema_suffix = ""
@@ -44,8 +44,16 @@ class DatalakeMetastoreService:
     def get_dw_info(env, schema):
         Environment.validate_env(env)
 
+        # TODO: Forno is under new AWS accounts, then use new structure
+        # Prod is temporarily under old AWS account and will be migrated soon, then this
+        # if clause should be removed
+        if env == Environment.FORNO:
+            bucket = f"dw.s3.{env}.data.quintoandar.com.br"
+        else:
+            bucket = f"5a-dw-{env}"
+
         return {
-            "dw_bucket": f"5a-dw-{env}",
+            "dw_bucket": bucket,
             "dw_schema_databricks": f"dw_{schema}",
-            "dw_schema_path": f"s3://5a-dw-{env}/{schema}/",
+            "dw_schema_path": f"s3://{bucket}/{schema}/",
         }
