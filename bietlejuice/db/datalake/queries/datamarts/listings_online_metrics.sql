@@ -45,12 +45,12 @@ pre_online_metrics AS (
   WITH
   metrics AS (
         SELECT
-          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
+          DATE_TRUNC('week', CAST(ts_event AS DATE)) AS event_date,
           coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '') as house_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
           CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views
-        FROM datalake_amplitude_clean_prod.events
+        FROM datalake_amplitude_clean_prod.events_repartitioned
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed')
           AND platform IN ('Web', 'iOS')
           and cast(json_extract(user_properties, '$.platform') as varchar) IN ('web_mobile', 'web_desktop', 'ios')

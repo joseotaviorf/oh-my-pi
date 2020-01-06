@@ -4,11 +4,11 @@ with events as (
 	-- merge amplitude users to leading amplitude user (NEEDS MANUAL UPDATE) 
 	-- remove merge amplitude users because its columns aren't used.
 	select
-	    evt.ts_event as event_time,
-	    evt.id_amplitude,
-	    evt.id_session,
-	    evt.event_type,
-	    coalesce(split_part(split_part(json_extract_scalar(evt.user_properties, '$.entrance_uri'), 'utm_source=', 2), '&', 1), 'direct') as utm_source,
+	  evt.ts_event as event_time,
+	  evt.id_amplitude,
+	  evt.id_session,
+	  evt.event_type,
+	  coalesce(split_part(split_part(json_extract_scalar(evt.user_properties, '$.entrance_uri'), 'utm_source=', 2), '&', 1), 'direct') as utm_source,
 		coalesce(split_part(split_part(json_extract_scalar(evt.user_properties, '$.entrance_uri'), 'utm_medium=', 2), '&', 1), 'direct') as utm_medium,
 		coalesce(split_part(split_part(json_extract_scalar(evt.user_properties, '$.entrance_uri'), 'utm_campaign=', 2), '&', 1), 'direct') as utm_campaign,
 		coalesce(split_part(split_part(json_extract_scalar(evt.user_properties, '$.entrance_uri'), 'utm_content=', 2), '&', 1), 'direct') as utm_content,
@@ -37,7 +37,7 @@ touchpoints as (
 	-- aggregate events to attributed sessions (=touchpoints)
 	-- determine for each session the start_time and the time of closest conversion event
 	-- order matters for building seq. paths - user ASC > Nst conversion ASC > Nst session_start ASC
-	select
+	select 
 		evt.id_amplitude,
 		evt.id_session,
 		evt.utm_source || '/' || evt.utm_medium as utm_source_medium,

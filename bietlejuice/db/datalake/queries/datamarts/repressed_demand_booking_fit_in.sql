@@ -126,20 +126,17 @@ encaixe_to_booking as (
 ),
 encaixes_raw as (
   select
-  	cast(SUBSTR(trim(evt.event_time), 1,19)as timestamp) as event_date,
-  	trim(evt.user_id) as user_id,
-  	trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '')) as house_id,
-  	cast(date_parse(cast(json_extract(event_properties, '$.alert_target_date') as varchar), '%a, %d %b %Y %T GMT') as date) as target_date,
-  	cast(trim(cast(json_extract(event_properties, '$.alert_slot_from') as varchar)) as double) alert_slot_from,
-  	cast(trim(cast(json_extract(event_properties, '$.alert_slot_to') as varchar)) as double) alert_slot_to,
+    evt.ts_event as event_date,
+  	trim(evt.id_user) as user_id,
+  	trim(coalesce(evt.ep_house_id, '')) as house_id,
+  	cast(date_parse(evt.ep_alert_target_date, '%a, %d %b %Y %T GMT') as date) as target_date,
+  	cast(trim(evt.ep_alert_slot_from) as double) alert_slot_from,
+  	cast(trim(evt.ep_alert_slot_to) as double) alert_slot_to,
   	case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
- 	rank() over (partition by trim(evt.user_id), trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), '')) order by evt.event_time desc) as rank_enc
-  from datalake_amplitude_clean_prod.events evt
-     left join encaixe_to_booking etb on etb.user_id = trim(evt.user_id) and etb.house_id = trim(coalesce(cast(json_extract(event_properties, '$.house_id') as varchar), ''))
-  where trim(evt.event_type) = 'visit_hoursalert_confirmed'
-    and evt.year >= 2019
-    and evt.month >= 8
-    and evt.app = 170698
+ 	rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
+  from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" evt
+     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
+  where concat(cast(year as varchar), '-', cast(month as varchar)) >= '2019-08'
 ),
 encaixes_temp as (
   select distinct
