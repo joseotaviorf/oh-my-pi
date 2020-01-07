@@ -32,5 +32,8 @@ create table sortinghat.proposal (
   risk_level_best_subset varchar,
   process_date timestamp,
   home_exclusive_5A varchar,
-  home_last_published_at timestamp
+  home_last_published_at timestamp,
+  bypass_pre_analysis varchar,
+  pre_analysis_result varchar,
+  pre_analysis_reason varchar
 );

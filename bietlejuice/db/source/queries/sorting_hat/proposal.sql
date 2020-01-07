@@ -31,7 +31,10 @@ select
   risk_level_best_subset,
   process_date,
   "home_exclusive_5A",
-  home_last_published_at
+  home_last_published_at,
+  bypass_pre_analysis,
+  pre_analysis_result,
+  pre_analysis_reason
 from "Proposal"
 where date(analysis_date) <= date('{execution_date}')
 ;

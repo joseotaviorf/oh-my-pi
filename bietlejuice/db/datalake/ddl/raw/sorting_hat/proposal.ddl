@@ -32,7 +32,10 @@ create external table datalake_raw.sortinghat_proposal (
   risk_level_best_subset string,
   process_date string,
   home_exclusive_5A string,
-  home_last_published_at string
+  home_last_published_at string,
+  bypass_pre_analysis string,
+  pre_analysis_result string,
+  pre_analysis_reason string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (
