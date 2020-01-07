@@ -1,11 +1,11 @@
 drop view if exists vw_fact_house_listing_flows;
 create or replace view vw_fact_house_listing_flows as
 with legacy_doorman as (
-  select 
+  select
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
   from files.porteiros_legado
-  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
+  where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'))
     and porteiros_legado."Cod Imóvel" is not null
 ),
 rn_lead as (
@@ -38,12 +38,12 @@ base_lead_tasks_last as (
   where rn_last = 1
 ),
 base_photo_tasks as (
-  select distinct 
+  select distinct
     coalesce(h.id, h_direct.id)::integer as house_id,
     max((task_type = 'AgendarJobDeFotografo')::integer)::boolean as has_job_photo,
     max((task_type = 'FupFoto')::integer)::boolean as has_fup_photo
   from crm.photo_tasks pt
-  left join photo_job pj 
+  left join photo_job pj
     on pt.origin_id = pj.id
   left join house h
     on h.id = pj.imovel_id
@@ -51,9 +51,9 @@ base_photo_tasks as (
     on h_direct.id = pt.origin_id
   where coalesce(h.id, h_direct.id) is not null
   group by 1
-), 
+),
 base_leads as (
-  select 
+  select
     lead.id as lead_id,
     lead.tipo as lead_type,
     lead.origem as lead_origin,
@@ -62,12 +62,12 @@ base_leads as (
     coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)', false) as branded_lead,
     lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
     case
-      when lead.origem = 'Reprocessado' 
+      when lead.origem = 'Reprocessado'
         then ( select rl.id_origin_lead from reprocessed_lead rl where rl.id = lead.id)
       else NULL::bigint
     end as old_lead_id
   from lead
-), 
+),
 rep_leads as (
   select bl.lead_id,
     coalesce(old_bl.lead_type, bl.lead_type) as lead_type,
@@ -78,23 +78,23 @@ rep_leads as (
     coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead,
     coalesce(bl.lead_origin = 'Reprocessado', false) as reprocessed_flg
     from base_leads bl
-    left join base_leads old_bl 
+    left join base_leads old_bl
       on old_bl.lead_id = bl.old_lead_id
-), 
+),
 fact_with_reproc as (
   with reproc_leads as (
-    select 
+    select
       rl.id,
       l.origem,
       l.tipo,
       l.usuario_que_indicou_id,
       l.affiliate_type
     from reprocessed_lead rl
-    join lead l 
+    join lead l
       on l.id = rl.id_origin_lead
   ),
   acquisition_channels as (
-    select 
+    select
       fhlf.id,
       fhlf.lead_id,
       fhlf.conversao_id,
@@ -146,8 +146,9 @@ fact_with_reproc as (
       rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
       coalesce(
             coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
-            or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
-            , false) as is_b2b
+            or coalesce(pa_b2b.id, b2b_prime_draft.id_lead) is not null
+            , false) as is_b2b,
+      b2b_prime_draft.partner_id
     from fact_house_listing_flows fhlf
     left join lead l
       on l.id = fhlf.lead_id
@@ -155,20 +156,12 @@ fact_with_reproc as (
       on rl.id = fhlf.lead_id
     left join house h
       on h.id = fhlf.imovel_id
+    left join partner_agent pa_b2b
+      on pa_b2b.user_id = h.usuario_id
     left join (
 	  select
-	    lc.id_lead
-	  from lead_conversion lc
-	  join house h
-		on lc.id_house = h.id
-	  join partner_agent pa
-		on h.usuario_id = pa.user_id
-	  group by 1
-    ) b2b_prime
-	  on b2b_prime.id_lead = l.id
-    left join (
-	  select
-	    l.id as id_lead
+	    l.id as id_lead,
+	    max(pa_b2b.user_id) as partner_id
 	  from lead l
 	  join usuario u_b2b
 		on u_b2b.telefone_principal = l.telefone_anunciante
@@ -181,7 +174,6 @@ fact_with_reproc as (
 	left join house_listing hl
       on hl.id_house = fhlf.imovel_id
         and hl.version = 0
-      and hl.version = 0
     left join lead_sales_company lsc
       on lsc.id_lead = l.id
     where h.is_for_rent::int::boolean or l.is_for_rent::int::boolean
@@ -232,7 +224,8 @@ fact_with_reproc as (
     acquisition_channels.acquisition_channel_rep,
     acquisition_channels.origin_lead_usuario_que_indicou_id,
     acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
-    acquisition_channels.is_b2b
+    acquisition_channels.is_b2b,
+    acquisition_channels.partner_id
   from acquisition_channels
 ),
 acquisitions as (
@@ -267,25 +260,25 @@ leads_b2b as (
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id
   from lead l
-  left join partner_agent pa_b2b_online 
+  left join partner_agent pa_b2b_online
     on pa_b2b_online.user_id = l.usuario_que_indicou_id
   where pa_b2b_online.partner_id is not null
-), 
+),
 lead_city_region as (
   with city_region as (
-    select 
+    select
       region.id as id_region,
       regexp_replace(remove_accentuation(lower(region.nome)), '[^a-z]+', '', 'g') as formatted_city
     from region
     where region.nivel = 'Cidade'
   )
-  select 
+  select
     l.id,
     r.id_region
   from lead l
-  join city_region r 
+  join city_region r
     on r.formatted_city = regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '', 'g')
-), 
+),
 potential_listings as (
     select f.id as sk_house_listing_flow,
     coalesce(h.condo_id, '-1'::integer::bigint) as sk_condo,
@@ -301,7 +294,7 @@ potential_listings as (
     coalesce(f.region_id, '-1'::integer) as sk_region,
     coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, lcr.id_region, '-1'::integer) as sk_city,
-    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, '-1'::integer::bigint) as sk_partner,
+    coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, f.partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
     coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
@@ -358,7 +351,7 @@ potential_listings as (
     lfet.tracking_platform,
     coalesce(lower(btrim(lfet.tracking_campaign)) ~* '(institucional)|(branded)',
              bl.branded_lead) as is_branded,
-    (bl.b2b_lead or f.is_b2b) as is_b2b, -- Using business rules for both constraints of old b2b and new one
+    f.is_b2b,
     bl.reprocessed_flg,
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' as is_isales_direct_register,
@@ -381,30 +374,30 @@ potential_listings as (
 		 when u.dados_agente_id is not null then 'Agent'
 		 else ua.affiliateType end as affiliate_type
   from fact_with_reproc f
-  left join lead_first_event_tracking lfet 
+  left join lead_first_event_tracking lfet
     on lfet.id_lead = f.lead_id
-  left join acquisitions a 
+  left join acquisitions a
     on a.id = f.id
   left join base_lead_tasks_first btf
     on btf.lead_id = f.lead_id
   left join base_lead_tasks_last btl
     on btl.lead_id = f.lead_id
-  left join base_photo_tasks bpt 
+  left join base_photo_tasks bpt
     on f.imovel_id = bpt.house_id
-  left join rep_leads bl 
+  left join rep_leads bl
     on bl.lead_id = f.lead_id
-  left join house h 
+  left join house h
     on f.imovel_id = h.id
-  left join usuario us_cad 
-    on us_cad.id = h.usuario_que_cadastrou_id 
+  left join usuario us_cad
+    on us_cad.id = h.usuario_que_cadastrou_id
       and us_cad.email ~~ '%@hargos.com.br'
-  left join staging.dim_region dr 
+  left join staging.dim_region dr
     on dr.sk_region = f.region_id
-  left join lead_city_region lcr 
+  left join lead_city_region lcr
     on coalesce(f.region_id, '-1'::integer) = '-1'::integer and f.lead_id = lcr.id
-  left join leads_b2b l_b2b 
+  left join leads_b2b l_b2b
     on l_b2b.id_lead = f.lead_id
-  left join partner_agent pa_b2b_prime 
+  left join partner_agent pa_b2b_prime
     on h.usuario_id = pa_b2b_prime.user_id
   left join usuario u
 	on coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) = u.id
@@ -415,7 +408,7 @@ potential_listings as (
   left join house_listing hl_version_zero
   	on hl_version_zero.id_house = f.imovel_id
   	  and hl_version_zero.version = 0
-), 
+),
 taxonomy as (
   select
     distinct
@@ -438,7 +431,7 @@ taxonomy as (
     and mkt_origin <> 'B2B'
 ),
 applied_taxonomy as (
-select 
+select
   pl.*,
   case
     when pl.is_branded then 'Branded'
@@ -483,9 +476,9 @@ select
   end as mkt_source,
   now() as ts_load
 from potential_listings pl
-left join taxonomy t 
-  on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '') 
-    and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '') 
+left join taxonomy t
+  on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '')
+    and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '')
     and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
     and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
     and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')

@@ -7,8 +7,7 @@ with b2b_info as (
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
     coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
       or pa_b2b.id is not null
-      or coalesce(lo.codigo_imobiliaria, l.codigo_imobiliaria) is not null
-  	  or lo.flg_b2b or l.flg_b2b, false) as is_b2b,
+      , false) as is_b2b,
     case
       when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
        then 'online'

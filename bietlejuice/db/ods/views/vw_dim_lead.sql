@@ -54,13 +54,12 @@ create or replace view vw_dim_lead as
   coalesce(lo.usuario_que_indicou_id, l.usuario_que_indicou_id) as usuario_que_indicou_id,
   lsf.score_factor,
   coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-  	or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
-  	or coalesce(lo.codigo_imobiliaria, l.codigo_imobiliaria) is not null
-  	or lo.flg_b2b or l.flg_b2b, false) as is_b2b,
+  	or coalesce(lead_b2b.id, b2b_prime_draft.id_lead) is not null
+    , false) as is_b2b,
   case
     when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
      then 'online'
-    when coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
+    when coalesce(lead_b2b.id, b2b_prime_draft.id_lead) is not null
      then 'prime'
   end as b2b_type,
   lsc.sales_company,
@@ -94,17 +93,15 @@ left join lateral
   limit 1
 )  an
   on true
-left join (
-	select
-		lc.id_lead
+LEFT join (
+	select distinct lc.id_lead as id
 	from lead_conversion lc
 	join house h
-		on lc.id_house = h.id
+	    on lc.id_house = h.id
 	join partner_agent pa
-		on h.usuario_id = pa.user_id
-	group by 1
-) b2b_prime
-	on b2b_prime.id_lead = l.id
+	    on h.usuario_id = pa.user_id
+) lead_b2b
+	on lead_b2b.id = l.id
 left join (
 	select
 	    l.id as id_lead
