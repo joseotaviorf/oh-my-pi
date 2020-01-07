@@ -7,7 +7,6 @@ SELECT
   `status`,
   rejection_reason_description,
   `type`,
-  raw_entity,
   rejection_reason,
   original_rent,
   iteration,

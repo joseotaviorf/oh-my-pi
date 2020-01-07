@@ -6,7 +6,6 @@ SELECT
   version,
   `status`,
   `type`,
-  raw_entity,
   raw_document,
   created_at as ts_created,
   updated_at as ts_updated
