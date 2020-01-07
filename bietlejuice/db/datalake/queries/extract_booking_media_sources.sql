@@ -1,6 +1,6 @@
 with cross_platform as (
 	select
-	    "170698" as app,
+	    '170698' as app,
 	    ts_event,
 	    up_platform as platform,
 	    ep_visit_code as visit_code,
@@ -19,7 +19,7 @@ with cross_platform as (
 ),
 ios as (
 	select
-			"156118" as app,
+			'156118' as app,
 	    ts_event,
 	    'ios' as platform,
 	    coalesce(
@@ -42,7 +42,7 @@ ios as (
 ),
 web as (
 	select
-		"160023" as app,
+		'160023' as app,
 		ts_event,
 		case
 			when device_type in ('Linux','Windows','Mac') then 'web_desktop'
@@ -67,7 +67,7 @@ web as (
 ),
 android as (
 	select
-		"157033" as app,
+		'157033' as app,
 		ts_event,
 		'android'	as platform,
 		coalesce(

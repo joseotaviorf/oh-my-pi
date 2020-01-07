@@ -12,7 +12,7 @@ with amplitude_affiliate_tracking as(
         coalesce(country, '') as country,
         coalesce(region, '') as region,
         coalesce(city, '') as city,
-        coalesce(ts_client_event, '') as client_event_time,
+        ts_client_event as client_event_time,
         ts_event
     FROM datalake_amplitude_clean_prod.events_repartitioned
     WHERE event_type IN ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
@@ -36,11 +36,7 @@ select
 	country,
 	region,
 	city,
-	case
-		when
-			length(client_event_time) > 19 then date_parse(client_event_time, '%Y-%m-%d %H:%i:%s.%f')
-		else date_parse(client_event_time, '%Y-%m-%d %H:%i:%s') end
-		as client_event_time
+	client_event_time
 from
 	amplitude_affiliate_tracking
 where event_order = 1
