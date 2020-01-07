@@ -14,6 +14,7 @@ class DatabaseEnum:
     VANS = "ENV_VANS"
     RETSUKO = "ENV_RETSUKO"
     HEIMDALL = "HEIMDALL"
+    SAURON = "SAURON_DB"
 
 
 class DatabaseTypeEnum:
