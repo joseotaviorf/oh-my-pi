@@ -7,7 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.spark import sqlContext, SparkTableStorageFormat
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.services import SparkDataFrameService
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
