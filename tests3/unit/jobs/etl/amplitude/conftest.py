@@ -1,8 +1,8 @@
 import pytest
 
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
+from bietlejuice.jobs.composer.services import SparkDataFrameService
 
 
 class MockedSparkSqlConsumer:

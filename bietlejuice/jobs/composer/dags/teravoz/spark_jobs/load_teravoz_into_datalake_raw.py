@@ -8,11 +8,8 @@ from collections import OrderedDict
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_teravoz_client import TeravozClient
 
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkDataFrameService,
-    SparkTableStorageFormat,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.jobs.composer.services import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient

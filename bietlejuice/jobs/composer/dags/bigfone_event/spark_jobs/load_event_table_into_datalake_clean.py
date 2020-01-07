@@ -5,7 +5,7 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer

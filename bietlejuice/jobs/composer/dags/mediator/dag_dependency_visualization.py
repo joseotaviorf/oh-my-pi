@@ -4,7 +4,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DEPENDENCIES_FILE_PATH
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services import FileService
 
 logger = QuintoAndarLogger("dag_dependency_visualization")
 

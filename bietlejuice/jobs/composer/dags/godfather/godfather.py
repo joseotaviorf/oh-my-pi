@@ -11,7 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # DAG params
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services.file_service import FileService
 
 DAG_ID = "godfather"
 FULL_DAG_ID = f"bietlejuice.{DAG_ID}"

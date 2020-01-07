@@ -6,7 +6,7 @@ import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.s3 import S3Service
+from bietlejuice.jobs.composer.services import S3Service
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, BaseSparkContext
 from bietlejuice.jobs.composer.clients.db_clients import PostgresClient, SparkClient
 from bietlejuice.jobs.composer.loaders import RedshiftLoader

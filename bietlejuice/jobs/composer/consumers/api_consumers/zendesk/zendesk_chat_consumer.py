@@ -3,7 +3,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.consumers.api_consumers.zendesk.zendesk_consumer import (
     ZendeskConsumer,
 )
-from bietlejuice.jobs.composer.service.json_service import JsonService
+from bietlejuice.jobs.composer.services.json_service import JsonService
 
 logger = QuintoAndarLogger("ZendeskChatsConsumer")
 

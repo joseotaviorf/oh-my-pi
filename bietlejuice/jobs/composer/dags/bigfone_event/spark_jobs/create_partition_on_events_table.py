@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.composer.services.metastore_services import AthenaMetastoreService
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 
 DATABRICKS_SCOPE = "quintoandar"

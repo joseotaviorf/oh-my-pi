@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.base.db import (
     DatalakeMetastoreService,
     DDL_DATALAKE_PATH,
 )
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import spark, sqlContext
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient, SparkClient
 from bietlejuice.jobs.composer.services.metastore_services import (

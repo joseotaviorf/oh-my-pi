@@ -10,7 +10,7 @@ from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Oper
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
-from bietlejuice.jobs.composer.base.etl import FileService
+from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = "bietlejuice.composer"
 ENV = Variable.get("environment")
