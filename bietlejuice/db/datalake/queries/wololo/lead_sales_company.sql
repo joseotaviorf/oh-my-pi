@@ -5,6 +5,7 @@ lead_revision as (
       dimensionentity_id,
       salescompany as sales_company,
       from_unixtime(info.revtstmp/1000) as rev_datetime,
+      info.rev,
       min(from_unixtime(info.revtstmp/1000)) over (partition by referenceid) as insert_time,
       case when lag (salescompany) over (partition by referenceid order by from_unixtime(info.revtstmp/1000) asc) <> salescompany then true else false end as flag_change_sales_company
     from datalake_wololo_raw_prod.prospect_aud p
@@ -19,12 +20,21 @@ last_change_company as (
         max(case when flag_change_sales_company = true then rev_datetime else insert_time end) as last_change_company_time
     from lead_revision
     group by 1
-)
+),
+distinct_lcc as (
 select
     lr.id_lead,
     sales_company,
-    last_change_company_time as ts_sales_company_sent
+    last_change_company_time as ts_sales_company_sent,
+    rank() over (partition by lr.id_lead order by lr.rev desc) as rnk_lead
 from lead_revision lr
      join last_change_company lcc
         on lr.id_lead = lcc.id_lead
         and lcc.last_change_company_time = lr.rev_datetime
+)
+select
+    id_lead,
+    sales_company,
+    ts_sales_company_sent
+from distinct_lcc
+where rnk_lead = 1
