@@ -19,7 +19,7 @@ ENV = Variable.get("environment")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 # Job params
 SOURCE = "godfather"
