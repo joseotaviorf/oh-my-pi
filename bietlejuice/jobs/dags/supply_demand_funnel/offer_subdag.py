@@ -1,12 +1,12 @@
 from datetime import datetime
 
+from qa_python_utils import QuintoAndarLogger
+
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
-from bietlejuice.jobs.etl.godfather import GodFather
-from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('OfferSubDag')
 
@@ -29,26 +29,20 @@ class OfferSubDag(DimSubDag):
     def build_offer_with_tests(self):
         offer_dag = self._build_local_dag()
 
-        (offer_to_s3_task, topic_to_s3_task, message_to_s3_task, offer_to_ods_task, pre_proposal_task,
-         pre_proposta_aud_task, staging_dim_offer_task,
-         dim_offer_task) = self.__build_data_tasks(offer_dag)
+        (offer_to_ods_task, pre_proposal_task, pre_proposta_aud_task,
+         staging_dim_offer_task, dim_offer_task) = self.__build_data_tasks(offer_dag)
 
         tests_tasks = self.build_tests_tasks(
             dag=offer_dag,
             from_file_query=True
         )
 
-        offer_to_ods_task.set_upstream([offer_to_s3_task, topic_to_s3_task, message_to_s3_task])
         pre_proposal_task >> pre_proposta_aud_task
-        offer_to_ods_task >> staging_dim_offer_task
+        staging_dim_offer_task.set_upstream([offer_to_ods_task, pre_proposta_aud_task])
         staging_dim_offer_task.set_downstream(tests_tasks)
         dim_offer_task.set_upstream(tests_tasks)
 
         return offer_dag
-
-    @staticmethod
-    def __to_s3(**kwargs):
-        GodFather.to_s3(s3_bucket=OfferSubDag.S3_BUCKET, table_name=kwargs['table_name'])
 
     @logger
     def get_pre_proposal_query(self, **kwargs):
@@ -64,32 +58,6 @@ class OfferSubDag(DimSubDag):
 
     @logger
     def __build_data_tasks(self, dag):
-        offer_to_s3_task = BaseDAG.build_python_operator(
-            task_id='offer_to_s3',
-            dag=dag,
-            python_callable=OfferSubDag.__to_s3,
-            op_kwargs={
-                'table_name': 'offer'
-            }
-        )
-
-        topic_to_s3_task = BaseDAG.build_python_operator(
-            task_id='offer_topic_to_s3',
-            dag=dag,
-            python_callable=OfferSubDag.__to_s3,
-            op_kwargs={
-                'table_name': 'topic'
-            }
-        )
-
-        message_to_s3_task = BaseDAG.build_python_operator(
-            task_id='message_to_s3',
-            dag=dag,
-            python_callable=OfferSubDag.__to_s3,
-            op_kwargs={
-                'table_name': 'message'
-            }
-        )
 
         offer_to_ods_task = BaseDAG.build_python_operator(
             task_id='offer_to_ods',
@@ -143,5 +111,5 @@ class OfferSubDag(DimSubDag):
             }
         )
 
-        return (offer_to_s3_task, topic_to_s3_task, message_to_s3_task, offer_to_ods_task, pre_proposal_task,
+        return (offer_to_ods_task, pre_proposal_task,
                 pre_proposta_aud_task, staging_dim_offer_task, dim_offer_task)

@@ -40,15 +40,15 @@ rent_value_offers as (
 max_topic_type as (
   with max_topic_created as (
     select
-      offer_id,
+      id_offer,
       max(id) as id
-    from datalake_raw.godfather_topic
+    from datalake_godfather_clean_prod.business_topic
     group by 1
   )
   select gt.*
-  from datalake_raw.godfather_topic gt
+  from datalake_godfather_clean_prod.business_topic gt
   join max_topic_created mtc
-    on gt.offer_id = mtc.offer_id
+    on gt.id_offer = mtc.id_offer
       and gt.id = mtc.id
 )
 select distinct
@@ -73,24 +73,24 @@ select distinct
   eo.iteration,
   eo.expirationdate,
   coalesce(go_godfather.type, go_firestore.type) as type,
-  coalesce(go_godfather.first_sent_at, go_firestore.first_sent_at) as first_sent_at,
-  coalesce(go_godfather.last_sent_at, go_firestore.last_sent_at) as last_sent_at,
+  coalesce(go_godfather.ts_first_sent, go_firestore.ts_first_sent) as first_sent_at,
+  coalesce(go_godfather.ts_last_sent, go_firestore.ts_last_sent) as last_sent_at,
   coalesce(mtt_godfather.type, mtt_firestore.type) as topic_type,
   rvo.first_rent_offered_by_tenant,
   rvo.first_rent_offered_by_owner,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner
 from datalake_ebdb_raw_prod.offer eo
-left join datalake_raw.godfather_offer go_godfather
+left join datalake_godfather_clean_prod.business_offer go_godfather
   on eo.godfatherid = try_cast(go_godfather.id as bigint)
     and eo.godfatherid is not null
-left join datalake_raw.godfather_offer go_firestore
-  on eo.firestoreid = go_firestore.firestore_id
+left join datalake_godfather_clean_prod.business_offer go_firestore
+  on eo.firestoreid = go_firestore.id_firestore
     and eo.godfatherid is null
 left join max_topic_type mtt_godfather
-  on mtt_godfather.offer_id = go_godfather.id
+  on mtt_godfather.id_offer = go_godfather.id
 left join max_topic_type mtt_firestore
-  on mtt_firestore.offer_firestore_id = go_firestore.firestore_id
+  on mtt_firestore.id_offer_firestore = go_firestore.id_firestore
 left join analysis_date ad
   on ad.id = eo.id
 left join rent_value_offers rvo
