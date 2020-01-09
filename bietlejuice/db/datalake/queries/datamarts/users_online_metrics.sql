@@ -2,8 +2,8 @@ with pre_online_metrics AS (
   WITH
   metrics AS (
         SELECT
-          DATE_TRUNC('week', CAST(ts_event AS DATE)) AS event_date,
-          id_user as user_id,
+          DATE_TRUNC('week', CAST(SUBSTRING(TRIM(event_time), 1, 10) AS DATE)) AS event_date,
+          user_id,
           CASE WHEN event_type = 'listing_page_viewed' THEN uuid END AS listing_page_views,
           CASE WHEN event_type = 'schedule_page_viewed' THEN uuid END AS schedule_page_views,
           CASE WHEN event_type = 'tips_page_viewed' THEN uuid END AS tips_page_views,
@@ -17,7 +17,7 @@ with pre_online_metrics AS (
           CASE WHEN event_type = 'tip_entrydate_confirmed' THEN uuid END AS tip_entrydate_confirmed,
           CASE WHEN event_type = 'tip_description_confirmed' THEN uuid END AS tip_description_confirmed,
           CASE WHEN event_type = 'tip_negotiation_confirmed' THEN uuid END AS tip_negotiation_confirmed
-        FROM datalake_amplitude_clean_prod.events_repartitioned
+        FROM datalake_amplitude_clean_prod.events
         WHERE event_type IN ('listing_page_viewed', 'schedule_page_viewed', 'tips_page_viewed',
                              'tip_video_confirmed', 'tip_pets_confirmed', 'tip_furniture_confirmed', 'tip_entrydate_confirmed',
                              'tip_lowerprice_page_viewed', 'tip_lowerprice_confirmed', 'tip_description_confirmed', 'tip_negotiation_confirmed',
