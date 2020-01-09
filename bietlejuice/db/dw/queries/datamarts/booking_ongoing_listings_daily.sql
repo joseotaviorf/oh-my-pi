@@ -98,15 +98,16 @@ bookings as (
 lpv_events as (
 	-- aggregates listing_page_view event counts per event date and house_id
 	with amplitude as (
-        SELECT
-            case when nullif(regexp_substr(event_house_id::varchar, '^\\d{9}$'), '') is not null
-                 then regexp_substr(event_house_id::varchar, '^\\d{9}$')::bigint
-                 else null end as id_house,
-            to_char(date(regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')), 'YYYYMMDD')::bigint as sk_event_dt,
-            regexp_substr(event_time, '(\\d{4}-\\d{2}-\\d{2})')::date as event_dt,
+	    select
+            case
+              when nullif(regexp_substr(json_extract_path_text(event_properties, 'house_id'), '^\\d{9}$'), '') is not null
+                then regexp_substr(json_extract_path_text(event_properties, 'house_id'), '^\\d{9}$')::bigint
+              else null
+            end as id_house,
+            to_char(date(ts_event), 'YYYYMMDD')::bigint as sk_event_dt,
+            ts_event::date as event_dt,
             uuid
-        FROM datalake_amplitude_clean_prod.listing_page_viewed_events
-        WHERE app = 170698
+        from datalake_amplitude_clean_staging_prod."170698_listing_page_viewed_events"
     )
     select
         id_house,
