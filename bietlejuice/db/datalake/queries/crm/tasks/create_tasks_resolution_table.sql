@@ -36,7 +36,7 @@ with actions_prev as (
     resolved,
     regexp_extract_all(actions, '{[^}]+[^,]+[^{]+}') as action_array
   from datalake_clean.crm_tasks
-  where dt = '__PARTITION_DATE__'
+  where dt = '__PARTITION_DATE__' and type <> 'RevisarChat' -- temporal fix
   -- Filtering out bugged tasks with more than 500 actions
   and cardinality(regexp_extract_all(actions, '{[^}]+[^,]+[^{]+}')) <= 500
 ),
