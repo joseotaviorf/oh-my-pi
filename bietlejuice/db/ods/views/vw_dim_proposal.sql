@@ -36,7 +36,7 @@ with sortinghat_prop_prev as (
 	  pv.analysis_date as version_analysis_date,
 		row_number() over (partition by p.id order by pv.id) as rn
 	from sortinghat.proposal p
-	left join sortinghat.proposal_version pv
+	left join sortinghat.proposalversion pv
 		on p.id = pv.proposal_id
 ),
 sortinghat_prop as (
