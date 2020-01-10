@@ -39,7 +39,6 @@ select
 	ft.minutes_requester_wait_time_business,
 	ft.minutes_requester_wait_time_calendar,
     case when cast(ft.minutes_requester_wait_time_business as float)/60.0 <= 8 then 1 else 0 end as sla,
-    ft.minutes_requester_wait_time_business,
     cast(ft.minutes_requester_wait_time_business as float)/60.0 as rwt_hour,
     ft.replies,
     case
