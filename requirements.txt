@@ -81,4 +81,4 @@ snakebite==2.11.0
 rtbhouse-sdk==4.1.0
 sshtunnel==0.1.4
 twitter-ads==5.1.1
-git+git://github.com/quintoandar/python-utils.git@v0.3.6 # must be the last to be installed
+git+git://github.com/quintoandar/python-utils.git@v0.3.8 # must be the last to be installed
