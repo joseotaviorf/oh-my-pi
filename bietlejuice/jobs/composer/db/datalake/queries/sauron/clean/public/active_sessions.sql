@@ -1,0 +1,13 @@
+select
+  id,
+  agent,
+  status,
+  user_data,
+  user_phone,
+  last_message_at as ts_last_message,
+  first_message_at as ts_first_message,
+  context,
+  created_by,
+  created_at as ts_created,
+  updated_at as ts_updated
+from datalake_sauron_raw.activesessions
