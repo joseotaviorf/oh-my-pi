@@ -65,11 +65,6 @@ left JOIN
   Usuario udc
   on udc.id = dc.usuario_id
 left join
-  DadosGerenteContas dgc
-  on dgc.id = l.gerenteContas_id
-left join Usuario udgc
-  on udgc.id = dgc.usuario_id
-left join
   ProprietarioLead pl
   on pl.id = l.proprietarioLead_id
 left join

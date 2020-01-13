@@ -113,12 +113,6 @@ select
     DadosAfiliado_AUD da2
     on da1.id = da2.id and da1.REV = da2.REV
   left join
-    DadosGerenteContas gc
-    on gc.id = daf.gerenteContas_id
-  left join
-    Usuario ugc
-    on ugc.id = gc.usuario_id
-  left join
   (
     select
       U.id,
