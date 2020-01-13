@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS marketing.dim_google_keyword (
 	campaign_name VARCHAR,
 	adgroup_name VARCHAR,
 	match_type VARCHAR,
+	is_test_campaign BOOLEAN,
 	ts_load TIMESTAMP
 );

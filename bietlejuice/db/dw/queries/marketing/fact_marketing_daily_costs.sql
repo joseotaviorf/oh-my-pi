@@ -50,6 +50,9 @@ google_consolidated_cost as (
             on dga.sk_ad = fg.sk_ad
         left join marketing.dim_google_campaign dgc
             on dgc.sk_campaign = fg.sk_campaign
+        where dgk.is_test_campaign is not true
+          and dga.is_test_campaign is not true
+          and dgc.is_test_campaign is not true
         )
     select
 		coalesce(m.sk_date, g.sk_date) as sk_date,
@@ -96,7 +99,7 @@ fb_hist_list_affiliates as (
             hist.campaign
     from marketing.fact_facebook_daily_cost_attributions ff
     join marketing.dim_facebook_ad df
-        on ff.sk_ad = df.sk_ad
+        on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
     join formatted_historic_affiliates_national_campaigns_cost hist
         on lower(df.campaign_name) = lower(hist.campaign)
         and ff.sk_date = hist.sk_cost_date
@@ -200,7 +203,7 @@ campaigns_full as (
 		null as total_cost
 	from marketing.fact_facebook_daily_cost_attributions ff
 	join marketing.dim_facebook_ad df
-		on ff.sk_ad = df.sk_ad
+		on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
 	left join fb_hist_list_affiliates hl
 	    on hl.sk_date = ff.sk_date
 	    and df.campaign_name = hl.campaign_name
@@ -510,7 +513,7 @@ UNION
 	 	    when cf.campaign_name_l like '%minas_gerais%' then 'Belo Horizonte'
 	     	when cf.campaign_name_l like '%goi_nia%' or cf.campaign_name_l like '%goi_s%' then 'Goiânia'
 	     	when cf.campaign_name_l like '%bras_lia%' or cf.campaign_name_l like '%distrito_federal%' then 'Brasília'
-	     	when cf.campaign_name_l like '%porto%alegre%' then 'Porto Alegre' 
+	     	when cf.campaign_name_l like '%porto%alegre%' then 'Porto Alegre'
 	     	when cf.campaign_name_l like '%curitiba%' or cf.campaign_name_l like '%paran_%' then 'Curitiba'
 	     	when cf.campaign_name_l like '%florian_polis%' or cf.campaign_name_l like '%santa_catarina%' then 'Florianópolis'
 	     	when cf.campaign_name_l like '%poa%' then 'Porto Alegre'
@@ -585,7 +588,7 @@ UNION
 		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l
 		left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
-			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '') 
+			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '')
 				and cf.fact_cost = tx.fact_cost
 				and cf.origin = tx.origin
 ), kenshoo as (
@@ -614,7 +617,7 @@ UNION
 			on tx.origin = 'kenshoo'
 			and tx.side = ct.side
 )
-select 
+select
     sk_date,
     side as funnel_side,
     account_name,

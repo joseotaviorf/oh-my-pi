@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS marketing.dim_google_ad (
 	adgroup_name VARCHAR,
 	image_creative_name VARCHAR,
 	ad_type VARCHAR,
+	is_test_campaign BOOLEAN,
 	ts_load TIMESTAMP
 );

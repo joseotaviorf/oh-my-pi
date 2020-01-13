@@ -5,7 +5,8 @@ WITH clean_table_common as (
         ad_name,
         adset_name,
         campaign_name,
-        acc as account_name
+        acc as account_name,
+        (campaign_name like 'ZEBRA%') as is_test_campaign
     FROM staging.marketing_facebook_ads
     group by 2,3,4,5,6
 )

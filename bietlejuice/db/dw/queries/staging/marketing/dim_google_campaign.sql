@@ -5,7 +5,8 @@ WITH clean_table_common as (
         campaign_id,
         campaign_name,
         acc as account_name,
-        labels
+        labels,
+        (campaign_name like 'ZEBRA%') as is_test_campaign
     FROM staging.marketing_google_campaigns
     group by 2,3,4,5,6
 )

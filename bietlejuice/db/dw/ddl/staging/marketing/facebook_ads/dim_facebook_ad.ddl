@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS staging.dim_facebook_ad (
     adset_name VARCHAR,
     campaign_name VARCHAR,
     account_name VARCHAR,
+    is_test_campaign BOOLEAN,
     ts_load TIMESTAMP
 );

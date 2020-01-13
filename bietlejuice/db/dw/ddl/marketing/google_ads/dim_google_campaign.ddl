@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS marketing.dim_google_campaign (
     campaign_name varchar,
     account_name varchar,
     labels varchar,
+    is_test_campaign BOOLEAN,
     ts_load TIMESTAMP
 );
