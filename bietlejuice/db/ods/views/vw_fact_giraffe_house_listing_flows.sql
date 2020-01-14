@@ -4,7 +4,7 @@ with legacy_doorman as (
   select 
     porteiros_legado."Status" as status,
     892700000 + porteiros_legado."Cod Imóvel"::double precision::bigint as imovel_id
-  from files.porteiros_legado
+  from gsheets.porteiros_legado
   where (porteiros_legado."Status" in ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead')) 
     and porteiros_legado."Cod Imóvel" is not null
 ),
@@ -432,7 +432,7 @@ taxonomy as (
     mkt_medium,
     mkt_source
   from
-    files.taxonomy_growth
+    gsheets.taxonomy_growth
   where
     coalesce(mkt_medium, '') <> 'Doorman User'
     and mkt_origin <> 'B2B'

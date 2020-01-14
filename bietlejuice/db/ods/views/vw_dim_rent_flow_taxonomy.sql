@@ -11,5 +11,5 @@ select
 	Source as mkt_source,
 	Platform as mkt_platform,
 	now()::timestamp as ts_load
-from files.taxonomy_demand
+from gsheets.taxonomy_demand
 ;

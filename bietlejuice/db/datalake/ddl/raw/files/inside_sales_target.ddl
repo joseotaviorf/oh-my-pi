@@ -25,7 +25,7 @@ with serdeproperties (
   'mapping.manager'='Manager',
   'mapping.manager_id'='Manager ID'
 )
-location 's3://5a-datalake/raw/files/inside_sales_target/'
+location 's3://5a-datalake/raw/gsheets/inside_sales_target/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

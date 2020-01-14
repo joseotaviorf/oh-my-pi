@@ -28,7 +28,7 @@ with serdeproperties (
   'mapping.mkt_source'='Source',
   'mapping.mkt_platform'='Platform'
 )
-location 's3://5a-datalake/raw/files/taxonomy_demand/'
+location 's3://5a-datalake/raw/gsheets/taxonomy_demand/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

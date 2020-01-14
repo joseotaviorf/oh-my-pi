@@ -19,7 +19,7 @@ with serdeproperties (
   'separatorChar' = ';',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/raw/files/taxonomy_growth/'
+location 's3://5a-datalake/raw/gsheets/taxonomy_growth/'
 tblproperties (
   'skip.header.line.count' = '1'
 )

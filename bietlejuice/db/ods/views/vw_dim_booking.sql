@@ -16,7 +16,7 @@ taxonomy_demand as (
 	 with taxonomy_min_ids as (
 		select
 		  min(id) as id
-		from files.taxonomy_demand
+		from gsheets.taxonomy_demand
 		group by
 			lower(app_type),
 			lower(utm_source),
@@ -40,7 +40,7 @@ taxonomy_demand as (
 			td.Medium as mkt_medium,
 			td.Source as mkt_source,
 			td.Platform as mkt_platform
-    from files.taxonomy_demand td
+    from gsheets.taxonomy_demand td
     join taxonomy_min_ids td_min
     	on td.id = td_min.id
 ),
