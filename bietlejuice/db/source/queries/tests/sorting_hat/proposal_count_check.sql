@@ -1,4 +1,4 @@
 select count(*)
 from "Proposal"
-where date(analysis_date) <= date('{execution_date}')
+where date(created_at) <= date('{execution_date}')
 ;

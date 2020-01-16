@@ -120,13 +120,13 @@ screening_result_task = BaseDAG.build_python_operator(
 )
 
 # unit tests
-proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='proposal_unit_tests',
-    entity='proposal',
-    use_query_param=True
-)
+# proposal_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=unit_tests_sub_dag,
+#     sub_dag_name='proposal_unit_tests',
+#     entity='proposal',
+#     use_query_param=True
+# )
 
 proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -135,13 +135,13 @@ proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     entity='proponent'
 )
 
-proposal_version_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='proposal_version_unit_tests',
-    entity='proposal_version',
-    use_query_param=True
-)
+# proposal_version_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=unit_tests_sub_dag,
+#     sub_dag_name='proposal_version_unit_tests',
+#     entity='proposal_version',
+#     use_query_param=True
+# )
 
 external_score_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -159,8 +159,6 @@ screening_result_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
 )
 
 # flow
-proposal_task >> proposal_unit_tests_dag
-proposal_version_task >> proposal_version_unit_tests_dag
 proponent_task >> proponent_unit_tests_dag
 external_score_task >> external_score_unit_tests_dag
 screening_result_task >> screening_result_unit_tests_dag
