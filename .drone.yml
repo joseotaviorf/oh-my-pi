@@ -82,18 +82,31 @@ pipeline:
       event: [ push, tag ]
       branch: master
 
-  export-releases-to-s3:
+  export-releases-to-s3-prod:
     image: plugins/s3
     pull: true
     bucket: 5a-artifacts
     source: dist/*.whl
     target: bi-etl-ejuice/
     strip_prefix: dist/
-    acl: private
+    acl: bucket-owner-full-control
     cache_control: no-cache
     when:
       event: [ push, tag ]
-      branch: [ master, forno ]
+      branch: master
+
+  export-releases-to-s3-forno:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: forno
 
   export-github-credentials-ec2:
     image: python:2.7.12
@@ -252,6 +265,16 @@ pipeline:
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py 5a-databricks-forno
+    when:
+      event: push
+      branch: forno
+
+  load-spark-jobs-s3-new-forno-account:
+    group: updated_jobs
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
