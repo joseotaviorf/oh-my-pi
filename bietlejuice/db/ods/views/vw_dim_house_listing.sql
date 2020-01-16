@@ -22,7 +22,7 @@ with b2b_info as (
           case
             when pj.id is null and h.first_publication is not null
               then 'advanced_negotiation'
-            when h.external_id is null
+            when h.external_id is null or h.external_id ~ '^([a-zA-Z0-9]+-){4}[a-zA-Z0-9]+$'
               then 'standard'
             when h.external_id is not null
               then 'batch'
