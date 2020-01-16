@@ -26,6 +26,8 @@ engagements_parsed as(
 		cast((from_iso8601_timestamp(ce.ts) - interval '3' hour) as timestamp) as ts_engagement_started_local,
 		cast(ce.duration as double) as engagement_duration,
 		ce.agent_full_name,
+		ac.gestores as manager,
+		ac.centro_de_custo as cost_center,
 		ce.department_id,
 		od.name as department_name,
 		gdc.area_aux as area,
@@ -41,6 +43,8 @@ engagements_parsed as(
 			on ce.department_id = od.id
 		left join datalake_raw.gsheets_department_channel as gdc
 			on od.name = gdc.aux_canal
+		left join datalake_raw.gsheets_agents_control ac 
+	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
 			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(from_iso8601_timestamp(ce.ts) - interval '3' hour)
 	where

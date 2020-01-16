@@ -14,6 +14,8 @@ select
 	end as solved_status,
 	case when dzu.role = 'agent' then 1 else 0 end as is_created_by_agent,
 	ac.nome as agent_name,
+	ac.gestores as manager,
+	ac.centro_de_custo as cost_center,
 	dt.group_name,
 	gdc.area_aux as department,
     ft.replies,
