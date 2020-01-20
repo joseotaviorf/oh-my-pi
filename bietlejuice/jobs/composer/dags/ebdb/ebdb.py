@@ -28,6 +28,7 @@ SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/".format(DAG_ID)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
+ARTIFACTS_S3_BUCKET = Variable.get("5a_artifacts")
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -37,7 +38,9 @@ CLUSTER_DESCRIPTION["num_workers"] = 6
 # cluster libraries
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
-    {"jar": "s3://5a-artifacts/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
+    {
+        "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+    }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
