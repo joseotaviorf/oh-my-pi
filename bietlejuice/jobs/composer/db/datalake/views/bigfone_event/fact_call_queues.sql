@@ -97,6 +97,7 @@ with
             on prev.id<>next.id
             and prev.ts_created_wait_event > next.ts_created_wait_event
             and prev.queue_number=next.queue_number
+            and prev.id_call=next.id_call
     ),
     /* blind_transfer is a event that occurres before waiting event. 
         The metric logic is the same as wait_time_interactions, just inverted min to max.

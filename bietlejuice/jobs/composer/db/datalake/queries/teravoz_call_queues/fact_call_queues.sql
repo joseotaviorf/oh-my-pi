@@ -4,12 +4,10 @@
 ******************************************************************************************************************/
 with 
     queues as (
-        select * 
-        from datalake_teravoz_clean.queues
-        where year={year} and month={month} and day={day}
-              and date(concat(string(year), '-', 
-                              string(month), '-', 
-                              string(day)))>= date('2019-09-01')
+        select * from datalake_teravoz_clean.queues
+        where date(concat(cast(year as varchar(4)), '-',
+                          cast(month as varchar(2)), '-',
+                          cast(day as varchar(2))))>= date('2019-09-01')
     ),
     -- the queues are replicated daily, so the last load contains the more recent data. 
     queues_last_update as (
@@ -23,41 +21,50 @@ with
             q.name
         from queues q
         inner join queues_last_update ql
-        on q.number=ql.number 
-           and q.ts_load=ql.max_ts_load
+        on q.number=ql.number and q.ts_load=ql.max_ts_load
         group by 1,2
     ),
     call_events as (
         select *
         from datalake_bigfone_clean.events
-        where year={year} and month={month} and day={day}
-              and date(concat(string(year), '-', 
-                              string(month), '-', 
-                              string(day)))>= date('2019-09-01')
+        where date(concat(cast(year as varchar(4)), '-',
+                    cast(month as varchar(2)), '-',
+                    cast(day as varchar(2)))) >= date('2019-09-01')
     ),
     calls as (
         select distinct id_call from call_events
     ),
     waiting_events as (
         select
-            id,
+            min(id) as id,
             id_call,
             cast(get_json_object(metadata, '$.queue') as smallint) as queue_number,
             ts_created,
             ts_created_local
         from call_events
         where event='call.waiting'
+        group by 2,3,4,5
     ),
     waiting_next_events as (
         select
-            id,
+            min(id) as id,
             id_call,
             ts_created,
             ts_created_local
         from call_events
-        where event='actor.ringing' or event='call.finished'
-        group by 1,2,3,4
+        where 
+            event='actor.ringing' 
+            or event='call.finished' 
+            or event='call.queue-abandon'
+        group by 2,3,4
     ),
+    /*
+        wait_time_interactions = time diff between the next riging, queue-abandon or finished event immediately after 'call_waiting' event and 'call_waiting' event
+        A call can have multiple call_waiting event. So we find the pair (call_waiting, next_event) when:
+        1. the events compared are different  
+        2. min(ts_next_event) >= ts_call_waiting, and ts_call_ringing is the closest to ts_call_waiting
+        3. id_call is the same
+    */
     wait_time_interactions as (
         select
             wait.id,
@@ -69,19 +76,50 @@ with
             min(wait_next.ts_created) as ts_created_next_wait_event,
             min(wait_next.ts_created_local) as ts_created_next_wait_event_local
         from waiting_events wait
-        inner join waiting_next_events wait_next
+        left join waiting_next_events wait_next
         on wait.id_call = wait_next.id_call
-           and wait.ts_created <= wait_next.ts_created
+            and wait.ts_created <= wait_next.ts_created
         group by 1,2,3,4,5
     ),
-    blind_transfer as (
+    /* 
+        same_queue_transferred = it must find out if the queue has been transferred to the same queue number:
+        So we must find the previous waiting event (queue event) to queue event we are analyzing: 
+        1. In the first waiting event has no queue transfer in call yet.  
+        2. min(ts_waiting_event) > ts_previous_waiting_event
+        3. queue_number must be the same.
+    */
+    same_queue_transferred as (
+        select distinct prev.id
+        from wait_time_interactions prev
+        inner join wait_time_interactions next
+            on prev.id<>next.id
+            and prev.ts_created_wait_event > next.ts_created_wait_event
+            and prev.queue_number=next.queue_number
+            and prev.id_call=next.id_call
+    ),
+    -- blind_transfer is a event that occurres before waiting event. 
+    -- The metric logic is the same as wait_time_interactions, just inverted min to max.
+    blind_transfer_events as (
         select
             id_call,
-            cast(get_json_object(metadata, '$.to') as smallint) as queue_number,
+            cast(get_json_object(metadata, '$.to') as smallint) as destination_called_number,
             ts_created,
             ts_created_local
         from call_events
         where event='called.blind-transfer'
+        group by 1,2,3,4
+    ),
+    blind_transfer as (
+        select
+            wti.id,
+            max(bt.ts_created) as ts_created,
+            max(bt.ts_created_local) as ts_created_local
+        from blind_transfer_events bt
+        inner join  wait_time_interactions wti 
+            on wti.id_call = bt.id_call 
+            and wti.queue_number = bt.destination_called_number
+            and bt.ts_created <= wti.ts_created_wait_event
+        group by 1
     ),
     abandoned_queue as (
         select
@@ -91,15 +129,17 @@ with
             ts_created_local
         from call_events
         where event='call.queue-abandon'
+        group by 1,2,3,4
     ),
     call_finished as (
         select
-            id,
+            min(id) as id,
             id_call,
             ts_created,
             ts_created_local
         from call_events
         where event='call.finished'
+        group by 2,3,4
     ),
     outside_phone as (
         select
@@ -123,6 +163,7 @@ with
     ),
     -- the max(id) was used to users table from EBDB because a user can have the same phone in the same column. 
     -- returns the most recent user
+    -- the phones received by the Teravoz don't have the prefix +55.
     ebdb_main_phone as (
         select 
             max(id) as id,
@@ -157,7 +198,7 @@ with
     ),
     outside_user_phone as (
         select
-            coalesce(mp.id, sp.id, bp.id, op.id) as id_user,
+            max(coalesce(mp.id, sp.id, bp.id, op.id)) as id_user,
             outside.id_call
         from outside_phone outside
         left join ebdb_main_phone mp
@@ -169,11 +210,11 @@ with
         left join ebdb_old_phone op
             on outside.outside_phone=op.old_phone
         where coalesce(mp.id, sp.id, bp.id, op.id) is not null
-        group by 1,2
+        group by 2
     ),
     dialed_user_phone as (
         select
-            coalesce(mp.id, sp.id, bp.id, op.id) as id_user,
+            max(coalesce(mp.id, sp.id, bp.id, op.id)) as id_user,
             dial.id_call
         from dialed_phone dial
         left join ebdb_main_phone mp
@@ -185,21 +226,21 @@ with
         left join ebdb_old_phone op
             on dial.dialed_phone=op.old_phone
         where coalesce(mp.id, sp.id, bp.id, op.id) is not null
-        group by 1,2
+        group by 2
     )
 select
     wti.id as sk_call_queued,
     c.id_call as sk_call,
     wti.queue_number as sk_queue,
     coalesce(outside.id_user, dial.id_user) as sk_user,
-    int(date_format(wti.ts_created_wait_event, 'yyyyMMdd')) as sk_call_date,
-    int(date_format(wti.ts_created_wait_event_local, 'yyyyMMdd')) as sk_call_date_local,
+    cast(date_format(wti.ts_created_wait_event, '%Y%m%d') as bigint) as sk_call_date,
+    cast(date_format(wti.ts_created_wait_event_local, '%Y%m%d') as bigint) as sk_call_date_local,
     wti.queue_number,
     qn.name as queue_name,
     to_unix_timestamp(wti.ts_created_next_wait_event, 'yyyy-MM-dd HH:mm:ss') - 
         to_unix_timestamp(wti.ts_created_wait_event, 'yyyy-MM-dd HH:mm:ss') as seconds_queue_waiting_duration,
-    (wtit.id is not null) as is_same_queue_transferred,
-    (bt.queue_number is not null) as is_blind_transfer,
+    (transf.id is not null) as is_same_queue_transferred,
+    (bt.id is not null) as is_blind_transfer,
     (aq.id_call is not null) as is_call_abandoned_in_queue,
     wti.ts_created_wait_event as ts_queue_joined,
     wti.ts_created_wait_event_local as ts_queue_joined_local,
@@ -218,18 +259,13 @@ left join dialed_user_phone dial
     on c.id_call=dial.id_call
 inner join queues_name qn 
     on wti.queue_number = qn.number
-left join wait_time_interactions wtit 
-    on wti.id <> wtit.id 
-       and wti.id_call = wtit.id_call 
-       and wti.queue_number = wtit.queue_number 
-       and wti.ts_created_wait_event > wtit.ts_created_wait_event
+left join same_queue_transferred transf 
+    on wti.id=transf.id
 left join blind_transfer bt 
-    on wti.id_call = bt.id_call 
-       and wti.queue_number = bt.queue_number 
-       and bt.ts_created <= wti.ts_created_wait_event
+    on wti.id = bt.id
 left join abandoned_queue aq 
     on wti.id_call = aq.id_call 
-       and wti.queue_number = cast(aq.queue_number as smallint)
+       and wti.queue_number = aq.queue_number
 left join call_finished cf 
     on wti.id_call = cf.id_call 
        and wti.next_event_id = cf.id
