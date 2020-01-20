@@ -8,7 +8,7 @@ class DatabaseEnum:
     KILLQUEUE = "ENV_KILLQUEUE"
     ODS = "ENV_ODS"
     DW = "ENV_DW"
-    INSIDER = "ENV_INSIDER"
+    INSIDER = "INSIDER_DB"
     WOLOLO = "WOLOLO"
     LINHADIRETA = "ENV_LINHADIRETA"
     VANS = "ENV_VANS"
