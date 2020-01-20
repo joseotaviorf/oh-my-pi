@@ -98,8 +98,27 @@ select
   now()::timestamp as dt_timestamp,
   p.tenant_first_doc_sent as dt_tenant_first_document_sent,
   tenant_auto_first_doc_sent as dt_tenant_auto_first_doc_sent,
-  coalesce(shp.first_analysis_date, p.credit_analysis_init_date) as dt_credit_analysis_init,
-  coalesce(shp.process_date, p.credit_analysis_end_date, shp.analysis_date) as dt_credit_analysis_end,
+  p.credit_analysis_first_init_date as dt_credit_analysis_first_init,
+  p.credit_analysis_last_init_date as dt_credit_analysis_last_init,
+  case
+    when cast(p."criadoEm" as date) < date('2020-01-02')
+      then
+        coalesce(shp.first_analysis_date, p.credit_analysis_last_init_date)
+    else
+      p.credit_analysis_last_init_date
+  end as dt_credit_analysis_init,
+  p.credit_analysis_first_end_date as dt_credit_analysis_first_end,
+  p.credit_analysis_last_end_date as dt_credit_analysis_last_end,
+  case
+    when cast(p."criadoEm" as date) < date('2020-01-02')
+      then
+        coalesce(shp.process_date, p.credit_analysis_last_end_date, shp.analysis_date)
+    else
+      p.credit_analysis_last_end_date
+  end as dt_credit_analysis_end,
+  p.tenant_first_doc_complete_date as dt_tenant_first_doc_complete,
+  p.tenant_last_doc_complete_date as dt_tenant_last_doc_complete,
+  p.tenant_last_doc_complete_date as dt_tenant_doc_complete,
   nullif(shp.status, '') as status_sortinghat,
   doc_reused as flg_doc_reused,
   p.ts_processed,
