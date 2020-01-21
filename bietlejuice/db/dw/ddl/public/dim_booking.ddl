@@ -29,7 +29,7 @@ create table if not exists dim_booking (
   adjust_network varchar(255),
   utm_source varchar(255),
   utm_medium varchar(255),
-  utm_campaign varchar(255),
+  utm_campaign varchar(2000),
   utm_content varchar(255),
   utm_term varchar(255),
   dt_cancel timestamp,

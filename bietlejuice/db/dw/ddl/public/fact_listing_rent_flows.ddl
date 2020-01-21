@@ -52,7 +52,7 @@ create table fact_listing_rent_flows(
   visit_created_type varchar,
   flg_visit_last_updated_from_app boolean,
   sk_rent_flow_taxonomy bigint,
-  booking_utm_campaign varchar,
+  booking_utm_campaign varchar(2000),
   booking_utm_content varchar,
   booking_utm_term varchar,
   days_booking_created_to_visit numeric(14,2),

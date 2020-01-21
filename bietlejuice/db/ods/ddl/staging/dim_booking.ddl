@@ -29,7 +29,7 @@ CREATE TABLE staging.dim_booking (
   adjust_network VARCHAR(255),
   utm_source VARCHAR(255),
   utm_medium VARCHAR(255),
-  utm_campaign VARCHAR(255),
+  utm_campaign VARCHAR(2000),
   utm_content VARCHAR(255),
   utm_term VARCHAR(255),
   dt_cancel TIMESTAMP WITHOUT TIME ZONE,

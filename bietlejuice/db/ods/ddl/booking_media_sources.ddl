@@ -7,7 +7,7 @@ create table booking_media_sources (
     media_source VARCHAR(255) DEFAULT NULL::character varying,
     adjust_network VARCHAR(255) DEFAULT NULL::character varying,
     utm_source VARCHAR(255) DEFAULT NULL::character varying,
-    utm_campaign VARCHAR(255) DEFAULT NULL::character varying,
+    utm_campaign VARCHAR(2000) DEFAULT NULL::character varying,
     utm_medium VARCHAR(255) DEFAULT NULL::character varying,
     utm_content VARCHAR(255) DEFAULT NULL::character varying,
     utm_term VARCHAR(255) DEFAULT NULL::character varying
