@@ -19,20 +19,18 @@ business_hours as(
 ),
 engagements_parsed as(
 	select distinct
-		rank() over (partition by ce.id_chat order by cast((from_iso8601_timestamp(ce.ts)) as timestamp) asc) as engagement_order,
 		ce.id_chat,
 		ce.id,
 		cast((from_iso8601_timestamp(ce.ts)) as timestamp) as ts_engagement_started_utc,
 		cast((from_iso8601_timestamp(ce.ts) - interval '3' hour) as timestamp) as ts_engagement_started_local,
 		cast(ce.duration as double)/60 as engagement_duration_min,
-		ce.agent_full_name,
+		ac.nome as agent_full_name,
 		ac.gestores as manager,
 		ac.centro_de_custo as cost_center,
 		ce.department_id,
 		od.name as department_name,
 		gdc.area_aux as area,
 		ce.started_by,
-		cast(ce.response_time as double)/60,
 		case
 	  		when (hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) >= bh.start_hour 
 	  			and hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) < bh.final_hour) then 1
@@ -47,32 +45,30 @@ engagements_parsed as(
 	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
 			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(from_iso8601_timestamp(ce.ts) - interval '3' hour)
-	where
-		date(from_iso8601_timestamp(ce.ts) - interval '3' hour) between bh.start_date and bh.end_date
-		and not (ce.assigned = 'true' and ce.accepted = 'false')
+				and date(from_iso8601_timestamp(ce.ts) - interval '3' hour) between bh.start_date and bh.end_date
+	where not (ce.assigned = 'true' and ce.accepted = 'false')
+),
+chat_engagements as (
+	select
+		row_number() over (partition by ep.id_chat order by ts_engagement_started_local asc) as engagement_order,
+		*
+	from engagements_parsed as ep
 )
-select
-	ep.id,
-	ep.id_chat,
-	ep.engagement_order,
-	ep.ts_engagement_started_local,
-	date(ep.ts_engagement_started_local) as dt_engagement_started_local,
-	ep.agent_full_name,
-	ep.manager,
-	ep.cost_center,
-	ep.department_name,
-	ep.area,
-	ep.engagement_duration_min as minutes_engagement_duration,
-	ep.on_schedule,
-	case when c.dropped = true then 1 else 0 end as chat_dropped,
-	case    
-	    when ep.engagement_order = 1 and (cast(json_extract(c.response_time, '$.first') as double)/60) <= 15 then 1
-	    else 0
-	end sla_achieved_15biz_min,
-	case    
-	    when ep.engagement_order = 1 then (cast(json_extract(c.response_time, '$.first') as double)/60)
-	end as minutes_first_response_time
+select distinct
+	ce.id,
+	ce.id_chat,
+	ce.engagement_order,
+	ce.ts_engagement_started_local,
+	date(ce.ts_engagement_started_local) as dt_engagement_started_local,
+	ce.started_by,
+	ce.agent_full_name,
+	ce.manager,
+	ce.cost_center,
+	ce.department_name,
+	ce.area,
+	ce.engagement_duration_min as minutes_engagement_duration,
+	ce.on_schedule
 from datalake_zendesk_raw_prod.chats as c
-	join engagements_parsed as ep
-		on c.id = ep.id_chat
+	join chat_engagements as ce
+		on c.id = ce.id_chat
 where c.zendesk_ticket_id is not null
