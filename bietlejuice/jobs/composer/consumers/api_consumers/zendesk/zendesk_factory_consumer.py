@@ -4,6 +4,10 @@ from bietlejuice.jobs.composer.consumers.api_consumers.zendesk.zendesk_chat_cons
     ZendeskChatsConsumer,
 )
 
+from bietlejuice.jobs.composer.consumers.api_consumers.zendesk.zendesk_departments_consumer import (
+    ZendeskDepartmentsConsumer,
+)
+
 logger = QuintoAndarLogger("ZendeskFactoryConsumer")
 
 
@@ -23,4 +27,7 @@ class ZendeskFactoryConsumer:
 
     @staticmethod
     def __dispatch_dict(endpoint):
-        return {"chats": ZendeskChatsConsumer}.get(endpoint)
+        return {
+            "chats": ZendeskChatsConsumer,
+            "departments": ZendeskDepartmentsConsumer,
+        }.get(endpoint)

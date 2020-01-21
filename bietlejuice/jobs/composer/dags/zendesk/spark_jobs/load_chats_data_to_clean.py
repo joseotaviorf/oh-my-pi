@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 DATABRICKS_SCOPE = "quintoandar"
 
-JOB_NAME = "load_data_to_clean"
+JOB_NAME = "load_chats_data_to_clean"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)

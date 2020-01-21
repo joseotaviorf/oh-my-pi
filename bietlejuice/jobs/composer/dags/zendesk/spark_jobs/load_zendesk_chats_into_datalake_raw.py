@@ -18,14 +18,14 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 DATABRICKS_SCOPE = "quintoandar"
 
-JOB_NAME = "load_zendesk_into_datalake_raw"
+JOB_NAME = "load_zendesk_chats_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description="load_zendesk_into_datalake")
+    parser = ArgumentParser(description="load_zendesk_chats_into_datalake")
 
     # args passed by Airflow task
     parser.add_argument(
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(
-        "m=load_zendesk_into_datalake_raw, endpoint_name={}, execution_date={}, "
+        "m=load_zendesk_chats_into_datalake_raw, endpoint_name={}, execution_date={}, "
         "environment={}, msg=print args spark jobs params".format(
             args.endpoint_name, args.execution_date, args.environment
         )
