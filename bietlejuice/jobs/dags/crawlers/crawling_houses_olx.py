@@ -27,19 +27,31 @@ data_google_api_key = env.get_airflow_env_var('DATA_GOOGLE_API_KEY')
 
 def submit_olx(**kwargs):
     states = kwargs.get('states')
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
     assert isinstance(states, list)
+    business = kwargs.get('business')
+    assert isinstance(business, list)
+    nb_proxies = kwargs.get('nb_proxies')
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
     logger.info('m=submit_olx, msg=Starting job...')
+    cmd = ['./crawlers/olx_crawler.py'] + \
+          ['--business'] + business + \
+          ['--nb_proxies', nb_proxies] + \
+          ['--listing_date', execution_date] + \
+          ['--states'] + states
+
     r = BatchClient().start_batch_job(
         job_name='crawl-olx',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
         memory=16384,
-        command=['./crawlers/olx_crawler.py', '--listing_date', execution_date, '--states'] + states
+        command=cmd
     )
-    logger.info('m=submit_olx, msg=Job {} with status {}'.format('-'.join([r.get('jobId'),
-                                                                           r.get('jobName')]), r.get('status')))
+    logger.info(
+        'm=submit_olx, msg=Job {} with status {}'.format(
+            '-'.join([r.get('jobId'), r.get('jobName')]),
+            r.get('status'))
+    )
 
     # get task instance
     ti = kwargs.get('ti')
@@ -53,10 +65,12 @@ def enrich_and_move_to_clean(**kwargs):
     ws = 'olx'
     execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
 
-    query = BaseETL.get_query_from_file_name('{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
+    query = BaseETL.get_query_from_file_name(
+        '{}/crawlers/get_scrapped_listings.sql'.format(DATALAKE_QUERIES_DIR))
     if not query:
         raise RuntimeError(
-            'm=enrich_and_move_to_clean, msg=It was not found the query to extract data from datalake raw')
+            'm=enrich_and_move_to_clean, msg=It was not found the query to extract '
+            'data from datalake raw')
     crawler_entity = CrawlerEntity(s3_bucket, data_google_api_key, False)
     query = query.format(started_on=execution_date, ws=ws)
     leads = crawler_entity.athena_client.execute_query_and_return_dataframe(query)
@@ -64,7 +78,9 @@ def enrich_and_move_to_clean(**kwargs):
     if leads.empty:
         logger.info("m=enrich_and_move_to_clean, msg=there are no leads to process")
     else:
-        logger.info("m=enrich_and_move_to_clean, msg=got {} leads from datalake raw".format(len(leads)))
+        logger.info(
+            "m=enrich_and_move_to_clean, msg=got {} leads from datalake raw".format(
+                len(leads)))
         leads = crawler_entity.cleaning(leads)
         leads = leads.where((pd.notnull(leads)), None)
 
@@ -108,18 +124,23 @@ def enrich_and_move_to_clean(**kwargs):
         ])
 
         crawler_entity.athena_client.create_parquet_from_df(
-            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(ws, execution_date),
+            key='clean/crawlers/ws={}/started_on={}/listings.parq'.format(
+                ws,
+                execution_date
+            ),
             df=leads,
             raw_columns=r_cols,
             clean_columns=r_cols)
 
-        q = "alter table datalake_clean.crawlers add if not exists partition (ws='{}', started_on='{}')".format(
-            ws,
-            execution_date)
+        q = "alter table datalake_clean.crawlers add if not exists partition " \
+            "(ws='{}', started_on='{}')".format(ws, execution_date)
         try:
             crawler_entity.athena_client.execute_query_and_wait_for_results(q)
         except Exception as e:
-            logger.error("m=enrich_and_move_to_clean, msg=couldn't create partition, e={}.".format(e))
+            logger.error(
+                "m=enrich_and_move_to_clean, msg=couldn't create partition, "
+                "e={}.".format(
+                    e))
 
 
 dag = DAG(
