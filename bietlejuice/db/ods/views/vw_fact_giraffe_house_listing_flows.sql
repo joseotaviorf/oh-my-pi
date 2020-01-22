@@ -93,6 +93,14 @@ fact_with_reproc as (
     join lead l 
       on l.id = rl.id_origin_lead
   ),
+  lbc as (
+    select id_house,
+	   max((business_context = 'SALE')::integer)::boolean as is_for_sale,
+	   max((business_context = 'RENT')::integer)::boolean as is_for_rent
+    from
+       listing_business_context
+    group by 1
+  ),
   acquisition_channels as (
     select 
       fhlf.id,
@@ -181,10 +189,13 @@ fact_with_reproc as (
 	left join house_listing hl
       on hl.id_house = fhlf.imovel_id
         and hl.version = 0
-      and hl.version = 0
+    left join lbc
+      on lbc.id_house = h.id
     left join lead_sales_company lsc
       on lsc.id_lead = l.id
-    where h.is_for_sale::int::boolean or l.is_for_sale::int::boolean
+    where
+      lbc.is_for_sale
+      or l.is_for_sale::int::boolean
   )
   select
     acquisition_channels.id,

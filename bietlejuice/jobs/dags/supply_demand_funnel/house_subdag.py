@@ -28,14 +28,15 @@ class HouseSubDag(DimSubDag):
 
         (portability, house_task, affiliate, rent_flow, house_listing,
          staging_dim_house_listing_task,
-         dim_house_listing) = self.__build_data_tasks(house_dag)
+         dim_house_listing,
+         listing_business_context) = self.__build_data_tasks(house_dag)
 
         # TODO: put tests back to flow
         # tests_tasks = self.build_tests_tasks(house_dag)
 
         affiliate >> house_listing
         staging_dim_house_listing_task.set_upstream(
-            [portability, rent_flow, house_listing, house_task])
+            [portability, rent_flow, house_listing, house_task, listing_business_context])
         # staging_dim_house_listing_task.set_downstream(tests_tasks)
         # dim_house_listing.set_upstream(tests_tasks)
         staging_dim_house_listing_task >> dim_house_listing
@@ -124,6 +125,15 @@ class HouseSubDag(DimSubDag):
             }
         )
 
+        listing_business_context = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_listing_business_context',
+            provide_context=True,
+            python_callable=self.extract_from_ebdb_to_ods_with_query,
+            op_kwargs={'table_name': 'listing_business_context'}
+        )
+
         return (portability, property_task, affiliate, rent_flow, house_listing_task,
                 staging_dim_house_listing_task,
-                dim_house_listing)
+                dim_house_listing,
+                listing_business_context)

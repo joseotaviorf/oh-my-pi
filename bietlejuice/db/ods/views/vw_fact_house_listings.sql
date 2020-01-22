@@ -26,6 +26,14 @@ with house_listing_contracts as (
   	on hl.id_house_listing = lc.id_house_listing
   left join contract c
   	on c.id = lc.id_contract
+),
+lbc as (
+    select id_house,
+	   max((business_context = 'SALE')::integer)::boolean as is_for_sale,
+	   max((business_context = 'RENT')::integer)::boolean as is_for_rent
+    from
+       listing_business_context
+    group by 1
 )
 select
   hl.id_house_listing as sk_house_listing,
@@ -45,6 +53,8 @@ select
   coalesce(hlc.nr_renting::smallint, 0) as nr_renting,
   now()::timestamp as ts_load
 from house h
+left join lbc
+  on lbc.id_house = h.id
 join house_listing hl
   on hl.id_house = h.id
 left join house_listing_contracts hlc
@@ -62,5 +72,7 @@ left join partner_agent pa_b2b_online
   on pa_b2b_online.user_id = l.usuario_que_indicou_id
 left join vw_stranded_house_listings st
   on hl.id_house_listing = st.sk_house_listing
-where h.is_for_rent::int::boolean
+where
+  lbc.id_house is null
+  or lbc.is_for_rent
 ;

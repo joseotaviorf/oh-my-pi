@@ -53,6 +53,15 @@ house_portability as (
     where por.ts_created between coalesce(hl.ts_listing_version_start, '1900-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, now())
 ),
 house_listings as (
+  with lbc as (
+    select
+       id_house,
+       max((business_context = 'SALE')::integer)::boolean as is_for_sale,
+       max((business_context = 'RENT')::integer)::boolean as is_for_rent
+    from
+       listing_business_context
+    group by 1
+  )
   select
     hl.id_house_listing as sk_house_listing,
     h.id as id_house,
@@ -116,11 +125,16 @@ house_listings as (
     hl.dt_last_iorent_opted_in,
     hl.dt_last_iorent_opted_out,
     h.sale_price,
-    h.is_for_rent::integer::boolean as is_for_rent,
-    h.is_for_sale::integer::boolean as is_for_sale
+    case
+       when lbc.id_house is null then true -- When house is not in listing_business_context, it is for rent
+       else coalesce(lbc.is_for_rent, false)
+    end as is_for_rent,
+    coalesce(lbc.is_for_sale, false) as is_for_sale
   from house h
   join house_listing hl
     on hl.id_house = h.id
+  left join lbc
+    on lbc.id_house = h.id
 )
 select
   hl.sk_house_listing,

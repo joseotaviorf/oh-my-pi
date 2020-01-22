@@ -118,7 +118,7 @@ select
   i.announcedBy is not null or i.announcedBy_id is not null as imovel_v3,
   i.areaTotal as area_total,
   i.areaTerreno as area_terreno,
- case
+  case
 		when i.status <> 'despublicado'
 			then NULL
 		when i.unpublishedReason is not null
@@ -169,17 +169,15 @@ select
 		when ure.motivo is null
 			then 'UNKNOWN_NULL_VALUE'
 		else 'OTHER'
-	end as unpublished_reason,
-	coalesce(sc.exclusivity, 0) as exclusivity,
-	ot.name as house_occupant,
-    kt.name as key_type,
-    aat.name as key_location,
-    rt.name as visit_restriction,
-    i.predictedPrice as predicted_price,
-    hrs.registrationAbandonedReason as registration_abandoned_reason,
-  salePrice as sale_price,
-  coalesce(forRent+0, 1) as is_for_rent,
-  forSale+0 as is_for_sale
+  end as unpublished_reason,
+  coalesce(sc.exclusivity, 0) as exclusivity,
+  ot.name as house_occupant,
+  kt.name as key_type,
+  aat.name as key_location,
+  rt.name as visit_restriction,
+  i.predictedPrice as predicted_price,
+  hrs.registrationAbandonedReason as registration_abandoned_reason,
+  salePrice as sale_price
 from
   Imovel i
 left join
