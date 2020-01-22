@@ -108,6 +108,25 @@ class SparkDataFrameService:
                 self.df = self.df.withColumn(field.name, to_json(self.df[field.name]))
         return SparkDataFrameService(self.df)
 
+    def convert_struct_type_to_string(self):
+        """
+        This operation cast all structs type columns in the dataframe to string type
+        :return: SparkDataFrameService object with the result df
+        """
+        if not self.df:
+            raise ValueError("m=convert_struct_type_to_string, msg=input df is None")
+        for field in self.df.schema.fields:
+            if isinstance(field.dataType, StructType):
+                logger.info(
+                    "m=convert_struct_type_to_string, converting struct {} to string".format(
+                        field.name
+                    )
+                )
+                self.df = self.df.withColumn(
+                    field.name, self.df[field.name].cast("string")
+                )
+        return SparkDataFrameService(self.df)
+
     def explode_json_column(self, json_column, prefix="", format_column_names=False):
         """
         This operation gets all fields of a json column and create one new column in the dataframe for each of those

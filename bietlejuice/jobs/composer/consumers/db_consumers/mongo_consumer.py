@@ -51,6 +51,7 @@ class MongoConsumer(DBConsumer):
             .option("uri", self.connection["uri"])
             .option("database", db)
             .option("collection", table_name)
+            .option("sampleSize", 300000)
             .load()
         )
         return df
