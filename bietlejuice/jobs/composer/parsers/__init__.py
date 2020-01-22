@@ -1,0 +1,1 @@
+from bietlejuice.jobs.composer.parsers.firestore_parser import FirestoreParser

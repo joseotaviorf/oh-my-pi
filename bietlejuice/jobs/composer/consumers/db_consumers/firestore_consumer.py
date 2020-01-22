@@ -121,7 +121,7 @@ class FirestoreConsumer(DBConsumer):
         while old_id != current_id:
             logger.info(
                 f"m=get_data_from_table_in_chunks, msg=getting data chunk starting at "
-                f"id: {firestore_id}"
+                f"id: {current_id}"
             )
 
             next_query = (
@@ -135,9 +135,7 @@ class FirestoreConsumer(DBConsumer):
                 snapshot,
                 data_json,
                 last_doc,
-            ) = self._get_parameters_from_query_result(
-                next_query, doc_ref, firestore_id
-            )
+            ) = self._get_parameters_from_query_result(next_query, doc_ref, current_id)
             all_json.append(data_json)
         return self._get_default_read_format_and_options(all_json)  # todo: remove this
 
@@ -156,3 +154,13 @@ class FirestoreConsumer(DBConsumer):
 
     def parse_file(self, docs):
         return self.parser.parse_document_type(docs)
+
+    @logger
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
+        # todo: implement me!
+        raise NotImplementedError()
+
+    @logger
+    def get_table_schema(self, table_name):
+        # todo: implement me!
+        raise NotImplementedError()

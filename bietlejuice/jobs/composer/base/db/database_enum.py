@@ -14,9 +14,9 @@ class DatabaseEnum:
     VANS = "ENV_VANS"
     RETSUKO = "ENV_RETSUKO"
     HEIMDALL = "HEIMDALL"
+    FIRESTORE = "FIRESTORE_DB"
     TERMINATOR = "TERMINATOR_DB"
     SAURON = "SAURON_DB"
-    TERMINATOR = "TERMINATOR_DB"
 
 
 class DatabaseTypeEnum:
