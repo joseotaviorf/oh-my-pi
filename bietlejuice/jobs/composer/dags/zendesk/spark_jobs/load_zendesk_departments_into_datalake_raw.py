@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageF
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.dags.zendesk import CHATS as CHATS_PREFIX
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     loader.load_full_table(
         df=df,
         database_name=database_name,
-        table_name=endpoint_name,
+        table_name=f"{CHATS_PREFIX}_{endpoint_name}",
         format=SparkTableStorageFormat.DEFAULT_RAW,
         database_location=db_info["db_raw_path"],
     )

@@ -8,6 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.dags.zendesk import CHATS
 
 # dag params
 DAG_ID = "bietlejuice.zendesk"
@@ -15,10 +16,11 @@ local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2019, 11, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 DEFAULT_PARTITION_BY = ["year", "month", "day"]
-CHATS = "chats"
 DEPARTMENTS = "departments"
+DEPARTMENTS_WITH_PREFIX = f"{CHATS}_{DEPARTMENTS}"
 
 ENV = Variable.get("environment")
+S3_ARTIFACTS = Variable.get("5a_artifacts")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -38,10 +40,10 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": "s3://5a-artifacts/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
+        "whl": f"{S3_ARTIFACTS}/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
     },
     {
-        "whl": "s3://5a-artifacts/zendesk-client/quintoandar_zendesk_client-0.1.1-py3-none-any.whl"
+        "whl": f"{S3_ARTIFACTS}/zendesk-client/quintoandar_zendesk_client-0.1.1-py3-none-any.whl"
     },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
@@ -74,7 +76,7 @@ def create_departments_sub_dag(sub_dag_name):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_tables.py".format(SPARK_JOBS_PATH),
-                "parameters": [ENV, "clean", DEPARTMENTS],
+                "parameters": [ENV, "clean", DEPARTMENTS_WITH_PREFIX],
             }
         },
     )
@@ -87,7 +89,7 @@ def create_departments_sub_dag(sub_dag_name):
                 "python_file": "{}/load_departments_data_to_clean.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [DEPARTMENTS, "{{ ds }}", ENV],
+                "parameters": [DEPARTMENTS_WITH_PREFIX, "{{ ds }}", ENV],
             }
         },
     )

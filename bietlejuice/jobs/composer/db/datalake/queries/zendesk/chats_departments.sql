@@ -6,4 +6,4 @@ SELECT
     members,
     settings
 FROM
-    {db}.departments
+    {db}.chats_departments
