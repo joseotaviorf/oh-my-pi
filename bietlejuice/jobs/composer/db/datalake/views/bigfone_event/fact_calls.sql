@@ -214,7 +214,7 @@ with
             ts_created_local
         from call_events
         where 
-            event='actor.ringing' 
+            event='actor.entered' 
             or event='call.finished' 
             or event='call.queue-abandon'
         group by 2,3,4
@@ -260,30 +260,10 @@ with
         where dt_event >= date('2019-09-01')
         group by 1
     ),
-    /*
-        duration of the first call_waiting event after the last ura event
-        the same logic applied as wait_time_interactions / wait_time
-    */
-    waiting_time_after_ura as (
-        select
-            id_call,
-            date_diff('second', ts_created_wait_event, ts_created_next_wait_event) as seconds_waiting_time_after_ura
-        from (	
-            select
-                wt.id_call,
-                wt.ts_created_wait_event,
-                wt.ts_created_next_wait_event,
-                rank() over (partition by wt.id_call order by wt.ts_created_wait_event) as row_number_event
-            from wait_time_interactions wt
-            inner join ura
-            on wt.id_call=ura.id_call 
-            and wt.ts_created_wait_event >= ura.ts_last_ura_event
-        )
-        where row_number_event=1
-    ),
     queues as (
         select
             id_call,
+            count(distinct queue_number) as unique_queues_per_call,
             count(distinct id) as queues_per_call
         from wait_time_interactions
         group by 1
@@ -292,6 +272,7 @@ with
         select
             id_call,
             count(distinct id) as agents_per_call,
+            count(distinct agent_email) as unique_agents_per_call,
             min(ts_created) as ts_created_min,
             min(ts_created_local) as ts_created_min_local
         from agent_entered_events
@@ -308,12 +289,13 @@ select
     cast(date_format(c.ts_created_min, '%Y%m%d') as bigint) as sk_call_date,
     cast(date_format(c.ts_created_min_local, '%Y%m%d') as bigint) as sk_call_date_local,
     cast(coalesce(q.queues_per_call,0) as tinyint) as total_queues,
+    cast(coalesce(q.unique_queues_per_call,0) as tinyint) as total_unique_queues,
     cast(coalesce(a.agents_per_call,0) as tinyint) as total_agents,
+    cast(coalesce(a.unique_agents_per_call, 0) as tinyint) as total_unique_agents,
     cast(date_diff('second', c.ts_created_min, c.ts_created_max) as integer) as seconds_total_call_duration,
     cast(tk.seconds_talk_time as integer) as seconds_total_talk_duration,
     cast(wt.seconds_wait_time as integer) as seconds_total_wait_duration,
     cast(date_diff('second', ura.ts_first_ura_event, ura.ts_last_ura_event) as integer) as seconds_total_ura_duration,
-    cast(wt_ura.seconds_waiting_time_after_ura as integer) as seconds_waiting_time_after_ura,
     cast(csat.csat_rating as tinyint) as csat_rating,
     coalesce(a.agents_per_call>0, false) as is_call_answered,
     csat.is_csat_set as is_csat_answered,
@@ -329,7 +311,7 @@ select
         (wait.id_call is not null or ring.id_call is not null) -- call waiting for available agent or peer ringing
         and a.id_call is null, -- no agent entered
         false
-    ) as is_call_ended_before_answered,
+    ) as is_call_missed,
     ura.ts_first_ura_event as ts_ura_joined,
     ura.ts_first_ura_event_local as ts_ura_joined_local,
     ura.ts_last_ura_event as ts_ura_left,
@@ -355,8 +337,6 @@ left join wait_time wt
     on c.id_call=wt.id_call
 left join ura
     on c.id_call=ura.id_call
-left join waiting_time_after_ura wt_ura
-    on c.id_call=wt_ura.id_call
 left join queues q
     on c.id_call=q.id_call
 left join agents a

@@ -53,7 +53,7 @@ with
             ts_created_local
         from call_events
         where 
-            event='actor.ringing' 
+            event='actor.entered' 
             or event='call.finished' 
             or event='call.queue-abandon'
         group by 2,3,4
