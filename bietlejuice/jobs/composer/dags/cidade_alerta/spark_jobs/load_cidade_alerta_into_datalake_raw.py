@@ -14,10 +14,12 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 
 
-JOB_NAME = "load_insider_into_datalake_raw"
+JOB_NAME = "load_cidade_alerta_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+BLOCK_LIST = ["audit", "messages_broadcast", "messages", "messages_routing"]
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -48,13 +50,21 @@ if __name__ == "__main__":
 
     for table in tables:
         table_name = table.table_name.replace(".", "_")
-        df = mongo_consumer.get_data_from_table(table_name)
-        df = SparkDataFrameService().input(df).convert_struct_type_to_string().output()
 
-        loader.load_full_table(
-            df=df,
-            database_name=db_info["db_raw_databricks"],
-            table_name=table_name.lower(),
-            format=SparkTableStorageFormat.DEFAULT_RAW,
-            database_location=db_info["db_raw_path"],
-        )
+        if table_name not in BLOCK_LIST:
+            df = mongo_consumer.get_data_from_table(table_name)
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .convert_struct_type_to_string()
+                .convert_array_type_to_json()
+                .output()
+            )
+
+            loader.load_full_table(
+                df=df,
+                database_name=db_info["db_raw_databricks"],
+                table_name=table_name.lower(),
+                format=SparkTableStorageFormat.DEFAULT_RAW,
+                database_location=db_info["db_raw_path"],
+            )
