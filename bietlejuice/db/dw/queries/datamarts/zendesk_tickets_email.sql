@@ -3,6 +3,9 @@ select
 	dt.ts_created_local,
 	ft.ts_solved_local,
 	ft.ts_closed_local,
+	trunc(dt.ts_created_local) as dt_created_local,
+	trunc(ft.ts_solved_local) as dt_solved_local,
+	trunc(ft.ts_closed_local) as dt_closed_local,
 	case when ft.ts_solved_local is not null then 1 else 0 end as is_solved,
 	case 
 		when ft.ts_solved_local is null then 'not_solved'
@@ -47,7 +50,7 @@ select
 from zendesk.fact_tickets as ft
 	join zendesk.dim_ticket as dt
 		on dt.sk_ticket = ft.sk_ticket
-	join zendesk.dim_zendesk_user as dzu
+	left join zendesk.dim_zendesk_user as dzu
 		on ft.sk_zendesk_submitter_user = dzu.sk_zendesk_user
 	left join datalake_raw.gsheets_department_channel as gdc
 		on dt.group_name = gdc.aux_canal

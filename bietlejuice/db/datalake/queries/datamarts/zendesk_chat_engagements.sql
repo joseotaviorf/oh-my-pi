@@ -28,7 +28,7 @@ engagements_parsed as(
 		ac.gestores as manager,
 		ac.centro_de_custo as cost_center,
 		ce.department_id,
-		od.name as department_name,
+		cd.name as department_name,
 		gdc.area_aux as area,
 		ce.started_by,
 		case
@@ -37,10 +37,10 @@ engagements_parsed as(
 		else 0
 		end as on_schedule
 	from datalake_zendesk_raw_prod.chat_engagements as ce
-		left join datalake_raw.gsheets_ops_departments as od
-			on ce.department_id = od.id
+		 left join datalake_zendesk_clean_prod.chats_departments as cd
+			on try_cast(ce.department_id as bigint) = cd.id
 		left join datalake_raw.gsheets_department_channel as gdc
-			on od.name = gdc.aux_canal
+			on cd.name = gdc.aux_canal
 		left join datalake_raw.gsheets_agents_control ac 
 	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
@@ -67,7 +67,7 @@ select distinct
 	ce.department_name,
 	ce.area,
 	ce.engagement_duration_min as minutes_engagement_duration,
-	ce.on_schedule
+	ce.on_schedule as is_business_hours
 from datalake_zendesk_raw_prod.chats as c
 	join chat_engagements as ce
 		on c.id = ce.id_chat

@@ -28,7 +28,7 @@ engagements_parsed as(
 		ac.gestores as manager,
 		ac.centro_de_custo as cost_center,
 		ce.department_id,
-		od.name as department_name,
+		cd.name as department_name,
 		gdc.area_aux as area,
 		ce.started_by,
 		case
@@ -37,10 +37,10 @@ engagements_parsed as(
 		else 0
 		end as on_schedule
 	from datalake_zendesk_raw_prod.chat_engagements as ce
-		left join datalake_raw.gsheets_ops_departments as od
-			on ce.department_id = od.id
+		left join datalake_zendesk_clean_prod.chats_departments as cd
+			on try_cast(ce.department_id as bigint) = cd.id
 		left join datalake_raw.gsheets_department_channel as gdc
-			on od.name = gdc.aux_canal
+			on cd.name = gdc.aux_canal
 		left join datalake_raw.gsheets_agents_control ac 
 	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
@@ -72,11 +72,11 @@ chat_zendesk as (
 select distinct
 	c.id as id_chat,
 	c.zendesk_ticket_id,
-	cast((from_iso8601_timestamp(c."timestamp") - interval '3' hour) as timestamp) as ts_created_local,
-	date(from_iso8601_timestamp(c."timestamp") - interval '3' hour) as dt_created_local,
-	ce.department_name as first_deparment_engaged,
-	ce.area as first_area_engaged,
-    c.department_name as chat_last_department,
+	cast((from_iso8601_timestamp(c."timestamp") - interval '3' hour) as timestamp) as ts_started_local,
+	date(from_iso8601_timestamp(c."timestamp") - interval '3' hour) as dt_started_local,
+	ce.department_name as first_engagement_department,
+	ce.area as first_engagement_area,
+    c.department_name as last_engagement_department,
 	case 
         when c.tags like '%bot_end_conversation%' then 1
         else 0
@@ -92,7 +92,8 @@ select distinct
 	cast(json_extract(c.response_time, '$.first') as double)/60 as minutes_first_response_time,
 	case    
 	    when (cast(json_extract(c.response_time, '$.first') as double)/60) <= 15 then 1
-	    else 0
+	    when (cast(json_extract(c.response_time, '$.first') as double)/60) > 15 then 0
+	    else null
 	end sla_achieved_15biz_min
 from chat_zendesk as c
 	left join chat_engagements as ce
