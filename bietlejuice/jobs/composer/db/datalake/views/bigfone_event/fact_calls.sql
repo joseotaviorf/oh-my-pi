@@ -166,7 +166,7 @@ with
             id_call, 
             agent_email, 
             ts_created
-        from datalake_bigfone_clean_prod.agent_entered_events 
+        from datalake_bigfone_clean_prod.agent_left_events
         where dt_event >= date('2019-09-01')
         group by 1,2,3
     ),
