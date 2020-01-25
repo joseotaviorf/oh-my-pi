@@ -23,7 +23,7 @@ GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('BI_AFFILIATE_COSTS_GOOGLE_SHEETS_FILES'))
 MAIN_DAG_ID = 'bi-affiliate-costs'
 MAIN_START_DATE = datetime(2019, 11, 5)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 11 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 10 * * *')
 
 
 def load_google_sheet_files_to_datalake(files):
