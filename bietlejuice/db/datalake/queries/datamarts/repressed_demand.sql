@@ -122,7 +122,7 @@ encaixes_raw as (
     select
         evt.ts_event as event_date,
         trim(evt.id_user) as user_id,
-        trim(coalesce(evt.ep_house_id, '')) as house_id,
+        trim(coalesce(evt.ep_house_id, null)) as house_id,
         cast(date_parse(evt.ep_alert_target_date, '%a, %d %b %Y %T GMT') as date) as target_date,
         cast(trim(evt.ep_alert_slot_from) as double) alert_slot_from,
         cast(trim(evt.ep_alert_slot_to) as double) alert_slot_to,
