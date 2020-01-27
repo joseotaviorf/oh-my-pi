@@ -9,7 +9,7 @@ with fact as  (
 		mkt.mkt_medium,
 		mkt.mkt_source,
 		mkt.mkt_platform,
-		replace(replace(mkt.utm_campaign, '_', '.'), '-', '.') as utm_campaign,
+		replace(replace(mkt.utm_campaign, '-', '_'), '_', '.') as utm_campaign,
 		mkt.utm_term,
 		mkt.utm_content,
 		sum(coalesce(mkt.cost,0)) as cost
@@ -33,11 +33,8 @@ d_cube as (
 			 else mkt_platform end as mkt_platform,
 		-- Trying to minimize unmatching due to wrong separator parametrization in amplitude
 		replace(replace(utm_campaign, '-', '_'), '_', '.') as utm_campaign,
-		-- Due to limitations in Google API we need to remove excess data for each type of medium
-		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium = 'Display' then NULL
-			else utm_term end as utm_term,
-		case when mkt_channel = 'Online Paid' and mkt_source = 'Google' and mkt_medium <> 'Display' then NULL
-			else utm_content end as utm_content,
+		utm_term,
+		utm_content,
         sum(coalesce(total_{2}_sessions, 0)) as total_{2}_sessions,
 		sum(coalesce(total_{2}_active_users, 0)) as total_{2}_active_users,
 		sum(coalesce(total_{2}_visits_booked, 0)) as total_{2}_visits_booked,

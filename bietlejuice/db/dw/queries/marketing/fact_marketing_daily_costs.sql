@@ -39,7 +39,10 @@ google_consolidated_cost as (
             fg.sk_date,
             coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
             coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
-            dgk.keyword_name || '_' || lower(left(dgk.match_type, 1)) as utm_term,
+            case when fg.sk_keyword <> -1 then
+                dgk.keyword_name || '_' || lower(left(dgk.match_type, 1))
+                else cast(dga.adgroup_name as varchar) end
+                as utm_term,
             cast(dga.ad_id as varchar) as utm_content,
             fg.desktop_cost,
             fg.mobile_cost
