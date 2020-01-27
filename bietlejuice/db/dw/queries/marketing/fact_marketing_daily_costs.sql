@@ -575,7 +575,7 @@ UNION
                                     or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
                         when (coalesce(cf.account_name,'') not like '%supply%'
                                 and coalesce(cf.account_name, '') not like '%display%'
-                                and coalesce(cf.account_name, '') != 'indica_ai')
+                                and coalesce(cf.account_name, '') not like '%indica_ai%')
                                 OR
                              (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
                              or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
