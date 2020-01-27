@@ -2,7 +2,6 @@ select
     _id, 
     boolean(active) as is_active,
     business_context,
-    boolean(checkin) as is_checkin,
     cloudsearch_criteria,
     created_at,
     date,
