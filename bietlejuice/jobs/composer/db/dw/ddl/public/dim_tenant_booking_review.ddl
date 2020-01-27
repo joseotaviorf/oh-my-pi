@@ -16,5 +16,5 @@ create table dim_tenant_booking_review (
     agent_performance smallint,
     does_want_same_agent boolean,
     visit_type varchar(50),
-    comment varchar
+    comment varchar(510)
 )
