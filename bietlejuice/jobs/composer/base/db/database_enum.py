@@ -1,6 +1,6 @@
 class DatabaseEnum:
     DOCX = "ENV_DOCX"
-    EBDB = "ENV_EBDB"
+    EBDB = "EBDB_DB"
     GODFATHER = "ENV_GODFATHER"
     DARKRUM = "ENV_DARKRUM"
     SORTINGHAT = "ENV_SORTINGHAT"

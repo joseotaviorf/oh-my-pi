@@ -81,6 +81,9 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(SparkClient())
     loader = S3Loader(metastore_service)
 
+    # create database if not exists
+    metastore_service.create_database(db_info["db_raw_databricks"])
+
     with Pool(NB_THREADS) as p:
         p.map(
             load_relation_into_datalake,

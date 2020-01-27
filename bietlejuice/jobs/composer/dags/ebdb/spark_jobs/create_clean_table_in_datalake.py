@@ -38,6 +38,9 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
+    # create database if not exists
+    metastore_service.create_database(db_info["db_clean_databricks"])
+
     # create
     # todo: use DatabricksConsumer to read data
     df = spark_client.get_records(query)
