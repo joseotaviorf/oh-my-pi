@@ -39,8 +39,11 @@ with b2b_info as (
     on lo.id = rl.id_origin_lead
   left join partner_agent pa_b2b
     on pa_b2b.user_id = h.usuario_id
+  left join house_listing hl
+    on h.id = hl.id_house
   left join photo_job pj
     on pj.imovel_id = h.id
+    and pj.dt_job_created between hl.ts_listing_version_start and hl.ts_listing_version_end
 ),
 house_portability as (
     select
