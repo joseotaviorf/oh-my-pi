@@ -18,6 +18,9 @@ class DatabricksConsumer(DBConsumer):
     """
 
     def __init__(self, conn_config, spark_client):
+        # TODO: Other consumers need a conn_config with a db to connect. As it is not
+        #  the case of DatabricksConsumer, we should remove conn_config from this
+        #  constructor and send the database on its methods call when necessary
         self.conn_config = conn_config
         self.spark_client = spark_client
 

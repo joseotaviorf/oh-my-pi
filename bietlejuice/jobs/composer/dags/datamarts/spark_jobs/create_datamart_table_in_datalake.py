@@ -1,0 +1,58 @@
+import logging
+from argparse import ArgumentParser
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService, DB_SQL_PATH
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
+from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.services.file_service import FileService
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+
+JOB_NAME = "create_datamart_table_in_datalake"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+parser = ArgumentParser(description=JOB_NAME)
+parser.add_argument("env")
+parser.add_argument("dw_schema")
+parser.add_argument("schema")
+parser.add_argument("table")
+parser.add_argument("sql_file")
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    env = args.env
+    dw_schema = args.dw_schema
+    schema = args.schema
+    table = args.table
+    sql_file = args.sql_file
+
+    # check if query_path is diff from built one and raise warning
+    query_path = f"{DB_SQL_PATH}/{sql_file}"
+    s3_query = FileService.get_query_from_file_name(query_path)
+
+    spark_client = SparkClient()
+    # TODO: Needs refactoring. We're using default here because the consumer requests a
+    #  database. Please check on DatabricksConsumer.__init__ comments for more
+    conn_config = {"db": "default"}
+    databricks_consumer = DatabricksConsumer(conn_config, spark_client)
+    dm_table_df = databricks_consumer.get_data_from_query(s3_query)
+    dm_table_df = SparkDataFrameService(dm_table_df).optimize_partition(250000).output()
+
+    dw_db_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
+    metastore_service = SparkMetastoreService(spark_client)
+    metastore_service.create_database(dw_db_info["dw_schema_databricks"])
+
+    loader = S3Loader(metastore_service)
+    loader.load_full_table(
+        df=dm_table_df,
+        database_name=dw_db_info["dw_schema_databricks"],
+        table_name=table,
+        format=SparkTableStorageFormat.DEFAULT_DW,
+        database_location=dw_db_info["dw_schema_path"],
+    )

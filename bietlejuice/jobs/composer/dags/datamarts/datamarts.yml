@@ -1,0 +1,6 @@
+#pipeline:
+#  table-1:
+#    dw:
+#      sql_file: dw/queries/datamarts/table-1.sql
+#      table: table_1
+#      schema: datamarts
