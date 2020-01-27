@@ -66,7 +66,7 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         start_date=MAIN_START_DATE,
     )._build_local_dag()
 
-    QuintoAndarDatabricksSubmitRunOperator(
+    load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=sub_dag,
         task_id=f"create-clean-{slugged_table_name}-in-data-lake",
         json={
@@ -76,6 +76,19 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
             }
         },
     )
+
+    create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"create-clean-external-{slugged_table_name}-table",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
+                "parameters": [table_name, ENV],
+            }
+        },
+    )
+
+    load_clean_table_task >> create_external_table_task
 
     return sub_dag
 
