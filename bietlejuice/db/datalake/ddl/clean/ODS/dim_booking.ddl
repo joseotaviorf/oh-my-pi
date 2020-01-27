@@ -56,11 +56,10 @@ create external table if not exists datalake_clean.ods_dim_booking (
   mkt_category string,
   mkt_flow string,
   mkt_completion string,
-  mkt_device string,
-  mkt_channel_type string,
   mkt_channel string,
   mkt_medium string,
   mkt_source string,
+  mkt_platform string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
