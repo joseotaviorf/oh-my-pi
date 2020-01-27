@@ -4,8 +4,8 @@ import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
@@ -39,7 +39,8 @@ CLUSTER_DESCRIPTION["num_workers"] = 6
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+        "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1"
+        f".47.jar"
     }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
@@ -227,7 +228,6 @@ visit_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dim_table="dim_visit",
 )
 
-
 # TO DO: dim_contract
 # contract_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
 #     dag=dag,
@@ -281,7 +281,6 @@ ownerlead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="ownerlead",
 )
 
-
 agent_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="agent",
@@ -289,7 +288,6 @@ agent_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     source=SOURCE,
     clean_table="agent",
 )
-
 
 conversion_lead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
@@ -299,7 +297,6 @@ conversion_lead_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="conversion_lead",
 )
 
-
 visitor_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="visitor",
@@ -308,7 +305,6 @@ visitor_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="visitor",
 )
 
-
 user_revision_entity_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="user_revision_entity",
@@ -316,7 +312,6 @@ user_revision_entity_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     source=SOURCE,
     clean_table="user_revision_entity",
 )
-
 
 keytype_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
@@ -389,7 +384,6 @@ polygon_region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     source=SOURCE,
     clean_table="polygon_region",
 )
-
 
 bank_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
@@ -791,6 +785,14 @@ booking_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="booking_aud",
 )
 
+map_region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="map_region",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="map_region",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -869,4 +871,5 @@ ebdb_to_datalake_raw_task >> [
     photographer_job_aud_sub_dag_task,
     booking_sub_dag_task,
     booking_aud_sub_dag_task,
+    map_region_sub_dag_task,
 ] >> terminate_cluster_task

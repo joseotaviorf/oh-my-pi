@@ -1,3 +1,4 @@
+import collections
 import json
 import logging
 import math
@@ -14,7 +15,9 @@ from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
-BLACK_LIST = ["REVCHANGES"]
+TABLE_BLOCK_LIST = ["REVCHANGES"]
+VIEW_ALLOW_LIST = ["MapRegiao"]
+
 # todo: check this value and argument the choice
 PARTITION_SIZE = 512
 # todo: check this value and argument the choice
@@ -23,26 +26,30 @@ NB_THREADS = 20
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+Relation = collections.namedtuple("Relation", ["name", "size"])
+
 
 @logger
-def load_table_into_datalake(args):
-    loader, consumer, table_name, table_size, db_info = args
-    num_partitions = int(math.ceil(float(table_size) / PARTITION_SIZE))
+def load_relation_into_datalake(args):
+    """
+    Loads tables and views into datalake
+    """
+    loader, consumer, rel, db_info = args
+    num_partitions = int(math.ceil(float(rel.size) / PARTITION_SIZE))
     if num_partitions > 1:
-        df = consumer.get_data_from_table_in_parallel(table_name, num_partitions)
+        df = consumer.get_data_from_table_in_parallel(rel.name, num_partitions)
     else:
-        df = consumer.get_data_from_table(table_name)
+        df = consumer.get_data_from_table(rel.name)
     loader.load_full_table(
         df=df,
         database_name=db_info["db_raw_databricks"],
-        table_name=table_name.lower(),
+        table_name=rel.name.lower(),
         format=SparkTableStorageFormat.DEFAULT_RAW,
         database_location=db_info["db_raw_path"],
     )
     logger.info(
-        "m=load_table_into_datalake, table={}, msg=Finished loading table.".format(
-            table_name
-        )
+        "m=load_relation_into_datalake, relation={}, msg=Finished loading "
+        "relation.".format(rel.name)
     )
 
 
@@ -62,17 +69,20 @@ if __name__ == "__main__":
     mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
+    rels = [
+        Relation(name=t.table_name, size=t.size)
+        for t in tables
+        if t.table_name not in TABLE_BLOCK_LIST and t.table_name and t.size
+    ]
+
+    rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])
+
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
-    spark_client = SparkClient()
-    metastore_service = SparkMetastoreService(spark_client)
+    metastore_service = SparkMetastoreService(SparkClient())
     loader = S3Loader(metastore_service)
 
     with Pool(NB_THREADS) as p:
         p.map(
-            load_table_into_datalake,
-            [
-                (loader, mysql_consumer, t.table_name, t.size, db_info)
-                for t in tables
-                if t.table_name not in BLACK_LIST and t.table_name and t.size
-            ],
+            load_relation_into_datalake,
+            [(loader, mysql_consumer, rel, db_info) for rel in rels],
         )
