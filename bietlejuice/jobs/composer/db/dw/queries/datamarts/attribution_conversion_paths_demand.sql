@@ -154,15 +154,15 @@ touchpoints as (
 -- conversions July - September 2019
 -- lookback window of 6 month
 select
-	cast(date_format(date(conversion_time), '%Y%m%d') as integer) as sk_conversion_date,
+	cast(date_format(date(conversion_time), 'yyyyMMdd') as integer) as sk_conversion_date,
 	cast(id_amplitude * 1000 + nst_conversion as bigint) as unique_conversion_id,
-	cast(array_join(collect_list(utm_source_medium), '; ') as varchar(20000)) as path_utm_source_medium,
-	cast(array_join(collect_list(utm_source_medium_branded), '; ') as varchar(20000)) as path_utm_source_medium_branded,
-	cast(array_join(collect_list(utm_source), '; ') as varchar(20000)) as path_utm_source,
-	cast(array_join(collect_list(utm_medium), '; ') as varchar(20000)) as path_utm_medium,
-	cast(array_join(collect_list(utm_campaign), '; ') as varchar(20000)) as path_utm_campaign,
-	cast(array_join(collect_list(utm_content), '; ') as varchar(20000)) as path_utm_content,
-	cast(array_join(collect_list(utm_term), '; ') as varchar(20000)) as path_utm_term
+	left(cast(array_join(collect_list(utm_source_medium), '; ') as varchar(20000)), 20000) as path_utm_source_medium,
+	left(cast(array_join(collect_list(utm_source_medium_branded), '; ') as varchar(20000)), 20000) as path_utm_source_medium_branded,
+	left(cast(array_join(collect_list(utm_source), '; ') as varchar(20000)), 20000) as path_utm_source,
+	left(cast(array_join(collect_list(utm_medium), '; ') as varchar(20000)), 20000) as path_utm_medium,
+	left(cast(array_join(collect_list(utm_campaign), '; ') as varchar(20000)), 20000) as path_utm_campaign,
+	left(cast(array_join(collect_list(utm_content), '; ') as varchar(20000)), 20000) as path_utm_content,
+	left(cast(array_join(collect_list(utm_term), '; ') as varchar(20000)), 20000) as path_utm_term
 from touchpoints
 where conversion_time >= date('2019-07-01')
   and cast(months_between(conversion_time, session_start_time) as int) <= 6
