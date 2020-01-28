@@ -18,6 +18,7 @@ class DatabaseEnum:
     TERMINATOR = "TERMINATOR_DB"
     SAURON = "SAURON_DB"
     CIDADE_ALERTA = "CIDADE_ALERTA_DB"
+    ROBIN_HOOD = "ROBIN_HOOD_DB"
 
 
 class DatabaseTypeEnum:
