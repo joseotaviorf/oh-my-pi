@@ -178,7 +178,7 @@ select
 					left join Contrato c
 					  on c.proposta_id = coalesce(poa.id, pof.id)
 					left join Portability port
-	                  on port.house_id = i.id
+	                  on port.flow_id = fl.id
 					where ((_offer.o_id = o.id) is null
 						    or _offer.o_id = o.id)
 				        and port.id is null
@@ -293,7 +293,7 @@ select
 					left join Contrato c
 					  on c.proposta_id = coalesce(ppa.id, ppf.id)
 					left join Portability port
-	                  on port.house_id = i.id
+	                  on port.flow_id = fl.id
 					where ((_pre_proposal.pp_id = prep.id) is null
 						    or _pre_proposal.pp_id = prep.id)
 						and port.id is null
