@@ -636,10 +636,10 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
 )
 
 # trigger bi-crm-load dag after all tasks have been successfully completed
-trigger_bi_crm_load_dag_task = TriggerDagRunOperator(
+trigger_bi_crm_dw_dag_task = TriggerDagRunOperator(
     dag=main_dag,
-    task_id="trigger_bi_crm_load_dag",
-    trigger_dag_id="bi-crm-load",
+    task_id="trigger_bi_crm_dw_dag",
+    trigger_dag_id="bi-crm-dw",
     execution_date="{{ execution_date }}",
 )
 
@@ -715,6 +715,6 @@ trigger_bi_growth_dag_task.set_upstream(
         dw_fact_house_listing_status_task,
     ]
 )
-trigger_bi_crm_load_dag_task.set_upstream(
+trigger_bi_crm_dw_dag_task.set_upstream(
     [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows]
 )
