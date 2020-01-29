@@ -1,0 +1,361 @@
+with apts_iptu_sp AS (
+  SELECT
+    ea.numero_contribuinte || '/' || ea.cpf_cnpj AS property_person_id,
+    ea.setor_quadra,
+    ea.ano_construcao_corrigido,
+    ea.cpf_cnpj,
+    ea.nome_direct,
+    ea.sexo,
+    ea.idade,
+    ea.obito,
+    ea.qtd_ocorrencias,
+    ea.contribuinte_1_ou_2,
+    ea.tipo_contribuinte_1,
+    ea.tipo_contribuinte_2,
+    ea.formatted_address,
+    ea.numero_imovel,
+    ea.complemento_imovel,
+    geo.lat,
+    geo.lng,
+    geo.geocoded_address AS google_formatted_address,
+    'SP' as uf,
+    'São Paulo' as municipio
+  FROM datalake_raw.external_sp_apts AS ea
+  LEFT JOIN datalake_raw.sp_houses_geocoded_addresses AS geo
+    ON ea.bldg_address_id = geo.bldg_address_id
+    WHERE ea.numero_imovel IS NOT NULL 
+    AND geo.lat IS NOT NULL AND geo.lat != ''
+)
+, apts_direct AS (
+  SELECT
+    i.direct_id || '/' || i.proprietario_cpf_cnpj AS property_person_id,
+    NULL as setor_quadra,
+    NULL as ano_construcao_corrigido,
+    i.proprietario_cpf_cnpj AS cpf_cnpj,
+    i.proprietario_nome AS nome_direct,
+    NULL as sexo,
+    NULL as idade,
+    NULL as obito,
+    NULL as qtd_ocorrencias,
+    NULL as contribuinte_1_ou_2,
+    proprietario_tipo as tipo_contribuinte_1,
+    NULL as tipo_contribuinte_2,
+    a.formatted_address,
+    i.endereco_numero as numero_imovel,
+    i.endereco_complemento as complemento_imovel,
+    a.lat,
+    a.lng,
+    a.google_formatted_address,
+    i.uf,
+    i.municipio
+  FROM datalake_raw.external_iptu_owners i
+  JOIN datalake_raw.external_iptu_owners_addresses a ON i.direct_id = a.direct_id
+  WHERE
+    i.endereco_numero IS NOT NULL
+    AND a.lat IS NOT NULL AND a.lat != ''
+    AND COALESCE(i.proprietario_cpf_cnpj, '') != ''
+)
+, apts AS (
+  SELECT * FROM apts_iptu_sp
+  UNION ALL
+  SELECT * FROM apts_direct
+)
+, condos as (
+select 
+	google_formatted_address,
+	lat,
+	lng,
+	numero_imovel,
+	regexp_extract(google_formatted_address, '\d{5}[-]\d{3}') as cep,
+	ano_construcao_corrigido,
+	count(concat(lat,lng)) as num_apts
+from apts
+group by 1,2,3,4,5,6
+)
+, base_cnpj as (
+	select 
+		c.cnpj,
+		c.telefone_1,
+		c.email,
+		c.razao_social,
+		a.google_formatted_address,
+		c.cep,
+		c.numero,
+		c.uf,
+		c.municipio,
+		a.lat,
+		a.lng
+	FROM datalake_raw.cnpj_br_condos c
+  	INNER JOIN datalake_raw.cnpj_br_condos_geocoded_addresses a 
+  		ON c.hash = a.hash
+)
+, bases_externals as (
+select
+	bc.cnpj,
+	bc.razao_social,
+	bc.telefone_1,
+	bc.email,
+	max(c.google_formatted_address) as google_formatted_address,
+	cast(c.numero_imovel as bigint) as numero_imovel,
+	bc.cep,
+	c.ano_construcao_corrigido,
+	bc.uf,
+	bc.municipio,
+	c.lat,
+	c.lng,
+	c.num_apts
+from condos c
+inner join base_cnpj bc 
+	on concat(c.lat, c.lng) = concat(bc.lat, bc.lng)
+group by 1,2,3,4,6,7,8,9,10,11,12,13
+)
+, poligonos as (
+	SELECT 
+		r.*,
+		p.poligono AS geometry
+	FROM datalake_clean.ods_dim_region r
+	LEFT JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+	WHERE level = 'SubRegiao'
+)
+, cnpj_regions as (
+ select 
+ 	b.lat,
+	b.lng,
+ 	b.cnpj,
+	b.razao_social,
+	b.telefone_1,
+	b.email,
+	b.google_formatted_address,
+	b.numero_imovel,
+	b.cep,
+	b.ano_construcao_corrigido,
+	b.uf,
+	b.municipio,
+	b.num_apts,
+ 	p.sk_region,
+ 	p.region_code,
+ 	p.macro_name,
+ 	p.city_name,
+ 	p.city_group
+ from bases_externals as b
+ left join poligonos as p
+ ON ST_WITHIN(
+      ST_POINT(CAST(b.lng AS double), CAST(b.lat AS DOUBLE)),
+      p.geometry
+ 	)
+)
+, distinct_url as (
+select  
+    lat,
+    lng,
+    url,
+    advertiser_name,
+    cast(rent as real) as rent,
+    cast(condominium as real) as condominium,
+    cast(nb_street as bigint) as number_street,
+    cast(rent as real) + coalesce(cast(condominium as real),0) + coalesce(cast(iptu as real),0) as total_value,
+    max(crawled_on) as last_date
+from datalake_clean.crawlers
+where business in ('Alugado', 'aluguel', 'RENTAL')
+        and (ws = 'vivareal' or website = 'vivareal') 
+        and try_cast(crawled_on as date) >= CURRENT_DATE - interval '60' day
+        and lat is not null and lng is not null
+        and rent is not null
+        and 0.2*cast(rent as real) >= cast(iptu as real)
+        AND advertiser_name not like '%quinto%andar%'
+group by 1,2,3,4,5,6,7,8
+)
+, n_tile_table as (
+select 
+    *,
+    ntile(30) over (order by rent) as n_rent,
+    ntile(30) over (order by condominium) as n_condominium
+from distinct_url 
+)
+, base as (
+select 
+    lat,
+    lng,
+    number_street,
+    advertiser_name,
+    count(distinct url) listings,
+    avg(total_value) ticket_medio,
+    max(last_date) as last_date
+from n_tile_table
+where n_rent between 2 and 29 and n_condominium < 30 and number_street is not null
+group by 1,2,3,4
+)
+, bases_crawlers as (
+select 
+    lat,
+    lng,
+    number_street,
+    array_agg(advertiser_name) as r_state,
+    sum(listings) as listings,
+    sum(listings*ticket_medio)/sum(listings) as avg_rent,
+    max(last_date) as last_date
+from base 
+where number_street is not null
+group by 1,2,3
+)
+,  base_external_crawler as (
+ select
+ 	cr.lat,
+	cr.lng,
+ 	cr.sk_region,
+ 	cr.region_code,
+ 	cr.macro_name,
+ 	cr.city_name,
+ 	cr.city_group,
+ 	cr.cnpj,
+	cr.razao_social,
+	cr.telefone_1,
+	cr.email,
+	cr.google_formatted_address,
+	cr.numero_imovel,
+	cr.cep,
+	cr.ano_construcao_corrigido,
+	cr.uf,
+	cr.municipio,
+	cr.num_apts,
+	bc.lat as lat2,
+	bc.lng as lng2,
+ 	bc.r_state,
+ 	bc.listings,
+ 	bc.avg_rent,
+ 	bc.last_date
+ from cnpj_regions as cr
+ left join bases_crawlers as bc
+ 	on ST_WITHIN(
+      	ST_POINT(CAST(cr.lng AS double), CAST(cr.lat AS DOUBLE)),
+      	ST_BUFFER(
+       	 ST_POINT(CAST(bc.lng AS double), CAST(bc.lat AS DOUBLE)), 0.00045291823
+      	)
+    )
+    and cast(cr.numero_imovel as bigint) = cast(bc.number_street as bigint)
+)
+, ongoing as (
+select 
+    trim(dhl.house_lat) as house_lat, 
+    trim(dhl.house_lng) as house_lng, 
+    trim(dhl.house_number) as house_number,
+    count(distinct case when dhl.house_status = 'alugado' then dhl.id_house end) ongoing_contracts,
+    count(distinct case when dhl.house_status = 'publicado' then dhl.id_house end) ongoing_listing,
+    avg(cast(nullif(rent,'') as real)) ticket_medio, 
+    count(distinct case when dhl.house_status = 'despublicado' then dhl.id_house end) despublicados,
+    max(dhl.house_bedrooms) max_bedrooms,
+    min(dhl.house_bedrooms) min_bedrooms,
+    max(cast(coalesce(nullif(dhl.house_total_area,''),'0') as real)) max_area,
+    min(cast(coalesce(nullif(dhl.house_total_area,''),'0') as real)) min_area
+from datalake_clean.ods_dim_house_listing  dhl
+where dhl.is_last_version = 'True' and cast(dhl.version as bigint) > 0 and trim(house_city) in ('Curitiba','Osasco','Palhoça','Porto Alegre','Rio de Janeiro','Santo André','São Caetano do Sul','São José', 'São Paulo', 'Várzea Paulista')
+and dhl.version > '0'
+group by 1,2,3
+)
+, amenities as (
+select 
+    trim(dhl.house_lat) as house_lat, 
+    trim(dhl.house_lng) as house_lng, 
+    trim(dhl.house_number) as house_number,
+    max(cast(coalesce(nullif(dhl.house_elevator,''),'0') as bigint)) as elevator,
+    array_agg(distinct dhl.house_entrance) doorman,
+    array_agg(distinct dhl.key_location) key_location
+from datalake_clean.ods_dim_house_listing  dhl
+group by 1,2,3
+) 
+, leads as (
+select 
+    trim(dhl.house_lat) as house_lat, 
+    trim(dhl.house_lng) as house_lng, 
+    trim(dhl.house_number) as house_number,
+    count(case when fhlf.sk_conversion_date > '0' then 0 end) as converted_leads,
+    count(0) leads, 
+    count(case when dud.sk_user_affiliate > '0' then 0 end) doormen,
+    array_agg(distinct du.telefone_principal) as telephone,
+    array_agg(distinct du.nome) as name,
+    array_agg(distinct du.email) as email
+from datalake_clean.ods_fact_house_listing_flows fhlf
+join datalake_clean.ods_dim_house_listing  dhl on dhl.sk_house_listing = fhlf.sk_house_listing
+left join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = fhlf.sk_user_lead_affiliate
+left join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
+where cast(fhlf.sk_lead_date as bigint) > 20191001 and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
+group by 1,2,3
+)
+, base_interna as (
+select 	
+    l.house_lat,
+    l.house_lng,
+    regexp_extract(l.house_number, '(\d+)') as house_number,
+    o.ongoing_contracts,
+    o.ongoing_listing,
+    o.ticket_medio,
+    o.despublicados,
+    o.max_bedrooms,
+    o.min_bedrooms,
+    o.max_area,
+    o.min_area,
+    a.elevator,
+    a.doorman,
+    a.key_location,
+    l.converted_leads,
+    l.leads,
+    l.doormen,
+    l.name,
+    l.telephone,
+    l.email
+from leads as l 
+join amenities a on l.house_lat = a.house_lat 
+                       and l.house_lng = a.house_lng 
+                       and l.house_number = a.house_number
+join ongoing o on l.house_lat = o.house_lat 
+                       and l.house_lng = o.house_lng
+                       and l.house_number = o.house_number
+)
+select
+ 	bec.lat as iptu_lat,
+	bec.lng as iptu_lng,
+ 	bec.sk_region as iptu_sk_region,
+ 	bec.region_code as iptu_region_code,
+ 	bec.macro_name as iptu_macro_name,
+ 	bec.city_name as iptu_city_name,
+ 	bec.city_group as iptu_city_group,
+ 	bec.cnpj as iptu_cnpj,
+	bec.razao_social as iptu_razao_social,
+	bec.telefone_1 as iptu_telefone,
+	bec.email as iptu_email,
+	bec.google_formatted_address as iptu_google_formatted_address,
+	bec.numero_imovel as iptu_numero_imovel,
+	bec.cep as iptu_cep,
+	bec.ano_construcao_corrigido as iptu_ano_construcao_corrigido,
+	bec.uf as iptu_uf,
+	bec.municipio as iptu_municipio,
+	bec.num_apts as iptu_num_apts,
+ 	bec.r_state as competitors_advertiser,
+ 	bec.listings as competitors_listings,
+ 	bec.avg_rent as competitors_avg_rent,
+ 	bec.last_date as competitors_last_date,
+    bi.ongoing_contracts as bi_ongoing_contracts,
+    bi.ongoing_listing as bi_ongoing_listing,
+    bi.ticket_medio as bi_ticket_medio,
+    bi.despublicados as bi_despublicados,
+    bi.max_bedrooms as bi_max_bedrooms,
+    bi.min_bedrooms as bi_min_bedrooms,
+    bi.max_area as bi_max_area,
+    bi.min_area as bi_min_area,  
+    bi.elevator as bi_elevator,
+    bi.doorman as bi_doorman,
+    bi.key_location as bi_key_location,
+    bi.converted_leads as bi_converted_leads,
+    bi.leads as bi_leads,
+    bi.doormen as bi_doormen,
+    bi.name as bi_name,
+    bi.telephone as bi_telephone,
+    bi.email as bi_email  
+from base_external_crawler as bec
+left join base_interna as bi on ST_WITHIN(
+      	ST_POINT(CAST(bec.lng AS double), CAST(bec.lat AS DOUBLE)),
+      	ST_BUFFER(
+       	 ST_POINT(CAST(bi.house_lng AS double), CAST(bi.house_lat AS DOUBLE)), 0.00045291823
+      	)
+    )    
+    and cast(bec.numero_imovel as varchar) = bi.house_number
