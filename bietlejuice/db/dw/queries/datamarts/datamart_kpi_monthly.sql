@@ -41,6 +41,7 @@ left join fact_house_listings hl
   on dc.sk_contract = hl.sk_contract
 where dc.status in ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
   and date(coalesce(dc.dt_start, dc.dt_entrance)) < current_date -- we know we may have future dates for dt_start
+  and (date(coalesce(dc.dt_start, dc.dt_entrance)) < dc.dt_annulment or dc.dt_annulment is null) -- consider only contracts that weren't annulled before start date
 group by 1, 2
 ),
 new_contracts as (

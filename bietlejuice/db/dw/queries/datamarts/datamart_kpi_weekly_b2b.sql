@@ -55,6 +55,7 @@ left join dim_house_listing dhl
   on dhl.sk_house_listing = fhl.sk_house_listing
 where dc.status in ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
   and date(coalesce(dc.dt_start, dc.dt_entrance)) < current_date -- we know we may have future dates for dt_start
+  and (date(coalesce(dc.dt_start, dc.dt_entrance)) < dc.dt_annulment or dc.dt_annulment is null) -- consider only contracts that weren't annulled before start date
   and dhl.is_b2b = True
 group by 1, 2, 3, 4, 5
 ),
