@@ -17,10 +17,11 @@ MAIN_START_DATE = datetime(2019, 7, 12, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-S3_ARTIFACTS = Variable.get("5a_artifacts")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -37,14 +38,10 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": "{}/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl".format(
-            S3_ARTIFACTS
-        )
+        "whl": f"{ARTIFACTS_S3_BUCKET}/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
     },
     {
-        "whl": "{}/teravoz-client/quintoandar_teravoz_client-0.1.5-py3-none-any.whl".format(
-            S3_ARTIFACTS
-        )
+        "whl": f"{ARTIFACTS_S3_BUCKET}/teravoz-client/quintoandar_teravoz_client-0.1.5-py3-none-any.whl"
     },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES

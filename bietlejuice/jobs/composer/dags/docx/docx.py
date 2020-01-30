@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "docx"
 ENV = Variable.get("environment")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -32,7 +33,9 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
-    {"jar": "s3://5a-artifacts/mysql-connector-java/mysql-connector-java-5.1.47.jar"}
+    {
+        "jar": f"{ARTIFACTS_S3_BUCKET}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+    }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 

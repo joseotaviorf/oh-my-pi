@@ -28,7 +28,7 @@ SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/".format(DAG_ID)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
-ARTIFACTS_S3_BUCKET = Variable.get("5a_artifacts")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)

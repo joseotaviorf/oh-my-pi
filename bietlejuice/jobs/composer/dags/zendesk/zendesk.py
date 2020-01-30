@@ -20,7 +20,7 @@ DEPARTMENTS = "departments"
 DEPARTMENTS_WITH_PREFIX = f"{CHATS}_{DEPARTMENTS}"
 
 ENV = Variable.get("environment")
-S3_ARTIFACTS = Variable.get("5a_artifacts")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -40,10 +40,10 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
-        "whl": f"{S3_ARTIFACTS}/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
+        "whl": f"{ARTIFACTS_S3_BUCKET}/tapioca-wrapper/tapioca_wrapper-quintoandar_1.5.1-py3-none-any.whl"
     },
     {
-        "whl": f"{S3_ARTIFACTS}/zendesk-client/quintoandar_zendesk_client-0.1.1-py3-none-any.whl"
+        "whl": f"{ARTIFACTS_S3_BUCKET}/zendesk-client/quintoandar_zendesk_client-0.1.1-py3-none-any.whl"
     },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
