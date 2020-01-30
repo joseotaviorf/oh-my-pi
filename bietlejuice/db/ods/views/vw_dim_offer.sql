@@ -63,7 +63,7 @@ new_offer as (
       id as id_offer,
       godfather_id as id_godfather,
       firestore_id as id_firestore,
-      last_rent as last_offered_rent,
+      last_offered_rent,
       original_rent,
       original_condo,
       analysis_date as dt_analysis,
