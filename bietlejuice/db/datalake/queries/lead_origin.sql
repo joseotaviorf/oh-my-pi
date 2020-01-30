@@ -153,7 +153,7 @@ with t_all as (
 				            coalesce(region, '') as region,
 				            coalesce(city, '') as city,
 				            coalesce(uuid, '') as uuid
-				    from datalake_amplitude_clean_prod.events_repartitioned
+				    from datalake_amplitude_clean_prod.events
 				        where id_app = 183047
 				            and json_extract(user_properties, '$.lead_firestore_id') is not null
 				), prep_form as (

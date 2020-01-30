@@ -34,7 +34,7 @@ ios as (
 		coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as media_source
-	from datalake_amplitude_clean_prod.events_repartitioned
+	from datalake_amplitude_clean_prod.events
 	where
 		event_type = 'Confirmation-Visit_confirmed'
 		and id_app = 156118
@@ -60,7 +60,7 @@ web as (
 		coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), 'organic') as media_source
-	from datalake_amplitude_clean_prod.events_repartitioned
+	from datalake_amplitude_clean_prod.events
 	where event_type = 'Confirmation-Visit_confirmed'
 				and id_app = 160023
 				and cast(ts_event as date) < cast('2017-08-17' as date)
@@ -82,7 +82,7 @@ android as (
 		coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as utm_term,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as adjust_network,
 		coalesce(cast(json_extract(user_properties, '$["[adjust] network"]') as varchar), '') as media_source
-	from datalake_amplitude_clean_prod.events_repartitioned
+	from datalake_amplitude_clean_prod.events
 	where event_type = 'Confirmation-Visit_confirmed'
 				and id_app = 157033
 				and cast(ts_event as date) < cast('2017-08-23' as date)
