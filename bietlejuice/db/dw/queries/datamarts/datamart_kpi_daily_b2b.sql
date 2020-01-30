@@ -15,6 +15,7 @@ left join dim_house_listing dhl
 where (dc.dt_annulment < current_date OR dc.dt_annulment is null) -- we know we may have future dates for dt_annulment
   and dc.status in ('Ativo','Finalizado') -- consider only contracts that are active or were active and ended
   and dhl.is_b2b = True
+  and type <> 'DealOnly' -- this type of contract should only be considered for new contracts signed
 group by 1, 2, 3
 ),
 ongoing_rentals_daily as (
