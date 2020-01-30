@@ -66,7 +66,7 @@ select
 	lat,
 	lng,
 	numero_imovel,
-	regexp_extract(google_formatted_address, '\d{5}[-]\d{3}') as cep,
+	regexp_extract(google_formatted_address, '\d{{5}}[-]\d{{3}}') as cep,
 	ano_construcao_corrigido,
 	count(concat(lat,lng)) as num_apts
 from apts
