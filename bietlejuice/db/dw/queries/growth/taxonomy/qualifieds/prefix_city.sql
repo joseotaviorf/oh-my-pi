@@ -156,8 +156,8 @@ with all_dates_prev as (
 		on f.sk_region = dr.sk_region
 	join dim_lead l
         on f.sk_lead = l.sk_lead
-	where f.sk_qualified_date between 20180101 and to_char(current_date - 1, 'YYYYMMDD')::integer
-  order by 6, 1, 2, 3, 4
+	where f.sk_lead_date != -1 
+          and f.sk_qualified_date between 20180101 and to_char(current_date - 1, 'YYYYMMDD')::integer
 ),
 all_dates as (
     select
