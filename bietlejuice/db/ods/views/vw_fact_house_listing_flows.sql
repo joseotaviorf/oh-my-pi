@@ -187,7 +187,7 @@ fact_with_reproc as (
     left join lead_sales_company lsc
       on lsc.id_lead = l.id
     where
-      lbc.id_house is null -- When house is not in listing_business_context, it is for rent
+      (lbc.id_house is null and h.id is not null) -- When house is not in listing_business_context, it is for rent
       or lbc.is_for_rent
       or l.is_for_rent::int::boolean
   )
