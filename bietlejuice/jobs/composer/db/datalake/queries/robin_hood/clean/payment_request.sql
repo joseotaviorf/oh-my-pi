@@ -1,6 +1,6 @@
 select
     id,
-    parent_payment_request_id as id_parent_payment_request,
+    parent_id as id_parent,
     lot_id as id_lot,
     transaction_id as id_transaction,
     payee_id as id_payee,
