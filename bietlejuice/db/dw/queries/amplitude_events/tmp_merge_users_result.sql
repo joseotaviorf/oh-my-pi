@@ -4,7 +4,7 @@ with amplitude_events_not_empty as (
     case when device_id is null or device_id = '' then null else device_id end as device_id,
     case when amplitude_id is null or amplitude_id = '' then null else amplitude_id end as amplitude_id,
     case when user_id is null or user_id = '' then null else user_id end as user_id
-    from datalake_clean.amplitude_events
+    from datalake_amplitude_clean_prod.events
   where ym = '{0}'
 ),
 user_nulls as (
