@@ -22,7 +22,7 @@ from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('AmplitudeEventsETL')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 AMPLITUDE_EVENTS_TABLE = 'events'
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -199,7 +199,7 @@ class AmplitudeEventsETL(BaseETL):
 
     @logger
     def get_properties_as_df(self, athena_client):
-        props_query = f'describe {DB}.{AMPLITUDE_EVENTS_TABLE}'
+        props_query = 'describe {}.{}'.format(DB, AMPLITUDE_EVENTS_TABLE)
         return athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def expand_columns(self, athena_client, df, df_props, df_json, properties, prefix):

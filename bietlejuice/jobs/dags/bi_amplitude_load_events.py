@@ -14,7 +14,7 @@ from qa_python_utils.aws.athena import AthenaClient
 logger = QuintoAndarLogger('AmplitudeEvents')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 
 
 @logger(exclude='kwargs')

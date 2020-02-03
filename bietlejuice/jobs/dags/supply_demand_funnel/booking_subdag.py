@@ -10,7 +10,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 logger = QuintoAndarLogger('BookingSubDag')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 AMPLITUDE_EVENTS_TABLE = 'events'
 
 

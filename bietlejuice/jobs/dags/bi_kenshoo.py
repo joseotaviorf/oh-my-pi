@@ -22,7 +22,7 @@ MAIN_DAG_ID = 'bi-kenshoo'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 
 # dag
 main_dag = DAG(

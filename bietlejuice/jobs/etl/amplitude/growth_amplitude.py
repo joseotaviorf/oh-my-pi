@@ -7,7 +7,7 @@ from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('GrowthAmplitude')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 
 
 class GrowthAmplitude(object):

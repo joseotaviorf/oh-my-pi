@@ -11,7 +11,7 @@ from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('LeadSubDag')
 ENV = Variable.get("environment")
-DB = f"datalake_amplitude_clean_{ENV}"
+DB = "datalake_amplitude_clean_{}".format(ENV)
 AMPLITUDE_EVENTS_TABLE = 'events'
 
 

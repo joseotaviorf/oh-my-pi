@@ -27,7 +27,7 @@ SKYNET_RECOMMENDER_KWARGS = env.get_airflow_env_var('SKYNET_RECOMMENDER_KWARGS')
 SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
 KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
 DB_ENV = env.get_airflow_env_var('environment')
-DB = f"datalake_amplitude_clean_{DB_ENV}"
+DB = "datalake_amplitude_clean_{}".format(DB_ENV)
 AMPLITUDE_EVENTS_TABLE = 'events'
 
 TRAINING_PATH = 'listing2vec/training'
