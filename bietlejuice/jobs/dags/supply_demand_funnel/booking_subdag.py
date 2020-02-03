@@ -1,6 +1,7 @@
 from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
 
+from airflow.models import Variable
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -8,6 +9,9 @@ from bietlejuice.jobs.dags import SOURCE_QUERIES_DIR
 from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 
 logger = QuintoAndarLogger('BookingSubDag')
+ENV = Variable.get("environment")
+DB = f"datalake_amplitude_clean_{ENV}"
+AMPLITUDE_EVENTS_TABLE = 'events'
 
 
 class BookingSubDag(DimSubDag):
@@ -67,7 +71,8 @@ class BookingSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'booking_media_sources',
                 'file_name': 'extract_booking_media_sources.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': DimSubDag.S3_BUCKET,
+                'query_params': {'db': DB, 'table_name': AMPLITUDE_EVENTS_TABLE}
             }
         )
 

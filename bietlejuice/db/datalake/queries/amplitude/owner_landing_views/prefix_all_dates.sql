@@ -8,7 +8,7 @@ with all_events as (
         id_amplitude as amplitude_id,
         'QuintoAndar' as region,
         'QuintoAndar' as city
-    from datalake_amplitude_clean_prod.events
+    from {db}.events
     where event_type in (
           'landing_page_viewed',
           'Owner_Landing-Views_register_form'

@@ -12,7 +12,7 @@ with t_all as (
 	                    region,
 	                    city,
 	                    uuid
-	            from    datalake_amplitude_clean_prod."205027_referral_confirmation_page_viewed_events"
+	            from    {db}."205027_referral_confirmation_page_viewed_events"
 	            where regexp_like(cast(ep_lead_id as varchar), '(^\d+)')
 	            union
 	            select  ep_lead_id,
@@ -27,7 +27,7 @@ with t_all as (
 	                    region,
 	                    city,
 	                    uuid
-	            from    datalake_amplitude_clean_prod."205027_referral_opportunity_confirmed_events"
+	            from    {db}."205027_referral_opportunity_confirmed_events"
 	            where regexp_like(cast(ep_lead_id as varchar), '(^\d+)')
 	            union
 	            select  ep_lead_id,
@@ -42,7 +42,7 @@ with t_all as (
 	                    region,
 	                    city,
 	                    uuid
-	            from    datalake_amplitude_clean_prod."205027_referral_listing_confirmed_events"
+	            from    {db}."205027_referral_listing_confirmed_events"
 	            where regexp_like(cast(ep_lead_id as varchar), '(^\d+)')
 	            union
 	            select  ep_lead_id,
@@ -57,7 +57,7 @@ with t_all as (
 	                    region,
 	                    city,
 	                    uuid
-	            from    datalake_amplitude_clean_prod."205027_referral_form_response_received_events"
+	            from    {db}."205027_referral_form_response_received_events"
 	            where regexp_like(cast(ep_lead_id as varchar), '(^\d+)')
 	            ),app_183047 as (
 		            select  ep_formfield_lead_uuid,
@@ -73,7 +73,7 @@ with t_all as (
 		                    region,
 		                    city,
 		                    uuid
-		            from    datalake_amplitude_clean_prod."183047_lead_form_submitted_events"
+		            from    {db}."183047_lead_form_submitted_events"
 		            where   ep_formfield_lead_uuid is not null
 		            union
 		             select ep_formfield_lead_uuid,
@@ -89,7 +89,7 @@ with t_all as (
 		                    region,
 		                    city,
 		                    uuid
-		            from    datalake_amplitude_clean_prod."183047_price_suggestion_form_submitted_events"
+		            from    {db}."183047_price_suggestion_form_submitted_events"
 		            where   ep_formfield_lead_uuid is not null
 	            ),prep_ref as (
 		            select
@@ -132,7 +132,7 @@ with t_all as (
 				            coalesce(region, '') as region,
 				            coalesce(city, '') as city,
 				            coalesce(uuid, '') as uuid
-			    	from 	datalake_amplitude_clean_prod.events
+			    	from 	{db}.{table_name}
 			    	where 	event_type in ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
 			            and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
 			    ), prep_firestore as (
@@ -153,7 +153,7 @@ with t_all as (
 				            coalesce(region, '') as region,
 				            coalesce(city, '') as city,
 				            coalesce(uuid, '') as uuid
-				    from datalake_amplitude_clean_prod.events
+				    from {db}.{table_name}
 				        where id_app = 183047
 				            and json_extract(user_properties, '$.lead_firestore_id') is not null
 				), prep_form as (

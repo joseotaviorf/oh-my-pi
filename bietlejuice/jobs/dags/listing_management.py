@@ -32,6 +32,8 @@ SKYNET_LISTMGMT_KWARGS = env.get_airflow_env_var('SKYNET_LISTMGMT_KWARGS')
 SAGEMAKER_ROLE = env.get_airflow_env_var('SAGEMAKER_ROLE')
 SKYNET_KUBERNETES_TOKEN = env.get_airflow_env_var('SKYNET_KUBERNETES_TOKEN')
 KUBERNETES_API_ENDPOINT = env.get_airflow_env_var('KUBERNETES_API_ENDPOINT')
+DB_ENV = env.get_airflow_env_var('environment')
+DB = f"datalake_amplitude_clean_{DB_ENV}"
 
 # where on s3 to write the input data to give to fit
 # (and copy inside the container to /opt/ml/input/data/training)
@@ -98,6 +100,7 @@ def load_historical_ioi(exec_date):
         query = fd.read()
     hid = athena.execute_query_and_wait_for_results(
         query, s3_bucket=SKYNET_BUCKET,
+        query_params={'db': DB},
         bucket_folder_path=INPUT_PATH.format(exec_date))
     return hid
 

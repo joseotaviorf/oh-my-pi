@@ -1,10 +1,13 @@
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
+from airflow.models import Variable
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('GrowthAmplitude')
+ENV = Variable.get("environment")
+DB = f"datalake_amplitude_clean_{ENV}"
 
 
 class GrowthAmplitude(object):
@@ -35,7 +38,11 @@ class GrowthAmplitude(object):
 
     @logger
     def get_df(self, prefix, suffix, middle=''):
-        return self.athena_client.execute_query_and_return_dataframe(sql=prefix + middle + suffix)
+        if 'suffix' in suffix:
+            query_params = None
+        else:
+            query_params = {'db': DB}
+        return self.athena_client.execute_query_and_return_dataframe(sql=prefix + middle + suffix, query_params=query_params)
 
     @staticmethod
     @logger(exclude='df')

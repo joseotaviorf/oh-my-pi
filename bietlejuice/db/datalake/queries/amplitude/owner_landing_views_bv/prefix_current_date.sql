@@ -8,7 +8,7 @@ with all_events as (
         coalesce(cast(id_amplitude as varchar), '') as amplitude_id,
         'QuintoAndar' as region,
         'QuintoAndar' as city
-      from datalake_amplitude_clean_prod."183047_landing_page_viewed_events"
+      from {db}."183047_landing_page_viewed_events"
       where ep_ub_page_variant in ('bv','cj','co')
         and ep_ub_page_name = 'Proprietário'
 		and extract(year from ts_event) = extract(year from (now() - interval '1' month))

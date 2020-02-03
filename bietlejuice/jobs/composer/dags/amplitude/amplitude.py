@@ -275,9 +275,7 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
 )
 
 # tasks dependencies definition
-create_cluster_task >> events_to_datalake_raw_task >> [
-    events_raw_to_clean_task
-]
+create_cluster_task >> events_to_datalake_raw_task >> [events_raw_to_clean_task]
 
 events_raw_to_clean_task >> [
     add_clean_events_partitions_task,

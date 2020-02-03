@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
+from airflow.models import Variable
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
@@ -9,6 +10,9 @@ from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger('AffiliateSubDag')
+ENV = Variable.get("environment")
+DB = f"datalake_amplitude_clean_{ENV}"
+AMPLITUDE_EVENTS_TABLE = 'events'
 
 
 class AffiliateSubDag(DimSubDag):
@@ -56,7 +60,8 @@ class AffiliateSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'user_affiliate_origin',
                 'file_name': 'user_affiliate_origin.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': DimSubDag.S3_BUCKET,
+                'query_params': {'db': DB, 'table_name': AMPLITUDE_EVENTS_TABLE}
             }
         )
 

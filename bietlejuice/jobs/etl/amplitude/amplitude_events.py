@@ -9,6 +9,7 @@ from datetime import datetime
 import boto3
 import numpy as np
 import pandas as pd
+from airflow.models import Variable
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl import DW_QUERIES_DIR, DATALAKE_QUERIES_DIR
@@ -20,6 +21,9 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('AmplitudeEventsETL')
+ENV = Variable.get("environment")
+DB = f"datalake_amplitude_clean_{ENV}"
+AMPLITUDE_EVENTS_TABLE = 'events'
 
 DEFAULT_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 AMPLITUDE_API_DATE_FORMAT = '%Y%m%dT%H'
@@ -86,7 +90,7 @@ class AmplitudeEventsETL(BaseETL):
             '{}/{}/{}.sql'.format(DW_QUERIES_DIR, schema, table_tmp))
 
         BaseETL.execute_command(
-            command=query_create.format(ym),
+            command=query_create.format(DB, AMPLITUDE_EVENTS_TABLE, ym),
             db_enum=EnumDB.BI_DW,
             commit=True
         )
@@ -195,7 +199,7 @@ class AmplitudeEventsETL(BaseETL):
 
     @logger
     def get_properties_as_df(self, athena_client):
-        props_query = 'describe datalake_amplitude_clean_prod.events'
+        props_query = f'describe {DB}.{AMPLITUDE_EVENTS_TABLE}'
         return athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def expand_columns(self, athena_client, df, df_props, df_json, properties, prefix):
@@ -236,6 +240,8 @@ class AmplitudeEventsETL(BaseETL):
                 athena_client.execute_file_query_and_wait_for_results(
                     filename=add_column_clean_query,
                     query_params={
+                        'db': DB,
+                        'table_name': AMPLITUDE_EVENTS_TABLE,
                         'column_prefix': prefix,
                         'column_formatted': formatted_up,
                         'column_type': 'string',
@@ -375,6 +381,8 @@ class AmplitudeEventsETL(BaseETL):
             athena_client.execute_file_query(
                 filename=add_partition_clean_query,
                 query_params={
+                    'db': DB,
+                    'table_name': AMPLITUDE_EVENTS_TABLE,
                     'app': df_group[0],
                     'ym': ym,
                     's3_bucket': self.s3_bucket

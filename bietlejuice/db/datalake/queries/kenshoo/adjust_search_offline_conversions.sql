@@ -3,7 +3,7 @@ with amplitude_schedules as (
         ts_event as dt,
         '_k_' || up_gclid || '_k_'  as gclid
     from
-        datalake_amplitude_clean_prod."170698_visit_schedule_confirmed_events"
+        {db}.{table_name}
     where
         up_gclid is not null
         and up_platform = 'iOS'
