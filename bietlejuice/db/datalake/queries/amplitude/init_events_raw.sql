@@ -1,4 +1,4 @@
 select *
-  from datalake_raw.amplitude_events
+  from datalake_amplitude_raw_prod.events
 where dt = '{dt_partition}'
 ;

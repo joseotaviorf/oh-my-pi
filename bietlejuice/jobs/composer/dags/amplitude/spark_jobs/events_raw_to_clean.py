@@ -17,11 +17,11 @@ from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("events_repartitioned_raw_to_clean")
+logger = QuintoAndarLogger("events_raw_to_clean")
 
 spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 
-parser = ArgumentParser(description="events_repartitioned_raw_to_clean")
+parser = ArgumentParser(description="events_raw_to_clean")
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("table_name")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         {"db": db_info["db_raw_databricks"]}, spark_client
     )
 
-    # create events_repartitioned in datalake
+    # create events in datalake
     df = amplitude_events.create_clean_events_df(
         date, spark_sql_consumer, dataframe_service, partition_cols
     )

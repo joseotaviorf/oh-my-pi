@@ -195,7 +195,7 @@ class AmplitudeEventsETL(BaseETL):
 
     @logger
     def get_properties_as_df(self, athena_client):
-        props_query = 'describe datalake_clean.amplitude_events'
+        props_query = 'describe datalake_amplitude_clean_prod.events'
         return athena_client.execute_txt_query_and_return_dataframe(props_query)
 
     def expand_columns(self, athena_client, df, df_props, df_json, properties, prefix):
