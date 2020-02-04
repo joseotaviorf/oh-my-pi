@@ -52,7 +52,7 @@ dag = DAG(
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
-        'depends_on_past': False
+        'depends_on_past': True
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
