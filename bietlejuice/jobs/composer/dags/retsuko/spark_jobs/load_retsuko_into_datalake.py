@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_retsuko_into_datalake"
-BLACK_LIST = ["schema_migrations"]
+BLOCK_LIST = ["schema_migrations"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -40,8 +40,12 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
+    # create database if not exists
+    database_name = db_info["db_raw_databricks"]
+    metastore_service.create_database(database_name)
+
     for table in tables:
-        if table.table_name not in BLACK_LIST:
+        if table.table_name not in BLOCK_LIST:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             loader.load_full_table(
