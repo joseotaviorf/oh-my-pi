@@ -6,7 +6,7 @@ select
     from_account_id as id_from_account,
     to_account_id as id_to_account,
     invoice_id as id_invoice,
-    amount
+    amount,
     bill_item,
     description,
     producer,
