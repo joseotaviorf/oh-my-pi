@@ -1,19 +1,35 @@
+, offers as (
+  select
+     o.firestore_id,
+     max(oe.id) as id
+  from datalake_firestore_raw_prod.offers o
+  left join datalake_ebdb_raw_prod.offer oe
+      on o.firestore_id = oe.firestoreid
+  group by 1
+)
 , contracts as (
   select
     t.*,
-    cast(coalesce(dc.sk_contract, eo.contrato_id, ev.contrato_id, '-1') as bigint) as sk_contract
+    cast(coalesce(dc.sk_contract, cast(eo.contrato_id as varchar), cast(ev.contrato_id as varchar), cast(co.id as varchar), '-1') as bigint) as sk_contract
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
-  left join datalake_raw.ebdb_onboarding eo
+      and cast(try_cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
+  left join datalake_ebdb_raw_prod.onboarding eo
     on trim(ct.origin) = 'Onboarding'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(eo.id as bigint))
-  left join datalake_raw.ebdb_vistoria ev
+      and cast(try_cast(ct.id_origin as decimal) as bigint) = try(cast(eo.id as bigint))
+  left join datalake_ebdb_raw_prod.vistoria ev
     on trim(ct.origin) = 'Vistoria'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(ev.id as bigint))
+      and cast(try_cast(ct.id_origin as decimal) as bigint) = try(cast(ev.id as bigint))
+  left join offers o
+      on trim(ct.origin) = 'Offer'
+      and o.firestore_id = ct.id_origin
+  left join datalake_ebdb_raw_prod.proposta p
+      on o.id = p.offer_id
+  left join datalake_ebdb_raw_prod.contrato co
+      on p.id = co.proposta_id
 ),
 contract_house_listing as (
   select
