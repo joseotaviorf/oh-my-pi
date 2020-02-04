@@ -10,7 +10,7 @@ with all_events as (
                      892700000 + cast(regexp_extract(ep_house_id, '\d+') as integer),
                      cast(regexp_extract(ep_house_id, '\d+') as integer))
         as house_id
-      from {db}."170698_schedule_page_viewed_events"
+      from datalake_amplitude_clean_prod."170698_schedule_page_viewed_events"
       where extract(year from ts_event) = extract(year from (now() - interval '1' month))
 		    and extract(month from ts_event) = extract(month from (now() - interval '1' month))
 		    and extract(day from ts_event) < extract(day from now())

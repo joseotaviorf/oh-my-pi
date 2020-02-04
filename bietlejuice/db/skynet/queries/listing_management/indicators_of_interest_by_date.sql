@@ -47,7 +47,7 @@ first_listing_viz as (
 		id_amplitude 		as amplitude_id,
 		min(date(ts_event)) as first_event_date
 	from
-		{db}."170698_listing_page_viewed_events"
+		datalake_amplitude_clean_prod."170698_listing_page_viewed_events"
 	where
 		cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
 	group by
@@ -60,7 +60,7 @@ first_schedule_viz as (
 		id_amplitude 		as amplitude_id,
 		min(date(ts_event)) as first_event_date
 	from
-		{db}."170698_schedule_page_viewed_events"
+		datalake_amplitude_clean_prod."170698_schedule_page_viewed_events"
 	where
 		cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
 	group by
@@ -97,7 +97,7 @@ first_favorite_set as (
 		id_amplitude 		as amplitude_id,
 		min(date(ts_event)) as first_event_date
 	from
-		{db}."170698_listing_favorite_set_events"
+		datalake_amplitude_clean_prod."170698_listing_favorite_set_events"
 	where
 		cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
 	group by
@@ -122,7 +122,7 @@ first_discard as (
 		id_amplitude 		as amplitude_id,
 		min(date(ts_event)) as first_event_date
 	from
-		{db}."170698_listing_discard_confirmed_events"
+		datalake_amplitude_clean_prod."170698_listing_discard_confirmed_events"
 	where
 		cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between date_format(current_date - interval '498' day, '%Y-%m') and date_format(current_date, '%Y-%m')
 	group by

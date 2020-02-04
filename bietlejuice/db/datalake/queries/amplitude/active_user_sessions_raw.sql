@@ -16,7 +16,7 @@ with sessions_raw as (
 	    event_type,
 	    min(ts_event) as session_start_ts,
 	    date(ts_server_uploaded) as server_upload_time
-    from {db}.events
+    from datalake_amplitude_clean_prod.events
     where ym >= '{ym}'
     and date(ts_server_uploaded) = date('{dt}')
     and id_session != -1

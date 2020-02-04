@@ -13,7 +13,7 @@ with all_events as (
             cast(regexp_extract(ep_house_id, '\d+') as integer))
       else -1
     end as house_id
-  from {db}."170698_schedule_page_viewed_events"
+  from datalake_amplitude_clean_prod."170698_schedule_page_viewed_events"
   where cast(ts_event as date) >= cast('2017-08-23' as date)
         and cast(ts_event as date) < cast(now() as date)
 ),

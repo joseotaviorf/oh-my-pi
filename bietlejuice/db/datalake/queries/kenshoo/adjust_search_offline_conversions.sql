@@ -3,7 +3,7 @@ with amplitude_schedules as (
         ts_event as dt,
         '_k_' || up_gclid || '_k_'  as gclid
     from
-        {db}.{table_name}
+        datalake_amplitude_clean_prod.events
     where
         up_gclid is not null
         and up_platform = 'iOS'

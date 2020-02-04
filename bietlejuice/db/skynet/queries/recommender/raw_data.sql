@@ -12,7 +12,7 @@ with prev as (
       ) as integer
     ) as house_id,
     cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}') as timestamp) as action_time
-  from {db}.{table_name}
+  from datalake_amplitude_clean_prod.events
   where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between '__START_YM__' and '__END_YM__'
     and event_type in ('listing_page_viewed', 'visit_intent_clicked')
     and app = 170698

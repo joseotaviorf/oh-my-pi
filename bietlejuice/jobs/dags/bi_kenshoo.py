@@ -5,7 +5,7 @@ from os.path import isfile, join
 
 from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.contrib.operators.sftp_operator import SFTPOperator, SFTPOperation
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
@@ -21,8 +21,6 @@ env.set_airflow_var_to_local_env('BI_DW')
 MAIN_DAG_ID = 'bi-kenshoo'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 8 * * *')
-ENV = Variable.get("environment")
-DB = "datalake_amplitude_clean_{}".format(ENV)
 
 # dag
 main_dag = DAG(
@@ -40,7 +38,7 @@ main_dag = DAG(
 
 
 # functions
-def execute_athena_query(query_filename, ds, file_name, use_query_params, table_name=None, **kwargs):
+def execute_athena_query(query_filename, ds, file_name, use_query_params, **kwargs):
     kenshoo = Kenshoo(
         execution_date=ds
     )
@@ -51,7 +49,7 @@ def execute_athena_query(query_filename, ds, file_name, use_query_params, table_
                                                   file_name=file_name,
                                                   query_params=dict(
                                                       {'dt': datetime.date(
-                                                          kwargs['execution_date']), 'db': DB, 'table_name': table_name}) if use_query_params else None)
+                                                          kwargs['execution_date'])}) if use_query_params else None)
 
 
 def execute_redshift_query(query_filename, ds, split_by_column=None, extra_params=None,
@@ -120,7 +118,6 @@ execute_adjust_search_offline_conversions_query_task = BaseDAG.build_python_oper
     provide_context=True,
     op_kwargs={'query_filename': 'adjust_search_offline_conversions.sql',
                'file_name': 'adjust_search_offline_conversions',
-               'table_name': '170698_visit_schedule_confirmed_events',
                'use_query_params': True},
     dag=main_dag
 )
@@ -157,7 +154,6 @@ execute_visit_schedule_confirmed_with_gclid_query_task = BaseDAG.build_python_op
     provide_context=True,
     op_kwargs={'query_filename': 'visit_schedule_confirmed_with_gclid.sql',
                'file_name': 'visit_schedule_confirmed_with_gclid',
-               'table_name': 'events',
                'use_query_params': True},
     dag=main_dag
 )

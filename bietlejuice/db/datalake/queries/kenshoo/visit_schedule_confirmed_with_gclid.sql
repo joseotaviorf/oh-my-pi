@@ -6,7 +6,7 @@ with amplitude_schedules as (
 		end as "GCLID"
 		-- Appending _k_ so kenshoo client can decode as google client id
 	from
-		{db}.{table_name}
+		datalake_amplitude_clean_prod.events
 	where
 		event_type = 'visit_schedule_confirmed'
 		and json_extract_scalar(user_properties, '$.utm_source') = 'google'

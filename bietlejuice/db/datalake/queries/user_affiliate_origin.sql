@@ -14,7 +14,7 @@ with amplitude_affiliate_tracking as(
         coalesce(city, '') as city,
         ts_client_event as client_event_time,
         ts_event
-    FROM {db}.{table_name}
+    FROM datalake_amplitude_clean_prod.events
     WHERE event_type IN ('signup_user_created', 'login_confirmation_viewed', 'home_page_viewed')
         AND id_app = 205027
         AND id_user is not null

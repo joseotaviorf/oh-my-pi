@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.dags.util import environment as env
@@ -13,8 +13,6 @@ from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger('AmplitudeEvents')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-ENV = Variable.get("environment")
-DB = "datalake_amplitude_clean_{}".format(ENV)
 
 
 @logger(exclude='kwargs')
@@ -50,8 +48,7 @@ def athena_execute_file_query_and_wait_for_results(filename, execution_date, buc
     return_df = a.execute_file_query_and_return_dataframe(
         filename='{}/{}'.format(DATALAKE_QUERIES_DIR, filename),
         query_params={'ym': str(execution_date.strftime('%Y-%m')),
-                      'dt': str(execution_date.strftime('%Y-%m-%d')),
-                      'db': DB})
+                      'dt': str(execution_date.strftime('%Y-%m-%d'))})
 
     suffix = '{}.csv'.format(str(execution_date))
     full_filename = '{}/{}'.format(bucket_folder_path, suffix)
