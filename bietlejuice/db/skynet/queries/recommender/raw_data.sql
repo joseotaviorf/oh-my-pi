@@ -1,7 +1,7 @@
 with prev as (
   select
-    amplitude_id as user_id,
-    session_id,
+    id_amplitude as user_id,
+    id_session as session_id,
     event_type as "action",
     try_cast(
       coalesce(
@@ -11,11 +11,11 @@ with prev as (
         regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '^(\d+)(\.0)?$', 1)
       ) as integer
     ) as house_id,
-    cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}[ |T]\d{2}:\d{2}:\d{2}') as timestamp) as action_time
-  from datalake_amplitude_clean_prod.events
+    ts_event as action_time
+  from {db}.{table_name}
   where cast(year as varchar) || '-' || lpad(cast(month as varchar), 2, '0') between '__START_YM__' and '__END_YM__'
     and event_type in ('listing_page_viewed', 'visit_intent_clicked')
-    and app = 170698
+    and id_app = 170698
     and ip_address not in ('187.72.188.226', '127.0.0.1', '201.49.126.67')
 ),
 flg_lag as (
@@ -59,5 +59,5 @@ dataset as (
 select
   *
 from dataset
-where first_action_time between date '__START_DATE__' and date '__END_DATE__'
+where CAST(first_action_time as date) between date '__START_DATE__' and date '__END_DATE__'
   and cardinality(listing_views) >= 5
