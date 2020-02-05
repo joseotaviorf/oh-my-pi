@@ -1,6 +1,6 @@
 select
     id,
-    related_document_id,
+    related_document_id as id_related_document,
     due_amount,
     due_date as dt_due, 
     timestamp(issue_date_time) as ts_issued,

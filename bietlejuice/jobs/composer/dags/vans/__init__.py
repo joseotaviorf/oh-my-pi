@@ -1,0 +1,4 @@
+from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
+
+SOURCE = "vans"
+QUERIES_VANS_DATALAKE_PATH = QUERIES_DATALAKE_PATH + SOURCE
