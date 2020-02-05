@@ -20,4 +20,4 @@ select
     bank_payment_id as id_bank_payment,
     barcode   
 from
-    datalake_vans_raw.payment_boleto
+    datalake_vans_raw.paymentboleto

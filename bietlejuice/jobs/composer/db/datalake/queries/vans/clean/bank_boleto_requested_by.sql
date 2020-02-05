@@ -4,4 +4,4 @@ select
     boolean(active) as is_active,
     boolean(fallback) as is_fallback
 from
-    datalake_vans_raw.bank_boleto_requested_by
+    datalake_vans_raw.bankboletorequestedby

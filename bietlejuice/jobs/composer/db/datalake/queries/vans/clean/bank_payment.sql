@@ -7,4 +7,4 @@ select
     sha2(account_digit,256) as account_digit,
     contract_number
 from
-    datalake_vans_raw.bank_payment
+    datalake_vans_raw.bankpayment
