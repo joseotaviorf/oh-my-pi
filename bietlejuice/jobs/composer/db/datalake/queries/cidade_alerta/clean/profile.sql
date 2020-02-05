@@ -20,7 +20,6 @@ select
     last_email_run,
     name,
     boolean(new_houses_alert_subscription) as has_new_houses_alert_subscription,
-    partnerId as id_partner,
     phone,
     phoneNumber as phone_number,
     phoneNumberSecondary as phone_number_secondary,
