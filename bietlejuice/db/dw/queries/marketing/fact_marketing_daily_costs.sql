@@ -513,7 +513,7 @@ taxonomy_by_platform as (
     txmc.*,
 		s.mkt_platform,
 		cast(coalesce(nullif(trim(SPLIT_PART(txmc.cost_factor, ';', s.i)), ''), '1.0') as float) as fator_custo
-	from datalake_raw.gsheets_taxonomy_mkt_cost_tmp txmc
+	from datalake_raw.gsheets_taxonomy_mkt_cost txmc
 	cross join (
 	 select 1, 'Desktop'
 	 union all
