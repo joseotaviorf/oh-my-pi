@@ -18,5 +18,11 @@ CREATE TABLE IF NOT EXISTS staging.fact_google_daily_cost_attributions (
 	desktop_cost DOUBLE PRECISION,
 	total_cost DOUBLE PRECISION,
 	impressions INTEGER,
+	desktop_search_impression_share DOUBLE PRECISION,
+	mobile_search_impression_share DOUBLE PRECISION,
+	tablet_search_impression_share DOUBLE PRECISION,
+	desktop_absolute_top_impression_percentage DOUBLE PRECISION,
+	mobile_absolute_top_impression_percentage DOUBLE PRECISION,
+	tablet_absolute_top_impression_percentage DOUBLE PRECISION,
 	ts_load TIMESTAMP
 );

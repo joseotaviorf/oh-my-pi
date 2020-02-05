@@ -10,6 +10,8 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_google_campaigns (
   date string,
   device string,
   impressions string,
+  absolute_top_impression_percentage string,
+  search_impression_share string,
   account_name string,
   hour_of_day string,
   month string,

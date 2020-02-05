@@ -13,6 +13,15 @@ class GoogleAds(Marketing):
     TABLE_PARTITION_DATE = '__PARTITION_DATE__'
     TABLE_PARTITION_ACCOUNT = '__PARTITION_ACCOUNT__'
 
+    # absolute_top_impression_percentage:
+    #   The percent of our ad impressions that are shown as the very first ad above the organic search results.
+    #   Value between 0 and 1.
+    #
+    # search_impression_share:
+    #   The impressions we've received on the Search Network divided by the estimated number of impressions
+    #   we were eligible to receive.
+    #   Value between 0 and 100.
+
     COLUMN_TYPE_MAP = {
         'marketing_google_ads': {
             'account_id': long,
@@ -21,7 +30,8 @@ class GoogleAds(Marketing):
             'clicks': int,
             'cost': float,
             'impressions': int,
-            'keyword_id': long
+            'keyword_id': long,
+            'absolute_top_impression_percentage': float
         },
         'marketing_google_keywords': {
             'account_id': long,
@@ -30,14 +40,18 @@ class GoogleAds(Marketing):
             'clicks': int,
             'cost': float,
             'impressions': int,
-            'keyword_id': long
+            'keyword_id': long,
+            'absolute_top_impression_percentage': float,
+            'search_impression_share': float
         },
         'marketing_google_campaigns': {
             'account_id': long,
             'campaign_id': long,
             'clicks': int,
             'cost': float,
-            'impressions': int
+            'impressions': int,
+            'absolute_top_impression_percentage': float,
+            'search_impression_share': float
         }
     }
 
@@ -58,6 +72,8 @@ class GoogleAds(Marketing):
             ('date', str),
             ('device', str),
             ('impressions', str),
+            ('absolute_top_impression_percentage', str),
+            ('search_impression_share', str),
             ('account_name', str),
             ('hour_of_day', str),
             ('month', str),
@@ -88,6 +104,8 @@ class GoogleAds(Marketing):
             ('device', str),
             ('id', str),
             ('impressions', str),
+            ('absolutetopimpressionpercentage', str),
+            ('searchimpressionshare', str),
             ('keywordmatchtype', str),
             ('labels', str),
             ('criteria', str),
@@ -107,6 +125,8 @@ class GoogleAds(Marketing):
             ('device', str),
             ('keyword_id', str),
             ('impressions', str),
+            ('absolute_top_impression_percentage', str),
+            ('search_impression_share', str),
             ('match_type', str),
             ('labels', str),
             ('criteria', str),
@@ -138,6 +158,7 @@ class GoogleAds(Marketing):
             ('device', str),
             ('id', str),
             ('impressions', str),
+            ('absolutetopimpressionpercentage', str),
             ('labels', str),
             ('imagecreativename', str),
             ('accountdescriptivename', str),
@@ -161,6 +182,7 @@ class GoogleAds(Marketing):
             ('device', str),
             ('ad_id', str),
             ('impressions', str),
+            ('absolute_top_impression_percentage', str),
             ('labels', str),
             ('image_creative_name', str),
             ('account_name', str),
@@ -179,7 +201,9 @@ class GoogleAds(Marketing):
 
     @logger(exclude='account')
     def load_to_pre_staging(self, clean_table, prod_table, account):
-        self._load_to_pre_staging(clean_table, prod_table, account, GoogleAds.COLUMN_TYPE_MAP[clean_table])
+        query = BaseETL.get_query_from_file_name(
+            '{}/staging/marketing/pre_staging/{}.sql'.format(DW_QUERIES_DIR, clean_table))
+        self._load_to_pre_staging(clean_table, prod_table, account, GoogleAds.COLUMN_TYPE_MAP[clean_table], query)
 
     @logger
     def load_to_staging(self, dw_table_name):

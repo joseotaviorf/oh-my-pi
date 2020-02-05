@@ -23,5 +23,6 @@ CREATE TABLE IF NOT EXISTS staging.marketing_google_ads (
     description1 varchar,
     description2 varchar,
     acc varchar,
-    dt_created varchar
+    dt_created varchar,
+    absolute_top_impression_percentage varchar
 )

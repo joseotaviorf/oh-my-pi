@@ -6,10 +6,12 @@ computer_devices_campaigns as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_campaigns
     WHERE device = 'Computers'
-    GROUP BY 1,2,3,4,8
+    GROUP BY 1,2,3,4,10
 ),
 mobile_devices_campaigns as (
     SELECT campaign_id,
@@ -19,10 +21,12 @@ mobile_devices_campaigns as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_campaigns
     WHERE device = 'Mobile devices with full browsers'
-    GROUP BY 1,2,3,4,8
+    GROUP BY 1,2,3,4,10
 ),
 tablet_devices_campaigns as (
     SELECT campaign_id,
@@ -32,10 +36,12 @@ tablet_devices_campaigns as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_campaigns
     WHERE device = 'Tablets with full browsers'
-    GROUP BY 1,2,3,4,8
+    GROUP BY 1,2,3,4,10
 ),
 cte_campaigns as (
     SELECT min(id) over (PARTITION BY google_table.campaign_id, google_table.account_id) as id,
@@ -52,6 +58,12 @@ cte_campaigns as (
         COALESCE(computer_devices_campaigns.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_campaigns.total_cost, 0) + COALESCE(tablet_devices_campaigns.total_cost, 0) + COALESCE(computer_devices_campaigns.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices_campaigns.impressions, 0) + COALESCE(tablet_devices_campaigns.impressions, 0) + COALESCE(computer_devices_campaigns.impressions, 0)) as impressions,
+        COALESCE(computer_devices_campaigns.search_impression_share, 0)             as desktop_search_impression_share,
+        COALESCE(mobile_devices_campaigns.search_impression_share, 0)               as mobile_search_impression_share,
+        COALESCE(tablet_devices_campaigns.search_impression_share, 0)               as tablet_search_impression_share,
+        COALESCE(computer_devices_campaigns.absolute_top_impression_percentage, 0)  as desktop_absolute_top_impression_percentage,
+        COALESCE(mobile_devices_campaigns.absolute_top_impression_percentage, 0)    as mobile_absolute_top_impression_percentage,
+        COALESCE(tablet_devices_campaigns.absolute_top_impression_percentage, 0)    as tablet_absolute_top_impression_percentage,
         google_table.acc
 FROM staging.marketing_google_campaigns google_table
 LEFT JOIN computer_devices_campaigns
@@ -86,6 +98,16 @@ final_cte_campaigns as (
         cte_campaigns.desktop_cost,
         cte_campaigns.total_cost,
         cte_campaigns.impressions,
+        -- Search Impression Share is the impressions we've received on the Search Network divided by the
+        -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
+        cte_campaigns.desktop_search_impression_share,
+        cte_campaigns.mobile_search_impression_share,
+        cte_campaigns.tablet_search_impression_share,
+        -- Absolute Top Impression Perc. is the percent of our ad impressions that are shown as the very
+        -- first ad above the organic search results. Value ranging from 0 to 1.
+        cte_campaigns.desktop_absolute_top_impression_percentage,
+        cte_campaigns.mobile_absolute_top_impression_percentage,
+        cte_campaigns.tablet_absolute_top_impression_percentage,
         getdate() as ts_load
     from cte_campaigns
     left join staging.dim_google_campaign dim

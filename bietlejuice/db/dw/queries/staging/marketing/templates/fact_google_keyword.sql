@@ -8,10 +8,12 @@ computer_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_keywords
     WHERE device = 'Computers'
-    GROUP BY 1,2,3,4,5,6,10
+    GROUP BY 1,2,3,4,5,6,12
 ),
 mobile_devices_keywords as (
     SELECT keyword_id,
@@ -23,10 +25,12 @@ mobile_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_keywords
     WHERE device = 'Mobile devices with full browsers'
-    GROUP BY 1,2,3,4,5,6,10
+    GROUP BY 1,2,3,4,5,6,12
 ),
 tablet_devices_keywords as (
     SELECT keyword_id,
@@ -38,10 +42,12 @@ tablet_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
+        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
+        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         date
     FROM staging.marketing_google_keywords
     WHERE device = 'Tablets with full browsers'
-    GROUP BY 1,2,3,4,5,6,10
+    GROUP BY 1,2,3,4,5,6,12
 ),
 cte_keywords as (
     SELECT min(id) over (PARTITION BY google_table.keyword_id, google_table.account_id, google_table.campaign_id, google_table.adgroup_id) as id,
@@ -62,6 +68,12 @@ cte_keywords as (
         COALESCE(computer_devices_keywords.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0) + COALESCE(computer_devices_keywords.total_cost, 0)) as total_cost,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) as impressions,
+        COALESCE(computer_devices_keywords.search_impression_share, 0)             as desktop_search_impression_share,
+        COALESCE(mobile_devices_keywords.search_impression_share, 0)               as mobile_search_impression_share,
+        COALESCE(tablet_devices_keywords.search_impression_share, 0)               as tablet_search_impression_share,
+        COALESCE(computer_devices_keywords.absolute_top_impression_percentage, 0)  as desktop_absolute_top_impression_percentage,
+        COALESCE(mobile_devices_keywords.absolute_top_impression_percentage, 0)    as mobile_absolute_top_impression_percentage,
+        COALESCE(tablet_devices_keywords.absolute_top_impression_percentage, 0)    as tablet_absolute_top_impression_percentage,
         google_table.acc
 FROM staging.marketing_google_keywords google_table
 LEFT JOIN computer_devices_keywords
@@ -102,6 +114,16 @@ final_cte_keywords as (
         cte_keywords.desktop_cost,
         cte_keywords.total_cost,
         cte_keywords.impressions,
+        -- Search Impression Share is the impressions we've received on the Search Network divided by the
+        -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
+        cte_keywords.desktop_search_impression_share,
+        cte_keywords.mobile_search_impression_share,
+        cte_keywords.tablet_search_impression_share,
+        -- Absolute Top Impression Perc. is the percent of our ad impressions that are shown as the very
+        -- first ad above the organic search results. Value ranging from 0 to 1.
+        cte_keywords.desktop_absolute_top_impression_percentage,
+        cte_keywords.mobile_absolute_top_impression_percentage,
+        cte_keywords.tablet_absolute_top_impression_percentage,
         getdate() as ts_load
     from cte_keywords
     left join staging.dim_google_keyword dim

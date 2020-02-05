@@ -99,7 +99,7 @@ class Marketing(object):
         )
 
     @logger(exclude=['table_schema', 'accounts'])
-    def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema):
+    def _load_to_pre_staging(self, clean_table, prod_table, accounts, table_schema, query=None):
         clean_schema_name = 'datalake_clean'
 
         BaseETL.truncate_table(
@@ -108,8 +108,11 @@ class Marketing(object):
             schema=Marketing.SCHEMA_NAMES['staging']
         )
 
-        pre_staging_query = "select distinct * from {}.{}".format(clean_schema_name,
-                                                                  clean_table)
+        if query is None:
+            pre_staging_query = "select distinct * from {}.{}".format(clean_schema_name,
+                                                                      clean_table)
+        else:
+            pre_staging_query = query
 
         empty = self._is_prod_table_empty(prod_table)
         if empty:

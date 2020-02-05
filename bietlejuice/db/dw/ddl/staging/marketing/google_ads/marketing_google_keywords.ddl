@@ -19,5 +19,7 @@ CREATE TABLE IF NOT EXISTS staging.marketing_google_keywords (
     criteria varchar(256),
     account_name varchar(256),
     acc varchar(256),
-    dt_created varchar(256)
+    dt_created varchar(256),
+    absolute_top_impression_percentage varchar(256),
+    search_impression_share varchar(256)
 )

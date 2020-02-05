@@ -13,6 +13,8 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_google_keywords (
   device string,
   id string,
   impressions string,
+  absolutetopimpressionpercentage string,
+  searchimpressionshare string,
   keywordmatchtype string,
   labels string,
   criteria string,

@@ -18,5 +18,7 @@ CREATE TABLE IF NOT EXISTS staging.marketing_google_campaigns (
     week varchar,
     year varchar,
     acc varchar,
-    dt_created varchar
+    dt_created varchar,
+    absolute_top_impression_percentage varchar,
+    search_impression_share varchar
 );

@@ -15,6 +15,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_google_ads (
   device string,
   id string,
   impressions string,
+  absolutetopimpressionpercentage string,
   labels string,
   imagecreativename string,
   accountdescriptivename string,

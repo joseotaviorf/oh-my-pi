@@ -1,7 +1,7 @@
 DROP TABLE datalake_clean.marketing_google_ads;
 
 CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads (
-   account_id string,
+    account_id string,
     adgroup_id string,
     adgroup_name string,
     ad_type string,
@@ -15,6 +15,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_google_ads (
     device string,
     ad_id string,
     impressions string,
+    absolute_top_impression_percentage string,
     labels string,
     image_creative_name string,
     account_name string,

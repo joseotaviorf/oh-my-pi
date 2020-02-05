@@ -13,6 +13,8 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_google_keywords (
     device string,
     keyword_id string,
     impressions string,
+    absolute_top_impression_percentage string,
+    search_impression_share string,
     match_type string,
     labels string,
     criteria string,
