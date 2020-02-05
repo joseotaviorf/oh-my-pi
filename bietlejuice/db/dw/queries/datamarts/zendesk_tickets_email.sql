@@ -26,7 +26,7 @@ select
 	ft.minutes_requester_wait_time_business,
 	ft.minutes_requester_wait_time_calendar,
 	ft.minutes_full_resolution_time_business,
-    case when cast(ft.minutes_first_reply_time_business as float)/60.0 <= 8 then 1 else 0 end as sla_achieved_8biz_hr,
+    case when cast(ft.minutes_first_reply_time_business as float)/60.0 <= 6 then 1 else 0 end as sla_achieved_6biz_hr,
     cast(ft.minutes_requester_wait_time_business as float)/60.0 as hours_requester_wait_time_business,
     case
     	when ft.replies > 1 then (cast(ft.minutes_requester_wait_time_business as float)/60.0)/ft.replies 
@@ -45,7 +45,7 @@ select
         	dt.tags ilike '%redirecionado_adm_v1%'
         	then 1 
     	else 0 
-	end as exclude_tags,
+	end as has_exclude_tags,
     dt.tags
 from zendesk.fact_tickets as ft
 	join zendesk.dim_ticket as dt
