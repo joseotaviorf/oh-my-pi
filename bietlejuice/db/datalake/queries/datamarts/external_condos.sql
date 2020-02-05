@@ -1,17 +1,7 @@
 with apts_iptu_sp AS (
-  SELECT
-    ea.numero_contribuinte || '/' || ea.cpf_cnpj AS property_person_id,
+  SELECT DISTINCT
     ea.setor_quadra,
     ea.ano_construcao_corrigido,
-    ea.cpf_cnpj,
-    ea.nome_direct,
-    ea.sexo,
-    ea.idade,
-    ea.obito,
-    ea.qtd_ocorrencias,
-    ea.contribuinte_1_ou_2,
-    ea.tipo_contribuinte_1,
-    ea.tipo_contribuinte_2,
     ea.formatted_address,
     ea.numero_imovel,
     ea.complemento_imovel,
@@ -27,19 +17,9 @@ with apts_iptu_sp AS (
     AND geo.lat IS NOT NULL AND geo.lat != ''
 )
 , apts_direct AS (
-  SELECT
-    i.direct_id || '/' || i.proprietario_cpf_cnpj AS property_person_id,
+  SELECT DISTINCT
     NULL as setor_quadra,
     NULL as ano_construcao_corrigido,
-    i.proprietario_cpf_cnpj AS cpf_cnpj,
-    i.proprietario_nome AS nome_direct,
-    NULL as sexo,
-    NULL as idade,
-    NULL as obito,
-    NULL as qtd_ocorrencias,
-    NULL as contribuinte_1_ou_2,
-    proprietario_tipo as tipo_contribuinte_1,
-    NULL as tipo_contribuinte_2,
     a.formatted_address,
     i.endereco_numero as numero_imovel,
     i.endereco_complemento as complemento_imovel,
@@ -67,20 +47,20 @@ select
 	lng,
 	numero_imovel,
 	regexp_extract(google_formatted_address, '\d{{5}}[-]\d{{3}}') as cep,
-	ano_construcao_corrigido,
+	round(avg(cast(ano_construcao_corrigido as bigint)), 0) as ano_construcao_corrigido,
 	count(concat(lat,lng)) as num_apts
 from apts
-group by 1,2,3,4,5,6
+group by 1,2,3,4,5
 )
 , base_cnpj as (
 	select 
-		c.cnpj,
-		c.telefone_1,
-		c.email,
-		c.razao_social,
+		max(c.cnpj) as cnpj,
+        max(c.telefone_1) as telefone_1,
+        max(c.email) as email,
+        min(c.razao_social) as razao_social,
 		a.google_formatted_address,
 		c.cep,
-		c.numero,
+		trim(replace(c.numero, '.', '')) as numero,
 		c.uf,
 		c.municipio,
 		a.lat,
@@ -88,6 +68,14 @@ group by 1,2,3,4,5,6
 	FROM datalake_raw.cnpj_br_condos c
   	INNER JOIN datalake_raw.cnpj_br_condos_geocoded_addresses a 
   		ON c.hash = a.hash
+    group by
+        a.google_formatted_address,
+        c.cep,
+        trim(replace(c.numero, '.', '')),
+        c.uf,
+        c.municipio,
+        a.lat,
+        a.lng
 )
 , bases_externals as (
 select
@@ -136,7 +124,8 @@ group by 1,2,3,4,6,7,8,9,10,11,12,13
  	p.region_code,
  	p.macro_name,
  	p.city_name,
- 	p.city_group
+ 	p.city_group,
+  p.name
  from bases_externals as b
  left join poligonos as p
  ON ST_WITHIN(
@@ -207,6 +196,7 @@ group by 1,2,3
  	cr.macro_name,
  	cr.city_name,
  	cr.city_group,
+  cr.name,
  	cr.cnpj,
 	cr.razao_social,
 	cr.telefone_1,
@@ -276,9 +266,10 @@ select
     array_agg(distinct du.email) as email
 from datalake_clean.ods_fact_house_listing_flows fhlf
 join datalake_clean.ods_dim_house_listing  dhl on dhl.sk_house_listing = fhlf.sk_house_listing
+join datalake_clean.ods_dim_date dd on fhlf.sk_lead_date = dd.sk_date
 left join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = fhlf.sk_user_lead_affiliate
 left join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
-where cast(fhlf.sk_lead_date as bigint) > 20191001 and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
+where try_cast(dd."date" as date) > current_date - interval '120' day and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
 group by 1,2,3
 )
 , base_interna as (
@@ -312,45 +303,46 @@ join ongoing o on l.house_lat = o.house_lat
                        and l.house_number = o.house_number
 )
 select
- 	bec.lat as iptu_lat,
-	bec.lng as iptu_lng,
- 	bec.sk_region as iptu_sk_region,
- 	bec.region_code as iptu_region_code,
- 	bec.macro_name as iptu_macro_name,
- 	bec.city_name as iptu_city_name,
- 	bec.city_group as iptu_city_group,
- 	bec.cnpj as iptu_cnpj,
-	bec.razao_social as iptu_razao_social,
-	bec.telefone_1 as iptu_telefone,
-	bec.email as iptu_email,
-	bec.google_formatted_address as iptu_google_formatted_address,
-	bec.numero_imovel as iptu_numero_imovel,
-	bec.cep as iptu_cep,
-	bec.ano_construcao_corrigido as iptu_ano_construcao_corrigido,
-	bec.uf as iptu_uf,
-	bec.municipio as iptu_municipio,
-	bec.num_apts as iptu_num_apts,
+ 	bec.lat as lat,
+    bec.lng as lng,
+    bec.sk_region as sk_region,
+    bec.region_code as region_code,
+    bec.name as neighborhood,
+    bec.macro_name as macro_name,
+    bec.city_name as city_name,
+    bec.city_group as city_group,
+    bec.cnpj as cnpj,
+    bec.razao_social as condo_name,
+    bec.telefone_1 as telephone,
+    bec.email as email,
+    bec.google_formatted_address as google_formatted_address,
+    bec.numero_imovel as condo_address_number,
+    bec.cep as zipcode,
+    bec.ano_construcao_corrigido as condo_construction_year,
+    bec.uf as uf,
+-- bec.municipio as iptu_city,
+    bec.num_apts as iptu_quantity_of_apartments,
  	bec.r_state as competitors_advertiser,
  	bec.listings as competitors_listings,
- 	bec.avg_rent as competitors_avg_rent,
- 	bec.last_date as competitors_last_date,
-    bi.ongoing_contracts as bi_ongoing_contracts,
-    bi.ongoing_listing as bi_ongoing_listing,
-    bi.ticket_medio as bi_ticket_medio,
-    bi.despublicados as bi_despublicados,
-    bi.max_bedrooms as bi_max_bedrooms,
-    bi.min_bedrooms as bi_min_bedrooms,
-    bi.max_area as bi_max_area,
-    bi.min_area as bi_min_area,  
-    bi.elevator as bi_elevator,
-    bi.doorman as bi_doorman,
-    bi.key_location as bi_key_location,
-    bi.converted_leads as bi_converted_leads,
-    bi.leads as bi_leads,
-    bi.doormen as bi_doormen,
-    bi.name as bi_name,
-    bi.telephone as bi_telephone,
-    bi.email as bi_email  
+ 	bec.avg_rent as competitors_avg_total_value,
+    bec.last_date as competitors_listing_last_date,
+    bi.ongoing_contracts as qa_ongoing_contracts,
+    bi.ongoing_listing as qa_ongoing_listing,
+    bi.ticket_medio as qa_avg_total_value,
+    bi.despublicados as qa_despublicados,
+    bi.min_bedrooms as qa_min_bedrooms,
+    bi.max_bedrooms as qa_max_bedrooms,
+    bi.min_area as qa_min_area,
+    bi.max_area as qa_max_area,
+    bi.elevator as qa_elevator,
+    bi.doorman as qa_entrance,
+    bi.key_location as qa_key_location,
+    bi.converted_leads as qa_converted_leads_last_120_days,
+    bi.leads as qa_leads_last_120_days,
+    bi.doormen as qa_doormen,
+    bi.name as qa_doormen_name,
+    bi.telephone as qa_doormen_telephone,
+    bi.email as qa_doormen_email
 from base_external_crawler as bec
 left join base_interna as bi on ST_WITHIN(
       	ST_POINT(CAST(bec.lng AS double), CAST(bec.lat AS DOUBLE)),
