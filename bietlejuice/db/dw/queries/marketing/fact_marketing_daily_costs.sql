@@ -579,6 +579,7 @@ cost_taxonomy as (
 		end as campaign_city_matched,
 		-- defining final city_group
 	    coalesce(cost_city_group,city_campaign_mapping_rule, campaign_city_matched,'Not Mapped') as city_group_final,
+      tp.campaign_origin_aquisition,
 	    tp.mkt_category,
 	    tp.mkt_flow,
 	    tp.mkt_completion,
@@ -643,7 +644,7 @@ kenshoo as (
 		tp.mkt_medium,
 		tp.mkt_source,
 		tp.mkt_platform,
-		ct.cost * cast(k.rate as float) as cost
+		ct.cost * cast(k.rate as float) * tp.fator_custo as cost
 	from cost_taxonomy ct
     join datalake_raw.gsheets_marketing_kenshoo_configuration k
 		on	ct.mkt_source = k.mkt_source
@@ -655,6 +656,7 @@ kenshoo as (
 	left join taxonomy_by_platform as tp
 			on tp.origin = 'kenshoo'
 			and tp.side = ct.side
+      and tp.campaign_origin_aquisition = ct.campaign_origin_aquisition
 )
 select
     sk_date,
@@ -698,3 +700,4 @@ select
     getdate() as ts_load
 from kenshoo
 group by 1,2,3,5,6,7,8,10,11,12,13
+having sum(cost) > 0
