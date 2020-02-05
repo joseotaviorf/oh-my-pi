@@ -185,89 +185,90 @@ UNION ALL
 		on lower(gi.campaign_name) = lower(hist.campaign)
 ),
 campaigns_full as (
--- FACEBOOK
+  with _campaigns_full as (
+    -- FACEBOOK
     select
-		ff.sk_date,
-		'facebook'  as origin,
-		'fact_facebook_daily_cost_attributions' as fact_cost,
-		df.campaign_name,
-		coalesce(
-		    ashare.city_group,
-		    lower(SPLIT_PART(df.campaign_name, '.', 4))) as campaign_city,
-		df.account_name,
-		lower(df.campaign_name) as campaign_name_l,
-		lower(df.account_name) as account_name_l,
-		df.campaign_name as utm_campaign,
-		df.adset_name as utm_term,
-		df.ad_name as utm_content,
-		ff.desktop_spend * coalesce(ashare.share, 1) as desktop_cost,
-		ff.mobile_spend * coalesce(ashare.share, 1) as mobile_cost,
-		ff.other_spend * coalesce(ashare.share, 1) as other_cost,
-		null as total_cost
-	from marketing.fact_facebook_daily_cost_attributions ff
-	join marketing.dim_facebook_ad df
-		on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
-	left join fb_hist_list_affiliates hl
-	    on hl.sk_date = ff.sk_date
-	    and df.campaign_name = hl.campaign_name
-	-- Applying share for affiliates national campaigns
-	join dim_date dd
-		on dd.sk_date = ff.sk_date
-	left join marketing.affiliates_national_campaigns_share ashare
-        on lower(df.campaign_name) similar to '%(p\.brasil|ia\-campanha|px\.)%'
-        and ashare.tracking_source = 'facebook'
-        -- use previous month share
-        and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
-	where ff.sk_date >= 20180101
-	    -- Filter out affiliate_costs of national-campaigns with manual-historic costs
-	    and hl.sk_date is null
-UNION
--- GOOGLE
-    select
-		gcc.sk_date,
-		'google' as origin,
-		'fact_google_daily_cost_attributions' as fact_cost,
-		gcc.campaign_name,
-		coalesce(ashare.city_group,
-            lower(case when SPLIT_PART(gcc.campaign_name, '.', 2) ~ '^[0-9]+$' then
-                SPLIT_PART(gcc.campaign_name, '.', 3)
-                else
-                SPLIT_PART(gcc.campaign_name, '.', 2)
-                end))
-            as campaign_city,
-		gcc.account_name,
-		lower(gcc.campaign_name) as campaign_name_l,
-		lower(gcc.account_name) as account_name_l,
-		cast(gcc.utm_campaign as varchar) as utm_campaign,
-		cast(gcc.utm_term as varchar) as utm_term,
-		cast(gcc.utm_content as varchar) as utm_content,
-		gcc.desktop_cost * coalesce(ashare.share, 1) as desktop_cost,
-		gcc.mobile_cost * coalesce(ashare.share, 1) as mobile_cost,
-		null as other_cost,
-		null as total_cost
-	from google_consolidated_cost gcc
-	left join gg_hist_list_affiliates hl
-	    on hl.sk_date = gcc.sk_date
-	    and gcc.campaign_name = hl.campaign_name
-	-- Applying share for affiliates national campaigns
-	join dim_date dd
-		on dd.sk_date = gcc.sk_date
-	left join marketing.affiliates_national_campaigns_share ashare
-        on lower(gcc.campaign_name) similar to '%(ia\_affiliates\_nacional|px\.)%'
-        and ashare.tracking_source = 'google'
-        -- use previous month share
-        and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
-	where
+      ff.sk_date,
+      'facebook'  as origin,
+      'fact_facebook_daily_cost_attributions' as fact_cost,
+      df.campaign_name,
+      coalesce(
+          ashare.city_group,
+          lower(SPLIT_PART(df.campaign_name, '.', 4))) as campaign_city,
+      df.account_name,
+      lower(df.campaign_name) as campaign_name_l,
+      lower(df.account_name) as account_name_l,
+      df.campaign_name as utm_campaign,
+      df.adset_name as utm_term,
+      df.ad_name as utm_content,
+      ff.desktop_spend * coalesce(ashare.share, 1) as desktop_cost,
+      ff.mobile_spend * coalesce(ashare.share, 1) as mobile_cost,
+      ff.other_spend * coalesce(ashare.share, 1) as other_cost,
+      null as total_cost
+    from marketing.fact_facebook_daily_cost_attributions ff
+    join marketing.dim_facebook_ad df
+      on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
+    left join fb_hist_list_affiliates hl
+        on hl.sk_date = ff.sk_date
+        and df.campaign_name = hl.campaign_name
+    -- Applying share for affiliates national campaigns
+    join dim_date dd
+      on dd.sk_date = ff.sk_date
+    left join marketing.affiliates_national_campaigns_share ashare
+          on lower(df.campaign_name) similar to '%(p\.brasil|ia\-campanha|px\.)%'
+          and ashare.tracking_source = 'facebook'
+          -- use previous month share
+          and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
+    where ff.sk_date >= 20180101
         -- Filter out affiliate_costs of national-campaigns with manual-historic costs
-	    hl.sk_date is null
-UNION
--- FACEBOOK & GOOGLE AFFILIATES' HISTORIC COST
+        and hl.sk_date is null
+  UNION
+    -- GOOGLE
+    select
+      gcc.sk_date,
+      'google' as origin,
+      'fact_google_daily_cost_attributions' as fact_cost,
+      gcc.campaign_name,
+      coalesce(ashare.city_group,
+              lower(case when SPLIT_PART(gcc.campaign_name, '.', 2) ~ '^[0-9]+$' then
+                  SPLIT_PART(gcc.campaign_name, '.', 3)
+                  else
+                  SPLIT_PART(gcc.campaign_name, '.', 2)
+                  end))
+              as campaign_city,
+      gcc.account_name,
+      lower(gcc.campaign_name) as campaign_name_l,
+      lower(gcc.account_name) as account_name_l,
+      cast(gcc.utm_campaign as varchar) as utm_campaign,
+      cast(gcc.utm_term as varchar) as utm_term,
+      cast(gcc.utm_content as varchar) as utm_content,
+      gcc.desktop_cost * coalesce(ashare.share, 1) as desktop_cost,
+      gcc.mobile_cost * coalesce(ashare.share, 1) as mobile_cost,
+      null as other_cost,
+      null as total_cost
+    from google_consolidated_cost gcc
+    left join gg_hist_list_affiliates hl
+        on hl.sk_date = gcc.sk_date
+        and gcc.campaign_name = hl.campaign_name
+    -- Applying share for affiliates national campaigns
+    join dim_date dd
+      on dd.sk_date = gcc.sk_date
+    left join marketing.affiliates_national_campaigns_share ashare
+          on lower(gcc.campaign_name) similar to '%(ia\_affiliates\_nacional|px\.)%'
+          and ashare.tracking_source = 'google'
+          -- use previous month share
+          and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
+    where
+          -- Filter out affiliate_costs of national-campaigns with manual-historic costs
+        hl.sk_date is null
+  UNION
+    -- FACEBOOK & GOOGLE AFFILIATES' HISTORIC COST
     select
         *
     from
         affiliates_cost
-UNION
---TROVIT
+  UNION
+    --TROVIT
     (
     -- selects costs from each cities, mapping campaigns to use OL share
     with trovit_city_costs as (
@@ -341,9 +342,9 @@ UNION
         union all
         select * from trovit_share_by_ol_cities
     )
-)
-UNION
--- MITULA
+  )
+  UNION
+    -- MITULA
     select
         fm.sk_date,
         'mitula' as origin,
@@ -367,9 +368,9 @@ UNION
     join cities_share_by_ol csol
         on fm.sk_date = csol.sk_date
     where fm.sk_date >= 20180101
-UNION
--- CRITEO
-	select
+  UNION
+    -- CRITEO
+    select
         fct.sk_date,
         'criteo' as origin,
         'fact_criteo_daily_cost_attributions' as fact_cost,
@@ -385,12 +386,12 @@ UNION
         null as mobile_cost,
         null as other_cost,
         fct.cost as total_cost
-	from marketing.fact_criteo_daily_cost_attributions fct
-	left join marketing.dim_criteo_campaign dct
-		on fct.sk_criteo_campaign = dct.sk_criteo_campaign
-	where fct.sk_date >= 20180101
-UNION
--- RTB
+    from marketing.fact_criteo_daily_cost_attributions fct
+    left join marketing.dim_criteo_campaign dct
+      on fct.sk_criteo_campaign = dct.sk_criteo_campaign
+    where fct.sk_date >= 20180101
+  UNION
+    -- RTB
     select
         frt.sk_date,
         'rtb' as origin,
@@ -409,11 +410,11 @@ UNION
         null as total_cost
       from marketing.fact_rtb_daily_cost_attributions frt
       left join marketing.dim_rtb_sub_campaign drt
-      	on frt.sk_sub_campaign = drt.sk_sub_campaign
+        on frt.sk_sub_campaign = drt.sk_sub_campaign
       where frt.sk_date >= 20180101
       group by 1,2,3,4,5,6,7,8,9,10,11
-UNION
--- MANUAL COSTS
+  UNION
+    -- MANUAL COSTS
     select
         fcl.sk_date,
         dcl.name as origin,
@@ -435,8 +436,8 @@ UNION
       left join cities_share_by_ol csol on csol.sk_date = fcl.sk_date
       -- filter with 'between' because there is future cost
       where fcl.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
-UNION
--- TWITTER
+  UNION
+    -- TWITTER
     select
         ftw.sk_date,
         'twitter' as origin,
@@ -460,8 +461,8 @@ UNION
         on ftw.sk_ad_group = dtag.sk_ad_group
     where ftw.sk_date >= 20180101
     group by 1,2,3,4,5,6,7,8,9,10,11
-UNION
--- LINKEDIN
+  UNION
+    -- LINKEDIN
     select
         fli.sk_date,
         'linkedin' as origin,
@@ -484,8 +485,44 @@ UNION
     join marketing.dim_linkedin_campaign_group dlcc
         on dlcc.sk_campaign_group = fli.sk_campaign_group
     group by 1,2,3,4,5,6,7,8,9,10,11
-)
-,cost_taxonomy as (
+  )
+  select
+    sk_date,
+    origin,
+    fact_cost,
+    campaign_name,
+    campaign_city,
+    account_name,
+    campaign_name_l,
+    CASE
+      when campaign_name_l like '%calc%' then 'Calculator'
+      else 'Other'
+    end as campaign_origin_aquisition,
+    account_name_l,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    desktop_cost,
+    mobile_cost,
+    other_cost,
+    total_cost
+    from _campaigns_full
+),
+taxonomy_by_platform as (
+	select
+    txmc.*,
+		s.mkt_platform,
+		cast(coalesce(nullif(trim(SPLIT_PART(txmc.cost_factor, ';', s.i)), ''), '1.0') as float) as fator_custo
+	from datalake_raw.gsheets_taxonomy_mkt_cost_tmp txmc
+	cross join (
+	 select 1, 'Desktop'
+	 union all
+	 select 2, 'Mobile'
+	 union all
+	 select 3, 'Other'
+	) as s(i, mkt_platform)
+),
+cost_taxonomy as (
 	select
 		cf.origin,
 		cf.sk_date,
@@ -542,71 +579,70 @@ UNION
 		end as campaign_city_matched,
 		-- defining final city_group
 	    coalesce(cost_city_group,city_campaign_mapping_rule, campaign_city_matched,'Not Mapped') as city_group_final,
-	    tx.mkt_category,
-	    tx.mkt_flow,
-	    tx.mkt_completion,
-	    -- due to higher granularity it was not possible to add this column in taxonomy table
-	    case when tx.side = 'supply' and cf.campaign_name_l like '%calculadora%' then 'PriceSuggestion'
-	         when tx.side = 'supply' then 'OwnerPWA'
-	    end as mkt_origin,
-	    tx.mkt_channel,
-	    tx.mkt_medium,
-	    tx.mkt_source,
-	    tx.mkt_platform,
-	    tx.fator_custo,
+	    tp.mkt_category,
+	    tp.mkt_flow,
+	    tp.mkt_completion,
+	    tp.mkt_origin,
+	    tp.mkt_channel,
+	    tp.mkt_medium,
+	    tp.mkt_source,
+	    tp.mkt_platform,
+	    tp.fator_custo,
 	    cf.utm_campaign,
-		cf.utm_term,
-		cf.utm_content,
+      cf.utm_term,
+      cf.utm_content,
 		case
 		    when total_cost is null then
-                case when tx.mkt_platform = 'Mobile' then mobile_cost
-                     when tx.mkt_platform = 'Desktop' then desktop_cost
-                     when tx.mkt_platform = 'Other' then other_cost
+                case when tp.mkt_platform = 'Mobile' then mobile_cost
+                     when tp.mkt_platform = 'Desktop' then desktop_cost
+                     when tp.mkt_platform = 'Other' then other_cost
                 end
             else total_cost
-        end * cast(coalesce(fator_custo, '0') as numeric(3,2)) as cost,
-        case
-            -- cases with supply and demand costs in the same account
-            when cf.origin in ('google', 'facebook', 'trovit') then
-                    case
-                        when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
-                                and coalesce(cf.account_name_l,'') != 'supply_affiliates')
-                                OR
-                                -- abbreviation rule
-                                (SPLIT_PART(cf.campaign_name, '.', 2) = 'S'
-                                    or SPLIT_PART(cf.campaign_name, '.', 1) = '0'
-                                    or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
-                        when (coalesce(cf.account_name,'') not like '%supply%'
-                                and coalesce(cf.account_name, '') not like '%display%'
-                                and coalesce(cf.account_name, '') not like '%indica_ai%')
-                                OR
-                             (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
-                             or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
-                             or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
-                        else tx.side
-                    end
-            else tx.side
-            end as side
+        end * cast(coalesce(tp.fator_custo, '0') as numeric(3,2)) as cost,
+    case
+        -- cases with supply and demand costs in the same account
+        when cf.origin in ('google', 'facebook', 'trovit') then
+                case
+                    when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
+                            and coalesce(cf.account_name_l,'') != 'supply_affiliates')
+                            OR
+                            -- abbreviation rule
+                            (SPLIT_PART(cf.campaign_name, '.', 2) = 'S'
+                                or SPLIT_PART(cf.campaign_name, '.', 1) = '0'
+                                or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
+                    when (coalesce(cf.account_name,'') not like '%supply%'
+                            and coalesce(cf.account_name, '') not like '%display%'
+                            and coalesce(cf.account_name, '') not like '%indica_ai%')
+                            OR
+                         (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
+                         or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
+                         or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
+                    else tp.side
+                end
+        else tp.side
+        end as side
 	from campaigns_full cf
 		left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
 			on lower(mccc.campaign_name) = cf.campaign_name_l
-		left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
-			on coalesce(cf.account_name, '') = coalesce(tx.account_name, '')
-				and cf.fact_cost = tx.fact_cost
-				and cf.origin = tx.origin
-), kenshoo as (
+		left join taxonomy_by_platform as tp
+			on coalesce(cf.account_name, '') = coalesce(tp.account_name, '')
+				and cf.fact_cost = tp.fact_cost
+				and cf.origin = tp.origin
+        and cf.campaign_origin_aquisition = tp.campaign_origin_aquisition
+),
+kenshoo as (
 	select
 		ct.sk_date,
 		ct.side as funnel_side,
-		tx.account_name as account_name,
+		tp.account_name as account_name,
 		ct.city_group_final as city_group,
-		tx.mkt_category,
-		tx.mkt_flow,
-		tx.mkt_completion,
-		tx.mkt_channel,
-		tx.mkt_medium,
-		tx.mkt_source,
-		tx.mkt_platform,
+		tp.mkt_category,
+		tp.mkt_flow,
+		tp.mkt_completion,
+		tp.mkt_channel,
+		tp.mkt_medium,
+		tp.mkt_source,
+		tp.mkt_platform,
 		ct.cost * cast(k.rate as float) as cost
 	from cost_taxonomy ct
     join datalake_raw.gsheets_marketing_kenshoo_configuration k
@@ -616,9 +652,9 @@ UNION
 			cast(to_char(to_date(k.date_from, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
 			and
 			cast(to_char(to_date(k.date_until, 'MM/DD/YYYY'), 'YYYYMMDD') as integer)
-	left join datalake_raw.gsheets_taxonomy_mkt_cost as tx
-			on tx.origin = 'kenshoo'
-			and tx.side = ct.side
+	left join taxonomy_by_platform as tp
+			on tp.origin = 'kenshoo'
+			and tp.side = ct.side
 )
 select
     sk_date,
