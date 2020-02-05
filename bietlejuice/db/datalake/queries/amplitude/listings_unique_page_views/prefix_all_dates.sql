@@ -1,58 +1,59 @@
 -- returns listings with more than 200 unique page views from the last 7 days
 with unique_views_prev as (
 -- get unique amplitude ids from the listing page view event (considering old ones)
-        select
-            false as partial,
-            cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) as dt,
-            cast(replace(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint) as dt_int,
-            extract(year from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _year,
-            extract(month from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _month,
-            extract(week from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _week,
-            extract(day from cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date)) as _day,
-            coalesce(cast(amplitude_id as varchar), '') as amplitude_id,
-            case
-              when json_extract(event_properties, '$.house_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') is not null
-                then if(length(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+')) < 9,
-                         892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') as double) as integer),
-                         if(length(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+')) > 9,
-                             null,
-                             cast(cast(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') AS double) AS integer)
-                         )
-                      )
-              when json_extract(event_properties, '$.Id_Imovel') is not null and regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') is not null
-                then if(length(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+')) < 9,
-                    892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') as double) as integer),
-                    cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') as double) as integer))
-              when json_extract(event_properties, '$.imovel_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') is not null
-                then if(length(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+')) < 9,
-                    892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') as double) as integer),
-                    cast(cast(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') as double) as integer))
-              when json_extract(event_properties, '$.Imovel_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') is not null
-                then if(length(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+')) < 9,
-                    892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer),
-                    cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer))
-            else -1
-            end as house_id
-        from datalake_amplitude_clean_prod.events
-        where ((app = 170698 and event_type = 'listing_page_viewed' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-08-23' as date))
-              or (app = 157033 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-              or (app = 160023 and event_type = 'Listing-Views_listing' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date))
-              or (app = 156118 and event_type = 'Listing-View' and cast(regexp_extract(event_time, '\d{4}-\d{2}-\d{2}') as date) < cast('2017-08-23' as date)))
-              and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) >= cast('2017-01-01' as date)
-              and cast(regexp_extract(trim(event_time), '\d{4}-\d{2}-\d{2}') as date) < current_date
-      )
-      select
-        partial,
-        dt,
-        dt_int,
-        _year,
-        _month,
-        _week,
-        _day,
-       count(distinct amplitude_id) as unique_amplitude_ids,
-       house_id
-      from amplitude
-      group by 1, 2, 3, 4, 5, 6, 7, 9
+  with amplitude as (
+  select
+      false as partial,
+      cast(ts_event as date) as dt,
+      cast(replace(regexp_extract(cast(ts_event as varchar), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint) as dt_int,
+      year as _year,
+      month as _month,
+      extract(week from cast(ts_event as date)) as _week,
+      day as _day,
+      coalesce(cast(id_amplitude as varchar), '') as amplitude_id,
+      case
+        when json_extract(event_properties, '$.house_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') is not null
+          then if(length(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+')) < 9,
+                    892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') as double) as integer),
+                    if(length(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+')) > 9,
+                        null,
+                        cast(cast(regexp_extract(cast(json_extract(event_properties, '$.house_id') as varchar), '\d+') AS double) AS integer)
+                    )
+                )
+        when json_extract(event_properties, '$.Id_Imovel') is not null and regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') is not null
+          then if(length(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+')) < 9,
+              892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') as double) as integer),
+              cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Id_Imovel') as varchar), '\d+') as double) as integer))
+        when json_extract(event_properties, '$.imovel_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') is not null
+          then if(length(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+')) < 9,
+              892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') as double) as integer),
+              cast(cast(regexp_extract(cast(json_extract(event_properties, '$.imovel_id') as varchar), '\d+') as double) as integer))
+        when json_extract(event_properties, '$.Imovel_id') is not null and regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') is not null
+          then if(length(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+')) < 9,
+              892700000 + cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer),
+              cast(cast(regexp_extract(cast(json_extract(event_properties, '$.Imovel_id') as varchar), '\d+') as double) as integer))
+      else -1
+      end as house_id
+  from datalake_amplitude_clean_prod.events_repartitioned
+    where ((id_app = 170698 and event_type = 'listing_page_viewed' and cast(ts_event as date) >= cast('2017-08-23' as date))
+    or (id_app = 157033 and event_type = 'Listing-View' and cast(ts_event as date) < cast('2017-08-23' as date))
+    or (id_app = 160023 and event_type = 'Listing-Views_listing' and cast(ts_event as date) < cast('2017-08-23' as date))
+    or (id_app = 156118 and event_type = 'Listing-View' and cast(ts_event as date) < cast('2017-08-23' as date)))
+    and cast(ts_event as date) >= cast('2017-01-01' as date)
+    and cast(ts_event as date) < current_date
+  )
+  select
+    partial,
+    dt,
+    dt_int,
+    _year,
+    _month,
+    _week,
+    _day,
+    count(distinct amplitude_id) as unique_amplitude_ids,
+    house_id
+    from amplitude
+    group by 1, 2, 3, 4, 5, 6, 7, 9
 ),
 unique_views as (
 -- get house region and filter only published houses at the time of the event
