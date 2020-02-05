@@ -10,6 +10,7 @@ create table gsheets.taxonomy_demand (
     Flow varchar(255),
     id varchar(8),
     Medium varchar(255),
+    Origin varchar(255),
     Platform varchar(255),
     Source varchar(255),
     utm_medium varchar(255),

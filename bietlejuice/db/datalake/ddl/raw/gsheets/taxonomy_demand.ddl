@@ -11,6 +11,7 @@ create external table datalake_raw.gsheets_taxonomy_demand (
     flow string,
     id string,
     medium string,
+    origin string,
     platform string,
     source string,
     utm_medium string,

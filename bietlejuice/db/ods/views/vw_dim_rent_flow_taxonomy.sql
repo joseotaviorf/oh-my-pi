@@ -6,6 +6,7 @@ select
 	Category as mkt_category,
 	Flow as mkt_flow,
 	Completion as mkt_completion,
+	Origin as mkt_origin,
 	Channel as mkt_channel,
 	Medium as mkt_medium,
 	Source as mkt_source,

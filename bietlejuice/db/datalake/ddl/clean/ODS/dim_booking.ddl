@@ -56,6 +56,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   mkt_category string,
   mkt_flow string,
   mkt_completion string,
+  mkt_origin string,
   mkt_channel string,
   mkt_medium string,
   mkt_source string,

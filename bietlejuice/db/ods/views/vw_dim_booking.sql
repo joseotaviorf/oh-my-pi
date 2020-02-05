@@ -38,6 +38,7 @@ taxonomy_demand as (
 			td.Completion as mkt_completion,
 			td.Channel as mkt_channel,
 			td.Medium as mkt_medium,
+			td.Origin as mkt_origin,
 			td.Source as mkt_source,
 			td.Platform as mkt_platform
     from gsheets.taxonomy_demand td
@@ -268,6 +269,7 @@ select
     case when td.mkt_flow is null then 'Not Mapped' else td.mkt_category end as mkt_category,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_flow end as mkt_flow,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_completion end as mkt_completion,
+	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_origin end as mkt_origin,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_channel end as mkt_channel,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_medium end as mkt_medium,
 	case when td.mkt_flow is null then 'Not Mapped' else td.mkt_source end as mkt_source,
