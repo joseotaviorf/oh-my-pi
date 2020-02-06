@@ -15,6 +15,8 @@ SELECT
 	r.short_region_name,
 	r.greater_region,
 	r.regional,
+	r.regional_deprecated,
+	r.tier,
 	r.dt_created,
 	r.dt_updated,
 	r.dt_timestamp,

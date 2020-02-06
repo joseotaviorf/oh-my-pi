@@ -17,6 +17,8 @@ CREATE TABLE staging.dim_region (
 	short_region_name varchar(255),
 	greater_region varchar(255),
 	regional varchar(255),
+	regional_deprecated varchar(255),
+	tier int4,
 	dt_created timestamp,
 	dt_updated timestamp,
 	dt_timestamp timestamp,
