@@ -12,7 +12,6 @@ SELECT
     ar.region_code,
     ar.region_code_deprecated,
     ar.state AS short_region_name,
-    ar.long_region_name,
     CASE
         WHEN coalesce(r.city_name, ar.city) IN ('Rio de Janeiro') THEN coalesce(r.city_name, ar.city)
         WHEN coalesce(r.city_name, ar.city) IN ('Campinas') THEN coalesce(r.city_name, ar.city)
