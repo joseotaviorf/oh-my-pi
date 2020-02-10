@@ -82,6 +82,12 @@ with
         d.month_start,
         d.month_end,
         f.status_history,
+        case
+            when status_history != 'suspenso' then status_history
+            when (lower(status_change_reason) like '%reserv%' or lower(status_change_reason) like '%negocia%'
+                or lower(status_change_reason) like '%proposta%') then 'suspended_in_negotiation'
+            else 'suspended_other'
+        end status_history_v2,
         row_number() over(partition by f.sk_house_listing, d.date order by nullif(f.ts_status_start,-1) desc) as order_status -- daily order status
     from fact_house_listing_status f
     join dim_date d
@@ -98,6 +104,7 @@ with
         fhsal.month_end,
         fhsal.order_status,
         fhsal.status_history,
+        fhsal.status_history_v2,
         dr.city_name,
         dr.city_group,
         dr.regional
@@ -115,6 +122,7 @@ with
         faal.regional as regional_al,
         faal.sk_house_listing as sk_house_listing_al,
         faal.status_history as status_history_al,
+        faal.status_history_v2 as status_history_v2_al,
         dhl.listing_category_start as listing_category_start_al,
         cast(dhl.ts_listing_version_start as date) as listing_version_start_al
     from fact_adjusted_AL faal
@@ -151,6 +159,7 @@ select
     regional_al,
     status_history_ol,
     status_history_al,
+    status_history_v2_al,
     coalesce(status_history_ol,status_history_alo) as status_history_alo,
     listing_category_start_al,
     listing_version_start_al,
@@ -158,8 +167,24 @@ select
     count(distinct sk_house_listing_al) as listings_al,
     count(distinct sk_house_listing_alo) as listings_alo
 from OL_AL_week
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
-order by 1,2
+group by
+  week_start_ol,
+  week_start_al,
+  city_group_ol,
+  city_group_al,
+  city_name_ol,
+  city_name_al,
+  regional_ol,
+  regional_al,
+  status_history_ol,
+  status_history_al,
+  status_history_v2_al,
+  coalesce(status_history_ol, status_history_alo),
+  listing_category_start_al,
+  listing_version_start_al
+order by
+  week_start_ol,
+  week_start_al
 ),
 week_flows as (
 -- Query to build the calculation base for ongoing listing flow by week.
@@ -207,10 +232,21 @@ select
 				  and status_history_alo in ('edicao', 'aguardando_publicacao')
 				  then listings_al end) as al_other_listings,
 	sum(case when status_history_al = 'publicado' then listings_al end) as ol_next_week,
-	date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week') as next_week_start
+	date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week') as next_week_start,
+  sum(case
+          when status_history_ol = 'publicado'
+          and status_history_v2_al = 'suspended_in_negotiation' then listings_al
+      end) as ol_suspended_in_negotiation
 from ol_flows
-group by 1,2,3,4,18
-order by 1 desc, 18 desc
+group by
+  date(least(week_start_ol,(week_start_al - interval '1 week'))),
+  coalesce(city_name_ol, city_name_al),
+  coalesce(city_group_ol, city_group_al),
+  coalesce(regional_ol, regional_al),
+  date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week')
+order by
+  date(least(week_start_ol,(week_start_al - interval '1 week'))) desc,
+  date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week') desc
 )
 select
 -- Query to calculate the ongoing listing flow by week.
@@ -229,10 +265,17 @@ select
 	sum(coalesce(wf.al_suspended_to_published,0)) as suspended_to_published,
 	sum(coalesce(wf.al_other_listings,0)) as other_listings,
 	sum(coalesce(wf.ol_next_week,0)) as ol_next_week,
-	wf.next_week_start
+	wf.next_week_start,
+  sum(coalesce(wf.ol_suspended_in_negotiation, 0)) as ol_suspended_in_negotiation
 from week_flows wf
 where wf.week_start < date_trunc('week',current_date) - interval '1 week'
-group by 1,2,3,4,16
-order by 1 desc
+group by
+  wf.week_start,
+  wf.city_group,
+  wf.city_name,
+  wf.regional,
+  wf.next_week_start
+order by
+  wf.week_start desc
 
 
