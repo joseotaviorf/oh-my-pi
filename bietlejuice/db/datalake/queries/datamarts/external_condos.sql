@@ -79,23 +79,29 @@ group by 1,2,3,4,5
 )
 , bases_externals as (
 select
-	bc.cnpj,
-	bc.razao_social,
-	bc.telefone_1,
-	bc.email,
+	max(bc.cnpj) as cnpj,
+    min(bc.razao_social) as razao_social,
+    max(bc.telefone_1) as telefone_1,
+    max(bc.email) as email,
 	max(c.google_formatted_address) as google_formatted_address,
 	cast(c.numero_imovel as bigint) as numero_imovel,
 	bc.cep,
-	c.ano_construcao_corrigido,
+	round(avg(c.ano_construcao_corrigido),0) as ano_construcao_corrigido,
 	bc.uf,
 	bc.municipio,
 	c.lat,
 	c.lng,
-	c.num_apts
+	sum(c.num_apts) as num_apts
 from condos c
 inner join base_cnpj bc 
 	on concat(c.lat, c.lng) = concat(bc.lat, bc.lng)
-group by 1,2,3,4,6,7,8,9,10,11,12,13
+group by
+    cast(c.numero_imovel as bigint),
+    bc.cep,
+    bc.uf,
+    bc.municipio,
+    c.lat,
+    c.lng
 )
 , poligonos as (
 	SELECT 
@@ -161,7 +167,7 @@ select
     ntile(30) over (order by condominium) as n_condominium
 from distinct_url 
 )
-, base as (
+, bases_crawlers as (
 select 
     lat,
     lng,
@@ -172,21 +178,10 @@ select
     max(last_date) as last_date
 from n_tile_table
 where n_rent between 2 and 29 and n_condominium < 30 and number_street is not null
+    and number_street is not null
 group by 1,2,3,4
 )
-, bases_crawlers as (
-select 
-    lat,
-    lng,
-    number_street,
-    array_agg(advertiser_name) as r_state,
-    sum(listings) as listings,
-    sum(listings*ticket_medio)/sum(listings) as avg_rent,
-    max(last_date) as last_date
-from base 
-where number_street is not null
-group by 1,2,3
-)
+
 ,  base_external_crawler as (
  select
  	cr.lat,
@@ -196,7 +191,7 @@ group by 1,2,3
  	cr.macro_name,
  	cr.city_name,
  	cr.city_group,
-  cr.name,
+    cr.name,
  	cr.cnpj,
 	cr.razao_social,
 	cr.telefone_1,
@@ -208,12 +203,10 @@ group by 1,2,3
 	cr.uf,
 	cr.municipio,
 	cr.num_apts,
-	bc.lat as lat2,
-	bc.lng as lng2,
- 	bc.r_state,
- 	bc.listings,
- 	bc.avg_rent,
- 	bc.last_date
+ 	array_distinct(array_agg(bc.advertiser_name)) as r_state,
+    sum(bc.listings) as listings,
+    sum(listings * ticket_medio) / sum(listings) as avg_rent,
+    max(bc.last_date) as last_date
  from cnpj_regions as cr
  left join bases_crawlers as bc
  	on ST_WITHIN(
@@ -223,6 +216,26 @@ group by 1,2,3
       	)
     )
     and cast(cr.numero_imovel as bigint) = cast(bc.number_street as bigint)
+group by
+  cr.lat,
+  cr.lng,
+  cr.sk_region,
+  cr.region_code,
+  cr.macro_name,
+  cr.city_name,
+  cr.city_group,
+  cr.name,
+  cr.cnpj,
+  cr.razao_social,
+  cr.telefone_1,
+  cr.email,
+  cr.google_formatted_address,
+  cr.numero_imovel,
+  cr.cep,
+  cr.ano_construcao_corrigido,
+  cr.uf,
+  cr.municipio,
+  cr.num_apts
 )
 , ongoing as (
 select 
@@ -248,8 +261,8 @@ select
     trim(dhl.house_lng) as house_lng, 
     trim(dhl.house_number) as house_number,
     max(cast(coalesce(nullif(dhl.house_elevator,''),'0') as bigint)) as elevator,
-    array_agg(distinct dhl.house_entrance) doorman,
-    array_agg(distinct dhl.key_location) key_location
+    array_distinct(array_agg(dhl.house_entrance)) doorman,
+    array_distinct(array_agg(dhl.key_location)) key_location
 from datalake_clean.ods_dim_house_listing  dhl
 group by 1,2,3
 ) 
@@ -322,27 +335,27 @@ select
     bec.uf as uf,
 -- bec.municipio as iptu_city,
     bec.num_apts as iptu_quantity_of_apartments,
- 	bec.r_state as competitors_advertiser,
+ 	array_agg(bec.r_state) as competitors_advertiser,
  	bec.listings as competitors_listings,
  	bec.avg_rent as competitors_avg_total_value,
     bec.last_date as competitors_listing_last_date,
-    bi.ongoing_contracts as qa_ongoing_contracts,
-    bi.ongoing_listing as qa_ongoing_listing,
-    bi.ticket_medio as qa_avg_total_value,
-    bi.despublicados as qa_despublicados,
-    bi.min_bedrooms as qa_min_bedrooms,
-    bi.max_bedrooms as qa_max_bedrooms,
-    bi.min_area as qa_min_area,
-    bi.max_area as qa_max_area,
-    bi.elevator as qa_elevator,
-    bi.doorman as qa_entrance,
-    bi.key_location as qa_key_location,
-    bi.converted_leads as qa_converted_leads_last_120_days,
-    bi.leads as qa_leads_last_120_days,
-    bi.doormen as qa_doormen,
-    bi.name as qa_doormen_name,
-    bi.telephone as qa_doormen_telephone,
-    bi.email as qa_doormen_email
+    sum(bi.ongoing_contracts) as qa_ongoing_contracts,
+sum(bi.ongoing_listing) as qa_ongoing_listing,
+sum((ongoing_contracts + ongoing_listing) * ticket_medio) / sum(ongoing_contracts + ongoing_listing) as qa_avg_total_value,
+sum(bi.despublicados) as qa_unpublished,
+min(bi.min_bedrooms) as qa_min_bedrooms,
+max(bi.max_bedrooms) as qa_max_bedrooms,
+min(bi.min_area) as qa_min_area,
+max(bi.max_area) as qa_max_area,
+max(bi.elevator) as qa_elevator,
+array_agg(coalesce(bi.doorman, array [''])) as qa_entrance,
+array_agg(coalesce(bi.key_location, array [''])) as qa_key_location,
+sum(bi.converted_leads) as qa_converted_leads_last_120_days,
+sum(bi.leads) as qa_leads_last_120_days,
+sum(bi.doormen) as qa_doormen,
+array_agg(coalesce(bi.name, array [''])) as qa_doormen_name,
+array_agg(coalesce(bi.telephone, array [''])) as qa_doormen_telephone,
+array_agg(coalesce(bi.email, array [''])) as qa_doormen_email
 from base_external_crawler as bec
 left join base_interna as bi on ST_WITHIN(
       	ST_POINT(CAST(bec.lng AS double), CAST(bec.lat AS DOUBLE)),
@@ -351,3 +364,25 @@ left join base_interna as bi on ST_WITHIN(
       	)
     )    
     and cast(bec.numero_imovel as varchar) = bi.house_number
+group by
+  bec.lat,
+  bec.lng,
+  bec.sk_region,
+  bec.region_code,
+  bec.name,
+  bec.macro_name,
+  bec.city_name,
+  bec.city_group,
+  bec.cnpj,
+  bec.razao_social,
+  bec.telefone_1,
+  bec.email,
+  bec.google_formatted_address,
+  bec.numero_imovel,
+  bec.cep,
+  bec.ano_construcao_corrigido,
+  bec.uf,
+  bec.num_apts,
+  bec.listings,
+  bec.avg_rent,
+  bec.last_date
