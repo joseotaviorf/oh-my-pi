@@ -26,7 +26,6 @@ parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("source")
 parser.add_argument("source_table_name")
-parser.add_argument("target_table_name")
 parser.add_argument("--spark", action="store_true", dest="spark_flag")
 parser.add_argument("--athena", action="store_true", dest="athena_flag")
 
@@ -42,7 +41,7 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
         clean_db=db_info["db_clean_databricks"],
         source_table_name=source_table_name,
         clean_staging_source_path=db_info["db_clean_staging_path"],
-        target_table_name=target_table_name,
+        target_table_name=source_table_name,
         partition_values_path="/".join(
             ["{}={}".format(key, getattr(row, key)) for key in row.asDict()]
         ),
@@ -112,17 +111,15 @@ if __name__ == "__main__":
     env = args.env
     source = args.source
     source_table_name = args.source_table_name
-    target_table_name = args.target_table_name
     spark_flag = args.spark_flag
     athena_flag = args.athena_flag
 
     logger.info(
         "m=__main__, date={}, source={}, source_table_name={}, "
-        "target_table_name={}, spark_flag={}, athena_flag={} msg=Job started".format(
+        "spark_flag={}, athena_flag={} msg=Job started".format(
             execution_date,
             source,
             source_table_name,
-            target_table_name,
             spark_flag,
             athena_flag,
         )

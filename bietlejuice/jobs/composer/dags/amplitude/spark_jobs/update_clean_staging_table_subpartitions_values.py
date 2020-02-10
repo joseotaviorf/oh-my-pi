@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     logger.info(
         "m=__main__, date={}, source={}, source_table_name={}, "
-        "target_table_name={}, msg=Job started".format(
+        ", msg=Job started".format(
             execution_date, source, source_table_name, subpartitions
         )
     )
