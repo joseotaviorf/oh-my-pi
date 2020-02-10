@@ -320,7 +320,7 @@ webmetrics AS (
                         THEN uuid
                         ELSE NULL
                         END) AS schedule_page_viewed
-    FROM datalake_amplitude_clean_prod.events_repartitioned
+    FROM datalake_amplitude_clean_prod.events
     WHERE year >= 2019
         and event_type IN ('listing_page_viewed',
                            'visit_intent_clicked',

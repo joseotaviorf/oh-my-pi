@@ -68,7 +68,7 @@ user_session_events as (
         case when nullif(regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$'), '') is not null
              then regexp_substr(cast(json_extract_path_text(event_properties, 'house_id') as varchar), '^\\d{9}$')::bigint
              else null end as id_house
-       FROM datalake_amplitude_clean_prod.events_repartitioned
+       FROM datalake_amplitude_clean_prod.events
        WHERE event_type IN ('listing_page_viewed',
                             'search_results_page_viewed',
                             'home_page_viewed',

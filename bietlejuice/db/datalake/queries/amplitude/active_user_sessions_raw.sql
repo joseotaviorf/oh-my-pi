@@ -1,40 +1,40 @@
 with sessions_raw as (
     select
-	    amplitude_id,
-	    date(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as event_date,
-	    session_id,
-	    u_utm_source,
-	    u_utm_medium,
-	    u_utm_campaign,
-	    u_utm_content,
-	    u_utm_term,
+	    id_amplitude,
+	    date(ts_event) as event_date,
+	    id_session,
+        coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as u_utm_source,
+        coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as u_utm_medium,
+        coalesce(cast(json_extract(user_properties, '$.utm_campaign') as varchar), '') as u_utm_campaign,
+        coalesce(cast(json_extract(user_properties, '$.utm_content') as varchar), '') as u_utm_content,
+        coalesce(cast(json_extract(user_properties, '$.utm_term') as varchar), '') as u_utm_term,
 	    country,
 	    city,
 	    region,
-	    u_platform,
-	    app,
+        coalesce(cast(json_extract(user_properties, '$.platform') as varchar), '') as u_platform,
+	    id_app,
 	    event_type,
-	    min(cast(regexp_extract(trim(event_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as session_start_ts,
-	    date(cast(regexp_extract(trim(server_upload_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) as server_upload_time
-    from datalake_clean.amplitude_events
+	    min(ts_event) as session_start_ts,
+	    date(ts_server_uploaded) as server_upload_time
+    from datalake_amplitude_clean_prod.events
     where ym >= '{ym}'
-    and date(cast(regexp_extract(trim(server_upload_time), '(\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}})', 1) as timestamp)) = date('{dt}')
-    and session_id != '-1'
-    and (app = '170698' or app ='183047')
+    and date(ts_server_uploaded) = date('{dt}')
+    and id_session != -1
+    and (id_app = '170698' or id_app ='183047')
     group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16
 ),
 rn as (
 	select
 		*,
-		row_number() over (partition by event_date, amplitude_id, session_start_ts) as rn
+		row_number() over (partition by event_date, id_amplitude, session_start_ts) as rn
 	from sessions_raw
 )
 select
     cast(event_date as varchar) as event_date,
     cast(server_upload_time as varchar) as server_upload_time,
     cast(session_start_ts as varchar) as session_start_ts,
-    amplitude_id,
-    session_id,
+    id_amplitude,
+    id_session,
     country,
     city,
     region,
@@ -45,6 +45,6 @@ select
     u_utm_content as utm_content,
     u_utm_term as utm_term,
     event_type,
-    app as app
+    id_app as app
 from rn
     where rn = 1

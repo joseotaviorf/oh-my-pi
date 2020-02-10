@@ -6,7 +6,7 @@ with all_events as (
          extract(day from ts_event) as _day,
          coalesce(cast(id_amplitude as varchar), '') as amplitude_id,
          false as partial
-      from datalake_amplitude_clean_prod.events_repartitioned
+      from datalake_amplitude_clean_prod.events
       where event_type in ('listing_page_viewed',
                            'search_results_page_viewed',
                            'schedule_page_viewed',
