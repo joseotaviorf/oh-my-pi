@@ -1,75 +1,143 @@
-from pymongo import MongoClient
+import json
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.consumers.db_consumers.db_consumer import DBConsumer
+from bietlejuice.jobs.composer.services import JsonService
+
+from bson.json_util import dumps as bson_dumps, RELAXED_JSON_OPTIONS
 
 logger = QuintoAndarLogger("MongoConsumer")
-
-spark, sc = BaseSparkContext.spark, BaseSparkContext.sc  # todo: remove this
 
 
 class MongoConsumer(DBConsumer):
     """
-    This class is deprecated at the moment. If you want to use it, please, check the
-    other database consumers (e.g. PostgresConsumer) and refactor it. Try to remove
-    the dependency on the external MongoClient class and only use the SparkClient
-    class to read data from Mongo if you want to return Spark DataFrames in the
-    inherited methods (defined by the interface DBConsumer). Also, try to favor
-    dependency injection and avoid spark code in this class.
+    Gets data from a Mongo database through MongoClient passed by param and
+    returns it as a Spark Dataframe.
+    :mongo_client: A client to handle the Mongo connection
+    :type mongo_client: MongoClient
+    :spark_client: A client to handle the Spark connection
+    :type spark_client: SparkClient
     """
 
-    def __init__(self, conn_config):
-        self.connection = conn_config
+    def __init__(self, mongo_client, spark_client):
+        self.mongo_client = mongo_client
+        self.spark_client = spark_client
+
+    @logger
+    def _get_collection_names(self):
+        """
+            Gets the collection names of a Mongo database.
+            :return: A list of collection names
+        """
+        query = {
+            "listCollections": 1.0,
+            "authorizedCollections": True,
+            "nameOnly": True,
+        }
+        collections = self.mongo_client.run(query)["cursor"]["firstBatch"]
+        collection_names = []
+
+        for coll in collections:
+            collection_names.append(coll["name"])
+
+        return collection_names
+
+    @logger
+    def _estimate_collection_size(self, collection_name):
+        """
+        Calculates an estimated value for the size of a collection
+        :param collection_name: The name of the collection
+        :return: The estimated value for the size
+        """
+        query = {"collstats": collection_name, "scale": 1048576}
+        collection_size = self.mongo_client.run(query)["size"]
+
+        return collection_size
 
     @logger
     def get_table_names_and_sizes(self):
-        db = self.connection["db"]
-        client = MongoClient(self.connection["uri"])
-        mb_size = 1048576
-
+        """
+        Gets the collection names and sizes of a Mongo database.
+        :return: A Spark Dataframe with cols: name and size
+        """
+        collection_names = self._get_collection_names()
         collections = [
-            {
-                "table_name": collection,
-                "size": client[db].command("collstats", collection)["size"] / mb_size,
-            }
-            for collection in client[db].list_collection_names()
+            {"table_name": coll_name, "size": self._estimate_collection_size(coll_name)}
+            for coll_name in collection_names
         ]
-        df = spark.read.json(sc.parallelize(collections, 1))  # todo: remove this
+        df = self.spark_client.create_dataframe(collections)
         return df
 
     @logger
-    def get_table_schema(self, table_name):
-        raise NotImplementedError()
+    def __convert_columns_to_string_type(self, data):
+        """
+        Converts all columns of a dict or a list of dict to string type.
+        :param data: the data that must be converted.
+        :type data: dict or list of dict
+        """
+        converted_data = []
+        if isinstance(data, list):
+            for item in data:
+                converted_data.append(
+                    JsonService.transform_columns_type_to_string(item)
+                )
+        else:
+            converted_data.append(JsonService.transform_columns_type_to_string(data))
 
-    @logger
+        return converted_data
+
+    @logger(exclude_return=True)
+    def __convert_bson_documents_to_spark_dataframe(self, documents):
+        """
+        Converts [a list of] bson documents to spark_dataframe using bson_dumps
+        :param documents: return get_documents method in MongoClient
+        :type documents: list of bson documents or a bson document
+        :return: A Spark DataFrame with all columns of the string type
+        """
+        # documents are a list of Bson (Mongo format), it's necessary to convert to dict.
+        # convert  bson -> json_string -> dict
+        data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
+        converted_data = self.__convert_columns_to_string_type(data)
+        return self.spark_client.create_dataframe(converted_data)
+
+    @logger(exclude_return=True)
     def get_data_from_table(self, table_name):
-        db = self.connection["db"]
-        # todo: remove this
-        df = (
-            spark.read.format("com.mongodb.spark.sql.DefaultSource")
-            .option("uri", self.connection["uri"])
-            .option("database", db)
-            .option("collection", table_name)
-            .option("sampleSize", 300000)
-            .load()
-        )
+        """
+        Gets all data from a collection in a Mongo database.
+        :param table_name: Name of the table
+        :return: A Spark DataFrame with the table data
+        OBS: ALL fields are converted to string type
+        """
+        documents = self.mongo_client.get_documents(table_name, {})
+        df = self.__convert_bson_documents_to_spark_dataframe(documents)
         return df
 
     @logger
     def get_data_from_table_in_parallel(self, table_name, concurrency):
+        # todo: implement me!
         raise NotImplementedError()
 
-    @logger
-    def get_data_from_query(self, query, table_name):
-        db = self.connection["db"]
-        # todo: remove this
-        df = (
-            spark.read.format("com.mongodb.spark.sql.DefaultSource")
-            .option("uri", self.connection["uri"])
-            .option("database", db)
-            .option("collection", table_name)
-            .option("pipeline", query)
-            .load()
-        )
+    @logger(exclude_return=True)
+    def get_data_from_query(self, table_name, query):
+        """
+        Gets the results of a query in a Mongo database.
+        :param query: Query content
+        :param type: dict
+        :param table_name: Name of the table relevant to the query
+        :return: A Spark DataFrame with the query results.
+        OBS: ALL fields are converted to string type
+        """
+        documents = self.mongo_client.get_documents(table_name, query)
+        df = self.__convert_bson_documents_to_spark_dataframe(documents)
         return df
+
+    @logger
+    def get_table_schema(self, query, table_name=None):
+        logger.error(
+            """
+        `get_table_schema` is not implemented in MongoConsumer because the MongoDB does not have
+        the concept of schema. The methods `get_data_*` already infer on the data to create the
+        Spark DataFrame.
+        """
+        )
+        raise NotImplementedError()

@@ -6,7 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
@@ -33,27 +33,22 @@ if __name__ == "__main__":
         scope="quintoandar", key=DatabaseEnum.HEIMDALL
     )
     connection = json.loads(connection_json)
-    mongo_consumer = MongoConsumer(connection)
+    mongo_client = MongoClient(connection)
     spark_client = SparkClient()
 
+    mongo_consumer = MongoConsumer(mongo_client, spark_client)
     tables = mongo_consumer.get_table_names_and_sizes().collect()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
     spark_metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(spark_metastore_service)
 
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(db_info["db_raw_databricks"])
+
     for table in tables:
         df = mongo_consumer.get_data_from_table(table.table_name)
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .optimize_partition(250000)
-            .convert_array_type_to_json()
-            .convert_struct_type_to_json()
-            .output()
-            .withColumn("updatedAt", df.updatedAt.cast(dataType="string"))
-            .withColumn("createdAt", df.createdAt.cast(dataType="string"))
-        )
+        df = SparkDataFrameService().input(df).optimize_partition(250000).output()
 
         loader.load_full_table(
             df=df,

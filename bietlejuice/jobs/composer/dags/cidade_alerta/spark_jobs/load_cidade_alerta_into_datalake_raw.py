@@ -7,7 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
@@ -36,30 +36,25 @@ if __name__ == "__main__":
         scope="quintoandar", key=DatabaseEnum.CIDADE_ALERTA
     )
     conn_config = json.loads(conn_config_json)
+
+    mongo_client = MongoClient(conn_config)
     spark_client = SparkClient()
-    mongo_consumer = MongoConsumer(conn_config)
+    mongo_consumer = MongoConsumer(mongo_client, spark_client)
 
     tables = mongo_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source)
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
-    # create database if not exists
-    database_name = db_info["db_raw_databricks"]
-    metastore_service.create_database(database_name)
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    metastore_service.create_database(db_info["db_raw_databricks"])
 
     for table in tables:
         table_name = table.table_name.replace(".", "_")
 
         if table_name not in BLOCK_LIST:
             df = mongo_consumer.get_data_from_table(table_name)
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .convert_struct_type_to_string()
-                .convert_array_type_to_json()
-                .output()
-            )
+            df = SparkDataFrameService().input(df).optimize_partition(200000).output()
 
             loader.load_full_table(
                 df=df,

@@ -19,6 +19,7 @@ class MongoClient(DBClient):
                   "db": str,
                   "user": str,
                   "pwd": str,
+                  "dbtype": "mongo",
                   "params": json (optional)
             }
         """
