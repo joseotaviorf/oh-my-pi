@@ -117,11 +117,7 @@ if __name__ == "__main__":
     logger.info(
         "m=__main__, date={}, source={}, source_table_name={}, "
         "spark_flag={}, athena_flag={} msg=Job started".format(
-            execution_date,
-            source,
-            source_table_name,
-            spark_flag,
-            athena_flag,
+            execution_date, source, source_table_name, spark_flag, athena_flag,
         )
     )
 
