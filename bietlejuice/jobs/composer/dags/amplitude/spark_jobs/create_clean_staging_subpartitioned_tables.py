@@ -41,7 +41,6 @@ def create_subpartitioned_table_in_spark(subpartitioned_table_name, row):
         clean_db=db_info["db_clean_databricks"],
         source_table_name=source_table_name,
         clean_staging_source_path=db_info["db_clean_staging_path"],
-        target_table_name=source_table_name,
         partition_values_path="/".join(
             ["{}={}".format(key, getattr(row, key)) for key in row.asDict()]
         ),
