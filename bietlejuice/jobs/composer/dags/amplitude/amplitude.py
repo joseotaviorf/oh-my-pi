@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 # variable definitions
 DAG_ID = "bietlejuice.amplitude"
@@ -22,27 +22,17 @@ DEFAULT_PARTITION_BY = ["year", "month", "day"]
 # s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 AMPLITUDE_SPARK_JOBS_PATH = "{}/spark_jobs/amplitude/".format(S3_PREFIX)
-ADD_CLEAN_EVENTS_PARTITIONS_FILE_PATH = (
-    AMPLITUDE_SPARK_JOBS_PATH + "add_clean_events_partitions.py"
-)
-CREATE_ATHENA_EXTERNAL_TABLE_FILE_PATH = (
-    AMPLITUDE_SPARK_JOBS_PATH + "create_athena_external_table.py"
-)
-EVENTS_RAW_TO_CLEAN_FILE_PATH = AMPLITUDE_SPARK_JOBS_PATH + "events_raw_to_clean.py"
 LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "load_events_into_datalake_raw.py"
 )
-CREATE_CLEAN_FILTERED_EVENT_FILE_PATH = (
-    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_filtered_event.py"
-)
-EVENTS_REPARTITIONED_RAW_TO_CLEAN_FILE_PATH = (
+EVENTS_RAW_TO_CLEAN_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_incremental_table_in_datalake.py"
 )
 UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "update_athena_table_daily_partition.py"
 )
 CREATE_CLEAN_STAGING_EVENTS_FILE_PATH = (
-    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_repartitioned_table.py"
+    AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_table.py"
 )
 CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "create_clean_staging_subpartitioned_tables.py"
@@ -67,50 +57,6 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
-
-
-# task builders
-def create_clean_filtered_event_task(dag, event_type):
-    return QuintoAndarDatabricksSubmitRunOperator(
-        task_id="create-{}-event-table".format(event_type.replace("_", "-")),
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": CREATE_CLEAN_FILTERED_EVENT_FILE_PATH,
-                "parameters": ["{{ ds }}", ENV, event_type],
-            }
-        },
-    )
-
-
-def create_athena_external_table_task(dag, table_name, partition_by):
-    return QuintoAndarDatabricksSubmitRunOperator(
-        task_id="create-{}-athena-external-table".format(table_name.replace("_", "-")),
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": CREATE_ATHENA_EXTERNAL_TABLE_FILE_PATH,
-                "parameters": [ENV, table_name, "--partition_by"] + partition_by,
-            }
-        },
-    )
-
-
-def create_filtered_events_sub_dag(sub_dag_name):
-    local_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name=DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )._build_local_dag()
-    for event_type in EVENT_TYPES:
-        t1 = create_clean_filtered_event_task(local_dag, event_type)
-        table_name = "{}_events".format(event_type)
-        t2 = create_athena_external_table_task(
-            local_dag, table_name, DEFAULT_PARTITION_BY
-        )
-        t1 >> t2
-    return local_dag
 
 
 # Dag definition
@@ -146,72 +92,29 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
 events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-raw-to-clean",
     dag=dag,
     json={
         "spark_python_task": {
             "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
-            "parameters": ["{{ ds }}", ENV, "events", "--partition_by"]
-            + DEFAULT_PARTITION_BY
-            + ["event_type"],
-        }
-    },
-)
-
-add_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="add-clean-events-partitions",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": ADD_CLEAN_EVENTS_PARTITIONS_FILE_PATH,
-            "parameters": ["{{ ds }}", ENV],
-        }
-    },
-)
-
-create_filtered_events_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="create-filtered-events",
-    sub_dag_func=create_filtered_events_sub_dag,
-)
-
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
-events_repartitioned_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="events-repartitioned-raw-to-clean",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": EVENTS_REPARTITIONED_RAW_TO_CLEAN_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "--partition_by",
-            ]
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "--partition_by"]
             + DEFAULT_PARTITION_BY,
         }
     },
 )
 
-update_clean_events_repartitioned_daily_partition_athena_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-events-repartitioned-daily-partition-athena",
+update_clean_events_daily_partition_athena_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="update-clean-events-daily-partition-athena",
     dag=dag,
     json={
         "spark_python_task": {
             "python_file": UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "clean",
-            ],
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "clean"],
         }
     },
 )
@@ -222,14 +125,7 @@ create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_CLEAN_STAGING_EVENTS_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "events",
-                "--partition_by",
-            ]
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "--partition_by"]
             + ["id_app", "event_type"]
             + DEFAULT_PARTITION_BY,
         }
@@ -242,13 +138,7 @@ update_clean_staging_subpartitions_values_task = QuintoAndarDatabricksSubmitRunO
     json={
         "spark_python_task": {
             "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONS_VALUES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "--subpartitions",
-            ]
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "--subpartitions"]
             + ["id_app", "event_type"],
         }
     },
@@ -260,14 +150,7 @@ create_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSub
     json={
         "spark_python_task": {
             "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "events",
-                "--spark",
-            ],
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "--spark"],
         }
     },
 )
@@ -278,14 +161,7 @@ create_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     json={
         "spark_python_task": {
             "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                "amplitude",
-                "events_repartitioned",
-                "events",
-                "--athena",
-            ],
+            "parameters": ["{{ ds }}", ENV, "amplitude", "events", "--athena"],
         }
     },
 )
@@ -313,19 +189,11 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
 )
 
 # tasks dependencies definition
-create_cluster_task >> events_to_datalake_raw_task >> [
-    events_raw_to_clean_task,
-    events_repartitioned_raw_to_clean_task,
-]
+create_cluster_task >> events_to_datalake_raw_task >> events_raw_to_clean_task
 
+events_raw_to_clean_task >> update_clean_events_daily_partition_athena_task
+update_clean_events_daily_partition_athena_task >> terminate_cluster_task
 events_raw_to_clean_task >> [
-    add_clean_events_partitions_task,
-    create_filtered_events_sub_dag_task,
-] >> terminate_cluster_task
-
-events_repartitioned_raw_to_clean_task >> update_clean_events_repartitioned_daily_partition_athena_task
-update_clean_events_repartitioned_daily_partition_athena_task >> terminate_cluster_task
-events_repartitioned_raw_to_clean_task >> [
     create_clean_staging_events_task,
     update_clean_staging_subpartitions_values_task,
 ] >> create_clean_staging_subpartitioned_tables_spark_task
@@ -333,5 +201,4 @@ create_clean_staging_subpartitioned_tables_spark_task >> [
     create_clean_staging_subpartitioned_tables_athena_task,
     update_clean_staging_subpartitioned_tables_spark_task,
 ] >> terminate_cluster_task
-create_clean_staging_subpartitioned_tables_athena_task >> update_clean_staging_subpartitioned_tables_athena_task
-update_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task
+create_clean_staging_subpartitioned_tables_athena_task >> update_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task

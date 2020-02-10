@@ -12,9 +12,9 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("create_clean_staging_table")
+logger = QuintoAndarLogger("create_clean_staging_repartitioned_table")
 
-parser = ArgumentParser(description="create_clean_staging_table")
+parser = ArgumentParser(description="create_clean_staging_repartitioned_table")
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("source")
@@ -31,8 +31,8 @@ if __name__ == "__main__":
     partition_by = args.partition_by
 
     logger.info(
-        "m=__main__, date={}, source={}, "
-        "source_table_name{}, partition_by={}, msg=Job started".format(
+        "m=__main__, date={}, source={},"
+        "source_table_name={}, partition_by={}, msg=Job started".format(
             execution_date, source, source_table_name, partition_by
         )
     )
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         "{}.{}".format(db_info["db_clean_databricks"], source_table_name)
     ).where("year = {} and month = {} and day = {}".format(year, month, day))
 
-    df_partitioned = (
+    df_repartitioned = (
         SparkDataFrameService(df)
         .optimize_partitions_by_partition_columns(partition_by)
         .output()
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     #  only writes the files, but this needs to be discussed yet. For now it's
     #  not a big deal
     loader.load_incremental_table(
-        df=df_partitioned,
+        df=df_repartitioned,
         database_name=db_info["db_clean_staging_databricks"],
         table_name=source_table_name,
         format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
