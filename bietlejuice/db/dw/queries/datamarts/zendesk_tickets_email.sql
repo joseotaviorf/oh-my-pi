@@ -46,7 +46,24 @@ select
         	then 1 
     	else 0 
 	end as has_exclude_tags,
-    dt.tags
+	case 
+	    when dt.tags ilike '%resolve_ticket_acompanhamento%' or
+        	dt.tags ilike '%fechado_automaticamente_noreply%' or
+        	dt.tags ilike '%redirecionado_atendimento_2%' or
+        	dt.tags ilike '%zapdesk%' or
+        	dt.tags ilike '%ticket_via_call%' or
+        	dt.tags ilike '%call_contato_receptivo%' or
+        	dt.tags ilike '%call_contato_ativo%' or
+        	dt.tags ilike '%resolve_ticket_acompanhamento%' or
+        	dt.tags ilike '%redirecionado_adm_v1%'
+        	then 1 
+    	else 0 
+	end as has_retention_tags,
+	case 
+	    when dt.tags ilike '%closed_by_merge%' 	then 1 
+    	else 0 
+	end as has_merged_tags,
+    	dt.tags
 from zendesk.fact_tickets as ft
 	join zendesk.dim_ticket as dt
 		on dt.sk_ticket = ft.sk_ticket
