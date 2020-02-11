@@ -275,6 +275,7 @@ campaigns_full as (
         select
             ftc.sk_date,
             dtc.campaign_name,
+            dtc.campaign_name as utm_campaign,
             case
                 when lower(dtc.campaign_name) like '%campinas%' then 'Campinas'
                 when lower(dtc.campaign_name) like '%s_o_paulo%' or lower(dtc.campaign_name) like '%sp detailed%' then 'RMSP'
@@ -312,6 +313,7 @@ campaigns_full as (
         select
             tcc.sk_date,
             tcc.campaign_name,
+            tcc.campaign_name as utm_campaign,
             csol.city_group as city_group,
             tcc.desktop_cost * csol.share  as desktop_cost,
             tcc.mobile_cost * csol.share as mobile_cost
@@ -330,7 +332,7 @@ campaigns_full as (
         null as account_name,
         city_group as campaign_name_l,
         null as account_name_l,
-        null as utm_campaign,
+        utm_campaign,
         null as utm_term,
         null as utm_content,
         desktop_cost,
@@ -354,7 +356,7 @@ campaigns_full as (
         null as account_name,
         csol.city_group as campaign_name_l,
         null as account_name_l,
-        null as utm_campaign,
+        campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
         fm.desktop_cost * csol.share as desktop_cost,
@@ -379,7 +381,7 @@ campaigns_full as (
         null as account_name,
         lower(dct.campaign_name) as campaign_name_l,
         null as account_name_l,
-        null as utm_campaign,
+        dct.campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
         null as desktop_cost,
@@ -401,7 +403,7 @@ campaigns_full as (
         drt.account_name as account_name,
         lower(drt.campaign_name) as campaign_name_l,
         lower(drt.account_name) as account_name_l,
-        null as utm_campaign,
+        drt.campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
         sum(coalesce(case when device = 'Desktop' then cost end, 0)) as desktop_cost,
