@@ -5,6 +5,7 @@ with fact as  (
 		mkt.mkt_category,
 		mkt.mkt_flow,
 		mkt.mkt_completion,
+		mkt.mkt_origin,
 		mkt.mkt_channel,
 		mkt.mkt_medium,
 		mkt.mkt_source,
@@ -25,6 +26,7 @@ d_cube as (
 		mkt_category,
 		mkt_flow,
 		mkt_completion,
+		mkt_origin,
 		mkt_channel,
 		mkt_medium,
 		mkt_source,
@@ -51,6 +53,7 @@ select
 	coalesce(fact.mkt_category, d_cube.mkt_category) as mkt_category,
 	coalesce(fact.mkt_flow, d_cube.mkt_flow) as mkt_flow,
 	coalesce(fact.mkt_completion, d_cube.mkt_completion) as mkt_completion,
+	coalesce(fact.mkt_origin, d_cube.mkt_origin) as mkt_origin,
 	coalesce(fact.mkt_channel, d_cube.mkt_channel) as mkt_channel,
 	coalesce(fact.mkt_medium, d_cube.mkt_medium) as mkt_medium,
 	coalesce(fact.mkt_source, d_cube.mkt_source) as mkt_source,
@@ -74,6 +77,7 @@ full outer join d_cube
 	and coalesce(fact.mkt_category, '') = coalesce(d_cube.mkt_category, '')
 	and coalesce(fact.mkt_flow, '') = coalesce(d_cube.mkt_flow, '')
 	and coalesce(fact.mkt_completion, '') = coalesce(d_cube.mkt_completion, '')
+	and coalesce(fact.mkt_origin, '') = coalesce(d_cube.mkt_origin, '')
 	and coalesce(fact.mkt_channel, '') = coalesce(d_cube.mkt_channel, '')
 	and coalesce(fact.mkt_medium, '') = coalesce(d_cube.mkt_medium, '')
 	and coalesce(fact.mkt_source, '') = coalesce(d_cube.mkt_source, '')

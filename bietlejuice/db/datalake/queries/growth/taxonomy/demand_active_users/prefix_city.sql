@@ -7,6 +7,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -20,7 +21,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'demand'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), weekly as (
 select
 	date,
@@ -30,6 +31,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -43,7 +45,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'demand'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ), monthly as (
 select
 	date,
@@ -53,6 +55,7 @@ select
 	mkt_category,
 	mkt_flow,
 	mkt_completion,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,
@@ -66,7 +69,7 @@ left join datalake_clean.ods_dim_region dr
     on dau.city = dr.name
     and level = 'Cidade'
 where app = 'demand'
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 dim_date as (
 SELECT
@@ -91,6 +94,7 @@ WHERE sk_date > 20180101
             daily.mkt_category = weekly.mkt_category and
             daily.mkt_flow = weekly.mkt_flow and
             daily.mkt_completion = weekly.mkt_completion and
+            daily.mkt_origin = weekly.mkt_origin and
             daily.mkt_channel = weekly.mkt_channel and
             daily.mkt_medium = weekly.mkt_medium and
             daily.mkt_source = weekly.mkt_source and
@@ -104,6 +108,7 @@ WHERE sk_date > 20180101
             daily.mkt_category = monthly.mkt_category and
             daily.mkt_flow = monthly.mkt_flow and
             daily.mkt_completion = monthly.mkt_completion and
+            daily.mkt_origin = monthly.mkt_origin and
             daily.mkt_channel = monthly.mkt_channel and
             daily.mkt_medium = monthly.mkt_medium and
             daily.mkt_source = monthly.mkt_source and
@@ -123,7 +128,7 @@ all_dates as (
     mkt_category,
 	mkt_flow,
 	mkt_completion,
-	'Not Mapped' as mkt_origin,
+	mkt_origin,
 	mkt_channel,
 	mkt_medium,
 	mkt_source,

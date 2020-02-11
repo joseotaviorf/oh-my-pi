@@ -6,6 +6,7 @@ select
 	vb1.mkt_category,
 	vb1.mkt_flow,
 	vb1.mkt_completion,
+	vb1.mkt_origin,
 	vb1.mkt_channel,
 	vb1.mkt_medium,
 	vb1.mkt_source,
@@ -16,7 +17,7 @@ select
 	sum(coalesce(vb1.daily_count, 0)) as total_daily_visits_booked
 from
 	growth.taxonomy_visits_booked vb1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 visit_confirmed as (
 select
@@ -26,6 +27,7 @@ select
 	vc1.mkt_category,
 	vc1.mkt_flow,
 	vc1.mkt_completion,
+	vc1.mkt_origin,
 	vc1.mkt_channel,
 	vc1.mkt_medium,
 	vc1.mkt_source,
@@ -36,7 +38,7 @@ select
 	sum(coalesce(vc1.daily_count, 0)) as total_daily_visits_confirmed
 from
 	growth.taxonomy_visits_completed vc1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 offer_submitted as (
 select
@@ -46,6 +48,7 @@ select
 	os1.mkt_category,
 	os1.mkt_flow,
 	os1.mkt_completion,
+	os1.mkt_origin,
 	os1.mkt_channel,
 	os1.mkt_medium,
 	os1.mkt_source,
@@ -56,7 +59,7 @@ select
 	sum(coalesce(os1.daily_count, 0)) as total_daily_offers_submitted
 from
 	growth.taxonomy_offers_submitted os1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 offer_approved as (
 select
@@ -66,6 +69,7 @@ select
 	oa1.mkt_category,
 	oa1.mkt_flow,
 	oa1.mkt_completion,
+	oa1.mkt_origin,
 	oa1.mkt_channel,
 	oa1.mkt_medium,
 	oa1.mkt_source,
@@ -76,7 +80,7 @@ select
 	sum(coalesce(oa1.daily_count, 0)) as total_daily_offers_approved
 from
 	growth.taxonomy_offers_approved oa1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 contract_signed as (
 select
@@ -86,6 +90,7 @@ select
 	cs1.mkt_category,
 	cs1.mkt_flow,
 	cs1.mkt_completion,
+	cs1.mkt_origin,
 	cs1.mkt_channel,
 	cs1.mkt_medium,
 	cs1.mkt_source,
@@ -96,7 +101,7 @@ select
 	sum(coalesce(cs1.daily_count, 0)) as total_daily_contracts_signed
 from
 	growth.taxonomy_contracts_signed cs1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 demand_session as
 (
@@ -107,6 +112,7 @@ select
 	ds1.mkt_category,
 	ds1.mkt_flow,
 	ds1.mkt_completion,
+	ds1.mkt_origin,
 	ds1.mkt_channel,
 	ds1.mkt_medium,
 	ds1.mkt_source,
@@ -117,7 +123,7 @@ select
 	sum(coalesce(ds1.monthly_count, 0)) as total_monthly_demand_sessions
 from
 	growth.taxonomy_demand_active_user_sessions ds1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 demand_dau as (
 select
@@ -127,6 +133,7 @@ select
 	dau1.mkt_category,
 	dau1.mkt_flow,
 	dau1.mkt_completion,
+	dau1.mkt_origin,
 	dau1.mkt_channel,
 	dau1.mkt_medium,
 	dau1.mkt_source,
@@ -137,7 +144,7 @@ select
 	sum(coalesce(dau1.monthly_count, 0)) as total_monthly_demand_dau
 from
 	growth.taxonomy_demand_active_users dau1
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ),
 demand as (
 select
@@ -147,6 +154,7 @@ select
 	vb1.mkt_category,
 	vb1.mkt_flow,
 	vb1.mkt_completion,
+	vb1.mkt_origin,
 	vb1.mkt_channel,
 	vb1.mkt_medium,
 	vb1.mkt_source,
@@ -167,6 +175,7 @@ left join visit_confirmed vc1 on
 	and (coalesce(vb1.mkt_category,'') = coalesce(vc1.mkt_category,''))
 	and (coalesce(vb1.mkt_flow,'') = coalesce(vc1.mkt_flow,''))
 	and (coalesce(vb1.mkt_completion,'') = coalesce(vc1.mkt_completion,''))
+	and (coalesce(vb1.mkt_origin,'') = coalesce(vc1.mkt_origin,''))
 	and (coalesce(vb1.mkt_channel,'') = coalesce(vc1.mkt_channel,''))
 	and (coalesce(vb1.mkt_medium,'') = coalesce(vc1.mkt_medium,''))
 	and (coalesce(vb1.mkt_source,'') = coalesce(vc1.mkt_source,''))
@@ -181,6 +190,7 @@ left join offer_submitted os1 on
 	and (coalesce(vb1.mkt_category,'') = coalesce(os1.mkt_category,''))
 	and (coalesce(vb1.mkt_flow,'') = coalesce(os1.mkt_flow,''))
 	and (coalesce(vb1.mkt_completion,'') = coalesce(os1.mkt_completion,''))
+	and (coalesce(vb1.mkt_origin,'') = coalesce(os1.mkt_origin,''))
 	and (coalesce(vb1.mkt_channel,'') = coalesce(os1.mkt_channel,''))
 	and (coalesce(vb1.mkt_medium,'') = coalesce(os1.mkt_medium,''))
 	and (coalesce(vb1.mkt_source,'') = coalesce(os1.mkt_source,''))
@@ -195,6 +205,7 @@ left join offer_approved oa1 on
 	and (coalesce(vb1.mkt_category,'') = coalesce(oa1.mkt_category,''))
 	and (coalesce(vb1.mkt_flow,'') = coalesce(oa1.mkt_flow,''))
 	and (coalesce(vb1.mkt_completion,'') = coalesce(oa1.mkt_completion,''))
+	and (coalesce(vb1.mkt_origin,'') = coalesce(oa1.mkt_origin,''))
 	and (coalesce(vb1.mkt_channel,'') = coalesce(oa1.mkt_channel,''))
 	and (coalesce(vb1.mkt_medium,'') = coalesce(oa1.mkt_medium,''))
 	and (coalesce(vb1.mkt_source,'') = coalesce(oa1.mkt_source,''))
@@ -209,6 +220,7 @@ left join contract_signed cs1 on
 	and (coalesce(vb1.mkt_category,'') = coalesce(cs1.mkt_category,''))
 	and (coalesce(vb1.mkt_flow,'') = coalesce(cs1.mkt_flow,''))
 	and (coalesce(vb1.mkt_completion,'') = coalesce(cs1.mkt_completion,''))
+	and (coalesce(vb1.mkt_origin,'') = coalesce(cs1.mkt_origin,''))
 	and (coalesce(vb1.mkt_channel,'') = coalesce(cs1.mkt_channel,''))
 	and (coalesce(vb1.mkt_medium,'') = coalesce(cs1.mkt_medium,''))
 	and (coalesce(vb1.mkt_source,'') = coalesce(cs1.mkt_source,''))
@@ -218,7 +230,7 @@ left join contract_signed cs1 on
 	and (coalesce(vb1.utm_term,'') = coalesce(cs1.utm_term,''))
 join public.dim_date dd
    on vb1.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ), users as (
 select
  to_char(dd.month_start, 'yyyyMMdd')::integer as sk_month_start_date,
@@ -227,6 +239,7 @@ select
  tx1.mkt_category,
  tx1.mkt_flow,
  tx1.mkt_completion,
+ tx1.mkt_origin,
  tx1.mkt_channel,
  tx1.mkt_medium,
  tx1.mkt_source,
@@ -245,6 +258,7 @@ left join demand_dau ls1
  and (ls1.mkt_category = tx1.mkt_category)
  and (ls1.mkt_flow = tx1.mkt_flow)
  and (ls1.mkt_completion = tx1.mkt_completion)
+ and (ls1.mkt_origin = tx1.mkt_origin)
  and (ls1.mkt_channel = tx1.mkt_channel)
  and (ls1.mkt_medium = tx1.mkt_medium)
  and (ls1.mkt_source = tx1.mkt_source)
@@ -254,7 +268,7 @@ left join demand_dau ls1
  and (coalesce(ls1.utm_content,'') = coalesce(tx1.utm_content,''))
 join public.dim_date dd
    on tx1.sk_date = dd.sk_date
-group by 1,2,3,4,5,6,7,8,9,10,11,12,13
+group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 )
 select
 	demand.*,
@@ -268,6 +282,7 @@ left join users us
  and (us.mkt_category = demand.mkt_category)
  and (us.mkt_flow = demand.mkt_flow)
  and (us.mkt_completion = demand.mkt_completion)
+ and (us.mkt_origin = demand.mkt_origin)
  and (us.mkt_channel = demand.mkt_channel)
  and (us.mkt_medium = demand.mkt_medium)
  and (us.mkt_source = demand.mkt_source)
@@ -283,6 +298,7 @@ select
 	us.mkt_category,
 	us.mkt_flow,
 	us.mkt_completion,
+	us.mkt_origin,
 	us.mkt_channel,
 	us.mkt_medium,
 	us.mkt_source,
@@ -305,6 +321,7 @@ left join demand dem on
 	and (coalesce(us.mkt_category,'') = coalesce(dem.mkt_category,''))
 	and (coalesce(us.mkt_flow,'') = coalesce(dem.mkt_flow,''))
 	and (coalesce(us.mkt_completion,'') = coalesce(dem.mkt_completion,''))
+	and (coalesce(us.mkt_origin,'') = coalesce(dem.mkt_origin,''))
 	and (coalesce(us.mkt_channel,'') = coalesce(dem.mkt_channel,''))
 	and (coalesce(us.mkt_medium,'') = coalesce(dem.mkt_medium,''))
 	and (coalesce(us.mkt_source,'') = coalesce(dem.mkt_source,''))
