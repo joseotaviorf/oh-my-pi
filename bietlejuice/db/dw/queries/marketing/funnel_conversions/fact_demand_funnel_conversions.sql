@@ -17,7 +17,7 @@ with fact as  (
 	from marketing.fact_marketing_daily_costs mkt
 	join public.dim_date dd on dd.sk_date =  mkt.sk_date
     where funnel_side = 'demand'
-	group by 1,2,3,4,5,6,7,8,9,10,11,12
+	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 d_cube as (
 	select
@@ -45,7 +45,7 @@ d_cube as (
 		sum(coalesce(total_{2}_offers_approved, 0)) as total_{2}_offers_approved,
 		sum(coalesce(total_{2}_contracts_signed, 0)) as total_{2}_contracts_signed
 	from growth.conversion_points_demand_{2}
-	group by 1,2,3,4,5,6,7,8,9,10,11,12
+	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 )
 select
 	coalesce(fact.sk_date, d_cube.sk_date) as sk_date,
