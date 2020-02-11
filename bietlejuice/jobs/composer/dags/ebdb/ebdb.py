@@ -801,6 +801,22 @@ house_maintenance_condition_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="house_maintenance_condition_aud",
 )
 
+info_amenities_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="info_amenities_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="info_amenities_aud",
+)
+
+amenities_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="amenities",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="amenities",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -881,4 +897,6 @@ ebdb_to_datalake_raw_task >> [
     booking_aud_sub_dag_task,
     map_region_sub_dag_task,
     house_maintenance_condition_aud_sub_dag_task,
+    info_amenities_aud_sub_dag_task,
+    amenities_sub_dag_task,
 ] >> terminate_cluster_task
