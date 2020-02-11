@@ -68,7 +68,7 @@ class MongoConsumer(DBConsumer):
         df = self.spark_client.create_dataframe(collections)
         return df
 
-    @logger
+    @logger(exclude="data", exclude_return=True)
     def __convert_columns_to_string_type(self, data):
         """
         Converts all columns of a dict or a list of dict to string type.
