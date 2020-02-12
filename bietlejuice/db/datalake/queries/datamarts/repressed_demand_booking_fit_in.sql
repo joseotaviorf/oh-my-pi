@@ -123,6 +123,7 @@ encaixe_to_booking as (
     datalake_clean.ods_dim_booking
   where
     type = 'Visita'
+	and visit_intent = 'RENT'
 ),
 encaixes_raw as (
   select
@@ -137,6 +138,7 @@ encaixes_raw as (
   from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" evt
      left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
   where concat(cast(year as varchar), '-', cast(month as varchar)) >= '2019-08'
+  	and cast(json_extract(event_properties, '$.business_context') as varchar) != 'sale'
 ),
 encaixes_temp as (
   select distinct
