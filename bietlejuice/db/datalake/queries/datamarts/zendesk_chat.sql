@@ -37,16 +37,16 @@ engagements_parsed as(
 	  		when (hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) < bh.start_hour 
 	  			and hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) >= bh.final_hour) then 0
 		end as on_schedule
-	from datalake_zendesk_raw_prod.chat_engagements as ce
+	from datalake_zendesk_clean_prod.chat_engagements as ce
 		left join datalake_zendesk_clean_prod.chats_departments as cd
 			on try_cast(ce.department_id as bigint) = cd.id
 		left join datalake_raw.gsheets_department_channel as gdc
 			on cd.name = gdc.aux_canal
-		left join datalake_raw.gsheets_agents_control ac 
+		left join datalake_raw.gsheets_agents_control ac
 	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
 			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(from_iso8601_timestamp(ce.ts) - interval '3' hour)
-				and date(from_iso8601_timestamp(ce.ts) - interval '3' hour) between bh.start_date and bh.end_date 
+				and date(from_iso8601_timestamp(ce.ts) - interval '3' hour) between bh.start_date and bh.end_date
 	where not (ce.assigned = 'true' and ce.accepted = 'false')
 ),
 chat_engagements as (
@@ -57,31 +57,31 @@ chat_engagements as (
 	from engagements_parsed as ep
 ),
 chat_zendesk as (
-	select distinct 
+	select distinct
 		c.id,
-		c.zendesk_ticket_id,
-		cast((from_iso8601_timestamp(c."timestamp")) as timestamp) as ts_chat_started,
-		cast((from_iso8601_timestamp(c."timestamp") - interval '3' hour) as timestamp) as ts_chat_started_local,
+		c.id_ticket as zendesk_ticket_id,
+		c.ts_created as ts_chat_started,
+		c.ts_created - interval '3' hour as ts_chat_started_local,
 		c.department_name,
 		gdc.area_aux as chat_area,
 		c.tags,
-		c.missed,
-		c.dropped,
+		c.is_missed,
+		c.is_dropped,
 		c.duration,
 		c.response_time,
 		case
-	  		when (hour(from_iso8601_timestamp(c."timestamp") - interval '3' hour) >= bh.start_hour 
-	  			and hour(from_iso8601_timestamp(c."timestamp") - interval '3' hour) < bh.final_hour) then 1
-	  		when (hour(from_iso8601_timestamp(c."timestamp") - interval '3' hour) < bh.start_hour 
-	  			and hour(from_iso8601_timestamp(c."timestamp") - interval '3' hour) >= bh.final_hour) then 0
+	  		when (hour(c.ts_created - interval '3' hour) >= bh.start_hour
+	  			and hour(c.ts_created - interval '3' hour) < bh.final_hour) then 1
+	  		when (hour(c.ts_created - interval '3' hour) < bh.start_hour
+	  			and hour(c.ts_created - interval '3' hour) >= bh.final_hour) then 0
 		end as chat_on_schedule
-	from datalake_zendesk_raw_prod.chats as c
+	from datalake_zendesk_clean_prod.chats as c
 		left join datalake_raw.gsheets_department_channel as gdc
 			on c.department_name = gdc.aux_canal
 		left join business_hours bh
-			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(from_iso8601_timestamp(c."timestamp") - interval '3' hour)
-				and date(from_iso8601_timestamp(c."timestamp") - interval '3' hour) between bh.start_date and bh.end_date 
-	where zendesk_ticket_id is not null
+			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(c.ts_created - interval '3' hour)
+				and date(c.ts_created - interval '3' hour) between bh.start_date and bh.end_date
+	where id_ticket is not null
 )
 select distinct
 	c.id as id_chat,
@@ -92,31 +92,31 @@ select distinct
 	ce.area as first_engagement_area,
     c.department_name as last_chat_department,
     c.chat_area as last_chat_area,
-	case 
+	case
         when c.tags like '%bot_end_conversation%' then 1
         else 0
     end as bot_end_conversation,
     c.tags,
     ce.total_engagements,
-    case 
+    case
     	when ce.on_schedule = 1 or c.chat_on_schedule = 1 then 1
     	when ce.on_schedule is null and c.chat_on_schedule is null
-    		then 
+    		then
 	    		(case
 					when (day_of_week(c.ts_chat_started_local) between 1 and 5
-				        and hour(c.ts_chat_started_local) >= 8  
+				        and hour(c.ts_chat_started_local) >= 8
 					    and hour(c.ts_chat_started_local) < 19)
-				    or (day_of_week(c.ts_chat_started_local) = 6 
-				        and hour(c.ts_chat_started_local) >= 9 
+				    or (day_of_week(c.ts_chat_started_local) = 6
+				        and hour(c.ts_chat_started_local) >= 9
 					    and hour(c.ts_chat_started_local) < 14) then 1
 				else 0 end)
     	else 0
     end as is_business_hours,
-	case when c.missed = true and c.tags not like '%bot_end_conversation%' then 1 else 0 end as missed,
-	case when c.dropped = true then 1 else 0 end as dropped,
+	case when c.is_missed = true and c.tags not like '%bot_end_conversation%' then 1 else 0 end as missed,
+	case when c.is_dropped = true then 1 else 0 end as dropped,
 	cast(c.duration as double) as seconds_chat_duration,
 	cast(json_extract(c.response_time, '$.first') as double)/60 as minutes_first_response_time,
-	case    
+	case
 	    when (cast(json_extract(c.response_time, '$.first') as double)/60) <= 15 then 1
 	    when (cast(json_extract(c.response_time, '$.first') as double)/60) > 15 then 0
 	    else null

@@ -32,16 +32,16 @@ engagements_parsed as(
 		gdc.area_aux as area,
 		ce.started_by,
 		case
-	  		when (hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) >= bh.start_hour 
+	  		when (hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) >= bh.start_hour
 	  			and hour(from_iso8601_timestamp(ce.ts) - interval '3' hour) < bh.final_hour) then 1
 		else 0
 		end as on_schedule
-	from datalake_zendesk_raw_prod.chat_engagements as ce
+	from datalake_zendesk_clean_prod.chat_engagements as ce
 		 left join datalake_zendesk_clean_prod.chats_departments as cd
 			on try_cast(ce.department_id as bigint) = cd.id
 		left join datalake_raw.gsheets_department_channel as gdc
 			on cd.name = gdc.aux_canal
-		left join datalake_raw.gsheets_agents_control ac 
+		left join datalake_raw.gsheets_agents_control ac
 	    		on ac.assignee_id = ce.agent_id
 		left join business_hours bh
 			on bh.area = gdc.area_aux and bh.week_day_int = day_of_week(from_iso8601_timestamp(ce.ts) - interval '3' hour)
@@ -68,7 +68,7 @@ select distinct
 	ce.area,
 	ce.engagement_duration_min as minutes_engagement_duration,
 	ce.on_schedule as is_business_hours
-from datalake_zendesk_raw_prod.chats as c
+from datalake_zendesk_clean_prod.chats as c
 	join chat_engagements as ce
 		on c.id = ce.id_chat
-where c.zendesk_ticket_id is not null
+where c.id_ticket is not null
