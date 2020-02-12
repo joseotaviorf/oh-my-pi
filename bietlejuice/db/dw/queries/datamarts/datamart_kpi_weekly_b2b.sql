@@ -297,25 +297,25 @@ select
 	nbk.new_bookers_weekly
 from ongoing_contracts_weekly ocont
 full outer join ongoing_rentals_weekly orent
-  on ocont.week_start = orent.week_start and ocont.sk_region = orent.sk_region
+  on ocont.week_start = orent.week_start and ocont.sk_region = orent.sk_region and ocont.sk_partner = orent.sk_partner
 full outer join new_rentals nrent
-  on ocont.week_start = nrent.rental_week_start and ocont.sk_region = nrent.sk_region
+  on ocont.week_start = nrent.rental_week_start and ocont.sk_region = nrent.sk_region and ocont.sk_partner = nrent.sk_partner
 full outer join new_contracts ncont
-  on ocont.week_start = ncont.contract_week_start and ocont.sk_region = ncont.sk_region
+  on ocont.week_start = ncont.contract_week_start and ocont.sk_region = ncont.sk_region and ocont.sk_partner = ncont.sk_partner
 full outer join new_first_listings nfl
-  on ocont.week_start = nfl.first_listing_week_start and ocont.sk_region = nfl.sk_region
+  on ocont.week_start = nfl.first_listing_week_start and ocont.sk_region = nfl.sk_region and ocont.sk_partner = nfl.sk_partner
 full outer join re_rentals rr
-  on ocont.week_start = rr.rental_week_start and ocont.sk_region = rr.sk_region
+  on ocont.week_start = rr.rental_week_start and ocont.sk_region = rr.sk_region and ocont.sk_partner = rr.sk_partner
 full outer join ended_rentals er
-  on ocont.week_start = er.week_date and ocont.sk_region = er.sk_region
+  on ocont.week_start = er.week_date and ocont.sk_region = er.sk_region and ocont.sk_partner = er.sk_partner
 full outer join ended_rentals_confirmed erc
-  on ocont.week_start = erc.week_date and ocont.sk_region = erc.sk_region
+  on ocont.week_start = erc.week_date and ocont.sk_region = erc.sk_region and ocont.sk_partner = erc.sk_partner
 full outer join ongoing_listings_weekly olist
-  on ocont.week_start = olist.week_start and ocont.sk_region = olist.sk_region
+  on ocont.week_start = olist.week_start and ocont.sk_region = olist.sk_region and ocont.sk_partner = olist.sk_partner
 full outer join bookers bk
-  on ocont.week_start = bk.booking_created_week and ocont.sk_region = bk.sk_region
+  on ocont.week_start = bk.booking_created_week and ocont.sk_region = bk.sk_region and ocont.sk_partner = bk.sk_partner
 full outer join new_bookers nbk
-  on ocont.week_start = nbk.first_booking_created_week and ocont.sk_region = nbk.sk_region
+  on ocont.week_start = nbk.first_booking_created_week and ocont.sk_region = nbk.sk_region and ocont.sk_partner = nbk.sk_partner
 )
 select
 	dm.week_date,
