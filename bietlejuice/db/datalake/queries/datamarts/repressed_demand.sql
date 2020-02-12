@@ -117,6 +117,7 @@ encaixe_to_booking as (
         id_property as house_id
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
+		and visit_intent = 'RENT'
 ),
 encaixes_raw as (
     select
@@ -131,6 +132,7 @@ encaixes_raw as (
         from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" as evt
     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
     where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2019-01'
+    	and cast(json_extract(event_properties, '$.business_context') as varchar) != 'sale'
 ),
 encaixes_temp as (
 	select distinct
@@ -262,6 +264,7 @@ bookings_raw as (
 	from datalake_clean.ods_dim_booking bk
   	join datalake_ebdb_raw_prod.imovel i on i.id = cast(bk.id_property as bigint)
   	where type = 'Visita'
+		and visit_intent = 'RENT'
 ),
 bookings_clean as (
 	select
