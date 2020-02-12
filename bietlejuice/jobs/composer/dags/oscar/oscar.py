@@ -121,23 +121,12 @@ oscar_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-raw-external-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "create_raw_external_tables.py",
-            "parameters": [ENV],
-        }
-    },
-)
-
-create_cluster_task >> oscar_to_datalake_raw_task >> create_raw_external_tables_task
+create_cluster_task >> oscar_to_datalake_raw_task
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
 build_clean_subdags(
-    prev_task=create_raw_external_tables_task, next_task=terminate_cluster_task
+    prev_task=oscar_to_datalake_raw_task, next_task=terminate_cluster_task
 )
