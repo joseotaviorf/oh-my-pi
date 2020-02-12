@@ -6,5 +6,5 @@ select
     created_at as ts_created,
     recommended_house_count as count_recommended_house,
     status,
-    referred_id as id_referred
+    referrer_id as id_referrer
 from datalake_oscar_raw.referral_summary_view
