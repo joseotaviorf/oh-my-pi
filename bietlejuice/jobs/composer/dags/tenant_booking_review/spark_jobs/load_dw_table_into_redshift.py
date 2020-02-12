@@ -21,6 +21,7 @@ if base_dbutils.get_dbutils() is not None:
     dbutils = base_dbutils.get_dbutils()
 
 parser = ArgumentParser(description=JOB_NAME)
+parser.add_argument("spectrum_iam_role")
 parser.add_argument("table_name")
 parser.add_argument("dw_schema")
 parser.add_argument("env")
@@ -45,6 +46,7 @@ def validate_load(spark_schema, redshift_schema, table_name):
 if __name__ == "__main__":
     # job execution information
     args = parser.parse_args()
+    spectrum_iam_role = args.spectrum_iam_role
     table_name = args.table_name
     dw_schema = args.dw_schema
     env = args.env
@@ -72,7 +74,9 @@ if __name__ == "__main__":
         password=redshift_connection["pwd"],
         keepalives_idle=200,
     )
-    redshift_loader = RedshiftLoader(redshift_client, s3_client, dw_info["dw_bucket"])
+    redshift_loader = RedshiftLoader(
+        spectrum_iam_role, redshift_client, s3_client, dw_info["dw_bucket"]
+    )
 
     # load
     redshift_loader.load_table_from_metastore(

@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 DAG_ID = "ebdb"
 FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
 ENV = Variable.get("environment")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
@@ -84,7 +85,7 @@ def load_dw_table_into_redshift_task(local_dag, table_name, schema, env):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-                "parameters": [table_name, schema, env],
+                "parameters": [SPECTRUM_IAM_ROLE, table_name, schema, env],
             }
         },
     )

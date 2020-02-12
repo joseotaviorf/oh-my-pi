@@ -55,12 +55,14 @@ def validate_load(spark_schema, redshift_schema, table_name):
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("spectrum_iam_role")
 parser.add_argument("dw_schema")
 parser.add_argument("table_name")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
+    spectrum_iam_role = args.spectrum_iam_role
     dw_schema = args.dw_schema
     table_name = args.table_name
 
@@ -82,7 +84,9 @@ if __name__ == "__main__":
     )
 
     metastore_service = SparkMetastoreService(SparkClient())
-    redshift_loader = RedshiftLoader(redshift_client, s3_client, dw_info["dw_bucket"])
+    redshift_loader = RedshiftLoader(
+        spectrum_iam_role, redshift_client, s3_client, dw_info["dw_bucket"]
+    )
     redshift_loader.load_table_from_metastore(
         metastore_service=metastore_service,
         source_schema=dw_info["dw_schema_databricks"],

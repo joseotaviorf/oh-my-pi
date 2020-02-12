@@ -16,6 +16,7 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_ID = "datamarts"
 FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
 ENV = Variable.get("environment")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
@@ -106,7 +107,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
-                "parameters": [ENV, DW_SCHEMA, table],
+                "parameters": [ENV, SPECTRUM_IAM_ROLE, DW_SCHEMA, table],
             }
         },
     )

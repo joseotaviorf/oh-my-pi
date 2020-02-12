@@ -28,10 +28,9 @@ class RedshiftLoader:
     MANIFEST_PATH_TEMPLATE = (
         "s3://{}/redshift-load-manifests/{}/{}/year={}/month={}/day={}/manifest.json"
     )
-    # todo: please remove me!!!
-    IAM_ROLE = "arn:aws:iam::632540934959:role/SpectrumAccess"
 
-    def __init__(self, redshift_client, s3_service, dw_bucket):
+    def __init__(self, spectrum_iam_role, redshift_client, s3_service, dw_bucket):
+        self.spectrum_iam_role = spectrum_iam_role
         self.redshift_client = redshift_client
         self.s3_service = s3_service
         self.dw_bucket = dw_bucket
@@ -47,7 +46,7 @@ class RedshiftLoader:
 
     def _create_copy_command(self, schema, table, manifest_path):
         return self.COPY_COMMAND_TEMPLATE.format(
-            schema, table, manifest_path, self.IAM_ROLE
+            schema, table, manifest_path, self.spectrum_iam_role
         )
 
     @logger

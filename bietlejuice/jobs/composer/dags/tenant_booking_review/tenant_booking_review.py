@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "bietlejuice.tenant_booking_review"
 ENV = Variable.get("environment")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -87,7 +88,7 @@ dw_public_to_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-            "parameters": [f"dim_{TABLE_NAME}", "public", ENV],
+            "parameters": [SPECTRUM_IAM_ROLE, f"dim_{TABLE_NAME}", "public", ENV],
         }
     },
 )
