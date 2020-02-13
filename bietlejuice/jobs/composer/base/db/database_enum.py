@@ -21,6 +21,7 @@ class DatabaseEnum:
     ROBIN_HOOD = "ROBIN_HOOD_DB"
     OSCAR = "OSCAR_DB"
     KILL_QUEUE = "KILL_QUEUE_DB"
+    SORTING_HAT = "SORTING_HAT_DB"
 
 
 class DatabaseTypeEnum:
