@@ -46,6 +46,11 @@ class MySqlConsumer(DBConsumer):
             "password": self.conn_config["pwd"],
         }
 
+        if "params" in conn_config:
+            params = [k + "=" + v for k, v in conn_config["params"].items()]
+            params = "?" + "&".join(params)
+            self.spark_common_options["url"] += params
+
     @logger
     def get_table_names_and_sizes(self):
         """
