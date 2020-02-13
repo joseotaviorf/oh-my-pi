@@ -17,8 +17,6 @@ SELECT
     reservation_fee,
     reservation_fee_mod as is_reservation_fee_mod,
     region_id as id_region,
-    owner_id as id_owner,
-    is_valid,
-    is_valid_mod
+    owner_id as id_owner
 FROM
     datalake_kill_queue_raw.house_aud
