@@ -38,6 +38,17 @@ class DBConsumer(ABC):
         pass
 
     @abstractmethod
+    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
+        """
+        Gets incremental data from a table based on a column of type date.
+        :param table_name: Name of the table
+        :param column_name:  Name of the column to be filtered
+        :param execution_date: Value of the column to be filtered
+        :return: A DataFrame with the table data
+        """
+        pass
+
+    @abstractmethod
     def get_data_from_query(self, query, table_name=None):
         """
         Gets the results of a query.

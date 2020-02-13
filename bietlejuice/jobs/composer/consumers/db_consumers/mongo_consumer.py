@@ -108,14 +108,46 @@ class MongoConsumer(DBConsumer):
         :return: A Spark DataFrame with the table data
         OBS: ALL fields are converted to string type
         """
-        documents = self.mongo_client.get_documents(table_name, {})
-        df = self.__convert_bson_documents_to_spark_dataframe(documents)
+        query = {}
+        df = self.get_data_from_query(table_name, query)
         return df
 
-    @logger
-    def get_data_from_table_in_parallel(self, table_name, concurrency):
-        # todo: implement me!
-        raise NotImplementedError()
+    @logger(exclude_return=True)
+    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
+        """
+        Gets incremental data from a collection in a Mongo Database.
+        The method expects a column table that contains a date to make the filter.
+        :param table_name: Name of the table
+        :param column_name: Name of the column to make the filter
+        :param execution_date: Value of the column
+        :type execution_date: date str in format %Y-%m-%d
+        :return: A Spark DataFrame with the table data
+        OBS: ALL fields are converted to string type
+        """
+        start_date = execution_date + "T00:00:00Z"
+        end_date = execution_date + "T23:59:59Z"
+
+        # the query verifies if the value of the column is between start_date and end_date
+        # and handles when the column is a timestamp or/and string.
+        query = {
+            "$or": [
+                {"$and": [{column_name: {"$gte": start_date, "$lte": end_date}}]},
+                {
+                    "$and": [
+                        {
+                            column_name: {
+                                "$gte": {"$date": start_date},
+                                "$lte": {"$date": end_date},
+                            }
+                        }
+                    ]
+                },
+                {column_name: execution_date},
+            ]
+        }
+
+        df = self.get_data_from_query(table_name, query)
+        return df
 
     @logger(exclude_return=True)
     def get_data_from_query(self, table_name, query):

@@ -80,3 +80,8 @@ class DatabricksConsumer(DBConsumer):
         df = self.spark_client.get_records(query)
 
         return df
+
+    @logger
+    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
+        # todo: implement me!
+        raise NotImplementedError()

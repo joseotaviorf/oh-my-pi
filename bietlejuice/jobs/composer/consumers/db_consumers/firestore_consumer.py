@@ -164,3 +164,8 @@ class FirestoreConsumer(DBConsumer):
     def get_table_schema(self, table_name):
         # todo: implement me!
         raise NotImplementedError()
+
+    @logger
+    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
+        # todo: implement me!
+        raise NotImplementedError()

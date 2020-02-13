@@ -205,3 +205,8 @@ class MySqlConsumer(DBConsumer):
             "m=_get_partition_column_from_table, table={}, msg=Partition column "
             "to parallelize the table read was not found.".format(table_name)
         )
+
+    @logger
+    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
+        # todo: implement me!
+        raise NotImplementedError()
