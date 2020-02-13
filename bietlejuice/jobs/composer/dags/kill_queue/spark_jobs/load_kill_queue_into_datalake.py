@@ -17,6 +17,8 @@ JOB_NAME = "load_kill_queue_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+BLOCK_LIST = ["flyway_schema_history"]
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
@@ -44,12 +46,13 @@ if __name__ == "__main__":
     loader = S3Loader(metastore_service)
 
     for table in tables:
-        df = mysql_consumer.get_data_from_table(table.table_name)
-        # the table names in the datalake must be lowercase
-        loader.load_full_table(
-            df=df,
-            database_name=db_info["db_raw_databricks"],
-            table_name=table.table_name.lower(),
-            format=SparkTableStorageFormat.DEFAULT_RAW,
-            database_location=db_info["db_raw_path"],
-        )
+        if table.table_name not in BLOCK_LIST:
+            df = mysql_consumer.get_data_from_table(table.table_name)
+            # the table names in the datalake must be lowercase
+            loader.load_full_table(
+                df=df,
+                database_name=db_info["db_raw_databricks"],
+                table_name=table.table_name.lower(),
+                format=SparkTableStorageFormat.DEFAULT_RAW,
+                database_location=db_info["db_raw_path"],
+            )
