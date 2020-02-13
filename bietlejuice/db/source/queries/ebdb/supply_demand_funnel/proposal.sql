@@ -56,16 +56,16 @@ left join (
       end
     ) as credit_analysis_last_init_date,
     min(
-      if(p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito'), from_unixtime(ure.`timestamp` / 1000), null)
+      if(p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito', 'StandBy'), from_unixtime(ure.`timestamp` / 1000), null)
     ) as credit_analysis_first_end_date,
     max(
-      if(p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito'), from_unixtime(ure.`timestamp` / 1000), null)
+      if(p_aud.statusDocumentacaoInq in ('Aprovado', 'RecusadoCredito', 'StandBy'), from_unixtime(ure.`timestamp` / 1000), null)
     ) as credit_analysis_last_end_date,
     min(
-      if(p_aud.statusDocumentacaoInq in ('AnaliseCredito', 'StandBy'), from_unixtime(ure.`timestamp` / 1000), null)
+      if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)
     ) as tenant_first_doc_complete_date,
     max(
-      if(p_aud.statusDocumentacaoInq in ('AnaliseCredito', 'StandBy'), from_unixtime(ure.`timestamp` / 1000), null)
+      if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)
     ) as tenant_last_doc_complete_date,
 		if(date_format(min(from_unixtime(ure.`timestamp` / 1000)), '%Y-%m-%d %H') != date_format(min(p_aud.dataDocumentosEnviados), '%Y-%m-%d %H'),
 		     max(ure.motivo is null or ure.motivo like '[AUTO] used previous tenant%'), 0) as doc_reused,
