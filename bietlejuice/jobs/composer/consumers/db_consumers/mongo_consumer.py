@@ -112,6 +112,11 @@ class MongoConsumer(DBConsumer):
         df = self.get_data_from_query(table_name, query)
         return df
 
+    @logger
+    def get_data_from_table_in_parallel(self, table_name, concurrency):
+        # todo: implement me!
+        raise NotImplementedError()
+
     @logger(exclude_return=True)
     def get_incremental_data_from_table(self, table_name, column_name, execution_date):
         """
