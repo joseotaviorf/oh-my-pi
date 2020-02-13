@@ -20,6 +20,7 @@ class DatabaseEnum:
     CIDADE_ALERTA = "CIDADE_ALERTA_DB"
     ROBIN_HOOD = "ROBIN_HOOD_DB"
     OSCAR = "OSCAR_DB"
+    KILL_QUEUE = "KILL_QUEUE_DB"
 
 
 class DatabaseTypeEnum:
