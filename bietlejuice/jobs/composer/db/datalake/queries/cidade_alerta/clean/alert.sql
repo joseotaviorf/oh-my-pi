@@ -1,9 +1,11 @@
+-- Some fields are JSON strings. We're using REGEX because it's not possible to use get_json_object because of the special characters.
+
 select
-    _id, 
+    regexp_extract(_id, '(\\w+\\d+)', 1) as _id,    -- format: {"$oid": "5b9ffb4da939ee6a2c873276"}
     boolean(active) as is_active,
     business_context,
     cloudsearch_criteria,
-    created_at,
+    date(created_at) as dt_alert_triggered,
     date,
     days,
     device_id as id_device,
@@ -14,21 +16,21 @@ select
     houses_ids as ids_houses,
     houses_sent, 
     boolean(is_auto_scheduling_possible) as is_auto_scheduling_possible,
-    timestamp(lastActivation) as ts_last_activation,
-    timestamp(last_day_sent) as ts_last_day_sent,
-    last_email_run,
+    cast(regexp_extract(lastActivation, '(\\d{4}-\\d{2}-\\d{2}\\w{1}\\d{2}:\\d{2}:\\d{2})', 0) as timestamp) as ts_last_activation,     -- format {"$date": "2019-05-01T10:00:00Z" }
+    cast(regexp_extract(last_day_sent, '(\\d{4}-\\d{2}-\\d{2}\\w{1}\\d{2}:\\d{2}:\\d{2})', 0) as timestamp) as ts_last_day_sent,        -- format {"$date": "2019-05-01T10:00:00Z" }
+    timestamp(last_email_run) as ts_last_email_run,
     lead_id as id_lead,
     name,
     notifications_sent_agent,
-    profile_id as id_profile,
+    regexp_extract(profile_id, '(\\w+\\d+)', 0) as id_profile,  -- format: {"$oid": "5b9ffb4da939ee6a2c873276"}
     push_user_id as id_push_user,
     quintoandar_id as id_quintoandar,
     results, 
     source,
     type,
-    updated_at,
+    cast(regexp_extract(updated_at, '(\\d+(-\\d+(-\\d+\\w+(:\\d+(:\\d+(.\\w+))))))', 0) as timestamp ) as ts_updated,       -- format {"$date": "2019-05-01T10:00:00Z" }
     user_id as id_user,
     visit_code,
-    timestamp(visit_day_time) as ts_visited_day_time
+    cast(regexp_extract(visit_day_time, '(\\d+(-\\d+(-\\d+\\w+(:\\d+(:\\d+(.\\w+))))))', 0) as timestamp) as ts_visited     -- format {"$date": "2019-05-01T10:00:00Z" }
 from
     datalake_cidade_alerta_raw.alert
