@@ -39,7 +39,10 @@ CUSTOM_LIBRARIES = [
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
+
 
 dag = DAG(
     dag_id="bietlejuice.{}".format(DAG_ID),
@@ -48,8 +51,8 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz),
-    schedule_interval="0 1 * * *",
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     catchup=False,
 )

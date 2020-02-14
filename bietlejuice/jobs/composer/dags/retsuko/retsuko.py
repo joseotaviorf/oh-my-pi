@@ -29,9 +29,9 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 1, 25, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2020, 1, 25, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,

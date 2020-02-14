@@ -13,9 +13,10 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 SOURCE = "firestore"
 DAG_ID = "bietlejuice.{}".format(SOURCE)
 ENV = Variable.get("environment")
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
 
 # s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")

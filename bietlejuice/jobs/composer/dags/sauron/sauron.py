@@ -13,10 +13,10 @@ from bietlejuice.jobs.composer.services.file_service import FileService
 
 DAG_ID = "sauron"
 FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=local_tz)
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
 
 ENV = Variable.get("environment")
 SOURCE = "sauron"

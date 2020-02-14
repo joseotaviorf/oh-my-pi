@@ -17,7 +17,7 @@ from bietlejuice.jobs.composer.dags.bigfone_event import DAG_NAME
 DAG_ID = "bietlejuice.{}".format(DAG_NAME)
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 9, 9, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 
 ENV = Variable.get("environment")
