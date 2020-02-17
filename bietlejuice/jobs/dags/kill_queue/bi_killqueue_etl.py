@@ -1,4 +1,3 @@
-import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from datetime import datetime
 from qa_python_utils import QuintoAndarLogger
@@ -51,17 +50,6 @@ def create_datalake_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_data_and_move_to_raw = BaseDAG.build_python_operator(
-        task_id='extract_data_and_move_to_raw',
-        python_callable=run_factory_method,
-        dag=local_dag,
-        provide_context=False,
-        op_kwargs={
-            'table': kwargs['table'],
-            'method': 'extract_data_and_move_to_raw'
-        }
-    )
-
     move_data_from_raw_to_clean = BaseDAG.build_python_operator(
         task_id='move_data_from_raw_to_clean',
         python_callable=run_factory_method,
@@ -73,10 +61,7 @@ def create_datalake_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    airflow_helpers.chain(
-        extract_data_and_move_to_raw,
-        move_data_from_raw_to_clean
-    )
+    move_data_from_raw_to_clean
 
     return local_dag
 

@@ -16,10 +16,6 @@ class KillQueueReservationAud(KillQueue):
         self.table_name = KillQueueTableEnum.RESERVATION_AUD.value
 
     @logger
-    def extract_data_and_move_to_raw(self):
-        self._extract_data_and_move_to_raw(self.table_name)
-
-    @logger
     def move_data_from_raw_to_clean(self):
         r_cols = OrderedDict([
             ('id', str),
