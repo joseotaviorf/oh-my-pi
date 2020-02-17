@@ -5,6 +5,6 @@ SELECT
     temCaracteristica as has_feature,
     temCaracteristica_MOD as mod_has_feature,
     imovel_id as id_house,
-    amenidades_id as id_amenity
+    instalacao_id as id_amenity
 FROM
     datalake_ebdb_raw.instalacaoinfo_aud
