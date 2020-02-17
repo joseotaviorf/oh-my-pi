@@ -95,6 +95,19 @@ pipeline:
       event: [ push, tag ]
       branch: master
 
+  export-releases-to-s3-new-prod-account:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.data.quintoandar.com.br
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: master
+
   export-releases-to-s3-forno:
     image: plugins/s3
     pull: true
@@ -285,6 +298,16 @@ pipeline:
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py 5a-databricks
+    when:
+      event: push
+      branch: master
+
+  load-spark-jobs-s3-new-prod-account:
+    group: updated_jobs
+    image: python:3.6.7
+    commands:
+      - pip install boto3==1.9.159
+      - python scripts/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
     when:
       event: push
       branch: master
