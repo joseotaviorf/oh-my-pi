@@ -21,7 +21,7 @@ class KillQueueReservationAud(KillQueue):
             ('id', str),
             ('rev', str),
             ('rev_type', str),
-            ('revend', str),
+            ('rev_end', str),
             ('attempt', str),
             ('is_attempt_mod', str),
             ('mundipagg_token', str),
