@@ -1,11 +1,11 @@
 select
     id,
-    parent_payment_request_lot,
-    name,
+    source_id as id_source,
     external_request_id as id_external_request,
+    name,
     payment_method,
-    source_code,
     send_date as dt_sent,
+    date(due_date) as dt_due,
     timestamp(sent_at) as ts_sent,
     timestamp(created_at) as ts_created,
     timestamp(canceled_at) as ts_canceled
