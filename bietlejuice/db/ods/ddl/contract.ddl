@@ -32,6 +32,7 @@ create table if not exists contract (
   cancellation_reason varchar,
   id_proposal bigint,
   id_house bigint,
-  ts_analyst_annulment_input timestamp
+  ts_analyst_annulment_input timestamp,
+  contract_version varchar
 ) with (oids = false)
 ;

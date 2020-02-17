@@ -127,7 +127,8 @@ select
   ccr.cancellation_reason,
   c.proposta_id as id_proposal,
   c.imovel_id as id_house,
-  cad.ts_analyst_annulment_input
+  cad.ts_analyst_annulment_input,
+  regexp_extract(cv.versiondisplaycontract,'^v[^_]+') as contract_version
 from datalake_ebdb_raw_prod.contrato c
 left join contract_cancellation_reasons ccr
   on ccr.id = c.id
@@ -135,4 +136,6 @@ left join datalake_ebdb_raw_prod.contratofull cf
     on cf.id = c.id
 left join contract_analyst_date cad
 	on cad.id = c.id
+left join datalake_ebdb_raw_prod.contractversion cv
+	on c.contractversion_id = cv.id
 ;

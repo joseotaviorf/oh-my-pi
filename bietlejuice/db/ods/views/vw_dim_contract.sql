@@ -96,6 +96,7 @@ select
       else bi.b2b_prime_type
   end as b2b_prime_type,
   c.ts_analyst_annulment_input,
+  c.contract_version as version,
   now() as ts_load
 from contract c
 left join b2b_info bi
