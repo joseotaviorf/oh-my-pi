@@ -1,2 +1,2 @@
 SELECT *
-FROM datalake_raw.killqueue_rent_flow;
+FROM datalake_kill_queue_clean_prod.rent_flow;

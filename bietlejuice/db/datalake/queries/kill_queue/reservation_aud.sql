@@ -1,2 +1,2 @@
 SELECT *
-FROM datalake_raw.killqueue_reservation_aud;
+FROM datalake_kill_queue_clean_prod.reservation_aud;
