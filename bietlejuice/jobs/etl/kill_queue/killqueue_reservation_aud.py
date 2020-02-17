@@ -20,18 +20,20 @@ class KillQueueReservationAud(KillQueue):
         r_cols = OrderedDict([
             ('id', str),
             ('rev', str),
-            ('revtype', str),
+            ('rev_type', str),
             ('revend', str),
             ('attempt', str),
-            ('attempt_mod', str),
+            ('is_attempt_mod', str),
             ('mundipagg_token', str),
-            ('mundipagg_token_mod', str),
+            ('is_mundipagg_token_mod', str),
             ('status', str),
-            ('status_mod', str),
-            ('tenant_id', str),
+            ('is_status_mod', str),
+            ('id_tenant', str),
             ('value', str),
-            ('value_mod', str),
-            ('house_id', str),
+            ('is_value_mod', str),
+            ('id_house', str),
+            ('cancellation_reason', str),
+            ('is_cancellation_reason_mod', str),
         ])
         c_cols = deepcopy(r_cols)
 

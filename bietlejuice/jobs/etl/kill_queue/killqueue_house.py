@@ -19,21 +19,21 @@ class KillQueueHouse(KillQueue):
     def move_data_from_raw_to_clean(self):
         r_cols = OrderedDict([
             ('id', str),
-            ('created_at', str),
-            ('updated_at', str),
+            ('ts_created', str),
+            ('ts_updated', str),
             ('version', str),
-            ('main_id', str),
+            ('id_main', str),
             ('street_address', str),
             ('house_number', str),
             ('complement', str),
             ('city', str),
             ('state', str),
-            ('reservation_allowed', str),
+            ('is_reservation_allowed', str),
             ('rent_price', str),
             ('floor', str),
             ('reservation_fee', str),
-            ('region_id', str),
-            ('owner_id', str)
+            ('id_region', str),
+            ('id_owner', str)
         ])
         c_cols = deepcopy(r_cols)
 

@@ -19,12 +19,12 @@ class KillQueueRentFlow(KillQueue):
     def move_data_from_raw_to_clean(self):
         r_cols = OrderedDict([
             ('id', str),
-            ('created_at', str),
-            ('updated_at', str),
+            ('ts_created', str),
+            ('ts_updated', str),
             ('version', str),
-            ('firestore_id', str),
-            ('house_id', str),
-            ('tenant_id', str),
+            ('id_firestore', str),
+            ('id_house', str),
+            ('id_tenant', str),
             ('status', str),
         ])
         c_cols = deepcopy(r_cols)
