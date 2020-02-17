@@ -1,14 +1,17 @@
 SELECT
-  cast(id as char) as id,
-  cast(created_at as char) as created_at,
-  cast(updated_at as char) as updated_at,
-  cast(version as char) as version,
-  cast(attempt as char) as attempt,
-  cast(rent_flow_id as char) as rent_flow_id,
+  id,
+  cast(date(ts_created) as date) as created_at,
+  cast(date(ts_updated) as date) as updated_at,
+  version,
+  attempt,
+  id_rent_flow as rent_flow_id,
   status,
-  cast(tenant_id as char) as tenant_id,
-  cast(value as char) as value,
-  cast(house_id as char) as house_id,
+  id_tenant as tenant_id,
+  value,
+  id_house as house_id,
   mundipagg_token,
-  cast(coalesce(is_ongoing, 0) as unsigned) as is_ongoing
+  case
+    when coalesce(is_ongoing,false) = TRUE THEN 1
+    ELSE 0
+  end as is_ongoing
 FROM reservation;

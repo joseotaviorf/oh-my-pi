@@ -1,10 +1,10 @@
 SELECT
   id,
-  cast(created_at as char) as created_at,
-  cast(updated_at as char) as updated_at,
+  cast(date(ts_created) as date) as created_at,
+  cast(date(ts_updated) as date) as updated_at,
   version,
-  firestore_id,
-  cast(house_id as char) as house_id,
-  cast(tenant_id as char) as tenant_id,
+  id_firestore,
+  id_house as house_id,
+  id_tenant as tenant_id,
   status
 FROM rent_flow;
