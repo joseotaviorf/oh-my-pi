@@ -64,18 +64,17 @@ class AutodialerETL(object):
             df = self.__get_athena_data(filequery=_file)
             logger.info('m=move_data_to_clean, file={}, msg=Query executed.'.format(dir_files))
 
-            # treat data
-            df = self.__normalize_json_columns(df)
-
-            # save file
             dt = 'dt_extraction={}'.format(
                 dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d'))
 
             file_part = 0
             for df_split in np.array_split(df, 3):
+                df_split = self.__normalize_json_columns(df_split)
                 key = 'clean/autodialer/{0}/{1}/file_{2}.parq'.format(table_name, dt, str(file_part))
+
                 self.athena_client.create_parquet_from_df(key=key, df=df_split)
                 logger.info('m=move_data_to_clean, key={}, msg=File created in s3.'.format(key))
+
                 file_part += 1
 
             self.athena_client.add_partition(
@@ -83,7 +82,8 @@ class AutodialerETL(object):
                 table_name='{}_{}'.format('autodialer', table_name),
                 partition="dt_extraction='{}'".format(
                     dummy_dt if self.execution_date is None else self.execution_date.strftime('%Y-%m-%d')))
-            logger.info('m=move_data_to_clean, msg=Created partition in clean.'.format(key))
+
+            logger.info('m=move_data_to_clean, msg=Created partition in clean.')
 
     # aux methods
     @logger
@@ -129,13 +129,9 @@ class AutodialerETL(object):
         for column in df_treatment:
             try:
                 df_json = df[column].apply(json.loads)
-                df_concat = json_normalize(df_json)
-
-                df_treated = pd.concat([df_treated, df_concat], axis=1)
+                df_treated = pd.concat([df_treated, json_normalize(df_json)], axis=1)
                 df_treated.drop(column, axis=1, inplace=True)
 
-                # Remove df from memory to use it again in the next iteration
-                del df_concat
                 logger.info('m=__normalize_json_columns, column={}, msg=Json normalized'.format(str(column)))
             except Exception:
                 logger.info('m=__normalize_json_columns, column={}, msg=Not Json'.format(str(column)))
@@ -147,6 +143,7 @@ class AutodialerETL(object):
         # final treatment
         # remove duplicated columns
         df_unique_columns = df_treated.T.groupby(level=0).first().T
+        del df_treated
         df_unique_columns.replace('', np.NaN, inplace=True)
 
         return df_unique_columns
