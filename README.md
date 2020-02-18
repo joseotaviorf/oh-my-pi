@@ -40,6 +40,7 @@ Repository with implementation of Airflow DAGs.
 - [Architecture](#architecture)
 - [Operators](#operators)
 - [Monitoring](#monitoring)
+- [Airflow extra features](#airflow-extra-features)
 - [Folders structure](#folders-structure)
 
 ## Project Overview
@@ -240,6 +241,10 @@ Furthermore:
 
 * Webserver, Scheduler and Gunicorn logs are available at [CloudWatch](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logs:prefix=/aws/ec2/airflow)
 * Job logs are available at [S3](https://s3.console.aws.amazon.com/s3/home?region=us-east-1#)
+
+### Airflow extra features
+
+You can enable some extra features like an _Auto Refresh_ button on the DAG's page with [this chrome extension](https://chrome.google.com/webstore/detail/airflow-lifunf/eloabhccocaamibhganmeogabcenidfa)
 
 ## Folders structure
 
