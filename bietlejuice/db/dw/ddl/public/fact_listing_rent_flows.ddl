@@ -10,6 +10,7 @@ create table fact_listing_rent_flows(
   sk_condo bigint,
   sk_rent_flow bigint,
   sk_booking bigint,
+  sk_tenant_booking_review bigint,
   sk_booking_created_date bigint,
   sk_visit_date bigint,
   sk_owner bigint,

@@ -435,6 +435,7 @@ select
 	sk_condo,
 	sk_rent_flow,
 	sk_booking,
+  	sk_booking as sk_tenant_booking_review,
 	sk_booking_created_date,
 	sk_visit_date,
 	sk_owner,
