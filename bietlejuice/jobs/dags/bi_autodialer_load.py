@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -45,7 +45,8 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
         task_id='{}_to_raw'.format(document_type_enum.value),
         python_callable=execute_method,
         op_kwargs={'document_type_enum': document_type_enum,
-                   'method': 'move_data_to_raw'}
+                   'method': 'move_data_to_raw'},
+        execution_timeout=timedelta(hours=6)
     )
 
     clean_task = BaseDAG.build_python_operator(
@@ -53,7 +54,8 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
         task_id='{}_to_clean'.format(document_type_enum.value),
         python_callable=execute_method,
         op_kwargs={'document_type_enum': document_type_enum,
-                   'method': 'move_data_to_clean'}
+                   'method': 'move_data_to_clean'},
+        execution_timeout=timedelta(hours=6)
     )
 
     raw_task >> clean_task
@@ -82,12 +84,14 @@ task_reference_inbound_events = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
     sub_dag_name=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS.value,
-    document_type_enum=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS
+    document_type_enum=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS,
+    execution_timeout=timedelta(hours=6)
 )
 
 task_reference_outbound_events = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
     sub_dag_name=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS.value,
-    document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS
+    document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS,
+    execution_timeout=timedelta(hours=6)
 )
