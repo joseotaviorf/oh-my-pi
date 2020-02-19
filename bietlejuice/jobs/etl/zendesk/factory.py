@@ -1,7 +1,7 @@
 from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskTickets, ZendeskTicketFields, ZendeskGroups, ZendeskUsers, ZendeskGroupMemberships,\
-    ZendeskTicketMetrics, ZendeskFactTickets, ZendeskDimTicket, ZendeskDimUser
+    ZendeskTicketMetrics, ZendeskFactTickets, ZendeskDimTicket, ZendeskDimUser, ZendeskCustomFields
 
 logger = QuintoAndarLogger('ZendeskFactory')
 
@@ -28,6 +28,7 @@ class ZendeskFactory(object):
             ZendeskTableEnum.USERS: ZendeskUsers,
             ZendeskTableEnum.GROUP_MEMBERSHIPS: ZendeskGroupMemberships,
             ZendeskTableEnum.TICKET_METRICS: ZendeskTicketMetrics,
+            ZendeskTableEnum.CUSTOM_FIELDS: ZendeskCustomFields,
             ZendeskTableEnum.FACT_TICKETS: ZendeskFactTickets,
             ZendeskTableEnum.DIM_TICKET: ZendeskDimTicket,
             ZendeskTableEnum.DIM_ZENDESK_USER: ZendeskDimUser,

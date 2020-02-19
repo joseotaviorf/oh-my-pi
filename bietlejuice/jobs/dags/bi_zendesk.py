@@ -71,10 +71,6 @@ def sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    # extract and load data by StitchData
-
-    upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
-
     move_to_clean_task = BaseDAG.build_python_operator(
         task_id='move_to_clean',
         python_callable=exec_factory_method,
@@ -89,11 +85,16 @@ def sub_dag(sub_dag_name, **kwargs):
 
     upsert_clean_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'clean', **kwargs)
 
-    airflow_helpers.chain(
-        upsert_raw_partition_task,
-        move_to_clean_task,
-        upsert_clean_partition_task
-    )
+    if kwargs['class_'] == ZendeskTableEnum.CUSTOM_FIELDS:
+        move_to_clean_task >> upsert_clean_partition_task
+    else:
+        # extract and load data by StitchData
+        upsert_raw_partition_task = upsert_partitioned(sub_dag_name, local_dag, 'raw', **kwargs)
+        airflow_helpers.chain(
+            upsert_raw_partition_task,
+            move_to_clean_task,
+            upsert_clean_partition_task
+        )
 
     return local_dag
 
@@ -178,6 +179,13 @@ ticket_metrics_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.TICKET_METRICS
 )
 
+zendesk_custom_fields_sub_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='custom_fields',
+    sub_dag_func=sub_dag,
+    class_=ZendeskTableEnum.CUSTOM_FIELDS
+)
+
 fact_tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='fact_tickets',
@@ -199,6 +207,7 @@ dim_zendesk_user_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.DIM_ZENDESK_USER
 )
 
+zendesk_custom_fields_sub_dag.set_upstream([tickets_sub_dag, ticket_fields_sub_dag])
 dim_ticket_sub_dag.set_upstream([tickets_sub_dag, groups_sub_dag, ticket_fields_sub_dag])
 fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
 dim_zendesk_user_sub_dag.set_upstream([users_sub_dag])

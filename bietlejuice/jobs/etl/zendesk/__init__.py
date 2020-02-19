@@ -2,6 +2,7 @@ from bietlejuice.jobs.etl.zendesk.ticket_fields import ZendeskTicketFields
 from bietlejuice.jobs.etl.zendesk.tickets import ZendeskTickets
 from bietlejuice.jobs.etl.zendesk.groups import ZendeskGroups
 from bietlejuice.jobs.etl.zendesk.users import ZendeskUsers
+from bietlejuice.jobs.etl.zendesk.custom_fields import ZendeskCustomFields
 from bietlejuice.jobs.etl.zendesk.group_memberships import ZendeskGroupMemberships
 from bietlejuice.jobs.etl.zendesk.ticket_metrics import ZendeskTicketMetrics
 from bietlejuice.jobs.etl.zendesk.fact_tickets import ZendeskFactTickets
