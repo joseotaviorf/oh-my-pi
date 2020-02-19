@@ -826,6 +826,94 @@ info_condo_amenities_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="info_condo_amenities_aud",
 )
 
+agent_data_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="agent_data_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="agent_data_aud",
+)
+
+agent_data_types_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="agent_data_types",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="agent_data_types",
+)
+
+agent_specific_hour_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="agent_specific_hour",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="agent_specific_hour",
+)
+
+agent_weekly_hours_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="agent_weekly_hours_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="agent_weekly_hours_aud",
+)
+
+cep_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="cep",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="cep",
+)
+
+contract_person_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="contract_person",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="contract_person",
+)
+
+house_visit_information_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_visit_information_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_visit_information_aud",
+)
+
+house_visit_status_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="house_visit_status_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="house_visit_status_aud",
+)
+
+image_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="image",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="image",
+)
+
+onboarding_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="onboarding",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="onboarding",
+)
+
+proponent_proposal_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="proponent_proposal",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="proponent_proposal",
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -909,4 +997,15 @@ ebdb_to_datalake_raw_task >> [
     info_amenities_aud_sub_dag_task,
     amenities_sub_dag_task,
     info_condo_amenities_aud_sub_dag_task,
+    agent_data_aud_sub_dag_task,
+    agent_data_types_sub_dag_task,
+    agent_specific_hour_sub_dag_task,
+    agent_weekly_hours_aud_sub_dag_task,
+    cep_sub_dag_task,
+    contract_person_sub_dag_task,
+    house_visit_information_aud_sub_dag_task,
+    house_visit_status_aud_sub_dag_task,
+    image_sub_dag_task,
+    onboarding_sub_dag_task,
+    proponent_proposal_sub_dag_task,
 ] >> terminate_cluster_task
