@@ -24,7 +24,8 @@ def move_ebdb_to_datalake(**kwargs):
     table_names = ebdb_datalake.get_table_names(priority_tables=EBDB_PRIORITY_TABLES)
 
     for table_name in table_names:
-        ebdb_datalake.move_to_datalake(table_name[0])
+        if 'tmp_' not in table_name:
+            ebdb_datalake.move_to_datalake(table_name[0])
 
 
 # def transform_to_clean():
