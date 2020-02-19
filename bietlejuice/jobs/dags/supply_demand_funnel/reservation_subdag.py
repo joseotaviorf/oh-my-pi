@@ -5,6 +5,7 @@ from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.base.enum_db import EnumDB
+from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
 logger = QuintoAndarLogger('ReservationSubDag')
 
@@ -25,6 +26,8 @@ class ReservationSubDag(BaseSubDag):
     @logger
     def build_tasks_with_tests(self):
         reservation_dag = self._build_local_dag()
+
+        (house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task, reservation_aud_to_datalake_task) = self.__build_data_tasks(reservation_dag)
 
         reservation_to_ods_task = BaseDAG.build_python_operator(
             task_id='reservation-to-ods',
@@ -60,6 +63,8 @@ class ReservationSubDag(BaseSubDag):
             }
         )
 
+        reservation_to_ods_task.set_upstream(
+            [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task, reservation_aud_to_datalake_task])
         reservation_to_ods_task.set_downstream(staging_dim_reservation_task)
         staging_dim_reservation_task.set_downstream(tests_tasks)
         dim_reservation_task.set_upstream(tests_tasks)
@@ -110,3 +115,63 @@ class ReservationSubDag(BaseSubDag):
                 }
             ]
         })
+
+    @logger
+    def __build_data_tasks(self, dag):
+        house_to_datalake_task = BaseDAG.build_python_operator(
+            task_id='house-to-datalake',
+            dag=dag,
+            provide_context=False,
+            python_callable=self.run_factory_method,
+            op_kwargs={
+                'table': KillQueueTableEnum.HOUSE,
+                'method': 'move_data_from_raw_to_clean',
+                'bucket': self.bucket
+            }
+        )
+
+        rent_flow_to_datalake_task = BaseDAG.build_python_operator(
+            task_id='rent-flow-to-datalake',
+            dag=dag,
+            provide_context=False,
+            python_callable=self.run_factory_method,
+            op_kwargs={
+                'table': KillQueueTableEnum.RENT_FLOW,
+                'method': 'move_data_from_raw_to_clean',
+                'bucket': self.bucket
+            }
+        )
+
+        reservation_to_datalake_task = BaseDAG.build_python_operator(
+            task_id='reservation-to-datalake',
+            dag=dag,
+            provide_context=False,
+            python_callable=self.run_factory_method,
+            op_kwargs={
+                'table': KillQueueTableEnum.RESERVATION,
+                'method': 'move_data_from_raw_to_clean',
+                'bucket': self.bucket
+            }
+        )
+
+        reservation_aud_to_datalake_task = BaseDAG.build_python_operator(
+            task_id='reservation-aud-to-datalake',
+            dag=dag,
+            provide_context=False,
+            python_callable=self.run_factory_method,
+            op_kwargs={
+                'table': KillQueueTableEnum.RESERVATION_AUD,
+                'method': 'move_data_from_raw_to_clean',
+                'bucket': self.bucket
+            }
+        )
+
+        return (house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task, reservation_aud_to_datalake_task)
+
+    @logger
+    def run_factory_method(self, bucket, table, method):
+        kill_queue_obj = KillQueueFactory.factory(
+            entity=table,
+            s3_bucket=bucket
+        )
+        getattr(kill_queue_obj, method)()

@@ -4,7 +4,7 @@ from qa_python_utils import QuintoAndarLogger
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.dags.kill_queue.reservation_subdag import ReservationSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.reservation_subdag import ReservationSubDag
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
@@ -106,13 +106,13 @@ reservation_aud_to_datalake_task = BaseSubDag.get_sub_dag_operator(
     table=KillQueueTableEnum.RESERVATION_AUD
 )
 
-reservation_subdag = BaseSubDag.get_sub_dag_operator(
+reservation_subdag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='reservation',
     sub_dag_func=reservation_sub_dag
 
 )
 
-reservation_subdag.set_upstream(
+reservation_subdag_task.set_upstream(
     [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task,
      reservation_aud_to_datalake_task])

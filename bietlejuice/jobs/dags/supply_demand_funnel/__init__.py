@@ -16,6 +16,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.partner_subdag import PartnerSub
 from bietlejuice.jobs.dags.supply_demand_funnel.photo_job_subdag import PhotoJobSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.proposal_subdag import ProposalSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.region_subdag import RegionSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.reservation_subdag import ReservationSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.special_condition_subdag import SpecialConditionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag

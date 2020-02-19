@@ -14,6 +14,7 @@ from bietlejuice.jobs.dags import (
 from bietlejuice.jobs.dags.supply_demand_funnel import (
     BookingSubDag,
     ContractSubDag,
+    ReservationSubDag,
     BankSubDag,
     HouseSubDag,
     LeadSubDag,
@@ -225,6 +226,17 @@ def house_sub_dag(sub_dag_name):
     )
 
     return sub_dag.build_house_with_tests()
+
+
+def reservation_sub_dag(sub_dag_name):
+    sub_dag = ReservationSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )
+    return sub_dag.build_tasks_with_tests()
 
 
 def visit_sub_dag(sub_dag_name):
@@ -548,6 +560,10 @@ house_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag, sub_dag_func=house_sub_dag, sub_dag_name="House"
 )
 
+reservation_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag, sub_dag_func=reservation_sub_dag, sub_dag_name="Reservation"
+)
+
 visit_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag, sub_dag_func=visit_sub_dag, sub_dag_name="Visit"
 )
@@ -682,6 +698,7 @@ dw_fact_house_listing_flows.set_upstream(
         lead_dag,
         photo_job_dag,
         region_dag,
+        reservation_dag,
         user_dag,
         house_dag,
         condo_dag,
