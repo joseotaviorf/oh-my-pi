@@ -666,6 +666,7 @@ affiliate_dag.set_upstream([region_dag, user_dag])
 
 fact_listing_rent_flows.set_upstream(
     [
+        reservation_dag,
         booking_dag,
         visit_dag,
         offer_dag,
