@@ -2,7 +2,9 @@ drop table if exists dim_tenant_booking_review;
 create table dim_tenant_booking_review (
     sk_tenant_booking_review bigint primary key,
     id_tenant_booking_review bigint,
-    is_listing_fidelity boolean,
+    review_status varchar,
+    visit_not_happened_reason varchar,
+    is_listing_accurate boolean,
     wrong_listing_info varchar,
     is_offer_intent boolean,
     no_offer_intent_reason varchar,
