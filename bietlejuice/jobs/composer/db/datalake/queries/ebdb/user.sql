@@ -55,6 +55,7 @@ SELECT
     accountKitId AS id_account_kit,
     dadosFotografo_id AS id_photographer,
     dadosVendedor_id AS id_sales_rep,
+    dadosAgente_id AS id_agent_rep,
     dadosAfiliado_id AS id_affiliates,
     contaCorrente_id AS id_account,
     oldPhone AS old_phone,
