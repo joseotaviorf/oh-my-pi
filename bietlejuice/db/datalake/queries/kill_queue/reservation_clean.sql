@@ -8,7 +8,7 @@ SELECT
   r.status,
   id_tenant as tenant_id,
   r.value,
-  id_house as house_id,
+  id_main as house_id,
   r.mundipagg_token,
   cast(r.is_ongoing as integer) as is_ongoing
 FROM datalake_kill_queue_clean_prod.reservation r
