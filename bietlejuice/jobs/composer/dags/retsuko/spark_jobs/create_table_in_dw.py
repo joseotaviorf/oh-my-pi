@@ -30,12 +30,12 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
 
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(db_info["dw_schema_databricks"])
+
     conn_config = {"db": db_info["dw_staging_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, spark_client)
     df = databricks_consumer.get_data_from_table(table_name)
-
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(db_info["dw_schema_databricks"])
 
     loader = S3Loader(spark_metastore_service)
     loader.load_full_table(

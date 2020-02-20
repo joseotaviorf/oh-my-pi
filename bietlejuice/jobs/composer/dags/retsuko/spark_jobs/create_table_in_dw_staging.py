@@ -39,15 +39,15 @@ if __name__ == "__main__":
         QUERIES_RETSUKO_DATALAKE_PATH + "/dw/" + table_name + ".sql"
     )
 
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(dw_info["dw_staging_databricks"])
+
     # conn_config wasn't used, but the class required conn_config to be instantiated
     conn_config = {"db": dw_info["dw_staging_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, spark_client)
     df = databricks_consumer.get_data_from_query(
         query
     )  # does not depend on conn_config
-
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(dw_info["dw_staging_databricks"])
 
     loader = S3Loader(spark_metastore_service)
     loader.load_full_table(
