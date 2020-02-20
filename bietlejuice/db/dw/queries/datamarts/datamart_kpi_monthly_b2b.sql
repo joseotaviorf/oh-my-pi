@@ -267,25 +267,25 @@ select
 	nbk.new_bookers_monthly
 from ongoing_contracts_monthly ocont
 full outer join ongoing_rentals_monthly orent
-  on ocont.month_start = orent.month_start and ocont.sk_region = orent.sk_region
+  on ocont.month_start = orent.month_start and ocont.sk_region = orent.sk_region and ocont.sk_partner = orent.sk_partner
 full outer join new_rentals nrent
-  on ocont.month_start = nrent.rental_month_start and ocont.sk_region = nrent.sk_region
+  on ocont.month_start = nrent.rental_month_start and ocont.sk_region = nrent.sk_region and ocont.sk_partner = nrent.sk_partner
 full outer join new_contracts ncont
-  on ocont.month_start = ncont.contract_month_start and ocont.sk_region = ncont.sk_region
+  on ocont.month_start = ncont.contract_month_start and ocont.sk_region = ncont.sk_region and ocont.sk_partner = ncont.sk_partner
 full outer join re_rentals rr
-  on rr.rental_month_start = ocont.month_start and rr.sk_region = ocont.sk_region
+  on rr.rental_month_start = ocont.month_start and rr.sk_region = ocont.sk_region and rr.sk_partner = orent.sk_partner
 full outer join new_first_listings nfl
-  on ocont.month_start = nfl.first_listing_month_start and ocont.sk_region = nfl.sk_region
+  on ocont.month_start = nfl.first_listing_month_start and ocont.sk_region = nfl.sk_region and ocont.sk_partner = nfl.sk_partner
 full outer join ended_rentals er
-  on ocont.month_start = er.month_date and ocont.sk_region = er.sk_region
+  on ocont.month_start = er.month_date and ocont.sk_region = er.sk_region and ocont.sk_partner = er.sk_partner
 full outer join ended_rentals_confirmed erc
-  on ocont.month_start = erc.month_date and ocont.sk_region = erc.sk_region
+  on ocont.month_start = erc.month_date and ocont.sk_region = erc.sk_region and ocont.sk_partner = erc.sk_partner
 full outer join ongoing_listings_monthly olist
-  on ocont.month_start = olist.month_start and ocont.sk_region = olist.sk_region
+  on ocont.month_start = olist.month_start and ocont.sk_region = olist.sk_region and ocont.sk_partner = olist.sk_partner
 full outer join bookers bk
-  on ocont.month_start = bk.booking_created_month and ocont.sk_region = bk.sk_region
+  on ocont.month_start = bk.booking_created_month and ocont.sk_region = bk.sk_region and ocont.sk_partner = bk.sk_partner
 full outer join new_bookers nbk
-  on ocont.month_start = nbk.first_booking_created_month and ocont.sk_region = nbk.sk_region
+  on ocont.month_start = nbk.first_booking_created_month and ocont.sk_region = nbk.sk_region and ocont.sk_partner = nbk.sk_partner
 )
 select
 	dm.month_date,
