@@ -60,8 +60,15 @@ class DatabricksConsumer(DBConsumer):
 
     @logger
     def get_data_from_table(self, table_name):
-        # todo: implement me!
-        raise NotImplementedError()
+        """
+        Gets all data from table.
+        :param table_name: Name of a table
+        :return: A Spark DataFrame with all the data.
+        """
+        query = f"SELECT * FROM {self.conn_config['db']}.{table_name}"
+        df = self.spark_client.get_records(query)
+
+        return df
 
     @logger
     def get_data_from_table_in_parallel(self, table_name, concurrency):

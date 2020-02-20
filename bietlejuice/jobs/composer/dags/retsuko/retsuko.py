@@ -7,8 +7,13 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
+from airflow.operators.dummy_operator import DummyOperator
 
-from bietlejuice.jobs.composer.dags.retsuko import SOURCE
+from bietlejuice.jobs.composer.dags.retsuko import (
+    SOURCE,
+    DW_SCHEMA,
+    QUERIES_RETSUKO_DATALAKE_PATH,
+)
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
@@ -83,24 +88,66 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
     return sub_dag
 
 
-def build_clean_subdags(prev_task, next_task):
-    # create subdag for each clean table
-    file_list = FileService.list_raw_to_clean_sql_files(SOURCE, "")
+def dw_tasks(sub_dag_name, table_name, slugged_table_name):
 
-    if file_list:
-        for file_name in file_list:
-            file_name = FileService.remove_file_extension(file_name)
-            slugged_table_name = file_name.replace("_", "-")
-            table_sub_dag = BaseSubDAG.get_sub_dag_operator(
-                dag=dag,
-                sub_dag_name=f"load-{slugged_table_name}-to-datalake-clean",
-                sub_dag_func=clean_tasks,
-                table_name=file_name,
-                slugged_table_name=slugged_table_name,
-            )
-            prev_task >> table_sub_dag >> next_task
-    else:
-        prev_task >> next_task
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    create_table_in_dw_staging = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_table_in_dw_staging.py",
+                "parameters": [table_name, ENV],
+            }
+        },
+    )
+
+    create_table_in_dw = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_table_in_dw.py",
+                "parameters": [table_name, ENV],
+            }
+        },
+    )
+
+    copy_table_to_redshift = DummyOperator(
+        dag=sub_dag, task_id=f"copy-{slugged_table_name}-to-redshift"
+    )
+
+    create_table_in_dw_staging >> create_table_in_dw >> copy_table_to_redshift
+
+    return sub_dag
+
+
+def build_subdags(stage):
+    # create subdag for each table
+    file_list = FileService.list_files(f"{QUERIES_RETSUKO_DATALAKE_PATH}/{stage}")
+    subdags = {}
+
+    for file_name in file_list:
+        file_name = FileService.remove_file_extension(file_name)
+        slugged_table_name = file_name.replace("_", "-")
+        table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+            dag=dag,
+            sub_dag_name=f"load-{slugged_table_name}-to-{stage}",
+            sub_dag_func=eval(f"{stage}_tasks"),
+            table_name=file_name,
+            slugged_table_name=slugged_table_name,
+        )
+        subdags[file_name] = table_sub_dag
+
+    # subdags is a dict where the keys are table or file names
+    # and the values are corresponding subdag objects
+    return subdags
 
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -121,12 +168,27 @@ retsuko_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_cluster_task >> retsuko_to_datalake_raw_task
+clean_sub_dags = build_subdags("clean")
+dw_sub_dags = build_subdags("dw")
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-build_clean_subdags(
-    prev_task=retsuko_to_datalake_raw_task, next_task=terminate_cluster_task
-)
+create_cluster_task >> retsuko_to_datalake_raw_task
+retsuko_to_datalake_raw_task >> list(clean_sub_dags.values())
+
+# remove the dict the element {"invoice": invoice instance sub dag} and return the value
+# because we don't want to connect that subdag with the terminate_cluster task
+clean_sub_dags.pop("invoice") >> [
+    dw_sub_dags["dim_invoice"],
+    dw_sub_dags["dim_invoice_entry"],
+]
+# the same for the account and entry sub dags
+[clean_sub_dags.pop("account"), clean_sub_dags.pop("entry")] >> dw_sub_dags[
+    "dim_invoice_entry"
+]
+
+# look out! the clean sub dags no longer have the dependency instances
+list(clean_sub_dags.values()) >> terminate_cluster_task
+list(dw_sub_dags.values()) >> terminate_cluster_task

@@ -59,8 +59,10 @@ class TestDatalakeMetastoreService:
         # assert
         expected = {
             'dw_bucket': 'dw.s3.forno.data.quintoandar.com.br',
+            'dw_staging_databricks': 'dw__my_schema__staging',
             'dw_schema_databricks': 'dw__my_schema_',
-            'dw_schema_path': 's3://dw.s3.forno.data.quintoandar.com.br/_my_schema_/'
+            'dw_staging_path': 's3://dw.s3.forno.data.quintoandar.com.br/staging/_my_schema_/',
+            'dw_schema_path': 's3://dw.s3.forno.data.quintoandar.com.br/_my_schema_/',
         }
         assert actual_dw_info_dict == expected
 
@@ -76,6 +78,8 @@ class TestDatalakeMetastoreService:
         expected = {
             'dw_bucket': '5a-dw-prod',
             'dw_schema_databricks': 'dw__my_schema_',
-            'dw_schema_path': 's3://5a-dw-prod/_my_schema_/'
+            'dw_staging_databricks': 'dw__my_schema__staging',
+            'dw_staging_path': 's3://5a-dw-prod/staging/_my_schema_/',
+            'dw_schema_path': 's3://5a-dw-prod/_my_schema_/',
         }
         assert actual_dw_info_dict == expected

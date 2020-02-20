@@ -47,6 +47,21 @@ class FileService:
 
     @staticmethod
     @logger
+    def list_files(path):
+        """
+        Return the files that are inside the path
+        :param path: files path
+        :return: files list
+        """
+        if not isdir(path):
+            raise RuntimeError(
+                f"m=list_files path={path}, msg=Given schema does not have a dir"
+            )
+
+        return listdir(path)
+
+    @staticmethod
+    @logger
     def list_raw_to_clean_sql_files(source, schema):
         """
         Return the SQL files used to move table from raw to clean for given schema
@@ -56,13 +71,7 @@ class FileService:
         """
         raw_to_clean_path = f"{QUERIES_DATALAKE_PATH}{source}/clean"
         schema_path = f"{raw_to_clean_path}/{schema}"
-        if not isdir(schema_path):
-            raise RuntimeError(
-                f"m=list_raw_to_clean_sql_files path={raw_to_clean_path}, "
-                f"schema={schema}, msg=Given schema does not have a dir"
-            )
-
-        return listdir(schema_path)
+        return FileService.list_files(schema_path)
 
     @staticmethod
     @logger
