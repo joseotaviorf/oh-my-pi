@@ -1,7 +1,7 @@
 with tickets_filter as (
 	select distinct * from datalake_clean.zendesk_tickets t
 	where (t.ticket_via<>'api' or (t.ticket_via='api' and t.tags not like '%hsm%'))
-          and dt_extracted = '{execution_date}'
+        and dt_extracted = '{execution_date}'
 ),
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
@@ -19,8 +19,9 @@ parse_fields as (
         on tf.id_ticket=l.id_ticket
     cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
 )
-select f.id_ticket,
-    map_agg(tf.raw_title, f.value) as custom_fields
+select
+    f.id_ticket,
+    CAST(map_agg(f.raw_title, f.value) AS json) as custom_fields
 from parse_fields f
 inner join last_updated_ticket_fields l
 on l.id_ticket_fields = f.id_field
