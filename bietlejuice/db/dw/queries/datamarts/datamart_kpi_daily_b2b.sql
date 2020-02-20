@@ -296,25 +296,25 @@ select
 	nbk.new_bookers_daily
 from ongoing_contracts_daily ocont
 full outer join ongoing_rentals_daily orent
-  on ocont.date = orent.date and ocont.sk_region = orent.sk_region
+  on ocont.date = orent.date and ocont.sk_region = orent.sk_region and ocont.sk_partner = orent.sk_partner
 full outer join new_rentals nrent
-  on ocont.date = nrent.rental_date and ocont.sk_region = nrent.sk_region
+  on ocont.date = nrent.rental_date and ocont.sk_region = nrent.sk_region and ocont.sk_partner = nrent.sk_partner
 full outer join new_contracts ncont
-  on ocont.date = ncont.contract_signed_date and ocont.sk_region = ncont.sk_region
+  on ocont.date = ncont.contract_signed_date and ocont.sk_region = ncont.sk_region and ocont.sk_partner = ncont.sk_partner
 full outer join new_first_listings nfl
-  on ocont.date = nfl.first_listing_date and ocont.sk_region = nfl.sk_region
+  on ocont.date = nfl.first_listing_date and ocont.sk_region = nfl.sk_region and ocont.sk_partner = nfl.sk_partner
 full outer join re_rentals rr
-  on ocont.date = rr.rental_date and ocont.sk_region = rr.sk_region
+  on ocont.date = rr.rental_date and ocont.sk_region = rr.sk_region and ocont.sk_partner = orent.sk_partner
 full outer join ended_rentals er
-  on ocont.date = er.date_date and ocont.sk_region = er.sk_region
+  on ocont.date = er.date_date and ocont.sk_region = er.sk_region and ocont.sk_partner = er.sk_partner
 full outer join ended_rentals_confirmed erc
-  on ocont.date = erc.date_date and ocont.sk_region = erc.sk_region
+  on ocont.date = erc.date_date and ocont.sk_region = erc.sk_region and ocont.sk_partner = erc.sk_partner
 full outer join ongoing_listings_daily olist
-  on ocont.date = olist.date and ocont.sk_region = olist.sk_region
+  on ocont.date = olist.date and ocont.sk_region = olist.sk_region and ocont.sk_partner = olist.sk_partner
 full outer join bookers bk
-  on ocont.date = bk.booking_created_date and ocont.sk_region = bk.sk_region
+  on ocont.date = bk.booking_created_date and ocont.sk_region = bk.sk_region and ocont.sk_partner = bk.sk_partner
 full outer join new_bookers nbk
-  on ocont.date = nbk.first_booking_created_date and ocont.sk_region = nbk.sk_region
+  on ocont.date = nbk.first_booking_created_date and ocont.sk_region = nbk.sk_region and ocont.sk_partner = nbk.sk_partner
 )
 select
 	dm.date_date,
