@@ -155,6 +155,7 @@ class TwitterCampaigns(Marketing):
             ('charge_by', str),
             ('include_sentiment', str),
             ('lookalike_expansion', str),
+            ('audience_expansion', str),
             ('objective', str),
             ('optimization', str),
             ('placements', str),
@@ -423,7 +424,7 @@ class TwitterCampaigns(Marketing):
                         'charge_by': line_item.charge_by,
                         'entity_status': line_item.entity_status,
                         'include_sentiment': line_item.include_sentiment,
-                        'lookalike_expansion': line_item.lookalike_expansion,
+                        'audience_expansion': line_item.audience_expansion,
                         'objective': line_item.objective,
                         'optimization': line_item.optimization,
                         'placements': line_item.placements,
@@ -592,16 +593,23 @@ class TwitterCampaigns(Marketing):
                 **kwargs)
 
             job_1_result, job_2_result = self._fetch_jobs_result(account,
-                                                                 queued_job_1['id'],
-                                                                 queued_job_2['id'])
+                                                                 queued_job_1.id,
+                                                                 queued_job_2.id)
 
-            all_on_twitter_stats = \
-                PromotedTweet.async_stats_job_data(account, job_1_result['url'])
-            publisher_network_stats = \
-                PromotedTweet.async_stats_job_data(account, job_2_result['url'])
+            all_on_twitter_data = []
+            for result in job_1_result:
+                all_on_twitter_stats = \
+                    PromotedTweet.async_stats_job_data(account, result.url)
+                all_on_twitter_data += all_on_twitter_stats['data']
 
-            prom_tweets_list += self._merge_placements_stats(all_on_twitter_stats,
-                                                             publisher_network_stats)
+            publisher_network_data = []
+            for result in job_2_result:
+                publisher_network_stats = \
+                    PromotedTweet.async_stats_job_data(account, result.url)
+                publisher_network_data += publisher_network_stats['data']
+
+            prom_tweets_list += self._merge_placements_stats(all_on_twitter_data,
+                                                             publisher_network_data)
 
             logger.info('m=_fetch_and_save_promoted_tweets_stats, msg=Now parsing and '
                         'saving data, ads_stats_found={}'.format(len(prom_tweets_list)))
@@ -610,8 +618,15 @@ class TwitterCampaigns(Marketing):
                          prom_tweets_list)
 
     @staticmethod
-    def _job_has_finished(job_result):
-        return 'url' in job_result and job_result['url'] is not None
+    def _job_has_finished(job_results):
+        if not job_results:
+            return False
+
+        for result in job_results:
+            if result.status != "SUCCESS":
+                return False
+
+        return True
 
     @logger
     def _fetch_jobs_result(self, account, job_1_id, job_2_id):
@@ -632,8 +647,8 @@ class TwitterCampaigns(Marketing):
             # Twitter API requires some time for the job to complete
             time.sleep(self._JOB_WAIT_SECONDS)
 
-            job_1_result = Campaign.async_stats_job_result(account, job_1_id)
-            job_2_result = Campaign.async_stats_job_result(account, job_2_id)
+            job_1_result = Campaign.async_stats_job_result(account, job_ids=job_1_id)
+            job_2_result = Campaign.async_stats_job_result(account, job_ids=job_2_id)
 
             if self._job_has_finished(job_1_result) and self._job_has_finished(
                     job_2_result):
@@ -697,8 +712,8 @@ class TwitterCampaigns(Marketing):
 
         return plat_twt
 
-    @logger(exclude=['all_on_twitter_stats', 'publisher_network_stats'])
-    def _merge_placements_stats(self, all_on_twitter_stats, publisher_network_stats):
+    @logger(exclude=['all_on_twitter_data', 'publisher_network_data'])
+    def _merge_placements_stats(self, all_on_twitter_data, publisher_network_data):
         """
         Extract platform(Ios, Android, Web) stats and merge the two placements stats
         for each platform using tweet and platform ids
@@ -708,7 +723,7 @@ class TwitterCampaigns(Marketing):
 
         all_promoted_tweets_stats = dict()
 
-        for aot_prom_tweet in all_on_twitter_stats['data']:
+        for aot_prom_tweet in all_on_twitter_data:
             prom_twt_id = aot_prom_tweet['id']
 
             # id_data contains one object with stats by platform
@@ -722,7 +737,7 @@ class TwitterCampaigns(Marketing):
                 all_promoted_tweets_stats = self._add_platform_tweet_to_list(
                     all_promoted_tweets_stats, prom_twt_id, platform_id, plat_twt)
 
-        for pn_prom_tweet in publisher_network_stats['data']:
+        for pn_prom_tweet in publisher_network_data:
             prom_twt_id = pn_prom_tweet['id']
 
             for plat_stats in pn_prom_tweet['id_data']:

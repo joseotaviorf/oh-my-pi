@@ -19,6 +19,7 @@ SELECT
     charge_by,
     include_sentiment,
     lookalike_expansion,
+    audience_expansion,
     objective,
     optimization,
     placements,

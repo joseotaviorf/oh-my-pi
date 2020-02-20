@@ -163,6 +163,7 @@ class TestTwitterCampaigns(object):
             ('charge_by', str),
             ('include_sentiment', str),
             ('lookalike_expansion', str),
+            ('audience_expansion', str),
             ('objective', str),
             ('optimization', str),
             ('placements', str),
@@ -522,7 +523,7 @@ class TestTwitterCampaigns(object):
         mock_line_item.charge_by = '15'
         mock_line_item.entity_status = '16'
         mock_line_item.include_sentiment = '17'
-        mock_line_item.lookalike_expansion = '18'
+        mock_line_item.audience_expansion = '18'
         mock_line_item.objective = '19'
         mock_line_item.optimization = '20'
         mock_line_item.placements = '21'
@@ -565,7 +566,7 @@ class TestTwitterCampaigns(object):
             'charge_by': '15',
             'entity_status': '16',
             'include_sentiment': '17',
-            'lookalike_expansion': '18',
+            'audience_expansion': '18',
             'objective': '19',
             'optimization': '20',
             'placements': '21',
@@ -760,14 +761,14 @@ class TestTwitterCampaigns(object):
             [{'id': 'aaa'}, {'id': 'bbb'}, {'id': 'ccc'}])
 
     @mock.patch.object(Campaign, 'async_stats_job_result')
-    def test_fetch_jobs_result_with_api_fail(self, mock__async_stats_job_result,
+    @mock.patch.object(TwitterCampaigns, '_job_has_finished', return_value=False)
+    def test_fetch_jobs_result_with_api_fail(self, mock__job_has_finished, mock__async_stats_job_result,
                                              twitter_campaigns):
         # arrange
         twitter_campaigns._JOB_WAIT_SECONDS = 0.1
         twitter_campaigns._JOB_STATUS_MAX_TRIES = 2
 
-        jobs_result = {'url': 'lorem.com'}
-        mock__async_stats_job_result.return_value = {}
+        mock__async_stats_job_result.return_value = mock.ANY
 
         # assert
         with raises(RuntimeError):
@@ -775,10 +776,11 @@ class TestTwitterCampaigns(object):
             twitter_campaigns._fetch_jobs_result(Mock(), 'job_1_id', 'job_2_id')
 
     @mock.patch.object(Campaign, 'async_stats_job_result')
-    def test_fetch_jobs_result(self, mock__async_stats_job_result, twitter_campaigns):
+    @mock.patch.object(TwitterCampaigns, '_job_has_finished', return_value=True)
+    def test_fetch_jobs_result(self, mock__job_has_finished, mock__async_stats_job_result, twitter_campaigns):
         # arrange
         twitter_campaigns._JOB_WAIT_SECONDS = 0.1
-        jobs_result = {'url': 'lorem.com'}
+        jobs_result = Mock()
         mock__async_stats_job_result.return_value = jobs_result
 
         # act
@@ -847,7 +849,13 @@ class TestTwitterCampaigns(object):
         account = MagicMock()
         account.id = 'ab123'
         prom_tweets_ids = ['aaa1']
-        mock__fetch_jobs_result.return_value = {'url': None}, {'url': None}
+
+        result = Mock()
+        result.url = 'aaaaa'
+        job_1_result = [result]
+        job_2_result = [result]
+        mock__fetch_jobs_result.return_value = job_1_result, job_2_result
+
         prom_tweets_list = [Mock(), Mock(), Mock()]
         mock__merge_placements_stats.return_value = prom_tweets_list
 
@@ -918,8 +926,8 @@ class TestTwitterCampaigns(object):
                 }
             }]
         }
-        all_on_twitter_stats = {'data': [twt_stats_1]}
-        publisher_network_stats = {'data': [twt_stats_2]}
+        all_on_twitter_stats = [twt_stats_1]
+        publisher_network_stats = [twt_stats_2]
 
         # act
         twts_list = twitter_campaigns._merge_placements_stats(all_on_twitter_stats,
@@ -1078,3 +1086,45 @@ class TestTwitterCampaigns(object):
 
         # assert
         mock__load_to_prod.assert_called_once_with(table_name)
+
+    def test_job_has_finished_none_object(self, twitter_campaigns):
+        # arrange
+        job_result = None
+
+        # act
+        success = twitter_campaigns._job_has_finished(job_result)
+
+        # assert
+        assert not success
+
+    def test_job_has_finished_false(self, twitter_campaigns):
+        # arrange
+        result_1 = Mock()
+        result_2 = Mock()
+
+        result_1.status = "PROCESSING"
+        result_2.status = "SUCCESS"
+
+        job_result = [result_1, result_2]
+
+        # act
+        success = twitter_campaigns._job_has_finished(job_result)
+
+        # assert
+        assert not success
+
+    def test_job_has_finished_true(self, twitter_campaigns):
+        # arrange
+        result_1 = Mock()
+        result_2 = Mock()
+
+        result_1.status = "SUCCESS"
+        result_2.status = "SUCCESS"
+
+        job_result = [result_1, result_2]
+
+        # act
+        success = twitter_campaigns._job_has_finished(job_result)
+
+        # assert
+        assert success

@@ -21,6 +21,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS datalake_clean.marketing_twitter_ad_groups(
   charge_by string,
   include_sentiment string,
   lookalike_expansion string,
+  audience_expansion string,
   objective string,
   optimization string,
   placements string,
