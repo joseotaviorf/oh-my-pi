@@ -21,7 +21,7 @@ parse_fields as (
 )
 select
     f.id_ticket,
-    CAST(map_agg(tf.raw_title, f.value) AS json) as custom_fields
+    map_agg(tf.raw_title, f.value) as custom_fields
 from parse_fields f
 inner join last_updated_ticket_fields l
 on l.id_ticket_fields = f.id_field
