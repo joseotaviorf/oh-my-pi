@@ -699,7 +699,6 @@ dw_fact_house_listing_flows.set_upstream(
         lead_dag,
         photo_job_dag,
         region_dag,
-        reservation_dag,
         user_dag,
         house_dag,
         condo_dag,

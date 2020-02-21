@@ -3,8 +3,8 @@ from qa_python_utils import QuintoAndarLogger
 import bietlejuice.jobs.base.new_base_etl as utils
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.base.enum_db import EnumDB
+# from bietlejuice.jobs.base.base_test import BaseTest
+# from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.etl.kill_queue import KillQueueFactory, KillQueueTableEnum
 
 logger = QuintoAndarLogger('ReservationSubDag')
@@ -49,9 +49,9 @@ class ReservationSubDag(BaseSubDag):
         )
 
         # TODO refactor DimSubdag to put this class to inherit from it and not include these tests here
-        tests_tasks = self.create_tests_tasks(
-            dag=reservation_dag,
-        )
+        # tests_tasks = self.create_tests_tasks(
+        #     dag=reservation_dag,
+        # )
 
         dim_reservation_task = BaseDAG.build_python_operator(
             task_id='dw-dim-reservation',
@@ -66,55 +66,56 @@ class ReservationSubDag(BaseSubDag):
         reservation_to_ods_task.set_upstream(
             [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task, reservation_aud_to_datalake_task])
         reservation_to_ods_task.set_downstream(staging_dim_reservation_task)
-        staging_dim_reservation_task.set_downstream(tests_tasks)
-        dim_reservation_task.set_upstream(tests_tasks)
+        staging_dim_reservation_task >> dim_reservation_task
+        # staging_dim_reservation_task.set_downstream(tests_tasks)
+        # dim_reservation_task.set_upstream(tests_tasks)
 
         return reservation_dag
 
-    @logger
-    def create_tests_tasks(self, dag):
-        return self._build_tests_tasks(
-            dag=dag,
-            tests=[
-                ('duplicates_dim_{}'.format(self.ods_stg_table_name), self.__test_duplicates),
-                ('emptiness_dim_{}'.format(self.ods_stg_table_name), self.__test_emptiness),
-                ('counts_dim_{}'.format(self.ods_stg_table_name),
-                 self.__test_counts_from_raw_query)
-            ]
-        )
+    # @logger
+    # def create_tests_tasks(self, dag):
+    #     return self._build_tests_tasks(
+    #         dag=dag,
+    #         tests=[
+    #             ('duplicates_dim_{}'.format(self.ods_stg_table_name), self.__test_duplicates),
+    #             ('emptiness_dim_{}'.format(self.ods_stg_table_name), self.__test_emptiness),
+    #             ('counts_dim_{}'.format(self.ods_stg_table_name),
+    #              self.__test_counts_from_raw_query)
+    #         ]
+    #     )
 
-    def __test_duplicates(self):
-        BaseTest.check_for_duplicates(
-            schema='staging',
-            table='dim_{}'.format(self.ods_stg_table_name),
-            key='sk_{}'.format(self.ods_stg_table_name),
-            enum_db=EnumDB.BI_ODS
-        )
+    # def __test_duplicates(self):
+    #     BaseTest.check_for_duplicates(
+    #         schema='staging',
+    #         table='dim_{}'.format(self.ods_stg_table_name),
+    #         key='sk_{}'.format(self.ods_stg_table_name),
+    #         enum_db=EnumDB.BI_ODS
+    #     )
 
-    def __test_emptiness(self):
-        BaseTest.check_for_emptiness(
-            schema='staging',
-            table='dim_{}'.format(self.ods_stg_table_name),
-            enum_db=EnumDB.BI_ODS
-        )
+    # def __test_emptiness(self):
+    #     BaseTest.check_for_emptiness(
+    #         schema='staging',
+    #         table='dim_{}'.format(self.ods_stg_table_name),
+    #         enum_db=EnumDB.BI_ODS
+    #     )
 
-    def __test_counts_from_raw_query(self):
-        BaseTest.are_counts_equal({
-            'acceptable_diff': .5,
-            'sources': [
-                {
-                    'schema': 'staging',
-                    'table_name': 'dim_{}'.format(self.ods_stg_table_name),
-                    'enum_db': EnumDB.BI_ODS
-                },
-                {
-                    'schema': 'killqueue',
-                    'table_name': self.table_name,
-                    'enum_db': EnumDB.QuintoAndar_killqueue,
-                    'encoding': 'LATIN1'
-                }
-            ]
-        })
+    # def __test_counts_from_raw_query(self):
+    #     BaseTest.are_counts_equal({
+    #         'acceptable_diff': .5,
+    #         'sources': [
+    #             {
+    #                 'schema': 'staging',
+    #                 'table_name': 'dim_{}'.format(self.ods_stg_table_name),
+    #                 'enum_db': EnumDB.BI_ODS
+    #             },
+    #             {
+    #                 'schema': 'killqueue',
+    #                 'table_name': self.table_name,
+    #                 'enum_db': EnumDB.QuintoAndar_killqueue,
+    #                 'encoding': 'LATIN1'
+    #             }
+    #         ]
+    #     })
 
     @logger
     def __build_data_tasks(self, dag):
