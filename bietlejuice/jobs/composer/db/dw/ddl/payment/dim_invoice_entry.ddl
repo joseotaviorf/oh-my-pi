@@ -1,0 +1,11 @@
+drop table if exists payment.dim_invoice_entry;
+create table if not exists payment.dim_invoice_entry (
+    sk_invoice_entry bigint primary key,
+    entry_type varchar(80),
+    from_account_type varchar(50),
+    to_account_type varchar(50),
+    accounting_account varchar(30),
+    description varchar(200),
+    accrual_year_month int,
+    ts_load timestamp
+)

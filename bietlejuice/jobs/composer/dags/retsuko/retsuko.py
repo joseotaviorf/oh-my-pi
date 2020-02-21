@@ -7,7 +7,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-from airflow.operators.dummy_operator import DummyOperator
 
 from bietlejuice.jobs.composer.dags.retsuko import (
     SOURCE,
@@ -19,6 +18,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
@@ -119,11 +119,18 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         },
     )
 
-    copy_table_to_redshift = DummyOperator(
-        dag=sub_dag, task_id=f"copy-{slugged_table_name}-to-redshift"
+    load_dw_table_into_redshift = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-redshift",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
+                "parameters": [table_name, ENV, SPECTRUM_IAM_ROLE],
+            }
+        },
     )
 
-    create_table_in_dw_staging >> create_table_in_dw >> copy_table_to_redshift
+    create_table_in_dw_staging >> create_table_in_dw >> load_dw_table_into_redshift
 
     return sub_dag
 

@@ -53,12 +53,12 @@ class S3Service:
             return [
                 (path_prefix + obj.key, obj.size)
                 for obj in self.s3_resource.Bucket(bucket_name).objects.filter(
-                    Prefix=objects_filter
+                    Prefix=objects_filter + "/"
                 )
             ]
         return [
             path_prefix + obj.key
             for obj in self.s3_resource.Bucket(bucket_name).objects.filter(
-                Prefix=objects_filter
+                Prefix=objects_filter + "/"
             )
         ]
