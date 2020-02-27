@@ -472,9 +472,12 @@ class BaseETL(object):
                         EMPTYASNULL
                         DELIMITER '{}' FORMAT CSV IGNOREHEADER 1; commit;""".format(
                     table_name, file, credentials_str, delimiter)
-                con.cursor().execute(sql)
+
+                print 'm=bulk_insert_from_s3_to_dw, msg=Executing SQL'
+                result = con.cursor().execute(sql)
+                print 'm=bulk_insert_from_s3_to_dw, copy_result={}, msg=Success coping table'.format(result)
             else:
-                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from stdin to Redshift'.format(
+                print 'm=bulk_insert_from_s3_to_dw, table_name={}, file={}, msg=copying file from stdin to ODS'.format(
                     table_name, file)
                 sql = """COPY {} FROM stdin DELIMITER '{}' CSV header;""".format(table_name, delimiter)
                 con.cursor().copy_expert(sql, f_cursor)
@@ -482,6 +485,8 @@ class BaseETL(object):
             if commit:
                 print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
+        except Exception as e:
+            print 'm=bulk_insert_from_s3_to_dw, e={}, msg=An exception occurred'.format(e)
         finally:
             if not conn:
                 print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
