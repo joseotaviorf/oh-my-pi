@@ -28,10 +28,7 @@ select
 	ft.minutes_full_resolution_time_business,
     case when cast(ft.minutes_first_reply_time_business as float)/60.0 <= 6 then 1 else 0 end as sla_achieved_6biz_hr,
     cast(ft.minutes_requester_wait_time_business as float)/60.0 as hours_requester_wait_time_business,
-    case
-    	when ft.replies > 1 then (cast(ft.minutes_requester_wait_time_business as float)/60.0)/ft.replies 
-    	when ft.replies = 0 then cast(ft.minutes_requester_wait_time_business as float)
-    end as rwt_per_reply,
+    case when ft.replies > 0 then ((1.0*ft.minutes_requester_wait_time_business/60)/ft.replies) end as requester_wait_time_per_reply,
     case 
 	    when dt.tags ilike '%resolve_ticket_acompanhamento%' or
         	dt.tags ilike '%fechado_automaticamente_noreply%' or
