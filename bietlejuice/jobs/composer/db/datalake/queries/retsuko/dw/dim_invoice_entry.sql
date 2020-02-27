@@ -1,6 +1,13 @@
+with entry_type as (
+    select 
+        id_external, 
+        replace(regexp_extract(bill_item, 'entry.bill-item/(.+)', 1), '-', ' ') as entry_type
+    from
+        datalake_retsuko_clean.entry
+)
 select 
     e.id_external as sk_invoice_entry,
-    replace(substring(e.bill_item, 17), '-', ' ') as entry_type,
+    et.entry_type,
     replace(af.type, '-', ' ') as from_account_type,
     replace(at.type, '-', ' ') as to_account_type,
     case 
@@ -43,15 +50,15 @@ select
 		when e.bill_item in ('entry.bill-item/rental',
                              'entry.bill-item/igpm-rental') then 'rental'
 		when e.bill_item = 'entry.bill-item/reservation' then 'reservation'
-		else replace(substring(e.bill_item, 17), '-', ' ')
+		else et.entry_type
     end as accounting_account,
     e.description,
     e.accrual_year_month,
     now() as ts_load
 from datalake_retsuko_clean.entry e
-left join datalake_retsuko_clean.invoice i
-	on e.id_invoice = i.id
+inner join entry_type et
+    on e.id_external=et.id_external
 inner join datalake_retsuko_clean.account af 
-	on e.id_from_account = af.id
+    on e.id_from_account = af.id
 inner join datalake_retsuko_clean.account at 
-	on e.id_to_account = at.id
+    on e.id_to_account = at.id

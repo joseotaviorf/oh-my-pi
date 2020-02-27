@@ -187,10 +187,7 @@ retsuko_to_datalake_raw_task >> list(clean_sub_dags.values())
 
 # remove the dict the element {"invoice": invoice instance sub dag} and return the value
 # because we don't want to connect that subdag with the terminate_cluster task
-clean_sub_dags.pop("invoice") >> [
-    dw_sub_dags["dim_invoice"],
-    dw_sub_dags["dim_invoice_entry"],
-]
+clean_sub_dags.pop("invoice") >> dw_sub_dags["dim_invoice"]
 # the same for the account and entry sub dags
 [clean_sub_dags.pop("account"), clean_sub_dags.pop("entry")] >> dw_sub_dags[
     "dim_invoice_entry"
